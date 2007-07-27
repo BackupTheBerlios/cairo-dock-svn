@@ -17,7 +17,7 @@ static void _cairo_dock_activate_one_element (GtkCellRendererToggle * cell_rende
 
 static gboolean _cairo_dock_increase_order (GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter, int *pOrder)
 {
-	//g_print ("%s (%d)\n", __func__, *pOrder);
+	g_print ("%s (%d)\n", __func__, *pOrder);
 	int iMyOrder;
 	gtk_tree_model_get (model, iter, 2, &iMyOrder, -1);
 	
@@ -31,7 +31,7 @@ static gboolean _cairo_dock_increase_order (GtkTreeModel * model, GtkTreePath * 
 
 static gboolean _cairo_dock_decrease_order (GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter, int *pOrder)
 {
-	//g_print ("%s (%d)\n", __func__, *pOrder);
+	g_print ("%s (%d)\n", __func__, *pOrder);
 	int iMyOrder;
 	gtk_tree_model_get (model, iter, 2, &iMyOrder, -1);
 
@@ -45,7 +45,7 @@ static gboolean _cairo_dock_decrease_order (GtkTreeModel * model, GtkTreePath * 
 
 static gboolean _cairo_dock_decrease_order_if_greater (GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter, int *pOrder)
 {
-	//g_print ("%s (%d)\n", __func__, *pOrder);
+	g_print ("%s (%d)\n", __func__, *pOrder);
 	int iMyOrder;
 	gtk_tree_model_get (model, iter, 2, &iMyOrder, -1);
 
@@ -59,12 +59,13 @@ static gboolean _cairo_dock_decrease_order_if_greater (GtkTreeModel * model, Gtk
 
 static void _cairo_dock_go_up (GtkButton *button, GtkTreeView *pTreeView)
 {
-	//g_print ("%s ()\n", __func__);
+	g_print ("%s ()\n", __func__);
 	GtkTreeSelection *pSelection = gtk_tree_view_get_selection (pTreeView);
-	GtkTreeModel *pModel;
 	
+	GtkTreeModel *pModel;
 	GtkTreeIter iter;
-	gtk_tree_selection_get_selected (pSelection, &pModel, &iter);
+	if (! gtk_tree_selection_get_selected (pSelection, &pModel, &iter))
+		return ;
 	
 	int iOrder;
 	gtk_tree_model_get (pModel, &iter, 2, &iOrder, -1);
@@ -79,12 +80,13 @@ static void _cairo_dock_go_up (GtkButton *button, GtkTreeView *pTreeView)
 
 static void _cairo_dock_go_down (GtkButton *button, GtkTreeView *pTreeView)
 {
-	//g_print ("%s ()\n", __func__);
+	g_print ("%s ()\n", __func__);
 	GtkTreeSelection *pSelection = gtk_tree_view_get_selection (pTreeView);
-	GtkTreeModel *pModel;
 	
+	GtkTreeModel *pModel;
 	GtkTreeIter iter;
-	gtk_tree_selection_get_selected (pSelection, &pModel, &iter);
+	if (! gtk_tree_selection_get_selected (pSelection, &pModel, &iter))
+		return ;
 	
 	int iOrder;
 	gtk_tree_model_get (pModel, &iter, 2, &iOrder, -1);

@@ -9,4 +9,3 @@ GtkWidget *cairo_dock_build_menu (GtkWidget *pWidget);
 
 
 #endif
-

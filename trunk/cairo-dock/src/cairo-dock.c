@@ -544,6 +544,44 @@ main (int argc, char** argv)
       
 	
 	gtk_main ();
+	/*Window root = DefaultRootWindow (g_XDisplay);
+	Window w = GDK_WINDOW_XID (GTK_WIDGET (pWindow)->window);
+	XEvent event;
+	while (1)
+	{
+		XNextEvent (g_XDisplay, &event);
+		if (event.window == w)
+		{
+			g_print ("w (%d)\n", event.type);
+			switch (event.type)
+			{
+				case MotionNotify :
+				
+				break;
+				
+				case Expose : 
+				
+				break;
+				
+				case ConfigureNotify :
+				
+				break;
+				
+				default :
+				break;
+			}
+		}
+		else if (event.window == root)
+		{
+			g_print ("root (%d)\n", event.type);
+			switch (event.type)
+			{
+				
+				default :
+				break;
+			}
+		}
+	}*/
 	
 	
 	Icon *icon;

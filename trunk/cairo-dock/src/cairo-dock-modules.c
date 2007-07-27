@@ -377,7 +377,8 @@ void cairo_dock_configure_module (CairoDockModule *module, GtkWidget *pWidget, G
 		cairo_t *pCairoContext = cairo_dock_create_context_from_window (pWidget->window);
 		Icon *pNewIcon = module->initModule (pCairoContext, &tmp_erreur);
 		cairo_destroy (pCairoContext);
-		pNewIcon->pModule = module;
+		if (pNewIcon != NULL)
+			pNewIcon->pModule = module;
 		if (tmp_erreur != NULL)
 		{
 			module->bActive = FALSE;
@@ -389,13 +390,17 @@ void cairo_dock_configure_module (CairoDockModule *module, GtkWidget *pWidget, G
 		if (pOldIcon != NULL)
 		{
 			pOldIcon->pModule = NULL;
-			pNewIcon->fOrder = pOldIcon->fOrder;
+			if (pNewIcon != NULL)
+				pNewIcon->fOrder = pOldIcon->fOrder;
 			cairo_dock_remove_icon_from_dock (pOldIcon);
 			cairo_dock_free_icon (pOldIcon);
 		}
 		
-		cairo_dock_insert_icon_in_list (pNewIcon, pWidget, TRUE, FALSE);
-		cairo_dock_redraw_my_icon (pNewIcon);
+		if (pNewIcon != NULL)
+		{
+			cairo_dock_insert_icon_in_list (pNewIcon, pWidget, TRUE, FALSE);
+			cairo_dock_redraw_my_icon (pNewIcon);
+		}
 	}
 }
 
