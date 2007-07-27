@@ -2,37 +2,39 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([cd-dustbin],[0.0.1],[Fabrice Rey (fabounet_03@yahoo.fr)])
+AC_INIT([cairo-dock], [0.9.4], [Fabrice Rey (fabounet_03@yahoo.fr)])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
 
 AM_INIT_AUTOMAKE([foreign])
 AC_PROG_LIBTOOL
 
+
 # Checks for programs.
 AC_PROG_CC
 
 # Checks for libraries.
-# FIXME: Replace `main' with a function in `-lpopt':
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([stdlib.h string.h])
+AC_CHECK_HEADERS([stdlib.h])
 
-# Checks for typedefs, sructures, and compiler characteristics.
-AC_C_CONST
-AC_TYPE_PID_T
+# Checks for typedefs, structures, and compiler characteristics.
 
 # Checks for library functions.
-AC_CHECK_FUNCS([sscanf])
 
-PKG_CHECK_MODULES(PACKAGE, cairo-dock)
+
+AM_CONDITIONAL(COMPIL_PLUG_IN, test x$enable_plug_in = xyes)
+AM_CONDITIONAL(COMPIL_VERBOSE, test x$enable_verbose = xyes)
+AM_CONDITIONAL(COMPIL_WITH_GLITZ, test x$enable_glitz = xyes)
+
+
+PKG_CHECK_MODULES(PACKAGE, "gtk+-2.0 cairo librsvg-2.0 glitz")
+
 
 AC_CONFIG_FILES([Makefile
 		src/Makefile
 		data/Makefile
-		data/themes/Makefile
-		data/themes/Gion/Makefile
-		data/themes/Crystal/Makefile
-		data/themes/NuoveXT-2/Makefile])
+		cairo-dock.pc
+		])
 AC_OUTPUT

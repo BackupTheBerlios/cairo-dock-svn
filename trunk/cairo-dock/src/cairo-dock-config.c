@@ -953,7 +953,7 @@ static void _cairo_dock_write_one_name (gchar *cName, gpointer value, GString *p
 }
 void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, int iNbAvailableChoices, gchar *cUsefullComment)
 {
-	g_print ("%s (%s)\n", __func__, cConfFile);
+	//g_print ("%s (%s)\n", __func__, cConfFile);
 	GError *erreur = NULL;
 	
 	//\___________________ On ouvre le fichier de conf.

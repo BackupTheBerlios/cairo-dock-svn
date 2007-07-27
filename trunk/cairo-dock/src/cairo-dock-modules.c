@@ -218,7 +218,7 @@ CairoDockModule * cairo_dock_load_module (gchar *cSoFilePath, GHashTable *pModul
 
 void cairo_dock_preload_module_from_directory (gchar *cModuleDirPath, GHashTable *pModuleTable, GError **erreur)
 {
-	g_print ("%s (%s)\n", __func__, cModuleDirPath);
+	//g_print ("%s (%s)\n", __func__, cModuleDirPath);
 	GError *tmp_erreur = NULL;
 	GDir *dir = g_dir_open (cModuleDirPath, 0, &tmp_erreur);
 	if (tmp_erreur != NULL)
@@ -264,7 +264,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, GHashTabl
 	while (cActiveModuleList[i] != NULL)
 	{
 		cModuleName = cActiveModuleList[i];
-		g_print (" + %s\n", cModuleName);
+		//g_print (" + %s\n", cModuleName);
 		pModule = g_hash_table_lookup (pModuleTable, cModuleName);
 		if (pModule != NULL)
 		{
@@ -330,7 +330,6 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, cairo_t *pCairoConte
 	Icon *icon = module->initModule (pCairoContext, &tmp_erreur);
 	if (tmp_erreur != NULL)
 	{
-		g_print ("%s () : init failed\n", __func__);
 		g_propagate_error (erreur, tmp_erreur);
 		return NULL;
 	}
@@ -390,11 +389,13 @@ void cairo_dock_configure_module (CairoDockModule *module, GtkWidget *pWidget, G
 		if (pOldIcon != NULL)
 		{
 			pOldIcon->pModule = NULL;
+			pNewIcon->fOrder = pOldIcon->fOrder;
 			cairo_dock_remove_icon_from_dock (pOldIcon);
 			cairo_dock_free_icon (pOldIcon);
 		}
 		
 		cairo_dock_insert_icon_in_list (pNewIcon, pWidget, TRUE, FALSE);
+		cairo_dock_redraw_my_icon (pNewIcon);
 	}
 }
 

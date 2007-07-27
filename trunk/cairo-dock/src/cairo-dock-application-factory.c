@@ -188,7 +188,7 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 
 Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid)
 {
-	g_print ("%s (%d)\n", __func__, Xid);
+	//g_print ("%s (%d)\n", __func__, Xid);
 	guchar *pNameBuffer;
 	gulong *pPidBuffer = NULL;
 	double fWidth, fHeight;
@@ -215,11 +215,11 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid)
 			if (pXStateBuffer[i] == aNetWmSkipTaskbar)
 				bSkip = TRUE;
 		}
-		g_print (" -------- bSkip : %d\n",  bSkip);
+		//g_print (" -------- bSkip : %d\n",  bSkip);
 		XFree (pXStateBuffer);
 	}
-	else
-		g_print ("pas d'etat defini, donc on continue\n");
+	//else
+	//	g_print ("pas d'etat defini, donc on continue\n");
 	if (bSkip)
 		return NULL;
 	
@@ -231,7 +231,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid)
 		XGetWindowProperty (g_XDisplay, Xid, aNetWmPid, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pPidBuffer);
 		if (iBufferNbElements > 0)
 		{
-			g_print (" +++ PID %d\n", *pPidBuffer);
+			//g_print (" +++ PID %d\n", *pPidBuffer);
 			
 			Icon *pIcon = g_hash_table_lookup (g_hAppliTable, pPidBuffer);
 			if (pIcon != NULL)  // si c'est une fenetre d'une appli deja referencee, on ne rajoute pas d'icones.
@@ -242,7 +242,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid)
 		}
 		else
 		{
-			g_print ("pas de PID defini -> elle degage\n");
+			//g_print ("pas de PID defini -> elle degage\n");
 			return NULL;
 		}
 	}
@@ -264,7 +264,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid)
 	}
 	else
 	{
-		g_print (" pas de type defini -> elle degage\n");
+		//g_print (" pas de type defini -> elle degage\n");
 		return NULL;
 	}
 	

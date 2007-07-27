@@ -462,7 +462,7 @@ gboolean cairo_dock_update_applis_list (GtkWidget *pWidget)
 			if (event.type == CreateNotify || event.type == DestroyNotify)
 			{
 				XPutBackEvent (g_XDisplay, &event);
-				g_print ("On le remet dans la queue\n");
+				//g_print ("On le remet dans la queue\n");
 				break ;
 			}
 		}
