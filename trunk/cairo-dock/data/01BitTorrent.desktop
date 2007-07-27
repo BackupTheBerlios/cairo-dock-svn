@@ -1,0 +1,11 @@
+#!
+[Desktop Entry]
+#s image's name or path:
+Icon=transmission.png
+#s launcher's name:
+Name=BitTorrent
+#s Exec command:
+Exec=transmission-gtk
+#i Order you want for this launcher among the other launchers:
+Order=1
+

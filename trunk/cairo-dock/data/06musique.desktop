@@ -1,0 +1,11 @@
+#!
+[Desktop Entry]
+#s image's name or path:
+Icon=music.svg
+#s launcher's name:
+Name=Musique
+#s Exec command:
+Exec=beep-media-player
+#i Order you want for this launcher among the other launchers:
+Order=6
+

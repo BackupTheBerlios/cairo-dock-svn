@@ -1,0 +1,11 @@
+#!
+[Desktop Entry]
+#s image's name or path:
+Icon=Tux.svg
+#s launcher's name:
+Name=Console
+#s Exec command:
+Exec=gnome-terminal
+#i Order you want for this launcher among the other launchers:
+Order=3
+

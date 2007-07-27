@@ -1,0 +1,11 @@
+#!
+[Desktop Entry]
+#s image's name or path:
+Icon=firefox.svg
+#s launcher's name:
+Name=Web
+#s Exec command:
+Exec=firefox
+#i Order you want for this launcher among the other launchers:
+Order=5
+
