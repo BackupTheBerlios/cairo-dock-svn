@@ -1,9 +1,5 @@
 #dnl Process this file with automake to produce Makefile.in
 
-if COMPIL_PLUG_IN
-opt_subdir = ../plug-ins/
-endif
-
 if COMPIL_WITH_GLITZ
 HAVE_GLITZ = true
 endif
@@ -13,7 +9,7 @@ CAIRO_DOCK_VERBOSE = true
 endif
 
 
-SUBDIRS = . src data $(opt_subdir)
+SUBDIRS = . src data
 
 
 pkgconfigdir = $(libdir)/pkgconfig
