@@ -29,17 +29,13 @@ released under the terms of the GNU General Public License.
 #include "cairo-dock-load.h"
 #include "cairo-dock-application-factory.h"
 #include "cairo-dock-separator-factory.h"
+#include "cairo-dock-dock-factory.h"
 #include "cairo-dock-applications.h"
 
 
-extern GList* icons;
-
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
-extern gint g_iCurrentWidth;
-extern gint g_iCurrentHeight;
 
-extern float g_fMagnitude;
 extern double g_fAmplitude;
 extern int g_iLabelSize;
 extern gboolean g_bUseText;
@@ -47,34 +43,16 @@ extern int g_iDockRadius;
 extern int g_iDockLineWidth;
 extern gboolean g_bAutoHide;
 extern int g_iIconGap;
-extern int g_iMaxIconHeight;
 
-extern gboolean g_bAtBottom;
-extern gboolean g_bAtTop;
-extern gboolean g_bInside;
 extern gchar *g_cConfFile;
 extern gchar *g_cCairoDockDataDir;
 
-extern gint g_iWindowPositionX;
-extern gint g_iWindowPositionY;
-
-extern gdouble g_fGradientOffsetX;
-
-extern int g_iMaxDockWidth;
-extern int g_iMaxDockHeight;
-extern int g_iMinDockWidth;
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
-extern int g_iGapX;
-extern int g_iGapY;
+
 extern int g_iNbAnimationRounds;
 extern gchar *g_cLabelPolice;
 
-extern int g_iSidMoveDown;
-extern int g_iSidMoveUp;
-extern int g_iSidGrowUp;
-extern int g_iSidShrinkDown;
-extern gboolean g_bMenuVisible;
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
 
@@ -396,7 +374,7 @@ void cairo_dock_set_root_window_mask (void)
 
 
 static XEvent event;
-gboolean cairo_dock_update_applis_list (GtkWidget *pWidget)
+gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 {
 	Bool bEventPresent;
 	gboolean bInterestedEvent = FALSE;
@@ -417,8 +395,8 @@ gboolean cairo_dock_update_applis_list (GtkWidget *pWidget)
 			{
 				//g_print ("c'est %s qui se fait exploser\n", icon->acName);
 				icon->fPersonnalScale = 1.0;
-				if (g_iSidShrinkDown == 0)
-					g_iSidShrinkDown = g_timeout_add (50, (GSourceFunc) shrink_down2, (gpointer) pWidget);
+				if (pDock->iSidShrinkDown == 0)
+					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) shrink_down2, (gpointer) pDock);
 			}
 		}
 	}
@@ -440,13 +418,13 @@ gboolean cairo_dock_update_applis_list (GtkWidget *pWidget)
 			else
 			{
 				//g_print ("c'est une nouvelle fenetre\n");
-				cairo_t *pCairoContext = cairo_dock_create_context_from_window (pWidget->window);
-				icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xunmap.window);
+				cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
+				icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xunmap.window, pDock);
 				if (icon != NULL)
 				{
-					cairo_dock_insert_icon_in_list (icon, pWidget, TRUE, TRUE);
-					if (g_iSidShrinkDown == 0)
-						g_iSidShrinkDown = g_timeout_add (50, (GSourceFunc) shrink_down2, (gpointer) pWidget);
+					cairo_dock_insert_icon_in_dock (icon, pDock, TRUE, TRUE);
+					if (pDock->iSidShrinkDown == 0)
+						pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) shrink_down2, (gpointer) pDock);
 				}
 			}
 		}
@@ -478,7 +456,7 @@ int cairo_dock_xerror_handler (Display * pDisplay, XErrorEvent *pXError)
 }
 
 
-void cairo_dock_show_all_applis (GtkWidget *pWidget)
+void cairo_dock_show_all_applis (CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
 	cairo_dock_set_root_window_mask ();
@@ -486,22 +464,22 @@ void cairo_dock_show_all_applis (GtkWidget *pWidget)
 	Window *pXWindowsList = cairo_dock_get_windows_list (&iNbWindows);
 	Window Xid;
 	Icon *pIcon;
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pWidget->window);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
 	
 	//\__________________ On cree les icones de toutes les applis existantes.
 	for (i = 0; i < iNbWindows; i ++)
 	{
 		Xid = pXWindowsList[i];
-		pIcon = cairo_dock_create_icon_from_xwindow (pCairoContext, Xid);
+		pIcon = cairo_dock_create_icon_from_xwindow (pCairoContext, Xid, pDock);
 		
 		if (pIcon != NULL)
-			cairo_dock_insert_icon_in_list (pIcon, pWidget, FALSE, FALSE);
+			cairo_dock_insert_icon_in_dock (pIcon, pDock, FALSE, FALSE);
 		//if (pIcon != NULL)
 		//	g_print (">>>>>>>>>>>> Xid : %d\n", Xid);
 	}
 	
-	cairo_dock_update_dock_size (pWidget, g_iMaxIconHeight, g_iMinDockWidth);
-	g_iSidUpdateAppliList = g_timeout_add (200, (GSourceFunc) cairo_dock_update_applis_list, (gpointer) pWidget);  // un g_idle_add () consomme 90% de CPU ! :-/
+	cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+	g_iSidUpdateAppliList = g_timeout_add (200, (GSourceFunc) cairo_dock_update_applis_list, (gpointer) pDock);  // un g_idle_add () consomme 90% de CPU ! :-/
 }
 
 

@@ -26,24 +26,13 @@ released under the terms of the GNU General Public License.
 #include "cairo-dock-draw.h"
 #include "cairo-dock-config.h"
 #include "cairo-dock-modules.h"
+#include "cairo-dock-callbacks.h"
 #include "cairo-dock-icons.h"
 
 
-extern GList* icons;
-
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
-extern gint g_iCurrentWidth;
-extern gint g_iCurrentHeight;
 
-extern float g_fMagnitude;
-
-extern gboolean g_bAtBottom;
-extern gboolean g_bAtTop;
-extern gboolean g_bInside;
-
-extern gint g_iWindowPositionX;
-extern gint g_iWindowPositionY;
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
 extern double g_fLineColor[4];
@@ -52,31 +41,19 @@ extern int g_iLabelSize;
 extern gboolean g_bRoundedBottomCorner;
 extern gboolean g_bAutoHide;
 
-extern gdouble g_fGradientOffsetX;
 extern double g_fStripesColorBright[4];
 extern double g_fStripesColorDark[4];
 
-extern int g_iMaxDockWidth;
-extern int g_iMaxDockHeight;
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
-extern int g_iGapX;
-extern int g_iGapY;
-extern int g_iMaxIconHeight;
 extern gchar *g_cCairoDockDataDir;
 
 extern cairo_surface_t *g_pVisibleZoneSurface;
 extern double g_fVisibleZoneImageWidth, g_fVisibleZoneImageHeight;
 extern double g_fVisibleZoneAlpha;
 extern int g_iNbStripes;
-extern int g_iMinDockWidth;
 extern double g_fAmplitude;
 extern int g_iSinusoidWidth;
-
-extern int g_iSidMoveDown;
-extern int g_iSidMoveUp;
-extern int g_iSidGrowUp;
-extern int g_iSidShrinkDown;
 
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
@@ -93,6 +70,14 @@ extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 extern gchar *g_cConfFile;
 extern GHashTable *g_hModuleTable;
+
+
+extern gboolean g_bKeepAbove;
+extern gboolean g_bSkipPager;
+extern gboolean g_bSkipTaskbar;
+extern gboolean g_bSticky;
+extern CairoDock *g_pMainDock;
+
 
 void cairo_dock_free_icon (Icon *icon)
 {
@@ -132,22 +117,24 @@ int cairo_dock_compare_icons_order (Icon *icon1, Icon *icon2)
 }
 
 
-Icon* cairo_dock_get_first_icon (void)
+Icon* cairo_dock_get_first_icon (GList *pIconList)
 {
-	return (Icon*) (g_list_first(icons)->data);
+	GList *pListHead = g_list_first(pIconList);
+	return (pListHead != NULL ? pListHead->data : NULL);
 }
 
-Icon* cairo_dock_get_last_icon (void)
+Icon* cairo_dock_get_last_icon (GList *pIconList)
 {
-	return (Icon*) (g_list_last(icons)->data);
+	GList *pListTail = g_list_last(pIconList);
+	return (pListTail != NULL ? pListTail->data : NULL);
 }
 
 
-Icon* cairo_dock_get_first_icon_of_type (CairoDockIconType iType)
+Icon* cairo_dock_get_first_icon_of_type (GList *pIconList, CairoDockIconType iType)
 {
 	GList* ic;
 	Icon *icon;
-	for (ic = icons; ic != NULL; ic = ic->next)
+	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
 		if (icon->iType == iType)
@@ -157,11 +144,11 @@ Icon* cairo_dock_get_first_icon_of_type (CairoDockIconType iType)
 }
 
 
-Icon* cairo_dock_get_last_icon_of_type (CairoDockIconType iType)
+Icon* cairo_dock_get_last_icon_of_type (GList *pIconList, CairoDockIconType iType)
 {
 	GList* ic;
 	Icon *icon;
-	for (ic = g_list_last (icons); ic != NULL; ic = ic->prev)
+	for (ic = g_list_last (pIconList); ic != NULL; ic = ic->prev)
 	{
 		icon = ic->data;
 		if (icon->iType == iType)
@@ -170,11 +157,11 @@ Icon* cairo_dock_get_last_icon_of_type (CairoDockIconType iType)
 	return NULL;
 }
 
-Icon* cairo_dock_get_pointed_icon (void)
+Icon* cairo_dock_get_pointed_icon (GList *pIconList)
 {
 	GList* ic;
 	Icon *icon;
-	for (ic = icons; ic != NULL; ic = ic->next)
+	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
 		if (icon->bPointed)
@@ -183,11 +170,11 @@ Icon* cairo_dock_get_pointed_icon (void)
 	return NULL;
 }
 
-Icon *cairo_dock_get_bouncing_icon (void)
+Icon *cairo_dock_get_bouncing_icon (GList *pIconList)
 {
 	GList* ic;
 	Icon *icon;
-	for (ic = icons; ic != NULL; ic = ic->next)
+	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
 		if (icon->iCount > 0)
@@ -196,11 +183,11 @@ Icon *cairo_dock_get_bouncing_icon (void)
 	return NULL;
 }
 
-Icon *cairo_dock_get_removing_or_inserting_icon (void)
+Icon *cairo_dock_get_removing_or_inserting_icon (GList *pIconList)
 {
 	GList* ic;
 	Icon *icon;
-	for (ic = icons; ic != NULL; ic = ic->next)
+	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
 		if (icon->fPersonnalScale != 0)
@@ -211,7 +198,7 @@ Icon *cairo_dock_get_removing_or_inserting_icon (void)
 
 
 
-void cairo_dock_swap_icons (Icon *icon1, Icon *icon2)
+void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 {
 	//g_print ("%s (%s, %s) : %.2f <-> %.2f\n", __func__, icon1->acName, icon2->acName, icon1->fOrder, icon2->fOrder);
 	if (! ( (CAIRO_DOCK_IS_APPLI (icon1) && CAIRO_DOCK_IS_APPLI (icon2)) || (CAIRO_DOCK_IS_LAUNCHER (icon1) && CAIRO_DOCK_IS_LAUNCHER (icon2)) || (CAIRO_DOCK_IS_APPLET (icon1) && CAIRO_DOCK_IS_APPLET (icon2)) ) )
@@ -259,24 +246,24 @@ void cairo_dock_swap_icons (Icon *icon1, Icon *icon2)
 	}
 	
 	//\_________________ On les intervertit dans la liste.
-	icons = g_list_remove (icons, icon1);
-	icons = g_list_remove (icons, icon2);
-	icons = g_list_insert_sorted (icons,
+	pDock->icons = g_list_remove (pDock->icons, icon1);
+	pDock->icons = g_list_remove (pDock->icons, icon2);
+	pDock->icons = g_list_insert_sorted (pDock->icons,
 		icon1,
 		(GCompareFunc) cairo_dock_compare_icons_order);
-	icons = g_list_insert_sorted (icons,
+	pDock->icons = g_list_insert_sorted (pDock->icons,
 		icon2,
 		(GCompareFunc) cairo_dock_compare_icons_order);
 	
 	if (CAIRO_DOCK_IS_APPLET (icon1))
-		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, g_hModuleTable);
+		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons, g_hModuleTable);
 	
 	//\_________________ On recalcule la largeur max, qui peut avoir ete influencee par le changement d'ordre.
-	g_iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (g_iMinDockWidth)) + 1;
+	pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock->icons, pDock->iMinDockWidth)) + 1;
 }
 
 
-void cairo_dock_remove_one_icon_from_dock (Icon *icon)
+void cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon)
 {
 	//\___________________ On effectue les taches de fermeture de l'icone suivant son type.
 	if (icon->iPid != 0 && g_bUniquePid)
@@ -291,67 +278,67 @@ void cairo_dock_remove_one_icon_from_dock (Icon *icon)
 	}
 	
 	//\___________________ On l'enleve de la liste.
-	icons = g_list_remove (icons, icon);
-	g_iMinDockWidth -= g_iIconGap + icon->fWidth;
+	pDock->icons = g_list_remove (pDock->icons, icon);
+	pDock->iMinDockWidth -= g_iIconGap + icon->fWidth;
 	
 	//\___________________ Cette icone realisait peut-etre le max des hauteurs, comme on l'enleve on recalcule ce max. 
 	Icon *pOtherIcon;
 	GList *ic;
-	if (icon->fHeight == g_iMaxIconHeight)
+	if (icon->fHeight == pDock->iMaxIconHeight)
 	{
-		g_iMaxIconHeight = 0;
-		for (ic = icons; ic != NULL; ic = ic->next)
+		pDock->iMaxIconHeight = 0;
+		for (ic = pDock->icons; ic != NULL; ic = ic->next)
 		{
 			pOtherIcon = ic->data;
-			g_iMaxIconHeight = MAX (g_iMaxIconHeight, pOtherIcon->fHeight);
+			pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, pOtherIcon->fHeight);
 		}
 	}
 }
 
-void cairo_dock_remove_icon_from_dock (Icon *icon)
+void cairo_dock_remove_icon_from_dock (CairoDock *pDock, Icon *icon)
 {
-	cairo_dock_remove_one_icon_from_dock (icon);
+	cairo_dock_remove_one_icon_from_dock (pDock, icon);
 	
 	//\___________________ On enleve le separateur si c'est la derniere icone de son type.
 	Icon * pSeparatorIcon = NULL;
 	if (! CAIRO_DOCK_IS_SEPARATOR (icon))
 	{
-		Icon *pSameTypeIcon = cairo_dock_get_first_icon_of_type (icon->iType);
+		Icon *pSameTypeIcon = cairo_dock_get_first_icon_of_type (pDock->icons, icon->iType);
 		if (pSameTypeIcon == NULL)
 		{
 			if (icon->iType - 1 > 0)
-				pSeparatorIcon = cairo_dock_get_first_icon_of_type (icon->iType - 1);
+				pSeparatorIcon = cairo_dock_get_first_icon_of_type (pDock->icons, icon->iType - 1);
 			else if (icon->iType + 1 > CAIRO_DOCK_NB_TYPES)
-				pSeparatorIcon = cairo_dock_get_first_icon_of_type (icon->iType + 1);
+				pSeparatorIcon = cairo_dock_get_first_icon_of_type (pDock->icons, icon->iType + 1);
 			
 			if (pSeparatorIcon != NULL)
 			{
-				icons = g_list_remove (icons, pSeparatorIcon);
+				pDock->icons = g_list_remove (pDock->icons, pSeparatorIcon);
 				cairo_dock_free_icon (pSeparatorIcon);
 			}
 		}
 	}
 }
 
-void cairo_dock_remove_icons_of_type (CairoDockIconType iType)
+void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType)
 {
 	Icon *icon;
 	GList *ic;
-	if (icons == NULL)
+	if (pDock->icons == NULL)
 		return ;
 	
 	gboolean bInside = FALSE;
 	Icon *pSeparatorIcon = NULL;
-	ic = icons;
+	ic = pDock->icons;
 	if (ic->next != NULL)
 	{
-		for (ic = icons->next; ic != NULL; ic = ic->next)
+		for (ic = pDock->icons->next; ic != NULL; ic = ic->next)
 		{
 			icon = ic->prev->data;  // on ne peut pas enlever l'element courant, sinon on perd 'ic'.
 			if (icon->iType == iType)
 			{
 				bInside = TRUE;
-				cairo_dock_remove_one_icon_from_dock (icon);
+				cairo_dock_remove_one_icon_from_dock (pDock, icon);
 				cairo_dock_free_icon (icon);
 			}
 			else if ((! bInside || pSeparatorIcon == NULL) && CAIRO_DOCK_IS_SEPARATOR (icon))
@@ -361,68 +348,68 @@ void cairo_dock_remove_icons_of_type (CairoDockIconType iType)
 		}
 	}
 	
-	icon = cairo_dock_get_last_icon_of_type (iType);
+	icon = cairo_dock_get_last_icon_of_type (pDock->icons, iType);
 	if (icon != NULL)
 	{
-		cairo_dock_remove_one_icon_from_dock (icon);
+		cairo_dock_remove_one_icon_from_dock (pDock, icon);
 		cairo_dock_free_icon (icon);
 	}
 	
 	if (pSeparatorIcon != NULL)
 	{
-		cairo_dock_remove_one_icon_from_dock (pSeparatorIcon);
+		cairo_dock_remove_one_icon_from_dock (pDock, pSeparatorIcon);
 		cairo_dock_free_icon (pSeparatorIcon);
 	}
 }
 
-void cairo_dock_remove_separator (CairoDockIconType iType)
+void cairo_dock_remove_separator (CairoDock *pDock, CairoDockIconType iType)
 {
 	GList* ic;
 	Icon *icon;
-	for (ic = icons; ic != NULL; ic = ic->next)
+	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
 		if (icon->iType == iType)
-			icons = g_list_remove (icons, icon);
+			pDock->icons = g_list_remove (pDock->icons, icon);
 	}
 }
 
 
-void cairo_dock_remove_all_separators (void)
+void cairo_dock_remove_all_separators (CairoDock *pDock)
 {
 	GList* ic;
 	Icon *icon;
-	for (ic = icons; ic != NULL; ic = ic->next)
+	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
 		if (CAIRO_DOCK_IS_SEPARATOR (icon))
-			cairo_dock_remove_icon_from_dock (icon);
+			cairo_dock_remove_icon_from_dock (pDock, icon);
 	}
 }
 
-void cairo_dock_remove_all_applis (GtkWidget *pWidget)
+void cairo_dock_remove_all_applis (CairoDock *pDock)
 {
 	if (g_iSidUpdateAppliList != 0)
 		g_source_remove (g_iSidUpdateAppliList);
 	g_iSidUpdateAppliList = 0;
 	
-	cairo_dock_remove_icons_of_type (CAIRO_DOCK_APPLI);
+	cairo_dock_remove_icons_of_type (pDock, CAIRO_DOCK_APPLI);
 }
 
-void cairo_dock_remove_all_applets (GtkWidget *pWidget)
+void cairo_dock_remove_all_applets (CairoDock *pDock)
 {
-	cairo_dock_remove_icons_of_type (CAIRO_DOCK_APPLET);
+	cairo_dock_remove_icons_of_type (pDock, CAIRO_DOCK_APPLET);
 }
 
 
-Icon * cairo_dock_calculate_icons_with_position (int x_abs, gdouble fMagnitude, int iWidth, int iHeight)
+Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight)
 {
 	//g_print ("%s (%d)\n", __func__, x_abs);
 	float x_cumulated = 0;
 	int c;
-	GList* ic, *pointed_ic = (x_abs < 0 ? icons : NULL);
+	GList* ic, *pointed_ic = (x_abs < 0 ? pIconList : NULL);
 	Icon *icon, *prev_icon, *next_icon;
-	for (ic = icons; ic != NULL; ic = ic->next)
+	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
 		
@@ -480,7 +467,7 @@ Icon * cairo_dock_calculate_icons_with_position (int x_abs, gdouble fMagnitude, 
 			}
 			else
 			{
-				icon->fX = x_cumulated - 1. * (g_iMinDockWidth - iWidth) / 2;
+				icon->fX = x_cumulated - 1. * (iMinDockWidth - iWidth) / 2;
 			}
 		}
 		
@@ -489,7 +476,7 @@ Icon * cairo_dock_calculate_icons_with_position (int x_abs, gdouble fMagnitude, 
 		{
 			pointed_ic = ic;
 			icon->bPointed = TRUE;
-			icon->fX = x_cumulated - g_iMinDockWidth / 2 + iWidth / 2 + (1 - icon->fScale) * (x_abs - x_cumulated);
+			icon->fX = x_cumulated - iMinDockWidth / 2 + iWidth / 2 + (1 - icon->fScale) * (x_abs - x_cumulated);
 		}
 		else
 			icon->bPointed = FALSE;
@@ -500,10 +487,10 @@ Icon * cairo_dock_calculate_icons_with_position (int x_abs, gdouble fMagnitude, 
 	//\_______________ On place les icones precedant l'icone pointee par rapport a celle-ci.
 	if (pointed_ic == NULL)
 	{
-		pointed_ic = g_list_last (icons);
+		pointed_ic = g_list_last (pIconList);
 		g_return_val_if_fail (pointed_ic != NULL, NULL);
 		icon = pointed_ic->data;
-		icon->fX = x_cumulated - g_iMinDockWidth / 2 + iWidth / 2 - icon->fWidth * icon->fScale - g_iIconGap;
+		icon->fX = x_cumulated - iMinDockWidth / 2 + iWidth / 2 - icon->fWidth * icon->fScale - g_iIconGap;
 	}
 	for (ic = pointed_ic->prev; ic != NULL; ic = ic->prev)
 	{
@@ -521,60 +508,62 @@ Icon * cairo_dock_calculate_icons_with_position (int x_abs, gdouble fMagnitude, 
 }
 
 
-void cairo_dock_calculate_icons (GtkWidget* pWidget, gdouble fMagnitude)
+Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 {
 	//\_______________ On calcule la position du curseur dans le referentiel du dock a plat.
 	int iWidth, iHeight;
-	gtk_window_get_size (GTK_WINDOW (pWidget), &iWidth, &iHeight);
-	gint iMouseX, iMouseY;
-	gdk_window_get_pointer (pWidget->window, &iMouseX, &iMouseY, NULL);
+	gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iWidth, &iHeight);
+	//gint iMouseX, iMouseY;
+	//gdk_window_get_pointer (pDock->pWidget->window, &iMouseX, &iMouseY, NULL);
 	//g_print ("%s (%dx%d)\n", __func__, iMouseX, iMouseY);
 	
-	int dx = g_iWindowPositionX + iMouseX - (g_iScreenWidth / 2 + g_iGapX);  // ecart par rapport au milieu du dock a plat.
-	g_fGradientOffsetX = - iMouseX ;  //  - iMouseX % (100 / g_iNbStripes)// indice de decalage des rayures.
+	int dx = pDock->iWindowPositionX + iMouseX - (g_iScreenWidth / 2 + pDock->iGapX);  // ecart par rapport au milieu du dock a plat.
+	pDock->fGradientOffsetX = - iMouseX;  // indice de decalage des rayures.
 	
-	int x_abs = dx + g_iMinDockWidth / 2;  // ecart par rapport a la gauche du dock minimal.
+	int x_abs = dx + pDock->iMinDockWidth / 2;  // ecart par rapport a la gauche du dock minimal.
 	
 	//\_______________ On calcule l'ensemble des parametres des icones.
-	Icon *pPointedIcon = cairo_dock_calculate_icons_with_position (x_abs, fMagnitude, iWidth, iHeight);
+	Icon *pPointedIcon = cairo_dock_calculate_icons_with_position (pDock->icons, x_abs, pDock->fMagnitude, pDock->iMinDockWidth, iWidth, iHeight);
 	
 	
 	//\_______________ On regarde si le curseur est dans le dock ou pas, et on joue sur la taille des icones en consequence.
-	gboolean bMouseInsideDock = (x_abs >= 0 && x_abs <= g_iMinDockWidth);
+	gboolean bMouseInsideDock = (x_abs >= 0 && x_abs <= pDock->iMinDockWidth);
 	
-	if (! bMouseInsideDock && g_iSidShrinkDown == 0 && g_fMagnitude > 0)
+	if (! bMouseInsideDock && pDock->iSidShrinkDown == 0 && pDock->fMagnitude > 0)
 	{
-		if (g_iSidGrowUp > 0)
+		if (pDock->iSidGrowUp > 0)
 		{
-			g_source_remove (g_iSidGrowUp);
-			g_iSidGrowUp = 0;
+			g_source_remove (pDock->iSidGrowUp);
+			pDock->iSidGrowUp = 0;
 		}
-		g_iSidShrinkDown = g_timeout_add (75, (GSourceFunc) shrink_down2, pWidget);
+		pDock->iSidShrinkDown = g_timeout_add (75, (GSourceFunc) shrink_down2, pDock);
 	}
 	
-	if (bMouseInsideDock && g_fMagnitude < 1 && cairo_dock_none_clicked && g_iSidGrowUp == 0 && g_iSidShrinkDown == 0)  // on est dedans en x et la taille des icones est non maximale bien qu'on n'ait pas clique sur une icone.
+	if (bMouseInsideDock && pDock->fMagnitude < 1 && cairo_dock_none_clicked (pDock->icons) && pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0)  // on est dedans en x et la taille des icones est non maximale bien qu'on n'ait pas clique sur une icone.
 	{
-		if ( (g_bDirectionUp && iMouseY > iHeight - pPointedIcon->fHeight * pPointedIcon->fScale && iMouseY < iHeight) || (! g_bDirectionUp && iMouseY < pPointedIcon->fHeight * pPointedIcon->fScale && iMouseY > g_iWindowPositionY) )  // et en plus on est dedans en y.
+		if ( (g_bDirectionUp && pPointedIcon != NULL && iMouseY > iHeight - pPointedIcon->fHeight * pPointedIcon->fScale && iMouseY < iHeight) || (! g_bDirectionUp && pPointedIcon != NULL && iMouseY < pPointedIcon->fHeight * pPointedIcon->fScale && iMouseY > pDock->iWindowPositionY) )  // et en plus on est dedans en y.
 		{
-			if (g_iSidShrinkDown > 0)
+			if (pDock->iSidShrinkDown > 0)
 			{
-				g_source_remove (g_iSidShrinkDown);
-				g_iSidShrinkDown = 0;
+				g_source_remove (pDock->iSidShrinkDown);
+				pDock->iSidShrinkDown = 0;
 			}
-			g_iSidGrowUp = g_timeout_add (75, (GSourceFunc) grow_up2, pWidget);
+			pDock->iSidGrowUp = g_timeout_add (75, (GSourceFunc) grow_up2, pDock);
 		}
 	}
+	
+	return pPointedIcon;
 }
 
 
-double cairo_dock_calculate_max_dock_width (int iFlatDockWidth)
+double cairo_dock_calculate_max_dock_width (GList *pIconList, int iFlatDockWidth)
 {
 	double fMaxDockWidth = 0.;
 	
 	//\_______________ On remet a zero les positions d'equilibre des icones.
 	GList* ic;
 	Icon *icon;
-	for (ic = icons; ic != NULL; ic = ic->next)
+	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
 		icon->fXMax = -1e4;
@@ -586,9 +575,9 @@ double cairo_dock_calculate_max_dock_width (int iFlatDockWidth)
 	int iVirtualMouseX;
 	for (iVirtualMouseX = 0; iVirtualMouseX < iFlatDockWidth; iVirtualMouseX ++)
 	{
-		cairo_dock_calculate_icons_with_position (iVirtualMouseX, 1, 0, 0);
+		cairo_dock_calculate_icons_with_position (pIconList, iVirtualMouseX, 1, iFlatDockWidth, 0, 0);
 		
-		for (ic = icons; ic != NULL; ic = ic->next)
+		for (ic = pIconList; ic != NULL; ic = ic->next)
 		{
 			icon = ic->data;
 			
@@ -597,10 +586,10 @@ double cairo_dock_calculate_max_dock_width (int iFlatDockWidth)
 			if (icon->fX < icon->fXMin)
 				icon->fXMin = icon->fX;
 		}
-		fMaxDockWidth = MAX (fMaxDockWidth, get_current_dock_width ());
+		fMaxDockWidth = MAX (fMaxDockWidth, get_current_dock_width (pIconList));
 	}
 	
-	for (ic = icons; ic != NULL; ic = ic->next)
+	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
 		icon->fXMin += fMaxDockWidth / 2;
@@ -608,8 +597,7 @@ double cairo_dock_calculate_max_dock_width (int iFlatDockWidth)
 	}
 	
 	//\_______________ On recalcule les icones avec une position situee en dehors du dock pour remettre les icones a plat.
-	cairo_dock_calculate_icons_with_position (-1, 1, 0, 0);
+	cairo_dock_calculate_icons_with_position (pIconList, -1, 1, iFlatDockWidth, 0, 0);
 	
 	return fMaxDockWidth;
 }
-

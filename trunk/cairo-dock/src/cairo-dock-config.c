@@ -19,18 +19,15 @@ released under the terms of the GNU General Public License.
 #include "cairo-dock-applications.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-keyfile-manager.h"
+#include "cairo-dock-dock-factory.h"
 #include "cairo-dock-config.h"
 
 
 static gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "random", NULL};
 
-extern GList* icons;
-
 extern int g_iSinusoidWidth;
 extern double g_fAmplitude;
 
-extern gint g_iWindowPositionX;
-extern gint g_iWindowPositionY;
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
 extern int g_iIconGap;
@@ -50,26 +47,26 @@ extern gchar **g_cDefaultIconDirectory;
 extern gchar *g_cCairoDockDataDir;
 extern gchar *g_cConfFile;
 
-extern int g_iMaxDockWidth;
-extern int g_iMaxDockHeight;
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
-extern int g_iGapX;
-extern int g_iGapY;
+
 extern gchar *g_cCairoDockBackgroundFileName;
-extern int g_iMaxIconHeight;
-extern int g_iMinDockWidth;
+
 extern int g_iDockRadius;
 extern int g_iDockLineWidth;
 extern gboolean g_bRoundedBottomCorner;
+extern double g_fLineColor[4];
+
 extern double g_fStripesColorBright[4];
 extern double g_fStripesColorDark[4];
-extern double g_fLineColor[4];
+extern cairo_surface_t *g_pStripesBuffer;
 extern int g_iNbStripes;
+extern double g_fStripesSpeedFactor;
 extern double g_fStripesWidth;
+extern double g_fStripesAngle;
+
 extern gchar *g_cDefaultFileBrowser;
 
-extern gboolean g_bAtBottom;
 extern int g_iScreenWidth;
 extern int g_iScreenHeight;
 
@@ -77,6 +74,7 @@ extern double g_fGrowUpFactor;
 extern double g_fShrinkDownFactor;
 extern double g_fMoveUpSpeed;
 extern double g_fMoveDownSpeed;
+extern double g_fRefreshInterval;
 
 extern gboolean g_bShowAppli;
 extern gboolean g_bUniquePid;
@@ -110,7 +108,7 @@ int cairo_dock_get_number_from_name (gchar *cName, gchar **tNamesList)
 	return 0;
 }
 
-void cairo_dock_read_conf_file (GtkWidget *pWidget, gchar *conf_file)
+void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
 	GError *erreur = NULL;
@@ -130,24 +128,24 @@ void cairo_dock_read_conf_file (GtkWidget *pWidget, gchar *conf_file)
 	}
 	
 	//\___________________ On recupere la position du dock.
-	g_iGapX = g_key_file_get_integer (fconf, "POSITION", "x gap", &erreur);
+	pDock->iGapX = g_key_file_get_integer (fconf, "POSITION", "x gap", &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
-		g_iGapX = 0;  // valeur par defaut.
-		g_key_file_set_integer (fconf, "POSITION", "x gap", g_iGapX);
+		pDock->iGapX = 0;  // valeur par defaut.
+		g_key_file_set_integer (fconf, "POSITION", "x gap", pDock->iGapX);
 		bFlushConfFileNeeded = TRUE;
 	}
-	g_iGapY = g_key_file_get_integer (fconf, "POSITION", "y gap", &erreur);
+	pDock->iGapY = g_key_file_get_integer (fconf, "POSITION", "y gap", &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
-		g_iGapY = 0;  // valeur par defaut.
-		g_key_file_set_integer (fconf, "POSITION", "y gap", g_iGapY);
+		pDock->iGapY = 0;  // valeur par defaut.
+		g_key_file_set_integer (fconf, "POSITION", "y gap", pDock->iGapY);
 		bFlushConfFileNeeded = TRUE;
 	}
 	
@@ -164,14 +162,14 @@ void cairo_dock_read_conf_file (GtkWidget *pWidget, gchar *conf_file)
 	
 	
 	//\___________________ On recupere les parametres de la zone visible.
-	g_cCairoDockBackgroundFileName = g_key_file_get_string (fconf, "ZONE", "background image", &erreur);
+	g_cCairoDockBackgroundFileName = g_key_file_get_string (fconf, "AUTO-HIDE", "background image", &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 		g_cCairoDockBackgroundFileName = NULL;
-		g_key_file_set_string (fconf, "ZONE", "background image", "");
+		g_key_file_set_string (fconf, "AUTO-HIDE", "background image", "");
 		bFlushConfFileNeeded = TRUE;
 	}
 	else if (g_cCairoDockBackgroundFileName != NULL && strcmp (g_cCairoDockBackgroundFileName, "") == 0)
@@ -180,46 +178,46 @@ void cairo_dock_read_conf_file (GtkWidget *pWidget, gchar *conf_file)
 		g_cCairoDockBackgroundFileName = NULL;
 	}
 	
-	g_iVisibleZoneWidth = g_key_file_get_integer (fconf, "ZONE", "zone width", &erreur);
+	g_iVisibleZoneWidth = g_key_file_get_integer (fconf, "AUTO-HIDE", "zone width", &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 		g_iVisibleZoneWidth = 150;  // valeur par defaut.
-		g_key_file_set_integer (fconf, "ZONE", "zone width", g_iVisibleZoneWidth);
+		g_key_file_set_integer (fconf, "AUTO-HIDE", "zone width", g_iVisibleZoneWidth);
 		bFlushConfFileNeeded = TRUE;
 	}
-	g_iVisibleZoneHeight = g_key_file_get_integer (fconf, "ZONE", "zone height", &erreur);
+	g_iVisibleZoneHeight = g_key_file_get_integer (fconf, "AUTO-HIDE", "zone height", &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 		g_iVisibleZoneHeight = 25;  // valeur par defaut.
-		g_key_file_set_integer (fconf, "ZONE", "zone height", g_iVisibleZoneHeight);
+		g_key_file_set_integer (fconf, "AUTO-HIDE", "zone height", g_iVisibleZoneHeight);
 		bFlushConfFileNeeded = TRUE;
 	}
 	
-	g_fVisibleZoneAlpha = g_key_file_get_double (fconf, "ZONE", "alpha", &erreur);
+	g_fVisibleZoneAlpha = g_key_file_get_double (fconf, "AUTO-HIDE", "alpha", &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 		g_fVisibleZoneAlpha = 0.5;  // valeur par defaut.
-		g_key_file_set_double (fconf, "ZONE", "alpha", g_fVisibleZoneAlpha);
+		g_key_file_set_double (fconf, "AUTO-HIDE", "alpha", g_fVisibleZoneAlpha);
 		bFlushConfFileNeeded = TRUE;
 	}
 	
-	g_bAutoHide = g_key_file_get_boolean (fconf, "ZONE", "auto-hide", &erreur);
+	g_bAutoHide = g_key_file_get_boolean (fconf, "AUTO-HIDE", "auto-hide", &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 		g_bAutoHide = TRUE;  // valeur par defaut.
-		g_key_file_set_boolean (fconf, "ZONE", "auto-hide", g_bAutoHide);
+		g_key_file_set_boolean (fconf, "AUTO-HIDE", "auto-hide", g_bAutoHide);
 		bFlushConfFileNeeded = TRUE;
 	}
 	
@@ -516,32 +514,44 @@ void cairo_dock_read_conf_file (GtkWidget *pWidget, gchar *conf_file)
 	}
 	g_fMoveDownSpeed = MAX (0.01, MIN (g_fMoveDownSpeed, 1));
 	
+	int iRefreshFrequency = g_key_file_get_integer (fconf, "CAIRO DOCK", "refresh frequency", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		iRefreshFrequency = 25;  // valeur par defaut.
+		g_key_file_set_integer (fconf, "CAIRO DOCK", "refresh frequency", iRefreshFrequency);
+		bFlushConfFileNeeded = TRUE;
+	}
+	g_fRefreshInterval = 1000. / iRefreshFrequency;
+	
 	
 	//\___________________ On recupere les parametres des rayures.
-	g_iNbStripes = g_key_file_get_integer (fconf, "STRIPES", "number of stripes", &erreur);
+	g_iNbStripes = g_key_file_get_integer (fconf, "BACKGROUND", "number of stripes", &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 		g_iNbStripes = 10;  // valeur par defaut.
-		g_key_file_set_integer (fconf, "STRIPES", "number of stripes", g_iNbStripes);
+		g_key_file_set_integer (fconf, "BACKGROUND", "number of stripes", g_iNbStripes);
 		bFlushConfFileNeeded = TRUE;
 	}
 	
-	g_fStripesWidth = g_key_file_get_double (fconf, "STRIPES", "stripes width", &erreur);
+	g_fStripesWidth = g_key_file_get_double (fconf, "BACKGROUND", "stripes width", &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 		g_fStripesWidth = 0.02;  // valeur par defaut.
-		g_key_file_set_double (fconf, "STRIPES", "stripes width", g_fStripesWidth);
+		g_key_file_set_double (fconf, "BACKGROUND", "stripes width", g_fStripesWidth);
 		bFlushConfFileNeeded = TRUE;
 	}
 	
 	length = 0;
-	couleur = g_key_file_get_double_list (fconf, "STRIPES", "stripes color bright", &length, &erreur);
+	couleur = g_key_file_get_double_list (fconf, "BACKGROUND", "stripes color bright", &length, &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
@@ -551,7 +561,7 @@ void cairo_dock_read_conf_file (GtkWidget *pWidget, gchar *conf_file)
 		g_fStripesColorBright[1] = 0.9;  // valeur par defaut.
 		g_fStripesColorBright[2] = 0.7;  // valeur par defaut.
 		g_fStripesColorBright[3] = 0.4;  // valeur par defaut.
-		g_key_file_set_double_list (fconf, "STRIPES", "stripes color bright", g_fStripesColorBright, 4);
+		g_key_file_set_double_list (fconf, "BACKGROUND", "stripes color bright", g_fStripesColorBright, 4);
 		bFlushConfFileNeeded = TRUE;
 	}
 	else
@@ -562,7 +572,7 @@ void cairo_dock_read_conf_file (GtkWidget *pWidget, gchar *conf_file)
 	g_free (couleur);
 	
 	length = 0;
-	couleur = g_key_file_get_double_list (fconf, "STRIPES", "stripes color dark", &length, &erreur);
+	couleur = g_key_file_get_double_list (fconf, "BACKGROUND", "stripes color dark", &length, &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
@@ -572,7 +582,7 @@ void cairo_dock_read_conf_file (GtkWidget *pWidget, gchar *conf_file)
 		g_fStripesColorDark[1] = 0.7;  // valeur par defaut.
 		g_fStripesColorDark[2] = 1.0;  // valeur par defaut.
 		g_fStripesColorDark[3] = 0.7;  // valeur par defaut.
-		g_key_file_set_double_list (fconf, "STRIPES", "stripes color dark", g_fStripesColorDark, 4);
+		g_key_file_set_double_list (fconf, "BACKGROUND", "stripes color dark", g_fStripesColorDark, 4);
 		bFlushConfFileNeeded = TRUE;
 	}
 	else
@@ -581,6 +591,28 @@ void cairo_dock_read_conf_file (GtkWidget *pWidget, gchar *conf_file)
 			memcpy (&g_fStripesColorDark, couleur, MAX (4, length) * sizeof (double));
 	}
 	g_free (couleur);
+	
+	g_fStripesSpeedFactor = g_key_file_get_double (fconf, "BACKGROUND", "scroll speed factor", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_fStripesSpeedFactor = 1.0;  // valeur par defaut.
+		g_key_file_set_double (fconf, "BACKGROUND", "scroll speed factor", g_fStripesSpeedFactor);
+		bFlushConfFileNeeded = TRUE;
+	}
+	
+	g_fStripesAngle = g_key_file_get_double (fconf, "BACKGROUND", "stripes angle", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_fStripesAngle = 30.0;  // valeur par defaut.
+		g_key_file_set_double (fconf, "BACKGROUND", "stripes angle", g_fStripesAngle);
+		bFlushConfFileNeeded = TRUE;
+	}
 	
 	
 	//\___________________ On recupere les parametres des aplications.
@@ -773,59 +805,61 @@ void cairo_dock_read_conf_file (GtkWidget *pWidget, gchar *conf_file)
 	
 	
 	//\___________________ On (re)charge tout, car n'importe quel parametre peut avoir change.
-	cairo_dock_remove_all_applets (pWidget);  // on est obliges d'arreter tous les applets, 
+	cairo_dock_remove_all_applets (pDock);  // on est obliges d'arreter tous les applets.
 	
 	if (g_iSidUpdateAppliList != 0 && ! g_bShowAppli)  // on ne veut plus voir les applis, il faut donc les enlever.
 	{
-		cairo_dock_remove_all_applis (pWidget);
+		cairo_dock_remove_all_applis (pDock);
 	}
 	
 	
-	if (icons == NULL)
-		cairo_dock_init_list_with_desktop_files (pWidget, g_cCairoDockDataDir);
+	if (pDock->icons == NULL)
+		cairo_dock_build_docks_tree_with_desktop_files (pDock, g_cCairoDockDataDir);
 	else
-		cairo_dock_reload_buffers (pWidget, 1 + g_fAmplitude, g_iLabelSize, g_bUseText);
+		cairo_dock_reload_buffers_in_dock (pDock, 1 + g_fAmplitude, g_iLabelSize, g_bUseText);
 	
 	
 	if (g_iSidUpdateAppliList == 0 && g_bShowAppli)  // maintenant on veut voir les applis !
 	{
-		cairo_dock_show_all_applis (pWidget);
+		cairo_dock_show_all_applis (pDock);
 	}
 	
 	
 	//cairo_dock_load_module_from_directory (CAIRO_DOCK_MODULES_DIR, pWidget, NULL, g_tActiveModuleList);
-	cairo_dock_activate_modules_from_list (cActiveModuleList, g_hModuleTable, pWidget);
+	cairo_dock_activate_modules_from_list (cActiveModuleList, g_hModuleTable, pDock);
 	g_strfreev (cActiveModuleList);
 	
-	cairo_dock_update_dock_size (pWidget, g_iMaxIconHeight, g_iMinDockWidth);
+	cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+	
+	cairo_dock_load_stripes_background (pDock);
 	
 	if (!g_bHorizontalDock)
 	{
-		double tmp = g_iMaxDockWidth;
-		g_iMaxDockWidth = g_iMaxDockHeight;
-		g_iMaxDockHeight = tmp;
+		double tmp = pDock->iMaxDockWidth;
+		pDock->iMaxDockWidth = pDock->iMaxDockHeight;
+		pDock->iMaxDockHeight = tmp;
 		tmp = g_iVisibleZoneWidth;
 		g_iVisibleZoneWidth = g_iVisibleZoneHeight;
 		g_iVisibleZoneHeight = tmp;
 	}
 	
-	cairo_dock_load_background_image (GTK_WINDOW (pWidget), g_cCairoDockBackgroundFileName, g_iVisibleZoneWidth, g_iVisibleZoneHeight);
-	if (g_bAtBottom)
+	cairo_dock_load_background_image (GTK_WINDOW (pDock->pWidget), g_cCairoDockBackgroundFileName, g_iVisibleZoneWidth, g_iVisibleZoneHeight);
+	if (pDock->bAtBottom)
 	{
-		//g_print ("on commence en bas a %dx%d\n", g_iVisibleZoneWidth, g_iVisibleZoneHeight);
 		if (g_bHorizontalDock)
 		{
-			g_iWindowPositionX = g_iGapX + (g_iScreenWidth - g_iVisibleZoneWidth) / 2;
-			g_iWindowPositionY = g_iScreenHeight - g_iGapY - (g_bDirectionUp ? g_iVisibleZoneHeight : 0);
+			pDock->iWindowPositionX = pDock->iGapX + (g_iScreenWidth - g_iVisibleZoneWidth) / 2;
+			pDock->iWindowPositionY = g_iScreenHeight - pDock->iGapY - (g_bDirectionUp ? g_iVisibleZoneHeight : 0);
 		}
 		else
 		{
-			g_iWindowPositionX = (g_bDirectionUp ? g_iGapX : g_iScreenWidth - g_iGapX);
-			g_iWindowPositionY = g_iScreenHeight / 2 + g_iGapY;
+			pDock->iWindowPositionX = (g_bDirectionUp ? pDock->iGapX : g_iScreenWidth - pDock->iGapX);
+			pDock->iWindowPositionY = g_iScreenHeight / 2 + pDock->iGapY;
 		}
-		gdk_window_move_resize (pWidget->window,
-			g_iWindowPositionX,
-			g_iWindowPositionY,
+		//g_print ("on commence en bas a %dx%d (%d;%d)\n", g_iVisibleZoneWidth, g_iVisibleZoneHeight, pDock->iWindowPositionX, pDock->iWindowPositionY);
+		gdk_window_move_resize (pDock->pWidget->window,
+			pDock->iWindowPositionX,
+			pDock->iWindowPositionY,
 			g_iVisibleZoneWidth,
 			g_iVisibleZoneHeight);
 	}
@@ -1007,7 +1041,7 @@ static void _cairo_dock_write_one_module_name_if_active (gchar *cModuleName, Cai
 			*pListeModule = g_slist_prepend (*pListeModule, cModuleName);
 	}
 }
-void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GHashTable *pModuleTable)
+void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *pIconList, GHashTable *pModuleTable)
 {
 	g_print ("%s ()\n", __func__);
 	GError *erreur = NULL;
@@ -1027,7 +1061,7 @@ void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GHashTab
 	Icon *icon;
 	gboolean bInside = FALSE;
 	GList *pList = NULL;
-	for (pList = icons; pList != NULL; pList = pList->next)
+	for (pList = pIconList; pList != NULL; pList = pList->next)
 	{
 		icon = pList->data;
 		if (CAIRO_DOCK_IS_APPLET (icon))
@@ -1057,4 +1091,3 @@ void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GHashTab
 	g_string_free (cActiveModules, TRUE);
 	g_key_file_free (pKeyFile);
 }
-

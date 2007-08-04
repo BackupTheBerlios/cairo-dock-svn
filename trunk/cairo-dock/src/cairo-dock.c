@@ -76,6 +76,7 @@
 #include "cairo-dock-applications.h"
 #include "cairo-dock-callbacks.h"
 #include "cairo-dock-modules.h"
+#include "cairo-dock-dock-factory.h"
 #include "cairo-dock-config.h"
 
 
@@ -83,40 +84,17 @@
 //#define CAIRO_DOCK_CONF_FILE "cairo-dock.conf"
 
 
-GList* icons = NULL;
-GtkWidget *g_pWidget = NULL;
+CairoDock *g_pMainDock;
+GHashTable *g_hDocksTable = NULL;
 
 gint g_iScreenWidth = 0;  // dimensions de l'ecran.
 gint g_iScreenHeight = 0;
-gint g_iCurrentWidth = 0;  // inutile sans glitz.
-gint g_iCurrentHeight = 0;
-
-gboolean g_bAtBottom = TRUE;
-gboolean g_bAtTop = FALSE;
-gboolean g_bInside = FALSE;
-gboolean g_bMenuVisible = FALSE;
-
-float g_fMagnitude = 0.0; // coef multiplicateur de l'amplitude de la sinusoide (entre 0 et 1)
-gdouble g_fGradientOffsetX = 4.0f;  // decalage des rayures pour les faire suivre la souris.
-
-int g_iMaxIconHeight = 0;  // max des hauteurs des icones.
-int g_iMinDockWidth = 0;  // taille minimale du dock.
-int g_iMaxDockWidth = 0;  // taille maximale du dock.
-int g_iMaxDockHeight = 0;
-
-gint g_iWindowPositionX = 0;  // dock-windows current y-position
-gint g_iWindowPositionY = 0;  // dock-windows current y-position
-int g_iSidMoveDown = 0;  // serial ID du thread de descente de la fenetre.
-int g_iSidMoveUp = 0;  // serial ID du thread de montee de la fenetre.
-int g_iSidGrowUp = 0;  // serial ID du thread de grossisement des icones.
-int g_iSidShrinkDown = 0;  // serial ID du thread de diminution des icones.
 
 gchar *g_cCairoDockBackgroundFileName = NULL;  // le chemin de l'image de fond de la partie tout le temps visible.
 gchar *g_cConfFile = NULL;  // le chemin du fichier de conf.
 gchar **g_cDefaultIconDirectory = NULL;  // les repertoires par defaut ou on va chercher les icones.
 gchar *g_cCairoDockDataDir = NULL;  // le repertoire ou on va chercher les .desktop.
-gchar *g_cDefaultFileBrowser = NULL;
-
+gchar *g_cDefaultFileBrowser = NULL;  // pour les raccourcis.
 
 gboolean g_bAutoHide;
 double g_fAmplitude;  // amplitude de la siunsoide.
@@ -128,12 +106,16 @@ gboolean g_bRoundedBottomCorner;  // vrai ssi les coins du bas sont arrondis.
 double g_fLineColor[4];  // la couleur du cadre.
 
 cairo_surface_t *g_pVisibleZoneSurface = NULL;
+cairo_surface_t *g_pVisibleZoneSurfaceAlpha = NULL;
 double g_fVisibleZoneImageWidth, g_fVisibleZoneImageHeight;
 double g_fVisibleZoneAlpha;
 int g_iNbStripes = 0;  // le nombre de rayures a dessiner en fond dans chaque motif elementaire.
+double g_fStripesSpeedFactor = 2.0;  // =1 les rayures suivent le curseur, >1 les rayures vont d'autant moins vite.
 double g_fStripesWidth;  // leur epaisseur relative.
 double g_fStripesColorBright[4];  // la couleur claire des rayures.
 double g_fStripesColorDark[4];  // la couleur foncee des rayures.
+double g_fStripesAngle;
+cairo_surface_t *g_pStripesBuffer = NULL;
 
 int g_iIconGap = 0;  // ecart en pixels entre les icones (pour l'instant une valeur > 0 cree des decalages intempestifs).
 int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
@@ -145,8 +127,7 @@ GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
 
 int g_iVisibleZoneWidth = 0;  // dimensions de la zone ou on place le curseur pour faire apparaitre le dock.
 int g_iVisibleZoneHeight = 0;
-int g_iGapX = 0;  // decalage de la zone par rapport au milieu bas de l'ecran.
-int g_iGapY = 0;
+
 //		|                                |
 //		|                                |
 //		|                                |
@@ -159,7 +140,7 @@ int g_iGapY = 0;
 //		                 ^-- gapX
 
 gboolean g_bDirectionUp;  // la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.
-gboolean g_bHorizontalDock = TRUE;  // dit si le dock est horizontal ou vertical.
+gboolean g_bHorizontalDock = TRUE;  // dit si le dock est horizontal ou vertical (non encore implemente).
 gboolean g_bUseText;  // vrai ssi on doit afficher les etiquettes au-dessus des icones.
 int g_iLabelSize;  // taille de la police des etiquettes.
 gchar *g_cLabelPolice;  // police de caracteres des etiquettes.
@@ -171,6 +152,7 @@ double g_fGrowUpFactor = 1.4;
 double g_fShrinkDownFactor = 0.6;
 double g_fMoveUpSpeed = 0.5;
 double g_fMoveDownSpeed = 0.33;
+double g_fRefreshInterval = .04;
 
 gboolean g_bShowAppli = FALSE;  // au debut on ne montre pas les applis, il faut que cairo-dock le sache.
 gboolean g_bUniquePid;
@@ -189,11 +171,10 @@ Icon *g_pLastFixedIconLeft = NULL;
 Icon *g_pLastFixedIconRight = NULL;
 
 
-static gboolean g_bKeepAbove = TRUE;
-static gboolean g_bSkipPager = TRUE;
-static gboolean g_bSkipTaskbar = TRUE;
-static gboolean g_bSticky = TRUE;
-
+gboolean g_bKeepAbove = TRUE;
+gboolean g_bSkipPager = TRUE;
+gboolean g_bSkipTaskbar = TRUE;
+gboolean g_bSticky = TRUE;
 
 #ifdef HAVE_GLITZ
 gboolean g_bUseGlitz = TRUE;
@@ -201,21 +182,6 @@ glitz_drawable_format_t *gDrawFormat = NULL;
 glitz_drawable_t* g_pGlitzDrawable = NULL;
 glitz_format_t* g_pGlitzFormat = NULL;
 #endif // HAVE_GLITZ
-
-
-static void
-on_alpha_screen_changed (GtkWidget* pWidget,
-			GdkScreen* pOldScreen,
-			GtkWidget* pLabel)
-{
-	GdkScreen* pScreen = gtk_widget_get_screen (pWidget);
-	GdkColormap* pColormap = gdk_screen_get_rgba_colormap (pScreen);
-	
-	if (!pColormap)
-		pColormap = gdk_screen_get_rgb_colormap (pScreen);
-		
-	gtk_widget_set_colormap (pWidget, pColormap);
-}
 
 
 int
@@ -227,10 +193,10 @@ main (int argc, char** argv)
 		g_tIconTypeOrder[i] = i;
 	
 	
- 	gtk_init (&argc, &argv);
- 	
- 		
-	//\___________________ On recupere quelques options (peu utile).
+	gtk_init (&argc, &argv);
+	
+	
+	//\___________________ On recupere quelques options.
 	int iWmHint = GDK_WINDOW_TYPE_HINT_NORMAL;
 	for (i = 0; i < argc; i++)
 	{
@@ -276,31 +242,6 @@ main (int argc, char** argv)
 		}
 	}
 	
-
-	//\___________________ On cree la fenetre.
-	GtkWidget* pWindow = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-	g_pWidget = pWindow;
-	
-	if (g_bSticky)
-		gtk_window_stick (GTK_WINDOW (pWindow));
-	gtk_window_set_keep_above (GTK_WINDOW (pWindow), g_bKeepAbove);
-	gtk_window_set_skip_pager_hint (GTK_WINDOW (pWindow), g_bSkipPager);
-	gtk_window_set_skip_taskbar_hint (GTK_WINDOW (pWindow), g_bSkipTaskbar);
-	gtk_window_set_gravity (GTK_WINDOW (pWindow), GDK_GRAVITY_STATIC);
-	gtk_window_set_type_hint (GTK_WINDOW (pWindow), iWmHint);
-	on_alpha_screen_changed (pWindow, NULL, NULL);
-
-	gtk_widget_set_app_paintable (pWindow, TRUE);
-	gtk_window_set_decorated (GTK_WINDOW (pWindow), FALSE);
-	gtk_window_set_resizable (GTK_WINDOW (pWindow), TRUE);
-	gtk_window_set_title (GTK_WINDOW (pWindow), "cairo-dock");
-	
-	GdkScreen *gdkscreen = gtk_window_get_screen (GTK_WINDOW (pWindow));
-	g_iScreenWidth = gdk_screen_get_width (gdkscreen);
-	g_iScreenHeight = gdk_screen_get_height (gdkscreen);
-	
-	gtk_widget_show_all (pWindow);
-	
 	//\___________________ On definit des variables necessaires aux applis.
 	g_hAppliTable = g_hash_table_new_full (g_int_hash,
 		g_int_equal,
@@ -319,6 +260,7 @@ main (int argc, char** argv)
 		g_str_equal,
 		NULL,  // la cle est le nom du module, et pointe directement sur le champ 'cModuleName' du module.
 		(GDestroyNotify) cairo_dock_free_module);
+	
 	
 	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
 	g_cCairoDockDataDir = g_strdup_printf ("%s/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR);
@@ -352,6 +294,7 @@ main (int argc, char** argv)
 		g_free (cCommand);
 	}
 	
+	
 	//\___________________ On pre-charge les modules existant.
 	GError *erreur = NULL;
 	cairo_dock_preload_module_from_directory (CAIRO_DOCK_MODULES_DIR, g_hModuleTable, &erreur);
@@ -363,9 +306,21 @@ main (int argc, char** argv)
 	}
 	cairo_dock_update_conf_file_with_modules (g_cConfFile, g_hModuleTable);
 	
-	//\___________________ On lit le fichier de conf et on charge tout.
 	
-	cairo_dock_read_conf_file (pWindow, g_cConfFile);
+	//\___________________ On cree le dock principal.
+	g_hDocksTable = g_hash_table_new_full (g_str_hash,
+		g_str_equal,
+		g_free,
+		NULL);
+	g_pMainDock = cairo_dock_create_new_dock (iWmHint, CAIRO_DOCK_MAIN_DOCK_NAME);
+	g_pMainDock->bIsMainDock = TRUE;
+	GdkScreen *gdkscreen = gtk_window_get_screen (GTK_WINDOW (g_pMainDock->pWidget));
+        g_iScreenWidth = gdk_screen_get_width (gdkscreen);
+        g_iScreenHeight = gdk_screen_get_height (gdkscreen);
+	
+	
+	//\___________________ On lit le fichier de conf et on charge tout.
+	cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
 	
 	
 #ifdef HAVE_GLITZ
@@ -373,7 +328,7 @@ main (int argc, char** argv)
 	g_iCurrentHeight = g_iVisibleZoneHeight;
 	if (g_bUseGlitz)
 	{
-	    glitz_drawgeable_format_t templ, *format;
+	    glitz_drawgeable_format_t templ, *format;la fenetre
 	    unsigned long	    mask = 0;
 	    XVisualInfo		    *vinfo = NULL;
 	    int			    screen = 0;
@@ -429,73 +384,6 @@ main (int argc, char** argv)
 	else
 #endif
 	
-
-	
-	//\___________________ On connecte les evenements.
-	gtk_widget_add_events (pWindow,
-			       GDK_BUTTON_PRESS_MASK |
-			       GDK_POINTER_MOTION_MASK |
-			       GDK_POINTER_MOTION_HINT_MASK);
-	
-	g_signal_connect (G_OBJECT (pWindow),
-			  "destroy",
-			  G_CALLBACK (gtk_main_quit),
-			  NULL);
-	g_signal_connect (G_OBJECT (pWindow),
-			  "expose-event",
-			  G_CALLBACK (on_expose),
-			  NULL);
-//#ifdef HAVE_GLITZ	
-	g_signal_connect (G_OBJECT (pWindow),
-			  "configure-event",
-			  G_CALLBACK (on_configure),
-			  NULL);
-//#endif
-	g_signal_connect (G_OBJECT (pWindow),
-			  "key-press-event",
-			  G_CALLBACK (on_key_press),
-			  NULL);
-	g_signal_connect (G_OBJECT (pWindow),
-			  "key-release-event",
-			  G_CALLBACK (on_key_release),
-			  NULL);
-	g_signal_connect (G_OBJECT (pWindow),
-			  "button-press-event",
-			  G_CALLBACK (on_button_press2),
-			  NULL);
-	g_signal_connect (G_OBJECT (pWindow),
-			  "button-release-event",
-			  G_CALLBACK (on_button_release),
-			  NULL);
-	g_signal_connect (G_OBJECT (pWindow),
-			  "motion-notify-event",
-			  G_CALLBACK (on_motion_notify2),
-			  NULL);
-	g_signal_connect (G_OBJECT (pWindow),
-			  "enter-notify-event",
-			  G_CALLBACK (on_enter_notify2),
-			  NULL);
-	g_signal_connect (G_OBJECT (pWindow),
-			  "leave-notify-event",
-			  G_CALLBACK (on_leave_notify2),
-			  NULL);
-	g_signal_connect (G_OBJECT (pWindow),
-			  "drag_data_received",
-			  G_CALLBACK (on_drag_data_received),
-			  NULL);
-	g_signal_connect (G_OBJECT (pWindow),
-			  "drag_motion",
-			  G_CALLBACK (on_drag_motion),
-			  NULL);
-	GtkTargetEntry *pTargetEntry = g_new0 (GtkTargetEntry, 1);
-	pTargetEntry[0].target = g_strdup ("text/uri-list");
-	pTargetEntry[0].flags = (GtkTargetFlags) 0;
-	pTargetEntry[0].info = 0;
-	gtk_drag_dest_set (pWindow,
-		GTK_DEST_DEFAULT_DROP | GTK_DEST_DEFAULT_MOTION,  // GTK_DEST_DEFAULT_HIGHLIGHT ne rend pas joli je trouve.
-		pTargetEntry,
-		1,
-		GDK_ACTION_COPY);
 	
 	
 #ifdef HAVE_GLITZ
@@ -541,37 +429,60 @@ main (int argc, char** argv)
 		}
 	}
 #endif
-      
 	
 	gtk_main ();
 	/*Window root = DefaultRootWindow (g_XDisplay);
 	Window w = GDK_WINDOW_XID (GTK_WIDGET (pWindow)->window);
+	XSetWindowAttributes attr;
+	attr.event_mask = 
+		KeyPressMask | KeyReleaseMask | ButtonPressMask
+		| ButtonReleaseMask | EnterWindowMask
+		| LeaveWindowMask | PointerMotionMask
+		| Button1MotionMask
+		//| Button2MotionMask | Button3MotionMask
+		//| Button4MotionMask | Button5MotionMask
+		| ButtonMotionMask | KeymapStateMask
+		| ExposureMask //VisibilityChangeMask
+		| StructureNotifyMask // | ResizeRedirectMask
+		| SubstructureNotifyMask | SubstructureRedirectMask
+		//| FocusChangeMask | PropertyChangeMask
+		//| ColormapChangeMask | OwnerGrabButtonMask
+		;
+	XSelectInput(g_XDisplay, w, attr.event_mask);
 	XEvent event;
 	while (1)
 	{
 		XNextEvent (g_XDisplay, &event);
-		if (event.window == w)
+		if (event.xany.window != root)
 		{
 			g_print ("w (%d)\n", event.type);
 			switch (event.type)
 			{
 				case MotionNotify :
-				
+					on_xmotion_notify (&event.xmotion);
 				break;
 				
 				case Expose : 
-				
+					on_xexpose (&event.xexpose);
 				break;
 				
 				case ConfigureNotify :
+					on_xconfigure (&event.xconfigure);
+				break;
 				
+				case EnterNotify :
+					on_xenter_notify (&event.xcrossing);
+				break;
+				
+				case LeaveNotify :
+					on_xleave_notify (&event.xcrossing);
 				break;
 				
 				default :
 				break;
 			}
 		}
-		else if (event.window == root)
+		else //if (event.xany.window == root)
 		{
 			g_print ("root (%d)\n", event.type);
 			switch (event.type)
@@ -586,12 +497,12 @@ main (int argc, char** argv)
 	
 	Icon *icon;
 	GList *ic;
-	for (ic = icons; ic != NULL; ic = ic->next)
+	for (ic = g_pMainDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
 		cairo_dock_free_icon (icon);
 	}
-	g_list_free (icons);
+	g_list_free (g_pMainDock->icons);
 
 	rsvg_term ();
 

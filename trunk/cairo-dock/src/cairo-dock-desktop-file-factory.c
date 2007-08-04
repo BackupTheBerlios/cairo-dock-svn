@@ -25,17 +25,13 @@ released under the terms of the GNU General Public License.
 
 #include "cairo-dock-icons.h"
 #include "cairo-dock-keyfile-manager.h"
+#include "cairo-dock-dock-factory.h"
 #include "cairo-dock-desktop-file-factory.h"
 
 
-extern GList* icons;
-
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
-extern gint g_iCurrentWidth;
-extern gint g_iCurrentHeight;
 
-extern float g_fMagnitude;
 extern double g_fAmplitude;
 extern int g_iLabelSize;
 extern gboolean g_bUseText;
@@ -43,33 +39,15 @@ extern int g_iDockRadius;
 extern int g_iDockLineWidth;
 extern gboolean g_bAutoHide;
 extern int g_iIconGap;
-extern int g_iMaxIconHeight;
 
-extern gboolean g_bAtBottom;
-extern gboolean g_bAtTop;
-extern gboolean g_bInside;
 extern gchar *g_cConfFile;
 extern gchar *g_cCairoDockDataDir;
 
-extern gint g_iWindowPositionX;
-extern gint g_iWindowPositionY;
-
-extern gdouble g_fGradientOffsetX;
-
-extern int g_iMaxDockWidth;
-extern int g_iMaxDockHeight;
-extern int g_iMinDockWidth;
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
-extern int g_iGapX;
-extern int g_iGapY;
+
 extern gchar *g_cLabelPolice;
 
-extern int g_iSidMoveDown;
-extern int g_iSidMoveUp;
-extern int g_iSidGrowUp;
-extern int g_iSidShrinkDown;
-extern gboolean g_bMenuVisible;
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
 
@@ -93,14 +71,17 @@ extern glitz_format_t* g_pGlitzFormat;
 
 
 
-gchar *cairo_dock_add_desktop_file_from_path (gchar *cFilePath, double fOrder, GError **erreur)
+gchar *cairo_dock_add_desktop_file_from_path (gchar *cFilePath, gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur)
 {
 	//g_print ("%s (%s)\n", __func__, cFilePath);
 	double fEffectiveOrder;
 	if (fOrder == CAIRO_DOCK_LAST_ORDER)
 	{
-		Icon *pLastIcon = cairo_dock_get_last_launcher ();
-		fEffectiveOrder = pLastIcon->fOrder + 1;
+		Icon *pLastIcon = cairo_dock_get_last_launcher (pDock->icons);
+		if (pLastIcon != NULL)
+			fEffectiveOrder = pLastIcon->fOrder + 1;
+		else
+			fEffectiveOrder = 1;
 	}
 	else
 		fEffectiveOrder = fOrder;
@@ -110,23 +91,48 @@ gchar *cairo_dock_add_desktop_file_from_path (gchar *cFilePath, double fOrder, G
 	gchar *cNewDesktopContent;
 	gsize lenght;
 	
-	//\_________________ On regarde si c'est un repertoire ou un fichier.
-	GDir *pDirectory = g_dir_open (cFilePath, 0, NULL);
-	if (pDirectory != NULL)
+	//\_________________ On regarde si c'est un repertoire ou un fichier ou sinon un fichier cree a partir de zero.
+	if (cFilePath == NULL)
 	{
-		g_dir_close (pDirectory);
 		//\___________________ On cree le texte qu'on va y mettre par defaut.
 		cNewDesktopContent = g_strdup_printf ("#!\n[Desktop Entry]\n\
-			#s Image's name or path :\
-			Icon = %s\n\
-			#s Launcher's name :\
-			Name[fr] = %s\n\
-			Name[en] = %s\n\
-			#s Exec command :\
-			Exec = %s %s\n\
-			#f Order you want for this launcher among the other launchers :\
-			Order = %f\n",
-			g_cDefaultFileBrowser, cFilePath, cFilePath, g_cDefaultFileBrowser, cFilePath, fEffectiveOrder);
+#s Image's name or path :\n\
+Icon = \n\
+#s Launcher's name :\n\
+Name[fr] = Nouveau Lanceur\n\
+Name[en] = New Launcher\n\
+#s Exec command :\n\
+Exec = echo 'edit me !'\n\
+#i Order you want for this launcher among the other launchers :\n\
+Order = %d\n\
+#s Name of the container it belongs to:\n\
+Container = %s\n\
+#b Is this icon a container ?\n\
+Is container = false",
+		(int) fEffectiveOrder, cDockName);
+		lenght = -1;
+		
+		//\___________________ On lui choisit un nom de fichier tel qu'il n'y ait pas de collision.
+		cNewDesktopFileName = cairo_dock_generate_desktop_filename (g_cCairoDockDataDir);
+	}
+	else if (g_file_test (cFilePath, G_FILE_TEST_IS_DIR))
+	{
+		//\___________________ On cree le texte qu'on va y mettre par defaut.
+		cNewDesktopContent = g_strdup_printf ("#!\n[Desktop Entry]\n\
+#s Image's name or path :\
+Icon = %s\n\
+#s Launcher's name :\
+Name[fr] = %s\n\
+Name[en] = %s\n\
+#s Exec command :\
+Exec = %s %s\n\n\
+#f Order you want for this launcher among the other launchers :\
+Order = %f\n\
+#s Name of the container it belongs to:\n\
+Container = %s\n\
+#b Is this icon a container ?\n\
+Is container = false",
+		g_cDefaultFileBrowser, cFilePath, cFilePath, g_cDefaultFileBrowser, cFilePath, fEffectiveOrder, cDockName);
 		lenght = -1;
 		
 		//\___________________ On lui choisit un nom de fichier tel qu'il n'y ait pas de collision.
@@ -156,8 +162,10 @@ gchar *cairo_dock_add_desktop_file_from_path (gchar *cFilePath, double fOrder, G
 			*cUndesiredArgument = '\0';
 		g_key_file_set_string (pKeyFile, "Desktop Entry", "Exec", cExecField);
 		
-		//\_________________ On lui rajoute un champ "Order".
+		//\_________________ On lui rajoute les champ propres a Cairo-Dock.
 		g_key_file_set_double (pKeyFile, "Desktop Entry", "Order", fEffectiveOrder);
+		g_key_file_set_string (pKeyFile, "Desktop Entry", "Container", cDockName);
+		g_key_file_set_boolean (pKeyFile, "Desktop Entry", "Is container", FALSE);
 		
 		//\_________________ On en fait un fichier de conf evolue.
 		if (! cairo_dock_is_advanced_keyfile (pKeyFile))
@@ -167,6 +175,8 @@ gchar *cairo_dock_add_desktop_file_from_path (gchar *cFilePath, double fOrder, G
 			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Name", "s Launcher's name :", NULL);
 			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Exec", "s Exec command :", NULL);
 			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Order", "i Order you want for this launcher among the other launchers :", NULL);
+			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Container", "s Name of the container it belongs to:", NULL);
+			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Is container", "b Is this icon a container ?", NULL);
 		}
 		
 		//\_________________ On ecrit tout dans un nouveau fichier portant le meme nom dans le repertoire .cairo-dock.

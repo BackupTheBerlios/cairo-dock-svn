@@ -33,11 +33,11 @@ int cairo_dock_get_current_desktop (void);
 
 
 void cairo_dock_set_root_window_mask (void);
-gboolean cairo_dock_update_applis_list (GtkWidget *pWidget);
+gboolean cairo_dock_update_applis_list (CairoDock *pDock);
 
 int cairo_dock_xerror_handler (Display * pDisplay, XErrorEvent *pXError);
 
-void cairo_dock_show_all_applis (GtkWidget *pWidget);
+void cairo_dock_show_all_applis (CairoDock *pDock);
 
 
 #endif

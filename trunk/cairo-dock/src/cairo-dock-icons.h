@@ -18,47 +18,48 @@ void cairo_dock_free_icon (Icon *icon);
 int cairo_dock_compare_icons_order (Icon *icon1, Icon *icon2);
 
 
-Icon* cairo_dock_get_first_icon (void);
-Icon* cairo_dock_get_last_icon (void);
-Icon* cairo_dock_get_first_icon_of_type (CairoDockIconType iType);
-Icon* cairo_dock_get_last_icon_of_type (CairoDockIconType iType);
-Icon* cairo_dock_get_pointed_icon (void);
-Icon *cairo_dock_get_bouncing_icon (void);
-Icon *cairo_dock_get_removing_or_inserting_icon (void);
+Icon* cairo_dock_get_first_icon (GList *pIconList);
+Icon* cairo_dock_get_last_icon (GList *pIconList);
+Icon* cairo_dock_get_first_icon_of_type (GList *pIconList, CairoDockIconType iType);
+Icon* cairo_dock_get_last_icon_of_type (GList *pIconList, CairoDockIconType iType);
+Icon* cairo_dock_get_pointed_icon (GList *pIconList);
+Icon *cairo_dock_get_bouncing_icon (GList *pIconList);
+Icon *cairo_dock_get_removing_or_inserting_icon (GList *pIconList);
 
 #define get_first_icon cairo_dock_get_first_icon
 #define get_last_icon cairo_dock_get_last_icon
-#define cairo_dock_none_clicked (cairo_dock_get_bouncing_icon () == NULL)
+#define cairo_dock_none_clicked(pIconList) (cairo_dock_get_bouncing_icon (pIconList) == NULL)
 #define none_clicked2 cairo_dock_none_clicked
-#define cairo_dock_none_removed_or_inserted (cairo_dock_get_removing_or_inserting_icon () == NULL)
+#define cairo_dock_none_removed_or_inserted(pIconList) (cairo_dock_get_removing_or_inserting_icon (pIconList) == NULL)
 
-#define cairo_dock_get_first_launcher(...) cairo_dock_get_first_icon_of_type (CAIRO_DOCK_LAUNCHER)
-#define cairo_dock_get_last_launcher(...) cairo_dock_get_last_icon_of_type (CAIRO_DOCK_LAUNCHER)
-#define cairo_dock_get_first_appli(...) cairo_dock_get_first_icon_of_type (CAIRO_DOCK_APPLI)
-#define cairo_dock_get_last_appli(...) cairo_dock_get_last_icon_of_type (CAIRO_DOCK_APPLI)
-
-
-void cairo_dock_swap_icons (Icon *icon1, Icon *icon2);
+#define cairo_dock_get_first_launcher(pIconList) cairo_dock_get_first_icon_of_type (pIconList, CAIRO_DOCK_LAUNCHER)
+#define cairo_dock_get_last_launcher(pIconList) cairo_dock_get_last_icon_of_type (pIconList, CAIRO_DOCK_LAUNCHER)
+#define cairo_dock_get_first_appli(pIconList) cairo_dock_get_first_icon_of_type (pIconList, CAIRO_DOCK_APPLI)
+#define cairo_dock_get_last_appli(pIconList) cairo_dock_get_last_icon_of_type (pIconList, CAIRO_DOCK_APPLI)
 
 
-void cairo_dock_remove_one_icon_from_dock (Icon *icon);
-void cairo_dock_remove_icon_from_dock (Icon *icon);
-void cairo_dock_remove_icons_of_type (CairoDockIconType iType);
-
-void cairo_dock_remove_separator (CairoDockIconType iType);
-
-void cairo_dock_remove_all_separators (void);
-
-void cairo_dock_remove_all_applis (GtkWidget *pWidget);
-
-void cairo_dock_remove_all_applets (GtkWidget *pWidget);
+void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2);
 
 
-Icon * cairo_dock_calculate_icons_with_position (int x_abs, gdouble fMagnitude, int iWidth, int iHeight);
+void cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon);
+void cairo_dock_remove_icon_from_dock (CairoDock *pDock, Icon *icon);
+void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType);
 
-void cairo_dock_calculate_icons (GtkWidget* pWidget, gdouble fMagnitude);
+void cairo_dock_remove_separator (CairoDock *pDock, CairoDockIconType iType);
 
-double cairo_dock_calculate_max_dock_width (int iFlatDockWidth);
+void cairo_dock_remove_all_separators (CairoDock *pDock);
+
+void cairo_dock_remove_all_applis (CairoDock *pDock);
+
+void cairo_dock_remove_all_applets (CairoDock *pDock);
+
+
+Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight);
+
+Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY);
+
+double cairo_dock_calculate_max_dock_width (GList *pIconList, int iFlatDockWidth);
+
 
 #endif
 

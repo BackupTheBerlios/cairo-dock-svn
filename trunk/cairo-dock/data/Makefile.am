@@ -2,6 +2,7 @@ cairo_dock_datadir = $(pkgdatadir)/data
 cairo_dock_data_DATA = \
 	background.png\
 	background-ubuntu.png\
+	background-cairo-dock.svg\
 	separateur.svg\
 	01BitTorrent.desktop\
 	02fichiers.desktop\
@@ -9,6 +10,7 @@ cairo_dock_data_DATA = \
 	04thunderbid.desktop\
 	05web.desktop\
 	06musique.desktop\
+	07firefox.desktop\
 	firefox.svg\
 	music.svg\
 	thunderbird.svg\

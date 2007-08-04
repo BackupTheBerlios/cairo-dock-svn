@@ -32,14 +32,9 @@ released under the terms of the GNU General Public License.
 #include "cairo-dock-application-factory.h"
 
 
-extern GList* icons;
-
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
-extern gint g_iCurrentWidth;
-extern gint g_iCurrentHeight;
 
-extern float g_fMagnitude;
 extern double g_fAmplitude;
 extern int g_iLabelSize;
 extern gboolean g_bUseText;
@@ -47,33 +42,15 @@ extern int g_iDockRadius;
 extern int g_iDockLineWidth;
 extern gboolean g_bAutoHide;
 extern int g_iIconGap;
-extern int g_iMaxIconHeight;
 
-extern gboolean g_bAtBottom;
-extern gboolean g_bAtTop;
-extern gboolean g_bInside;
 extern gchar *g_cConfFile;
 extern gchar *g_cCairoDockDataDir;
 
-extern gint g_iWindowPositionX;
-extern gint g_iWindowPositionY;
-
-extern gdouble g_fGradientOffsetX;
-
-extern int g_iMaxDockWidth;
-extern int g_iMaxDockHeight;
-extern int g_iMinDockWidth;
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
-extern int g_iGapX;
-extern int g_iGapY;
+
 extern gchar *g_cLabelPolice;
 
-extern int g_iSidMoveDown;
-extern int g_iSidMoveUp;
-extern int g_iSidGrowUp;
-extern int g_iSidShrinkDown;
-extern gboolean g_bMenuVisible;
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
 
@@ -127,6 +104,13 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 		(int) (*fWidth) * iNbChannels,
 		NULL,
 		NULL);
+	
+	if (!gdk_pixbuf_get_has_alpha (pixbuf))  // on lui rajoute un canal alpha si elle n'en a pas.
+	{
+		GdkPixbuf *pixbuf2 = gdk_pixbuf_add_alpha (pixbuf, TRUE, 255, 255, 255);  // TRUE <=> les pixels blancs deviennent transparents.906.00x299.00
+		gdk_pixbuf_unref (pixbuf);
+		pixbuf = pixbuf2;
+	}
 	
 	guchar *pixels = gdk_pixbuf_get_pixels (pixbuf);
 	cairo_surface_t *surface_ini = cairo_image_surface_create_for_data (pixels,
@@ -186,7 +170,7 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 
 
 
-Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid)
+Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid, CairoDock *pDock)
 {
 	//g_print ("%s (%d)\n", __func__, Xid);
 	guchar *pNameBuffer;
@@ -296,7 +280,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid)
 	if (g_bUniquePid)
 		icon->iPid = *pPidBuffer;
 	icon->Xid = Xid;
-	Icon * pLastAppli = cairo_dock_get_last_appli ();
+	Icon * pLastAppli = cairo_dock_get_last_appli (pDock->icons);
 	icon->fOrder = (pLastAppli != NULL ? pLastAppli->fOrder + 1 : 1);
 	icon->iType = CAIRO_DOCK_APPLI;
 	

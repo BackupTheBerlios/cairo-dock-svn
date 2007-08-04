@@ -28,14 +28,9 @@ released under the terms of the GNU General Public License.
 #include "cairo-dock-separator-factory.h"
 
 
-extern GList* icons;
-
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
-extern gint g_iCurrentWidth;
-extern gint g_iCurrentHeight;
 
-extern float g_fMagnitude;
 extern double g_fAmplitude;
 extern int g_iLabelSize;
 extern gboolean g_bUseText;
@@ -45,31 +40,13 @@ extern gboolean g_bAutoHide;
 extern int g_iIconGap;
 extern int g_iMaxIconHeight;
 
-extern gboolean g_bAtBottom;
-extern gboolean g_bAtTop;
-extern gboolean g_bInside;
 extern gchar *g_cConfFile;
 extern gchar *g_cCairoDockDataDir;
 
-extern gint g_iWindowPositionX;
-extern gint g_iWindowPositionY;
-
-extern gdouble g_fGradientOffsetX;
-
-extern int g_iMaxDockWidth;
-extern int g_iMaxDockHeight;
-extern int g_iMinDockWidth;
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
-extern int g_iGapX;
-extern int g_iGapY;
 extern gchar *g_cLabelPolice;
 
-extern int g_iSidMoveDown;
-extern int g_iSidMoveUp;
-extern int g_iSidGrowUp;
-extern int g_iSidShrinkDown;
-extern gboolean g_bMenuVisible;
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
 extern double g_fLineColor[4];;
@@ -140,14 +117,14 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 
 
 
-Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorType)
+Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorType, CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
 	Icon *icon = g_new0 (Icon, 1);
 	
 	icon->pIconBuffer = cairo_dock_create_separator_surface (pSourceContext, 1 + g_fAmplitude, &icon->fWidth, &icon->fHeight);
 	
-	Icon * pLastLauncher = cairo_dock_get_last_launcher ();
+	Icon * pLastLauncher = cairo_dock_get_last_launcher (pDock->icons);
 	icon->fOrder = (pLastLauncher != NULL ? pLastLauncher->fOrder + 1 : 1);
 	icon->iType = iSeparatorType;
 	

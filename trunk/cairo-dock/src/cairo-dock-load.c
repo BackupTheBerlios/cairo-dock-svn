@@ -35,14 +35,9 @@ released under the terms of the GNU General Public License.
 #include "cairo-dock-applet-factory.h"
 #include "cairo-dock-load.h"
 
-
-extern GList* icons;
-
+extern GHashTable *g_hDocksTable;
 extern int g_iSinusoidWidth;
-extern double g_fAmplitude;
 
-extern gint g_iWindowPositionX;
-extern gint g_iWindowPositionY;
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
 extern int g_iIconGap;
@@ -53,15 +48,11 @@ extern gchar *g_cLabelPolice;
 extern gchar **g_cDefaultIconDirectory;
 extern gchar *g_cCairoDockDataDir;
 
-extern int g_iMaxDockWidth;
-extern int g_iMaxDockHeight;
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
-extern int g_iGapX;
-extern int g_iGapY;
+
 extern gchar *g_cCairoDockBackgroundFileName;
-extern int g_iMaxIconHeight;
-extern int g_iMinDockWidth;
+
 extern int g_iNbAnimationRounds;
 extern int g_iDockRadius;
 extern int g_iDockLineWidth;
@@ -71,12 +62,18 @@ extern double g_fStripesColor2[4];
 extern double g_fLineColor[4];
 
 extern cairo_surface_t *g_pVisibleZoneSurface;
+extern cairo_surface_t *g_pVisibleZoneSurfaceAlpha;
 extern double g_fVisibleZoneImageWidth, g_fVisibleZoneImageHeight;
 extern int g_iNbStripes;
+extern double g_fStripesAngle;
+extern double g_fStripesWidth;
+extern double g_fStripesColorBright[4];
+extern double g_fStripesColorDark[4];
+extern cairo_surface_t *g_pStripesBuffer;
+
 extern gboolean g_bHorizontalDock;
 extern gboolean g_bDirectionUp;
 
-extern gboolean g_bAtBottom;
 extern int g_iScreenWidth;
 extern int g_iScreenHeight;
 extern gboolean g_bShowAppli;
@@ -91,6 +88,7 @@ extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
+
 
 #ifdef HAVE_GLITZ
 extern gboolean g_bUseGlitz;
@@ -127,54 +125,6 @@ void cairo_dock_calculate_contrainted_icon_size (double *fImageWidth, double *fI
 
 
 
-void cairo_dock_insert_icon_in_list (Icon *icon, GtkWidget *pWidget, gboolean bUpdateSize, gboolean bAnimated)
-{
-	g_return_if_fail (icon != NULL);
-	
-	//\______________ On regarde si on doit inserer un separateur.
-	if (! CAIRO_DOCK_IS_SEPARATOR (icon))
-	{
-		Icon *pSameTypeIcon = cairo_dock_get_first_icon_of_type (icon->iType);
-		if (pSameTypeIcon == NULL && icons != NULL)
-		{
-			cairo_t *pSourceContext = cairo_dock_create_context_from_window (pWidget->window);
-			int iSeparatorType = -1;
-			if (g_tIconTypeOrder[icon->iType] > 1)  // on l'insere avant nous de preference.
-				iSeparatorType = icon->iType - 1;
-			else if (g_tIconTypeOrder[icon->iType] + 1 < CAIRO_DOCK_NB_TYPES)
-				iSeparatorType = icon->iType + 1;
-			//g_print ("iSeparatorType : %d\n", iSeparatorType);
-			if (iSeparatorType != -1)
-			{
-				Icon *pSeparatorIcon = cairo_dock_create_separator_icon (pSourceContext, iSeparatorType);
-				icons = g_list_insert_sorted (icons,
-					pSeparatorIcon,
-					(GCompareFunc) cairo_dock_compare_icons_order);
-				g_iMinDockWidth += g_iIconGap + pSeparatorIcon->fWidth;
-				g_iMaxIconHeight = MAX (g_iMaxIconHeight, pSeparatorIcon->fHeight);
-			}
-		}
-	}
-	
-	//\______________ On insere l'icone a sa place dans la liste.
-	icons = g_list_insert_sorted (icons,
-		icon,
-		(GCompareFunc) cairo_dock_compare_icons_order);
-	
-	g_iMinDockWidth += g_iIconGap + icon->fWidth;
-	g_iMaxIconHeight = MAX (g_iMaxIconHeight, icon->fHeight);
-	
-	//\______________ On effectue les actions demandees.
-	if (bAnimated)
-		icon->fPersonnalScale = - 0.95;
-	
-	if (bUpdateSize)
-		cairo_dock_update_dock_size (pWidget, g_iMaxIconHeight, g_iMinDockWidth);
-	
-	
-}
-
-
 
 void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdouble fMaxScale)
 {
@@ -209,9 +159,6 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	{
 		icon->pIconBuffer = cairo_dock_create_separator_surface (pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight);
 	}
-	
-	g_iMinDockWidth += g_iIconGap + icon->fWidth;
-	g_iMaxIconHeight = MAX (g_iMaxIconHeight, icon->fHeight);
 }
 
 
@@ -258,8 +205,8 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, gbool
 	pango_layout_get_pixel_extents (pLayout, &ink, &log);
 	
 	pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-						    CAIRO_CONTENT_COLOR_ALPHA,
-						    ink.width + 2, ink.height + 2);
+		CAIRO_CONTENT_COLOR_ALPHA,
+		ink.width + 2, ink.height + 2);
 	pCairoContext = cairo_create (pNewSurface);
 	cairo_translate (pCairoContext, -ink.x, -ink.y);
 	
@@ -294,30 +241,34 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, gbool
 }
 
 
-void cairo_dock_reload_buffers (GtkWidget *pWidget, double fMaxScale, int iLabelSize, gboolean bUseText)
+void cairo_dock_reload_buffers_in_dock (CairoDock *pDock, double fMaxScale, int iLabelSize, gboolean bUseText)
 {
-	g_iMinDockWidth = - g_iIconGap;
-	g_iMaxIconHeight = 0;
+	pDock->iMinDockWidth = - g_iIconGap;
+	pDock->iMaxIconHeight = 0;
 	
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pWidget->window);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
 	
 	Icon* icon;
 	GList* ic;
-	for (ic = icons; ic != NULL; ic = ic->next)
+	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
 		
 		cairo_dock_fill_one_icon_buffer (icon, pCairoContext, fMaxScale);
+		pDock->iMinDockWidth += g_iIconGap + icon->fWidth;
+		pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, icon->fHeight);
 		
 		cairo_dock_fill_one_text_buffer (icon, pCairoContext, bUseText, g_iLabelSize, g_cLabelPolice);
+		
+		if (icon->pSubDock != NULL)
+		{
+			cairo_dock_reload_buffers_in_dock (icon->pSubDock, fMaxScale, iLabelSize, bUseText);
+		}
 	}
 	
 	cairo_destroy (pCairoContext);
-	g_iMaxDockHeight = (int) (fMaxScale * g_iMaxIconHeight) + iLabelSize;
+	pDock->iMaxDockHeight = (int) (fMaxScale * pDock->iMaxIconHeight) + iLabelSize;
 }
-
-
-
 
 
 
@@ -362,32 +313,108 @@ void cairo_dock_load_background_image (GtkWindow *pWindow, gchar *image_filename
 			g_fVisibleZoneImageHeight = tmp;
 			cairo_rotate (pCairoContext, .2,);
 		}*/
+		cairo_destroy (pCairoContext);
+		
+		pCairoContext = cairo_dock_create_context_from_window (GTK_WIDGET (pWindow)->window);
+		g_pVisibleZoneSurfaceAlpha = cairo_surface_create_similar (cairo_get_target (pCairoContext),
+			CAIRO_CONTENT_COLOR_ALPHA,
+			g_fVisibleZoneImageWidth,
+			g_fVisibleZoneImageHeight);
+		cairo_destroy (pCairoContext);
+		pCairoContext = cairo_create (g_pVisibleZoneSurfaceAlpha);
+		cairo_set_source_surface (pCairoContext, g_pVisibleZoneSurface, 0, 0);
+		cairo_paint_with_alpha (pCairoContext, 0.4);
+		
+		cairo_destroy (pCairoContext);
 		g_free (cImagePath);
 	}
 }
 
-
-
-
-void cairo_dock_init_list_with_desktop_files (GtkWidget *pWidget, gchar *cDirectory)
+void cairo_dock_update_stripes_if_necessary (GtkWidget *pWidget, int iNewMaxDockWidth, int iNewMaxIconHeight, gboolean bForce)
 {
-	icons = NULL;
-	
-	DIR* dir = opendir (cDirectory);
-	g_return_if_fail (dir != NULL);
-	
-	Icon* icon;
-	gchar *cFileName;
-	struct dirent *dirpointer;
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pWidget->window);
-	while ((dirpointer = readdir (dir)) != NULL)
+	static int iStripesWidth = 0, iStripesHeight = 0;
+	if (g_iNbStripes > 0)
 	{
-		cFileName = dirpointer->d_name;
-		if (g_str_has_suffix (cFileName, ".desktop"))
+		if (iNewMaxDockWidth > iStripesWidth || iNewMaxIconHeight > iStripesHeight || bForce)
 		{
-			icon = cairo_dock_create_icon_from_desktop_file (cFileName, pCairoContext);
-			cairo_dock_insert_icon_in_list (icon, pWidget, FALSE, FALSE);  // inutile de passer le widget ici.
+			if (bForce)
+			{
+				iStripesWidth = iNewMaxDockWidth;
+				iStripesHeight = iNewMaxIconHeight;
+			}
+			else
+			{
+				iStripesWidth = MAX (iStripesWidth, iNewMaxDockWidth);
+				iStripesHeight = MAX (iStripesHeight, iNewMaxIconHeight);
+			}
+			
+			cairo_pattern_t *pStripesPattern = cairo_pattern_create_linear (0.0f,
+			0.0f,
+			200,
+			(gdouble) 200. * tan (g_fStripesAngle * G_PI/180.));
+			g_return_if_fail (cairo_pattern_status (pStripesPattern) == CAIRO_STATUS_SUCCESS);
+			
+			
+			cairo_pattern_set_extend (pStripesPattern, CAIRO_EXTEND_REPEAT);
+			gdouble fStep;
+			double fStripesGap = 1. / (g_iNbStripes);  // ecart entre 2 rayures foncees.
+			for (fStep = 0.0f; fStep < 1.0f; fStep += fStripesGap)
+			{
+				cairo_pattern_add_color_stop_rgba (pStripesPattern,
+					fStep - g_fStripesWidth / 2,
+					g_fStripesColorBright[0],
+					g_fStripesColorBright[1],
+					g_fStripesColorBright[2],
+					g_fStripesColorBright[3]);
+				cairo_pattern_add_color_stop_rgba (pStripesPattern,
+					fStep,
+					g_fStripesColorDark[0],
+					g_fStripesColorDark[1],
+					g_fStripesColorDark[2],
+					g_fStripesColorDark[3]);
+				cairo_pattern_add_color_stop_rgba (pStripesPattern,
+					fStep + g_fStripesWidth / 2,
+					g_fStripesColorBright[0],
+					g_fStripesColorBright[1],
+					g_fStripesColorBright[2],
+					g_fStripesColorBright[3]);
+			}
+			
+			cairo_t *pCairoContext = cairo_dock_create_context_from_window (pWidget->window);
+			
+			cairo_surface_destroy (g_pStripesBuffer);
+			g_pStripesBuffer = cairo_surface_create_similar (cairo_get_target (pCairoContext),
+				CAIRO_CONTENT_COLOR_ALPHA,
+				ceil (2 * iStripesWidth),
+				ceil (iStripesHeight));
+			cairo_t *pImageContext = cairo_create (g_pStripesBuffer);
+			cairo_set_source (pImageContext, pStripesPattern);
+			cairo_paint (pImageContext);
+			
+			cairo_pattern_destroy (pStripesPattern);
+			cairo_destroy (pCairoContext);
+			cairo_destroy (pImageContext);
 		}
 	}
 }
 
+
+static void _cairo_dock_search_max_docks_size (gchar *cDockName, CairoDock *pDock, int *data)
+{
+	if (pDock->iMaxDockWidth > data[0])
+		data[0] = pDock->iMaxDockWidth;
+	if (pDock->iMaxIconHeight > data[1])
+		data[1] = pDock->iMaxIconHeight;
+}
+void cairo_dock_load_stripes_background (CairoDock *pMainDock)
+{
+	if (g_iNbStripes > 0)
+	{
+		int iMaxDocksWidth = 0, iMaxIconsHeight = 0;
+		int data[2] = {0, 0};  // iMaxDocksWidth, iMaxIconsHeight.
+		g_hash_table_foreach (g_hDocksTable, (GHFunc) _cairo_dock_search_max_docks_size, &data);
+		
+		cairo_dock_update_stripes_if_necessary (pMainDock->pWidget, data[0], data[1], TRUE);
+	}
+	
+}

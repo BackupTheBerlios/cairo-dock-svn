@@ -10,7 +10,7 @@
 cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight);
 
 
-Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorType);
+Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorType, CairoDock *pDock);
 
 
 #endif

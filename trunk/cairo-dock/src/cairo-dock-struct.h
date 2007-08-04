@@ -16,7 +16,42 @@ released under the terms of the GNU General Public License.
 #include <librsvg/rsvg-cairo.h>
 
 
-typedef gpointer (*CairoDockModuleInit) (cairo_t *pSourceContext, GError **erreur);  // renvoie son icone si il en a.
+
+typedef struct _CairoDock {
+	GList* icons;
+	GtkWidget *pWidget;
+	gboolean bIsMainDock;
+	gint iRefCount;  // le nombre d'icones pointant sur lui.
+	gint iGapX;  // decalage de la zone par rapport au milieu bas de l'ecran.
+	gint iGapY;
+	
+	gint iCurrentWidth;  // inutile sans glitz.
+	gint iCurrentHeight;
+	
+	gboolean bAtBottom;
+	gboolean bAtTop;
+	gboolean bInside;
+	gboolean bMenuVisible;
+	
+	gfloat fMagnitude; // coef multiplicateur de l'amplitude de la sinusoide (entre 0 et 1)
+	gdouble fGradientOffsetX;  // decalage des rayures pour les faire suivre la souris.
+	
+	gint iMaxIconHeight;  // max des hauteurs des icones.
+	gint iMinDockWidth;  // taille minimale du dock.
+	gint iMaxDockWidth;  // taille maximale du dock.
+	gint iMaxDockHeight;
+	
+	gint iWindowPositionX;  // dock-windows current y-position
+	gint iWindowPositionY;  // dock-windows current y-position
+	gint iSidMoveDown;  // serial ID du thread de descente de la fenetre.
+	gint iSidMoveUp;  // serial ID du thread de montee de la fenetre.
+	gint iSidGrowUp;  // serial ID du thread de grossisement des icones.
+	gint iSidShrinkDown;  // serial ID du thread de diminution des icones.
+	} CairoDock;
+
+
+
+typedef gpointer (*CairoDockModuleInit) (GtkWidget *pWidget, GError **erreur);  // renvoie son icone si il en a.
 
 typedef void (*CairoDockModuleStop) ();
 
@@ -35,10 +70,7 @@ typedef struct _CairoDockModule {
 	gboolean bActive;
 } CairoDockModule;
 
-/*typedef struct _CairoDockMenuEntry {
-	gchar *cLabel;
-	gpointer pCallback;
-	} CairoDockMenuEntry;*/
+
 
 typedef enum {
 	CAIRO_DOCK_LAUNCHER = 0,
@@ -49,7 +81,6 @@ typedef enum {
 	CAIRO_DOCK_NB_TYPES
 	} CairoDockIconType;
 
-
 typedef struct _Icon {
 	//\____________ renseignes lors de la creation de l'icone.
 	gchar *acDesktopFileName;
@@ -58,6 +89,8 @@ typedef struct _Icon {
 	gchar* acCommand;
 	CairoDockIconType iType;
 	gdouble fOrder;
+	CairoDock *pSubDock;
+	gchar *cParentDockName;
 	//\____________ calcules lors du chargement de l'icone.
 	gdouble fWidth;
 	gdouble fHeight;
@@ -65,10 +98,10 @@ typedef struct _Icon {
 	cairo_surface_t* pTextBuffer;
 	gdouble fTextXOffset;
 	gdouble fTextYOffset;
-	gdouble fPhase;
 	gdouble fXMax;
 	gdouble fXMin;
 	//\____________ calcules a chaque fois.
+	gdouble fPhase;
 	gdouble fX;
 	gdouble fY;
 	gdouble fScale;
@@ -87,6 +120,8 @@ typedef struct _Icon {
 
 
 #define CAIRO_DOCK_LAST_ORDER -1e9
+
+#define CAIRO_DOCK_MAIN_DOCK_NAME "_MainDock_"
 
 
 typedef enum {

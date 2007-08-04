@@ -7,36 +7,33 @@
 #include "cairo-dock-struct.h"
 
 
-double get_current_dock_width ();
+double get_current_dock_width (GList *pIconList);
 
-double get_dock_offset_y ();
+double get_current_dock_offset_x (GList *pIconList);
 
-double get_current_dock_offset_x ();
+double get_current_dock_offset_y (CairoDock *pDock);
 
-double get_current_dock_offset_y ();
-
-void cairo_dock_update_dock_size (GtkWidget *pWidget, int iMaxIconHeight, int iMinDockWidth);
 
 
 cairo_t * cairo_dock_create_context_from_window (GdkWindow* pWindow);
 
-void render (GtkWidget *pWidget);
+void render (CairoDock *pDock);
 
-void cairo_dock_render_background (GtkWidget *pWidget);
+void cairo_dock_render_background (CairoDock *pDock);
 
-void cairo_dock_render_blank (GtkWidget *pWidget);
-
-
-
-gboolean grow_up2 (GtkWidget* pWidget);
-
-gboolean shrink_down2 (GtkWidget* pWidget);
+void cairo_dock_render_blank (CairoDock *pDock);
 
 
 
-void cairo_dock_redraw_my_icon (Icon *icon);
+gboolean grow_up2 (CairoDock *pDock);
 
-void cairo_dock_render_optimized (GtkWidget *pWidget, GdkRectangle *pArea);
+gboolean shrink_down2 (CairoDock *pDock);
+
+
+
+void cairo_dock_redraw_my_icon (Icon *icon, GtkWidget *pWidget);
+
+void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea);
 
 
 #endif

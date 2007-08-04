@@ -5,52 +5,53 @@
 #include <gtk/gtk.h>
 
 
-gboolean move_up2 (GtkWidget *pWidget);
+gboolean move_up2 (CairoDock *pDock);
 
-gboolean move_down2 (GtkWidget *pWidget);
+gboolean move_down2 (CairoDock *pDock);
 
 
 gboolean on_expose (GtkWidget *pWidget,
-			GdkEventExpose *pExpose);
+			GdkEventExpose *pExpose,
+			CairoDock *pDock);
 
 gboolean on_motion_notify2 (GtkWidget* pWidget,
 					GdkEventMotion* pMotion,
-					gpointer data);
+					CairoDock *pDock);
 
 
 gboolean on_leave_notify2 (GtkWidget* pWidget,
 					GdkEventCrossing* pEvent,
-					gpointer data);
+					CairoDock *pDock);
 
 gboolean on_enter_notify2 (GtkWidget* pWidget,
 					GdkEventCrossing* pEvent,
-					gpointer data);
+					CairoDock *pDock);
 
 
-void cairo_dock_update_gaps_with_window_position (GtkWidget *pWidget);
+void cairo_dock_update_gaps_with_window_position (CairoDock *pDock);
 
 gboolean on_key_release (GtkWidget *pWidget,
 				GdkEventKey *pKey,
-				gpointer userData);
+				CairoDock *pDock);
 gboolean on_key_press (GtkWidget *pWidget,
 				GdkEventKey *pKey,
-				gpointer userData);
+				CairoDock *pDock);
 
 
 gboolean on_button_press2 (GtkWidget* pWidget,
 					GdkEventButton* pButton,
-					GdkWindowEdge edge);
+					CairoDock *pDock);
 gboolean on_button_release (GtkWidget* pWidget,
 					GdkEventButton* pButton,
-					GdkWindowEdge edge);
+					CairoDock *pDock);
 
 
 gboolean on_configure (GtkWidget* pWidget,
 	   			GdkEventConfigure* pEvent,
-	   			gpointer userData);
+	   			CairoDock *pDock);
 
-void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, GtkSelectionData *selection_data, guint info, guint t, gpointer data);
-void on_drag_motion (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, guint t, gpointer data);
+void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, GtkSelectionData *selection_data, guint info, guint t, CairoDock *pDock);
+void on_drag_motion (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, guint t, CairoDock *pDock);
 
 
 #endif

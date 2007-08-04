@@ -30,24 +30,13 @@ released under the terms of the GNU General Public License.
 #include "cairo-dock-draw.h"
 #include "cairo-dock-icons.h"
 #include "cairo-dock-load.h"
+#include "cairo-dock-dock-factory.h"
 #include "cairo-dock-modules.h"
 
 
-extern GList* icons;
-
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
-extern gint g_iCurrentWidth;
-extern gint g_iCurrentHeight;
 
-extern float g_fMagnitude;
-
-extern gboolean g_bAtBottom;
-extern gboolean g_bAtTop;
-extern gboolean g_bInside;
-
-extern gint g_iWindowPositionX;
-extern gint g_iWindowPositionY;
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
 extern double g_fLineColor[4];
@@ -56,31 +45,19 @@ extern int g_iLabelSize;
 extern gboolean g_bRoundedBottomCorner;
 extern gboolean g_bAutoHide;
 
-extern gdouble g_fGradientOffsetX;
 extern double g_fStripesColorBright[4];
 extern double g_fStripesColorDark[4];
 
-extern int g_iMaxDockWidth;
-extern int g_iMaxDockHeight;
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
-extern int g_iGapX;
-extern int g_iGapY;
-extern int g_iMaxIconHeight;
 extern gchar *g_cCairoDockDataDir;
 
 extern cairo_surface_t *g_pVisibleZoneSurface;
 extern double g_fVisibleZoneImageWidth, g_fVisibleZoneImageHeight;
 extern double g_fVisibleZoneAlpha;
 extern int g_iNbStripes;
-extern int g_iMinDockWidth;
 extern double g_fAmplitude;
 extern int g_iSinusoidWidth;
-
-extern int g_iSidMoveDown;
-extern int g_iSidMoveUp;
-extern int g_iSidGrowUp;
-extern int g_iSidShrinkDown;
 
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
@@ -254,12 +231,11 @@ void cairo_dock_preload_module_from_directory (gchar *cModuleDirPath, GHashTable
 }
 
 
-void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, GHashTable *pModuleTable, GtkWidget *pWidget)
+void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, GHashTable *pModuleTable, CairoDock *pDock)
 {
 	GError *erreur = NULL;
 	gchar *cModuleName;
 	CairoDockModule *pModule;
-	cairo_t* pCairoContext = cairo_dock_create_context_from_window (pWidget->window);
 	int i = 0, iOrder = 0;
 	while (cActiveModuleList[i] != NULL)
 	{
@@ -268,7 +244,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, GHashTabl
 		pModule = g_hash_table_lookup (pModuleTable, cModuleName);
 		if (pModule != NULL)
 		{
-			Icon *pIcon = cairo_dock_activate_module (pModule, pCairoContext, &erreur);
+			Icon *pIcon = cairo_dock_activate_module (pModule, pDock->pWidget, &erreur);
 			if (erreur != NULL)
 			{
 				g_print ("Attention : %s", erreur->message);
@@ -279,12 +255,11 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, GHashTabl
 			{
 				pIcon->pModule = pModule;
 				pIcon->fOrder = iOrder ++;
-				cairo_dock_insert_icon_in_list (pIcon, pWidget, FALSE, FALSE);
+				cairo_dock_insert_icon_in_dock (pIcon, pDock, FALSE, FALSE);
 			}
 		}
 		i ++;
 	}
-	cairo_destroy (pCairoContext);
 }
 
 
@@ -301,7 +276,7 @@ void cairo_dock_free_module (CairoDockModule *module)
 	g_free (module);
 }
 
-Icon * cairo_dock_activate_module (CairoDockModule *module, cairo_t *pCairoContext, GError **erreur)
+Icon * cairo_dock_activate_module (CairoDockModule *module, GtkWidget *pWidget, GError **erreur)
 {
 	if (module == NULL)
 	{
@@ -327,7 +302,7 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, cairo_t *pCairoConte
 	}
 	
 	
-	Icon *icon = module->initModule (pCairoContext, &tmp_erreur);
+	Icon *icon = module->initModule (pWidget, &tmp_erreur);
 	if (tmp_erreur != NULL)
 	{
 		g_propagate_error (erreur, tmp_erreur);
@@ -356,7 +331,7 @@ void cairo_dock_deactivate_module (CairoDockModule *module)
 	module->configModule = NULL;
 }
 
-void cairo_dock_configure_module (CairoDockModule *module, GtkWidget *pWidget, GError **erreur)
+void cairo_dock_configure_module (CairoDockModule *module, CairoDock *pDock, GError **erreur)
 {
 	g_return_if_fail (module != NULL);
 	
@@ -374,9 +349,7 @@ void cairo_dock_configure_module (CairoDockModule *module, GtkWidget *pWidget, G
 		}
 		
 		GError *tmp_erreur = NULL;
-		cairo_t *pCairoContext = cairo_dock_create_context_from_window (pWidget->window);
-		Icon *pNewIcon = module->initModule (pCairoContext, &tmp_erreur);
-		cairo_destroy (pCairoContext);
+		Icon *pNewIcon = module->initModule (pDock->pWidget, &tmp_erreur);
 		if (pNewIcon != NULL)
 			pNewIcon->pModule = module;
 		if (tmp_erreur != NULL)
@@ -386,31 +359,31 @@ void cairo_dock_configure_module (CairoDockModule *module, GtkWidget *pWidget, G
 			return ;
 		}
 		
-		Icon *pOldIcon = cairo_dock_find_icon_from_module (module);
+		Icon *pOldIcon = cairo_dock_find_icon_from_module (module, pDock->icons);
 		if (pOldIcon != NULL)
 		{
 			pOldIcon->pModule = NULL;
 			if (pNewIcon != NULL)
 				pNewIcon->fOrder = pOldIcon->fOrder;
-			cairo_dock_remove_icon_from_dock (pOldIcon);
+			cairo_dock_remove_icon_from_dock (pDock, pOldIcon);
 			cairo_dock_free_icon (pOldIcon);
 		}
 		
 		if (pNewIcon != NULL)
 		{
-			cairo_dock_insert_icon_in_list (pNewIcon, pWidget, TRUE, FALSE);
-			cairo_dock_redraw_my_icon (pNewIcon);
+			cairo_dock_insert_icon_in_dock (pNewIcon, pDock, TRUE, FALSE);
+			cairo_dock_redraw_my_icon (pNewIcon, pDock->pWidget);
 		}
 	}
 }
 
 
 
-Icon *cairo_dock_find_icon_from_module (CairoDockModule *module)
+Icon *cairo_dock_find_icon_from_module (CairoDockModule *module, GList *pIconList)
 {
 	Icon *icon;
 	GList *ic;
-	for (ic = icons; ic != NULL; ic = ic->next)
+	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
 		if (icon->pModule == module)
