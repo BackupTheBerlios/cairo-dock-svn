@@ -488,7 +488,8 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, int x_abs, gd
 	if (pointed_ic == NULL)
 	{
 		pointed_ic = g_list_last (pIconList);
-		g_return_val_if_fail (pointed_ic != NULL, NULL);
+		if (pointed_ic == NULL)  // peut arriver si le dock est vide.
+			return NULL;
 		icon = pointed_ic->data;
 		icon->fX = x_cumulated - iMinDockWidth / 2 + iWidth / 2 - icon->fWidth * icon->fScale - g_iIconGap;
 	}
@@ -559,6 +560,9 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 double cairo_dock_calculate_max_dock_width (GList *pIconList, int iFlatDockWidth)
 {
 	double fMaxDockWidth = 0.;
+	//g_print ("%s (%d)\n", __func__, iFlatDockWidth);
+	if (pIconList == NULL)
+		return 2 * g_iDockRadius + g_iDockLineWidth;
 	
 	//\_______________ On remet a zero les positions d'equilibre des icones.
 	GList* ic;
@@ -573,10 +577,10 @@ double cairo_dock_calculate_max_dock_width (GList *pIconList, int iFlatDockWidth
 	
 	//\_______________ On simule le passage du curseur sur toute la largeur du dock, et on chope la largeur maximale qui s'en degage, ainsi que les positions d'equilibre de chaque icone.
 	int iVirtualMouseX;
+	double fMaxBorderX = 0;
 	for (iVirtualMouseX = 0; iVirtualMouseX < iFlatDockWidth; iVirtualMouseX ++)
 	{
 		cairo_dock_calculate_icons_with_position (pIconList, iVirtualMouseX, 1, iFlatDockWidth, 0, 0);
-		
 		for (ic = pIconList; ic != NULL; ic = ic->next)
 		{
 			icon = ic->data;
@@ -586,8 +590,10 @@ double cairo_dock_calculate_max_dock_width (GList *pIconList, int iFlatDockWidth
 			if (icon->fX < icon->fXMin)
 				icon->fXMin = icon->fX;
 		}
-		fMaxDockWidth = MAX (fMaxDockWidth, get_current_dock_width (pIconList));
+		//fMaxDockWidth = MAX (fMaxDockWidth, get_current_dock_width (pIconList));
+		fMaxBorderX = MAX (fMaxBorderX, icon->fX + icon->fWidth * icon->fScale);
 	}
+	fMaxDockWidth = fMaxBorderX - cairo_dock_get_first_icon (pIconList)->fXMin + 2 * g_iDockRadius + g_iDockLineWidth;
 	
 	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{

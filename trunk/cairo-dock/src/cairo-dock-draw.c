@@ -90,7 +90,7 @@ double get_current_dock_width (GList *pIconList)
 		return 2 * g_iDockRadius + g_iDockLineWidth;
 	Icon *pLastIcon = get_last_icon (pIconList);
 	Icon *pFirstIcon = get_first_icon (pIconList);
-	double fWidth = (pLastIcon != NULL ? pLastIcon->fX + pLastIcon->fWidth * pLastIcon->fScale : 0) - (pFirstIcon != NULL ? pFirstIcon->fX : 0) + 2 * g_iDockRadius + g_iDockLineWidth;
+	double fWidth = pLastIcon->fX + pLastIcon->fWidth * pLastIcon->fScale - pFirstIcon->fX + 2 * g_iDockRadius + g_iDockLineWidth;
 	
 	return fWidth;
 }
@@ -171,7 +171,7 @@ void render (CairoDock *pDock)
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
 	g_return_if_fail (pCairoContext != NULL);
 	
-	cairo_set_tolerance (pCairoContext, 1.0);  // avec moins que 1.0 on ne voit pas la difference.
+	cairo_set_tolerance (pCairoContext, 0.5);  // avec moins que 0.5 on ne voit pas la difference.
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 	cairo_paint (pCairoContext);
@@ -483,7 +483,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 	g_return_if_fail (pCairoContext != NULL);
 
 	/* set rendering-"fidelity" and clear canvas */
-	cairo_set_tolerance (pCairoContext, 1.0);
+	cairo_set_tolerance (pCairoContext, 0.5);
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 	cairo_paint (pCairoContext);

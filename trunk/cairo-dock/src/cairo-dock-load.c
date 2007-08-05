@@ -33,11 +33,16 @@ released under the terms of the GNU General Public License.
 #include "cairo-dock-application-factory.h"
 #include "cairo-dock-separator-factory.h"
 #include "cairo-dock-applet-factory.h"
+#include "cairo-dock-modules.h"
+#include "cairo-dock-dock-factory.h"
 #include "cairo-dock-load.h"
 
 extern GHashTable *g_hDocksTable;
-extern int g_iSinusoidWidth;
+extern CairoDock *g_pMainDock;
 
+GHashTable *g_hModuleTable;
+
+extern int g_iSinusoidWidth;
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
 extern int g_iIconGap;
@@ -47,6 +52,7 @@ extern int g_iLabelSize;
 extern gchar *g_cLabelPolice;
 extern gchar **g_cDefaultIconDirectory;
 extern gchar *g_cCairoDockDataDir;
+extern gchar *g_cConfFile;
 
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
@@ -323,7 +329,7 @@ void cairo_dock_load_background_image (GtkWindow *pWindow, gchar *image_filename
 		cairo_destroy (pCairoContext);
 		pCairoContext = cairo_create (g_pVisibleZoneSurfaceAlpha);
 		cairo_set_source_surface (pCairoContext, g_pVisibleZoneSurface, 0, 0);
-		cairo_paint_with_alpha (pCairoContext, 0.4);
+		cairo_paint_with_alpha (pCairoContext, 0.5);
 		
 		cairo_destroy (pCairoContext);
 		g_free (cImagePath);
@@ -408,6 +414,8 @@ static void _cairo_dock_search_max_docks_size (gchar *cDockName, CairoDock *pDoc
 }
 void cairo_dock_load_stripes_background (CairoDock *pMainDock)
 {
+	cairo_surface_destroy (g_pStripesBuffer);
+	g_pStripesBuffer = NULL;
 	if (g_iNbStripes > 0)
 	{
 		int iMaxDocksWidth = 0, iMaxIconsHeight = 0;
@@ -416,5 +424,92 @@ void cairo_dock_load_stripes_background (CairoDock *pMainDock)
 		
 		cairo_dock_update_stripes_if_necessary (pMainDock->pWidget, data[0], data[1], TRUE);
 	}
+}
+
+
+gpointer cairo_dock_init (gpointer data)
+{
+	//while (gtk_events_pending ())
+	//	gtk_main_iteration ();
 	
+	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
+	GError *erreur = NULL;
+	if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
+	{
+		GHashTable *pThemeTable = cairo_dock_list_themes (CAIRO_DOCK_SHARE_THEMES_DIR, &erreur);
+		if (erreur != NULL)
+		{
+			g_print ("Attention : %s\n", erreur->message);
+			g_error_free (erreur);
+			exit (1);
+		}
+		
+		gchar *cTemporaryFilePath = g_strdup ("/tmp/cairo-dock-init");
+		g_file_set_contents (cTemporaryFilePath, "#!\n[INIT]\ntheme = default", -1, &erreur);
+		if (erreur != NULL)
+		{
+			g_print ("Error while writing data : %s\n", erreur->message);
+			g_error_free (erreur);
+			exit (1);
+		}
+		cairo_dock_update_conf_file_with_hash_table (cTemporaryFilePath, pThemeTable, "INIT", "theme", 1, "Choose a theme to start using cairo-dock :");
+		
+		gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTemporaryFilePath, "Choose a theme to start with");
+		if (! bChoiceOK)
+		{
+			g_print ("Mata ne.\n");
+			exit (0);
+		}
+		
+		GKeyFile *pKeyFile = g_key_file_new ();
+		g_key_file_load_from_file (pKeyFile, cTemporaryFilePath, G_KEY_FILE_KEEP_COMMENTS, &erreur);
+		if (erreur != NULL)
+		{
+			g_print ("Attention : %s\n", erreur->message);
+			g_error_free (erreur);
+			exit (1);
+		}
+		gchar *cChosenTheme = g_key_file_get_string (pKeyFile, "INIT", "theme", &erreur);
+		if (erreur != NULL)
+		{
+			g_print ("Attention : %s\n", erreur->message);
+			g_error_free (erreur);
+			exit (1);
+		}
+		g_key_file_free (pKeyFile);
+		g_free (cTemporaryFilePath);
+		
+		
+		gchar *cCommand = g_strdup_printf ("mkdir -p %s", g_cCairoDockDataDir);
+		system (cCommand);
+		g_free (cCommand);
+		
+		cCommand = g_strdup_printf ("cp -r %s/%s/* %s", CAIRO_DOCK_SHARE_THEMES_DIR, cChosenTheme, g_cCairoDockDataDir);
+		system (cCommand);
+		g_free (cCommand);
+		
+		g_free (cChosenTheme);
+		g_hash_table_destroy (pThemeTable);
+		
+		if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
+		{
+			g_print("Attention : directory %s unreadable.\n", g_cCairoDockDataDir);
+			exit (1) ;
+		}
+	}
+	else if (! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS))
+	{
+		gchar *cCommand = g_strdup_printf ("cp %s/%s %s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_CONF_FILE, g_cCairoDockDataDir);
+		system (cCommand);
+		g_free (cCommand);
+	}
+	
+	
+	//\___________________ On lit le fichier de conf et on charge tout.
+	cairo_dock_update_conf_file_with_modules (g_cConfFile, g_hModuleTable);
+	
+	cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
+	
+	
+	return NULL;
 }

@@ -1,0 +1,15 @@
+#!
+[Desktop Entry]
+#s image's name or path:
+Icon=thunderbird.svg
+#s launcher's name:
+Name=Courrier
+#s Exec command:
+Exec=mozilla-thunderbird
+
+#i Order you want for this launcher among the other launchers:
+Order=2
+#s Name of the container it belongs to:
+Container = Web
+#b Is this icon a container ?
+Is container = false

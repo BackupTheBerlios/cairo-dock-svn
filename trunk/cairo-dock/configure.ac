@@ -33,8 +33,12 @@ PKG_CHECK_MODULES(PACKAGE, "gtk+-2.0 cairo librsvg-2.0 glitz")
 
 
 AC_CONFIG_FILES([Makefile
+		cairo-dock.pc
 		src/Makefile
 		data/Makefile
-		cairo-dock.pc
+		data/themes/Makefile
+		data/themes/default/Makefile
+		data/themes/Fabounet/Makefile
+		data/themes/Ubuntu/Makefile
 		])
 AC_OUTPUT

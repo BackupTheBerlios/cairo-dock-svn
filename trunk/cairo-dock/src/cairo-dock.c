@@ -56,15 +56,15 @@
 
 #include <math.h>
 #include <string.h>
-
-#include <pango/pango.h>
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <sys/types.h>
 #include <dirent.h>
+
+#include <pango/pango.h>
+#include <glib.h>
+#include <gtk/gtk.h>
+
 #ifdef HAVE_GLITZ
 #include <gdk/gdkx.h>
 #include <glitz-glx.h>
@@ -77,6 +77,7 @@
 #include "cairo-dock-callbacks.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-dock-factory.h"
+#include "cairo-dock-load.h"
 #include "cairo-dock-config.h"
 
 
@@ -242,7 +243,7 @@ main (int argc, char** argv)
 		}
 	}
 	
-	//\___________________ On definit des variables necessaires aux applis.
+	//\___________________ On definit quelques structures et quelques variables necessaires aux applis.
 	g_hAppliTable = g_hash_table_new_full (g_int_hash,
 		g_int_equal,
 		g_free,
@@ -261,39 +262,10 @@ main (int argc, char** argv)
 		NULL,  // la cle est le nom du module, et pointe directement sur le champ 'cModuleName' du module.
 		(GDestroyNotify) cairo_dock_free_module);
 	
-	
-	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
-	g_cCairoDockDataDir = g_strdup_printf ("%s/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR);
-	g_cConfFile = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_CONF_FILE);
-	if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
-	{
-		g_print("Attention : directory %s doesn't exist or is not readable. Trying to fix it ...\n", g_cCairoDockDataDir);
-		
-		gchar *cCommand = g_strdup_printf ("mkdir -p %s", g_cCairoDockDataDir);
-		system (cCommand);
-		g_free (cCommand);
-		
-		cCommand = g_strdup_printf ("cp %s/%s %s", CAIRO_DOCK_SHARE_DIR, CAIRO_DOCK_CONF_FILE, g_cCairoDockDataDir);
-		system (cCommand);
-		g_free (cCommand);
-		
-		cCommand = g_strdup_printf ("cp %s/* %s", CAIRO_DOCK_SHARE_DATA_DIR, g_cCairoDockDataDir);
-		system (cCommand);
-		g_free (cCommand);
-		
-		if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
-		{
-			g_print("Attention : directory %s unreadable.\n", g_cCairoDockDataDir);
-			exit (1) ;
-		}
-	}
-	else if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_EXISTS))
-	{
-		gchar *cCommand = g_strdup_printf ("cp %s/%s %s", CAIRO_DOCK_SHARE_DIR, CAIRO_DOCK_CONF_FILE, g_cCairoDockDataDir);
-		system (cCommand);
-		g_free (cCommand);
-	}
-	
+	g_hDocksTable = g_hash_table_new_full (g_str_hash,
+		g_str_equal,
+		g_free,
+		NULL);
 	
 	//\___________________ On pre-charge les modules existant.
 	GError *erreur = NULL;
@@ -304,24 +276,18 @@ main (int argc, char** argv)
 		g_error_free (erreur);
 		erreur = NULL;
 	}
-	cairo_dock_update_conf_file_with_modules (g_cConfFile, g_hModuleTable);
-	
 	
 	//\___________________ On cree le dock principal.
-	g_hDocksTable = g_hash_table_new_full (g_str_hash,
-		g_str_equal,
-		g_free,
-		NULL);
 	g_pMainDock = cairo_dock_create_new_dock (iWmHint, CAIRO_DOCK_MAIN_DOCK_NAME);
 	g_pMainDock->bIsMainDock = TRUE;
 	GdkScreen *gdkscreen = gtk_window_get_screen (GTK_WINDOW (g_pMainDock->pWidget));
         g_iScreenWidth = gdk_screen_get_width (gdkscreen);
         g_iScreenHeight = gdk_screen_get_height (gdkscreen);
 	
-	
-	//\___________________ On lit le fichier de conf et on charge tout.
-	cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
-	
+	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
+	g_cCairoDockDataDir = g_strdup_printf ("%s/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR);
+	g_cConfFile = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_CONF_FILE);
+	cairo_dock_init (NULL);
 	
 #ifdef HAVE_GLITZ
 	g_iCurrentWidth = g_iVisibleZoneWidth;
@@ -381,12 +347,7 @@ main (int argc, char** argv)
 		gtk_widget_set_colormap (pWindow, colormap);
 		gtk_widget_set_double_buffered (pWindow, FALSE);
 	}
-	else
-#endif
 	
-	
-	
-#ifdef HAVE_GLITZ
 	if (g_bUseGlitz)
 	{
 		glitz_format_t templ;
@@ -494,16 +455,8 @@ main (int argc, char** argv)
 		}
 	}*/
 	
+	cairo_dock_destroy_dock (g_pMainDock, CAIRO_DOCK_MAIN_DOCK_NAME, NULL, NULL);
 	
-	Icon *icon;
-	GList *ic;
-	for (ic = g_pMainDock->icons; ic != NULL; ic = ic->next)
-	{
-		icon = ic->data;
-		cairo_dock_free_icon (icon);
-	}
-	g_list_free (g_pMainDock->icons);
-
 	rsvg_term ();
 
 	return 0;

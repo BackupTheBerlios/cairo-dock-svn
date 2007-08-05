@@ -86,7 +86,7 @@ gboolean move_up2 (CairoDock *pDock)
 	if ((g_bDirectionUp && deltaY_possible > 0) || (! g_bDirectionUp && deltaY_possible < 0))  // alors on peut encore monter.
 	{
 		if (g_bHorizontalDock)
-			pDock->iWindowPositionY -= (int) (deltaY_possible * g_fMoveUpSpeed) + (g_bDirectionUp ? 1 : -1); // 0.5
+			pDock->iWindowPositionY -= (int) (deltaY_possible * g_fMoveUpSpeed) + (g_bDirectionUp ? 1 : -1);
 		else
 			pDock->iWindowPositionX += (int) (deltaY_possible * g_fMoveUpSpeed) + (g_bDirectionUp ? 1 : -1);
 		//g_print ("  move to (%dx%d)\n", g_iWindowPositionX, g_iWindowPositionY);
@@ -190,6 +190,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 {
 	static double fLastTime = 9;
 	static Icon *pLastPointedIcon = NULL;
+	static CairoDock *pLastDock = NULL;
 	//g_print ("%s (%d,%d) (%d, %.2fms)\n", __func__, (int) pMotion->x, (int) pMotion->y, pMotion->is_hint, pMotion->time - fLastTime);
 	
 	//\_______________ On elague le flux des MotionNotify, sinon X en envoie autant que le permet le CPU !
@@ -218,13 +219,30 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		gtk_widget_queue_draw (pWidget);
 	}
 	
-	
 	if (pPointedIcon != pLastPointedIcon)
 	{
-		if (pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
-			gtk_widget_hide (pLastPointedIcon->pSubDock->pWidget);
-		if (pPointedIcon->pSubDock != NULL)
-			gtk_widget_show (pPointedIcon->pSubDock->pWidget);
+		if (pDock == pLastDock && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
+			//gtk_widget_hide (pLastPointedIcon->pSubDock->pWidget);
+			gdk_window_hide (pLastPointedIcon->pSubDock->pWidget->window);
+		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL)
+		{
+			CairoDock *pSubDock = pPointedIcon->pSubDock;
+			
+			pSubDock->iGapX = pDock->iGapX + (pPointedIcon->fX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 - pDock->iMaxDockWidth / 2);
+			pSubDock->iGapY = pDock->iGapY + (pDock->iMaxDockHeight) * (g_bDirectionUp ? 1 : -1);
+			
+			pSubDock->iWindowPositionX = (g_iScreenWidth - pSubDock->iMinDockWidth) / 2 + pSubDock->iGapX;
+			pSubDock->iWindowPositionY = g_iScreenHeight - (pSubDock->iMaxIconHeight + g_iLabelSize) - pSubDock->iGapY;
+			
+			//gtk_widget_show (pSubDock->pWidget);
+			//gdk_window_show (pSubDock->pWidget->window);
+			gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
+			gdk_window_move (pSubDock->pWidget->window, pSubDock->iWindowPositionX, pSubDock->iWindowPositionY);
+			
+			
+			pLastDock = pDock;
+			
+		}
 		pLastPointedIcon = pPointedIcon;
 	}
 	
@@ -391,7 +409,7 @@ gboolean on_key_press (GtkWidget *pWidget,
 		switch (pKey->keyval)
 		{
 			case GDK_q :
-				if (pKey != NULL && pKey->state & GDK_CONTROL_MASK)  // CTRL + q quitte l'appli.
+				if (pDock->bIsMainDock && pKey != NULL && pKey->state & GDK_CONTROL_MASK)  // CTRL + q quitte l'appli.
 					gtk_main_quit ();
 			break;
 			

@@ -140,17 +140,50 @@ static void _cairo_dock_remove (GtkButton *button, gpointer *data)
 	g_free (cValue);
 }
 
+static void _cairo_dock_pick_a_file (GtkButton *button, gpointer *data)
+{
+	GtkEntry *pEntry = data[0];
+	gint iFileType = GPOINTER_TO_INT (data[1]);
+	GtkWindow *pParentWindow = data[2];
+	
+	GtkWidget* pFileChooserDialog = gtk_file_chooser_dialog_new (
+			(iFileType == 0 ? "Pick up a file" : "Pick up a directory"),
+			pParentWindow,
+			(iFileType == 0 ? GTK_FILE_CHOOSER_ACTION_OPEN : GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER),
+			GTK_STOCK_OK,
+			GTK_RESPONSE_OK,
+			GTK_STOCK_CANCEL,
+			GTK_RESPONSE_CANCEL,
+			NULL);
+	gchar *cDirectoryPath = g_path_get_basename (gtk_entry_get_text (pEntry));
+	gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (pFileChooserDialog), cDirectoryPath);
+	g_free (cDirectoryPath);
+	gtk_file_chooser_set_select_multiple (GTK_FILE_CHOOSER (pFileChooserDialog), FALSE);
+	gtk_widget_show (pFileChooserDialog);
+	int answer = gtk_dialog_run (GTK_DIALOG (pFileChooserDialog));
+	if (answer == GTK_RESPONSE_OK)
+	{
+		gchar *cFilePath = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (pFileChooserDialog));
+		gtk_entry_set_text (pEntry, cFilePath);
+	}
+	gtk_widget_destroy (pFileChooserDialog);
+}
+
 
 
 GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWidget *pParentWidget, GSList **pWidgetList)
 {
-	static gpointer* data = NULL;
+	static GPtrArray *s_pBufferArray = NULL;
 	
 	if (! cairo_dock_is_advanced_keyfile (pKeyFile))
 		return NULL;
 	
-	if (data == NULL)
-		data = g_new0 (gpointer, 2);
+	if (s_pBufferArray == NULL)
+	{
+		s_pBufferArray = g_ptr_array_new ();
+	}
+	gpointer *data;
+	int iNbBuffers = 0;
 	gsize length = 0;
 	gchar **pKeyList;
 	gchar **pGroupList = g_key_file_get_groups (pKeyFile, &length);
@@ -163,6 +196,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	GtkWidget *pTable;
 	GtkWidget *pButtonAdd, *pButtonRemove;
 	GtkWidget *pButtonDown, *pButtonUp;
+	GtkWidget *pButtonFileChooser;
 	GtkWidget *pFrame, *pFrameVBox;
 	gchar *cGroupName, *cKeyName, *cKeyComment, *cUsefulComment, *cAuthorizedValuesChain, **pAuthorizedValuesList;
 	gpointer *pGroupKeyWidget;
@@ -344,7 +378,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							else
 								fMaxValue = 9999;
 							pOneWidget = gtk_spin_button_new_with_range (fMinValue, fMaxValue, (fMaxValue - fMinValue) / 20.);
-							gtk_spin_button_set_digits (GTK_SPIN_BUTTON (pOneWidget), 2);
+							gtk_spin_button_set_digits (GTK_SPIN_BUTTON (pOneWidget), 3);
 							gtk_spin_button_set_value (GTK_SPIN_BUTTON (pOneWidget), fValue);
 							
 							pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
@@ -358,7 +392,10 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					break;
 					
 					case 's' :
+					case 'S' :
+					case 'D' :
 						//g_print ("  + a string\n");
+						pEntry = NULL;
 						length = 0;
 						cValueList = g_key_file_get_string_list (pKeyFile, cGroupName, cKeyName, &length, NULL);
 						if (iNbElements == 1)
@@ -367,6 +404,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							if (pAuthorizedValuesList == NULL || pAuthorizedValuesList[0] == NULL)
 							{
 								pOneWidget = gtk_entry_new ();
+								pEntry = pOneWidget;
 								gtk_entry_set_text (GTK_ENTRY (pOneWidget), cValue);
 							}
 							else
@@ -552,10 +590,49 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									GTK_SHRINK,
 									0,
 									0);
+								if (iNbBuffers < s_pBufferArray->len)
+								{
+									data = g_ptr_array_index (s_pBufferArray, iNbBuffers);
+								}
+								else
+								{
+									data = g_new (gpointer, 3);  // tous les buffers ont 3 elements.
+									g_ptr_array_add (s_pBufferArray, data);
+								}
+								iNbBuffers ++;
 								data[0] = pOneWidget;
 								data[1] = pEntry;
+								
 							}
 						}
+						
+						if (iElementType != 's' && pEntry != NULL)
+						{
+							if (iNbBuffers < s_pBufferArray->len)
+							{
+								data = g_ptr_array_index (s_pBufferArray, iNbBuffers);
+							}
+							else
+							{
+								data = g_new (gpointer, 3);
+								g_ptr_array_add (s_pBufferArray, data);
+							}
+							iNbBuffers ++;
+							data[0] = pEntry;
+							data[1] = GINT_TO_POINTER (iElementType == 'S' ? 0 : 1);
+							data[2] = GTK_WINDOW (dialog);
+							pButtonFileChooser = gtk_button_new_from_stock (GTK_STOCK_OPEN);
+							g_signal_connect (G_OBJECT (pButtonFileChooser),
+								"clicked",
+								G_CALLBACK (_cairo_dock_pick_a_file),
+								data);
+							gtk_box_pack_start (GTK_BOX (pHBox),
+								pButtonFileChooser,
+								FALSE,
+								FALSE,
+								0);
+						}
+						
 						g_strfreev (cValueList);
 					break;
 					

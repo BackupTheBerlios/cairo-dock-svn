@@ -25,5 +25,7 @@ void cairo_dock_update_stripes_if_necessary (GtkWidget *pWidget, int iNewMaxDock
 void cairo_dock_load_stripes_background (CairoDock *pMainDock);
 
 
+gpointer cairo_dock_init (gpointer data);
+
 #endif
 

@@ -12,8 +12,8 @@ endif
 cairo_dock_CFLAGS = \
 	$(PACKAGE_CFLAGS) \
 	$(include_verbose)\
-	-DCAIRO_DOCK_SHARE_DIR=\""$(pkgdatadir)"\"\
-	-DCAIRO_DOCK_SHARE_DATA_DIR=\""$(pkgdatadir)/data"\"\
+	-DCAIRO_DOCK_SHARE_DATA_DIR=\""$(pkgdatadir)"\"\
+	-DCAIRO_DOCK_SHARE_THEMES_DIR=\""$(pkgdatadir)/themes"\"\
 	-DCAIRO_DOCK_MODULES_DIR=\""$(pkgdatadir)/plug-in"\"\
 	-DCAIRO_DOCK_CONF_FILE=\""cairo-dock.conf"\"\
 	-std=c99\

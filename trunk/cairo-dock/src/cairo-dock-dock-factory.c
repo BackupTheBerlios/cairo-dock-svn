@@ -130,10 +130,11 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 		GDK_POINTER_MOTION_MASK |
 		GDK_POINTER_MOTION_HINT_MASK);
 	
-	g_signal_connect (G_OBJECT (pWindow),
-		"destroy",
-		G_CALLBACK (gtk_main_quit),
-		pDock);
+	if (strcmp (cDockName, CAIRO_DOCK_MAIN_DOCK_NAME) == 0)
+		g_signal_connect (G_OBJECT (pWindow),
+			"destroy",
+			G_CALLBACK (gtk_main_quit),
+			pDock);
 	g_signal_connect (G_OBJECT (pWindow),
 		"expose-event",
 		G_CALLBACK (on_expose),
@@ -227,7 +228,7 @@ void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMin
 {
 	//g_print ("%s (%d, %d)\n", __func__, iMaxIconHeight, iMinDockWidth);
 	pDock->iMaxDockHeight = (int) ((1 + g_fAmplitude) * iMaxIconHeight) + g_iLabelSize;
-	pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock->icons, iMinDockWidth)) + 1;  // + 1 pour gerer les largeur impaire.
+	pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock->icons, iMinDockWidth)) + 1;  // + 1 pour gerer les largeurs impaires.
 	cairo_dock_calculate_icons (pDock, 0, 0);
 	
 	if (! g_bAutoHide)
@@ -347,6 +348,7 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 			{
 				g_print ("le dock parent (%s) n'existe pas, on le cree\n", icon->cParentDockName);
 				pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_NORMAL, icon->cParentDockName);
+				pParentDock->iRefCount --;
 			}
 			
 			/*if (GPOINTER_TO_INT (icon->pSubDock) != 0)
@@ -380,9 +382,18 @@ void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *Rec
 	Icon *icon;
 	GList *ic;
 	gchar *cDesktopFilePath;
+	GKeyFile *pKeyFile;
+	GError *erreur = NULL;
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
+		
+		if (icon->pSubDock != NULL)
+		{
+			cairo_dock_destroy_dock (icon->pSubDock, icon->acName, ReceivingDock, cReceivingDockName);
+			icon->pSubDock = NULL;
+		}
+		
 		cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, icon->acDesktopFileName);
 		
 		if (ReceivingDock == NULL || cReceivingDockName == NULL)  // alors on les jete.
@@ -393,9 +404,7 @@ void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *Rec
 		}
 		else  // on les re-attribue au dock receveur.
 		{
-			cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, icon->acDesktopFileName);
-			GKeyFile *pKeyFile = g_key_file_new();
-			GError *erreur = NULL;
+			pKeyFile = g_key_file_new();
 			g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 			if (erreur != NULL)
 			{
@@ -405,10 +414,10 @@ void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *Rec
 			}
 			else
 			{
+				g_free (icon->cParentDockName);
 				icon->cParentDockName = g_strdup (cReceivingDockName);
 				g_key_file_set_string (pKeyFile, "Desktop Entry", "Container", icon->cParentDockName);
 				cairo_dock_write_keys_to_file (pKeyFile, cDesktopFilePath);
-				g_free (cDesktopFilePath);
 			}
 			g_key_file_free (pKeyFile);
 			
