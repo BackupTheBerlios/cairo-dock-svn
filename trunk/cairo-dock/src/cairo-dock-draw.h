@@ -36,5 +36,7 @@ void cairo_dock_redraw_my_icon (Icon *icon, GtkWidget *pWidget);
 void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea);
 
 
+void cairo_dock_hide_parent_docks (CairoDock *pDock);
+
 #endif
 

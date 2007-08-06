@@ -26,8 +26,10 @@ released under the terms of the GNU General Public License.
 
 #include "cairo-dock-icons.h"
 #include "cairo-dock-dock-factory.h"
+#include "cairo-dock-callbacks.h"
 #include "cairo-dock-draw.h"
 
+extern GHashTable *g_hDocksTable;
 
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
@@ -435,6 +437,13 @@ gboolean shrink_down2 (CairoDock *pDock)
 			gdk_window_get_pointer (pDock->pWidget->window, &iMouseX, &iMouseY, NULL);
 			
 			cairo_dock_calculate_icons (pDock, iMouseX, iMouseY);  // relance le grossissement si on est dedans.
+			if (! pDock->bInside && pDock->iRefCount > 0)
+			{
+					//gtk_widget_hide (pDock->pWidget);
+					//gtk_window_move (GTK_WINDOW (pDock->pWidget), 0, g_iScreenHeight + 1);
+					gdk_window_hide (pDock->pWidget->window);
+					cairo_dock_hide_parent_docks (pDock);
+			}
 			return FALSE;
 		}
 		
@@ -571,3 +580,25 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 	cairo_destroy (pCairoContext);
 }
 
+
+static gboolean _cairo_dock_hide_dock (gchar *cDockName, CairoDock *pDock, CairoDock *pChildDock)
+{
+	Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
+	if (pPointedIcon != NULL && pPointedIcon->pSubDock == pChildDock && ! pDock->bInside)
+	{
+		if (pDock->bIsMainDock)
+			cairo_dock_leave_from_main_dock (pDock);
+		else
+		{
+			//gtk_window_move (GTK_WINDOW (pDock->pWidget), 0, g_iScreenHeight + 1);
+			gdk_window_hide (pDock->pWidget->window);
+			cairo_dock_hide_parent_docks (pDock);
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
+void cairo_dock_hide_parent_docks (CairoDock *pDock)
+{
+	 g_hash_table_find (g_hDocksTable, (GHRFunc)_cairo_dock_hide_dock, pDock);
+}

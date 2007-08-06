@@ -39,7 +39,6 @@ extern double g_fLineColor[4];
 extern int g_iIconGap;
 extern int g_iLabelSize;
 extern gboolean g_bRoundedBottomCorner;
-extern gboolean g_bAutoHide;
 
 extern double g_fStripesColorBright[4];
 extern double g_fStripesColorDark[4];

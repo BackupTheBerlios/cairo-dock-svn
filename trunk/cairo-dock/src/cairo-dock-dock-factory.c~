@@ -387,17 +387,18 @@ void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *Rec
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
+		
+		if (icon->pSubDock != NULL)
+		{
+			cairo_dock_destroy_dock (icon->pSubDock, icon->acName, ReceivingDock, cReceivingDockName);
+			icon->pSubDock = NULL;
+		}
+		
 		cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, icon->acDesktopFileName);
 		
 		if (ReceivingDock == NULL || cReceivingDockName == NULL)  // alors on les jete.
 		{
 			g_remove (cDesktopFilePath);
-			
-			if (icon->pSubDock != NULL)
-			{
-				cairo_dock_destroy_dock (icon->pSubDock, icon->acName, ReceivingDock, cReceivingDockName);
-				icon->pSubDock = NULL;
-			}
 			
 			cairo_dock_free_icon (icon);
 		}

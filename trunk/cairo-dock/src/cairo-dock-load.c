@@ -462,7 +462,7 @@ gpointer cairo_dock_init (gpointer data)
 		}
 		
 		GKeyFile *pKeyFile = g_key_file_new ();
-		g_key_file_load_from_file (pKeyFile, cTemporaryFilePath, G_KEY_FILE_KEEP_COMMENTS, &erreur);
+		g_key_file_load_from_file (pKeyFile, cTemporaryFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 		if (erreur != NULL)
 		{
 			g_print ("Attention : %s\n", erreur->message);

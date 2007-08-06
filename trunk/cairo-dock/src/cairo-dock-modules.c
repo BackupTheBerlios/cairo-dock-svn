@@ -33,31 +33,7 @@ released under the terms of the GNU General Public License.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-modules.h"
 
-
-extern gint g_iScreenWidth;
-extern gint g_iScreenHeight;
-
-extern gint g_iDockLineWidth;
-extern gint g_iDockRadius;
-extern double g_fLineColor[4];
-extern int g_iIconGap;
-extern int g_iLabelSize;
-extern gboolean g_bRoundedBottomCorner;
-extern gboolean g_bAutoHide;
-
-extern double g_fStripesColorBright[4];
-extern double g_fStripesColorDark[4];
-
-extern int g_iVisibleZoneWidth;
-extern int g_iVisibleZoneHeight;
 extern gchar *g_cCairoDockDataDir;
-
-extern cairo_surface_t *g_pVisibleZoneSurface;
-extern double g_fVisibleZoneImageWidth, g_fVisibleZoneImageHeight;
-extern double g_fVisibleZoneAlpha;
-extern int g_iNbStripes;
-extern double g_fAmplitude;
-extern int g_iSinusoidWidth;
 
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;

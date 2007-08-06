@@ -37,7 +37,6 @@ extern int g_iLabelSize;
 extern gboolean g_bUseText;
 extern int g_iDockRadius;
 extern int g_iDockLineWidth;
-extern gboolean g_bAutoHide;
 extern int g_iIconGap;
 
 extern gchar *g_cConfFile;
@@ -282,7 +281,7 @@ void cairo_dock_load_desktop_file_information (gchar *cDesktopFileName, Icon *ic
 	
 	GError *erreur = NULL;
 	GKeyFile* keyfile = g_key_file_new();
-	g_key_file_load_from_file (keyfile, cDesktopFilePath, G_KEY_FILE_NONE, &erreur);
+	g_key_file_load_from_file (keyfile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : while trying to load %s : %s\n", cDesktopFileName, erreur->message);
@@ -357,7 +356,7 @@ void cairo_dock_load_desktop_file_information (gchar *cDesktopFileName, Icon *ic
 		if (pChildDock == NULL)
 		{
 			g_print ("le dock fils (%s) n'existe pas, on le cree\n", icon->acName);
-			pChildDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_NORMAL, icon->acName);
+			pChildDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->acName);
 		}
 		else
 			pChildDock->iRefCount ++;  // peut-etre qu'il faudrait en faire une operation atomique...

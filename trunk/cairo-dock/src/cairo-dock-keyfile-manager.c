@@ -397,7 +397,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						//g_print ("  + a string\n");
 						pEntry = NULL;
 						length = 0;
-						cValueList = g_key_file_get_string_list (pKeyFile, cGroupName, cKeyName, &length, NULL);
+						cValueList = g_key_file_get_locale_string_list (pKeyFile, cGroupName, cKeyName, NULL, &length, NULL);
 						if (iNbElements == 1)
 						{
 							cValue =  (0 < length ? cValueList[0] : "");
@@ -844,7 +844,25 @@ static void _cairo_dock_get_each_widget_value (gpointer *data, GKeyFile *pKeyFil
 	else if (GTK_IS_ENTRY (pOneWidget))
 	{
 		const gchar *cValue = gtk_entry_get_text (GTK_ENTRY (pOneWidget));
-		g_key_file_set_string (pKeyFile, cGroupName, cKeyName, cValue);
+		const gchar* const * cPossibleLocales = g_get_language_names ();
+		gchar *cKeyNameFull, *cTranslatedValue;
+		while (cPossibleLocales[i] != NULL)
+		{
+			cKeyNameFull = g_strdup_printf ("%s[%s]", cKeyName, cPossibleLocales[i]);
+			cTranslatedValue = g_key_file_get_string (pKeyFile, cGroupName, cKeyNameFull, NULL);
+			g_free (cKeyNameFull);
+			if (cTranslatedValue != NULL && strcmp (cTranslatedValue, "") != 0)
+			{
+				g_free (cTranslatedValue);
+				break;
+			}
+			g_free (cTranslatedValue);
+			i ++;
+		}
+		if (cPossibleLocales[i] != NULL)
+			g_key_file_set_locale_string (pKeyFile, cGroupName, cKeyName, cPossibleLocales[i], cValue);
+		else
+			g_key_file_set_string (pKeyFile, cGroupName, cKeyName, cValue);  // arg, g_key_file_set_locale_string ne marche pas avec une locale NULL comme le fait 'g_key_file_get_locale_string' !
 	}
 	else if (GTK_IS_TREE_VIEW (pOneWidget))
 	{

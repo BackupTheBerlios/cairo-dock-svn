@@ -36,7 +36,6 @@ extern int g_iLabelSize;
 extern gboolean g_bUseText;
 extern int g_iDockRadius;
 extern int g_iDockLineWidth;
-extern gboolean g_bAutoHide;
 extern int g_iIconGap;
 extern int g_iMaxIconHeight;
 

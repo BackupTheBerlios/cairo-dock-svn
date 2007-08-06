@@ -347,7 +347,7 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 			if (pParentDock == NULL)
 			{
 				g_print ("le dock parent (%s) n'existe pas, on le cree\n", icon->cParentDockName);
-				pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_NORMAL, icon->cParentDockName);
+				pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->cParentDockName);
 				pParentDock->iRefCount --;
 			}
 			

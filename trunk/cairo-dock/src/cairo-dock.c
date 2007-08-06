@@ -87,6 +87,7 @@
 
 CairoDock *g_pMainDock;
 GHashTable *g_hDocksTable = NULL;
+CairoDock *pLastPointedDock = NULL;
 
 gint g_iScreenWidth = 0;  // dimensions de l'ecran.
 gint g_iScreenHeight = 0;
@@ -280,9 +281,10 @@ main (int argc, char** argv)
 	//\___________________ On cree le dock principal.
 	g_pMainDock = cairo_dock_create_new_dock (iWmHint, CAIRO_DOCK_MAIN_DOCK_NAME);
 	g_pMainDock->bIsMainDock = TRUE;
+	g_pMainDock->iRefCount --;
 	GdkScreen *gdkscreen = gtk_window_get_screen (GTK_WINDOW (g_pMainDock->pWidget));
-        g_iScreenWidth = gdk_screen_get_width (gdkscreen);
-        g_iScreenHeight = gdk_screen_get_height (gdkscreen);
+	g_iScreenWidth = gdk_screen_get_width (gdkscreen);
+	g_iScreenHeight = gdk_screen_get_height (gdkscreen);
 	
 	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
 	g_cCairoDockDataDir = g_strdup_printf ("%s/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR);
@@ -455,10 +457,8 @@ main (int argc, char** argv)
 		}
 	}*/
 	
-	cairo_dock_destroy_dock (g_pMainDock, CAIRO_DOCK_MAIN_DOCK_NAME, NULL, NULL);
-	
 	rsvg_term ();
-
+	
 	return 0;
 }
 

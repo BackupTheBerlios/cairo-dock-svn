@@ -33,6 +33,7 @@ released under the terms of the GNU General Public License.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-callbacks.h"
 
+extern CairoDock *pLastPointedDock;
 
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
@@ -165,7 +166,6 @@ gboolean on_expose (GtkWidget *pWidget,
 	if (!pDock->bAtBottom)
 	{
 		render (pDock);
-		
 	}
 	else
 	{
@@ -189,14 +189,16 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	CairoDock *pDock)
 {
 	static double fLastTime = 9;
-	static Icon *pLastPointedIcon = NULL;
-	static CairoDock *pLastDock = NULL;
+	Icon *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
+	//if (pLastPointedIcon != NULL) g_print ("pLastPointedIcon : %s\n", pLastPointedIcon->acName);
 	//g_print ("%s (%d,%d) (%d, %.2fms)\n", __func__, (int) pMotion->x, (int) pMotion->y, pMotion->is_hint, pMotion->time - fLastTime);
 	
 	//\_______________ On elague le flux des MotionNotify, sinon X en envoie autant que le permet le CPU !
 	Icon *pPointedIcon;
 	if (pMotion != NULL)
 	{
+		if (pDock->bIsMainDock)
+			g_print ("pDock->bAtBottom :%d pDock->bInside : %d pDock->iSidShrinkDown : %d\n", pDock->bAtBottom, pDock->bInside, pDock->iSidShrinkDown);
 		if (pDock->bAtBottom || ! pDock->bInside || pDock->iSidShrinkDown > 0 || pMotion->time - fLastTime < g_fRefreshInterval)  // si les icones sont en train de diminuer de taille (suite a un clic) on ne redimensionne pas les icones, le temps que l'animation se finisse.
 		{
 			gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);
@@ -219,29 +221,43 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		gtk_widget_queue_draw (pWidget);
 	}
 	
-	if (pPointedIcon != pLastPointedIcon)
+	//if (pPointedIcon != NULL) g_print ("pPointedIcon : %s\n", pPointedIcon->acName);
+	if (pPointedIcon != pLastPointedIcon || pLastPointedDock == NULL)
 	{
-		if (pDock == pLastDock && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
+		g_print ("on change d'icone\n");
+		if (pDock == pLastPointedDock && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
+		{
 			//gtk_widget_hide (pLastPointedIcon->pSubDock->pWidget);
+			//gtk_window_move (GTK_WINDOW (pLastPointedIcon->pSubDock->pWidget), 0, g_iScreenHeight + 1);
 			gdk_window_hide (pLastPointedIcon->pSubDock->pWidget->window);
+		}
 		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL)
 		{
+			g_print ("on montre le dock fils\n");
 			CairoDock *pSubDock = pPointedIcon->pSubDock;
+			
+			if (pSubDock->iSidShrinkDown != 0)
+			{
+				g_source_remove (pSubDock->iSidShrinkDown);
+				pSubDock->iSidShrinkDown = 0;
+				pSubDock->fMagnitude = 0.0;
+				shrink_down2 (pSubDock);
+			}
 			
 			pSubDock->iGapX = pDock->iGapX + (pPointedIcon->fX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 - pDock->iMaxDockWidth / 2);
 			pSubDock->iGapY = pDock->iGapY + (pDock->iMaxDockHeight) * (g_bDirectionUp ? 1 : -1);
 			
 			pSubDock->iWindowPositionX = (g_iScreenWidth - pSubDock->iMinDockWidth) / 2 + pSubDock->iGapX;
-			pSubDock->iWindowPositionY = g_iScreenHeight - (pSubDock->iMaxIconHeight + g_iLabelSize) - pSubDock->iGapY;
+			pSubDock->iWindowPositionY = g_iScreenHeight - (pSubDock->iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth) - pSubDock->iGapY;
 			
 			//gtk_widget_show (pSubDock->pWidget);
 			//gdk_window_show (pSubDock->pWidget->window);
-			gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
+			//gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
+			
 			gdk_window_move (pSubDock->pWidget->window, pSubDock->iWindowPositionX, pSubDock->iWindowPositionY);
-			
-			
-			pLastDock = pDock;
-			
+			//gdk_window_show (pSubDock->pWidget->window);
+			pLastPointedDock = pDock;
+			gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
 		}
 		pLastPointedIcon = pPointedIcon;
 	}
@@ -250,19 +266,13 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 }
 
 
-gboolean on_leave_notify2 (GtkWidget* pWidget,
-	GdkEventCrossing* pEvent,
-	CairoDock *pDock)
+void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
-	if (pDock->bAtBottom || ! pDock->bInside)
-		return FALSE;
-	//g_print ("%s ()\n", __func__);
-	
 	pDock->bInside = FALSE;
 	if (pDock->bMenuVisible)
 	{
 		pDock->bAtTop = FALSE;
-		return FALSE;
+		return ;
 	}
 	if (pDock->iSidMoveUp > 0)  // si on est en train de monter, on arrete.
 	{
@@ -289,8 +299,41 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	if (pDock->iSidShrinkDown == 0)  // on commence a faire diminuer la taille des icones.
 		pDock->iSidShrinkDown = g_timeout_add (35, (GSourceFunc) shrink_down2, (gpointer) pDock);
 	
-	return FALSE;
+	pLastPointedDock = NULL;
+	g_print ("pLastPointedDock <- NULL\n");
+}
+gboolean on_leave_notify2 (GtkWidget* pWidget,
+	GdkEventCrossing* pEvent,
+	CairoDock *pDock)
+{
+	if (pDock->bAtBottom || ! pDock->bInside)
+		return FALSE;
+	g_print ("%s ()\n", __func__);
 	
+	Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
+	if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL)
+	{
+		g_print ("  pointed icon : %s, on attend\n", pPointedIcon->acName);
+		while (gtk_events_pending ())
+			gtk_main_iteration ();
+		pDock->bInside = FALSE;
+		if (pPointedIcon->pSubDock->bInside)
+		{
+			pDock->bAtTop = FALSE;
+			g_print ("on quitte par une icone\n");
+			return FALSE;
+		}
+		else  // si on sort du dock sans passer par le sous-dock, par exemple en sortant par le bas.
+		{
+			//gtk_window_move (GTK_WINDOW (pPointedIcon->pSubDock->pWidget), 0, g_iScreenHeight + 1);
+			gdk_window_hide (pPointedIcon->pSubDock->pWidget->window);
+		}
+	}
+	
+	
+	cairo_dock_leave_from_main_dock (pDock);
+	
+	return FALSE;
 }
 
 
@@ -300,7 +343,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 {
 	if (pDock->bAtTop || pDock->bInside)
 		return FALSE;
-	//g_print ("%s (%d)\n", __func__, g_iWindowPositionY);
+	g_print ("%s ()\n", __func__);
 	
 	gtk_window_present (GTK_WINDOW (pWidget));
 	pDock->bInside = TRUE;
@@ -579,7 +622,10 @@ gboolean on_configure (GtkWidget* pWidget,
 		pDock->iCurrentHeight = iNewHeight;
 		
 		cairo_dock_calculate_icons (pDock, iNewWidth / 2, 0);
-		if (!pDock->bAtBottom)
+		///if (gdk_window_is_visible (pWidget->window))
+		///	gtk_window_present (GTK_WINDOW (pWidget));
+		gtk_widget_queue_draw (pWidget);
+		/**if (!pDock->bAtBottom)
 		{
 			render (pDock);
 		}
@@ -589,7 +635,7 @@ gboolean on_configure (GtkWidget* pWidget,
 				cairo_dock_render_background (pDock);
 			else
 				render (pDock);
-		}
+		}*/
 
 
 #ifdef HAVE_GLITZ

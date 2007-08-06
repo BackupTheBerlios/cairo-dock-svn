@@ -19,6 +19,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 					CairoDock *pDock);
 
 
+void cairo_dock_leave_from_main_dock (CairoDock *pDock);
 gboolean on_leave_notify2 (GtkWidget* pWidget,
 					GdkEventCrossing* pEvent,
 					CairoDock *pDock);
