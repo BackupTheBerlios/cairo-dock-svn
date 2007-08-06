@@ -1,0 +1,4 @@
+SUBDIRS = \
+	default\
+	Fabounet\
+	Ubuntu

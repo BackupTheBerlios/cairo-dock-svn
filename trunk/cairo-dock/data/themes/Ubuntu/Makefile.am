@@ -15,4 +15,5 @@ theme_DATA = \
 	firefox.svg\
 	06musique.desktop\
 	Tux.svg\
-	gaim.svg
+	gaim.svg\
+	07synaptic.desktop
