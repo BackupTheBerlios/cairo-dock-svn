@@ -21,5 +21,10 @@ theme_DATA = \
 	08gaim.desktop\
 	gaim.svg\
 	09system.desktop\
-	gnome-main-menu.svg
-	
+	gnome-main-menu.svg\
+	10synaptic.desktop\
+	synaptic.png\
+	11gnome-system-monitor.desktop\
+	utilities-system-monitor.svg\
+	12beryl-settings.desktop\
+	beryl-settings.svg
