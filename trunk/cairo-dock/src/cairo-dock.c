@@ -88,6 +88,7 @@
 CairoDock *g_pMainDock;
 GHashTable *g_hDocksTable = NULL;
 CairoDock *pLastPointedDock = NULL;
+gchar *g_cLanguage = NULL;
 
 gint g_iScreenWidth = 0;  // dimensions de l'ecran.
 gint g_iScreenHeight = 0;

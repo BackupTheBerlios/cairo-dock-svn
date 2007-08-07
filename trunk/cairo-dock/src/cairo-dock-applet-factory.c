@@ -183,4 +183,3 @@ GHashTable *cairo_dock_list_themes (gchar *cThemesDir, GError **erreur)
 	
 	return pThemeTable;
 }
-

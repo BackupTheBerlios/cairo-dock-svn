@@ -173,7 +173,7 @@ static void _cairo_dock_pick_a_file (GtkButton *button, gpointer *data)
 
 GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWidget *pParentWidget, GSList **pWidgetList)
 {
-	static GPtrArray *s_pBufferArray = NULL;
+	static GPtrArray *s_pBufferArray = NULL;  // pour empecher les fuites memoires.
 	
 	if (! cairo_dock_is_advanced_keyfile (pKeyFile))
 		return NULL;
@@ -289,7 +289,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					cUsefulComment[strlen (cUsefulComment) - 1] = '\0';
 				//g_print ("cUsefulComment : %s\n", cUsefulComment);
 				
-				if (*cUsefulComment != '\0' && strcmp (cUsefulComment, "...") != 0)
+				if (*cUsefulComment != '\0' && strcmp (cUsefulComment, "...") != 0 && iElementType != 'F')
 				{
 					pLabel = gtk_label_new (cUsefulComment);
 					GtkWidget *pAlign = gtk_alignment_new (0., 0.5, 0., 0.);
@@ -370,11 +370,11 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						{
 							fValue =  (k < length ? fValueList[k] : 0);
 							if (pAuthorizedValuesList != NULL && pAuthorizedValuesList[0] != NULL)
-								fMinValue = atof(pAuthorizedValuesList[0]);
+								fMinValue = g_ascii_strtod (pAuthorizedValuesList[0], NULL);
 							else
 								fMinValue = 0;
 							if (pAuthorizedValuesList != NULL && pAuthorizedValuesList[1] != NULL)
-								fMaxValue = atof(pAuthorizedValuesList[1]);
+								fMaxValue = g_ascii_strtod (pAuthorizedValuesList[1], NULL);
 							else
 								fMaxValue = 9999;
 							pOneWidget = gtk_spin_button_new_with_range (fMinValue, fMaxValue, (fMaxValue - fMinValue) / 20.);
@@ -645,7 +645,10 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						}
 						else
 						{
-							cValue = g_key_file_get_string (pKeyFile, cGroupName, cKeyName, NULL);
+							if (pAuthorizedValuesList[0] == NULL || *pAuthorizedValuesList[0] == '\0')
+								cValue = g_key_file_get_string (pKeyFile, cGroupName, cKeyName, NULL);
+							else
+								cValue = pAuthorizedValuesList[0];
 							gchar *cFrameTitle = g_strdup_printf ("<b>%s</b>", cValue);
 							pLabel= gtk_label_new (NULL);
 							gtk_label_set_markup (GTK_LABEL (pLabel), cFrameTitle);
@@ -662,7 +665,8 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							pFrameVBox = gtk_vbox_new (FALSE, 3);
 							gtk_container_add (GTK_CONTAINER (pFrame),
 								pFrameVBox);
-							g_free (cValue);
+							if (pAuthorizedValuesList[0] == NULL || *pAuthorizedValuesList[0] == '\0')
+								g_free (cValue);
 						}
 					break;
 					
@@ -910,3 +914,64 @@ void cairo_dock_free_generated_widget_list (GSList *pWidgetList)
 	g_slist_free (pWidgetList);
 }
 
+
+void cairo_dock_replace_comments (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile)
+{
+	GError *erreur = NULL;
+	gsize length = 0;
+	gchar **pKeyList;
+	gchar **pGroupList = g_key_file_get_groups (pReplacementKeyFile, &length);
+	gchar *cGroupName, *cKeyName, *cKeyComment;
+	int i, j;
+	
+	cKeyComment =  g_key_file_get_comment (pReplacementKeyFile, NULL, NULL, NULL);
+	if (cKeyComment != NULL && *cKeyComment != '\0')
+	{
+		g_key_file_set_comment (pOriginalKeyFile, NULL, NULL, cKeyComment, &erreur);
+		if (erreur != NULL)
+		{
+			g_print ("Attention : %s\n", erreur->message);
+			g_error_free (erreur);
+			erreur = NULL;
+		}
+	}
+	g_free (cKeyComment);
+	
+	i = 0;
+	while (pGroupList[i] != NULL)
+	{
+		cGroupName = pGroupList[i];
+		
+		length = 0;
+		pKeyList = g_key_file_get_keys (pReplacementKeyFile, cGroupName, NULL, NULL);
+		
+		j = 0;
+		while (pKeyList[j] != NULL)
+		{
+			cKeyName = pKeyList[j];
+			
+			cKeyComment =  g_key_file_get_comment (pReplacementKeyFile, cGroupName, cKeyName, &erreur);
+			if (erreur != NULL)
+			{
+				g_print ("Attention : %s\n", erreur->message);
+				g_error_free (erreur);
+				erreur = NULL;
+			}
+			else if (cKeyComment != NULL && *cKeyComment != '\0')
+			{
+				if (cKeyComment[strlen(cKeyComment) - 1] == '\n')
+					cKeyComment[strlen(cKeyComment) - 1] = '\0';
+				g_key_file_set_comment (pOriginalKeyFile, cGroupName, cKeyName, cKeyComment, &erreur);
+				if (erreur != NULL)
+				{
+					g_print ("Attention : %s\n", erreur->message);
+					g_error_free (erreur);
+					erreur = NULL;
+				}
+			}
+			g_free (cKeyComment);
+			j ++;
+		}
+		i ++;
+	}
+}

@@ -273,7 +273,7 @@ void cairo_dock_reload_buffers_in_dock (CairoDock *pDock, double fMaxScale, int 
 	}
 	
 	cairo_destroy (pCairoContext);
-	pDock->iMaxDockHeight = (int) (fMaxScale * pDock->iMaxIconHeight) + iLabelSize;
+	pDock->iMaxDockHeight = (int) (fMaxScale * pDock->iMaxIconHeight) + iLabelSize + g_iDockLineWidth;
 }
 
 
@@ -429,9 +429,6 @@ void cairo_dock_load_stripes_background (CairoDock *pMainDock)
 
 gpointer cairo_dock_init (gpointer data)
 {
-	//while (gtk_events_pending ())
-	//	gtk_main_iteration ();
-	
 	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
 	GError *erreur = NULL;
 	if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
@@ -452,7 +449,7 @@ gpointer cairo_dock_init (gpointer data)
 			g_error_free (erreur);
 			exit (1);
 		}
-		cairo_dock_update_conf_file_with_hash_table (cTemporaryFilePath, pThemeTable, "INIT", "theme", 1, "Choose a theme to start using cairo-dock :");
+		cairo_dock_update_conf_file_with_hash_table (cTemporaryFilePath, pThemeTable, "INIT", "theme", 1, "Choose a theme to start using cairo-dock\n (you can choose another theme later\n by deleting your ~/.cairo-dock direcory,\n and re-launching cairo-dock)");
 		
 		gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTemporaryFilePath, "Choose a theme to start with");
 		if (! bChoiceOK)
@@ -507,6 +504,7 @@ gpointer cairo_dock_init (gpointer data)
 	
 	//\___________________ On lit le fichier de conf et on charge tout.
 	cairo_dock_update_conf_file_with_modules (g_cConfFile, g_hModuleTable);
+	cairo_dock_update_conf_file_with_translations (g_cConfFile, CAIRO_DOCK_SHARE_DATA_DIR);
 	
 	cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
 	

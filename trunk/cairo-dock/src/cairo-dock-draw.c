@@ -158,16 +158,6 @@ void render (CairoDock *pDock)
 	gint iWidth, iHeight;
 	///gtk_window_get_size (GTK_WINDOW (pWidget), &iWidth, &iHeight);
 	iWidth = pDock->iCurrentWidth; iHeight = pDock->iCurrentHeight;
-	/*if (fDockWidth > iWidth)
-	{
-		g_iMaxDockWidth = ceil (fDockWidth);
-		g_iWindowPositionX = g_iGapX + (g_iScreenWidth - fDockWidth) / 2;
-		gdk_window_move_resize (pWidget->window,
-			g_iWindowPositionX,
-			g_iWindowPositionY,
-			g_iMaxDockWidth,
-			iHeight);
-	}*/
 	
 	//\_________________ On cree le contexte du dessin.
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
@@ -187,12 +177,12 @@ void render (CairoDock *pDock)
 	if (g_bDirectionUp)
 	{
 		sens = 1;
-		fDockOffsetY = iHeight - pDock->iMaxIconHeight - fLineWidth / 2;
+		fDockOffsetY = iHeight - pDock->iMaxIconHeight - 1.5 * fLineWidth;
 	}
 	else
 	{
 		sens = -1;
-		fDockOffsetY = pDock->iMaxIconHeight + fLineWidth / 2;
+		fDockOffsetY = pDock->iMaxIconHeight + 1.5 * fLineWidth;
 	}
 	cairo_move_to (pCairoContext, fDockOffsetX, fDockOffsetY);
 	
@@ -203,7 +193,7 @@ void render (CairoDock *pDock)
 		0, 0,
 		fRadius, 0,
 		fRadius, sens * fRadius);
-	cairo_rel_line_to (pCairoContext, 0, sens * (pDock->iMaxIconHeight - fRadius * (g_bRoundedBottomCorner ? 2 : 1)));
+	cairo_rel_line_to (pCairoContext, 0, sens * (pDock->iMaxIconHeight + fLineWidth - fRadius * (g_bRoundedBottomCorner ? 2 : 1)));
 	
 	// Bottom Right.
 	if (g_bRoundedBottomCorner)
@@ -220,7 +210,7 @@ void render (CairoDock *pDock)
 			0, 0,
 			-fRadius, 0,
 			-fRadius, -sens * fRadius);
-	cairo_rel_line_to (pCairoContext, 0, sens * (- pDock->iMaxIconHeight + fRadius * (g_bRoundedBottomCorner ? 2 : 1)));
+	cairo_rel_line_to (pCairoContext, 0, sens * (- pDock->iMaxIconHeight - fLineWidth + fRadius * (g_bRoundedBottomCorner ? 2 : 1)));
 	
 	// Top Left.
 	cairo_rel_curve_to (pCairoContext,
@@ -236,7 +226,7 @@ void render (CairoDock *pDock)
 	{
 		cairo_save (pCairoContext);
 		
-		cairo_translate (pCairoContext, - (pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth, iHeight - pDock->iMaxIconHeight + fLineWidth / 2);
+		cairo_translate (pCairoContext, - (pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
 		cairo_set_source_surface (pCairoContext, g_pStripesBuffer, 0., 0.);
 		
 		cairo_fill_preserve (pCairoContext);
@@ -246,7 +236,7 @@ void render (CairoDock *pDock)
 	{
 		cairo_save (pCairoContext);
 		
-		cairo_translate (pCairoContext, - (pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth / 2, iHeight - pDock->iMaxIconHeight + fLineWidth / 2);
+		cairo_translate (pCairoContext, - (pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth / 2, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
 		cairo_scale (pCairoContext, 1. * iWidth / g_fVisibleZoneImageWidth, 1. * pDock->iMaxIconHeight / g_fVisibleZoneImageHeight);
 		cairo_set_source_surface (pCairoContext, (pDock->bInside ? g_pVisibleZoneSurface : g_pVisibleZoneSurfaceAlpha), 0., 0.);
 		
@@ -399,7 +389,7 @@ gboolean grow_up2 (CairoDock *pDock)
 
 gboolean shrink_down2 (CairoDock *pDock)
 {
-	//g_print ("%s (%f)\n", __func__, g_fMagnitude);
+	//g_print ("%s (%f)\n", __func__, pDock->fMagnitude);
 	if (pDock->fMagnitude > 0.05)
 		pDock->fMagnitude *= g_fShrinkDownFactor; //  0.6
 	else
@@ -421,16 +411,17 @@ gboolean shrink_down2 (CairoDock *pDock)
 			pDock->fMagnitude = 0;
 			pDock->iSidShrinkDown = 0;
 			
-			if (! g_bAutoHide && ! pDock->bInside)
+			if (! (g_bAutoHide && pDock->iRefCount == 0) && ! pDock->bInside)
 			{
 				//g_print ("on arrive en bas -> %dx%d\n", g_iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth, g_iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth);
-				pDock->iWindowPositionX = (g_iScreenWidth - (pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth)) / 2 + pDock->iGapX;
-				pDock->iWindowPositionY = g_iScreenHeight - pDock->iGapY - (g_bDirectionUp ? pDock->iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth : 0);
+				cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE);
+				//pDock->iWindowPositionX = (g_iScreenWidth - (pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth)) / 2 + pDock->iGapX;
+				//pDock->iWindowPositionY = g_iScreenHeight - pDock->iGapY - (g_bDirectionUp ? pDock->iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth : 0);
 				gdk_window_move_resize (pDock->pWidget->window,
 					pDock->iWindowPositionX,
 					pDock->iWindowPositionY,
 					pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth,
-					pDock->iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth);
+					pDock->iMaxIconHeight + 2 * g_iDockLineWidth);
 			}
 			
 			gint iMouseX, iMouseY;
@@ -500,9 +491,8 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 	//\_________________ On dessine les rayures du fond sur la portion de fenetre.
 	cairo_save (pCairoContext);
 	
-	double fDockOffsetY;
 	double fDockOffsetX = pArea->x;
-	fDockOffsetY = iHeight - pDock->iMaxIconHeight - fLineWidth / 2;
+	double fDockOffsetY = (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth : fLineWidth);
 	
 	cairo_move_to (pCairoContext, fDockOffsetX, fDockOffsetY);
 	cairo_rectangle (pCairoContext, fDockOffsetX, fDockOffsetY, pArea->width, pDock->iMaxIconHeight);
@@ -510,7 +500,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 	{
 		cairo_save (pCairoContext);
 		
-		cairo_translate (pCairoContext, - (pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth, iHeight - pDock->iMaxIconHeight + fLineWidth / 2);
+		cairo_translate (pCairoContext, - (pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth, fDockOffsetY);
 		cairo_set_source_surface (pCairoContext, g_pStripesBuffer, 0., 0.);
 		
 		cairo_fill_preserve (pCairoContext);
@@ -520,7 +510,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 	{
 		cairo_save (pCairoContext);
 		
-		cairo_translate (pCairoContext, - (pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth / 2, iHeight - pDock->iMaxIconHeight + fLineWidth / 2);
+		cairo_translate (pCairoContext, - (pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth / 2, fDockOffsetY);
 		cairo_scale (pCairoContext, 1. * iWidth / g_fVisibleZoneImageWidth, 1. * pDock->iMaxIconHeight / g_fVisibleZoneImageHeight);
 		cairo_set_source_surface (pCairoContext, (pDock->bInside ? g_pVisibleZoneSurface : g_pVisibleZoneSurfaceAlpha), 0., 0.);
 		
@@ -531,7 +521,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 	//\_________________ On dessine la partie du cadre qui va bien.
 	cairo_new_path (pCairoContext);
 	
-	cairo_move_to (pCairoContext, fDockOffsetX, fDockOffsetY);
+	cairo_move_to (pCairoContext, fDockOffsetX, fDockOffsetY - fLineWidth / 2);
 	cairo_rel_line_to (pCairoContext, pArea->width, 0);
 	cairo_set_line_width (pCairoContext, fLineWidth);
 	cairo_set_source_rgba (pCairoContext, g_fLineColor[0], g_fLineColor[1], g_fLineColor[2], g_fLineColor[3]);
@@ -539,7 +529,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 	
 	cairo_new_path (pCairoContext);
 	
-	cairo_move_to (pCairoContext, fDockOffsetX, iHeight - fLineWidth / 2);
+	cairo_move_to (pCairoContext, fDockOffsetX, (g_bDirectionUp ? iHeight - fLineWidth / 2 : pDock->iMaxIconHeight + 1.5 * fLineWidth));
 	cairo_rel_line_to (pCairoContext, pArea->width, 0);
 	cairo_set_line_width (pCairoContext, fLineWidth);
 	cairo_set_source_rgba (pCairoContext, g_fLineColor[0], g_fLineColor[1], g_fLineColor[2], g_fLineColor[3]);
@@ -586,7 +576,7 @@ static gboolean _cairo_dock_hide_dock (gchar *cDockName, CairoDock *pDock, Cairo
 	Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
 	if (pPointedIcon != NULL && pPointedIcon->pSubDock == pChildDock && ! pDock->bInside)
 	{
-		if (pDock->bIsMainDock)
+		if (pDock->iRefCount == 0)  // pDock->bIsMainDock
 			cairo_dock_leave_from_main_dock (pDock);
 		else
 		{
@@ -601,4 +591,25 @@ static gboolean _cairo_dock_hide_dock (gchar *cDockName, CairoDock *pDock, Cairo
 void cairo_dock_hide_parent_docks (CairoDock *pDock)
 {
 	 g_hash_table_find (g_hDocksTable, (GHRFunc)_cairo_dock_hide_dock, pDock);
+}
+
+
+
+void cairo_dock_calculate_window_position_at_balance (CairoDock *pDock, CairoDockSizeType iSizeType)
+{
+	if (iSizeType == CAIRO_DOCK_MAX_SIZE)
+	{
+		pDock->iWindowPositionX = (g_iScreenWidth - pDock->iMaxDockWidth) / 2 + pDock->iGapX;
+		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - pDock->iMaxDockHeight - pDock->iGapY : pDock->iGapY);
+	}
+	else if (iSizeType == CAIRO_DOCK_NORMAL_SIZE)
+	{
+		pDock->iWindowPositionX = (g_iScreenWidth - (pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth)) / 2 + pDock->iGapX;
+		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - (pDock->iMaxIconHeight + 2 * g_iDockLineWidth) - pDock->iGapY : pDock->iGapY);
+	}
+	else
+	{
+		pDock->iWindowPositionX = (g_iScreenWidth - g_iVisibleZoneWidth) / 2 + pDock->iGapX;
+		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - g_iVisibleZoneHeight - pDock->iGapY : pDock->iGapY);
+	}
 }

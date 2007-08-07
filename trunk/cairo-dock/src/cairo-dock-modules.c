@@ -209,6 +209,7 @@ void cairo_dock_preload_module_from_directory (gchar *cModuleDirPath, GHashTable
 
 void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, GHashTable *pModuleTable, CairoDock *pDock)
 {
+	g_return_if_fail (cActiveModuleList != NULL);
 	GError *erreur = NULL;
 	gchar *cModuleName;
 	CairoDockModule *pModule;

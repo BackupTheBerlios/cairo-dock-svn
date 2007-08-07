@@ -123,6 +123,11 @@ typedef struct _Icon {
 
 #define CAIRO_DOCK_MAIN_DOCK_NAME "_MainDock_"
 
+typedef enum {
+	CAIRO_DOCK_MAX_SIZE,
+	CAIRO_DOCK_NORMAL_SIZE,
+	CAIRO_DOCK_MIN_SIZE
+	} CairoDockSizeType;
 
 typedef enum {
 	CAIRO_DOCK_BOUNCE = 0,

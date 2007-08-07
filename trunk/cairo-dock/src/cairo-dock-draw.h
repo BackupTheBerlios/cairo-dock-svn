@@ -38,5 +38,8 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea);
 
 void cairo_dock_hide_parent_docks (CairoDock *pDock);
 
+
+void cairo_dock_calculate_window_position_at_balance (CairoDock *pDock, CairoDockSizeType iSizeType);
+
 #endif
 

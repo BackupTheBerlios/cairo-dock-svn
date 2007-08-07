@@ -24,6 +24,7 @@ released under the terms of the GNU General Public License.
 
 
 static gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "random", NULL};
+extern gchar *g_cLanguage;
 
 extern int g_iSinusoidWidth;
 extern double g_fAmplitude;
@@ -392,6 +393,18 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	
 	
 	//\___________________ On recupere les parametres du dock en lui-meme.
+	gchar *cPreviousLanguage = g_cLanguage;
+	g_cLanguage = g_key_file_get_string (fconf, "CAIRO DOCK", "language", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_cLanguage = g_strdup ("en");  // valeur par defaut.
+		g_key_file_set_string (fconf, "CAIRO DOCK", "language", g_cLanguage);
+		bFlushConfFileNeeded = TRUE;
+	}
+	
 	g_fAmplitude = g_key_file_get_double (fconf, "CAIRO DOCK", "amplitude", &erreur);
 	if (erreur != NULL)
 	{
@@ -848,8 +861,12 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	{
 		if (g_bHorizontalDock)
 		{
-			pDock->iWindowPositionX = pDock->iGapX + (g_iScreenWidth - g_iVisibleZoneWidth) / 2;
-			pDock->iWindowPositionY = g_iScreenHeight - pDock->iGapY - (g_bDirectionUp ? g_iVisibleZoneHeight : 0);
+			if (g_bAutoHide && pDock->iRefCount == 0)
+				cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MIN_SIZE);
+			else
+				cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE);
+			//pDock->iWindowPositionX = pDock->iGapX + (g_iScreenWidth - g_iVisibleZoneWidth) / 2;
+			//pDock->iWindowPositionY = g_iScreenHeight - pDock->iGapY - (g_bDirectionUp ? g_iVisibleZoneHeight : 0);
 		}
 		else
 		{
@@ -857,12 +874,27 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 			pDock->iWindowPositionY = g_iScreenHeight / 2 + pDock->iGapY;
 		}
 		//g_print ("on commence en bas a %dx%d (%d;%d)\n", g_iVisibleZoneWidth, g_iVisibleZoneHeight, pDock->iWindowPositionX, pDock->iWindowPositionY);
-		gdk_window_move_resize (pDock->pWidget->window,
-			pDock->iWindowPositionX,
-			pDock->iWindowPositionY,
-			g_iVisibleZoneWidth,
-			g_iVisibleZoneHeight);
+		if (g_bAutoHide && pDock->iRefCount == 0)
+			gdk_window_move_resize (pDock->pWidget->window,
+				pDock->iWindowPositionX,
+				pDock->iWindowPositionY,
+				g_iVisibleZoneWidth,
+				g_iVisibleZoneHeight);
+		else
+			gdk_window_move_resize (pDock->pWidget->window,
+				pDock->iWindowPositionX,
+				pDock->iWindowPositionY,
+				pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth,
+				pDock->iMaxIconHeight + 2 * g_iDockLineWidth);
 	}
+	
+	if (cPreviousLanguage != NULL && g_cLanguage != NULL && strcmp (cPreviousLanguage, g_cLanguage) != 0)
+	{
+		gchar *cTranslatedFilePath = g_strdup_printf ("%s/cairo-dock-%s.conf", CAIRO_DOCK_SHARE_DATA_DIR, g_cLanguage);
+		cairo_dock_apply_translation_on_conf_file (conf_file, cTranslatedFilePath);
+		g_free (cTranslatedFilePath);
+	}
+	g_free (cPreviousLanguage);
 	
 	g_key_file_free (fconf);
 }
@@ -1027,9 +1059,19 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 	cairo_dock_write_keys_to_file (pKeyFile, cConfFile);
 	g_key_file_free (pKeyFile);
 }
+
 void cairo_dock_update_conf_file_with_modules (gchar *cConfFile, GHashTable *pModuleTable)
 {
 	cairo_dock_update_conf_file_with_hash_table (cConfFile, pModuleTable, "APPLETS", "active modules", 99, "List of active plug-ins (applets and others).");
+}
+
+void cairo_dock_update_conf_file_with_translations (gchar *cConfFile, gchar *cTranslationsDir)
+{
+	GError *erreur = NULL;
+	GHashTable *pTranslationTable = cairo_dock_list_available_translations (cTranslationsDir, "cairo-dock-", &erreur);
+	
+	cairo_dock_update_conf_file_with_hash_table (cConfFile, pTranslationTable, "CAIRO DOCK", "language", 1, "List of available languages (for config windows) :");
+	g_hash_table_destroy (pTranslationTable);
 }
 
 
@@ -1090,4 +1132,79 @@ void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *p
 	
 	g_string_free (cActiveModules, TRUE);
 	g_key_file_free (pKeyFile);
+}
+
+
+
+void cairo_dock_apply_translation_on_conf_file (gchar *cConfFilePath, gchar *cTranslatedConfFilePath)
+{
+	GKeyFile *pConfKeyFile = g_key_file_new ();
+	
+	GError *erreur = NULL;
+	g_key_file_load_from_file (pConfKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		return ;
+	}
+	
+	
+	GKeyFile *pTranslatedKeyFile = g_key_file_new ();
+	
+	g_key_file_load_from_file (pTranslatedKeyFile, cTranslatedConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		g_key_file_free (pConfKeyFile);
+		return ;
+	}
+	
+	cairo_dock_replace_comments (pConfKeyFile, pTranslatedKeyFile);
+	
+	cairo_dock_write_keys_to_file (pConfKeyFile, cConfFilePath);
+	
+	g_key_file_free (pConfKeyFile);
+	g_key_file_free (pTranslatedKeyFile);
+}
+
+
+GHashTable *cairo_dock_list_available_translations (gchar *cTranslationsDir, gchar *cFilePrefix, GError **erreur)
+{
+	g_return_val_if_fail (cFilePrefix != NULL, NULL);
+	GError *tmp_erreur = NULL;
+	GDir *dir = g_dir_open (cTranslationsDir, 0, &tmp_erreur);
+	if (tmp_erreur != NULL)
+	{
+		g_propagate_error (erreur, tmp_erreur);
+		return NULL;
+	}
+	
+	GHashTable *pTranslationTable = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+	
+	int iPrefixLength = strlen (cFilePrefix);
+	const gchar* cFileName;
+	gchar *cLanguage;
+	gchar *cFilePath;
+	do
+	{
+		cFileName = g_dir_read_name (dir);
+		if (cFileName == NULL)
+			break ;
+		
+		if (g_str_has_suffix (cFileName, ".conf") && strncmp (cFileName, cFilePrefix, iPrefixLength) == 0)
+		{
+			cFilePath = g_strdup_printf ("%s/%s", cTranslationsDir, cFileName);
+			
+			cLanguage = g_strdup (cFileName + iPrefixLength);
+			cLanguage[strlen (cLanguage) - 5] = '\0';
+			
+			g_hash_table_insert (pTranslationTable, cLanguage, cFilePath);
+		}
+	}
+	while (1);
+	g_dir_close (dir);
+	
+	return pTranslationTable;
 }

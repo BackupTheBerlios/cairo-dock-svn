@@ -80,7 +80,7 @@ gboolean move_up2 (CairoDock *pDock)
 {
 	int deltaY_possible;
 	if (g_bHorizontalDock)
-		deltaY_possible = (g_bDirectionUp ? pDock->iWindowPositionY - (g_iScreenHeight - pDock->iMaxDockHeight - pDock->iGapY) : pDock->iWindowPositionY - g_iScreenHeight + pDock->iGapY + g_iVisibleZoneHeight);
+		deltaY_possible = pDock->iWindowPositionY - (g_bDirectionUp ? g_iScreenHeight - pDock->iMaxDockHeight - pDock->iGapY : pDock->iGapY);
 	else
 		deltaY_possible = (g_bDirectionUp ? pDock->iGapX - pDock->iWindowPositionX : - g_iScreenWidth + pDock->iGapX + pDock->iMaxDockWidth + pDock->iWindowPositionX);
 	//g_print ("%s (%dx%d -> %d)\n", __func__, g_iWindowPositionX, g_iWindowPositionY, deltaY_possible);
@@ -108,7 +108,7 @@ gboolean move_down2 (CairoDock *pDock)
 {
 	if (pDock->fMagnitude > 0.1)  // on retarde le cachage du dock pour apercevoir les effets.
 		return TRUE;
-	int deltaY_possible = g_iScreenHeight - pDock->iGapY - (g_bDirectionUp ? g_iVisibleZoneHeight : pDock->iMaxDockHeight) - pDock->iWindowPositionY;
+	int deltaY_possible = (g_bDirectionUp ? g_iScreenHeight - pDock->iGapY - g_iVisibleZoneHeight : pDock->iGapY + g_iVisibleZoneHeight - pDock->iMaxDockHeight) - pDock->iWindowPositionY;
 	//g_print ("%s (%d)\n", __func__, deltaY_possible);
 	if ((g_bDirectionUp && deltaY_possible > 4) || (! g_bDirectionUp && deltaY_possible < -4))  // alors on peut encore descendre.
 	{
@@ -120,8 +120,9 @@ gboolean move_down2 (CairoDock *pDock)
 	else  // on se fixe en bas, et on montre la zone visible.
 	{
 		pDock->bAtBottom = TRUE;
-		pDock->iWindowPositionX = (g_iScreenWidth - g_iVisibleZoneWidth) / 2 + pDock->iGapX;
-		pDock->iWindowPositionY = g_iScreenHeight - g_iVisibleZoneHeight - pDock->iGapY;
+		//pDock->iWindowPositionX = (g_iScreenWidth - g_iVisibleZoneWidth) / 2 + pDock->iGapX;
+		//pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - g_iVisibleZoneHeight - pDock->iGapY : pDock->iGapY);
+		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MIN_SIZE);
 		//g_print ("%s () -> %dx%d\n", __func__, g_iVisibleZoneWidth, g_iVisibleZoneHeight);
 		gdk_window_move_resize (pDock->pWidget->window,
 			pDock->iWindowPositionX,
@@ -130,7 +131,7 @@ gboolean move_down2 (CairoDock *pDock)
 			g_iVisibleZoneHeight);
 		pDock->iSidMoveDown = 0;
 		
-		if (g_bAutoHide)
+		if ((g_bAutoHide && pDock->iRefCount == 0))
 		{
 			Icon *pBouncingIcon = cairo_dock_get_bouncing_icon (pDock->icons);
 			if (pBouncingIcon != NULL)  // s'il y'a une icone en cours d'animation, on l'arrete.
@@ -157,7 +158,7 @@ gboolean on_expose (GtkWidget *pWidget,
 	
 	if (pExpose->area.x + pExpose->area.y != 0)  // x et y sont >= 0.
 	{
-		if (! g_bAutoHide || ! pDock->bAtBottom)
+		if (! (g_bAutoHide && pDock->iRefCount == 0) || ! pDock->bAtBottom)
 			cairo_dock_render_optimized (pDock, &pExpose->area);
 		
 		return FALSE;
@@ -169,7 +170,7 @@ gboolean on_expose (GtkWidget *pWidget,
 	}
 	else
 	{
-		if (g_bAutoHide)
+		if ((g_bAutoHide && pDock->iRefCount == 0))
 		{
 			if (pDock->bInside)
 				cairo_dock_render_blank (pDock);
@@ -197,8 +198,6 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	Icon *pPointedIcon;
 	if (pMotion != NULL)
 	{
-		if (pDock->bIsMainDock)
-			g_print ("pDock->bAtBottom :%d pDock->bInside : %d pDock->iSidShrinkDown : %d\n", pDock->bAtBottom, pDock->bInside, pDock->iSidShrinkDown);
 		if (pDock->bAtBottom || ! pDock->bInside || pDock->iSidShrinkDown > 0 || pMotion->time - fLastTime < g_fRefreshInterval)  // si les icones sont en train de diminuer de taille (suite a un clic) on ne redimensionne pas les icones, le temps que l'animation se finisse.
 		{
 			gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);
@@ -224,7 +223,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	//if (pPointedIcon != NULL) g_print ("pPointedIcon : %s\n", pPointedIcon->acName);
 	if (pPointedIcon != pLastPointedIcon || pLastPointedDock == NULL)
 	{
-		g_print ("on change d'icone\n");
+		//g_print ("on change d'icone\n");
 		if (pDock == pLastPointedDock && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
 		{
 			//gtk_widget_hide (pLastPointedIcon->pSubDock->pWidget);
@@ -233,7 +232,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		}
 		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL)
 		{
-			g_print ("on montre le dock fils\n");
+			//g_print ("on montre le dock fils\n");
 			CairoDock *pSubDock = pPointedIcon->pSubDock;
 			
 			if (pSubDock->iSidShrinkDown != 0)
@@ -245,11 +244,11 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			}
 			
 			pSubDock->iGapX = pDock->iGapX + (pPointedIcon->fX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 - pDock->iMaxDockWidth / 2);
-			pSubDock->iGapY = pDock->iGapY + (pDock->iMaxDockHeight) * (g_bDirectionUp ? 1 : -1);
+			pSubDock->iGapY = pDock->iGapY + pDock->iMaxDockHeight;
 			
-			pSubDock->iWindowPositionX = (g_iScreenWidth - pSubDock->iMinDockWidth) / 2 + pSubDock->iGapX;
-			pSubDock->iWindowPositionY = g_iScreenHeight - (pSubDock->iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth) - pSubDock->iGapY;
-			
+			//pSubDock->iWindowPositionX = (g_iScreenWidth - pSubDock->iMinDockWidth) / 2 + pSubDock->iGapX;
+			//pSubDock->iWindowPositionY = g_iScreenHeight - (pSubDock->iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth) - pSubDock->iGapY;
+			cairo_dock_calculate_window_position_at_balance (pSubDock, CAIRO_DOCK_NORMAL_SIZE);
 			//gtk_widget_show (pSubDock->pWidget);
 			//gdk_window_show (pSubDock->pWidget->window);
 			//gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
@@ -268,6 +267,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
+	//g_print ("%s ()\n", __func__);
 	pDock->bInside = FALSE;
 	if (pDock->bMenuVisible)
 	{
@@ -285,7 +285,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 		pDock->iSidGrowUp = 0;
 	}
 	
-	if (g_bAutoHide)
+	if ((g_bAutoHide && pDock->iRefCount == 0))
 	{
 		if (pDock->iSidMoveDown == 0)  // on commence a descendre.
 			pDock->iSidMoveDown = g_timeout_add (40, (GSourceFunc) move_down2, (gpointer) pDock);
@@ -300,7 +300,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 		pDock->iSidShrinkDown = g_timeout_add (35, (GSourceFunc) shrink_down2, (gpointer) pDock);
 	
 	pLastPointedDock = NULL;
-	g_print ("pLastPointedDock <- NULL\n");
+	//g_print ("pLastPointedDock <- NULL\n");
 }
 gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
@@ -308,19 +308,17 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 {
 	if (pDock->bAtBottom || ! pDock->bInside)
 		return FALSE;
-	g_print ("%s ()\n", __func__);
+	//g_print ("%s ()\n", __func__);
 	
 	Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
 	if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL)
 	{
-		g_print ("  pointed icon : %s, on attend\n", pPointedIcon->acName);
 		while (gtk_events_pending ())
 			gtk_main_iteration ();
 		pDock->bInside = FALSE;
 		if (pPointedIcon->pSubDock->bInside)
 		{
 			pDock->bAtTop = FALSE;
-			g_print ("on quitte par une icone\n");
 			return FALSE;
 		}
 		else  // si on sort du dock sans passer par le sous-dock, par exemple en sortant par le bas.
@@ -343,7 +341,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 {
 	if (pDock->bAtTop || pDock->bInside)
 		return FALSE;
-	g_print ("%s ()\n", __func__);
+	//g_print ("%s ()\n", __func__);
 	
 	gtk_window_present (GTK_WINDOW (pWidget));
 	pDock->bInside = TRUE;
@@ -351,16 +349,18 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	
 	if (g_bHorizontalDock)
 	{
-		pDock->iWindowPositionX = (g_iScreenWidth - pDock->iMaxDockWidth) / 2 + pDock->iGapX;
-		if (! g_bAutoHide)
-			pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - pDock->iMaxDockHeight - pDock->iGapY : g_iScreenHeight - pDock->iGapY);
-		else
-			pDock->iWindowPositionY = (g_bDirectionUp ? pDock->iWindowPositionY : g_iVisibleZoneHeight - pDock->iMaxDockHeight + (g_iScreenHeight - pDock->iGapY));
+		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MAX_SIZE);
+		//pDock->iWindowPositionX = (g_iScreenWidth - pDock->iMaxDockWidth) / 2 + pDock->iGapX;
+		//if (! (g_bAutoHide && pDock->iRefCount == 0))
+			//pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - pDock->iMaxDockHeight - pDock->iGapY : g_iScreenHeight - pDock->iGapY);
+		//else
+		if ((g_bAutoHide && pDock->iRefCount == 0))
+			pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - g_iVisibleZoneHeight - pDock->iGapY : g_iVisibleZoneHeight + pDock->iGapY - pDock->iMaxDockHeight);
 	}
 	else
 	{
 		pDock->iWindowPositionY = (g_iScreenHeight - pDock->iMaxDockHeight) / 2 + pDock->iGapY;
-		if (! g_bAutoHide)
+		if (! (g_bAutoHide && pDock->iRefCount == 0))
 			pDock->iWindowPositionX = (g_bDirectionUp ? pDock->iWindowPositionX : g_iScreenWidth - pDock->iGapX - pDock->iMaxDockWidth);
 		else
 			pDock->iWindowPositionX = (g_bDirectionUp ? pDock->iGapX - pDock->iMaxDockWidth : g_iScreenWidth - pDock->iGapX - pDock->iMaxDockWidth);
@@ -385,7 +385,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 		g_iSidShrinkDown = 0;
 	}*/
 	
-	if (g_bAutoHide)
+	if ((g_bAutoHide && pDock->iRefCount == 0))
 	{
 		if (pDock->iSidMoveUp == 0)  // on commence a monter.
 			pDock->iSidMoveUp = g_timeout_add (40, (GSourceFunc) move_up2, (gpointer) pDock);
@@ -409,12 +409,12 @@ void cairo_dock_update_gaps_with_window_position (CairoDock *pDock)
 	gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iWidth, &iHeight);
 	gtk_window_get_position (GTK_WINDOW (pDock->pWidget), &pDock->iWindowPositionX, &pDock->iWindowPositionY);
 	
-	int x, y;  // position du centre bas du dock;
+	int x, y;  // position du point invariant du dock.
 	x = pDock->iWindowPositionX + iWidth / 2;
-	y = pDock->iWindowPositionY + (g_bDirectionUp ? iHeight : (g_bAutoHide ? g_iVisibleZoneHeight : 0));
+	y = (g_bDirectionUp ? pDock->iWindowPositionY + iHeight : pDock->iWindowPositionY);
 	
 	pDock->iGapX = x - g_iScreenWidth / 2;
-	pDock->iGapY = g_iScreenHeight - y;
+	pDock->iGapY = (g_bDirectionUp ? g_iScreenHeight - y : y);
 	
 	if (pDock->bIsMainDock)
 		cairo_dock_update_conf_file_with_position (g_cConfFile, pDock->iGapX, pDock->iGapY);

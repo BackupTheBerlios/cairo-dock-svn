@@ -452,7 +452,7 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, int x_abs, gd
 		}
 		else
 		{
-			icon->fY = (g_bDirectionUp ? iHeight - icon->fScale * icon->fHeight : 0);
+			icon->fY = (g_bDirectionUp ? iHeight - g_iDockLineWidth - icon->fScale * icon->fHeight : g_iDockLineWidth);
 		}
 		//\_______________ Si on avait deja defini l'icone pointee, on peut placer l'icone courante par rapport a la precedente.
 		if (pointed_ic != NULL)
@@ -529,17 +529,17 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	//\_______________ On regarde si le curseur est dans le dock ou pas, et on joue sur la taille des icones en consequence.
 	gboolean bMouseInsideDock = (x_abs >= 0 && x_abs <= pDock->iMinDockWidth);
 	
-	if (! bMouseInsideDock && pDock->iSidShrinkDown == 0 && pDock->fMagnitude > 0)
+	if (! bMouseInsideDock && pDock->iSidShrinkDown == 0 && pDock->fMagnitude > 0 && pDock->iSidGrowUp == 0)
 	{
-		if (pDock->iSidGrowUp > 0)
+		/*if (pDock->iSidGrowUp > 0)
 		{
 			g_source_remove (pDock->iSidGrowUp);
 			pDock->iSidGrowUp = 0;
-		}
+		}*/
 		pDock->iSidShrinkDown = g_timeout_add (75, (GSourceFunc) shrink_down2, pDock);
 	}
 	
-	if (bMouseInsideDock && pDock->fMagnitude < 1 && cairo_dock_none_clicked (pDock->icons) && pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0)  // on est dedans en x et la taille des icones est non maximale bien qu'on n'ait pas clique sur une icone.
+	if (bMouseInsideDock && pDock->fMagnitude < 1 && cairo_dock_none_clicked (pDock->icons) && pDock->iSidGrowUp == 0)  // on est dedans en x et la taille des icones est non maximale bien qu'on n'ait pas clique sur une icone.  // && pDock->iSidShrinkDown == 0
 	{
 		if ( (g_bDirectionUp && pPointedIcon != NULL && iMouseY > iHeight - pPointedIcon->fHeight * pPointedIcon->fScale && iMouseY < iHeight) || (! g_bDirectionUp && pPointedIcon != NULL && iMouseY < pPointedIcon->fHeight * pPointedIcon->fScale && iMouseY > pDock->iWindowPositionY) )  // et en plus on est dedans en y.
 		{
@@ -552,7 +552,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 		}
 	}
 	
-	return pPointedIcon;
+	return (bMouseInsideDock ? pPointedIcon : NULL);
 }
 
 

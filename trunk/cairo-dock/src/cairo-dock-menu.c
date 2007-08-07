@@ -107,7 +107,7 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 	
 	GtkWidget *pLabel = gtk_label_new (NULL);
 	gtk_label_set_use_markup (GTK_LABEL (pLabel), TRUE);
-	gchar *cAboutText = g_strdup_printf ("<b>Original idea/first development :</b>\n  Mac Slow\n<b>Main developer :</b>\n  Fabrice Rey\n\n<b>Themes :</b>\n  Fabrice Rey");
+	gchar *cAboutText = g_strdup_printf ("<b>Original idea/first development :</b>\n  Mac Slow\n<b>Main developer :</b>\n  Fabrice Rey\n\n<b>Themes :</b>\n  Fabrice Rey\n\n<b>Translations :</b>\n\n<b>Contributors :</b>\n");
 	gtk_label_set_markup (GTK_LABEL (pLabel), cAboutText);
 	g_free (cAboutText);
 	gtk_container_add (GTK_CONTAINER (GTK_DIALOG (pDialog)->vbox), pLabel);
@@ -331,7 +331,10 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 		
 		cairo_dock_insert_icon_in_dock (pNewIcon, pNewContainer, TRUE, FALSE);  // pour l'instant on n'empeche pas les bouclages.
 		
-		cairo_dock_free_icon (icon);  // on le fait maintenant por plus de surete.
+		if (pDock != pNewContainer)
+			cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+		
+		cairo_dock_free_icon (icon);  // on le fait maintenant pour plus de surete.
 		cairo_destroy (pCairoContext);
 		gtk_widget_queue_draw (pDock->pWidget);
 		if (pNewContainer != pDock)
@@ -666,4 +669,3 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	
 	return menu;
 }
-
