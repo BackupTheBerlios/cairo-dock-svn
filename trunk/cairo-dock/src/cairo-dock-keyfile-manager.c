@@ -549,6 +549,16 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									FALSE,
 									0);
 								
+								if (iNbBuffers < s_pBufferArray->len)
+								{
+									data = g_ptr_array_index (s_pBufferArray, iNbBuffers);
+								}
+								else
+								{
+									data = g_new (gpointer, 3);  // tous les buffers ont 3 elements.
+									g_ptr_array_add (s_pBufferArray, data);
+								}
+								
 								pButtonAdd = gtk_button_new_from_stock (GTK_STOCK_ADD);
 								g_signal_connect (G_OBJECT (pButtonAdd),
 									"clicked",
@@ -590,15 +600,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									GTK_SHRINK,
 									0,
 									0);
-								if (iNbBuffers < s_pBufferArray->len)
-								{
-									data = g_ptr_array_index (s_pBufferArray, iNbBuffers);
-								}
-								else
-								{
-									data = g_new (gpointer, 3);  // tous les buffers ont 3 elements.
-									g_ptr_array_add (s_pBufferArray, data);
-								}
+								
 								iNbBuffers ++;
 								data[0] = pOneWidget;
 								data[1] = pEntry;

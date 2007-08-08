@@ -195,7 +195,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, gbool
 	gint i;
 	PangoRectangle ink, log;
 	
-	if (CAIRO_DOCK_IS_APPLI (icon) && g_iAppliMaxNameLength > 0 && strlen (icon->acName) > g_iAppliMaxNameLength)  // marchera pas avec les caracteres non latins, mais avec la glib c'est la galere.
+	if (CAIRO_DOCK_IS_APPLI (icon) && g_iAppliMaxNameLength > 0 && strlen (icon->acName) > g_iAppliMaxNameLength)  // marchera pas avec les caracteres non latins, mais avec la glib c'est la galere...
 	{
 		gchar *cTruncatedName = g_new0 (gchar, g_iAppliMaxNameLength + 4);
 		strncpy (cTruncatedName, icon->acName, g_iAppliMaxNameLength);
@@ -240,7 +240,8 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, gbool
 					 log.width / 2. - ink.x,
 					 log.height     - ink.y);*/
 	icon->fTextXOffset = log.width / 2. - ink.x;
-	icon->fTextYOffset = log.height     - ink.y;
+	///icon->fTextYOffset = log.height     - ink.y;
+	icon->fTextYOffset = iLabelSize;
 	icon->pTextBuffer = pNewSurface;
 	
 	g_object_unref (pLayout);

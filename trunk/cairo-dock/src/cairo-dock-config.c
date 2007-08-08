@@ -22,8 +22,8 @@ released under the terms of the GNU General Public License.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-config.h"
 
-
 static gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "random", NULL};
+
 extern gchar *g_cLanguage;
 
 extern int g_iSinusoidWidth;
@@ -893,6 +893,8 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		gchar *cTranslatedFilePath = g_strdup_printf ("%s/cairo-dock-%s.conf", CAIRO_DOCK_SHARE_DATA_DIR, g_cLanguage);
 		cairo_dock_apply_translation_on_conf_file (conf_file, cTranslatedFilePath);
 		g_free (cTranslatedFilePath);
+		cairo_dock_update_conf_file_with_modules (conf_file, g_hModuleTable);
+		cairo_dock_update_conf_file_with_translations (conf_file, CAIRO_DOCK_SHARE_DATA_DIR);
 	}
 	g_free (cPreviousLanguage);
 	
@@ -1017,7 +1019,7 @@ static void _cairo_dock_write_one_name (gchar *cName, gpointer value, GString *p
 {
 	g_string_append_printf (pString, "%s;", cName);
 }
-void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, int iNbAvailableChoices, gchar *cUsefullComment)
+void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, int iNbAvailableChoices, gchar *cNewUsefullComment)
 {
 	//g_print ("%s (%s)\n", __func__, cConfFile);
 	GError *erreur = NULL;
@@ -1033,19 +1035,46 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 		return ;
 	}
 	
-	g_key_file_remove_comment (pKeyFile, cGroupName, cKeyName, &erreur);
-	if (erreur != NULL)
+	gchar *cUsefullComment = NULL;
+	if (cNewUsefullComment == NULL)
 	{
-		g_print ("Attention : %s\n", erreur->message);
-		g_error_free (erreur);
-		erreur = NULL;
+		gchar *cOldComment = g_key_file_get_comment (pKeyFile, cGroupName, cKeyName, &erreur);
+		if (erreur != NULL)
+		{
+			g_print ("Attention : %s\n", erreur->message);
+			g_error_free (erreur);
+			erreur = NULL;
+		}
+		//g_print ("cOldComment : %s\n", cOldComment);
+		if (cOldComment != NULL)
+		{
+			cOldComment[strlen (cOldComment) - 1] = '\0';
+			cUsefullComment = strchr (cOldComment, ']');
+			if (cUsefullComment == NULL)
+			{
+				cUsefullComment = cOldComment;
+				while (*cUsefullComment == ' ')
+					cUsefullComment ++;
+			}
+			if (*cUsefullComment != '\0')
+				cUsefullComment ++;  // on saute le caractere de type ou le crochet.
+			else
+				cUsefullComment = NULL;
+			if (cUsefullComment != NULL)
+				cUsefullComment = g_strdup (cUsefullComment);
+			g_free (cOldComment);
+		}
+	}
+	else
+	{
+		cUsefullComment = g_strdup (cNewUsefullComment);
 	}
 	
 	GString *cComment = g_string_new ("");
 	g_string_printf (cComment, "s%d[", iNbAvailableChoices);
 	g_hash_table_foreach (pModuleTable, (GHFunc) _cairo_dock_write_one_name, cComment);
 	cComment->len --;
-	g_string_append_printf (cComment, "]\n %s", cUsefullComment);
+	g_string_append_printf (cComment, "] %s", (cUsefullComment != NULL ? cUsefullComment : ""));
 	
 	g_key_file_set_comment (pKeyFile, cGroupName, cKeyName, cComment->str, &erreur);
 	if (erreur != NULL)
@@ -1058,11 +1087,12 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 	
 	cairo_dock_write_keys_to_file (pKeyFile, cConfFile);
 	g_key_file_free (pKeyFile);
+	g_free (cUsefullComment);
 }
 
 void cairo_dock_update_conf_file_with_modules (gchar *cConfFile, GHashTable *pModuleTable)
 {
-	cairo_dock_update_conf_file_with_hash_table (cConfFile, pModuleTable, "APPLETS", "active modules", 99, "List of active plug-ins (applets and others).");
+	cairo_dock_update_conf_file_with_hash_table (cConfFile, pModuleTable, "APPLETS", "active modules", 99, NULL);  // "List of active plug-ins (applets and others)."
 }
 
 void cairo_dock_update_conf_file_with_translations (gchar *cConfFile, gchar *cTranslationsDir)
@@ -1070,7 +1100,8 @@ void cairo_dock_update_conf_file_with_translations (gchar *cConfFile, gchar *cTr
 	GError *erreur = NULL;
 	GHashTable *pTranslationTable = cairo_dock_list_available_translations (cTranslationsDir, "cairo-dock-", &erreur);
 	
-	cairo_dock_update_conf_file_with_hash_table (cConfFile, pTranslationTable, "CAIRO DOCK", "language", 1, "List of available languages (for config windows) :");
+	cairo_dock_update_conf_file_with_hash_table (cConfFile, pTranslationTable, "CAIRO DOCK", "language", 1, NULL);
+	
 	g_hash_table_destroy (pTranslationTable);
 }
 

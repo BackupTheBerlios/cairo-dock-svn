@@ -193,7 +193,14 @@ void render (CairoDock *pDock)
 		0, 0,
 		fRadius, 0,
 		fRadius, sens * fRadius);
+	/*cairo_arc (pCairoContext,
+		fDockWidth - fRadius - fLineWidth / 2,
+		fDockOffsetY + sens * fRadius,
+		fRadius,
+		0,
+		- sens * G_PI / 2);*/
 	cairo_rel_line_to (pCairoContext, 0, sens * (pDock->iMaxIconHeight + fLineWidth - fRadius * (g_bRoundedBottomCorner ? 2 : 1)));
+	
 	
 	// Bottom Right.
 	if (g_bRoundedBottomCorner)
@@ -217,6 +224,14 @@ void render (CairoDock *pDock)
 		0, 0,
 		0, -sens * fRadius,
 		fRadius, -sens * fRadius);
+	/*cairo_arc (pCairoContext,
+		fDockOffsetX + fRadius,
+		fDockOffsetY + sens * fRadius,
+		fRadius,
+		sens * G_PI / 2,
+		0);*/
+	if (fRadius < 1)
+		cairo_close_path (pCairoContext);
 	if (! g_bDirectionUp)
 		cairo_move_to (pCairoContext, fDockOffsetX, iHeight - pDock->iMaxIconHeight - fLineWidth / 2);
 	
@@ -314,7 +329,7 @@ void render (CairoDock *pDock)
 				icon->pTextBuffer,
 				-icon->fTextXOffset + icon->fWidth * icon->fScale * 0.5,
 				(g_bDirectionUp ? -icon->fTextYOffset : icon->fHeight * icon->fScale));
-			cairo_paint_with_alpha (pCairoContext, ((icon->fScale - 1) / g_fAmplitude) * ((icon->fScale - 1) / g_fAmplitude));
+			cairo_paint_with_alpha (pCairoContext, (g_bLabelForPointedIconOnly ? 1.0 : ((icon->fScale - 1) / g_fAmplitude) * ((icon->fScale - 1) / g_fAmplitude)));
 		}
 		// Made this tighter [KL]
 		cairo_restore (pCairoContext);

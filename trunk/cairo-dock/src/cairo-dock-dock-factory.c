@@ -231,22 +231,11 @@ void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMin
 	pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock->icons, iMinDockWidth)) + 1;  // + 1 pour gerer les largeurs impaires.
 	cairo_dock_calculate_icons (pDock, 0, 0);
 	
-	/**if (! (g_bAutoHide && pDock->iRefCount == 0))
-	{
-		g_iVisibleZoneWidth = iMinDockWidth + 2 * (g_iDockRadius + g_iDockLineWidth);
-		g_iVisibleZoneHeight = pDock->iMaxIconHeight + 2 * g_iDockLineWidth;
-	}*/
-	
 	if (! pDock->bInside && (g_bAutoHide && pDock->iRefCount == 0))
 		return;
 	else if (pDock->bInside)
 	{
 		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MAX_SIZE);  // inutile de recalculer Y mais bon...
-		//pDock->iWindowPositionX = (g_iScreenWidth - pDock->iMaxDockWidth) / 2 + pDock->iGapX;
-		//if (! (g_bAutoHide && pDock->iRefCount == 0))
-		//	pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - pDock->iMaxDockHeight - pDock->iGapY : g_iScreenHeight - pDock->iGapY);
-		//else
-		//	pDock->iWindowPositionY = (g_bDirectionUp ? pDock->iWindowPositionY : g_iVisibleZoneHeight - pDock->iMaxDockHeight + (g_iScreenHeight - pDock->iGapY));
 		//g_print ("%s () -> %dx%d\n", __func__, g_iMaxDockWidth, g_iMaxDockHeight);
 		gdk_window_move_resize (pDock->pWidget->window,
 			pDock->iWindowPositionX,
@@ -257,8 +246,6 @@ void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMin
 	else
 	{
 		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE);  // inutile de recalculer Y mais bon...
-		//pDock->iWindowPositionX = (g_iScreenWidth - (iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth)) / 2 + pDock->iGapX;
-		//pDock->iWindowPositionY = g_iScreenHeight - pDock->iGapY - (g_bDirectionUp ? iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth : 0);
 		//g_print ("%s () -> %dx%d\n", __func__, g_iMaxDockWidth, g_iMaxDockHeight);
 		gdk_window_move_resize (pDock->pWidget->window,
 			pDock->iWindowPositionX,
@@ -321,6 +308,11 @@ void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDock, gpo
 	if (! pDock->bIsMainDock)
 	{
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+		//gtk_widget_queue_draw (pDock->pWidget);
+		render (pDock);
+		gtk_window_present (GTK_WINDOW (pDock->pWidget));
+		while (gtk_events_pending ())
+			gtk_main_iteration ();
 		if (pDock->iRefCount > 0)
 			gtk_widget_hide (pDock->pWidget);
 	}
@@ -354,17 +346,6 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 				pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->cParentDockName);
 				pParentDock->iRefCount --;
 			}
-			
-			/*if (GPOINTER_TO_INT (icon->pSubDock) != 0)
-			{
-				pChildDock = g_hash_table_lookup (g_hDocksTable, icon->acName);
-				if (pChildDock == NULL)
-				{
-					g_print ("le dock fils (%s) n'existe pas, on le cree\n", icon->acName);
-					pChildDock= cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_NORMAL, icon->acName);
-				}
-				icon->pSubDock = pChildDock;
-			}*/
 			
 			cairo_dock_insert_icon_in_dock (icon, pParentDock, FALSE, FALSE);
 		}
