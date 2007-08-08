@@ -15,7 +15,7 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 
 void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, gboolean bUseText, int iLabelSize, gchar *cLabelPolice);
 
-void cairo_dock_reload_buffers_in_dock (CairoDock *pDock, double fMaxScale, int iLabelSize, gboolean bUseText);
+void cairo_dock_reload_buffers_in_all_dock (GHashTable *hDocksTable, double fMaxScale, int iLabelSize, gboolean bUseText, gchar *cLabelPolice);
 
 
 

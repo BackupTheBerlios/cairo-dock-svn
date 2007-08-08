@@ -50,6 +50,7 @@ extern int g_iNbStripes;
 extern double g_fStripesWidth;
 extern cairo_surface_t *g_pStripesBuffer;
 extern double g_fStripesSpeedFactor;
+extern double g_fLabelAlphaThreshold;
 
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
@@ -241,7 +242,7 @@ void render (CairoDock *pDock)
 	{
 		cairo_save (pCairoContext);
 		
-		cairo_translate (pCairoContext, - (pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
+		cairo_translate (pCairoContext, - (pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth * 1.5, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
 		cairo_set_source_surface (pCairoContext, g_pStripesBuffer, 0., 0.);
 		
 		cairo_fill_preserve (pCairoContext);
@@ -271,6 +272,7 @@ void render (CairoDock *pDock)
 	GList* ic;
 	double fWidthFactor = 1.;
 	int c;
+	double fMagnitude;
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = (Icon*) ic->data;
@@ -323,13 +325,15 @@ void render (CairoDock *pDock)
 		cairo_restore (pCairoContext);
 		
 		//\_____________________ On dessine les etiquettes, avec un alpha proportionnel a leur facteur d'echelle.
-		if (g_bUseText && icon->pTextBuffer != NULL && icon->fScale > 1.0 && (! g_bLabelForPointedIconOnly || icon->bPointed))
+		if (g_bUseText && icon->pTextBuffer != NULL && icon->fScale > 1.01 && (! g_bLabelForPointedIconOnly || icon->bPointed))  // 1.01 car sin(pi) = 1+epsilon :-/
 		{
 			cairo_set_source_surface (pCairoContext,
 				icon->pTextBuffer,
 				-icon->fTextXOffset + icon->fWidth * icon->fScale * 0.5,
 				(g_bDirectionUp ? -icon->fTextYOffset : icon->fHeight * icon->fScale));
-			cairo_paint_with_alpha (pCairoContext, (g_bLabelForPointedIconOnly ? 1.0 : ((icon->fScale - 1) / g_fAmplitude) * ((icon->fScale - 1) / g_fAmplitude)));
+			fMagnitude = (icon->fScale - 1) / g_fAmplitude;
+			//cairo_paint_with_alpha (pCairoContext, (g_bLabelForPointedIconOnly ? 1.0 : pow (fMagnitude, 3)));
+			cairo_paint_with_alpha (pCairoContext, (g_bLabelForPointedIconOnly ? 1.0 : (fMagnitude > 1. - 1. / g_fLabelAlphaThreshold ? 1.0 : 1. / (1. - fMagnitude) / g_fLabelAlphaThreshold)));
 		}
 		// Made this tighter [KL]
 		cairo_restore (pCairoContext);
@@ -515,7 +519,8 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 	{
 		cairo_save (pCairoContext);
 		
-		cairo_translate (pCairoContext, - (pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth, fDockOffsetY);
+		//cairo_translate (pCairoContext, - (pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth, fDockOffsetY);
+		cairo_translate (pCairoContext, - (pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth * 1.5, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
 		cairo_set_source_surface (pCairoContext, g_pStripesBuffer, 0., 0.);
 		
 		cairo_fill_preserve (pCairoContext);

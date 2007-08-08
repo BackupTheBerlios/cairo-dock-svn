@@ -150,6 +150,7 @@ gchar *g_cLabelPolice;  // police de caracteres des etiquettes.
 int g_iLabelWeight;
 int g_iLabelStyle;
 gboolean g_bLabelForPointedIconOnly;
+double g_fLabelAlphaThreshold = 10.;  // seuil de visibilité de etiquettes.
 
 double g_fGrowUpFactor = 1.4;
 double g_fShrinkDownFactor = 0.6;

@@ -1,7 +1,7 @@
 #!
 [Desktop Entry]
 #s Launcher's name :
-Name=Gaim Internet Messenger
+Name=Gaim
 Name[ar]=جايم مراسل الانترنت
 Name[ca]=Missatger d'Internet Gaim
 Name[ca@valencia]=Missatger d'Internet Gaim
@@ -16,7 +16,7 @@ Name[et]=Gaim - Interneti sõnumivahetus
 Name[eu]=Gaim interneteko mezularitza 
 Name[fa]=پیغام‌رسان اینترنتی گِیم
 Name[fi]=Gaim-pikaviestin
-Name[fr]=Gaim Messagerie Internet
+Name[fr]=Gaim
 Name[gl]=Gaim - Mensaxería na Internet
 Name[he]=גיים למסרים באינטרנט
 Name[hu]=Gaim azonnali üzenő

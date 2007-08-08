@@ -327,7 +327,10 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 		//\_____________ On cherche le dock auquel elle appartient maintenant.
 		CairoDock *pNewContainer = cairo_dock_search_dock_from_name (pNewIcon->cParentDockName);
 		if (pNewContainer == NULL)
-			pNewContainer = g_pMainDock;
+		{
+			pNewContainer = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, pNewIcon->cParentDockName);
+			pNewContainer->iRefCount --;
+		}
 		
 		cairo_dock_insert_icon_in_dock (pNewIcon, pNewContainer, TRUE, FALSE);  // pour l'instant on n'empeche pas les bouclages.
 		

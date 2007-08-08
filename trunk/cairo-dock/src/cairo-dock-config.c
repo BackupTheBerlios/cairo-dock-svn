@@ -24,6 +24,7 @@ released under the terms of the GNU General Public License.
 
 static gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "random", NULL};
 
+extern GHashTable *g_hDocksTable;
 extern gchar *g_cLanguage;
 
 extern int g_iSinusoidWidth;
@@ -43,6 +44,7 @@ extern gchar *g_cLabelPolice;
 extern int g_iLabelWeight;
 extern int g_iLabelStyle;
 extern gboolean g_bLabelForPointedIconOnly;
+extern double g_fLabelAlphaThreshold;
 
 extern gchar **g_cDefaultIconDirectory;
 extern gchar *g_cCairoDockDataDir;
@@ -302,6 +304,16 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		bFlushConfFileNeeded = TRUE;
 	}
 	
+	g_fLabelAlphaThreshold = g_key_file_get_double (fconf, "LABELS", "alpha threshold", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_fLabelAlphaThreshold = 10.;  // valeur par defaut.
+		g_key_file_set_double (fconf, "LABELS", "alpha threshold", g_fLabelAlphaThreshold);
+		bFlushConfFileNeeded = TRUE;
+	}
 	
 	if (g_cLabelPolice == NULL)
 		g_bUseText = FALSE;
@@ -829,7 +841,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	if (pDock->icons == NULL)
 		cairo_dock_build_docks_tree_with_desktop_files (pDock, g_cCairoDockDataDir);
 	else
-		cairo_dock_reload_buffers_in_dock (pDock, 1 + g_fAmplitude, g_iLabelSize, g_bUseText);
+		cairo_dock_reload_buffers_in_all_dock (g_hDocksTable, 1 + g_fAmplitude, g_iLabelSize, g_bUseText, g_cLabelPolice);
 	
 	
 	if (g_iSidUpdateAppliList == 0 && g_bShowAppli)  // maintenant on veut voir les applis !
@@ -888,7 +900,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 				pDock->iMaxIconHeight + 2 * g_iDockLineWidth);
 	}
 	
-	if (cPreviousLanguage != NULL && g_cLanguage != NULL && strcmp (cPreviousLanguage, g_cLanguage) != 0)
+	if ((cPreviousLanguage != NULL && g_cLanguage != NULL && strcmp (cPreviousLanguage, g_cLanguage) != 0) || bFlushConfFileNeeded)
 	{
 		gchar *cTranslatedFilePath = g_strdup_printf ("%s/cairo-dock-%s.conf", CAIRO_DOCK_SHARE_DATA_DIR, g_cLanguage);
 		cairo_dock_apply_translation_on_conf_file (conf_file, cTranslatedFilePath);
