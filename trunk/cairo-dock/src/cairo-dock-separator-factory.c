@@ -24,6 +24,7 @@ released under the terms of the GNU General Public License.
 #endif
 
 #include "cairo-dock-icons.h"
+#include "cairo-dock-load.h"
 #include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-separator-factory.h"
 
@@ -93,6 +94,9 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 	else
 	{
 		int iLineWidth = g_iDockLineWidth;
+		
+		double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
+		cairo_dock_calculate_contrainted_icon_size (fWidth, fHeight, g_tMinIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12], g_tMinIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12], g_tMaxIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12], g_tMaxIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12], &fIconWidthSaturationFactor, &fIconHeightSaturationFactor);
 		
 		pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 			CAIRO_CONTENT_COLOR_ALPHA,

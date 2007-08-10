@@ -100,9 +100,9 @@ void cairo_dock_free_icon (Icon *icon)
 
 int cairo_dock_compare_icons_order (Icon *icon1, Icon *icon2)
 {
-	if (icon1->iType < icon2->iType)
+	if (g_tIconTypeOrder[icon1->iType] < g_tIconTypeOrder[icon2->iType])
 		return -1;
-	else if (icon1->iType > icon2->iType)
+	else if (g_tIconTypeOrder[icon1->iType] > g_tIconTypeOrder[icon2->iType])
 		return 1;
 	else
 	{
@@ -191,6 +191,42 @@ Icon *cairo_dock_get_removing_or_inserting_icon (GList *pIconList)
 		icon = ic->data;
 		if (icon->fPersonnalScale != 0)
 			return icon;
+	}
+	return NULL;
+}
+
+Icon *cairo_dock_get_next_icon (GList *pIconList, Icon *pIcon)
+{
+	GList* ic;
+	Icon *icon;
+	for (ic = pIconList; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (icon == pIcon)
+		{
+			if (ic->next != NULL)
+				return ic->next->data;
+			else
+				return NULL;
+		}
+	}
+	return NULL;
+}
+
+Icon *cairo_dock_get_previous_icon (GList *pIconList, Icon *pIcon)
+{
+	GList* ic;
+	Icon *icon;
+	for (ic = pIconList; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (icon == pIcon)
+		{
+			if (ic->prev != NULL)
+				return ic->prev->data;
+			else
+				return NULL;
+		}
 	}
 	return NULL;
 }
@@ -305,10 +341,10 @@ void cairo_dock_remove_icon_from_dock (CairoDock *pDock, Icon *icon)
 		Icon *pSameTypeIcon = cairo_dock_get_first_icon_of_type (pDock->icons, icon->iType);
 		if (pSameTypeIcon == NULL)
 		{
-			if (icon->iType - 1 > 0)
-				pSeparatorIcon = cairo_dock_get_first_icon_of_type (pDock->icons, icon->iType - 1);
-			else if (icon->iType + 1 > CAIRO_DOCK_NB_TYPES)
-				pSeparatorIcon = cairo_dock_get_first_icon_of_type (pDock->icons, icon->iType + 1);
+			if (g_tIconTypeOrder[icon->iType] > 1)  // attention : iType - 1 > 0 si iType = 0, car c'est un unsigned int !
+				pSeparatorIcon = cairo_dock_get_first_icon_of_type (pDock->icons, g_tIconTypeOrder[icon->iType] - 1);
+			else if (g_tIconTypeOrder[icon->iType] + 1 < CAIRO_DOCK_NB_TYPES)
+				pSeparatorIcon = cairo_dock_get_first_icon_of_type (pDock->icons, g_tIconTypeOrder[icon->iType] + 1);
 			
 			if (pSeparatorIcon != NULL)
 			{

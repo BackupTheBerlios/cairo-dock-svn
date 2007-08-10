@@ -12,7 +12,7 @@ int cairo_dock_get_number_from_name (gchar *cName, gchar **tNamesList);
 void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock);
 
 
-gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar *cTitle);
+gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar *cTitle, int iWindowWidth, int iWindowHeight);
 
 
 void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file);
@@ -28,6 +28,7 @@ void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *p
 
 
 void cairo_dock_apply_translation_on_conf_file (gchar *cConfFilePath, gchar *cCommentsFilePath);
+void cairo_dock_replace_values_in_conf_file (gchar *cConfFilePath, GKeyFile *pValidKeyFile);
 
 GHashTable *cairo_dock_list_available_translations (gchar *cTranslationsDir, gchar *cFilePrefix, GError **erreur);
 

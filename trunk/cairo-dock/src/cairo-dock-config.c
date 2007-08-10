@@ -23,6 +23,7 @@ released under the terms of the GNU General Public License.
 #include "cairo-dock-config.h"
 
 static gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "random", NULL};
+static gchar * s_cIconTypeNames[(CAIRO_DOCK_NB_TYPES+1)/2] = {"launchers", "applications", "applets"};
 
 extern GHashTable *g_hDocksTable;
 extern gchar *g_cLanguage;
@@ -237,6 +238,28 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		bFlushConfFileNeeded = TRUE;
 	}
 	
+	g_bLabelForPointedIconOnly = g_key_file_get_boolean (fconf, "LABELS", "pointed icon only", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_bLabelForPointedIconOnly = FALSE;  // valeur par defaut.
+		g_key_file_set_boolean (fconf, "LABELS", "pointed icon only", g_bLabelForPointedIconOnly);
+		bFlushConfFileNeeded = TRUE;
+	}
+	
+	g_fLabelAlphaThreshold = g_key_file_get_double (fconf, "LABELS", "alpha threshold", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_fLabelAlphaThreshold = 10.;  // valeur par defaut.
+		g_key_file_set_double (fconf, "LABELS", "alpha threshold", g_fLabelAlphaThreshold);
+		bFlushConfFileNeeded = TRUE;
+	}
+	
 	g_cLabelPolice = g_key_file_get_string (fconf, "LABELS", "police", &erreur);
 	if (erreur != NULL)
 	{
@@ -292,28 +315,6 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		g_iLabelStyle = PANGO_STYLE_ITALIC;
 	else
 		g_iLabelStyle = PANGO_STYLE_NORMAL;
-	
-	g_bLabelForPointedIconOnly = g_key_file_get_boolean (fconf, "LABELS", "pointed icon only", &erreur);
-	if (erreur != NULL)
-	{
-		g_print ("Attention : %s\n", erreur->message);
-		g_error_free (erreur);
-		erreur = NULL;
-		g_bLabelForPointedIconOnly = FALSE;  // valeur par defaut.
-		g_key_file_set_boolean (fconf, "LABELS", "pointed icon only", g_bLabelForPointedIconOnly);
-		bFlushConfFileNeeded = TRUE;
-	}
-	
-	g_fLabelAlphaThreshold = g_key_file_get_double (fconf, "LABELS", "alpha threshold", &erreur);
-	if (erreur != NULL)
-	{
-		g_print ("Attention : %s\n", erreur->message);
-		g_error_free (erreur);
-		erreur = NULL;
-		g_fLabelAlphaThreshold = 10.;  // valeur par defaut.
-		g_key_file_set_double (fconf, "LABELS", "alpha threshold", g_fLabelAlphaThreshold);
-		bFlushConfFileNeeded = TRUE;
-	}
 	
 	if (g_cLabelPolice == NULL)
 		g_bUseText = FALSE;
@@ -416,6 +417,33 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		g_key_file_set_string (fconf, "CAIRO DOCK", "language", g_cLanguage);
 		bFlushConfFileNeeded = TRUE;
 	}
+	
+	length = 0;
+	gchar **cIconsTypesList = g_key_file_get_string_list (fconf, "CAIRO DOCK", "icon's type order", &length, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		cIconsTypesList = NULL;  // valeur par defaut.
+		g_key_file_set_string (fconf, "CAIRO DOCK", "icon's type order", "launchers;applications;applets");
+		bFlushConfFileNeeded = TRUE;
+	}
+	if (cIconsTypesList != NULL && length > 0)
+	{
+		int i, j;
+		for (i = 0; i < length; i ++)
+		{
+			for (j = 0; j < ((CAIRO_DOCK_NB_TYPES + 1) / 2); j ++)
+			{
+				if (strcmp (cIconsTypesList[i], s_cIconTypeNames[j]) == 0)
+				{
+					g_tIconTypeOrder[2*j] = 2 * i;
+				}
+			}
+		}
+	}
+	g_strfreev (cIconsTypesList);
 	
 	g_fAmplitude = g_key_file_get_double (fconf, "CAIRO DOCK", "amplitude", &erreur);
 	if (erreur != NULL)
@@ -825,7 +853,24 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	
 	if (bFlushConfFileNeeded)
 	{
-		cairo_dock_write_keys_to_file (fconf, g_cConfFile);
+		gchar *cCommand = g_strdup_printf ("/bin/cp %s/cairo-dock-%s.conf %s", CAIRO_DOCK_SHARE_DATA_DIR, g_cLanguage, g_cConfFile);
+		system (cCommand);
+		g_free (cCommand);
+		
+		cairo_dock_replace_values_in_conf_file (g_cConfFile, fconf);
+	}
+	
+	
+	GdkScreen *gdkscreen = gtk_window_get_screen (GTK_WINDOW (pDock->pWidget));
+	if (g_bHorizontalDock)
+	{
+		g_iScreenWidth = gdk_screen_get_width (gdkscreen);
+		g_iScreenHeight = gdk_screen_get_height (gdkscreen);
+	}
+	else
+	{
+		g_iScreenHeight = gdk_screen_get_width (gdkscreen);
+		g_iScreenWidth = gdk_screen_get_height (gdkscreen);
 	}
 	
 	
@@ -835,6 +880,10 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	if (g_iSidUpdateAppliList != 0 && ! g_bShowAppli)  // on ne veut plus voir les applis, il faut donc les enlever.
 	{
 		cairo_dock_remove_all_applis (pDock);
+	}
+	else  // il reste 2 types distincts dans la liste, on reordonne car l'ordre des types a pu changer.
+	{
+		pDock->icons = g_list_sort (pDock->icons, (GCompareFunc) cairo_dock_compare_icons_order);
 	}
 	
 	
@@ -900,7 +949,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 				pDock->iMaxIconHeight + 2 * g_iDockLineWidth);
 	}
 	
-	if ((cPreviousLanguage != NULL && g_cLanguage != NULL && strcmp (cPreviousLanguage, g_cLanguage) != 0) || bFlushConfFileNeeded)
+	if (cPreviousLanguage != NULL && g_cLanguage != NULL && strcmp (cPreviousLanguage, g_cLanguage) != 0 && ! bFlushConfFileNeeded)
 	{
 		gchar *cTranslatedFilePath = g_strdup_printf ("%s/cairo-dock-%s.conf", CAIRO_DOCK_SHARE_DATA_DIR, g_cLanguage);
 		cairo_dock_apply_translation_on_conf_file (conf_file, cTranslatedFilePath);
@@ -914,7 +963,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 }
 
 
-gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar *cTitle)
+gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar *cTitle, int iWindowWidth, int iWindowHeight)
 {
 	GSList *pWidgetList = NULL;
 	GtkTextBuffer *pTextBuffer = NULL;
@@ -935,6 +984,9 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 		pDialog = cairo_dock_generate_basic_ihm_from_keyfile (conf_file, cTitle, pWidget, &pTextBuffer);
 	}
 	g_return_val_if_fail (pDialog != NULL, FALSE);
+	
+	if (iWindowWidth != 0 && iWindowHeight != 0)
+		gtk_window_resize (GTK_WINDOW (pDialog), iWindowWidth, iWindowHeight);
 	
 	gint action = gtk_dialog_run (GTK_DIALOG (pDialog));
 	gboolean config_ok = TRUE;
@@ -1210,6 +1262,26 @@ void cairo_dock_apply_translation_on_conf_file (gchar *cConfFilePath, gchar *cTr
 	
 	g_key_file_free (pConfKeyFile);
 	g_key_file_free (pTranslatedKeyFile);
+}
+
+void cairo_dock_replace_values_in_conf_file (gchar *cConfFilePath, GKeyFile *pValidKeyFile)
+{
+	GKeyFile *pConfKeyFile = g_key_file_new ();
+	
+	GError *erreur = NULL;
+	g_key_file_load_from_file (pConfKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		return ;
+	}
+	
+	cairo_dock_replace_key_values (pConfKeyFile, pValidKeyFile);
+	
+	cairo_dock_write_keys_to_file (pConfKeyFile, cConfFilePath);
+	
+	g_key_file_free (pConfKeyFile);
 }
 
 

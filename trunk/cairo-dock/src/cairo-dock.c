@@ -51,6 +51,8 @@
 **     Now it sems more like a real dock !
 **     Feel free to upgrade it according to your wishes !
 **
+**     Edit : plus a taskbar, plus an applet system, plus the container ability.
+**
 **
 *******************************************************************************/
 
@@ -87,7 +89,7 @@
 
 CairoDock *g_pMainDock;
 GHashTable *g_hDocksTable = NULL;
-CairoDock *pLastPointedDock = NULL;
+CairoDock *g_pLastPointedDock = NULL;
 gchar *g_cLanguage = NULL;
 
 gint g_iScreenWidth = 0;  // dimensions de l'ecran.
@@ -150,7 +152,7 @@ gchar *g_cLabelPolice;  // police de caracteres des etiquettes.
 int g_iLabelWeight;
 int g_iLabelStyle;
 gboolean g_bLabelForPointedIconOnly;
-double g_fLabelAlphaThreshold = 10.;  // seuil de visibilité de etiquettes.
+double g_fLabelAlphaThreshold;  // seuil de visibilité de etiquettes.
 
 double g_fGrowUpFactor = 1.4;
 double g_fShrinkDownFactor = 0.6;
@@ -193,7 +195,7 @@ main (int argc, char** argv)
 {
 	memset (g_tIconsSubList, 0, CAIRO_DOCK_NB_TYPES * sizeof (GList *));
 	gint i;
-	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)  // pour l'instant en dur.
+	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)
 		g_tIconTypeOrder[i] = i;
 	
 	

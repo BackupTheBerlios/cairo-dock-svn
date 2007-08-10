@@ -242,7 +242,7 @@ void render (CairoDock *pDock)
 	{
 		cairo_save (pCairoContext);
 		
-		cairo_translate (pCairoContext, - (pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth * 1.5, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
+		cairo_translate (pCairoContext, (- pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth * 0.5, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
 		cairo_set_source_surface (pCairoContext, g_pStripesBuffer, 0., 0.);
 		
 		cairo_fill_preserve (pCairoContext);
@@ -330,7 +330,7 @@ void render (CairoDock *pDock)
 			cairo_set_source_surface (pCairoContext,
 				icon->pTextBuffer,
 				-icon->fTextXOffset + icon->fWidth * icon->fScale * 0.5,
-				(g_bDirectionUp ? -icon->fTextYOffset : icon->fHeight * icon->fScale));
+				g_bDirectionUp ? -icon->fTextYOffset : icon->fHeight * icon->fScale);
 			fMagnitude = (icon->fScale - 1) / g_fAmplitude;
 			//cairo_paint_with_alpha (pCairoContext, (g_bLabelForPointedIconOnly ? 1.0 : pow (fMagnitude, 3)));
 			cairo_paint_with_alpha (pCairoContext, (g_bLabelForPointedIconOnly ? 1.0 : (fMagnitude > 1. - 1. / g_fLabelAlphaThreshold ? 1.0 : 1. / (1. - fMagnitude) / g_fLabelAlphaThreshold)));
@@ -486,7 +486,7 @@ gboolean shrink_down2 (CairoDock *pDock)
 
 void cairo_dock_redraw_my_icon (Icon *icon, GtkWidget *pWidget)
 {
-	GdkRectangle rect = {(int) icon->fX, (int) icon->fY, (int) icon->fWidth * icon->fScale, (int) icon->fHeight * icon->fScale};
+	GdkRectangle rect = {(int) round (icon->fX), (int) icon->fY, (int) round (icon->fWidth * icon->fScale), (int) icon->fHeight * icon->fScale};
 	gdk_window_invalidate_rect (pWidget->window, &rect, FALSE);
 }
 
@@ -520,7 +520,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 		cairo_save (pCairoContext);
 		
 		//cairo_translate (pCairoContext, - (pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth, fDockOffsetY);
-		cairo_translate (pCairoContext, - (pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth * 1.5, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
+		cairo_translate (pCairoContext, (- pDock->fGradientOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth * 0.5, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
 		cairo_set_source_surface (pCairoContext, g_pStripesBuffer, 0., 0.);
 		
 		cairo_fill_preserve (pCairoContext);

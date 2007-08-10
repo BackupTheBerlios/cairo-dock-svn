@@ -17,7 +17,6 @@ static void _cairo_dock_activate_one_element (GtkCellRendererToggle * cell_rende
 
 static gboolean _cairo_dock_increase_order (GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter, int *pOrder)
 {
-	g_print ("%s (%d)\n", __func__, *pOrder);
 	int iMyOrder;
 	gtk_tree_model_get (model, iter, 2, &iMyOrder, -1);
 	
@@ -31,7 +30,6 @@ static gboolean _cairo_dock_increase_order (GtkTreeModel * model, GtkTreePath * 
 
 static gboolean _cairo_dock_decrease_order (GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter, int *pOrder)
 {
-	g_print ("%s (%d)\n", __func__, *pOrder);
 	int iMyOrder;
 	gtk_tree_model_get (model, iter, 2, &iMyOrder, -1);
 
@@ -45,7 +43,6 @@ static gboolean _cairo_dock_decrease_order (GtkTreeModel * model, GtkTreePath * 
 
 static gboolean _cairo_dock_decrease_order_if_greater (GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter, int *pOrder)
 {
-	g_print ("%s (%d)\n", __func__, *pOrder);
 	int iMyOrder;
 	gtk_tree_model_get (model, iter, 2, &iMyOrder, -1);
 
@@ -59,7 +56,6 @@ static gboolean _cairo_dock_decrease_order_if_greater (GtkTreeModel * model, Gtk
 
 static void _cairo_dock_go_up (GtkButton *button, GtkTreeView *pTreeView)
 {
-	g_print ("%s ()\n", __func__);
 	GtkTreeSelection *pSelection = gtk_tree_view_get_selection (pTreeView);
 	
 	GtkTreeModel *pModel;
@@ -80,7 +76,6 @@ static void _cairo_dock_go_up (GtkButton *button, GtkTreeView *pTreeView)
 
 static void _cairo_dock_go_down (GtkButton *button, GtkTreeView *pTreeView)
 {
-	g_print ("%s ()\n", __func__);
 	GtkTreeSelection *pSelection = gtk_tree_view_get_selection (pTreeView);
 	
 	GtkTreeModel *pModel;
@@ -198,6 +193,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	GtkWidget *pButtonDown, *pButtonUp;
 	GtkWidget *pButtonFileChooser;
 	GtkWidget *pFrame, *pFrameVBox;
+	GtkWidget *pScrolledWindow;
 	gchar *cGroupName, *cKeyName, *cKeyComment, *cUsefulComment, *cAuthorizedValuesChain, **pAuthorizedValuesList;
 	gpointer *pGroupKeyWidget;
 	int i, j, k, iNbElements;
@@ -230,7 +226,13 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 		
 		pLabel = gtk_label_new (cGroupName);
 		pVBox = gtk_vbox_new (FALSE, 3);
-		gtk_notebook_append_page (GTK_NOTEBOOK (pNoteBook), pVBox, pLabel);
+		
+		pScrolledWindow = gtk_scrolled_window_new (NULL, NULL);
+		gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (pScrolledWindow), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+		gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (pScrolledWindow), pVBox);
+		
+		gtk_notebook_append_page (GTK_NOTEBOOK (pNoteBook), pScrolledWindow, pLabel);
+		
 		
 		length = 0;
 		pKeyList = g_key_file_get_keys (pKeyFile, cGroupName, NULL, NULL);
@@ -391,9 +393,10 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						g_free (fValueList);
 					break;
 					
-					case 's' :
-					case 'S' :
-					case 'D' :
+					case 's' :  // string
+					case 'S' :  // string with a filename chooser
+					case 'D' :  // string with a directory chooser.
+					case 'T' :  // string, but can't uncheck boxes.
 						//g_print ("  + a string\n");
 						pEntry = NULL;
 						length = 0;
@@ -437,7 +440,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (pOneWidget), FALSE);
 							
 							GtkCellRenderer *rend;
-							if (pAuthorizedValuesList != NULL && pAuthorizedValuesList[0] != NULL)
+							if (pAuthorizedValuesList != NULL && pAuthorizedValuesList[0] != NULL && iElementType != 'T')
 							{
 								rend = gtk_cell_renderer_toggle_new ();
 								gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (pOneWidget), -1, NULL, rend, "active", 0, NULL);
@@ -699,6 +702,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	g_strfreev (pGroupList);
 	
 	gtk_widget_show_all (dialog);
+	
 	return dialog;
 }
 
@@ -972,6 +976,49 @@ void cairo_dock_replace_comments (GKeyFile *pOriginalKeyFile, GKeyFile *pReplace
 				}
 			}
 			g_free (cKeyComment);
+			j ++;
+		}
+		i ++;
+	}
+}
+
+
+void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile)
+{
+	GError *erreur = NULL;
+	gsize length = 0;
+	gchar **pKeyList;
+	gchar **pGroupList = g_key_file_get_groups (pReplacementKeyFile, &length);
+	gchar *cGroupName, *cKeyName, *cKeyValue;
+	int i, j;
+	
+	i = 0;
+	while (pGroupList[i] != NULL)
+	{
+		cGroupName = pGroupList[i];
+		
+		length = 0;
+		pKeyList = g_key_file_get_keys (pReplacementKeyFile, cGroupName, NULL, NULL);
+		
+		j = 0;
+		while (pKeyList[j] != NULL)
+		{
+			cKeyName = pKeyList[j];
+			
+			cKeyValue =  g_key_file_get_string (pReplacementKeyFile, cGroupName, cKeyName, &erreur);
+			if (erreur != NULL)
+			{
+				g_print ("Attention : %s\n", erreur->message);
+				g_error_free (erreur);
+				erreur = NULL;
+			}
+			else
+			{
+				if (cKeyValue[strlen(cKeyValue) - 1] == '\n')
+					cKeyValue[strlen(cKeyValue) - 1] = '\0';
+				g_key_file_set_string (pOriginalKeyFile, cGroupName, cKeyName, (cKeyValue != NULL ? cKeyValue : ""));
+			}
+			g_free (cKeyValue);
 			j ++;
 		}
 		i ++;

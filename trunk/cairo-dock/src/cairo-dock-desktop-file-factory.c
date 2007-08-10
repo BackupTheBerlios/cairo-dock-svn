@@ -95,13 +95,13 @@ gchar *cairo_dock_add_desktop_file_from_path (gchar *cFilePath, gchar *cDockName
 	{
 		//\___________________ On cree le texte qu'on va y mettre par defaut.
 		cNewDesktopContent = g_strdup_printf ("#!\n[Desktop Entry]\n\
-#s Image's name or path :\n\
-Icon = \n\
 #s Launcher's name :\n\
 Name[fr] = Nouveau Lanceur\n\
 Name[en] = New Launcher\n\
 #s Exec command :\n\
 Exec = echo 'edit me !'\n\
+#s Image's name or path :\n\
+Icon = \n\
 #f Order you want for this launcher among the other launchers :\n\
 Order = %d\n\
 #s Name of the container it belongs to:\n\
@@ -118,13 +118,13 @@ Is container = false",
 	{
 		//\___________________ On cree le texte qu'on va y mettre par defaut.
 		cNewDesktopContent = g_strdup_printf ("#!\n[Desktop Entry]\n\
-#s Image's name or path :\
-Icon = %s\n\
 #s Launcher's name :\
 Name[fr] = %s\n\
 Name[en] = %s\n\
 #s Exec command :\
 Exec = %s %s\n\n\
+#s Image's name or path :\
+Icon = %s\n\
 #f Order you want for this launcher among the other launchers :\
 Order = %f\n\
 #s Name of the container it belongs to:\n\
@@ -170,9 +170,9 @@ Is container = false",
 		if (! cairo_dock_is_advanced_keyfile (pKeyFile))
 		{
 			g_key_file_set_comment (pKeyFile, NULL, NULL, "!", NULL);
-			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Icon", "s Image's name or path :", NULL);
 			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Name", "s Launcher's name :", NULL);
 			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Exec", "s Exec command :", NULL);
+			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Icon", "s Image's name or path :", NULL);
 			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Order", "f Order you want for this launcher among the other launchers :", NULL);
 			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Container", "s Name of the container it belongs to:", NULL);
 			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Is container", "b Is this icon a container ?", NULL);

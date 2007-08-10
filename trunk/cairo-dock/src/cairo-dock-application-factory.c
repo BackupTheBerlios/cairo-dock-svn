@@ -106,7 +106,7 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 	
 	if (!gdk_pixbuf_get_has_alpha (pixbuf))  // on lui rajoute un canal alpha si elle n'en a pas.
 	{
-		GdkPixbuf *pixbuf2 = gdk_pixbuf_add_alpha (pixbuf, TRUE, 255, 255, 255);  // TRUE <=> les pixels blancs deviennent transparents.906.00x299.00
+		GdkPixbuf *pixbuf2 = gdk_pixbuf_add_alpha (pixbuf, TRUE, 255, 255, 255);  // TRUE <=> les pixels blancs deviennent transparents.
 		gdk_pixbuf_unref (pixbuf);
 		pixbuf = pixbuf2;
 	}

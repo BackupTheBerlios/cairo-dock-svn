@@ -3,12 +3,11 @@
 [Desktop Entry]
 #s Launcher's name :
 Name=Beryl Settings Manager
-Comment=Configure Beryl
 #s Exec command :
 Exec=beryl-settings
 #s Image's name or path :
 Icon=beryl-settings.svg
-#i Order you want for this launcher among the other launchers :
+#f Order you want for this launcher among the other launchers :
 Order=2
 #s Name of the container it belongs to:
 Container=System

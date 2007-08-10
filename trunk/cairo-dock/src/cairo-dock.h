@@ -19,4 +19,3 @@
 #include "cairo-dock-separator-factory.h"
 
 #endif
-

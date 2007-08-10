@@ -55,5 +55,7 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 void on_drag_motion (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, guint t, CairoDock *pDock);
 
 
+gboolean on_delete (GtkWidget *pWidget, GdkEvent *event, CairoDock *pDock);
+
 #endif
 

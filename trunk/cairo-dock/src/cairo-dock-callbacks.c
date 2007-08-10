@@ -33,7 +33,9 @@ released under the terms of the GNU General Public License.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-callbacks.h"
 
-extern CairoDock *pLastPointedDock;
+extern CairoDock *g_pMainDock;;
+
+extern CairoDock *g_pLastPointedDock;
 
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
@@ -83,7 +85,7 @@ gboolean move_up2 (CairoDock *pDock)
 		deltaY_possible = pDock->iWindowPositionY - (g_bDirectionUp ? g_iScreenHeight - pDock->iMaxDockHeight - pDock->iGapY : pDock->iGapY);
 	else
 		deltaY_possible = (g_bDirectionUp ? pDock->iGapX - pDock->iWindowPositionX : - g_iScreenWidth + pDock->iGapX + pDock->iMaxDockWidth + pDock->iWindowPositionX);
-	//g_print ("%s (%dx%d -> %d)\n", __func__, g_iWindowPositionX, g_iWindowPositionY, deltaY_possible);
+	//g_print ("%s (%dx%d -> %d)\n", __func__, pDock->iWindowPositionX, pDock->iWindowPositionY, deltaY_possible);
 	if ((g_bDirectionUp && deltaY_possible > 0) || (! g_bDirectionUp && deltaY_possible < 0))  // alors on peut encore monter.
 	{
 		if (g_bHorizontalDock)
@@ -205,7 +207,10 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		}
 		
 		//\_______________ On recalcule toutes les icones.
-		pPointedIcon = cairo_dock_calculate_icons (pDock, (int) pMotion->x, (int) pMotion->y);
+		if (g_bHorizontalDock)
+			pPointedIcon = cairo_dock_calculate_icons (pDock, (int) pMotion->x, (int) pMotion->y);
+		else
+			pPointedIcon = cairo_dock_calculate_icons (pDock, (int) pMotion->y, (int) pMotion->x);
 		gtk_widget_queue_draw (pWidget);
 		fLastTime = pMotion->time;
 		
@@ -216,15 +221,18 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	{
 		int iX, iY;
 		gdk_window_get_pointer (pWidget->window, &iX, &iY, NULL);
-		pPointedIcon = cairo_dock_calculate_icons (pDock, iX, iY);
+		if (g_bHorizontalDock)
+			pPointedIcon = cairo_dock_calculate_icons (pDock, iX, iY);
+		else
+			pPointedIcon = cairo_dock_calculate_icons (pDock, iY, iX);
 		gtk_widget_queue_draw (pWidget);
 	}
 	
 	//if (pPointedIcon != NULL) g_print ("pPointedIcon : %s\n", pPointedIcon->acName);
-	if (pPointedIcon != pLastPointedIcon || pLastPointedDock == NULL)
+	if (pPointedIcon != pLastPointedIcon || g_pLastPointedDock == NULL)
 	{
 		//g_print ("on change d'icone\n");
-		if (pDock == pLastPointedDock && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
+		if (pDock == g_pLastPointedDock && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
 		{
 			//gtk_widget_hide (pLastPointedIcon->pSubDock->pWidget);
 			//gtk_window_move (GTK_WINDOW (pLastPointedIcon->pSubDock->pWidget), 0, g_iScreenHeight + 1);
@@ -255,7 +263,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			
 			gdk_window_move (pSubDock->pWidget->window, pSubDock->iWindowPositionX, pSubDock->iWindowPositionY);
 			//gdk_window_show (pSubDock->pWidget->window);
-			pLastPointedDock = pDock;
+			g_pLastPointedDock = pDock;
 			gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
 		}
 		pLastPointedIcon = pPointedIcon;
@@ -299,8 +307,8 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	if (pDock->iSidShrinkDown == 0)  // on commence a faire diminuer la taille des icones.
 		pDock->iSidShrinkDown = g_timeout_add (35, (GSourceFunc) shrink_down2, (gpointer) pDock);
 	
-	pLastPointedDock = NULL;
-	//g_print ("pLastPointedDock <- NULL\n");
+	g_pLastPointedDock = NULL;
+	//g_print ("g_pLastPointedDock <- NULL\n");
 }
 gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
@@ -354,7 +362,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 		//if (! (g_bAutoHide && pDock->iRefCount == 0))
 			//pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - pDock->iMaxDockHeight - pDock->iGapY : g_iScreenHeight - pDock->iGapY);
 		//else
-		if ((g_bAutoHide && pDock->iRefCount == 0))
+		if ((g_bAutoHide && pDock->iRefCount == 0) && pDock->bAtBottom)
 			pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - g_iVisibleZoneHeight - pDock->iGapY : g_iVisibleZoneHeight + pDock->iGapY - pDock->iMaxDockHeight);
 	}
 	else
@@ -366,12 +374,12 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 			pDock->iWindowPositionX = (g_bDirectionUp ? pDock->iGapX - pDock->iMaxDockWidth : g_iScreenWidth - pDock->iGapX - pDock->iMaxDockWidth);
 	}
 	//g_print (" -> %dx%d\n", g_iWindowPositionX, g_iWindowPositionY);
-		
-	gdk_window_move_resize (pWidget->window,
-		pDock->iWindowPositionX,
-		pDock->iWindowPositionY,
-		pDock->iMaxDockWidth,
-		pDock->iMaxDockHeight);
+	if (pDock->bAtBottom || ! (g_bAutoHide && pDock->iRefCount == 0))
+		gdk_window_move_resize (pWidget->window,
+			pDock->iWindowPositionX,
+			pDock->iWindowPositionY,
+			pDock->iMaxDockWidth,
+			pDock->iMaxDockHeight);
 	//gtk_widget_queue_draw (pWidget);
 	
 	if (pDock->iSidMoveDown > 0)  // si on est en train de descendre, on arrete.
@@ -385,7 +393,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 		g_iSidShrinkDown = 0;
 	}*/
 	
-	if ((g_bAutoHide && pDock->iRefCount == 0))
+	if (g_bAutoHide && pDock->iRefCount == 0)
 	{
 		if (pDock->iSidMoveUp == 0)  // on commence a monter.
 			pDock->iSidMoveUp = g_timeout_add (40, (GSourceFunc) move_up2, (gpointer) pDock);
@@ -452,8 +460,8 @@ gboolean on_key_press (GtkWidget *pWidget,
 		switch (pKey->keyval)
 		{
 			case GDK_q :
-				if (pDock->bIsMainDock && pKey != NULL && pKey->state & GDK_CONTROL_MASK)  // CTRL + q quitte l'appli.
-					gtk_main_quit ();
+				//if (pDock->bIsMainDock && pKey != NULL && pKey->state & GDK_CONTROL_MASK)  // CTRL + q quitte l'appli.
+				//	gtk_main_quit ();
 			break;
 			
 			case GDK_Down :
@@ -729,3 +737,45 @@ void on_drag_motion (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, gui
 	on_motion_notify2 (pWidget, NULL, pDock);
 }
 
+
+gboolean on_delete (GtkWidget *pWidget, GdkEvent *event, CairoDock *pDock)
+{
+	if (pDock->bIsMainDock)
+	{
+		GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (pWidget),
+		GTK_DIALOG_DESTROY_WITH_PARENT,
+		GTK_MESSAGE_QUESTION,
+		GTK_BUTTONS_YES_NO,
+		"Quit Cairo-Dock ?");
+		int answer = gtk_dialog_run (GTK_DIALOG (dialog));
+		gtk_widget_destroy (dialog);
+		if (answer == GTK_RESPONSE_YES)
+			gtk_main_quit ();
+	}
+	else
+	{
+		GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (pWidget),
+		GTK_DIALOG_DESTROY_WITH_PARENT,
+		GTK_MESSAGE_QUESTION,
+		GTK_BUTTONS_YES_NO,
+		"destroy this dock ?");
+		int answer = gtk_dialog_run (GTK_DIALOG (dialog));
+		gtk_widget_destroy (dialog);
+		if (answer == GTK_RESPONSE_YES)
+		{
+			const gchar *cDockName = cairo_dock_search_dock_name (pDock);
+			gboolean bDestroyIcons = TRUE;
+			dialog = gtk_message_dialog_new (GTK_WINDOW (pWidget),
+				GTK_DIALOG_DESTROY_WITH_PARENT,
+				GTK_MESSAGE_QUESTION,
+				GTK_BUTTONS_YES_NO,
+				"Do you want to re-dispatch the icons contained inside this container into the dock (otherwise they will be destroyed) ?");
+			int answer = gtk_dialog_run (GTK_DIALOG (dialog));
+			gtk_widget_destroy (dialog);
+			if (answer == GTK_RESPONSE_YES)
+				bDestroyIcons = FALSE;
+			cairo_dock_destroy_dock (pDock, cDockName, (bDestroyIcons ? NULL : g_pMainDock), (bDestroyIcons ? NULL : CAIRO_DOCK_MAIN_DOCK_NAME));
+		}
+	}
+	return TRUE;
+}

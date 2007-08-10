@@ -20,6 +20,7 @@ void cairo_dock_free_generated_widget_list (GSList *pWidgetList);
 
 
 void cairo_dock_replace_comments (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile);
+void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile);
 
 #endif
 

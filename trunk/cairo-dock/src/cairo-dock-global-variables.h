@@ -4,6 +4,8 @@
 #include <glib.h>
 #include <cairo.h>
 
+extern CairoDock *g_pMainDock;
+
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
 

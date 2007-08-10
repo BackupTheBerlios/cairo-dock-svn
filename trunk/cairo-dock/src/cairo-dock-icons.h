@@ -25,6 +25,8 @@ Icon* cairo_dock_get_last_icon_of_type (GList *pIconList, CairoDockIconType iTyp
 Icon* cairo_dock_get_pointed_icon (GList *pIconList);
 Icon *cairo_dock_get_bouncing_icon (GList *pIconList);
 Icon *cairo_dock_get_removing_or_inserting_icon (GList *pIconList);
+Icon *cairo_dock_get_next_icon (GList *pIconList, Icon *pIcon);
+Icon *cairo_dock_get_previous_icon (GList *pIconList, Icon *pIcon);
 
 #define get_first_icon cairo_dock_get_first_icon
 #define get_last_icon cairo_dock_get_last_icon

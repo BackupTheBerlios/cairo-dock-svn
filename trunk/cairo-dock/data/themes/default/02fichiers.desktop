@@ -1,13 +1,12 @@
 #!
 [Desktop Entry]
-#s image's name or path:
-Icon=nautilus.svg
 #s launcher's name:
 Name=Fichiers
 #s Exec command:
 Exec=nautilus --no-desktop
-
-#i Order you want for this launcher among the other launchers:
+#s image's name or path:
+Icon=nautilus.svg
+#f Order you want for this launcher among the other launchers:
 Order=2
 #s Name of the container it belongs to:
 Container = _MainDock_

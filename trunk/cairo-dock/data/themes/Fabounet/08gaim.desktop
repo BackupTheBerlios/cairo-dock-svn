@@ -42,7 +42,7 @@ Name[zh_TW]=Gaim 網路即時通
 Exec=gaim
 #s Image's name or path :
 Icon=gaim.svg
-#i Order you want for this launcher among the other launchers :
+#f Order you want for this launcher among the other launchers :
 Order=2
 #s Name of the container it belongs to:
 Container=Web

@@ -231,18 +231,41 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, gbool
 	cairo_set_source_rgb (pCairoContext, 1., 1., 1.);
 	cairo_move_to (pCairoContext, 1., 1.);
 	pango_cairo_show_layout (pCairoContext, pLayout);
-
+	
 	cairo_destroy (pCairoContext);
-
+	
 	/* set_device_offset is buggy, doesn't work for positive
 	 * offsets.  so we use explicit offsets... so unfortunate.
 	cairo_surface_set_device_offset (pNewSurface, 
 					 log.width / 2. - ink.x,
 					 log.height     - ink.y);*/
 	icon->fTextXOffset = log.width / 2. - ink.x;
-	///icon->fTextYOffset = log.height     - ink.y;
+	//icon->fTextYOffset = log.height     - ink.y;
 	icon->fTextYOffset = iLabelSize;
-	icon->pTextBuffer = pNewSurface;
+	
+	double fAdjustmentFactor = 1. * iLabelSize / (ink.height + 2);
+	if (fAdjustmentFactor < .999)  // le texte obtenu est trop grand (pas de beaucoup, mais cela arrive avec sertaines polices).
+	{
+		icon->pTextBuffer = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+		CAIRO_CONTENT_COLOR_ALPHA,
+		(ink.width + 2) * fAdjustmentFactor, (ink.height + 2) * fAdjustmentFactor);
+		pCairoContext = cairo_create (icon->pTextBuffer);
+		
+		cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
+		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
+		cairo_paint (pCairoContext);
+		
+		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
+		cairo_move_to (pCairoContext, 0, 0);
+		cairo_scale (pCairoContext, fAdjustmentFactor, fAdjustmentFactor);
+		cairo_set_source_surface (pCairoContext, pNewSurface, 0., 0.);
+		cairo_paint (pCairoContext);
+		
+		cairo_surface_destroy (pNewSurface);
+		cairo_destroy (pCairoContext);
+	}
+	else
+		icon->pTextBuffer = pNewSurface;
 	
 	g_object_unref (pLayout);
 }
@@ -460,7 +483,7 @@ gpointer cairo_dock_init (gpointer data)
 		}
 		cairo_dock_update_conf_file_with_hash_table (cTemporaryFilePath, pThemeTable, "INIT", "theme", 1, "Choose a theme to start using cairo-dock\n (you can choose another theme later\n by deleting your ~/.cairo-dock direcory,\n and re-launching cairo-dock)");
 		
-		gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTemporaryFilePath, "Choose a theme to start with");
+		gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTemporaryFilePath, "Choose a theme to start with", 400, 300);
 		if (! bChoiceOK)
 		{
 			g_print ("Mata ne.\n");

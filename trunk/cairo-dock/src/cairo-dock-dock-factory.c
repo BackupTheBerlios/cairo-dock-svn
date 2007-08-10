@@ -130,11 +130,10 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 		GDK_POINTER_MOTION_MASK |
 		GDK_POINTER_MOTION_HINT_MASK);
 	
-	if (strcmp (cDockName, CAIRO_DOCK_MAIN_DOCK_NAME) == 0)
-		g_signal_connect (G_OBJECT (pWindow),
-			"destroy",
-			G_CALLBACK (gtk_main_quit),
-			pDock);
+	g_signal_connect (G_OBJECT (pWindow),
+		"delete-event",
+		G_CALLBACK (on_delete),
+		pDock);
 	g_signal_connect (G_OBJECT (pWindow),
 		"expose-event",
 		G_CALLBACK (on_expose),
@@ -262,29 +261,12 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 	g_return_if_fail (icon != NULL);
 	
 	//\______________ On regarde si on doit inserer un separateur.
+	gboolean bSeparatorNeeded = FALSE;
 	if (! CAIRO_DOCK_IS_SEPARATOR (icon))
 	{
 		Icon *pSameTypeIcon = cairo_dock_get_first_icon_of_type (pDock->icons, icon->iType);
 		if (pSameTypeIcon == NULL && pDock->icons != NULL)
-		{
-			cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
-			int iSeparatorType = -1;
-			if (g_tIconTypeOrder[icon->iType] > 1)  // on l'insere avant nous de preference.
-				iSeparatorType = icon->iType - 1;
-			else if (g_tIconTypeOrder[icon->iType] + 1 < CAIRO_DOCK_NB_TYPES)
-				iSeparatorType = icon->iType + 1;
-			//g_print ("iSeparatorType : %d\n", iSeparatorType);
-			if (iSeparatorType != -1)
-			{
-				Icon *pSeparatorIcon = cairo_dock_create_separator_icon (pSourceContext, iSeparatorType, pDock);
-				pDock->icons = g_list_insert_sorted (pDock->icons,
-					pSeparatorIcon,
-					(GCompareFunc) cairo_dock_compare_icons_order);
-				pDock->iMinDockWidth += g_iIconGap + pSeparatorIcon->fWidth;
-				pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, pSeparatorIcon->fHeight);
-			}
-			cairo_destroy (pSourceContext);
-		}
+			bSeparatorNeeded = TRUE;
 	}
 	
 	//\______________ On insere l'icone a sa place dans la liste.
@@ -294,6 +276,47 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 	
 	pDock->iMinDockWidth += g_iIconGap + icon->fWidth;
 	pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, icon->fHeight);
+	
+	//\______________ On insere un separateur si necessaire.
+	if (bSeparatorNeeded)
+	{
+		if (g_tIconTypeOrder[icon->iType] + 1 < CAIRO_DOCK_NB_TYPES)
+		{
+			Icon *pNextIcon = cairo_dock_get_next_icon (pDock->icons, icon);
+			if (pNextIcon != NULL && ((pNextIcon->iType - icon->iType) % 2 == 0))
+			{
+				int iSeparatorType = g_tIconTypeOrder[icon->iType] + 1;
+				//g_print ("insertion de %s -> iSeparatorType : %d\n", icon->acName, iSeparatorType);
+				
+				cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
+				Icon *pSeparatorIcon = cairo_dock_create_separator_icon (pSourceContext, iSeparatorType, pDock);
+				pDock->icons = g_list_insert_sorted (pDock->icons,
+					pSeparatorIcon,
+					(GCompareFunc) cairo_dock_compare_icons_order);
+				pDock->iMinDockWidth += g_iIconGap + pSeparatorIcon->fWidth;
+				pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, pSeparatorIcon->fHeight);
+				cairo_destroy (pSourceContext);
+			}
+		}
+		if (g_tIconTypeOrder[icon->iType] - 1 > 0)
+		{
+			Icon *pPrevIcon = cairo_dock_get_previous_icon (pDock->icons, icon);
+			if (pPrevIcon != NULL && ((pPrevIcon->iType - icon->iType) % 2 == 0))
+			{
+				int iSeparatorType = g_tIconTypeOrder[icon->iType] - 1;
+				//g_print ("insertion de %s -> iSeparatorType : %d\n", icon->acName, iSeparatorType);
+				
+				cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
+				Icon *pSeparatorIcon = cairo_dock_create_separator_icon (pSourceContext, iSeparatorType, pDock);
+				pDock->icons = g_list_insert_sorted (pDock->icons,
+					pSeparatorIcon,
+					(GCompareFunc) cairo_dock_compare_icons_order);
+				pDock->iMinDockWidth += g_iIconGap + pSeparatorIcon->fWidth;
+				pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, pSeparatorIcon->fHeight);
+				cairo_destroy (pSourceContext);
+			}
+		}
+	}
 	
 	//\______________ On effectue les actions demandees.
 	if (bAnimated)

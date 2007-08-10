@@ -83,7 +83,7 @@ static void cairo_dock_edit_and_reload_conf_file (GtkMenuItem *menu_item, gpoint
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock");
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", 400, 600);
 	if (config_ok)
 	{
 		cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
@@ -95,11 +95,13 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
 	
+	gchar *cTitle = g_strdup_printf ("\nCairo-Dock (2007)\n version %s", CAIRO_DOCK_VERSION);
 	GtkWidget *pDialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
 		GTK_DIALOG_DESTROY_WITH_PARENT,
 		GTK_MESSAGE_INFO,
 		GTK_BUTTONS_CLOSE,
-		"\nCairo-Dock (2007)");
+		cTitle);
+	g_free (cTitle);
 	
 	gchar *cImagePath = g_strdup_printf ("%s/cairo-dock.svg", CAIRO_DOCK_SHARE_DATA_DIR);
 	GtkWidget *pImage = gtk_image_new_from_file (cImagePath);
@@ -189,7 +191,7 @@ static void cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data)
 	gchar *cNewDesktopFileName = g_path_get_basename (cNewDesktopFilePath);
 	
 	//\___________________ On ouvre automatiquement l'IHM pour permettre de modifier ses champs.
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cNewDesktopFilePath, "Fill this launcher");
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cNewDesktopFilePath, "Fill this launcher", 0, 0);
 	if (config_ok)
 	{
 		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
@@ -288,7 +290,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	Icon *icon = data[1];
 	
 	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, icon->acDesktopFileName);
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher");
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", 0, 0);
 	g_free (cDesktopFilePath);
 	if (config_ok)
 	{
