@@ -81,19 +81,16 @@ extern glitz_format_t* g_pGlitzFormat;
 gboolean move_up2 (CairoDock *pDock)
 {
 	int deltaY_possible;
-	if (g_bHorizontalDock)
-		deltaY_possible = pDock->iWindowPositionY - (g_bDirectionUp ? g_iScreenHeight - pDock->iMaxDockHeight - pDock->iGapY : pDock->iGapY);
-	else
-		deltaY_possible = (g_bDirectionUp ? pDock->iGapX - pDock->iWindowPositionX : - g_iScreenWidth + pDock->iGapX + pDock->iMaxDockWidth + pDock->iWindowPositionX);
+	deltaY_possible = pDock->iWindowPositionY - (g_bDirectionUp ? g_iScreenHeight - pDock->iMaxDockHeight - pDock->iGapY : pDock->iGapY);
 	//g_print ("%s (%dx%d -> %d)\n", __func__, pDock->iWindowPositionX, pDock->iWindowPositionY, deltaY_possible);
 	if ((g_bDirectionUp && deltaY_possible > 0) || (! g_bDirectionUp && deltaY_possible < 0))  // alors on peut encore monter.
 	{
-		if (g_bHorizontalDock)
 			pDock->iWindowPositionY -= (int) (deltaY_possible * g_fMoveUpSpeed) + (g_bDirectionUp ? 1 : -1);
-		else
-			pDock->iWindowPositionX += (int) (deltaY_possible * g_fMoveUpSpeed) + (g_bDirectionUp ? 1 : -1);
 		//g_print ("  move to (%dx%d)\n", g_iWindowPositionX, g_iWindowPositionY);
-		gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);
+		if (g_bHorizontalDock)
+			gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);
+		else
+			gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionY, pDock->iWindowPositionX);
 		pDock->bAtBottom = FALSE;
 		return TRUE;
 	}
@@ -115,7 +112,10 @@ gboolean move_down2 (CairoDock *pDock)
 	if ((g_bDirectionUp && deltaY_possible > 4) || (! g_bDirectionUp && deltaY_possible < -4))  // alors on peut encore descendre.
 	{
 		pDock->iWindowPositionY += (int) (deltaY_possible * g_fMoveDownSpeed) + (g_bDirectionUp ? 1 : -1);  // 0.33
-		gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);
+		if (g_bHorizontalDock)
+			gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);
+		else
+			gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionY, pDock->iWindowPositionX);
 		pDock->bAtTop = FALSE;
 		return TRUE;
 	}
@@ -126,11 +126,18 @@ gboolean move_down2 (CairoDock *pDock)
 		//pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - g_iVisibleZoneHeight - pDock->iGapY : pDock->iGapY);
 		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MIN_SIZE);
 		//g_print ("%s () -> %dx%d\n", __func__, g_iVisibleZoneWidth, g_iVisibleZoneHeight);
-		gdk_window_move_resize (pDock->pWidget->window,
-			pDock->iWindowPositionX,
-			pDock->iWindowPositionY,
-			g_iVisibleZoneWidth,
-			g_iVisibleZoneHeight);
+		if (g_bHorizontalDock)
+			gdk_window_move_resize (pDock->pWidget->window,
+				pDock->iWindowPositionX,
+				pDock->iWindowPositionY,
+				g_iVisibleZoneWidth,
+				g_iVisibleZoneHeight);
+		else
+			gdk_window_move_resize (pDock->pWidget->window,
+				pDock->iWindowPositionY,
+				pDock->iWindowPositionX,
+				g_iVisibleZoneHeight,
+				g_iVisibleZoneWidth);
 		pDock->iSidMoveDown = 0;
 		
 		if ((g_bAutoHide && pDock->iRefCount == 0))
@@ -261,7 +268,10 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			//gdk_window_show (pSubDock->pWidget->window);
 			//gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
 			
-			gdk_window_move (pSubDock->pWidget->window, pSubDock->iWindowPositionX, pSubDock->iWindowPositionY);
+			if (g_bHorizontalDock)
+				gdk_window_move (pSubDock->pWidget->window, pSubDock->iWindowPositionX, pSubDock->iWindowPositionY);
+			else
+				gdk_window_move (pSubDock->pWidget->window, pSubDock->iWindowPositionY, pSubDock->iWindowPositionX);
 			//gdk_window_show (pSubDock->pWidget->window);
 			g_pLastPointedDock = pDock;
 			gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
@@ -275,7 +285,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
-	//g_print ("%s ()\n", __func__);
+	g_print ("%s ()\n", __func__);
 	pDock->bInside = FALSE;
 	if (pDock->bMenuVisible)
 	{
@@ -295,6 +305,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	
 	if ((g_bAutoHide && pDock->iRefCount == 0))
 	{
+		pDock->bAtTop = FALSE;
 		if (pDock->iSidMoveDown == 0)  // on commence a descendre.
 			pDock->iSidMoveDown = g_timeout_add (40, (GSourceFunc) move_down2, (gpointer) pDock);
 	}
@@ -349,7 +360,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 {
 	if (pDock->bAtTop || pDock->bInside)
 		return FALSE;
-	//g_print ("%s ()\n", __func__);
+	g_print ("%s ()\n", __func__);
 	
 	gtk_window_present (GTK_WINDOW (pWidget));
 	pDock->bInside = TRUE;
@@ -374,12 +385,19 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 			pDock->iWindowPositionX = (g_bDirectionUp ? pDock->iGapX - pDock->iMaxDockWidth : g_iScreenWidth - pDock->iGapX - pDock->iMaxDockWidth);
 	}
 	//g_print (" -> %dx%d\n", g_iWindowPositionX, g_iWindowPositionY);
-	if (pDock->bAtBottom || ! (g_bAutoHide && pDock->iRefCount == 0))
+	///if (pDock->bAtBottom || ! (g_bAutoHide && pDock->iRefCount == 0))
+	if (g_bHorizontalDock)
 		gdk_window_move_resize (pWidget->window,
 			pDock->iWindowPositionX,
 			pDock->iWindowPositionY,
 			pDock->iMaxDockWidth,
 			pDock->iMaxDockHeight);
+	else
+		gdk_window_move_resize (pWidget->window,
+			pDock->iWindowPositionY,
+			pDock->iWindowPositionX,
+			pDock->iMaxDockHeight,
+			pDock->iMaxDockWidth);
 	//gtk_widget_queue_draw (pWidget);
 	
 	if (pDock->iSidMoveDown > 0)  // si on est en train de descendre, on arrete.
@@ -454,7 +472,7 @@ gboolean on_key_press (GtkWidget *pWidget,
 	gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iWidth, &iHeight);
 	int x, y;  // position du centre bas du dock;
 	x = pDock->iWindowPositionX +iWidth / 2;
-	y = pDock->iWindowPositionY + iHeight;
+	y = pDock->iWindowPositionY + iHeight - 1;
 	if (pKey->type == GDK_KEY_PRESS)
 	{
 		switch (pKey->keyval)

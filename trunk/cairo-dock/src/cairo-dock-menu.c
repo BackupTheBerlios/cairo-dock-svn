@@ -290,7 +290,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	Icon *icon = data[1];
 	
 	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, icon->acDesktopFileName);
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", 0, 0);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", 300, 400);
 	g_free (cDesktopFilePath);
 	if (config_ok)
 	{
@@ -306,7 +306,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 		{
 			if (pNewIcon->pSubDock == NULL)  // ce n'est plus un container.
 			{
-				gboolean bDestroyIcons = FALSE;
+				gboolean bDestroyIcons = TRUE;
 				GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
 					GTK_DIALOG_DESTROY_WITH_PARENT,
 					GTK_MESSAGE_QUESTION,
@@ -315,7 +315,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 				int answer = gtk_dialog_run (GTK_DIALOG (dialog));
 				gtk_widget_destroy (dialog);
 				if (answer == GTK_RESPONSE_YES)
-					bDestroyIcons = TRUE;
+					bDestroyIcons = FALSE;
 				cairo_dock_destroy_dock (icon->pSubDock, icon->acName, (bDestroyIcons ? NULL : g_pMainDock), (bDestroyIcons ? NULL : CAIRO_DOCK_MAIN_DOCK_NAME));
 				icon->pSubDock = NULL;
 			}

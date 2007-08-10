@@ -236,21 +236,35 @@ void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMin
 	{
 		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MAX_SIZE);  // inutile de recalculer Y mais bon...
 		//g_print ("%s () -> %dx%d\n", __func__, g_iMaxDockWidth, g_iMaxDockHeight);
-		gdk_window_move_resize (pDock->pWidget->window,
-			pDock->iWindowPositionX,
-			pDock->iWindowPositionY,
-			pDock->iMaxDockWidth,
-			pDock->iMaxDockHeight);
+		if (g_bHorizontalDock)
+			gdk_window_move_resize (pDock->pWidget->window,
+				pDock->iWindowPositionX,
+				pDock->iWindowPositionY,
+				pDock->iMaxDockWidth,
+				pDock->iMaxDockHeight);
+		else
+			gdk_window_move_resize (pDock->pWidget->window,
+				pDock->iWindowPositionY,
+				pDock->iWindowPositionX,
+				pDock->iMaxDockHeight,
+				pDock->iMaxDockWidth);
 	}
 	else
 	{
 		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE);  // inutile de recalculer Y mais bon...
 		//g_print ("%s () -> %dx%d\n", __func__, g_iMaxDockWidth, g_iMaxDockHeight);
-		gdk_window_move_resize (pDock->pWidget->window,
-			pDock->iWindowPositionX,
-			pDock->iWindowPositionY,
-			iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth,
-			iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth);
+		if (g_bHorizontalDock)
+			gdk_window_move_resize (pDock->pWidget->window,
+				pDock->iWindowPositionX,
+				pDock->iWindowPositionY,
+				iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth,
+				iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth);
+		else
+			gdk_window_move_resize (pDock->pWidget->window,
+				pDock->iWindowPositionY,
+				pDock->iWindowPositionX,
+				iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth,
+				iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth);
 	}
 }
 

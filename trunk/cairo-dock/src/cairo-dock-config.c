@@ -907,46 +907,40 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	
 	cairo_dock_load_stripes_background (pDock);
 	
-	if (!g_bHorizontalDock)
-	{
-		double tmp = pDock->iMaxDockWidth;
-		pDock->iMaxDockWidth = pDock->iMaxDockHeight;
-		pDock->iMaxDockHeight = tmp;
-		tmp = g_iVisibleZoneWidth;
-		g_iVisibleZoneWidth = g_iVisibleZoneHeight;
-		g_iVisibleZoneHeight = tmp;
-	}
-	
 	cairo_dock_load_background_image (GTK_WINDOW (pDock->pWidget), g_cCairoDockBackgroundFileName, g_iVisibleZoneWidth, g_iVisibleZoneHeight);
 	if (pDock->bAtBottom)
 	{
-		if (g_bHorizontalDock)
-		{
-			if (g_bAutoHide && pDock->iRefCount == 0)
-				cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MIN_SIZE);
-			else
-				cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE);
-			//pDock->iWindowPositionX = pDock->iGapX + (g_iScreenWidth - g_iVisibleZoneWidth) / 2;
-			//pDock->iWindowPositionY = g_iScreenHeight - pDock->iGapY - (g_bDirectionUp ? g_iVisibleZoneHeight : 0);
-		}
+		if (g_bAutoHide && pDock->iRefCount == 0)
+			cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MIN_SIZE);
 		else
-		{
-			pDock->iWindowPositionX = (g_bDirectionUp ? pDock->iGapX : g_iScreenWidth - pDock->iGapX);
-			pDock->iWindowPositionY = g_iScreenHeight / 2 + pDock->iGapY;
-		}
+			cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE);
 		//g_print ("on commence en bas a %dx%d (%d;%d)\n", g_iVisibleZoneWidth, g_iVisibleZoneHeight, pDock->iWindowPositionX, pDock->iWindowPositionY);
 		if (g_bAutoHide && pDock->iRefCount == 0)
-			gdk_window_move_resize (pDock->pWidget->window,
-				pDock->iWindowPositionX,
-				pDock->iWindowPositionY,
-				g_iVisibleZoneWidth,
-				g_iVisibleZoneHeight);
+			if (g_bHorizontalDock)
+				gdk_window_move_resize (pDock->pWidget->window,
+					pDock->iWindowPositionX,
+					pDock->iWindowPositionY,
+					g_iVisibleZoneWidth,
+					g_iVisibleZoneHeight);
+			else
+				gdk_window_move_resize (pDock->pWidget->window,
+					pDock->iWindowPositionY,
+					pDock->iWindowPositionX,
+					g_iVisibleZoneHeight,
+					g_iVisibleZoneWidth);
 		else
-			gdk_window_move_resize (pDock->pWidget->window,
-				pDock->iWindowPositionX,
-				pDock->iWindowPositionY,
-				pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth,
-				pDock->iMaxIconHeight + 2 * g_iDockLineWidth);
+			if (g_bHorizontalDock)
+				gdk_window_move_resize (pDock->pWidget->window,
+					pDock->iWindowPositionX,
+					pDock->iWindowPositionY,
+					pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth,
+					pDock->iMaxIconHeight + 2 * g_iDockLineWidth);
+			else
+				gdk_window_move_resize (pDock->pWidget->window,
+					pDock->iWindowPositionY,
+					pDock->iWindowPositionX,
+					pDock->iMaxIconHeight + 2 * g_iDockLineWidth,
+					pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth);
 	}
 	
 	if (cPreviousLanguage != NULL && g_cLanguage != NULL && strcmp (cPreviousLanguage, g_cLanguage) != 0 && ! bFlushConfFileNeeded)

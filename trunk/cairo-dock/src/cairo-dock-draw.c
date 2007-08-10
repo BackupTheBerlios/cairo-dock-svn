@@ -157,8 +157,16 @@ void render (CairoDock *pDock)
 	double fLineWidth = g_iDockLineWidth;
 	double fDockWidth = get_current_dock_width (pDock->icons);
 	gint iWidth, iHeight;
-	///gtk_window_get_size (GTK_WINDOW (pWidget), &iWidth, &iHeight);
-	iWidth = pDock->iCurrentWidth; iHeight = pDock->iCurrentHeight;
+	if (g_bHorizontalDock)
+	{
+		iWidth = pDock->iCurrentWidth;
+		iHeight = pDock->iCurrentHeight;
+	}
+	else
+	{
+		iWidth = pDock->iCurrentHeight;
+		iHeight = pDock->iCurrentWidth;
+	}
 	
 	//\_________________ On cree le contexte du dessin.
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
@@ -436,11 +444,18 @@ gboolean shrink_down2 (CairoDock *pDock)
 				cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE);
 				//pDock->iWindowPositionX = (g_iScreenWidth - (pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth)) / 2 + pDock->iGapX;
 				//pDock->iWindowPositionY = g_iScreenHeight - pDock->iGapY - (g_bDirectionUp ? pDock->iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth : 0);
-				gdk_window_move_resize (pDock->pWidget->window,
-					pDock->iWindowPositionX,
-					pDock->iWindowPositionY,
-					pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth,
-					pDock->iMaxIconHeight + 2 * g_iDockLineWidth);
+				if (g_bHorizontalDock)
+					gdk_window_move_resize (pDock->pWidget->window,
+						pDock->iWindowPositionX,
+						pDock->iWindowPositionY,
+						pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth,
+						pDock->iMaxIconHeight + 2 * g_iDockLineWidth);
+				else
+					gdk_window_move_resize (pDock->pWidget->window,
+						pDock->iWindowPositionY,
+						pDock->iWindowPositionX,
+						pDock->iMaxIconHeight + 2 * g_iDockLineWidth,
+						pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth);
 			}
 			
 			gint iMouseX, iMouseY;

@@ -577,7 +577,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	
 	if (bMouseInsideDock && pDock->fMagnitude < 1 && cairo_dock_none_clicked (pDock->icons) && pDock->iSidGrowUp == 0)  // on est dedans en x et la taille des icones est non maximale bien qu'on n'ait pas clique sur une icone.  // && pDock->iSidShrinkDown == 0
 	{
-		if ( (g_bDirectionUp && pPointedIcon != NULL && iMouseY > iHeight - pPointedIcon->fHeight * pPointedIcon->fScale && iMouseY < iHeight) || (! g_bDirectionUp && pPointedIcon != NULL && iMouseY < pPointedIcon->fHeight * pPointedIcon->fScale && iMouseY > pDock->iWindowPositionY) )  // et en plus on est dedans en y.
+		if ( (g_bDirectionUp && pPointedIcon != NULL && iMouseY > iHeight - pPointedIcon->fHeight * pPointedIcon->fScale && iMouseY < iHeight) || (! g_bDirectionUp && pPointedIcon != NULL && iMouseY < pPointedIcon->fHeight * pPointedIcon->fScale && iMouseY > 0) )  // et en plus on est dedans en y.
 		{
 			if (pDock->iSidShrinkDown > 0)
 			{
