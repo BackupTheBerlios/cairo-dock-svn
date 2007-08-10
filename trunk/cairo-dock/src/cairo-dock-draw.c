@@ -442,8 +442,6 @@ gboolean shrink_down2 (CairoDock *pDock)
 			{
 				//g_print ("on arrive en bas -> %dx%d\n", g_iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth, g_iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth);
 				cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE);
-				//pDock->iWindowPositionX = (g_iScreenWidth - (pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth)) / 2 + pDock->iGapX;
-				//pDock->iWindowPositionY = g_iScreenHeight - pDock->iGapY - (g_bDirectionUp ? pDock->iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth : 0);
 				if (g_bHorizontalDock)
 					gdk_window_move_resize (pDock->pWidget->window,
 						pDock->iWindowPositionX,
@@ -464,8 +462,6 @@ gboolean shrink_down2 (CairoDock *pDock)
 			cairo_dock_calculate_icons (pDock, iMouseX, iMouseY);  // relance le grossissement si on est dedans.
 			if (! pDock->bInside && pDock->iRefCount > 0)
 			{
-					//gtk_widget_hide (pDock->pWidget);
-					//gtk_window_move (GTK_WINDOW (pDock->pWidget), 0, g_iScreenHeight + 1);
 					gdk_window_hide (pDock->pWidget->window);
 					cairo_dock_hide_parent_docks (pDock);
 			}

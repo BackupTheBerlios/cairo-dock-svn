@@ -109,7 +109,7 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 	
 	GtkWidget *pLabel = gtk_label_new (NULL);
 	gtk_label_set_use_markup (GTK_LABEL (pLabel), TRUE);
-	gchar *cAboutText = g_strdup_printf ("<b>Original idea/first development :</b>\n  Mac Slow\n<b>Main developer :</b>\n  Fabrice Rey\n\n<b>Themes :</b>\n  Fabrice Rey\n\n<b>Translations :</b>\n\n<b>Contributors :</b>\n");
+	gchar *cAboutText = g_strdup_printf ("<b>Original idea/first development :</b>\n  Mac Slow\n<b>Main developer :</b>\n  Fabounet (Fabrice Rey)\n\n<b>Themes :</b>\n  Fabounet\n  Chilperik\n\n<b>Translations :</b>\n\n<b>Contributors :</b>\n");
 	gtk_label_set_markup (GTK_LABEL (pLabel), cAboutText);
 	g_free (cAboutText);
 	gtk_container_add (GTK_CONTAINER (GTK_DIALOG (pDialog)->vbox), pLabel);

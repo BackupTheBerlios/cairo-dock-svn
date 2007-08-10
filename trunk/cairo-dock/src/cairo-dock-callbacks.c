@@ -366,24 +366,14 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	pDock->bInside = TRUE;
 	
 	
-	if (g_bHorizontalDock)
-	{
-		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MAX_SIZE);
-		//pDock->iWindowPositionX = (g_iScreenWidth - pDock->iMaxDockWidth) / 2 + pDock->iGapX;
-		//if (! (g_bAutoHide && pDock->iRefCount == 0))
-			//pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - pDock->iMaxDockHeight - pDock->iGapY : g_iScreenHeight - pDock->iGapY);
-		//else
-		if ((g_bAutoHide && pDock->iRefCount == 0) && pDock->bAtBottom)
-			pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - g_iVisibleZoneHeight - pDock->iGapY : g_iVisibleZoneHeight + pDock->iGapY - pDock->iMaxDockHeight);
-	}
-	else
-	{
-		pDock->iWindowPositionY = (g_iScreenHeight - pDock->iMaxDockHeight) / 2 + pDock->iGapY;
-		if (! (g_bAutoHide && pDock->iRefCount == 0))
-			pDock->iWindowPositionX = (g_bDirectionUp ? pDock->iWindowPositionX : g_iScreenWidth - pDock->iGapX - pDock->iMaxDockWidth);
-		else
-			pDock->iWindowPositionX = (g_bDirectionUp ? pDock->iGapX - pDock->iMaxDockWidth : g_iScreenWidth - pDock->iGapX - pDock->iMaxDockWidth);
-	}
+	cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MAX_SIZE);
+	//pDock->iWindowPositionX = (g_iScreenWidth - pDock->iMaxDockWidth) / 2 + pDock->iGapX;
+	//if (! (g_bAutoHide && pDock->iRefCount == 0))
+		//pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - pDock->iMaxDockHeight - pDock->iGapY : g_iScreenHeight - pDock->iGapY);
+	//else
+	if ((g_bAutoHide && pDock->iRefCount == 0) && pDock->bAtBottom)
+		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - g_iVisibleZoneHeight - pDock->iGapY : g_iVisibleZoneHeight + pDock->iGapY - pDock->iMaxDockHeight);
+	
 	//g_print (" -> %dx%d\n", g_iWindowPositionX, g_iWindowPositionY);
 	///if (pDock->bAtBottom || ! (g_bAutoHide && pDock->iRefCount == 0))
 	if (g_bHorizontalDock)

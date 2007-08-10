@@ -1,4 +1,6 @@
 SUBDIRS = \
 	default\
 	Fabounet\
-	Ubuntu
+	Ubuntu\
+	Chilperik
+	
