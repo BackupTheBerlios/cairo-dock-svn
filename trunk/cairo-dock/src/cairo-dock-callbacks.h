@@ -5,11 +5,6 @@
 #include <gtk/gtk.h>
 
 
-gboolean move_up2 (CairoDock *pDock);
-
-gboolean move_down2 (CairoDock *pDock);
-
-
 gboolean on_expose (GtkWidget *pWidget,
 			GdkEventExpose *pExpose,
 			CairoDock *pDock);

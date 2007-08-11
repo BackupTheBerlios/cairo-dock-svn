@@ -344,13 +344,27 @@ void cairo_dock_load_background_image (GtkWindow *pWindow, gchar *image_filename
 			&g_fVisibleZoneImageWidth,
 			&g_fVisibleZoneImageHeight,
 			(g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)));
-		/*if (! g_bHorizontalDock)
+		if (! g_bHorizontalDock)
 		{
-			double tmp = g_fVisibleZoneImageWidth;
+			/*double tmp = g_fVisibleZoneImageWidth;
 			g_fVisibleZoneImageWidth = g_fVisibleZoneImageHeight;
-			g_fVisibleZoneImageHeight = tmp;
-			cairo_rotate (pCairoContext, .2,);
-		}*/
+			g_fVisibleZoneImageHeight = tmp;*/
+			/*cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pCairoContext),
+				CAIRO_CONTENT_COLOR_ALPHA,
+				g_fVisibleZoneImageHeight,
+				g_fVisibleZoneImageWidth);
+			cairo_destroy (pCairoContext);
+			pCairoContext = cairo_create (pNewSurface);
+			
+			cairo_move_to (pCairoContext, g_fVisibleZoneImageHeight, 0);
+			cairo_rotate (pCairoContext, -G_PI / 2);
+			cairo_translate (pCairoContext, - g_fVisibleZoneImageWidth, 0);
+			cairo_set_source_surface (pCairoContext, g_pVisibleZoneSurface, 0, 0);
+			
+			cairo_paint (pCairoContext);
+			cairo_surface_destroy (g_pVisibleZoneSurface);
+			g_pVisibleZoneSurface = pNewSurface;*/
+		}
 		cairo_destroy (pCairoContext);
 		
 		pCairoContext = cairo_dock_create_context_from_window (GTK_WIDGET (pWindow)->window);

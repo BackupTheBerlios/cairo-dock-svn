@@ -24,6 +24,7 @@ released under the terms of the GNU General Public License.
 #endif
 
 #include "cairo-dock-draw.h"
+#include "cairo-dock-animations.h"
 #include "cairo-dock-config.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-callbacks.h"
@@ -244,7 +245,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 	icon1->fOrder = icon2->fOrder;
 	icon2->fOrder = fSwap;
 	
-	//\_________________ On change l'ordre dans le fichier du lanceur 1.
+	//\_________________ On change l'ordre dans les fichiers des 2 lanceurs.
 	if (CAIRO_DOCK_IS_LAUNCHER (icon1))
 	{
 		GError *erreur = NULL;
@@ -263,7 +264,6 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 		g_key_file_free (pKeyFile);
 		g_free (cDesktopFilePath);
 		
-		//\_________________ On change l'ordre dans le fichier du lanceur 2.
 		cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, icon2->acDesktopFileName);
 		pKeyFile = g_key_file_new();
 		g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
@@ -288,6 +288,63 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 		(GCompareFunc) cairo_dock_compare_icons_order);
 	pDock->icons = g_list_insert_sorted (pDock->icons,
 		icon2,
+		(GCompareFunc) cairo_dock_compare_icons_order);
+	
+	if (CAIRO_DOCK_IS_APPLET (icon1))
+		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons, g_hModuleTable);
+	
+	//\_________________ On recalcule la largeur max, qui peut avoir ete influencee par le changement d'ordre.
+	pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock->icons, pDock->iMinDockWidth)) + 1;
+}
+
+void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2)
+{
+	//g_print ("%s (%s, %s) : %.2f <-> %.2f\n", __func__, icon1->acName, icon2->acName, icon1->fOrder, icon2->fOrder);
+	if ((icon2 != NULL) && (! ( (CAIRO_DOCK_IS_APPLI (icon1) && CAIRO_DOCK_IS_APPLI (icon2)) || (CAIRO_DOCK_IS_LAUNCHER (icon1) && CAIRO_DOCK_IS_LAUNCHER (icon2)) || (CAIRO_DOCK_IS_APPLET (icon1) && CAIRO_DOCK_IS_APPLET (icon2)) ) ))
+		return ;
+	
+	//\_________________ On change l'ordre de l'icone.
+	if (icon2 != NULL)
+	{
+		Icon *pNextIcon = cairo_dock_get_next_icon (pDock->icons, icon2);
+		if (pNextIcon == NULL || pNextIcon->iType != icon2->iType)
+			icon1->fOrder = icon2->fOrder + 1;
+		else
+			icon1->fOrder = (pNextIcon->fOrder - icon2->fOrder > 1 ? icon2->fOrder + 1 : (pNextIcon->fOrder - icon2->fOrder) / 2);
+	}
+	else
+	{
+		Icon *pFirstIcon = cairo_dock_get_first_icon_of_type (pDock->icons, icon1->iType);
+		if (pFirstIcon != NULL)
+			icon1->fOrder = pFirstIcon->fOrder - 1;
+		else
+			icon1->fOrder = 1;
+	}
+	
+	//\_________________ On change l'ordre dans le fichier du lanceur 1.
+	if (CAIRO_DOCK_IS_LAUNCHER (icon1))
+	{
+		GError *erreur = NULL;
+		gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, icon1->acDesktopFileName);
+		GKeyFile* pKeyFile = g_key_file_new();
+		g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+		if (erreur != NULL)
+		{
+			g_print ("Attention : %s\n", erreur->message);
+			g_error_free (erreur);
+			return ;
+		}
+		
+		g_key_file_set_double (pKeyFile, "Desktop Entry", "Order", icon1->fOrder);
+		cairo_dock_write_keys_to_file (pKeyFile, cDesktopFilePath);
+		g_key_file_free (pKeyFile);
+		g_free (cDesktopFilePath);
+	}
+	
+	//\_________________ On change sa place dans la liste.
+	pDock->icons = g_list_remove (pDock->icons, icon1);
+	pDock->icons = g_list_insert_sorted (pDock->icons,
+		icon1,
 		(GCompareFunc) cairo_dock_compare_icons_order);
 	
 	if (CAIRO_DOCK_IS_APPLET (icon1))
@@ -548,15 +605,17 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 {
 	//\_______________ On calcule la position du curseur dans le referentiel du dock a plat.
 	int iWidth, iHeight;
-	gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iWidth, &iHeight);
-	//gint iMouseX, iMouseY;
-	//gdk_window_get_pointer (pDock->pWidget->window, &iMouseX, &iMouseY, NULL);
+	if (g_bHorizontalDock)
+		gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iWidth, &iHeight);
+	else
+		gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iHeight, &iWidth);
 	//g_print ("%s (%dx%d)\n", __func__, iMouseX, iMouseY);
 	
-	int dx = pDock->iWindowPositionX + iMouseX - (g_iScreenWidth / 2 + pDock->iGapX);  // ecart par rapport au milieu du dock a plat.
-	pDock->fGradientOffsetX = - iMouseX;  // indice de decalage des rayures.
-	
+	///int dx = pDock->iWindowPositionX + iMouseX - (g_iScreenWidth / 2 + pDock->iGapX);  // ecart par rapport au milieu du dock a plat.
+	int dx = iMouseX - (pDock->iMaxDockWidth + 2 * g_iDockRadius + g_iDockLineWidth) / 2;  // ecart par rapport au milieu du dock a plat.
 	int x_abs = dx + pDock->iMinDockWidth / 2;  // ecart par rapport a la gauche du dock minimal.
+	
+	pDock->fGradientOffsetX = - iMouseX;  // indice de decalage des rayures.
 	
 	//\_______________ On calcule l'ensemble des parametres des icones.
 	Icon *pPointedIcon = cairo_dock_calculate_icons_with_position (pDock->icons, x_abs, pDock->fMagnitude, pDock->iMinDockWidth, iWidth, iHeight);
@@ -572,7 +631,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 			g_source_remove (pDock->iSidGrowUp);
 			pDock->iSidGrowUp = 0;
 		}*/
-		pDock->iSidShrinkDown = g_timeout_add (75, (GSourceFunc) shrink_down2, pDock);
+		pDock->iSidShrinkDown = g_timeout_add (75, (GSourceFunc) cairo_dock_shrink_down, pDock);
 	}
 	
 	if (bMouseInsideDock && pDock->fMagnitude < 1 && cairo_dock_none_clicked (pDock->icons) && pDock->iSidGrowUp == 0)  // on est dedans en x et la taille des icones est non maximale bien qu'on n'ait pas clique sur une icone.  // && pDock->iSidShrinkDown == 0
@@ -584,7 +643,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 				g_source_remove (pDock->iSidShrinkDown);
 				pDock->iSidShrinkDown = 0;
 			}
-			pDock->iSidGrowUp = g_timeout_add (75, (GSourceFunc) grow_up2, pDock);
+			pDock->iSidGrowUp = g_timeout_add (75, (GSourceFunc) cairo_dock_grow_up, pDock);
 		}
 	}
 	

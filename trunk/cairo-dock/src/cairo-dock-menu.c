@@ -7,6 +7,7 @@ released under the terms of the GNU General Public License.
 ******************************************************************************/
 #include <math.h>
 #include <string.h>
+#include <stdio.h>
 #include <glib.h>
 #include <cairo.h>
 #include <pango/pango.h>
@@ -28,6 +29,7 @@ released under the terms of the GNU General Public License.
 
 #include "cairo-dock-config.h"
 #include "cairo-dock-draw.h"
+#include "cairo-dock-animations.h"
 #include "cairo-dock-load.h"
 #include "cairo-dock-icons.h"
 #include "cairo-dock-callbacks.h"
@@ -169,7 +171,7 @@ static void cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 		
 		icon->fPersonnalScale = 1.0;
 		if (pDock->iSidShrinkDown == 0)
-			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) shrink_down2, (gpointer) pDock);
+			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 	}
 }
 
@@ -200,7 +202,7 @@ static void cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data)
 		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, TRUE, TRUE);
 		
 		if (pDock->iSidShrinkDown == 0)
-			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) shrink_down2, (gpointer) pDock);
+			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 	}
 	else
 	{
@@ -268,7 +270,7 @@ static void cairo_dock_add_launcher (GtkMenuItem *menu_item, gpointer *data)
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 		
 		if (pDock->iSidShrinkDown == 0)
-			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) shrink_down2, (gpointer) pDock);
+			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 		gtk_widget_queue_draw (pDock->pWidget);
 		
 		gtk_widget_destroy (pFileChooserDialog);
@@ -332,6 +334,11 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 		{
 			pNewContainer = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, pNewIcon->cParentDockName);
 			pNewContainer->iRefCount --;
+		}
+		
+		if (pDock != pNewContainer)
+		{
+			pNewIcon->fOrder = CAIRO_DOCK_LAST_ORDER;
 		}
 		
 		cairo_dock_insert_icon_in_dock (pNewIcon, pNewContainer, TRUE, FALSE);  // pour l'instant on n'empeche pas les bouclages.
@@ -456,6 +463,7 @@ static void cairo_dock_swap_with_prev_icon (GtkMenuItem *menu_item, gpointer *da
 				return ;
 			Icon *prev_icon = ic->prev->data;
 			cairo_dock_swap_icons (pDock, icon, prev_icon);
+			return ;
 		}
 	}
 }
@@ -475,6 +483,7 @@ static void cairo_dock_swap_with_next_icon (GtkMenuItem *menu_item, gpointer *da
 				return ;
 			Icon *next_icon = ic->next->data;
 			cairo_dock_swap_icons (pDock, icon, next_icon);
+			return ;
 		}
 	}
 }
@@ -484,9 +493,7 @@ static void cairo_dock_swap_with_first_icon (GtkMenuItem *menu_item, gpointer *d
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
 	
-	Icon* pFirstIcon = cairo_dock_get_first_icon_of_type (pDock->icons, icon->iType);
-	if (pFirstIcon != NULL && pFirstIcon != icon)
-		cairo_dock_swap_icons (pDock, icon, pFirstIcon);
+	cairo_dock_move_icon_after_icon (pDock, icon, NULL);
 }
 
 static void cairo_dock_swap_with_last_icon (GtkMenuItem *menu_item, gpointer *data)
@@ -496,7 +503,7 @@ static void cairo_dock_swap_with_last_icon (GtkMenuItem *menu_item, gpointer *da
 	
 	Icon* pLastIcon = cairo_dock_get_last_icon_of_type (pDock->icons, icon->iType);
 	if (pLastIcon != NULL && pLastIcon != icon)
-		cairo_dock_swap_icons (pDock, icon, pLastIcon);
+		cairo_dock_move_icon_after_icon (pDock, icon, pLastIcon);
 }
 
 static void cairo_dock_delete_menu (GtkMenuShell *menu, CairoDock *pDock)

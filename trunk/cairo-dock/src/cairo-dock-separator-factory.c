@@ -88,7 +88,7 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 			g_tMaxIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12],
 			fWidth,
 			fHeight,
-			0);
+			(g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)));
 		g_free (cImagePath);
 	}
 	else

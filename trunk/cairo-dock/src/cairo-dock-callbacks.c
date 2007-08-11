@@ -24,6 +24,7 @@ released under the terms of the GNU General Public License.
 
 #include "cairo-dock-menu.h"
 #include "cairo-dock-draw.h"
+#include "cairo-dock-animations.h"
 #include "cairo-dock-load.h"
 #include "cairo-dock-icons.h"
 #include "cairo-dock-applications.h"
@@ -62,8 +63,6 @@ extern gboolean g_bHorizontalDock;
 
 extern int g_iNbStripes;
 
-extern double g_fMoveUpSpeed;
-extern double g_fMoveDownSpeed;
 extern double g_fRefreshInterval;
 
 extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
@@ -76,87 +75,6 @@ extern glitz_drawable_format_t *gDrawFormat;
 extern glitz_drawable_t* g_pGlitzDrawable;
 extern glitz_format_t* g_pGlitzFormat;
 #endif // HAVE_GLITZ
-
-
-gboolean move_up2 (CairoDock *pDock)
-{
-	int deltaY_possible;
-	deltaY_possible = pDock->iWindowPositionY - (g_bDirectionUp ? g_iScreenHeight - pDock->iMaxDockHeight - pDock->iGapY : pDock->iGapY);
-	//g_print ("%s (%dx%d -> %d)\n", __func__, pDock->iWindowPositionX, pDock->iWindowPositionY, deltaY_possible);
-	if ((g_bDirectionUp && deltaY_possible > 0) || (! g_bDirectionUp && deltaY_possible < 0))  // alors on peut encore monter.
-	{
-			pDock->iWindowPositionY -= (int) (deltaY_possible * g_fMoveUpSpeed) + (g_bDirectionUp ? 1 : -1);
-		//g_print ("  move to (%dx%d)\n", g_iWindowPositionX, g_iWindowPositionY);
-		if (g_bHorizontalDock)
-			gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);
-		else
-			gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionY, pDock->iWindowPositionX);
-		pDock->bAtBottom = FALSE;
-		return TRUE;
-	}
-	else
-	{
-		pDock->bAtTop = TRUE;
-		pDock->iSidMoveUp = 0;
-		return FALSE;
-	}
-}
-
-
-gboolean move_down2 (CairoDock *pDock)
-{
-	if (pDock->fMagnitude > 0.1)  // on retarde le cachage du dock pour apercevoir les effets.
-		return TRUE;
-	int deltaY_possible = (g_bDirectionUp ? g_iScreenHeight - pDock->iGapY - g_iVisibleZoneHeight : pDock->iGapY + g_iVisibleZoneHeight - pDock->iMaxDockHeight) - pDock->iWindowPositionY;
-	//g_print ("%s (%d)\n", __func__, deltaY_possible);
-	if ((g_bDirectionUp && deltaY_possible > 4) || (! g_bDirectionUp && deltaY_possible < -4))  // alors on peut encore descendre.
-	{
-		pDock->iWindowPositionY += (int) (deltaY_possible * g_fMoveDownSpeed) + (g_bDirectionUp ? 1 : -1);  // 0.33
-		if (g_bHorizontalDock)
-			gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);
-		else
-			gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionY, pDock->iWindowPositionX);
-		pDock->bAtTop = FALSE;
-		return TRUE;
-	}
-	else  // on se fixe en bas, et on montre la zone visible.
-	{
-		pDock->bAtBottom = TRUE;
-		//pDock->iWindowPositionX = (g_iScreenWidth - g_iVisibleZoneWidth) / 2 + pDock->iGapX;
-		//pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - g_iVisibleZoneHeight - pDock->iGapY : pDock->iGapY);
-		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MIN_SIZE);
-		//g_print ("%s () -> %dx%d\n", __func__, g_iVisibleZoneWidth, g_iVisibleZoneHeight);
-		if (g_bHorizontalDock)
-			gdk_window_move_resize (pDock->pWidget->window,
-				pDock->iWindowPositionX,
-				pDock->iWindowPositionY,
-				g_iVisibleZoneWidth,
-				g_iVisibleZoneHeight);
-		else
-			gdk_window_move_resize (pDock->pWidget->window,
-				pDock->iWindowPositionY,
-				pDock->iWindowPositionX,
-				g_iVisibleZoneHeight,
-				g_iVisibleZoneWidth);
-		pDock->iSidMoveDown = 0;
-		
-		if ((g_bAutoHide && pDock->iRefCount == 0))
-		{
-			Icon *pBouncingIcon = cairo_dock_get_bouncing_icon (pDock->icons);
-			if (pBouncingIcon != NULL)  // s'il y'a une icone en cours d'animation, on l'arrete.
-			{
-				pBouncingIcon->iCount = 0;
-			}
-			Icon *pRemovingIcon = cairo_dock_get_removing_or_inserting_icon (pDock->icons);
-			if (pRemovingIcon != NULL)  // idem.
-			{
-				pRemovingIcon->fPersonnalScale = 0.001;
-			}
-		}
-		
-		return FALSE;
-	}
-}
 
 
 gboolean on_expose (GtkWidget *pWidget,
@@ -255,7 +173,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 				g_source_remove (pSubDock->iSidShrinkDown);
 				pSubDock->iSidShrinkDown = 0;
 				pSubDock->fMagnitude = 0.0;
-				shrink_down2 (pSubDock);
+				cairo_dock_shrink_down (pSubDock);
 			}
 			
 			pSubDock->iGapX = pDock->iGapX + (pPointedIcon->fX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 - pDock->iMaxDockWidth / 2);
@@ -307,7 +225,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	{
 		pDock->bAtTop = FALSE;
 		if (pDock->iSidMoveDown == 0)  // on commence a descendre.
-			pDock->iSidMoveDown = g_timeout_add (40, (GSourceFunc) move_down2, (gpointer) pDock);
+			pDock->iSidMoveDown = g_timeout_add (40, (GSourceFunc) cairo_dock_move_down, (gpointer) pDock);
 	}
 	else
 	{
@@ -316,7 +234,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	}
 	
 	if (pDock->iSidShrinkDown == 0)  // on commence a faire diminuer la taille des icones.
-		pDock->iSidShrinkDown = g_timeout_add (35, (GSourceFunc) shrink_down2, (gpointer) pDock);
+		pDock->iSidShrinkDown = g_timeout_add (35, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 	
 	g_pLastPointedDock = NULL;
 	//g_print ("g_pLastPointedDock <- NULL\n");
@@ -404,7 +322,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	if (g_bAutoHide && pDock->iRefCount == 0)
 	{
 		if (pDock->iSidMoveUp == 0)  // on commence a monter.
-			pDock->iSidMoveUp = g_timeout_add (40, (GSourceFunc) move_up2, (gpointer) pDock);
+			pDock->iSidMoveUp = g_timeout_add (40, (GSourceFunc) cairo_dock_move_up, (gpointer) pDock);
 	}
 	else
 	{
@@ -412,7 +330,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 		pDock->bAtBottom = FALSE;
 	}
 	if (pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0)  // on commence a faire grossir les icones.
-		pDock->iSidGrowUp = g_timeout_add (35, (GSourceFunc) grow_up2, (gpointer) pDock);
+		pDock->iSidGrowUp = g_timeout_add (35, (GSourceFunc) cairo_dock_grow_up, (gpointer) pDock);
 	
 	return FALSE;
 }
@@ -580,7 +498,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				}
 				
 				if (pDock->iSidShrinkDown == 0)
-					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) shrink_down2, (gpointer) pDock);  // fera diminuer de taille les icones, et rebondir/tourner/clignoter celle qui est cliquee.
+					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);  // fera diminuer de taille les icones, et rebondir/tourner/clignoter celle qui est cliquee.
 			}
 		}
 		else if (pButton->button == 3)  // clique droit.
@@ -730,7 +648,7 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 			cairo_dock_insert_icon_in_dock (pNewIcon, pReceivingDock, TRUE, TRUE);
 		
 		if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
-			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) shrink_down2, (gpointer) pDock);
+			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 		
 		g_free (cFilePath);
 	}

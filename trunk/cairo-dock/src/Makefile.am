@@ -60,7 +60,9 @@ cairo_dock_SOURCES = \
 	cairo-dock-keyfile-manager.c\
 	cairo-dock-keyfile-manager.h\
 	cairo-dock-dock-factory.c\
-	cairo-dock-dock-factory.h
+	cairo-dock-dock-factory.h\
+	cairo-dock-animations.c\
+	cairo-dock-animations.h
 	
 
 cairo_dockincludedir =\

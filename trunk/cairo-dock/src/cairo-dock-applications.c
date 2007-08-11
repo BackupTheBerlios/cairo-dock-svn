@@ -26,6 +26,7 @@ released under the terms of the GNU General Public License.
 
 #include "cairo-dock-icons.h"
 #include "cairo-dock-draw.h"
+#include "cairo-dock-animations.h"
 #include "cairo-dock-load.h"
 #include "cairo-dock-application-factory.h"
 #include "cairo-dock-separator-factory.h"
@@ -395,7 +396,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 				//g_print ("c'est %s qui se fait exploser\n", icon->acName);
 				icon->fPersonnalScale = 1.0;
 				if (pDock->iSidShrinkDown == 0)
-					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) shrink_down2, (gpointer) pDock);
+					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 			}
 		}
 	}
@@ -423,7 +424,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 				{
 					cairo_dock_insert_icon_in_dock (icon, pDock, TRUE, TRUE);
 					if (pDock->iSidShrinkDown == 0)
-						pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) shrink_down2, (gpointer) pDock);
+						pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 				}
 			}
 		}

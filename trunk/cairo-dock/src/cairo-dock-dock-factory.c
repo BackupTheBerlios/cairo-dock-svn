@@ -284,6 +284,15 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 	}
 	
 	//\______________ On insere l'icone a sa place dans la liste.
+	if (icon->fOrder == CAIRO_DOCK_LAST_ORDER)
+	{
+		Icon *pLastIcon = cairo_dock_get_last_launcher (pDock->icons);
+		if (pLastIcon != NULL)
+			icon->fOrder = pLastIcon->fOrder + 1;
+		else
+			icon->fOrder = 1;
+	}
+	
 	pDock->icons = g_list_insert_sorted (pDock->icons,
 		icon,
 		(GCompareFunc) cairo_dock_compare_icons_order);

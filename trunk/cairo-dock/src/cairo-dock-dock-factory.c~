@@ -263,7 +263,7 @@ void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMin
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionY,
 				pDock->iWindowPositionX,
-				iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth
+				iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth,
 				iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth);
 	}
 }
@@ -284,6 +284,14 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 	}
 	
 	//\______________ On insere l'icone a sa place dans la liste.
+	if (icon->fOrder == CAIRO_DOCK_LAST_ORDER)
+	{
+		Icon *pLastIcon = cairo_dock_get_last_launcher (pDock->icons);
+		if (pLastIcon != NULL)
+			icon->fOrder = pLastIcon->fOrder + 1;
+		else
+			icon->fOrder = 1;
+	}
 	pDock->icons = g_list_insert_sorted (pDock->icons,
 		icon,
 		(GCompareFunc) cairo_dock_compare_icons_order);

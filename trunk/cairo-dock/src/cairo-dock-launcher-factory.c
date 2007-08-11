@@ -173,8 +173,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 			
 			pCairoContext = cairo_create (pNewSurface);
 			cairo_scale (pCairoContext, fMaxScale * fIconWidthSaturationFactor, fMaxScale * fIconHeightSaturationFactor);
-			if (fRotationAngle != 0)
-				cairo_rotate (pCairoContext, fRotationAngle);
+			
 			rsvg_handle_render_cairo (rsvg_handle, pCairoContext);
 		}
 	}
@@ -208,11 +207,6 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 				ceil ((*fImageHeight) * fMaxScale));
 			pCairoContext = cairo_create (pNewSurface);
 			
-			if (fRotationAngle != 0)
-			{
-				cairo_translate (pCairoContext, (*fImageWidth), 0);
-				cairo_rotate (pCairoContext, -fRotationAngle);
-			}
 			cairo_scale (pCairoContext, fMaxScale * fIconWidthSaturationFactor, fMaxScale * fIconHeightSaturationFactor);
 			
 			cairo_set_source_surface (pCairoContext, surface_ini, 0, 0);
@@ -262,11 +256,28 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 		pCairoContext = cairo_create (pNewSurface);
 		
 		cairo_scale (pCairoContext, fMaxScale * fIconWidthSaturationFactor, fMaxScale * fIconHeightSaturationFactor);
-		if (fRotationAngle != 0)
-			cairo_rotate (pCairoContext, fRotationAngle);
 		cairo_set_source_surface (pCairoContext, surface_ini, 0, 0);
 		cairo_paint (pCairoContext);
 		cairo_surface_destroy (surface_ini);
+	}
+	
+	if (fRotationAngle != 0)
+	{
+		cairo_surface_t *pNewSurfaceRotated = cairo_surface_create_similar (cairo_get_target (pCairoContext),
+			CAIRO_CONTENT_COLOR_ALPHA,
+			*fImageHeight * fMaxScale,
+			*fImageWidth * fMaxScale);
+		cairo_destroy (pCairoContext);
+		pCairoContext = cairo_create (pNewSurfaceRotated);
+		
+		cairo_move_to (pCairoContext, *fImageHeight * fMaxScale, 0);
+		cairo_rotate (pCairoContext, fRotationAngle);
+		cairo_translate (pCairoContext, - (*fImageWidth) * fMaxScale, 0);
+		cairo_set_source_surface (pCairoContext, pNewSurface, 0, 0);
+		
+		cairo_paint (pCairoContext);
+		cairo_surface_destroy (pNewSurface);
+		pNewSurface = pNewSurfaceRotated;
 	}
 	
 	cairo_destroy (pCairoContext);

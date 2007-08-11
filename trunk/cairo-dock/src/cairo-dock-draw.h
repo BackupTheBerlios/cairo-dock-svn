@@ -7,11 +7,7 @@
 #include "cairo-dock-struct.h"
 
 
-double get_current_dock_width (GList *pIconList);
-
-double get_current_dock_offset_x (GList *pIconList);
-
-double get_current_dock_offset_y (CairoDock *pDock);
+double cairo_dock_get_current_dock_width (GList *pIconList);
 
 
 
@@ -22,12 +18,6 @@ void render (CairoDock *pDock);
 void cairo_dock_render_background (CairoDock *pDock);
 
 void cairo_dock_render_blank (CairoDock *pDock);
-
-
-
-gboolean grow_up2 (CairoDock *pDock);
-
-gboolean shrink_down2 (CairoDock *pDock);
 
 
 

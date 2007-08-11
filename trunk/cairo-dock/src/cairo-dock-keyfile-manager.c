@@ -164,6 +164,72 @@ static void _cairo_dock_pick_a_file (GtkButton *button, gpointer *data)
 	gtk_widget_destroy (pFileChooserDialog);
 }
 
+static void _cairo_dock_set_color (GtkColorButton *pColorButton, GSList *pWidgetList)
+{
+	GdkColor gdkColor;
+	gtk_color_button_get_color (pColorButton, &gdkColor);
+	
+	GtkSpinButton *pSpinButton;
+	GSList *pList = pWidgetList;
+	if (pList == NULL)
+		return;
+	pSpinButton = pList->data;
+	gtk_spin_button_set_value (pSpinButton, 1. * gdkColor.red / 65535);
+	pList = pList->next;
+	
+	if (pList == NULL)
+		return;
+	pSpinButton = pList->data;
+	gtk_spin_button_set_value (pSpinButton, 1. * gdkColor.green / 65535);
+	pList = pList->next;
+	
+	if (pList == NULL)
+		return;
+	pSpinButton = pList->data;
+	gtk_spin_button_set_value (pSpinButton, 1. * gdkColor.blue / 65535);
+	pList = pList->next;
+	
+	if (gtk_color_button_get_use_alpha (pColorButton))
+	{
+		if (pList == NULL)
+			return;
+		pSpinButton = pList->data;
+		gtk_spin_button_set_value (pSpinButton, 1. * gtk_color_button_get_alpha (pColorButton) / 65535);
+	}
+}
+
+static void _cairo_dock_recup_current_color (GtkColorButton *pColorButton, GSList *pWidgetList)
+{
+	GdkColor gdkColor;
+	GtkSpinButton *pSpinButton;
+	
+	GSList *pList = pWidgetList;
+	if (pList == NULL)
+		return;
+	pSpinButton = pList->data;
+	gdkColor.red = gtk_spin_button_get_value (pSpinButton) * 65535;
+	pList = pList->next;
+	
+	if (pList == NULL)
+		return;
+	pSpinButton = pList->data;
+	gdkColor.green = gtk_spin_button_get_value (pSpinButton) * 65535;
+	pList = pList->next;
+	
+	if (pList == NULL)
+		return;
+	pSpinButton = pList->data;
+	gdkColor.blue = gtk_spin_button_get_value (pSpinButton) * 65535;
+	pList = pList->next;
+	
+	gtk_color_button_set_color (pColorButton, &gdkColor);
+	
+	if (pList == NULL)
+		return;
+	pSpinButton = pList->data;
+	if (gtk_color_button_get_use_alpha (pColorButton))
+	gtk_color_button_set_alpha (pColorButton, gtk_spin_button_get_value (pSpinButton) * 65535);
+}
 
 
 GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWidget *pParentWidget, GSList **pWidgetList)
@@ -194,6 +260,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	GtkWidget *pButtonFileChooser;
 	GtkWidget *pFrame, *pFrameVBox;
 	GtkWidget *pScrolledWindow;
+	GtkWidget *pColorButton;
 	gchar *cGroupName, *cKeyName, *cKeyComment, *cUsefulComment, *cAuthorizedValuesChain, **pAuthorizedValuesList;
 	gpointer *pGroupKeyWidget;
 	int i, j, k, iNbElements;
@@ -202,6 +269,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	int iValue, iMinValue, iMaxValue, *iValueList;
 	double fValue, fMinValue, fMaxValue, *fValueList;
 	gchar *cValue, **cValueList;
+	GdkColor gdkColor;
 	
 	GtkWidget *dialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
 		(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
@@ -365,6 +433,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					break;
 					
 					case 'f' :
+					case 'c' :
 						//g_print ("  + a float\n");
 						length = 0;
 						fValueList = g_key_file_get_double_list (pKeyFile, cGroupName, cKeyName, &length, NULL);
@@ -389,6 +458,30 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								FALSE,
 								FALSE,
 								0);
+						}
+						if (iElementType == 'c' && length > 2)
+						{
+							gdkColor.red = fValueList[0] * 65535;
+							gdkColor.green = fValueList[1] * 65535;
+							gdkColor.blue = fValueList[2] * 65535;
+							pColorButton = gtk_color_button_new_with_color (&gdkColor);
+							if (length > 3)
+							{
+								gtk_color_button_set_use_alpha (GTK_COLOR_BUTTON (pColorButton), TRUE);
+								gtk_color_button_set_alpha (GTK_COLOR_BUTTON (pColorButton), fValueList[3] * 65535);
+							}
+							else
+								gtk_color_button_set_use_alpha (GTK_COLOR_BUTTON (pColorButton), FALSE);
+							
+							
+							gtk_box_pack_start (GTK_BOX (pHBox),
+								pColorButton,
+								FALSE,
+								FALSE,
+								0);
+							 g_signal_connect (G_OBJECT (pColorButton), "color-set", G_CALLBACK(_cairo_dock_set_color), pSubWidgetList);
+							 g_signal_connect (G_OBJECT (pColorButton), "clicked", G_CALLBACK(_cairo_dock_recup_current_color), pSubWidgetList);
+							
 						}
 						g_free (fValueList);
 					break;
