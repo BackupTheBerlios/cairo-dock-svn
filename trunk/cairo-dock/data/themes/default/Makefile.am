@@ -2,11 +2,11 @@ themedir = $(pkgdatadir)/themes/default
 
 theme_DATA = \
 	cairo-dock.conf\
+	background-snow.svg\
 	01BitTorrent.desktop\
 	05firefox.desktop\
 	music.svg\
 	02fichiers.desktop\
-	background-cairo-dock.svg\
 	nautilus.svg\
 	03terminal.desktop\
 	separateur.svg\

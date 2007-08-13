@@ -27,6 +27,7 @@ typedef struct _CairoDock {
 	
 	gint iCurrentWidth;  // inutile sans glitz.
 	gint iCurrentHeight;
+	gint iScrollOffset;  // pour faire defiler les icones avec la molette.
 	
 	gboolean bAtBottom;
 	gboolean bAtTop;

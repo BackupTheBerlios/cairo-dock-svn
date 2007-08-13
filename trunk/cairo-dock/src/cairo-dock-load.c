@@ -47,35 +47,36 @@ extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
 extern int g_iIconGap;
 
+extern cairo_surface_t *g_pVisibleZoneSurface;
+
 extern gboolean g_bUseText;
 extern int g_iLabelSize;
+extern int g_iLabelWeight;
+extern int g_iLabelStyle;
 extern gchar *g_cLabelPolice;
 extern gchar **g_cDefaultIconDirectory;
 extern gchar *g_cCairoDockDataDir;
 extern gchar *g_cConfFile;
 
-extern int g_iVisibleZoneWidth;
-extern int g_iVisibleZoneHeight;
-
-extern gchar *g_cCairoDockBackgroundFileName;
-
 extern int g_iNbAnimationRounds;
 extern int g_iDockRadius;
 extern int g_iDockLineWidth;
+extern double g_fLineColor[4];
 extern gboolean g_bRoundedBottomCorner;
+
 extern double g_fStripesColor1[4];
 extern double g_fStripesColor2[4];
-extern double g_fLineColor[4];
-
-extern cairo_surface_t *g_pVisibleZoneSurface;
-extern cairo_surface_t *g_pVisibleZoneSurfaceAlpha;
-extern double g_fVisibleZoneImageWidth, g_fVisibleZoneImageHeight;
+extern gchar *g_cBackgroundImageFile;
+extern double g_fBackgroundImageAlpha;
+extern cairo_surface_t *g_pBackgroundSurface;
+extern cairo_surface_t *g_pBackgroundSurfaceFull;
+extern double g_fBackgroundImageWidth, g_fBackgroundImageHeight;
+extern gboolean g_bBackgroundImageRepeat;
 extern int g_iNbStripes;
 extern double g_fStripesAngle;
 extern double g_fStripesWidth;
 extern double g_fStripesColorBright[4];
 extern double g_fStripesColorDark[4];
-extern cairo_surface_t *g_pStripesBuffer;
 
 extern gboolean g_bHorizontalDock;
 extern gboolean g_bDirectionUp;
@@ -85,9 +86,6 @@ extern int g_iScreenHeight;
 extern gboolean g_bShowAppli;
 extern unsigned int g_iAppliMaxNameLength;
 extern gchar *g_cDefaultFileBrowser;
-
-extern int g_iLabelWeight;
-extern int g_iLabelStyle;
 
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
@@ -148,7 +146,7 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 		//\_______________________ On cree la surface cairo a afficher.
 		if (strlen (cIconPath) > 0)
 		{
-			icon->pIconBuffer = cairo_dock_create_surface_from_image (cIconPath, pSourceContext, fMaxScale, g_tMinIconAuthorizedSize[CAIRO_DOCK_LAUNCHER], g_tMinIconAuthorizedSize[CAIRO_DOCK_LAUNCHER], g_tMaxIconAuthorizedSize[CAIRO_DOCK_LAUNCHER], g_tMaxIconAuthorizedSize[CAIRO_DOCK_LAUNCHER], &icon->fWidth, &icon->fHeight, 0);
+			icon->pIconBuffer = cairo_dock_create_surface_from_image (cIconPath, pSourceContext, fMaxScale, g_tMinIconAuthorizedSize[CAIRO_DOCK_LAUNCHER], g_tMinIconAuthorizedSize[CAIRO_DOCK_LAUNCHER], g_tMaxIconAuthorizedSize[CAIRO_DOCK_LAUNCHER], g_tMaxIconAuthorizedSize[CAIRO_DOCK_LAUNCHER], &icon->fWidth, &icon->fHeight, 0, 1, FALSE);
 		}
 		
 		g_free (cIconPath);
@@ -293,9 +291,6 @@ static void _cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDo
 		pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, icon->fHeight);
 		
 		cairo_dock_fill_one_text_buffer (icon, pCairoContext, bUseText, iLabelSize, cLabelPolice);
-		
-		//if (icon->pSubDock != NULL)
-		//	cairo_dock_reload_buffers_in_dock (icon->pSubDock, fMaxScale, iLabelSize, bUseText);
 	}
 	
 	cairo_destroy (pCairoContext);
@@ -310,146 +305,218 @@ void cairo_dock_reload_buffers_in_all_dock (GHashTable *hDocksTable, double fMax
 
 
 
-void cairo_dock_load_background_image (GtkWindow *pWindow, gchar *image_filename, int image_width, int image_height)
+cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFile, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern)
 {
 	//g_print ("%s (%dx%d)\n", __func__, image_width, image_height);
-	cairo_surface_destroy (g_pVisibleZoneSurface);
-	g_pVisibleZoneSurface = NULL;
+	cairo_surface_t *pNewSurface = NULL;
 	
-	if (image_filename != NULL)
+	if (cImageFile != NULL)
 	{
 		gchar *cImagePath;
-		if (*image_filename == '~')
+		if (*cImageFile == '~')
 		{
-			cImagePath = g_strdup_printf ("%s%s", getenv("HOME"), image_filename + 1);
+			cImagePath = g_strdup_printf ("%s%s", getenv("HOME"), cImageFile + 1);
 		}
-		else if (*image_filename == '/')
+		else if (*cImageFile == '/')
 		{
-			cImagePath = g_strdup (image_filename);
+			cImagePath = g_strdup (cImageFile);
 		}
 		else
 		{
-			cImagePath = g_strdup_printf ("%s/.cairo-dock/%s", getenv("HOME"), image_filename);
+			cImagePath = g_strdup_printf ("%s/.cairo-dock/%s", getenv("HOME"), cImageFile);
 		}
 		
-		cairo_t * pCairoContext = cairo_dock_create_context_from_window (GTK_WIDGET (pWindow)->window);
-		
-		g_pVisibleZoneSurface = cairo_dock_create_surface_from_image (cImagePath,
-			pCairoContext,
+		pNewSurface = cairo_dock_create_surface_from_image (cImagePath,
+			pSourceContext,
 			1.,
-			image_width,
-			image_height,
-			image_width,
-			image_height,
-			&g_fVisibleZoneImageWidth,
-			&g_fVisibleZoneImageHeight,
-			(g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)));
-		if (! g_bHorizontalDock)
-		{
-			/*double tmp = g_fVisibleZoneImageWidth;
-			g_fVisibleZoneImageWidth = g_fVisibleZoneImageHeight;
-			g_fVisibleZoneImageHeight = tmp;*/
-			/*cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pCairoContext),
-				CAIRO_CONTENT_COLOR_ALPHA,
-				g_fVisibleZoneImageHeight,
-				g_fVisibleZoneImageWidth);
-			cairo_destroy (pCairoContext);
-			pCairoContext = cairo_create (pNewSurface);
-			
-			cairo_move_to (pCairoContext, g_fVisibleZoneImageHeight, 0);
-			cairo_rotate (pCairoContext, -G_PI / 2);
-			cairo_translate (pCairoContext, - g_fVisibleZoneImageWidth, 0);
-			cairo_set_source_surface (pCairoContext, g_pVisibleZoneSurface, 0, 0);
-			
-			cairo_paint (pCairoContext);
-			cairo_surface_destroy (g_pVisibleZoneSurface);
-			g_pVisibleZoneSurface = pNewSurface;*/
-		}
-		cairo_destroy (pCairoContext);
+			(int) (*fImageWidth),
+			(int) (*fImageHeight),
+			(int) (*fImageWidth),
+			(int) (*fImageHeight),
+			fImageWidth,
+			fImageHeight,
+			fRotationAngle,
+			fAlpha,
+			bReapeatAsPattern);
 		
-		pCairoContext = cairo_dock_create_context_from_window (GTK_WIDGET (pWindow)->window);
-		g_pVisibleZoneSurfaceAlpha = cairo_surface_create_similar (cairo_get_target (pCairoContext),
-			CAIRO_CONTENT_COLOR_ALPHA,
-			g_fVisibleZoneImageWidth,
-			g_fVisibleZoneImageHeight);
-		cairo_destroy (pCairoContext);
-		pCairoContext = cairo_create (g_pVisibleZoneSurfaceAlpha);
-		cairo_set_source_surface (pCairoContext, g_pVisibleZoneSurface, 0, 0);
-		cairo_paint_with_alpha (pCairoContext, 0.5);
-		
-		cairo_destroy (pCairoContext);
 		g_free (cImagePath);
 	}
+	
+	return pNewSurface;
 }
 
-void cairo_dock_update_stripes_if_necessary (GtkWidget *pWidget, int iNewMaxDockWidth, int iNewMaxIconHeight, gboolean bForce)
+void cairo_dock_load_visible_zone (GtkWidget *pWidget, gchar *cVisibleZoneImageFile, int iVisibleZoneWidth, int iVisibleZoneHeight, double fVisibleZoneAlpha)
 {
-	static int iStripesWidth = 0, iStripesHeight = 0;
+	double fVisibleZoneWidth = iVisibleZoneWidth, fVisibleZoneHeight = iVisibleZoneHeight;
+	cairo_surface_destroy (g_pVisibleZoneSurface);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pWidget->window);
+	g_pVisibleZoneSurface = cairo_dock_load_image (pCairoContext,
+		cVisibleZoneImageFile,
+		&fVisibleZoneWidth,
+		&fVisibleZoneHeight,
+		(g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)),
+		fVisibleZoneAlpha,
+		FALSE);
+	cairo_destroy (pCairoContext);
+}
+
+cairo_surface_t *cairo_dock_load_stripes (cairo_t* pSourceContext, int iStripesWidth, int iStripesHeight, double fRotationAngle)
+{
+	cairo_pattern_t *pStripesPattern;
+	double fWidth = (g_iNbStripes > 0 ? 200. : iStripesWidth);
+	if (fabs (g_fStripesAngle) != 90)
+		pStripesPattern = cairo_pattern_create_linear (0.0f,
+			0.0f,
+			fWidth,
+			fWidth * tan (g_fStripesAngle * G_PI/180.));
+	else
+		pStripesPattern = cairo_pattern_create_linear (0.0f,
+			0.0f,
+			0.,
+			(g_fStripesAngle == 90) ? iStripesHeight : - iStripesHeight);
+	g_return_val_if_fail (cairo_pattern_status (pStripesPattern) == CAIRO_STATUS_SUCCESS, NULL);
+	
+	
+	cairo_pattern_set_extend (pStripesPattern, CAIRO_EXTEND_REPEAT);
+	
 	if (g_iNbStripes > 0)
 	{
-		if (iNewMaxDockWidth > iStripesWidth || iNewMaxIconHeight > iStripesHeight || bForce)
+		gdouble fStep;
+		double fStripesGap = 1. / (g_iNbStripes);  // ecart entre 2 rayures foncees.
+		for (fStep = 0.0f; fStep < 1.0f; fStep += fStripesGap)
 		{
-			if (bForce)
-			{
-				iStripesWidth = iNewMaxDockWidth;
-				iStripesHeight = iNewMaxIconHeight;
-			}
-			else
-			{
-				iStripesWidth = MAX (iStripesWidth, iNewMaxDockWidth);
-				iStripesHeight = MAX (iStripesHeight, iNewMaxIconHeight);
-			}
-			
-			cairo_pattern_t *pStripesPattern = cairo_pattern_create_linear (0.0f,
-			0.0f,
-			200,
-			(gdouble) 200. * tan (g_fStripesAngle * G_PI/180.));
-			g_return_if_fail (cairo_pattern_status (pStripesPattern) == CAIRO_STATUS_SUCCESS);
-			
-			
-			cairo_pattern_set_extend (pStripesPattern, CAIRO_EXTEND_REPEAT);
-			gdouble fStep;
-			double fStripesGap = 1. / (g_iNbStripes);  // ecart entre 2 rayures foncees.
-			for (fStep = 0.0f; fStep < 1.0f; fStep += fStripesGap)
-			{
-				cairo_pattern_add_color_stop_rgba (pStripesPattern,
-					fStep - g_fStripesWidth / 2,
-					g_fStripesColorBright[0],
-					g_fStripesColorBright[1],
-					g_fStripesColorBright[2],
-					g_fStripesColorBright[3]);
-				cairo_pattern_add_color_stop_rgba (pStripesPattern,
-					fStep,
-					g_fStripesColorDark[0],
-					g_fStripesColorDark[1],
-					g_fStripesColorDark[2],
-					g_fStripesColorDark[3]);
-				cairo_pattern_add_color_stop_rgba (pStripesPattern,
-					fStep + g_fStripesWidth / 2,
-					g_fStripesColorBright[0],
-					g_fStripesColorBright[1],
-					g_fStripesColorBright[2],
-					g_fStripesColorBright[3]);
-			}
-			
-			cairo_t *pCairoContext = cairo_dock_create_context_from_window (pWidget->window);
-			
-			cairo_surface_destroy (g_pStripesBuffer);
-			g_pStripesBuffer = cairo_surface_create_similar (cairo_get_target (pCairoContext),
-				CAIRO_CONTENT_COLOR_ALPHA,
-				ceil (2 * iStripesWidth),
-				ceil (iStripesHeight));
-			cairo_t *pImageContext = cairo_create (g_pStripesBuffer);
-			cairo_set_source (pImageContext, pStripesPattern);
-			cairo_paint (pImageContext);
-			
-			cairo_pattern_destroy (pStripesPattern);
-			cairo_destroy (pCairoContext);
-			cairo_destroy (pImageContext);
+			cairo_pattern_add_color_stop_rgba (pStripesPattern,
+				fStep - g_fStripesWidth / 2,
+				g_fStripesColorBright[0],
+				g_fStripesColorBright[1],
+				g_fStripesColorBright[2],
+				g_fStripesColorBright[3]);
+			cairo_pattern_add_color_stop_rgba (pStripesPattern,
+				fStep,
+				g_fStripesColorDark[0],
+				g_fStripesColorDark[1],
+				g_fStripesColorDark[2],
+				g_fStripesColorDark[3]);
+			cairo_pattern_add_color_stop_rgba (pStripesPattern,
+				fStep + g_fStripesWidth / 2,
+				g_fStripesColorBright[0],
+				g_fStripesColorBright[1],
+				g_fStripesColorBright[2],
+				g_fStripesColorBright[3]);
 		}
 	}
+	else
+	{
+		cairo_pattern_add_color_stop_rgba (pStripesPattern,
+			0.,
+			g_fStripesColorDark[0],
+			g_fStripesColorDark[1],
+			g_fStripesColorDark[2],
+			g_fStripesColorDark[3]);
+		cairo_pattern_add_color_stop_rgba (pStripesPattern,
+			1.,
+			g_fStripesColorBright[0],
+			g_fStripesColorBright[1],
+			g_fStripesColorBright[2],
+			g_fStripesColorBright[3]);
+	}
+	
+	
+	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+		CAIRO_CONTENT_COLOR_ALPHA,
+		iStripesWidth,
+		iStripesHeight);
+	cairo_t *pImageContext = cairo_create (pNewSurface);
+	cairo_set_source (pImageContext, pStripesPattern);
+	cairo_paint (pImageContext);
+	
+	cairo_pattern_destroy (pStripesPattern);
+	cairo_destroy (pImageContext);
+	
+	if (fRotationAngle != 0)
+	{
+		cairo_surface_t *pNewSurfaceRotated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+			CAIRO_CONTENT_COLOR_ALPHA,
+			iStripesHeight,
+			iStripesWidth);
+		pImageContext = cairo_create (pNewSurfaceRotated);
+		
+		if (fRotationAngle < 0)
+		{
+			cairo_move_to (pImageContext, iStripesWidth, 0);
+			cairo_rotate (pImageContext, fRotationAngle);
+			cairo_translate (pImageContext, - iStripesWidth, 0);
+		}
+		else
+		{
+			cairo_move_to (pImageContext, 0, 0);
+			cairo_rotate (pImageContext, fRotationAngle);
+			cairo_translate (pImageContext, 0, - iStripesHeight);
+		}
+		cairo_set_source_surface (pImageContext, pNewSurface, 0, 0);
+		
+		cairo_paint (pImageContext);
+		cairo_surface_destroy (pNewSurface);
+		cairo_destroy (pImageContext);
+		pNewSurface = pNewSurfaceRotated;
+	}
+	
+	return pNewSurface;
 }
 
+
+
+
+void cairo_dock_update_background_decorations_if_necessary (GtkWidget *pWidget, int iNewMaxDockWidth, int iNewMaxIconHeight, double fRotationAngle)
+{
+	if (2 * iNewMaxDockWidth > g_fBackgroundImageWidth || iNewMaxIconHeight > g_fBackgroundImageHeight)
+	{
+		int iDecorationsWidth = MAX (iDecorationsWidth, iNewMaxDockWidth);
+		int iDecorationsHeight = MAX (iDecorationsHeight, iNewMaxIconHeight);
+		
+		cairo_surface_destroy (g_pBackgroundSurface);
+		cairo_surface_destroy (g_pBackgroundSurfaceFull);
+		g_pBackgroundSurface = NULL;
+		g_pBackgroundSurfaceFull = NULL;
+		cairo_t *pCairoContext = cairo_dock_create_context_from_window (pWidget->window);
+		
+		if (g_cBackgroundImageFile != NULL)
+		{
+			if (g_bBackgroundImageRepeat)
+			{
+				g_fBackgroundImageWidth = 2 * iDecorationsWidth;
+				g_fBackgroundImageHeight = iDecorationsHeight;
+				g_pBackgroundSurfaceFull = cairo_dock_load_image (pCairoContext,
+					g_cBackgroundImageFile,
+					&g_fBackgroundImageWidth,
+					&g_fBackgroundImageHeight,
+					(g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)),
+					g_fBackgroundImageAlpha,
+					g_bBackgroundImageRepeat);
+			}
+			else if (g_fBackgroundImageWidth == 0 || g_fBackgroundImageHeight == 0)
+			{
+				g_fBackgroundImageWidth = 0;
+				g_fBackgroundImageHeight = iDecorationsHeight;
+				g_pBackgroundSurface = cairo_dock_load_image (pCairoContext,
+					g_cBackgroundImageFile,
+					&g_fBackgroundImageWidth,
+					&g_fBackgroundImageHeight,
+					(g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)),
+					g_fBackgroundImageAlpha,
+					g_bBackgroundImageRepeat);
+			}
+		}
+		else
+		{
+			g_fBackgroundImageWidth = 2 * iDecorationsWidth;
+			g_fBackgroundImageHeight = iDecorationsHeight;
+			g_pBackgroundSurfaceFull = cairo_dock_load_stripes (pCairoContext, g_fBackgroundImageWidth, g_fBackgroundImageHeight, (g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)));
+		}
+		
+		cairo_destroy (pCairoContext);
+	}
+}
 
 static void _cairo_dock_search_max_docks_size (gchar *cDockName, CairoDock *pDock, int *data)
 {
@@ -458,19 +525,17 @@ static void _cairo_dock_search_max_docks_size (gchar *cDockName, CairoDock *pDoc
 	if (pDock->iMaxIconHeight > data[1])
 		data[1] = pDock->iMaxIconHeight;
 }
-void cairo_dock_load_stripes_background (CairoDock *pMainDock)
+void cairo_dock_load_background_decorations (GtkWidget *pWidget)
 {
-	cairo_surface_destroy (g_pStripesBuffer);
-	g_pStripesBuffer = NULL;
-	if (g_iNbStripes > 0)
-	{
-		int iMaxDocksWidth = 0, iMaxIconsHeight = 0;
-		int data[2] = {0, 0};  // iMaxDocksWidth, iMaxIconsHeight.
-		g_hash_table_foreach (g_hDocksTable, (GHFunc) _cairo_dock_search_max_docks_size, &data);
-		
-		cairo_dock_update_stripes_if_necessary (pMainDock->pWidget, data[0], data[1], TRUE);
-	}
+	int iMaxDocksWidth = 0, iMaxIconsHeight = 0;
+	int data[2] = {0, 0};  // iMaxDocksWidth, iMaxIconsHeight.
+	g_hash_table_foreach (g_hDocksTable, (GHFunc) _cairo_dock_search_max_docks_size, &data);
+	
+	g_fBackgroundImageWidth = 0;
+	g_fBackgroundImageHeight = 0;
+	cairo_dock_update_background_decorations_if_necessary (pWidget, data[0], data[1], (g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)));
 }
+
 
 
 gpointer cairo_dock_init (gpointer data)
@@ -542,7 +607,7 @@ gpointer cairo_dock_init (gpointer data)
 	}
 	else if (! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS))
 	{
-		gchar *cCommand = g_strdup_printf ("cp %s/%s %s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_CONF_FILE, g_cCairoDockDataDir);
+		gchar *cCommand = g_strdup_printf ("cp %s/%s %s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_CONF_FILE, g_cConfFile);
 		system (cCommand);
 		g_free (cCommand);
 	}

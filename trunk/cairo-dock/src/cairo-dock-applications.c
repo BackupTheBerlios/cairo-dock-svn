@@ -376,6 +376,7 @@ void cairo_dock_set_root_window_mask (void)
 static XEvent event;
 gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 {
+	g_return_val_if_fail (pDock != NULL, FALSE);
 	Bool bEventPresent;
 	gboolean bInterestedEvent = FALSE;
 	Window root = DefaultRootWindow (g_XDisplay);

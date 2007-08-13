@@ -89,13 +89,14 @@
 
 CairoDock *g_pMainDock;
 GHashTable *g_hDocksTable = NULL;
+int g_iWmHint;
 CairoDock *g_pLastPointedDock = NULL;
 gchar *g_cLanguage = NULL;
 
 gint g_iScreenWidth = 0;  // dimensions de l'ecran.
 gint g_iScreenHeight = 0;
+int g_iMaxAuthorizedWidth = 5000;
 
-gchar *g_cCairoDockBackgroundFileName = NULL;  // le chemin de l'image de fond de la partie tout le temps visible.
 gchar *g_cConfFile = NULL;  // le chemin du fichier de conf.
 gchar **g_cDefaultIconDirectory = NULL;  // les repertoires par defaut ou on va chercher les icones.
 gchar *g_cCairoDockDataDir = NULL;  // le repertoire ou on va chercher les .desktop.
@@ -111,8 +112,6 @@ gboolean g_bRoundedBottomCorner;  // vrai ssi les coins du bas sont arrondis.
 double g_fLineColor[4];  // la couleur du cadre.
 
 cairo_surface_t *g_pVisibleZoneSurface = NULL;
-cairo_surface_t *g_pVisibleZoneSurfaceAlpha = NULL;
-double g_fVisibleZoneImageWidth, g_fVisibleZoneImageHeight;
 double g_fVisibleZoneAlpha;
 int g_iNbStripes = 0;  // le nombre de rayures a dessiner en fond dans chaque motif elementaire.
 double g_fStripesSpeedFactor = 2.0;  // =1 les rayures suivent le curseur, >1 les rayures vont d'autant moins vite.
@@ -120,7 +119,13 @@ double g_fStripesWidth;  // leur epaisseur relative.
 double g_fStripesColorBright[4];  // la couleur claire des rayures.
 double g_fStripesColorDark[4];  // la couleur foncee des rayures.
 double g_fStripesAngle;
-cairo_surface_t *g_pStripesBuffer = NULL;
+gchar *g_cBackgroundImageFile = NULL;
+double g_fBackgroundImageWidth = 0, g_fBackgroundImageHeight = 0;
+gboolean g_bBackgroundImageRepeat;
+double g_fBackgroundImageAlpha;
+cairo_surface_t *g_pBackgroundSurface = NULL;
+cairo_surface_t *g_pBackgroundSurfaceFull = NULL;
+///cairo_surface_t *g_pBackgroundSurfaceAlpha = NULL;
 
 int g_iIconGap = 0;  // ecart en pixels entre les icones (pour l'instant une valeur > 0 cree des decalages intempestifs).
 int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
@@ -144,8 +149,8 @@ int g_iVisibleZoneHeight = 0;
 //		 ---------------.----------------
 //		                 ^-- gapX
 
-gboolean g_bDirectionUp;  // la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.
-gboolean g_bHorizontalDock = TRUE;  // dit si le dock est horizontal ou vertical (non encore implemente).
+gboolean g_bDirectionUp = TRUE;  // la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.
+gboolean g_bHorizontalDock = TRUE;  // dit si le dock est horizontal ou vertical.
 gboolean g_bUseText;  // vrai ssi on doit afficher les etiquettes au-dessus des icones.
 int g_iLabelSize;  // taille de la police des etiquettes.
 gchar *g_cLabelPolice;  // police de caracteres des etiquettes.
@@ -203,7 +208,7 @@ main (int argc, char** argv)
 	
 	
 	//\___________________ On recupere quelques options.
-	int iWmHint = GDK_WINDOW_TYPE_HINT_NORMAL;
+	int g_iWmHint = GDK_WINDOW_TYPE_HINT_NORMAL;
 	for (i = 0; i < argc; i++)
 	{
 		if (strcmp (argv[i], "--glitz") == 0)
@@ -230,9 +235,9 @@ main (int argc, char** argv)
 		else if (strcmp (argv[i], "--no-sticky") == 0)
 			g_bSticky = FALSE;
 		else if (strcmp (argv[i], "--toolbar-hint") == 0)
-			iWmHint = GDK_WINDOW_TYPE_HINT_TOOLBAR;
+			g_iWmHint = GDK_WINDOW_TYPE_HINT_TOOLBAR;
 		else if (strcmp (argv[i], "--dock-hint") == 0)
-			iWmHint = GDK_WINDOW_TYPE_HINT_DOCK;
+			g_iWmHint = GDK_WINDOW_TYPE_HINT_DOCK;
 		else if (strcmp (argv[i], "--version") == 0)  // le dock restera devant quoiqu'il arrive, mais ne recupere plus les touches clavier.
 		{
 			system ("pkg-config --modversion cairo-dock");
@@ -283,7 +288,7 @@ main (int argc, char** argv)
 	}
 	
 	//\___________________ On cree le dock principal.
-	g_pMainDock = cairo_dock_create_new_dock (iWmHint, CAIRO_DOCK_MAIN_DOCK_NAME);
+	g_pMainDock = cairo_dock_create_new_dock (g_iWmHint, CAIRO_DOCK_MAIN_DOCK_NAME);
 	g_pMainDock->bIsMainDock = TRUE;
 	g_pMainDock->iRefCount --;
 	GdkScreen *gdkscreen = gtk_window_get_screen (GTK_WINDOW (g_pMainDock->pWidget));
@@ -296,8 +301,6 @@ main (int argc, char** argv)
 	cairo_dock_init (NULL);
 	
 #ifdef HAVE_GLITZ
-	g_iCurrentWidth = g_iVisibleZoneWidth;
-	g_iCurrentHeight = g_iVisibleZoneHeight;
 	if (g_bUseGlitz)
 	{
 	    glitz_drawgeable_format_t templ, *format;la fenetre

@@ -41,6 +41,7 @@ released under the terms of the GNU General Public License.
 #include "cairo-dock-menu.h"
 
 extern CairoDock *g_pMainDock;
+extern int g_iWmHint;
 
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
@@ -90,6 +91,62 @@ static void cairo_dock_edit_and_reload_conf_file (GtkMenuItem *menu_item, gpoint
 	{
 		cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
 	}
+}
+
+static void cairo_dock_choose_theme (GtkMenuItem *menu_item, gpointer *data)
+{
+	CairoDock *pDock = data[0];
+	Icon *icon = data[1];
+	
+	//\___________________ On demande une confirmation a l'utilisateur.
+	gchar *cSaveConfDir = g_strdup_printf ("%s.ori", g_cCairoDockDataDir);
+	GtkWidget *dialog;
+	if (g_file_test (cSaveConfDir, G_FILE_TEST_EXISTS))
+	{
+		dialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
+			GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_MESSAGE_QUESTION,
+			GTK_BUTTONS_YES_NO,
+			"Attention : ~/.cairo-dock.ori already exists, so your present config will not be saved back, and you will loose it.\nProceed ?");
+	}
+	else
+	{
+		dialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
+			GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_MESSAGE_QUESTION,
+			GTK_BUTTONS_YES_NO,
+			"You're about to write over your present config. If possible, it will be saved to ~/.cairo-dock.ori.\nProceed ?");
+	}
+	int answer = gtk_dialog_run (GTK_DIALOG (dialog));
+	gtk_widget_destroy (dialog);
+	if (answer != GTK_RESPONSE_YES)
+		return ;
+	
+	//\___________________ On efface la config actuelle.
+	if (! g_file_test (cSaveConfDir, G_FILE_TEST_EXISTS))
+	{
+
+		gchar *cCommand = g_strdup_printf ("mv %s %s", g_cCairoDockDataDir, cSaveConfDir);
+		system (cCommand);
+		g_free (cCommand);
+	}
+	else
+	{
+		gchar *cCommand = g_strdup_printf ("rm -rf %s", g_cCairoDockDataDir);
+		system (cCommand);
+		g_free (cCommand);
+	}
+	
+	//\___________________ On libere toute la memoire allouee pour les docks (stoppe aussi tous les threads).
+	cairo_dock_free_all_docks (g_pMainDock);
+	
+	//\___________________ On cree le dock principal.
+	g_pMainDock = cairo_dock_create_new_dock (g_iWmHint, CAIRO_DOCK_MAIN_DOCK_NAME);
+	g_pMainDock->bIsMainDock = TRUE;
+	g_pMainDock->iRefCount --;
+	
+	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
+	cairo_dock_init (NULL);
 }
 
 static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
@@ -547,6 +604,10 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_edit_and_reload_conf_file), data);
 	
+	menu_item = gtk_menu_item_new_with_label ("Choose a theme");
+	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
+	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_choose_theme), data);
+	
 	menu_item = gtk_menu_item_new_with_label ("About");
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_about), data);
@@ -554,6 +615,7 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	menu_item = gtk_menu_item_new_with_label ("Help");
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_help), data);
+	
 	
 	menu_item = gtk_separator_menu_item_new ();
 	gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);

@@ -2,5 +2,6 @@ SUBDIRS = \
 	default\
 	Fabounet\
 	Ubuntu\
-	Chilperik
+	Chilperik\
+	Djoole
 	

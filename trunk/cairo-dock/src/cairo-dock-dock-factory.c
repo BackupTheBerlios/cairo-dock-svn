@@ -25,6 +25,7 @@ released under the terms of the GNU General Public License.
 #endif
 
 #include "cairo-dock-draw.h"
+#include "cairo-dock-load.h"
 #include "cairo-dock-config.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-callbacks.h"
@@ -39,6 +40,7 @@ extern GHashTable *g_hDocksTable;
 
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
+extern int g_iMaxAuthorizedWidth;
 
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
@@ -161,6 +163,10 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 		G_CALLBACK (on_button_release),
 		pDock);
 	g_signal_connect (G_OBJECT (pWindow),
+		"scroll-event",
+		G_CALLBACK (on_scroll),
+		pDock);
+	g_signal_connect (G_OBJECT (pWindow),
 		"motion-notify-event",
 		G_CALLBACK (on_motion_notify2),
 		pDock);
@@ -240,14 +246,14 @@ void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMin
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionX,
 				pDock->iWindowPositionY,
-				pDock->iMaxDockWidth,
+				MIN (g_iMaxAuthorizedWidth, pDock->iMaxDockWidth),
 				pDock->iMaxDockHeight);
 		else
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionY,
 				pDock->iWindowPositionX,
 				pDock->iMaxDockHeight,
-				pDock->iMaxDockWidth);
+				MIN (g_iMaxAuthorizedWidth, pDock->iMaxDockWidth));
 	}
 	else
 	{
@@ -257,15 +263,17 @@ void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMin
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionX,
 				pDock->iWindowPositionY,
-				iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth,
+				MIN (g_iMaxAuthorizedWidth, iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth),
 				iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth);
 		else
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionY,
 				pDock->iWindowPositionX,
 				iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth,
-				iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth);
+				MIN (g_iMaxAuthorizedWidth, iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth));
 	}
+	
+	cairo_dock_update_background_decorations_if_necessary (pDock->pWidget, pDock->iMaxDockWidth, pDock->iMaxIconHeight, (g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)));
 }
 
 
@@ -353,6 +361,8 @@ void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDock, gpo
 {
 	if (! pDock->bIsMainDock)
 	{
+		pDock->iCurrentWidth = pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth;
+		pDock->iCurrentHeight = pDock->iMaxIconHeight + 2 * g_iDockLineWidth;
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 		//gtk_widget_queue_draw (pDock->pWidget);
 		render (pDock);
@@ -402,11 +412,62 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 }
 
 
+static gboolean _cairo_dock_free_one_dock (gchar *cDockName, CairoDock *pDock, gpointer data)
+{
+	if (pDock->iSidMoveDown != 0)
+		g_source_remove (pDock->iSidMoveDown);
+	if (pDock->iSidMoveUp != 0)
+		g_source_remove (pDock->iSidMoveUp);
+	if (pDock->iSidGrowUp != 0)
+		g_source_remove (pDock->iSidGrowUp);
+	if (pDock->iSidShrinkDown != 0)
+		g_source_remove (pDock->iSidShrinkDown);
+	if (pDock->bIsMainDock && g_iSidUpdateAppliList != 0)
+	{
+		g_source_remove (g_iSidUpdateAppliList);
+		g_iSidUpdateAppliList = 0;
+	}
+	
+	gtk_widget_destroy (pDock->pWidget);
+	pDock->pWidget = NULL;
+	
+	g_list_foreach (pDock->icons, (GFunc) cairo_dock_free_icon, NULL);
+	g_list_free (pDock->icons);
+	pDock->icons = NULL;
+	
+	g_free (pDock);
+	return TRUE;
+}
+void cairo_dock_free_all_docks (CairoDock *pMainDock)
+{
+	cairo_dock_remove_all_applets (pMainDock);
+	
+	if (g_iSidUpdateAppliList != 0)
+		cairo_dock_remove_all_applis (pMainDock);
+	
+	g_hash_table_foreach_remove (g_hDocksTable, (GHRFunc) _cairo_dock_free_one_dock, NULL);
+}
+
 void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *ReceivingDock, gchar *cReceivingDockName)
 {
 	pDock->iRefCount --;  // peut-etre qu'il faudrait en faire une operation atomique...
 	if (pDock->iRefCount > 0)
 		return ;
+	
+	if (pDock->iSidMoveDown != 0)
+		g_source_remove (pDock->iSidMoveDown);
+	if (pDock->iSidMoveUp != 0)
+		g_source_remove (pDock->iSidMoveUp);
+	if (pDock->iSidGrowUp != 0)
+		g_source_remove (pDock->iSidGrowUp);
+	if (pDock->iSidShrinkDown != 0)
+		g_source_remove (pDock->iSidShrinkDown);
+	if (pDock->bIsMainDock && g_iSidUpdateAppliList != 0)
+	{
+		g_source_remove (g_iSidUpdateAppliList);
+		g_iSidUpdateAppliList = 0;
+	}
+	
 	gtk_widget_destroy (pDock->pWidget);
 	pDock->pWidget = NULL;
 	

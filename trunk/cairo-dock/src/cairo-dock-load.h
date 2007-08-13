@@ -18,11 +18,16 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, gbool
 void cairo_dock_reload_buffers_in_all_dock (GHashTable *hDocksTable, double fMaxScale, int iLabelSize, gboolean bUseText, gchar *cLabelPolice);
 
 
+cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFile, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern);
 
-void cairo_dock_load_background_image (GtkWindow *pWindow, gchar *image_filename, int image_width, int image_height);
+void cairo_dock_load_visible_zone (GtkWidget *pWidget, gchar *cVisibleZoneImageFile, int iVisibleZoneWidth, int iVisibleZoneHeight, double fVisibleZoneAlpha);
 
-void cairo_dock_update_stripes_if_necessary (GtkWidget *pWidget, int iNewMaxDockWidth, int iNewMaxIconHeight, gboolean bForce);
-void cairo_dock_load_stripes_background (CairoDock *pMainDock);
+cairo_surface_t *cairo_dock_load_stripes (cairo_t* pSourceContext, int iStripesWidth, int iStripesHeight, double fRotationAngle);
+
+void cairo_dock_update_background_decorations_if_necessary (GtkWidget *pWidget, int iNewMaxDockWidth, int iNewMaxIconHeight, double fRotationAngle);
+
+void cairo_dock_load_background_decorations (GtkWidget *pWidget);
+
 
 
 gpointer cairo_dock_init (gpointer data);

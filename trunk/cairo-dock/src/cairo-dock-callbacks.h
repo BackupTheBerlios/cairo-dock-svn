@@ -40,7 +40,9 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 gboolean on_button_release (GtkWidget* pWidget,
 					GdkEventButton* pButton,
 					CairoDock *pDock);
-
+gboolean on_scroll (GtkWidget* pWidget,
+				GdkEventScroll* pScroll,
+				CairoDock *pDock);
 
 gboolean on_configure (GtkWidget* pWidget,
 	   			GdkEventConfigure* pEvent,

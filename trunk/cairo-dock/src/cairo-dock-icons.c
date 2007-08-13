@@ -605,15 +605,17 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 {
 	//\_______________ On calcule la position du curseur dans le referentiel du dock a plat.
 	int iWidth, iHeight;
-	if (g_bHorizontalDock)
+	iWidth = pDock->iCurrentWidth;
+	iHeight = pDock->iCurrentHeight;
+	/**if (g_bHorizontalDock)
 		gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iWidth, &iHeight);
 	else
-		gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iHeight, &iWidth);
+		gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iHeight, &iWidth);*/
 	//g_print ("%s (%dx%d)\n", __func__, iMouseX, iMouseY);
 	
 	///int dx = pDock->iWindowPositionX + iMouseX - (g_iScreenWidth / 2 + pDock->iGapX);  // ecart par rapport au milieu du dock a plat.
 	int dx = iMouseX - (pDock->iMaxDockWidth + 2 * g_iDockRadius + g_iDockLineWidth) / 2;  // ecart par rapport au milieu du dock a plat.
-	int x_abs = dx + pDock->iMinDockWidth / 2;  // ecart par rapport a la gauche du dock minimal.
+	int x_abs = dx + pDock->iMinDockWidth / 2 - pDock->iScrollOffset;  // ecart par rapport a la gauche du dock minimal.
 	
 	pDock->fGradientOffsetX = - iMouseX;  // indice de decalage des rayures.
 	

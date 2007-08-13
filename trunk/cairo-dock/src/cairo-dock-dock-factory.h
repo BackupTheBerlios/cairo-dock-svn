@@ -21,6 +21,8 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDock, gpointer data);
 void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar *cDirectory);
 
+
+void cairo_dock_free_all_docks (CairoDock *pMainDock);
 void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *ReceivingDock, gchar *cReceivingDockName);
 
 
