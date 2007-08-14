@@ -3,6 +3,7 @@
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
+Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
 
 ******************************************************************************/
 #include <math.h>
@@ -43,6 +44,7 @@ extern gboolean g_bUseText;
 extern int g_iDockRadius;
 extern int g_iDockLineWidth;
 extern int g_iIconGap;
+extern gboolean g_bAutoHide;
 
 extern gchar *g_cConfFile;
 extern gchar *g_cCairoDockDataDir;
@@ -395,7 +397,10 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 			if (icon != NULL)
 			{
 				//g_print ("c'est %s qui se fait exploser\n", icon->acName);
-				icon->fPersonnalScale = 1.0;
+				if (pDock->bInside || ! g_bAutoHide || ! pDock->bAtBottom)
+					icon->fPersonnalScale = 1.0;
+				else
+					icon->fPersonnalScale = 0.05;
 				if (pDock->iSidShrinkDown == 0)
 					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 			}
@@ -424,6 +429,8 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 				if (icon != NULL)
 				{
 					cairo_dock_insert_icon_in_dock (icon, pDock, TRUE, TRUE);
+					if (! pDock->bInside && g_bAutoHide && pDock->bAtBottom)
+						icon->fPersonnalScale = - 0.05;
 					if (pDock->iSidShrinkDown == 0)
 						pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 				}

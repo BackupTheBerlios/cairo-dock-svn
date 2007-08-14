@@ -3,6 +3,7 @@
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
+Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
 
 ******************************************************************************/
 #include <math.h>
@@ -41,6 +42,7 @@ extern CairoDock *g_pLastPointedDock;
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
 extern int g_iMaxAuthorizedWidth;
+extern int g_iScrollAmount;
 
 extern double g_fAmplitude;
 extern int g_iLabelSize;
@@ -195,7 +197,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
-	//g_print ("%s ()\n", __func__);
+	//g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
 	pDock->bInside = FALSE;
 	if (pDock->bMenuVisible)
 	{
@@ -556,14 +558,14 @@ gboolean on_scroll (GtkWidget* pWidget,
 		pNeighborIcon = cairo_dock_get_previous_icon (pDock->icons, pLastPointedIcon);
 		if (pNeighborIcon == NULL)
 			return FALSE;
-		pDock->iScrollOffset += (pNeighborIcon->fWidth + pLastPointedIcon->fWidth) / 2;
+		pDock->iScrollOffset += (g_iScrollAmount == 0 ? (pNeighborIcon->fWidth + pLastPointedIcon->fWidth) / 2 : g_iScrollAmount);
 	}
 	else if (pScroll->direction == GDK_SCROLL_DOWN)
 	{
 		pNeighborIcon = cairo_dock_get_next_icon (pDock->icons, pLastPointedIcon);
 		if (pNeighborIcon == NULL)
 			return FALSE;
-		pDock->iScrollOffset -= (pNeighborIcon->fWidth + pLastPointedIcon->fWidth) / 2;
+		pDock->iScrollOffset -= (g_iScrollAmount == 0 ? (pNeighborIcon->fWidth + pLastPointedIcon->fWidth) / 2 : g_iScrollAmount);
 	}
 	else
 	{

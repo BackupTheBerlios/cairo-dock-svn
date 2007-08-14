@@ -3,6 +3,7 @@
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
+Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
 
 ******************************************************************************/
 #include <math.h>
@@ -48,6 +49,7 @@ extern gint g_iDockRadius;
 extern int g_iIconGap;
 
 extern cairo_surface_t *g_pVisibleZoneSurface;
+extern gboolean g_bReverseVisibleImage;
 
 extern gboolean g_bUseText;
 extern int g_iLabelSize;
@@ -360,7 +362,7 @@ void cairo_dock_load_visible_zone (GtkWidget *pWidget, gchar *cVisibleZoneImageF
 		cVisibleZoneImageFile,
 		&fVisibleZoneWidth,
 		&fVisibleZoneHeight,
-		(g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)),
+		(g_bHorizontalDock ? (! g_bDirectionUp && g_bReverseVisibleImage ? G_PI : 0) : (g_bDirectionUp ? -G_PI/2 : G_PI/2)),
 		fVisibleZoneAlpha,
 		FALSE);
 	cairo_destroy (pCairoContext);

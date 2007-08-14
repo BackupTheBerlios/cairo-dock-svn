@@ -3,6 +3,7 @@
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
+Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
 
 ******************************************************************************/
 #include <math.h>
@@ -41,8 +42,6 @@ extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
 extern double g_fLineColor[4];
 extern int g_iIconGap;
-extern int g_iLabelSize;
-extern double g_fLabelAlphaThreshold;
 
 extern gboolean g_bRoundedBottomCorner;
 extern gboolean g_bAutoHide;
@@ -71,6 +70,7 @@ extern gboolean g_bUseText;
 extern int g_iLabelSize;
 extern gchar *g_cLabelPolice;
 extern gboolean g_bLabelForPointedIconOnly;
+extern double g_fLabelAlphaThreshold;
 
 extern double g_fGrowUpFactor;
 extern double g_fShrinkDownFactor;
@@ -217,11 +217,11 @@ static void _cairo_dock_draw_frame_vertical (CairoDock *pDock, cairo_t *pCairoCo
 }
 void render (CairoDock *pDock)
 {
-	//g_print ("%s ()\n", __func__);
 	double fRadius = g_iDockRadius;
 	double fLineWidth = g_iDockLineWidth;
 	double fDockWidth = cairo_dock_get_current_dock_width (pDock->icons);
 	double fX;
+	//g_print ("%s (%.2f)\n", __func__, fDockWidth);
 	
 	//\_________________ On determine des parametres de construction.
 	int sens;
@@ -233,6 +233,7 @@ void render (CairoDock *pDock)
 		fDockOffsetX = fRadius + fLineWidth / 2;
 	if (fDockOffsetX + fDockWidth - (fRadius + fLineWidth / 2) > pDock->iCurrentWidth)
 		fDockWidth = pDock->iCurrentWidth - fDockOffsetX + (fRadius + fLineWidth / 2);
+	//g_print ("fDockOffsetX : %.2f\n", fDockOffsetX);
 	
 	//g_print ("fDockOffsetX : %.2f ; fDockWidth : %.2f\n", fDockOffsetX, fDockWidth);
 	if (g_bDirectionUp)
@@ -313,6 +314,7 @@ void render (CairoDock *pDock)
 		//\_____________________ On dessine les icones en les zoomant du facteur d'echelle pre-calcule.
 		//g_print ("fX : %.2f -> %.2f\n", icon->fX, icon->fX - pDock->iMaxDockWidth / 2 + pDock->iCurrentWidth / 2 + pDock->iScrollOffset);
 		fX = icon->fX - pDock->iMaxDockWidth / 2 + pDock->iCurrentWidth / 2 + pDock->iScrollOffset;
+		//g_print ("icon->fX : %.2f -> %.2f\n", icon->fX, fX);
 		if (g_bHorizontalDock)
 			cairo_translate (pCairoContext, fX, icon->fY);
 		else
@@ -588,6 +590,7 @@ static gboolean _cairo_dock_hide_dock (gchar *cDockName, CairoDock *pDock, Cairo
 		if (pDock->iRefCount == 0)  // pDock->bIsMainDock
 		{
 			if (pDock->iScrollOffset != 0 && g_bResetScrollOnLeave)
+				pDock->iScrollOffset = 0;
 			cairo_dock_leave_from_main_dock (pDock);
 		}
 		else

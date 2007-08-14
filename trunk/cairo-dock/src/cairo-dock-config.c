@@ -3,6 +3,7 @@
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
+Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
 
 ******************************************************************************/
 #include <math.h>
@@ -27,8 +28,10 @@ static gchar * s_cIconTypeNames[(CAIRO_DOCK_NB_TYPES+1)/2] = {"launchers", "appl
 
 extern GHashTable *g_hDocksTable;
 extern gchar *g_cLanguage;
+extern gboolean g_bReverseVisibleImage;
 
 extern int g_iMaxAuthorizedWidth;
+extern int g_iScrollAmount;
 extern gboolean g_bResetScrollOnLeave;
 extern double g_fScrollAcceleration;
 
@@ -175,6 +178,17 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	{
 		g_free (cScreenBorder);
 		cScreenBorder = g_strdup ("bottom");
+	}
+	
+	g_bReverseVisibleImage = g_key_file_get_boolean (fconf, "POSITION", "reverse visible image", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_bReverseVisibleImage = TRUE;  // valeur par defaut.
+		g_key_file_set_boolean (fconf, "POSITION", "reverse visible image", g_bReverseVisibleImage);
+		bFlushConfFileNeeded = TRUE;
 	}
 	
 	
@@ -466,6 +480,17 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		erreur = NULL;
 		g_iMaxAuthorizedWidth = 9999;  // valeur par defaut.
 		g_key_file_set_double (fconf, "CAIRO DOCK", "max autorized width", g_iMaxAuthorizedWidth);
+		bFlushConfFileNeeded = TRUE;
+	}
+	
+	g_iScrollAmount = g_key_file_get_integer (fconf, "CAIRO DOCK", "scroll amount", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_iScrollAmount = 0;  // valeur par defaut.
+		g_key_file_set_integer (fconf, "CAIRO DOCK", "scroll amount", g_iScrollAmount);
 		bFlushConfFileNeeded = TRUE;
 	}
 	

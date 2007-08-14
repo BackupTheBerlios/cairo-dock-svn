@@ -1,17 +1,17 @@
-/*******************************************************************************
+/*****************************************************************************************************
 **
 ** Program:
 **    cairo-dock
 **
 ** License :
-**    This program is released under the terms of the GNU General Public License.
+**    This program is released under the terms of the GNU General Public License, version 3 or above.
 **    If you don't know what that means take a look at:
 **       http://www.gnu.org/licenses/licenses.html#GPL
 **
 ** Original idea :
 **    Mirco Mueller, June 2006.
 **
-*********************** VERSION 1 *********************
+*********************** VERSION 1 (2006)*********************
 ** author(s):
 **    Mirco "MacSlow" Mueller <macslow@bangang.de>
 **    Behdad Esfahbod <behdad@behdad.org>
@@ -37,7 +37,7 @@
 **    great deal by sending me additional tweaked and optimized versions. I've
 **    now merged all that with my recent additions.
 **
-*********************** VERSION 2 *********************
+*********************** VERSION 2 (2007)*********************
 **
 ** author(s) :
 **     Fabrice Rey <fabounet_03@yahoo.fr>, 
@@ -46,12 +46,13 @@
 **     I've completely rewritten the calculation part, and the callback system.
 **     Plus added a conf file that allows to dynamically modify most of the parameters.
 **     Plus a visible zone that make the hiding/showing more friendly.
-**     Plus added a menu and the drag'n'drop ability.
+**     Plus a menu and the drag'n'drop ability.
 **     Also I've separated functions in several files in order to make the code more readable.
 **     Now it sems more like a real dock !
 **     Feel free to upgrade it according to your wishes !
 **
-**     Edit : plus a taskbar, plus an applet system, plus the container ability.
+**     Edit : plus a taskbar, plus an applet system,
+**            plus the container ability, plus the carousel view, plus the top and vertical view.
 **
 **
 *******************************************************************************/
@@ -93,9 +94,11 @@ int g_iWmHint;
 CairoDock *g_pLastPointedDock = NULL;
 gchar *g_cLanguage = NULL;
 
+gboolean g_bReverseVisibleImage;
 gint g_iScreenWidth = 0;  // dimensions de l'ecran.
 gint g_iScreenHeight = 0;
-int g_iMaxAuthorizedWidth = 300;
+int g_iMaxAuthorizedWidth;
+int g_iScrollAmount;
 gboolean g_bResetScrollOnLeave;
 double g_fScrollAcceleration;
 gchar *g_cConfFile = NULL;  // le chemin du fichier de conf.

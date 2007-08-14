@@ -3,6 +3,7 @@
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
+Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
 
 ******************************************************************************/
 #include <math.h>
@@ -191,6 +192,19 @@ Icon *cairo_dock_get_removing_or_inserting_icon (GList *pIconList)
 	{
 		icon = ic->data;
 		if (icon->fPersonnalScale != 0)
+			return icon;
+	}
+	return NULL;
+}
+
+Icon *cairo_dock_get_animated_icon (GList *pIconList)
+{
+	GList* ic;
+	Icon *icon;
+	for (ic = pIconList; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (icon->fPersonnalScale != 0 || icon->iCount > 0)
 			return icon;
 	}
 	return NULL;
@@ -530,7 +544,7 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, int x_abs, gd
 			if (icon->fPersonnalScale > -0.05)
 				icon->fPersonnalScale = -0.05;
 		}
-		if (icon->iCount > 0 && icon->iAnimationType == CAIRO_DOCK_BOUNCE)
+		if (icon->iCount > 0 && icon->iAnimationType == CAIRO_DOCK_BOUNCE && iWidth > 0)
 		{
 			c = icon->iCount;
 			if ( (c/5) & 1)  // c/5 est impair, on monte.
@@ -635,11 +649,12 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 		pDock->iSidShrinkDown = g_timeout_add (75, (GSourceFunc) cairo_dock_shrink_down, pDock);
 	}
 	
-	if (bMouseInsideDock && pDock->fMagnitude < 1 && cairo_dock_none_clicked (pDock->icons) && pDock->iSidGrowUp == 0)  // on est dedans en x et la taille des icones est non maximale bien qu'on n'ait pas clique sur une icone.  // && pDock->iSidShrinkDown == 0
+	if (bMouseInsideDock && pDock->fMagnitude < 1 && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons))  // on est dedans en x et la taille des icones est non maximale bien qu'aucune icone  ne soit animee.  // && pDock->iSidShrinkDown == 0
 	{
 		if ( (g_bDirectionUp && pPointedIcon != NULL && iMouseY > iHeight - pPointedIcon->fHeight * pPointedIcon->fScale && iMouseY < iHeight) || (! g_bDirectionUp && pPointedIcon != NULL && iMouseY < pPointedIcon->fHeight * pPointedIcon->fScale && iMouseY > 0) )  // et en plus on est dedans en y.
 		{
-			if (pDock->iSidShrinkDown > 0)
+			//g_print ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone  ne soit animee\n");
+			if (pDock->iSidShrinkDown != 0)
 			{
 				g_source_remove (pDock->iSidShrinkDown);
 				pDock->iSidShrinkDown = 0;

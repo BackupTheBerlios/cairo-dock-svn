@@ -3,6 +3,7 @@
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
+Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
 
 ******************************************************************************/
 #include <math.h>
@@ -123,7 +124,6 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 	gtk_window_set_resizable (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_title (GTK_WINDOW (pWindow), "cairo-dock");
 	
-	gtk_widget_show_all (pWindow);
 	gtk_window_move (GTK_WINDOW (pWindow), 0, g_iScreenHeight);
 	pDock->pWidget = pWindow;
 	
@@ -198,6 +198,7 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 		GDK_ACTION_COPY);
 	
 	g_hash_table_insert (g_hDocksTable, g_strdup (cDockName), pDock);
+	gtk_widget_show_all (pWindow);
 	
 	return pDock;
 }
@@ -264,12 +265,12 @@ void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMin
 				pDock->iWindowPositionX,
 				pDock->iWindowPositionY,
 				MIN (g_iMaxAuthorizedWidth, iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth),
-				iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth);
+				iMaxIconHeight + 2 * g_iDockLineWidth);
 		else
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionY,
 				pDock->iWindowPositionX,
-				iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth,
+				iMaxIconHeight + 2 * g_iDockLineWidth,
 				MIN (g_iMaxAuthorizedWidth, iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth));
 	}
 	
@@ -364,7 +365,7 @@ void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDock, gpo
 		pDock->iCurrentWidth = pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth;
 		pDock->iCurrentHeight = pDock->iMaxIconHeight + 2 * g_iDockLineWidth;
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
-		render (pDock);
+		//render (pDock);
 		gtk_window_present (GTK_WINDOW (pDock->pWidget));
 		gtk_widget_queue_draw (pDock->pWidget);
 		while (gtk_events_pending ())

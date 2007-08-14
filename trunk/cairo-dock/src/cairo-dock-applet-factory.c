@@ -3,6 +3,7 @@
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
+Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
 
 ******************************************************************************/
 #include <math.h>
@@ -26,7 +27,6 @@ released under the terms of the GNU General Public License.
 #include "cairo-dock-load.h"
 #include "cairo-dock-applet-factory.h"
 
-
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
 
@@ -36,7 +36,6 @@ extern gboolean g_bUseText;
 extern int g_iDockRadius;
 extern int g_iDockLineWidth;
 extern int g_iIconGap;
-
 
 extern gchar *g_cConfFile;
 extern gchar *g_cCairoDockDataDir;

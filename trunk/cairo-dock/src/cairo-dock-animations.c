@@ -3,6 +3,7 @@
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
+Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
 
 ******************************************************************************/
 #include <math.h>
@@ -153,6 +154,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 		
 		if ((g_bAutoHide && pDock->iRefCount == 0))
 		{
+			g_print ("on arrete les animations\n");
 			Icon *pBouncingIcon = cairo_dock_get_bouncing_icon (pDock->icons);
 			if (pBouncingIcon != NULL)  // s'il y'a une icone en cours d'animation, on l'arrete.
 			{
@@ -163,6 +165,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 			{
 				pRemovingIcon->fPersonnalScale = 0.001;
 			}
+			pDock->iScrollOffset = 0;
 		}
 		
 		return FALSE;
@@ -202,7 +205,7 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 
 gboolean cairo_dock_shrink_down (CairoDock *pDock)
 {
-	//g_print ("%s (%f)\n", __func__, pDock->fMagnitude);
+	//g_print ("%s (%f;%d)\n", __func__, pDock->fMagnitude, pDock->iScrollOffset);
 	if (pDock->fMagnitude > 0.05)
 		pDock->fMagnitude *= g_fShrinkDownFactor; //  0.6
 	else

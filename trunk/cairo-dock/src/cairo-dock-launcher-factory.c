@@ -3,6 +3,7 @@
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
+Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
 
 ******************************************************************************/
 #include <math.h>
@@ -303,24 +304,40 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 	
 	if (fRotationAngle != 0)
 	{
-		cairo_surface_t *pNewSurfaceRotated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-			CAIRO_CONTENT_COLOR_ALPHA,
-			*fImageHeight * fMaxScale,
-			*fImageWidth * fMaxScale);
-		cairo_destroy (pCairoContext);
-		pCairoContext = cairo_create (pNewSurfaceRotated);
-		
-		if (fRotationAngle < 0)
+		cairo_surface_t *pNewSurfaceRotated;
+		if (fabs (fRotationAngle) > G_PI / 2)
 		{
-			cairo_move_to (pCairoContext, *fImageHeight * fMaxScale, 0);
-			cairo_rotate (pCairoContext, fRotationAngle);
-			cairo_translate (pCairoContext, - (*fImageWidth) * fMaxScale, 0);
+			pNewSurfaceRotated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+				CAIRO_CONTENT_COLOR_ALPHA,
+				*fImageWidth * fMaxScale,
+				*fImageHeight * fMaxScale);
+			cairo_destroy (pCairoContext);
+			pCairoContext = cairo_create (pNewSurfaceRotated);
+			
+			cairo_translate (pCairoContext, 0, *fImageHeight * fMaxScale);
+			cairo_scale (pCairoContext, 1, -1);
 		}
 		else
 		{
-			cairo_move_to (pCairoContext, 0, 0);
-			cairo_rotate (pCairoContext, fRotationAngle);
-			cairo_translate (pCairoContext, 0, - *fImageHeight * fMaxScale);
+			pNewSurfaceRotated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+				CAIRO_CONTENT_COLOR_ALPHA,
+				*fImageHeight * fMaxScale,
+				*fImageWidth* fMaxScale);
+			cairo_destroy (pCairoContext);
+			pCairoContext = cairo_create (pNewSurfaceRotated);
+			
+			if (fRotationAngle < 0)
+			{
+				cairo_move_to (pCairoContext, *fImageHeight * fMaxScale, 0);
+				cairo_rotate (pCairoContext, fRotationAngle);
+				cairo_translate (pCairoContext, - (*fImageWidth) * fMaxScale, 0);
+			}
+			else
+			{
+				cairo_move_to (pCairoContext, 0, 0);
+				cairo_rotate (pCairoContext, fRotationAngle);
+				cairo_translate (pCairoContext, 0, - *fImageHeight * fMaxScale);
+			}
 		}
 		cairo_set_source_surface (pCairoContext, pNewSurface, 0, 0);
 		

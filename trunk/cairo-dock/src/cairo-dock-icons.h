@@ -25,11 +25,13 @@ Icon* cairo_dock_get_last_icon_of_type (GList *pIconList, CairoDockIconType iTyp
 Icon* cairo_dock_get_pointed_icon (GList *pIconList);
 Icon *cairo_dock_get_bouncing_icon (GList *pIconList);
 Icon *cairo_dock_get_removing_or_inserting_icon (GList *pIconList);
+Icon *cairo_dock_get_animated_icon (GList *pIconList);
 Icon *cairo_dock_get_next_icon (GList *pIconList, Icon *pIcon);
 Icon *cairo_dock_get_previous_icon (GList *pIconList, Icon *pIcon);
 
 #define cairo_dock_none_clicked(pIconList) (cairo_dock_get_bouncing_icon (pIconList) == NULL)
 #define cairo_dock_none_removed_or_inserted(pIconList) (cairo_dock_get_removing_or_inserting_icon (pIconList) == NULL)
+#define cairo_dock_none_animated(pIconList) (cairo_dock_get_animated_icon (pIconList) == NULL)
 
 #define cairo_dock_get_first_launcher(pIconList) cairo_dock_get_first_icon_of_type (pIconList, CAIRO_DOCK_LAUNCHER)
 #define cairo_dock_get_last_launcher(pIconList) cairo_dock_get_last_icon_of_type (pIconList, CAIRO_DOCK_LAUNCHER)
