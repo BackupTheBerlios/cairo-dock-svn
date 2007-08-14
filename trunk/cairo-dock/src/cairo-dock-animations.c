@@ -154,7 +154,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 		
 		if ((g_bAutoHide && pDock->iRefCount == 0))
 		{
-			g_print ("on arrete les animations\n");
+			//g_print ("on arrete les animations\n");
 			Icon *pBouncingIcon = cairo_dock_get_bouncing_icon (pDock->icons);
 			if (pBouncingIcon != NULL)  // s'il y'a une icone en cours d'animation, on l'arrete.
 			{

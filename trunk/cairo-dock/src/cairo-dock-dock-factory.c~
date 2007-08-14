@@ -362,9 +362,11 @@ void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDock, gpo
 {
 	if (! pDock->bIsMainDock)
 	{
-		pDock->iCurrentWidth = pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth;
-		pDock->iCurrentHeight = pDock->iMaxIconHeight + 2 * g_iDockLineWidth;
+		//pDock->iCurrentWidth = pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth;
+		//pDock->iCurrentHeight = pDock->iMaxIconHeight + 2 * g_iDockLineWidth;
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+		pDock->iCurrentWidth = pDock->iMaxDockWidth;
+		pDock->iCurrentHeight = pDock->iMaxDockHeight;
 		//render (pDock);
 		gtk_window_present (GTK_WINDOW (pDock->pWidget));
 		gtk_widget_queue_draw (pDock->pWidget);

@@ -16,4 +16,3 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 
 
 #endif
-
