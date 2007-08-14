@@ -294,7 +294,13 @@ static void _cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDo
 	}
 	
 	cairo_destroy (pCairoContext);
-	pDock->iMaxDockHeight = (int) (fMaxScale * pDock->iMaxIconHeight) + iLabelSize + g_iDockLineWidth;
+	//pDock->iMaxDockHeight = (int) (fMaxScale * pDock->iMaxIconHeight) + iLabelSize + g_iDockLineWidth;
+	if (! pDock->bIsMainDock)
+	{
+		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+		pDock->iCurrentWidth = (g_bHorizontalDock ? pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth : pDock->iMaxIconHeight + 2 * g_iDockLineWidth);
+		pDock->iCurrentHeight= (g_bHorizontalDock ? pDock->iMaxIconHeight + 2 * g_iDockLineWidth : pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth);
+	}
 }
 void cairo_dock_reload_buffers_in_all_dock (GHashTable *hDocksTable, double fMaxScale, int iLabelSize, gboolean bUseText, gchar *cLabelPolice)
 {

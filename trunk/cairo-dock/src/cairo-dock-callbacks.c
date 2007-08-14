@@ -213,7 +213,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 		pDock->iSidGrowUp = 0;
 	}
 	
-	if ((g_bAutoHide && pDock->iRefCount == 0))
+	if (g_bAutoHide && pDock->iRefCount == 0)
 	{
 		pDock->bAtTop = FALSE;
 		if (pDock->iSidMoveDown == 0)  // on commence a descendre.
@@ -331,17 +331,15 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 void cairo_dock_update_gaps_with_window_position (CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
-	int iWidth, iHeight;
-	iWidth = pDock->iCurrentWidth;
-	iHeight = pDock->iCurrentHeight;
+	int iWidth, iHeight;  // mieux que iCurrentWidth.
 	if (g_bHorizontalDock)
 	{
-		///gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iWidth, &iHeight);
+		gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iWidth, &iHeight);
 		gtk_window_get_position (GTK_WINDOW (pDock->pWidget), &pDock->iWindowPositionX, &pDock->iWindowPositionY);
 	}
 	else
 	{
-		///gtk_window_get_size (GTK_WINDOW (pDock->pWidget),  &iHeight, &iWidth);
+		gtk_window_get_size (GTK_WINDOW (pDock->pWidget),  &iHeight, &iWidth);
 		gtk_window_get_position (GTK_WINDOW (pDock->pWidget), &pDock->iWindowPositionY, &pDock->iWindowPositionX);
 	}
 	
@@ -379,9 +377,7 @@ gboolean on_key_press (GtkWidget *pWidget,
 	int iPossibleMove;
 	
 	int iWidth, iHeight;
-	///gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iWidth, &iHeight);
-	iWidth = pDock->iCurrentWidth;
-	iHeight = pDock->iCurrentHeight;
+	gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iWidth, &iHeight);  // mieux que iCurrentWidth.
 	
 	int x, y;  // position du centre bas du dock;
 	x = pDock->iWindowPositionX +iWidth / 2;
@@ -548,8 +544,8 @@ gboolean on_button_release (GtkWidget* pWidget,
 }
 
 gboolean on_scroll (GtkWidget* pWidget,
-				GdkEventScroll* pScroll,
-				CairoDock *pDock)
+			GdkEventScroll* pScroll,
+			CairoDock *pDock)
 {
 	static double fLastTime = 0;
 	//g_print ("%s (%d)\n", __func__, pScroll->direction);

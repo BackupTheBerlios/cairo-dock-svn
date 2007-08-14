@@ -250,7 +250,7 @@ static void cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data)
 	gchar *cNewDesktopFileName = g_path_get_basename (cNewDesktopFilePath);
 	
 	//\___________________ On ouvre automatiquement l'IHM pour permettre de modifier ses champs.
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cNewDesktopFilePath, "Fill this launcher", 0, 0);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cNewDesktopFilePath, "Fill this launcher", 300, 400);
 	if (config_ok)
 	{
 		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);

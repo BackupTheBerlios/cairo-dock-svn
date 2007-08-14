@@ -29,6 +29,9 @@ extern GHashTable *g_hDocksTable;
 extern gchar *g_cLanguage;
 
 extern int g_iMaxAuthorizedWidth;
+extern gboolean g_bResetScrollOnLeave;
+extern double g_fScrollAcceleration;
+
 extern int g_iSinusoidWidth;
 extern double g_fAmplitude;
 
@@ -454,6 +457,39 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		}
 	}
 	g_strfreev (cIconsTypesList);
+	
+	g_iMaxAuthorizedWidth = g_key_file_get_double (fconf, "CAIRO DOCK", "max autorized width", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_iMaxAuthorizedWidth = 9999;  // valeur par defaut.
+		g_key_file_set_double (fconf, "CAIRO DOCK", "max autorized width", g_iMaxAuthorizedWidth);
+		bFlushConfFileNeeded = TRUE;
+	}
+	
+	g_bResetScrollOnLeave = g_key_file_get_boolean (fconf, "CAIRO DOCK", "reset scroll", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_fAmplitude = 1.0;  // valeur par defaut.
+		g_key_file_set_boolean (fconf, "CAIRO DOCK", "reset scroll", g_fAmplitude);
+		bFlushConfFileNeeded = TRUE;
+	}
+	
+	g_fScrollAcceleration = g_key_file_get_double (fconf, "CAIRO DOCK", "reset scroll acceleration", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_fScrollAcceleration = 0.9;  // valeur par defaut.
+		g_key_file_set_double (fconf, "CAIRO DOCK", "reset scroll acceleration", g_fScrollAcceleration);
+		bFlushConfFileNeeded = TRUE;
+	}
 	
 	g_fAmplitude = g_key_file_get_double (fconf, "CAIRO DOCK", "amplitude", &erreur);
 	if (erreur != NULL)

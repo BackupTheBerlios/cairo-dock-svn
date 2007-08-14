@@ -123,8 +123,7 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 	gtk_window_set_resizable (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_title (GTK_WINDOW (pWindow), "cairo-dock");
 	
-	gtk_widget_show_all (pWindow);
-	
+	gtk_window_move (GTK_WINDOW (pWindow), 0, g_iScreenHeight);
 	pDock->pWidget = pWindow;
 	
 	gtk_widget_add_events (pWindow,
@@ -198,6 +197,7 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 		GDK_ACTION_COPY);
 	
 	g_hash_table_insert (g_hDocksTable, g_strdup (cDockName), pDock);
+	gtk_widget_show_all (pWindow);
 	
 	return pDock;
 }
@@ -364,9 +364,9 @@ void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDock, gpo
 		pDock->iCurrentWidth = pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth;
 		pDock->iCurrentHeight = pDock->iMaxIconHeight + 2 * g_iDockLineWidth;
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
-		//gtk_widget_queue_draw (pDock->pWidget);
 		render (pDock);
 		gtk_window_present (GTK_WINDOW (pDock->pWidget));
+		gtk_widget_queue_draw (pDock->pWidget);
 		while (gtk_events_pending ())
 			gtk_main_iteration ();
 		if (pDock->iRefCount > 0)
@@ -480,9 +480,9 @@ void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *Rec
 	{
 		icon = ic->data;
 		
-		if (icon->pSubDock != NULL)
+		if (icon->pSubDock != NULL && ReceivingDock == NULL)
 		{
-			cairo_dock_destroy_dock (icon->pSubDock, icon->acName, ReceivingDock, cReceivingDockName);
+			cairo_dock_destroy_dock (icon->pSubDock, icon->acName, NULL, NULL);
 			icon->pSubDock = NULL;
 		}
 		
@@ -518,6 +518,9 @@ void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *Rec
 		
 		g_free (cDesktopFilePath);
 	}
+	if (ReceivingDock != NULL)
+		cairo_dock_update_dock_size (ReceivingDock, ReceivingDock->iMaxIconHeight, ReceivingDock->iMinDockWidth);
+	
 	g_list_free (pDock->icons);
 	pDock->icons = NULL;
 	

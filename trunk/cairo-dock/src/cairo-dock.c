@@ -95,8 +95,9 @@ gchar *g_cLanguage = NULL;
 
 gint g_iScreenWidth = 0;  // dimensions de l'ecran.
 gint g_iScreenHeight = 0;
-int g_iMaxAuthorizedWidth = 5000;
-
+int g_iMaxAuthorizedWidth = 300;
+gboolean g_bResetScrollOnLeave;
+double g_fScrollAcceleration;
 gchar *g_cConfFile = NULL;  // le chemin du fichier de conf.
 gchar **g_cDefaultIconDirectory = NULL;  // les repertoires par defaut ou on va chercher les icones.
 gchar *g_cCairoDockDataDir = NULL;  // le repertoire ou on va chercher les .desktop.

@@ -286,6 +286,21 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 		pNewSurface = pNewSurfaceFilled;
 	}
 	
+	if (fAlpha < 1)
+	{
+		cairo_surface_t *pNewSurfaceAlpha = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+			CAIRO_CONTENT_COLOR_ALPHA,
+			*fImageWidth * fMaxScale,
+			*fImageHeight * fMaxScale);
+		cairo_destroy (pCairoContext);
+		pCairoContext = cairo_create (pNewSurfaceAlpha);
+		
+		cairo_set_source_surface (pCairoContext, pNewSurface, 0, 0);
+		cairo_paint_with_alpha (pCairoContext, fAlpha);
+		cairo_surface_destroy (pNewSurface);
+		pNewSurface = pNewSurfaceAlpha;
+	}
+	
 	if (fRotationAngle != 0)
 	{
 		cairo_surface_t *pNewSurfaceRotated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
@@ -312,21 +327,6 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 		cairo_paint (pCairoContext);
 		cairo_surface_destroy (pNewSurface);
 		pNewSurface = pNewSurfaceRotated;
-	}
-	
-	if (fAlpha < 1)
-	{
-		cairo_surface_t *pNewSurfaceAlpha = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-			CAIRO_CONTENT_COLOR_ALPHA,
-			*fImageWidth * fMaxScale,
-			*fImageHeight * fMaxScale);
-		cairo_destroy (pCairoContext);
-		pCairoContext = cairo_create (pNewSurfaceAlpha);
-		
-		cairo_set_source_surface (pCairoContext, pNewSurface, 0, 0);
-		cairo_paint_with_alpha (pCairoContext, fAlpha);
-		cairo_surface_destroy (pNewSurface);
-		pNewSurface = pNewSurfaceAlpha;
 	}
 	
 	cairo_destroy (pCairoContext);

@@ -23,7 +23,6 @@ released under the terms of the GNU General Public License.
 #include <cairo-glitz.h>
 #endif
 
-
 #include "cairo-dock-icons.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-callbacks.h"
@@ -35,6 +34,7 @@ extern GHashTable *g_hDocksTable;
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
 extern int g_iMaxAuthorizedWidth;
+extern double g_fScrollAcceleration;
 
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
@@ -116,7 +116,7 @@ gboolean cairo_dock_move_up (CairoDock *pDock)
 
 gboolean cairo_dock_move_down (CairoDock *pDock)
 {
-	if (pDock->fMagnitude > 0.1)  // on retarde le cachage du dock pour apercevoir les effets.
+	if (pDock->fMagnitude > 0.0)  // on retarde le cachage du dock pour apercevoir les effets.
 		return TRUE;
 	int deltaY_possible = (g_bDirectionUp ? g_iScreenHeight - pDock->iGapY - g_iVisibleZoneHeight : pDock->iGapY + g_iVisibleZoneHeight - pDock->iMaxDockHeight) - pDock->iWindowPositionY;
 	//g_print ("%s (%d)\n", __func__, deltaY_possible);
@@ -214,6 +214,13 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 	else
 		gdk_window_get_pointer (pDock->pWidget->window, &iMouseY, &iMouseX, NULL);
 	
+	if (pDock->iScrollOffset != 0)
+	{
+		pDock->iScrollOffset = pDock->iScrollOffset * g_fScrollAcceleration;
+		if (fabs (pDock->iScrollOffset) < 5)
+			pDock->iScrollOffset = 0;
+	}
+	
 	cairo_dock_calculate_icons (pDock, iMouseX, iMouseY);
 	gtk_widget_queue_draw (pDock->pWidget);
 	
@@ -222,7 +229,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 		Icon *pBouncingIcon = cairo_dock_get_bouncing_icon (pDock->icons);
 		Icon *pRemovingIcon = cairo_dock_get_removing_or_inserting_icon (pDock->icons);
 		
-		if (pBouncingIcon == NULL && pRemovingIcon == NULL)
+		if (pBouncingIcon == NULL && pRemovingIcon == NULL && pDock->iScrollOffset == 0)
 		{
 			pDock->fMagnitude = 0;
 			pDock->iSidShrinkDown = 0;
@@ -254,8 +261,8 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 			cairo_dock_calculate_icons (pDock, iMouseX, iMouseY);  // relance le grossissement si on est dedans.
 			if (! pDock->bInside && pDock->iRefCount > 0)
 			{
-					gdk_window_hide (pDock->pWidget->window);
-					cairo_dock_hide_parent_docks (pDock);
+				gdk_window_hide (pDock->pWidget->window);
+				cairo_dock_hide_parent_docks (pDock);
 			}
 			return FALSE;
 		}
