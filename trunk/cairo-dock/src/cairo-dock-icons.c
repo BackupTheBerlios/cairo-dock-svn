@@ -638,6 +638,8 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	
 	//\_______________ On regarde si le curseur est dans le dock ou pas, et on joue sur la taille des icones en consequence.
 	gboolean bMouseInsideDock = (x_abs >= 0 && x_abs <= pDock->iMinDockWidth);
+	if (! bMouseInsideDock)
+		pDock->fGradientOffsetX = - pDock->iMinDockWidth / 2;  // on fixe les decorations.
 	
 	if (! bMouseInsideDock && pDock->iSidShrinkDown == 0 && pDock->fMagnitude > 0 && pDock->iSidGrowUp == 0)
 	{
