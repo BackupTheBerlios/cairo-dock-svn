@@ -235,7 +235,6 @@ void render (CairoDock *pDock)
 		fDockWidth = pDock->iCurrentWidth - fDockOffsetX + (fRadius + fLineWidth / 2);
 	//g_print ("fDockOffsetX : %.2f\n", fDockOffsetX);
 	
-	//g_print ("fDockOffsetX : %.2f ; fDockWidth : %.2f\n", fDockOffsetX, fDockWidth);
 	if (g_bDirectionUp)
 	{
 		sens = 1;
@@ -284,7 +283,6 @@ void render (CairoDock *pDock)
 		double fDeltaX = (- pDock->fGradientOffsetX - pDock->iCurrentWidth / 2) / g_fStripesSpeedFactor;
 		if (g_bHorizontalDock)
 		{
-			//cairo_translate (pCairoContext, - (pDock->fGradientOffsetX - pDock->iCurrentWidth / 2) / g_fStripesSpeedFactor - pDock->iCurrentWidth / 2, (g_bDirectionUp ? pDock->iCurrentHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
 			cairo_translate (pCairoContext, (fDeltaX + pDock->iCurrentWidth / 2 - pDock->iCurrentWidth / 2), (g_bDirectionUp ? pDock->iCurrentHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
 			cairo_scale (pCairoContext, 1. * pDock->iCurrentWidth / g_fBackgroundImageWidth, 1. * pDock->iMaxIconHeight / g_fBackgroundImageHeight);
 		}

@@ -41,4 +41,3 @@ void cairo_dock_show_all_applis (CairoDock *pDock);
 
 
 #endif
-

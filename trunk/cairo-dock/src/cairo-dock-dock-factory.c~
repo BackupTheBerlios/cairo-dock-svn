@@ -199,6 +199,7 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 	
 	g_hash_table_insert (g_hDocksTable, g_strdup (cDockName), pDock);
 	gtk_widget_show_all (pWindow);
+	gtk_window_move (GTK_WINDOW (pWindow), 500, 500);
 	
 	return pDock;
 }
@@ -235,7 +236,7 @@ void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMin
 	//g_print ("%s (%d, %d)\n", __func__, iMaxIconHeight, iMinDockWidth);
 	pDock->iMaxDockHeight = (int) ((1 + g_fAmplitude) * iMaxIconHeight) + g_iLabelSize + g_iDockLineWidth;
 	pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock->icons, iMinDockWidth)) + 1;  // + 1 pour gerer les largeurs impaires.
-	cairo_dock_calculate_icons (pDock, 0, 0);
+	cairo_dock_calculate_icons (pDock, iMinDockWidth / 2, 1);
 	
 	if (! pDock->bInside && (g_bAutoHide && pDock->iRefCount == 0))
 		return;
