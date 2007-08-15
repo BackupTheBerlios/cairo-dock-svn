@@ -1,0 +1,18 @@
+#!
+
+
+
+[Desktop Entry]
+#s Image's name or path :
+Icon=internet.svg
+#s Launcher's name :
+Name[fr]=HellaNZB
+Name[en]=New Launcher
+#s Exec command :
+Exec=alltray -i /usr/share/icons/Neu/scalable/categories/gnome-globe.svg -stask "gnome-terminal -t HellaNZB -x hellanzb"
+#f Order you want for this launcher among the other launchers :
+Order=10
+#s Name of the container it belongs to:
+Container=_MainDock_
+#b Is this icon a container ?
+Is container=false
