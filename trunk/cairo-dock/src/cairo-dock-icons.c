@@ -630,7 +630,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	int dx = iMouseX - iWidth / 2;  // ecart par rapport au milieu du dock a plat.
 	int x_abs = dx + pDock->iMinDockWidth / 2 - pDock->iScrollOffset;  // ecart par rapport a la gauche du dock minimal.
 	
-	pDock->fGradientOffsetX = - iMouseX;  // indice de decalage des rayures.
+	pDock->fDecorationsOffsetX = - iMouseX;  // indice de decalage des rayures.
 	
 	//\_______________ On calcule l'ensemble des parametres des icones.
 	Icon *pPointedIcon = cairo_dock_calculate_icons_with_position (pDock->icons, x_abs, pDock->fMagnitude, pDock->iMinDockWidth, pDock->iMaxDockWidth, iHeight);  /// a la base ca marchait nickel avec iWidth.
@@ -639,7 +639,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	//\_______________ On regarde si le curseur est dans le dock ou pas, et on joue sur la taille des icones en consequence.
 	gboolean bMouseInsideDock = (x_abs >= 0 && x_abs <= pDock->iMinDockWidth);
 	if (! bMouseInsideDock)
-		pDock->fGradientOffsetX = - pDock->iMinDockWidth / 2;  // on fixe les decorations.
+		pDock->fDecorationsOffsetX = - pDock->iMinDockWidth / 2;  // on fixe les decorations.
 	
 	if (! bMouseInsideDock && pDock->iSidShrinkDown == 0 && pDock->fMagnitude > 0 && pDock->iSidGrowUp == 0)
 	{

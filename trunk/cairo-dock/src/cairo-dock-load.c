@@ -226,7 +226,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, gbool
 	cairo_pop_group_to_source (pCairoContext);
 	if (! g_bHorizontalDock)
 		cairo_rotate (pCairoContext, (g_bDirectionUp ? - G_PI / 2 : G_PI / 2));
-	cairo_paint_with_alpha (pCairoContext, .7);
+	cairo_paint_with_alpha (pCairoContext, 1);  // .7
 	
 	cairo_set_source_rgb (pCairoContext, 1., 1., 1.);
 	cairo_move_to (pCairoContext, 1., 1.);

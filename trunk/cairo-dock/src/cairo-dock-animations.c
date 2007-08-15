@@ -205,7 +205,8 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 
 gboolean cairo_dock_shrink_down (CairoDock *pDock)
 {
-	//g_print ("%s (%f;%d)\n", __func__, pDock->fMagnitude, pDock->iScrollOffset);
+	if (pDock->bIsMainDock)
+		g_print ("%s (%f;%d)\n", __func__, pDock->fMagnitude, pDock->iScrollOffset);
 	if (pDock->fMagnitude > 0.05)
 		pDock->fMagnitude *= g_fShrinkDownFactor; //  0.6
 	else

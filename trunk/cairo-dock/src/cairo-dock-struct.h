@@ -35,7 +35,7 @@ typedef struct _CairoDock {
 	gboolean bMenuVisible;
 	
 	gfloat fMagnitude; // coef multiplicateur de l'amplitude de la sinusoide (entre 0 et 1)
-	gdouble fGradientOffsetX;  // decalage des rayures pour les faire suivre la souris.
+	gdouble fDecorationsOffsetX;  // decalage des decorations pour les faire suivre la souris.
 	
 	gint iMaxIconHeight;  // max des hauteurs des icones.
 	gint iMinDockWidth;  // taille minimale du dock.

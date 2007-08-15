@@ -154,7 +154,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 		
 		if ((g_bAutoHide && pDock->iRefCount == 0))
 		{
-			g_print ("on arrete les animations\n");
+			//g_print ("on arrete les animations\n");
 			Icon *pBouncingIcon = cairo_dock_get_bouncing_icon (pDock->icons);
 			if (pBouncingIcon != NULL)  // s'il y'a une icone en cours d'animation, on l'arrete.
 			{
@@ -273,7 +273,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 		//\______________ Au moins une icone est en cours d'animation suite a un clique, on continue le 'shrink_down'.
 		if (pRemovingIcon != NULL)
 		{
-			g_print ("au moins 1 icone en cours d'insertion/suppression (%f)\n", pRemovingIcon->fPersonnalScale);
+			//g_print ("au moins 1 icone en cours d'insertion/suppression (%f)\n", pRemovingIcon->fPersonnalScale);
 			if (pRemovingIcon->fPersonnalScale == 0.05)
 			{
 				//g_print ("  fin\n");
@@ -287,8 +287,6 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 				pRemovingIcon->fPersonnalScale = 0;
 			}
 		}
-		if (pBouncingIcon != NULL)
-			g_print ("au moins 1 icone cliquee (%d)\n", pBouncingIcon->iCount);
 		
 		pDock->fMagnitude = 0.001;  // on garde la magnitude > 0 de facon a ce qu'un motion_notify ne commence pas un 'grow_up'.
 		return TRUE;

@@ -996,6 +996,9 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		g_iScreenWidth = gdk_screen_get_height (gdkscreen);
 	}
 	
+	if (g_iMaxAuthorizedWidth == 0)
+		g_iMaxAuthorizedWidth = g_iScreenWidth;
+	
 	
 	cairo_dock_remove_all_applets (pDock);  // on est obliges d'arreter tous les applets.
 	

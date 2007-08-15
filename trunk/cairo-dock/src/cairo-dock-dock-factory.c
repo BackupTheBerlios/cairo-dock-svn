@@ -124,7 +124,6 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 	gtk_window_set_resizable (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_title (GTK_WINDOW (pWindow), "cairo-dock");
 	
-	gtk_window_move (GTK_WINDOW (pWindow), 0, g_iScreenHeight);
 	pDock->pWidget = pWindow;
 	
 	gtk_widget_add_events (pWindow,

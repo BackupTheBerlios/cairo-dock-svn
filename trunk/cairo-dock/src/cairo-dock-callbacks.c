@@ -500,6 +500,9 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 					icon->pModule->actionModule ();
 				}
 				
+				if (icon->pSubDock != NULL)
+					gtk_widget_hide (icon->pSubDock->pWidget);
+				
 				if (pDock->iSidShrinkDown == 0)
 					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);  // fera diminuer de taille les icones, et rebondir/tourner/clignoter celle qui est cliquee.
 			}
@@ -557,28 +560,39 @@ gboolean on_scroll (GtkWidget* pWidget,
 	{
 		pNeighborIcon = cairo_dock_get_previous_icon (pDock->icons, pLastPointedIcon);
 		if (pNeighborIcon == NULL)
+			pNeighborIcon = cairo_dock_get_last_icon (pDock->icons);
+		if (pNeighborIcon == NULL)
 			return FALSE;
-		pDock->iScrollOffset += (g_iScrollAmount == 0 ? (pNeighborIcon->fWidth + pLastPointedIcon->fWidth) / 2 : g_iScrollAmount);
+		pDock->iScrollOffset += (g_iScrollAmount == 0 ? (pNeighborIcon->fWidth + (pLastPointedIcon != NULL ? pLastPointedIcon->fWidth : 0)) / 2 : g_iScrollAmount);
 	}
 	else if (pScroll->direction == GDK_SCROLL_DOWN)
 	{
 		pNeighborIcon = cairo_dock_get_next_icon (pDock->icons, pLastPointedIcon);
 		if (pNeighborIcon == NULL)
+			pNeighborIcon = cairo_dock_get_first_icon (pDock->icons);
+		if (pNeighborIcon == NULL)
 			return FALSE;
-		pDock->iScrollOffset -= (g_iScrollAmount == 0 ? (pNeighborIcon->fWidth + pLastPointedIcon->fWidth) / 2 : g_iScrollAmount);
+		pDock->iScrollOffset -= (g_iScrollAmount == 0 ? (pNeighborIcon->fWidth + (pLastPointedIcon != NULL ? pLastPointedIcon->fWidth : 0)) / 2 : g_iScrollAmount);
 	}
 	else
 	{
 		return FALSE;
 	}
+	double fDockWidth = cairo_dock_get_current_dock_width (pDock->icons);
+	g_print ("fDockWidth : %.2f ; iScrollOffset : %d\n", fDockWidth, pDock->iScrollOffset);
+	if (pDock->iScrollOffset > fDockWidth / 2)
+		pDock->iScrollOffset -= fDockWidth;
+	if (pDock->iScrollOffset < - fDockWidth / 2)
+		pDock->iScrollOffset += fDockWidth;
 	
-	Icon *pPointedIcon;
 	if (pDock->bAtBottom || ! pDock->bInside || pDock->iSidShrinkDown > 0 || pScroll->time - fLastTime < g_fRefreshInterval)  // si les icones sont en train de diminuer de taille (suite a un clic) on ne redimensionne pas les icones, le temps que l'animation se finisse.
 	{
+		g_print ("scroll ignore\n");
 		return FALSE;
 	}
 	
 	//\_______________ On recalcule toutes les icones.
+	Icon *pPointedIcon;
 	if (g_bHorizontalDock)
 		pPointedIcon = cairo_dock_calculate_icons (pDock, (int) pScroll->x, (int) pScroll->y);
 	else
