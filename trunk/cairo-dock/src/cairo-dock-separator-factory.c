@@ -76,7 +76,7 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 	*fWidth = 10;
 	*fHeight = 48;
 	
-	cairo_surface_t *pNewSurface;
+	cairo_surface_t *pNewSurface = NULL;
 	if (g_cSeparatorImage != NULL)
 	{
 		gchar *cImagePath = cairo_dock_search_image_path (g_cSeparatorImage);
@@ -94,7 +94,7 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 			FALSE);
 		g_free (cImagePath);
 	}
-	else
+	/*else
 	{
 		int iLineWidth = g_iDockLineWidth;
 		
@@ -117,7 +117,7 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 		cairo_stroke (pCairoContext);
 		
 		cairo_destroy (pCairoContext);
-	}
+	}*/
 	return pNewSurface;
 }
 
@@ -126,10 +126,16 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorType, CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
+	double fWidth, fHeight;
+	cairo_surface_t *pSeparatorSurface = cairo_dock_create_separator_surface (pSourceContext, 1 + g_fAmplitude, &fWidth, &fHeight);
+	
+	if (pSeparatorSurface == NULL)
+		return NULL;
+	
 	Icon *icon = g_new0 (Icon, 1);
-	
-	icon->pIconBuffer = cairo_dock_create_separator_surface (pSourceContext, 1 + g_fAmplitude, &icon->fWidth, &icon->fHeight);
-	
+	icon->pIconBuffer = pSeparatorSurface;
+	icon->fWidth = fWidth;
+	icon->fHeight = fHeight;
 	Icon * pLastLauncher = cairo_dock_get_last_launcher (pDock->icons);
 	icon->fOrder = (pLastLauncher != NULL ? pLastLauncher->fOrder + 1 : 1);
 	icon->iType = iSeparatorType;

@@ -384,6 +384,8 @@ gboolean on_key_press (GtkWidget *pWidget,
 	y = pDock->iWindowPositionY + iHeight - 1;
 	if (pKey->type == GDK_KEY_PRESS)
 	{
+		GdkEventScroll dummyScroll;
+		int iX, iY;
 		switch (pKey->keyval)
 		{
 			case GDK_q :
@@ -441,6 +443,28 @@ gboolean on_key_press (GtkWidget *pWidget,
 					if (pDock->bIsMainDock)
 						cairo_dock_update_conf_file_with_position (g_cConfFile, pDock->iGapX, pDock->iGapY);
 				}
+			break;
+			
+			case GDK_Page_Up :
+				dummyScroll.direction = GDK_SCROLL_UP;
+				gdk_window_get_pointer (pWidget->window, &iX, &iY, NULL);
+				dummyScroll.x = iX;
+				dummyScroll.y = iY;
+				dummyScroll.time = pKey->time;
+				on_scroll (pWidget,
+					&dummyScroll,
+					pDock);
+			break;
+			
+			case GDK_Page_Down:
+				dummyScroll.direction = GDK_SCROLL_DOWN;
+				gdk_window_get_pointer (pWidget->window, &iX, &iY, NULL);
+				dummyScroll.x = iX;
+				dummyScroll.y = iY;
+				dummyScroll.time = pKey->time;
+				on_scroll (pWidget,
+					&dummyScroll,
+					pDock);
 			break;
 		}
 	}
@@ -557,6 +581,10 @@ gboolean on_scroll (GtkWidget* pWidget,
 {
 	static double fLastTime = 0;
 	//g_print ("%s (%d)\n", __func__, pScroll->direction);
+	if (pDock->bAtBottom || ! pDock->bInside || pDock->iSidShrinkDown > 0 || pScroll->time - fLastTime < g_fRefreshInterval)  // si les icones sont en train de diminuer de taille (suite a un clic) on ne redimensionne pas les icones, le temps que l'animation se finisse.
+	{
+		return FALSE;
+	}
 	
 	Icon *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
 	Icon *pNeighborIcon;
@@ -634,7 +662,8 @@ gboolean on_scroll (GtkWidget* pWidget,
 				gdk_window_move (pSubDock->pWidget->window, pSubDock->iWindowPositionY, pSubDock->iWindowPositionX);
 			//gdk_window_show (pSubDock->pWidget->window);
 			g_pLastPointedDock = pDock;
-			gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
+			//gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
+			gtk_widget_show (pSubDock->pWidget);
 		}
 		pLastPointedIcon = pPointedIcon;
 	}
@@ -679,24 +708,11 @@ gboolean on_configure (GtkWidget* pWidget,
 		///if (gdk_window_is_visible (pWidget->window))
 		///	gtk_window_present (GTK_WINDOW (pWidget));
 		gtk_widget_queue_draw (pWidget);
-		/**if (!pDock->bAtBottom)
-		{
-			render (pDock);
-		}
-		else
-		{
-			if (g_bAutoHide)
-				cairo_dock_render_background (pDock);
-			else
-				render (pDock);
-		}*/
-
-
 #ifdef HAVE_GLITZ
 		if (g_pGlitzDrawable)
 			glitz_drawable_update_size (g_pGlitzDrawable,
-						    g_iCurrentWidth,
-						    g_iCurrentHeight);
+				g_iCurrentWidth,
+				g_iCurrentHeight);
 #endif
 	}
 
