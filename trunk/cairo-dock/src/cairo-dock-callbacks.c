@@ -43,6 +43,7 @@ extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
 extern int g_iMaxAuthorizedWidth;
 extern int g_iScrollAmount;
+extern gboolean g_bResetScrollOnLeave;
 
 extern double g_fAmplitude;
 extern int g_iLabelSize;
@@ -175,10 +176,11 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 				cairo_dock_shrink_down (pSubDock);
 			}
 			
-			pSubDock->iGapX = pDock->iGapX + pDock->iScrollOffset + (pPointedIcon->fX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 - pDock->iMaxDockWidth / 2);
+			pSubDock->iGapX = pDock->iGapX + (pPointedIcon->fX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 - pDock->iMaxDockWidth / 2);
 			pSubDock->iGapY = pDock->iGapY + pDock->iMaxDockHeight;
 			
-			cairo_dock_calculate_window_position_at_balance (pSubDock, CAIRO_DOCK_NORMAL_SIZE);
+			int iNewWidth, iNewHeight;
+			cairo_dock_calculate_window_position_at_balance (pSubDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
 			
 			if (g_bHorizontalDock)
 				gdk_window_move (pSubDock->pWidget->window, pSubDock->iWindowPositionX, pSubDock->iWindowPositionY);
@@ -277,12 +279,8 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	gtk_window_present (GTK_WINDOW (pWidget));
 	pDock->bInside = TRUE;
 	
-	
-	cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MAX_SIZE);
-	//pDock->iWindowPositionX = (g_iScreenWidth - pDock->iMaxDockWidth) / 2 + pDock->iGapX;
-	//if (! (g_bAutoHide && pDock->iRefCount == 0))
-		//pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - pDock->iMaxDockHeight - pDock->iGapY : g_iScreenHeight - pDock->iGapY);
-	//else
+	int iNewWidth, iNewHeight;
+	cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MAX_SIZE, &iNewWidth, &iNewHeight);
 	if ((g_bAutoHide && pDock->iRefCount == 0) && pDock->bAtBottom)
 		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - g_iVisibleZoneHeight - pDock->iGapY : g_iVisibleZoneHeight + pDock->iGapY - pDock->iMaxDockHeight);
 	
@@ -292,14 +290,14 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 		gdk_window_move_resize (pWidget->window,
 			pDock->iWindowPositionX,
 			pDock->iWindowPositionY,
-			MIN (g_iMaxAuthorizedWidth, pDock->iMaxDockWidth),
-			pDock->iMaxDockHeight);
+			iNewWidth,
+			iNewHeight);
 	else
 		gdk_window_move_resize (pWidget->window,
 			pDock->iWindowPositionY,
 			pDock->iWindowPositionX,
-			pDock->iMaxDockHeight,
-			MIN (g_iMaxAuthorizedWidth, pDock->iMaxDockWidth));
+			iNewHeight,
+			iNewWidth);
 	//gtk_widget_queue_draw (pWidget);
 	
 	if (pDock->iSidMoveDown > 0)  // si on est en train de descendre, on arrete.
@@ -525,6 +523,11 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 		else if (pButton->button == 2)  // clique milieu.
 		{
 			pDock->iScrollOffset = 0;
+			cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+			if (g_bHorizontalDock)
+				cairo_dock_calculate_icons (pDock, (int) pButton->x, (int) pButton->y);
+			else
+				cairo_dock_calculate_icons (pDock, (int) pButton->y, (int) pButton->x);
 			gtk_widget_queue_draw (pWidget);
 			/*gtk_window_begin_move_drag (GTK_WINDOW (pWidget),
 				pButton->button,
@@ -554,6 +557,7 @@ gboolean on_scroll (GtkWidget* pWidget,
 {
 	static double fLastTime = 0;
 	//g_print ("%s (%d)\n", __func__, pScroll->direction);
+	
 	Icon *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
 	Icon *pNeighborIcon;
 	if (pScroll->direction == GDK_SCROLL_UP)
@@ -563,7 +567,7 @@ gboolean on_scroll (GtkWidget* pWidget,
 			pNeighborIcon = cairo_dock_get_last_icon (pDock->icons);
 		if (pNeighborIcon == NULL)
 			return FALSE;
-		pDock->iScrollOffset += (g_iScrollAmount == 0 ? (pNeighborIcon->fWidth + (pLastPointedIcon != NULL ? pLastPointedIcon->fWidth : 0)) / 2 : g_iScrollAmount);
+		pDock->iScrollOffset += ((pScroll->state & GDK_CONTROL_MASK) || g_iScrollAmount == 0 ? (pNeighborIcon->fWidth + (pLastPointedIcon != NULL ? pLastPointedIcon->fWidth : 0)) / 2 : g_iScrollAmount);
 	}
 	else if (pScroll->direction == GDK_SCROLL_DOWN)
 	{
@@ -572,24 +576,21 @@ gboolean on_scroll (GtkWidget* pWidget,
 			pNeighborIcon = cairo_dock_get_first_icon (pDock->icons);
 		if (pNeighborIcon == NULL)
 			return FALSE;
-		pDock->iScrollOffset -= (g_iScrollAmount == 0 ? (pNeighborIcon->fWidth + (pLastPointedIcon != NULL ? pLastPointedIcon->fWidth : 0)) / 2 : g_iScrollAmount);
+		pDock->iScrollOffset -= ((pScroll->state & GDK_CONTROL_MASK) || g_iScrollAmount == 0 ? (pNeighborIcon->fWidth + (pLastPointedIcon != NULL ? pLastPointedIcon->fWidth : 0)) / 2 : g_iScrollAmount);
 	}
 	else
 	{
 		return FALSE;
 	}
-	double fDockWidth = cairo_dock_get_current_dock_width (pDock->icons);
-	g_print ("fDockWidth : %.2f ; iScrollOffset : %d\n", fDockWidth, pDock->iScrollOffset);
-	if (pDock->iScrollOffset > fDockWidth / 2)
-		pDock->iScrollOffset -= fDockWidth;
-	if (pDock->iScrollOffset < - fDockWidth / 2)
-		pDock->iScrollOffset += fDockWidth;
 	
-	if (pDock->bAtBottom || ! pDock->bInside || pDock->iSidShrinkDown > 0 || pScroll->time - fLastTime < g_fRefreshInterval)  // si les icones sont en train de diminuer de taille (suite a un clic) on ne redimensionne pas les icones, le temps que l'animation se finisse.
-	{
-		g_print ("scroll ignore\n");
-		return FALSE;
-	}
+	if (pDock->iScrollOffset >= pDock->iMinDockWidth)
+		pDock->iScrollOffset -= pDock->iMinDockWidth;
+	if (pDock->iScrollOffset < 0)
+		pDock->iScrollOffset += pDock->iMinDockWidth;
+	//g_print ("iScrollOffset <- %d, (%d;%d)\n", pDock->iScrollOffset, (int) pScroll->x, (int) pScroll->y);
+	
+	//pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
+	cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 	
 	//\_______________ On recalcule toutes les icones.
 	Icon *pPointedIcon;
@@ -621,10 +622,11 @@ gboolean on_scroll (GtkWidget* pWidget,
 				cairo_dock_shrink_down (pSubDock);
 			}
 			
-			pSubDock->iGapX = pDock->iGapX + pDock->iScrollOffset + (pPointedIcon->fX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 - pDock->iMaxDockWidth / 2);
+			pSubDock->iGapX = pDock->iGapX + (pPointedIcon->fX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 - pDock->iMaxDockWidth / 2);
 			pSubDock->iGapY = pDock->iGapY + pDock->iMaxDockHeight;
 			
-			cairo_dock_calculate_window_position_at_balance (pSubDock, CAIRO_DOCK_NORMAL_SIZE);
+			int iNewWidth, iNewHeight;
+			cairo_dock_calculate_window_position_at_balance (pSubDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
 			
 			if (g_bHorizontalDock)
 				gdk_window_move (pSubDock->pWidget->window, pSubDock->iWindowPositionX, pSubDock->iWindowPositionY);
@@ -664,7 +666,13 @@ gboolean on_configure (GtkWidget* pWidget,
 		pDock->iCurrentWidth = iNewWidth;
 		pDock->iCurrentHeight = iNewHeight;
 		
-		cairo_dock_calculate_icons (pDock, iNewWidth / 2, 0);
+		int iX, iY;
+		gdk_window_get_pointer (pWidget->window, &iX, &iY, NULL);
+		if (g_bHorizontalDock)
+			cairo_dock_calculate_icons (pDock, iX, iY);
+		else
+			cairo_dock_calculate_icons (pDock, iY, iX);
+		
 		///if (gdk_window_is_visible (pWidget->window))
 		///	gtk_window_present (GTK_WINDOW (pWidget));
 		gtk_widget_queue_draw (pWidget);

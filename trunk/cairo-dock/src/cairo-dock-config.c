@@ -34,6 +34,7 @@ extern int g_iMaxAuthorizedWidth;
 extern int g_iScrollAmount;
 extern gboolean g_bResetScrollOnLeave;
 extern double g_fScrollAcceleration;
+extern gboolean g_bForceLoop;
 
 extern int g_iSinusoidWidth;
 extern double g_fAmplitude;
@@ -472,14 +473,25 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	}
 	g_strfreev (cIconsTypesList);
 	
-	g_iMaxAuthorizedWidth = g_key_file_get_double (fconf, "CAIRO DOCK", "max autorized width", &erreur);
+	g_iMaxAuthorizedWidth = g_key_file_get_integer (fconf, "CAIRO DOCK", "max autorized width", &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
-		g_iMaxAuthorizedWidth = 9999;  // valeur par defaut.
-		g_key_file_set_double (fconf, "CAIRO DOCK", "max autorized width", g_iMaxAuthorizedWidth);
+		g_iMaxAuthorizedWidth = 0;  // valeur par defaut.
+		g_key_file_set_integer (fconf, "CAIRO DOCK", "max autorized width", g_iMaxAuthorizedWidth);
+		bFlushConfFileNeeded = TRUE;
+	}
+	
+	g_bForceLoop = g_key_file_get_boolean (fconf, "CAIRO DOCK", "force loop", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_bForceLoop = FALSE;  // valeur par defaut.
+		g_key_file_set_boolean (fconf, "CAIRO DOCK", "force loop", g_bForceLoop);
 		bFlushConfFileNeeded = TRUE;
 	}
 	
@@ -500,8 +512,8 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
-		g_fAmplitude = 1.0;  // valeur par defaut.
-		g_key_file_set_boolean (fconf, "CAIRO DOCK", "reset scroll", g_fAmplitude);
+		g_bResetScrollOnLeave = TRUE;  // valeur par defaut.
+		g_key_file_set_boolean (fconf, "CAIRO DOCK", "reset scroll", g_bResetScrollOnLeave);
 		bFlushConfFileNeeded = TRUE;
 	}
 	
@@ -1040,37 +1052,24 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	
 	if (pDock->bAtBottom)
 	{
+		int iNewWidth, iNewHeight;
 		if (g_bAutoHide && pDock->iRefCount == 0)
-			cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MIN_SIZE);
+			cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MIN_SIZE, &iNewWidth, &iNewHeight);
 		else
-			cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE);
+			cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
 		//g_print ("on commence en bas a %dx%d (%d;%d)\n", g_iVisibleZoneWidth, g_iVisibleZoneHeight, pDock->iWindowPositionX, pDock->iWindowPositionY);
-		if (g_bAutoHide && pDock->iRefCount == 0)
-			if (g_bHorizontalDock)
-				gdk_window_move_resize (pDock->pWidget->window,
-					pDock->iWindowPositionX,
-					pDock->iWindowPositionY,
-					g_iVisibleZoneWidth,
-					g_iVisibleZoneHeight);
-			else
-				gdk_window_move_resize (pDock->pWidget->window,
-					pDock->iWindowPositionY,
-					pDock->iWindowPositionX,
-					g_iVisibleZoneHeight,
-					g_iVisibleZoneWidth);
+		if (g_bHorizontalDock)
+			gdk_window_move_resize (pDock->pWidget->window,
+				pDock->iWindowPositionX,
+				pDock->iWindowPositionY,
+				iNewWidth,
+				iNewHeight);
 		else
-			if (g_bHorizontalDock)
-				gdk_window_move_resize (pDock->pWidget->window,
-					pDock->iWindowPositionX,
-					pDock->iWindowPositionY,
-					MIN (g_iMaxAuthorizedWidth, pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth),
-					pDock->iMaxIconHeight + 2 * g_iDockLineWidth);
-			else
-				gdk_window_move_resize (pDock->pWidget->window,
-					pDock->iWindowPositionY,
-					pDock->iWindowPositionX,
-					pDock->iMaxIconHeight + 2 * g_iDockLineWidth,
-					MIN (g_iMaxAuthorizedWidth, pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth));
+			gdk_window_move_resize (pDock->pWidget->window,
+				pDock->iWindowPositionY,
+				pDock->iWindowPositionX,
+				iNewHeight,
+				iNewWidth);
 	}
 	
 	if ((cPreviousLanguage != NULL && g_cLanguage != NULL && strcmp (cPreviousLanguage, g_cLanguage) != 0) || bFlushConfFileNeeded)

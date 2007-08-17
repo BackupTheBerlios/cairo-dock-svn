@@ -42,6 +42,7 @@ extern GHashTable *g_hDocksTable;
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
 extern int g_iMaxAuthorizedWidth;
+extern gboolean g_bForceLoop;
 
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
@@ -233,45 +234,48 @@ CairoDock *cairo_dock_search_dock_from_name (gchar *cDockName)
 void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMinDockWidth)
 {
 	//g_print ("%s (%d, %d)\n", __func__, iMaxIconHeight, iMinDockWidth);
+	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, iMinDockWidth, pDock->iScrollOffset);
 	pDock->iMaxDockHeight = (int) ((1 + g_fAmplitude) * iMaxIconHeight) + g_iLabelSize + g_iDockLineWidth;
-	pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock->icons, iMinDockWidth)) + 1;  // + 1 pour gerer les largeurs impaires.
-	cairo_dock_calculate_icons (pDock, 0, 0);
+	pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, iMinDockWidth)) + 1;  // + 1 pour gerer les largeurs impaires.
+	int iNewMaxWidth = (g_bForceLoop && pDock->iRefCount == 0 ? pDock->iMaxDockWidth / 2 : MIN (g_iMaxAuthorizedWidth, pDock->iMaxDockWidth));
 	
 	if (! pDock->bInside && (g_bAutoHide && pDock->iRefCount == 0))
 		return;
 	else if (pDock->bInside)
 	{
-		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MAX_SIZE);  // inutile de recalculer Y mais bon...
+		int iNewWidth, iNewHeight;
+		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MAX_SIZE, &iNewWidth, &iNewHeight);  // inutile de recalculer Y mais bon...
 		//g_print ("%s () -> %dx%d\n", __func__, g_iMaxDockWidth, g_iMaxDockHeight);
 		if (g_bHorizontalDock)
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionX,
 				pDock->iWindowPositionY,
-				MIN (g_iMaxAuthorizedWidth, pDock->iMaxDockWidth),
-				pDock->iMaxDockHeight);
+				iNewWidth,
+				iNewHeight);
 		else
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionY,
 				pDock->iWindowPositionX,
-				pDock->iMaxDockHeight,
-				MIN (g_iMaxAuthorizedWidth, pDock->iMaxDockWidth));
+				iNewHeight,
+				iNewWidth);
 	}
 	else
 	{
-		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE);  // inutile de recalculer Y mais bon...
+		int iNewWidth, iNewHeight;
+		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);  // inutile de recalculer Y mais bon...
 		//g_print ("%s () -> %dx%d\n", __func__, g_iMaxDockWidth, g_iMaxDockHeight);
 		if (g_bHorizontalDock)
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionX,
 				pDock->iWindowPositionY,
-				MIN (g_iMaxAuthorizedWidth, iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth),
-				iMaxIconHeight + 2 * g_iDockLineWidth);
+				iNewWidth,
+				iNewHeight);
 		else
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionY,
 				pDock->iWindowPositionX,
-				iMaxIconHeight + 2 * g_iDockLineWidth,
-				MIN (g_iMaxAuthorizedWidth, iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth));
+				iNewHeight,
+				iNewWidth);
 	}
 	
 	cairo_dock_update_background_decorations_if_necessary (pDock->pWidget, pDock->iMaxDockWidth, pDock->iMaxIconHeight, (g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)));
@@ -349,6 +353,8 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 			}
 		}
 	}
+	
+	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
 	
 	//\______________ On effectue les actions demandees.
 	if (bAnimated)

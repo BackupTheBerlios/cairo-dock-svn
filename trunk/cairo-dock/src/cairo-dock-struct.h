@@ -25,9 +25,10 @@ typedef struct _CairoDock {
 	gint iGapX;  // decalage de la zone par rapport au milieu bas de l'ecran.
 	gint iGapY;
 	
-	gint iCurrentWidth;  // inutile sans glitz.
+	gint iCurrentWidth;  // taille de la fenetre, apres le redimensionnement par GTK.
 	gint iCurrentHeight;
 	gint iScrollOffset;  // pour faire defiler les icones avec la molette.
+	GList *pFirstDrawnElement;  // pointeur sur le 1er element de la liste des icones a etre dessine, en partant de la gauche.
 	
 	gboolean bAtBottom;
 	gboolean bAtTop;
@@ -101,6 +102,8 @@ typedef struct _Icon {
 	gdouble fTextYOffset;
 	gdouble fXMax;
 	gdouble fXMin;
+	//\____________ calcules a chaque scroll et insertion/suppression d'une icone.
+	gdouble fXAtRest;
 	//\____________ calcules a chaque fois.
 	gdouble fPhase;
 	gdouble fX;

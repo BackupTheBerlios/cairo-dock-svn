@@ -101,6 +101,8 @@ int g_iMaxAuthorizedWidth;
 int g_iScrollAmount;
 gboolean g_bResetScrollOnLeave;
 double g_fScrollAcceleration;
+gboolean g_bForceLoop;
+
 gchar *g_cConfFile = NULL;  // le chemin du fichier de conf.
 gchar **g_cDefaultIconDirectory = NULL;  // les repertoires par defaut ou on va chercher les icones.
 gchar *g_cCairoDockDataDir = NULL;  // le repertoire ou on va chercher les .desktop.

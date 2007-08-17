@@ -7,7 +7,7 @@
 #include "cairo-dock-struct.h"
 
 
-double cairo_dock_get_current_dock_width (GList *pIconList);
+double cairo_dock_get_current_dock_width (CairoDock *pDock);
 
 
 
@@ -29,7 +29,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea);
 void cairo_dock_hide_parent_docks (CairoDock *pDock);
 
 
-void cairo_dock_calculate_window_position_at_balance (CairoDock *pDock, CairoDockSizeType iSizeType);
+void cairo_dock_calculate_window_position_at_balance (CairoDock *pDock, CairoDockSizeType iSizeType, int *iNewWidth, int *iNewHeight);
 
 #endif
 

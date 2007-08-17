@@ -20,6 +20,8 @@ int cairo_dock_compare_icons_order (Icon *icon1, Icon *icon2);
 
 Icon* cairo_dock_get_first_icon (GList *pIconList);
 Icon* cairo_dock_get_last_icon (GList *pIconList);
+Icon *cairo_dock_get_first_drawn_icon (CairoDock *pDock);
+Icon *cairo_dock_get_last_drawn_icon (CairoDock *pDock);
 Icon* cairo_dock_get_first_icon_of_type (GList *pIconList, CairoDockIconType iType);
 Icon* cairo_dock_get_last_icon_of_type (GList *pIconList, CairoDockIconType iType);
 Icon* cairo_dock_get_pointed_icon (GList *pIconList);
@@ -56,11 +58,13 @@ void cairo_dock_remove_all_applis (CairoDock *pDock);
 void cairo_dock_remove_all_applets (CairoDock *pDock);
 
 
-Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight);
+GList * cairo_dock_calculate_icons_positions_at_rest (GList *pIconList, int iMinDockWidth, int iXOffset);
+
+Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirstDrawnElement, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight, int iXOffset);
 
 Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY);
 
-double cairo_dock_calculate_max_dock_width (GList *pIconList, int iFlatDockWidth);
+double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawnElement, int iFlatDockWidth);
 
 
 #endif

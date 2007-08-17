@@ -36,6 +36,7 @@ extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
 extern int g_iMaxAuthorizedWidth;
 extern double g_fScrollAcceleration;
+extern gboolean g_bResetScrollOnLeave;
 
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
@@ -136,20 +137,21 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 		pDock->bAtBottom = TRUE;
 		//pDock->iWindowPositionX = (g_iScreenWidth - g_iVisibleZoneWidth) / 2 + pDock->iGapX;
 		//pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - g_iVisibleZoneHeight - pDock->iGapY : pDock->iGapY);
-		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MIN_SIZE);
+		int iNewWidth, iNewHeight;
+		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MIN_SIZE, &iNewWidth, &iNewHeight);
 		//g_print ("%s () -> %dx%d\n", __func__, g_iVisibleZoneWidth, g_iVisibleZoneHeight);
 		if (g_bHorizontalDock)
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionX,
 				pDock->iWindowPositionY,
-				g_iVisibleZoneWidth,
-				g_iVisibleZoneHeight);
+				iNewWidth,
+				iNewHeight);
 		else
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionY,
 				pDock->iWindowPositionX,
-				g_iVisibleZoneHeight,
-				g_iVisibleZoneWidth);
+				iNewHeight,
+				iNewWidth);
 		pDock->iSidMoveDown = 0;
 		
 		if ((g_bAutoHide && pDock->iRefCount == 0))
@@ -166,6 +168,9 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 				pRemovingIcon->fPersonnalScale = 0.001;
 			}
 			pDock->iScrollOffset = 0;
+			
+			pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
+			pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
 		}
 		
 		return FALSE;
@@ -205,8 +210,6 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 
 gboolean cairo_dock_shrink_down (CairoDock *pDock)
 {
-	if (pDock->bIsMainDock)
-		g_print ("%s (%f;%d)\n", __func__, pDock->fMagnitude, pDock->iScrollOffset);
 	if (pDock->fMagnitude > 0.05)
 		pDock->fMagnitude *= g_fShrinkDownFactor; //  0.6
 	else
@@ -218,11 +221,16 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 	else
 		gdk_window_get_pointer (pDock->pWidget->window, &iMouseY, &iMouseX, NULL);
 	
-	if (pDock->iScrollOffset != 0)
+	if (pDock->iScrollOffset != 0 && g_bResetScrollOnLeave)
 	{
-		pDock->iScrollOffset = pDock->iScrollOffset * g_fScrollAcceleration;
-		if (fabs (pDock->iScrollOffset) < 5)
+		if (pDock->iScrollOffset < pDock->iMinDockWidth / 2)
+			pDock->iScrollOffset = pDock->iScrollOffset * g_fScrollAcceleration;
+		else
+			pDock->iScrollOffset += ceil ((pDock->iMinDockWidth - pDock->iScrollOffset) * (1 - g_fScrollAcceleration));
+		if (pDock->iScrollOffset < 5 || pDock->iMinDockWidth - pDock->iScrollOffset < 5)
 			pDock->iScrollOffset = 0;
+		pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
+		pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
 	}
 	
 	cairo_dock_calculate_icons (pDock, iMouseX, iMouseY);
@@ -233,27 +241,28 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 		Icon *pBouncingIcon = cairo_dock_get_bouncing_icon (pDock->icons);
 		Icon *pRemovingIcon = cairo_dock_get_removing_or_inserting_icon (pDock->icons);
 		
-		if (pBouncingIcon == NULL && pRemovingIcon == NULL && pDock->iScrollOffset == 0)
+		if (pBouncingIcon == NULL && pRemovingIcon == NULL && (! g_bResetScrollOnLeave || pDock->iScrollOffset == 0))
 		{
 			pDock->fMagnitude = 0;
 			pDock->iSidShrinkDown = 0;
+			int iNewWidth, iNewHeight;
 			
 			if (! (g_bAutoHide && pDock->iRefCount == 0) && ! pDock->bInside)
 			{
 				//g_print ("on arrive en bas -> %dx%d\n", g_iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth, g_iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth);
-				cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE);
+				cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
 				if (g_bHorizontalDock)
 					gdk_window_move_resize (pDock->pWidget->window,
 						pDock->iWindowPositionX,
 						pDock->iWindowPositionY,
-						MIN (g_iMaxAuthorizedWidth, pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth),
-						pDock->iMaxIconHeight + 2 * g_iDockLineWidth);
+						iNewWidth,
+						iNewHeight);
 				else
 					gdk_window_move_resize (pDock->pWidget->window,
 						pDock->iWindowPositionY,
 						pDock->iWindowPositionX,
-						pDock->iMaxIconHeight + 2 * g_iDockLineWidth,
-						MIN (g_iMaxAuthorizedWidth, pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth));
+						iNewHeight,
+						iNewWidth);
 			}
 			
 			gint iMouseX, iMouseY;

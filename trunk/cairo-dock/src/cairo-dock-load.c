@@ -224,9 +224,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, gbool
 		pango_cairo_show_layout (pCairoContext, pLayout);
 	}
 	cairo_pop_group_to_source (pCairoContext);
-	if (! g_bHorizontalDock)
-		cairo_rotate (pCairoContext, (g_bDirectionUp ? - G_PI / 2 : G_PI / 2));
-	cairo_paint_with_alpha (pCairoContext, 1);  // .7
+	cairo_paint_with_alpha (pCairoContext, .75);
 	
 	cairo_set_source_rgb (pCairoContext, 1., 1., 1.);
 	cairo_move_to (pCairoContext, 1., 1.);
@@ -241,31 +239,39 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, gbool
 					 log.height     - ink.y);*/
 	icon->fTextXOffset = log.width / 2. - ink.x;
 	//icon->fTextYOffset = log.height     - ink.y;
-	icon->fTextYOffset = iLabelSize;
+	icon->fTextYOffset = iLabelSize - (log.height + 1) + ink.y ;  // en tenant compte de l'ecart du bas du texte.
+	//g_print ("%s -> %.2f (%d;%d)\n", icon->acName, icon->fTextYOffset, log.height, ink.y);
 	
-	double fAdjustmentFactor = 1. * iLabelSize / (ink.height + 2);
-	if (fAdjustmentFactor < .999)  // le texte obtenu est trop grand (pas de beaucoup, mais cela arrive avec sertaines polices).
+	double fRotationAngle = (g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2));
+	if (fRotationAngle != 0)
 	{
-		icon->pTextBuffer = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-		CAIRO_CONTENT_COLOR_ALPHA,
-		(ink.width + 2) * fAdjustmentFactor, (ink.height + 2) * fAdjustmentFactor);
-		pCairoContext = cairo_create (icon->pTextBuffer);
+		cairo_surface_t *pNewSurfaceRotated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+			CAIRO_CONTENT_COLOR_ALPHA,
+			ink.height + 2,
+			ink.width + 2);
+		pCairoContext = cairo_create (pNewSurfaceRotated);
 		
-		cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
-		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
+		if (fRotationAngle < 0)
+		{
+			cairo_move_to (pCairoContext, ink.height + 2, 0);
+			cairo_rotate (pCairoContext, fRotationAngle);
+			cairo_translate (pCairoContext, - (ink.width + 2), 0);
+		}
+		else
+		{
+			cairo_move_to (pCairoContext, 0, 0);
+			cairo_rotate (pCairoContext, fRotationAngle);
+			cairo_translate (pCairoContext, 0, - (ink.height + 2));
+		}
+		cairo_set_source_surface (pCairoContext, pNewSurface, 0, 0);
+		
 		cairo_paint (pCairoContext);
-		
-		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
-		cairo_move_to (pCairoContext, 0, 0);
-		cairo_scale (pCairoContext, fAdjustmentFactor, fAdjustmentFactor);
-		cairo_set_source_surface (pCairoContext, pNewSurface, 0., 0.);
-		cairo_paint (pCairoContext);
-		
 		cairo_surface_destroy (pNewSurface);
+		pNewSurface = pNewSurfaceRotated;
 		cairo_destroy (pCairoContext);
 	}
-	else
-		icon->pTextBuffer = pNewSurface;
+	
+	icon->pTextBuffer = pNewSurface;
 	
 	g_object_unref (pLayout);
 }
