@@ -1118,6 +1118,7 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 	
 	if (iWindowWidth != 0 && iWindowHeight != 0)
 		gtk_window_resize (GTK_WINDOW (pDialog), iWindowWidth, iWindowHeight);
+	gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER);
 	
 	gint action = gtk_dialog_run (GTK_DIALOG (pDialog));
 	gboolean config_ok = TRUE;

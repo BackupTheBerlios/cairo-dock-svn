@@ -257,7 +257,7 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, int 
 			fTheta = (fX / fDeltaLeft - 1) * G_PI / 2;
 			fX = b * (1 + sin (fTheta));
 			fY = (g_bDirectionUp ? a * (1 + cos (fTheta)) : - a * cos (fTheta) + g_iDockLineWidth);
-			fAlpha = MAX (0.2, MIN (0.8, sin (fTheta) * sin (fTheta)));
+			fAlpha = MAX (0.2, MIN (0.75, sin (fTheta) * sin (fTheta)));
 			//g_print ("  theta = %.2fdeg -> fX = %.2f; fY = %.2f; alpha = %.2f\n", fTheta / G_PI*180, fX, fY, fAlpha);
 		}
 		else
@@ -267,7 +267,7 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, int 
 			fTheta = ((fX + icon->fWidth * icon->fScale - iCurrentWidth) / fDeltaRight + 1) * G_PI / 2;
 			fX = b * (1 + sin (fTheta));
 			fY = (g_bDirectionUp ? a * (1 + cos (fTheta)) : - a * cos (fTheta) + g_iDockLineWidth);
-			fAlpha = MAX (0.2, MIN (0.8, sin (fTheta) * sin (fTheta)));
+			fAlpha = MAX (0.2, MIN (0.75, sin (fTheta) * sin (fTheta)));
 			//g_print ("  theta = %.2fdeg -> fX = %.2f; fY = %.2f; alpha = %.2f\n", fTheta / G_PI*180, fX, fY, fAlpha);
 		}
 	}

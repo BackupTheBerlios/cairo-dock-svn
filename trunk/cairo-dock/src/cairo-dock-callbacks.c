@@ -272,7 +272,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	if (pDock->bAtTop || pDock->bInside)
+	if (pDock->bAtTop || pDock->bInside || pDock->iSidMoveDown != 0)  // le 'iSidMoveDown != 0' est la pour empecher le dock de "vibrer" si l'utilisateur sort par en bas avec l'auto-hide active.
 		return FALSE;
 	//g_print ("%s ()\n", __func__);
 	
