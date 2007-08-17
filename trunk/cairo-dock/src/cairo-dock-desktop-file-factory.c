@@ -101,7 +101,7 @@ Name[fr] = Nouveau Lanceur\n\
 Name[en] = New Launcher\n\
 #s Exec command :\n\
 Exec = echo 'edit me !'\n\
-#s Image's name or path :\n\
+#S Image's name or path :\n\
 Icon = \n\
 #f Order you want for this launcher among the other launchers :\n\
 Order = %d\n\
@@ -124,7 +124,7 @@ Name[fr] = %s\n\
 Name[en] = %s\n\
 #s Exec command :\
 Exec = %s %s\n\n\
-#s Image's name or path :\
+#S Image's name or path :\
 Icon = %s\n\
 #f Order you want for this launcher among the other launchers :\
 Order = %f\n\
@@ -173,7 +173,7 @@ Is container = false",
 			g_key_file_set_comment (pKeyFile, NULL, NULL, "!", NULL);
 			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Name", "s Launcher's name :", NULL);
 			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Exec", "s Exec command :", NULL);
-			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Icon", "s Image's name or path :", NULL);
+			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Icon", "S Image's name or path :", NULL);
 			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Order", "f Order you want for this launcher among the other launchers :", NULL);
 			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Container", "s Name of the container it belongs to:", NULL);
 			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Is container", "b Is this icon a container ?", NULL);

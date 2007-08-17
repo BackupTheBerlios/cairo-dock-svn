@@ -662,16 +662,19 @@ gboolean on_configure (GtkWidget* pWidget,
 	
 	if (iNewWidth != pDock->iCurrentWidth || iNewHeight != pDock->iCurrentHeight)
 	{
-		//g_print ("-> %dx%d\n", iNewWidth, iNewHeight);
+		g_print ("-> %dx%d\n", iNewWidth, iNewHeight);
 		pDock->iCurrentWidth = iNewWidth;
 		pDock->iCurrentHeight = iNewHeight;
 		
 		int iX, iY;
-		gdk_window_get_pointer (pWidget->window, &iX, &iY, NULL);
 		if (g_bHorizontalDock)
-			cairo_dock_calculate_icons (pDock, iX, iY);
+			gdk_window_get_pointer (pWidget->window, &iX, &iY, NULL);
 		else
-			cairo_dock_calculate_icons (pDock, iY, iX);
+			gdk_window_get_pointer (pWidget->window, &iY, &iX, NULL);
+		if (iX < 0 || iX > pDock->iCurrentWidth)
+			iX = 0;
+		
+		cairo_dock_calculate_icons (pDock, iX, iY);
 		
 		///if (gdk_window_is_visible (pWidget->window))
 		///	gtk_window_present (GTK_WINDOW (pWidget));

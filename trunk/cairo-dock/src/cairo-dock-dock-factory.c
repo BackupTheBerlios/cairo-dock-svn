@@ -199,7 +199,6 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 	
 	g_hash_table_insert (g_hDocksTable, g_strdup (cDockName), pDock);
 	gtk_widget_show_all (pWindow);
-	gtk_window_move (GTK_WINDOW (pWindow), 500, 500);
 	
 	return pDock;
 }

@@ -724,10 +724,10 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	int iWidth, iHeight;
 	iWidth = pDock->iCurrentWidth;
 	iHeight = pDock->iCurrentHeight;
-	if (g_bHorizontalDock)
+	/**if (g_bHorizontalDock)
 		gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iWidth, &iHeight);
 	else
-		gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iHeight, &iWidth);
+		gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iHeight, &iWidth);*/
 	//g_print ("%s (%dx%d, %dx%d)\n", __func__, iMouseX, iMouseY, iWidth, iHeight);
 	
 	int dx = iMouseX - iWidth / 2;  // ecart par rapport au milieu du dock a plat.
@@ -846,10 +846,13 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 		icon->fXMin += fMaxDockWidth / 2;
 		icon->fXMax += fMaxDockWidth / 2;
 		//g_print ("%s : [%d;%d]\n", icon->acName, (int) icon->fXMin, (int) icon->fXMax);
+		icon->fX = icon->fXAtRest;
+		icon->fScale = 1;
 	}
 	
 	//\_______________ On recalcule les icones avec une position situee en dehors du dock pour remettre les icones a plat.
-	cairo_dock_calculate_icons_with_position (pIconList, pFirstDrawnElement, -1e4, 1, iFlatDockWidth, 0, 0, 0);
+	
+	
 	
 	return fMaxDockWidth;
 }

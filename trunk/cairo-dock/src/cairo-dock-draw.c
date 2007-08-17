@@ -223,7 +223,7 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, int 
 	double fDeltaLeft = (iMaxDockWidth - iCurrentWidth) / 2, fDeltaRight = fDeltaLeft;
 	double fX, fY, fAlpha, fTheta;
 	fX = icon->fX + (iCurrentWidth - iMaxDockWidth) / 2;
-	//g_print ("icon->fX : %.2f -> %.2f\n", icon->fX, fX);
+	//g_print ("(%s) icon->fX : %.2f -> %.2f\n", icon->acName, icon->fX, fX);
 	if ((fX > 0 && fX + icon->fWidth * icon->fScale < iCurrentWidth))
 	{
 		fAlpha = 1;
