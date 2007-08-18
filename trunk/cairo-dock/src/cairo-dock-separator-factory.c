@@ -62,6 +62,7 @@ extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern gchar *g_cSeparatorImage;
+extern gboolean g_bRevolveSeparator;
 
 #ifdef HAVE_GLITZ
 extern gboolean g_bUseGlitz;
@@ -80,6 +81,19 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 	if (g_cSeparatorImage != NULL)
 	{
 		gchar *cImagePath = cairo_dock_search_image_path (g_cSeparatorImage);
+		double fRotationAngle;
+		if (! g_bRevolveSeparator)
+			fRotationAngle = 0;
+		else if (g_bHorizontalDock)
+			if (g_bDirectionUp)
+				fRotationAngle = 0;
+			else
+				fRotationAngle = G_PI;
+		else
+			if (g_bDirectionUp)
+				fRotationAngle = -G_PI/2;
+			else
+				fRotationAngle = G_PI/2;
 		pNewSurface = cairo_dock_create_surface_from_image (cImagePath,
 			pSourceContext,
 			fMaxScale,
@@ -89,7 +103,7 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 			g_tMaxIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12],
 			fWidth,
 			fHeight,
-			(g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)),
+			fRotationAngle,
 			1,
 			FALSE);
 		g_free (cImagePath);

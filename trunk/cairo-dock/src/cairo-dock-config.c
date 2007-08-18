@@ -105,6 +105,8 @@ extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 
 extern gchar *g_cSeparatorImage;
+extern gboolean g_bRevolveSeparator;
+
 extern GHashTable *g_hModuleTable;
 
 #ifdef HAVE_GLITZ
@@ -181,17 +183,6 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		cScreenBorder = g_strdup ("bottom");
 	}
 	
-	g_bReverseVisibleImage = g_key_file_get_boolean (fconf, "POSITION", "reverse visible image", &erreur);
-	if (erreur != NULL)
-	{
-		g_print ("Attention : %s\n", erreur->message);
-		g_error_free (erreur);
-		erreur = NULL;
-		g_bReverseVisibleImage = TRUE;  // valeur par defaut.
-		g_key_file_set_boolean (fconf, "POSITION", "reverse visible image", g_bReverseVisibleImage);
-		bFlushConfFileNeeded = TRUE;
-	}
-	
 	
 	//\___________________ On recupere les parametres de la zone visible.
 	gchar *cVisibleZoneImageFile = g_key_file_get_string (fconf, "AUTO-HIDE", "background image", &erreur);
@@ -250,6 +241,17 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		erreur = NULL;
 		g_bAutoHide = TRUE;  // valeur par defaut.
 		g_key_file_set_boolean (fconf, "AUTO-HIDE", "auto-hide", g_bAutoHide);
+		bFlushConfFileNeeded = TRUE;
+	}
+	
+	g_bReverseVisibleImage = g_key_file_get_boolean (fconf, "AUTO-HIDE", "reverse visible image", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_bReverseVisibleImage = TRUE;  // valeur par defaut.
+		g_key_file_set_boolean (fconf, "AUTO-HIDE", "reverse visible image", g_bReverseVisibleImage);
 		bFlushConfFileNeeded = TRUE;
 	}
 	
@@ -970,6 +972,17 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	{
 		g_free (g_cSeparatorImage);
 		g_cSeparatorImage = NULL;
+	}
+	
+	g_bRevolveSeparator = g_key_file_get_boolean (fconf, "SEPARATORS", "revolve separator image", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_bRevolveSeparator = TRUE;  // valeur par defaut.
+		g_key_file_set_boolean (fconf, "SEPARATORS", "revolve separator image", g_bRevolveSeparator);
+		bFlushConfFileNeeded = TRUE;
 	}
 	
 	

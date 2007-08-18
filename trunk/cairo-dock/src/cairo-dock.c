@@ -181,6 +181,7 @@ GHashTable *g_hAppliTable = NULL;  // table des PID connus de cairo-dock (affich
 GHashTable *g_hXWindowTable = NULL;  // table des fenetres X affichees dans le dock.
 int g_iSidUpdateAppliList = 0;
 gchar *g_cSeparatorImage = NULL;
+gboolean g_bRevolveSeparator;
 
 GHashTable *g_hModuleTable = NULL;  // table des modules charges dans l'appli.
 

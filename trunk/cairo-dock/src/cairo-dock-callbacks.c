@@ -161,7 +161,8 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		//g_print ("on change d'icone\n");
 		if (pDock == g_pLastPointedDock && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
 		{
-			gdk_window_hide (pLastPointedIcon->pSubDock->pWidget->window);
+			if (GTK_WIDGET_VISIBLE (pLastPointedIcon->pSubDock->pWidget))
+				gdk_window_hide (pLastPointedIcon->pSubDock->pWidget->window);
 		}
 		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL)
 		{
@@ -451,6 +452,7 @@ gboolean on_key_press (GtkWidget *pWidget,
 				dummyScroll.x = iX;
 				dummyScroll.y = iY;
 				dummyScroll.time = pKey->time;
+				dummyScroll.state = pKey->state;
 				on_scroll (pWidget,
 					&dummyScroll,
 					pDock);
@@ -462,6 +464,7 @@ gboolean on_key_press (GtkWidget *pWidget,
 				dummyScroll.x = iX;
 				dummyScroll.y = iY;
 				dummyScroll.time = pKey->time;
+				dummyScroll.state = pKey->state;
 				on_scroll (pWidget,
 					&dummyScroll,
 					pDock);
@@ -635,7 +638,8 @@ gboolean on_scroll (GtkWidget* pWidget,
 		//g_print ("on change d'icone\n");
 		if (pDock == g_pLastPointedDock && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
 		{
-			gdk_window_hide (pLastPointedIcon->pSubDock->pWidget->window);
+			if (GTK_WIDGET_VISIBLE (pLastPointedIcon->pSubDock->pWidget))
+				gdk_window_hide (pLastPointedIcon->pSubDock->pWidget->window);
 		}
 		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL)
 		{
@@ -662,8 +666,8 @@ gboolean on_scroll (GtkWidget* pWidget,
 				gdk_window_move (pSubDock->pWidget->window, pSubDock->iWindowPositionY, pSubDock->iWindowPositionX);
 			//gdk_window_show (pSubDock->pWidget->window);
 			g_pLastPointedDock = pDock;
-			//gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
-			gtk_widget_show (pSubDock->pWidget);
+			gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
+			//gtk_widget_show (pSubDock->pWidget);
 		}
 		pLastPointedIcon = pPointedIcon;
 	}
