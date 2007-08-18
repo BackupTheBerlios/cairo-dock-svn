@@ -18,22 +18,22 @@ released under the terms of the GNU General Public License.
 
 
 typedef struct _CairoDock {
-	GList* icons;
-	GtkWidget *pWidget;
-	gboolean bIsMainDock;
+	GList* icons;  // la liste de ses icones.
+	GtkWidget *pWidget;  // sa fenetre de dessin.
+	gboolean bIsMainDock;  // si le dock est le dock racine.
 	gint iRefCount;  // le nombre d'icones pointant sur lui.
 	gint iGapX;  // decalage de la zone par rapport au milieu bas de l'ecran.
 	gint iGapY;
 	
-	gint iCurrentWidth;  // taille de la fenetre, apres le redimensionnement par GTK.
+	gint iCurrentWidth;  // taille de la fenetre, _apres_ le redimensionnement par GTK.
 	gint iCurrentHeight;
 	gint iScrollOffset;  // pour faire defiler les icones avec la molette.
 	GList *pFirstDrawnElement;  // pointeur sur le 1er element de la liste des icones a etre dessine, en partant de la gauche.
 	
-	gboolean bAtBottom;
-	gboolean bAtTop;
-	gboolean bInside;
-	gboolean bMenuVisible;
+	gboolean bAtBottom;  // le dock est en bas au repos.
+	gboolean bAtTop;  // le dock est en haut pret a etre utilise.
+	gboolean bInside;  // lorsque la souris est dans le dock.
+	gboolean bMenuVisible;  // lorsque le menu du clique droit est visible.
 	
 	gfloat fMagnitude; // coef multiplicateur de l'amplitude de la sinusoide (entre 0 et 1)
 	gdouble fDecorationsOffsetX;  // decalage des decorations pour les faire suivre la souris.
@@ -49,6 +49,11 @@ typedef struct _CairoDock {
 	gint iSidMoveUp;  // serial ID du thread de montee de la fenetre.
 	gint iSidGrowUp;  // serial ID du thread de grossisement des icones.
 	gint iSidShrinkDown;  // serial ID du thread de diminution des icones.
+#ifdef HAVE_GLITZ
+	glitz_drawable_format_t *pDrawFormat;
+	glitz_drawable_t* pGlitzDrawable;
+	glitz_format_t* pGlitzFormat;
+#endif // HAVE_GLITZ
 	} CairoDock;
 
 

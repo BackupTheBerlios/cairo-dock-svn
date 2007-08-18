@@ -82,21 +82,78 @@ extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 extern gchar *g_cConfFile;
 extern GHashTable *g_hModuleTable;
 
-
 extern gboolean g_bKeepAbove;
 extern gboolean g_bSkipPager;
 extern gboolean g_bSkipTaskbar;
 extern gboolean g_bSticky;
 
+extern gboolean g_bUseGlitz;
 
-static void
-on_alpha_screen_changed (GtkWidget* pWidget,
-			GdkScreen* pOldScreen,
-			GtkWidget* pLabel)
+static void _cairo_dock_set_colormap (GtkWidget* pWidget)
 {
-	GdkScreen* pScreen = gtk_widget_get_screen (pWidget);
-	GdkColormap* pColormap = gdk_screen_get_rgba_colormap (pScreen);
+	GdkColormap* pColormap;
+#ifdef HAVE_GLITZ
+	if (g_bUseGlitz)
+	{
+		glitz_drawable_format_t templ, *format;
+		unsigned long	    mask = GLITZ_FORMAT_DOUBLEBUFFER_MASK;
+		XVisualInfo		    *vinfo = NULL;
+		int			    screen = 0;
+		GdkVisual		    *visual;
+		GdkDisplay		    *gdkdisplay;
+		Display		    *xdisplay;
+		
+		templ.doublebuffer = 1;
+		gdkdisplay = gtk_widget_get_display (pWindow);
+		xdisplay   = gdk_x11_display_get_xdisplay (gdkdisplay);
+		
+		i = 0;
+		do
+		{
+			format = glitz_glx_find_window_format (xdisplay,
+				screen,
+				mask,
+				&templ,
+				i++);
+			if (format)
+			{
+				vinfo = glitz_glx_get_visual_info_from_format (xdisplay,
+					screen,
+					format);
+				if (vinfo->depth == 32)
+				{
+					pDock->pDrawFormat = format;
+					break;
+				}
+				else if (!pDock->pDrawFormat)
+				{
+					pDock->pDrawFormat = format;
+				}
+			}
+		} while (format);
+		
+		if (! pDock->pDrawFormat)
+		{
+			g_print ("Attention : no double buffered GLX visual\n");
+		}
+		else
+		{
+			vinfo = glitz_glx_get_visual_info_from_format (xdisplay,
+				screen,
+				gDrawFormat);
 	
+			visual = gdkx_visual_get (vinfo->visualid);
+			pColormap = gdk_colormap_new (visual, TRUE);
+	
+			gtk_widget_set_colormap (pWindow, pColormap);
+			gtk_widget_set_double_buffered (pWindow, FALSE);
+			return ;
+		}
+	}
+#endif
+	
+	GdkScreen* pScreen = gtk_widget_get_screen (pWidget);
+	pColormap = gdk_screen_get_rgba_colormap (pScreen);
 	if (!pColormap)
 		pColormap = gdk_screen_get_rgb_colormap (pScreen);
 		
@@ -118,7 +175,8 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 	gtk_window_set_gravity (GTK_WINDOW (pWindow), GDK_GRAVITY_STATIC);
 	
 	gtk_window_set_type_hint (GTK_WINDOW (pWindow), iWmHint);
-	on_alpha_screen_changed (pWindow, NULL, NULL);
+	
+	_cairo_dock_set_colormap (pWindow);
 	
 	gtk_widget_set_app_paintable (pWindow, TRUE);
 	gtk_window_set_decorated (GTK_WINDOW (pWindow), FALSE);
@@ -128,7 +186,7 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 	pDock->pWidget = pWindow;
 	
 	gtk_widget_add_events (pWindow,
-		GDK_BUTTON_PRESS_MASK |
+		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | 
 		GDK_POINTER_MOTION_MASK |
 		GDK_POINTER_MOTION_HINT_MASK);
 	
@@ -160,7 +218,7 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 		pDock);
 	g_signal_connect (G_OBJECT (pWindow),
 		"button-release-event",
-		G_CALLBACK (on_button_release),
+		G_CALLBACK (on_button_press2),
 		pDock);
 	g_signal_connect (G_OBJECT (pWindow),
 		"scroll-event",

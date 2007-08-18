@@ -109,10 +109,6 @@ extern gboolean g_bRevolveSeparator;
 
 extern GHashTable *g_hModuleTable;
 
-#ifdef HAVE_GLITZ
-extern gboolean g_bUseGlitz;
-#endif // HAVE_GLITZ
-
 
 int cairo_dock_get_number_from_name (gchar *cName, gchar **tNamesList)
 {
@@ -1095,15 +1091,11 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		
 		cairo_dock_update_conf_file_with_modules (conf_file, g_hModuleTable);
 		cairo_dock_update_conf_file_with_translations (conf_file, CAIRO_DOCK_SHARE_DATA_DIR);
-		/*gchar *cTranslatedFilePath = g_strdup_printf ("%s/cairo-dock-%s.conf", CAIRO_DOCK_SHARE_DATA_DIR, g_cLanguage);
-		cairo_dock_apply_translation_on_conf_file (conf_file, cTranslatedFilePath);
-		g_free (cTranslatedFilePath);
-		cairo_dock_update_conf_file_with_modules (conf_file, g_hModuleTable);
-		cairo_dock_update_conf_file_with_translations (conf_file, CAIRO_DOCK_SHARE_DATA_DIR);*/
 	}
 	g_free (cPreviousLanguage);
 	
 	g_key_file_free (fconf);
+	gtk_widget_queue_draw (pDock->pWidget);
 }
 
 
@@ -1131,7 +1123,8 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 	
 	if (iWindowWidth != 0 && iWindowHeight != 0)
 		gtk_window_resize (GTK_WINDOW (pDialog), iWindowWidth, iWindowHeight);
-	gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER);
+	//gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER);
+	gtk_window_move (GTK_WINDOW (pDialog), (g_iScreenWidth - iWindowWidth) / 2, (g_iScreenHeight - iWindowHeight) / 2);
 	
 	gint action = gtk_dialog_run (GTK_DIALOG (pDialog));
 	gboolean config_ok = TRUE;

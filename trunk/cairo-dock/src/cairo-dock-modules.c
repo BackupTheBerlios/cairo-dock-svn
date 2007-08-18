@@ -18,15 +18,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <glib/gstdio.h>
 
 #include <cairo.h>
-#include <pango/pango.h>
-#include <librsvg/rsvg.h>
-#include <librsvg/rsvg-cairo.h>
-
-#ifdef HAVE_GLITZ
-#include <gdk/gdkx.h>
-#include <glitz-glx.h>
-#include <cairo-glitz.h>
-#endif
 
 #include "cairo-dock-draw.h"
 #include "cairo-dock-icons.h"

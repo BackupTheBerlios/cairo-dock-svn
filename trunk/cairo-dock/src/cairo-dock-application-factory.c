@@ -70,13 +70,7 @@ extern Display *g_XDisplay;
 extern GHashTable *g_hAppliTable;
 extern GHashTable *g_hXWindowTable;
 
-#ifdef HAVE_GLITZ
 extern gboolean g_bUseGlitz;
-extern glitz_drawable_format_t *gDrawFormat;
-extern glitz_drawable_t* g_pGlitzDrawable;
-extern glitz_format_t* g_pGlitzFormat;
-#endif // HAVE_GLITZ
-
 
 
 cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuffer, int iBufferNbElements, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)

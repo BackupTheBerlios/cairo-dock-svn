@@ -84,13 +84,6 @@ extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
 
 extern GtkWidget *g_pWidget;
 
-#ifdef HAVE_GLITZ
-extern gboolean g_bUseGlitz;
-extern glitz_drawable_format_t *gDrawFormat;
-extern glitz_drawable_t* g_pGlitzDrawable;
-extern glitz_format_t* g_pGlitzFormat;
-#endif // HAVE_GLITZ
-
 
 gboolean cairo_dock_move_up (CairoDock *pDock)
 {

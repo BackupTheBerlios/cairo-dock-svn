@@ -194,12 +194,7 @@ gboolean g_bSkipPager = TRUE;
 gboolean g_bSkipTaskbar = TRUE;
 gboolean g_bSticky = TRUE;
 
-#ifdef HAVE_GLITZ
-gboolean g_bUseGlitz = TRUE;
-glitz_drawable_format_t *gDrawFormat = NULL;
-glitz_drawable_t* g_pGlitzDrawable = NULL;
-glitz_format_t* g_pGlitzFormat = NULL;
-#endif // HAVE_GLITZ
+gboolean g_bUseGlitz = FALSE;
 
 
 int
@@ -223,15 +218,13 @@ main (int argc, char** argv)
 #ifdef HAVE_GLITZ
 			g_bUseGlitz = TRUE;
 #else
-			fprintf (stderr, "Not compiled with glitz\n");
-			return 1;
+			g_print ("Attention : Cairo-Dock was not compiled with glitz\n");
+			g_bUseGlitz = FALSE;
 #endif
 		}
 		else if (strcmp (argv[i], "--no-glitz") == 0)
 		{
-#ifdef HAVE_GLITZ
 			g_bUseGlitz = FALSE;
-#endif
 		}
 		else if (strcmp (argv[i], "--no-keep-above") == 0)
 			g_bKeepAbove = FALSE;

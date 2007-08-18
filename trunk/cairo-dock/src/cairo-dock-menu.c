@@ -27,7 +27,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <cairo-glitz.h>
 #endif
 
-
 #include "cairo-dock-config.h"
 #include "cairo-dock-draw.h"
 #include "cairo-dock-animations.h"
@@ -74,12 +73,7 @@ extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
 extern GHashTable *g_hModuleTable;
 
-#ifdef HAVE_GLITZ
 extern gboolean g_bUseGlitz;
-extern glitz_drawable_format_t *gDrawFormat;
-extern glitz_drawable_t* g_pGlitzDrawable;
-extern glitz_format_t* g_pGlitzFormat;
-#endif // HAVE_GLITZ
 
 
 static void cairo_dock_edit_and_reload_conf_file (GtkMenuItem *menu_item, gpointer *data)
@@ -570,7 +564,9 @@ static void cairo_dock_delete_menu (GtkMenuShell *menu, CairoDock *pDock)
 	pDock->bMenuVisible = FALSE;
 	if (! pDock->bInside)
 	{
+		//g_print ("on force a quitter\n");
 		pDock->bInside = TRUE;
+		pDock->bAtBottom = FALSE;
 		on_leave_notify2 (pDock->pWidget,
 			NULL,
 			pDock);

@@ -37,16 +37,16 @@ gboolean on_key_press (GtkWidget *pWidget,
 gboolean on_button_press2 (GtkWidget* pWidget,
 					GdkEventButton* pButton,
 					CairoDock *pDock);
-gboolean on_button_release (GtkWidget* pWidget,
-					GdkEventButton* pButton,
-					CairoDock *pDock);
+
 gboolean on_scroll (GtkWidget* pWidget,
 				GdkEventScroll* pScroll,
 				CairoDock *pDock);
 
+
 gboolean on_configure (GtkWidget* pWidget,
 	   			GdkEventConfigure* pEvent,
 	   			CairoDock *pDock);
+
 
 void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, GtkSelectionData *selection_data, guint info, guint t, CairoDock *pDock);
 void on_drag_motion (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, guint t, CairoDock *pDock);

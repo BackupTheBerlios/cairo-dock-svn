@@ -337,7 +337,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 
 void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2)
 {
-	//g_print ("%s (%s, %s) : %.2f <-> %.2f\n", __func__, icon1->acName, icon2->acName, icon1->fOrder, icon2->fOrder);
+	g_print ("%s (%s, %s) : %.2f <-> %.2f\n", __func__, icon1->acName, icon2->acName, icon1->fOrder, icon2->fOrder);
 	if ((icon2 != NULL) && (! ( (CAIRO_DOCK_IS_APPLI (icon1) && CAIRO_DOCK_IS_APPLI (icon2)) || (CAIRO_DOCK_IS_LAUNCHER (icon1) && CAIRO_DOCK_IS_LAUNCHER (icon2)) || (CAIRO_DOCK_IS_APPLET (icon1) && CAIRO_DOCK_IS_APPLET (icon2)) ) ))
 		return ;
 	
@@ -380,17 +380,18 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 	}
 	
 	//\_________________ On change sa place dans la liste.
+	pDock->pFirstDrawnElement = NULL;
 	pDock->icons = g_list_remove (pDock->icons, icon1);
 	pDock->icons = g_list_insert_sorted (pDock->icons,
 		icon1,
 		(GCompareFunc) cairo_dock_compare_icons_order);
 	
-	if (CAIRO_DOCK_IS_APPLET (icon1))
-		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons, g_hModuleTable);
-	
 	//\_________________ On recalcule la largeur max, qui peut avoir ete influencee par le changement d'ordre.
 	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
 	pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
+	
+	if (CAIRO_DOCK_IS_APPLET (icon1))
+		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons, g_hModuleTable);
 }
 
 

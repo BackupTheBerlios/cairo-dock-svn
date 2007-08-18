@@ -95,11 +95,7 @@ extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
 
-
-#ifdef HAVE_GLITZ
 extern gboolean g_bUseGlitz;
-#endif // HAVE_GLITZ
-
 
 
 void cairo_dock_calculate_contrainted_icon_size (double *fImageWidth, double *fImageHeight, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fIconWidthSaturationFactor, double *fIconHeightSaturationFactor)

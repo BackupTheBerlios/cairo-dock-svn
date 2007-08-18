@@ -29,7 +29,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-launcher-factory.h"
 
-
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
 
@@ -62,12 +61,7 @@ extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 
-#ifdef HAVE_GLITZ
 extern gboolean g_bUseGlitz;
-extern glitz_drawable_format_t *gDrawFormat;
-extern glitz_drawable_t* g_pGlitzDrawable;
-extern glitz_format_t* g_pGlitzFormat;
-#endif // HAVE_GLITZ
 
 
 gchar *cairo_dock_search_image_path (gchar *cFileName)

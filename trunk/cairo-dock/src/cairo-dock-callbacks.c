@@ -35,6 +35,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-callbacks.h"
 
+static Icon *s_pIconClicked = NULL;
+
 extern CairoDock *g_pMainDock;;
 
 extern CairoDock *g_pLastPointedDock;
@@ -73,12 +75,7 @@ extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
 extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
 
-#ifdef HAVE_GLITZ
 extern gboolean g_bUseGlitz;
-extern glitz_drawable_format_t *gDrawFormat;
-extern glitz_drawable_t* g_pGlitzDrawable;
-extern glitz_format_t* g_pGlitzFormat;
-#endif // HAVE_GLITZ
 
 
 gboolean on_expose (GtkWidget *pWidget,
@@ -189,6 +186,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 				gdk_window_move (pSubDock->pWidget->window, pSubDock->iWindowPositionY, pSubDock->iWindowPositionX);
 			//gdk_window_show (pSubDock->pWidget->window);
 			g_pLastPointedDock = pDock;
+			pSubDock->bAtBottom = FALSE;
 			gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
 		}
 		pLastPointedIcon = pPointedIcon;
@@ -202,9 +200,9 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
 	//g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
 	pDock->bInside = FALSE;
+	pDock->bAtTop = FALSE;
 	if (pDock->bMenuVisible)
 	{
-		pDock->bAtTop = FALSE;
 		return ;
 	}
 	if (pDock->iSidMoveUp > 0)  // si on est en train de monter, on arrete.
@@ -220,13 +218,11 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	
 	if (g_bAutoHide && pDock->iRefCount == 0)
 	{
-		pDock->bAtTop = FALSE;
 		if (pDock->iSidMoveDown == 0)  // on commence a descendre.
 			pDock->iSidMoveDown = g_timeout_add (40, (GSourceFunc) cairo_dock_move_down, (gpointer) pDock);
 	}
 	else
 	{
-		pDock->bAtTop = FALSE;
 		pDock->bAtBottom = TRUE;
 	}
 	
@@ -242,7 +238,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 {
 	if (pDock->bAtBottom || ! pDock->bInside)
 		return FALSE;
-	//g_print ("%s ()\n", __func__);
+	g_print ("%s ()\n", __func__);
 	
 	Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
 	if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL)
@@ -257,7 +253,6 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 		}
 		else  // si on sort du dock sans passer par le sous-dock, par exemple en sortant par le bas.
 		{
-			//gtk_window_move (GTK_WINDOW (pPointedIcon->pSubDock->pWidget), 0, g_iScreenHeight + 1);
 			gdk_window_hide (pPointedIcon->pSubDock->pWidget->window);
 		}
 	}
@@ -481,12 +476,12 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				CairoDock *pDock)
 {
 	//g_print ("%s (%d/%d)\n", __func__, pButton->type, pButton->button);
-	if (pButton->type == GDK_BUTTON_PRESS)  // simple clique.
+	if (pButton->button == 1)  // clique gauche.
 	{
-		if (pButton->button == 1)  // clique gauche.
+		if (pButton->type == GDK_BUTTON_RELEASE)
 		{
 			Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
-			if (icon != NULL && ! CAIRO_DOCK_IS_SEPARATOR (icon))
+			if (icon != NULL && ! CAIRO_DOCK_IS_SEPARATOR (icon) && icon == s_pIconClicked)
 			{
 				icon->iAnimationType = g_tAnimationType[icon->iType];
 				do
@@ -531,50 +526,70 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				if (pDock->iSidShrinkDown == 0)
 					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);  // fera diminuer de taille les icones, et rebondir/tourner/clignoter celle qui est cliquee.
 			}
+			else if (s_pIconClicked != NULL && icon != s_pIconClicked && icon->iType == s_pIconClicked->iType)
+			{
+				g_print ("deplacement de %s\n", s_pIconClicked->acName);
+				int iX, iY;
+				if (g_bHorizontalDock)
+				{
+					iX = pButton->x;
+					iY = pButton->y;
+				}
+				else
+				{
+					iX = pButton->y;
+					iY = pButton->x;
+				}
+				
+				if (iX > icon->fX + icon->fWidth * icon->fScale / 2)
+					cairo_dock_move_icon_after_icon (pDock, s_pIconClicked, icon);
+				else
+				{
+					Icon *prev_icon = cairo_dock_get_previous_icon (pDock->icons, icon);
+					cairo_dock_move_icon_after_icon (pDock, s_pIconClicked, prev_icon);
+				}
+				
+				cairo_dock_calculate_icons (pDock, iX, iY);
+				gtk_widget_queue_draw (pWidget);
+			}
+			s_pIconClicked = NULL;
 		}
-		else if (pButton->button == 3)  // clique droit.
+		else if (pButton->type == GDK_BUTTON_PRESS)
 		{
-			pDock->bMenuVisible = TRUE;
-			GtkWidget *menu = cairo_dock_build_menu (pDock);
-			
-			gtk_widget_show_all (menu);
-			
-			gtk_menu_popup (GTK_MENU (menu),
-				NULL,
-				NULL,
-				NULL,
-				NULL,
-				1,
-				gtk_get_current_event_time ());
+			s_pIconClicked = cairo_dock_get_pointed_icon (pDock->icons);
 		}
-		else if (pButton->button == 2)  // clique milieu.
-		{
-			pDock->iScrollOffset = 0;
-			cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
-			if (g_bHorizontalDock)
-				cairo_dock_calculate_icons (pDock, (int) pButton->x, (int) pButton->y);
-			else
-				cairo_dock_calculate_icons (pDock, (int) pButton->y, (int) pButton->x);
-			gtk_widget_queue_draw (pWidget);
-			/*gtk_window_begin_move_drag (GTK_WINDOW (pWidget),
-				pButton->button,
-				pButton->x_root,
-				pButton->y_root,
-				pButton->time);  // permet de déplacer la fenetre, marche avec Metacity, mais pas avec Beryl !*/
-		}
+	}
+	else if (pButton->button == 3 && pButton->type == GDK_BUTTON_PRESS)  // clique droit.
+	{
+		pDock->bMenuVisible = TRUE;
+		GtkWidget *menu = cairo_dock_build_menu (pDock);
+		
+		gtk_widget_show_all (menu);
+		
+		gtk_menu_popup (GTK_MENU (menu),
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			1,
+			gtk_get_current_event_time ());
+	}
+	else if (pButton->button == 2 && pButton->type == GDK_BUTTON_PRESS)  // clique milieu.
+	{
+		pDock->iScrollOffset = 0;
+		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+		if (g_bHorizontalDock)
+			cairo_dock_calculate_icons (pDock, (int) pButton->x, (int) pButton->y);
+		else
+			cairo_dock_calculate_icons (pDock, (int) pButton->y, (int) pButton->x);
+		gtk_widget_queue_draw (pWidget);
+		/*gtk_window_begin_move_drag (GTK_WINDOW (pWidget),
+			pButton->button,
+			pButton->x_root,
+			pButton->y_root,
+			pButton->time);  // permet de déplacer la fenetre, marche avec Metacity, mais pas avec Beryl !*/
 	}
 	
-	return FALSE;
-}
-gboolean on_button_release (GtkWidget* pWidget,
-				GdkEventButton* pButton,
-				CairoDock *pDock)
-{
-	//g_print ("%s ()\n", __func__);
-	if (pButton->button == 2)  // fin d'un drag and drop, sauf que ca ne marche ni avec Beryl, ni avec Metacity, car ils ne laissent pas passer le signal de relache du bouton :-/
-	{
-		cairo_dock_update_gaps_with_window_position (pDock);
-	}
 	return FALSE;
 }
 
@@ -664,7 +679,6 @@ gboolean on_scroll (GtkWidget* pWidget,
 				gdk_window_move (pSubDock->pWidget->window, pSubDock->iWindowPositionX, pSubDock->iWindowPositionY);
 			else
 				gdk_window_move (pSubDock->pWidget->window, pSubDock->iWindowPositionY, pSubDock->iWindowPositionX);
-			//gdk_window_show (pSubDock->pWidget->window);
 			g_pLastPointedDock = pDock;
 			gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
 			//gtk_widget_show (pSubDock->pWidget);
@@ -695,7 +709,7 @@ gboolean on_configure (GtkWidget* pWidget,
 	
 	if (iNewWidth != pDock->iCurrentWidth || iNewHeight != pDock->iCurrentHeight)
 	{
-		g_print ("-> %dx%d\n", iNewWidth, iNewHeight);
+		//g_print ("-> %dx%d\n", iNewWidth, iNewHeight);
 		pDock->iCurrentWidth = iNewWidth;
 		pDock->iCurrentHeight = iNewHeight;
 		
@@ -714,9 +728,9 @@ gboolean on_configure (GtkWidget* pWidget,
 		gtk_widget_queue_draw (pWidget);
 #ifdef HAVE_GLITZ
 		if (g_pGlitzDrawable)
-			glitz_drawable_update_size (g_pGlitzDrawable,
-				g_iCurrentWidth,
-				g_iCurrentHeight);
+			glitz_drawable_update_size (pDock->pGlitzDrawable,
+				pEvent->width,
+				pEvent->height);
 #endif
 	}
 

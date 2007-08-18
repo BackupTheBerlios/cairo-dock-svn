@@ -58,13 +58,7 @@ extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 
-#ifdef HAVE_GLITZ
 extern gboolean g_bUseGlitz;
-extern glitz_drawable_format_t *gDrawFormat;
-extern glitz_drawable_t* g_pGlitzDrawable;
-extern glitz_format_t* g_pGlitzFormat;
-#endif // HAVE_GLITZ
-
 
 
 cairo_surface_t *cairo_dock_create_applet_surface (cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)

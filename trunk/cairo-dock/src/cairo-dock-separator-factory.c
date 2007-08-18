@@ -29,7 +29,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-separator-factory.h"
 
-
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
 
@@ -64,12 +63,7 @@ extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern gchar *g_cSeparatorImage;
 extern gboolean g_bRevolveSeparator;
 
-#ifdef HAVE_GLITZ
 extern gboolean g_bUseGlitz;
-extern glitz_drawable_format_t *gDrawFormat;
-extern glitz_drawable_t* g_pGlitzDrawable;
-extern glitz_format_t* g_pGlitzFormat;
-#endif // HAVE_GLITZ
 
 
 cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)

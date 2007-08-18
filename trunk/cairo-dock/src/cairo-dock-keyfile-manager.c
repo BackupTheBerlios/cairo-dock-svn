@@ -272,6 +272,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	gpointer *pGroupKeyWidget;
 	int i, j, k, iNbElements;
 	char iElementType;
+	gboolean bIsAligned;
 	gboolean bValue, *bValueList;
 	int iValue, iMinValue, iMaxValue, *iValueList;
 	double fValue, fMinValue, fMaxValue, *fValueList;
@@ -364,21 +365,29 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 				}
 				if (cUsefulComment[strlen (cUsefulComment) - 1] == '\n')
 					cUsefulComment[strlen (cUsefulComment) - 1] = '\0';
+				if (cUsefulComment[strlen (cUsefulComment) - 1] == '/')
+				{
+					bIsAligned = TRUE;
+					cUsefulComment[strlen (cUsefulComment) - 1] = '\0';
+				}
+				else
+					bIsAligned = FALSE;
 				//g_print ("cUsefulComment : %s\n", cUsefulComment);
+				
+				pHBox = gtk_hbox_new (FALSE, 3);
 				
 				if (*cUsefulComment != '\0' && strcmp (cUsefulComment, "...") != 0 && iElementType != 'F')
 				{
 					pLabel = gtk_label_new (cUsefulComment);
 					GtkWidget *pAlign = gtk_alignment_new (0., 0.5, 0., 0.);
 					gtk_container_add (GTK_CONTAINER (pAlign), pLabel);
-					gtk_box_pack_start (pFrameVBox == NULL ? GTK_BOX (pVBox) : GTK_BOX (pFrameVBox),
+					gtk_box_pack_start ((bIsAligned ? GTK_BOX (pHBox) : (pFrameVBox == NULL ? GTK_BOX (pVBox) : GTK_BOX (pFrameVBox))),
 						pAlign,
 						FALSE,
 						FALSE,
 						0);
 				}
 				
-				pHBox = gtk_hbox_new (FALSE, 3);
 				gtk_box_pack_start (pFrameVBox == NULL ? GTK_BOX (pVBox) : GTK_BOX (pFrameVBox),
 						pHBox,
 						FALSE,
@@ -441,6 +450,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					
 					case 'f' :
 					case 'c' :
+					case 'e' :
 						//g_print ("  + a float\n");
 						length = 0;
 						fValueList = g_key_file_get_double_list (pKeyFile, cGroupName, cKeyName, &length, NULL);
@@ -455,9 +465,26 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								fMaxValue = g_ascii_strtod (pAuthorizedValuesList[1], NULL);
 							else
 								fMaxValue = 9999;
-							pOneWidget = gtk_spin_button_new_with_range (fMinValue, fMaxValue, (fMaxValue - fMinValue) / 20.);
-							gtk_spin_button_set_digits (GTK_SPIN_BUTTON (pOneWidget), 3);
-							gtk_spin_button_set_value (GTK_SPIN_BUTTON (pOneWidget), fValue);
+							
+							GtkObject *pAdjustment = gtk_adjustment_new (fValue,
+								fMinValue,
+								fMaxValue,
+								(fMaxValue - fMinValue) / 20.,
+								(fMaxValue - fMinValue) / 10.,
+								0);
+							
+							if (iElementType == 'e')
+							{
+								pOneWidget = gtk_hscale_new (GTK_ADJUSTMENT (pAdjustment));
+								gtk_scale_set_digits (GTK_SCALE (pOneWidget), 3);
+								gtk_widget_set (pOneWidget, "width-request", 150);
+							}
+							else
+							{
+								pOneWidget = gtk_spin_button_new (GTK_ADJUSTMENT (pAdjustment),
+									1.,
+									3);
+							}
 							
 							pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
 							gtk_box_pack_start (GTK_BOX (pHBox),
@@ -912,15 +939,16 @@ static void _cairo_dock_get_each_widget_value (gpointer *data, GKeyFile *pKeyFil
 			g_key_file_set_boolean (pKeyFile, cGroupName, cKeyName, tBooleanValues[0]);
 		g_free (tBooleanValues);
 	}
-	else if (GTK_IS_SPIN_BUTTON (pOneWidget))
+	else if (GTK_IS_SPIN_BUTTON (pOneWidget) || GTK_IS_HSCALE (pOneWidget))
 	{
-		if (gtk_spin_button_get_digits (GTK_SPIN_BUTTON (pOneWidget)) == 0)
+		gboolean bIsSpin = GTK_IS_SPIN_BUTTON (pOneWidget);
+		if ( (bIsSpin && gtk_spin_button_get_digits (GTK_SPIN_BUTTON (pOneWidget)) == 0) || (! bIsSpin && gtk_scale_get_digits (GTK_SCALE (pOneWidget)) == 0) )
 		{
 			int *tIntegerValues = g_new0 (int, iNbElements);
 			for (pList = pSubWidgetList; pList != NULL; pList = pList->next)
 			{
 				pOneWidget = pList->data;
-				tIntegerValues[i] = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (pOneWidget));
+				tIntegerValues[i] = (bIsSpin ? gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (pOneWidget)) : gtk_range_get_value (GTK_RANGE (pOneWidget)));
 				i ++;
 			}
 			if (iNbElements > 1)
@@ -935,7 +963,7 @@ static void _cairo_dock_get_each_widget_value (gpointer *data, GKeyFile *pKeyFil
 			for (pList = pSubWidgetList; pList != NULL; pList = pList->next)
 			{
 				pOneWidget = pList->data;
-				tDoubleValues[i] = gtk_spin_button_get_value (GTK_SPIN_BUTTON (pOneWidget));
+				tDoubleValues[i] = (bIsSpin ? gtk_spin_button_get_value (GTK_SPIN_BUTTON (pOneWidget)) : gtk_range_get_value (GTK_RANGE (pOneWidget)));
 				i ++;
 			}
 			if (iNbElements > 1)
