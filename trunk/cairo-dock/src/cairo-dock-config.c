@@ -26,6 +26,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 static gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "random", NULL};
 static gchar * s_cIconTypeNames[(CAIRO_DOCK_NB_TYPES+1)/2] = {"launchers", "applications", "applets"};
 
+extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
 extern gchar *g_cLanguage;
 extern gboolean g_bReverseVisibleImage;
@@ -1059,6 +1060,10 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	cairo_dock_load_background_decorations (pDock->pWidget);
 	
 	
+	cairo_dock_calculate_icons (pDock, 0, 0);
+	gtk_widget_queue_draw (pDock->pWidget);
+	
+	
 	if (pDock->bAtBottom)
 	{
 		int iNewWidth, iNewHeight;
@@ -1095,11 +1100,10 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	g_free (cPreviousLanguage);
 	
 	g_key_file_free (fconf);
-	gtk_widget_queue_draw (pDock->pWidget);
 }
 
 
-gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar *cTitle, int iWindowWidth, int iWindowHeight)
+gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar *cTitle, int iWindowWidth, int iWindowHeight, gboolean bFullConfig, CairoDockConfigFunc pConfigFunc, gpointer data)
 {
 	GSList *pWidgetList = NULL;
 	GtkTextBuffer *pTextBuffer = NULL;
@@ -1114,10 +1118,10 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 		erreur = NULL;
 	}
 	
-	GtkWidget *pDialog = cairo_dock_generate_advanced_ihm_from_keyfile (pKeyFile, cTitle, pWidget, &pWidgetList);
+	GtkWidget *pDialog = cairo_dock_generate_advanced_ihm_from_keyfile (pKeyFile, cTitle, pWidget, &pWidgetList, (pConfigFunc != NULL), bFullConfig);
 	if (pDialog == NULL || pWidgetList == NULL)
 	{
-		pDialog = cairo_dock_generate_basic_ihm_from_keyfile (conf_file, cTitle, pWidget, &pTextBuffer);
+		pDialog = cairo_dock_generate_basic_ihm_from_keyfile (conf_file, cTitle, pWidget, &pTextBuffer, (pConfigFunc != NULL));
 	}
 	g_return_val_if_fail (pDialog != NULL, FALSE);
 	
@@ -1126,36 +1130,44 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 	//gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER);
 	gtk_window_move (GTK_WINDOW (pDialog), (g_iScreenWidth - iWindowWidth) / 2, (g_iScreenHeight - iWindowHeight) / 2);
 	
-	gint action = gtk_dialog_run (GTK_DIALOG (pDialog));
+	gint action;
 	gboolean config_ok = TRUE;
-	if (action == GTK_RESPONSE_ACCEPT)
+	do
 	{
-		if (pWidgetList != NULL)
+		action = gtk_dialog_run (GTK_DIALOG (pDialog));
+		if (action == GTK_RESPONSE_ACCEPT || action == GTK_RESPONSE_APPLY)
 		{
-			cairo_dock_update_keyfile_from_widget_list (pKeyFile, pWidgetList);
-			cairo_dock_write_keys_to_file (pKeyFile, conf_file);
+			if (pWidgetList != NULL)
+			{
+				cairo_dock_update_keyfile_from_widget_list (pKeyFile, pWidgetList);
+				cairo_dock_write_keys_to_file (pKeyFile, conf_file);
+			}
+			else
+			{
+				GtkTextIter start, end;
+				gtk_text_buffer_get_iter_at_offset (pTextBuffer, &start, 0);
+				gtk_text_buffer_get_iter_at_offset (pTextBuffer, &end, -1);
+				
+				gchar *cConfiguration = gtk_text_buffer_get_text (pTextBuffer, &start, &end, FALSE);
+				
+				gboolean write_ok = g_file_set_contents (conf_file, cConfiguration, -1, NULL);
+				g_free (cConfiguration);
+				if (! write_ok)
+				{
+					g_print ("error while writing to %s\n", conf_file);
+					config_ok = FALSE;
+				}
+			}
+			
+			if (pConfigFunc != NULL)
+				pConfigFunc (conf_file, data);
 		}
 		else
 		{
-			GtkTextIter start, end;
-			gtk_text_buffer_get_iter_at_offset (pTextBuffer, &start, 0);
-			gtk_text_buffer_get_iter_at_offset (pTextBuffer, &end, -1);
-			
-			gchar *cConfiguration = gtk_text_buffer_get_text (pTextBuffer, &start, &end, FALSE);
-			
-			gboolean write_ok = g_file_set_contents (conf_file, cConfiguration, -1, NULL);
-			g_free (cConfiguration);
-			if (! write_ok)
-			{
-				g_print ("error while writing to %s\n", conf_file);
-				config_ok = FALSE;
-			}
+			config_ok = FALSE;
 		}
 	}
-	else
-	{
-		config_ok = FALSE;
-	}
+	while (action == GTK_RESPONSE_APPLY);
 	
 	g_key_file_free (pKeyFile);
 	cairo_dock_free_generated_widget_list (pWidgetList);

@@ -572,7 +572,7 @@ gpointer cairo_dock_init (gpointer data)
 		}
 		cairo_dock_update_conf_file_with_hash_table (cTemporaryFilePath, pThemeTable, "INIT", "theme", 1, "Choose a theme to start using cairo-dock\n (you can choose another theme later\n by deleting your ~/.cairo-dock direcory,\n and re-launching cairo-dock)");
 		
-		gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTemporaryFilePath, "Choose a theme to start with", 400, 300);
+		gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTemporaryFilePath, "Choose a theme to start with", 400, 300, TRUE, NULL, NULL);
 		if (! bChoiceOK)
 		{
 			g_print ("Mata ne.\n");

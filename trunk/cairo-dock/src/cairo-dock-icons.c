@@ -580,7 +580,7 @@ GList *cairo_dock_calculate_icons_positions_at_rest (GList *pIconList, int iMinD
 
 Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight, int iXOffset)
 {
-	//g_print (">>>>>%s (%d, %dx%d)\n", __func__, x_abs, iWidth, iHeight);
+	g_print (">>>>>%s (%d, %dx%d)\n", __func__, x_abs, iWidth, iHeight);
 	if (pIconList == NULL)
 		return NULL;
 	float x_cumulated = 0, fXMiddle;
@@ -617,11 +617,11 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 				icon->fPhase = G_PI;
 		}
 		//g_print ("x_cumulated : %.2f => fPhase : %.2fdeg\n", x_cumulated, icon->fPhase / G_PI * 180);
-		//if (CAIRO_DOCK_IS_SEPARATOR (icon))
-		//	icon->fPhase = 0;
 		
 		//\_______________ On en deduit l'amplitude de la sinusoide au niveau de cette icone, et donc son echelle.
 		icon->fScale = 1 + fMagnitude * g_fAmplitude * sin (icon->fPhase);
+		//if (CAIRO_DOCK_IS_SEPARATOR (icon))
+		//	icon->fScale = 1;
 		if (icon->fPersonnalScale > 0 && iWidth > 0)
 		{
 			icon->fPersonnalScale *= .9;
@@ -729,7 +729,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 		gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iWidth, &iHeight);
 	else
 		gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iHeight, &iWidth);*/
-	//g_print ("%s (%dx%d, %dx%d)\n", __func__, iMouseX, iMouseY, iWidth, iHeight);
+	g_print ("%s (%dx%d, %dx%d)\n", __func__, iMouseX, iMouseY, iWidth, iHeight);
 	
 	int dx = iMouseX - iWidth / 2;  // ecart par rapport au milieu du dock a plat.
 	int x_abs = dx + pDock->iMinDockWidth / 2;  // ecart par rapport a la gauche du dock minimal.
@@ -738,9 +738,6 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	
 	//\_______________ On calcule l'ensemble des parametres des icones.
 	Icon *pPointedIcon = cairo_dock_calculate_icons_with_position (pDock->icons, pDock->pFirstDrawnElement, x_abs, pDock->fMagnitude, pDock->iMinDockWidth, pDock->iMaxDockWidth, iHeight, pDock->iScrollOffset);
-	
-	//\_______________ On calcule un echantillon des 
-	
 	
 	//\_______________ On regarde si le curseur est dans le dock ou pas, et on joue sur la taille des icones en consequence.
 	gboolean bMouseInsideDock = (x_abs >= 0 && x_abs <= pDock->iMinDockWidth);

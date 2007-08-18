@@ -81,7 +81,7 @@ static void cairo_dock_edit_and_reload_conf_file (GtkMenuItem *menu_item, gpoint
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", 400, 600);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", 400, 600, TRUE, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock);
 	if (config_ok)
 	{
 		cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
@@ -245,7 +245,7 @@ static void cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data)
 	gchar *cNewDesktopFileName = g_path_get_basename (cNewDesktopFilePath);
 	
 	//\___________________ On ouvre automatiquement l'IHM pour permettre de modifier ses champs.
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cNewDesktopFilePath, "Fill this launcher", 300, 400);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cNewDesktopFilePath, "Fill this launcher", 300, 400, TRUE, NULL, NULL);
 	if (config_ok)
 	{
 		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
@@ -344,7 +344,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	Icon *icon = data[1];
 	
 	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, icon->acDesktopFileName);
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", 300, 400);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", 300, 400, TRUE, NULL, NULL);
 	g_free (cDesktopFilePath);
 	if (config_ok)
 	{

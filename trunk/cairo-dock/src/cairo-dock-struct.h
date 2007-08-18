@@ -58,7 +58,7 @@ typedef struct _CairoDock {
 
 
 
-typedef gpointer (*CairoDockModuleInit) (GtkWidget *pWidget, GError **erreur);  // renvoie son icone si il en a.
+typedef gpointer (*CairoDockModuleInit) (GtkWidget *pWidget, gchar **cConfFilePath, GError **erreur);  // renvoie son icone si il en a.
 
 typedef void (*CairoDockModuleStop) ();
 
@@ -72,8 +72,8 @@ typedef struct _CairoDockModule {
 	GModule *pModule;
 	CairoDockModuleInit initModule;
 	CairoDockModuleStop stopModule;
-	CairoDockModuleConfig configModule;
 	CairoDockModuleAction actionModule;
+	gchar *cConfFilePath;
 	gboolean bActive;
 } CairoDockModule;
 
@@ -146,6 +146,7 @@ typedef enum {
 	CAIRO_DOCK_NB_ANIMATIONS
 	} CairoDockAnimationType;
 
+typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
 
 #endif
 
