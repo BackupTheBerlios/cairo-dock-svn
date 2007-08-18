@@ -87,6 +87,17 @@ static void cairo_dock_edit_and_reload_conf_file (GtkMenuItem *menu_item, gpoint
 		cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
 	}
 }
+static void cairo_dock_edit_and_reload_conf_file_fast (GtkMenuItem *menu_item, gpointer *data)
+{
+	CairoDock *pDock = data[0];
+	Icon *icon = data[1];
+	
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", 400, 600, FALSE, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock);
+	if (config_ok)
+	{
+		cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
+	}
+}
 
 static void cairo_dock_choose_theme (GtkMenuItem *menu_item, gpointer *data)
 {
@@ -600,6 +611,10 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	menu_item = gtk_menu_item_new_with_label ("Configure Cairo-Dock");
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_edit_and_reload_conf_file), data);
+	
+	menu_item = gtk_menu_item_new_with_label ("Fast-configure Cairo-Dock");
+	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
+	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_edit_and_reload_conf_file_fast), data);
 	
 	menu_item = gtk_menu_item_new_with_label ("Choose a theme");
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);

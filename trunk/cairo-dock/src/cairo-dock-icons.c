@@ -580,7 +580,7 @@ GList *cairo_dock_calculate_icons_positions_at_rest (GList *pIconList, int iMinD
 
 Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight, int iXOffset)
 {
-	g_print (">>>>>%s (%d, %dx%d)\n", __func__, x_abs, iWidth, iHeight);
+	//g_print (">>>>>%s (%d, %dx%d)\n", __func__, x_abs, iWidth, iHeight);
 	if (pIconList == NULL)
 		return NULL;
 	float x_cumulated = 0, fXMiddle;
@@ -729,7 +729,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 		gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iWidth, &iHeight);
 	else
 		gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iHeight, &iWidth);*/
-	g_print ("%s (%dx%d, %dx%d)\n", __func__, iMouseX, iMouseY, iWidth, iHeight);
+	//g_print ("%s (%dx%d, %dx%d)\n", __func__, iMouseX, iMouseY, iWidth, iHeight);
 	
 	int dx = iMouseX - iWidth / 2;  // ecart par rapport au milieu du dock a plat.
 	int x_abs = dx + pDock->iMinDockWidth / 2;  // ecart par rapport a la gauche du dock minimal.

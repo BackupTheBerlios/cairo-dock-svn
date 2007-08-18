@@ -343,12 +343,13 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 				cUsefulComment ++;
 				if (*cUsefulComment == '-' || *cUsefulComment == '+')
 				{
-					cUsefulComment ++;
 					if (! bFullConfig && *cUsefulComment == '-')
 					{
 						g_free (cKeyComment);
+						j ++;
 						continue;
 					}
+					cUsefulComment ++;
 				}
 				
 				if (g_ascii_isdigit (*cUsefulComment))
