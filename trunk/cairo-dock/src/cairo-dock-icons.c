@@ -603,19 +603,9 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 		//\_______________ On calcule sa phase (pi/2 au niveau du curseur).
 		icon->fPhase = (fXMiddle - x_abs) / g_iSinusoidWidth * G_PI + G_PI / 2;
 		if (icon->fPhase < 0)
-		{
-			/*if (bIsLoop && fXMiddle + iMinDockWidth < iXMaxSinusoid)
-				icon->fPhase = (fXMiddle + iMinDockWidth - x_abs) / g_iSinusoidWidth * G_PI + G_PI / 2;
-			else*/
-				icon->fPhase = 0;
-		}
+			icon->fPhase = 0;
 		else if (icon->fPhase > G_PI)
-		{
-			/*if (bIsLoop && fXMiddle - iMinDockWidth > iXMinSinusoid)
-				icon->fPhase = (fXMiddle - iMinDockWidth - x_abs) / g_iSinusoidWidth * G_PI + G_PI / 2;
-			else*/
-				icon->fPhase = G_PI;
-		}
+			icon->fPhase = G_PI;
 		//g_print ("x_cumulated : %.2f => fPhase : %.2fdeg\n", x_cumulated, icon->fPhase / G_PI * 180);
 		
 		//\_______________ On en deduit l'amplitude de la sinusoide au niveau de cette icone, et donc son echelle.
@@ -815,7 +805,6 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 			if (ic2 == NULL)
 				ic2 = pIconList;
 		} while (ic2 != pFirstDrawnElement);
-		//fMaxDockWidth = MAX (fMaxDockWidth, get_current_dock_width (pIconList));
 		fMaxBorderX = MAX (fMaxBorderX, icon->fX + icon->fWidth * icon->fScale);
 	}
 	cairo_dock_calculate_icons_with_position (pIconList, pFirstDrawnElement, iFlatDockWidth - 1, 1, iFlatDockWidth, 0, 0, 0);
@@ -835,7 +824,6 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 	} while (ic != pFirstDrawnElement);
 	fMaxBorderX = MAX (fMaxBorderX, icon->fX + icon->fWidth * icon->fScale);
 	
-	
 	fMaxDockWidth = fMaxBorderX - ((Icon *) pFirstDrawnElement->data)->fXMin + 2 * g_iDockRadius + g_iDockLineWidth;
 	
 	for (ic = pIconList; ic != NULL; ic = ic->next)
@@ -847,10 +835,6 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 		icon->fX = icon->fXAtRest;
 		icon->fScale = 1;
 	}
-	
-	//\_______________ On recalcule les icones avec une position situee en dehors du dock pour remettre les icones a plat.
-	
-	
 	
 	return fMaxDockWidth;
 }

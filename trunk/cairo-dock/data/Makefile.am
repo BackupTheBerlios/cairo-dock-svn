@@ -8,5 +8,6 @@ essentialdata_DATA = \
 	cairo-dock-fr.conf\
 	launcher-en.conf\
 	launcher-fr.conf\
+	themes-fr.conf\
+	themes-en.conf\
 	cairo-dock.svg
-
