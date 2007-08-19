@@ -614,14 +614,14 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 		//	icon->fScale = 1;
 		if (icon->fPersonnalScale > 0 && iWidth > 0)
 		{
-			icon->fPersonnalScale *= .9;
+			icon->fPersonnalScale *= .85;
 			icon->fScale *= icon->fPersonnalScale;
 			if (icon->fPersonnalScale < 0.05)
 				icon->fPersonnalScale = 0.05;
 		}
 		else if (icon->fPersonnalScale < 0 && iWidth > 0)
 		{
-			icon->fPersonnalScale *= .9;
+			icon->fPersonnalScale *= .85;
 			icon->fScale *= (1 + icon->fPersonnalScale);
 			if (icon->fPersonnalScale > -0.05)
 				icon->fPersonnalScale = -0.05;

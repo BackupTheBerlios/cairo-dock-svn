@@ -284,7 +284,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	if (bApplyButtonPresent)
 		dialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
 			(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
-			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_APPLY,
 			GTK_RESPONSE_APPLY,
 			GTK_STOCK_OK,
