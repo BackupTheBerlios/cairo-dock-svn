@@ -57,7 +57,7 @@ extern int g_iLabelWeight;
 extern int g_iLabelStyle;
 extern gchar *g_cLabelPolice;
 extern gchar **g_cDefaultIconDirectory;
-extern gchar *g_cCairoDockDataDir;
+extern gchar *g_cCurrentThemePath;
 extern gchar *g_cConfFile;
 
 extern int g_iNbAnimationRounds;
@@ -333,7 +333,7 @@ cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFi
 		}
 		else
 		{
-			cImagePath = g_strdup_printf ("%s/.cairo-dock/%s", getenv("HOME"), cImageFile);
+			cImagePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cImageFile);
 		}
 		
 		pNewSurface = cairo_dock_create_surface_from_image (cImagePath,
@@ -544,91 +544,4 @@ void cairo_dock_load_background_decorations (GtkWidget *pWidget)
 	g_fBackgroundImageWidth = 0;
 	g_fBackgroundImageHeight = 0;
 	cairo_dock_update_background_decorations_if_necessary (pWidget, data[0], data[1], (g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)));
-}
-
-
-
-gpointer cairo_dock_init (gpointer data)
-{
-	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
-	GError *erreur = NULL;
-	if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
-	{
-		GHashTable *pThemeTable = cairo_dock_list_themes (CAIRO_DOCK_SHARE_THEMES_DIR, &erreur);
-		if (erreur != NULL)
-		{
-			g_print ("Attention : %s\n", erreur->message);
-			g_error_free (erreur);
-			exit (1);
-		}
-		
-		gchar *cTemporaryFilePath = g_strdup ("/tmp/cairo-dock-init");
-		g_file_set_contents (cTemporaryFilePath, "#!\n[INIT]\ntheme = default", -1, &erreur);
-		if (erreur != NULL)
-		{
-			g_print ("Error while writing data : %s\n", erreur->message);
-			g_error_free (erreur);
-			exit (1);
-		}
-		cairo_dock_update_conf_file_with_hash_table (cTemporaryFilePath, pThemeTable, "INIT", "theme", 1, "Choose a theme to start using cairo-dock\n (you can choose another theme later\n by deleting your ~/.cairo-dock direcory,\n and re-launching cairo-dock)");
-		
-		gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTemporaryFilePath, "Choose a theme to start with", 400, 300, TRUE, NULL, NULL);
-		if (! bChoiceOK)
-		{
-			g_print ("Mata ne.\n");
-			exit (0);
-		}
-		
-		GKeyFile *pKeyFile = g_key_file_new ();
-		g_key_file_load_from_file (pKeyFile, cTemporaryFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
-		if (erreur != NULL)
-		{
-			g_print ("Attention : %s\n", erreur->message);
-			g_error_free (erreur);
-			exit (1);
-		}
-		gchar *cChosenTheme = g_key_file_get_string (pKeyFile, "INIT", "theme", &erreur);
-		if (erreur != NULL)
-		{
-			g_print ("Attention : %s\n", erreur->message);
-			g_error_free (erreur);
-			exit (1);
-		}
-		g_key_file_free (pKeyFile);
-		g_free (cTemporaryFilePath);
-		
-		
-		gchar *cCommand = g_strdup_printf ("mkdir -p %s", g_cCairoDockDataDir);
-		system (cCommand);
-		g_free (cCommand);
-		
-		cCommand = g_strdup_printf ("cp -r %s/%s/* %s", CAIRO_DOCK_SHARE_THEMES_DIR, cChosenTheme, g_cCairoDockDataDir);
-		system (cCommand);
-		g_free (cCommand);
-		
-		g_free (cChosenTheme);
-		g_hash_table_destroy (pThemeTable);
-		
-		if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
-		{
-			g_print("Attention : directory %s unreadable.\n", g_cCairoDockDataDir);
-			exit (1) ;
-		}
-	}
-	else if (! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS))
-	{
-		gchar *cCommand = g_strdup_printf ("cp %s/%s %s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_CONF_FILE, g_cConfFile);
-		system (cCommand);
-		g_free (cCommand);
-	}
-	
-	
-	//\___________________ On lit le fichier de conf et on charge tout.
-	cairo_dock_update_conf_file_with_modules (g_cConfFile, g_hModuleTable);
-	cairo_dock_update_conf_file_with_translations (g_cConfFile, CAIRO_DOCK_SHARE_DATA_DIR);
-	
-	cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
-	
-	
-	return NULL;
 }

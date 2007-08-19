@@ -41,7 +41,7 @@ extern int g_iDockLineWidth;
 extern int g_iIconGap;
 
 extern gchar *g_cConfFile;
-extern gchar *g_cCairoDockDataDir;
+extern gchar *g_cCurrentThemePath;
 
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
@@ -105,20 +105,20 @@ Is container = false",
 		lenght = -1;
 		
 		//\___________________ On lui choisit un nom de fichier tel qu'il n'y ait pas de collision.
-		cNewDesktopFileName = cairo_dock_generate_desktop_filename (g_cCairoDockDataDir);
+		cNewDesktopFileName = cairo_dock_generate_desktop_filename (g_cCurrentThemePath);
 	}
 	else if (g_file_test (cFilePath, G_FILE_TEST_IS_DIR))
 	{
 		//\___________________ On cree le texte qu'on va y mettre par defaut.
 		cNewDesktopContent = g_strdup_printf ("#!\n[Desktop Entry]\n\
-#s Launcher's name :\
+#s Launcher's name :\n\
 Name[fr] = %s\n\
 Name[en] = %s\n\
-#s Exec command :\
-Exec = %s %s\n\n\
-#S Image's name or path :\
+#s Exec command :\n\
+Exec = %s %s\n\
+#S Image's name or path :\n\
 Icon = %s\n\
-#f Order you want for this launcher among the other launchers :\
+#f Order you want for this launcher among the other launchers :\n\
 Order = %f\n\
 #s Name of the container it belongs to:\n\
 Container = %s\n\
@@ -128,7 +128,7 @@ Is container = false",
 		lenght = -1;
 		
 		//\___________________ On lui choisit un nom de fichier tel qu'il n'y ait pas de collision.
-		cNewDesktopFileName = cairo_dock_generate_desktop_filename (g_cCairoDockDataDir);
+		cNewDesktopFileName = cairo_dock_generate_desktop_filename (g_cCurrentThemePath);
 	}
 	else
 	{
@@ -183,7 +183,7 @@ Is container = false",
 		cNewDesktopFileName = g_path_get_basename (cFilePath);
 	}
 	
-	gchar *cNewFilePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, cNewDesktopFileName);
+	gchar *cNewFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cNewDesktopFileName);
 	g_free (cNewDesktopFileName);
 	
 	g_file_set_contents (cNewFilePath, cNewDesktopContent, lenght, &tmp_erreur);

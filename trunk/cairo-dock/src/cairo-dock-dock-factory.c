@@ -57,7 +57,7 @@ extern double g_fStripesColorDark[4];
 
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
-extern gchar *g_cCairoDockDataDir;
+extern gchar *g_cCurrentThemePath;
 
 extern cairo_surface_t *g_pVisibleZoneSurface;
 extern double g_fVisibleZoneImageWidth, g_fVisibleZoneImageHeight;
@@ -140,7 +140,7 @@ static void _cairo_dock_set_colormap (GtkWidget* pWidget)
 		{
 			vinfo = glitz_glx_get_visual_info_from_format (xdisplay,
 				screen,
-				gDrawFormat);
+				pDock->pDrawFormat);
 	
 			visual = gdkx_visual_get (vinfo->visualid);
 			pColormap = gdk_colormap_new (visual, TRUE);
@@ -198,12 +198,10 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 		"expose-event",
 		G_CALLBACK (on_expose),
 		pDock);
-//#ifdef HAVE_GLITZ	
 	g_signal_connect (G_OBJECT (pWindow),
 		"configure-event",
 		G_CALLBACK (on_configure),
 		pDock);
-//#endif
 	g_signal_connect (G_OBJECT (pWindow),
 		"key-press-event",
 		G_CALLBACK (on_key_press),
@@ -256,7 +254,50 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 		GDK_ACTION_COPY);
 	
 	g_hash_table_insert (g_hDocksTable, g_strdup (cDockName), pDock);
+	gtk_window_get_size (GTK_WINDOW (pWindow), &pDock->iCurrentWidth, &pDock->iCurrentHeight);  // ca n'est que la taille initiale allouee par GTK.
 	gtk_widget_show_all (pWindow);
+	
+	
+#ifdef HAVE_GLITZ
+	if (g_bUseGlitz && pDock->pDrawFormat != NULL)
+	{
+		glitz_format_t templ;
+		GdkDisplay	   *gdkdisplay;
+		Display	   *XDisplay;
+		Window	   xid;
+
+		gdkdisplay = gdk_display_get_default ();
+		XDisplay   = gdk_x11_display_get_g_XDisplay (gdkdisplay);
+		xid = gdk_x11_drawable_get_xid (GDK_DRAWABLE (pWindow->window));
+		pDock->pGlitzDrawable = glitz_glx_create_drawable_for_window (XDisplay,
+			0,
+			pDock->pDrawFormat,
+			xid,
+			pDock->iCurrentWidth,
+			pDock->iCurrentHeight);
+		if (! pDock->pGlitzDrawable)
+		{
+			g_print ("Attention : failed to create glitz drawable\n");
+		}
+		else
+		{
+			templ.color        = gDrawFormat->color;
+			templ.color.fourcc = GLITZ_FOURCC_RGB;
+			pDock->pGlitzFormat = glitz_find_format (g_pGlitzDrawable,
+				GLITZ_FORMAT_RED_SIZE_MASK   |
+				GLITZ_FORMAT_GREEN_SIZE_MASK |
+				GLITZ_FORMAT_BLUE_SIZE_MASK  |
+				GLITZ_FORMAT_ALPHA_SIZE_MASK |
+				GLITZ_FORMAT_FOURCC_MASK,
+				&templ,
+				0);
+			if (! pDock->pGlitzFormat)
+			{
+				g_print ("couldn't find glitz surface format\n");
+			}
+		}
+	}
+#endif
 	
 	return pDock;
 }
@@ -558,7 +599,7 @@ void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *Rec
 			icon->pSubDock = NULL;
 		}
 		
-		cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, icon->acDesktopFileName);
+		cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon->acDesktopFileName);
 		
 		if (ReceivingDock == NULL || cReceivingDockName == NULL)  // alors on les jete.
 		{

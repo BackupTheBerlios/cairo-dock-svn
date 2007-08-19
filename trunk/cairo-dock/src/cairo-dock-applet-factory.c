@@ -146,7 +146,7 @@ gboolean cairo_dock_read_header_applet_conf_file (GKeyFile *pKeyFile, int *iWidt
 
 
 
-GHashTable *cairo_dock_list_themes (gchar *cThemesDir, GError **erreur)
+GHashTable *cairo_dock_list_themes (gchar *cThemesDir, GHashTable *hProvidedTable, GError **erreur)
 {
 	GError *tmp_erreur = NULL;
 	GDir *dir = g_dir_open (cThemesDir, 0, &tmp_erreur);
@@ -156,7 +156,7 @@ GHashTable *cairo_dock_list_themes (gchar *cThemesDir, GError **erreur)
 		return NULL;
 	}
 	
-	GHashTable *pThemeTable = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+	GHashTable *pThemeTable = (hProvidedTable != NULL ? hProvidedTable : g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free));
 	
 	const gchar* cThemeName;
 	gchar *cThemePath;
@@ -168,7 +168,7 @@ GHashTable *cairo_dock_list_themes (gchar *cThemesDir, GError **erreur)
 		
 		cThemePath = g_strdup_printf ("%s/%s", cThemesDir, cThemeName);
 		
-		if (g_file_test (cThemePath, G_FILE_TEST_IS_DIR | G_FILE_TEST_IS_EXECUTABLE))
+		if (g_file_test (cThemePath, G_FILE_TEST_IS_DIR))
 			g_hash_table_insert (pThemeTable, g_strdup (cThemeName), cThemePath);
 	}
 	while (1);

@@ -16,7 +16,7 @@ Icon *cairo_dock_create_icon_for_applet (cairo_t *pSourceContext, int iWidth, in
 gboolean cairo_dock_read_header_applet_conf_file (GKeyFile *pKeyFile, int *iWidth, int *iHeight, gchar **cName);
 
 
-GHashTable *cairo_dock_list_themes (gchar *cThemesDir, GError **erreur);
+GHashTable *cairo_dock_list_themes (gchar *cThemesDir, GHashTable *hProvidedTable, GError **erreur);
 
 
 #endif

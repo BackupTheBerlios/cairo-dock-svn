@@ -123,7 +123,6 @@ typedef struct _Icon {
 	Window Xid;
 	//\____________ Pour les modules.
 	CairoDockModule *pModule;
-	//GList *pMenuEntryList;  // une liste de CairoDockMenuEntry*.
 	GtkWidget *pMenu;
 } Icon;
 
@@ -131,6 +130,9 @@ typedef struct _Icon {
 #define CAIRO_DOCK_LAST_ORDER -1e9
 
 #define CAIRO_DOCK_MAIN_DOCK_NAME "_MainDock_"
+
+#define CAIRO_DOCK_THEMES_DIR "themes"
+
 
 typedef enum {
 	CAIRO_DOCK_MAX_SIZE,

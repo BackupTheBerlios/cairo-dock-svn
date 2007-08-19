@@ -48,7 +48,7 @@ extern double g_fStripesColorDark[4];
 
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
-extern gchar *g_cCairoDockDataDir;
+extern gchar *g_cCurrentThemePath;
 
 extern cairo_surface_t *g_pVisibleZoneSurface;
 extern double g_fVisibleZoneImageWidth, g_fVisibleZoneImageHeight;
@@ -283,7 +283,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 	if (CAIRO_DOCK_IS_LAUNCHER (icon1))
 	{
 		GError *erreur = NULL;
-		gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, icon1->acDesktopFileName);
+		gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon1->acDesktopFileName);
 		GKeyFile* pKeyFile = g_key_file_new();
 		g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 		if (erreur != NULL)
@@ -298,7 +298,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 		g_key_file_free (pKeyFile);
 		g_free (cDesktopFilePath);
 		
-		cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, icon2->acDesktopFileName);
+		cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon2->acDesktopFileName);
 		pKeyFile = g_key_file_new();
 		g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 		if (erreur != NULL)
@@ -363,7 +363,7 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 	if (CAIRO_DOCK_IS_LAUNCHER (icon1))
 	{
 		GError *erreur = NULL;
-		gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, icon1->acDesktopFileName);
+		gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon1->acDesktopFileName);
 		GKeyFile* pKeyFile = g_key_file_new();
 		g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 		if (erreur != NULL)

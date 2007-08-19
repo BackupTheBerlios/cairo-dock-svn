@@ -28,6 +28,7 @@ extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
 
 extern gchar *g_cCairoDockDataDir;
+extern gchar *g_cCurrentThemePath;
 
 extern cairo_surface_t *g_pVisibleZoneSurface;
 extern double g_fVisibleZoneImageWidth, g_fVisibleZoneImageHeight;

@@ -29,8 +29,5 @@ void cairo_dock_update_background_decorations_if_necessary (GtkWidget *pWidget, 
 void cairo_dock_load_background_decorations (GtkWidget *pWidget);
 
 
-
-gpointer cairo_dock_init (gpointer data);
-
 #endif
 

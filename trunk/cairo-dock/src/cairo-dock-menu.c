@@ -38,7 +38,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-dock-factory.h"
+#include "cairo-dock-themes-manager.h"
 #include "cairo-dock-menu.h"
+
+extern gchar *g_cCurrentThemeName;
 
 extern CairoDock *g_pMainDock;
 extern int g_iWmHint;
@@ -54,7 +57,7 @@ extern int g_iDockLineWidth;
 extern int g_iIconGap;
 
 extern gchar *g_cConfFile;
-extern gchar *g_cCairoDockDataDir;
+extern gchar *g_cCurrentThemePath;
 
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
@@ -99,60 +102,12 @@ static void cairo_dock_edit_and_reload_conf_file_fast (GtkMenuItem *menu_item, g
 	}
 }
 
-static void cairo_dock_choose_theme (GtkMenuItem *menu_item, gpointer *data)
+static void cairo_dock_initiate_theme_management(GtkMenuItem *menu_item, gpointer *data)
 {
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
 	
-	//\___________________ On demande une confirmation a l'utilisateur.
-	gchar *cSaveConfDir = g_strdup_printf ("%s.ori", g_cCairoDockDataDir);
-	GtkWidget *dialog;
-	if (g_file_test (cSaveConfDir, G_FILE_TEST_EXISTS))
-	{
-		dialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
-			GTK_DIALOG_DESTROY_WITH_PARENT,
-			GTK_MESSAGE_QUESTION,
-			GTK_BUTTONS_YES_NO,
-			"Attention : ~/.cairo-dock.ori already exists, so your present config will not be saved back, and you will loose it.\nProceed ?");
-	}
-	else
-	{
-		dialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
-			GTK_DIALOG_DESTROY_WITH_PARENT,
-			GTK_MESSAGE_QUESTION,
-			GTK_BUTTONS_YES_NO,
-			"You're about to write over your present config. If possible, it will be saved to ~/.cairo-dock.ori.\nProceed ?");
-	}
-	int answer = gtk_dialog_run (GTK_DIALOG (dialog));
-	gtk_widget_destroy (dialog);
-	if (answer != GTK_RESPONSE_YES)
-		return ;
-	
-	//\___________________ On efface la config actuelle.
-	if (! g_file_test (cSaveConfDir, G_FILE_TEST_EXISTS))
-	{
-
-		gchar *cCommand = g_strdup_printf ("mv %s %s", g_cCairoDockDataDir, cSaveConfDir);
-		system (cCommand);
-		g_free (cCommand);
-	}
-	else
-	{
-		gchar *cCommand = g_strdup_printf ("rm -rf %s", g_cCairoDockDataDir);
-		system (cCommand);
-		g_free (cCommand);
-	}
-	
-	//\___________________ On libere toute la memoire allouee pour les docks (stoppe aussi tous les threads).
-	cairo_dock_free_all_docks (g_pMainDock);
-	
-	//\___________________ On cree le dock principal.
-	g_pMainDock = cairo_dock_create_new_dock (g_iWmHint, CAIRO_DOCK_MAIN_DOCK_NAME);
-	g_pMainDock->bIsMainDock = TRUE;
-	g_pMainDock->iRefCount --;
-	
-	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
-	cairo_dock_init (NULL);
+	cairo_dock_manage_themes (pDock->pWidget);
 }
 
 static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
@@ -211,7 +166,7 @@ static void cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 	{
 		if (icon->acDesktopFileName != NULL)  // normallement impossible.
 		{
-			gchar *icon_path = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, icon->acDesktopFileName);
+			gchar *icon_path = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon->acDesktopFileName);
 			g_remove (icon_path);
 			g_free (icon_path);
 		}
@@ -354,7 +309,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
 	
-	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, icon->acDesktopFileName);
+	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon->acDesktopFileName);
 	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", 300, 400, TRUE, NULL, NULL);
 	g_free (cDesktopFilePath);
 	if (config_ok)
@@ -616,9 +571,9 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_edit_and_reload_conf_file_fast), data);
 	
-	menu_item = gtk_menu_item_new_with_label ("Choose a theme");
+	menu_item = gtk_menu_item_new_with_label ("Manage themes");
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
-	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_choose_theme), data);
+	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_initiate_theme_management), data);
 	
 	menu_item = gtk_menu_item_new_with_label ("About");
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
@@ -708,24 +663,6 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 				
 				gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), icon->pMenu);
 			}
-			/*if (icon->pMenuEntryList != NULL)
-			{
-				menu_item = gtk_menu_item_new_with_label (icon->pModule->cModuleName);
-				gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
-				
-				GtkWidget *pModuleSubmenu = gtk_menu_new ();
-				gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), pModuleSubmenu);
-				GList *pMenuEntry;
-				CairoDockMenuEntry *pEntryData;
-				for (pMenuEntry = icon->pMenuEntryList; pMenuEntry != NULL; pMenuEntry = pMenuEntry->next)
-				{
-					pEntryData = pMenuEntry->data;
-					menu_item = gtk_menu_item_new_with_label (pEntryData->cLabel);
-					gtk_menu_shell_append  (GTK_MENU_SHELL (pModuleSubmenu), menu_item);
-					g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(pEntryData->pCallback), data);
-				}
-			}*/
-			
 		}
 		menu_item = gtk_menu_item_new_with_label ("Move this icon");
 		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);

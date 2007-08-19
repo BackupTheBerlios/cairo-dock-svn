@@ -129,7 +129,8 @@ static void _cairo_dock_remove (GtkButton *button, gpointer *data)
 	GtkTreeModel *pModel;
 	
 	GtkTreeIter iter;
-	gtk_tree_selection_get_selected (pSelection, &pModel, &iter);
+	if (! gtk_tree_selection_get_selected (pSelection, &pModel, &iter))
+		return ;
 	
 	gchar *cValue = NULL;
 	int iOrder;
@@ -591,7 +592,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (pOneWidget), FALSE);
 							
 							GtkCellRenderer *rend;
-							if (pAuthorizedValuesList != NULL && pAuthorizedValuesList[0] != NULL && iElementType != 'T')
+							if (pAuthorizedValuesList != NULL && iElementType != 'T')  // && pAuthorizedValuesList[0] != NULL
 							{
 								rend = gtk_cell_renderer_toggle_new ();
 								gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (pOneWidget), -1, NULL, rend, "active", 0, NULL);
@@ -640,7 +641,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								0);
 							
 							GtkTreeIter iter;
-							if (pAuthorizedValuesList != NULL && pAuthorizedValuesList[0] != NULL)
+							if (pAuthorizedValuesList != NULL)  //  && pAuthorizedValuesList[0] != NULL
 							{
 								int l, iOrder = 0;
 								for (l = 0; l < length; l ++)

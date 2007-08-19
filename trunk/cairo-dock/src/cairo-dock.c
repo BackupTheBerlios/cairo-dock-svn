@@ -66,6 +66,7 @@
 
 #include <pango/pango.h>
 #include <glib.h>
+#include <glib/gstdio.h>
 #include <gtk/gtk.h>
 
 #ifdef HAVE_GLITZ
@@ -82,11 +83,10 @@
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-load.h"
 #include "cairo-dock-config.h"
-
+#include "cairo-dock-themes-manager.h"
 
 #define CAIRO_DOCK_DATA_DIR ".cairo-dock"
 //#define CAIRO_DOCK_CONF_FILE "cairo-dock.conf"
-
 
 CairoDock *g_pMainDock;
 GHashTable *g_hDocksTable = NULL;
@@ -103,6 +103,7 @@ gboolean g_bResetScrollOnLeave;
 double g_fScrollAcceleration;
 gboolean g_bForceLoop;
 
+gchar *g_cCurrentThemePath = NULL;  // le chemin vers le repertoire du theme courant.
 gchar *g_cConfFile = NULL;  // le chemin du fichier de conf.
 gchar **g_cDefaultIconDirectory = NULL;  // les repertoires par defaut ou on va chercher les icones.
 gchar *g_cCairoDockDataDir = NULL;  // le repertoire ou on va chercher les .desktop.
@@ -297,108 +298,44 @@ main (int argc, char** argv)
 	
 	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
 	g_cCairoDockDataDir = g_strdup_printf ("%s/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR);
-	g_cConfFile = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_CONF_FILE);
-	cairo_dock_init (NULL);
-	
-#ifdef HAVE_GLITZ
-	if (g_bUseGlitz)
+	if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_IS_DIR))
 	{
-	    glitz_drawgeable_format_t templ, *format;la fenetre
-	    unsigned long	    mask = 0;
-	    XVisualInfo		    *vinfo = NULL;
-	    int			    screen = 0;
-	    GdkVisual		    *visual;
-	    GdkColormap		    *colormap;
-	    GdkDisplay		    *gdkdisplay;
-	    Display		    *g_XDisplay;
-
-	    templ.doublebuffer = 1;
-	    mask |= GLITZ_FORMAT_DOUBLEBUFFER_MASK;
-
-	    gdkdisplay = gtk_widget_get_display (pWindow);
-	    g_XDisplay   = gdk_x11_display_get_g_XDisplay (gdkdisplay);
-
-	    i = 0;
-	    do {
-		format = glitz_glx_find_window_format (g_XDisplay, screen,
-						       mask, &templ, i++);
-		if (format)
+		g_mkdir (g_cCairoDockDataDir, 7*8*8+7*8+5);
+	}
+	gchar *cThemeDir = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_THEMES_DIR);
+	if (! g_file_test (cThemeDir, G_FILE_TEST_IS_DIR))
+	{
+		g_mkdir (cThemeDir, 7*8*8+7*8+5);
+	}
+	g_free (cThemeDir);
+	
+	//\___________________ On charge le dernier theme ou on demande a l'utilisateur d'en choisir un.
+	gchar *cLastThemeName = cairo_dock_get_last_theme_name (g_cCairoDockDataDir);
+	g_cCurrentThemePath = cairo_dock_get_theme_path (cLastThemeName, NULL);
+	g_free (cLastThemeName);
+	
+	if (g_cCurrentThemePath != NULL)
+		g_cConfFile = cairo_dock_load_theme (g_cCurrentThemePath);
+	
+	if (g_cConfFile == NULL || ! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS))
+	{
+		g_cCurrentThemePath = cairo_dock_ask_initial_theme ();
+		
+		if (g_cCurrentThemePath == NULL)
 		{
-		    vinfo = glitz_glx_get_visual_info_from_format (g_XDisplay,
-								   screen,
-								   format);
-		    if (vinfo->depth == 32)
-		    {
-			gDrawFormat = format;
-			break;
-		    }
-		    else
-		    {
-			if (!gDrawFormat)
-			    gDrawFormat = format;
-		    }
+			g_print ("Mata ne.\n");
+			exit (0);
 		}
-	    } while (format);
-
-		if (!gDrawFormat)
+		else
 		{
-			fprintf (stderr, "no double buffered GLX visual\n");
-			return 1;
+			g_cConfFile = cairo_dock_load_theme (g_cCurrentThemePath);
+			if (g_cConfFile == NULL || ! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS))
+			{
+				g_error ("failed to open theme\n");
+			}
 		}
-
-		vinfo = glitz_glx_get_visual_info_from_format (g_XDisplay,
-							       screen,
-							       gDrawFormat);
-
-		visual = gdkx_visual_get (vinfo->visualid);
-		colormap = gdk_colormap_new (visual, TRUE);
-
-		gtk_widget_set_colormap (pWindow, colormap);
-		gtk_widget_set_double_buffered (pWindow, FALSE);
 	}
 	
-	if (g_bUseGlitz)
-	{
-		glitz_format_t templ;
-		GdkDisplay	   *gdkdisplay;
-		Display	   *g_XDisplay;
-		Window	   xid;
-
-		gdkdisplay = gdk_display_get_default ();
-		g_XDisplay   = gdk_x11_display_get_g_XDisplay (gdkdisplay);
-
-		xid = gdk_x11_drawable_get_xid (GDK_DRAWABLE (pWindow->window));
-
-		g_pGlitzDrawable = glitz_glx_create_drawable_for_window (g_XDisplay,
-									 0,
-									 gDrawFormat,
-									 xid,
-									 g_iCurrentWidth,
-									 g_iCurrentHeight);
-		if (!g_pGlitzDrawable)
-		{
-			fprintf (stderr, "failed to create drawable\n");
-			return 1;
-		}
-
-		templ.color        = gDrawFormat->color;g_iMaxDockWidth
-		templ.color.fourcc = GLITZ_FOURCC_RGB;
-
-		g_pGlitzFormat = glitz_find_format (g_pGlitzDrawable,
-						    GLITZ_FORMAT_RED_SIZE_MASK   |
-						    GLITZ_FORMAT_GREEN_SIZE_MASK |
-						    GLITZ_FORMAT_BLUE_SIZE_MASK  |
-						    GLITZ_FORMAT_ALPHA_SIZE_MASK |
-						    GLITZ_FORMAT_FOURCC_MASK,
-						    &templ,
-						    0);
-		if (!g_pGlitzFormat)
-		{
-			fprintf (stderr, "couldn't find surface format\n");
-			return 1;
-		}
-	}
-#endif
 	
 	gtk_main ();
 	/*Window root = DefaultRootWindow (g_XDisplay);

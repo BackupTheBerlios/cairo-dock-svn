@@ -62,7 +62,9 @@ cairo_dock_SOURCES = \
 	cairo-dock-dock-factory.c\
 	cairo-dock-dock-factory.h\
 	cairo-dock-animations.c\
-	cairo-dock-animations.h
+	cairo-dock-animations.h\
+	cairo-dock-themes-manager.c\
+	cairo-dock-themes-manager.h
 	
 
 cairo_dockincludedir =\
@@ -91,4 +93,5 @@ cairo_docksubinclude_HEADERS =\
 	cairo-dock-separator-factory.h\
 	cairo-dock-desktop-file-factory.h\
 	cairo-dock-keyfile-manager.h\
-	cairo-dock-dock-factory.h
+	cairo-dock-dock-factory.h\
+	cairo-dock-themes-manager.h

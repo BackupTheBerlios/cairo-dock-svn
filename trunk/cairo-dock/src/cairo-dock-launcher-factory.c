@@ -40,7 +40,7 @@ extern int g_iDockLineWidth;
 extern int g_iIconGap;
 
 extern gchar *g_cConfFile;
-extern gchar *g_cCairoDockDataDir;
+extern gchar *g_cCurrentThemePath;
 extern gchar **g_cDefaultIconDirectory;
 
 extern int g_iVisibleZoneWidth;
@@ -348,7 +348,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 
 void cairo_dock_load_desktop_file_information (gchar *cDesktopFileName, Icon *icon)
 {
-	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, cDesktopFileName);
+	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cDesktopFileName);
 	
 	GError *erreur = NULL;
 	GKeyFile* keyfile = g_key_file_new();

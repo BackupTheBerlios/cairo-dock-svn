@@ -57,7 +57,7 @@ extern gboolean g_bLabelForPointedIconOnly;
 extern double g_fLabelAlphaThreshold;
 
 extern gchar **g_cDefaultIconDirectory;
-extern gchar *g_cCairoDockDataDir;
+extern gchar *g_cCurrentThemePath;
 extern gchar *g_cConfFile;
 
 extern int g_iVisibleZoneWidth;
@@ -368,7 +368,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	}
 	g_strfreev (g_cDefaultIconDirectory);
 	g_cDefaultIconDirectory = g_new0 (gchar *, length + 2);
-	g_cDefaultIconDirectory[0] = g_strdup (g_cCairoDockDataDir);
+	g_cDefaultIconDirectory[0] = g_strdup (g_cCurrentThemePath);
 	if (directoryList != NULL && length > 0)
 		memcpy (&g_cDefaultIconDirectory[1], directoryList, length * sizeof (gchar *));
 	g_free (directoryList);
@@ -1037,7 +1037,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	g_fBackgroundImageWidth = 0;
 	g_fBackgroundImageHeight = 0;
 	if (pDock->icons == NULL)
-		cairo_dock_build_docks_tree_with_desktop_files (pDock, g_cCairoDockDataDir);
+		cairo_dock_build_docks_tree_with_desktop_files (pDock, g_cCurrentThemePath);
 	else
 		cairo_dock_reload_buffers_in_all_dock (g_hDocksTable, 1 + g_fAmplitude, g_iLabelSize, g_bUseText, g_cLabelPolice);
 	
@@ -1088,11 +1088,11 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	
 	if ((cPreviousLanguage != NULL && g_cLanguage != NULL && strcmp (cPreviousLanguage, g_cLanguage) != 0) || bFlushConfFileNeeded)
 	{
-		gchar *cCommand = g_strdup_printf ("/bin/cp %s/cairo-dock-%s.conf %s", CAIRO_DOCK_SHARE_DATA_DIR, g_cLanguage, g_cConfFile);
+		gchar *cCommand = g_strdup_printf ("/bin/cp %s/cairo-dock-%s.conf %s", CAIRO_DOCK_SHARE_DATA_DIR, g_cLanguage, conf_file);
 		system (cCommand);
 		g_free (cCommand);
 		
-		cairo_dock_replace_values_in_conf_file (g_cConfFile, fconf);
+		cairo_dock_replace_values_in_conf_file (conf_file, fconf);
 		
 		cairo_dock_update_conf_file_with_modules (conf_file, g_hModuleTable);
 		cairo_dock_update_conf_file_with_translations (conf_file, CAIRO_DOCK_SHARE_DATA_DIR);
@@ -1287,7 +1287,8 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 	GString *cComment = g_string_new ("");
 	g_string_printf (cComment, "s%d[", iNbAvailableChoices);
 	g_hash_table_foreach (pModuleTable, (GHFunc) _cairo_dock_write_one_name, cComment);
-	cComment->len --;
+	if (cComment->str[cComment->len-1] == ';')  // peut etre faux si aucune valeur n'a ete ecrite.
+		cComment->len --;
 	g_string_append_printf (cComment, "] %s", (cUsefullComment != NULL ? cUsefullComment : ""));
 	
 	g_key_file_set_comment (pKeyFile, cGroupName, cKeyName, cComment->str, &erreur);

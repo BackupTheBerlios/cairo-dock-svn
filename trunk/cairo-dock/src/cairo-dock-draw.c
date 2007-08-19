@@ -87,7 +87,6 @@ extern GtkWidget *g_pWidget;
 extern gboolean g_bUseGlitz;
 
 
-
 double cairo_dock_get_current_dock_width (CairoDock *pDock)
 {
 	if (pDock->icons == NULL)
@@ -101,35 +100,34 @@ double cairo_dock_get_current_dock_width (CairoDock *pDock)
 }
 
 
-
 cairo_t * cairo_dock_create_context_from_window (GdkWindow* pWindow)
 {
 #ifdef HAVE_GLITZ
-	if (g_pGlitzDrawable)
+	if (pDock->pGlitzDrawable)
 	{
 		glitz_surface_t* pGlitzSurface;
 		cairo_surface_t* pCairoSurface;
 		cairo_t* pCairoContext;
-
-		pGlitzSurface = glitz_surface_create (g_pGlitzDrawable,
+		
+		pGlitzSurface = glitz_surface_create (pDock->pGlitzDrawable,
 			g_pGlitzFormat,
 			g_iCurrentWidth,
 			g_iCurrentHeight,
 			0,
 			NULL);
-
+		
 		if (gDrawFormat->doublebuffer)
 			glitz_surface_attach (pGlitzSurface,
-				g_pGlitzDrawable,
+				pDock->pGlitzDrawable,
 				GLITZ_DRAWABLE_BUFFER_BACK_COLOR);
 		else
 			glitz_surface_attach (pGlitzSurface,
-				g_pGlitzDrawable,
+				pDock->pGlitzDrawable,
 				GLITZ_DRAWABLE_BUFFER_FRONT_COLOR);
-
+		
 		pCairoSurface = cairo_glitz_surface_create (pGlitzSurface);
 		pCairoContext = cairo_create (pCairoSurface);
-
+		
 		cairo_surface_destroy (pCairoSurface);
 		glitz_surface_destroy (pGlitzSurface);
 
@@ -555,7 +553,7 @@ void cairo_dock_redraw_my_icon (Icon *icon, GtkWidget *pWidget)
 
 void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 {
-	//g_print ("%s ((%d;%d) x (%d;%d) / (%dx%d))\n", __func__, pArea->x, pArea->y, pArea->width, pArea->height, pDock->iCurrentWidth, pDock->iCurrentHeight);
+	g_print ("%s ((%d;%d) x (%d;%d) / (%dx%d))\n", __func__, pArea->x, pArea->y, pArea->width, pArea->height, pDock->iCurrentWidth, pDock->iCurrentHeight);
 	double fLineWidth = g_iDockLineWidth;
 	int iWidth = pDock->iCurrentWidth;
 	int iHeight = pDock->iCurrentHeight;
@@ -680,18 +678,12 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 			do
 			{
 				icon = ic->data;
+				fX = icon->fX - (pDock->iMaxDockWidth - pDock->iCurrentWidth) / 2;
+				
 				cairo_save (pCairoContext);
-				//g_print ("redessin de %s (%.2f->%.2f)\n", icon->acName, fX, (fX + icon->fWidth * icon->fScale));
-				/*fX = icon->fX - (pDock->iMaxDockWidth - pDock->iCurrentWidth) / 2;
-				if (g_bHorizontalDock)
-					cairo_translate (pCairoContext, fX, icon->fY);
-				else
-					cairo_translate (pCairoContext, icon->fY, fX);
-				cairo_scale (pCairoContext, icon->fScale / (1 + g_fAmplitude), icon->fScale / (1 + g_fAmplitude));
-				cairo_set_source_surface (pCairoContext, icon->pIconBuffer, 0.0, 0.0);
-				cairo_paint (pCairoContext);
-				cairo_restore (pCairoContext);*/
+				g_print ("redessin de %s (%.2f->%.2f)\n", icon->acName, fX, (fX + icon->fWidth * icon->fScale));
 				cairo_dock_render_one_icon (icon, pCairoContext, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside);
+				cairo_restore (pCairoContext);
 				
 				ic = ic->next;
 				if (ic == NULL)
