@@ -218,10 +218,11 @@ static void _cairo_dock_draw_frame_vertical (CairoDock *pDock, cairo_t *pCairoCo
 static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth, gboolean bLoop, gboolean bInside)
 {
 	//\_____________________ On dessine les icones en les zoomant du facteur d'echelle pre-calcule.
-	double fDeltaLeft = (iMaxDockWidth - iCurrentWidth) / 2, fDeltaRight = fDeltaLeft;
+	///double fDeltaLeft = (iMaxDockWidth - iCurrentWidth) / 2, fDeltaRight = fDeltaLeft;
+	double fDeltaLeft = (iMaxDockWidth - iCurrentWidth - icon->fWidth * icon->fScale) / 2, fDeltaRight = fDeltaLeft;
 	double fX, fY, fAlpha, fTheta;
 	fX = icon->fX + (iCurrentWidth - iMaxDockWidth) / 2;
-	//g_print ("(%s) icon->fX : %.2f -> %.2f\n", icon->acName, icon->fX, fX);
+	g_print ("(%s) icon->fX : %.2f -> %.2f\n", icon->acName, icon->fX, fX);
 	if (fX >= 0 && fX + icon->fWidth * icon->fScale <= iCurrentWidth)
 	{
 		fAlpha = 1;
@@ -252,21 +253,23 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, int 
 		{
 			a = iCurrentHeight - icon->fHeight * icon->fScale;
 			b = (iCurrentWidth - icon->fWidth * icon->fScale) / 2;
-			fTheta = (fX / fDeltaLeft - 1) * G_PI / 2;
+			///fTheta = (fX / fDeltaLeft - 1) * G_PI / 2;
+			fTheta = ((fX + icon->fWidth * icon->fScale / 2) / fDeltaLeft - 1) * G_PI / 2;
 			fX = b * (1 + sin (fTheta));
-			fY = (g_bDirectionUp ? a * (1 + cos (fTheta)) : - a * cos (fTheta) + g_iDockLineWidth);
+			fY = (g_bDirectionUp ? a * (1 + MIN (0, cos (fTheta))) : - a * cos (fTheta) + g_iDockLineWidth);
 			fAlpha = MAX (0.2, MIN (0.75, sin (fTheta) * sin (fTheta)));
-			//g_print ("  theta = %.2fdeg -> fX = %.2f; fY = %.2f; alpha = %.2f\n", fTheta / G_PI*180, fX, fY, fAlpha);
+			g_print ("  theta = %.2fdeg -> fX = %.2f; fY = %.2f; alpha = %.2f\n", fTheta / G_PI*180, fX, fY, fAlpha);
 		}
 		else
 		{
 			a = iCurrentHeight - icon->fHeight * icon->fScale;
 			b = (iCurrentWidth - icon->fWidth * icon->fScale) / 2;
-			fTheta = ((fX + icon->fWidth * icon->fScale - iCurrentWidth) / fDeltaRight + 1) * G_PI / 2;
+			///fTheta = ((fX + icon->fWidth * icon->fScale - iCurrentWidth) / fDeltaRight + 1) * G_PI / 2;
+			fTheta = ((fX + icon->fWidth * icon->fScale / 2 - iCurrentWidth) / fDeltaLeft + 1) * G_PI / 2;
 			fX = b * (1 + sin (fTheta));
-			fY = (g_bDirectionUp ? a * (1 + cos (fTheta)) : - a * cos (fTheta) + g_iDockLineWidth);
+			fY = (g_bDirectionUp ? a * (1 + MIN (0, cos (fTheta))) : - a * cos (fTheta) + g_iDockLineWidth);
 			fAlpha = MAX (0.2, MIN (0.75, sin (fTheta) * sin (fTheta)));
-			//g_print ("  theta = %.2fdeg -> fX = %.2f; fY = %.2f; alpha = %.2f\n", fTheta / G_PI*180, fX, fY, fAlpha);
+			g_print ("  theta = %.2fdeg -> fX = %.2f; fY = %.2f; alpha = %.2f\n", fTheta / G_PI*180, fX, fY, fAlpha);
 		}
 	}
 	
@@ -497,7 +500,7 @@ void render (CairoDock *pDock)
 		return ;
 	}
 	//for (ic = pDock->icons; ic != NULL; ic = ic->next)
-	//g_print ("--------------------\n");
+	g_print ("--------------------\n");
 	do
 	{
 		icon = (Icon*) ic->data;
