@@ -66,6 +66,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY);
 
 double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawnElement, int iFlatDockWidth);
 
+Icon *cairo_dock_guess_pointed_icon (CairoDock *pDock, int iMouseX);
 
 #endif
 

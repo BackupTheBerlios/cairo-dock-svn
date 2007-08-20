@@ -530,7 +530,7 @@ static void cairo_dock_delete_menu (GtkMenuShell *menu, CairoDock *pDock)
 	pDock->bMenuVisible = FALSE;
 	if (! pDock->bInside)
 	{
-		//g_print ("on force a quitter\n");
+		g_print ("on force a quitter\n");
 		pDock->bInside = TRUE;
 		pDock->bAtBottom = FALSE;
 		on_leave_notify2 (pDock->pWidget,

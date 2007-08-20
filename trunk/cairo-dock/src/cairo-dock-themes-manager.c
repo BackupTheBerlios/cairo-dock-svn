@@ -55,7 +55,8 @@ gchar *cairo_dock_edit_themes (gchar *cLanguage, GHashTable **hThemeTable)
 	GHashTable *hUserThemeTable = cairo_dock_list_themes (cThemesDir, NULL, NULL);
 	g_free (cThemesDir);
 	gchar *cCurrentThemeName = (g_cCurrentThemePath != NULL ? g_path_get_basename (g_cCurrentThemePath) : NULL);
-	g_hash_table_remove (hUserThemeTable, cCurrentThemeName);
+	if (cCurrentThemeName != NULL)
+		g_hash_table_remove (hUserThemeTable, cCurrentThemeName);
 	
 	GString *sThemeNames = g_string_new ("");
 	g_hash_table_foreach (hUserThemeTable, (GHFunc) _cairo_dock_write_one_theme_name, sThemeNames);

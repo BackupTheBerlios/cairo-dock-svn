@@ -155,11 +155,20 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	
 	if (pPointedIcon != pLastPointedIcon || g_pLastPointedDock == NULL)
 	{
-		//g_print ("on change d'icone\n");
-		if (pDock == g_pLastPointedDock && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
+		//g_print ("on change d'icone (-> %s)\n", (pPointedIcon != NULL ? pPointedIcon->acName : "rien"));
+		if ((pDock == g_pLastPointedDock || g_pLastPointedDock == NULL) && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
 		{
 			if (GTK_WIDGET_VISIBLE (pLastPointedIcon->pSubDock->pWidget))
-				gdk_window_hide (pLastPointedIcon->pSubDock->pWidget->window);
+			{
+				//g_print ("on cache %s en changeant d'icône\n", pLastPointedIcon->acName);
+				//gdk_window_hide (pLastPointedIcon->pSubDock->pWidget->window);
+				//while (gtk_events_pending ())
+				//	gtk_main_iteration ();
+				pLastPointedIcon->pSubDock->iScrollOffset = 0;
+				gtk_widget_hide (pLastPointedIcon->pSubDock->pWidget);
+			}
+			//else
+			//	g_print ("pas encore visible !\n");
 		}
 		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL)
 		{
@@ -190,6 +199,8 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
 		}
 		pLastPointedIcon = pPointedIcon;
+		if (g_pLastPointedDock == NULL)
+			 g_pLastPointedDock = pDock;
 	}
 	
 	return FALSE;
@@ -236,27 +247,41 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
+	//g_print ("%s ()\n", __func__);
 	if (pDock->bAtBottom || ! pDock->bInside)
 		return FALSE;
-	g_print ("%s ()\n", __func__);
+	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
 	Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
-	if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL)
+	//if (pPointedIcon == NULL)
+	//	g_print ("  aucune icone pointee\n");
+	//else
+	//	g_print ("  on pointe sur %s\n", pPointedIcon->acName);
+	/*if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL)
 	{
 		while (gtk_events_pending ())
 			gtk_main_iteration ();
 		pDock->bInside = FALSE;
 		if (pPointedIcon->pSubDock->bInside)
 		{
+			//g_print ("on est dans le sous-dock, donc on ne le cache pas\n");
 			pDock->bAtTop = FALSE;
 			return FALSE;
 		}
 		else  // si on sort du dock sans passer par le sous-dock, par exemple en sortant par le bas.
 		{
-			gdk_window_hide (pPointedIcon->pSubDock->pWidget->window);
+			//g_print ("on cache %s en sortant du dock principal\n", pPointedIcon->acName);
+			//while (gtk_events_pending ())
+			//	gtk_main_iteration ();
+			//gdk_window_hide (pPointedIcon->pSubDock->pWidget->window);
+			pPointedIcon->pSubDock->iScrollOffset = 0;
+			gtk_widget_hide (pPointedIcon->pSubDock->pWidget);
 		}
-	}
-	
+	}*/
+	while (gtk_events_pending ())  // on laisse le temps au signal d'entree dans le sous-dock d'etre traite.
+		gtk_main_iteration ();
+	if (! cairo_dock_hide_child_docks (pDock))  // on quitte si on entre dans un sous-dock, pour rester en position "haute".
+		return FALSE;
 	
 	cairo_dock_leave_from_main_dock (pDock);
 	
@@ -270,9 +295,10 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 {
 	if (pDock->bAtTop || pDock->bInside || pDock->iSidMoveDown != 0)  // le 'iSidMoveDown != 0' est la pour empecher le dock de "vibrer" si l'utilisateur sort par en bas avec l'auto-hide active.
 		return FALSE;
-	//g_print ("%s ()\n", __func__);
+	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
-	gtk_window_present (GTK_WINDOW (pWidget));
+	if (! pDock->bIsMainDock)
+		gtk_window_present (GTK_WINDOW (pWidget));
 	pDock->bInside = TRUE;
 	
 	int iNewWidth, iNewHeight;
@@ -694,7 +720,7 @@ gboolean on_configure (GtkWidget* pWidget,
 			GdkEventConfigure* pEvent,
 			CairoDock *pDock)
 {
-	//g_print ("%s ()\n", __func__);
+	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	gint iNewWidth, iNewHeight;
 	if (g_bHorizontalDock)
 	{

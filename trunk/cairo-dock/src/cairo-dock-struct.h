@@ -114,6 +114,9 @@ typedef struct _Icon {
 	gdouble fX;
 	gdouble fY;
 	gdouble fScale;
+	gdouble fDrawX;
+	gdouble fDrawY;
+	gdouble fWidthFactor;
 	gboolean bPointed;
 	gint iCount;
 	gint iAnimationType;

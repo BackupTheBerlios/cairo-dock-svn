@@ -654,8 +654,8 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 			{
 				prev_icon = (ic->prev != NULL ? ic->prev->data : cairo_dock_get_last_icon (pIconList));
 				icon->fX = prev_icon->fX + prev_icon->fWidth * prev_icon->fScale + g_iIconGap;
-				if (icon->fX > icon->fXMax - icon->fWidth / 8 && iWidth != 0 && icon->fPhase == G_PI)
-					icon->fX = icon->fXMax - icon->fWidth / 16;
+				if (icon->fX > icon->fXMax - icon->fWidth / 6 && iWidth != 0 && icon->fPhase == G_PI)
+					icon->fX = icon->fXMax - icon->fWidth / 12;
 			}
 		}
 		
@@ -698,10 +698,10 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 		
 		prev_icon->fX = icon->fX - g_iIconGap - prev_icon->fWidth * prev_icon->fScale;
 		//g_print ("fX <- %.2f; fXMin : %.2f\n", prev_icon->fX, prev_icon->fXMin);
-		if (prev_icon->fX < prev_icon->fXMin + prev_icon->fWidth / 5 && iWidth != 0 && prev_icon->fPhase == 0 && x_abs < iWidth)
+		if (prev_icon->fX < prev_icon->fXMin + prev_icon->fWidth / 6 && iWidth != 0 && prev_icon->fPhase == 0 && x_abs < iWidth)
 		{
 			//g_print ("  on contraint %s (fXMin=%.2f , fX=%.2f\n", prev_icon->acName, prev_icon->fXMin, prev_icon->fX);
-			prev_icon->fX = prev_icon->fXMin + prev_icon->fWidth / 10;
+			prev_icon->fX = prev_icon->fXMin + prev_icon->fWidth / 12;
 		}
 	}
 	
@@ -837,4 +837,22 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 	}
 	
 	return fMaxDockWidth;
+}
+
+Icon *cairo_dock_guess_pointed_icon (CairoDock *pDock, int iMouseX)
+{
+	int x_abs = iMouseX - (pDock->iCurrentWidth - pDock->iMinDockWidth) / 2;  // ecart par rapport a la gauche du dock minimal.
+	
+	Icon *icon;
+	GList *pFirstDrawnElement = (pDock->pFirstDrawnElement != NULL ? pDock->pFirstDrawnElement : pDock->icons);
+	GList *ic = pFirstDrawnElement;
+	do
+	{
+		icon = ic->data;
+		if (x_abs >= icon->fXAtRest && x_abs <= icon->fXAtRest + icon->fWidth)
+			return icon;
+	} while (ic != pFirstDrawnElement);
+	
+	
+	return NULL;
 }

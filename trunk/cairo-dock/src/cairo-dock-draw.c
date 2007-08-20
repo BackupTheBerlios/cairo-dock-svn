@@ -179,34 +179,36 @@ static void _cairo_dock_draw_frame_horizontal (CairoDock *pDock, cairo_t *pCairo
 }
 static void _cairo_dock_draw_frame_vertical (CairoDock *pDock, cairo_t *pCairoContext, double fRadius, double fLineWidth, double fDockWidth, double fDockOffsetX, double fDockOffsetY, int sens, gboolean bIsLoop)
 {
-	cairo_move_to (pCairoContext, fDockOffsetY, fDockOffsetX);
+	double fDeltaXForLoop = (bIsLoop ? (pDock->iMaxIconHeight + fLineWidth - 2 * fRadius) * tan (30.*G_PI/180) : 0.);
+	double fDeltaCornerForLoop = fRadius / (pDock->iMaxIconHeight + fLineWidth - 2 * fRadius) * fDeltaXForLoop;
+	cairo_move_to (pCairoContext, fDockOffsetY, fDockOffsetX + fDeltaXForLoop + fDeltaCornerForLoop / 2);
 	
-	cairo_rel_line_to (pCairoContext, 0, fDockWidth - (2 * fRadius + fLineWidth));
+	cairo_rel_line_to (pCairoContext, 0, fDockWidth - (2 * fRadius + fLineWidth + 2 * fDeltaXForLoop + fDeltaCornerForLoop));
 	// Top Right.
 	cairo_rel_curve_to (pCairoContext,
 		0, 0,
-		0, fRadius,
+		0, fRadius - fDeltaCornerForLoop,
 		sens * fRadius, fRadius);
-	cairo_rel_line_to (pCairoContext, sens * (pDock->iMaxIconHeight + fLineWidth - fRadius * (g_bRoundedBottomCorner ? 2 : 1)), 0);
+	cairo_rel_line_to (pCairoContext, sens * (pDock->iMaxIconHeight + fLineWidth - fRadius * (g_bRoundedBottomCorner ? 2 : 1)), fDeltaXForLoop);
 	// Bottom Right.
 	if (g_bRoundedBottomCorner)
 		cairo_rel_curve_to (pCairoContext,
 			0, 0,
-			sens * fRadius, 0,
+			sens * fRadius, fDeltaCornerForLoop,
 			sens * fRadius, -fRadius);
 	
-	cairo_rel_line_to (pCairoContext, 0, -fDockWidth + fLineWidth + (g_bRoundedBottomCorner ? 2 * fRadius : 0));
+	cairo_rel_line_to (pCairoContext, 0, -fDockWidth + fLineWidth + (g_bRoundedBottomCorner ? 2 * fRadius : 0) + fDeltaCornerForLoop);
 	// Bottom Left
 	if (g_bRoundedBottomCorner)
 		cairo_rel_curve_to (pCairoContext,
 			0, 0,
-			0, -fRadius,
+			0, -(fRadius + fDeltaCornerForLoop),
 			-sens * fRadius, -fRadius);
-	cairo_rel_line_to (pCairoContext, sens * (- pDock->iMaxIconHeight - fLineWidth + fRadius * (g_bRoundedBottomCorner ? 2 : 1)), 0);
+	cairo_rel_line_to (pCairoContext, sens * (- pDock->iMaxIconHeight - fLineWidth + fRadius * (g_bRoundedBottomCorner ? 2 : 1)), fDeltaXForLoop);
 	// Top Left.
 	cairo_rel_curve_to (pCairoContext,
 		0, 0,
-		-sens * fRadius, 0,
+		-sens * fRadius, fDeltaCornerForLoop,
 		-sens * fRadius, fRadius);
 	if (fRadius < 1)
 		cairo_close_path (pCairoContext);
@@ -220,7 +222,7 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, int 
 	double fX, fY, fAlpha, fTheta;
 	fX = icon->fX + (iCurrentWidth - iMaxDockWidth) / 2;
 	//g_print ("(%s) icon->fX : %.2f -> %.2f\n", icon->acName, icon->fX, fX);
-	if ((fX >= 0 && fX + icon->fWidth * icon->fScale <= iCurrentWidth))
+	if (fX >= 0 && fX + icon->fWidth * icon->fScale <= iCurrentWidth)
 	{
 		fAlpha = 1;
 		fY = icon->fY;
@@ -267,7 +269,6 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, int 
 			//g_print ("  theta = %.2fdeg -> fX = %.2f; fY = %.2f; alpha = %.2f\n", fTheta / G_PI*180, fX, fY, fAlpha);
 		}
 	}
-	
 	
 	
 	double fWidthFactor = 1.;
@@ -352,15 +353,15 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, int 
 		if (icon->iCount > 0 && icon->iAnimationType == CAIRO_DOCK_BLINK)
 		{
 			int c = icon->iCount;
-			double alpha;
 			if ( (c/10) & 1)
-				alpha = 1. * (c%10) / 10;
+				fAlpha *= 1. * (c%10) / 10;
 			else
-				alpha = 1. * (9 - (c%10)) / 10;
-			cairo_paint_with_alpha (pCairoContext, alpha * alpha);
+				fAlpha *= 1. * (9 - (c%10)) / 10;
+			fAlpha *= fAlpha;
+			//cairo_paint_with_alpha (pCairoContext, alpha * alpha);
 			icon->iCount --;
 		}
-		else
+		//else
 		{
 			if (fAlpha == 1)
 				cairo_paint (pCairoContext);
@@ -387,6 +388,10 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, int 
 		//cairo_paint_with_alpha (pCairoContext, (g_bLabelForPointedIconOnly ? 1.0 : pow (fMagnitude, 3)));
 		cairo_paint_with_alpha (pCairoContext, (g_bLabelForPointedIconOnly ? 1.0 : (fMagnitude > 1. - 1. / g_fLabelAlphaThreshold ? 1.0 : 1. / (1. - fMagnitude) / g_fLabelAlphaThreshold)));
 	}
+	
+	icon->fDrawX = fX;
+	icon->fDrawY = fY;
+	icon->fWidthFactor = fWidthFactor;  // son signe nous renseigne sur la position de l'icone (avant-plan ou arriere-plan).
 }
 
 void render (CairoDock *pDock)
@@ -539,7 +544,7 @@ void render (CairoDock *pDock)
 
 void cairo_dock_render_background (CairoDock *pDock)
 {
-	//g_print ("%s ()\n", __func__);
+	g_print ("%s (%.2f)\n", __func__, g_fVisibleZoneAlpha);
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
 	
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
@@ -558,7 +563,7 @@ void cairo_dock_render_background (CairoDock *pDock)
 
 void cairo_dock_render_blank (CairoDock *pDock)
 {
-	//g_print ("%s ()\n", __func__);
+	g_print ("%s ()\n", __func__);
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
 	
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
@@ -572,13 +577,14 @@ void cairo_dock_render_blank (CairoDock *pDock)
 
 void cairo_dock_redraw_my_icon (Icon *icon, GtkWidget *pWidget)
 {
-	GdkRectangle rect = {(int) round (icon->fX - (g_pMainDock->iMaxDockWidth - g_pMainDock->iCurrentWidth) / 2), (int) icon->fY, (int) round (icon->fWidth * icon->fScale), (int) icon->fHeight * icon->fScale};
+	//GdkRectangle rect = {(int) round (icon->fX - (g_pMainDock->iMaxDockWidth - g_pMainDock->iCurrentWidth) / 2), (int) icon->fY, (int) round (icon->fWidth * icon->fScale), (int) icon->fHeight * icon->fScale};
+	GdkRectangle rect = {(int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor)), (int) icon->fDrawY, (int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)), (int) icon->fHeight * icon->fScale};
 	if (! g_bHorizontalDock)
 	{
-		rect.x = (int) icon->fY;
-		rect.y = (int) round (icon->fX - (g_pMainDock->iMaxDockWidth - g_pMainDock->iCurrentWidth) / 2);
+		rect.x = (int) icon->fDrawY;
+		rect.y = (int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor));
 		rect.width = (int) icon->fHeight * icon->fScale;
-		rect.height = (int) round (icon->fWidth * icon->fScale);
+		rect.height = (int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor));
 	}
 	gdk_window_invalidate_rect (pWidget->window, &rect, FALSE);
 }
@@ -694,12 +700,13 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 	
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 	
-	double fX, fXLimit = (g_bHorizontalDock ? pArea->x + pArea->width : pArea->y + pArea->height);
+	//double fX, fXLimit = (g_bHorizontalDock ? pArea->x + pArea->width : pArea->y + pArea->height);
+	double fX, fXMin = (g_bHorizontalDock ? pArea->x : pArea->y), fXMax = (g_bHorizontalDock ? pArea->x + pArea->width : pArea->y + pArea->height);
 	GList *ic;
 	Icon *icon;
 	GList *pFirstDrawnElement = (pDock->pFirstDrawnElement != NULL ? pDock->pFirstDrawnElement : pDock->icons);
 	ic = pFirstDrawnElement;
-	do
+	/*do
 	{
 		if (ic == NULL)
 			break;
@@ -729,7 +736,56 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 		if (ic == NULL)
 			ic = pDock->icons;
 	}
-	while (ic != pFirstDrawnElement);
+	while (ic != pFirstDrawnElement);*/
+	do
+	{
+		icon = (Icon*) ic->data;
+		
+		fX = icon->fDrawX;
+		//g_print ("test a gauche de %s (%.2f -> %.2f)\n", icon->acName, fX, fX + icon->fWidth * icon->fScale * fabs (icon->fWidthFactor));
+		
+		if (fX <= pArea->x + pArea->width && floor (fX + icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)) > pArea->x)
+		{
+			cairo_save (pCairoContext);
+			
+			//g_print ("  redessin a gauche de %s\n", icon->acName);
+			cairo_dock_render_one_icon (icon, pCairoContext, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside);
+			
+			cairo_restore (pCairoContext);
+		}
+		ic = ic->next;
+		if (ic == NULL)
+			ic = pDock->icons;
+	}
+	while (icon->fX + icon->fWidth * icon->fScale - (pDock->iMaxDockWidth - pDock->iCurrentWidth) / 2 < 0 && ic != pFirstDrawnElement);
+	
+	GList *pMiddleElement = ic;
+	ic = pFirstDrawnElement->prev;
+	if (ic == NULL)
+		ic = g_list_last (pDock->icons);
+	do
+	{
+		icon = (Icon*) ic->data;
+		
+		fX = icon->fDrawX;
+		//g_print ("test a droite de %s (%.2f -> %.2f)\n", icon->acName, fX, fX + icon->fWidth * icon->fScale * fabs (icon->fWidthFactor));
+		
+		if (fX <= pArea->x + pArea->width && floor (fX + icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)) > pArea->x)
+		{
+			cairo_save (pCairoContext);
+			
+			//g_print ("  redessin a droite de %s\n", icon->acName);
+			cairo_dock_render_one_icon (icon, pCairoContext, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside);
+			
+			cairo_restore (pCairoContext);
+		}
+		if (ic == pMiddleElement)
+			break;
+		ic = ic->prev;
+		if (ic == NULL)
+			ic = g_list_last (pDock->icons);
+	}
+	while (TRUE);
 	
 	cairo_destroy (pCairoContext);
 }
@@ -765,6 +821,35 @@ void cairo_dock_hide_parent_docks (CairoDock *pDock)
 	 g_hash_table_find (g_hDocksTable, (GHRFunc)_cairo_dock_hide_dock, pDock);
 }
 
+gboolean cairo_dock_hide_child_docks (CairoDock *pDock)
+{
+	GList* ic;
+	Icon *icon;
+	for (ic = pDock->icons; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (icon->pSubDock != NULL && GTK_WIDGET_VISIBLE (icon->pSubDock->pWidget))
+		{
+			if (icon->pSubDock->bInside)
+			{
+				//g_print ("on est dans le sous-dock, donc on ne le cache pas\n");
+				pDock->bInside = FALSE;
+				pDock->bAtTop = FALSE;
+				return FALSE;
+			}
+			else  // si on sort du dock sans passer par le sous-dock, par exemple en sortant par le bas.
+			{
+				//g_print ("on cache %s en sortant du dock principal\n", pPointedIcon->acName);
+				//while (gtk_events_pending ())
+				//	gtk_main_iteration ();
+				//gdk_window_hide (pPointedIcon->pSubDock->pWidget->window);
+				icon->pSubDock->iScrollOffset = 0;
+				gtk_widget_hide (icon->pSubDock->pWidget);
+			}
+		}
+	}
+	return TRUE;
+}
 
 
 void cairo_dock_calculate_window_position_at_balance (CairoDock *pDock, CairoDockSizeType iSizeType, int *iNewWidth, int *iNewHeight)

@@ -57,7 +57,7 @@ extern double g_fStripesColorDark[4];
 
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
-extern gchar *g_cCairoDockDataDir;
+extern gchar *g_cCurrentThemePath;
 
 extern cairo_surface_t *g_pVisibleZoneSurface;
 extern double g_fVisibleZoneImageWidth, g_fVisibleZoneImageHeight;
@@ -599,7 +599,7 @@ void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *Rec
 			icon->pSubDock = NULL;
 		}
 		
-		cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, icon->acDesktopFileName);
+		cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon->acDesktopFileName);
 		
 		if (ReceivingDock == NULL || cReceivingDockName == NULL)  // alors on les jete.
 		{
