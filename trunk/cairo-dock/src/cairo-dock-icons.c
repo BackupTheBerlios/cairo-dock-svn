@@ -678,11 +678,9 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 	//\_______________ On place les icones precedant l'icone pointee par rapport a celle-ci.
 	if (pointed_ic == NULL)  // on est a droite des icones.
 	{
-		pointed_ic = (pFirstDrawnElement == NULL || pFirstDrawnElement->prev == NULL ? g_list_last (pIconList) : pFirstDrawnElement->prev);
-		if (pointed_ic == NULL)  // peut arriver si le dock est vide.
-			return NULL;
+		pointed_ic = (pFirstDrawnElement->prev == NULL ? g_list_last (pIconList) : pFirstDrawnElement->prev);
 		icon = pointed_ic->data;
-		icon->fX = x_cumulated - (iMinDockWidth - iWidth) / 2 - icon->fWidth * icon->fScale - g_iIconGap;
+		icon->fX = x_cumulated - (iMinDockWidth - iWidth) / 2 + (1 - icon->fScale) * icon->fWidth;
 	}
 	
 	ic = pointed_ic;
