@@ -506,6 +506,9 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 	{
 		if (pButton->type == GDK_BUTTON_RELEASE)
 		{
+			if (s_pIconClicked != NULL)
+				s_pIconClicked->fPersonnalAlpha = 0;
+			
 			Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
 			if (icon != NULL && ! CAIRO_DOCK_IS_SEPARATOR (icon) && icon == s_pIconClicked)
 			{
@@ -554,7 +557,9 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 			}
 			else if (s_pIconClicked != NULL && icon != NULL && icon != s_pIconClicked && icon->iType == s_pIconClicked->iType)
 			{
-				g_print ("deplacement de %s\n", s_pIconClicked->acName);
+				//g_print ("deplacement de %s\n", s_pIconClicked->acName);
+				s_pIconClicked->iCount = 20;  // 2 rebonds.
+				s_pIconClicked->iAnimationType = CAIRO_DOCK_BOUNCE;
 				int iX, iY;
 				if (g_bHorizontalDock)
 				{
@@ -577,12 +582,16 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				
 				cairo_dock_calculate_icons (pDock, iX, iY);
 				gtk_widget_queue_draw (pWidget);
+				
+				if (pDock->iSidShrinkDown == 0)  // on commence a faire diminuer la taille des icones.
+					pDock->iSidShrinkDown = g_timeout_add (35, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 			}
 			s_pIconClicked = NULL;
 		}
 		else if (pButton->type == GDK_BUTTON_PRESS)
 		{
 			s_pIconClicked = cairo_dock_get_pointed_icon (pDock->icons);
+			s_pIconClicked->fPersonnalAlpha = 0.4;
 		}
 	}
 	else if (pButton->button == 3 && pButton->type == GDK_BUTTON_PRESS)  // clique droit.

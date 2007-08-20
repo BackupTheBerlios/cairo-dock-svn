@@ -302,6 +302,13 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, int 
 	
 	fX += (1 - fWidthFactor) / 2 * icon->fWidth * icon->fScale;
 	
+	if (icon->fPersonnalAlpha != 0)
+	{
+		fX = icon->fDrawX + (iCurrentWidth - iMaxDockWidth) / 2 - icon->fWidth * icon->fScale / 2;
+		fY = icon->fDrawY -icon->fHeight * icon->fScale / 2 ;
+		fAlpha = icon->fPersonnalAlpha;
+	}
+	
 	if (g_bHorizontalDock)
 	{
 		cairo_translate (pCairoContext, fX, fY);

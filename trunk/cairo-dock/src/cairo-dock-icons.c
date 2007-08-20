@@ -337,7 +337,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 
 void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2)
 {
-	g_print ("%s (%s, %s) : %.2f <-> %.2f\n", __func__, icon1->acName, icon2->acName, icon1->fOrder, icon2->fOrder);
+	//g_print ("%s (%s, %s) : %.2f <-> %.2f\n", __func__, icon1->acName, icon2->acName, icon1->fOrder, icon2->fOrder);
 	if ((icon2 != NULL) && (! ( (CAIRO_DOCK_IS_APPLI (icon1) && CAIRO_DOCK_IS_APPLI (icon2)) || (CAIRO_DOCK_IS_LAUNCHER (icon1) && CAIRO_DOCK_IS_LAUNCHER (icon2)) || (CAIRO_DOCK_IS_APPLET (icon1) && CAIRO_DOCK_IS_APPLET (icon2)) ) ))
 		return ;
 	
@@ -578,7 +578,7 @@ GList *cairo_dock_calculate_icons_positions_at_rest (GList *pIconList, int iMinD
 	return pFirstDrawnElement;
 }
 
-Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight, int iXOffset)
+Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight, int iMouseY)
 {
 	//g_print (">>>>>%s (%d, %dx%d)\n", __func__, x_abs, iWidth, iHeight);
 	if (pIconList == NULL)
@@ -672,6 +672,13 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 		else
 			icon->bPointed = FALSE;
 		
+		if (icon->fPersonnalAlpha != 0)
+		{
+			icon->fScale = 1 + g_fAmplitude;
+			icon->fDrawX = x_abs - (iMinDockWidth - iWidth) / 2;
+			icon->fDrawY = iMouseY;
+		}
+		
 		ic = ic->next;
 		if (ic == NULL)
 			ic = pIconList;
@@ -727,7 +734,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	pDock->fDecorationsOffsetX = - iMouseX;
 	
 	//\_______________ On calcule l'ensemble des parametres des icones.
-	Icon *pPointedIcon = cairo_dock_calculate_icons_with_position (pDock->icons, pDock->pFirstDrawnElement, x_abs, pDock->fMagnitude, pDock->iMinDockWidth, pDock->iMaxDockWidth, iHeight, pDock->iScrollOffset);
+	Icon *pPointedIcon = cairo_dock_calculate_icons_with_position (pDock->icons, pDock->pFirstDrawnElement, x_abs, pDock->fMagnitude, pDock->iMinDockWidth, pDock->iMaxDockWidth, iHeight, iMouseY);
 	
 	//\_______________ On regarde si le curseur est dans le dock ou pas, et on joue sur la taille des icones en consequence.
 	gboolean bMouseInsideDock = (x_abs >= 0 && x_abs <= pDock->iMinDockWidth);

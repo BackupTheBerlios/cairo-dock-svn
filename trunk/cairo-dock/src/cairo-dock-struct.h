@@ -121,6 +121,7 @@ typedef struct _Icon {
 	gint iCount;
 	gint iAnimationType;
 	gdouble fPersonnalScale;
+	gdouble fPersonnalAlpha;
 	//\____________ Pour les fenetres.
 	gint iPid;
 	Window Xid;
