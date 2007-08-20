@@ -222,7 +222,7 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, int 
 	double fDeltaLeft = (iMaxDockWidth - iCurrentWidth - icon->fWidth * icon->fScale) / 2, fDeltaRight = fDeltaLeft;
 	double fX, fY, fAlpha, fTheta;
 	fX = icon->fX + (iCurrentWidth - iMaxDockWidth) / 2;
-	g_print ("(%s) icon->fX : %.2f -> %.2f\n", icon->acName, icon->fX, fX);
+	//g_print ("(%s) icon->fX : %.2f -> %.2f\n", icon->acName, icon->fX, fX);
 	if (fX >= 0 && fX + icon->fWidth * icon->fScale <= iCurrentWidth)
 	{
 		fAlpha = 1;
@@ -258,7 +258,7 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, int 
 			fX = b * (1 + sin (fTheta));
 			fY = (g_bDirectionUp ? a * (1 + MIN (0, cos (fTheta))) : - a * cos (fTheta) + g_iDockLineWidth);
 			fAlpha = MAX (0.2, MIN (0.75, sin (fTheta) * sin (fTheta)));
-			g_print ("  theta = %.2fdeg -> fX = %.2f; fY = %.2f; alpha = %.2f\n", fTheta / G_PI*180, fX, fY, fAlpha);
+			//g_print ("  theta = %.2fdeg -> fX = %.2f; fY = %.2f; alpha = %.2f\n", fTheta / G_PI*180, fX, fY, fAlpha);
 		}
 		else
 		{
@@ -269,7 +269,7 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, int 
 			fX = b * (1 + sin (fTheta));
 			fY = (g_bDirectionUp ? a * (1 + MIN (0, cos (fTheta))) : - a * cos (fTheta) + g_iDockLineWidth);
 			fAlpha = MAX (0.2, MIN (0.75, sin (fTheta) * sin (fTheta)));
-			g_print ("  theta = %.2fdeg -> fX = %.2f; fY = %.2f; alpha = %.2f\n", fTheta / G_PI*180, fX, fY, fAlpha);
+			//g_print ("  theta = %.2fdeg -> fX = %.2f; fY = %.2f; alpha = %.2f\n", fTheta / G_PI*180, fX, fY, fAlpha);
 		}
 	}
 	
@@ -500,7 +500,7 @@ void render (CairoDock *pDock)
 		return ;
 	}
 	//for (ic = pDock->icons; ic != NULL; ic = ic->next)
-	g_print ("--------------------\n");
+	//g_print ("--------------------\n");
 	do
 	{
 		icon = (Icon*) ic->data;
@@ -547,7 +547,7 @@ void render (CairoDock *pDock)
 
 void cairo_dock_render_background (CairoDock *pDock)
 {
-	g_print ("%s (%.2f)\n", __func__, g_fVisibleZoneAlpha);
+	//g_print ("%s (%.2f)\n", __func__, g_fVisibleZoneAlpha);
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
 	
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
@@ -566,7 +566,7 @@ void cairo_dock_render_background (CairoDock *pDock)
 
 void cairo_dock_render_blank (CairoDock *pDock)
 {
-	g_print ("%s ()\n", __func__);
+	//g_print ("%s ()\n", __func__);
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
 	
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);

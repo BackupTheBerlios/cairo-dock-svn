@@ -348,7 +348,7 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 		if (pNextIcon == NULL || pNextIcon->iType != icon2->iType)
 			icon1->fOrder = icon2->fOrder + 1;
 		else
-			icon1->fOrder = (pNextIcon->fOrder - icon2->fOrder > 1 ? icon2->fOrder + 1 : (pNextIcon->fOrder - icon2->fOrder) / 2);
+			icon1->fOrder = (pNextIcon->fOrder - icon2->fOrder > 1 ? icon2->fOrder + 1 : (pNextIcon->fOrder + icon2->fOrder) / 2);
 	}
 	else
 	{
@@ -654,8 +654,10 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 			{
 				prev_icon = (ic->prev != NULL ? ic->prev->data : cairo_dock_get_last_icon (pIconList));
 				icon->fX = prev_icon->fX + prev_icon->fWidth * prev_icon->fScale + g_iIconGap;
-				if (icon->fX > icon->fXMax - icon->fWidth / 6 && iWidth != 0 && icon->fPhase == G_PI)
-					icon->fX = icon->fXMax - icon->fWidth / 12;
+				///if (icon->fX > icon->fXMax - icon->fWidth / 6 && iWidth != 0 && icon->fPhase == G_PI)
+				///	icon->fX = icon->fXMax - icon->fWidth / 12;
+				if (icon->fX + icon->fWidth * icon->fScale > icon->fXMax - icon->fWidth / 10 && iWidth != 0)
+					icon->fX = icon->fXMax - icon->fWidth * icon->fScale - icon->fWidth / 20;
 			}
 		}
 		
@@ -794,8 +796,8 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 		{
 			icon = ic2->data;
 			
-			if (icon->fX > icon->fXMax)
-				icon->fXMax = icon->fX;
+			if (icon->fX + icon->fWidth * icon->fScale > icon->fXMax)
+				icon->fXMax = icon->fX + icon->fWidth * icon->fScale;
 			if (icon->fX < icon->fXMin)
 				icon->fXMin = icon->fX;
 			
@@ -811,8 +813,8 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 	{
 		icon = ic->data;
 		
-		if (icon->fX > icon->fXMax)
-			icon->fXMax = icon->fX;
+		if (icon->fX + icon->fWidth * icon->fScale > icon->fXMax)
+			icon->fXMax = icon->fX + icon->fWidth * icon->fScale;
 		if (icon->fX < icon->fXMin)
 			icon->fXMin = icon->fX;
 		
@@ -822,8 +824,8 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 	} while (ic != pFirstDrawnElement);
 	fMaxBorderX = MAX (fMaxBorderX, icon->fX + icon->fWidth * icon->fScale);
 	
-	fMaxDockWidth = fMaxBorderX - ((Icon *) pFirstDrawnElement->data)->fXMin + 2 * g_iDockRadius + g_iDockLineWidth;
-	
+	//fMaxDockWidth = fMaxBorderX - ((Icon *) pFirstDrawnElement->data)->fXMin + 2 * g_iDockRadius + g_iDockLineWidth;
+	fMaxDockWidth = icon->fXMax - ((Icon *) pFirstDrawnElement->data)->fXMin + 2 * g_iDockRadius + g_iDockLineWidth;
 	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
