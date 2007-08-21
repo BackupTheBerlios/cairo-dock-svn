@@ -145,11 +145,12 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	else  // cas d'un drag and drop.
 	{
 		int iX, iY;
-		gdk_window_get_pointer (pWidget->window, &iX, &iY, NULL);
 		if (g_bHorizontalDock)
-			pPointedIcon = cairo_dock_calculate_icons (pDock, iX, iY);
+			gdk_window_get_pointer (pWidget->window, &iX, &iY, NULL);
 		else
-			pPointedIcon = cairo_dock_calculate_icons (pDock, iY, iX);
+			gdk_window_get_pointer (pWidget->window, &iY, &iX, NULL);
+		pPointedIcon = cairo_dock_calculate_icons (pDock, iX, iY);
+		cairo_dock_mark_icons_as_avoiding_mouse (pDock, iX);
 		gtk_widget_queue_draw (pWidget);
 	}
 	
@@ -507,7 +508,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 		if (pButton->type == GDK_BUTTON_RELEASE)
 		{
 			if (s_pIconClicked != NULL)
-				s_pIconClicked->fPersonnalAlpha = 0;
+				s_pIconClicked->iAnimationType = 0;
 			
 			Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
 			if (icon != NULL && ! CAIRO_DOCK_IS_SEPARATOR (icon) && icon == s_pIconClicked)
@@ -558,6 +559,15 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 			else if (s_pIconClicked != NULL && icon != NULL && icon != s_pIconClicked && icon->iType == s_pIconClicked->iType)
 			{
 				//g_print ("deplacement de %s\n", s_pIconClicked->acName);
+				CairoDock *pOriginDock = cairo_dock_search_container_from_icon (s_pIconClicked);
+				if (pDock != pOriginDock)
+				{
+					cairo_dock_remove_icon_from_dock (pOriginDock, s_pIconClicked);
+					cairo_dock_update_dock_size (pOriginDock, pOriginDock->iMaxIconHeight, pOriginDock->iMinDockWidth);
+					
+					cairo_dock_update_icon_s_container_name (s_pIconClicked, icon->cParentDockName);
+				}
+				
 				s_pIconClicked->iCount = 20;  // 2 rebonds.
 				s_pIconClicked->iAnimationType = CAIRO_DOCK_BOUNCE;
 				int iX, iY;
@@ -580,6 +590,8 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 					cairo_dock_move_icon_after_icon (pDock, s_pIconClicked, prev_icon);
 				}
 				
+				if (pDock != pOriginDock)
+					cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 				cairo_dock_calculate_icons (pDock, iX, iY);
 				gtk_widget_queue_draw (pWidget);
 				
@@ -591,7 +603,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 		else if (pButton->type == GDK_BUTTON_PRESS)
 		{
 			s_pIconClicked = cairo_dock_get_pointed_icon (pDock->icons);
-			s_pIconClicked->fPersonnalAlpha = 0.4;
+			s_pIconClicked->iAnimationType = CAIRO_DOCK_FOLLOW_MOUSE;
 		}
 	}
 	else if (pButton->button == 3 && pButton->type == GDK_BUTTON_PRESS)  // clique droit.
@@ -776,6 +788,8 @@ gboolean on_configure (GtkWidget* pWidget,
 void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, GtkSelectionData *selection_data, guint info, guint t, CairoDock *pDock)
 {
 	//g_print ("%s (%dx%d)\n", __func__, x, y);
+	
+	cairo_dock_mark_icons_as_avoiding_mouse (pDock, -1e4);
 	
 	gchar *cReceivedData = (gchar *) selection_data->data;
 	if (strncmp (cReceivedData, "file://", 7) == 0)

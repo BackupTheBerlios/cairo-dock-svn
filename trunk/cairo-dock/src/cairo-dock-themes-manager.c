@@ -71,8 +71,8 @@ gchar *cairo_dock_edit_themes (gchar *cLanguage, GHashTable **hThemeTable)
 	g_free (cCommand);
 	
 	
-	cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, *hThemeTable, "THEMES", "chosen theme", 1, NULL);
-	cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, hUserThemeTable, "DELETE", "wanted themes", 999, NULL);
+	cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, *hThemeTable, "Themes", "chosen theme", 1, NULL);
+	cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, hUserThemeTable, "Delete", "wanted themes", 999, NULL);
 	g_hash_table_destroy (hUserThemeTable);
 	
 	
@@ -85,10 +85,10 @@ gchar *cairo_dock_edit_themes (gchar *cLanguage, GHashTable **hThemeTable)
 		return NULL;
 	}
 	
-	g_key_file_set_string (pKeyFile, "THEMES", "chosen theme", (cCurrentThemeName != NULL ? cCurrentThemeName : "default"));
-	g_key_file_set_string (pKeyFile, "RENAME", "theme name", (cCurrentThemeName != NULL ? cCurrentThemeName : ""));
+	g_key_file_set_string (pKeyFile, "Themes", "chosen theme", (cCurrentThemeName != NULL ? cCurrentThemeName : "default"));
+	g_key_file_set_string (pKeyFile, "Rename", "theme name", (cCurrentThemeName != NULL ? cCurrentThemeName : ""));
 	g_free (cCurrentThemeName);
-	g_key_file_set_string (pKeyFile, "DELETE", "wanted themes", sThemeNames->str);
+	g_key_file_set_string (pKeyFile, "Delete", "wanted themes", sThemeNames->str);
 	g_string_free (sThemeNames, TRUE);
 	
 	
@@ -96,7 +96,7 @@ gchar *cairo_dock_edit_themes (gchar *cLanguage, GHashTable **hThemeTable)
 	g_key_file_free (pKeyFile);
 	
 	//\___________________ On laisse l'utilisateur l'editer.
-	gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTmpConfFile, "Manage themes", 400, 400, TRUE, NULL, NULL);
+	gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTmpConfFile, "Manage themes", 400, 400, TRUE, NULL, NULL, NULL);
 	if (! bChoiceOK)
 	{
 		g_free (cTmpConfFile);
@@ -118,7 +118,7 @@ gchar *cairo_dock_get_chosen_theme (gchar *cConfFile)
 		return NULL;
 	}
 	
-	gchar *cThemeName = g_key_file_get_string (pKeyFile, "THEMES", "chosen theme", &erreur);
+	gchar *cThemeName = g_key_file_get_string (pKeyFile, "Themes", "chosen theme", &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
@@ -286,7 +286,7 @@ void cairo_dock_manage_themes (GtkWidget *pWidget)
 		}
 		
 		//\___________________ On charge le nouveau theme choisi.
-		gchar *cNewThemeName = g_key_file_get_string (pKeyFile, "THEMES", "chosen theme", &erreur);
+		gchar *cNewThemeName = g_key_file_get_string (pKeyFile, "Themes", "chosen theme", &erreur);
 		if (erreur != NULL)
 		{
 			g_print ("Attention : %s\n", erreur->message);
@@ -316,7 +316,7 @@ void cairo_dock_manage_themes (GtkWidget *pWidget)
 		g_free (cNewThemeName);
 		
 		//\___________________ On renomme le theme actuel 
-		cNewThemeName = g_key_file_get_string (pKeyFile, "RENAME", "theme name", &erreur);
+		cNewThemeName = g_key_file_get_string (pKeyFile, "Rename", "theme name", &erreur);
 		if (erreur != NULL)
 		{
 			g_print ("Attention : %s\n", erreur->message);
@@ -353,7 +353,7 @@ void cairo_dock_manage_themes (GtkWidget *pWidget)
 		
 		//\___________________ On efface les themes qui ne sont plus desires, sauf le theme actuel.
 		gsize length = 0;
-		gchar ** cThemesList = g_key_file_get_string_list (pKeyFile, "DELETE", "wanted themes", &length, &erreur);
+		gchar ** cThemesList = g_key_file_get_string_list (pKeyFile, "Delete", "wanted themes", &length, &erreur);
 		if (erreur != NULL)
 		{
 			g_print ("Attention : %s\n", erreur->message);

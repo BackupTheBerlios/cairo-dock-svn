@@ -641,3 +641,13 @@ void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *Rec
 	
 	g_free (pDock);
 }
+
+
+static gboolean _cairo_dock_search_icon_in_a_dock (gchar *cDockName, CairoDock *pDock, Icon *icon)
+{
+	return (g_list_find (pDock->icons, icon) != NULL);
+}
+CairoDock *cairo_dock_search_container_from_icon (Icon *icon)
+{
+	return g_hash_table_find (g_hDocksTable, (GHRFunc) _cairo_dock_search_icon_in_a_dock, icon);
+}

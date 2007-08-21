@@ -273,6 +273,24 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, int 
 		}
 	}
 	
+	if (icon->iAnimationType == CAIRO_DOCK_BOUNCE && icon->iCount != 0)
+	{
+		int c = icon->iCount;
+		int k = 10 - (c%10);
+		gdouble fPossibleDeltaY;
+		if (g_bDirectionUp)
+		{
+			fPossibleDeltaY = iCurrentHeight -icon->fY;
+			fY -= 1. * k / 10 * fPossibleDeltaY * (2 - 1.*k/10);
+		}
+		else
+		{
+			fPossibleDeltaY = iCurrentHeight - icon->fHeight * icon->fScale;
+			
+		}
+		icon->iCount --;
+	}
+	
 	
 	double fWidthFactor = 1.;
 	if (icon->iCount > 0 && icon->iAnimationType == CAIRO_DOCK_ROTATE)
@@ -302,11 +320,16 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, int 
 	
 	fX += (1 - fWidthFactor) / 2 * icon->fWidth * icon->fScale;
 	
-	if (icon->fPersonnalAlpha != 0)
+	if (icon->iAnimationType == CAIRO_DOCK_FOLLOW_MOUSE)
 	{
 		fX = icon->fDrawX + (iCurrentWidth - iMaxDockWidth) / 2 - icon->fWidth * icon->fScale / 2;
 		fY = icon->fDrawY -icon->fHeight * icon->fScale / 2 ;
-		fAlpha = icon->fPersonnalAlpha;
+		fAlpha = 0.4;
+	}
+	else if (icon->iAnimationType == CAIRO_DOCK_AVOID_MOUSE)
+	{
+		fAlpha = 0.4;
+		fX += icon->fWidth / 2 * (icon->fScale - 1) / g_fAmplitude * (icon->fPhase < G_PI/2 ? -1 : 1);
 	}
 	
 	if (g_bHorizontalDock)
@@ -610,7 +633,6 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 	
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
 	g_return_if_fail (pCairoContext != NULL);
-
 	/* set rendering-"fidelity" and clear canvas */
 	cairo_set_tolerance (pCairoContext, 0.5);
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
@@ -711,7 +733,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 	
 	//double fX, fXLimit = (g_bHorizontalDock ? pArea->x + pArea->width : pArea->y + pArea->height);
-	double fX, fXMin = (g_bHorizontalDock ? pArea->x : pArea->y), fXMax = (g_bHorizontalDock ? pArea->x + pArea->width : pArea->y + pArea->height);
+	double fXMin = (g_bHorizontalDock ? pArea->x : pArea->y), fXMax = (g_bHorizontalDock ? pArea->x + pArea->width : pArea->y + pArea->height);
 	GList *ic;
 	Icon *icon;
 	GList *pFirstDrawnElement = (pDock->pFirstDrawnElement != NULL ? pDock->pFirstDrawnElement : pDock->icons);
@@ -747,14 +769,24 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 			ic = pDock->icons;
 	}
 	while (ic != pFirstDrawnElement);*/
+	double fXLeft, fXRight;  // il faut tenir compte de l'inversion si l'icone est en arriere-plan.
 	do
 	{
 		icon = (Icon*) ic->data;
 		
-		fX = icon->fDrawX;
-		//g_print ("test a gauche de %s (%.2f -> %.2f)\n", icon->acName, fX, fX + icon->fWidth * icon->fScale * fabs (icon->fWidthFactor));
+		if (icon->fWidthFactor < 0)
+		{
+			fXLeft = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor;
+			fXRight = icon->fDrawX;
+		}
+		else
+		{
+			fXLeft = icon->fDrawX;
+			fXRight = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor;
+		}
 		
-		if (fX <= pArea->x + pArea->width && floor (fX + icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)) > pArea->x)
+		//g_print ("test a gauche de %s (%.2f -> %.2f)\n", icon->acName, fXLeft, fXRight);
+		if (fXLeft <= pArea->x + pArea->width && floor (fXRight) > pArea->x)
 		{
 			cairo_save (pCairoContext);
 			
@@ -777,10 +809,19 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 	{
 		icon = (Icon*) ic->data;
 		
-		fX = icon->fDrawX;
-		//g_print ("test a droite de %s (%.2f -> %.2f)\n", icon->acName, fX, fX + icon->fWidth * icon->fScale * fabs (icon->fWidthFactor));
+		if (icon->fWidthFactor < 0)
+		{
+			fXLeft = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor;
+			fXRight = icon->fDrawX;
+		}
+		else
+		{
+			fXLeft = icon->fDrawX;
+			fXRight = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor;
+		}
 		
-		if (fX <= pArea->x + pArea->width && floor (fX + icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)) > pArea->x)
+		//g_print ("test a droite de %s (%.2f -> %.2f)\n", icon->acName, fXLeft, fXRight);
+		if (fXLeft <= pArea->x + pArea->width && floor (fXRight) > pArea->x)
 		{
 			cairo_save (pCairoContext);
 			

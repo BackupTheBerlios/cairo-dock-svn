@@ -284,7 +284,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	if (bApplyButtonPresent)
 		dialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
 			(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
-			GTK_DIALOG_DESTROY_WITH_PARENT,  // GTK_DIALOG_MODAL | 
+			GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_APPLY,
 			GTK_RESPONSE_APPLY,
 			GTK_STOCK_OK,
@@ -424,7 +424,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 				switch (iElementType)
 				{
 					case 'b' :
-						//g_print ("  + a boolean\n");
+						//g_print ("  + boolean\n");
 						length = 0;
 						bValueList = g_key_file_get_boolean_list (pKeyFile, cGroupName, cKeyName, &length, NULL);
 						for (k = 0; k < iNbElements; k ++)
@@ -445,7 +445,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					break;
 					
 					case 'i' :
-						//g_print ("  + an integer\n");
+						//g_print ("  + integer\n");
 						length = 0;
 						iValueList = g_key_file_get_integer_list (pKeyFile, cGroupName, cKeyName, &length, NULL);
 						for (k = 0; k < iNbElements; k ++)
@@ -476,7 +476,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					case 'f' :
 					case 'c' :
 					case 'e' :
-						//g_print ("  + a float\n");
+						//g_print ("  + float\n");
 						length = 0;
 						fValueList = g_key_file_get_double_list (pKeyFile, cGroupName, cKeyName, &length, NULL);
 						for (k = 0; k < iNbElements; k ++)
@@ -546,10 +546,10 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					break;
 					
 					case 's' :  // string
-					case 'S' :  // string with a filename chooser
-					case 'D' :  // string with a directory chooser.
-					case 'T' :  // string, but can't uncheck boxes.
-						//g_print ("  + a string\n");
+					case 'S' :  // string avec un selecteur de fichier a cote du GtkEntry.
+					case 'D' :  // string avec un selecteur de repertoire a cote du GtkEntry.
+					case 'T' :  // string, mais sans pouvoir decochez les cases.
+						//g_print ("  + string\n");
 						pEntry = NULL;
 						length = 0;
 						cValueList = g_key_file_get_locale_string_list (pKeyFile, cGroupName, cKeyName, NULL, &length, NULL);
@@ -794,7 +794,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					break;
 					
 					case 'F' :
-						//g_print ("  + a frame\n");
+						//g_print ("  + frame\n");
 						if (pAuthorizedValuesList == NULL)
 						{
 							pFrame = NULL;
@@ -888,7 +888,7 @@ GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, gch
 	if (bApplyButtonPresent)
 		pDialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
 			(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
-			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_APPLY,
 			GTK_RESPONSE_APPLY,
 			GTK_STOCK_OK,

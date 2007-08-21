@@ -672,12 +672,20 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 		else
 			icon->bPointed = FALSE;
 		
-		if (icon->fPersonnalAlpha != 0)
+		if (icon->iAnimationType == CAIRO_DOCK_FOLLOW_MOUSE)
 		{
 			icon->fScale = 1 + g_fAmplitude;
 			icon->fDrawX = x_abs - (iMinDockWidth - iWidth) / 2;
 			icon->fDrawY = iMouseY;
 		}
+		/*else if (icon->iAnimationType == CAIRO_DOCK_AVOID_MOUSE)
+		{
+			if (x_abs < x_cumulated + icon->fWidth / 2)  // on est a gauche.
+				icon->fDrawX = icon->fX - 20 * (1 - icon->fScale);
+			else
+				icon->fDrawX = icon->fX + 20 * (1 - icon->fScale);
+			icon->fDrawY = icon->fY;
+		}*/
 		
 		ic = ic->next;
 		if (ic == NULL)
@@ -690,6 +698,14 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 		pointed_ic = (pFirstDrawnElement->prev == NULL ? g_list_last (pIconList) : pFirstDrawnElement->prev);
 		icon = pointed_ic->data;
 		icon->fX = x_cumulated - (iMinDockWidth - iWidth) / 2 + (1 - icon->fScale) * icon->fWidth;
+		/*if (icon->iAnimationType == CAIRO_DOCK_AVOID_MOUSE)
+		{
+			if (x_abs < x_cumulated + icon->fWidth / 2)  // on est a gauche.
+				icon->fDrawX = icon->fX - 20 * (1 - icon->fScale);
+			else
+				icon->fDrawX = icon->fX + 20 * (1 - icon->fScale);
+			icon->fDrawY = icon->fY;
+		}*/
 	}
 	
 	ic = pointed_ic;
@@ -846,7 +862,7 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 	return fMaxDockWidth;
 }
 
-Icon *cairo_dock_guess_pointed_icon (CairoDock *pDock, int iMouseX)
+void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX)
 {
 	int x_abs = iMouseX - (pDock->iCurrentWidth - pDock->iMinDockWidth) / 2;  // ecart par rapport a la gauche du dock minimal.
 	
@@ -857,9 +873,63 @@ Icon *cairo_dock_guess_pointed_icon (CairoDock *pDock, int iMouseX)
 	{
 		icon = ic->data;
 		if (x_abs >= icon->fXAtRest && x_abs <= icon->fXAtRest + icon->fWidth)
-			return icon;
+		{
+			icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
+			if (x_abs < icon->fXAtRest + icon->fWidth / 2)  // on est a gauche.
+			{
+				Icon *prev_icon;
+				if (ic->prev != NULL)
+					prev_icon = ic->prev->data;
+				else
+					prev_icon = g_list_last (pDock->icons);
+				prev_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
+			}
+			else
+			{
+				Icon *next_icon;
+				if (ic->next != NULL)
+					next_icon = ic->next->data;
+				else
+					next_icon = pDock->icons;
+				next_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
+				ic = ic->next;
+				if (ic == NULL)
+					ic = pDock->icons;
+				if (ic == pFirstDrawnElement)
+					break ;
+			}
+		}
+		else
+			icon->iAnimationType = 0;
+		
+		ic = ic->next;
+		if (ic == NULL)
+			ic = pDock->icons;
 	} while (ic != pFirstDrawnElement);
+}
+
+
+void cairo_dock_update_icon_s_container_name (Icon *icon, gchar *cNewParentDockName)
+{
+	g_free (icon->cParentDockName);
+	icon->cParentDockName = g_strdup (cNewParentDockName);
 	
+	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon->acDesktopFileName);
 	
-	return NULL;
+	GError *erreur = NULL;
+	GKeyFile *pKeyFile = g_key_file_new ();
+	g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		g_free (cDesktopFilePath);
+		return ;
+	}
+	
+	g_key_file_set_string (pKeyFile, "Desktop Entry", "Container", cNewParentDockName);
+	cairo_dock_write_keys_to_file (pKeyFile, cDesktopFilePath);
+	
+	g_free (cDesktopFilePath);
+	g_key_file_free (pKeyFile);
 }

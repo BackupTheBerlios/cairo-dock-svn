@@ -16,7 +16,6 @@ released under the terms of the GNU General Public License.
 #include <librsvg/rsvg-cairo.h>
 
 
-
 typedef struct _CairoDock {
 	GList* icons;  // la liste de ses icones.
 	GtkWidget *pWidget;  // sa fenetre de dessin.
@@ -121,7 +120,6 @@ typedef struct _Icon {
 	gint iCount;
 	gint iAnimationType;
 	gdouble fPersonnalScale;
-	gdouble fPersonnalAlpha;
 	//\____________ Pour les fenetres.
 	gint iPid;
 	Window Xid;
@@ -149,7 +147,9 @@ typedef enum {
 	CAIRO_DOCK_ROTATE,
 	CAIRO_DOCK_BLINK,
 	CAIRO_DOCK_RANDOM,
-	CAIRO_DOCK_NB_ANIMATIONS
+	CAIRO_DOCK_NB_ANIMATIONS,
+	CAIRO_DOCK_FOLLOW_MOUSE,
+	CAIRO_DOCK_AVOID_MOUSE
 	} CairoDockAnimationType;
 
 typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);

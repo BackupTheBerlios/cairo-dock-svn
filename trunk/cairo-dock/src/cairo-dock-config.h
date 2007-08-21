@@ -12,7 +12,7 @@ int cairo_dock_get_number_from_name (gchar *cName, gchar **tNamesList);
 void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock);
 
 
-gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar *cTitle, int iWindowWidth, int iWindowHeight, gboolean bFullConfig, CairoDockConfigFunc pConfigFunc, gpointer data);
+gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar *cTitle, int iWindowWidth, int iWindowHeight, gboolean bFullConfig, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc);
 
 
 void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file);

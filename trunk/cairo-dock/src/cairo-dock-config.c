@@ -1103,10 +1103,58 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 }
 
 
-gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar *cTitle, int iWindowWidth, int iWindowHeight, gboolean bFullConfig, CairoDockConfigFunc pConfigFunc, gpointer data)
+static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, gpointer *user_data)
+{
+	GKeyFile *pKeyFile = user_data[0];
+	GSList *pWidgetList = user_data[1];
+	gchar *conf_file = user_data[2];
+	GtkTextBuffer *pTextBuffer = user_data[3];
+	CairoDockConfigFunc pConfigFunc = user_data[4];
+	gpointer data = user_data[5];
+	GFunc pFreeUserDataFunc = user_data[6];
+	
+	gtk_window_set_modal (GTK_WINDOW (pDialog), TRUE);  // pour prevenir tout interaction avec l'appli pendant sa re-configuration.
+	if (action == GTK_RESPONSE_ACCEPT || action == GTK_RESPONSE_APPLY)
+	{
+		if (pWidgetList != NULL)
+		{
+			cairo_dock_update_keyfile_from_widget_list (pKeyFile, pWidgetList);
+			cairo_dock_write_keys_to_file (pKeyFile, conf_file);
+		}
+		else
+		{
+			GtkTextIter start, end;
+			gtk_text_buffer_get_iter_at_offset (pTextBuffer, &start, 0);
+			gtk_text_buffer_get_iter_at_offset (pTextBuffer, &end, -1);
+			
+			gchar *cConfiguration = gtk_text_buffer_get_text (pTextBuffer, &start, &end, FALSE);
+			
+			gboolean write_ok = g_file_set_contents (conf_file, cConfiguration, -1, NULL);
+			g_free (cConfiguration);
+			if (! write_ok)
+				g_print ("error while writing to %s\n", conf_file);
+		}
+		
+		if (pConfigFunc != NULL)
+			pConfigFunc (conf_file, data);
+	}
+	gtk_window_set_modal (GTK_WINDOW (pDialog), FALSE);
+	
+	if (action != GTK_RESPONSE_APPLY)
+	{
+		gtk_widget_destroy (GTK_WIDGET (pDialog));
+		g_key_file_free (pKeyFile);
+		cairo_dock_free_generated_widget_list (pWidgetList);
+		g_free (conf_file);
+		if (pFreeUserDataFunc != NULL)
+			pFreeUserDataFunc (data, NULL);
+		g_free (user_data);
+	}
+}
+gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar *cTitle, int iWindowWidth, int iWindowHeight, gboolean bFullConfig, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc)
 {
 	GSList *pWidgetList = NULL;
-	GtkTextBuffer *pTextBuffer = NULL;
+	GtkTextBuffer *pTextBuffer = NULL;  // le buffer est lie au widget, donc au pDialog.
 	GKeyFile *pKeyFile = g_key_file_new ();
 	
 	GError *erreur = NULL;
@@ -1130,13 +1178,26 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 	//gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER);
 	gtk_window_move (GTK_WINDOW (pDialog), (g_iScreenWidth - iWindowWidth) / 2, (g_iScreenHeight - iWindowHeight) / 2);
 	
-	gint action;
-	gboolean config_ok = TRUE;
-	do
+	if (pConfigFunc != NULL)  // alors on autorise la modification a la volee, avec un bouton "Appliquer". La fenetre doit donc laisser l'appli se derouler.
 	{
-		action = gtk_dialog_run (GTK_DIALOG (pDialog));
-		if (action == GTK_RESPONSE_ACCEPT || action == GTK_RESPONSE_APPLY)
+		gpointer *user_data = g_new (gpointer, 7);
+		user_data[0] = pKeyFile;
+		user_data[1] = pWidgetList;
+		user_data[2] = g_strdup (conf_file);
+		user_data[3] = pTextBuffer;
+		user_data[4] = pConfigFunc;
+		user_data[5] = data;
+		user_data[6] = pFreeUserDataFunc;
+		g_signal_connect (pDialog, "response", G_CALLBACK (_cairo_dock_user_action_on_config), user_data);
+		return FALSE;
+	}
+	else  // sinon on bloque l'appli jusqu'a ce que l'utilisateur valide ou annule.
+	{
+		gboolean config_ok;
+		gint action = gtk_dialog_run (GTK_DIALOG (pDialog));
+		if (action == GTK_RESPONSE_ACCEPT)
 		{
+			config_ok = TRUE;
 			if (pWidgetList != NULL)
 			{
 				cairo_dock_update_keyfile_from_widget_list (pKeyFile, pWidgetList);
@@ -1158,21 +1219,17 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 					config_ok = FALSE;
 				}
 			}
-			
-			if (pConfigFunc != NULL)
-				pConfigFunc (conf_file, data);
 		}
 		else
 		{
 			config_ok = FALSE;
 		}
+		
+		g_key_file_free (pKeyFile);
+		cairo_dock_free_generated_widget_list (pWidgetList);
+		gtk_widget_destroy (GTK_WIDGET (pDialog));
+		return config_ok;
 	}
-	while (action == GTK_RESPONSE_APPLY);
-	
-	g_key_file_free (pKeyFile);
-	cairo_dock_free_generated_widget_list (pWidgetList);
-	gtk_widget_destroy (GTK_WIDGET (pDialog));
-	return config_ok;
 }
 
 

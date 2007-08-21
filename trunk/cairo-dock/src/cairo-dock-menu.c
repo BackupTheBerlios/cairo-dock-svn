@@ -84,22 +84,22 @@ static void cairo_dock_edit_and_reload_conf_file (GtkMenuItem *menu_item, gpoint
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", 400, 600, TRUE, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock);
-	if (config_ok)
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", 400, 600, TRUE, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
+	/*if (config_ok)
 	{
 		cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
-	}
+	}*/
 }
 static void cairo_dock_edit_and_reload_conf_file_fast (GtkMenuItem *menu_item, gpointer *data)
 {
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", 400, 600, FALSE, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock);
-	if (config_ok)
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", 400, 600, FALSE, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
+	/*if (config_ok)
 	{
 		cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
-	}
+	}*/
 }
 
 static void cairo_dock_initiate_theme_management(GtkMenuItem *menu_item, gpointer *data)
@@ -211,7 +211,7 @@ static void cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data)
 	gchar *cNewDesktopFileName = g_path_get_basename (cNewDesktopFilePath);
 	
 	//\___________________ On ouvre automatiquement l'IHM pour permettre de modifier ses champs.
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cNewDesktopFilePath, "Fill this launcher", 300, 400, TRUE, NULL, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cNewDesktopFilePath, "Fill this launcher", 300, 400, TRUE, NULL, NULL, NULL);
 	if (config_ok)
 	{
 		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
@@ -310,7 +310,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	Icon *icon = data[1];
 	
 	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon->acDesktopFileName);
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", 300, 400, TRUE, NULL, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", 300, 400, TRUE, NULL, NULL, NULL);
 	g_free (cDesktopFilePath);
 	if (config_ok)
 	{
@@ -530,7 +530,7 @@ static void cairo_dock_delete_menu (GtkMenuShell *menu, CairoDock *pDock)
 	pDock->bMenuVisible = FALSE;
 	if (! pDock->bInside)
 	{
-		g_print ("on force a quitter\n");
+		//g_print ("on force a quitter\n");
 		pDock->bInside = TRUE;
 		pDock->bAtBottom = FALSE;
 		on_leave_notify2 (pDock->pWidget,

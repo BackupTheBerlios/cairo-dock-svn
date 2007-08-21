@@ -356,14 +356,16 @@ void cairo_dock_configure_module (CairoDockModule *module, CairoDock *pDock, GEr
 		return;
 	
 	gchar *cTitle = g_strdup_printf ("Configuration of %s", module->cModuleName);
-	gpointer data[2] = {module, pDock};
-	gboolean configuration_ok = cairo_dock_edit_conf_file (NULL, module->cConfFilePath, cTitle, 450, 450, TRUE,  (CairoDockConfigFunc) cairo_dock_reload_module, data);
+	gpointer *user_data = g_new (gpointer, 2);
+	user_data[0]= module;
+	user_data[1] = pDock;
+	gboolean configuration_ok = cairo_dock_edit_conf_file (NULL, module->cConfFilePath, cTitle, 450, 450, TRUE,  (CairoDockConfigFunc) cairo_dock_reload_module, user_data, (GFunc) g_free);
 	g_free (cTitle);
 	
-	if (configuration_ok && module->bActive)  // si le module etait actif, on le re-active avec sa nouvelle configuration.
+	/*if (configuration_ok && module->bActive)  // si le module etait actif, on le re-active avec sa nouvelle configuration.
 	{
-		cairo_dock_reload_module (module->cConfFilePath, data);
-	}
+		cairo_dock_reload_module (module->cConfFilePath, user_data);
+	}*/
 }
 
 

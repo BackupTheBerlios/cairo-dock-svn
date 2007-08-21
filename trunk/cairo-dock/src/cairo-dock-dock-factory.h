@@ -25,5 +25,6 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 void cairo_dock_free_all_docks (CairoDock *pMainDock);
 void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *ReceivingDock, gchar *cReceivingDockName);
 
+CairoDock *cairo_dock_search_container_from_icon (Icon *icon);
 
 #endif
