@@ -30,59 +30,21 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-draw.h"
 #include "cairo-dock-animations.h"
 
-extern GHashTable *g_hDocksTable;
-
-extern gint g_iScreenWidth;
-extern gint g_iScreenHeight;
-extern int g_iMaxAuthorizedWidth;
 extern double g_fScrollAcceleration;
 extern gboolean g_bResetScrollOnLeave;
 
-extern gint g_iDockLineWidth;
-extern gint g_iDockRadius;
-extern double g_fLineColor[4];
-extern int g_iIconGap;
-extern int g_iLabelSize;
-extern gboolean g_bRoundedBottomCorner;
+extern int g_iScreenHeight;
+
 extern gboolean g_bAutoHide;
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
 
-extern double g_fStripesColorBright[4];
-extern double g_fStripesColorDark[4];
-extern int g_iNbStripes;
-extern double g_fStripesWidth;
-extern cairo_surface_t *g_pStripesBuffer;
-extern double g_fStripesSpeedFactor;
-extern double g_fLabelAlphaThreshold;
-
-extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
-
-extern cairo_surface_t *g_pVisibleZoneSurface;
-extern cairo_surface_t *g_pVisibleZoneSurfaceAlpha;
-extern double g_fVisibleZoneImageWidth, g_fVisibleZoneImageHeight;
-extern double g_fVisibleZoneAlpha;
-extern double g_fAmplitude;
-extern int g_iSinusoidWidth;
-
-extern gboolean g_bUseText;
-extern int g_iLabelSize;
-extern gchar *g_cLabelPolice;
-extern gboolean g_bLabelForPointedIconOnly;
 
 extern double g_fGrowUpFactor;
 extern double g_fShrinkDownFactor;
 extern double g_fMoveUpSpeed;
 extern double g_fMoveDownSpeed;
-
-extern Icon *g_pLastFixedIconLeft;
-extern Icon *g_pLastFixedIconRight;
-
-extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
-extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
-
-extern GtkWidget *g_pWidget;
 
 
 gboolean cairo_dock_move_up (CairoDock *pDock)
@@ -128,11 +90,8 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 	else  // on se fixe en bas, et on montre la zone visible.
 	{
 		pDock->bAtBottom = TRUE;
-		//pDock->iWindowPositionX = (g_iScreenWidth - g_iVisibleZoneWidth) / 2 + pDock->iGapX;
-		//pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - g_iVisibleZoneHeight - pDock->iGapY : pDock->iGapY);
 		int iNewWidth, iNewHeight;
 		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MIN_SIZE, &iNewWidth, &iNewHeight);
-		//g_print ("%s () -> %dx%d\n", __func__, g_iVisibleZoneWidth, g_iVisibleZoneHeight);
 		if (g_bHorizontalDock)
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionX,
@@ -242,7 +201,6 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 			
 			if (! (g_bAutoHide && pDock->iRefCount == 0) && ! pDock->bInside)
 			{
-				//g_print ("on arrive en bas -> %dx%d\n", g_iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth, g_iMaxIconHeight + g_iLabelSize + 2 * g_iDockLineWidth);
 				cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
 				if (g_bHorizontalDock)
 					gdk_window_move_resize (pDock->pWidget->window,

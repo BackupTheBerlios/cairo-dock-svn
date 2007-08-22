@@ -26,19 +26,11 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-modules.h"
 
-extern gchar *g_cCairoDockDataDir;
-
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
-extern gboolean g_bUseText;
-extern int g_iLabelSize;
 extern gchar *g_cLabelPolice;
 extern GHashTable *g_hAppliTable;
 extern GHashTable *g_hXWindowTable;
-
-extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
-extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
-extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 
 
 gchar *cairo_dock_extract_module_name_from_path (gchar *cSoFilePath)

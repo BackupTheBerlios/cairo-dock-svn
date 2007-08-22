@@ -47,6 +47,7 @@ extern gboolean g_bAutoHide;
 extern double g_fVisibleZoneAlpha;
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
+extern CairoDockCornerType g_iWhichCorner;
 
 extern gboolean g_bUseText;
 extern int g_iLabelSize;

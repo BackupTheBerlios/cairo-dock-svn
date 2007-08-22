@@ -33,35 +33,11 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-application-factory.h"
 
 
-extern gint g_iScreenWidth;
-extern gint g_iScreenHeight;
-
 extern double g_fAmplitude;
 extern int g_iLabelSize;
 extern gboolean g_bUseText;
-extern int g_iDockRadius;
-extern int g_iDockLineWidth;
-extern int g_iIconGap;
-
-extern gchar *g_cConfFile;
-extern gchar *g_cCairoDockDataDir;
-
-extern int g_iVisibleZoneWidth;
-extern int g_iVisibleZoneHeight;
-
 extern gchar *g_cLabelPolice;
 
-extern gboolean g_bDirectionUp;
-extern gboolean g_bHorizontalDock;
-
-extern int g_iNbStripes;
-
-extern double g_fMoveUpSpeed;
-extern double g_fMoveDownSpeed;
-
-extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
-extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
-extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 
@@ -75,6 +51,7 @@ extern gboolean g_bUseGlitz;
 
 cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuffer, int iBufferNbElements, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
 {
+	//g_print ("%s (%d)\n", __func__, iBufferNbElements);
 	int iNbChannels = 4;
 	
 	//\____________________ On recupere la plus grosse des icones presentes dans le tampon (meilleur rendu).
@@ -86,32 +63,32 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 		iIndex += 2 + pXIconBuffer[iIndex] * pXIconBuffer[iIndex+1];
 	}
 	
-	//\____________________ On transforme le tampon en un GdkPixbuf, qu'on colle dans une surface cairo.
+	//\____________________ On pre-multiplie chaque composante par le alpha (necessaire pour libcairo).
 	*fWidth = (double) pXIconBuffer[iBestIndex];
 	*fHeight = (double) pXIconBuffer[iBestIndex+1];
-	GdkPixbuf *pixbuf = gdk_pixbuf_new_from_data ((guchar *)&pXIconBuffer[iBestIndex+2],
-		GDK_COLORSPACE_RGB,
-		(iNbChannels == 4),
-		8,
-		(int) *fWidth,
-		(int) *fHeight,
-		(int) (*fWidth) * iNbChannels,
-		NULL,
-		NULL);
 	
-	if (!gdk_pixbuf_get_has_alpha (pixbuf))  // on lui rajoute un canal alpha si elle n'en a pas.
+	int i;
+	int alpha, red, green, blue;
+	float fAlphaFactor;
+	for (i = 0; i < (int) (*fHeight) * (*fWidth); i ++)
 	{
-		GdkPixbuf *pixbuf2 = gdk_pixbuf_add_alpha (pixbuf, TRUE, 255, 255, 255);  // TRUE <=> les pixels blancs deviennent transparents.
-		gdk_pixbuf_unref (pixbuf);
-		pixbuf = pixbuf2;
+		alpha = (pXIconBuffer[iBestIndex+2+i] & 0xFF000000) >> 24;
+		red = (pXIconBuffer[iBestIndex+2+i] & 0x00FF0000) >> 16;
+		green = (pXIconBuffer[iBestIndex+2+i] & 0x0000FF00) >> 8;
+		blue = pXIconBuffer[iBestIndex+2+i] & 0x000000FF;
+		fAlphaFactor = (float) alpha / 255;
+		red *= fAlphaFactor;
+		green *= fAlphaFactor;
+		blue *= fAlphaFactor;
+		pXIconBuffer[iBestIndex+2+i] = (pXIconBuffer[iBestIndex+2+i] & 0xFF000000) + (red << 16) + (green << 8) + blue;
 	}
 	
-	guchar *pixels = gdk_pixbuf_get_pixels (pixbuf);
-	cairo_surface_t *surface_ini = cairo_image_surface_create_for_data (pixels,
+	//\____________________ On cree la surface a partir du tampon.
+	cairo_surface_t *surface_ini = cairo_image_surface_create_for_data ((guchar *)&pXIconBuffer[iBestIndex+2],
 		CAIRO_FORMAT_ARGB32,
-		gdk_pixbuf_get_width (pixbuf),
-		gdk_pixbuf_get_height (pixbuf),
-		gdk_pixbuf_get_rowstride (pixbuf));
+		(int) pXIconBuffer[iBestIndex],
+		(int) pXIconBuffer[iBestIndex+1],
+		(int) pXIconBuffer[iBestIndex] * iNbChannels);
 	
 	double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
 	cairo_dock_calculate_contrainted_icon_size (fWidth, 
@@ -128,6 +105,10 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 		ceil (*fWidth * fMaxScale),
 		ceil (*fHeight * fMaxScale));
 	cairo_t *pCairoContext = cairo_create (pNewSurface);
+	/*cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
+	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
+	cairo_paint (pCairoContext);
+	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);*/
 	
 	cairo_scale (pCairoContext, fMaxScale * fIconWidthSaturationFactor, fMaxScale * fIconHeightSaturationFactor);
 	cairo_set_source_surface (pCairoContext, surface_ini, 0, 0);
@@ -256,6 +237,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 			g_hash_table_insert (g_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
 		return NULL;
 	}
+	//g_print ("ajout de %s\n", pNameBuffer);
 	
 	//\__________________ On recupere son icone.
 	pNewSurface = cairo_dock_create_surface_from_xwindow (Xid, pSourceContext, 1 + g_fAmplitude, &fWidth, &fHeight);

@@ -88,19 +88,18 @@
 #define CAIRO_DOCK_DATA_DIR ".cairo-dock"
 //#define CAIRO_DOCK_CONF_FILE "cairo-dock.conf"
 
-CairoDock *g_pMainDock;
-GHashTable *g_hDocksTable = NULL;
-int g_iWmHint;
-CairoDock *g_pLastPointedDock = NULL;
-gchar *g_cLanguage = NULL;
+CairoDock *g_pMainDock;  // pointeur sur le dock principal.
+GHashTable *g_hDocksTable = NULL;  // table des docks existant.
+int g_iWmHint;  // hint pour la fenetre du dock principal.
+gchar *g_cLanguage = NULL;  // langue courante.
 
-gboolean g_bReverseVisibleImage;
+gboolean g_bReverseVisibleImage;  // retrouner l'image de la zone de rappel quand le dock est en haut.
 gint g_iScreenWidth = 0;  // dimensions de l'ecran.
 gint g_iScreenHeight = 0;
-int g_iMaxAuthorizedWidth;
-int g_iScrollAmount;
-gboolean g_bResetScrollOnLeave;
-double g_fScrollAcceleration;
+int g_iMaxAuthorizedWidth;  // largeur maximale autorisee pour la fenetre (0 pour la taille de l'ecran).
+int g_iScrollAmount;  // de combien de pixels fait defiler un coup de molette.
+gboolean g_bResetScrollOnLeave;  // revenir a un defilement nul lorsqu'on quitte la fenetre.
+double g_fScrollAcceleration;  // acceleration du defilement quand il revient a la normale.
 gboolean g_bForceLoop;
 
 gchar *g_cCurrentThemePath = NULL;  // le chemin vers le repertoire du theme courant.
@@ -118,29 +117,28 @@ gint g_iDockRadius;  // radius of dock-bg corners.
 gboolean g_bRoundedBottomCorner;  // vrai ssi les coins du bas sont arrondis.
 double g_fLineColor[4];  // la couleur du cadre.
 
-cairo_surface_t *g_pVisibleZoneSurface = NULL;
-double g_fVisibleZoneAlpha;
-int g_iNbStripes = 0;  // le nombre de rayures a dessiner en fond dans chaque motif elementaire.
-double g_fStripesSpeedFactor = 2.0;  // =1 les rayures suivent le curseur, >1 les rayures vont d'autant moins vite.
+cairo_surface_t *g_pVisibleZoneSurface = NULL;  // surface de la zone de rappel.
+double g_fVisibleZoneAlpha;  // transparence de la zone de rappel.
+int g_iNbStripes;  // le nombre de rayures a dessiner en fond dans chaque motif elementaire.
+double g_fStripesSpeedFactor;  // =1 les rayures suivent le curseur, >1 les rayures vont d'autant moins vite.
 double g_fStripesWidth;  // leur epaisseur relative.
-double g_fStripesColorBright[4];  // la couleur claire des rayures.
-double g_fStripesColorDark[4];  // la couleur foncee des rayures.
-double g_fStripesAngle;
-gchar *g_cBackgroundImageFile = NULL;
-double g_fBackgroundImageWidth = 0, g_fBackgroundImageHeight = 0;
-gboolean g_bBackgroundImageRepeat;
-double g_fBackgroundImageAlpha;
-cairo_surface_t *g_pBackgroundSurface = NULL;
-cairo_surface_t *g_pBackgroundSurfaceFull = NULL;
-///cairo_surface_t *g_pBackgroundSurfaceAlpha = NULL;
+double g_fStripesColorBright[4];  // couleur claire du fond ou des rayures.
+double g_fStripesColorDark[4];  // couleur foncee du fond ou des rayures.
+double g_fStripesAngle;  // angle par rapport a la verticale des decorations.
+gchar *g_cBackgroundImageFile = NULL;  // nom du fichier image a mettre en fond.
+double g_fBackgroundImageWidth = 0, g_fBackgroundImageHeight = 0;  // sa taille reelle.
+gboolean g_bBackgroundImageRepeat; // repeter l'image du fond comme un motif.
+double g_fBackgroundImageAlpha;  // transparence de l'image de fond.
+cairo_surface_t *g_pBackgroundSurface = NULL;  // surface associee a l'image du fond, de la taille de l'image du fond.
+cairo_surface_t *g_pBackgroundSurfaceFull = NULL;  // surface associee aux decorations, de 2 fois la taille de la fenetre.
 
 int g_iIconGap = 0;  // ecart en pixels entre les icones (pour l'instant une valeur > 0 cree des decalages intempestifs).
-int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
-int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];  // les tailles min et max pour chaque type d'icone.
+int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];  // les tailles min et max pour chaque type d'icone.
+int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 int g_tAnimationType[CAIRO_DOCK_NB_TYPES];  // le type de l'animation pour chaque type d'icone.
 int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];  // le nombre de rebonds/rotation/etc lors d'un clique gauche.
 int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];  // l'ordre de chaque type dans le dock.
-GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
+int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS] = {14, 20, 20, 0};  // multiples de 2,4,2.
 
 int g_iVisibleZoneWidth = 0;  // dimensions de la zone ou on place le curseur pour faire apparaitre le dock.
 int g_iVisibleZoneHeight = 0;
@@ -158,6 +156,7 @@ int g_iVisibleZoneHeight = 0;
 
 gboolean g_bDirectionUp = TRUE;  // la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.
 gboolean g_bHorizontalDock = TRUE;  // dit si le dock est horizontal ou vertical.
+CairoDockCornerType g_iWhichCorner;  // dis par rapport a quel coin on doit considerer le delta_x.
 gboolean g_bUseText;  // vrai ssi on doit afficher les etiquettes au-dessus des icones.
 int g_iLabelSize;  // taille de la police des etiquettes.
 gchar *g_cLabelPolice;  // police de caracteres des etiquettes.
@@ -186,10 +185,6 @@ gboolean g_bRevolveSeparator;
 
 GHashTable *g_hModuleTable = NULL;  // table des modules charges dans l'appli.
 
-Icon *g_pLastFixedIconLeft = NULL;
-Icon *g_pLastFixedIconRight = NULL;
-
-
 gboolean g_bKeepAbove = TRUE;
 gboolean g_bSkipPager = TRUE;
 gboolean g_bSkipTaskbar = TRUE;
@@ -201,7 +196,6 @@ gboolean g_bUseGlitz = FALSE;
 int
 main (int argc, char** argv)
 {
-	memset (g_tIconsSubList, 0, CAIRO_DOCK_NB_TYPES * sizeof (GList *));
 	gint i;
 	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)
 		g_tIconTypeOrder[i] = i;

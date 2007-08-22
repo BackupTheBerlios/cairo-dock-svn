@@ -35,45 +35,31 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-callbacks.h"
 
-static Icon *s_pIconClicked = NULL;
+static Icon *s_pIconClicked = NULL;  // pour savoir quand on deplace une icone a la souris.
+static CairoDock *g_pLastPointedDock = NULL;  // pour savoir quand on passe d'un dock a un autre.
 
-extern CairoDock *g_pMainDock;;
-
-extern CairoDock *g_pLastPointedDock;
+extern CairoDock *g_pMainDock;
 
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
-extern int g_iMaxAuthorizedWidth;
 extern int g_iScrollAmount;
 extern gboolean g_bResetScrollOnLeave;
 
-extern double g_fAmplitude;
-extern int g_iLabelSize;
-extern gboolean g_bUseText;
 extern int g_iDockRadius;
 extern int g_iDockLineWidth;
 extern gboolean g_bAutoHide;
-extern int g_iIconGap;
 
 extern gchar *g_cConfFile;
-extern gchar *g_cCairoDockDataDir;
 
-
-extern int g_iVisibleZoneWidth;
-extern int g_iVisibleZoneHeight;
-extern gchar *g_cLabelPolice;
-
-
+extern int g_iVisibleZoneHeight, g_iVisibleZoneWidth;
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
-
-extern int g_iNbStripes;
 
 extern double g_fRefreshInterval;
 
 extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
-extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
+extern int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS];
 
 extern gboolean g_bUseGlitz;
 
@@ -210,7 +196,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
-	//g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
+	g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
 	pDock->bInside = FALSE;
 	pDock->bAtTop = FALSE;
 	if (pDock->bMenuVisible)
@@ -253,34 +239,9 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 		return FALSE;
 	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
-	Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
-	//if (pPointedIcon == NULL)
-	//	g_print ("  aucune icone pointee\n");
-	//else
-	//	g_print ("  on pointe sur %s\n", pPointedIcon->acName);
-	/*if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL)
-	{
-		while (gtk_events_pending ())
-			gtk_main_iteration ();
-		pDock->bInside = FALSE;
-		if (pPointedIcon->pSubDock->bInside)
-		{
-			//g_print ("on est dans le sous-dock, donc on ne le cache pas\n");
-			pDock->bAtTop = FALSE;
-			return FALSE;
-		}
-		else  // si on sort du dock sans passer par le sous-dock, par exemple en sortant par le bas.
-		{
-			//g_print ("on cache %s en sortant du dock principal\n", pPointedIcon->acName);
-			//while (gtk_events_pending ())
-			//	gtk_main_iteration ();
-			//gdk_window_hide (pPointedIcon->pSubDock->pWidget->window);
-			pPointedIcon->pSubDock->iScrollOffset = 0;
-			gtk_widget_hide (pPointedIcon->pSubDock->pWidget);
-		}
-	}*/
 	while (gtk_events_pending ())  // on laisse le temps au signal d'entree dans le sous-dock d'etre traite.
 		gtk_main_iteration ();
+	
 	if (! cairo_dock_hide_child_docks (pDock))  // on quitte si on entre dans un sous-dock, pour rester en position "haute".
 		return FALSE;
 	
@@ -514,28 +475,9 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 			if (icon != NULL && ! CAIRO_DOCK_IS_SEPARATOR (icon) && icon == s_pIconClicked)
 			{
 				icon->iAnimationType = g_tAnimationType[icon->iType];
-				do
-				{
-					switch (icon->iAnimationType)
-					{
-						case CAIRO_DOCK_BOUNCE:
-							icon->iCount = 10;  // 5 tours pour monter et 5 pour descendre.
-						break;
-						case CAIRO_DOCK_ROTATE:
-							icon->iCount = 20;  // 5 iterations par quart de tour.
-						break;
-						case CAIRO_DOCK_BLINK:
-							icon->iCount = 20;  // 10 iterations par inversion d'alpha.
-						break;
-						case CAIRO_DOCK_RANDOM:
-							icon->iCount = 0;
-							icon->iAnimationType =  g_random_int_range (0, CAIRO_DOCK_NB_ANIMATIONS);
-						break;
-						default :
-							icon->iCount = 10;
-					}
-				} while (icon->iCount == 0);
-				icon->iCount = icon->iCount * g_tNbAnimationRounds[icon->iType] - 1;
+				if (icon->iAnimationType == CAIRO_DOCK_RANDOM)
+					icon->iAnimationType =  g_random_int_range (0, CAIRO_DOCK_NB_ANIMATIONS);  // [a;b[
+				icon->iCount = g_tNbIterInOneRound[icon->iAnimationType] * g_tNbAnimationRounds[icon->iType] - 1;
 				
 				if (icon->acCommand != NULL)
 				{
@@ -840,18 +782,21 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 		}
 		
 		//\_________________ On charge ce nouveau lanceur.
-		gchar *cDesktopFileName = g_path_get_basename (cNewDesktopFilePath);
-		g_free (cNewDesktopFilePath);
-		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pWidget->window);
-		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cDesktopFileName, pCairoContext);
-		g_free (cDesktopFileName);
-		cairo_destroy (pCairoContext);
-		
-		if (pNewIcon != NULL)
-			cairo_dock_insert_icon_in_dock (pNewIcon, pReceivingDock, TRUE, TRUE);
-		
-		if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
-			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+		if (cNewDesktopFilePath != NULL)
+		{
+			gchar *cDesktopFileName = g_path_get_basename (cNewDesktopFilePath);
+			g_free (cNewDesktopFilePath);
+			cairo_t* pCairoContext = cairo_dock_create_context_from_window (pWidget->window);
+			Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cDesktopFileName, pCairoContext);
+			g_free (cDesktopFileName);
+			cairo_destroy (pCairoContext);
+			
+			if (pNewIcon != NULL)
+				cairo_dock_insert_icon_in_dock (pNewIcon, pReceivingDock, TRUE, TRUE);
+			
+			if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
+				pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+		}
 		
 		g_free (cFilePath);
 	}

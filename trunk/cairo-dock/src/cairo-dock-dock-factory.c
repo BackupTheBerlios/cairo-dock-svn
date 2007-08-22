@@ -36,48 +36,24 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 
 
-extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
 
-extern gint g_iScreenWidth;
-extern gint g_iScreenHeight;
 extern int g_iMaxAuthorizedWidth;
 extern gboolean g_bForceLoop;
 
 extern gint g_iDockLineWidth;
-extern gint g_iDockRadius;
-extern double g_fLineColor[4];
 extern int g_iIconGap;
 extern int g_iLabelSize;
-extern gboolean g_bRoundedBottomCorner;
+extern double g_fAmplitude;
+
 extern gboolean g_bAutoHide;
 
-extern double g_fStripesColorBright[4];
-extern double g_fStripesColorDark[4];
-
-extern int g_iVisibleZoneWidth;
-extern int g_iVisibleZoneHeight;
 extern gchar *g_cCurrentThemePath;
-
-extern cairo_surface_t *g_pVisibleZoneSurface;
-extern double g_fVisibleZoneImageWidth, g_fVisibleZoneImageHeight;
-extern double g_fVisibleZoneAlpha;
-extern int g_iNbStripes;
-extern double g_fAmplitude;
-extern int g_iSinusoidWidth;
 
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
-extern gboolean g_bUseText;
-extern int g_iLabelSize;
-extern gchar *g_cLabelPolice;
-extern GHashTable *g_hAppliTable;
-extern gboolean g_bUniquePid;
-extern GHashTable *g_hXWindowTable;
-extern int g_iSidUpdateAppliList;
 
-extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
-extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
+extern int g_iSidUpdateAppliList;
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 extern gchar *g_cConfFile;
 extern GHashTable *g_hModuleTable;
@@ -472,8 +448,6 @@ void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDock, gpo
 {
 	if (! pDock->bIsMainDock)
 	{
-		//pDock->iCurrentWidth = pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth;
-		//pDock->iCurrentHeight = pDock->iMaxIconHeight + 2 * g_iDockLineWidth;
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 		pDock->iCurrentWidth = pDock->iMaxDockWidth;
 		pDock->iCurrentHeight = pDock->iMaxDockHeight;

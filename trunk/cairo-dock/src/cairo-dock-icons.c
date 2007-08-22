@@ -35,50 +35,25 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
 
-extern gboolean g_bResetScrollOnLeave;
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
-extern double g_fLineColor[4];
 extern int g_iIconGap;
-extern int g_iLabelSize;
-extern gboolean g_bRoundedBottomCorner;
 
-extern double g_fStripesColorBright[4];
-extern double g_fStripesColorDark[4];
-
-extern int g_iVisibleZoneWidth;
-extern int g_iVisibleZoneHeight;
 extern gchar *g_cCurrentThemePath;
 
-extern cairo_surface_t *g_pVisibleZoneSurface;
-extern double g_fVisibleZoneImageWidth, g_fVisibleZoneImageHeight;
-extern double g_fVisibleZoneAlpha;
-extern int g_iNbStripes;
 extern double g_fAmplitude;
 extern int g_iSinusoidWidth;
 
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
-extern gboolean g_bUseText;
-extern int g_iLabelSize;
-extern gchar *g_cLabelPolice;
 extern GHashTable *g_hAppliTable;
 extern gboolean g_bUniquePid;
 extern GHashTable *g_hXWindowTable;
 extern int g_iSidUpdateAppliList;
 
-extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
-extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 extern gchar *g_cConfFile;
 extern GHashTable *g_hModuleTable;
-
-
-extern gboolean g_bKeepAbove;
-extern gboolean g_bSkipPager;
-extern gboolean g_bSkipTaskbar;
-extern gboolean g_bSticky;
-extern CairoDock *g_pMainDock;
 
 
 void cairo_dock_free_icon (Icon *icon)
@@ -441,6 +416,7 @@ void cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon)
 
 void cairo_dock_remove_icon_from_dock (CairoDock *pDock, Icon *icon)
 {
+	//g_print ("%s (%s)\n", __func__, icon->acName);
 	cairo_dock_remove_one_icon_from_dock (pDock, icon);
 	
 	//\___________________ On enleve le separateur si c'est la derniere icone de son type.
@@ -457,6 +433,7 @@ void cairo_dock_remove_icon_from_dock (CairoDock *pDock, Icon *icon)
 			
 			if (pSeparatorIcon != NULL)
 			{
+				//g_print ("  on enleve un separateur\n");
 				pDock->icons = g_list_remove (pDock->icons, pSeparatorIcon);
 				cairo_dock_free_icon (pSeparatorIcon);
 			}
@@ -466,41 +443,42 @@ void cairo_dock_remove_icon_from_dock (CairoDock *pDock, Icon *icon)
 
 void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType)
 {
+	//g_print ("%s (%d)\n", __func__, iType);
 	Icon *icon;
 	GList *ic;
 	if (pDock->icons == NULL)
 		return ;
 	
-	gboolean bInside = FALSE;
+	gboolean bOneIconFound = FALSE;
 	Icon *pSeparatorIcon = NULL;
 	ic = pDock->icons;
-	if (ic->next != NULL)
+	for (ic = pDock->icons->next; ic != NULL; ic = ic->next)
 	{
-		for (ic = pDock->icons->next; ic != NULL; ic = ic->next)
+		icon = ic->prev->data;  // on ne peut pas enlever l'element courant, sinon on perd 'ic'.
+		if (icon->iType == iType)
 		{
-			icon = ic->prev->data;  // on ne peut pas enlever l'element courant, sinon on perd 'ic'.
-			if (icon->iType == iType)
-			{
-				bInside = TRUE;
-				cairo_dock_remove_one_icon_from_dock (pDock, icon);
-				cairo_dock_free_icon (icon);
-			}
-			else if ((! bInside || pSeparatorIcon == NULL) && CAIRO_DOCK_IS_SEPARATOR (icon))
-			{
+			bOneIconFound = TRUE;
+			cairo_dock_remove_one_icon_from_dock (pDock, icon);
+			cairo_dock_free_icon (icon);
+		}
+		else if (CAIRO_DOCK_IS_SEPARATOR (icon))
+		{
+			if ( (bOneIconFound && pSeparatorIcon == NULL) || (! bOneIconFound) )
 				pSeparatorIcon = icon;
-			}
 		}
 	}
 	
 	icon = cairo_dock_get_last_icon_of_type (pDock->icons, iType);
-	if (icon != NULL)
+	if (icon->iType == iType)
 	{
+		bOneIconFound = TRUE;
 		cairo_dock_remove_one_icon_from_dock (pDock, icon);
 		cairo_dock_free_icon (icon);
 	}
 	
-	if (pSeparatorIcon != NULL)
+	if (bOneIconFound && pSeparatorIcon != NULL)
 	{
+		//g_print ("  on enleve un separateur\n");
 		cairo_dock_remove_one_icon_from_dock (pDock, pSeparatorIcon);
 		cairo_dock_free_icon (pSeparatorIcon);
 	}
@@ -569,11 +547,9 @@ GList *cairo_dock_calculate_icons_positions_at_rest (GList *pIconList, int iMinD
 			fXMin = icon->fXAtRest;
 			pFirstDrawnElement = ic;
 		}
-		//g_print ("%s au repos : %.2f\n", icon->acName, icon->fXAtRest);
+		
 		x_cumulated += icon->fWidth + g_iIconGap;
 	}
-	//if (pFirstDrawnElement != NULL)
-	//	g_print ("pFirstDrawnElement : %s (fXAtRest : %.2f)\n", ((Icon *) pFirstDrawnElement->data)->acName, ((Icon *) pFirstDrawnElement->data)->fXAtRest);
 	
 	return pFirstDrawnElement;
 }
@@ -606,7 +582,6 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 			icon->fPhase = 0;
 		else if (icon->fPhase > G_PI)
 			icon->fPhase = G_PI;
-		//g_print ("x_cumulated : %.2f => fPhase : %.2fdeg\n", x_cumulated, icon->fPhase / G_PI * 180);
 		
 		//\_______________ On en deduit l'amplitude de la sinusoide au niveau de cette icone, et donc son echelle.
 		icon->fScale = 1 + fMagnitude * g_fAmplitude * sin (icon->fPhase);
@@ -626,23 +601,8 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 			if (icon->fPersonnalScale > -0.05)
 				icon->fPersonnalScale = -0.05;
 		}
-		if (icon->iCount > 0 && icon->iAnimationType == CAIRO_DOCK_BOUNCE && iWidth > 0)
-		{
-			c = icon->iCount;
-			if ( (c/5) & 1)  // c/5 est impair, on monte.
-			{
-				icon->fY -= (g_bDirectionUp ? (icon->fY - g_iLabelSize) : - (iHeight - g_iLabelSize - icon->fY - icon->fWidth * icon->fScale)) * .6;
-			}
-			else
-			{
-				icon->fY += (g_bDirectionUp ? (iHeight - (icon->fY + icon->fScale * icon->fHeight)) : - icon->fY) * .6;
-			}
-			icon->iCount --;
-		}
-		else
-		{
-			icon->fY = (g_bDirectionUp ? iHeight - g_iDockLineWidth - icon->fScale * icon->fHeight : g_iDockLineWidth);
-		}
+		icon->fY = (g_bDirectionUp ? iHeight - g_iDockLineWidth - icon->fScale * icon->fHeight : g_iDockLineWidth);
+		
 		//\_______________ Si on avait deja defini l'icone pointee, on peut placer l'icone courante par rapport a la precedente.
 		if (pointed_ic != NULL)
 		{
@@ -654,8 +614,7 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 			{
 				prev_icon = (ic->prev != NULL ? ic->prev->data : cairo_dock_get_last_icon (pIconList));
 				icon->fX = prev_icon->fX + prev_icon->fWidth * prev_icon->fScale + g_iIconGap;
-				///if (icon->fX > icon->fXMax - icon->fWidth / 6 && iWidth != 0 && icon->fPhase == G_PI)
-				///	icon->fX = icon->fXMax - icon->fWidth / 12;
+				
 				if (icon->fX + icon->fWidth * icon->fScale > icon->fXMax - icon->fWidth / 10 && iWidth != 0)
 					icon->fX = icon->fXMax - icon->fWidth * icon->fScale - icon->fWidth / 20;
 			}
@@ -678,14 +637,6 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 			icon->fDrawX = x_abs - (iMinDockWidth - iWidth) / 2;
 			icon->fDrawY = iMouseY;
 		}
-		/*else if (icon->iAnimationType == CAIRO_DOCK_AVOID_MOUSE)
-		{
-			if (x_abs < x_cumulated + icon->fWidth / 2)  // on est a gauche.
-				icon->fDrawX = icon->fX - 20 * (1 - icon->fScale);
-			else
-				icon->fDrawX = icon->fX + 20 * (1 - icon->fScale);
-			icon->fDrawY = icon->fY;
-		}*/
 		
 		ic = ic->next;
 		if (ic == NULL)
@@ -698,14 +649,6 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 		pointed_ic = (pFirstDrawnElement->prev == NULL ? g_list_last (pIconList) : pFirstDrawnElement->prev);
 		icon = pointed_ic->data;
 		icon->fX = x_cumulated - (iMinDockWidth - iWidth) / 2 + (1 - icon->fScale) * icon->fWidth;
-		/*if (icon->iAnimationType == CAIRO_DOCK_AVOID_MOUSE)
-		{
-			if (x_abs < x_cumulated + icon->fWidth / 2)  // on est a gauche.
-				icon->fDrawX = icon->fX - 20 * (1 - icon->fScale);
-			else
-				icon->fDrawX = icon->fX + 20 * (1 - icon->fScale);
-			icon->fDrawY = icon->fY;
-		}*/
 	}
 	
 	ic = pointed_ic;
@@ -738,10 +681,6 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	int iWidth, iHeight;
 	iWidth = pDock->iCurrentWidth;
 	iHeight = pDock->iCurrentHeight;
-	/**if (g_bHorizontalDock)
-		gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iWidth, &iHeight);
-	else
-		gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iHeight, &iWidth);*/
 	//g_print ("%s (%dx%d, %dx%d)\n", __func__, iMouseX, iMouseY, iWidth, iHeight);
 	
 	int dx = iMouseX - iWidth / 2;  // ecart par rapport au milieu du dock a plat.
@@ -847,7 +786,6 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 	} while (ic != pFirstDrawnElement);
 	fMaxBorderX = MAX (fMaxBorderX, icon->fX + icon->fWidth * icon->fScale);
 	
-	//fMaxDockWidth = fMaxBorderX - ((Icon *) pFirstDrawnElement->data)->fXMin + 2 * g_iDockRadius + g_iDockLineWidth;
 	fMaxDockWidth = icon->fXMax - ((Icon *) pFirstDrawnElement->data)->fXMin + 2 * g_iDockRadius + g_iDockLineWidth;
 	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
@@ -864,6 +802,8 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 
 void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX)
 {
+	if (pDock->icons == NULL)
+		return;
 	int x_abs = iMouseX - (pDock->iCurrentWidth - pDock->iMinDockWidth) / 2;  // ecart par rapport a la gauche du dock minimal.
 	
 	Icon *icon;
@@ -881,7 +821,7 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX)
 				if (ic->prev != NULL)
 					prev_icon = ic->prev->data;
 				else
-					prev_icon = g_list_last (pDock->icons);
+					prev_icon = g_list_last (pDock->icons)->data;
 				prev_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
 			}
 			else
@@ -890,9 +830,9 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX)
 				if (ic->next != NULL)
 					next_icon = ic->next->data;
 				else
-					next_icon = pDock->icons;
+					next_icon = pDock->icons->data;
 				next_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
-				ic = ic->next;
+				ic = ic->next;  // on la saute.
 				if (ic == NULL)
 					ic = pDock->icons;
 				if (ic == pFirstDrawnElement)

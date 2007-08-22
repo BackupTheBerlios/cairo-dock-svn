@@ -39,9 +39,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-load.h"
 
 extern GHashTable *g_hDocksTable;
-extern CairoDock *g_pMainDock;
-
-GHashTable *g_hModuleTable;
 
 extern int g_iSinusoidWidth;
 extern gint g_iDockLineWidth;
@@ -51,23 +48,13 @@ extern int g_iIconGap;
 extern cairo_surface_t *g_pVisibleZoneSurface;
 extern gboolean g_bReverseVisibleImage;
 
-extern gboolean g_bUseText;
-extern int g_iLabelSize;
 extern int g_iLabelWeight;
 extern int g_iLabelStyle;
-extern gchar *g_cLabelPolice;
-extern gchar **g_cDefaultIconDirectory;
 extern gchar *g_cCurrentThemePath;
-extern gchar *g_cConfFile;
 
-extern int g_iNbAnimationRounds;
 extern int g_iDockRadius;
 extern int g_iDockLineWidth;
-extern double g_fLineColor[4];
-extern gboolean g_bRoundedBottomCorner;
 
-extern double g_fStripesColor1[4];
-extern double g_fStripesColor2[4];
 extern gchar *g_cBackgroundImageFile;
 extern double g_fBackgroundImageAlpha;
 extern cairo_surface_t *g_pBackgroundSurface;
@@ -83,17 +70,10 @@ extern double g_fStripesColorDark[4];
 extern gboolean g_bHorizontalDock;
 extern gboolean g_bDirectionUp;
 
-extern int g_iScreenWidth;
-extern int g_iScreenHeight;
-extern gboolean g_bShowAppli;
 extern unsigned int g_iAppliMaxNameLength;
-extern gchar *g_cDefaultFileBrowser;
 
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
-extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
-extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
-extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
 
 extern gboolean g_bUseGlitz;
 

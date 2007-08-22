@@ -44,36 +44,14 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 extern gchar *g_cCurrentThemeName;
 
 extern CairoDock *g_pMainDock;
-extern int g_iWmHint;
-
-extern gint g_iScreenWidth;
-extern gint g_iScreenHeight;
-
-extern double g_fAmplitude;
-extern int g_iLabelSize;
-extern gboolean g_bUseText;
-extern int g_iDockRadius;
-extern int g_iDockLineWidth;
-extern int g_iIconGap;
 
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentThemePath;
 
-extern int g_iVisibleZoneWidth;
-extern int g_iVisibleZoneHeight;
-extern int g_iNbAnimationRounds;
-extern gchar *g_cLabelPolice;
-
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
 
-extern int g_iNbStripes;
-
-extern double g_fMoveUpSpeed;
-extern double g_fMoveDownSpeed;
-
 extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
-extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
 extern GHashTable *g_hModuleTable;
 
 extern gboolean g_bUseGlitz;
@@ -312,6 +290,17 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon->acDesktopFileName);
 	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", 300, 400, TRUE, NULL, NULL, NULL);
 	g_free (cDesktopFilePath);
+	
+	if (! pDock->bInside)
+	{
+		//g_print ("on force a quitter\n");
+		pDock->bInside = TRUE;
+		pDock->bAtBottom = FALSE;
+		on_leave_notify2 (pDock->pWidget,
+			NULL,
+			pDock);
+	}
+	
 	if (config_ok)
 	{
 		GError *erreur = NULL;

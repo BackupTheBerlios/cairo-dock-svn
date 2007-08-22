@@ -29,35 +29,20 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-launcher-factory.h"
 
-extern gint g_iScreenWidth;
-extern gint g_iScreenHeight;
-
 extern double g_fAmplitude;
 extern int g_iLabelSize;
 extern gboolean g_bUseText;
-extern int g_iDockRadius;
-extern int g_iDockLineWidth;
 extern int g_iIconGap;
 
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentThemePath;
 extern gchar **g_cDefaultIconDirectory;
 
-extern int g_iVisibleZoneWidth;
-extern int g_iVisibleZoneHeight;
 extern gchar *g_cLabelPolice;
 
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
 
-extern int g_iNbStripes;
-
-extern double g_fMoveUpSpeed;
-extern double g_fMoveDownSpeed;
-
-extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
-extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
-extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 

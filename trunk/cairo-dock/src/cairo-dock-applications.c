@@ -13,7 +13,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 #include <cairo.h>
 #include <gtk/gtk.h>
-
 #include </usr/include/X11/Xlib.h>
 #include </usr/include/X11/Xatom.h>
 #include </usr/include/X11/Xutil.h>
@@ -24,7 +23,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <cairo-glitz.h>
 #endif
 
-
 #include "cairo-dock-icons.h"
 #include "cairo-dock-draw.h"
 #include "cairo-dock-animations.h"
@@ -34,38 +32,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-applications.h"
 
-
-extern gint g_iScreenWidth;
-extern gint g_iScreenHeight;
-
-extern double g_fAmplitude;
-extern int g_iLabelSize;
-extern gboolean g_bUseText;
-extern int g_iDockRadius;
-extern int g_iDockLineWidth;
-extern int g_iIconGap;
 extern gboolean g_bAutoHide;
-
-extern gchar *g_cConfFile;
-extern gchar *g_cCairoDockDataDir;
-
-extern int g_iVisibleZoneWidth;
-extern int g_iVisibleZoneHeight;
-
-extern int g_iNbAnimationRounds;
-extern gchar *g_cLabelPolice;
-
-extern gboolean g_bDirectionUp;
-extern gboolean g_bHorizontalDock;
-
-extern int g_iNbStripes;
-
-extern double g_fMoveUpSpeed;
-extern double g_fMoveDownSpeed;
-
-extern int g_iMinIconAuthorizedHeight;
-extern int g_iMaxIconAuthorizedHeight;
-extern double g_fLineColor[4];
 
 extern Display *g_XDisplay;
 extern Screen *g_XScreen;
@@ -76,9 +43,6 @@ extern int g_iSidUpdateAppliList;
 
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
-extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
-extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
-extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 
 
 Window *cairo_dock_get_windows_list (gulong *iNbWindows)
@@ -439,6 +403,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 	}
 	
 	//g_print ("%d events\n", XEventsQueued (g_XDisplay, QueuedAlready));
+	//\_____________________ On vide la queue des messages qui ne nous interessent pas.
 	if (!bInterestedEvent)
 	{
 		long event_mask = 0xFFFFFFFF;

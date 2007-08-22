@@ -135,7 +135,6 @@ typedef struct _Icon {
 
 #define CAIRO_DOCK_THEMES_DIR "themes"
 
-
 typedef enum {
 	CAIRO_DOCK_MAX_SIZE,
 	CAIRO_DOCK_NORMAL_SIZE,
@@ -151,6 +150,12 @@ typedef enum {
 	CAIRO_DOCK_FOLLOW_MOUSE,
 	CAIRO_DOCK_AVOID_MOUSE
 	} CairoDockAnimationType;
+
+typedef enum {
+	CAIRO_DOCK_LEFT_CORNER = 0,
+	CAIRO_DOCK_MIDDLE,
+	CAIRO_DOCK_RIGHT_CORNER
+	} CairoDockCornerType;
 
 typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
 
