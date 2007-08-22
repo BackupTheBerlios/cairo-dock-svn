@@ -196,7 +196,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
-	g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
+	//g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
 	pDock->bInside = FALSE;
 	pDock->bAtTop = FALSE;
 	if (pDock->bMenuVisible)

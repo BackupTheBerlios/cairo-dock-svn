@@ -353,11 +353,6 @@ void cairo_dock_configure_module (CairoDockModule *module, CairoDock *pDock, GEr
 	user_data[1] = pDock;
 	gboolean configuration_ok = cairo_dock_edit_conf_file (NULL, module->cConfFilePath, cTitle, 450, 450, TRUE,  (CairoDockConfigFunc) cairo_dock_reload_module, user_data, (GFunc) g_free);
 	g_free (cTitle);
-	
-	/*if (configuration_ok && module->bActive)  // si le module etait actif, on le re-active avec sa nouvelle configuration.
-	{
-		cairo_dock_reload_module (module->cConfFilePath, user_data);
-	}*/
 }
 
 

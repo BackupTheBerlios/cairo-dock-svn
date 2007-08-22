@@ -469,7 +469,7 @@ void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType)
 	}
 	
 	icon = cairo_dock_get_last_icon_of_type (pDock->icons, iType);
-	if (icon->iType == iType)
+	if (icon != NULL && icon->iType == iType)
 	{
 		bOneIconFound = TRUE;
 		cairo_dock_remove_one_icon_from_dock (pDock, icon);
