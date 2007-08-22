@@ -434,7 +434,7 @@ void cairo_dock_remove_icon_from_dock (CairoDock *pDock, Icon *icon)
 			if (pSeparatorIcon != NULL)
 			{
 				//g_print ("  on enleve un separateur\n");
-				pDock->icons = g_list_remove (pDock->icons, pSeparatorIcon);
+				cairo_dock_remove_one_icon_from_dock (pDock, pSeparatorIcon);
 				cairo_dock_free_icon (pSeparatorIcon);
 			}
 		}

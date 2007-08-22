@@ -214,7 +214,6 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, GHashTabl
 			}
 			if (pIcon != NULL)
 			{
-				pIcon->pModule = pModule;
 				pIcon->fOrder = iOrder ++;
 				cairo_dock_insert_icon_in_dock (pIcon, pDock, FALSE, FALSE);
 			}
@@ -271,6 +270,8 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, GtkWidget *pWidget, 
 		return NULL;
 	}
 	
+	icon->pModule = module;
+	icon->iType = CAIRO_DOCK_APPLET;
 	module->bActive = TRUE;
 	return icon;
 }
@@ -300,18 +301,20 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 	g_return_if_fail (data != NULL);
 	CairoDockModule *module = data[0];
 	CairoDock *pDock = data[1];
+	GError *erreur = NULL;
 	
-	if (module->stopModule != NULL)
+	/*if (module->stopModule != NULL)
 	{
 		module->stopModule ();
 	}
 	g_free (module->cConfFilePath);
 	module->cConfFilePath = NULL;
 	
-	GError *erreur = NULL;
 	Icon *pNewIcon = module->initModule (pDock->pWidget, &module->cConfFilePath, &erreur);
 	if (pNewIcon != NULL)
-		pNewIcon->pModule = module;
+		pNewIcon->pModule = module;*/
+	cairo_dock_deactivate_module (module);
+	Icon *pNewIcon = cairo_dock_activate_module (module, pDock->pWidget, &erreur);
 	if (erreur != NULL)
 	{
 		module->bActive = FALSE;
@@ -333,11 +336,11 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 	if (pNewIcon != NULL)
 	{
 		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, TRUE, FALSE);
-		cairo_dock_redraw_my_icon (pNewIcon, pDock->pWidget);
-		
-		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
-		gtk_widget_queue_draw (pDock->pWidget);
+		//cairo_dock_redraw_my_icon (pNewIcon, pDock->pWidget);
 	}
+	
+	//cairo_dock_calculate_icons (pDock, 0, 0);
+	//gtk_widget_queue_draw (pDock->pWidget);
 }
 
 void cairo_dock_configure_module (CairoDockModule *module, CairoDock *pDock, GError **erreur)

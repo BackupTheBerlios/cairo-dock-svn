@@ -396,6 +396,7 @@ static void cairo_dock_remove_module (GtkMenuItem *menu_item, gpointer *data)
 		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons, g_hModuleTable);
 		//cairo_dock_free_icon (icon);
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+		gtk_widget_queue_draw (pDock->pWidget);
 	}
 }
 

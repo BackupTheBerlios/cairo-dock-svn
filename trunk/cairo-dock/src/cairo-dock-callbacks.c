@@ -545,7 +545,8 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 		else if (pButton->type == GDK_BUTTON_PRESS)
 		{
 			s_pIconClicked = cairo_dock_get_pointed_icon (pDock->icons);
-			s_pIconClicked->iAnimationType = CAIRO_DOCK_FOLLOW_MOUSE;
+			if (s_pIconClicked != NULL)
+				s_pIconClicked->iAnimationType = CAIRO_DOCK_FOLLOW_MOUSE;
 		}
 	}
 	else if (pButton->button == 3 && pButton->type == GDK_BUTTON_PRESS)  // clique droit.

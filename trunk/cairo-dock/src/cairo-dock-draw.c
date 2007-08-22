@@ -213,7 +213,7 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, int 
 	else
 	{
 		double a, b;  // parametres de la demi-ellipse.
-		if (! bInside)
+		if (! bInside || ! bLoop)
 		{
 			fAlpha = 0.25;
 			fY = icon->fY;
@@ -359,7 +359,7 @@ void render (CairoDock *pDock)
 	double fRadius = (pDock->iMaxIconHeight + fLineWidth - 2 * g_iDockRadius > 0 ? g_iDockRadius : (pDock->iMaxIconHeight + fLineWidth) / 2 - 1);
 	double fDockWidth = cairo_dock_get_current_dock_width (pDock);
 	gboolean bIsLoop = pDock->iRefCount == 0 && 1. * pDock->iCurrentWidth / pDock->iMaxDockWidth < .6 && pDock->bInside;
-	//g_print ("%s (%.2f)\n", __func__, fDockWidth);
+	//g_print ("%s (%.2f) %d / %d -> %d\n", __func__, fDockWidth, pDock->iCurrentWidth, pDock->iMaxDockWidth, bIsLoop);
 	
 	//\_________________ On determine des parametres de construction.
 	int sens;
