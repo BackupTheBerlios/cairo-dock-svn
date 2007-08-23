@@ -110,16 +110,16 @@ PACKAGE_BUGREPORT = Fabrice Rey (fabounet_03@yahoo.fr)
 PACKAGE_CFLAGS = -I/usr/local/include/cairo -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/include/pango-1.0 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/freetype2 -I/usr/include/libpng12 -I/usr/include/librsvg-2  
 PACKAGE_LIBS = -L/usr/local/lib -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lpangocairo-1.0 -lfontconfig -lXext -lXrender -lXinerama -lXi -lXrandr -lXcursor -lXfixes -lpango-1.0 -lX11 -lcairo -lrsvg-2 -lgdk_pixbuf-2.0 -lgobject-2.0 -lgmodule-2.0 -ldl -lglib-2.0 -lglitz -lm  
 PACKAGE_NAME = cairo-dock
-PACKAGE_STRING = cairo-dock 1.2.4
+PACKAGE_STRING = cairo-dock 1.2.5
 PACKAGE_TARNAME = cairo-dock
-PACKAGE_VERSION = 1.2.4
+PACKAGE_VERSION = 1.2.5
 PATH_SEPARATOR = :
 PKG_CONFIG = /usr/bin/pkg-config
 RANLIB = ranlib
 SET_MAKE = 
 SHELL = /bin/bash
 STRIP = strip
-VERSION = 1.2.4
+VERSION = 1.2.5
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 ac_ct_F77 = 
@@ -183,7 +183,6 @@ theme_DATA = \
 	10launcher.desktop \
 	background-cairo-dock.svg \
 	background-snow.svg \
-	blank.png \
 	cairo-dock.conf \
 	calculator.svg \
 	desktop.svg \

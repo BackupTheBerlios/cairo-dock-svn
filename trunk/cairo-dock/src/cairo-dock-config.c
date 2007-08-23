@@ -48,6 +48,7 @@ extern double g_fVisibleZoneAlpha;
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
 extern CairoDockCornerType g_iWhichCorner;
+extern double g_fAlign;
 
 extern gboolean g_bUseText;
 extern int g_iLabelSize;
@@ -179,6 +180,17 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	{
 		g_free (cScreenBorder);
 		cScreenBorder = g_strdup ("bottom");
+	}
+	
+	g_fAlign = g_key_file_get_double (fconf, "POSITION", "alignment", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_fAlign = 0.5;  // valeur par defaut.
+		g_key_file_set_double (fconf, "POSITION", "alignment", g_fAlign);
+		bFlushConfFileNeeded = TRUE;
 	}
 	
 	
@@ -1166,6 +1178,7 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 		g_error_free (erreur);
 		erreur = NULL;
 	}
+	g_key_file_remove_key (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", NULL);
 	
 	GtkWidget *pDialog = cairo_dock_generate_advanced_ihm_from_keyfile (pKeyFile, cTitle, pWidget, &pWidgetList, (pConfigFunc != NULL), bFullConfig);
 	if (pDialog == NULL || pWidgetList == NULL)
@@ -1176,8 +1189,11 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 	
 	if (iWindowWidth != 0 && iWindowHeight != 0)
 		gtk_window_resize (GTK_WINDOW (pDialog), iWindowWidth, iWindowHeight);
-	//gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER);
-	gtk_window_move (GTK_WINDOW (pDialog), (g_iScreenWidth - iWindowWidth) / 2, (g_iScreenHeight - iWindowHeight) / 2);
+	gint iWidth, iHeight;
+	gtk_window_get_size (GTK_WINDOW (pDialog), &iWidth, &iHeight);
+	iWidth = MAX (iWidth, iWindowWidth);  // car la taille n'est pas encore effective.
+	iHeight = MAX (iWidth, iWindowHeight);
+	gtk_window_move (GTK_WINDOW (pDialog), (g_iScreenWidth - iWidth) / 2, (g_iScreenHeight - iHeight) / 2);
 	
 	if (pConfigFunc != NULL)  // alors on autorise la modification a la volee, avec un bouton "Appliquer". La fenetre doit donc laisser l'appli se derouler.
 	{

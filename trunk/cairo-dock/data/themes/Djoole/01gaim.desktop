@@ -1,23 +1,11 @@
 #!
-
-
-
-
-
-
-
-
-
-
-
 [Desktop Entry]
-#s image's name or path:
-Icon=desktop.svg
 #s launcher's name:
 Name=Bureau
 #s Exec command:
 Exec=/home/julien/.cairo-dock/ShowDesktop
-
+#S image's name or path:
+Icon=desktop.svg
 #i Order you want for this launcher among the other launchers:
 Order=1
 #s Name of the container it belongs to:

@@ -1,14 +1,11 @@
 #!
-
-
 [Desktop Entry]
-#s image's name or path:
-Icon=mail.svg
 #s launcher's name:
 Name=Courrier
 #s Exec command:
 Exec=alltray -stask thunderbird
-
+#S image's name or path:
+Icon=mail.svg
 #i Order you want for this launcher among the other launchers:
 Order=3
 #s Name of the container it belongs to:

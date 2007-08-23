@@ -1,15 +1,11 @@
 #!
-
-
-
 [Desktop Entry]
-#s image's name or path:
-Icon=terminal.svg
 #s launcher's name:
 Name=Terminal
 #s Exec command:
 Exec=gnome-terminal
-
+#S image's name or path:
+Icon=terminal.svg
 #i Order you want for this launcher among the other launchers:
 Order=5
 #s Name of the container it belongs to:

@@ -21,6 +21,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 extern gchar *g_cCairoDockDataDir;
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentThemePath;
+extern gchar *g_cLanguage;
 
 extern CairoDock *g_pMainDock;
 extern int g_iWmHint;
@@ -259,7 +260,7 @@ static void _cairo_dock_delete_one_theme (gchar *cThemeName, gchar *cThemePath, 
 		gtk_widget_destroy (dialog);
 		if (answer == GTK_RESPONSE_YES)
 		{
-			gchar *cCommand = g_strdup_printf ("rm -rf %s", cThemePath);
+			gchar *cCommand = g_strdup_printf ("rm -rf '%s'", cThemePath);
 			system (cCommand);  // g_rmdir n'efface qu'un repertoire vide.
 			g_free (cCommand);
 		}
@@ -268,7 +269,7 @@ static void _cairo_dock_delete_one_theme (gchar *cThemeName, gchar *cThemePath, 
 void cairo_dock_manage_themes (GtkWidget *pWidget)
 {
 	GHashTable *hThemeTable = NULL;
-	gchar *cInitConfFile = cairo_dock_edit_themes ("en", &hThemeTable);
+	gchar *cInitConfFile = cairo_dock_edit_themes (g_cLanguage, &hThemeTable);
 	
 	if (cInitConfFile != NULL)
 	{

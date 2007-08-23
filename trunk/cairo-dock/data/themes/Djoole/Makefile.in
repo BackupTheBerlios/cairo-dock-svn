@@ -183,7 +183,6 @@ theme_DATA = \
 	10launcher.desktop \
 	background-cairo-dock.svg \
 	background-snow.svg \
-	blank.png \
 	cairo-dock.conf \
 	calculator.svg \
 	desktop.svg \

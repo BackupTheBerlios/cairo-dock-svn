@@ -54,6 +54,7 @@ extern gchar *g_cConfFile;
 extern int g_iVisibleZoneHeight, g_iVisibleZoneWidth;
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
+extern double g_fAlign;
 
 extern double g_fRefreshInterval;
 
@@ -170,7 +171,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 				cairo_dock_shrink_down (pSubDock);
 			}
 			
-			pSubDock->iGapX = pDock->iGapX + (pPointedIcon->fX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 - pDock->iMaxDockWidth / 2);
+			pSubDock->iGapX = pDock->iGapX + pPointedIcon->fX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 + pDock->iWindowPositionX - g_iScreenWidth / 2; // les sous-dock ont un alignement eal a 0.5.
 			pSubDock->iGapY = pDock->iGapY + pDock->iMaxDockHeight;
 			
 			int iNewWidth, iNewHeight;
@@ -329,10 +330,10 @@ void cairo_dock_update_gaps_with_window_position (CairoDock *pDock)
 	}
 	
 	int x, y;  // position du point invariant du dock.
-	x = pDock->iWindowPositionX + iWidth / 2;
+	x = pDock->iWindowPositionX + iWidth * g_fAlign;
 	y = (g_bDirectionUp ? pDock->iWindowPositionY + iHeight : pDock->iWindowPositionY);
 	
-	pDock->iGapX = x - g_iScreenWidth / 2;
+	pDock->iGapX = x - g_iScreenWidth * g_fAlign;
 	pDock->iGapY = (g_bDirectionUp ? g_iScreenHeight - y : y);
 	
 	if (pDock->bIsMainDock)
@@ -353,81 +354,78 @@ gboolean on_key_release (GtkWidget *pWidget,
 	return FALSE;
 }
 
+
+static int _move_up_by_arrow (int iMoveByArrow, CairoDock *pDock)
+{
+	int iPossibleMove = MAX (0, pDock->iWindowPositionY);
+	int iEffectiveMove = MIN (iMoveByArrow, iPossibleMove);
+	//g_print ("%s () : iPossibleMove=%d->%d\n", __func__, iPossibleMove, iEffectiveMove);
+	if (iEffectiveMove > 0)
+	{
+		pDock->iWindowPositionY -= iEffectiveMove;
+		pDock->iGapY += (g_bDirectionUp ? iEffectiveMove : -iEffectiveMove);
+	}
+	return iEffectiveMove;
+}
+static int _move_down_by_arrow (int iMoveByArrow, CairoDock *pDock)
+{
+	int iPossibleMove = MAX (0, g_iScreenHeight - (pDock->iWindowPositionY + pDock->iCurrentHeight));
+	int iEffectiveMove = MIN (iMoveByArrow, iPossibleMove);
+	//g_print ("%s () : iPossibleMove=%d->%d\n", __func__, iPossibleMove, iEffectiveMove);
+	if (iEffectiveMove > 0)
+	{
+		pDock->iWindowPositionY += iEffectiveMove;
+		pDock->iGapY += (g_bDirectionUp ? -iEffectiveMove : iEffectiveMove);
+	}
+	return iEffectiveMove;
+}
+static int _move_left_by_arrow (int iMoveByArrow, CairoDock *pDock)
+{
+	int iPossibleMove = MAX (0, pDock->iWindowPositionX);
+	int iEffectiveMove = MIN (iMoveByArrow, iPossibleMove);
+	if (iEffectiveMove > 0)
+	{
+		pDock->iWindowPositionX -= iEffectiveMove;
+		pDock->iGapX -= iEffectiveMove;
+	}
+	return iEffectiveMove;
+}
+static int _move_right_by_arrow (int iMoveByArrow, CairoDock *pDock)
+{
+	int iPossibleMove = MAX (0, g_iScreenWidth - (pDock->iWindowPositionX + pDock->iCurrentWidth));
+	int iEffectiveMove = MIN (iMoveByArrow, iPossibleMove);
+	if (iEffectiveMove > 0)
+	{
+		pDock->iWindowPositionX += iEffectiveMove;
+		pDock->iGapX += iEffectiveMove;
+	}
+	return iEffectiveMove;
+}
 gboolean on_key_press (GtkWidget *pWidget,
 			GdkEventKey *pKey,
 			CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
-	iMoveByArrow ++;
-	int iPossibleMove;
-	
-	int iWidth, iHeight;
-	gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iWidth, &iHeight);  // mieux que iCurrentWidth.
-	
-	int x, y;  // position du centre bas du dock;
-	x = pDock->iWindowPositionX +iWidth / 2;
-	y = pDock->iWindowPositionY + iHeight - 1;
 	if (pKey->type == GDK_KEY_PRESS)
 	{
 		GdkEventScroll dummyScroll;
 		int iX, iY;
 		switch (pKey->keyval)
 		{
-			case GDK_q :
-				//if (pDock->bIsMainDock && pKey != NULL && pKey->state & GDK_CONTROL_MASK)  // CTRL + q quitte l'appli.
-				//	gtk_main_quit ();
-			break;
-			
 			case GDK_Down :
-				iPossibleMove = MAX (0, g_iScreenHeight - 1 - y);
-				iMoveByArrow = MIN (iMoveByArrow, iPossibleMove);
-				if (iMoveByArrow > 0)
-				{
-					pDock->iWindowPositionY += iMoveByArrow;
-					pDock->iGapY -= iMoveByArrow;
-					gtk_window_move (GTK_WINDOW (pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);
-					if (pDock->bIsMainDock)
-						cairo_dock_update_conf_file_with_position (g_cConfFile, pDock->iGapX, pDock->iGapY);
-				}
+				iMoveByArrow = (g_bHorizontalDock ? _move_down_by_arrow (++iMoveByArrow, pDock) : _move_right_by_arrow (++iMoveByArrow, pDock));
 			break;
 
 			case GDK_Up :
-				iPossibleMove = MAX (0, y - pDock->iMaxDockHeight);
-				iMoveByArrow = MIN (iMoveByArrow, iPossibleMove);
-				if (iMoveByArrow > 0)
-				{
-					pDock->iWindowPositionY -= iMoveByArrow;
-					pDock->iGapY += iMoveByArrow;
-					gtk_window_move (GTK_WINDOW (pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);
-					if (pDock->bIsMainDock)
-						cairo_dock_update_conf_file_with_position (g_cConfFile, pDock->iGapX, pDock->iGapY);
-				}
+				iMoveByArrow = (g_bHorizontalDock ? _move_up_by_arrow (++iMoveByArrow, pDock) : _move_left_by_arrow (++iMoveByArrow, pDock));
 			break;
 			
 			case GDK_Left :
-				iPossibleMove = MAX (0, x - pDock->iMinDockWidth / 2);
-				iMoveByArrow = MIN (iMoveByArrow, iPossibleMove);
-				if (iMoveByArrow > 0)
-				{
-					pDock->iWindowPositionX -= iMoveByArrow;
-					pDock->iGapX -= iMoveByArrow;
-					gtk_window_move (GTK_WINDOW (pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);
-					if (pDock->bIsMainDock)
-						cairo_dock_update_conf_file_with_position (g_cConfFile, pDock->iGapX, pDock->iGapY);
-				}
+				iMoveByArrow = (g_bHorizontalDock ? _move_left_by_arrow (++iMoveByArrow, pDock) : _move_up_by_arrow (++iMoveByArrow, pDock));
 			break;
 			
 			case GDK_Right :
-				iPossibleMove = MAX (0, g_iScreenWidth - (x + pDock->iMinDockWidth / 2 + g_iDockRadius + g_iDockLineWidth));
-				iMoveByArrow = MIN (iMoveByArrow, iPossibleMove);
-				if (iMoveByArrow > 0)
-				{
-					pDock->iWindowPositionX += iMoveByArrow;
-					pDock->iGapX += iMoveByArrow;
-					gtk_window_move (GTK_WINDOW (pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);
-					if (pDock->bIsMainDock)
-						cairo_dock_update_conf_file_with_position (g_cConfFile, pDock->iGapX, pDock->iGapY);
-				}
+				iMoveByArrow = (g_bHorizontalDock ? _move_right_by_arrow (++iMoveByArrow, pDock) : _move_down_by_arrow (++iMoveByArrow, pDock));
 			break;
 			
 			case GDK_Page_Up :
@@ -454,6 +452,16 @@ gboolean on_key_press (GtkWidget *pWidget,
 					pDock);
 			break;
 		}
+	}
+	
+	if (iMoveByArrow > 0)
+	{
+		if (g_bHorizontalDock)
+			gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);
+		else
+			gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionY, pDock->iWindowPositionX);
+		if (pDock->bIsMainDock)
+			cairo_dock_update_conf_file_with_position (g_cConfFile, pDock->iGapX, pDock->iGapY);
 	}
 	
 	return FALSE;
@@ -511,8 +519,8 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 					cairo_dock_update_icon_s_container_name (s_pIconClicked, icon->cParentDockName);
 				}
 				
-				s_pIconClicked->iCount = 20;  // 2 rebonds.
 				s_pIconClicked->iAnimationType = CAIRO_DOCK_BOUNCE;
+				s_pIconClicked->iCount = 2 * g_tNbIterInOneRound[icon->iAnimationType];  // 2 rebonds.
 				int iX, iY;
 				if (g_bHorizontalDock)
 				{
@@ -660,7 +668,7 @@ gboolean on_scroll (GtkWidget* pWidget,
 				cairo_dock_shrink_down (pSubDock);
 			}
 			
-			pSubDock->iGapX = pDock->iGapX + (pPointedIcon->fX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 - pDock->iMaxDockWidth / 2);
+			pSubDock->iGapX = pDock->iGapX + pPointedIcon->fX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 + pDock->iWindowPositionX - g_iScreenWidth / 2; // les sous-dock ont un alignement eal a 0.5.
 			pSubDock->iGapY = pDock->iGapY + pDock->iMaxDockHeight;
 			
 			int iNewWidth, iNewHeight;
@@ -756,7 +764,7 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 			if (icon->bPointed)
 			{
 				//g_print ("On pointe sur %s\n", icon->acName);
-				if (icon->pSubDock != NULL)
+				if (icon->pSubDock != NULL && icon->pSubDock->icons == NULL)
 				{
 					pReceivingDock = icon->pSubDock;
 				}

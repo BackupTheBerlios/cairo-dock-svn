@@ -121,7 +121,6 @@ StartupNotify=true
 Terminal=false
 Type=Application
 Categories=Network;InstantMessaging;
-X-Ubuntu-Gettext-Domain=pidgin
 #f Order you want for this launcher among the other launchers :
 Order=1
 #s Name of the container it belongs to:

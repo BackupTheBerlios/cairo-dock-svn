@@ -157,6 +157,7 @@ int g_iVisibleZoneHeight = 0;
 gboolean g_bDirectionUp = TRUE;  // la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.
 gboolean g_bHorizontalDock = TRUE;  // dit si le dock est horizontal ou vertical.
 CairoDockCornerType g_iWhichCorner;  // dis par rapport a quel coin on doit considerer le delta_x.
+double g_fAlign;  // alignement, entre 0 et 1, du dock sur le bord de l'ecran.
 gboolean g_bUseText;  // vrai ssi on doit afficher les etiquettes au-dessus des icones.
 int g_iLabelSize;  // taille de la police des etiquettes.
 gchar *g_cLabelPolice;  // police de caracteres des etiquettes.

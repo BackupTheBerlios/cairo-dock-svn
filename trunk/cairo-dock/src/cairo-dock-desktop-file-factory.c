@@ -96,7 +96,7 @@ Order = %f\n\
 Container = %s\n\
 #b Is this icon a container ?\n\
 Is container = false",
-		g_cDefaultFileBrowser, cFilePath, cFilePath, g_cDefaultFileBrowser, cFilePath, fEffectiveOrder, cDockName);
+		cFilePath, cFilePath, g_cDefaultFileBrowser, cFilePath, g_cDefaultFileBrowser, fEffectiveOrder, cDockName);
 		lenght = -1;
 		
 		//\___________________ On lui choisit un nom de fichier tel qu'il n'y ait pas de collision.
@@ -132,7 +132,14 @@ Is container = false",
 		g_key_file_set_boolean (pKeyFile, "Desktop Entry", "Is container", FALSE);
 		
 		//\_________________ Et surtout on vire l'infame usine a gaz de traduction automatique d'Ubuntu !
-		g_key_file_remove_key (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", NULL);
+		g_key_file_remove_key (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", &tmp_erreur);
+		if (tmp_erreur != NULL)
+		{
+			g_error_free (tmp_erreur);
+			tmp_erreur = NULL;
+		}
+		//else  // il y en a 2 !
+		//	g_key_file_set_string (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", "");
 		
 		//\_________________ On en fait un fichier de conf evolue.
 		if (! cairo_dock_is_advanced_keyfile (pKeyFile))

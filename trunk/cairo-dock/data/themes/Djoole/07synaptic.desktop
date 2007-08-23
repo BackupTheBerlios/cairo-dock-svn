@@ -1,22 +1,4 @@
 #!
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 [Desktop Entry]
 #s Launcher's name :
 Name=Synaptic Package Manager
@@ -58,7 +40,7 @@ Name[zh_CN]=新立得软件包管理器
 Name[zh_TW]=Synaptic 套件管理程式
 #s Exec command :
 Exec=gksu /usr/sbin/synaptic
-#s Image's name or path :
+#S Image's name or path :
 Icon=synaptic.svg
 #i Order you want for this launcher among the other launchers :
 Order=7

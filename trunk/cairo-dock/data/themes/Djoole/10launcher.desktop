@@ -1,14 +1,12 @@
 #!
-
-
 [Desktop Entry]
-#s Image's name or path :
-Icon=grisbi.png
 #s Launcher's name :
 Name[fr]=Grisbi
 Name[en]=New Launcher
 #s Exec command :
 Exec=grisbi
+#S Image's name or path :
+Icon=grisbi.png
 #f Order you want for this launcher among the other launchers :
 Order=11
 #s Name of the container it belongs to:

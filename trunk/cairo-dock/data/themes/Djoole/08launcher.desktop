@@ -1,14 +1,12 @@
 #!
-
-
 [Desktop Entry]
-#s Image's name or path :
-Icon=calculator.svg
 #s Launcher's name :
 Name[fr]=Calculatrice
 Name[en]=New Launcher
 #s Exec command :
 Exec=gcalctool
+#S Image's name or path :
+Icon=calculator.svg
 #f Order you want for this launcher among the other launchers :
 Order=9
 #s Name of the container it belongs to:
