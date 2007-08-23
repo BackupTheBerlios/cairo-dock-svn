@@ -716,6 +716,11 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 				g_source_remove (pDock->iSidShrinkDown);
 				pDock->iSidShrinkDown = 0;
 			}
+			if (pDock->iSidMoveDown != 0)
+			{
+				g_source_remove (pDock->iSidMoveDown);
+				pDock->iSidMoveDown = 0;
+			}
 			pDock->iSidGrowUp = g_timeout_add (75, (GSourceFunc) cairo_dock_grow_up, pDock);
 		}
 	}

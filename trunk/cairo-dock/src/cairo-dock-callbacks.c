@@ -234,7 +234,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	//g_print ("%s ()\n", __func__);
+	//g_print ("%s (bInside:%d)\n", __func__, pDock->bInside);
 	if (pDock->bAtBottom || ! pDock->bInside)
 		return FALSE;
 	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
@@ -255,7 +255,8 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	if (pDock->bAtTop || pDock->bInside || pDock->iSidMoveDown != 0)  // le 'iSidMoveDown != 0' est la pour empecher le dock de "vibrer" si l'utilisateur sort par en bas avec l'auto-hide active.
+	//g_print ("%s (iSidMoveDown:%d)\n", __func__, pDock->iSidMoveDown);
+	if (pDock->bAtTop || pDock->bInside || (pDock->iSidMoveDown != 0 && pDock->fMagnitude == 0))  // le 'iSidMoveDown != 0' est la pour empecher le dock de "vibrer" si l'utilisateur sort par en bas avec l'auto-hide active.
 		return FALSE;
 	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	

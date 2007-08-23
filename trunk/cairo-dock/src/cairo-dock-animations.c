@@ -73,6 +73,7 @@ gboolean cairo_dock_move_up (CairoDock *pDock)
 
 gboolean cairo_dock_move_down (CairoDock *pDock)
 {
+	//g_print ("%s ()\n", __func__);
 	if (pDock->fMagnitude > 0.0)  // on retarde le cachage du dock pour apercevoir les effets.
 		return TRUE;
 	int deltaY_possible = (g_bDirectionUp ? g_iScreenHeight - pDock->iGapY - g_iVisibleZoneHeight : pDock->iGapY + g_iVisibleZoneHeight - pDock->iMaxDockHeight) - pDock->iWindowPositionY;
@@ -162,6 +163,7 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 
 gboolean cairo_dock_shrink_down (CairoDock *pDock)
 {
+	//g_print ("%s (%f)\n", __func__, pDock->fMagnitude);
 	if (pDock->fMagnitude > 0.05)
 		pDock->fMagnitude *= g_fShrinkDownFactor; //  0.6
 	else
@@ -229,6 +231,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 				gdk_window_hide (pDock->pWidget->window);
 				cairo_dock_hide_parent_docks (pDock);
 			}
+			//g_print ("fin du shrink down\n");
 			return FALSE;
 		}
 		

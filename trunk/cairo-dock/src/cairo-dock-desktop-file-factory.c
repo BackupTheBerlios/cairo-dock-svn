@@ -131,6 +131,9 @@ Is container = false",
 		g_key_file_set_string (pKeyFile, "Desktop Entry", "Container", cDockName);
 		g_key_file_set_boolean (pKeyFile, "Desktop Entry", "Is container", FALSE);
 		
+		//\_________________ Et surtout on vire l'infame usine a gaz de traduction automatique d'Ubuntu !
+		g_key_file_remove_key (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", NULL);
+		
 		//\_________________ On en fait un fichier de conf evolue.
 		if (! cairo_dock_is_advanced_keyfile (pKeyFile))
 		{
