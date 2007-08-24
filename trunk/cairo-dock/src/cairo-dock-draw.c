@@ -40,6 +40,7 @@ extern gboolean g_bForceLoop;
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
 extern double g_fLineColor[4];
+extern gboolean g_bLinkWithString;
 extern int g_iIconGap;
 
 extern gboolean g_bRoundedBottomCorner;
@@ -469,87 +470,90 @@ void render (CairoDock *pDock)
 		return ;
 	}
 	
-	cairo_save (pCairoContext);
-	Icon *prev_icon = NULL, *next_icon;
-	if (bIsLoop)
+	if (g_bLinkWithString)
 	{
-		ic = cairo_dock_get_previous_element (pFirstDrawnElement, pDock->icons);
-		prev_icon = ic->data;
-	}
-	ic = pFirstDrawnElement;
-	icon = ic->data;
-	double x, y, fCurvature = 0.3;
-	x = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor / 2;
-	y = icon->fDrawY + icon->fHeight * icon->fScale / 2;
-	GList *next_ic;
-	double x1, x2, x3;
-	double y1, y2, y3;
-	double dx, dy;
-	if (g_bHorizontalDock)
-		cairo_move_to (pCairoContext, x, y);
-	else
-		cairo_move_to (pCairoContext, y, x);
-	do
-	{
-		if (prev_icon != NULL)
+		cairo_save (pCairoContext);
+		Icon *prev_icon = NULL, *next_icon;
+		if (bIsLoop)
 		{
-			x1 = prev_icon->fDrawX + prev_icon->fWidth * prev_icon->fScale * prev_icon->fWidthFactor / 2;
-			y1 = prev_icon->fDrawY + prev_icon->fHeight * prev_icon->fScale / 2;
+			ic = cairo_dock_get_previous_element (pFirstDrawnElement, pDock->icons);
+			prev_icon = ic->data;
 		}
-		else
-		{
-			x1 = x;
-			y1 = y;
-		}
-		prev_icon = icon;
-		
-		ic = cairo_dock_get_next_element (ic, pDock->icons);
-		if (ic == pFirstDrawnElement && ! bIsLoop)
-			break;
+		ic = pFirstDrawnElement;
 		icon = ic->data;
-		x2 = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor / 2;
-		y2 = icon->fDrawY + icon->fHeight * icon->fScale / 2;
-		
-		dx = x2 - x;
-		dy = y2 - y;
-		
-		next_ic = cairo_dock_get_next_element (ic, pDock->icons);
-		next_icon = (next_ic == pFirstDrawnElement && ! bIsLoop ? NULL : next_ic->data);
-		if (next_icon != NULL)
-		{
-			x3 = next_icon->fDrawX + next_icon->fWidth * next_icon->fScale * next_icon->fWidthFactor / 2;
-			y3 = next_icon->fDrawY + next_icon->fHeight * next_icon->fScale / 2;
-		}
-		else
-		{
-			x3 = x2;
-			y3 = y2;
-		}
-		
+		double x, y, fCurvature = 0.3;
+		x = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor / 2;
+		y = icon->fDrawY + icon->fHeight * icon->fScale / 2;
+		GList *next_ic;
+		double x1, x2, x3;
+		double y1, y2, y3;
+		double dx, dy;
 		if (g_bHorizontalDock)
-			cairo_rel_curve_to (pCairoContext,
-				(fabs ((x - x1) / (y - y1)) > .35 ? dx * fCurvature : 0),
-				(fabs ((x - x1) / (y - y1)) > .35 ? dx * fCurvature * (y - y1) / (x - x1) : 0),
-				(fabs ((x3 - x2) / (y3 - y2)) > .35 ? dx * (1 - fCurvature) : dx),
-				(fabs ((x3 - x2) / (y3 - y2)) > .35 ? MAX (0, MIN (dy, dy - dx * fCurvature * (y3 - y2) / (x3 - x2))) : dy),
-				dx,
-				dy);
+			cairo_move_to (pCairoContext, x, y);
 		else
-			cairo_rel_curve_to (pCairoContext,
-				(fabs ((x - x1) / (y - y1)) > .35 ? dx * fCurvature * (y - y1) / (x - x1) : 0),
-				(fabs ((x - x1) / (y - y1)) > .35 ? dx * fCurvature : 0),
-				(fabs ((x3 - x2) / (y3 - y2)) > .35 ? MAX (0, MIN (dy, dy - dx * fCurvature * (y3 - y2) / (x3 - x2))) : dy),
-				(fabs ((x3 - x2) / (y3 - y2)) > .35 ? dx * (1 - fCurvature) : dx),
-				dy,
-				dx);
-		x = x2;
-		y = y2;
+			cairo_move_to (pCairoContext, y, x);
+		do
+		{
+			if (prev_icon != NULL)
+			{
+				x1 = prev_icon->fDrawX + prev_icon->fWidth * prev_icon->fScale * prev_icon->fWidthFactor / 2;
+				y1 = prev_icon->fDrawY + prev_icon->fHeight * prev_icon->fScale / 2;
+			}
+			else
+			{
+				x1 = x;
+				y1 = y;
+			}
+			prev_icon = icon;
+			
+			ic = cairo_dock_get_next_element (ic, pDock->icons);
+			if (ic == pFirstDrawnElement && ! bIsLoop)
+				break;
+			icon = ic->data;
+			x2 = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor / 2;
+			y2 = icon->fDrawY + icon->fHeight * icon->fScale / 2;
+			
+			dx = x2 - x;
+			dy = y2 - y;
+			
+			next_ic = cairo_dock_get_next_element (ic, pDock->icons);
+			next_icon = (next_ic == pFirstDrawnElement && ! bIsLoop ? NULL : next_ic->data);
+			if (next_icon != NULL)
+			{
+				x3 = next_icon->fDrawX + next_icon->fWidth * next_icon->fScale * next_icon->fWidthFactor / 2;
+				y3 = next_icon->fDrawY + next_icon->fHeight * next_icon->fScale / 2;
+			}
+			else
+			{
+				x3 = x2;
+				y3 = y2;
+			}
+			
+			if (g_bHorizontalDock)
+				cairo_rel_curve_to (pCairoContext,
+					(fabs ((x - x1) / (y - y1)) > .35 ? dx * fCurvature : 0),
+					(fabs ((x - x1) / (y - y1)) > .35 ? dx * fCurvature * (y - y1) / (x - x1) : 0),
+					(fabs ((x3 - x2) / (y3 - y2)) > .35 ? dx * (1 - fCurvature) : dx),
+					(fabs ((x3 - x2) / (y3 - y2)) > .35 ? MAX (0, MIN (dy, dy - dx * fCurvature * (y3 - y2) / (x3 - x2))) : dy),
+					dx,
+					dy);
+			else
+				cairo_rel_curve_to (pCairoContext,
+					(fabs ((x - x1) / (y - y1)) > .35 ? dx * fCurvature * (y - y1) / (x - x1) : 0),
+					(fabs ((x - x1) / (y - y1)) > .35 ? dx * fCurvature : 0),
+					(fabs ((x3 - x2) / (y3 - y2)) > .35 ? MAX (0, MIN (dy, dy - dx * fCurvature * (y3 - y2) / (x3 - x2))) : dy),
+					(fabs ((x3 - x2) / (y3 - y2)) > .35 ? dx * (1 - fCurvature) : dx),
+					dy,
+					dx);
+			x = x2;
+			y = y2;
+		}
+		while (ic != pFirstDrawnElement);
+		cairo_set_line_width (pCairoContext, 2);
+		cairo_set_source_rgba (pCairoContext, g_fLineColor[0], g_fLineColor[1], g_fLineColor[2], g_fLineColor[3]);
+		cairo_stroke (pCairoContext);
+		cairo_restore (pCairoContext);
 	}
-	while (ic != pFirstDrawnElement);
-	cairo_set_line_width (pCairoContext, 2);
-	cairo_set_source_rgba (pCairoContext, g_fLineColor[0], g_fLineColor[1], g_fLineColor[2], g_fLineColor[3]);
-	cairo_stroke (pCairoContext);
-	cairo_restore (pCairoContext);
 	
 	//\____________________ On dessine les icones et les etiquettes, en tenant compte de l'ordre pour dessiner celles en arriere-plan avant celles en avant-plan.
 	//g_print ("--------------------\n");

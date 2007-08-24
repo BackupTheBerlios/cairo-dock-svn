@@ -71,6 +71,7 @@ extern int g_iDockRadius;
 extern int g_iDockLineWidth;
 extern gboolean g_bRoundedBottomCorner;
 extern double g_fLineColor[4];
+extern gboolean g_bLinkWithString;
 
 extern gboolean g_bBackgroundImageRepeat;
 extern double g_fBackgroundImageAlpha;
@@ -616,6 +617,16 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		bFlushConfFileNeeded = TRUE;
 	}
 	
+	g_bLinkWithString = g_key_file_get_boolean (fconf, "CAIRO DOCK", "draw string", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_bLinkWithString = FALSE;  // valeur par defaut.
+		g_key_file_set_boolean (fconf, "CAIRO DOCK", "draw string", g_bLinkWithString);
+		bFlushConfFileNeeded = TRUE;
+	}
 	
 	g_fGrowUpFactor = g_key_file_get_double (fconf, "CAIRO DOCK", "grow up factor", &erreur);
 	if (erreur != NULL)
