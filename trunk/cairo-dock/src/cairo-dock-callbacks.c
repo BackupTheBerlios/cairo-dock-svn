@@ -107,7 +107,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 {
 	static double fLastTime = 0;
 	Icon *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
-	//g_print ("%s (%d,%d) (%d, %.2fms)\n", __func__, (int) pMotion->x, (int) pMotion->y, pMotion->is_hint, pMotion->time - fLastTime);
+	//g_print ("%s (%d,%d) (%d, %.2fms, bAtBottom:%d)\n", __func__, (int) pMotion->x, (int) pMotion->y, pMotion->is_hint, pMotion->time - fLastTime, pDock->bAtBottom);
 	
 	//\_______________ On elague le flux des MotionNotify, sinon X en envoie autant que le permet le CPU !
 	Icon *pPointedIcon;
@@ -169,7 +169,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 				cairo_dock_shrink_down (pSubDock);
 			}
 			
-			pSubDock->iGapX = pDock->iGapX + pPointedIcon->fDrawX + pDock->iWindowPositionX - g_iScreenWidth / 2; // les sous-dock ont un alignement egal a 0.5.
+			pSubDock->iGapX = pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 + pDock->iWindowPositionX - g_iScreenWidth / 2; // les sous-dock ont un alignement egal a 0.5.
 			pSubDock->iGapY = pDock->iGapY + pDock->iMaxDockHeight;
 			
 			int iNewWidth, iNewHeight;
@@ -664,7 +664,7 @@ gboolean on_scroll (GtkWidget* pWidget,
 			
 			gboolean bIsLoop = pDock->iRefCount == 0 && 1. * pDock->iCurrentWidth / pDock->iMaxDockWidth < .6 && pDock->bInside;
 			cairo_dock_calculate_construction_parameters (pPointedIcon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside);  // c'est un peu un hack pourri, l'idee c'est de recalculer la position exacte de l'icone pointee pour pouvoir placer le sous-dock precisement, car sa derniere position connue est decalee d'un coup de molette par rapport a la nouvelle, ce qui fait beaucoup.
-			pSubDock->iGapX = pDock->iGapX + pPointedIcon->fDrawX + pDock->iWindowPositionX - g_iScreenWidth / 2; // les sous-dock ont un alignement egal a 0.5.
+			pSubDock->iGapX = pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 + pDock->iWindowPositionX - g_iScreenWidth / 2; // les sous-dock ont un alignement egal a 0.5.
 			pSubDock->iGapY = pDock->iGapY + pDock->iMaxDockHeight;
 			
 			int iNewWidth, iNewHeight;

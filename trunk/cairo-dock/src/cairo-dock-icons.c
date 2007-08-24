@@ -707,6 +707,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 		{
 			//g_print ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone  ne soit animee\n");
 			//pDock->bInside = TRUE;
+			pDock->bAtBottom = FALSE;
 			if (pDock->iSidShrinkDown != 0)
 			{
 				g_source_remove (pDock->iSidShrinkDown);
