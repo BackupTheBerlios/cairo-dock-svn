@@ -124,7 +124,18 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 		//\_______________________ On cree la surface cairo a afficher.
 		if (strlen (cIconPath) > 0)
 		{
-			icon->pIconBuffer = cairo_dock_create_surface_from_image (cIconPath, pSourceContext, fMaxScale, g_tMinIconAuthorizedSize[CAIRO_DOCK_LAUNCHER], g_tMinIconAuthorizedSize[CAIRO_DOCK_LAUNCHER], g_tMaxIconAuthorizedSize[CAIRO_DOCK_LAUNCHER], g_tMaxIconAuthorizedSize[CAIRO_DOCK_LAUNCHER], &icon->fWidth, &icon->fHeight, 0, 1, FALSE);
+			icon->pIconBuffer = cairo_dock_create_surface_from_image (cIconPath,
+				pSourceContext,
+				fMaxScale,
+				g_tMinIconAuthorizedSize[CAIRO_DOCK_LAUNCHER],
+				g_tMinIconAuthorizedSize[CAIRO_DOCK_LAUNCHER],
+				g_tMaxIconAuthorizedSize[CAIRO_DOCK_LAUNCHER],
+				g_tMaxIconAuthorizedSize[CAIRO_DOCK_LAUNCHER],
+				(g_bHorizontalDock ? &icon->fWidth : &icon->fHeight),
+				(g_bHorizontalDock ? &icon->fHeight : &icon->fWidth),
+				0,
+				1,
+				FALSE);
 		}
 		
 		g_free (cIconPath);
@@ -282,8 +293,9 @@ static void _cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDo
 	if (! pDock->bIsMainDock)
 	{
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
-		pDock->iCurrentWidth = (g_bHorizontalDock ? pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth : pDock->iMaxIconHeight + 2 * g_iDockLineWidth);
-		pDock->iCurrentHeight= (g_bHorizontalDock ? pDock->iMaxIconHeight + 2 * g_iDockLineWidth : pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth);
+		pDock->iCurrentWidth = pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth;
+		pDock->iCurrentHeight= pDock->iMaxIconHeight + 2 * g_iDockLineWidth;
+		cairo_dock_calculate_icons (pDock, 0, 0);
 	}
 }
 void cairo_dock_reload_buffers_in_all_dock (GHashTable *hDocksTable, double fMaxScale, int iLabelSize, gboolean bUseText, gchar *cLabelPolice)

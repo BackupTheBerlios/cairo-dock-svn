@@ -111,6 +111,7 @@ gchar *cairo_dock_search_image_path (gchar *cFileName)
 
 cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern)
 {
+	//g_print ("%s (%s  : %d)\n", __func__, cImagePath, strlen (cImagePath));
 	g_return_val_if_fail (cImagePath != NULL, NULL);
 	GError *erreur = NULL;
 	RsvgDimensionData rsvg_dimension_data;
@@ -443,26 +444,11 @@ void cairo_dock_load_desktop_file_information (gchar *cDesktopFileName, Icon *ic
 Icon * cairo_dock_create_icon_from_desktop_file (gchar *cDesktopFileName, cairo_t *pSourceContext)
 {
 	Icon *icon = g_new0 (Icon, 1);
-	icon->iType = CAIRO_DOCK_LAUNCHER;
 	
 	cairo_dock_load_desktop_file_information (cDesktopFileName, icon);
+	g_return_val_if_fail (icon->acDesktopFileName != NULL, NULL);
 	
-	gchar *cImagePath = cairo_dock_search_image_path (icon->acFileName);
-	
-	icon->fWidth = 48.;  // valeurs par defaut si aucune image ne sera trouvee.
-	icon->fHeight = 48.;
-	icon->pIconBuffer = cairo_dock_create_surface_from_image (cImagePath,
-		pSourceContext,
-		1 + g_fAmplitude,
-		g_tMinIconAuthorizedSize[CAIRO_DOCK_LAUNCHER],
-		g_tMinIconAuthorizedSize[CAIRO_DOCK_LAUNCHER],
-		g_tMaxIconAuthorizedSize[CAIRO_DOCK_LAUNCHER],
-		g_tMaxIconAuthorizedSize[CAIRO_DOCK_LAUNCHER],
-		(g_bHorizontalDock ? &icon->fWidth : &icon->fHeight),
-		(g_bHorizontalDock ? &icon->fHeight : &icon->fWidth),
-		0,
-		1,
-		FALSE);
+	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude);
 	
 	cairo_dock_fill_one_text_buffer (icon,
 		pSourceContext,

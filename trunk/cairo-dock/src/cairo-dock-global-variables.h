@@ -50,4 +50,6 @@ extern GHashTable *g_hXWindowTable;
 extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 
+extern CairoDockClickFunc cairo_dock_default_click_on_icon_func;
+
 #endif

@@ -379,8 +379,7 @@ void cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon)
 		g_hash_table_remove (g_hXWindowTable, &icon->Xid);
 	if (icon->pModule != NULL)
 	{
-		cairo_dock_deactivate_module (icon->pModule);
-		//cairo_dock_close_module (icon->pModule, NULL);
+		cairo_dock_deactivate_module (icon->pModule);  // desactive le module mais ne le decharge pas.
 		icon->pModule = NULL;  // pour ne pas le liberer lors du free_icon.
 	}
 	
@@ -698,12 +697,8 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	
 	if (! bMouseInsideDock && pDock->iSidShrinkDown == 0 && pDock->fMagnitude > 0 && pDock->iSidGrowUp == 0)
 	{
-		/*if (pDock->iSidGrowUp > 0)
-		{
-			g_source_remove (pDock->iSidGrowUp);
-			pDock->iSidGrowUp = 0;
-		}*/
-		pDock->iSidShrinkDown = g_timeout_add (75, (GSourceFunc) cairo_dock_shrink_down, pDock);
+		//pDock->iSidShrinkDown = g_timeout_add (75, (GSourceFunc) cairo_dock_shrink_down, pDock);
+		g_signal_emit_by_name (pDock->pWidget, "leave-notify-event", NULL);
 	}
 	
 	if (bMouseInsideDock && pDock->fMagnitude < 1 && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons))  // on est dedans en x et la taille des icones est non maximale bien qu'aucune icone  ne soit animee.  // && pDock->iSidShrinkDown == 0
@@ -711,6 +706,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 		if ( (g_bDirectionUp && pPointedIcon != NULL && iMouseY > iHeight - pPointedIcon->fHeight * pPointedIcon->fScale && iMouseY < iHeight) || (! g_bDirectionUp && pPointedIcon != NULL && iMouseY < pPointedIcon->fHeight * pPointedIcon->fScale && iMouseY > 0) )  // et en plus on est dedans en y.
 		{
 			//g_print ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone  ne soit animee\n");
+			//pDock->bInside = TRUE;
 			if (pDock->iSidShrinkDown != 0)
 			{
 				g_source_remove (pDock->iSidShrinkDown);

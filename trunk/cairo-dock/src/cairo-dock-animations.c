@@ -78,7 +78,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 		return TRUE;
 	int deltaY_possible = (g_bDirectionUp ? g_iScreenHeight - pDock->iGapY - g_iVisibleZoneHeight : pDock->iGapY + g_iVisibleZoneHeight - pDock->iMaxDockHeight) - pDock->iWindowPositionY;
 	//g_print ("%s (%d)\n", __func__, deltaY_possible);
-	if ((g_bDirectionUp && deltaY_possible > 4) || (! g_bDirectionUp && deltaY_possible < -4))  // alors on peut encore descendre.
+	if ((g_bDirectionUp && deltaY_possible > 8) || (! g_bDirectionUp && deltaY_possible < -8))  // alors on peut encore descendre.
 	{
 		pDock->iWindowPositionY += (int) (deltaY_possible * g_fMoveDownSpeed) + (g_bDirectionUp ? 1 : -1);  // 0.33
 		if (g_bHorizontalDock)

@@ -394,9 +394,9 @@ static void cairo_dock_remove_module (GtkMenuItem *menu_item, gpointer *data)
 	{
 		cairo_dock_remove_icon_from_dock (pDock, icon);  // desactive le module.
 		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons, g_hModuleTable);
-		//cairo_dock_free_icon (icon);
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 		gtk_widget_queue_draw (pDock->pWidget);
+		cairo_dock_free_icon (icon);
 	}
 }
 
@@ -407,9 +407,7 @@ static void cairo_dock_close_appli (GtkMenuItem *menu_item, gpointer *data)
 	Icon *icon = data[1];
 	
 	if (icon->Xid > 0)
-	{
 		cairo_dock_close_xwindow (icon->Xid);
-	}
 }
 
 static void cairo_dock_minimize_appli (GtkMenuItem *menu_item, gpointer *data)
@@ -460,55 +458,29 @@ static void cairo_dock_swap_with_prev_icon (GtkMenuItem *menu_item, gpointer *da
 {
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
-	Icon *pOtherIcon;
-	GList *ic;
-	for (ic = pDock->icons; ic != NULL; ic = ic->next)
-	{
-		pOtherIcon = (Icon*) ic->data;
-		if (pOtherIcon == icon)
-		{
-			if (ic->prev == NULL)
-				return ;
-			Icon *prev_icon = ic->prev->data;
-			cairo_dock_swap_icons (pDock, icon, prev_icon);
-			return ;
-		}
-	}
+	Icon *prev_icon = cairo_dock_get_previous_icon (pDock->icons, icon);
+	cairo_dock_swap_icons (pDock, icon, prev_icon);
 }
 
 static void cairo_dock_swap_with_next_icon (GtkMenuItem *menu_item, gpointer *data)
 {
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
-	Icon *pOtherIcon;
-	GList *ic;
-	for (ic = pDock->icons; ic != NULL; ic = ic->next)
-	{
-		pOtherIcon = (Icon*) ic->data;
-		if (pOtherIcon == icon)
-		{
-			if (ic->next == NULL)
-				return ;
-			Icon *next_icon = ic->next->data;
-			cairo_dock_swap_icons (pDock, icon, next_icon);
-			return ;
-		}
-	}
+	Icon *next_icon = cairo_dock_get_next_icon (pDock->icons, icon);
+	cairo_dock_swap_icons (pDock, icon, next_icon);
 }
 
-static void cairo_dock_swap_with_first_icon (GtkMenuItem *menu_item, gpointer *data)
+static void cairo_dock_move_icon_to_beginning (GtkMenuItem *menu_item, gpointer *data)
 {
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
-	
 	cairo_dock_move_icon_after_icon (pDock, icon, NULL);
 }
 
-static void cairo_dock_swap_with_last_icon (GtkMenuItem *menu_item, gpointer *data)
+static void cairo_dock_move_icon_to_end (GtkMenuItem *menu_item, gpointer *data)
 {
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
-	
 	Icon* pLastIcon = cairo_dock_get_last_icon_of_type (pDock->icons, icon->iType);
 	if (pLastIcon != NULL && pLastIcon != icon)
 		cairo_dock_move_icon_after_icon (pDock, icon, pLastIcon);
@@ -671,12 +643,12 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 		
 		menu_item = gtk_menu_item_new_with_label ("To the beginning");
 		gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
-		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_swap_with_first_icon), data);
+		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_move_icon_to_beginning), data);
 		gtk_widget_show_all (menu);
 		
 		menu_item = gtk_menu_item_new_with_label ("To the end");
 		gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
-		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_swap_with_last_icon), data);
+		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_move_icon_to_end), data);
 	}
 	
 	

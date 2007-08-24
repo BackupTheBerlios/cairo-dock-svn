@@ -18,18 +18,20 @@ void cairo_dock_free_icon (Icon *icon);
 int cairo_dock_compare_icons_order (Icon *icon1, Icon *icon2);
 
 
-Icon* cairo_dock_get_first_icon (GList *pIconList);
-Icon* cairo_dock_get_last_icon (GList *pIconList);
+Icon *cairo_dock_get_first_icon (GList *pIconList);
+Icon *cairo_dock_get_last_icon (GList *pIconList);
 Icon *cairo_dock_get_first_drawn_icon (CairoDock *pDock);
 Icon *cairo_dock_get_last_drawn_icon (CairoDock *pDock);
-Icon* cairo_dock_get_first_icon_of_type (GList *pIconList, CairoDockIconType iType);
-Icon* cairo_dock_get_last_icon_of_type (GList *pIconList, CairoDockIconType iType);
-Icon* cairo_dock_get_pointed_icon (GList *pIconList);
+Icon *cairo_dock_get_first_icon_of_type (GList *pIconList, CairoDockIconType iType);
+Icon *cairo_dock_get_last_icon_of_type (GList *pIconList, CairoDockIconType iType);
+Icon *cairo_dock_get_pointed_icon (GList *pIconList);
 Icon *cairo_dock_get_bouncing_icon (GList *pIconList);
 Icon *cairo_dock_get_removing_or_inserting_icon (GList *pIconList);
 Icon *cairo_dock_get_animated_icon (GList *pIconList);
 Icon *cairo_dock_get_next_icon (GList *pIconList, Icon *pIcon);
 Icon *cairo_dock_get_previous_icon (GList *pIconList, Icon *pIcon);
+#define cairo_dock_get_next_element(ic, list) (ic->next == NULL ? list : ic->next);
+#define cairo_dock_get_previous_element(ic, list) (ic->prev == NULL ? g_list_last (list) : ic->prev);
 
 #define cairo_dock_none_clicked(pIconList) (cairo_dock_get_bouncing_icon (pIconList) == NULL)
 #define cairo_dock_none_removed_or_inserted(pIconList) (cairo_dock_get_removing_or_inserting_icon (pIconList) == NULL)

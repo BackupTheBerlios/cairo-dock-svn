@@ -338,6 +338,7 @@ void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMin
 		int iNewWidth, iNewHeight;
 		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);  // inutile de recalculer Y mais bon...
 		//g_print ("%s () -> %dx%d\n", __func__, g_iMaxDockWidth, g_iMaxDockHeight);
+		//g_print ("  W(%d;%d) (%d)\n", pDock->iWindowPositionX, pDock->iWindowPositionY, pDock->iRefCount == 0);
 		if (g_bHorizontalDock)
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionX,
@@ -449,11 +450,8 @@ void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDock, gpo
 	if (! pDock->bIsMainDock)
 	{
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
-		pDock->iCurrentWidth = pDock->iMaxDockWidth;
-		pDock->iCurrentHeight = pDock->iMaxDockHeight;
-		//render (pDock);
+		cairo_dock_calculate_icons (pDock, 0, 0);
 		gtk_window_present (GTK_WINDOW (pDock->pWidget));
-		gtk_widget_queue_draw (pDock->pWidget);
 		while (gtk_events_pending ())
 			gtk_main_iteration ();
 		if (pDock->iRefCount > 0)

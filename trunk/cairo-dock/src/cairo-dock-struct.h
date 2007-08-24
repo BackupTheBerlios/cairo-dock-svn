@@ -116,6 +116,7 @@ typedef struct _Icon {
 	gdouble fDrawX;
 	gdouble fDrawY;
 	gdouble fWidthFactor;
+	gdouble fAlpha;
 	gboolean bPointed;
 	gint iCount;
 	gint iAnimationType;
@@ -158,6 +159,8 @@ typedef enum {
 	} CairoDockCornerType;
 
 typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
+
+typedef void (*CairoDockClickFunc) (CairoDock *pDock, Icon *icon);
 
 #endif
 

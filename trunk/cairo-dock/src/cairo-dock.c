@@ -191,6 +191,8 @@ gboolean g_bSkipPager = TRUE;
 gboolean g_bSkipTaskbar = TRUE;
 gboolean g_bSticky = TRUE;
 
+CairoDockClickFunc cairo_dock_default_click_on_icon_func = NULL;
+
 gboolean g_bUseGlitz = FALSE;
 
 
