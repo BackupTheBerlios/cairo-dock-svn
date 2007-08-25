@@ -61,8 +61,8 @@ gchar *cairo_dock_add_desktop_file_from_path (gchar *cFilePath, gchar *cDockName
 		//\___________________ On cree le texte qu'on va y mettre par defaut.
 		cNewDesktopContent = g_strdup_printf ("#!\n[Desktop Entry]\n\
 #s Launcher's name :\n\
+Name = New Launcher\n\
 Name[fr] = Nouveau Lanceur\n\
-Name[en] = New Launcher\n\
 #s Exec command :\n\
 Exec = echo 'edit me !'\n\
 #S Image's name or path :\n\
@@ -84,8 +84,8 @@ Is container = false",
 		//\___________________ On cree le texte qu'on va y mettre par defaut.
 		cNewDesktopContent = g_strdup_printf ("#!\n[Desktop Entry]\n\
 #s Launcher's name :\n\
+Name = %s\n\
 Name[fr] = %s\n\
-Name[en] = %s\n\
 #s Exec command :\n\
 Exec = %s %s\n\
 #S Image's name or path :\n\
