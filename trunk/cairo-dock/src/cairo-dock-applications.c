@@ -122,7 +122,43 @@ void cairo_dock_show_appli (Window Xid)
 	//g_print ("%s (%d)\n", __func__, Xid);
 	g_return_if_fail (Xid > 0);
 	XEvent xClientMessage;
+	Window root = DefaultRootWindow (g_XDisplay);
 	
+	//\______________ On recupere le numero du bureau de la fenetre a afficher.
+	Atom aNetWmDesktop = XInternAtom (g_XDisplay, "_NET_WM_DESKTOP", False);
+	gulong iLeftBytes, iBufferNbElements = 0;
+	Atom aReturnedType = 0;
+	int aReturnedFormat = 0;
+	gulong *pBuffer = NULL;
+	XGetWindowProperty (g_XDisplay, Xid, aNetWmDesktop, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pBuffer);
+	gulong iDesktopNumber = 0;
+	if (iBufferNbElements > 0)
+		iDesktopNumber = *pBuffer;
+	XFree (pBuffer);
+	//g_print ("iDesktopNumber : %d\n", iDesktopNumber);
+	
+	//\______________ On se deplace dessus (autrement Metacity deplacera la fenetre sur le bureau actuel).
+	int iTimeStamp = cairo_dock_get_xwindow_timestamp (root);
+	xClientMessage.xclient.type = ClientMessage;
+	xClientMessage.xclient.serial = 0;
+	xClientMessage.xclient.send_event = True;
+	xClientMessage.xclient.display = g_XDisplay;
+	xClientMessage.xclient.window = root;
+	xClientMessage.xclient.message_type = XInternAtom (g_XDisplay, "_NET_CURRENT_DESKTOP", False);
+	xClientMessage.xclient.format = 32;
+	xClientMessage.xclient.data.l[0] = iDesktopNumber;
+	xClientMessage.xclient.data.l[1] = iTimeStamp;
+	xClientMessage.xclient.data.l[2] = 0;
+	xClientMessage.xclient.data.l[3] = 0;
+	xClientMessage.xclient.data.l[4] = 0;
+	
+	XSendEvent (g_XDisplay,
+		root,
+		False,
+		SubstructureRedirectMask | SubstructureNotifyMask,
+		&xClientMessage);
+	
+	//\______________ On active la fenetre.
 	xClientMessage.xclient.type = ClientMessage;
 	xClientMessage.xclient.serial = 0;
 	xClientMessage.xclient.send_event = True;
@@ -136,7 +172,6 @@ void cairo_dock_show_appli (Window Xid)
 	xClientMessage.xclient.data.l[3] = 0;
 	xClientMessage.xclient.data.l[4] = 0;
 	
-	Window root = DefaultRootWindow (g_XDisplay);
 	XSendEvent (g_XDisplay,
 		root,
 		False,
