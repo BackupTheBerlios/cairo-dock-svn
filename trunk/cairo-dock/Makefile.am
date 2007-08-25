@@ -1,13 +1,5 @@
 #dnl Process this file with automake to produce Makefile.in
 
-if COMPIL_WITH_GLITZ
-HAVE_GLITZ = true
-endif
-
-if COMPIL_VERBOSE
-CAIRO_DOCK_VERBOSE = true
-endif
-
 
 SUBDIRS = . src data
 

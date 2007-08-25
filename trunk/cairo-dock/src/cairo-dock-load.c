@@ -269,7 +269,7 @@ static void _cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDo
 	pDock->iMinDockWidth = - g_iIconGap;
 	pDock->iMaxIconHeight = 0;
 	
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 	double fMaxScale = *((double *) data[0]);
 	int iLabelSize = *((int *) data[1]);
 	gboolean bUseText = *((gboolean *) data[2]);
@@ -347,11 +347,11 @@ cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFi
 	return pNewSurface;
 }
 
-void cairo_dock_load_visible_zone (GtkWidget *pWidget, gchar *cVisibleZoneImageFile, int iVisibleZoneWidth, int iVisibleZoneHeight, double fVisibleZoneAlpha)
+void cairo_dock_load_visible_zone (CairoDock *pDock, gchar *cVisibleZoneImageFile, int iVisibleZoneWidth, int iVisibleZoneHeight, double fVisibleZoneAlpha)
 {
 	double fVisibleZoneWidth = iVisibleZoneWidth, fVisibleZoneHeight = iVisibleZoneHeight;
 	cairo_surface_destroy (g_pVisibleZoneSurface);
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pWidget->window);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 	g_pVisibleZoneSurface = cairo_dock_load_image (pCairoContext,
 		cVisibleZoneImageFile,
 		&fVisibleZoneWidth,
@@ -469,7 +469,7 @@ cairo_surface_t *cairo_dock_load_stripes (cairo_t* pSourceContext, int iStripesW
 
 
 
-void cairo_dock_update_background_decorations_if_necessary (GtkWidget *pWidget, int iNewMaxDockWidth, int iNewMaxIconHeight, double fRotationAngle)
+void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, int iNewMaxDockWidth, int iNewMaxIconHeight, double fRotationAngle)
 {
 	if (2 * iNewMaxDockWidth > g_fBackgroundImageWidth || iNewMaxIconHeight > g_fBackgroundImageHeight)
 	{
@@ -480,7 +480,7 @@ void cairo_dock_update_background_decorations_if_necessary (GtkWidget *pWidget, 
 		cairo_surface_destroy (g_pBackgroundSurfaceFull);
 		g_pBackgroundSurface = NULL;
 		g_pBackgroundSurfaceFull = NULL;
-		cairo_t *pCairoContext = cairo_dock_create_context_from_window (pWidget->window);
+		cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 		
 		if (g_cBackgroundImageFile != NULL)
 		{
@@ -527,7 +527,7 @@ static void _cairo_dock_search_max_docks_size (gchar *cDockName, CairoDock *pDoc
 	if (pDock->iMaxIconHeight > data[1])
 		data[1] = pDock->iMaxIconHeight;
 }
-void cairo_dock_load_background_decorations (GtkWidget *pWidget)
+void cairo_dock_load_background_decorations (CairoDock *pDock)
 {
 	int iMaxDocksWidth = 0, iMaxIconsHeight = 0;
 	int data[2] = {0, 0};  // iMaxDocksWidth, iMaxIconsHeight.
@@ -535,5 +535,5 @@ void cairo_dock_load_background_decorations (GtkWidget *pWidget)
 	
 	g_fBackgroundImageWidth = 0;
 	g_fBackgroundImageHeight = 0;
-	cairo_dock_update_background_decorations_if_necessary (pWidget, data[0], data[1], (g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)));
+	cairo_dock_update_background_decorations_if_necessary (pDock, data[0], data[1], (g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)));
 }

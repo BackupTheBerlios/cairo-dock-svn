@@ -46,7 +46,6 @@ extern int g_iIconGap;
 extern gboolean g_bRoundedBottomCorner;
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
-extern CairoDockCornerType g_iWhichCorner;
 extern double g_fAlign;
 
 extern double g_fStripesSpeedFactor;
@@ -84,23 +83,24 @@ double cairo_dock_get_current_dock_width (CairoDock *pDock)
 }
 
 
-cairo_t * cairo_dock_create_context_from_window (GdkWindow* pWindow)
+cairo_t * cairo_dock_create_context_from_window (CairoDock *pDock)
 {
 #ifdef HAVE_GLITZ
 	if (pDock->pGlitzDrawable)
 	{
+		//g_print ("creation d'un contexte lie a une surface glitz\n");
 		glitz_surface_t* pGlitzSurface;
 		cairo_surface_t* pCairoSurface;
 		cairo_t* pCairoContext;
 		
 		pGlitzSurface = glitz_surface_create (pDock->pGlitzDrawable,
-			g_pGlitzFormat,
-			g_iCurrentWidth,
-			g_iCurrentHeight,
+			pDock->pGlitzFormat,
+			pDock->iCurrentWidth,
+			pDock->iCurrentHeight,
 			0,
 			NULL);
 		
-		if (gDrawFormat->doublebuffer)
+		if (pDock->pDrawFormat->doublebuffer)
 			glitz_surface_attach (pGlitzSurface,
 				pDock->pGlitzDrawable,
 				GLITZ_DRAWABLE_BUFFER_BACK_COLOR);
@@ -118,7 +118,7 @@ cairo_t * cairo_dock_create_context_from_window (GdkWindow* pWindow)
 		return pCairoContext;
 	}
 #endif // HAVE_GLITZ
-	return gdk_cairo_create (pWindow);
+	return gdk_cairo_create (pDock->pWidget->window);
 }
 
 static void _cairo_dock_draw_frame_horizontal (CairoDock *pDock, cairo_t *pCairoContext, double fRadius, double fLineWidth, double fDockWidth, double fDockOffsetX, double fDockOffsetY, int sens, gboolean bIsLoop)
@@ -394,7 +394,7 @@ void render (CairoDock *pDock)
 	}
 	
 	//\____________________ On cree le contexte du dessin.
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 	g_return_if_fail (pCairoContext != NULL);
 	
 	cairo_set_tolerance (pCairoContext, 0.5);  // avec moins que 0.5 on ne voit pas la difference.
@@ -593,7 +593,7 @@ void render (CairoDock *pDock)
 	cairo_destroy (pCairoContext);
 	
 #ifdef HAVE_GLITZ
-	if (pDock->DrawFormat && pDock->DrawFormat->doublebuffer)
+	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
 		glitz_drawable_swap_buffers (pDock->pGlitzDrawable);
 #endif
 }
@@ -601,7 +601,7 @@ void render (CairoDock *pDock)
 void cairo_dock_render_background (CairoDock *pDock)
 {
 	//g_print ("%s (%.2f)\n", __func__, g_fVisibleZoneAlpha);
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 	
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
@@ -620,7 +620,7 @@ void cairo_dock_render_background (CairoDock *pDock)
 void cairo_dock_render_blank (CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 	
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
@@ -653,7 +653,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 	int iHeight = pDock->iCurrentHeight;
 	gboolean bIsLoop = pDock->iRefCount == 0 && 1. * pDock->iCurrentWidth / pDock->iMaxDockWidth < .6 && pDock->bInside;
 	
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 	g_return_if_fail (pCairoContext != NULL);
 	/* set rendering-"fidelity" and clear canvas */
 	cairo_set_tolerance (pCairoContext, 0.5);

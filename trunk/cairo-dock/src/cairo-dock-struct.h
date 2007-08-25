@@ -15,6 +15,12 @@ released under the terms of the GNU General Public License.
 #include <librsvg/rsvg.h>
 #include <librsvg/rsvg-cairo.h>
 
+#ifdef HAVE_GLITZ
+#include <gdk/gdkx.h>
+#include <glitz-glx.h>
+#include <cairo-glitz.h>
+#endif
+
 
 typedef struct _CairoDock {
 	GList* icons;  // la liste de ses icones.
@@ -151,12 +157,6 @@ typedef enum {
 	CAIRO_DOCK_FOLLOW_MOUSE,
 	CAIRO_DOCK_AVOID_MOUSE
 	} CairoDockAnimationType;
-
-typedef enum {
-	CAIRO_DOCK_LEFT_CORNER = 0,
-	CAIRO_DOCK_MIDDLE,
-	CAIRO_DOCK_RIGHT_CORNER
-	} CairoDockCornerType;
 
 typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
 

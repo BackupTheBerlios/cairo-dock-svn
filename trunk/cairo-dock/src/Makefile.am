@@ -8,10 +8,17 @@ bin_PROGRAMS = \
 if COMPIL_VERBOSE
 include_verbose = -DCAIRO_DOCK_VERBOSE=TRUE
 endif
+if COMPIL_WITH_GLITZ
+include_glitz = -DHAVE_GLITZ=TRUE
+glitz_cflags = $(GLITZ_CFLAGS)
+glitz_libs = $(GLITZ_LIBS)
+endif
 
 cairo_dock_CFLAGS = \
 	$(PACKAGE_CFLAGS) \
+	$(glitz_cflags) \
 	$(include_verbose)\
+	$(include_glitz)\
 	-DCAIRO_DOCK_SHARE_DATA_DIR=\""$(pkgdatadir)"\"\
 	-DCAIRO_DOCK_SHARE_THEMES_DIR=\""$(pkgdatadir)/themes"\"\
 	-DCAIRO_DOCK_MODULES_DIR=\""$(pkgdatadir)/plug-in"\"\
@@ -25,6 +32,7 @@ cairo_dock_LDFLAGS = \
 	-Wl,--export-dynamic
 
 cairo_dock_LDADD = \
+	$(glitz_libs) \
 	$(PACKAGE_LIBS)
 
 cairo_dock_SOURCES = \

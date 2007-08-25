@@ -722,10 +722,12 @@ gboolean on_configure (GtkWidget* pWidget,
 		///	gtk_window_present (GTK_WINDOW (pWidget));
 		gtk_widget_queue_draw (pWidget);
 #ifdef HAVE_GLITZ
-		if (g_pGlitzDrawable)
+		if (pDock->pGlitzDrawable)
+		{
 			glitz_drawable_update_size (pDock->pGlitzDrawable,
 				pEvent->width,
 				pEvent->height);
+		}
 #endif
 	}
 
@@ -792,7 +794,7 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 		{
 			gchar *cDesktopFileName = g_path_get_basename (cNewDesktopFilePath);
 			g_free (cNewDesktopFilePath);
-			cairo_t* pCairoContext = cairo_dock_create_context_from_window (pWidget->window);
+			cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
 			Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cDesktopFileName, pCairoContext);
 			g_free (cDesktopFileName);
 			cairo_destroy (pCairoContext);

@@ -30,7 +30,7 @@ AM_CONDITIONAL(COMPIL_WITH_GLITZ, test x$enable_glitz = xyes)
 
 
 PKG_CHECK_MODULES(PACKAGE, "gtk+-2.0 cairo librsvg-2.0 glitz")
-
+PKG_CHECK_MODULES(GLITZ, "glitz-glx")
 
 AC_CONFIG_FILES([Makefile
 		cairo-dock.pc

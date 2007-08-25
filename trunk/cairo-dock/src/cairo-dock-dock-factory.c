@@ -65,8 +65,9 @@ extern gboolean g_bSticky;
 
 extern gboolean g_bUseGlitz;
 
-static void _cairo_dock_set_colormap (GtkWidget* pWidget)
+static void _cairo_dock_set_colormap (CairoDock *pDock)
 {
+	//g_print ("%s f%d)\n", __func__, g_bUseGlitz);
 	GdkColormap* pColormap;
 #ifdef HAVE_GLITZ
 	if (g_bUseGlitz)
@@ -80,10 +81,10 @@ static void _cairo_dock_set_colormap (GtkWidget* pWidget)
 		Display		    *xdisplay;
 		
 		templ.doublebuffer = 1;
-		gdkdisplay = gtk_widget_get_display (pWindow);
+		gdkdisplay = gtk_widget_get_display (pDock->pWidget);
 		xdisplay   = gdk_x11_display_get_xdisplay (gdkdisplay);
 		
-		i = 0;
+		int i = 0;
 		do
 		{
 			format = glitz_glx_find_window_format (xdisplay,
@@ -121,19 +122,19 @@ static void _cairo_dock_set_colormap (GtkWidget* pWidget)
 			visual = gdkx_visual_get (vinfo->visualid);
 			pColormap = gdk_colormap_new (visual, TRUE);
 	
-			gtk_widget_set_colormap (pWindow, pColormap);
-			gtk_widget_set_double_buffered (pWindow, FALSE);
+			gtk_widget_set_colormap (pDock->pWidget, pColormap);
+			gtk_widget_set_double_buffered (pDock->pWidget, FALSE);
 			return ;
 		}
 	}
 #endif
 	
-	GdkScreen* pScreen = gtk_widget_get_screen (pWidget);
+	GdkScreen* pScreen = gtk_widget_get_screen (pDock->pWidget);
 	pColormap = gdk_screen_get_rgba_colormap (pScreen);
 	if (!pColormap)
 		pColormap = gdk_screen_get_rgb_colormap (pScreen);
 		
-	gtk_widget_set_colormap (pWidget, pColormap);
+	gtk_widget_set_colormap (pDock->pWidget, pColormap);
 }
 CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 {
@@ -143,6 +144,8 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 	pDock->iRefCount = 1;
 	
 	GtkWidget* pWindow = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+	pDock->pWidget = pWindow;
+	
 	if (g_bSticky)
 		gtk_window_stick (GTK_WINDOW (pWindow));
 	gtk_window_set_keep_above (GTK_WINDOW (pWindow), g_bKeepAbove);
@@ -152,14 +155,15 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 	
 	gtk_window_set_type_hint (GTK_WINDOW (pWindow), iWmHint);
 	
-	_cairo_dock_set_colormap (pWindow);
+	
+	_cairo_dock_set_colormap (pDock);
 	
 	gtk_widget_set_app_paintable (pWindow, TRUE);
 	gtk_window_set_decorated (GTK_WINDOW (pWindow), FALSE);
 	gtk_window_set_resizable (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_title (GTK_WINDOW (pWindow), "cairo-dock");
 	
-	pDock->pWidget = pWindow;
+	
 	
 	gtk_widget_add_events (pWindow,
 		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | 
@@ -243,7 +247,7 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 		Window	   xid;
 
 		gdkdisplay = gdk_display_get_default ();
-		XDisplay   = gdk_x11_display_get_g_XDisplay (gdkdisplay);
+		XDisplay   = gdk_x11_display_get_xdisplay (gdkdisplay);
 		xid = gdk_x11_drawable_get_xid (GDK_DRAWABLE (pWindow->window));
 		pDock->pGlitzDrawable = glitz_glx_create_drawable_for_window (XDisplay,
 			0,
@@ -257,9 +261,9 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 		}
 		else
 		{
-			templ.color        = gDrawFormat->color;
+			templ.color        = pDock->pDrawFormat->color;
 			templ.color.fourcc = GLITZ_FOURCC_RGB;
-			pDock->pGlitzFormat = glitz_find_format (g_pGlitzDrawable,
+			pDock->pGlitzFormat = glitz_find_format (pDock->pGlitzDrawable,
 				GLITZ_FORMAT_RED_SIZE_MASK   |
 				GLITZ_FORMAT_GREEN_SIZE_MASK |
 				GLITZ_FORMAT_BLUE_SIZE_MASK  |
@@ -353,7 +357,7 @@ void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMin
 				iNewWidth);
 	}
 	
-	cairo_dock_update_background_decorations_if_necessary (pDock->pWidget, pDock->iMaxDockWidth, pDock->iMaxIconHeight, (g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)));
+	cairo_dock_update_background_decorations_if_necessary (pDock, pDock->iMaxDockWidth, pDock->iMaxIconHeight, (g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)));
 }
 
 
@@ -399,7 +403,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 				int iSeparatorType = g_tIconTypeOrder[icon->iType] + 1;
 				//g_print ("insertion de %s -> iSeparatorType : %d\n", icon->acName, iSeparatorType);
 				
-				cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
+				cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock);
 				Icon *pSeparatorIcon = cairo_dock_create_separator_icon (pSourceContext, iSeparatorType, pDock);
 				if (pSeparatorIcon != NULL)
 				{
@@ -420,7 +424,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 				int iSeparatorType = g_tIconTypeOrder[icon->iType] - 1;
 				//g_print ("insertion de %s -> iSeparatorType : %d\n", icon->acName, iSeparatorType);
 				
-				cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
+				cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock);
 				Icon *pSeparatorIcon = cairo_dock_create_separator_icon (pSourceContext, iSeparatorType, pDock);
 				if (pSeparatorIcon != NULL)
 				{
@@ -466,7 +470,7 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 	Icon* icon;
 	const gchar *cFileName;
 	CairoDock *pParentDock, *pChildDock;
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pMainDock->pWidget->window);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pMainDock);
 	
 	do
 	{

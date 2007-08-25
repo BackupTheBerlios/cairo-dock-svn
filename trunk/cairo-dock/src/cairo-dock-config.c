@@ -47,7 +47,6 @@ extern gboolean g_bAutoHide;
 extern double g_fVisibleZoneAlpha;
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
-extern CairoDockCornerType g_iWhichCorner;
 extern double g_fAlign;
 
 extern gboolean g_bUseText;
@@ -1078,10 +1077,10 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 	
 	
-	cairo_dock_load_visible_zone (pDock->pWidget, cVisibleZoneImageFile, g_iVisibleZoneWidth, g_iVisibleZoneHeight, g_fVisibleZoneAlpha);
+	cairo_dock_load_visible_zone (pDock, cVisibleZoneImageFile, g_iVisibleZoneWidth, g_iVisibleZoneHeight, g_fVisibleZoneAlpha);
 	g_free (cVisibleZoneImageFile);
 	
-	cairo_dock_load_background_decorations (pDock->pWidget);
+	cairo_dock_load_background_decorations (pDock);
 	
 	
 	cairo_dock_calculate_icons (pDock, 0, 0);

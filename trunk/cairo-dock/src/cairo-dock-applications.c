@@ -461,7 +461,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 			else
 			{
 				//g_print ("c'est une nouvelle fenetre\n");
-				cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
+				cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 				icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xunmap.window, pDock);
 				if (icon != NULL)
 				{
@@ -510,7 +510,7 @@ void cairo_dock_show_all_applis (CairoDock *pDock)
 	Window *pXWindowsList = cairo_dock_get_windows_list (&iNbWindows);
 	Window Xid;
 	Icon *pIcon;
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 	
 	//\__________________ On cree les icones de toutes les applis existantes.
 	for (i = 0; i < iNbWindows; i ++)
@@ -529,3 +529,30 @@ void cairo_dock_show_all_applis (CairoDock *pDock)
 }
 
 
+void cairo_dock_set_strut_partial (int Xid, int left, int right, int top, int bottom)
+{
+	g_return_if_fail (Xid > 0);
+	XEvent xClientMessage;
+	
+	xClientMessage.xclient.type = ClientMessage;
+	xClientMessage.xclient.serial = 0;
+	xClientMessage.xclient.send_event = True;
+	xClientMessage.xclient.display = g_XDisplay;
+	xClientMessage.xclient.window = Xid;
+	xClientMessage.xclient.message_type = XInternAtom (g_XDisplay, "_NET_WM_STRUT_PARTIAL", False);
+	xClientMessage.xclient.format = 32;
+	xClientMessage.xclient.data.l[0] = left;
+	xClientMessage.xclient.data.l[1] = right;
+	xClientMessage.xclient.data.l[2] = top;
+	xClientMessage.xclient.data.l[3] = bottom;
+	xClientMessage.xclient.data.l[4] = 0;
+
+	Window root = DefaultRootWindow (g_XDisplay);
+	XSendEvent (g_XDisplay,
+		root,
+		False,
+		SubstructureRedirectMask | SubstructureNotifyMask,
+		&xClientMessage);
+	
+	cairo_dock_set_xwindow_timestamp (Xid, cairo_dock_get_xwindow_timestamp (root));
+}

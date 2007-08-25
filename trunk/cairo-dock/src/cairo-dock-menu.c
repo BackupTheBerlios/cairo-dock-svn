@@ -192,7 +192,7 @@ static void cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data)
 	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cNewDesktopFilePath, "Fill this launcher", 300, 400, TRUE, NULL, NULL, NULL);
 	if (config_ok)
 	{
-		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
+		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
 		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cNewDesktopFileName, pCairoContext);
 		
 		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, TRUE, TRUE);
@@ -233,7 +233,7 @@ static void cairo_dock_add_launcher (GtkMenuItem *menu_item, gpointer *data)
 	if (answer == GTK_RESPONSE_OK)
 	{
 		GSList* selected_files = gtk_file_chooser_get_filenames (GTK_FILE_CHOOSER (pFileChooserDialog));
-		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
+		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
 		gchar *cFilePath;
 		Icon *pNewIcon;
 		gchar *cDesktopFileName;
@@ -307,7 +307,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 		cairo_dock_remove_icon_from_dock (pDock, icon);  // car sa position a pu changer.
 		
 		//\_____________ On recree l'icone.
-		cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock->pWidget->window);
+		cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (icon->acDesktopFileName, pCairoContext);
 		
 		//\_____________ On redistribue les icones du sous-dock si l'icone n'est plus un container.
