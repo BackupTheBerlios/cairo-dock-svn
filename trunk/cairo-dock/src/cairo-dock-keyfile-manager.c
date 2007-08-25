@@ -1026,7 +1026,6 @@ static void _cairo_dock_get_each_widget_value (gpointer *data, GKeyFile *pKeyFil
 		{
 			cKeyNameFull = g_strdup_printf ("%s[%s]", cKeyName, cPossibleLocales[i]);
 			cTranslatedValue = g_key_file_get_string (pKeyFile, cGroupName, cKeyNameFull, NULL);
-			g_print ("%s -> %s\n", cKeyNameFull, cTranslatedValue);
 			g_free (cKeyNameFull);
 			if (cTranslatedValue != NULL && strcmp (cTranslatedValue, "") != 0)
 			{

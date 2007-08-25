@@ -24,12 +24,11 @@ void cairo_dock_show_appli (Window Xid);
 void cairo_dock_minimize_xwindow (Window Xid);
 void cairo_dock_maximize_xwindow (Window Xid, gboolean bMaximize);
 void cairo_dock_set_xwindow_fullscreen (Window Xid, gboolean bFullScreen);
-void cairo_dock_move_xwindow_to_nth_desktop (Window Xid, int iDesktopNumber);
+void cairo_dock_move_xwindow_to_nth_desktop (Window Xid, int iDesktopNumber, int iDesktopViewportX, int iDesktopViewportY);
 
 gboolean cairo_dock_window_is_maximized (Window Xid);
 gboolean cairo_dock_window_is_fullscreen (Window Xid);
-int cairo_dock_get_current_desktop (void);
-
+void cairo_dock_get_current_desktop (int *iDesktopNumber, int *iDesktopViewportX, int *iDesktopViewportY);
 
 
 void cairo_dock_set_root_window_mask (void);

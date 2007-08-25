@@ -34,6 +34,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 extern gboolean g_bAutoHide;
 
+extern int g_iScreenWidth, g_iScreenHeight;
+
 extern Display *g_XDisplay;
 extern Screen *g_XScreen;
 extern Atom g_aNetClientList;
@@ -209,7 +211,7 @@ void cairo_dock_set_xwindow_fullscreen (Window Xid, gboolean bFullScreen)
 	cairo_dock_set_xwindow_timestamp (Xid, cairo_dock_get_xwindow_timestamp (root));
 }
 
-void cairo_dock_move_xwindow_to_nth_desktop (Window Xid, int iDesktopNumber)
+void cairo_dock_move_xwindow_to_nth_desktop (Window Xid, int iDesktopNumber, int iDesktopViewportX, int iDesktopViewportY)
 {
 	g_return_if_fail (Xid > 0);
 	XEvent xClientMessage;
@@ -224,7 +226,7 @@ void cairo_dock_move_xwindow_to_nth_desktop (Window Xid, int iDesktopNumber)
 	xClientMessage.xclient.data.l[0] = iDesktopNumber;
 	xClientMessage.xclient.data.l[1] = 2;
 	xClientMessage.xclient.data.l[2] = 0;
-	xClientMessage.xclient.data.l[3] = 2;
+	xClientMessage.xclient.data.l[3] = 0;
 	xClientMessage.xclient.data.l[4] = 0;
 
 	Window root = DefaultRootWindow (g_XDisplay);
@@ -234,7 +236,40 @@ void cairo_dock_move_xwindow_to_nth_desktop (Window Xid, int iDesktopNumber)
 		SubstructureRedirectMask | SubstructureNotifyMask,
 		&xClientMessage);
 	
-	cairo_dock_set_xwindow_timestamp (Xid, cairo_dock_get_xwindow_timestamp (root));
+	Window root_return;
+	int x_return=1, y_return=1;
+	unsigned int width_return, height_return, border_width_return, depth_return;
+	XGetGeometry(g_XDisplay, Xid, &root_return, &x_return, &y_return, &width_return, 
+		&height_return, &border_width_return, &depth_return);
+	while (x_return < 0)
+		x_return += g_iScreenWidth;
+	while (x_return >= g_iScreenWidth)
+		x_return -= g_iScreenWidth;
+	while (y_return < 0)
+		y_return += g_iScreenHeight;
+	while (y_return >= g_iScreenHeight)
+		y_return -= g_iScreenHeight;
+	//g_print ("position relative : (%d;%d)\n", x_return, y_return);
+	
+	xClientMessage.xclient.type = ClientMessage;
+	xClientMessage.xclient.serial = 0;
+	xClientMessage.xclient.send_event = True;
+	xClientMessage.xclient.display = g_XDisplay;
+	xClientMessage.xclient.window = Xid;
+	xClientMessage.xclient.message_type = XInternAtom (g_XDisplay, "_NET_MOVERESIZE_WINDOW", False);
+	xClientMessage.xclient.format = 32;
+	xClientMessage.xclient.data.l[0] = StaticGravity | (1 << 8) | (1 << 9) | (0 << 10) | (0 << 11);
+	xClientMessage.xclient.data.l[1] = iDesktopViewportX + x_return;
+	xClientMessage.xclient.data.l[2] = iDesktopViewportY + y_return;
+	xClientMessage.xclient.data.l[3] = 0;
+	xClientMessage.xclient.data.l[4] = 0;
+	XSendEvent (g_XDisplay,
+		root,
+		False,
+		SubstructureRedirectMask | SubstructureNotifyMask,
+		&xClientMessage);
+	
+	//cairo_dock_set_xwindow_timestamp (Xid, cairo_dock_get_xwindow_timestamp (root));
 }
 
 
@@ -293,9 +328,9 @@ gboolean cairo_dock_window_is_fullscreen (Window Xid)
 	return bIsFullScreen;
 }
 
-int cairo_dock_get_current_desktop (void)
+void cairo_dock_get_current_desktop (int *iDesktopNumber, int *iDesktopViewportX, int *iDesktopViewportY)
 {
-	Atom aNetCurrentDesktop = XInternAtom (g_XDisplay, "_NET_NUMBER_OF_DESKTOPS", False);
+	Atom aNetCurrentDesktop = XInternAtom (g_XDisplay, "_NET_CURRENT_DESKTOP", False);
 	Atom aReturnedType = 0;
 	int aReturnedFormat = 0;
 	unsigned long iLeftBytes, iBufferNbElements = 0;
@@ -303,11 +338,49 @@ int cairo_dock_get_current_desktop (void)
 	Window root = DefaultRootWindow (g_XDisplay);
 	XGetWindowProperty (g_XDisplay, root, aNetCurrentDesktop, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXDesktopNumberBuffer);
 	
-	int iCurrentDesktop = 0;
 	if (iBufferNbElements > 0)
-		iCurrentDesktop = *pXDesktopNumberBuffer;
+		*iDesktopNumber = *pXDesktopNumberBuffer;
+	else
+		*iDesktopNumber = 0;
 	XFree (pXDesktopNumberBuffer);
-	return iCurrentDesktop;
+	//g_print ("bureau actuel : %d\n", *iDesktopNumber);
+	
+	Atom aNetDesktopViewport = XInternAtom (g_XDisplay, "_NET_DESKTOP_VIEWPORT", False);
+	iBufferNbElements = 0;
+	gulong *pXDesktopViewport = NULL;
+	XGetWindowProperty (g_XDisplay, root, aNetDesktopViewport, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXDesktopViewport);
+	if (iBufferNbElements > 1)
+	{
+		if (iBufferNbElements >= *iDesktopNumber)
+		{
+			*iDesktopViewportX = pXDesktopViewport[2*(*iDesktopNumber)];
+			*iDesktopViewportY = pXDesktopViewport[2*(*iDesktopNumber)+1];
+		}
+		else
+		{
+			*iDesktopViewportX = pXDesktopViewport[0];
+			*iDesktopViewportY = pXDesktopViewport[1];
+		}
+	}
+	else
+	{
+		
+		*iDesktopViewportX = 0;
+		*iDesktopViewportY = 0;
+	}
+	XFree (pXDesktopViewport);
+	//g_print ("viewport actuel : (%d;%d)\n", *iDesktopViewportX, *iDesktopViewportY);
+	
+	/*Atom aNetWorkArea = XInternAtom (g_XDisplay, "_NET_WORKAREA", False);
+	iBufferNbElements = 0;
+	gulong *pXWorkArea = NULL;
+	XGetWindowProperty (g_XDisplay, root, aNetWorkArea, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXWorkArea);
+	int i;
+	for (i = 0; i < iBufferNbElements/4; i ++)
+	{
+		g_print ("work area : (%d;%d) %dx%d\n", pXWorkArea[4*i], pXWorkArea[4*i+1], pXWorkArea[4*i+2], pXWorkArea[4*i+3]);
+	}
+	XFree (pXWorkArea);*/
 }
 
 

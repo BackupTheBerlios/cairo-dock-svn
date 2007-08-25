@@ -442,14 +442,15 @@ static void cairo_dock_set_appli_fullscreen (GtkMenuItem *menu_item, gpointer *d
 
 static void cairo_dock_move_appli_to_current_desktop (GtkMenuItem *menu_item, gpointer *data)
 {
-	g_print ("%s ()\n", __func__);
+	//g_print ("%s ()\n", __func__);
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
 	if (icon->Xid > 0)
 	{
-		int iCurrentDesktop = cairo_dock_get_current_desktop ();
-		g_print ("iCurrentDesktop : %d\n", iCurrentDesktop);
-		cairo_dock_move_xwindow_to_nth_desktop (icon->Xid, iCurrentDesktop);
+		int iCurrentDesktop, iDesktopViewportX, iDesktopViewportY;
+		cairo_dock_get_current_desktop (&iCurrentDesktop, &iDesktopViewportX, &iDesktopViewportY);
+		
+		cairo_dock_move_xwindow_to_nth_desktop (icon->Xid, iCurrentDesktop, 0, 0);  // on ne veut pas decaler son viewport par rapport a nous.
 	}
 }
 
