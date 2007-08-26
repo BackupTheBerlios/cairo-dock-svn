@@ -37,7 +37,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-callbacks.h"
 
 static Icon *s_pIconClicked = NULL;  // pour savoir quand on deplace une icone a la souris.
-static CairoDock *g_pLastPointedDock = NULL;  // pour savoir quand on passe d'un dock a un autre.
+static CairoDock *s_pLastPointedDock = NULL;  // pour savoir quand on passe d'un dock a un autre.
+static int s_iSidNonStopScrolling = 0;
+static int s_iScrollDirection = 0;
 
 extern CairoDock *g_pMainDock;
 
@@ -143,10 +145,10 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		gtk_widget_queue_draw (pWidget);
 	}
 	
-	if (pPointedIcon != pLastPointedIcon || g_pLastPointedDock == NULL)
+	if (pPointedIcon != pLastPointedIcon || s_pLastPointedDock == NULL)
 	{
 		//g_print ("on change d'icone (-> %s)\n", (pPointedIcon != NULL ? pPointedIcon->acName : "rien"));
-		if ((pDock == g_pLastPointedDock || g_pLastPointedDock == NULL) && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
+		if ((pDock == s_pLastPointedDock || s_pLastPointedDock == NULL) && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
 		{
 			if (GTK_WIDGET_VISIBLE (pLastPointedIcon->pSubDock->pWidget))
 			{
@@ -181,13 +183,13 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 				gtk_window_move (GTK_WINDOW (pSubDock->pWidget), pSubDock->iWindowPositionX, pSubDock->iWindowPositionY);
 			else
 				gtk_window_move (GTK_WINDOW (pSubDock->pWidget), pSubDock->iWindowPositionY, pSubDock->iWindowPositionX);
-			g_pLastPointedDock = pDock;
+			s_pLastPointedDock = pDock;
 			pSubDock->bAtBottom = FALSE;
 			gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
 		}
 		pLastPointedIcon = pPointedIcon;
-		if (g_pLastPointedDock == NULL)
-			 g_pLastPointedDock = pDock;
+		if (s_pLastPointedDock == NULL)
+			 s_pLastPointedDock = pDock;
 	}
 	
 	return FALSE;
@@ -227,8 +229,8 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	if (pDock->iSidShrinkDown == 0)  // on commence a faire diminuer la taille des icones.
 		pDock->iSidShrinkDown = g_timeout_add (35, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 	
-	g_pLastPointedDock = NULL;
-	//g_print ("g_pLastPointedDock <- NULL\n");
+	s_pLastPointedDock = NULL;
+	//g_print ("s_pLastPointedDock <- NULL\n");
 }
 gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
@@ -592,16 +594,16 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 	return FALSE;
 }
 
-gboolean on_scroll (GtkWidget* pWidget,
-			GdkEventScroll* pScroll,
-			CairoDock *pDock)
+
+static gboolean _cairo_dock_autoscroll (gpointer *data)
 {
-	static double fLastTime = 0;
-	//g_print ("%s (%d)\n", __func__, pScroll->direction);
-	if (pDock->bAtBottom || ! pDock->bInside || pDock->iSidShrinkDown > 0 || pScroll->time - fLastTime < g_fRefreshInterval)  // si les icones sont en train de diminuer de taille (suite a un clic) on ne redimensionne pas les icones, le temps que l'animation se finisse.
-	{
+	GdkEventScroll* pScroll = data[0];
+	CairoDock *pDock = data[1];
+	gboolean bAutoScroll = GPOINTER_TO_INT (data[2]);
+	pScroll->time += 10 * g_fRefreshInterval;
+	
+	if (pDock->iSidShrinkDown != 0 || pDock->fMagnitude == 0)
 		return FALSE;
-	}
 	
 	Icon *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
 	Icon *pNeighborIcon;
@@ -612,7 +614,7 @@ gboolean on_scroll (GtkWidget* pWidget,
 			pNeighborIcon = cairo_dock_get_last_icon (pDock->icons);
 		if (pNeighborIcon == NULL)
 			return FALSE;
-		pDock->iScrollOffset += ((pScroll->state & GDK_CONTROL_MASK) || g_iScrollAmount == 0 ? (pNeighborIcon->fWidth + (pLastPointedIcon != NULL ? pLastPointedIcon->fWidth : 0)) / 2 : g_iScrollAmount);
+		pDock->iScrollOffset += (bAutoScroll ? 10 : ((pScroll->state & GDK_CONTROL_MASK) || g_iScrollAmount == 0 ? (pNeighborIcon->fWidth + (pLastPointedIcon != NULL ? pLastPointedIcon->fWidth : 0)) / 2 : g_iScrollAmount));
 	}
 	else if (pScroll->direction == GDK_SCROLL_DOWN)
 	{
@@ -621,7 +623,7 @@ gboolean on_scroll (GtkWidget* pWidget,
 			pNeighborIcon = cairo_dock_get_first_icon (pDock->icons);
 		if (pNeighborIcon == NULL)
 			return FALSE;
-		pDock->iScrollOffset -= ((pScroll->state & GDK_CONTROL_MASK) || g_iScrollAmount == 0 ? (pNeighborIcon->fWidth + (pLastPointedIcon != NULL ? pLastPointedIcon->fWidth : 0)) / 2 : g_iScrollAmount);
+		pDock->iScrollOffset -= (bAutoScroll ? 10 : ((pScroll->state & GDK_CONTROL_MASK) || g_iScrollAmount == 0 ? (pNeighborIcon->fWidth + (pLastPointedIcon != NULL ? pLastPointedIcon->fWidth : 0)) / 2 : g_iScrollAmount));
 	}
 	else
 	{
@@ -632,9 +634,8 @@ gboolean on_scroll (GtkWidget* pWidget,
 		pDock->iScrollOffset -= pDock->iMinDockWidth;
 	if (pDock->iScrollOffset < 0)
 		pDock->iScrollOffset += pDock->iMinDockWidth;
-	//g_print ("iScrollOffset <- %d, (%d;%d)\n", pDock->iScrollOffset, (int) pScroll->x, (int) pScroll->y);
+	//g_print ("iScrollOffset <- %d, (%d;%d) (%x)\n", pDock->iScrollOffset, (int) pScroll->x, (int) pScroll->y, pDock->icons);
 	
-	//pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
 	cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 	
 	//\_______________ On recalcule toutes les icones.
@@ -643,14 +644,13 @@ gboolean on_scroll (GtkWidget* pWidget,
 		pPointedIcon = cairo_dock_calculate_icons (pDock, (int) pScroll->x, (int) pScroll->y);
 	else
 		pPointedIcon = cairo_dock_calculate_icons (pDock, (int) pScroll->y, (int) pScroll->x);
-	gtk_widget_queue_draw (pWidget);
-	fLastTime = pScroll->time;
+	gtk_widget_queue_draw (pDock->pWidget);
 	
 	//\_______________ On montre les sous-docks.
-	if (pPointedIcon != pLastPointedIcon || g_pLastPointedDock == NULL)
+	if (pPointedIcon != pLastPointedIcon || s_pLastPointedDock == NULL)
 	{
 		//g_print ("on change d'icone\n");
-		if (pDock == g_pLastPointedDock && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
+		if (pDock == s_pLastPointedDock && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
 		{
 			if (GTK_WIDGET_VISIBLE (pLastPointedIcon->pSubDock->pWidget))
 				gdk_window_hide (pLastPointedIcon->pSubDock->pWidget->window);
@@ -680,12 +680,57 @@ gboolean on_scroll (GtkWidget* pWidget,
 				gdk_window_move (pSubDock->pWidget->window, pSubDock->iWindowPositionX, pSubDock->iWindowPositionY);
 			else
 				gdk_window_move (pSubDock->pWidget->window, pSubDock->iWindowPositionY, pSubDock->iWindowPositionX);
-			g_pLastPointedDock = pDock;
+			s_pLastPointedDock = pDock;
 			gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
 			//gtk_widget_show (pSubDock->pWidget);
 		}
 		pLastPointedIcon = pPointedIcon;
 	}
+	
+	return TRUE;
+}
+gboolean on_scroll (GtkWidget* pWidget,
+			GdkEventScroll* pScroll,
+			CairoDock *pDock)
+{
+	static double fLastTime = 0;
+	static int iNbSimultaneousScroll = 0;
+	static GdkEventScroll my_scroll;
+	static gpointer data[3] = {&my_scroll, NULL, NULL};
+	
+	//g_print ("%s (%d)\n", __func__, pScroll->direction);
+	if (pScroll->time - fLastTime < g_fRefreshInterval && s_iSidNonStopScrolling == 0)
+		iNbSimultaneousScroll ++;
+	else
+		iNbSimultaneousScroll = 0;
+	if (iNbSimultaneousScroll == 2 && s_iSidNonStopScrolling == 0)
+	{
+		g_print ("on a scrolle comme un bourrinos\n");
+		iNbSimultaneousScroll = -999;
+		data[1] = pDock;
+		data[2] = GINT_TO_POINTER (1);
+		memcpy (&my_scroll, pScroll, sizeof (GdkEventScroll));
+		s_iSidNonStopScrolling = g_timeout_add (g_fRefreshInterval, (GSourceFunc)_cairo_dock_autoscroll, data);
+		return FALSE;
+	}
+	
+	if (s_iSidNonStopScrolling != 0 && pScroll->direction != my_scroll.direction)
+	{
+		//g_print ("on arrete\n");
+		g_source_remove (s_iSidNonStopScrolling);
+		s_iSidNonStopScrolling = 0;
+		return FALSE;
+	}
+	
+	if (pDock->bAtBottom || ! pDock->bInside || pDock->iSidShrinkDown > 0 || pScroll->time - fLastTime < g_fRefreshInterval)  // si les icones sont en train de diminuer de taille (suite a un clic) on ne redimensionne pas les icones, le temps que l'animation se finisse.
+	{
+		return FALSE;
+	}
+	
+	fLastTime = pScroll->time;
+	gpointer user_data[3] = {pScroll, pDock, GINT_TO_POINTER (0)};
+	_cairo_dock_autoscroll (user_data);
+	
 	
 	return FALSE;
 }

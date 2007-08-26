@@ -170,5 +170,11 @@ typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
 
 typedef void (*CairoDockClickFunc) (CairoDock *pDock, Icon *icon);
 
+
+typedef void (*CairoDockCalculateShapeFunc) (CairoDock *pDock, CairoDockSizeType iSizeType, int *iNewWidth, int *iNewHeight);
+typedef void (*CairoDockCalculateParametersFunc) (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth, gboolean bInside);
+typedef void (*CairoDockRender) (CairoDock *pDock);
+
+
 #endif
 
