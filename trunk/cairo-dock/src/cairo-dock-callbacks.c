@@ -602,6 +602,7 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 	gboolean bAutoScroll = GPOINTER_TO_INT (data[2]);
 	pScroll->time += 10 * g_fRefreshInterval;
 	
+	//g_print ("%s (%d, %.2f)\n", __func__, pDock->iSidShrinkDown, pDock->fMagnitude);
 	if (pDock->iSidShrinkDown != 0 || pDock->fMagnitude == 0)
 		return FALSE;
 	
@@ -612,8 +613,6 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 		pNeighborIcon = cairo_dock_get_previous_icon (pDock->icons, pLastPointedIcon);
 		if (pNeighborIcon == NULL)
 			pNeighborIcon = cairo_dock_get_last_icon (pDock->icons);
-		if (pNeighborIcon == NULL)
-			return FALSE;
 		pDock->iScrollOffset += (bAutoScroll ? 10 : ((pScroll->state & GDK_CONTROL_MASK) || g_iScrollAmount == 0 ? (pNeighborIcon->fWidth + (pLastPointedIcon != NULL ? pLastPointedIcon->fWidth : 0)) / 2 : g_iScrollAmount));
 	}
 	else if (pScroll->direction == GDK_SCROLL_DOWN)
@@ -621,12 +620,11 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 		pNeighborIcon = cairo_dock_get_next_icon (pDock->icons, pLastPointedIcon);
 		if (pNeighborIcon == NULL)
 			pNeighborIcon = cairo_dock_get_first_icon (pDock->icons);
-		if (pNeighborIcon == NULL)
-			return FALSE;
 		pDock->iScrollOffset -= (bAutoScroll ? 10 : ((pScroll->state & GDK_CONTROL_MASK) || g_iScrollAmount == 0 ? (pNeighborIcon->fWidth + (pLastPointedIcon != NULL ? pLastPointedIcon->fWidth : 0)) / 2 : g_iScrollAmount));
 	}
 	else
 	{
+		//g_print ("stop\n");
 		return FALSE;
 	}
 	
@@ -697,6 +695,8 @@ gboolean on_scroll (GtkWidget* pWidget,
 	static int iNbSimultaneousScroll = 0;
 	static GdkEventScroll my_scroll;
 	static gpointer data[3] = {&my_scroll, NULL, NULL};
+	if (pDock->icons == NULL)
+		return FALSE;
 	
 	//g_print ("%s (%d)\n", __func__, pScroll->direction);
 	if (pScroll->time - fLastTime < g_fRefreshInterval && s_iSidNonStopScrolling == 0)
@@ -714,6 +714,7 @@ gboolean on_scroll (GtkWidget* pWidget,
 		return FALSE;
 	}
 	
+	//g_print ("%d / %d\n", pScroll->direction, my_scroll.direction);
 	if (s_iSidNonStopScrolling != 0 && pScroll->direction != my_scroll.direction)
 	{
 		//g_print ("on arrete\n");

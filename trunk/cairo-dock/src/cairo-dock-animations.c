@@ -54,7 +54,7 @@ gboolean cairo_dock_move_up (CairoDock *pDock)
 	//g_print ("%s (%dx%d -> %d)\n", __func__, pDock->iWindowPositionX, pDock->iWindowPositionY, deltaY_possible);
 	if ((g_bDirectionUp && deltaY_possible > 0) || (! g_bDirectionUp && deltaY_possible < 0))  // alors on peut encore monter.
 	{
-			pDock->iWindowPositionY -= (int) (deltaY_possible * g_fMoveUpSpeed) + (g_bDirectionUp ? 1 : -1);
+		pDock->iWindowPositionY -= (int) (deltaY_possible * g_fMoveUpSpeed) + (g_bDirectionUp ? 1 : -1);
 		//g_print ("  move to (%dx%d)\n", g_iWindowPositionX, g_iWindowPositionY);
 		if (g_bHorizontalDock)
 			gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);
@@ -138,8 +138,10 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 	if (pDock->fMagnitude < 0.05)
 		pDock->fMagnitude = 0.05;
 	
+	pDock->fGrowFactor *= g_fGrowUpFactor;
+	if (pDock->fGrowFactor > 1.0)
+		pDock->fGrowFactor = 1.0;
 	pDock->fMagnitude *= g_fGrowUpFactor;  // 1.4
-	
 	if (pDock->fMagnitude > 1.0)
 		pDock->fMagnitude = 1.0;
 	
