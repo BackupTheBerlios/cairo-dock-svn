@@ -16,6 +16,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <pango/pango.h>
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
+#include </usr/include/X11/Xlib.h>
 
 #ifdef HAVE_GLITZ
 #include <gdk/gdkx.h>
@@ -498,6 +499,11 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				if (icon->pSubDock != NULL)
 					gtk_widget_hide (icon->pSubDock->pWidget);
 				
+				if (pDock->iSidGrowUp != 0)
+				{
+					g_source_remove (pDock->iSidGrowUp);
+					pDock->iSidGrowUp = 0;
+				}
 				if (pDock->iSidShrinkDown == 0)
 					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);  // fera diminuer de taille les icones, et rebondir/tourner/clignoter celle qui est cliquee.
 			}
@@ -545,7 +551,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 			}
 			s_pIconClicked = NULL;
 		}
-		else if (pButton->type == GDK_BUTTON_PRESS)
+		else //if (pButton->type == GDK_BUTTON_PRESS)
 		{
 			s_pIconClicked = cairo_dock_get_pointed_icon (pDock->icons);
 			if (s_pIconClicked != NULL)

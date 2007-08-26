@@ -195,6 +195,7 @@ gboolean g_bSticky = TRUE;
 CairoDockClickFunc cairo_dock_default_click_on_icon_func = NULL;
 
 gboolean g_bUseGlitz = FALSE;
+gboolean g_bVerbose = FALSE;
 
 
 int
@@ -241,6 +242,15 @@ main (int argc, char** argv)
 		{
 			system ("pkg-config --modversion cairo-dock");
 			return 0;
+		}
+		else if (strcmp (argv[i], "--verbose") == 0)
+		{
+#ifdef CAIRO_DOCK_VERBOSE
+			g_bVerbose = TRUE;
+#else
+			g_print ("Attention : Cairo-Dock was not compiled with verbose\n");
+			g_bVerbose = FALSE;
+#endif
 		}
 		else if (argv[i][0] == '-')
 		{

@@ -365,6 +365,21 @@ gboolean cairo_dock_window_is_fullscreen (Window Xid)
 	return bIsFullScreen;
 }
 
+Window cairo_dock_get_active_window (void)
+{
+	Atom aNetActiveWindow = XInternAtom (g_XDisplay, "_NET_ACTIVE_WINDOW", False);
+	Atom aReturnedType = 0;
+	int aReturnedFormat = 0;
+	unsigned long iLeftBytes, iBufferNbElements = 0;
+	gulong *pXBuffer = NULL;
+	Window root = DefaultRootWindow (g_XDisplay);
+	XGetWindowProperty (g_XDisplay, root, aNetActiveWindow, 0, G_MAXULONG, False, XA_WINDOW, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXBuffer);
+	
+	Window xActiveWindow = (iBufferNbElements > 0 && pXBuffer != NULL ? pXBuffer[0] : 0);
+	XFree (pXBuffer);
+	return xActiveWindow;
+}
+
 void cairo_dock_get_current_desktop (int *iDesktopNumber, int *iDesktopViewportX, int *iDesktopViewportY)
 {
 	Atom aNetCurrentDesktop = XInternAtom (g_XDisplay, "_NET_CURRENT_DESKTOP", False);
@@ -461,7 +476,8 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 	Bool bEventPresent;
 	gboolean bInterestedEvent = FALSE;
 	Window root = DefaultRootWindow (g_XDisplay);
-	//bEventPresent = XCheckTypedWindowEvent(g_XDisplay, root, UnmapNotify, &event);
+	Window xDestroyedWindow = 0;
+	Window xUnwantedWindow = 0;
 	
 	//\_____________________ On regarde si une fenetre s'est faite effacee.
 	bEventPresent = TRUE;
@@ -476,6 +492,8 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 			if (icon != NULL)
 			{
 				//g_print ("c'est %s qui se fait exploser\n", icon->acName);
+				icon->bIsMapped = FALSE;
+				xDestroyedWindow = event.xdestroywindow.window;
 				if (pDock->bInside || ! g_bAutoHide || ! pDock->bAtBottom)
 					icon->fPersonnalScale = 1.0;
 				else
@@ -485,7 +503,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 			}
 		}
 	}
-	//\_____________________ On regarde si une fenetre est apparue.
+	//\_____________________ On regarde si une fenetre est creee.
 	bEventPresent = TRUE;
 	//while (bEventPresent)
 	{
@@ -495,14 +513,14 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 			bInterestedEvent = TRUE;
 			//g_print ("Create (%d)\n", event.xcreatewindow.window);
 			Icon *icon = g_hash_table_lookup (g_hXWindowTable, &event.xcreatewindow.window);
-			if (icon != NULL)
+			if (icon != NULL)  // a priori impossible.
 			{
-				//g_print ("c'est %s qui ressucite\n", icon->acName);
-				///icon->bIsMapped = TRUE;
+				//g_print ("c'est %s qui ressucite d'entre les morts\n", icon->acName);
+				icon->bIsMapped = TRUE;
 			}
 			else
 			{
-				//g_print ("c'est une nouvelle fenetre\n");
+				//g_print ("c'est une nouvelle fenetre qui est cree\n");
 				cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 				icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xcreatewindow.window, pDock);
 				if (icon != NULL)
@@ -513,9 +531,12 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 					if (pDock->iSidShrinkDown == 0)
 						pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 				}
+				else
+					xUnwantedWindow = event.xcreatewindow.window;
 			}
 		}
 	}
+	//\_____________________ On regarde si une fenetre se cache.
 	bEventPresent = TRUE;
 	while (bEventPresent)
 	{
@@ -525,36 +546,57 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 			bInterestedEvent = TRUE;
 			//g_print ("Destroy (%d)\n", event.xunmap.window);
 			Icon *icon = g_hash_table_lookup (g_hXWindowTable, &event.xunmap.window);
-			if (icon != NULL && event.xunmap.from_configure == False)
+			if (icon != NULL)
 			{
-				g_print ("c'est %s qui se fait reduire en zone de notification\n", icon->acName);
-				// Ce qu'il faudrait faire : reduire son icone de moitie et la deplacer a droite des applis. Cependant, la zone de notification de gnome reduit la fenetre des qu'on veut la remapper nous-memes ! Du coup pas le choix, on l'enleve de la barre.
-				if (pDock->bInside || ! g_bAutoHide || ! pDock->bAtBottom)
-					icon->fPersonnalScale = 1.0;
-				else
-					icon->fPersonnalScale = 0.05;
-				if (pDock->iSidShrinkDown == 0)
-					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+				if (icon->bIsMapped)
+				{
+					//g_print ("est %s qui se cache\n", icon->acName);
+					icon->bIsMapped = FALSE;
+				}
+				else if (event.xunmap.window != xDestroyedWindow)
+				{
+					// Ce qu'il faudrait faire : reduire son icone de moitie et la deplacer a droite des applis. Cependant, la zone de notification de gnome reduit la fenetre des qu'on veut la remapper nous-memes ! Du coup pas le choix, on l'enleve de la barre.
+					//g_print ("c'est %s qui se fait degager (%d)\n", icon->acName, event.xunmap.from_configure);
+					if (pDock->bInside || ! g_bAutoHide || ! pDock->bAtBottom)
+						icon->fPersonnalScale = 1.0;
+					else
+						icon->fPersonnalScale = 0.05;
+					if (pDock->iSidShrinkDown == 0)
+						pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+				}
 			}
 		}
 	}
+	//\_____________________ On regarde si une fenetre apparait.
 	bEventPresent = TRUE;
 	//while (bEventPresent)
 	{
 		bEventPresent = XCheckTypedEvent(g_XDisplay, MapNotify, &event);
-		if (bEventPresent)
+		if (bEventPresent && event.xmap.window != xUnwantedWindow)
 		{
 			bInterestedEvent = TRUE;
 			//g_print ("Create (%d)\n", event.xcreatewindow.window);
 			Icon *icon = g_hash_table_lookup (g_hXWindowTable, &event.xmap.window);
 			if (icon != NULL)
 			{
-				//g_print ("c'est %s qui ressucite\n", icon->acName);
-				///icon->bIsMapped = TRUE;
+				//g_print ("c'est %s qui re-apparait\n", icon->acName);
+				icon->bIsMapped = TRUE;
+				if (icon->fPersonnalScale > 0)  // elle est en train de disparaitre, on arrete ca.
+				{
+					if (pDock->iSidShrinkDown > 0)
+						g_source_remove (pDock->iSidShrinkDown);
+					pDock->iSidShrinkDown = 0;
+					
+					if (! pDock->bInside && g_bAutoHide && pDock->bAtBottom)
+						icon->fPersonnalScale = - 0.05;
+					else
+						icon->fPersonnalScale = -0.95;
+					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+				}
 			}
 			else
 			{
-				//g_print ("c'est une nouvelle fenetre\n");
+				//g_print ("c'est une nouvelle fenetre qui apparait\n");
 				cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 				icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xmap.window, pDock);
 				if (icon != NULL)

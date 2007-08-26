@@ -63,7 +63,7 @@ typedef struct _CairoDock {
 
 
 
-typedef gpointer (*CairoDockModuleInit) (GtkWidget *pWidget, gchar **cConfFilePath, GError **erreur);  // renvoie son icone si il en a.
+typedef gpointer (*CairoDockModuleInit) (CairoDock *pDock, gchar **cConfFilePath, GError **erreur);  // renvoie son icone si il en a.
 
 typedef void (*CairoDockModuleStop) ();
 
@@ -130,6 +130,7 @@ typedef struct _Icon {
 	//\____________ Pour les fenetres.
 	gint iPid;
 	Window Xid;
+	gboolean bIsMapped;
 	//\____________ Pour les modules.
 	CairoDockModule *pModule;
 	GtkWidget *pMenu;
@@ -141,6 +142,13 @@ typedef struct _Icon {
 #define CAIRO_DOCK_MAIN_DOCK_NAME "_MainDock_"
 
 #define CAIRO_DOCK_THEMES_DIR "themes"
+
+#ifdef CAIRO_DOCK_VERBOSE
+#define CAIRO_DOCK_MESSAGE if (g_bVerbose) g_message
+#else
+#define CAIRO_DOCK_MESSAGE(s, ...)
+#endif
+
 
 typedef enum {
 	CAIRO_DOCK_MAX_SIZE,

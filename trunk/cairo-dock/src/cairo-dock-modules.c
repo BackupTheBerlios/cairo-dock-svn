@@ -205,7 +205,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, GHashTabl
 		pModule = g_hash_table_lookup (pModuleTable, cModuleName);
 		if (pModule != NULL)
 		{
-			Icon *pIcon = cairo_dock_activate_module (pModule, pDock->pWidget, &erreur);
+			Icon *pIcon = cairo_dock_activate_module (pModule, pDock, &erreur);
 			if (erreur != NULL)
 			{
 				g_print ("Attention : %s", erreur->message);
@@ -236,7 +236,7 @@ void cairo_dock_free_module (CairoDockModule *module)
 	g_free (module);
 }
 
-Icon * cairo_dock_activate_module (CairoDockModule *module, GtkWidget *pWidget, GError **erreur)
+Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GError **erreur)
 {
 	if (module == NULL)
 	{
@@ -263,7 +263,7 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, GtkWidget *pWidget, 
 	
 	g_free (module->cConfFilePath);
 	module->cConfFilePath = NULL;
-	Icon *icon = module->initModule (pWidget, &module->cConfFilePath, &tmp_erreur);
+	Icon *icon = module->initModule (pDock, &module->cConfFilePath, &tmp_erreur);
 	if (tmp_erreur != NULL)
 	{
 		g_propagate_error (erreur, tmp_erreur);
@@ -310,11 +310,11 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 	g_free (module->cConfFilePath);
 	module->cConfFilePath = NULL;
 	
-	Icon *pNewIcon = module->initModule (pDock->pWidget, &module->cConfFilePath, &erreur);
+	Icon *pNewIcon = module->initModule (pDock, &module->cConfFilePath, &erreur);
 	if (pNewIcon != NULL)
 		pNewIcon->pModule = module;*/
 	cairo_dock_deactivate_module (module);
-	Icon *pNewIcon = cairo_dock_activate_module (module, pDock->pWidget, &erreur);
+	Icon *pNewIcon = cairo_dock_activate_module (module, pDock, &erreur);
 	if (erreur != NULL)
 	{
 		module->bActive = FALSE;

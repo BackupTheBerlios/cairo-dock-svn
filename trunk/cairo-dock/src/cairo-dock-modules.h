@@ -19,7 +19,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, GHashTabl
 
 void cairo_dock_free_module (CairoDockModule *module);
 
-Icon * cairo_dock_activate_module (CairoDockModule *module, GtkWidget *pWidget, GError **erreur);
+Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GError **erreur);
 
 void cairo_dock_deactivate_module (CairoDockModule *module);
 
