@@ -159,6 +159,8 @@ void cairo_dock_show_appli (Window Xid)
 		&xClientMessage);
 	
 	//\______________ On active la fenetre.
+	//XMapRaised (g_XDisplay, Xid);  // on la mappe, pour les cas ou elle etait en zone de notification. Malheuresement, la zone de notif de gnome est bugguee, et reduit la fenetre aussitot qu'on l'a mappee :-(
+	
 	xClientMessage.xclient.type = ClientMessage;
 	xClientMessage.xclient.serial = 0;
 	xClientMessage.xclient.send_event = True;
@@ -450,6 +452,11 @@ void cairo_dock_set_root_window_mask (void)
 static XEvent event;
 gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 {
+	static gboolean bInProgress = FALSE;
+	if (bInProgress)
+		return TRUE;
+	bInProgress = TRUE;
+	
 	g_return_val_if_fail (pDock != NULL, FALSE);
 	Bool bEventPresent;
 	gboolean bInterestedEvent = FALSE;
@@ -486,8 +493,8 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 		if (bEventPresent)
 		{
 			bInterestedEvent = TRUE;
-			//g_print ("Create (%d)\n", event.xunmap.window);
-			Icon *icon = g_hash_table_lookup (g_hXWindowTable, &event.xunmap.window);
+			//g_print ("Create (%d)\n", event.xcreatewindow.window);
+			Icon *icon = g_hash_table_lookup (g_hXWindowTable, &event.xcreatewindow.window);
 			if (icon != NULL)
 			{
 				//g_print ("c'est %s qui ressucite\n", icon->acName);
@@ -497,7 +504,59 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 			{
 				//g_print ("c'est une nouvelle fenetre\n");
 				cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
-				icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xunmap.window, pDock);
+				icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xcreatewindow.window, pDock);
+				if (icon != NULL)
+				{
+					cairo_dock_insert_icon_in_dock (icon, pDock, TRUE, TRUE);
+					if (! pDock->bInside && g_bAutoHide && pDock->bAtBottom)
+						icon->fPersonnalScale = - 0.05;
+					if (pDock->iSidShrinkDown == 0)
+						pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+				}
+			}
+		}
+	}
+	bEventPresent = TRUE;
+	while (bEventPresent)
+	{
+		bEventPresent = XCheckTypedEvent(g_XDisplay, UnmapNotify, &event);
+		if (bEventPresent)
+		{
+			bInterestedEvent = TRUE;
+			//g_print ("Destroy (%d)\n", event.xunmap.window);
+			Icon *icon = g_hash_table_lookup (g_hXWindowTable, &event.xunmap.window);
+			if (icon != NULL && event.xunmap.from_configure == False)
+			{
+				g_print ("c'est %s qui se fait reduire en zone de notification\n", icon->acName);
+				// Ce qu'il faudrait faire : reduire son icone de moitie et la deplacer a droite des applis. Cependant, la zone de notification de gnome reduit la fenetre des qu'on veut la remapper nous-memes ! Du coup pas le choix, on l'enleve de la barre.
+				if (pDock->bInside || ! g_bAutoHide || ! pDock->bAtBottom)
+					icon->fPersonnalScale = 1.0;
+				else
+					icon->fPersonnalScale = 0.05;
+				if (pDock->iSidShrinkDown == 0)
+					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+			}
+		}
+	}
+	bEventPresent = TRUE;
+	//while (bEventPresent)
+	{
+		bEventPresent = XCheckTypedEvent(g_XDisplay, MapNotify, &event);
+		if (bEventPresent)
+		{
+			bInterestedEvent = TRUE;
+			//g_print ("Create (%d)\n", event.xcreatewindow.window);
+			Icon *icon = g_hash_table_lookup (g_hXWindowTable, &event.xmap.window);
+			if (icon != NULL)
+			{
+				//g_print ("c'est %s qui ressucite\n", icon->acName);
+				///icon->bIsMapped = TRUE;
+			}
+			else
+			{
+				//g_print ("c'est une nouvelle fenetre\n");
+				cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+				icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xmap.window, pDock);
 				if (icon != NULL)
 				{
 					cairo_dock_insert_icon_in_dock (icon, pDock, TRUE, TRUE);
@@ -510,6 +569,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 		}
 	}
 	
+	
 	//g_print ("%d events\n", XEventsQueued (g_XDisplay, QueuedAlready));
 	//\_____________________ On vide la queue des messages qui ne nous interessent pas.
 	if (!bInterestedEvent)
@@ -518,7 +578,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 		//while (XCheckWindowEvent (g_XDisplay, root, event_mask, &event))
 		while (XCheckMaskEvent (g_XDisplay, event_mask, &event))
 		{
-			if (event.type == CreateNotify || event.type == DestroyNotify)
+			if (event.type == CreateNotify || event.type == DestroyNotify || event.type == UnmapNotify || event.type == MapNotify)
 			{
 				XPutBackEvent (g_XDisplay, &event);
 				//g_print ("On le remet dans la queue\n");
@@ -526,6 +586,8 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 			}
 		}
 	}
+	
+	bInProgress = FALSE;
 	return TRUE;
 }
 
