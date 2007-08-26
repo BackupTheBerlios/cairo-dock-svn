@@ -42,6 +42,5 @@ AC_CONFIG_FILES([Makefile
 		data/themes/Ubuntu/Makefile
 		data/themes/Chilperik/Makefile
 		data/themes/Djoole/Makefile
-		data/themes/new_theme/Makefile
 		])
 AC_OUTPUT

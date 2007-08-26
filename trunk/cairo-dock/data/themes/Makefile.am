@@ -3,6 +3,5 @@ SUBDIRS = \
 	Fabounet\
 	Ubuntu\
 	Chilperik\
-	Djoole\
-	new_theme
+	Djoole
 	
