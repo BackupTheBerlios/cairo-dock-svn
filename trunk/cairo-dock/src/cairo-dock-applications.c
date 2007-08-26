@@ -574,7 +574,7 @@ void cairo_dock_set_strut_partial (int Xid, int left, int right, int top, int bo
 	xClientMessage.xclient.send_event = True;
 	xClientMessage.xclient.display = g_XDisplay;
 	xClientMessage.xclient.window = Xid;
-	xClientMessage.xclient.message_type = XInternAtom (g_XDisplay, "_NET_WM_STRUT_PARTIAL", False);
+	xClientMessage.xclient.message_type = XInternAtom (g_XDisplay, "_NET_WM_STRUT", False);
 	xClientMessage.xclient.format = 32;
 	xClientMessage.xclient.data.l[0] = left;
 	xClientMessage.xclient.data.l[1] = right;

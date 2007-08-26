@@ -70,7 +70,8 @@ extern int g_iDockRadius;
 extern int g_iDockLineWidth;
 extern gboolean g_bRoundedBottomCorner;
 extern double g_fLineColor[4];
-extern gboolean g_bLinkWithString;
+extern gint g_iStringLineWidth;
+extern double g_fStringColor[4];
 
 extern gboolean g_bBackgroundImageRepeat;
 extern double g_fBackgroundImageAlpha;
@@ -616,16 +617,36 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		bFlushConfFileNeeded = TRUE;
 	}
 	
-	g_bLinkWithString = g_key_file_get_boolean (fconf, "CAIRO DOCK", "draw string", &erreur);
+	g_iStringLineWidth = g_key_file_get_integer (fconf, "CAIRO DOCK", "string width", &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
-		g_bLinkWithString = FALSE;  // valeur par defaut.
-		g_key_file_set_boolean (fconf, "CAIRO DOCK", "draw string", g_bLinkWithString);
+		g_iStringLineWidth = 2;  // valeur par defaut.
+		g_key_file_set_integer (fconf, "CAIRO DOCK", "string width", g_iStringLineWidth);
 		bFlushConfFileNeeded = TRUE;
 	}
+	
+	couleur = g_key_file_get_double_list (fconf, "CAIRO DOCK", "string color", &length, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_fStringColor[0] = 0.0;  // valeur par defaut.
+		g_fStringColor[1] = 0.0;  // valeur par defaut.
+		g_fStringColor[2] = 0.6;  // valeur par defaut.
+		g_fStringColor[3] = 0.4;  // valeur par defaut.
+		g_key_file_set_double_list (fconf, "CAIRO DOCK", "string color", g_fStringColor, 4);
+		bFlushConfFileNeeded = TRUE;
+	}
+	else
+	{
+		if (length > 0)
+			memcpy (&g_fStringColor, couleur, MAX (4, length) * sizeof (double));
+	}
+	g_free (couleur);
 	
 	g_fGrowUpFactor = g_key_file_get_double (fconf, "CAIRO DOCK", "grow up factor", &erreur);
 	if (erreur != NULL)
@@ -1091,10 +1112,16 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	{
 		int iNewWidth, iNewHeight;
 		if (g_bAutoHide && pDock->iRefCount == 0)
+		{
 			cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MIN_SIZE, &iNewWidth, &iNewHeight);
+		}
 		else
+		{
 			cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
-		//g_print ("on commence en bas a %dx%d (%d;%d)\n", g_iVisibleZoneWidth, g_iVisibleZoneHeight, pDock->iWindowPositionX, pDock->iWindowPositionY);
+		}
+		int Xid = GDK_WINDOW_XID (pDock->pWidget->window);
+		cairo_dock_set_strut_partial (Xid, 0, 0, 0, iNewHeight);
+		g_print ("on commence en bas a %dx%d (%d;%d)\n", g_iVisibleZoneWidth, g_iVisibleZoneHeight, pDock->iWindowPositionX, pDock->iWindowPositionY);
 		if (g_bHorizontalDock)
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionX,

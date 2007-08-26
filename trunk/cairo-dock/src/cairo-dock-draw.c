@@ -40,7 +40,8 @@ extern gboolean g_bForceLoop;
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
 extern double g_fLineColor[4];
-extern gboolean g_bLinkWithString;
+extern gint g_iStringLineWidth;
+extern double g_fStringColor[4];
 extern int g_iIconGap;
 
 extern gboolean g_bRoundedBottomCorner;
@@ -470,7 +471,7 @@ void render (CairoDock *pDock)
 		return ;
 	}
 	
-	if (g_bLinkWithString)
+	if (g_iStringLineWidth > 0)
 	{
 		cairo_save (pCairoContext);
 		Icon *prev_icon = NULL, *next_icon;
@@ -549,8 +550,8 @@ void render (CairoDock *pDock)
 			y = y2;
 		}
 		while (ic != pFirstDrawnElement);
-		cairo_set_line_width (pCairoContext, 2);
-		cairo_set_source_rgba (pCairoContext, g_fLineColor[0], g_fLineColor[1], g_fLineColor[2], g_fLineColor[3]);
+		cairo_set_line_width (pCairoContext, g_iStringLineWidth);
+		cairo_set_source_rgba (pCairoContext, g_fStringColor[0], g_fStringColor[1], g_fStringColor[2], g_fStringColor[3]);
 		cairo_stroke (pCairoContext);
 		cairo_restore (pCairoContext);
 	}

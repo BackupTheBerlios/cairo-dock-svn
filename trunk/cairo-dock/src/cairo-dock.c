@@ -116,7 +116,8 @@ gint g_iDockLineWidth;  // thickness of dock-bg outline.
 gint g_iDockRadius;  // radius of dock-bg corners.
 gboolean g_bRoundedBottomCorner;  // vrai ssi les coins du bas sont arrondis.
 double g_fLineColor[4];  // la couleur du cadre.
-gboolean g_bLinkWithString;
+gint g_iStringLineWidth;  // epaisseur de la ficelle.
+double g_fStringColor[4];  // la couleur de la ficelle.
 
 cairo_surface_t *g_pVisibleZoneSurface = NULL;  // surface de la zone de rappel.
 double g_fVisibleZoneAlpha;  // transparence de la zone de rappel.
