@@ -27,7 +27,6 @@ theme_DATA = \
 	mail.svg \
 	music.svg \
 	nautilus.svg \
-	README \
 	separateur.svg \
 	ShowDesktop \
 	synaptic.svg \

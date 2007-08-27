@@ -59,7 +59,7 @@ cairo_surface_t *cairo_dock_create_applet_surface (cairo_t *pSourceContext, doub
 
 
 
-Icon *cairo_dock_create_icon_for_applet (cairo_t *pSourceContext, int iWidth, int iHeight, gchar *cName, GtkWidget *pMenu)
+Icon *cairo_dock_create_icon_for_applet (CairoDock *pDock, int iWidth, int iHeight, gchar *cName, GtkWidget *pMenu)
 {
 	Icon *icon = g_new0 (Icon, 1);
 	icon->iType = CAIRO_DOCK_APPLET;
@@ -69,9 +69,12 @@ Icon *cairo_dock_create_icon_for_applet (cairo_t *pSourceContext, int iWidth, in
 	
 	icon->fWidth =iWidth;
 	icon->fHeight =iHeight;
-	icon->pIconBuffer = cairo_dock_create_applet_surface (pSourceContext, 1 + g_fAmplitude, &icon->fWidth, &icon->fHeight);
-	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_bUseText, g_iLabelSize, g_cLabelPolice);
+	cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock);
 	
+	icon->pIconBuffer = cairo_dock_create_applet_surface (pSourceContext, 1 + g_fAmplitude, &icon->fWidth, &icon->fHeight);
+	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_bUseText, g_iLabelSize, g_cLabelPolice, pDock->bHorizontalDock);
+	
+	cairo_destroy (pSourceContext);
 	return icon;
 }
 

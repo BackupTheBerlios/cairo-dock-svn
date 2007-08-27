@@ -29,6 +29,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-launcher-factory.h"
 
+extern CairoDock *g_pMainDock;
+
 extern double g_fAmplitude;
 extern int g_iLabelSize;
 extern gboolean g_bUseText;
@@ -41,7 +43,7 @@ extern gchar **g_cDefaultIconDirectory;
 extern gchar *g_cLabelPolice;
 
 extern gboolean g_bDirectionUp;
-extern gboolean g_bHorizontalDock;
+extern gboolean g_bSameHorizontality;
 
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
@@ -416,7 +418,10 @@ void cairo_dock_load_desktop_file_information (gchar *cDesktopFileName, Icon *ic
 			pChildDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->acName);
 		}
 		else
+		{
 			pChildDock->iRefCount ++;  // peut-etre qu'il faudrait en faire une operation atomique...
+			pChildDock->bHorizontalDock = (g_bSameHorizontality ? g_pMainDock->bHorizontalDock : ! g_pMainDock->bHorizontalDock);
+		}
 		icon->pSubDock = pChildDock;
 	}
 	
@@ -441,20 +446,21 @@ void cairo_dock_load_desktop_file_information (gchar *cDesktopFileName, Icon *ic
 
 
 
-Icon * cairo_dock_create_icon_from_desktop_file (gchar *cDesktopFileName, cairo_t *pSourceContext)
+Icon * cairo_dock_create_icon_from_desktop_file (gchar *cDesktopFileName, cairo_t *pSourceContext, gboolean bHorizontalDock)
 {
 	Icon *icon = g_new0 (Icon, 1);
 	
 	cairo_dock_load_desktop_file_information (cDesktopFileName, icon);
 	g_return_val_if_fail (icon->acDesktopFileName != NULL, NULL);
 	
-	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude);
+	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, bHorizontalDock);
 	
 	cairo_dock_fill_one_text_buffer (icon,
 		pSourceContext,
 		g_bUseText,
 		g_iLabelSize,
-		g_cLabelPolice);
+		g_cLabelPolice,
+		bHorizontalDock);
 	
 	return icon;
 }

@@ -14,7 +14,7 @@ double cairo_dock_get_current_dock_width (CairoDock *pDock);
 cairo_t * cairo_dock_create_context_from_window (CairoDock *pDock);
 
 
-void cairo_dock_calculate_construction_parameters (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth, gboolean bLoop, gboolean bInside);
+void cairo_dock_calculate_construction_parameters (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth, gboolean bLoop, gboolean bInside, double fGrowFactor);
 
 void render (CairoDock *pDock);
 
@@ -24,7 +24,7 @@ void cairo_dock_render_blank (CairoDock *pDock);
 
 
 
-void cairo_dock_redraw_my_icon (Icon *icon, GtkWidget *pWidget);
+void cairo_dock_redraw_my_icon (Icon *icon, CairoDock *pDock);
 
 void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea);
 

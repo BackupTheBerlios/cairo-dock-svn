@@ -46,7 +46,8 @@ extern int g_iIconGap;
 extern gboolean g_bAutoHide;
 extern double g_fVisibleZoneAlpha;
 extern gboolean g_bDirectionUp;
-extern gboolean g_bHorizontalDock;
+extern gboolean g_bSameHorizontality;
+extern double g_fSubDockSizeRatio;
 extern double g_fAlign;
 
 extern gboolean g_bUseText;
@@ -90,6 +91,7 @@ extern gchar *g_cDefaultFileBrowser;
 extern int g_iScreenWidth;
 extern int g_iScreenHeight;
 
+extern double g_fUnfoldAcceleration;
 extern double g_fGrowUpFactor;
 extern double g_fShrinkDownFactor;
 extern double g_fMoveUpSpeed;
@@ -648,6 +650,17 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	}
 	g_free (couleur);
 	
+	g_fUnfoldAcceleration = g_key_file_get_double (fconf, "CAIRO DOCK", "unfold factor", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_fUnfoldAcceleration = 0.9;  // valeur par defaut.
+		g_key_file_set_double (fconf, "CAIRO DOCK", "unfold factor", g_fUnfoldAcceleration);
+		bFlushConfFileNeeded = TRUE;
+	}
+	
 	g_fGrowUpFactor = g_key_file_get_double (fconf, "CAIRO DOCK", "grow up factor", &erreur);
 	if (erreur != NULL)
 	{
@@ -704,6 +717,30 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		bFlushConfFileNeeded = TRUE;
 	}
 	g_fRefreshInterval = 1000. / iRefreshFrequency;
+	
+	
+	//\___________________ On recupere les parametres propres aux sous-docks.
+	g_bSameHorizontality = g_key_file_get_boolean (fconf, "SUB-DOCKS", "same horizontality", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_bSameHorizontality = TRUE;  // valeur par defaut.
+		g_key_file_set_boolean (fconf, "SUB-DOCKS", "same horizontality", g_bSameHorizontality);
+		bFlushConfFileNeeded = TRUE;
+	}
+	
+	g_fSubDockSizeRatio = g_key_file_get_double (fconf, "SUB-DOCKS", "relative icon size", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_fSubDockSizeRatio = 1.0;  // valeur par defaut.
+		g_key_file_set_double (fconf, "SUB-DOCKS", "relative icon size", g_fSubDockSizeRatio);
+		bFlushConfFileNeeded = TRUE;
+	}
 	
 	
 	//\___________________ On recupere les parametres du fond.
@@ -891,6 +928,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		bFlushConfFileNeeded = TRUE;
 	}
 	
+	gboolean bUniquePidOld = g_bUniquePid;
 	g_bUniquePid = g_key_file_get_boolean (fconf, "APPLICATIONS", "unique PID", &erreur);
 	if (erreur != NULL)
 	{
@@ -898,7 +936,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		g_error_free (erreur);
 		erreur = NULL;
 		g_bUniquePid = FALSE;  // valeur par defaut.
-		g_key_file_set_boolean (fconf, "APPLICATIONS", "unique PID", g_iAppliMaxNameLength);
+		g_key_file_set_boolean (fconf, "APPLICATIONS", "unique PID", g_bUniquePid);
 		bFlushConfFileNeeded = TRUE;
 	}
 	
@@ -1030,28 +1068,28 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	//\___________________ On (re)charge tout, car n'importe quel parametre peut avoir change.
 	if (strcmp (cScreenBorder, "bottom") == 0)
 	{
-		g_bHorizontalDock = TRUE;
+		pDock->bHorizontalDock = TRUE;
 		g_bDirectionUp = TRUE;
 	}
 	else if (strcmp (cScreenBorder, "top") == 0)
 	{
-		g_bHorizontalDock = TRUE;
+		pDock->bHorizontalDock = TRUE;
 		g_bDirectionUp = FALSE;
 	}
 	else if (strcmp (cScreenBorder, "right") == 0)
 	{
-		g_bHorizontalDock = FALSE;
+		pDock->bHorizontalDock = FALSE;
 		g_bDirectionUp = TRUE;
 	}
 	else if (strcmp (cScreenBorder, "left") == 0)
 	{
-		g_bHorizontalDock = FALSE;
+		pDock->bHorizontalDock = FALSE;
 		g_bDirectionUp = FALSE;
 	}
 	g_free (cScreenBorder);
 	
 	GdkScreen *gdkscreen = gtk_window_get_screen (GTK_WINDOW (pDock->pWidget));
-	if (g_bHorizontalDock)
+	if (pDock->bHorizontalDock)
 	{
 		g_iScreenWidth = gdk_screen_get_width (gdkscreen);
 		g_iScreenHeight = gdk_screen_get_height (gdkscreen);
@@ -1068,7 +1106,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	
 	cairo_dock_remove_all_applets (pDock);  // on est obliges d'arreter tous les applets.
 	
-	if (g_iSidUpdateAppliList != 0 && ! g_bShowAppli)  // on ne veut plus voir les applis, il faut donc les enlever.
+	if (bUniquePidOld != g_bUniquePid || (g_iSidUpdateAppliList != 0 && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
 	{
 		cairo_dock_remove_all_applis (pDock);
 	}
@@ -1114,6 +1152,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		if (g_bAutoHide && pDock->iRefCount == 0)
 		{
 			cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MIN_SIZE, &iNewWidth, &iNewHeight);
+			pDock->fLateralFactor = g_fUnfoldAcceleration;
 		}
 		else
 		{
@@ -1122,7 +1161,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		///int Xid = GDK_WINDOW_XID (pDock->pWidget->window);
 		///cairo_dock_set_strut_partial (Xid, 0, 0, 0, iNewHeight);
 		//g_print ("on commence en bas a %dx%d (%d;%d)\n", g_iVisibleZoneWidth, g_iVisibleZoneHeight, pDock->iWindowPositionX, pDock->iWindowPositionY);
-		if (g_bHorizontalDock)
+		if (pDock->bHorizontalDock)
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionX,
 				pDock->iWindowPositionY,

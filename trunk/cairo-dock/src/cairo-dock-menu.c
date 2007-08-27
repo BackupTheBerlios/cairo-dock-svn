@@ -49,7 +49,6 @@ extern gchar *g_cConfFile;
 extern gchar *g_cCurrentThemePath;
 
 extern gboolean g_bDirectionUp;
-extern gboolean g_bHorizontalDock;
 
 extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern GHashTable *g_hModuleTable;
@@ -193,7 +192,7 @@ static void cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data)
 	if (config_ok)
 	{
 		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
-		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cNewDesktopFileName, pCairoContext);
+		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cNewDesktopFileName, pCairoContext, pDock->bHorizontalDock);
 		
 		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, TRUE, TRUE);
 		
@@ -254,7 +253,7 @@ static void cairo_dock_add_launcher (GtkMenuItem *menu_item, gpointer *data)
 			}
 			
 			cDesktopFileName = g_path_get_basename (cFilePath);
-			pNewIcon = cairo_dock_create_icon_from_desktop_file (cDesktopFileName, pCairoContext);
+			pNewIcon = cairo_dock_create_icon_from_desktop_file (cDesktopFileName, pCairoContext, pDock->bHorizontalDock);
 			
 			cairo_dock_insert_icon_in_dock (pNewIcon, pDock, FALSE, TRUE);
 			
@@ -308,7 +307,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 		
 		//\_____________ On recree l'icone.
 		cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
-		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (icon->acDesktopFileName, pCairoContext);
+		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (icon->acDesktopFileName, pCairoContext, pDock->bHorizontalDock);
 		
 		//\_____________ On redistribue les icones du sous-dock si l'icone n'est plus un container.
 		if (icon->pSubDock != NULL)

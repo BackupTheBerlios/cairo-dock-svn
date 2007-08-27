@@ -16,6 +16,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include </usr/include/X11/Xlib.h>
 #include </usr/include/X11/Xatom.h>
 #include </usr/include/X11/Xutil.h>
+#include <signal.h>
 
 #ifdef HAVE_GLITZ
 #include <gdk/gdkx.h>
@@ -42,6 +43,7 @@ extern Atom g_aNetClientList;
 extern GHashTable *g_hXWindowTable;
 extern unsigned int g_iAppliMaxNameLength;
 extern int g_iSidUpdateAppliList;
+extern gboolean g_bUniquePid;
 
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
@@ -91,29 +93,48 @@ void cairo_dock_close_xwindow (Window Xid)
 {
 	//g_print ("%s (%d)\n", __func__, Xid);
 	g_return_if_fail (Xid > 0);
-	XEvent xClientMessage;
 	
-	xClientMessage.xclient.type = ClientMessage;
-	xClientMessage.xclient.serial = 0;
-	xClientMessage.xclient.send_event = True;
-	xClientMessage.xclient.display = g_XDisplay;
-	xClientMessage.xclient.window = Xid;
-	xClientMessage.xclient.message_type = XInternAtom (g_XDisplay, "_NET_CLOSE_WINDOW", False);
-	xClientMessage.xclient.format = 32;
-	xClientMessage.xclient.data.l[0] = cairo_dock_get_xwindow_timestamp (Xid);  // timestamp
-	xClientMessage.xclient.data.l[1] = 2;  // 2 <=> pagers and other Clients that represent direct user actions.
-	xClientMessage.xclient.data.l[2] = 0;
-	xClientMessage.xclient.data.l[3] = 0;
-	xClientMessage.xclient.data.l[4] = 0;
-	
-	Window root = DefaultRootWindow (g_XDisplay);
-	XSendEvent (g_XDisplay,
-		root,
-		False,
-		SubstructureRedirectMask | SubstructureNotifyMask,
-		&xClientMessage);
-	
-	//cairo_dock_set_xwindow_timestamp (Xid, cairo_dock_get_xwindow_timestamp (root));
+	if (g_bUniquePid)
+	{
+		gulong *pPidBuffer = NULL;
+		Atom aReturnedType = 0;
+		int aReturnedFormat = 0;
+		unsigned long iLeftBytes, iBufferNbElements = 0;
+		Atom aNetWmPid = XInternAtom (g_XDisplay, "_NET_WM_PID", False);
+		iBufferNbElements = 0;
+		XGetWindowProperty (g_XDisplay, Xid, aNetWmPid, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pPidBuffer);
+		if (iBufferNbElements > 0)
+		{
+			g_print ("kill (%d)\n", pPidBuffer[0]);
+			kill (pPidBuffer[0], 1);  // 1 : HUP, 2 : INT, 3 : QUIT, 15 : TERM.
+		}
+		XFree (pPidBuffer);
+	}
+	else
+	{
+		XEvent xClientMessage;
+		
+		xClientMessage.xclient.type = ClientMessage;
+		xClientMessage.xclient.serial = 0;
+		xClientMessage.xclient.send_event = True;
+		xClientMessage.xclient.display = g_XDisplay;
+		xClientMessage.xclient.window = Xid;
+		xClientMessage.xclient.message_type = XInternAtom (g_XDisplay, "_NET_CLOSE_WINDOW", False);
+		xClientMessage.xclient.format = 32;
+		xClientMessage.xclient.data.l[0] = cairo_dock_get_xwindow_timestamp (Xid);  // timestamp
+		xClientMessage.xclient.data.l[1] = 2;  // 2 <=> pagers and other Clients that represent direct user actions.
+		xClientMessage.xclient.data.l[2] = 0;
+		xClientMessage.xclient.data.l[3] = 0;
+		xClientMessage.xclient.data.l[4] = 0;
+		
+		Window root = DefaultRootWindow (g_XDisplay);
+		XSendEvent (g_XDisplay,
+			root,
+			False,
+			SubstructureRedirectMask | SubstructureNotifyMask,
+			&xClientMessage);
+		//cairo_dock_set_xwindow_timestamp (Xid, cairo_dock_get_xwindow_timestamp (root));
+	}
 }
 
 

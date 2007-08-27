@@ -157,7 +157,8 @@ int g_iVisibleZoneHeight = 0;
 //		                 ^-- gapX
 
 gboolean g_bDirectionUp = TRUE;  // la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.
-gboolean g_bHorizontalDock = TRUE;  // dit si le dock est horizontal ou vertical.
+gboolean g_bSameHorizontality = TRUE;  // dit si les sous-docks ont la meme horizontalite que les docks racines.
+double g_fSubDockSizeRatio;  // ratio de la taille des icones des sous-docks par rapport a celles du dock principal.
 double g_fAlign;  // alignement, entre 0 et 1, du dock sur le bord de l'ecran.
 gboolean g_bUseText;  // vrai ssi on doit afficher les etiquettes au-dessus des icones.
 int g_iLabelSize;  // taille de la police des etiquettes.
@@ -167,6 +168,7 @@ int g_iLabelStyle;
 gboolean g_bLabelForPointedIconOnly;
 double g_fLabelAlphaThreshold;  // seuil de visibilité de etiquettes.
 
+double g_fUnfoldAcceleration = 0;
 double g_fGrowUpFactor = 1.4;
 double g_fShrinkDownFactor = 0.6;
 double g_fMoveUpSpeed = 0.5;

@@ -43,9 +43,9 @@ extern gchar *g_cCurrentThemePath;
 
 extern double g_fAmplitude;
 extern int g_iSinusoidWidth;
+extern double g_fUnfoldAcceleration;
 
 extern gboolean g_bDirectionUp;
-extern gboolean g_bHorizontalDock;
 extern GHashTable *g_hAppliTable;
 extern gboolean g_bUniquePid;
 extern GHashTable *g_hXWindowTable;
@@ -701,9 +701,9 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 		g_signal_emit_by_name (pDock->pWidget, "leave-notify-event", NULL);
 	}
 	
-	if (bMouseInsideDock && pDock->fMagnitude < 1 && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons))  // on est dedans en x et la taille des icones est non maximale bien qu'aucune icone  ne soit animee.  // && pDock->iSidShrinkDown == 0
+	if (bMouseInsideDock && pDock->fMagnitude < 1 && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons) && pDock->iSidMoveDown == 0)  // on est dedans en x et la taille des icones est non maximale bien qu'aucune icone  ne soit animee.  // && pDock->iSidShrinkDown == 0
 	{
-		if ( (g_bDirectionUp && pPointedIcon != NULL && iMouseY > iHeight - pPointedIcon->fHeight * pPointedIcon->fScale && iMouseY < iHeight) || (! g_bDirectionUp && pPointedIcon != NULL && iMouseY < pPointedIcon->fHeight * pPointedIcon->fScale && iMouseY > 0) )  // et en plus on est dedans en y.
+		if ( (g_bDirectionUp && pPointedIcon != NULL && iMouseY > 0 && iMouseY < iHeight) || (! g_bDirectionUp && pPointedIcon != NULL && iMouseY < iHeight && iMouseY > 0) )  // et en plus on est dedans en y.
 		{
 			//g_print ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone  ne soit animee\n");
 			//pDock->bInside = TRUE;
@@ -719,6 +719,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 				pDock->iSidMoveDown = 0;
 			}
 			pDock->iSidGrowUp = g_timeout_add (75, (GSourceFunc) cairo_dock_grow_up, pDock);
+			pDock->iSidMoveUp = g_timeout_add (40, (GSourceFunc) cairo_dock_move_up, pDock);
 		}
 	}
 	

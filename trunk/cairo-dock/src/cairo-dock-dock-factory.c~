@@ -35,8 +35,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-dock-factory.h"
 
-
+extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
+extern gboolean g_bSameHorizontality;
 
 extern int g_iMaxAuthorizedWidth;
 extern gboolean g_bForceLoop;
@@ -51,7 +52,6 @@ extern gboolean g_bAutoHide;
 extern gchar *g_cCurrentThemePath;
 
 extern gboolean g_bDirectionUp;
-extern gboolean g_bHorizontalDock;
 
 extern int g_iSidUpdateAppliList;
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
@@ -142,6 +142,7 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 	CairoDock *pDock = g_new0 (CairoDock, 1);
 	pDock->bAtBottom = TRUE;
 	pDock->iRefCount = 1;
+	pDock->bHorizontalDock = (g_bSameHorizontality ? g_pMainDock->bHorizontalDock : ! g_pMainDock->bHorizontalDock);
 	
 	GtkWidget* pWindow = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 	pDock->pWidget = pWindow;
@@ -241,7 +242,6 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 #ifdef HAVE_GLITZ
 	if (g_bUseGlitz && pDock->pDrawFormat != NULL)
 	{
-		g_print ("ce dock utilise un format glitz\n");
 		glitz_format_t templ;
 		GdkDisplay	   *gdkdisplay;
 		Display	   *XDisplay;
@@ -325,7 +325,7 @@ void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMin
 		int iNewWidth, iNewHeight;
 		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MAX_SIZE, &iNewWidth, &iNewHeight);  // inutile de recalculer Y mais bon...
 		//g_print ("%s () -> %dx%d\n", __func__, g_iMaxDockWidth, g_iMaxDockHeight);
-		if (g_bHorizontalDock)
+		if (pDock->bHorizontalDock)
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionX,
 				pDock->iWindowPositionY,
@@ -344,7 +344,7 @@ void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMin
 		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);  // inutile de recalculer Y mais bon...
 		//g_print ("%s () -> %dx%d\n", __func__, g_iMaxDockWidth, g_iMaxDockHeight);
 		//g_print ("  W(%d;%d) (%d)\n", pDock->iWindowPositionX, pDock->iWindowPositionY, pDock->iRefCount == 0);
-		if (g_bHorizontalDock)
+		if (pDock->bHorizontalDock)
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionX,
 				pDock->iWindowPositionY,
@@ -358,7 +358,7 @@ void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMin
 				iNewWidth);
 	}
 	
-	cairo_dock_update_background_decorations_if_necessary (pDock, pDock->iMaxDockWidth, pDock->iMaxIconHeight, (g_bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)));
+	cairo_dock_update_background_decorations_if_necessary (pDock, pDock->iMaxDockWidth, pDock->iMaxIconHeight, (pDock->bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)));
 }
 
 
@@ -481,7 +481,7 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 		
 		if (g_str_has_suffix (cFileName, ".desktop"))
 		{
-			icon = cairo_dock_create_icon_from_desktop_file (cFileName, pCairoContext);
+			icon = cairo_dock_create_icon_from_desktop_file (cFileName, pCairoContext, pMainDock->bHorizontalDock);
 			
 			g_return_if_fail (icon->cParentDockName != NULL);
 			
@@ -491,6 +491,7 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 				g_print ("le dock parent (%s) n'existe pas, on le cree\n", icon->cParentDockName);
 				pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->cParentDockName);
 				pParentDock->iRefCount --;
+				pParentDock->bHorizontalDock = g_pMainDock->bHorizontalDock;
 			}
 			
 			cairo_dock_insert_icon_in_dock (icon, pParentDock, FALSE, FALSE);

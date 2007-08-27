@@ -43,7 +43,7 @@ extern gboolean g_bRevolveSeparator;
 extern gboolean g_bUseGlitz;
 
 
-cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
+cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, double fMaxScale, gboolean bHorizontalDock, double *fWidth, double *fHeight)
 {
 	*fWidth = 10;
 	*fHeight = 48;
@@ -55,7 +55,7 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 		double fRotationAngle;
 		if (! g_bRevolveSeparator)
 			fRotationAngle = 0;
-		else if (g_bHorizontalDock)
+		else if (bHorizontalDock)
 			if (g_bDirectionUp)
 				fRotationAngle = 0;
 			else
@@ -112,7 +112,7 @@ Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorT
 {
 	//g_print ("%s ()\n", __func__);
 	double fWidth, fHeight;
-	cairo_surface_t *pSeparatorSurface = cairo_dock_create_separator_surface (pSourceContext, 1 + g_fAmplitude, &fWidth, &fHeight);
+	cairo_surface_t *pSeparatorSurface = cairo_dock_create_separator_surface (pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock, &fWidth, &fHeight);
 	
 	if (pSeparatorSurface == NULL)
 		return NULL;

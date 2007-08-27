@@ -264,7 +264,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	icon->fHeight = fHeight;
 	icon->pIconBuffer = pNewSurface;
 	icon->bIsMapped = TRUE;  // si elle n'est pas visible, le 2eme UnmapNotify sera juste ignore.
-	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_bUseText, g_iLabelSize, g_cLabelPolice);
+	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_bUseText, g_iLabelSize, g_cLabelPolice, pDock->bHorizontalDock);
 	
 	if (g_bUniquePid)
 		g_hash_table_insert (g_hAppliTable, pPidBuffer, icon);
