@@ -38,6 +38,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
 extern gboolean g_bSameHorizontality;
+extern double g_fSubDockSizeRatio;
 
 extern int g_iMaxAuthorizedWidth;
 extern gboolean g_bForceLoop;
@@ -451,10 +452,22 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 }
 
-void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDock, gpointer data)
+static void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDock, gpointer data)
 {
 	if (! pDock->bIsMainDock)
 	{
+		Icon *icon;
+		GList *ic;
+		pDock->iMinDockWidth = -g_iIconGap;
+		for (ic = pDock->icons; ic != NULL; ic = ic->next)
+		{
+			icon = ic->data;
+			icon->fWidth *= g_fSubDockSizeRatio;
+			icon->fHeight *= g_fSubDockSizeRatio;
+			pDock->iMinDockWidth += icon->fWidth + g_iIconGap;
+		}
+		pDock->iMaxIconHeight *= g_fSubDockSizeRatio;
+		
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 		cairo_dock_calculate_icons (pDock, 0, 0);
 		gtk_window_present (GTK_WINDOW (pDock->pWidget));

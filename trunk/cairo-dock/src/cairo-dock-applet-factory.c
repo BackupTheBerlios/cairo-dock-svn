@@ -25,6 +25,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #endif
 
 #include "cairo-dock-load.h"
+#include "cairo-dock-draw.h"
 #include "cairo-dock-applet-factory.h"
 
 

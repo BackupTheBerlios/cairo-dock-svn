@@ -31,6 +31,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-draw.h"
 
 extern GHashTable *g_hDocksTable;
+extern double g_fSubDockSizeRatio;
 
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
@@ -46,7 +47,6 @@ extern int g_iIconGap;
 
 extern gboolean g_bRoundedBottomCorner;
 extern gboolean g_bDirectionUp;
-extern gboolean g_bHorizontalDock;
 extern double g_fAlign;
 extern double g_fStripesSpeedFactor;
 extern double g_fBackgroundImageWidth, g_fBackgroundImageHeight;
@@ -318,7 +318,7 @@ void cairo_dock_calculate_construction_parameters (Icon *icon, int iCurrentWidth
 	icon->fWidthFactor = fWidthFactor;  // son signe nous renseigne sur la position de l'icone (avant-plan ou arriere-plan).
 	icon->fAlpha = fAlpha;
 }
-static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock)
+static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio)
 {
 	//\_____________________ On dessine l'icone en fonction de son placement, son angle, et sa transparence.
 	//cairo_push_group (pCairoContext);
@@ -326,12 +326,12 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboo
 	{
 		cairo_translate (pCairoContext, icon->fDrawX, icon->fDrawY);
 		//cairo_move_to (pCairoContext, fX, fY);
-		cairo_scale (pCairoContext, icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude), icon->fScale / (1 + g_fAmplitude));
+		cairo_scale (pCairoContext, fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fScale / (1 + g_fAmplitude));
 	}
 	else
 	{
 		cairo_translate (pCairoContext, icon->fDrawY, icon->fDrawX);
-		cairo_scale (pCairoContext, icon->fScale / (1 + g_fAmplitude), icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude));
+		cairo_scale (pCairoContext, fRatio * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude));
 	}
 	
 	if (icon->pIconBuffer != NULL)
@@ -558,6 +558,7 @@ void render (CairoDock *pDock)
 	
 	//\____________________ On dessine les icones et les etiquettes, en tenant compte de l'ordre pour dessiner celles en arriere-plan avant celles en avant-plan.
 	//g_print ("--------------------\n");
+	double fRatio = (pDock->iRefCount == 0 ? 1 : g_fSubDockSizeRatio);
 	ic = pFirstDrawnElement;
 	do
 	{
@@ -565,7 +566,7 @@ void render (CairoDock *pDock)
 		cairo_save (pCairoContext);
 		
 		//g_print ("redessin a gauche de %s\n", icon->acName);
-		cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock);
+		cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio);
 		
 		cairo_restore (pCairoContext);
 		ic = cairo_dock_get_next_element (ic, pDock->icons);
@@ -582,7 +583,7 @@ void render (CairoDock *pDock)
 		cairo_save (pCairoContext);
 		
 		//g_print ("redessin a droite de %s\n", icon->acName);
-		cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock);
+		cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio);
 		
 		cairo_restore (pCairoContext);
 		if (ic == pMiddleElement)
@@ -760,6 +761,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 	GList *pFirstDrawnElement = (pDock->pFirstDrawnElement != NULL ? pDock->pFirstDrawnElement : pDock->icons);
 	ic = pFirstDrawnElement;
 	
+	double fRatio = (pDock->iRefCount == 0 ? 1 : g_fSubDockSizeRatio);
 	double fXLeft, fXRight;  // il faut tenir compte de l'inversion si l'icone est en arriere-plan.
 	do
 	{
@@ -783,7 +785,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 			
 			//g_print ("  redessin a gauche de %s\n", icon->acName);
 			cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fLateralFactor);
-			cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock);
+			cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio);
 			
 			cairo_restore (pCairoContext);
 		}
@@ -819,7 +821,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 			
 			//g_print ("  redessin a droite de %s\n", icon->acName);
 			cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fLateralFactor);
-			cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock);
+			cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio);
 			
 			cairo_restore (pCairoContext);
 		}

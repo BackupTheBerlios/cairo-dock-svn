@@ -39,6 +39,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-load.h"
 
 extern GHashTable *g_hDocksTable;
+extern double g_fSubDockSizeRatio;
 
 extern int g_iSinusoidWidth;
 extern gint g_iDockLineWidth;
@@ -276,11 +277,14 @@ static void _cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDo
 	
 	Icon* icon;
 	GList* ic;
+	double fRatio = (pDock->iRefCount == 0 ? 1 : g_fSubDockSizeRatio);
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
 		
 		cairo_dock_fill_one_icon_buffer (icon, pCairoContext, fMaxScale, pDock->bHorizontalDock);
+		icon->fWidth *= fRatio;
+		icon->fHeight *= fRatio;
 		pDock->iMinDockWidth += g_iIconGap + icon->fWidth;
 		pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, icon->fHeight);
 		

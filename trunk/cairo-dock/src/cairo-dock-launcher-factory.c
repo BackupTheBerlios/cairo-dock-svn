@@ -30,6 +30,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-launcher-factory.h"
 
 extern CairoDock *g_pMainDock;
+extern double g_fSubDockSizeRatio;
 
 extern double g_fAmplitude;
 extern int g_iLabelSize;
@@ -421,6 +422,21 @@ void cairo_dock_load_desktop_file_information (gchar *cDesktopFileName, Icon *ic
 		{
 			pChildDock->iRefCount ++;  // peut-etre qu'il faudrait en faire une operation atomique...
 			pChildDock->bHorizontalDock = (g_bSameHorizontality ? g_pMainDock->bHorizontalDock : ! g_pMainDock->bHorizontalDock);
+			if (pChildDock->iRefCount == 1)
+			{
+				Icon *icon;
+				GList *ic;
+				pChildDock->iMinDockWidth = -g_iIconGap;
+				for (ic = pChildDock->icons; ic != NULL; ic = ic->next)
+				{
+					icon = ic->data;
+					icon->fWidth *= g_fSubDockSizeRatio;
+					icon->fHeight *= g_fSubDockSizeRatio;
+					pChildDock->iMinDockWidth += icon->fWidth + g_iIconGap;
+				}
+				pChildDock->iMaxIconHeight *= g_fSubDockSizeRatio;
+				
+			}
 		}
 		icon->pSubDock = pChildDock;
 	}
