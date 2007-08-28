@@ -44,6 +44,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 extern gchar *g_cCurrentThemeName;
 
 extern CairoDock *g_pMainDock;
+extern double g_fSubDockSizeRatio;
 
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentThemePath;
@@ -102,7 +103,7 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 	
 	gchar *cImagePath = g_strdup_printf ("%s/cairo-dock.svg", CAIRO_DOCK_SHARE_DATA_DIR);
 	GtkWidget *pImage = gtk_image_new_from_file (cImagePath);
-	gtk_message_dialog_set_image (GTK_MESSAGE_DIALOG (pDialog), pImage);
+	///gtk_message_dialog_set_image (GTK_MESSAGE_DIALOG (pDialog), pImage);
 	
 	GtkWidget *pLabel = gtk_label_new (NULL);
 	gtk_label_set_use_markup (GTK_LABEL (pLabel), TRUE);
@@ -194,7 +195,7 @@ static void cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data)
 		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
 		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cNewDesktopFileName, pCairoContext, pDock->bHorizontalDock);
 		
-		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, TRUE, TRUE);
+		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 		
 		if (pDock->iSidShrinkDown == 0)
 			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
@@ -255,7 +256,7 @@ static void cairo_dock_add_launcher (GtkMenuItem *menu_item, gpointer *data)
 			cDesktopFileName = g_path_get_basename (cFilePath);
 			pNewIcon = cairo_dock_create_icon_from_desktop_file (cDesktopFileName, pCairoContext, pDock->bHorizontalDock);
 			
-			cairo_dock_insert_icon_in_dock (pNewIcon, pDock, FALSE, TRUE);
+			cairo_dock_insert_icon_in_dock (pNewIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 			
 			g_free (cFilePath);
 		}
@@ -347,7 +348,12 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 			pNewIcon->fOrder = CAIRO_DOCK_LAST_ORDER;
 		}
 		
-		cairo_dock_insert_icon_in_dock (pNewIcon, pNewContainer, TRUE, FALSE);  // pour l'instant on n'empeche pas les bouclages.
+		if (pDock->iRefCount > 0)
+		{
+			icon->fWidth /= g_fSubDockSizeRatio;
+			icon->fHeight /= g_fSubDockSizeRatio;
+		}
+		cairo_dock_insert_icon_in_dock (pNewIcon, pNewContainer, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);  // on n'empeche pas les bouclages.
 		
 		if (pDock != pNewContainer)
 			cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);

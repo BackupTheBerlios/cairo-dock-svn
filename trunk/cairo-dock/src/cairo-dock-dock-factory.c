@@ -365,7 +365,7 @@ void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMin
 
 
 
-void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpdateSize, gboolean bAnimated)
+void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpdateSize, gboolean bAnimated, gboolean bApplyRatio)
 {
 	g_return_if_fail (icon != NULL);
 	
@@ -391,6 +391,12 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 	pDock->icons = g_list_insert_sorted (pDock->icons,
 		icon,
 		(GCompareFunc) cairo_dock_compare_icons_order);
+	
+	if (bApplyRatio && pDock->iRefCount > 0)
+	{
+		icon->fWidth *= g_fSubDockSizeRatio;
+		icon->fHeight *= g_fSubDockSizeRatio;
+	}
 	
 	pDock->iMinDockWidth += g_iIconGap + icon->fWidth;
 	pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, icon->fHeight);
@@ -456,7 +462,7 @@ static void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDo
 {
 	if (! pDock->bIsMainDock)
 	{
-		Icon *icon;
+		/*Icon *icon;
 		GList *ic;
 		pDock->iMinDockWidth = -g_iIconGap;
 		for (ic = pDock->icons; ic != NULL; ic = ic->next)
@@ -466,7 +472,7 @@ static void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDo
 			icon->fHeight *= g_fSubDockSizeRatio;
 			pDock->iMinDockWidth += icon->fWidth + g_iIconGap;
 		}
-		pDock->iMaxIconHeight *= g_fSubDockSizeRatio;
+		pDock->iMaxIconHeight *= g_fSubDockSizeRatio;*/
 		
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 		cairo_dock_calculate_icons (pDock, 0, 0);
@@ -508,7 +514,13 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 				pParentDock->bHorizontalDock = g_pMainDock->bHorizontalDock;
 			}
 			
-			cairo_dock_insert_icon_in_dock (icon, pParentDock, FALSE, FALSE);
+			if (pParentDock->iRefCount > 0)
+			{
+				icon->fWidth *= g_fSubDockSizeRatio;
+				icon->fHeight *= g_fSubDockSizeRatio;
+			}
+			
+			cairo_dock_insert_icon_in_dock (icon, pParentDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, ! CAIRO_DOCK_APPLY_RATIO);
 		}
 	} while (1);
 	g_dir_close (dir);
@@ -618,7 +630,12 @@ void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *Rec
 			}
 			g_key_file_free (pKeyFile);
 			
-			cairo_dock_insert_icon_in_dock (icon, ReceivingDock, FALSE, TRUE);
+			if (pDock->iRefCount > 0)
+			{
+				icon->fWidth /= g_fSubDockSizeRatio;
+				icon->fHeight /= g_fSubDockSizeRatio;
+			}
+			cairo_dock_insert_icon_in_dock (icon, ReceivingDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 		}
 		
 		g_free (cDesktopFilePath);

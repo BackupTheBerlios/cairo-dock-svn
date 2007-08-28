@@ -33,7 +33,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 extern double g_fScrollAcceleration;
 extern gboolean g_bResetScrollOnLeave;
 
-extern int g_iScreenHeight;
+extern int g_iScreenHeight[2];
 
 extern gboolean g_bAutoHide;
 extern gboolean g_bDirectionUp;
@@ -50,7 +50,7 @@ extern double g_fMoveDownSpeed;
 gboolean cairo_dock_move_up (CairoDock *pDock)
 {
 	int deltaY_possible;
-	deltaY_possible = pDock->iWindowPositionY - (g_bDirectionUp ? g_iScreenHeight - pDock->iMaxDockHeight - pDock->iGapY : pDock->iGapY);
+	deltaY_possible = pDock->iWindowPositionY - (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - pDock->iMaxDockHeight - pDock->iGapY : pDock->iGapY);
 	//g_print ("%s (%dx%d -> %d)\n", __func__, pDock->iWindowPositionX, pDock->iWindowPositionY, deltaY_possible);
 	if ((g_bDirectionUp && deltaY_possible > 0) || (! g_bDirectionUp && deltaY_possible < 0))  // alors on peut encore monter.
 	{
@@ -76,7 +76,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 	//g_print ("%s ()\n", __func__);
 	if (pDock->fMagnitude > 0.0)  // on retarde le cachage du dock pour apercevoir les effets.
 		return TRUE;
-	int deltaY_possible = (g_bDirectionUp ? g_iScreenHeight - pDock->iGapY - g_iVisibleZoneHeight : pDock->iGapY + g_iVisibleZoneHeight - pDock->iMaxDockHeight) - pDock->iWindowPositionY;
+	int deltaY_possible = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - pDock->iGapY - g_iVisibleZoneHeight : pDock->iGapY + g_iVisibleZoneHeight - pDock->iMaxDockHeight) - pDock->iWindowPositionY;
 	//g_print ("%s (%d)\n", __func__, deltaY_possible);
 	if ((g_bDirectionUp && deltaY_possible > 8) || (! g_bDirectionUp && deltaY_possible < -8))  // alors on peut encore descendre.
 	{
@@ -138,7 +138,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 
 gboolean cairo_dock_grow_up (CairoDock *pDock)
 {
-	//g_print ("%s (%f ; %f)\n", __func__, pDock->fMagnitude, pDock->fLateralFactor);
+	//g_print ("%s (%f ; %f ; %d)\n", __func__, pDock->fMagnitude, pDock->fLateralFactor, pDock->iSidShrinkDown);
 	if (pDock->iSidShrinkDown != 0)
 		return TRUE;  // on se met en attente de fin d'animation.
 	
@@ -148,7 +148,8 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 	if (pDock->fMagnitude > 1.0)
 		pDock->fMagnitude = 1.0;
 	
-	pDock->fLateralFactor = (pDock->fLateralFactor != 0 ? pow (1.5, - 1. / pDock->fLateralFactor) : 0);  // f(x)-x < 0 pour a > exp(exp(-1)) ~ 1.445.
+	pDock->fLateralFactor *= pDock->fLateralFactor;
+	///pDock->fLateralFactor = (pDock->fLateralFactor != 0 ? pow (1.5, - 1. / pDock->fLateralFactor) : 0);  // f(x)-x < 0 pour a > exp(exp(-1)) ~ 1.445.
 	if (pDock->fLateralFactor < 0.03)
 		pDock->fLateralFactor = 0;
 	
@@ -207,7 +208,6 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 		if (pBouncingIcon == NULL && pRemovingIcon == NULL && (! g_bResetScrollOnLeave || pDock->iScrollOffset == 0))
 		{
 			pDock->fMagnitude = 0;
-			pDock->iSidShrinkDown = 0;
 			int iNewWidth, iNewHeight;
 			
 			if (! (g_bAutoHide && pDock->iRefCount == 0) && ! pDock->bInside)
@@ -241,6 +241,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 				cairo_dock_hide_parent_docks (pDock);
 			}
 			//g_print ("fin du shrink down\n");
+			pDock->iSidShrinkDown = 0;
 			return FALSE;
 		}
 		

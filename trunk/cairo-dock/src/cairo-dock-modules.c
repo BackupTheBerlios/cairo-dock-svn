@@ -215,7 +215,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, GHashTabl
 			if (pIcon != NULL)
 			{
 				pIcon->fOrder = iOrder ++;
-				cairo_dock_insert_icon_in_dock (pIcon, pDock, FALSE, FALSE);
+				cairo_dock_insert_icon_in_dock (pIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 			}
 		}
 		i ++;
@@ -335,7 +335,7 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 	
 	if (pNewIcon != NULL)
 	{
-		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, TRUE, FALSE);
+		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, ! CAIRO_DOCK_APPLY_RATIO);
 		//cairo_dock_redraw_my_icon (pNewIcon, pDock->pWidget);
 	}
 	

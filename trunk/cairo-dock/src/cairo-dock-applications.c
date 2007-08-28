@@ -35,7 +35,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 extern gboolean g_bAutoHide;
 
-extern int g_iScreenWidth, g_iScreenHeight;
+extern int g_iScreenWidth[2], g_iScreenHeight[2];
 
 extern Display *g_XDisplay;
 extern Screen *g_XScreen;
@@ -300,13 +300,13 @@ void cairo_dock_move_xwindow_to_nth_desktop (Window Xid, int iDesktopNumber, int
 	XGetGeometry(g_XDisplay, Xid, &root_return, &x_return, &y_return, &width_return, 
 		&height_return, &border_width_return, &depth_return);
 	while (x_return < 0)
-		x_return += g_iScreenWidth;
-	while (x_return >= g_iScreenWidth)
-		x_return -= g_iScreenWidth;
+		x_return += g_iScreenWidth[CAIRO_DOCK_HORIZONTAL];
+	while (x_return >= g_iScreenWidth[CAIRO_DOCK_HORIZONTAL])
+		x_return -= g_iScreenWidth[CAIRO_DOCK_HORIZONTAL];
 	while (y_return < 0)
-		y_return += g_iScreenHeight;
-	while (y_return >= g_iScreenHeight)
-		y_return -= g_iScreenHeight;
+		y_return += g_iScreenHeight[CAIRO_DOCK_HORIZONTAL];
+	while (y_return >= g_iScreenHeight[CAIRO_DOCK_HORIZONTAL])
+		y_return -= g_iScreenHeight[CAIRO_DOCK_HORIZONTAL];
 	//g_print ("position relative : (%d;%d)\n", x_return, y_return);
 	
 	xClientMessage.xclient.type = ClientMessage;
@@ -546,7 +546,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 				icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xcreatewindow.window, pDock);
 				if (icon != NULL)
 				{
-					cairo_dock_insert_icon_in_dock (icon, pDock, TRUE, TRUE);
+					cairo_dock_insert_icon_in_dock (icon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 					if (! pDock->bInside && g_bAutoHide && pDock->bAtBottom)
 						icon->fPersonnalScale = - 0.05;
 					if (pDock->iSidShrinkDown == 0)
@@ -622,7 +622,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 				icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xmap.window, pDock);
 				if (icon != NULL)
 				{
-					cairo_dock_insert_icon_in_dock (icon, pDock, TRUE, TRUE);
+					cairo_dock_insert_icon_in_dock (icon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 					if (! pDock->bInside && g_bAutoHide && pDock->bAtBottom)
 						icon->fPersonnalScale = - 0.05;
 					if (pDock->iSidShrinkDown == 0)
@@ -679,7 +679,7 @@ void cairo_dock_show_all_applis (CairoDock *pDock)
 		pIcon = cairo_dock_create_icon_from_xwindow (pCairoContext, Xid, pDock);
 		
 		if (pIcon != NULL)
-			cairo_dock_insert_icon_in_dock (pIcon, pDock, FALSE, FALSE);
+			cairo_dock_insert_icon_in_dock (pIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 		//if (pIcon != NULL)
 		//	g_print (">>>>>>>>>>>> Xid : %d\n", Xid);
 	}

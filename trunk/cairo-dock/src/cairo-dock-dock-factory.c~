@@ -38,7 +38,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
 extern gboolean g_bSameHorizontality;
-extern bouble g_fSubDockSizeRatio;
+extern double g_fSubDockSizeRatio;
 
 extern int g_iMaxAuthorizedWidth;
 extern gboolean g_bForceLoop;
@@ -456,7 +456,7 @@ static void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDo
 {
 	if (! pDock->bIsMainDock)
 	{
-		Icon *icon;
+		/*Icon *icon;
 		GList *ic;
 		pDock->iMinDockWidth = -g_iIconGap;
 		for (ic = pDock->icons; ic != NULL; ic = ic->next)
@@ -466,7 +466,7 @@ static void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDo
 			icon->fHeight *= g_fSubDockSizeRatio;
 			pDock->iMinDockWidth += icon->fWidth + g_iIconGap;
 		}
-		pDock->iMaxIconHeight *= g_fSubDockSizeRatio;
+		pDock->iMaxIconHeight *= g_fSubDockSizeRatio;*/
 		
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 		cairo_dock_calculate_icons (pDock, 0, 0);
@@ -506,6 +506,12 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 				pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->cParentDockName);
 				pParentDock->iRefCount --;
 				pParentDock->bHorizontalDock = g_pMainDock->bHorizontalDock;
+			}
+			
+			if (pParentDock->iRefCount > 0)
+			{
+				icon->fWidth *= g_fSubDockSizeRatio;
+				icon->fHeight *= g_fSubDockSizeRatio;
 			}
 			
 			cairo_dock_insert_icon_in_dock (icon, pParentDock, FALSE, FALSE);

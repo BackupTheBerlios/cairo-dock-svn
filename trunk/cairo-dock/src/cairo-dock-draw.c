@@ -30,11 +30,12 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-callbacks.h"
 #include "cairo-dock-draw.h"
 
+extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
 extern double g_fSubDockSizeRatio;
 
-extern gint g_iScreenWidth;
-extern gint g_iScreenHeight;
+extern gint g_iScreenWidth[2];
+extern gint g_iScreenHeight[2];
 extern gint g_iMaxAuthorizedWidth;
 extern gboolean g_bForceLoop;
 
@@ -199,7 +200,7 @@ void cairo_dock_calculate_construction_parameters (Icon *icon, int iCurrentWidth
 	double fDeltaLeft = (iMaxDockWidth - iCurrentWidth - icon->fWidth * icon->fScale) / 2, fDeltaRight = fDeltaLeft;
 	double fX, fY, fAlpha, fTheta;
 	fX = icon->fX + (iCurrentWidth - iMaxDockWidth) / 2;
-	fX = g_fAlign * iCurrentWidth + (fX - g_fAlign * iCurrentWidth) * (1 - fLateralFactor);
+	//fX = g_fAlign * iCurrentWidth + (fX - g_fAlign * iCurrentWidth) * (1 - fLateralFactor);
 	//g_print ("(%s) icon->fX : %.2f -> %.2f\n", icon->acName, icon->fX, fX);
 	if (fX >= 0 && fX + icon->fWidth * icon->fScale <= iCurrentWidth)
 	{
@@ -313,7 +314,7 @@ void cairo_dock_calculate_construction_parameters (Icon *icon, int iCurrentWidth
 		icon->iCount --;
 	}
 	
-	icon->fDrawX = fX;  // g_fAlign * iCurrentWidth + (fX - g_fAlign * iCurrentWidth) * (1 - fLateralFactor);
+	icon->fDrawX = g_fAlign * iCurrentWidth + (fX - g_fAlign * iCurrentWidth) * (1 - fLateralFactor);
 	icon->fDrawY = fY;
 	icon->fWidthFactor = fWidthFactor;  // son signe nous renseigne sur la position de l'icone (avant-plan ou arriere-plan).
 	icon->fAlpha = fAlpha;
@@ -362,7 +363,7 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboo
 	}
 }
 
-void render (CairoDock *pDock)
+void cairo_dock_render (CairoDock *pDock)
 {
 	double fChangeAxes = 0.5 * (pDock->iCurrentWidth - pDock->iMaxDockWidth);
 	double fLineWidth = g_iDockLineWidth;
@@ -852,7 +853,7 @@ static gboolean _cairo_dock_hide_dock (gchar *cDockName, CairoDock *pDock, Cairo
 			{
 				pDock->iScrollOffset = 0;
 				cairo_dock_calculate_icons (pDock, pDock->iCurrentWidth / 2, 0);
-				render (pDock);
+				cairo_dock_render (pDock);
 			}
 			
 			gdk_window_hide (pDock->pWidget->window);
@@ -899,13 +900,13 @@ gboolean cairo_dock_hide_child_docks (CairoDock *pDock)
 
 void cairo_dock_calculate_window_position_at_balance (CairoDock *pDock, CairoDockSizeType iSizeType, int *iNewWidth, int *iNewHeight)
 {
-	double fAlign = (pDock->iRefCount == 0 ? g_fAlign : .5);
+	double fAlign = (pDock->iRefCount == 0 ? g_fAlign : (pDock->bHorizontalDock == g_pMainDock->bHorizontalDock ? .5 : (g_bDirectionUp ? 1 : 0)));
 	if (iSizeType == CAIRO_DOCK_MAX_SIZE)
 	{
 		*iNewWidth = (g_bForceLoop && pDock->iRefCount == 0 ? pDock->iMaxDockWidth / 2 : MIN (g_iMaxAuthorizedWidth, pDock->iMaxDockWidth));
 		*iNewHeight = pDock->iMaxDockHeight;
-		pDock->iWindowPositionX = (g_iScreenWidth - *iNewWidth) * fAlign + pDock->iGapX;
-		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - (*iNewHeight) - pDock->iGapY : pDock->iGapY);
+		pDock->iWindowPositionX = (g_iScreenWidth[pDock->bHorizontalDock] - *iNewWidth) * fAlign + pDock->iGapX;
+		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - (*iNewHeight) - pDock->iGapY : pDock->iGapY);
 	}
 	else if (iSizeType == CAIRO_DOCK_NORMAL_SIZE)
 	{
@@ -913,24 +914,24 @@ void cairo_dock_calculate_window_position_at_balance (CairoDock *pDock, CairoDoc
 		if (g_bForceLoop && *iNewWidth > pDock->iMaxDockWidth / 2)
 			*iNewWidth = pDock->iMaxDockWidth / 2;
 		*iNewHeight = pDock->iMaxIconHeight + 2 * g_iDockLineWidth;
-		pDock->iWindowPositionX = (g_iScreenWidth - *iNewWidth) * fAlign + pDock->iGapX;
-		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - (*iNewHeight) - pDock->iGapY : pDock->iGapY);
+		pDock->iWindowPositionX = (g_iScreenWidth[pDock->bHorizontalDock] - *iNewWidth) * fAlign + pDock->iGapX;
+		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - (*iNewHeight) - pDock->iGapY : pDock->iGapY);
 	}
 	else
 	{
 		*iNewWidth = g_iVisibleZoneWidth;
 		*iNewHeight = g_iVisibleZoneHeight;
-		pDock->iWindowPositionX = (g_iScreenWidth - *iNewWidth) * fAlign + pDock->iGapX;
-		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - (*iNewHeight) - pDock->iGapY : pDock->iGapY);
+		pDock->iWindowPositionX = (g_iScreenWidth[pDock->bHorizontalDock] - *iNewWidth) * fAlign + pDock->iGapX;
+		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - (*iNewHeight) - pDock->iGapY : pDock->iGapY);
 	}
 	
 	if (pDock->iWindowPositionX < 0)
 		pDock->iWindowPositionX = 0;
-	else if (pDock->iWindowPositionX > g_iScreenWidth)
-		pDock->iWindowPositionX = g_iScreenWidth;
+	else if (pDock->iWindowPositionX > g_iScreenWidth[pDock->bHorizontalDock])
+		pDock->iWindowPositionX = g_iScreenWidth[pDock->bHorizontalDock];
 	
 	if (pDock->iWindowPositionY < 0)
 		pDock->iWindowPositionY = 0;
-	else if (pDock->iWindowPositionY > g_iScreenHeight)
-		pDock->iWindowPositionY = g_iScreenHeight;
+	else if (pDock->iWindowPositionY > g_iScreenHeight[pDock->bHorizontalDock])
+		pDock->iWindowPositionY = g_iScreenHeight[pDock->bHorizontalDock];
 }

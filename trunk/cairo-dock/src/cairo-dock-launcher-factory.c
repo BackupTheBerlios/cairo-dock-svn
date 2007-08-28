@@ -63,7 +63,7 @@ gchar *cairo_dock_search_image_path (gchar *cFileName)
 	//\_______________________ On construit le chemin de l'icone a afficher.
 	if (*cFileName == '~')
 	{
-		g_string_printf (sIconPath, "%s%s", getenv ("HOME"), cFileName+1);
+		g_string_printf (sIconPath, "%s%s", g_getenv ("HOME"), cFileName+1);
 	}
 	else if (*cFileName == '/')
 	{
@@ -103,7 +103,7 @@ gchar *cairo_dock_search_image_path (gchar *cFileName)
 		}
 		
 		if (! bFileFound)
-			g_string_truncate (sIconPath, 0);
+			g_string_printf (sIconPath, cFileName);
 	}
 	
 	gchar *cIconPath = sIconPath->str;
@@ -287,8 +287,10 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 	
 	if (fRotationAngle != 0)
 	{
-		cairo_surface_t *pNewSurfaceRotated;
-		if (fabs (fRotationAngle) > G_PI / 2)
+		cairo_surface_t *pNewSurfaceRotated = cairo_dock_rotate_surface (pNewSurface, pSourceContext, *fImageWidth * fMaxScale, *fImageHeight * fMaxScale, fRotationAngle);
+		cairo_surface_destroy (pNewSurface);
+		pNewSurface = pNewSurfaceRotated;
+		/*if (fabs (fRotationAngle) > G_PI / 2)
 		{
 			pNewSurfaceRotated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 				CAIRO_CONTENT_COLOR_ALPHA,
@@ -326,11 +328,62 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 		
 		cairo_paint (pCairoContext);
 		cairo_surface_destroy (pNewSurface);
-		pNewSurface = pNewSurfaceRotated;
+		pNewSurface = pNewSurfaceRotated;*/
 	}
 	
 	cairo_destroy (pCairoContext);
 	return pNewSurface;
+}
+
+cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fRotationAngle)
+{
+	if (fRotationAngle != 0)
+	{
+		cairo_surface_t *pNewSurfaceRotated;
+		cairo_t *pCairoContext;
+		if (fabs (fRotationAngle) > G_PI / 2)
+		{
+			pNewSurfaceRotated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+				CAIRO_CONTENT_COLOR_ALPHA,
+				fImageWidth,
+				fImageHeight);
+			pCairoContext = cairo_create (pNewSurfaceRotated);
+			
+			cairo_translate (pCairoContext, 0, fImageHeight);
+			cairo_scale (pCairoContext, 1, -1);
+		}
+		else
+		{
+			pNewSurfaceRotated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+				CAIRO_CONTENT_COLOR_ALPHA,
+				fImageHeight,
+				fImageWidth);
+			pCairoContext = cairo_create (pNewSurfaceRotated);
+			
+			if (fRotationAngle < 0)
+			{
+				cairo_move_to (pCairoContext, fImageHeight, 0);
+				cairo_rotate (pCairoContext, fRotationAngle);
+				cairo_translate (pCairoContext, - fImageWidth, 0);
+			}
+			else
+			{
+				cairo_move_to (pCairoContext, 0, 0);
+				cairo_rotate (pCairoContext, fRotationAngle);
+				cairo_translate (pCairoContext, 0, - fImageHeight);
+			}
+		}
+		cairo_set_source_surface (pCairoContext, pSurface, 0, 0);
+		cairo_paint (pCairoContext);
+		
+		cairo_destroy (pCairoContext);
+		return pNewSurfaceRotated;
+	}
+	else
+	{
+		g_object_ref (pSurface);
+		return pSurface;
+	}
 }
 
 

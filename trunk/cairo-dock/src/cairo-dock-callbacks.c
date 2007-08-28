@@ -39,12 +39,12 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 static Icon *s_pIconClicked = NULL;  // pour savoir quand on deplace une icone a la souris.
 static CairoDock *s_pLastPointedDock = NULL;  // pour savoir quand on passe d'un dock a un autre.
 static int s_iSidNonStopScrolling = 0;
-static int s_iScrollDirection = 0;
 
 extern CairoDock *g_pMainDock;
+extern double g_fSubDockSizeRatio;
 
-extern gint g_iScreenWidth;
-extern gint g_iScreenHeight;
+extern gint g_iScreenWidth[2];
+extern gint g_iScreenHeight[2];
 extern int g_iScrollAmount;
 extern gboolean g_bResetScrollOnLeave;
 
@@ -84,7 +84,7 @@ gboolean on_expose (GtkWidget *pWidget,
 	
 	if (!pDock->bAtBottom)
 	{
-		render (pDock);
+		cairo_dock_render (pDock);
 	}
 	else
 	{
@@ -96,7 +96,7 @@ gboolean on_expose (GtkWidget *pWidget,
 				cairo_dock_render_background (pDock);
 		}
 		else
-			render (pDock);
+			cairo_dock_render (pDock);
 	}
 	
 	return FALSE;
@@ -179,14 +179,24 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 				cairo_dock_shrink_down (pSubDock);
 			}
 			
-			pSubDock->iGapX = iX + pDock->iWindowPositionX - g_iScreenWidth / 2; // les sous-dock ont un alignement egal a 0.5.  // pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2
-			pSubDock->iGapY = pDock->iGapY + pDock->iMaxDockHeight;
-			
+			if (pSubDock->bHorizontalDock == pDock->bHorizontalDock)
+			{
+				pSubDock->iGapX = iX + pDock->iWindowPositionX - g_iScreenWidth[pDock->bHorizontalDock] / 2; // les sous-dock ont un alignement egal a 0.5.  // pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2
+				pSubDock->iGapY = pDock->iGapY + pDock->iMaxDockHeight;
+			}
+			else
+			{
+				pSubDock->iGapX = pDock->iGapY + pDock->iMaxDockHeight;
+				if (g_bDirectionUp)
+					pSubDock->iGapY = g_iScreenWidth[pDock->bHorizontalDock] - (iX + pDock->iWindowPositionX);  // les sous-dock ont un alignement egal a 1.
+				else
+					pSubDock->iGapY = iX + pDock->iWindowPositionX;  // les sous-dock ont un alignement egal a 0.
+			}
 			int iNewWidth, iNewHeight;
 			cairo_dock_calculate_window_position_at_balance (pSubDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
 			
-			//g_print ("  -> (%d;%d) (%d)\n", pSubDock->iWindowPositionX, pSubDock->iWindowPositionY, pSubDock->iRefCount == 0);
-			if (pDock->bHorizontalDock)
+			g_print ("  -> (%d;%d) (%d)\n", pSubDock->iWindowPositionX, pSubDock->iWindowPositionY, pSubDock->bHorizontalDock);
+			if (pSubDock->bHorizontalDock)
 				gtk_window_move (GTK_WINDOW (pSubDock->pWidget), pSubDock->iWindowPositionX, pSubDock->iWindowPositionY);
 			else
 				gtk_window_move (GTK_WINDOW (pSubDock->pWidget), pSubDock->iWindowPositionY, pSubDock->iWindowPositionX);
@@ -234,7 +244,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	}
 	
 	if (pDock->iSidShrinkDown == 0)  // on commence a faire diminuer la taille des icones.
-		pDock->iSidShrinkDown = g_timeout_add (35, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+		pDock->iSidShrinkDown = g_timeout_add (40, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 	
 	s_pLastPointedDock = NULL;
 	//g_print ("s_pLastPointedDock <- NULL\n");
@@ -247,6 +257,12 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	if (pDock->bAtBottom )  // || ! pDock->bInside
 		return FALSE;
 	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	
+	if (s_iSidNonStopScrolling > 0)
+	{
+		g_source_remove (s_iSidNonStopScrolling);
+		s_iSidNonStopScrolling = 0;
+	}
 	
 	while (gtk_events_pending ())  // on laisse le temps au signal d'entree dans le sous-dock d'etre traite.
 		gtk_main_iteration ();
@@ -277,7 +293,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	int iActualPositionY = pDock->iWindowPositionY;
 	cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MAX_SIZE, &iNewWidth, &iNewHeight);
 	if ((g_bAutoHide && pDock->iRefCount == 0) && pDock->bAtBottom)
-		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight - g_iVisibleZoneHeight - pDock->iGapY : g_iVisibleZoneHeight + pDock->iGapY - pDock->iMaxDockHeight);
+		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - g_iVisibleZoneHeight - pDock->iGapY : g_iVisibleZoneHeight + pDock->iGapY - pDock->iMaxDockHeight);
 	
 	///if (pDock->bAtBottom || ! (g_bAutoHide && pDock->iRefCount == 0))
 	if (pDock->bHorizontalDock)
@@ -319,7 +335,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	}
 	if (pDock->iSidGrowUp == 0)  // on commence a faire grossir les icones.  //  && pDock->iSidShrinkDown == 0
 	{
-		pDock->iSidGrowUp = g_timeout_add (35, (GSourceFunc) cairo_dock_grow_up, (gpointer) pDock);
+		pDock->iSidGrowUp = g_timeout_add (40, (GSourceFunc) cairo_dock_grow_up, (gpointer) pDock);
 	}
 	
 	return FALSE;
@@ -345,8 +361,8 @@ void cairo_dock_update_gaps_with_window_position (CairoDock *pDock)
 	x = pDock->iWindowPositionX + iWidth * g_fAlign;
 	y = (g_bDirectionUp ? pDock->iWindowPositionY + iHeight : pDock->iWindowPositionY);
 	
-	pDock->iGapX = x - g_iScreenWidth * g_fAlign;
-	pDock->iGapY = (g_bDirectionUp ? g_iScreenHeight - y : y);
+	pDock->iGapX = x - g_iScreenWidth[pDock->bHorizontalDock] * g_fAlign;
+	pDock->iGapY = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - y : y);
 	
 	if (pDock->bIsMainDock)
 		cairo_dock_update_conf_file_with_position (g_cConfFile, pDock->iGapX, pDock->iGapY);
@@ -381,7 +397,7 @@ static int _move_up_by_arrow (int iMoveByArrow, CairoDock *pDock)
 }
 static int _move_down_by_arrow (int iMoveByArrow, CairoDock *pDock)
 {
-	int iPossibleMove = MAX (0, g_iScreenHeight - (pDock->iWindowPositionY + pDock->iCurrentHeight));
+	int iPossibleMove = MAX (0, g_iScreenHeight[pDock->bHorizontalDock] - (pDock->iWindowPositionY + pDock->iCurrentHeight));
 	int iEffectiveMove = MIN (iMoveByArrow, iPossibleMove);
 	//g_print ("%s () : iPossibleMove=%d->%d\n", __func__, iPossibleMove, iEffectiveMove);
 	if (iEffectiveMove > 0)
@@ -404,7 +420,7 @@ static int _move_left_by_arrow (int iMoveByArrow, CairoDock *pDock)
 }
 static int _move_right_by_arrow (int iMoveByArrow, CairoDock *pDock)
 {
-	int iPossibleMove = MAX (0, g_iScreenWidth - (pDock->iWindowPositionX + pDock->iCurrentWidth));
+	int iPossibleMove = MAX (0, g_iScreenWidth[pDock->bHorizontalDock] - (pDock->iWindowPositionX + pDock->iCurrentWidth));
 	int iEffectiveMove = MIN (iMoveByArrow, iPossibleMove);
 	if (iEffectiveMove > 0)
 	{
@@ -530,6 +546,8 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 					cairo_dock_update_dock_size (pOriginDock, pOriginDock->iMaxIconHeight, pOriginDock->iMinDockWidth);
 					
 					cairo_dock_update_icon_s_container_name (s_pIconClicked, icon->cParentDockName);
+					icon->fWidth *= (pDock->iRefCount == 0 ? 1. : g_fSubDockSizeRatio) / (pOriginDock->iRefCount == 0 ? 1. : g_fSubDockSizeRatio);
+					icon->fHeight *= (pDock->iRefCount == 0 ? 1. : g_fSubDockSizeRatio) / (pOriginDock->iRefCount == 0 ? 1. : g_fSubDockSizeRatio);
 				}
 				
 				s_pIconClicked->iAnimationType = CAIRO_DOCK_BOUNCE;
@@ -560,7 +578,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				gtk_widget_queue_draw (pWidget);
 				
 				if (pDock->iSidShrinkDown == 0)  // on commence a faire diminuer la taille des icones.
-					pDock->iSidShrinkDown = g_timeout_add (35, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+					pDock->iSidShrinkDown = g_timeout_add (40, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 			}
 			s_pIconClicked = NULL;
 		}
@@ -611,7 +629,7 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 	GdkEventScroll* pScroll = data[0];
 	CairoDock *pDock = data[1];
 	gboolean bAutoScroll = GPOINTER_TO_INT (data[2]);
-	pScroll->time += 10 * g_fRefreshInterval;
+	//pScroll->time += 10 * g_fRefreshInterval;
 	
 	//g_print ("%s (%d, %.2f)\n", __func__, pDock->iSidShrinkDown, pDock->fMagnitude);
 	if (pDock->iSidShrinkDown != 0 || pDock->fMagnitude == 0)
@@ -649,10 +667,28 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 	
 	//\_______________ On recalcule toutes les icones.
 	Icon *pPointedIcon;
-	if (pDock->bHorizontalDock)
-		pPointedIcon = cairo_dock_calculate_icons (pDock, (int) pScroll->x, (int) pScroll->y);
+	int iX, iY;
+	if (bAutoScroll)
+	{
+		if (pDock->bHorizontalDock)
+			gdk_window_get_pointer (pDock->pWidget->window, &iX, &iY, NULL);
+		else
+			gdk_window_get_pointer (pDock->pWidget->window, &iY, &iX, NULL);
+	}
 	else
-		pPointedIcon = cairo_dock_calculate_icons (pDock, (int) pScroll->y, (int) pScroll->x);
+	{
+		if (pDock->bHorizontalDock)
+		{
+			iX = pScroll->x;
+			iY = pScroll->y;
+		}
+		else
+		{
+			iX = pScroll->y;
+			iY = pScroll->x;
+		}
+	}
+	pPointedIcon = cairo_dock_calculate_icons (pDock,  iX, iY);
 	gtk_widget_queue_draw (pDock->pWidget);
 	
 	//\_______________ On montre les sous-docks.
@@ -677,10 +713,18 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 				cairo_dock_shrink_down (pSubDock);
 			}
 			
-			gboolean bIsLoop = pDock->iRefCount == 0 && 1. * pDock->iCurrentWidth / pDock->iMaxDockWidth < .6 && pDock->bInside;
+			gboolean bIsLoop = (pDock->iRefCount == 0 && 1. * pDock->iCurrentWidth / pDock->iMaxDockWidth < .6 && pDock->bInside);
 			cairo_dock_calculate_construction_parameters (pPointedIcon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fLateralFactor);  // c'est un peu un hack pourri, l'idee c'est de recalculer la position exacte de l'icone pointee pour pouvoir placer le sous-dock precisement, car sa derniere position connue est decalee d'un coup de molette par rapport a la nouvelle, ce qui fait beaucoup.
-			pSubDock->iGapX = pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 + pDock->iWindowPositionX - g_iScreenWidth / 2; // les sous-dock ont un alignement egal a 0.5.
-			pSubDock->iGapY = pDock->iGapY + pDock->iMaxDockHeight;
+			if (pSubDock->bHorizontalDock == pDock->bHorizontalDock)
+			{
+				pSubDock->iGapX = iX + pDock->iWindowPositionX - g_iScreenWidth[pDock->bHorizontalDock] / 2; // les sous-dock ont un alignement egal a 0.5.  // pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2
+				pSubDock->iGapY = pDock->iGapY + pDock->iMaxDockHeight;
+			}
+			else
+			{
+				pSubDock->iGapX = pDock->iGapY + pDock->iMaxDockHeight;
+				pSubDock->iGapY = iX + pDock->iWindowPositionX - g_iScreenWidth[pDock->bHorizontalDock] / 2; // les sous-dock ont un alignement egal a 0.5.
+			}
 			
 			int iNewWidth, iNewHeight;
 			cairo_dock_calculate_window_position_at_balance (pSubDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
@@ -864,7 +908,7 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 			cairo_destroy (pCairoContext);
 			
 			if (pNewIcon != NULL)
-				cairo_dock_insert_icon_in_dock (pNewIcon, pReceivingDock, TRUE, TRUE);
+				cairo_dock_insert_icon_in_dock (pNewIcon, pReceivingDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 			
 			if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
 				pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);

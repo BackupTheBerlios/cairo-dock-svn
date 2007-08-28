@@ -94,8 +94,8 @@ int g_iWmHint;  // hint pour la fenetre du dock principal.
 gchar *g_cLanguage = NULL;  // langue courante.
 
 gboolean g_bReverseVisibleImage;  // retrouner l'image de la zone de rappel quand le dock est en haut.
-gint g_iScreenWidth = 0;  // dimensions de l'ecran.
-gint g_iScreenHeight = 0;
+gint g_iScreenWidth[2];  // dimensions de l'ecran.
+gint g_iScreenHeight[2];
 int g_iMaxAuthorizedWidth;  // largeur maximale autorisee pour la fenetre (0 pour la taille de l'ecran).
 int g_iScrollAmount;  // de combien de pixels fait defiler un coup de molette.
 gboolean g_bResetScrollOnLeave;  // revenir a un defilement nul lorsqu'on quitte la fenetre.
@@ -302,9 +302,6 @@ main (int argc, char** argv)
 	g_pMainDock = cairo_dock_create_new_dock (g_iWmHint, CAIRO_DOCK_MAIN_DOCK_NAME);
 	g_pMainDock->bIsMainDock = TRUE;
 	g_pMainDock->iRefCount --;
-	GdkScreen *gdkscreen = gtk_window_get_screen (GTK_WINDOW (g_pMainDock->pWidget));
-	g_iScreenWidth = gdk_screen_get_width (gdkscreen);
-	g_iScreenHeight = gdk_screen_get_height (gdkscreen);
 	
 	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
 	g_cCairoDockDataDir = g_strdup_printf ("%s/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR);

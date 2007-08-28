@@ -88,8 +88,8 @@ extern double g_fStripesAngle;
 
 extern gchar *g_cDefaultFileBrowser;
 
-extern int g_iScreenWidth;
-extern int g_iScreenHeight;
+extern int g_iScreenWidth[2];
+extern int g_iScreenHeight[2];
 
 extern double g_fUnfoldAcceleration;
 extern double g_fGrowUpFactor;
@@ -371,6 +371,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	
 	
 	//\___________________ On recupere les parametres des lanceurs.
+	length = 0;
 	gchar **directoryList = g_key_file_get_string_list (fconf, "LAUNCHERS", "default icon directory", &length, &erreur);
 	if (erreur != NULL)
 	{
@@ -383,11 +384,46 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		bFlushConfFileNeeded = TRUE;
 	}
 	g_strfreev (g_cDefaultIconDirectory);
-	g_cDefaultIconDirectory = g_new0 (gchar *, length + 2);
-	g_cDefaultIconDirectory[0] = g_strdup (g_cCurrentThemePath);
-	if (directoryList != NULL && length > 0)
-		memcpy (&g_cDefaultIconDirectory[1], directoryList, length * sizeof (gchar *));
-	g_free (directoryList);
+	g_cDefaultIconDirectory = g_new0 (gchar *, length + 2);  // +1 pour le NULL final, +1 pour le repertoire du theme.
+	if (directoryList == NULL)
+	{
+		g_cDefaultIconDirectory[0] = g_strdup (g_cCurrentThemePath);
+	}
+	else
+	{
+		gboolean bAddThemeDirectory = TRUE;
+		int i = 0, j = 0;
+		while (directoryList[i] != NULL)
+		{
+			if (directoryList[i][0] == '~')
+			{
+				g_cDefaultIconDirectory[j] = g_strdup_printf ("%s%s", getenv ("HOME"), directoryList[i]+1);
+			}
+			else if (directoryList[i][0] == '/')
+			{
+				g_cDefaultIconDirectory[j] = g_strdup (directoryList[i]);
+			}
+			else if (strncmp (directoryList[i], "_ThemeDirectory_", 16) == 0)
+			{
+				g_cDefaultIconDirectory[j] = g_strdup_printf ("%s%s", g_cCurrentThemePath, directoryList[i]+16);
+				if (directoryList[i]+16 == '\0')
+					bAddThemeDirectory = FALSE;
+			}
+			else
+			{
+				g_print ("Attention : invalid directory name (%s), will be ignored\n", directoryList[i]);
+				j --;
+			}
+			//g_print ("+ %s\n", g_cDefaultIconDirectory[j]);
+			i ++;
+			j ++;
+		}
+		if (bAddThemeDirectory)
+		{
+			g_cDefaultIconDirectory[j] = g_strdup (g_cCurrentThemePath);
+		}
+	}
+	g_strfreev (directoryList);
 	
 	g_tMaxIconAuthorizedSize[CAIRO_DOCK_LAUNCHER] = g_key_file_get_integer (fconf, "LAUNCHERS", "max icon size", &erreur);
 	if (erreur != NULL)
@@ -650,16 +686,18 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	}
 	g_free (couleur);
 	
-	g_fUnfoldAcceleration = g_key_file_get_double (fconf, "CAIRO DOCK", "unfold factor", &erreur);
+	double fUserValue = g_key_file_get_double (fconf, "CAIRO DOCK", "unfold factor", &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
-		g_fUnfoldAcceleration = 0.9;  // valeur par defaut.
-		g_key_file_set_double (fconf, "CAIRO DOCK", "unfold factor", g_fUnfoldAcceleration);
+		fUserValue = 8;  // valeur par defaut.
+		g_key_file_set_double (fconf, "CAIRO DOCK", "unfold factor", fUserValue);
 		bFlushConfFileNeeded = TRUE;
 	}
+	g_fUnfoldAcceleration = 1 - pow (2, - fUserValue);
+	g_print ("g_fUnfoldAcceleration <- %f\n", g_fUnfoldAcceleration);
 	
 	g_fGrowUpFactor = g_key_file_get_double (fconf, "CAIRO DOCK", "grow up factor", &erreur);
 	if (erreur != NULL)
@@ -1068,40 +1106,34 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	//\___________________ On (re)charge tout, car n'importe quel parametre peut avoir change.
 	if (strcmp (cScreenBorder, "bottom") == 0)
 	{
-		pDock->bHorizontalDock = TRUE;
+		pDock->bHorizontalDock = CAIRO_DOCK_HORIZONTAL;
 		g_bDirectionUp = TRUE;
 	}
 	else if (strcmp (cScreenBorder, "top") == 0)
 	{
-		pDock->bHorizontalDock = TRUE;
+		pDock->bHorizontalDock = CAIRO_DOCK_HORIZONTAL;
 		g_bDirectionUp = FALSE;
 	}
 	else if (strcmp (cScreenBorder, "right") == 0)
 	{
-		pDock->bHorizontalDock = FALSE;
+		pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
 		g_bDirectionUp = TRUE;
 	}
 	else if (strcmp (cScreenBorder, "left") == 0)
 	{
-		pDock->bHorizontalDock = FALSE;
+		pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
 		g_bDirectionUp = FALSE;
 	}
 	g_free (cScreenBorder);
 	
-	GdkScreen *gdkscreen = gtk_window_get_screen (GTK_WINDOW (pDock->pWidget));
-	if (pDock->bHorizontalDock)
-	{
-		g_iScreenWidth = gdk_screen_get_width (gdkscreen);
-		g_iScreenHeight = gdk_screen_get_height (gdkscreen);
-	}
-	else
-	{
-		g_iScreenHeight = gdk_screen_get_width (gdkscreen);
-		g_iScreenWidth = gdk_screen_get_height (gdkscreen);
-	}
+	GdkScreen *gdkscreen = gtk_window_get_screen (GTK_WINDOW (pDock->pWidget));  // on le fait ici, ca permet de remettre a jour le dock en le reconfigurant si l'on a change la resolution de l'ecran.
+	g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] = gdk_screen_get_width (gdkscreen);
+	g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] = gdk_screen_get_height (gdkscreen);
+	g_iScreenWidth[CAIRO_DOCK_VERTICAL] = g_iScreenHeight[CAIRO_DOCK_HORIZONTAL];
+	g_iScreenHeight[CAIRO_DOCK_VERTICAL] = g_iScreenWidth[CAIRO_DOCK_HORIZONTAL];
 	
 	if (g_iMaxAuthorizedWidth == 0)
-		g_iMaxAuthorizedWidth = g_iScreenWidth;
+		g_iMaxAuthorizedWidth = g_iScreenWidth[pDock->bHorizontalDock];
 	
 	
 	cairo_dock_remove_all_applets (pDock);  // on est obliges d'arreter tous les applets.
@@ -1116,8 +1148,8 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	}
 	
 	
-	g_fBackgroundImageWidth = 0;
-	g_fBackgroundImageHeight = 0;
+	g_fBackgroundImageWidth = 1e4;  // inutile de mettre a jour les decorations maintenant.
+	g_fBackgroundImageHeight = 1e4;
 	if (pDock->icons == NULL)
 		cairo_dock_build_docks_tree_with_desktop_files (pDock, g_cCurrentThemePath);
 	else
@@ -1269,7 +1301,7 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 	gtk_window_get_size (GTK_WINDOW (pDialog), &iWidth, &iHeight);
 	iWidth = MAX (iWidth, iWindowWidth);  // car la taille n'est pas encore effective.
 	iHeight = MAX (iWidth, iWindowHeight);
-	gtk_window_move (GTK_WINDOW (pDialog), (g_iScreenWidth - iWidth) / 2, (g_iScreenHeight - iHeight) / 2);
+	gtk_window_move (GTK_WINDOW (pDialog), (g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] - iWidth) / 2, (g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] - iHeight) / 2);
 	
 	if (pConfigFunc != NULL)  // alors on autorise la modification a la volee, avec un bouton "Appliquer". La fenetre doit donc laisser l'appli se derouler.
 	{

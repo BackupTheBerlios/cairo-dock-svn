@@ -1057,7 +1057,7 @@ static void _cairo_dock_get_each_widget_value (gpointer *data, GKeyFile *pKeyFil
 			i ++;
 		}
 		if (iNbElements > 1)
-			g_key_file_set_string_list (pKeyFile, cGroupName, cKeyName, tStringValues, iNbElements);
+			g_key_file_set_string_list (pKeyFile, cGroupName, cKeyName, (const gchar * const *)tStringValues, iNbElements);
 		else
 			g_key_file_set_string (pKeyFile, cGroupName, cKeyName, (tStringValues[0] != NULL ? tStringValues[0] : ""));
 		g_slist_free (pActiveElementList);  // ses donnees sont dans 'tStringValues' et seront donc liberees avec.

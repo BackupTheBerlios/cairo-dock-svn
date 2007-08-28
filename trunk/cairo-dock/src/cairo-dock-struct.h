@@ -22,6 +22,11 @@ released under the terms of the GNU General Public License.
 #endif
 
 
+typedef enum {
+	CAIRO_DOCK_VERTICAL = 0,
+	CAIRO_DOCK_HORIZONTAL
+	} CairoDockTypeHorizontality;
+
 typedef struct _CairoDock {
 	GList* icons;  // la liste de ses icones.
 	GtkWidget *pWidget;  // sa fenetre de dessin.
@@ -44,7 +49,7 @@ typedef struct _CairoDock {
 	gdouble fDecorationsOffsetX;  // decalage des decorations pour les faire suivre la souris.
 	gdouble fLateralFactor;  // un facteur d'acceleration lateral des icones lors du grossissement initial.
 	
-	gboolean bHorizontalDock;  // dit si le dock est horizontal ou vertical.
+	CairoDockTypeHorizontality bHorizontalDock;  // dit si le dock est horizontal ou vertical.
 	gint iMaxIconHeight;  // max des hauteurs des icones.
 	gint iMinDockWidth;  // taille minimale du dock.
 	gint iMaxDockWidth;  // taille maximale du dock.
@@ -144,6 +149,10 @@ typedef struct _Icon {
 #define CAIRO_DOCK_MAIN_DOCK_NAME "_MainDock_"
 
 #define CAIRO_DOCK_THEMES_DIR "themes"
+
+#define CAIRO_DOCK_UPDATE_DOCK_SIZE TRUE
+#define CAIRO_DOCK_ANIMATE_ICON TRUE
+#define CAIRO_DOCK_APPLY_RATIO TRUE
 
 #ifdef CAIRO_DOCK_VERBOSE
 #define CAIRO_DOCK_MESSAGE if (g_bVerbose) g_message

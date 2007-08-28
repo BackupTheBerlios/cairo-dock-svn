@@ -38,8 +38,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-load.h"
 
+extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
 extern double g_fSubDockSizeRatio;
+extern gboolean g_bSameHorizontality;
 
 extern int g_iSinusoidWidth;
 extern gint g_iDockLineWidth;
@@ -266,6 +268,11 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, gbool
 
 static void _cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpointer *data)
 {
+	if (pDock->iRefCount > 0)
+		pDock->bHorizontalDock = (g_bSameHorizontality ? g_pMainDock->bHorizontalDock : ! g_pMainDock->bHorizontalDock);
+	else
+		pDock->bHorizontalDock = g_pMainDock->bHorizontalDock;
+	
 	pDock->iMinDockWidth = - g_iIconGap;
 	pDock->iMaxIconHeight = 0;
 	

@@ -38,6 +38,7 @@ extern gint g_iScreenHeight;
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
 extern int g_iIconGap;
+extern double g_fAlign;
 
 extern gchar *g_cCurrentThemePath;
 
@@ -691,21 +692,25 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	Icon *pPointedIcon = cairo_dock_calculate_icons_with_position (pDock->icons, pDock->pFirstDrawnElement, x_abs, pDock->fMagnitude, pDock->iMinDockWidth, pDock->iMaxDockWidth, iHeight, iMouseY);
 	
 	//\_______________ On regarde si le curseur est dans le dock ou pas, et on joue sur la taille des icones en consequence.
-	gboolean bMouseInsideDock = (x_abs >= 0 && x_abs <= pDock->iMinDockWidth);
+	
+	gboolean bMouseInsideDock = (x_abs >= 0 && x_abs <= pDock->iMinDockWidth && iMouseX > 0 && iMouseX < iWidth);
 	if (! bMouseInsideDock)
 		pDock->fDecorationsOffsetX = - pDock->iMinDockWidth / 2;  // on fixe les decorations.
 	
-	if (! bMouseInsideDock && pDock->iSidShrinkDown == 0 && pDock->fMagnitude > 0 && pDock->iSidGrowUp == 0)
+	if (! bMouseInsideDock && pDock->iSidGrowUp == 0)
 	{
-		//pDock->iSidShrinkDown = g_timeout_add (75, (GSourceFunc) cairo_dock_shrink_down, pDock);
-		g_signal_emit_by_name (pDock->pWidget, "leave-notify-event", NULL);
+		double fSideMargin = (g_fAlign - .5) * (iWidth - pDock->iMinDockWidth);
+		if (x_abs < fSideMargin || x_abs > pDock->iMinDockWidth + fSideMargin)
+			g_signal_emit_by_name (pDock->pWidget, "leave-notify-event", NULL);
+		else if (pDock->fMagnitude > 0 && pDock->iSidShrinkDown == 0)
+			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, pDock);
 	}
 	
-	if (bMouseInsideDock && pDock->fMagnitude < 1 && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons) && pDock->iSidMoveDown == 0)  // on est dedans en x et la taille des icones est non maximale bien qu'aucune icone  ne soit animee.  // && pDock->iSidShrinkDown == 0
+	if (bMouseInsideDock && pDock->fMagnitude < 1 && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons) && pDock->iSidMoveDown == 0 && ! pDock->bAtBottom)  // on est dedans en x et la taille des icones est non maximale bien qu'aucune icone  ne soit animee.  // && pDock->iSidShrinkDown == 0
 	{
 		if ( (g_bDirectionUp && pPointedIcon != NULL && iMouseY > 0 && iMouseY < iHeight) || (! g_bDirectionUp && pPointedIcon != NULL && iMouseY < iHeight && iMouseY > 0) )  // et en plus on est dedans en y.
 		{
-			//g_print ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone  ne soit animee\n");
+			//g_print ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone  ne soit animee (iMouseX=%d => x_abs=%d)\n", iMouseX, x_abs);
 			//pDock->bInside = TRUE;
 			pDock->bAtBottom = FALSE;
 			if (pDock->iSidShrinkDown != 0)
@@ -718,7 +723,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 				g_source_remove (pDock->iSidMoveDown);
 				pDock->iSidMoveDown = 0;
 			}
-			pDock->iSidGrowUp = g_timeout_add (75, (GSourceFunc) cairo_dock_grow_up, pDock);
+			pDock->iSidGrowUp = g_timeout_add (40, (GSourceFunc) cairo_dock_grow_up, pDock);
 			pDock->iSidMoveUp = g_timeout_add (40, (GSourceFunc) cairo_dock_move_up, pDock);
 		}
 	}
