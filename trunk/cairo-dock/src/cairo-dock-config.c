@@ -697,7 +697,6 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		bFlushConfFileNeeded = TRUE;
 	}
 	g_fUnfoldAcceleration = 1 - pow (2, - fUserValue);
-	g_print ("g_fUnfoldAcceleration <- %f\n", g_fUnfoldAcceleration);
 	
 	g_fGrowUpFactor = g_key_file_get_double (fconf, "CAIRO DOCK", "grow up factor", &erreur);
 	if (erreur != NULL)

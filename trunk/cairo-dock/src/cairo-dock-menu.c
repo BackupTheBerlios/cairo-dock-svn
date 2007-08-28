@@ -103,7 +103,7 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 	
 	gchar *cImagePath = g_strdup_printf ("%s/cairo-dock.svg", CAIRO_DOCK_SHARE_DATA_DIR);
 	GtkWidget *pImage = gtk_image_new_from_file (cImagePath);
-	///gtk_message_dialog_set_image (GTK_MESSAGE_DIALOG (pDialog), pImage);
+	gtk_message_dialog_set_image (GTK_MESSAGE_DIALOG (pDialog), pImage);
 	
 	GtkWidget *pLabel = gtk_label_new (NULL);
 	gtk_label_set_use_markup (GTK_LABEL (pLabel), TRUE);
@@ -115,6 +115,14 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 	gtk_widget_show_all (pDialog);
 	gtk_dialog_run (GTK_DIALOG (pDialog));
 	gtk_widget_destroy (pDialog);
+}
+
+static void cairo_dock_update (GtkMenuItem *menu_item, gpointer *data)
+{
+	CairoDock *pDock = data[0];
+	Icon *icon = data[1];
+	
+	system ("xterm -e cairo-dock-update.sh &");
 }
 
 static void cairo_dock_help (GtkMenuItem *menu_item, gpointer *data)
@@ -542,6 +550,10 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	menu_item = gtk_menu_item_new_with_label ("Manage themes");
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_initiate_theme_management), data);
+	
+	menu_item = gtk_menu_item_new_with_label ("Update");
+	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
+	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_update), data);
 	
 	menu_item = gtk_menu_item_new_with_label ("About");
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);

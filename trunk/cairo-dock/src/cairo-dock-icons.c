@@ -697,12 +697,12 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	if (! bMouseInsideDock)
 		pDock->fDecorationsOffsetX = - pDock->iMinDockWidth / 2;  // on fixe les decorations.
 	
-	if (! bMouseInsideDock && pDock->iSidGrowUp == 0)
+	if (! bMouseInsideDock && pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0 && pDock->fMagnitude > 0)
 	{
 		double fSideMargin = (g_fAlign - .5) * (iWidth - pDock->iMinDockWidth);
 		if (x_abs < fSideMargin || x_abs > pDock->iMinDockWidth + fSideMargin)
 			g_signal_emit_by_name (pDock->pWidget, "leave-notify-event", NULL);
-		else if (pDock->fMagnitude > 0 && pDock->iSidShrinkDown == 0)
+		else
 			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, pDock);
 	}
 	
