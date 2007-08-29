@@ -13,9 +13,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 #include <cairo.h>
 #include <gtk/gtk.h>
-#include </usr/include/X11/Xlib.h>
-#include </usr/include/X11/Xatom.h>
-#include </usr/include/X11/Xutil.h>
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include <X11/Xutil.h>
 #include <signal.h>
 
 #ifdef HAVE_GLITZ
@@ -525,27 +525,28 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 		}
 	}
 	//\_____________________ On regarde si une fenetre est creee.
-	bEventPresent = TRUE;
+	/*bEventPresent = TRUE;
 	//while (bEventPresent)
 	{
 		bEventPresent = XCheckTypedEvent(g_XDisplay, CreateNotify, &event);
 		if (bEventPresent)
 		{
 			bInterestedEvent = TRUE;
-			//g_print ("Create (%d)\n", event.xcreatewindow.window);
+			g_print ("Create (%d)\n", event.xcreatewindow.window);
 			Icon *icon = g_hash_table_lookup (g_hXWindowTable, &event.xcreatewindow.window);
 			if (icon != NULL)  // a priori impossible.
 			{
-				//g_print ("c'est %s qui ressucite d'entre les morts\n", icon->acName);
+				g_print ("c'est %s qui ressucite d'entre les morts\n", icon->acName);
 				icon->bIsMapped = TRUE;
 			}
 			else
 			{
-				//g_print ("c'est une nouvelle fenetre qui est cree\n");
+				g_print ("c'est une nouvelle fenetre qui est cree\n");
 				cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 				icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xcreatewindow.window, pDock);
 				if (icon != NULL)
 				{
+					g_print (" -> %s\n", icon->acName);
 					cairo_dock_insert_icon_in_dock (icon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 					if (! pDock->bInside && g_bAutoHide && pDock->bAtBottom)
 						icon->fPersonnalScale = - 0.05;
@@ -556,7 +557,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 					xUnwantedWindow = event.xcreatewindow.window;
 			}
 		}
-	}
+	}*/
 	//\_____________________ On regarde si une fenetre se cache.
 	bEventPresent = TRUE;
 	while (bEventPresent)
@@ -596,7 +597,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 		if (bEventPresent && event.xmap.window != xUnwantedWindow)
 		{
 			bInterestedEvent = TRUE;
-			//g_print ("Create (%d)\n", event.xcreatewindow.window);
+			//g_print ("Map (%d)\n", event.xmap.window);
 			Icon *icon = g_hash_table_lookup (g_hXWindowTable, &event.xmap.window);
 			if (icon != NULL)
 			{
@@ -622,6 +623,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 				icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xmap.window, pDock);
 				if (icon != NULL)
 				{
+					//g_print (" -> %s\n", icon->acName);
 					cairo_dock_insert_icon_in_dock (icon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 					if (! pDock->bInside && g_bAutoHide && pDock->bAtBottom)
 						icon->fPersonnalScale = - 0.05;
@@ -641,7 +643,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 		//while (XCheckWindowEvent (g_XDisplay, root, event_mask, &event))
 		while (XCheckMaskEvent (g_XDisplay, event_mask, &event))
 		{
-			if (event.type == CreateNotify || event.type == DestroyNotify || event.type == UnmapNotify || event.type == MapNotify)
+			if (/*event.type == CreateNotify || */event.type == DestroyNotify || event.type == UnmapNotify || event.type == MapNotify)
 			{
 				XPutBackEvent (g_XDisplay, &event);
 				//g_print ("On le remet dans la queue\n");
@@ -689,30 +691,17 @@ void cairo_dock_show_all_applis (CairoDock *pDock)
 }
 
 
-void cairo_dock_set_strut_partial (int Xid, int left, int right, int top, int bottom)
+void cairo_dock_set_strut_partial (int Xid, int left, int right, int top, int bottom, int left_start_y, int left_end_y, int right_start_y, int right_end_y, int top_start_x, int top_end_x, int bottom_start_x, int bottom_end_x)
 {
 	g_return_if_fail (Xid > 0);
-	XEvent xClientMessage;
 	
-	xClientMessage.xclient.type = ClientMessage;
-	xClientMessage.xclient.serial = 0;
-	xClientMessage.xclient.send_event = True;
-	xClientMessage.xclient.display = g_XDisplay;
-	xClientMessage.xclient.window = Xid;
-	xClientMessage.xclient.message_type = XInternAtom (g_XDisplay, "_NET_WM_STRUT", False);
-	xClientMessage.xclient.format = 32;
-	xClientMessage.xclient.data.l[0] = left;
-	xClientMessage.xclient.data.l[1] = right;
-	xClientMessage.xclient.data.l[2] = top;
-	xClientMessage.xclient.data.l[3] = bottom;
-	xClientMessage.xclient.data.l[4] = 0;
-
-	Window root = DefaultRootWindow (g_XDisplay);
-	XSendEvent (g_XDisplay,
-		root,
-		False,
-		SubstructureRedirectMask | SubstructureNotifyMask,
-		&xClientMessage);
+	gulong iGeometryStrut[12] = {left, right, top, bottom, left_start_y, left_end_y, right_start_y, right_end_y, top_start_x, top_end_x, bottom_start_x, bottom_end_x};
 	
-	cairo_dock_set_xwindow_timestamp (Xid, cairo_dock_get_xwindow_timestamp (root));
+	XChangeProperty (g_XDisplay,
+		Xid,
+		XInternAtom (g_XDisplay, "_NET_WM_STRUT", False),
+		XA_CARDINAL, 32, PropModeReplace,
+		(guchar *) iGeometryStrut, 12);
+	
+	//cairo_dock_set_xwindow_timestamp (Xid, cairo_dock_get_xwindow_timestamp (root));
 }

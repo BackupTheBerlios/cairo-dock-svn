@@ -34,6 +34,7 @@ typedef struct _CairoDock {
 	gint iRefCount;  // le nombre d'icones pointant sur lui.
 	gint iGapX;  // decalage de la zone par rapport au milieu bas de l'ecran.
 	gint iGapY;
+	gdouble fAlign;  // alignement, entre 0 et 1, du dock sur le bord de l'ecran.
 	
 	gint iCurrentWidth;  // taille de la fenetre, _apres_ le redimensionnement par GTK.
 	gint iCurrentHeight;

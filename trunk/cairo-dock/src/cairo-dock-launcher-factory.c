@@ -381,8 +381,7 @@ cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t 
 	}
 	else
 	{
-		g_object_ref (pSurface);
-		return pSurface;
+		return NULL;
 	}
 }
 
@@ -471,26 +470,7 @@ void cairo_dock_load_desktop_file_information (gchar *cDesktopFileName, Icon *ic
 			g_print ("le dock fils (%s) n'existe pas, on le cree\n", icon->acName);
 			pChildDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->acName);
 		}
-		else
-		{
-			pChildDock->iRefCount ++;  // peut-etre qu'il faudrait en faire une operation atomique...
-			pChildDock->bHorizontalDock = (g_bSameHorizontality ? g_pMainDock->bHorizontalDock : ! g_pMainDock->bHorizontalDock);
-			if (pChildDock->iRefCount == 1)
-			{
-				Icon *icon;
-				GList *ic;
-				pChildDock->iMinDockWidth = -g_iIconGap;
-				for (ic = pChildDock->icons; ic != NULL; ic = ic->next)
-				{
-					icon = ic->data;
-					icon->fWidth *= g_fSubDockSizeRatio;
-					icon->fHeight *= g_fSubDockSizeRatio;
-					pChildDock->iMinDockWidth += icon->fWidth + g_iIconGap;
-				}
-				pChildDock->iMaxIconHeight *= g_fSubDockSizeRatio;
-				
-			}
-		}
+		cairo_dock_reference_dock (pChildDock);
 		icon->pSubDock = pChildDock;
 	}
 	
@@ -515,21 +495,28 @@ void cairo_dock_load_desktop_file_information (gchar *cDesktopFileName, Icon *ic
 
 
 
-Icon * cairo_dock_create_icon_from_desktop_file (gchar *cDesktopFileName, cairo_t *pSourceContext, gboolean bHorizontalDock)
+Icon * cairo_dock_create_icon_from_desktop_file (gchar *cDesktopFileName, cairo_t *pSourceContext)
 {
 	Icon *icon = g_new0 (Icon, 1);
 	
 	cairo_dock_load_desktop_file_information (cDesktopFileName, icon);
 	g_return_val_if_fail (icon->acDesktopFileName != NULL, NULL);
 	
-	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, bHorizontalDock);
+	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, g_pMainDock->bHorizontalDock);
 	
 	cairo_dock_fill_one_text_buffer (icon,
 		pSourceContext,
 		g_bUseText,
 		g_iLabelSize,
 		g_cLabelPolice,
-		bHorizontalDock);
+		g_pMainDock->bHorizontalDock);
+	
+	CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+	if (pParentDock == NULL)
+	{
+		g_print ("le dock parent (%s) n'existe pas, on le cree\n", icon->cParentDockName);
+		pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->cParentDockName);
+	}
 	
 	return icon;
 }

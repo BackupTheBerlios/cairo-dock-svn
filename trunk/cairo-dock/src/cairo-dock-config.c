@@ -30,6 +30,7 @@ extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
 extern gchar *g_cLanguage;
 extern gboolean g_bReverseVisibleImage;
+extern gboolean g_bReserveSpace;
 
 extern int g_iMaxAuthorizedWidth;
 extern int g_iScrollAmount;
@@ -48,7 +49,6 @@ extern double g_fVisibleZoneAlpha;
 extern gboolean g_bDirectionUp;
 extern gboolean g_bSameHorizontality;
 extern double g_fSubDockSizeRatio;
-extern double g_fAlign;
 
 extern gboolean g_bUseText;
 extern int g_iLabelSize;
@@ -185,17 +185,28 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		cScreenBorder = g_strdup ("bottom");
 	}
 	
-	g_fAlign = g_key_file_get_double (fconf, "POSITION", "alignment", &erreur);
+	double fAlign = g_key_file_get_double (fconf, "POSITION", "alignment", &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
-		g_fAlign = 0.5;  // valeur par defaut.
-		g_key_file_set_double (fconf, "POSITION", "alignment", g_fAlign);
+		fAlign = 0.5;  // valeur par defaut.
+		g_key_file_set_double (fconf, "POSITION", "alignment", fAlign);
 		bFlushConfFileNeeded = TRUE;
 	}
+	pDock->fAlign = fAlign;
 	
+	g_bReserveSpace = g_key_file_get_boolean (fconf, "POSITION", "reserve space", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		g_bReserveSpace = FALSE;  // valeur par defaut.
+		g_key_file_set_boolean (fconf, "POSITION", "reserve space", g_bReserveSpace);
+		bFlushConfFileNeeded = TRUE;
+	}
 	
 	//\___________________ On recupere les parametres de la zone visible.
 	gchar *cVisibleZoneImageFile = g_key_file_get_string (fconf, "AUTO-HIDE", "background image", &erreur);
@@ -774,7 +785,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
-		g_fSubDockSizeRatio = 1.0;  // valeur par defaut.
+		g_fSubDockSizeRatio = .8;  // valeur par defaut.
 		g_key_file_set_double (fconf, "SUB-DOCKS", "relative icon size", g_fSubDockSizeRatio);
 		bFlushConfFileNeeded = TRUE;
 	}
@@ -1189,8 +1200,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		{
 			cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
 		}
-		///int Xid = GDK_WINDOW_XID (pDock->pWidget->window);
-		///cairo_dock_set_strut_partial (Xid, 0, 0, 0, iNewHeight);
+		
 		//g_print ("on commence en bas a %dx%d (%d;%d)\n", g_iVisibleZoneWidth, g_iVisibleZoneHeight, pDock->iWindowPositionX, pDock->iWindowPositionY);
 		if (pDock->bHorizontalDock)
 			gdk_window_move_resize (pDock->pWidget->window,

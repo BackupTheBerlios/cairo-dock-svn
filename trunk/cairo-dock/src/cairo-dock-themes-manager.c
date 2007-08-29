@@ -179,7 +179,6 @@ gchar *cairo_dock_load_theme (gchar *cThemePath)
 	//\___________________ On cree le dock principal.
 	g_pMainDock = cairo_dock_create_new_dock (g_iWmHint, CAIRO_DOCK_MAIN_DOCK_NAME);
 	g_pMainDock->bIsMainDock = TRUE;
-	g_pMainDock->iRefCount --;
 	
 	//\___________________ On lit son fichier de conf et on charge tout.
 	cairo_dock_update_conf_file_with_modules (cConfFile, g_hModuleTable);

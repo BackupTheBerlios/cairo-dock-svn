@@ -18,9 +18,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <sys/types.h>
 #include <dirent.h>
 
-#include </usr/include/X11/Xlib.h>
-#include </usr/include/X11/Xatom.h>
-#include </usr/include/X11/Xutil.h>
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include <X11/Xutil.h>
 
 #ifdef HAVE_GLITZ
 #include <gdk/gdkx.h>

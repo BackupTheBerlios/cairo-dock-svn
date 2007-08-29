@@ -92,6 +92,7 @@ CairoDock *g_pMainDock;  // pointeur sur le dock principal.
 GHashTable *g_hDocksTable = NULL;  // table des docks existant.
 int g_iWmHint;  // hint pour la fenetre du dock principal.
 gchar *g_cLanguage = NULL;  // langue courante.
+gboolean g_bReserveSpace;
 
 gboolean g_bReverseVisibleImage;  // retrouner l'image de la zone de rappel quand le dock est en haut.
 gint g_iScreenWidth[2];  // dimensions de l'ecran.
@@ -159,7 +160,6 @@ int g_iVisibleZoneHeight = 0;
 gboolean g_bDirectionUp = TRUE;  // la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.
 gboolean g_bSameHorizontality = TRUE;  // dit si les sous-docks ont la meme horizontalite que les docks racines.
 double g_fSubDockSizeRatio;  // ratio de la taille des icones des sous-docks par rapport a celles du dock principal.
-double g_fAlign;  // alignement, entre 0 et 1, du dock sur le bord de l'ecran.
 gboolean g_bUseText;  // vrai ssi on doit afficher les etiquettes au-dessus des icones.
 int g_iLabelSize;  // taille de la police des etiquettes.
 gchar *g_cLabelPolice;  // police de caracteres des etiquettes.
@@ -301,7 +301,6 @@ main (int argc, char** argv)
 	//\___________________ On cree le dock principal.
 	g_pMainDock = cairo_dock_create_new_dock (g_iWmHint, CAIRO_DOCK_MAIN_DOCK_NAME);
 	g_pMainDock->bIsMainDock = TRUE;
-	g_pMainDock->iRefCount --;
 	
 	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
 	g_cCairoDockDataDir = g_strdup_printf ("%s/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR);

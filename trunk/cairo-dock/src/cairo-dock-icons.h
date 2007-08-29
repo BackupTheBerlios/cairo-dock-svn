@@ -62,7 +62,7 @@ void cairo_dock_remove_all_applets (CairoDock *pDock);
 
 GList * cairo_dock_calculate_icons_positions_at_rest (GList *pIconList, int iMinDockWidth, int iXOffset);
 
-Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirstDrawnElement, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight, int iMouseY);
+Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirstDrawnElement, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight, int iMouseY, double fAlign, double fLateralFactor);
 
 Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY);
 

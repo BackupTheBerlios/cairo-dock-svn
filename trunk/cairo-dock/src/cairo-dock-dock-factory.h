@@ -13,6 +13,7 @@ const gchar *cairo_dock_search_dock_name (CairoDock *pDock);
 CairoDock *cairo_dock_search_dock_from_name (gchar *cDockName);
 
 
+void cairo_dock_reserve_space_for_dock (CairoDock *pDock);
 void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMinDockWidth);
 
 
@@ -25,5 +26,9 @@ void cairo_dock_free_all_docks (CairoDock *pMainDock);
 void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *ReceivingDock, gchar *cReceivingDockName);
 
 CairoDock *cairo_dock_search_container_from_icon (Icon *icon);
+
+
+void cairo_dock_reference_dock (CairoDock *pChildDock);
+
 
 #endif

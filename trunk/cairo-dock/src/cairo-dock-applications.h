@@ -40,7 +40,7 @@ int cairo_dock_xerror_handler (Display * pDisplay, XErrorEvent *pXError);
 void cairo_dock_show_all_applis (CairoDock *pDock);
 
 
-void cairo_dock_set_strut_partial (int Xid, int left, int right, int top, int bottom);
+void cairo_dock_set_strut_partial (int Xid, int left, int right, int top, int bottom, int left_start_y, int left_end_y, int right_start_y, int right_end_y, int top_start_x, int top_end_x, int bottom_start_x, int bottom_end_x);
 
 
 #endif

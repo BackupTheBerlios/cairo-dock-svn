@@ -492,8 +492,8 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								fMaxValue = 9999;
 							
 							GtkObject *pAdjustment = gtk_adjustment_new (fValue,
-								fMinValue,
-								fMaxValue,
+								0,
+								1,
 								(fMaxValue - fMinValue) / 20.,
 								(fMaxValue - fMinValue) / 10.,
 								0);
@@ -510,6 +510,8 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									1.,
 									3);
 							}
+							g_object_set (pAdjustment, "lower", fMinValue, "upper", fMaxValue, NULL); // le 'width-request' sur un GtkHScale avec 'fMinValue' non nul plante ! Donc on les met apres...
+							gtk_adjustment_set_value (GTK_ADJUSTMENT (pAdjustment), fValue);
 							
 							pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
 							gtk_box_pack_start (GTK_BOX (pHBox),

@@ -232,7 +232,13 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, gbool
 	//g_print ("%s -> %.2f (%d;%d)\n", icon->acName, icon->fTextYOffset, log.height, ink.y);
 	
 	double fRotationAngle = (bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2));
-	if (fRotationAngle != 0)
+	cairo_surface_t *pNewSurfaceRotated = cairo_dock_rotate_surface (pNewSurface, pSourceContext, ink.width + 2, ink.height + 2, fRotationAngle);
+	if (pNewSurfaceRotated != NULL)
+	{
+		cairo_surface_destroy (pNewSurface);
+		pNewSurface = pNewSurfaceRotated;
+	}
+	/*if (fRotationAngle != 0)
 	{
 		cairo_surface_t *pNewSurfaceRotated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 			CAIRO_CONTENT_COLOR_ALPHA,
@@ -258,7 +264,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, gbool
 		cairo_surface_destroy (pNewSurface);
 		pNewSurface = pNewSurfaceRotated;
 		cairo_destroy (pCairoContext);
-	}
+	}*/
 	
 	icon->pTextBuffer = pNewSurface;
 	

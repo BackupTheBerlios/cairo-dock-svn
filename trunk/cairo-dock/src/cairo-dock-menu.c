@@ -107,7 +107,11 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 	
 	GtkWidget *pLabel = gtk_label_new (NULL);
 	gtk_label_set_use_markup (GTK_LABEL (pLabel), TRUE);
-	gchar *cAboutText = g_strdup_printf ("<b>Original idea/first development :</b>\n  Mac Slow\n<b>Main developer :</b>\n  Fabounet (Fabrice Rey)\n\n<b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole (Julien Barrau)\n\n<b>Translations :</b>\n\n<b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Necropotame\n  Ppmt\n  Sombrero");
+	gchar *cAboutText = g_strdup_printf ("<b>Original idea/first development :</b>\n  Mac Slow\n\
+<b>Main developer :</b>\n  Fabounet (Fabrice Rey)\n\
+<b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole (Julien Barrau)\n\
+<b>Translations :</b>\n  Fabounet\n\
+<b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Necropotame\n  Ppmt\n  Sombrero\n  Vilraleur");
 	gtk_label_set_markup (GTK_LABEL (pLabel), cAboutText);
 	g_free (cAboutText);
 	gtk_container_add (GTK_CONTAINER (GTK_DIALOG (pDialog)->vbox), pLabel);
@@ -201,9 +205,10 @@ static void cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data)
 	if (config_ok)
 	{
 		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
-		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cNewDesktopFileName, pCairoContext, pDock->bHorizontalDock);
+		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cNewDesktopFileName, pCairoContext);
 		
-		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+		CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+		cairo_dock_insert_icon_in_dock (pNewIcon, pParentDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 		
 		if (pDock->iSidShrinkDown == 0)
 			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
@@ -262,7 +267,7 @@ static void cairo_dock_add_launcher (GtkMenuItem *menu_item, gpointer *data)
 			}
 			
 			cDesktopFileName = g_path_get_basename (cFilePath);
-			pNewIcon = cairo_dock_create_icon_from_desktop_file (cDesktopFileName, pCairoContext, pDock->bHorizontalDock);
+			pNewIcon = cairo_dock_create_icon_from_desktop_file (cDesktopFileName, pCairoContext);
 			
 			cairo_dock_insert_icon_in_dock (pNewIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 			
@@ -316,7 +321,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 		
 		//\_____________ On recree l'icone.
 		cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
-		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (icon->acDesktopFileName, pCairoContext, pDock->bHorizontalDock);
+		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (icon->acDesktopFileName, pCairoContext);
 		
 		//\_____________ On redistribue les icones du sous-dock si l'icone n'est plus un container.
 		if (icon->pSubDock != NULL)
@@ -345,11 +350,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 		
 		//\_____________ On cherche le dock auquel elle appartient maintenant.
 		CairoDock *pNewContainer = cairo_dock_search_dock_from_name (pNewIcon->cParentDockName);
-		if (pNewContainer == NULL)
-		{
-			pNewContainer = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, pNewIcon->cParentDockName);
-			pNewContainer->iRefCount --;
-		}
+		g_return_if_fail (pNewContainer != NULL);
 		
 		if (pDock != pNewContainer)
 		{

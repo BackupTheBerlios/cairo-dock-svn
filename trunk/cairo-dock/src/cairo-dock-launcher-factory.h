@@ -18,7 +18,7 @@ cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t 
 void cairo_dock_load_desktop_file_information (gchar *cDesktopFileName, Icon *icon);
 
 
-Icon * cairo_dock_create_icon_from_desktop_file (gchar *cDesktopFileName, cairo_t *pSourceContext, gboolean bHorizontalDock);
+Icon * cairo_dock_create_icon_from_desktop_file (gchar *cDesktopFileName, cairo_t *pSourceContext);
 
 
 #endif

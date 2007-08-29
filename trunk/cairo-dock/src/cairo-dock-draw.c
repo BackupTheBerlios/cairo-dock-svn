@@ -33,6 +33,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
 extern double g_fSubDockSizeRatio;
+extern gboolean g_bAutoHide;
 
 extern gint g_iScreenWidth[2];
 extern gint g_iScreenHeight[2];
@@ -48,7 +49,6 @@ extern int g_iIconGap;
 
 extern gboolean g_bRoundedBottomCorner;
 extern gboolean g_bDirectionUp;
-extern double g_fAlign;
 extern double g_fStripesSpeedFactor;
 extern double g_fBackgroundImageWidth, g_fBackgroundImageHeight;
 extern cairo_surface_t *g_pBackgroundSurface;
@@ -78,7 +78,7 @@ double cairo_dock_get_current_dock_width (CairoDock *pDock)
 	
 	Icon *pLastIcon = cairo_dock_get_last_drawn_icon (pDock);
 	Icon *pFirstIcon = cairo_dock_get_first_drawn_icon (pDock);
-	double fWidth = pLastIcon->fX + pLastIcon->fWidth * pLastIcon->fScale - pFirstIcon->fX + 2 * g_iDockRadius + g_iDockLineWidth;
+	double fWidth = pLastIcon->fX - pFirstIcon->fX + 2 * g_iDockRadius + g_iDockLineWidth + pLastIcon->fWidth * pLastIcon->fScale;
 	
 	return fWidth;
 }
@@ -194,13 +194,13 @@ static void _cairo_dock_draw_frame_vertical (CairoDock *pDock, cairo_t *pCairoCo
 	if (fRadius < 1)
 		cairo_close_path (pCairoContext);
 }
-void cairo_dock_calculate_construction_parameters (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth, gboolean bLoop, gboolean bInside, double fLateralFactor)
+void cairo_dock_calculate_construction_parameters (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth, gboolean bLoop, gboolean bInside, double fLateralFactor, double fAlign)
 {
 	//\_____________________ On calcule leur position : en ligne droite sur l'avant-plan ou sur une ellipse en arriere-plan.
 	double fDeltaLeft = (iMaxDockWidth - iCurrentWidth - icon->fWidth * icon->fScale) / 2, fDeltaRight = fDeltaLeft;
 	double fX, fY, fAlpha, fTheta;
 	fX = icon->fX + (iCurrentWidth - iMaxDockWidth) / 2;
-	//fX = g_fAlign * iCurrentWidth + (fX - g_fAlign * iCurrentWidth) * (1 - fLateralFactor);
+	//fX = fAlign * iCurrentWidth + (fX - fAlign * iCurrentWidth) * (1 - fLateralFactor);
 	//g_print ("(%s) icon->fX : %.2f -> %.2f\n", icon->acName, icon->fX, fX);
 	if (fX >= 0 && fX + icon->fWidth * icon->fScale <= iCurrentWidth)
 	{
@@ -314,7 +314,7 @@ void cairo_dock_calculate_construction_parameters (Icon *icon, int iCurrentWidth
 		icon->iCount --;
 	}
 	
-	icon->fDrawX = g_fAlign * iCurrentWidth + (fX - g_fAlign * iCurrentWidth) * (1 - fLateralFactor);
+	icon->fDrawX = fX;  // fAlign * iCurrentWidth + (fX - fAlign * iCurrentWidth) * (1 - fLateralFactor);
 	icon->fDrawY = fY;
 	icon->fWidthFactor = fWidthFactor;  // son signe nous renseigne sur la position de l'icone (avant-plan ou arriere-plan).
 	icon->fAlpha = fAlpha;
@@ -460,7 +460,7 @@ void cairo_dock_render (CairoDock *pDock)
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
-		cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fLateralFactor);
+		cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fLateralFactor, pDock->fAlign);
 	}
 	
 	//\____________________ On dessine la ficelle qui les joint.
@@ -636,6 +636,8 @@ void cairo_dock_render_blank (CairoDock *pDock)
 
 void cairo_dock_redraw_my_icon (Icon *icon, CairoDock *pDock)
 {
+	if (pDock->bAtBottom && g_bAutoHide)
+		return ;
 	GdkRectangle rect = {(int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor)), (int) icon->fDrawY, (int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)), (int) icon->fHeight * icon->fScale};
 	if (! pDock->bHorizontalDock)
 	{
@@ -785,7 +787,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 			cairo_save (pCairoContext);
 			
 			//g_print ("  redessin a gauche de %s\n", icon->acName);
-			cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fLateralFactor);
+			cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fLateralFactor, pDock->fAlign);
 			cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio);
 			
 			cairo_restore (pCairoContext);
@@ -821,7 +823,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 			cairo_save (pCairoContext);
 			
 			//g_print ("  redessin a droite de %s\n", icon->acName);
-			cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fLateralFactor);
+			cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fLateralFactor, pDock->fAlign);
 			cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio);
 			
 			cairo_restore (pCairoContext);
@@ -900,12 +902,11 @@ gboolean cairo_dock_hide_child_docks (CairoDock *pDock)
 
 void cairo_dock_calculate_window_position_at_balance (CairoDock *pDock, CairoDockSizeType iSizeType, int *iNewWidth, int *iNewHeight)
 {
-	double fAlign = (pDock->iRefCount == 0 ? g_fAlign : (pDock->bHorizontalDock == g_pMainDock->bHorizontalDock ? .5 : (g_bDirectionUp ? 1 : 0)));
 	if (iSizeType == CAIRO_DOCK_MAX_SIZE)
 	{
 		*iNewWidth = (g_bForceLoop && pDock->iRefCount == 0 ? pDock->iMaxDockWidth / 2 : MIN (g_iMaxAuthorizedWidth, pDock->iMaxDockWidth));
 		*iNewHeight = pDock->iMaxDockHeight;
-		pDock->iWindowPositionX = (g_iScreenWidth[pDock->bHorizontalDock] - *iNewWidth) * fAlign + pDock->iGapX;
+		pDock->iWindowPositionX = (g_iScreenWidth[pDock->bHorizontalDock] - *iNewWidth) * pDock->fAlign + pDock->iGapX;
 		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - (*iNewHeight) - pDock->iGapY : pDock->iGapY);
 	}
 	else if (iSizeType == CAIRO_DOCK_NORMAL_SIZE)
@@ -914,14 +915,14 @@ void cairo_dock_calculate_window_position_at_balance (CairoDock *pDock, CairoDoc
 		if (g_bForceLoop && *iNewWidth > pDock->iMaxDockWidth / 2)
 			*iNewWidth = pDock->iMaxDockWidth / 2;
 		*iNewHeight = pDock->iMaxIconHeight + 2 * g_iDockLineWidth;
-		pDock->iWindowPositionX = (g_iScreenWidth[pDock->bHorizontalDock] - *iNewWidth) * fAlign + pDock->iGapX;
+		pDock->iWindowPositionX = (g_iScreenWidth[pDock->bHorizontalDock] - *iNewWidth) * pDock->fAlign + pDock->iGapX;
 		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - (*iNewHeight) - pDock->iGapY : pDock->iGapY);
 	}
 	else
 	{
 		*iNewWidth = g_iVisibleZoneWidth;
 		*iNewHeight = g_iVisibleZoneHeight;
-		pDock->iWindowPositionX = (g_iScreenWidth[pDock->bHorizontalDock] - *iNewWidth) * fAlign + pDock->iGapX;
+		pDock->iWindowPositionX = (g_iScreenWidth[pDock->bHorizontalDock] - *iNewWidth) * pDock->fAlign + pDock->iGapX;
 		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - (*iNewHeight) - pDock->iGapY : pDock->iGapY);
 	}
 	
