@@ -381,8 +381,8 @@ void cairo_dock_render (CairoDock *pDock)
 	if (fDockOffsetX - (fRadius + fLineWidth / 2) < 0)
 		fDockOffsetX = fRadius + fLineWidth / 2;
 	if (fDockOffsetX + fDockWidth - (fRadius + fLineWidth / 2) > pDock->iCurrentWidth)
-		fDockWidth = pDock->iCurrentWidth - fDockOffsetX + (fRadius + fLineWidth / 2);
-	//g_print ("fDockOffsetX : %.2f\n", fDockOffsetX);
+		fDockWidth = MAX (pDock->iCurrentWidth - fDockOffsetX + (fRadius + fLineWidth / 2), 2 * fRadius + fLineWidth);
+	//g_print ("fDockOffsetX : %.2f ; fDockWidth : %.2f ; pFirstIcon->fX : %.2f\n", fDockOffsetX, fDockWidth, (pFirstIcon != NULL ? pFirstIcon->fX : 0));
 	
 	if (g_bDirectionUp)
 	{
@@ -858,7 +858,9 @@ static gboolean _cairo_dock_hide_dock (gchar *cDockName, CairoDock *pDock, Cairo
 				cairo_dock_render (pDock);
 			}
 			
-			gdk_window_hide (pDock->pWidget->window);
+			g_print ("on cache %s par parente\n", cDockName);
+			//gdk_window_hide (pDock->pWidget->window);
+			gtk_widget_hide (pDock->pWidget);
 			cairo_dock_hide_parent_docks (pDock);
 		}
 		return TRUE;
@@ -891,7 +893,9 @@ gboolean cairo_dock_hide_child_docks (CairoDock *pDock)
 				//g_print ("on cache %s en sortant du dock principal\n", pPointedIcon->acName);
 				//while (gtk_events_pending ())
 				//	gtk_main_iteration ();
+				g_print ("on cache %s par filiation\n", icon->acName);
 				icon->pSubDock->iScrollOffset = 0;
+				icon->pSubDock->fLateralFactor = 0;
 				gtk_widget_hide (icon->pSubDock->pWidget);
 			}
 		}

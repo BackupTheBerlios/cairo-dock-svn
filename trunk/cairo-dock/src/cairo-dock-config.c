@@ -1157,7 +1157,6 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		pDock->icons = g_list_sort (pDock->icons, (GCompareFunc) cairo_dock_compare_icons_order);
 	}
 	
-	
 	g_fBackgroundImageWidth = 1e4;  // inutile de mettre a jour les decorations maintenant.
 	g_fBackgroundImageHeight = 1e4;
 	if (pDock->icons == NULL)
@@ -1175,6 +1174,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	cairo_dock_activate_modules_from_list (cActiveModuleList, g_hModuleTable, pDock);
 	g_strfreev (cActiveModuleList);
 	
+	cairo_dock_reserve_space_for_dock (pDock, g_bReserveSpace);
 	cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 	
 	

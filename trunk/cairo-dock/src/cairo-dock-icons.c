@@ -29,11 +29,13 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-config.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-callbacks.h"
+#include "cairo-dock-dock-factory.h"
 #include "cairo-dock-icons.h"
 
 
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
+extern gboolean g_bReserveSpace;
 
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
@@ -411,6 +413,9 @@ void cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon)
 			pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, pOtherIcon->fHeight);
 		}
 	}
+	
+	if (pDock->bIsMainDock && g_bReserveSpace)
+		cairo_dock_reserve_space_for_dock (pDock, TRUE);
 }
 
 void cairo_dock_remove_icon_from_dock (CairoDock *pDock, Icon *icon)

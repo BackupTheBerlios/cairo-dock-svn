@@ -318,58 +318,58 @@ CairoDock *cairo_dock_search_dock_from_name (gchar *cDockName)
 
 
 
-void cairo_dock_reserve_space_for_dock (CairoDock *pDock)
+void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
 {
 	int Xid = GDK_WINDOW_XID (pDock->pWidget->window);
 	int left=0, right=0, top=0, bottom=0;
 	int left_start_y=0, left_end_y=0, right_start_y=0, right_end_y=0, top_start_x=0, top_end_x=0, bottom_start_x=0, bottom_end_x=0;
 	int iHeight, iWidth;
 	
-	int iWindowPositionX = pDock->iWindowPositionX, iWindowPositionY = pDock->iWindowPositionY;
-	cairo_dock_calculate_window_position_at_balance (pDock, (g_bAutoHide ? CAIRO_DOCK_MIN_SIZE : CAIRO_DOCK_NORMAL_SIZE), &iWidth, &iHeight);
-	if (g_bDirectionUp)
+	if (bReserve)
 	{
-		if (pDock->bHorizontalDock)
+		int iWindowPositionX = pDock->iWindowPositionX, iWindowPositionY = pDock->iWindowPositionY;
+		cairo_dock_calculate_window_position_at_balance (pDock, (g_bAutoHide ? CAIRO_DOCK_MIN_SIZE : CAIRO_DOCK_NORMAL_SIZE), &iWidth, &iHeight);
+		if (g_bDirectionUp)
 		{
-			bottom = iHeight + pDock->iGapY;
-			bottom_start_x = pDock->iWindowPositionX;
-			bottom_end_x = pDock->iWindowPositionX + iWidth;
+			if (pDock->bHorizontalDock)
+			{
+				bottom = iHeight + pDock->iGapY;
+				bottom_start_x = pDock->iWindowPositionX;
+				bottom_end_x = pDock->iWindowPositionX + iWidth;
+				
+			}
+			else
+			{
+				right = iHeight + pDock->iGapY;
+				right_start_y = pDock->iWindowPositionX;
+				right_end_y = pDock->iWindowPositionX + iWidth;
+			}
+		}
+		else
+		{
 			
+			if (pDock->bHorizontalDock)
+			{
+				top = iHeight + pDock->iGapY;
+				top_start_x = pDock->iWindowPositionX;
+				top_end_x = pDock->iWindowPositionX + iWidth;
+			}
+			else
+			{
+				left = iHeight + pDock->iGapY;
+				left_start_y = pDock->iWindowPositionX;
+				left_end_y = pDock->iWindowPositionX + iWidth;
+			}
 		}
-		else
-		{
-			right = iHeight + pDock->iGapY;
-			right_start_y = pDock->iWindowPositionX;
-			right_end_y = pDock->iWindowPositionX + iWidth;
-		}
+		pDock->iWindowPositionX = iWindowPositionX;
+		pDock->iWindowPositionY = iWindowPositionY;
 	}
-	else
-	{
-		
-		if (pDock->bHorizontalDock)
-		{
-			top = iHeight + pDock->iGapY;
-			top_start_x = pDock->iWindowPositionX;
-			top_end_x = pDock->iWindowPositionX + iWidth;
-		}
-		else
-		{
-			left = iHeight + pDock->iGapY;
-			left_start_y = pDock->iWindowPositionX;
-			left_end_y = pDock->iWindowPositionX + iWidth;
-		}
-	}
-	pDock->iWindowPositionX = iWindowPositionX;
-	pDock->iWindowPositionY = iWindowPositionY;
 	cairo_dock_set_strut_partial (Xid, left, right, top, bottom, left_start_y, left_end_y, right_start_y, right_end_y, top_start_x, top_end_x, bottom_start_x, bottom_end_x);
-	
 }
 
 void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMinDockWidth)
 {
 	//g_print ("%s (%d, %d)\n", __func__, iMaxIconHeight, iMinDockWidth);
-	if (g_bReserveSpace)
-		cairo_dock_reserve_space_for_dock (pDock);
 	
 	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, iMinDockWidth, pDock->iScrollOffset);
 	pDock->iMaxDockHeight = (int) ((1 + g_fAmplitude) * iMaxIconHeight) + g_iLabelSize + g_iDockLineWidth;
@@ -519,6 +519,9 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 	
 	if (bUpdateSize)
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+	
+	if (pDock->bIsMainDock && g_bReserveSpace)
+		cairo_dock_reserve_space_for_dock (pDock, TRUE);
 }
 
 
@@ -533,6 +536,8 @@ static void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDo
 			gtk_main_iteration ();
 		if (pDock->iRefCount > 0)
 			gtk_widget_hide (pDock->pWidget);
+		else
+			gtk_window_move (GTK_WINDOW (pDock->pWidget), 500, 500);  // sinon ils n'apparaisesent pas.
 	}
 }
 void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar *cDirectory)

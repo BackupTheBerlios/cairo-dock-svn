@@ -13,7 +13,7 @@ const gchar *cairo_dock_search_dock_name (CairoDock *pDock);
 CairoDock *cairo_dock_search_dock_from_name (gchar *cDockName);
 
 
-void cairo_dock_reserve_space_for_dock (CairoDock *pDock);
+void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve);
 void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMinDockWidth);
 
 
