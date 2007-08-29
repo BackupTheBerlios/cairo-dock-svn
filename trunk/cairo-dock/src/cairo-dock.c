@@ -132,8 +132,8 @@ gchar *g_cBackgroundImageFile = NULL;  // nom du fichier image a mettre en fond.
 double g_fBackgroundImageWidth = 0, g_fBackgroundImageHeight = 0;  // sa taille reelle.
 gboolean g_bBackgroundImageRepeat; // repeter l'image du fond comme un motif.
 double g_fBackgroundImageAlpha;  // transparence de l'image de fond.
-cairo_surface_t *g_pBackgroundSurface = NULL;  // surface associee a l'image du fond, de la taille de l'image du fond.
-cairo_surface_t *g_pBackgroundSurfaceFull = NULL;  // surface associee aux decorations, de 2 fois la taille de la fenetre.
+cairo_surface_t *g_pBackgroundSurface[2] = {NULL, NULL};  // surface associee a l'image du fond, de la taille de l'image du fond.
+cairo_surface_t *g_pBackgroundSurfaceFull[2] = {NULL, NULL};  // surface associee aux decorations, de 2 fois la taille de la fenetre.
 
 int g_iIconGap = 0;  // ecart en pixels entre les icones (pour l'instant une valeur > 0 cree des decalages intempestifs).
 int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];  // les tailles min et max pour chaque type d'icone.

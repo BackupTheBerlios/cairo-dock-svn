@@ -60,8 +60,8 @@ extern int g_iDockLineWidth;
 
 extern gchar *g_cBackgroundImageFile;
 extern double g_fBackgroundImageAlpha;
-extern cairo_surface_t *g_pBackgroundSurface;
-extern cairo_surface_t *g_pBackgroundSurfaceFull;
+extern cairo_surface_t *g_pBackgroundSurface[2];
+extern cairo_surface_t *g_pBackgroundSurfaceFull[2];
 extern double g_fBackgroundImageWidth, g_fBackgroundImageHeight;
 extern gboolean g_bBackgroundImageRepeat;
 extern int g_iNbStripes;
@@ -492,10 +492,14 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 		int iDecorationsWidth = MAX (iDecorationsWidth, iNewMaxDockWidth);
 		int iDecorationsHeight = MAX (iDecorationsHeight, iNewMaxIconHeight);
 		
-		cairo_surface_destroy (g_pBackgroundSurface);
-		cairo_surface_destroy (g_pBackgroundSurfaceFull);
-		g_pBackgroundSurface = NULL;
-		g_pBackgroundSurfaceFull = NULL;
+		cairo_surface_destroy (g_pBackgroundSurface[0]);
+		cairo_surface_destroy (g_pBackgroundSurface[1]);
+		cairo_surface_destroy (g_pBackgroundSurfaceFull[0]);
+		cairo_surface_destroy (g_pBackgroundSurfaceFull[1]);
+		g_pBackgroundSurface[0] = NULL;
+		g_pBackgroundSurface[1] = NULL;
+		g_pBackgroundSurfaceFull[0] = NULL;
+		g_pBackgroundSurfaceFull[1] = NULL;
 		cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 		
 		if (g_cBackgroundImageFile != NULL)
@@ -504,32 +508,38 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 			{
 				g_fBackgroundImageWidth = 2 * iDecorationsWidth;
 				g_fBackgroundImageHeight = iDecorationsHeight;
-				g_pBackgroundSurfaceFull = cairo_dock_load_image (pCairoContext,
+				g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL] = cairo_dock_load_image (pCairoContext,
 					g_cBackgroundImageFile,
 					&g_fBackgroundImageWidth,
 					&g_fBackgroundImageHeight,
-					(pDock->bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)),
+					0,  // (pDock->bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)),
 					g_fBackgroundImageAlpha,
 					g_bBackgroundImageRepeat);
+				
+				g_pBackgroundSurfaceFull[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL], pCairoContext, g_fBackgroundImageWidth, g_fBackgroundImageHeight, (g_bDirectionUp ? -G_PI/2 : G_PI/2));
 			}
 			else if (g_fBackgroundImageWidth == 0 || g_fBackgroundImageHeight == 0)
 			{
 				g_fBackgroundImageWidth = 0;
 				g_fBackgroundImageHeight = iDecorationsHeight;
-				g_pBackgroundSurface = cairo_dock_load_image (pCairoContext,
+				g_pBackgroundSurface[CAIRO_DOCK_HORIZONTAL] = cairo_dock_load_image (pCairoContext,
 					g_cBackgroundImageFile,
 					&g_fBackgroundImageWidth,
 					&g_fBackgroundImageHeight,
-					(pDock->bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)),
+					0,  // (pDock->bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)),
 					g_fBackgroundImageAlpha,
 					g_bBackgroundImageRepeat);
+				
+				g_pBackgroundSurface[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (g_pBackgroundSurface[CAIRO_DOCK_HORIZONTAL], pCairoContext, g_fBackgroundImageWidth, g_fBackgroundImageHeight, (g_bDirectionUp ? -G_PI/2 : G_PI/2));
 			}
 		}
 		else
 		{
 			g_fBackgroundImageWidth = 2 * iDecorationsWidth;
 			g_fBackgroundImageHeight = iDecorationsHeight;
-			g_pBackgroundSurfaceFull = cairo_dock_load_stripes (pCairoContext, g_fBackgroundImageWidth, g_fBackgroundImageHeight, (pDock->bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)));
+			g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL] = cairo_dock_load_stripes (pCairoContext, g_fBackgroundImageWidth, g_fBackgroundImageHeight, 0);  // (pDock->bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2))
+			
+			g_pBackgroundSurfaceFull[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL], pCairoContext, g_fBackgroundImageWidth, g_fBackgroundImageHeight, (g_bDirectionUp ? -G_PI/2 : G_PI/2));
 		}
 		
 		cairo_destroy (pCairoContext);

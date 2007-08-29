@@ -24,7 +24,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <cairo-glitz.h>
 #endif
 
-
 #include "cairo-dock-icons.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-callbacks.h"
@@ -51,8 +50,8 @@ extern gboolean g_bRoundedBottomCorner;
 extern gboolean g_bDirectionUp;
 extern double g_fStripesSpeedFactor;
 extern double g_fBackgroundImageWidth, g_fBackgroundImageHeight;
-extern cairo_surface_t *g_pBackgroundSurface;
-extern cairo_surface_t *g_pBackgroundSurfaceFull;
+extern cairo_surface_t *g_pBackgroundSurface[2];
+extern cairo_surface_t *g_pBackgroundSurfaceFull[2];
 
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
@@ -412,7 +411,7 @@ void cairo_dock_render (CairoDock *pDock)
 		_cairo_dock_draw_frame_vertical (pDock, pCairoContext, fRadius, fLineWidth, fDockWidth, fDockOffsetX, fDockOffsetY, sens, bIsLoop);
 	
 	//\____________________ On dessine les decorations du fond.
-	if (g_pBackgroundSurfaceFull != NULL)
+	if (g_pBackgroundSurfaceFull[pDock->bHorizontalDock] != NULL)
 	{
 		cairo_save (pCairoContext);
 		
@@ -421,11 +420,11 @@ void cairo_dock_render (CairoDock *pDock)
 		else
 			cairo_translate (pCairoContext, (g_bDirectionUp ? pDock->iCurrentHeight - pDock->iMaxIconHeight - fLineWidth : fLineWidth), (- pDock->fDecorationsOffsetX - pDock->iCurrentWidth / 2) / g_fStripesSpeedFactor - pDock->iCurrentWidth * 0.5);
 		
-		cairo_set_source_surface (pCairoContext, g_pBackgroundSurfaceFull, 0., 0.);
+		cairo_set_source_surface (pCairoContext, g_pBackgroundSurfaceFull[pDock->bHorizontalDock], 0., 0.);
 		cairo_fill_preserve (pCairoContext);
 		cairo_restore (pCairoContext);
 	}
-	else if (g_pBackgroundSurface != NULL)
+	else if (g_pBackgroundSurface[pDock->bHorizontalDock] != NULL)
 	{
 		cairo_save (pCairoContext);
 		
@@ -443,7 +442,7 @@ void cairo_dock_render (CairoDock *pDock)
 		
 		//g_print ("(%dx%d) / (%dx%d)\n", pDock->iCurrentWidth, pDock->iMaxIconHeight, (int) g_fBackgroundImageWidth, (int) g_fBackgroundImageHeight);
 		
-		cairo_set_source_surface (pCairoContext, (pDock->bInside ? g_pBackgroundSurface : g_pBackgroundSurface), 0., 0.);
+		cairo_set_source_surface (pCairoContext, g_pBackgroundSurface[pDock->bHorizontalDock], 0., 0.);
 		cairo_fill_preserve (pCairoContext);
 		cairo_restore (pCairoContext);
 	}
@@ -686,7 +685,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 		cairo_rectangle (pCairoContext, fDockOffsetX, fDockOffsetY, pArea->width, pDock->iMaxIconHeight);
 	else
 		cairo_rectangle (pCairoContext, fDockOffsetX, fDockOffsetY, pDock->iMaxIconHeight, pArea->height);
-	if (g_pBackgroundSurfaceFull != NULL)
+	if (g_pBackgroundSurfaceFull[pDock->bHorizontalDock] != NULL)
 	{
 		cairo_save (pCairoContext);
 		
@@ -694,12 +693,12 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 			cairo_translate (pCairoContext, (- pDock->fDecorationsOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth * 0.5, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
 		else
 			cairo_translate (pCairoContext, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth), (- pDock->fDecorationsOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth * 0.5);
-		cairo_set_source_surface (pCairoContext, g_pBackgroundSurfaceFull, 0., 0.);
+		cairo_set_source_surface (pCairoContext, g_pBackgroundSurfaceFull[pDock->bHorizontalDock], 0., 0.);
 		
 		cairo_fill_preserve (pCairoContext);
 		cairo_restore (pCairoContext);
 	}
-	else if (g_pBackgroundSurface != NULL)
+	else if (g_pBackgroundSurface[pDock->bHorizontalDock] != NULL)
 	{
 		cairo_save (pCairoContext);
 		
@@ -714,7 +713,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 			cairo_scale (pCairoContext, 1. * pDock->iMaxIconHeight / g_fBackgroundImageHeight, 1. * iWidth / g_fBackgroundImageWidth);
 		}
 		
-		cairo_set_source_surface (pCairoContext, (pDock->bInside ? g_pBackgroundSurface : g_pBackgroundSurface), 0., 0.);
+		cairo_set_source_surface (pCairoContext, g_pBackgroundSurface[pDock->bHorizontalDock], 0., 0.);
 		
 		cairo_fill_preserve (pCairoContext);
 		cairo_restore (pCairoContext);
