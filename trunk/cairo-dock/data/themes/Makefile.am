@@ -2,6 +2,7 @@ SUBDIRS = \
 	default\
 	Fabounet\
 	Ubuntu\
-	Chilperik\
-	Djoole
-	
+	Verde\
+	Djoole\
+	Cobalt\
+	Cybergoll

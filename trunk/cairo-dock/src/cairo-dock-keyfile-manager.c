@@ -1156,7 +1156,7 @@ void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pRepla
 	GError *erreur = NULL;
 	gsize length = 0;
 	gchar **pKeyList;
-	gchar **pGroupList = g_key_file_get_groups (pReplacementKeyFile, &length);
+	gchar **pGroupList = g_key_file_get_groups (pOriginalKeyFile, &length);
 	gchar *cGroupName, *cKeyName, *cKeyValue;
 	int i, j;
 	
@@ -1166,7 +1166,7 @@ void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pRepla
 		cGroupName = pGroupList[i];
 		
 		length = 0;
-		pKeyList = g_key_file_get_keys (pReplacementKeyFile, cGroupName, NULL, NULL);
+		pKeyList = g_key_file_get_keys (pOriginalKeyFile, cGroupName, NULL, NULL);
 		
 		j = 0;
 		while (pKeyList[j] != NULL)

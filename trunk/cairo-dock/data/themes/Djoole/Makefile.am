@@ -34,4 +34,5 @@ theme_DATA = \
 	thunderbird.svg \
 	transmission.png \
 	Tux.svg \
-	web.svg
+	web.svg\
+	readme

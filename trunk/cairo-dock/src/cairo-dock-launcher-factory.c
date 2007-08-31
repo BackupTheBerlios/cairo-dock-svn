@@ -33,15 +33,15 @@ extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
 
 extern double g_fAmplitude;
-extern int g_iLabelSize;
-extern gboolean g_bUseText;
 extern int g_iIconGap;
+
+extern int g_iLabelSize;
+extern gboolean g_bTextAlwaysHorizontal;
+extern gchar *g_cLabelPolice;
 
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentThemePath;
 extern gchar **g_cDefaultIconDirectory;
-
-extern gchar *g_cLabelPolice;
 
 extern gboolean g_bDirectionUp;
 extern gboolean g_bSameHorizontality;
@@ -506,10 +506,9 @@ Icon * cairo_dock_create_icon_from_desktop_file (gchar *cDesktopFileName, cairo_
 	
 	cairo_dock_fill_one_text_buffer (icon,
 		pSourceContext,
-		g_bUseText,
 		g_iLabelSize,
 		g_cLabelPolice,
-		g_pMainDock->bHorizontalDock);
+		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : g_pMainDock->bHorizontalDock));
 	
 	CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 	if (pParentDock == NULL)

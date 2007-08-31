@@ -35,8 +35,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 extern double g_fAmplitude;
 extern int g_iLabelSize;
-extern gboolean g_bUseText;
 extern gchar *g_cLabelPolice;
+extern gboolean g_bTextAlwaysHorizontal;
 
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
@@ -264,7 +264,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	icon->fHeight = fHeight;
 	icon->pIconBuffer = pNewSurface;
 	icon->bIsMapped = TRUE;  // si elle n'est pas visible, le 2eme UnmapNotify sera juste ignore.
-	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_bUseText, g_iLabelSize, g_cLabelPolice, pDock->bHorizontalDock);
+	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 	
 	if (g_bUniquePid)
 		g_hash_table_insert (g_hAppliTable, pPidBuffer, icon);

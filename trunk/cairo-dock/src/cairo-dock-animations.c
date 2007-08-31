@@ -236,8 +236,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 			cairo_dock_calculate_icons (pDock, iMouseX, iMouseY);  // relance le grossissement si on est dedans.
 			if (! pDock->bInside && pDock->iRefCount > 0)
 			{
-				g_print ("on cache ce sous-dock en sortant par lui\n");
-				//gdk_window_hide (pDock->pWidget->window);
+				//g_print ("on cache ce sous-dock en sortant par lui\n");
 				gtk_widget_hide (pDock->pWidget);
 				cairo_dock_hide_parent_docks (pDock);
 			}

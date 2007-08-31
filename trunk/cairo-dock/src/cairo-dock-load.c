@@ -53,6 +53,7 @@ extern gboolean g_bReverseVisibleImage;
 
 extern int g_iLabelWeight;
 extern int g_iLabelStyle;
+extern gboolean g_bTextAlwaysHorizontal;
 extern gchar *g_cCurrentThemePath;
 
 extern int g_iDockRadius;
@@ -157,12 +158,12 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 }
 
 
-void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, gboolean bUseText, int iLabelSize, gchar *cLabelPolice, gboolean bHorizontalDock)
+void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, gboolean bHorizontalDock)
 {
 	//g_print ("%s (%s, %d)\n", __func__, cLabelPolice, iLabelSize);
 	cairo_surface_destroy (icon->pTextBuffer);
 	icon->pTextBuffer = NULL;
-	if (icon->acName == NULL || ! bUseText)
+	if (icon->acName == NULL || (iLabelSize == 0))
 		return ;
 	
 	PangoFontDescription *pDesc;
@@ -238,33 +239,6 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, gbool
 		cairo_surface_destroy (pNewSurface);
 		pNewSurface = pNewSurfaceRotated;
 	}
-	/*if (fRotationAngle != 0)
-	{
-		cairo_surface_t *pNewSurfaceRotated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-			CAIRO_CONTENT_COLOR_ALPHA,
-			ink.height + 2,
-			ink.width + 2);
-		pCairoContext = cairo_create (pNewSurfaceRotated);
-		
-		if (fRotationAngle < 0)
-		{
-			cairo_move_to (pCairoContext, ink.height + 2, 0);
-			cairo_rotate (pCairoContext, fRotationAngle);
-			cairo_translate (pCairoContext, - (ink.width + 2), 0);
-		}
-		else
-		{
-			cairo_move_to (pCairoContext, 0, 0);
-			cairo_rotate (pCairoContext, fRotationAngle);
-			cairo_translate (pCairoContext, 0, - (ink.height + 2));
-		}
-		cairo_set_source_surface (pCairoContext, pNewSurface, 0, 0);
-		
-		cairo_paint (pCairoContext);
-		cairo_surface_destroy (pNewSurface);
-		pNewSurface = pNewSurfaceRotated;
-		cairo_destroy (pCairoContext);
-	}*/
 	
 	icon->pTextBuffer = pNewSurface;
 	
@@ -285,8 +259,7 @@ static void _cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDo
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 	double fMaxScale = *((double *) data[0]);
 	int iLabelSize = *((int *) data[1]);
-	gboolean bUseText = *((gboolean *) data[2]);
-	gchar *cLabelPolice = (gchar *) data[3];
+	gchar *cLabelPolice = (gchar *) data[2];
 	
 	Icon* icon;
 	GList* ic;
@@ -301,11 +274,10 @@ static void _cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDo
 		pDock->iMinDockWidth += g_iIconGap + icon->fWidth;
 		pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, icon->fHeight);
 		
-		cairo_dock_fill_one_text_buffer (icon, pCairoContext, bUseText, iLabelSize, cLabelPolice, pDock->bHorizontalDock);
+		cairo_dock_fill_one_text_buffer (icon, pCairoContext, iLabelSize, cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 	}
-	
 	cairo_destroy (pCairoContext);
-	//pDock->iMaxDockHeight = (int) (fMaxScale * pDock->iMaxIconHeight) + iLabelSize + g_iDockLineWidth;
+	
 	if (! pDock->bIsMainDock)
 	{
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
@@ -314,9 +286,9 @@ static void _cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDo
 		cairo_dock_calculate_icons (pDock, 0, 0);
 	}
 }
-void cairo_dock_reload_buffers_in_all_dock (GHashTable *hDocksTable, double fMaxScale, int iLabelSize, gboolean bUseText, gchar *cLabelPolice)
+void cairo_dock_reload_buffers_in_all_dock (GHashTable *hDocksTable, double fMaxScale, int iLabelSize, gchar *cLabelPolice)
 {
-	gpointer data[4] = {&fMaxScale, &iLabelSize, &bUseText, cLabelPolice};
+	gpointer data[3] = {&fMaxScale, &iLabelSize, cLabelPolice};
 	g_hash_table_foreach (hDocksTable, (GHFunc) _cairo_dock_reload_buffers_in_dock, data);
 }
 
@@ -439,7 +411,6 @@ cairo_surface_t *cairo_dock_load_stripes (cairo_t* pSourceContext, int iStripesW
 			g_fStripesColorBright[3]);
 	}
 	
-	
 	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 		CAIRO_CONTENT_COLOR_ALPHA,
 		iStripesWidth,
@@ -481,7 +452,6 @@ cairo_surface_t *cairo_dock_load_stripes (cairo_t* pSourceContext, int iStripesW
 	
 	return pNewSurface;
 }
-
 
 
 

@@ -619,8 +619,11 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 				prev_icon = (ic->prev != NULL ? ic->prev->data : cairo_dock_get_last_icon (pIconList));
 				icon->fX = prev_icon->fX + prev_icon->fWidth * prev_icon->fScale + g_iIconGap;
 				
-				if (icon->fX + icon->fWidth * icon->fScale > icon->fXMax - icon->fWidth / 10 && iWidth != 0)
-					icon->fX = icon->fXMax - icon->fWidth * icon->fScale - icon->fWidth / 20;
+				if (icon->fX + icon->fWidth * icon->fScale > icon->fXMax - g_fAmplitude * icon->fWidth / 10 && iWidth != 0)
+				{
+					//g_print ("  on contraint %s (fXMax=%.2f , fX=%.2f\n", prev_icon->acName, prev_icon->fXMax, prev_icon->fX);
+					icon->fX = icon->fXMax - icon->fWidth * icon->fScale - g_fAmplitude * icon->fWidth / 20;
+				}
 			}
 			icon->fX = fAlign * iWidth + (icon->fX - fAlign * iWidth) * (1 - fLateralFactor);
 		}
@@ -671,10 +674,10 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 		
 		prev_icon->fX = icon->fX - g_iIconGap - prev_icon->fWidth * prev_icon->fScale;
 		//g_print ("fX <- %.2f; fXMin : %.2f\n", prev_icon->fX, prev_icon->fXMin);
-		if (prev_icon->fX < prev_icon->fXMin + prev_icon->fWidth / 6 && iWidth != 0 && prev_icon->fPhase == 0 && x_abs < iWidth)
+		if (prev_icon->fX < prev_icon->fXMin + g_fAmplitude * prev_icon->fWidth / 8 && iWidth != 0 && prev_icon->fPhase == 0 && x_abs < iWidth)
 		{
 			//g_print ("  on contraint %s (fXMin=%.2f , fX=%.2f\n", prev_icon->acName, prev_icon->fXMin, prev_icon->fX);
-			prev_icon->fX = prev_icon->fXMin + prev_icon->fWidth / 12;
+			prev_icon->fX = prev_icon->fXMin + g_fAmplitude * prev_icon->fWidth / 16;
 		}
 		prev_icon->fX = fAlign * iWidth + (prev_icon->fX - fAlign * iWidth) * (1 - fLateralFactor);
 	}

@@ -123,7 +123,7 @@ double g_fStringColor[4];  // la couleur de la ficelle.
 cairo_surface_t *g_pVisibleZoneSurface = NULL;  // surface de la zone de rappel.
 double g_fVisibleZoneAlpha;  // transparence de la zone de rappel.
 int g_iNbStripes;  // le nombre de rayures a dessiner en fond dans chaque motif elementaire.
-double g_fStripesSpeedFactor;  // =1 les rayures suivent le curseur, >1 les rayures vont d'autant moins vite.
+double g_fStripesSpeedFactor;  // =1 les rayures suivent le curseur, <1 les rayures vont d'autant moins vite.
 double g_fStripesWidth;  // leur epaisseur relative.
 double g_fStripesColorBright[4];  // couleur claire du fond ou des rayures.
 double g_fStripesColorDark[4];  // couleur foncee du fond ou des rayures.
@@ -160,13 +160,13 @@ int g_iVisibleZoneHeight = 0;
 gboolean g_bDirectionUp = TRUE;  // la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.
 gboolean g_bSameHorizontality = TRUE;  // dit si les sous-docks ont la meme horizontalite que les docks racines.
 double g_fSubDockSizeRatio;  // ratio de la taille des icones des sous-docks par rapport a celles du dock principal.
-gboolean g_bUseText;  // vrai ssi on doit afficher les etiquettes au-dessus des icones.
 int g_iLabelSize;  // taille de la police des etiquettes.
 gchar *g_cLabelPolice;  // police de caracteres des etiquettes.
-int g_iLabelWeight;
-int g_iLabelStyle;
-gboolean g_bLabelForPointedIconOnly;
+int g_iLabelWeight;  // epaisseur des traits.
+int g_iLabelStyle;  // italique ou droit.
+gboolean g_bLabelForPointedIconOnly;  // n'afficher les etiquettes que pour l'icone pointee.
 double g_fLabelAlphaThreshold;  // seuil de visibilité de etiquettes.
+gboolean g_bTextAlwaysHorizontal;  // true <=> tetiquettes horizontales meme pour les docks verticaux.
 
 double g_fUnfoldAcceleration = 0;
 double g_fGrowUpFactor = 1.4;

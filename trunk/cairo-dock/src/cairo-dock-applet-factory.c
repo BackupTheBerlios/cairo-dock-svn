@@ -31,8 +31,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 extern double g_fAmplitude;
 extern int g_iLabelSize;
-extern gboolean g_bUseText;
 extern gchar *g_cLabelPolice;
+extern gboolean g_bTextAlwaysHorizontal;
 
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
@@ -73,7 +73,7 @@ Icon *cairo_dock_create_icon_for_applet (CairoDock *pDock, int iWidth, int iHeig
 	cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock);
 	
 	icon->pIconBuffer = cairo_dock_create_applet_surface (pSourceContext, 1 + g_fAmplitude, &icon->fWidth, &icon->fHeight);
-	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_bUseText, g_iLabelSize, g_cLabelPolice, pDock->bHorizontalDock);
+	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 	
 	cairo_destroy (pSourceContext);
 	return icon;

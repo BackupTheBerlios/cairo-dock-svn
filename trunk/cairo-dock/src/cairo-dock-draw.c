@@ -309,7 +309,6 @@ void cairo_dock_calculate_construction_parameters (Icon *icon, int iCurrentWidth
 		else
 			fAlpha *= 1. * (n - 1 - (c%n)) / n;
 		fAlpha *= fAlpha;
-		//cairo_paint_with_alpha (pCairoContext, alpha * alpha);
 		icon->iCount --;
 	}
 	
@@ -325,12 +324,13 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboo
 	if (bHorizontalDock)
 	{
 		cairo_translate (pCairoContext, icon->fDrawX, icon->fDrawY);
-		//cairo_move_to (pCairoContext, fX, fY);
+		cairo_save (pCairoContext);
 		cairo_scale (pCairoContext, fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fScale / (1 + g_fAmplitude));
 	}
 	else
 	{
 		cairo_translate (pCairoContext, icon->fDrawY, icon->fDrawX);
+		cairo_save (pCairoContext);
 		cairo_scale (pCairoContext, fRatio * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude));
 	}
 	
@@ -342,9 +342,10 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboo
 		cairo_paint (pCairoContext);
 	else
 		cairo_paint_with_alpha (pCairoContext, icon->fAlpha);
+	cairo_restore (pCairoContext);
 	
 	//\_____________________ On dessine les etiquettes, avec un alpha proportionnel au facteur d'echelle de leur icone.
-	if (g_bUseText && icon->pTextBuffer != NULL && icon->fScale > 1.01 && (! g_bLabelForPointedIconOnly || icon->bPointed))  // 1.01 car sin(pi) = 1+epsilon :-/
+	if (icon->pTextBuffer != NULL && icon->fScale > 1.01 && (! g_bLabelForPointedIconOnly || icon->bPointed))  // 1.01 car sin(pi) = 1+epsilon :-/
 	{
 		if (bHorizontalDock)
 			cairo_set_source_surface (pCairoContext,
@@ -416,9 +417,9 @@ void cairo_dock_render (CairoDock *pDock)
 		cairo_save (pCairoContext);
 		
 		if (pDock->bHorizontalDock)
-			cairo_translate (pCairoContext, (- pDock->fDecorationsOffsetX - pDock->iCurrentWidth / 2) / g_fStripesSpeedFactor - pDock->iCurrentWidth * 0.5, (g_bDirectionUp ? pDock->iCurrentHeight - pDock->iMaxIconHeight - fLineWidth : fLineWidth));
+			cairo_translate (pCairoContext, (- pDock->fDecorationsOffsetX - pDock->iCurrentWidth / 2) * g_fStripesSpeedFactor - pDock->iCurrentWidth * 0.5, (g_bDirectionUp ? pDock->iCurrentHeight - pDock->iMaxIconHeight - fLineWidth : fLineWidth));
 		else
-			cairo_translate (pCairoContext, (g_bDirectionUp ? pDock->iCurrentHeight - pDock->iMaxIconHeight - fLineWidth : fLineWidth), (- pDock->fDecorationsOffsetX - pDock->iCurrentWidth / 2) / g_fStripesSpeedFactor - pDock->iCurrentWidth * 0.5);
+			cairo_translate (pCairoContext, (g_bDirectionUp ? pDock->iCurrentHeight - pDock->iMaxIconHeight - fLineWidth : fLineWidth), (- pDock->fDecorationsOffsetX - pDock->iCurrentWidth / 2) * g_fStripesSpeedFactor - pDock->iCurrentWidth * 0.5);
 		
 		cairo_set_source_surface (pCairoContext, g_pBackgroundSurfaceFull[pDock->bHorizontalDock], 0., 0.);
 		cairo_fill_preserve (pCairoContext);
@@ -428,7 +429,7 @@ void cairo_dock_render (CairoDock *pDock)
 	{
 		cairo_save (pCairoContext);
 		
-		double fDeltaX = (- pDock->fDecorationsOffsetX - pDock->iCurrentWidth / 2) / g_fStripesSpeedFactor;
+		double fDeltaX = (- pDock->fDecorationsOffsetX - pDock->iCurrentWidth / 2) * g_fStripesSpeedFactor;
 		if (pDock->bHorizontalDock)
 		{
 			cairo_translate (pCairoContext, fDeltaX, (g_bDirectionUp ? pDock->iCurrentHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
@@ -690,9 +691,9 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 		cairo_save (pCairoContext);
 		
 		if (pDock->bHorizontalDock)
-			cairo_translate (pCairoContext, (- pDock->fDecorationsOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth * 0.5, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
+			cairo_translate (pCairoContext, (- pDock->fDecorationsOffsetX - iWidth / 2) * g_fStripesSpeedFactor - iWidth * 0.5, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
 		else
-			cairo_translate (pCairoContext, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth), (- pDock->fDecorationsOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth * 0.5);
+			cairo_translate (pCairoContext, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth), (- pDock->fDecorationsOffsetX - iWidth / 2) * g_fStripesSpeedFactor - iWidth * 0.5);
 		cairo_set_source_surface (pCairoContext, g_pBackgroundSurfaceFull[pDock->bHorizontalDock], 0., 0.);
 		
 		cairo_fill_preserve (pCairoContext);
@@ -704,12 +705,12 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 		
 		if (pDock->bHorizontalDock)
 		{
-			cairo_translate (pCairoContext, - (pDock->fDecorationsOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth / 2, fDockOffsetY);
+			cairo_translate (pCairoContext, - (pDock->fDecorationsOffsetX - iWidth / 2) * g_fStripesSpeedFactor - iWidth / 2, fDockOffsetY);
 			cairo_scale (pCairoContext, 1. * iWidth / g_fBackgroundImageWidth, 1. * pDock->iMaxIconHeight / g_fBackgroundImageHeight);
 		}
 		else
 		{
-			cairo_translate (pCairoContext, 0, - (pDock->fDecorationsOffsetX - iWidth / 2) / g_fStripesSpeedFactor - iWidth / 2);
+			cairo_translate (pCairoContext, 0, - (pDock->fDecorationsOffsetX - iWidth / 2) * g_fStripesSpeedFactor - iWidth / 2);
 			cairo_scale (pCairoContext, 1. * pDock->iMaxIconHeight / g_fBackgroundImageHeight, 1. * iWidth / g_fBackgroundImageWidth);
 		}
 		

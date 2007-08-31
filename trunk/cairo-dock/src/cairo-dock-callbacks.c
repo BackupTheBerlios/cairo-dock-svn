@@ -49,10 +49,10 @@ extern gint g_iScreenHeight[2];
 extern int g_iScrollAmount;
 extern gboolean g_bResetScrollOnLeave;
 
-extern gboolean g_bUseText;
 extern gboolean g_bSameHorizontality;
 extern int g_iLabelSize;
 extern gchar *g_cLabelPolice;
+extern gboolean g_bTextAlwaysHorizontal;
 
 extern int g_iDockRadius;
 extern int g_iDockLineWidth;
@@ -572,7 +572,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 					if (pOriginDock->iRefCount > 0 && ! g_bSameHorizontality)
 					{
 						cairo_t* pSourceContext = cairo_dock_create_context_from_window (pDock);
-						cairo_dock_fill_one_text_buffer (s_pIconClicked, pSourceContext, g_bUseText, g_iLabelSize, g_cLabelPolice, g_pMainDock->bHorizontalDock);
+						cairo_dock_fill_one_text_buffer (s_pIconClicked, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : g_pMainDock->bHorizontalDock));
 						cairo_destroy (pSourceContext);
 					}
 					
