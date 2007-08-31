@@ -4,5 +4,4 @@ SUBDIRS = \
 	Ubuntu\
 	Verde\
 	Djoole\
-	Cobalt\
-	Cybergoll
+	Cobalt

@@ -510,7 +510,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	g_fStripesWidth = cairo_dock_get_double_key_value (pKeyFile, "Background", "stripes width", &bFlushConfFileNeeded, 0.02);
 	if (g_iNbStripes > 0 && g_fStripesWidth > 1. / g_iNbStripes)
 	{
-		g_print ("Attention : the stripes' width is greater than the space between them.\n);
+		g_print ("Attention : the stripes' width is greater than the space between them.\n");
 		g_fStripesWidth = 0.99 / g_iNbStripes;
 	}
 	

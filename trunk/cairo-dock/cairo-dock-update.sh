@@ -2,11 +2,14 @@
 
 #       cairo-dock-update.sh
 #
-#       Script qui télécharge et installe les packages de cairo-dock (core et plugins) depuis http://fabounet03.free.fr
+#       Script qui télécharge et installe les packages de cairo-dock (core et plugins) depuis
+#         http://download.berlios.de/cairo-dock/ pour la version stable (par défaut)
+#         http://fabounet03.free.fr pour la version unstable (option -u)
+#
 #       Ne PAS lancer en super-administrateur
 #
 #       @author sombrero [Colin Darie] <colindarie@gmail.com>
-#       @version 2007-08-10 00:14:50 +0200
+#       @version 2007-08-30 23:00:15 +0200
 #
 
 #       Merci à Fabounet pour la réalisation du dock !
@@ -24,7 +27,8 @@ COMMAND_RESTART_DOCK="/usr/bin/cairo-dock"
 
 
 ## Paramètres serveur HTTP
-HOST="http://fabounet03.free.fr"
+HOST_STABLE="http://download.berlios.de/cairo-dock"
+HOST_UNSTABLE="http://fabounet03.free.fr"
 FILE_MD5SUM_REMOTE="md5sum.txt"
 
 ## Regexp utilisées pour récupérer les noms des fichiers .deb
@@ -36,14 +40,29 @@ FILE_MD5SUM_LOCAL="cairo-dock-md5sum"
 FILE_MD5SUM_OLD="cairo-dock-md5sum.old"
 
 
-
-
 ## Création du repertoire de download s'il n'existe pas
 if [ ! -d $DIR ] ; then
   mkdir $DIR
 fi
 
 cd $DIR
+
+# Recup des options (pour l'instant uniquement -u pour unstable)
+UNSTABLE=0
+while getopts "u" opt; do
+  case $opt in
+    u) UNSTABLE=1 ;;
+  esac
+done
+
+
+## Suivant qu'on ait passé l'option --unstable au dock ou pas, on choisit le bon host
+if [ $UNSTABLE -eq 1 ] ; then
+  HOST=$HOST_UNSTABLE;
+else
+  HOST=$HOST_STABLE;
+fi
+
 
 ## Si on ne trouve pas d'ancien fichier md5sum.old , on en créé un vide
 if [ ! -e $FILE_MD5SUM_OLD ] ; then
@@ -85,9 +104,10 @@ if [ -n "$NEED_UPGRADE" ]; then
   ## On relance le dock si demandé
   if [ -n "$COMMAND_RESTART_DOCK" ] ; then
     ## Modif de Vilraleur : tuer les cairo-dock deja ouverts.
-    echo "on tue éventuellement tous les cairo-dock d'ouvert"
+    echo "On tue éventuellement tous les cairo-dock d'ouvert"
     killall cairo-dock
-    echo "Redémarrage de cairo-dock avec la commane $COMMAND_RESTART_DOCK ..."
+
+    echo "Redémarrage de cairo-dock avec la commande $COMMAND_RESTART_DOCK ..."
     exec $COMMAND_RESTART_DOCK &
   fi
 
@@ -100,8 +120,6 @@ else
 
   ## Suppression du fichier md5sum inutile
   rm $FILE_MD5SUM_LOCAL
-
-  sleep 1
 fi
 
 echo "Terminé.";
