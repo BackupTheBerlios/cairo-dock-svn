@@ -551,6 +551,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					case 'S' :  // string avec un selecteur de fichier a cote du GtkEntry.
 					case 'D' :  // string avec un selecteur de repertoire a cote du GtkEntry.
 					case 'T' :  // string, mais sans pouvoir decochez les cases.
+					case 'E' : // string, mais avec un GtkComboBoxEntry si 1 seul choix.
 						//g_print ("  + string\n");
 						pEntry = NULL;
 						length = 0;
@@ -566,7 +567,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							}
 							else
 							{
-								pOneWidget = gtk_combo_box_new_text ();
+								pOneWidget = (iElementType != 'E' ? gtk_combo_box_new_text () : gtk_combo_box_entry_new_text ());
 								int iSelectedElement = -1;
 								k = 0;
 								while (pAuthorizedValuesList[k] != NULL)
@@ -1151,12 +1152,12 @@ void cairo_dock_replace_comments (GKeyFile *pOriginalKeyFile, GKeyFile *pReplace
 }
 
 
-void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile)
+void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile, gboolean bUseOriginalKeys)
 {
 	GError *erreur = NULL;
 	gsize length = 0;
 	gchar **pKeyList;
-	gchar **pGroupList = g_key_file_get_groups (pOriginalKeyFile, &length);
+	gchar **pGroupList = g_key_file_get_groups ((bUseOriginalKeys ? pOriginalKeyFile : pReplacementKeyFile), &length);
 	gchar *cGroupName, *cKeyName, *cKeyValue;
 	int i, j;
 	
@@ -1166,7 +1167,7 @@ void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pRepla
 		cGroupName = pGroupList[i];
 		
 		length = 0;
-		pKeyList = g_key_file_get_keys (pOriginalKeyFile, cGroupName, NULL, NULL);
+		pKeyList = g_key_file_get_keys ((bUseOriginalKeys ? pOriginalKeyFile : pReplacementKeyFile), cGroupName, NULL, NULL);
 		
 		j = 0;
 		while (pKeyList[j] != NULL)

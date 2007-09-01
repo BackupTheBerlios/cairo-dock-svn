@@ -27,12 +27,11 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-icons.h"
 #include "cairo-dock-keyfile-manager.h"
 #include "cairo-dock-dock-factory.h"
+#include "cairo-dock-config.h"
 #include "cairo-dock-desktop-file-factory.h"
 
-
+extern GHashTable *g_hDocksTable;
 extern gchar *g_cCurrentThemePath;
-
-extern gchar *g_cDefaultFileBrowser;
 
 
 gchar *cairo_dock_add_desktop_file_from_path (gchar *cFilePath, gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur)
@@ -96,7 +95,7 @@ Order = %f\n\
 Container = %s\n\
 #b Is this icon a container ?\n\
 Is container = false",
-		cFilePath, cFilePath, g_cDefaultFileBrowser, cFilePath, g_cDefaultFileBrowser, fEffectiveOrder, cDockName);
+		cFilePath, cFilePath, "xdg-open", cFilePath, "nautilus", fEffectiveOrder, cDockName);
 		lenght = -1;
 		
 		//\___________________ On lui choisit un nom de fichier tel qu'il n'y ait pas de collision.
@@ -208,5 +207,33 @@ gchar *cairo_dock_generate_desktop_filename (gchar *cCairoDockDataDir)
 	while (dirpointer != NULL);  // si on a pas parcouru tout le repertoire, c'est qu'on a trouve une collision.
 	
 	return g_strdup_printf ("%02d%s", i, "launcher.desktop");
+}
+
+
+
+static void _cairo_dock_write_container_name (gchar *cDockName, CairoDock *pDock, GString *pString)
+{
+	g_string_append_printf (pString, "%s;", cDockName);
+}
+void cairo_dock_update_lanucher_desktop_file (gchar *cDesktopFilePath, gchar *cLanguage)
+{
+	GError *erreur = NULL;
+	GKeyFile *pKeyFile = g_key_file_new ();
+	g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		return ;
+	}
+	
+	gchar *cCommand = g_strdup_printf ("/bin/cp %s/launcher-%s.conf %s\n", CAIRO_DOCK_SHARE_DATA_DIR, cLanguage, cDesktopFilePath);
+	system (cCommand);
+	g_free (cCommand);
+	
+	cairo_dock_replace_values_in_conf_file (cDesktopFilePath, pKeyFile, FALSE);
+	g_key_file_free (pKeyFile);
+	
+	cairo_dock_update_conf_file_with_hash_table (cDesktopFilePath, g_hDocksTable, "Desktop Entry", "Container", 1, NULL, TRUE);
 }
 

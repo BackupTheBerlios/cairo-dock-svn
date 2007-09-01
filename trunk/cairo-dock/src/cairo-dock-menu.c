@@ -45,6 +45,7 @@ extern gchar *g_cCurrentThemeName;
 
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
+extern gchar *g_cLanguage;
 
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentThemePath;
@@ -301,6 +302,9 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	Icon *icon = data[1];
 	
 	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon->acDesktopFileName);
+	
+	cairo_dock_update_lanucher_desktop_file (cDesktopFilePath, g_cLanguage);
+	
 	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", 300, 400, TRUE, NULL, NULL, NULL);
 	g_free (cDesktopFilePath);
 	

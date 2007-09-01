@@ -463,12 +463,12 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 		int iDecorationsHeight = MAX (iDecorationsHeight, iNewMaxIconHeight);
 		
 		cairo_surface_destroy (g_pBackgroundSurface[0]);
-		cairo_surface_destroy (g_pBackgroundSurface[1]);
-		cairo_surface_destroy (g_pBackgroundSurfaceFull[0]);
-		cairo_surface_destroy (g_pBackgroundSurfaceFull[1]);
 		g_pBackgroundSurface[0] = NULL;
+		cairo_surface_destroy (g_pBackgroundSurface[1]);
 		g_pBackgroundSurface[1] = NULL;
+		cairo_surface_destroy (g_pBackgroundSurfaceFull[0]);
 		g_pBackgroundSurfaceFull[0] = NULL;
+		cairo_surface_destroy (g_pBackgroundSurfaceFull[1]);
 		g_pBackgroundSurfaceFull[1] = NULL;
 		cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 		

@@ -19,7 +19,7 @@ void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file);
 
 void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int y);
 
-void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, int iNbAvailableChoicess, gchar *cNewUsefullComment);
+void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, int iNbAvailableChoicess, gchar *cNewUsefullComment, gboolean bAllowNewChoice);
 void cairo_dock_update_conf_file_with_modules (gchar *cConfFile, GHashTable *pModuleTable);
 
 void cairo_dock_update_conf_file_with_translations (gchar *cConfFile, gchar *cTranslationsDir);
@@ -28,7 +28,7 @@ void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *p
 
 
 void cairo_dock_apply_translation_on_conf_file (gchar *cConfFilePath, gchar *cCommentsFilePath);
-void cairo_dock_replace_values_in_conf_file (gchar *cConfFilePath, GKeyFile *pValidKeyFile);
+void cairo_dock_replace_values_in_conf_file (gchar *cConfFilePath, GKeyFile *pValidKeyFile, gboolean bUseFileKeys);
 
 GHashTable *cairo_dock_list_available_translations (gchar *cTranslationsDir, gchar *cFilePrefix, GError **erreur);
 

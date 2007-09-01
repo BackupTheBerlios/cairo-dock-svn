@@ -689,6 +689,7 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 {
 	//\_______________ On calcule la position du curseur dans le referentiel du dock a plat.
+	static gboolean bReturn = FALSE;
 	int iWidth, iHeight;
 	iWidth = pDock->iCurrentWidth;
 	iHeight = pDock->iCurrentHeight;
@@ -712,7 +713,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	{
 		double fSideMargin = (pDock->fAlign - .5) * (iWidth - pDock->iMinDockWidth);
 		if (x_abs < fSideMargin || x_abs > pDock->iMinDockWidth + fSideMargin)
-			g_signal_emit_by_name (pDock->pWidget, "leave-notify-event", NULL);
+			g_signal_emit_by_name (pDock->pWidget, "leave-notify-event", NULL, &bReturn);
 		else
 			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, pDock);
 	}
@@ -831,10 +832,10 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX)
 	do
 	{
 		icon = ic->data;
-		if (x_abs >= icon->fXAtRest && x_abs <= icon->fXAtRest + icon->fWidth)
+		if (x_abs >= icon->fXAtRest && x_abs <= icon->fXAtRest + icon->fWidth)  // on n'utilise pas icon->bPointed, pour pouvoir remettre a zero.
 		{
 			icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
-			if (x_abs < icon->fXAtRest + icon->fWidth / 2)  // on est a gauche.
+			if (x_abs < icon->fXAtRest + icon->fWidth / 4)  // on est a gauche.
 			{
 				Icon *prev_icon;
 				if (ic->prev != NULL)
@@ -843,7 +844,7 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX)
 					prev_icon = g_list_last (pDock->icons)->data;
 				prev_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
 			}
-			else
+			else if (x_abs > icon->fXAtRest + 3. * icon->fWidth / 4)  // on est a droite.
 			{
 				Icon *next_icon;
 				if (ic->next != NULL)
@@ -857,6 +858,8 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX)
 				if (ic == pFirstDrawnElement)
 					break ;
 			}
+			else
+				icon->iAnimationType = 0;
 		}
 		else
 			icon->iAnimationType = 0;

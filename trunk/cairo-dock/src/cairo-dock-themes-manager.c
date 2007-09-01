@@ -72,8 +72,8 @@ gchar *cairo_dock_edit_themes (gchar *cLanguage, GHashTable **hThemeTable)
 	g_free (cCommand);
 	
 	
-	cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, *hThemeTable, "Themes", "chosen theme", 1, NULL);
-	cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, hUserThemeTable, "Delete", "wanted themes", 999, NULL);
+	cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, *hThemeTable, "Themes", "chosen theme", 1, NULL, FALSE);
+	cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, hUserThemeTable, "Delete", "wanted themes", 999, NULL, FALSE);
 	g_hash_table_destroy (hUserThemeTable);
 	
 	

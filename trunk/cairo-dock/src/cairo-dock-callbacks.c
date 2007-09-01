@@ -243,6 +243,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	}
 	if (pDock->iSidGrowUp > 0)  // si on est en train de faire grossir les icones, on arrete.
 	{
+		pDock->fLateralFactor = 0;
 		g_source_remove (pDock->iSidGrowUp);
 		pDock->iSidGrowUp = 0;
 	}
@@ -549,6 +550,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				
 				if (pDock->iSidGrowUp != 0)
 				{
+					pDock->fLateralFactor = 0;
 					g_source_remove (pDock->iSidGrowUp);
 					pDock->iSidGrowUp = 0;
 				}
@@ -580,7 +582,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				}
 				
 				s_pIconClicked->iAnimationType = CAIRO_DOCK_BOUNCE;
-				s_pIconClicked->iCount = 2 * g_tNbIterInOneRound[icon->iAnimationType];  // 2 rebonds.
+				s_pIconClicked->iCount = 2 * g_tNbIterInOneRound[icon->iAnimationType] - 1;  // 2 rebonds.
 				int iX, iY;
 				if (pDock->bHorizontalDock)
 				{
@@ -907,19 +909,38 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 			if (icon->bPointed)
 			{
 				//g_print ("On pointe sur %s\n", icon->acName);
-				if (icon->pSubDock != NULL && icon->pSubDock->icons == NULL)
-				{
-					pReceivingDock = icon->pSubDock;
-				}
-				else if (x > icon->fX + icon->fWidth * icon->fScale / 2)  // on est apres.
+				double fMargin;
+				if (g_str_has_suffix (cFilePath, ".desktop"))  // si c'est un .desktop, on l'ajoute.
+					fMargin = 0.5;
+				else  // sinon on le lance si on est sur l'icone, et on l'ajoute autrement.
+					fMargin = 0.25;
+				if (x > icon->fX + icon->fWidth * icon->fScale * (1 - fMargin))  // on est apres.
 				{
 					next_icon = (ic->next != NULL ? ic->next->data : NULL);
 					fOrder = (next_icon != NULL ? (icon->fOrder + next_icon->fOrder) / 2 : icon->fOrder + 1);
 				}
-				else
+				else if (x < icon->fX + icon->fWidth * icon->fScale * fMargin)  // on est avant.
 				{
 					prev_icon = (ic->prev != NULL ? ic->prev->data : NULL);
 					fOrder = (prev_icon != NULL ? (icon->fOrder + prev_icon->fOrder) / 2 : icon->fOrder - 1);
+				}
+				else  // on est dessus.
+				{
+					if (icon->pSubDock != NULL)
+					{
+						pReceivingDock = icon->pSubDock;
+					}
+					else
+					{
+						gchar *cCommand = g_strdup_printf ("%s '%s'", icon->acCommand, cFilePath);
+						g_spawn_command_line_async (cCommand, NULL);
+						g_free (cCommand);
+						icon->iAnimationType = CAIRO_DOCK_BLINK;
+						icon->iCount = g_tNbIterInOneRound[icon->iAnimationType] * 2 - 1;  // 2 clignotements.
+						if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
+							pDock->iSidShrinkDown = g_timeout_add (40, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+						return ;
+					}
 				}
 			}
 		}

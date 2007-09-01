@@ -618,6 +618,10 @@ void cairo_dock_render_background (CairoDock *pDock)
 		cairo_paint_with_alpha (pCairoContext, g_fVisibleZoneAlpha);
 	}
 	cairo_destroy (pCairoContext);
+#ifdef HAVE_GLITZ
+	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
+		glitz_drawable_swap_buffers (pDock->pGlitzDrawable);
+#endif
 }
 
 void cairo_dock_render_blank (CairoDock *pDock)
@@ -630,6 +634,10 @@ void cairo_dock_render_blank (CairoDock *pDock)
 	cairo_paint (pCairoContext);
 	
 	cairo_destroy (pCairoContext);
+#ifdef HAVE_GLITZ
+	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
+		glitz_drawable_swap_buffers (pDock->pGlitzDrawable);
+#endif
 }
 
 
@@ -646,6 +654,11 @@ void cairo_dock_redraw_my_icon (Icon *icon, CairoDock *pDock)
 		rect.width = (int) icon->fHeight * icon->fScale;
 		rect.height = (int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor));
 	}
+#ifdef HAVE_GLITZ
+	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
+		gtk_widget_queue_draw (pDock->pWidget);
+	else
+#endif
 	gdk_window_invalidate_rect (pDock->pWidget->window, &rect, FALSE);
 }
 
@@ -837,6 +850,10 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 	while (TRUE);
 	
 	cairo_destroy (pCairoContext);
+#ifdef HAVE_GLITZ
+	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
+		glitz_drawable_swap_buffers (pDock->pGlitzDrawable);
+#endif
 }
 
 

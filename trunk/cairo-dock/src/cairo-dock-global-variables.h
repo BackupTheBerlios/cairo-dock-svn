@@ -2,6 +2,7 @@
 #define __CAIRO_DOCK_GLOBAL_VARIABLES_H__
 
 #include <glib.h>
+#include <gtk/gtk.h>
 #include <cairo.h>
 
 extern CairoDock *g_pMainDock;
@@ -10,7 +11,6 @@ extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
 
 extern gchar *g_cCairoDockModuleDataDir;
-extern gchar *g_cDefaultFileBrowser;
 
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
@@ -27,6 +27,7 @@ extern double g_fStripesColorDark[4];
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
 
+extern GtkIconTheme *g_pIconTheme;
 extern gchar *g_cCairoDockDataDir;
 extern gchar *g_cCurrentThemePath;
 

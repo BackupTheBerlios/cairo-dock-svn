@@ -105,9 +105,9 @@ gboolean g_bForceLoop;
 
 gchar *g_cCurrentThemePath = NULL;  // le chemin vers le repertoire du theme courant.
 gchar *g_cConfFile = NULL;  // le chemin du fichier de conf.
-gchar **g_cDefaultIconDirectory = NULL;  // les repertoires par defaut ou on va chercher les icones.
+gchar **g_cDefaultIconDirectory = NULL;  // les repertoires ou on va chercher les icones avant d'aller chercher dans le theme d'icones.
+GtkIconTheme *g_pIconTheme = NULL;  // le theme d'icone choisi.
 gchar *g_cCairoDockDataDir = NULL;  // le repertoire ou on va chercher les .desktop.
-gchar *g_cDefaultFileBrowser = NULL;  // pour les raccourcis.
 
 gboolean g_bAutoHide;
 double g_fAmplitude;  // amplitude de la siunsoide.
@@ -209,7 +209,6 @@ main (int argc, char** argv)
 	
 	
 	gtk_init (&argc, &argv);
-	
 	
 	//\___________________ On recupere quelques options.
 	g_iWmHint = GDK_WINDOW_TYPE_HINT_NORMAL;

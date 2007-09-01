@@ -42,6 +42,7 @@ extern gchar *g_cLabelPolice;
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentThemePath;
 extern gchar **g_cDefaultIconDirectory;
+extern GtkIconTheme *g_pIconTheme;
 
 extern gboolean g_bDirectionUp;
 extern gboolean g_bSameHorizontality;
@@ -83,27 +84,50 @@ gchar *cairo_dock_search_image_path (gchar *cFileName)
 		//\_______________________ On parcourt les repertoires disponibles, en testant tous les suffixes connus.
 		i = 0;
 		bFileFound = FALSE;
-		while (g_cDefaultIconDirectory[i] != NULL && ! bFileFound)
+		if (g_cDefaultIconDirectory != NULL)
 		{
-			j = 0;
-			while (! bFileFound && (cSuffixTab[j] != NULL || ! bAddSuffix))
+			while (g_cDefaultIconDirectory[i] != NULL && ! bFileFound)
 			{
-				g_string_printf (sIconPath, "%s/%s", g_cDefaultIconDirectory[i], cFileName);
-				if (bAddSuffix)
-					g_string_append_printf (sIconPath, "%s", cSuffixTab[j]);
-				
-				if ( g_file_test (sIconPath->str, G_FILE_TEST_EXISTS) )
-					bFileFound = TRUE;
-				
-				j ++;
-				if (! bAddSuffix)
-					break;
+				j = 0;
+				while (! bFileFound && (cSuffixTab[j] != NULL || ! bAddSuffix))
+				{
+					g_string_printf (sIconPath, "%s/%s", g_cDefaultIconDirectory[i], cFileName);
+					if (bAddSuffix)
+						g_string_append_printf (sIconPath, "%s", cSuffixTab[j]);
+					
+					if ( g_file_test (sIconPath->str, G_FILE_TEST_EXISTS) )
+						bFileFound = TRUE;
+					
+					j ++;
+					if (! bAddSuffix)
+						break;
+				}
+				i ++;
 			}
-			i ++;
 		}
 		
 		if (! bFileFound)
-			g_string_printf (sIconPath, cFileName);
+		{
+			g_string_printf (sIconPath, "%s", cFileName);
+			if (! bAddSuffix)
+			{
+				gchar *str = strrchr (sIconPath->str, '.');
+				if (str != NULL)
+					*str = '\0';
+			}
+			//g_print ("on recherche %s dans le theme d'icones\n", sIconPath->str);
+			GtkIconInfo* pIconInfo = gtk_icon_theme_lookup_icon  (g_pIconTheme,
+			sIconPath->str,
+			64,
+			GTK_ICON_LOOKUP_FORCE_SVG);
+			if (pIconInfo != NULL)
+			{
+				g_string_printf (sIconPath, "%s", gtk_icon_info_get_filename (pIconInfo));
+				gtk_icon_info_free (pIconInfo);
+			}
+			else
+				g_string_printf (sIconPath, cFileName);
+		}
 	}
 	
 	gchar *cIconPath = sIconPath->str;
@@ -519,4 +543,3 @@ Icon * cairo_dock_create_icon_from_desktop_file (gchar *cDesktopFileName, cairo_
 	
 	return icon;
 }
-

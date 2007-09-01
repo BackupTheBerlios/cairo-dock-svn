@@ -59,6 +59,8 @@ extern double g_fLabelAlphaThreshold;
 extern gboolean g_bTextAlwaysHorizontal;
 
 extern gchar **g_cDefaultIconDirectory;
+extern GtkIconTheme *g_pIconTheme;
+static gboolean s_bUserTheme = FALSE;
 extern gchar *g_cCurrentThemePath;
 extern gchar *g_cConfFile;
 
@@ -85,8 +87,6 @@ extern int g_iNbStripes;
 extern double g_fStripesSpeedFactor;
 extern double g_fStripesWidth;
 extern double g_fStripesAngle;
-
-extern gchar *g_cDefaultFileBrowser;
 
 extern int g_iScreenWidth[2];
 extern int g_iScreenHeight[2];
@@ -357,9 +357,8 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 
 	
 	//\___________________ On ouvre le fichier de conf.
-	GKeyFile *fconf = g_key_file_new ();
-	GKeyFile *pKeyFile = fconf;
-	g_key_file_load_from_file (fconf, conf_file, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+	GKeyFile *pKeyFile = g_key_file_new ();
+	g_key_file_load_from_file (pKeyFile, conf_file, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
@@ -522,16 +521,33 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	
 		
 	//\___________________ On recupere les parametres des lanceurs.
-	gchar **directoryList = cairo_dock_get_string_list_key_value (pKeyFile, "Launchers", "default icon directory", &bFlushConfFileNeeded, &length, NULL);
-	g_strfreev (g_cDefaultIconDirectory);
-	g_cDefaultIconDirectory = g_new0 (gchar *, length + 2);  // +1 pour le NULL final, +1 pour le repertoire du theme.
-	if (directoryList == NULL)
+	gchar *cIconThemeName = cairo_dock_get_string_key_value (pKeyFile, "Launchers", "icon theme", &bFlushConfFileNeeded, NULL);
+	if (s_bUserTheme)
+		g_object_unref (g_pIconTheme);
+	
+	if (cIconThemeName != NULL)
 	{
-		g_cDefaultIconDirectory[0] = g_strdup (g_cCurrentThemePath);
+		g_pIconTheme = gtk_icon_theme_new ();
+		gtk_icon_theme_set_custom_theme (g_pIconTheme, cIconThemeName);
+		g_free (cIconThemeName);
+		s_bUserTheme = TRUE;
 	}
 	else
 	{
-		gboolean bAddThemeDirectory = TRUE;
+		g_pIconTheme = gtk_icon_theme_get_default ();
+		s_bUserTheme = FALSE;
+	}
+	
+	gchar **directoryList = cairo_dock_get_string_list_key_value (pKeyFile, "Launchers", "default icon directory", &bFlushConfFileNeeded, &length, NULL);
+	g_strfreev (g_cDefaultIconDirectory);
+	
+	if (directoryList == NULL)
+	{
+		g_cDefaultIconDirectory = NULL;
+	}
+	else
+	{
+		g_cDefaultIconDirectory = g_new0 (gchar *, length + 1);  // +1 pour le NULL final.
 		int i = 0, j = 0;
 		while (directoryList[i] != NULL)
 		{
@@ -546,8 +562,6 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 			else if (strncmp (directoryList[i], "_ThemeDirectory_", 16) == 0)
 			{
 				g_cDefaultIconDirectory[j] = g_strdup_printf ("%s%s", g_cCurrentThemePath, directoryList[i]+16);
-				if (directoryList[i]+16 == '\0')
-					bAddThemeDirectory = FALSE;
 			}
 			else
 			{
@@ -557,10 +571,6 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 			//g_print ("+ %s\n", g_cDefaultIconDirectory[j]);
 			i ++;
 			j ++;
-		}
-		if (bAddThemeDirectory)
-		{
-			g_cDefaultIconDirectory[j] = g_strdup (g_cCurrentThemePath);
 		}
 	}
 	g_strfreev (directoryList);
@@ -575,8 +585,6 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	g_free (cAnimationName);
 	
 	g_tNbAnimationRounds[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_integer_key_value (pKeyFile, "Launchers", "number of animation rounds", &bFlushConfFileNeeded, 4);
-	
-	g_cDefaultFileBrowser = cairo_dock_get_string_key_value (pKeyFile, "Launchers", "default file browser", &bFlushConfFileNeeded, "nautilus");
 	
 	
 	//\___________________ On recupere les parametres des aplications.
@@ -733,14 +741,14 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		system (cCommand);
 		g_free (cCommand);
 		
-		cairo_dock_replace_values_in_conf_file (conf_file, fconf);
+		cairo_dock_replace_values_in_conf_file (conf_file, pKeyFile, TRUE);
 		
 		cairo_dock_update_conf_file_with_modules (conf_file, g_hModuleTable);
 		cairo_dock_update_conf_file_with_translations (conf_file, CAIRO_DOCK_SHARE_DATA_DIR);
 	}
 	g_free (cPreviousLanguage);
 	
-	g_key_file_free (fconf);
+	g_key_file_free (pKeyFile);
 }
 
 
@@ -935,7 +943,7 @@ static void _cairo_dock_write_one_name (gchar *cName, gpointer value, GString *p
 {
 	g_string_append_printf (pString, "%s;", cName);
 }
-void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, int iNbAvailableChoices, gchar *cNewUsefullComment)
+void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, int iNbAvailableChoices, gchar *cNewUsefullComment, gboolean bAllowNewChoice)
 {
 	//g_print ("%s (%s)\n", __func__, cConfFile);
 	GError *erreur = NULL;
@@ -987,7 +995,7 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 	}
 	
 	GString *cComment = g_string_new ("");
-	g_string_printf (cComment, "s%d[", iNbAvailableChoices);
+	g_string_printf (cComment, "%c%d[", (bAllowNewChoice ? 'E' : 's'), iNbAvailableChoices);
 	g_hash_table_foreach (pModuleTable, (GHFunc) _cairo_dock_write_one_name, cComment);
 	if (cComment->str[cComment->len-1] == ';')  // peut etre faux si aucune valeur n'a ete ecrite.
 		cComment->len --;
@@ -1009,7 +1017,7 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 
 void cairo_dock_update_conf_file_with_modules (gchar *cConfFile, GHashTable *pModuleTable)
 {
-	cairo_dock_update_conf_file_with_hash_table (cConfFile, pModuleTable, "Applets", "active modules", 99, NULL);  // "List of active plug-ins (applets and others)."
+	cairo_dock_update_conf_file_with_hash_table (cConfFile, pModuleTable, "Applets", "active modules", 99, NULL, FALSE);  // "List of active plug-ins (applets and others)."
 }
 
 void cairo_dock_update_conf_file_with_translations (gchar *cConfFile, gchar *cTranslationsDir)
@@ -1017,7 +1025,7 @@ void cairo_dock_update_conf_file_with_translations (gchar *cConfFile, gchar *cTr
 	GError *erreur = NULL;
 	GHashTable *pTranslationTable = cairo_dock_list_available_translations (cTranslationsDir, "cairo-dock-", &erreur);
 	
-	cairo_dock_update_conf_file_with_hash_table (cConfFile, pTranslationTable, "Cairo Dock", "language", 1, NULL);
+	cairo_dock_update_conf_file_with_hash_table (cConfFile, pTranslationTable, "Cairo Dock", "language", 1, NULL, FALSE);
 	
 	g_hash_table_destroy (pTranslationTable);
 }
@@ -1117,7 +1125,7 @@ void cairo_dock_apply_translation_on_conf_file (gchar *cConfFilePath, gchar *cTr
 	g_key_file_free (pTranslatedKeyFile);
 }
 
-void cairo_dock_replace_values_in_conf_file (gchar *cConfFilePath, GKeyFile *pValidKeyFile)
+void cairo_dock_replace_values_in_conf_file (gchar *cConfFilePath, GKeyFile *pValidKeyFile, gboolean bUseFileKeys)
 {
 	GKeyFile *pConfKeyFile = g_key_file_new ();
 	
@@ -1130,7 +1138,7 @@ void cairo_dock_replace_values_in_conf_file (gchar *cConfFilePath, GKeyFile *pVa
 		return ;
 	}
 	
-	cairo_dock_replace_key_values (pConfKeyFile, pValidKeyFile);
+	cairo_dock_replace_key_values (pConfKeyFile, pValidKeyFile, bUseFileKeys);
 	
 	cairo_dock_write_keys_to_file (pConfKeyFile, cConfFilePath);
 	

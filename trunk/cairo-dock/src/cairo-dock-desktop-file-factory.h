@@ -13,5 +13,8 @@ gchar *cairo_dock_add_desktop_file_from_path (gchar *cFilePath, gchar *cDockName
 gchar *cairo_dock_generate_desktop_filename (gchar *cCairoDockDataDir);
 
 
+void cairo_dock_update_lanucher_desktop_file (gchar *cDesktopFilePath, gchar *cLanguage);
+
+
 #endif
 
