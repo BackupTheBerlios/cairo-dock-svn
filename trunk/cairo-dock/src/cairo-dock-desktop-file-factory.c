@@ -32,9 +32,11 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 extern GHashTable *g_hDocksTable;
 extern gchar *g_cCurrentThemePath;
+extern gchar *g_cLanguage;
+extern CairoDockFileManagerFunc cairo_dock_add_uri_func;
 
 
-gchar *cairo_dock_add_desktop_file_from_path (gchar *cFilePath, gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur)
+gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur)
 {
 	//g_print ("%s (%s)\n", __func__, cFilePath);
 	double fEffectiveOrder;
@@ -50,15 +52,29 @@ gchar *cairo_dock_add_desktop_file_from_path (gchar *cFilePath, gchar *cDockName
 		fEffectiveOrder = fOrder;
 	
 	GError *tmp_erreur = NULL;
-	gchar *cNewDesktopFileName;
-	gchar *cNewDesktopContent;
-	gsize lenght;
+	gchar *cNewDesktopFileName = NULL;
 	
 	//\_________________ On regarde si c'est un repertoire ou un fichier ou sinon un fichier cree a partir de zero.
-	if (cFilePath == NULL)
+	if (cURI == NULL)
 	{
-		//\___________________ On cree le texte qu'on va y mettre par defaut.
-		cNewDesktopContent = g_strdup_printf ("#!\n[Desktop Entry]\n\
+		//\___________________ On ouvre le patron.
+		gchar *cDesktopFileTemplate = cairo_dock_get_template_path ("launcher");
+		
+		GKeyFile *pKeyFile = g_key_file_new ();
+		g_key_file_load_from_file (pKeyFile, cDesktopFileTemplate, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &tmp_erreur);
+		g_free (cDesktopFileTemplate);
+		if (tmp_erreur != NULL)
+		{
+			g_propagate_error (erreur, tmp_erreur);
+			return NULL;
+		}
+		
+		//\___________________ On renseigne ce qu'on peut.
+		g_key_file_set_double (pKeyFile, "Desktop Entry", "Order", fEffectiveOrder);
+		g_key_file_set_string (pKeyFile, "Desktop Entry", "Container", cDockName);
+		g_key_file_set_string (pKeyFile, "Desktop Entry", "Exec command", "echo 'edit me !'");
+		
+		/*cNewDesktopContent = g_strdup_printf ("#!\n[Desktop Entry]\n\
 #s Launcher's name :\n\
 Name = New Launcher\n\
 Name[fr] = Nouveau Lanceur\n\
@@ -73,12 +89,19 @@ Container = %s\n\
 #b Is this icon a container ?\n\
 Is container = false",
 		(int) fEffectiveOrder, cDockName);
-		lenght = -1;
+		lenght = -1;*/
 		
 		//\___________________ On lui choisit un nom de fichier tel qu'il n'y ait pas de collision.
 		cNewDesktopFileName = cairo_dock_generate_desktop_filename (g_cCurrentThemePath);
+		
+		//\___________________ On ecrit tout.
+		gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cNewDesktopFileName);
+		cairo_dock_write_keys_to_file (pKeyFile, cNewDesktopFilePath);
+		g_free (cNewDesktopFilePath);
+		g_key_file_free (pKeyFile);
+		
 	}
-	else if (g_file_test (cFilePath, G_FILE_TEST_IS_DIR))
+	/*else if (g_file_test (cFilePath, G_FILE_TEST_IS_DIR))
 	{
 		//\___________________ On cree le texte qu'on va y mettre par defaut.
 		cNewDesktopContent = g_strdup_printf ("#!\n[Desktop Entry]\n\
@@ -100,12 +123,37 @@ Is container = false",
 		
 		//\___________________ On lui choisit un nom de fichier tel qu'il n'y ait pas de collision.
 		cNewDesktopFileName = cairo_dock_generate_desktop_filename (g_cCurrentThemePath);
-	}
-	else
+	}*/
+	else if (g_str_has_suffix (cURI, ".desktop") && strncmp (cURI, "file://", 7) == 0)
 	{
-		//\_________________ On ouvre le fichier pour controler certain champ.
-		GKeyFile *pKeyFile = g_key_file_new();
+		gchar *cFilePath = cURI + 7;  // on saute le "file://".
+		cNewDesktopFileName = g_path_get_basename (cFilePath);
+		
+		GKeyFile *pKeyFile = g_key_file_new ();
 		g_key_file_load_from_file (pKeyFile, cFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &tmp_erreur);
+		if (tmp_erreur != NULL)
+		{
+			g_propagate_error (erreur, tmp_erreur);
+			return NULL;
+		}
+		g_key_file_remove_key (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", NULL);
+		g_key_file_set_double (pKeyFile, "Desktop Entry", "Order", fEffectiveOrder);
+		g_key_file_set_string (pKeyFile, "Desktop Entry", "Container", cDockName);
+		g_key_file_set_boolean (pKeyFile, "Desktop Entry", "Is container", FALSE);
+		g_key_file_set_boolean (pKeyFile, "Desktop Entry", "Is URI", FALSE);
+		
+		gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cNewDesktopFileName);
+		cairo_dock_write_keys_to_file (pKeyFile, cNewDesktopFilePath);
+		g_key_file_free (pKeyFile);
+		
+		gchar *cDesktopFileTemplate = g_strdup_printf ("%s/launcher-%s.conf", CAIRO_DOCK_SHARE_DATA_DIR, g_cLanguage);
+		cairo_dock_apply_translation_on_conf_file (cNewDesktopFilePath, cDesktopFileTemplate);
+		g_free (cDesktopFileTemplate);
+		g_free (cNewDesktopFilePath);
+		
+		
+		//\_________________ On ouvre le fichier pour controler certain champ.
+		/*g_key_file_load_from_file (pKeyFile, cFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &tmp_erreur);
 		if (tmp_erreur != NULL)
 		{
 			g_propagate_error (erreur, tmp_erreur);
@@ -161,23 +209,23 @@ Is container = false",
 			return NULL;
 		}
 		
-		cNewDesktopFileName = g_path_get_basename (cFilePath);
+		cNewDesktopFileName = g_path_get_basename (cFilePath);*/
 	}
-	
-	gchar *cNewFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cNewDesktopFileName);
-	g_free (cNewDesktopFileName);
-	
-	g_file_set_contents (cNewFilePath, cNewDesktopContent, lenght, &tmp_erreur);
-	if (tmp_erreur != NULL)
+	else if (cairo_dock_add_uri_func != NULL)
 	{
-		g_propagate_error (erreur, tmp_erreur);
-		g_free (cNewDesktopContent);
-		g_free (cNewFilePath);
-		return NULL;
+		cNewDesktopFileName = cairo_dock_add_uri_func (cURI, cDockName, fEffectiveOrder, pDock, &tmp_erreur);
+		if (tmp_erreur != NULL)
+		{
+			g_propagate_error (erreur, tmp_erreur);
+			return NULL;
+		}
+	}
+	else
+	{
+		g_print ("no back-end function for managing this type of file\n");
 	}
 	
-	g_free (cNewDesktopContent);
-	return cNewFilePath;
+	return cNewDesktopFileName;
 }
 
 
@@ -215,7 +263,7 @@ static void _cairo_dock_write_container_name (gchar *cDockName, CairoDock *pDock
 {
 	g_string_append_printf (pString, "%s;", cDockName);
 }
-void cairo_dock_update_lanucher_desktop_file (gchar *cDesktopFilePath, gchar *cLanguage)
+void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath, gchar *cLanguage)
 {
 	GError *erreur = NULL;
 	GKeyFile *pKeyFile = g_key_file_new ();
@@ -237,3 +285,8 @@ void cairo_dock_update_lanucher_desktop_file (gchar *cDesktopFilePath, gchar *cL
 	cairo_dock_update_conf_file_with_hash_table (cDesktopFilePath, g_hDocksTable, "Desktop Entry", "Container", 1, NULL, TRUE);
 }
 
+
+gchar *cairo_dock_get_template_path (gchar *cGenericFileName)
+{
+	return g_strdup_printf ("%s/%s-%s.conf", CAIRO_DOCK_SHARE_DATA_DIR, cGenericFileName, g_cLanguage);
+}

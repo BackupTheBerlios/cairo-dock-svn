@@ -194,7 +194,8 @@ gboolean g_bSkipPager = TRUE;
 gboolean g_bSkipTaskbar = TRUE;
 gboolean g_bSticky = TRUE;
 
-CairoDockClickFunc cairo_dock_default_click_on_icon_func = NULL;
+CairoDockClickFunc cairo_dock_launch_uri_func = NULL;
+CairoDockFileManagerFunc cairo_dock_add_uri_func = NULL;
 
 gboolean g_bUseGlitz = FALSE;
 gboolean g_bVerbose = FALSE;
@@ -209,6 +210,7 @@ main (int argc, char** argv)
 	
 	
 	gtk_init (&argc, &argv);
+	
 	
 	//\___________________ On recupere quelques options.
 	g_iWmHint = GDK_WINDOW_TYPE_HINT_NORMAL;

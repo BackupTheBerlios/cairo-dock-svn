@@ -104,6 +104,7 @@ typedef enum {
 typedef struct _Icon {
 	//\____________ renseignes lors de la creation de l'icone.
 	gchar *acDesktopFileName;
+	gboolean bIsURI;
 	gchar* acFileName;
 	gchar* acName;
 	gchar* acCommand;
@@ -180,7 +181,10 @@ typedef enum {
 
 typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
 
-typedef void (*CairoDockClickFunc) (CairoDock *pDock, Icon *icon);
+typedef void (*CairoDockClickFunc) (Icon *icon);
+
+typedef gchar * (*CairoDockFileManagerFunc) (gchar *cURI, gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur);
+
 
 
 typedef void (*CairoDockCalculateShapeFunc) (CairoDock *pDock, CairoDockSizeType iSizeType, int *iNewWidth, int *iNewHeight);

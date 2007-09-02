@@ -17,5 +17,8 @@
 #include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-desktop-file-factory.h"
 #include "cairo-dock-separator-factory.h"
+#include "cairo-dock-dock-factory.h"
+#include "cairo-dock-themes-manager.h"
+#include "cairo-dock-animations.h"
 
 #endif

@@ -468,10 +468,11 @@ void cairo_dock_set_root_window_mask (void)
 	
 	XSetWindowAttributes attr;
 	XWindowAttributes wattr;
+	memset (&attr.event_mask, 0, sizeof (attr.event_mask));
 	
 	attr.event_mask = 
 		//StructureNotifyMask | /* ResizeRedirectMask | */
-		SubstructureNotifyMask 
+		SubstructureNotifyMask
 		//SubstructureRedirectMask 
 		//PropertyChangeMask
 		;
@@ -643,10 +644,11 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 		//while (XCheckWindowEvent (g_XDisplay, root, event_mask, &event))
 		while (XCheckMaskEvent (g_XDisplay, event_mask, &event))
 		{
+			//g_print ("on vide un evenement\n");
 			if (/*event.type == CreateNotify || */event.type == DestroyNotify || event.type == UnmapNotify || event.type == MapNotify)
 			{
 				XPutBackEvent (g_XDisplay, &event);
-				//g_print ("On le remet dans la queue\n");
+				g_print ("  on le remet dans la queue\n");
 				break ;
 			}
 		}
@@ -687,7 +689,7 @@ void cairo_dock_show_all_applis (CairoDock *pDock)
 	}
 	
 	cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
-	g_iSidUpdateAppliList = g_timeout_add (200, (GSourceFunc) cairo_dock_update_applis_list, (gpointer) pDock);  // un g_idle_add () consomme 90% de CPU ! :-/
+	g_iSidUpdateAppliList = g_timeout_add (350, (GSourceFunc) cairo_dock_update_applis_list, (gpointer) pDock);  // un g_idle_add () consomme 90% de CPU ! :-/
 }
 
 

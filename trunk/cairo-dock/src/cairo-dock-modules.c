@@ -271,8 +271,11 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 		return NULL;
 	}
 	
-	icon->pModule = module;
-	icon->iType = CAIRO_DOCK_APPLET;
+	if (icon != NULL)
+	{
+		icon->pModule = module;
+		icon->iType = CAIRO_DOCK_APPLET;
+	}
 	module->bActive = TRUE;
 	return icon;
 }

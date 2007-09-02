@@ -8,9 +8,11 @@
 
 
 #define CAIRO_DOCK_IS_APPLI(icon) (icon->iType == CAIRO_DOCK_APPLI)
-#define CAIRO_DOCK_IS_LAUNCHER(icon) (icon->iType == CAIRO_DOCK_LAUNCHER && icon->acDesktopFileName != NULL)
+#define CAIRO_DOCK_IS_LAUNCHER(icon) (icon->iType == CAIRO_DOCK_LAUNCHER)
 #define CAIRO_DOCK_IS_SEPARATOR(icon) (icon->iType & 1)
 #define CAIRO_DOCK_IS_APPLET(icon) (icon->iType  == CAIRO_DOCK_APPLET && icon->pModule != NULL)
+#define CAIRO_DOCK_IS_NORMAL_LAUNCHER(icon) (icon->iType == CAIRO_DOCK_LAUNCHER && icon->acDesktopFileName != NULL)
+#define CAIRO_DOCK_IS_URI_LAUNCHER(icon) (icon->iType == CAIRO_DOCK_LAUNCHER && icon->bIsURI)
 #define CAIRO_DOCK_IS_VALID_APPLI(icon) (CAIRO_DOCK_IS_APPLI (icon) && icon->Xid != 0)
 
 void cairo_dock_free_icon (Icon *icon);

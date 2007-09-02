@@ -766,7 +766,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							}
 						}
 						
-						if (iElementType != 's' && pEntry != NULL)
+						if ((iElementType == 'S' || iElementType == 'D') && pEntry != NULL)
 						{
 							if (iNbBuffers < s_pBufferArray->len)
 							{

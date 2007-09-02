@@ -28,7 +28,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-callbacks.h"
 #include "cairo-dock-draw.h"
-#include "cairo-dock-applications.h"
 #include "cairo-dock-animations.h"
 
 extern double g_fScrollAcceleration;
@@ -52,7 +51,7 @@ gboolean cairo_dock_move_up (CairoDock *pDock)
 {
 	int deltaY_possible;
 	deltaY_possible = pDock->iWindowPositionY - (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - pDock->iMaxDockHeight - pDock->iGapY : pDock->iGapY);
-	//g_print ("%s (%dx%d -> %d)\n", __func__, pDock->iWindowPositionX, pDock->iWindowPositionY, deltaY_possible);
+	g_print ("%s (%dx%d -> %d)\n", __func__, pDock->iWindowPositionX, pDock->iWindowPositionY, deltaY_possible);
 	if ((g_bDirectionUp && deltaY_possible > 0) || (! g_bDirectionUp && deltaY_possible < 0))  // alors on peut encore monter.
 	{
 		pDock->iWindowPositionY -= (int) (deltaY_possible * g_fMoveUpSpeed) + (g_bDirectionUp ? 1 : -1);
@@ -74,7 +73,7 @@ gboolean cairo_dock_move_up (CairoDock *pDock)
 
 gboolean cairo_dock_move_down (CairoDock *pDock)
 {
-	//g_print ("%s ()\n", __func__);
+	g_print ("%s ()\n", __func__);
 	if (pDock->fMagnitude > 0.0)  // on retarde le cachage du dock pour apercevoir les effets.
 		return TRUE;
 	int deltaY_possible = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - pDock->iGapY - g_iVisibleZoneHeight : pDock->iGapY + g_iVisibleZoneHeight - pDock->iMaxDockHeight) - pDock->iWindowPositionY;
@@ -139,7 +138,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 
 gboolean cairo_dock_grow_up (CairoDock *pDock)
 {
-	//g_print ("%s (%f ; %f ; %d)\n", __func__, pDock->fMagnitude, pDock->fLateralFactor, pDock->iSidShrinkDown);
+	g_print ("%s (%f ; %f ; %d)\n", __func__, pDock->fMagnitude, pDock->fLateralFactor, pDock->iSidShrinkDown);
 	if (pDock->iSidShrinkDown != 0)
 		return TRUE;  // on se met en attente de fin d'animation.
 	
@@ -174,7 +173,7 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 
 gboolean cairo_dock_shrink_down (CairoDock *pDock)
 {
-	//g_print ("%s (%f)\n", __func__, pDock->fMagnitude);
+	g_print ("%s (%f)\n", __func__, pDock->fMagnitude);
 	if (pDock->fMagnitude > 0.05)
 		pDock->fMagnitude *= g_fShrinkDownFactor; //  0.6
 	else
@@ -238,10 +237,10 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 			if (! pDock->bInside && pDock->iRefCount > 0)
 			{
 				//g_print ("on cache ce sous-dock en sortant par lui\n");
-				gdk_window_hide (pDock->pWidget->window);
+				gtk_widget_hide (pDock->pWidget);
 				cairo_dock_hide_parent_docks (pDock);
 			}
-			//g_print ("fin du shrink down\n");
+			g_print ("fin du shrink down\n");
 			pDock->iSidShrinkDown = 0;
 			return FALSE;
 		}
@@ -249,7 +248,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 		//\______________ Au moins une icone est en cours d'animation suite a un clique, on continue le 'shrink_down'.
 		if (pRemovingIcon != NULL)
 		{
-			//g_print ("au moins 1 icone en cours d'insertion/suppression (%f)\n", pRemovingIcon->fPersonnalScale);
+			g_print ("au moins 1 icone en cours d'insertion/suppression (%f)\n", pRemovingIcon->fPersonnalScale);
 			if (pRemovingIcon->fPersonnalScale == 0.05)
 			{
 				//g_print ("  fin\n");

@@ -835,10 +835,6 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX)
 		if (x_abs >= icon->fXAtRest && x_abs <= icon->fXAtRest + icon->fWidth)  // on n'utilise pas icon->bPointed, pour pouvoir remettre a zero.
 		{
 			icon->iAnimationType = 0;
-			if (CAIRO_DOCK_IS_LAUNCHER (icon))
-			{
-				icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
-			}
 			
 			if (x_abs < icon->fXAtRest + icon->fWidth / 4)  // on est a gauche.
 			{
@@ -847,12 +843,10 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX)
 					prev_icon = ic->prev->data;
 				else
 					prev_icon = g_list_last (pDock->icons)->data;
-				if (icon->iAnimationType == CAIRO_DOCK_AVOID_MOUSE)
-					prev_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
-				else if (CAIRO_DOCK_IS_LAUNCHER (prev_icon))
+				if (CAIRO_DOCK_IS_LAUNCHER (icon) || CAIRO_DOCK_IS_LAUNCHER (prev_icon))
 				{
-					prev_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
 					icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
+					prev_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
 				}
 			}
 			else if (x_abs > icon->fXAtRest + 3. * icon->fWidth / 4)  // on est a droite.
@@ -862,12 +856,10 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX)
 					next_icon = ic->next->data;
 				else
 					next_icon = pDock->icons->data;
-				if (icon->iAnimationType == CAIRO_DOCK_AVOID_MOUSE)
-					next_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
-				else if (CAIRO_DOCK_IS_LAUNCHER (next_icon))
+				if (CAIRO_DOCK_IS_LAUNCHER (icon) || CAIRO_DOCK_IS_LAUNCHER (next_icon))
 				{
-					next_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
 					icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
+					next_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
 				}
 				ic = ic->next;  // on la saute.
 				if (ic == NULL)

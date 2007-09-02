@@ -411,7 +411,7 @@ cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t 
 
 
 
-void cairo_dock_load_desktop_file_information (gchar *cDesktopFileName, Icon *icon)
+void cairo_dock_load_icon_info_from_desktop_file (gchar *cDesktopFileName, Icon *icon)
 {
 	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cDesktopFileName);
 	
@@ -447,13 +447,18 @@ void cairo_dock_load_desktop_file_information (gchar *cDesktopFileName, Icon *ic
 	
 	if (icon->acName == NULL)
 	{
-		icon->acName = g_key_file_get_locale_string (keyfile, "Desktop Entry", "Comment", NULL, &erreur);  // NULL <=> on demande la locale courante.
+		icon->acName = g_key_file_get_string (keyfile, "Desktop Entry", "Name", &erreur);
 		if (erreur != NULL)
 		{
 			g_print ("Attention : while trying to load %s : %s\n", cDesktopFileName, erreur->message);
 			g_error_free (erreur);
 			erreur = NULL;
 		}
+	}
+	if (icon->acName != NULL && strcmp (icon->acName, "") == 0)
+	{
+		g_free (icon->acName);
+		icon->acName = NULL;
 	}
 	
 	g_free(icon->acCommand);
@@ -474,6 +479,14 @@ void cairo_dock_load_desktop_file_information (gchar *cDesktopFileName, Icon *ic
 	if (erreur != NULL)
 	{
 		g_print ("Attention : while trying to load %s : %s\n", cDesktopFileName, erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+	}
+	
+	icon->bIsURI = g_key_file_get_boolean (keyfile, "Desktop Entry", "Is URI", &erreur);
+	if (erreur != NULL)
+	{
+		icon->bIsURI = FALSE;
 		g_error_free (erreur);
 		erreur = NULL;
 	}
@@ -523,7 +536,7 @@ Icon * cairo_dock_create_icon_from_desktop_file (gchar *cDesktopFileName, cairo_
 {
 	Icon *icon = g_new0 (Icon, 1);
 	
-	cairo_dock_load_desktop_file_information (cDesktopFileName, icon);
+	cairo_dock_load_icon_info_from_desktop_file (cDesktopFileName, icon);
 	g_return_val_if_fail (icon->acDesktopFileName != NULL, NULL);
 	
 	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, g_pMainDock->bHorizontalDock);

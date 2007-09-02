@@ -681,7 +681,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	if (pDock->icons == NULL)
 		cairo_dock_build_docks_tree_with_desktop_files (pDock, g_cCurrentThemePath);
 	else
-		cairo_dock_reload_buffers_in_all_dock (g_hDocksTable, 1 + g_fAmplitude, g_iLabelSize, g_cLabelPolice);
+		cairo_dock_reload_buffers_in_all_dock (g_hDocksTable);
 	
 	
 	if (g_iSidUpdateAppliList == 0 && g_bShowAppli)  // maintenant on veut voir les applis !

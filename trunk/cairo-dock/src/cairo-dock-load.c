@@ -46,6 +46,7 @@ extern gboolean g_bSameHorizontality;
 extern int g_iSinusoidWidth;
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
+extern double g_fAmplitude;
 extern int g_iIconGap;
 
 extern cairo_surface_t *g_pVisibleZoneSurface;
@@ -53,6 +54,8 @@ extern gboolean g_bReverseVisibleImage;
 
 extern int g_iLabelWeight;
 extern int g_iLabelStyle;
+extern int g_iLabelSize;
+extern gchar *g_cLabelPolice;
 extern gboolean g_bTextAlwaysHorizontal;
 extern gchar *g_cCurrentThemePath;
 
@@ -246,7 +249,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 }
 
 
-static void _cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpointer *data)
+void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpointer data)
 {
 	if (pDock->iRefCount > 0)
 		pDock->bHorizontalDock = (g_bSameHorizontality ? g_pMainDock->bHorizontalDock : ! g_pMainDock->bHorizontalDock);
@@ -257,9 +260,7 @@ static void _cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDo
 	pDock->iMaxIconHeight = 0;
 	
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
-	double fMaxScale = *((double *) data[0]);
-	int iLabelSize = *((int *) data[1]);
-	gchar *cLabelPolice = (gchar *) data[2];
+	double fMaxScale = 1 + g_fAmplitude;
 	
 	Icon* icon;
 	GList* ic;
@@ -274,7 +275,7 @@ static void _cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDo
 		pDock->iMinDockWidth += g_iIconGap + icon->fWidth;
 		pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, icon->fHeight);
 		
-		cairo_dock_fill_one_text_buffer (icon, pCairoContext, iLabelSize, cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
+		cairo_dock_fill_one_text_buffer (icon, pCairoContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 	}
 	cairo_destroy (pCairoContext);
 	
@@ -286,10 +287,9 @@ static void _cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDo
 		cairo_dock_calculate_icons (pDock, 0, 0);
 	}
 }
-void cairo_dock_reload_buffers_in_all_dock (GHashTable *hDocksTable, double fMaxScale, int iLabelSize, gchar *cLabelPolice)
+void cairo_dock_reload_buffers_in_all_dock (GHashTable *hDocksTable)
 {
-	gpointer data[3] = {&fMaxScale, &iLabelSize, cLabelPolice};
-	g_hash_table_foreach (hDocksTable, (GHFunc) _cairo_dock_reload_buffers_in_dock, data);
+	g_hash_table_foreach (hDocksTable, (GHFunc) cairo_dock_reload_buffers_in_dock, NULL);
 }
 
 

@@ -102,4 +102,5 @@ cairo_docksubinclude_HEADERS =\
 	cairo-dock-desktop-file-factory.h\
 	cairo-dock-keyfile-manager.h\
 	cairo-dock-dock-factory.h\
-	cairo-dock-themes-manager.h
+	cairo-dock-themes-manager.h\
+	cairo-dock-animations.h

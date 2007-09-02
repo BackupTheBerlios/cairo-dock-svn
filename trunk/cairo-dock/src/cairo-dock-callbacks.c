@@ -70,7 +70,7 @@ extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS];
 
 extern gboolean g_bUseGlitz;
-extern CairoDockClickFunc cairo_dock_default_click_on_icon_func;
+extern CairoDockClickFunc cairo_dock_launch_uri_func;
 
 
 gboolean on_expose (GtkWidget *pWidget,
@@ -523,12 +523,12 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 	//g_print ("%s (%d/%d)\n", __func__, pButton->type, pButton->button);
 	if (pButton->button == 1)  // clique gauche.
 	{
+		Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
 		if (pButton->type == GDK_BUTTON_RELEASE)
 		{
 			if (s_pIconClicked != NULL)
 				s_pIconClicked->iAnimationType = 0;  // stoppe les animations de suivi/evitement du curseur.
 			
-			Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
 			if (icon != NULL && ! CAIRO_DOCK_IS_SEPARATOR (icon) && icon == s_pIconClicked)
 			{
 				icon->iAnimationType = g_tAnimationType[icon->iType];
@@ -536,17 +536,41 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 					icon->iAnimationType =  g_random_int_range (0, CAIRO_DOCK_NB_ANIMATIONS);  // [a;b[
 				icon->iCount = g_tNbIterInOneRound[icon->iAnimationType] * g_tNbAnimationRounds[icon->iType] - 1;
 				
-				if (icon->acCommand != NULL)
-					g_spawn_command_line_async (icon->acCommand, NULL);
-				else if (icon->Xid != 0)
+				if (CAIRO_DOCK_IS_LAUNCHER (icon))
+				{
+					if (icon->pSubDock != NULL)
+					{
+						if (GTK_WIDGET_VISIBLE (icon->pSubDock->pWidget))
+							gtk_widget_hide (icon->pSubDock->pWidget);
+						else
+							gtk_window_present (GTK_WINDOW (icon->pSubDock->pWidget));
+						
+						icon->iAnimationType = CAIRO_DOCK_BLINK;
+						icon->iCount = g_tNbIterInOneRound[icon->iAnimationType] - 1;  // 1 clignotement.
+					}
+					else
+					{
+						if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
+							cairo_dock_launch_uri_func (icon);
+						else if (icon->acCommand != NULL)
+							g_spawn_command_line_async (icon->acCommand, NULL);
+						else
+						{
+							icon->iCount = 0;
+							return FALSE;
+						}
+					}
+				}
+				else if (CAIRO_DOCK_IS_VALID_APPLI (icon))
 					cairo_dock_show_appli (icon->Xid);
-				else if (icon->pModule != NULL && icon->pModule->actionModule != NULL)
+				else if (CAIRO_DOCK_IS_APPLET (icon) && icon->pModule->actionModule != NULL)
 					icon->pModule->actionModule ();
-				else if (cairo_dock_default_click_on_icon_func != NULL)
-					cairo_dock_default_click_on_icon_func (pDock, icon);
-				
-				if (icon->pSubDock != NULL)
-					gtk_widget_hide (icon->pSubDock->pWidget);
+				else
+				{
+					g_print ("No known action\n");
+					icon->iCount = 0;
+					return FALSE;
+				}
 				
 				if (pDock->iSidGrowUp != 0)
 				{
@@ -613,11 +637,21 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 			}
 			s_pIconClicked = NULL;
 		}
-		else //if (pButton->type == GDK_BUTTON_PRESS)
+		else if (pButton->type == GDK_BUTTON_PRESS)
 		{
-			s_pIconClicked = cairo_dock_get_pointed_icon (pDock->icons);
+			s_pIconClicked = icon;
 			if (s_pIconClicked != NULL)
 				s_pIconClicked->iAnimationType = CAIRO_DOCK_FOLLOW_MOUSE;
+		}
+		else if (pButton->type == GDK_2BUTTON_PRESS)
+		{
+			if (icon->pSubDock != NULL)
+			{
+				if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
+					cairo_dock_launch_uri_func (icon);
+				else if (icon->acCommand != NULL)
+					g_spawn_command_line_async (icon->acCommand, NULL);
+			}
 		}
 	}
 	else if (pButton->button == 3 && pButton->type == GDK_BUTTON_PRESS)  // clique droit.
@@ -886,93 +920,89 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 {
 	//g_print ("%s (%dx%d)\n", __func__, x, y);
 	
+	//\_________________ On arrete l'animation.
 	cairo_dock_mark_icons_as_avoiding_mouse (pDock, -1e4);
 	
+	//\_________________ On recupere l'URI.
 	gchar *cReceivedData = (gchar *) selection_data->data;
-	if (strncmp (cReceivedData, "file://", 7) == 0)
+	gchar *str = strrchr (cReceivedData, '\n');
+	if (str != NULL)
+		*(str-1) = '\0';  // on vire les retrours chariot.
+	g_print ("cReceivedData : %s\n", cReceivedData);
+	
+	//\_________________ On calcule la position a laquelle on l'a lache.
+	double fOrder = 0;
+	CairoDock *pReceivingDock = pDock;
+	GList *ic;
+	Icon *icon, *next_icon, *prev_icon;
+	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
-		GError *erreur = NULL;
-		//\_________________ On recupere l'URI du .desktop.
-		gchar *cFilePath = g_strdup (cReceivedData + 7);  // on saute le "file://".
-		gchar *str = strrchr (cFilePath, '\n');
-		if (str != NULL)
-			*(str-1) = '\0';  // on vire les retrours chariot.
-		
-		//\_________________ On calcule la position a laquelle on l'a lache.
-		double fOrder = 0;
-		CairoDock *pReceivingDock = pDock;
-		GList *ic;
-		Icon *icon, *next_icon, *prev_icon;
-		for (ic = pDock->icons; ic != NULL; ic = ic->next)
+		icon = ic->data;
+		if (icon->bPointed)
 		{
-			icon = ic->data;
-			if (icon->bPointed)
+			//g_print ("On pointe sur %s\n", icon->acName);
+			double fMargin;
+			if (g_str_has_suffix (cReceivedData, ".desktop"))  // si c'est un .desktop, on l'ajoute.
+				fMargin = 0.5;
+			else  // sinon on le lance si on est sur l'icone, et on l'ajoute autrement.
+				fMargin = 0.25;
+			
+			if (x > icon->fX + icon->fWidth * icon->fScale * (1 - fMargin))  // on est apres.
 			{
-				//g_print ("On pointe sur %s\n", icon->acName);
-				double fMargin;
-				if (g_str_has_suffix (cFilePath, ".desktop"))  // si c'est un .desktop, on l'ajoute.
-					fMargin = 0.5;
-				else  // sinon on le lance si on est sur l'icone, et on l'ajoute autrement.
-					fMargin = 0.25;
-				if (x > icon->fX + icon->fWidth * icon->fScale * (1 - fMargin))  // on est apres.
+				next_icon = (ic->next != NULL ? ic->next->data : NULL);
+				fOrder = (next_icon != NULL ? (icon->fOrder + next_icon->fOrder) / 2 : icon->fOrder + 1);
+			}
+			else if (x < icon->fX + icon->fWidth * icon->fScale * fMargin)  // on est avant.
+			{
+				prev_icon = (ic->prev != NULL ? ic->prev->data : NULL);
+				fOrder = (prev_icon != NULL ? (icon->fOrder + prev_icon->fOrder) / 2 : icon->fOrder - 1);
+			}
+			else  // on est dessus.
+			{
+				if (icon->pSubDock != NULL)
 				{
-					next_icon = (ic->next != NULL ? ic->next->data : NULL);
-					fOrder = (next_icon != NULL ? (icon->fOrder + next_icon->fOrder) / 2 : icon->fOrder + 1);
+					pReceivingDock = icon->pSubDock;
+					fOrder = CAIRO_DOCK_LAST_ORDER;
 				}
-				else if (x < icon->fX + icon->fWidth * icon->fScale * fMargin)  // on est avant.
+				else
 				{
-					prev_icon = (ic->prev != NULL ? ic->prev->data : NULL);
-					fOrder = (prev_icon != NULL ? (icon->fOrder + prev_icon->fOrder) / 2 : icon->fOrder - 1);
-				}
-				else  // on est dessus.
-				{
-					if (icon->pSubDock != NULL)
-					{
-						pReceivingDock = icon->pSubDock;
-					}
-					else
-					{
-						gchar *cCommand = g_strdup_printf ("%s '%s'", icon->acCommand, cFilePath);
-						g_spawn_command_line_async (cCommand, NULL);
-						g_free (cCommand);
-						icon->iAnimationType = CAIRO_DOCK_BLINK;
-						icon->iCount = g_tNbIterInOneRound[icon->iAnimationType] * 2 - 1;  // 2 clignotements.
-						if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
-							pDock->iSidShrinkDown = g_timeout_add (40, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
-						return ;
-					}
+					gchar *cCommand = g_strdup_printf ("%s '%s'", icon->acCommand, cReceivedData);
+					g_spawn_command_line_async (cCommand, NULL);
+					g_free (cCommand);
+					icon->iAnimationType = CAIRO_DOCK_BLINK;
+					icon->iCount = g_tNbIterInOneRound[icon->iAnimationType] * 2 - 1;  // 2 clignotements.
+					if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
+						pDock->iSidShrinkDown = g_timeout_add (40, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+					return ;
 				}
 			}
 		}
+	}
+	
+	//\_________________ On l'ajoute dans le repertoire .cairo-dock.
+	GError *erreur = NULL;
+	const gchar *cDockName = cairo_dock_search_dock_name (pReceivingDock);
+	gchar *cNewDesktopFileName = cairo_dock_add_desktop_file_from_uri (cReceivedData, cDockName, fOrder, pDock, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		return ;
+	}
+	
+	//\_________________ On charge ce nouveau lanceur.
+	if (cNewDesktopFileName != NULL)
+	{
+		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
+		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cNewDesktopFileName, pCairoContext);
+		g_free (cNewDesktopFileName);
+		cairo_destroy (pCairoContext);
 		
-		//\_________________ On l'ajoute dans le repertoire .cairo-dock.
-		const gchar *cDockName = cairo_dock_search_dock_name (pReceivingDock);
-		gchar *cNewDesktopFilePath = cairo_dock_add_desktop_file_from_path (cFilePath, cDockName, fOrder, pDock, &erreur);
-		if (erreur != NULL)
-		{
-			g_print ("Attention : %s\n", erreur->message);
-			g_error_free (erreur);
-			return ;
-		}
+		if (pNewIcon != NULL)
+			cairo_dock_insert_icon_in_dock (pNewIcon, pReceivingDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 		
-		//\_________________ On charge ce nouveau lanceur.
-		if (cNewDesktopFilePath != NULL)
-		{
-			gchar *cDesktopFileName = g_path_get_basename (cNewDesktopFilePath);
-			g_free (cNewDesktopFilePath);
-			cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
-			Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cDesktopFileName, pCairoContext);
-			g_free (cDesktopFileName);
-			cairo_destroy (pCairoContext);
-			
-			if (pNewIcon != NULL)
-				cairo_dock_insert_icon_in_dock (pNewIcon, pReceivingDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
-			
-			if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
-				pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
-		}
-		
-		g_free (cFilePath);
+		if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
+			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 	}
 }
 

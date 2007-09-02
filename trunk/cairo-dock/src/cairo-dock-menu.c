@@ -192,16 +192,16 @@ static void cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data)
 	//\___________________ On cree un fichier de lanceur avec des valeurs par defaut.
 	GError *erreur = NULL;
 	const gchar *cDockName = cairo_dock_search_dock_name (pDock);
-	gchar *cNewDesktopFilePath = cairo_dock_add_desktop_file_from_path (NULL, cDockName, CAIRO_DOCK_LAST_ORDER, pDock, &erreur);
+	gchar *cNewDesktopFileName = cairo_dock_add_desktop_file_from_uri (NULL, cDockName, CAIRO_DOCK_LAST_ORDER, pDock, &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : while trying to create a new launcher : %s\n", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
-	gchar *cNewDesktopFileName = g_path_get_basename (cNewDesktopFilePath);
 	
 	//\___________________ On ouvre automatiquement l'IHM pour permettre de modifier ses champs.
+	gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cNewDesktopFileName);
 	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cNewDesktopFilePath, "Fill this launcher", 300, 400, TRUE, NULL, NULL, NULL);
 	if (config_ok)
 	{
@@ -258,7 +258,7 @@ static void cairo_dock_add_launcher (GtkMenuItem *menu_item, gpointer *data)
 		{
 			cFilePath = pSelectedFile->data;
 			cDockName = cairo_dock_search_dock_name (pDock);
-			cairo_dock_add_desktop_file_from_path (cFilePath, cDockName, CAIRO_DOCK_LAST_ORDER, pDock, &erreur);
+			cairo_dock_add_desktop_file_from_uri (cFilePath, cDockName, CAIRO_DOCK_LAST_ORDER, pDock, &erreur);
 			if (erreur != NULL)
 			{
 				g_print ("Attention : %s\n", erreur->message);
@@ -303,7 +303,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	
 	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon->acDesktopFileName);
 	
-	cairo_dock_update_lanucher_desktop_file (cDesktopFilePath, g_cLanguage);
+	cairo_dock_update_launcher_desktop_file (cDesktopFilePath, g_cLanguage);
 	
 	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", 300, 400, TRUE, NULL, NULL, NULL);
 	g_free (cDesktopFilePath);
