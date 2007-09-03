@@ -141,7 +141,7 @@ int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 int g_tAnimationType[CAIRO_DOCK_NB_TYPES];  // le type de l'animation pour chaque type d'icone.
 int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];  // le nombre de rebonds/rotation/etc lors d'un clique gauche.
 int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];  // l'ordre de chaque type dans le dock.
-int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS] = {14, 20, 20, 0};  // multiples de 2,4,2.
+int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS] = {14, 20, 20, 12, 0};  // multiples de 2,4,2.
 
 int g_iVisibleZoneWidth = 0;  // dimensions de la zone ou on place le curseur pour faire apparaitre le dock.
 int g_iVisibleZoneHeight = 0;
@@ -160,6 +160,8 @@ int g_iVisibleZoneHeight = 0;
 gboolean g_bDirectionUp = TRUE;  // la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.
 gboolean g_bSameHorizontality = TRUE;  // dit si les sous-docks ont la meme horizontalite que les docks racines.
 double g_fSubDockSizeRatio;  // ratio de la taille des icones des sous-docks par rapport a celles du dock principal.
+gboolean bShowSubDockOnMouseOver;
+
 int g_iLabelSize;  // taille de la police des etiquettes.
 gchar *g_cLabelPolice;  // police de caracteres des etiquettes.
 int g_iLabelWeight;  // epaisseur des traits.

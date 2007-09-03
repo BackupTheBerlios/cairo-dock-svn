@@ -4,4 +4,5 @@ SUBDIRS = \
 	Ubuntu\
 	Verde\
 	Djoole\
-	Cobalt
+	Cobalt\
+	Glattering

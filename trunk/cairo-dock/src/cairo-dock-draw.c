@@ -299,6 +299,13 @@ void cairo_dock_calculate_construction_parameters (Icon *icon, int iCurrentWidth
 		fX += icon->fWidth / 2 * (icon->fScale - 1) / g_fAmplitude * (icon->fPhase < G_PI/2 ? -1 : 1);
 	}
 	
+	//\_____________________ On gere l'animation d'ondelette.
+	if (icon->iCount > 0 && icon->iAnimationType == CAIRO_DOCK_PULSE)
+	{
+		fAlpha = 1. * (icon->iCount % g_tNbIterInOneRound[CAIRO_DOCK_PULSE]) / g_tNbIterInOneRound[CAIRO_DOCK_PULSE];
+		icon->iCount --;
+	}
+	
 	//\_____________________ On gere l'animation de clignotement.
 	if (icon->iCount > 0 && icon->iAnimationType == CAIRO_DOCK_BLINK)
 	{
@@ -332,6 +339,25 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboo
 		cairo_translate (pCairoContext, icon->fDrawY, icon->fDrawX);
 		cairo_save (pCairoContext);
 		cairo_scale (pCairoContext, fRatio * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude));
+	}
+	
+	if (icon->iAnimationType == CAIRO_DOCK_PULSE)
+	{
+		if (icon->fAlpha > 0)
+		{
+			cairo_save (pCairoContext);
+			double fScaleFactor = 1 + (1 - icon->fAlpha);
+			if (bHorizontalDock)
+				cairo_translate (pCairoContext, icon->fWidth * (1 - fScaleFactor) * (1 + g_fAmplitude) / 2, icon->fHeight * (1 - fScaleFactor) * (1 + g_fAmplitude) / 2);
+			else
+				cairo_translate (pCairoContext, icon->fHeight * (1 - fScaleFactor) * (1 + g_fAmplitude) / 2, icon->fWidth * (1 - fScaleFactor) * (1 + g_fAmplitude) / 2);
+			cairo_scale (pCairoContext, fScaleFactor, fScaleFactor);
+			if (icon->pIconBuffer != NULL)
+				cairo_set_source_surface (pCairoContext, icon->pIconBuffer, 0.0, 0.0);
+			cairo_paint_with_alpha (pCairoContext, icon->fAlpha);
+			cairo_restore (pCairoContext);
+		}
+		icon->fAlpha = .8;
 	}
 	
 	if (icon->pIconBuffer != NULL)
@@ -875,7 +901,7 @@ static gboolean _cairo_dock_hide_dock (gchar *cDockName, CairoDock *pDock, Cairo
 				cairo_dock_render (pDock);
 			}
 			
-			g_print ("on cache %s par parente\n", cDockName);
+			//g_print ("on cache %s par parente\n", cDockName);
 			//gdk_window_hide (pDock->pWidget->window);
 			gtk_widget_hide (pDock->pWidget);
 			cairo_dock_hide_parent_docks (pDock);
@@ -910,7 +936,7 @@ gboolean cairo_dock_hide_child_docks (CairoDock *pDock)
 				//g_print ("on cache %s en sortant du dock principal\n", pPointedIcon->acName);
 				//while (gtk_events_pending ())
 				//	gtk_main_iteration ();
-				g_print ("on cache %s par filiation\n", icon->acName);
+				//g_print ("on cache %s par filiation\n", icon->acName);
 				icon->pSubDock->iScrollOffset = 0;
 				icon->pSubDock->fLateralFactor = 0;
 				gtk_widget_hide (icon->pSubDock->pWidget);

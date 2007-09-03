@@ -23,7 +23,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-config.h"
 
-static gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "random", NULL};
+static gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "pulse", "random", NULL};
 static gchar * s_cIconTypeNames[(CAIRO_DOCK_NB_TYPES+1)/2] = {"launchers", "applications", "applets"};
 
 extern CairoDock *g_pMainDock;
@@ -49,6 +49,7 @@ extern double g_fVisibleZoneAlpha;
 extern gboolean g_bDirectionUp;
 extern gboolean g_bSameHorizontality;
 extern double g_fSubDockSizeRatio;
+extern gboolean bShowSubDockOnMouseOver;
 
 extern int g_iLabelSize;
 extern gchar *g_cLabelPolice;
@@ -135,6 +136,7 @@ static gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGr
 	gboolean bValue = g_key_file_get_boolean (pKeyFile, cGroupName, cKeyName, &erreur);
 	if (erreur != NULL)
 	{
+		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 		
@@ -142,7 +144,6 @@ static gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGr
 		bValue = g_key_file_get_boolean (pKeyFile, cGroupNameUpperCase, cKeyName, &erreur);
 		if (erreur != NULL)
 		{
-			g_print ("Attention : %s\n", erreur->message);
 			g_error_free (erreur);
 			bValue = bDefaultValue;
 		}
@@ -159,6 +160,7 @@ static int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupNa
 	int iValue = g_key_file_get_integer (pKeyFile, cGroupName, cKeyName, &erreur);
 	if (erreur != NULL)
 	{
+		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 		
@@ -166,7 +168,6 @@ static int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupNa
 		iValue = g_key_file_get_integer (pKeyFile, cGroupNameUpperCase, cKeyName, &erreur);
 		if (erreur != NULL)
 		{
-			g_print ("Attention : %s\n", erreur->message);
 			g_error_free (erreur);
 			iValue = iDefaultValue;
 		}
@@ -183,6 +184,7 @@ static double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroup
 	double fValue = g_key_file_get_double (pKeyFile, cGroupName, cKeyName, &erreur);
 	if (erreur != NULL)
 	{
+		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 		
@@ -190,7 +192,6 @@ static double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroup
 		fValue = g_key_file_get_double (pKeyFile, cGroupNameUpperCase, cKeyName, &erreur);
 		if (erreur != NULL)
 		{
-			g_print ("Attention : %s\n", erreur->message);
 			g_error_free (erreur);
 			fValue = fDefaultValue;
 		}
@@ -207,6 +208,7 @@ static gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroup
 	gchar *cValue = g_key_file_get_string (pKeyFile, cGroupName, cKeyName, &erreur);
 	if (erreur != NULL)
 	{
+		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 		
@@ -214,13 +216,12 @@ static gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroup
 		cValue = g_key_file_get_string (pKeyFile, cGroupNameUpperCase, cKeyName, &erreur);
 		if (erreur != NULL)
 		{
-			g_print ("Attention : %s\n", erreur->message);
 			g_error_free (erreur);
 			cValue = g_strdup (cDefaultValue);
 		}
 		g_free (cGroupNameUpperCase);
 		
-		g_key_file_set_string (pKeyFile, cGroupName, cKeyName, cValue);
+		g_key_file_set_string (pKeyFile, cGroupName, cKeyName, (cValue != NULL ? cValue : ""));
 		*bFlushConfFileNeeded = TRUE;
 	}
 	if (cValue != NULL && *cValue == '\0')
@@ -240,6 +241,7 @@ static void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cG
 	int *iValuesList = g_key_file_get_integer_list (pKeyFile, cGroupName, cKeyName, &length, &erreur);
 	if (erreur != NULL)
 	{
+		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 		
@@ -247,7 +249,6 @@ static void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cG
 		iValuesList = g_key_file_get_integer_list (pKeyFile, cGroupNameUpperCase, cKeyName, &length, &erreur);
 		if (erreur != NULL)
 		{
-			g_print ("Attention : %s\n", erreur->message);
 			g_error_free (erreur);
 		}
 		else
@@ -277,6 +278,7 @@ static void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGr
 	double *fValuesList = g_key_file_get_double_list (pKeyFile, cGroupName, cKeyName, &length, &erreur);
 	if (erreur != NULL)
 	{
+		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 		
@@ -284,7 +286,6 @@ static void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGr
 		fValuesList = g_key_file_get_double_list (pKeyFile, cGroupNameUpperCase, cKeyName, &length, &erreur);
 		if (erreur != NULL)
 		{
-			g_print ("Attention : %s\n", erreur->message);
 			g_error_free (erreur);
 		}
 		else
@@ -311,6 +312,7 @@ static gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *
 	gchar **cValuesList = g_key_file_get_string_list (pKeyFile, cGroupName, cKeyName, length, &erreur);
 	if (erreur != NULL)
 	{
+		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 		
@@ -318,7 +320,6 @@ static gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *
 		cValuesList = g_key_file_get_string_list (pKeyFile, cGroupNameUpperCase, cKeyName, length, &erreur);
 		if (erreur != NULL)
 		{
-			g_print ("Attention : %s\n", erreur->message);
 			g_error_free (erreur);
 			cValuesList = g_strsplit (cDefaultValues, ";", -1);  // "" -> NULL.
 			int i = 0;
@@ -490,6 +491,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	
 	g_fSubDockSizeRatio = cairo_dock_get_double_key_value (pKeyFile, "Sub-Docks", "relative icon size", &bFlushConfFileNeeded, 0.8);
 	
+	bShowSubDockOnMouseOver = cairo_dock_get_boolean_key_value (pKeyFile, "Sub-Docks", "on mouse over", &bFlushConfFileNeeded, TRUE);
 	
 	//\___________________ On recupere les parametres du fond.
 	g_fStripesSpeedFactor = cairo_dock_get_double_key_value (pKeyFile, "Background", "scroll speed factor", &bFlushConfFileNeeded, 1.0);

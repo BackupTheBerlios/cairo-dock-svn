@@ -42,6 +42,7 @@ static int s_iSidNonStopScrolling = 0;
 
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
+extern gboolean bShowSubDockOnMouseOver;
 extern double g_fUnfoldAcceleration;
 
 extern gint g_iScreenWidth[2];
@@ -108,6 +109,57 @@ gboolean on_expose (GtkWidget *pWidget,
 }
 
 
+static void cairo_dock_show_subdock (Icon *pPointedIcon, int iMouseX, gboolean bUpdate, CairoDock *pDock)
+{
+	//g_print ("on montre le dock fils\n");
+	CairoDock *pSubDock = pPointedIcon->pSubDock;
+	g_return_if_fail (pSubDock != NULL);
+	
+	if (pSubDock->iSidShrinkDown != 0)
+	{
+		g_source_remove (pSubDock->iSidShrinkDown);
+		pSubDock->iSidShrinkDown = 0;
+		pSubDock->fMagnitude = 0.0;
+		cairo_dock_shrink_down (pSubDock);
+	}
+	
+	if (bUpdate)
+	{
+		gboolean bIsLoop = (pDock->iRefCount == 0 && 1. * pDock->iCurrentWidth / pDock->iMaxDockWidth < .6 && pDock->bInside);
+		cairo_dock_calculate_construction_parameters (pPointedIcon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fAlign, pDock->fLateralFactor);  // c'est un peu un hack pourri, l'idee c'est de recalculer la position exacte de l'icone pointee pour pouvoir placer le sous-dock precisement, car sa derniere position connue est decalee d'un coup de molette par rapport a la nouvelle, ce qui fait beaucoup.
+	}
+	
+	int iX = iMouseX + (iMouseX < pPointedIcon->fDrawX + pPointedIcon->fWidth / 2 ? (g_bDirectionUp ? 1 : 0) : (g_bDirectionUp ? 0 : -1)) * pPointedIcon->fWidth * pPointedIcon->fScale / 2;
+	if (pSubDock->bHorizontalDock == pDock->bHorizontalDock)
+	{
+		pSubDock->fAlign = 0.5;
+		pSubDock->iGapX = iX + pDock->iWindowPositionX - g_iScreenWidth[pDock->bHorizontalDock] / 2; // les sous-dock ont un alignement egal a 0.5.  // pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2
+		pSubDock->iGapY = pDock->iGapY + pDock->iMaxDockHeight;
+	}
+	else
+	{
+		pSubDock->fAlign = (g_bDirectionUp ? 1 : 0);
+		pSubDock->iGapX = (pDock->iGapY + pDock->iMaxDockHeight) * (g_bDirectionUp ? -1 : 1);
+		if (g_bDirectionUp)
+			pSubDock->iGapY = g_iScreenWidth[pDock->bHorizontalDock] - (iX + pDock->iWindowPositionX);  // les sous-dock ont un alignement egal a 1.
+		else
+			pSubDock->iGapY = iX + pDock->iWindowPositionX;  // les sous-dock ont un alignement egal a 0.
+	}
+	pSubDock->fLateralFactor = g_fUnfoldAcceleration;
+	int iNewWidth, iNewHeight;
+	cairo_dock_calculate_window_position_at_balance (pSubDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
+	
+	//g_print ("  -> Gap %d;%d -> W(%d;%d) (%d)\n", pSubDock->iGapX, pSubDock->iGapY, pSubDock->iWindowPositionX, pSubDock->iWindowPositionY, pSubDock->bHorizontalDock);
+	if (pSubDock->bHorizontalDock)
+		gtk_window_move (GTK_WINDOW (pSubDock->pWidget), pSubDock->iWindowPositionX, pSubDock->iWindowPositionY);
+	else
+		gtk_window_move (GTK_WINDOW (pSubDock->pWidget), pSubDock->iWindowPositionY, pSubDock->iWindowPositionX);
+	//g_print ("MaJ de pLastPointedDock\n");
+	
+	pSubDock->bAtBottom = FALSE;
+	gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
+}
+
 gboolean on_motion_notify2 (GtkWidget* pWidget,
 	GdkEventMotion* pMotion,
 	CairoDock *pDock)
@@ -123,7 +175,8 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	{
 		if (pDock->bAtBottom || pDock->iSidShrinkDown > 0 || pMotion->time - fLastTime < g_fRefreshInterval)  // si les icones sont en train de diminuer de taille (suite a un clic) on ne redimensionne pas les icones, le temps que l'animation se finisse.  // || ! pDock->bInside 
 		{
-			gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);
+			if (pDock->iSidShrinkDown == 0)
+				gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);
 			return FALSE;
 		}
 		
@@ -174,46 +227,9 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		}
 		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL && pPointedIcon->pSubDock != s_pLastPointedDock)
 		{
-			//g_print ("on montre le dock fils\n");
-			CairoDock *pSubDock = pPointedIcon->pSubDock;
-			
-			if (pSubDock->iSidShrinkDown != 0)
-			{
-				g_source_remove (pSubDock->iSidShrinkDown);
-				pSubDock->iSidShrinkDown = 0;
-				pSubDock->fMagnitude = 0.0;
-				cairo_dock_shrink_down (pSubDock);
-			}
-			
-			iX += (iX < pPointedIcon->fDrawX + pPointedIcon->fWidth / 2 ? (g_bDirectionUp ? 1 : 0) : (g_bDirectionUp ? 0 : -1)) * pPointedIcon->fWidth * pPointedIcon->fScale / 2;
-			if (pSubDock->bHorizontalDock == pDock->bHorizontalDock)
-			{
-				pSubDock->fAlign = 0.5;
-				pSubDock->iGapX = iX + pDock->iWindowPositionX - g_iScreenWidth[pDock->bHorizontalDock] / 2; // les sous-dock ont un alignement egal a 0.5.  // pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2
-				pSubDock->iGapY = pDock->iGapY + pDock->iMaxDockHeight;
-			}
-			else
-			{
-				pSubDock->fAlign = (g_bDirectionUp ? 1 : 0);
-				pSubDock->iGapX = (pDock->iGapY + pDock->iMaxDockHeight) * (g_bDirectionUp ? -1 : 1);
-				if (g_bDirectionUp)
-					pSubDock->iGapY = g_iScreenWidth[pDock->bHorizontalDock] - (iX + pDock->iWindowPositionX);  // les sous-dock ont un alignement egal a 1.
-				else
-					pSubDock->iGapY = iX + pDock->iWindowPositionX;  // les sous-dock ont un alignement egal a 0.
-			}
-			pSubDock->fLateralFactor = g_fUnfoldAcceleration;
-			int iNewWidth, iNewHeight;
-			cairo_dock_calculate_window_position_at_balance (pSubDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
-			
-			//g_print ("  -> Gap %d;%d -> W(%d;%d) (%d)\n", pSubDock->iGapX, pSubDock->iGapY, pSubDock->iWindowPositionX, pSubDock->iWindowPositionY, pSubDock->bHorizontalDock);
-			if (pSubDock->bHorizontalDock)
-				gtk_window_move (GTK_WINDOW (pSubDock->pWidget), pSubDock->iWindowPositionX, pSubDock->iWindowPositionY);
-			else
-				gtk_window_move (GTK_WINDOW (pSubDock->pWidget), pSubDock->iWindowPositionY, pSubDock->iWindowPositionX);
-			//g_print ("MaJ de pLastPointedDock\n");
+			if (bShowSubDockOnMouseOver)
+				cairo_dock_show_subdock (pPointedIcon, iX, FALSE, pDock);
 			s_pLastPointedDock = pDock;
-			pSubDock->bAtBottom = FALSE;
-			gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
 		}
 		pLastPointedIcon = pPointedIcon;
 		if (s_pLastPointedDock == NULL)
@@ -543,8 +559,12 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 						if (GTK_WIDGET_VISIBLE (icon->pSubDock->pWidget))
 							gtk_widget_hide (icon->pSubDock->pWidget);
 						else
-							gtk_window_present (GTK_WINDOW (icon->pSubDock->pWidget));
-						
+						{
+							if (bShowSubDockOnMouseOver)
+								gtk_window_present (GTK_WINDOW (icon->pSubDock->pWidget));
+							else
+								cairo_dock_show_subdock (icon, pButton->x, FALSE, pDock);
+						}
 						icon->iAnimationType = CAIRO_DOCK_BLINK;
 						icon->iCount = g_tNbIterInOneRound[icon->iAnimationType] - 1;  // 1 clignotement.
 					}
@@ -767,48 +787,9 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 		}
 		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL)
 		{
-			//g_print ("on montre le dock fils\n");
-			CairoDock *pSubDock = pPointedIcon->pSubDock;
-			
-			if (pSubDock->iSidShrinkDown != 0)
-			{
-				g_source_remove (pSubDock->iSidShrinkDown);
-				pSubDock->iSidShrinkDown = 0;
-				pSubDock->fMagnitude = 0.0;
-				cairo_dock_shrink_down (pSubDock);
-			}
-			
-			gboolean bIsLoop = (pDock->iRefCount == 0 && 1. * pDock->iCurrentWidth / pDock->iMaxDockWidth < .6 && pDock->bInside);
-			cairo_dock_calculate_construction_parameters (pPointedIcon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fAlign, pDock->fLateralFactor);  // c'est un peu un hack pourri, l'idee c'est de recalculer la position exacte de l'icone pointee pour pouvoir placer le sous-dock precisement, car sa derniere position connue est decalee d'un coup de molette par rapport a la nouvelle, ce qui fait beaucoup.
-			iX += (iX < pPointedIcon->fDrawX + pPointedIcon->fWidth / 2 ? (g_bDirectionUp ? 1 : 0) : (g_bDirectionUp ? 0 : -1)) * pPointedIcon->fWidth * pPointedIcon->fScale / 2;
-			if (pSubDock->bHorizontalDock == pDock->bHorizontalDock)
-			{
-				pSubDock->fAlign = 0.5;
-				pSubDock->iGapX = iX + pDock->iWindowPositionX - g_iScreenWidth[pDock->bHorizontalDock] / 2; // les sous-dock ont un alignement egal a 0.5.  // pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2
-				pSubDock->iGapY = pDock->iGapY + pDock->iMaxDockHeight;
-			}
-			else
-			{
-				pSubDock->fAlign = (g_bDirectionUp ? 1 : 0);
-				pSubDock->iGapX = (pDock->iGapY + pDock->iMaxDockHeight) * (g_bDirectionUp ? -1 : 1);
-				if (g_bDirectionUp)
-					pSubDock->iGapY = g_iScreenWidth[pDock->bHorizontalDock] - (iX + pDock->iWindowPositionX);  // les sous-dock ont un alignement egal a 1.
-				else
-					pSubDock->iGapY = iX + pDock->iWindowPositionX;  // les sous-dock ont un alignement egal a 0.
-			}
-			pSubDock->fLateralFactor = g_fUnfoldAcceleration;
-			int iNewWidth, iNewHeight;
-			cairo_dock_calculate_window_position_at_balance (pSubDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
-			
-			//g_print ("  -> Gap %d;%d -> W(%d;%d) (%d)\n", pSubDock->iGapX, pSubDock->iGapY, pSubDock->iWindowPositionX, pSubDock->iWindowPositionY, pSubDock->bHorizontalDock);
-			if (pSubDock->bHorizontalDock)
-				gtk_window_move (GTK_WINDOW (pSubDock->pWidget), pSubDock->iWindowPositionX, pSubDock->iWindowPositionY);
-			else
-				gtk_window_move (GTK_WINDOW (pSubDock->pWidget), pSubDock->iWindowPositionY, pSubDock->iWindowPositionX);
-			//g_print ("MaJ de pLastPointedDock\n");
+			if (bShowSubDockOnMouseOver)
+				cairo_dock_show_subdock (pPointedIcon, iX, TRUE, pDock);
 			s_pLastPointedDock = pDock;
-			pSubDock->bAtBottom = FALSE;
-			gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
 		}
 		pLastPointedIcon = pPointedIcon;
 	}

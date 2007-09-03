@@ -33,6 +33,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-applications.h"
 
+#define CAIRO_DOCK_TASKBAR_CHECK_INTERVAL 350
+
 extern gboolean g_bAutoHide;
 
 extern int g_iScreenWidth[2], g_iScreenHeight[2];
@@ -490,9 +492,12 @@ static XEvent event;
 gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 {
 	static gboolean bInProgress = FALSE;
+	static int iNbIteration = 0;
 	if (bInProgress)
 		return TRUE;
 	bInProgress = TRUE;
+	iNbIteration ++;
+	//g_print ("%s (%d)\n", __func__, iNbIteration);
 	
 	g_return_val_if_fail (pDock != NULL, FALSE);
 	Bool bEventPresent;
@@ -648,10 +653,19 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 			if (/*event.type == CreateNotify || */event.type == DestroyNotify || event.type == UnmapNotify || event.type == MapNotify)
 			{
 				XPutBackEvent (g_XDisplay, &event);
-				g_print ("  on le remet dans la queue\n");
+				//g_print ("  on le remet dans la queue\n");
 				break ;
 			}
 		}
+	}
+	
+	if (iNbIteration == 120000)  // 2x par jour.
+	{
+		//g_print ("on redemarre la barre des taches\n");
+		iNbIteration = 0;
+		g_iSidUpdateAppliList = g_timeout_add (CAIRO_DOCK_TASKBAR_CHECK_INTERVAL, (GSourceFunc) cairo_dock_update_applis_list, (gpointer) pDock);
+		bInProgress = FALSE;
+		return FALSE;
 	}
 	
 	bInProgress = FALSE;
@@ -689,7 +703,7 @@ void cairo_dock_show_all_applis (CairoDock *pDock)
 	}
 	
 	cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
-	g_iSidUpdateAppliList = g_timeout_add (350, (GSourceFunc) cairo_dock_update_applis_list, (gpointer) pDock);  // un g_idle_add () consomme 90% de CPU ! :-/
+	g_iSidUpdateAppliList = g_timeout_add (CAIRO_DOCK_TASKBAR_CHECK_INTERVAL, (GSourceFunc) cairo_dock_update_applis_list, (gpointer) pDock);  // un g_idle_add () consomme 90% de CPU ! :-/
 }
 
 

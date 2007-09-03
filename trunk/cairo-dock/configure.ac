@@ -43,5 +43,7 @@ AC_CONFIG_FILES([Makefile
 		data/themes/Verde/Makefile
 		data/themes/Djoole/Makefile
 		data/themes/Cobalt/Makefile
+		data/themes/Glattering/Makefile
+		data/themes/Glattering/icons/Makefile
 		])
 AC_OUTPUT
