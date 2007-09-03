@@ -105,6 +105,7 @@ typedef struct _Icon {
 	//\____________ renseignes lors de la creation de l'icone.
 	gchar *acDesktopFileName;
 	gboolean bIsURI;
+	gboolean bIsMountingPoint;
 	gchar* acFileName;
 	gchar* acName;
 	gchar* acCommand;
@@ -184,6 +185,8 @@ typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
 typedef void (*CairoDockClickFunc) (Icon *icon);
 
 typedef gchar * (*CairoDockFileManagerFunc) (gchar *cURI, gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur);
+
+typedef void (*CairoDockLoadDirectoryFunc) (Icon *pIcon);
 
 
 

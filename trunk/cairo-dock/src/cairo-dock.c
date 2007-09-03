@@ -196,6 +196,7 @@ gboolean g_bSticky = TRUE;
 
 CairoDockClickFunc cairo_dock_launch_uri_func = NULL;
 CairoDockFileManagerFunc cairo_dock_add_uri_func = NULL;
+CairoDockLoadDirectoryFunc cairo_dock_load_directory_func = NULL;
 
 gboolean g_bUseGlitz = FALSE;
 gboolean g_bVerbose = FALSE;

@@ -53,6 +53,6 @@ extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 
 extern CairoDockClickFunc cairo_dock_launch_uri_func;
 extern CairoDockFileManagerFunc cairo_dock_add_uri_func;
-
+extern CairoDockLoadDirectoryFunc cairo_dock_load_directory_func;
 
 #endif
