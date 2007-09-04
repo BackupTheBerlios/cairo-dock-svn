@@ -43,6 +43,7 @@ extern Display *g_XDisplay;
 extern Screen *g_XScreen;
 extern Atom g_aNetClientList;
 extern GHashTable *g_hXWindowTable;
+extern GHashTable *g_hAppliTable;
 extern unsigned int g_iAppliMaxNameLength;
 extern int g_iSidUpdateAppliList;
 extern gboolean g_bUniquePid;
@@ -492,12 +493,9 @@ static XEvent event;
 gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 {
 	static gboolean bInProgress = FALSE;
-	static int iNbIteration = 0;
 	if (bInProgress)
 		return TRUE;
 	bInProgress = TRUE;
-	iNbIteration ++;
-	//g_print ("%s (%d)\n", __func__, iNbIteration);
 	
 	g_return_val_if_fail (pDock != NULL, FALSE);
 	Bool bEventPresent;
@@ -643,6 +641,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 	
 	//g_print ("%d events\n", XEventsQueued (g_XDisplay, QueuedAlready));
 	//\_____________________ On vide la queue des messages qui ne nous interessent pas.
+	bEventPresent = FALSE;
 	if (!bInterestedEvent)
 	{
 		long event_mask = 0xFFFFFFFF;
@@ -653,19 +652,15 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 			if (/*event.type == CreateNotify || */event.type == DestroyNotify || event.type == UnmapNotify || event.type == MapNotify)
 			{
 				XPutBackEvent (g_XDisplay, &event);
-				//g_print ("  on le remet dans la queue\n");
+				g_print ("  on le remet dans la queue\n");
+				bEventPresent = TRUE;
 				break ;
 			}
 		}
 	}
-	
-	if (iNbIteration == 120000)  // 2x par jour.
+	if (! bEventPresent)
 	{
-		//g_print ("on redemarre la barre des taches\n");
-		iNbIteration = 0;
-		g_iSidUpdateAppliList = g_timeout_add (CAIRO_DOCK_TASKBAR_CHECK_INTERVAL, (GSourceFunc) cairo_dock_update_applis_list, (gpointer) pDock);
-		bInProgress = FALSE;
-		return FALSE;
+		XSync (g_XDisplay, True);
 	}
 	
 	bInProgress = FALSE;
