@@ -19,7 +19,12 @@ void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file);
 
 void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int y);
 
-void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, int iNbAvailableChoicess, gchar *cNewUsefullComment, gboolean bAllowNewChoice);
+
+void cairo_dock_write_one_name (gchar *cName, gpointer value, GString *pString);
+void cairo_dock_write_one_name_description (gchar *cName, gchar *cDescriptionFilePath, GString *pString);
+void cairo_dock_write_one_module_name (gchar *cName, CairoDockModule *pModule, GString *pString);
+void cairo_dock_write_one_theme_name (gchar *cName, gchar *cThemePath, GString *pString);
+void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, int iNbAvailableChoicess, gchar *cNewUsefullComment, gboolean bAllowNewChoice, gboolean bWriteDescription, GHFunc pWritingFunc);
 void cairo_dock_update_conf_file_with_modules (gchar *cConfFile, GHashTable *pModuleTable);
 
 void cairo_dock_update_conf_file_with_translations (gchar *cConfFile, gchar *cTranslationsDir);

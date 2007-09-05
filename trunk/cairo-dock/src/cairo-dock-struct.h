@@ -70,6 +70,7 @@ typedef struct _CairoDock {
 	} CairoDock;
 
 
+typedef gchar * (* CairoDockModulePreInit) (void);
 
 typedef gpointer (*CairoDockModuleInit) (CairoDock *pDock, gchar **cConfFilePath, GError **erreur);  // renvoie son icone si il en a.
 
@@ -87,6 +88,7 @@ typedef struct _CairoDockModule {
 	CairoDockModuleStop stopModule;
 	CairoDockModuleAction actionModule;
 	gchar *cConfFilePath;
+	gchar *cReadmeFilePath;
 	gboolean bActive;
 } CairoDockModule;
 

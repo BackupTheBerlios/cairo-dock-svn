@@ -597,8 +597,10 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 					pDock->fLateralFactor = 0;
 					g_source_remove (pDock->iSidGrowUp);
 					pDock->iSidGrowUp = 0;
+					if (pDock->iSidShrinkDown == 0)
+						pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 				}
-				if (pDock->iSidShrinkDown == 0)
+				else if (pDock->iSidShrinkDown == 0 && icon->iCount > 0)
 					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);  // fera diminuer de taille les icones, et rebondir/tourner/clignoter celle qui est cliquee.
 			}
 			else if (s_pIconClicked != NULL && icon != NULL && icon != s_pIconClicked && icon->iType == s_pIconClicked->iType)

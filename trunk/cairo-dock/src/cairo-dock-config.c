@@ -941,11 +941,24 @@ void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int
 }
 
 
-static void _cairo_dock_write_one_name (gchar *cName, gpointer value, GString *pString)
+void cairo_dock_write_one_name (gchar *cName, gpointer value, GString *pString)
 {
 	g_string_append_printf (pString, "%s;", cName);
 }
-void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, int iNbAvailableChoices, gchar *cNewUsefullComment, gboolean bAllowNewChoice)
+void cairo_dock_write_one_name_description (gchar *cName, gchar *cDescriptionFilePath, GString *pString)
+{
+	g_string_append_printf (pString, "%s;%s;", cName, cDescriptionFilePath);
+}
+void cairo_dock_write_one_module_name (gchar *cName, CairoDockModule *pModule, GString *pString)
+{
+	g_string_append_printf (pString, "%s;%s;", cName, (pModule->cReadmeFilePath != NULL ? pModule->cReadmeFilePath : "none"));
+}
+void cairo_dock_write_one_theme_name (gchar *cName, gchar *cThemePath, GString *pString)
+{
+	g_string_append_printf (pString, "%s;%s/readme;", cName, cThemePath);
+}
+
+void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, int iNbAvailableChoices, gchar *cNewUsefullComment, gboolean bAllowNewChoice, gboolean bWriteDescription, GHFunc pWritingFunc)
 {
 	//g_print ("%s (%s)\n", __func__, cConfFile);
 	GError *erreur = NULL;
@@ -996,21 +1009,21 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 		cUsefullComment = g_strdup (cNewUsefullComment);
 	}
 	
-	GString *cComment = g_string_new ("");
-	g_string_printf (cComment, "%c%d[", (bAllowNewChoice ? 'E' : 's'), iNbAvailableChoices);
-	g_hash_table_foreach (pModuleTable, (GHFunc) _cairo_dock_write_one_name, cComment);
-	if (cComment->str[cComment->len-1] == ';')  // peut etre faux si aucune valeur n'a ete ecrite.
-		cComment->len --;
-	g_string_append_printf (cComment, "] %s", (cUsefullComment != NULL ? cUsefullComment : ""));
+	GString *sComment = g_string_new ("");
+	g_string_printf (sComment, "%c%d[", (bAllowNewChoice ? 'E' : (bWriteDescription ? 'R' : 's')), iNbAvailableChoices);
+	g_hash_table_foreach (pModuleTable, (pWritingFunc != NULL ? pWritingFunc : (GHFunc) cairo_dock_write_one_name), sComment);
+	if (sComment->str[sComment->len-1] == ';')  // peut etre faux si aucune valeur n'a ete ecrite.
+		sComment->len --;
+	g_string_append_printf (sComment, "] %s", (cUsefullComment != NULL ? cUsefullComment : ""));
 	
-	g_key_file_set_comment (pKeyFile, cGroupName, cKeyName, cComment->str, &erreur);
+	g_key_file_set_comment (pKeyFile, cGroupName, cKeyName, sComment->str, &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
-	g_string_free (cComment, TRUE);
+	g_string_free (sComment, TRUE);
 	
 	cairo_dock_write_keys_to_file (pKeyFile, cConfFile);
 	g_key_file_free (pKeyFile);
@@ -1019,7 +1032,7 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 
 void cairo_dock_update_conf_file_with_modules (gchar *cConfFile, GHashTable *pModuleTable)
 {
-	cairo_dock_update_conf_file_with_hash_table (cConfFile, pModuleTable, "Applets", "active modules", 99, NULL, FALSE);  // "List of active plug-ins (applets and others)."
+	cairo_dock_update_conf_file_with_hash_table (cConfFile, pModuleTable, "Applets", "active modules", 999, NULL, FALSE, TRUE, (GHFunc) cairo_dock_write_one_module_name);
 }
 
 void cairo_dock_update_conf_file_with_translations (gchar *cConfFile, gchar *cTranslationsDir)
@@ -1027,7 +1040,7 @@ void cairo_dock_update_conf_file_with_translations (gchar *cConfFile, gchar *cTr
 	GError *erreur = NULL;
 	GHashTable *pTranslationTable = cairo_dock_list_available_translations (cTranslationsDir, "cairo-dock-", &erreur);
 	
-	cairo_dock_update_conf_file_with_hash_table (cConfFile, pTranslationTable, "Cairo Dock", "language", 1, NULL, FALSE);
+	cairo_dock_update_conf_file_with_hash_table (cConfFile, pTranslationTable, "Cairo Dock", "language", 1, NULL, FALSE, FALSE, (GHFunc) cairo_dock_write_one_name);
 	
 	g_hash_table_destroy (pTranslationTable);
 }

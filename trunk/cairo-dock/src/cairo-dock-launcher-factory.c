@@ -515,7 +515,6 @@ void cairo_dock_load_icon_info_from_desktop_file (gchar *cDesktopFileName, Icon 
 			g_print ("le dock fils (%s) n'existe pas, on le cree\n", icon->acName);
 			if (icon->bIsURI)
 			{
-				g_print ("toto\n");
 				if (cairo_dock_load_directory_func != NULL)
 					cairo_dock_load_directory_func (icon);
 			}

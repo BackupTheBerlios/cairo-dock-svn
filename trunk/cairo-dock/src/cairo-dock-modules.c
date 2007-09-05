@@ -26,12 +26,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-modules.h"
 
-extern gboolean g_bDirectionUp;
-extern gboolean g_bHorizontalDock;
-extern gchar *g_cLabelPolice;
-extern GHashTable *g_hAppliTable;
-extern GHashTable *g_hXWindowTable;
-
 
 gchar *cairo_dock_extract_module_name_from_path (gchar *cSoFilePath)
 {
@@ -66,6 +60,21 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 		g_set_error (erreur, 1, 1, "Attention : while opening module '%s' : (%s)", pCairoDockModule->cSoFilePath, g_module_error ());
 		return ;
 	}
+	
+	g_free (pCairoDockModule->cReadmeFilePath);
+	pCairoDockModule->cReadmeFilePath = NULL;
+	
+	CairoDockModulePreInit function_pre_init;
+	gchar *cPreInitFuncName = g_strdup_printf ("%s_pre_init", pCairoDockModule->cModuleName);
+	if (!g_module_symbol (module, cPreInitFuncName, (gpointer) &function_pre_init))
+	{
+		function_pre_init = NULL;
+	}
+	else
+	{
+		pCairoDockModule->cReadmeFilePath = function_pre_init ();
+	}
+	g_free (cPreInitFuncName);
 	
 	
 	CairoDockModuleInit function_init;
@@ -307,16 +316,6 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 	CairoDock *pDock = data[1];
 	GError *erreur = NULL;
 	
-	/*if (module->stopModule != NULL)
-	{
-		module->stopModule ();
-	}
-	g_free (module->cConfFilePath);
-	module->cConfFilePath = NULL;
-	
-	Icon *pNewIcon = module->initModule (pDock, &module->cConfFilePath, &erreur);
-	if (pNewIcon != NULL)
-		pNewIcon->pModule = module;*/
 	cairo_dock_deactivate_module (module);
 	Icon *pNewIcon = cairo_dock_activate_module (module, pDock, &erreur);
 	if (erreur != NULL)
@@ -343,7 +342,6 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 		//cairo_dock_redraw_my_icon (pNewIcon, pDock->pWidget);
 	}
 	
-	//cairo_dock_calculate_icons (pDock, 0, 0);
 	//gtk_widget_queue_draw (pDock->pWidget);
 }
 

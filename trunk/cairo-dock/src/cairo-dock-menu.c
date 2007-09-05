@@ -104,7 +104,7 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 	
 	gchar *cImagePath = g_strdup_printf ("%s/cairo-dock.svg", CAIRO_DOCK_SHARE_DATA_DIR);
 	GtkWidget *pImage = gtk_image_new_from_file (cImagePath);
-	gtk_message_dialog_set_image (GTK_MESSAGE_DIALOG (pDialog), pImage);
+	///gtk_message_dialog_set_image (GTK_MESSAGE_DIALOG (pDialog), pImage);
 	
 	GtkWidget *pLabel = gtk_label_new (NULL);
 	gtk_label_set_use_markup (GTK_LABEL (pLabel), TRUE);
