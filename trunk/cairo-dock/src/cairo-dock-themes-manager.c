@@ -97,7 +97,7 @@ gchar *cairo_dock_edit_themes (gchar *cLanguage, GHashTable **hThemeTable)
 	g_key_file_free (pKeyFile);
 	
 	//\___________________ On laisse l'utilisateur l'editer.
-	gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTmpConfFile, "Manage themes", 400, 400, TRUE, NULL, NULL, NULL);
+	gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTmpConfFile, "Manage themes", 500, 400, TRUE, NULL, NULL, NULL);
 	if (! bChoiceOK)
 	{
 		g_free (cTmpConfFile);

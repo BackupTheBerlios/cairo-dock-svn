@@ -4,6 +4,7 @@ SUBDIRS = . icons
 
 theme_DATA = \
 	cairo-dock.conf\
+	readme\
 	01launcher.desktop\
 	05firefox.desktop\
 	cairo-dock.conf\

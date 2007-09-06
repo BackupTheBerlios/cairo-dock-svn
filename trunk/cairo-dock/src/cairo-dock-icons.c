@@ -46,6 +46,7 @@ extern gchar *g_cCurrentThemePath;
 extern double g_fAmplitude;
 extern int g_iSinusoidWidth;
 extern double g_fUnfoldAcceleration;
+extern gboolean g_bAutoHide;
 
 extern gboolean g_bDirectionUp;
 extern GHashTable *g_hAppliTable;
@@ -243,6 +244,18 @@ Icon *cairo_dock_get_previous_icon (GList *pIconList, Icon *pIcon)
 	return NULL;
 }
 
+Icon *cairo_dock_get_icon_with_command (GList *pIconList, gchar *cCommand)
+{
+	GList* ic;
+	Icon *icon;
+	for (ic = pIconList; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (strcmp (icon->acCommand, cCommand) == 0)
+			return icon;
+	}
+	return NULL;
+}
 
 
 void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
@@ -698,7 +711,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	int dx = iMouseX - iWidth / 2;  // ecart par rapport au milieu du dock a plat.
 	int x_abs = dx + pDock->iMinDockWidth / 2;  // ecart par rapport a la gauche du dock minimal.
 	
-	pDock->fDecorationsOffsetX = - iMouseX;
+	///pDock->fDecorationsOffsetX = iMouseX - pDock->iCurrentWidth / 2;
 	
 	//\_______________ On calcule l'ensemble des parametres des icones.
 	Icon *pPointedIcon = cairo_dock_calculate_icons_with_position (pDock->icons, pDock->pFirstDrawnElement, x_abs, pDock->fMagnitude, pDock->iMinDockWidth, pDock->iMaxDockWidth, iHeight, iMouseY, pDock->fAlign, pDock->fLateralFactor);
@@ -718,25 +731,34 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, pDock);
 	}
 	
-	if (bMouseInsideDock && pDock->fMagnitude < 1 && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons) && pDock->iSidMoveDown == 0 && ! pDock->bAtBottom)  // on est dedans en x et la taille des icones est non maximale bien qu'aucune icone  ne soit animee.  // && pDock->iSidShrinkDown == 0
+	if (bMouseInsideDock && pDock->fMagnitude < 1 && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons) && pDock->iSidMoveDown == 0)  // on est dedans en x et la taille des icones est non maximale bien qu'aucune icone  ne soit animee.  // && pDock->iSidShrinkDown == 0 && ! pDock->bAtBottom
 	{
 		if ( (g_bDirectionUp && pPointedIcon != NULL && iMouseY > 0 && iMouseY < iHeight) || (! g_bDirectionUp && pPointedIcon != NULL && iMouseY < iHeight && iMouseY > 0) )  // et en plus on est dedans en y.
 		{
 			//g_print ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone  ne soit animee (iMouseX=%d => x_abs=%d)\n", iMouseX, x_abs);
 			//pDock->bInside = TRUE;
-			pDock->bAtBottom = FALSE;
-			if (pDock->iSidShrinkDown != 0)
+			if (pDock->bAtBottom)  // on emule une re-rentree.
 			{
-				g_source_remove (pDock->iSidShrinkDown);
-				pDock->iSidShrinkDown = 0;
+				g_signal_emit_by_name (pDock->pWidget, "enter-notify-event", NULL, &bReturn);
 			}
-			if (pDock->iSidMoveDown != 0)
+			else  // on se contente de faire grossir les icones.
 			{
-				g_source_remove (pDock->iSidMoveDown);
-				pDock->iSidMoveDown = 0;
+				pDock->bAtBottom = FALSE;
+				if (pDock->iSidShrinkDown != 0)
+				{
+					g_source_remove (pDock->iSidShrinkDown);
+					pDock->iSidShrinkDown = 0;
+				}
+				if (pDock->iSidMoveDown != 0)
+				{
+					g_source_remove (pDock->iSidMoveDown);
+					pDock->iSidMoveDown = 0;
+				}
+				if (pDock->iSidGrowUp == 0)
+					pDock->iSidGrowUp = g_timeout_add (40, (GSourceFunc) cairo_dock_grow_up, pDock);
+				if (g_bAutoHide && pDock->iRefCount == 0 && pDock->iSidMoveUp == 0)
+					pDock->iSidMoveUp = g_timeout_add (40, (GSourceFunc) cairo_dock_move_up, pDock);
 			}
-			pDock->iSidGrowUp = g_timeout_add (40, (GSourceFunc) cairo_dock_grow_up, pDock);
-			pDock->iSidMoveUp = g_timeout_add (40, (GSourceFunc) cairo_dock_move_up, pDock);
 		}
 	}
 	

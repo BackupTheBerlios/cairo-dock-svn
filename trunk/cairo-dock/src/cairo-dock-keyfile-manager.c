@@ -246,6 +246,14 @@ static void _cairo_dock_pick_a_file (GtkButton *button, gpointer *data)
 	gtk_widget_destroy (pFileChooserDialog);
 }
 
+static void _cairo_dock_set_font (GtkFontButton *widget, GtkEntry *pEntry)
+{
+	const gchar *cFontName = gtk_font_button_get_font_name (GTK_FONT_BUTTON (widget));
+	g_print (" -> %s\n", cFontName);
+	if (cFontName != NULL)
+		gtk_entry_set_text (pEntry, cFontName);
+}
+
 static void _cairo_dock_set_color (GtkColorButton *pColorButton, GSList *pWidgetList)
 {
 	GdkColor gdkColor;
@@ -343,6 +351,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	GtkWidget *pFrame, *pFrameVBox;
 	GtkWidget *pScrolledWindow;
 	GtkWidget *pColorButton;
+	GtkWidget *pFontButton;
 	GtkWidget *pDescriptionLabel;
 	gchar *cGroupName, *cKeyName, *cKeyComment, *cUsefulComment, *cAuthorizedValuesChain, **pAuthorizedValuesList;
 	gpointer *pGroupKeyWidget;
@@ -626,8 +635,9 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					case 'S' :  // string avec un selecteur de fichier a cote du GtkEntry.
 					case 'D' :  // string avec un selecteur de repertoire a cote du GtkEntry.
 					case 'T' :  // string, mais sans pouvoir decochez les cases.
-					case 'E' : // string, mais avec un GtkComboBoxEntry pour le choix unique.
+					case 'E' :  // string, mais avec un GtkComboBoxEntry pour le choix unique.
 					case 'R' :  // string, avec un label pour la description.
+					case 'P' :  // string avec un selecteur de font a cote du GtkEntry.
 						//g_print ("  + string\n");
 						pEntry = NULL;
 						pDescriptionLabel = NULL;
@@ -658,13 +668,13 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								}
 								
 								k = 0;
-								GtkTreeIter *pSelectediter = NULL;
+								int iSelectedItem = 0;
 								while (pAuthorizedValuesList[k] != NULL)
 								{
 									GtkTreeIter iter;
 									gtk_list_store_append (GTK_LIST_STORE (modele), &iter);
-									if (pSelectediter == NULL && strcmp (cValue, pAuthorizedValuesList[k]) == 0)
-										pSelectediter = &iter;
+									if (iSelectedItem == 0 && strcmp (cValue, pAuthorizedValuesList[k]) == 0)
+										iSelectedItem = k;
 									
 									gtk_list_store_set (GTK_LIST_STORE (modele), &iter,
 										CAIRO_DOCK_MODEL_NAME, pAuthorizedValuesList[k],
@@ -673,7 +683,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									
 									k += (iElementType == 'R') + 1;
 								}
-								gtk_combo_box_set_active_iter (GTK_COMBO_BOX (pOneWidget), pSelectediter);
+								gtk_combo_box_set_active (GTK_COMBO_BOX (pOneWidget), iSelectedItem);
 								
 								if (iElementType == 'R')
 								{
@@ -932,6 +942,21 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								FALSE,
 								0);
 						}
+						else if (iElementType == 'P' && pEntry != NULL)
+						{
+							pFontButton = gtk_font_button_new_with_font (gtk_entry_get_text (GTK_ENTRY (pEntry)));
+							gtk_font_button_set_show_style (GTK_FONT_BUTTON (pFontButton), FALSE);
+							gtk_font_button_set_show_size (GTK_FONT_BUTTON (pFontButton), FALSE);
+							g_signal_connect (G_OBJECT (pFontButton),
+								"font-set",
+								G_CALLBACK (_cairo_dock_set_font),
+								pEntry);
+							gtk_box_pack_start (GTK_BOX (pHBox),
+								pFontButton,
+								FALSE,
+								FALSE,
+								0);
+						}
 						
 						g_strfreev (cValueList);
 					break;
@@ -1083,7 +1108,7 @@ static gboolean _cairo_dock_get_active_elements (GtkTreeModel * model, GtkTreePa
 	//g_print ("%s (%d)\n", __func__, *pOrder);
 	gboolean bActive;
 	gchar *cValue = NULL;
-	gtk_tree_model_get (model, iter, 0, &bActive, 1, &cValue, -1);
+	gtk_tree_model_get (model, iter, CAIRO_DOCK_MODEL_ACTIVE, &bActive, CAIRO_DOCK_MODEL_NAME, &cValue, -1);
 
 	if (bActive)
 	{

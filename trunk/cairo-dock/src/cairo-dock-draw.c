@@ -443,9 +443,9 @@ void cairo_dock_render (CairoDock *pDock)
 		cairo_save (pCairoContext);
 		
 		if (pDock->bHorizontalDock)
-			cairo_translate (pCairoContext, (- pDock->fDecorationsOffsetX - pDock->iCurrentWidth / 2) * g_fStripesSpeedFactor - pDock->iCurrentWidth * 0.5, (g_bDirectionUp ? pDock->iCurrentHeight - pDock->iMaxIconHeight - fLineWidth : fLineWidth));
+			cairo_translate (pCairoContext, pDock->fDecorationsOffsetX * g_fStripesSpeedFactor - pDock->iCurrentWidth * 0.5, (g_bDirectionUp ? pDock->iCurrentHeight - pDock->iMaxIconHeight - fLineWidth : fLineWidth));
 		else
-			cairo_translate (pCairoContext, (g_bDirectionUp ? pDock->iCurrentHeight - pDock->iMaxIconHeight - fLineWidth : fLineWidth), (- pDock->fDecorationsOffsetX - pDock->iCurrentWidth / 2) * g_fStripesSpeedFactor - pDock->iCurrentWidth * 0.5);
+			cairo_translate (pCairoContext, (g_bDirectionUp ? pDock->iCurrentHeight - pDock->iMaxIconHeight - fLineWidth : fLineWidth), pDock->fDecorationsOffsetX * g_fStripesSpeedFactor - pDock->iCurrentWidth * 0.5);
 		
 		cairo_set_source_surface (pCairoContext, g_pBackgroundSurfaceFull[pDock->bHorizontalDock], 0., 0.);
 		cairo_fill_preserve (pCairoContext);
@@ -455,15 +455,14 @@ void cairo_dock_render (CairoDock *pDock)
 	{
 		cairo_save (pCairoContext);
 		
-		double fDeltaX = (- pDock->fDecorationsOffsetX - pDock->iCurrentWidth / 2) * g_fStripesSpeedFactor;
 		if (pDock->bHorizontalDock)
 		{
-			cairo_translate (pCairoContext, fDeltaX, (g_bDirectionUp ? pDock->iCurrentHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
+			cairo_translate (pCairoContext, pDock->fDecorationsOffsetX * g_fStripesSpeedFactor, (g_bDirectionUp ? pDock->iCurrentHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
 			cairo_scale (pCairoContext, 1. * pDock->iCurrentWidth / g_fBackgroundImageWidth, 1. * pDock->iMaxIconHeight / g_fBackgroundImageHeight);
 		}
 		else
 		{
-			cairo_translate (pCairoContext, (g_bDirectionUp ? pDock->iCurrentHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth), fDeltaX);
+			cairo_translate (pCairoContext, (g_bDirectionUp ? pDock->iCurrentHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth), pDock->fDecorationsOffsetX * g_fStripesSpeedFactor);
 			cairo_scale (pCairoContext, 1. * pDock->iMaxIconHeight / g_fBackgroundImageHeight, 1. * pDock->iCurrentWidth / g_fBackgroundImageWidth);
 		}
 		
@@ -730,9 +729,9 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 		cairo_save (pCairoContext);
 		
 		if (pDock->bHorizontalDock)
-			cairo_translate (pCairoContext, (- pDock->fDecorationsOffsetX - iWidth / 2) * g_fStripesSpeedFactor - iWidth * 0.5, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
+			cairo_translate (pCairoContext, pDock->fDecorationsOffsetX * g_fStripesSpeedFactor - iWidth * 0.5, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth));
 		else
-			cairo_translate (pCairoContext, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth), (- pDock->fDecorationsOffsetX - iWidth / 2) * g_fStripesSpeedFactor - iWidth * 0.5);
+			cairo_translate (pCairoContext, (g_bDirectionUp ? iHeight - pDock->iMaxIconHeight - fLineWidth: fLineWidth), pDock->fDecorationsOffsetX * g_fStripesSpeedFactor - iWidth * 0.5);
 		cairo_set_source_surface (pCairoContext, g_pBackgroundSurfaceFull[pDock->bHorizontalDock], 0., 0.);
 		
 		cairo_fill_preserve (pCairoContext);
@@ -744,12 +743,12 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 		
 		if (pDock->bHorizontalDock)
 		{
-			cairo_translate (pCairoContext, - (pDock->fDecorationsOffsetX - iWidth / 2) * g_fStripesSpeedFactor - iWidth / 2, fDockOffsetY);
+			cairo_translate (pCairoContext, pDock->fDecorationsOffsetX * g_fStripesSpeedFactor - iWidth / 2, fDockOffsetY);
 			cairo_scale (pCairoContext, 1. * iWidth / g_fBackgroundImageWidth, 1. * pDock->iMaxIconHeight / g_fBackgroundImageHeight);
 		}
 		else
 		{
-			cairo_translate (pCairoContext, 0, - (pDock->fDecorationsOffsetX - iWidth / 2) * g_fStripesSpeedFactor - iWidth / 2);
+			cairo_translate (pCairoContext, 0, pDock->fDecorationsOffsetX * g_fStripesSpeedFactor - iWidth / 2);
 			cairo_scale (pCairoContext, 1. * pDock->iMaxIconHeight / g_fBackgroundImageHeight, 1. * iWidth / g_fBackgroundImageWidth);
 		}
 		

@@ -48,6 +48,7 @@ typedef struct _CairoDock {
 	
 	gfloat fMagnitude; // coef multiplicateur de l'amplitude de la sinusoide (entre 0 et 1)
 	gdouble fDecorationsOffsetX;  // decalage des decorations pour les faire suivre la souris.
+	gint iMouseX;  // derniere position du curseur, dans le cas de decorations non asservies.
 	gdouble fLateralFactor;  // un facteur d'acceleration lateral des icones lors du grossissement initial.
 	
 	CairoDockTypeHorizontality bHorizontalDock;  // dit si le dock est horizontal ou vertical.
@@ -62,6 +63,7 @@ typedef struct _CairoDock {
 	gint iSidMoveUp;  // serial ID du thread de montee de la fenetre.
 	gint iSidGrowUp;  // serial ID du thread de grossisement des icones.
 	gint iSidShrinkDown;  // serial ID du thread de diminution des icones.
+	gint iSidLeaveDemand;  // serial ID du thread qui enverra le signal de sortie retarde.
 #ifdef HAVE_GLITZ
 	glitz_drawable_format_t *pDrawFormat;
 	glitz_drawable_t* pGlitzDrawable;

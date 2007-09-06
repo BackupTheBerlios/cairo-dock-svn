@@ -2,6 +2,7 @@ themedir = $(pkgdatadir)/themes/Cobalt
 
 theme_DATA = \
 	cairo-dock.conf\
+	readme\
 	00launcher.desktop\
 	f-spot.svg\
 	ooo-draw.desktop\

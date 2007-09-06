@@ -50,6 +50,7 @@ extern gboolean g_bDirectionUp;
 extern gboolean g_bSameHorizontality;
 extern double g_fSubDockSizeRatio;
 extern gboolean bShowSubDockOnMouseOver;
+extern int g_iLeaveSubDockDelay;
 
 extern int g_iLabelSize;
 extern gchar *g_cLabelPolice;
@@ -80,6 +81,7 @@ extern double g_fStringColor[4];
 extern gboolean g_bBackgroundImageRepeat;
 extern double g_fBackgroundImageAlpha;
 extern gchar *g_cBackgroundImageFile;
+extern gboolean g_bDecorationsFollowMouse;
 
 extern double g_fStripesColorBright[4];
 extern double g_fStripesColorDark[4];
@@ -493,9 +495,13 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	
 	bShowSubDockOnMouseOver = cairo_dock_get_boolean_key_value (pKeyFile, "Sub-Docks", "on mouse over", &bFlushConfFileNeeded, TRUE);
 	
+	g_iLeaveSubDockDelay = cairo_dock_get_integer_key_value (pKeyFile, "Sub-Docks", "leaving delay", &bFlushConfFileNeeded, 250);
+	
 	//\___________________ On recupere les parametres du fond.
 	g_fStripesSpeedFactor = cairo_dock_get_double_key_value (pKeyFile, "Background", "scroll speed factor", &bFlushConfFileNeeded, 1.0);
 	g_fStripesSpeedFactor = MIN (1., g_fStripesSpeedFactor);
+	
+	g_bDecorationsFollowMouse = cairo_dock_get_boolean_key_value (pKeyFile, "Background", "decorations enslaved", &bFlushConfFileNeeded, TRUE);
 	
 	double couleur2[4] = {.7, .9, .7, .4};
 	cairo_dock_get_double_list_key_value (pKeyFile, "Background", "stripes color bright", &bFlushConfFileNeeded, g_fStripesColorBright, 4, couleur2);

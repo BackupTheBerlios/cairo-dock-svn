@@ -134,6 +134,7 @@ gboolean g_bBackgroundImageRepeat; // repeter l'image du fond comme un motif.
 double g_fBackgroundImageAlpha;  // transparence de l'image de fond.
 cairo_surface_t *g_pBackgroundSurface[2] = {NULL, NULL};  // surface associee a l'image du fond, de la taille de l'image du fond.
 cairo_surface_t *g_pBackgroundSurfaceFull[2] = {NULL, NULL};  // surface associee aux decorations, de 2 fois la taille de la fenetre.
+gboolean g_bDecorationsFollowMouse;  // dis si les decorations sont asservies au curseur, ou si le delta de deplacement ne depend que de la direction de celui-ci.
 
 int g_iIconGap = 0;  // ecart en pixels entre les icones (pour l'instant une valeur > 0 cree des decalages intempestifs).
 int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];  // les tailles min et max pour chaque type d'icone.
@@ -161,6 +162,7 @@ gboolean g_bDirectionUp = TRUE;  // la direction dans laquelle les icones grossi
 gboolean g_bSameHorizontality = TRUE;  // dit si les sous-docks ont la meme horizontalite que les docks racines.
 double g_fSubDockSizeRatio;  // ratio de la taille des icones des sous-docks par rapport a celles du dock principal.
 gboolean bShowSubDockOnMouseOver;
+int g_iLeaveSubDockDelay;
 
 int g_iLabelSize;  // taille de la police des etiquettes.
 gchar *g_cLabelPolice;  // police de caracteres des etiquettes.

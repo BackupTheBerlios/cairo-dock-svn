@@ -1,6 +1,8 @@
 themedir = $(pkgdatadir)/themes/Djoole
 
 theme_DATA = \
+	cairo-dock.conf \
+	readme \
 	00launcher.desktop \
 	01BitTorrent.desktop \
 	01gaim.desktop \
@@ -15,7 +17,6 @@ theme_DATA = \
 	10launcher.desktop \
 	background-cairo-dock.svg \
 	background-snow.svg \
-	cairo-dock.conf \
 	calculator.svg \
 	desktop.svg \
 	firefox.svg \
@@ -34,5 +35,4 @@ theme_DATA = \
 	thunderbird.svg \
 	transmission.png \
 	Tux.svg \
-	web.svg\
-	readme
+	web.svg

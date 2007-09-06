@@ -155,7 +155,7 @@ static void cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 	gtk_widget_destroy (dialog);
 	if (answer == GTK_RESPONSE_YES)
 	{
-		if (icon->acDesktopFileName != NULL)  // normallement impossible.
+		if (icon->acDesktopFileName != NULL)
 		{
 			gchar *icon_path = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon->acDesktopFileName);
 			g_remove (icon_path);

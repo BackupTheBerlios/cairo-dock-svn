@@ -34,6 +34,7 @@ Icon *cairo_dock_get_next_icon (GList *pIconList, Icon *pIcon);
 Icon *cairo_dock_get_previous_icon (GList *pIconList, Icon *pIcon);
 #define cairo_dock_get_next_element(ic, list) (ic->next == NULL ? list : ic->next);
 #define cairo_dock_get_previous_element(ic, list) (ic->prev == NULL ? g_list_last (list) : ic->prev);
+Icon *cairo_dock_get_icon_with_command (GList *pIconList, gchar *cCommand);
 
 #define cairo_dock_none_clicked(pIconList) (cairo_dock_get_bouncing_icon (pIconList) == NULL)
 #define cairo_dock_none_removed_or_inserted(pIconList) (cairo_dock_get_removing_or_inserting_icon (pIconList) == NULL)

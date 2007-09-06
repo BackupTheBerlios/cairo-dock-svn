@@ -2,6 +2,7 @@ themedir = $(pkgdatadir)/themes/Ubuntu
 
 theme_DATA = \
 	cairo-dock.conf\
+	readme\
 	01gaim.desktop\
 	05firefox.desktop\
 	music.svg\

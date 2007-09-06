@@ -2,6 +2,7 @@ themedir = $(pkgdatadir)/themes/default
 
 theme_DATA = \
 	cairo-dock.conf\
+	readme\
 	background-snow.svg\
 	01BitTorrent.desktop\
 	05firefox.desktop\

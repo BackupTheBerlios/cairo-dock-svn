@@ -44,11 +44,14 @@ extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
 extern gboolean bShowSubDockOnMouseOver;
 extern double g_fUnfoldAcceleration;
+extern int g_iLeaveSubDockDelay;
 
 extern gint g_iScreenWidth[2];
 extern gint g_iScreenHeight[2];
 extern int g_iScrollAmount;
 extern gboolean g_bResetScrollOnLeave;
+extern gboolean g_bDecorationsFollowMouse;
+extern cairo_surface_t *g_pBackgroundSurfaceFull[2];
 
 extern gboolean g_bSameHorizontality;
 extern int g_iLabelSize;
@@ -166,14 +169,14 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 {
 	static double fLastTime = 0;
 	Icon *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
-	//g_print ("%s (%d,%d) (%d, %.2fms, bAtBottom:%d)\n", __func__, (int) pMotion->x, (int) pMotion->y, pMotion->is_hint, pMotion->time - fLastTime, pDock->bAtBottom);
+	//g_print ("%s (%d,%d) (%d, %.2fms, bAtBottom:%d; iSidShrinkDown:%d)\n", __func__, (int) pMotion->x, (int) pMotion->y, pMotion->is_hint, pMotion->time - fLastTime, pDock->bAtBottom, pDock->iSidShrinkDown);
 	
 	//\_______________ On elague le flux des MotionNotify, sinon X en envoie autant que le permet le CPU !
 	Icon *pPointedIcon;
 	int iX, iY;
 	if (pMotion != NULL)
 	{
-		if (pDock->bAtBottom || pDock->iSidShrinkDown > 0 || pMotion->time - fLastTime < g_fRefreshInterval)  // si les icones sont en train de diminuer de taille (suite a un clic) on ne redimensionne pas les icones, le temps que l'animation se finisse.  // || ! pDock->bInside 
+		if (pDock->iSidShrinkDown > 0 || pMotion->time - fLastTime < g_fRefreshInterval)  // si les icones sont en train de diminuer de taille (suite a un clic) on ne redimensionne pas les icones, le temps que l'animation se finisse.  // || ! pDock->bInside || pDock->bAtBottom
 		{
 			if (pDock->iSidShrinkDown == 0)
 				gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);
@@ -210,6 +213,37 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		gtk_widget_queue_draw (pWidget);
 	}
 	
+	if (g_bDecorationsFollowMouse)
+	{
+		pDock->fDecorationsOffsetX = iX - pDock->iCurrentWidth / 2;
+	}
+	else
+	{
+		if (iX > pDock->iMouseX)
+		{
+			pDock->fDecorationsOffsetX += 10;
+			if (pDock->fDecorationsOffsetX > pDock->iCurrentWidth / 2)
+			{
+				if (g_pBackgroundSurfaceFull[0] != NULL)
+					pDock->fDecorationsOffsetX -= pDock->iCurrentWidth;
+				else
+					pDock->fDecorationsOffsetX = pDock->iCurrentWidth / 2;
+			}
+		}
+		else
+		{
+			pDock->fDecorationsOffsetX -= 10;
+			if (pDock->fDecorationsOffsetX < - pDock->iCurrentWidth / 2)
+			{
+				if (g_pBackgroundSurfaceFull[0] != NULL)
+					pDock->fDecorationsOffsetX += pDock->iCurrentWidth;
+				else
+					pDock->fDecorationsOffsetX = - pDock->iCurrentWidth / 2;
+			}
+		}
+		pDock->iMouseX = iX;
+	}
+	
 	if (pPointedIcon != pLastPointedIcon || s_pLastPointedDock == NULL)
 	{
 		//g_print ("on change d'icone (-> %s)\n", (pPointedIcon != NULL ? pPointedIcon->acName : "rien"));
@@ -242,6 +276,13 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	return FALSE;
 }
 
+gboolean _cairo_dock_emit_leave_signal (CairoDock *pDock)
+{
+	static gboolean bReturn;
+	g_print ("demande de quitter\n");
+	g_signal_emit_by_name (pDock->pWidget, "leave-notify-event", NULL, &bReturn);
+	return FALSE;
+}
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
@@ -274,6 +315,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 		pDock->bAtBottom = TRUE;
 	}
 	
+	pDock->fDecorationsOffsetX = 0;
 	if (pDock->iSidShrinkDown == 0)  // on commence a faire diminuer la taille des icones.
 		pDock->iSidShrinkDown = g_timeout_add (40, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 	
@@ -284,10 +326,19 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	//g_print ("%s (bInside:%d)\n", __func__, pDock->bInside);
+	g_print ("%s (bInside:%d)\n", __func__, pDock->bInside);
 	if (pDock->bAtBottom )  // || ! pDock->bInside
 		return FALSE;
-	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	
+	if (pEvent != NULL && pDock->iRefCount > 0)  // on ne le fait que pour les containers.
+	{
+		g_print ("  on retarde la sortie\n");
+		if (pDock->iSidLeaveDemand == 0)
+			pDock->iSidLeaveDemand = g_timeout_add (g_iLeaveSubDockDelay, (GSourceFunc) _cairo_dock_emit_leave_signal, (gpointer) pDock);
+		return FALSE;
+	}
+	pDock->iSidLeaveDemand = 0;
 	
 	if (s_iSidNonStopScrolling > 0)
 	{
@@ -316,11 +367,21 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	//g_print ("%s (iSidMoveDown:%d)\n", __func__, pDock->iSidMoveDown);
+	//g_print ("%s (iSidMoveDown:%d; bInside:%d)\n", __func__, pDock->iSidMoveDown, pDock->bInside);
+	if (pDock->iSidLeaveDemand != 0)
+	{
+		g_source_remove (pDock->iSidLeaveDemand);
+		pDock->iSidLeaveDemand = 0;
+	}
 	if (pDock->bAtTop || pDock->bInside || (pDock->iSidMoveDown != 0 && pDock->fMagnitude == 0))  // le 'iSidMoveDown != 0' est la pour empecher le dock de "vibrer" si l'utilisateur sort par en bas avec l'auto-hide active.
+	{
 		return FALSE;
+	}
 	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
+	
+	
+	pDock->fDecorationsOffsetX = 0;
 	if (! pDock->bIsMainDock)
 		gtk_window_present (GTK_WINDOW (pWidget));
 	pDock->bInside = TRUE;

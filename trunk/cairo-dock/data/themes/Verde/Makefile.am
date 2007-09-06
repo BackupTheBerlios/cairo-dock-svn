@@ -2,6 +2,7 @@ themedir = $(pkgdatadir)/themes/Verde
 
 theme_DATA = \
 	cairo-dock.conf\
+	readme\
 	00launcher.desktop\
 	mail.svg\
 	oow.svg\
