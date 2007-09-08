@@ -1062,42 +1062,14 @@ void on_drag_motion (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, gui
 
 gboolean on_delete (GtkWidget *pWidget, GdkEvent *event, CairoDock *pDock)
 {
-	if (pDock->bIsMainDock)
-	{
-		GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (pWidget),
-		GTK_DIALOG_DESTROY_WITH_PARENT,
-		GTK_MESSAGE_QUESTION,
-		GTK_BUTTONS_YES_NO,
-		"Quit Cairo-Dock ?");
-		int answer = gtk_dialog_run (GTK_DIALOG (dialog));
-		gtk_widget_destroy (dialog);
-		if (answer == GTK_RESPONSE_YES)
-			gtk_main_quit ();
-	}
-	else
-	{
-		GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (pWidget),
-		GTK_DIALOG_DESTROY_WITH_PARENT,
-		GTK_MESSAGE_QUESTION,
-		GTK_BUTTONS_YES_NO,
-		"destroy this dock ?");
-		int answer = gtk_dialog_run (GTK_DIALOG (dialog));
-		gtk_widget_destroy (dialog);
-		if (answer == GTK_RESPONSE_YES)
-		{
-			const gchar *cDockName = cairo_dock_search_dock_name (pDock);
-			gboolean bDestroyIcons = TRUE;
-			dialog = gtk_message_dialog_new (GTK_WINDOW (pWidget),
-				GTK_DIALOG_DESTROY_WITH_PARENT,
-				GTK_MESSAGE_QUESTION,
-				GTK_BUTTONS_YES_NO,
-				"Do you want to re-dispatch the icons contained inside this container into the dock (otherwise they will be destroyed) ?");
-			int answer = gtk_dialog_run (GTK_DIALOG (dialog));
-			gtk_widget_destroy (dialog);
-			if (answer == GTK_RESPONSE_YES)
-				bDestroyIcons = FALSE;
-			cairo_dock_destroy_dock (pDock, cDockName, (bDestroyIcons ? NULL : g_pMainDock), (bDestroyIcons ? NULL : CAIRO_DOCK_MAIN_DOCK_NAME));
-		}
-	}
-	return TRUE;
+	GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (pWidget),
+	GTK_DIALOG_DESTROY_WITH_PARENT,
+	GTK_MESSAGE_QUESTION,
+	GTK_BUTTONS_YES_NO,
+	"Quit Cairo-Dock ?");
+	int answer = gtk_dialog_run (GTK_DIALOG (dialog));
+	gtk_widget_destroy (dialog);
+	if (answer == GTK_RESPONSE_YES)
+		gtk_main_quit ();
+	return FALSE;
 }

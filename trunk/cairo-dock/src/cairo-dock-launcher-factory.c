@@ -315,45 +315,6 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 		cairo_surface_t *pNewSurfaceRotated = cairo_dock_rotate_surface (pNewSurface, pSourceContext, *fImageWidth * fMaxScale, *fImageHeight * fMaxScale, fRotationAngle);
 		cairo_surface_destroy (pNewSurface);
 		pNewSurface = pNewSurfaceRotated;
-		/*if (fabs (fRotationAngle) > G_PI / 2)
-		{
-			pNewSurfaceRotated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-				CAIRO_CONTENT_COLOR_ALPHA,
-				*fImageWidth * fMaxScale,
-				*fImageHeight * fMaxScale);
-			cairo_destroy (pCairoContext);
-			pCairoContext = cairo_create (pNewSurfaceRotated);
-			
-			cairo_translate (pCairoContext, 0, *fImageHeight * fMaxScale);
-			cairo_scale (pCairoContext, 1, -1);
-		}
-		else
-		{
-			pNewSurfaceRotated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-				CAIRO_CONTENT_COLOR_ALPHA,
-				*fImageHeight * fMaxScale,
-				*fImageWidth* fMaxScale);
-			cairo_destroy (pCairoContext);
-			pCairoContext = cairo_create (pNewSurfaceRotated);
-			
-			if (fRotationAngle < 0)
-			{
-				cairo_move_to (pCairoContext, *fImageHeight * fMaxScale, 0);
-				cairo_rotate (pCairoContext, fRotationAngle);
-				cairo_translate (pCairoContext, - (*fImageWidth) * fMaxScale, 0);
-			}
-			else
-			{
-				cairo_move_to (pCairoContext, 0, 0);
-				cairo_rotate (pCairoContext, fRotationAngle);
-				cairo_translate (pCairoContext, 0, - *fImageHeight * fMaxScale);
-			}
-		}
-		cairo_set_source_surface (pCairoContext, pNewSurface, 0, 0);
-		
-		cairo_paint (pCairoContext);
-		cairo_surface_destroy (pNewSurface);
-		pNewSurface = pNewSurfaceRotated;*/
 	}
 	
 	cairo_destroy (pCairoContext);
@@ -513,10 +474,9 @@ void cairo_dock_load_icon_info_from_desktop_file (gchar *cDesktopFileName, Icon 
 		if (pChildDock == NULL)
 		{
 			g_print ("le dock fils (%s) n'existe pas, on le cree\n", icon->acName);
-			if (icon->bIsURI)
+			if (icon->bIsURI && cairo_dock_load_directory_func != NULL)
 			{
-				if (cairo_dock_load_directory_func != NULL)
-					cairo_dock_load_directory_func (icon);
+				cairo_dock_load_directory_func (icon);
 			}
 			else
 			{

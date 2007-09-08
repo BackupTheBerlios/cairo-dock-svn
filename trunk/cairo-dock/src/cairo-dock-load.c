@@ -248,6 +248,18 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 	g_object_unref (pLayout);
 }
 
+void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDock *pDock)
+{
+	g_return_if_fail (pIcon != NULL);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+	
+	cairo_dock_fill_one_icon_buffer (pIcon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
+	
+	cairo_dock_fill_one_text_buffer (pIcon, pCairoContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
+	
+	cairo_destroy (pCairoContext);
+}
+
 
 void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpointer data)
 {

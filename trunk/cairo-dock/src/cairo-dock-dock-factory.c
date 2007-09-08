@@ -564,19 +564,6 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 			g_return_if_fail (icon->cParentDockName != NULL);
 			
 			pParentDock = g_hash_table_lookup (g_hDocksTable, icon->cParentDockName);
-			/*if (pParentDock == NULL)
-			{
-				g_print ("le dock parent (%s) n'existe pas, on le cree\n", icon->cParentDockName);
-				pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->cParentDockName);
-				pParentDock->iRefCount --;
-				pParentDock->bHorizontalDock = g_pMainDock->bHorizontalDock;
-				pParentDock->fAlign = g_pMainDock->fAlign;
-			}
-			else if (pParentDock->iRefCount > 0)
-			{
-				icon->fWidth *= g_fSubDockSizeRatio;
-				icon->fHeight *= g_fSubDockSizeRatio;
-			}*/
 			
 			if (pParentDock != NULL)  // a priori toujours vrai.
 				cairo_dock_insert_icon_in_dock (icon, pParentDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);

@@ -6,6 +6,7 @@
 #include <cairo.h>
 
 extern CairoDock *g_pMainDock;
+extern GHashTable *g_hDocksTable;
 
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;

@@ -273,35 +273,44 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 	if (CAIRO_DOCK_IS_LAUNCHER (icon1))
 	{
 		GError *erreur = NULL;
-		gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon1->acDesktopFileName);
-		GKeyFile* pKeyFile = g_key_file_new();
-		g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
-		if (erreur != NULL)
+		gchar *cDesktopFilePath;
+		GKeyFile* pKeyFile;
+		
+		if (icon1->acDesktopFileName != NULL)
 		{
-			g_print ("Attention : %s\n", erreur->message);
-			g_error_free (erreur);
-			return ;
+			cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon1->acDesktopFileName);
+			pKeyFile = g_key_file_new();
+			g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+			if (erreur != NULL)
+			{
+				g_print ("Attention : %s\n", erreur->message);
+				g_error_free (erreur);
+				return ;
+			}
+			
+			g_key_file_set_double (pKeyFile, "Desktop Entry", "Order", icon1->fOrder);
+			cairo_dock_write_keys_to_file (pKeyFile, cDesktopFilePath);
+			g_key_file_free (pKeyFile);
+			g_free (cDesktopFilePath);
 		}
 		
-		g_key_file_set_double (pKeyFile, "Desktop Entry", "Order", icon1->fOrder);
-		cairo_dock_write_keys_to_file (pKeyFile, cDesktopFilePath);
-		g_key_file_free (pKeyFile);
-		g_free (cDesktopFilePath);
-		
-		cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon2->acDesktopFileName);
-		pKeyFile = g_key_file_new();
-		g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
-		if (erreur != NULL)
+		if (icon2->acDesktopFileName != NULL)
 		{
-			g_print ("Attention : %s\n", erreur->message);
-			g_error_free (erreur);
-			return ;
+			cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon2->acDesktopFileName);
+			pKeyFile = g_key_file_new();
+			g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+			if (erreur != NULL)
+			{
+				g_print ("Attention : %s\n", erreur->message);
+				g_error_free (erreur);
+				return ;
+			}
+			
+			g_key_file_set_double (pKeyFile, "Desktop Entry", "Order", icon2->fOrder);
+			cairo_dock_write_keys_to_file (pKeyFile, cDesktopFilePath);
+			g_key_file_free (pKeyFile);
+			g_free (cDesktopFilePath);
 		}
-		
-		g_key_file_set_double (pKeyFile, "Desktop Entry", "Order", icon2->fOrder);
-		cairo_dock_write_keys_to_file (pKeyFile, cDesktopFilePath);
-		g_key_file_free (pKeyFile);
-		g_free (cDesktopFilePath);
 	}
 	
 	//\_________________ On les intervertit dans la liste.
@@ -350,7 +359,7 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 	}
 	
 	//\_________________ On change l'ordre dans le fichier du lanceur 1.
-	if (CAIRO_DOCK_IS_LAUNCHER (icon1))
+	if (CAIRO_DOCK_IS_LAUNCHER (icon1) && icon1->acDesktopFileName != NULL)
 	{
 		GError *erreur = NULL;
 		gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon1->acDesktopFileName);
@@ -905,22 +914,25 @@ void cairo_dock_update_icon_s_container_name (Icon *icon, gchar *cNewParentDockN
 	g_free (icon->cParentDockName);
 	icon->cParentDockName = g_strdup (cNewParentDockName);
 	
-	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon->acDesktopFileName);
-	
-	GError *erreur = NULL;
-	GKeyFile *pKeyFile = g_key_file_new ();
-	g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
-	if (erreur != NULL)
+	if (icon->acDesktopFileName != NULL)
 	{
-		g_print ("Attention : %s\n", erreur->message);
-		g_error_free (erreur);
+		gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon->acDesktopFileName);
+		
+		GError *erreur = NULL;
+		GKeyFile *pKeyFile = g_key_file_new ();
+		g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+		if (erreur != NULL)
+		{
+			g_print ("Attention : %s\n", erreur->message);
+			g_error_free (erreur);
+			g_free (cDesktopFilePath);
+			return ;
+		}
+		
+		g_key_file_set_string (pKeyFile, "Desktop Entry", "Container", cNewParentDockName);
+		cairo_dock_write_keys_to_file (pKeyFile, cDesktopFilePath);
+		
 		g_free (cDesktopFilePath);
-		return ;
+		g_key_file_free (pKeyFile);
 	}
-	
-	g_key_file_set_string (pKeyFile, "Desktop Entry", "Container", cNewParentDockName);
-	cairo_dock_write_keys_to_file (pKeyFile, cDesktopFilePath);
-	
-	g_free (cDesktopFilePath);
-	g_key_file_free (pKeyFile);
 }
