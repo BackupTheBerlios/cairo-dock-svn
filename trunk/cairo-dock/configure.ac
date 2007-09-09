@@ -37,13 +37,13 @@ AC_CONFIG_FILES([Makefile
 		src/Makefile
 		data/Makefile
 		data/themes/Makefile
-		data/themes/default/Makefile
-		data/themes/Fabounet/Makefile
-		data/themes/Ubuntu/Makefile
-		data/themes/Verde/Makefile
-		data/themes/Djoole/Makefile
-		data/themes/Cobalt/Makefile
-		data/themes/Glattering/Makefile
-		data/themes/Glattering/icons/Makefile
+		data/themes/_default_/Makefile
+		data/themes/_Azur_/Makefile
+		data/themes/_Ubuntu_/Makefile
+		data/themes/_Verde_/Makefile
+		data/themes/_Djoole_/Makefile
+		data/themes/_Cobalt_/Makefile
+		data/themes/_Glattering_/Makefile
+		data/themes/_Glattering_/icons/Makefile
 		])
 AC_OUTPUT

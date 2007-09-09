@@ -322,7 +322,7 @@ static void _cairo_dock_recup_current_color (GtkColorButton *pColorButton, GSLis
 }
 
 
-GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWidget *pParentWidget, GSList **pWidgetList, gboolean bApplyButtonPresent, gboolean bFullConfig)
+GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWidget *pParentWidget, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier)
 {
 	static GPtrArray *s_pBufferArray = NULL;  // pour empecher les fuites memoires.
 	
@@ -394,21 +394,11 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	i = 0;
 	while (pGroupList[i] != NULL)
 	{
+		pVBox = NULL;
 		pFrame = NULL;
 		pFrameVBox = NULL;
 		cGroupName = pGroupList[i];
 		
-		pLabel = gtk_label_new (cGroupName);
-		pVBox = gtk_vbox_new (FALSE, 3);
-		
-		pScrolledWindow = gtk_scrolled_window_new (NULL, NULL);
-		gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (pScrolledWindow), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-		gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (pScrolledWindow), pVBox);
-		
-		gtk_notebook_append_page (GTK_NOTEBOOK (pNoteBook), pScrolledWindow, pLabel);
-		
-		
-		length = 0;
 		pKeyList = g_key_file_get_keys (pKeyFile, cGroupName, NULL, NULL);
 		
 		j = 0;
@@ -426,15 +416,28 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 				
 				iElementType = *cUsefulComment;
 				cUsefulComment ++;
-				if (*cUsefulComment == '-' || *cUsefulComment == '+')
+				
+				if (! g_ascii_isdigit (*cUsefulComment) && *cUsefulComment != '[')
 				{
-					if (! bFullConfig && *cUsefulComment == '-')
+					if (iIdentifier != 0 && *cUsefulComment != iIdentifier)
 					{
 						g_free (cKeyComment);
 						j ++;
 						continue;
 					}
 					cUsefulComment ++;
+				}
+				
+				if (pVBox == NULL)  // maintenant qu'on a au moins un element dans ce groupe, on cree sa page dans le notebook.
+				{
+					pLabel = gtk_label_new (cGroupName);
+					pVBox = gtk_vbox_new (FALSE, 3);
+					
+					pScrolledWindow = gtk_scrolled_window_new (NULL, NULL);
+					gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (pScrolledWindow), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+					gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (pScrolledWindow), pVBox);
+					
+					gtk_notebook_append_page (GTK_NOTEBOOK (pNoteBook), pScrolledWindow, pLabel);
 				}
 				
 				if (g_ascii_isdigit (*cUsefulComment))
@@ -1325,13 +1328,14 @@ void cairo_dock_replace_comments (GKeyFile *pOriginalKeyFile, GKeyFile *pReplace
 }
 
 
-void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile, gboolean bUseOriginalKeys)
+void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile, gboolean bUseOriginalKeys, gchar iIdentifier)
 {
+	g_print ("%s (%d)\n", __func__, iIdentifier);
 	GError *erreur = NULL;
 	gsize length = 0;
 	gchar **pKeyList;
 	gchar **pGroupList = g_key_file_get_groups ((bUseOriginalKeys ? pOriginalKeyFile : pReplacementKeyFile), &length);
-	gchar *cGroupName, *cKeyName, *cKeyValue;
+	gchar *cGroupName, *cKeyName, *cKeyValue, *cComment;
 	int i, j;
 	
 	i = 0;
@@ -1346,6 +1350,20 @@ void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pRepla
 		while (pKeyList[j] != NULL)
 		{
 			cKeyName = pKeyList[j];
+			
+			if (iIdentifier != 0)
+			{
+				cComment = g_key_file_get_comment (pReplacementKeyFile, cGroupName, cKeyName, NULL);
+				
+				if (cComment == NULL || strlen (cComment) < 2 || cComment[1] != iIdentifier)
+				{
+					g_print ("  on saute %s;%s (%s)\n", cGroupName, cKeyName, cComment);
+					g_free (cComment);
+					j ++;
+					continue ;
+				}
+				g_free (cComment);
+			}
 			
 			cKeyValue =  g_key_file_get_string (pReplacementKeyFile, cGroupName, cKeyName, &erreur);
 			if (erreur != NULL)
@@ -1363,6 +1381,9 @@ void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pRepla
 			g_free (cKeyValue);
 			j ++;
 		}
+		
+		g_strfreev (pKeyList);
 		i ++;
 	}
+	g_strfreev (pGroupList);
 }

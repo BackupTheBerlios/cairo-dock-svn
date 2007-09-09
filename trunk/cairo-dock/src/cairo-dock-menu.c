@@ -58,23 +58,34 @@ extern GHashTable *g_hModuleTable;
 extern gboolean g_bUseGlitz;
 
 
-static void cairo_dock_edit_and_reload_conf_file (GtkMenuItem *menu_item, gpointer *data)
+static void cairo_dock_edit_and_reload_appearance (GtkMenuItem *menu_item, gpointer *data)
 {
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", 400, 600, TRUE, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Appearance", 400, 600, '+', (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
 	/*if (config_ok)
 	{
 		cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
 	}*/
 }
-static void cairo_dock_edit_and_reload_conf_file_fast (GtkMenuItem *menu_item, gpointer *data)
+static void cairo_dock_edit_and_reload_behaviour (GtkMenuItem *menu_item, gpointer *data)
 {
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", 400, 600, FALSE, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Behaviour", 400, 600, '-', (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
+	/*if (config_ok)
+	{
+		cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
+	}*/
+}
+static void cairo_dock_edit_and_reload_conf (GtkMenuItem *menu_item, gpointer *data)
+{
+	CairoDock *pDock = data[0];
+	Icon *icon = data[1];
+	
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", 400, 600, 0, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
 	/*if (config_ok)
 	{
 		cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
@@ -104,7 +115,7 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 	
 	gchar *cImagePath = g_strdup_printf ("%s/cairo-dock.svg", CAIRO_DOCK_SHARE_DATA_DIR);
 	GtkWidget *pImage = gtk_image_new_from_file (cImagePath);
-	///gtk_message_dialog_set_image (GTK_MESSAGE_DIALOG (pDialog), pImage);
+	gtk_message_dialog_set_image (GTK_MESSAGE_DIALOG (pDialog), pImage);
 	
 	GtkWidget *pLabel = gtk_label_new (NULL);
 	gtk_label_set_use_markup (GTK_LABEL (pLabel), TRUE);
@@ -202,7 +213,7 @@ static void cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data)
 	
 	//\___________________ On ouvre automatiquement l'IHM pour permettre de modifier ses champs.
 	gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cNewDesktopFileName);
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cNewDesktopFilePath, "Fill this launcher", 300, 400, TRUE, NULL, NULL, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cNewDesktopFilePath, "Fill this launcher", 300, 400, 0, NULL, NULL, NULL);
 	if (config_ok)
 	{
 		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
@@ -305,7 +316,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	
 	cairo_dock_update_launcher_desktop_file (cDesktopFilePath, g_cLanguage);
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", 300, 400, TRUE, NULL, NULL, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", 300, 400, 0, NULL, NULL, NULL);
 	g_free (cDesktopFilePath);
 	
 	if (! pDock->bInside)
@@ -544,19 +555,28 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	GtkWidget *pSubMenu = gtk_menu_new ();
 	gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), pSubMenu);
 	
-	menu_item = gtk_menu_item_new_with_label ("Configure Cairo-Dock");
+	menu_item = gtk_menu_item_new_with_label ("Configure");
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
-	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_edit_and_reload_conf_file), data);
+	GtkWidget *pConfSubMenu = gtk_menu_new ();
+	gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), pConfSubMenu);
 	
-	menu_item = gtk_menu_item_new_with_label ("Fast-configure Cairo-Dock");
-	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
-	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_edit_and_reload_conf_file_fast), data);
+	menu_item = gtk_menu_item_new_with_label ("All");
+	gtk_menu_shell_append  (GTK_MENU_SHELL (pConfSubMenu), menu_item);
+	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_edit_and_reload_conf), data);
+	
+	menu_item = gtk_menu_item_new_with_label ("Appearance");
+	gtk_menu_shell_append  (GTK_MENU_SHELL (pConfSubMenu), menu_item);
+	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_edit_and_reload_appearance), data);
+	
+	menu_item = gtk_menu_item_new_with_label ("Behaviour");
+	gtk_menu_shell_append  (GTK_MENU_SHELL (pConfSubMenu), menu_item);
+	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_edit_and_reload_behaviour), data);
 	
 	menu_item = gtk_menu_item_new_with_label ("Manage themes");
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_initiate_theme_management), data);
 	
-	menu_item = gtk_menu_item_new_with_label ("Update");
+	menu_item = gtk_menu_item_new_with_label ("Check updates");
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_update), data);
 	

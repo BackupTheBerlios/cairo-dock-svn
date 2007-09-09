@@ -74,23 +74,6 @@ gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, gchar *cDockName, doub
 		g_key_file_set_string (pKeyFile, "Desktop Entry", "Container", cDockName);
 		g_key_file_set_string (pKeyFile, "Desktop Entry", "Exec command", "echo 'edit me !'");
 		
-		/*cNewDesktopContent = g_strdup_printf ("#!\n[Desktop Entry]\n\
-#s Launcher's name :\n\
-Name = New Launcher\n\
-Name[fr] = Nouveau Lanceur\n\
-#s Exec command :\n\
-Exec = echo 'edit me !'\n\
-#S Image's name or path :\n\
-Icon = \n\
-#f Order you want for this launcher among the other launchers :\n\
-Order = %d\n\
-#s Name of the container it belongs to:\n\
-Container = %s\n\
-#b Is this icon a container ?\n\
-Is container = false",
-		(int) fEffectiveOrder, cDockName);
-		lenght = -1;*/
-		
 		//\___________________ On lui choisit un nom de fichier tel qu'il n'y ait pas de collision.
 		cNewDesktopFileName = cairo_dock_generate_desktop_filename (g_cCurrentThemePath);
 		
@@ -99,31 +82,7 @@ Is container = false",
 		cairo_dock_write_keys_to_file (pKeyFile, cNewDesktopFilePath);
 		g_free (cNewDesktopFilePath);
 		g_key_file_free (pKeyFile);
-		
 	}
-	/*else if (g_file_test (cFilePath, G_FILE_TEST_IS_DIR))
-	{
-		//\___________________ On cree le texte qu'on va y mettre par defaut.
-		cNewDesktopContent = g_strdup_printf ("#!\n[Desktop Entry]\n\
-#s Launcher's name :\n\
-Name = %s\n\
-Name[fr] = %s\n\
-#s Exec command :\n\
-Exec = %s %s\n\
-#S Image's name or path :\n\
-Icon = %s\n\
-#f Order you want for this launcher among the other launchers :\n\
-Order = %f\n\
-#s Name of the container it belongs to:\n\
-Container = %s\n\
-#b Is this icon a container ?\n\
-Is container = false",
-		cFilePath, cFilePath, "xdg-open", cFilePath, "nautilus", fEffectiveOrder, cDockName);
-		lenght = -1;
-		
-		//\___________________ On lui choisit un nom de fichier tel qu'il n'y ait pas de collision.
-		cNewDesktopFileName = cairo_dock_generate_desktop_filename (g_cCurrentThemePath);
-	}*/
 	else if (g_str_has_suffix (cURI, ".desktop") && strncmp (cURI, "file://", 7) == 0)
 	{
 		gchar *cFilePath = cURI + 7;  // on saute le "file://".
@@ -150,66 +109,6 @@ Is container = false",
 		cairo_dock_apply_translation_on_conf_file (cNewDesktopFilePath, cDesktopFileTemplate);
 		g_free (cDesktopFileTemplate);
 		g_free (cNewDesktopFilePath);
-		
-		
-		//\_________________ On ouvre le fichier pour controler certain champ.
-		/*g_key_file_load_from_file (pKeyFile, cFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &tmp_erreur);
-		if (tmp_erreur != NULL)
-		{
-			g_propagate_error (erreur, tmp_erreur);
-			return NULL;
-		}
-		
-		//\_________________ On enleve les %F, %U et autres du champ "Exec".
-		gchar *cExecField = g_key_file_get_string (pKeyFile, "Desktop Entry", "Exec", &tmp_erreur);
-		if (tmp_erreur != NULL)
-		{
-			g_propagate_error (erreur, tmp_erreur);
-			return NULL;
-		}
-		
-		gchar *cUndesiredArgument = strchr (cExecField, '%');
-		if (cUndesiredArgument != NULL)
-			*cUndesiredArgument = '\0';
-		g_key_file_set_string (pKeyFile, "Desktop Entry", "Exec", cExecField);
-		
-		//\_________________ On lui rajoute les champ propres a Cairo-Dock.
-		g_key_file_set_double (pKeyFile, "Desktop Entry", "Order", fEffectiveOrder);
-		g_key_file_set_string (pKeyFile, "Desktop Entry", "Container", cDockName);
-		g_key_file_set_boolean (pKeyFile, "Desktop Entry", "Is container", FALSE);
-		
-		//\_________________ Et surtout on vire l'infame usine a gaz de traduction automatique d'Ubuntu !
-		g_key_file_remove_key (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", &tmp_erreur);
-		if (tmp_erreur != NULL)
-		{
-			g_error_free (tmp_erreur);
-			tmp_erreur = NULL;
-		}
-		//else  // il y en a 2 !
-		//	g_key_file_set_string (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", "");
-		
-		//\_________________ On en fait un fichier de conf evolue.
-		if (! cairo_dock_is_advanced_keyfile (pKeyFile))
-		{
-			g_key_file_set_comment (pKeyFile, NULL, NULL, "!", NULL);
-			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Name", "s Launcher's name :", NULL);
-			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Exec", "s Exec command :", NULL);
-			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Icon", "S Image's name or path :", NULL);
-			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Order", "f Order you want for this launcher among the other launchers :", NULL);
-			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Container", "s Name of the container it belongs to:", NULL);
-			g_key_file_set_comment (pKeyFile, "Desktop Entry", "Is container", "b Is this icon a container ?", NULL);
-		}
-		
-		//\_________________ On ecrit tout dans un nouveau fichier portant le meme nom dans le repertoire .cairo-dock.
-		cNewDesktopContent = g_key_file_to_data (pKeyFile, &lenght, &tmp_erreur);
-		g_key_file_free (pKeyFile);
-		if (tmp_erreur != NULL)
-		{
-			g_propagate_error (erreur, tmp_erreur);
-			return NULL;
-		}
-		
-		cNewDesktopFileName = g_path_get_basename (cFilePath);*/
 	}
 	else if (cairo_dock_add_uri_func != NULL)
 	{
@@ -279,10 +178,10 @@ void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath, gchar *cL
 	system (cCommand);
 	g_free (cCommand);
 	
-	cairo_dock_replace_values_in_conf_file (cDesktopFilePath, pKeyFile, FALSE);
+	cairo_dock_replace_values_in_conf_file (cDesktopFilePath, pKeyFile, FALSE, 0);
 	g_key_file_free (pKeyFile);
 	
-	cairo_dock_update_conf_file_with_hash_table (cDesktopFilePath, g_hDocksTable, "Desktop Entry", "Container", 1, NULL, TRUE, FALSE, cairo_dock_write_one_name);
+	cairo_dock_update_conf_file_with_hash_table (cDesktopFilePath, g_hDocksTable, "Desktop Entry", "Container", NULL, (GHFunc)cairo_dock_write_one_name);
 }
 
 

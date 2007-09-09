@@ -279,7 +279,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 gboolean _cairo_dock_emit_leave_signal (CairoDock *pDock)
 {
 	static gboolean bReturn;
-	g_print ("demande de quitter\n");
+	//g_print ("demande de quitter\n");
 	g_signal_emit_by_name (pDock->pWidget, "leave-notify-event", NULL, &bReturn);
 	return FALSE;
 }
@@ -326,10 +326,10 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	g_print ("%s (bInside:%d)\n", __func__, pDock->bInside);
+	//g_print ("%s (bInside:%d)\n", __func__, pDock->bInside);
 	if (pDock->bAtBottom )  // || ! pDock->bInside
 		return FALSE;
-	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
 	if (pEvent != NULL && pDock->iRefCount > 0)  // on ne le fait que pour les containers.
 	{
@@ -1037,6 +1037,8 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 	//\_________________ On charge ce nouveau lanceur.
 	if (cNewDesktopFileName != NULL)
 	{
+		cairo_dock_mark_theme_as_modified (TRUE);
+		
 		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
 		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cNewDesktopFileName, pCairoContext);
 		g_free (cNewDesktopFileName);

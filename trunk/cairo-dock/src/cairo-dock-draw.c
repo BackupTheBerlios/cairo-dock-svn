@@ -33,6 +33,7 @@ extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
 extern double g_fSubDockSizeRatio;
 extern gboolean g_bAutoHide;
+extern gboolean g_bTextAlwaysHorizontal;
 
 extern gint g_iScreenWidth[2];
 extern gint g_iScreenHeight[2];
@@ -60,7 +61,6 @@ extern cairo_surface_t *g_pVisibleZoneSurface;
 extern double g_fVisibleZoneAlpha;
 extern double g_fAmplitude;
 
-extern gboolean g_bUseText;
 extern int g_iLabelSize;
 extern gboolean g_bLabelForPointedIconOnly;
 extern double g_fLabelAlphaThreshold;
@@ -373,7 +373,7 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboo
 	//\_____________________ On dessine les etiquettes, avec un alpha proportionnel au facteur d'echelle de leur icone.
 	if (icon->pTextBuffer != NULL && icon->fScale > 1.01 && (! g_bLabelForPointedIconOnly || icon->bPointed))  // 1.01 car sin(pi) = 1+epsilon :-/
 	{
-		if (bHorizontalDock)
+		if (bHorizontalDock || g_bTextAlwaysHorizontal)
 			cairo_set_source_surface (pCairoContext,
 				icon->pTextBuffer,
 				-icon->fTextXOffset + icon->fWidthFactor * icon->fWidth * icon->fScale * 0.5,

@@ -21,6 +21,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-modules.h"
 #include "cairo-dock-keyfile-manager.h"
 #include "cairo-dock-dock-factory.h"
+#include "cairo-dock-themes-manager.h"
 #include "cairo-dock-config.h"
 
 static gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "pulse", "random", NULL};
@@ -353,11 +354,10 @@ static gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *
 
 void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 {
-	//g_print ("%s ()\n", __func__);
+	//g_print ("%s (%s)\n", __func__, conf_file);
 	GError *erreur = NULL;
 	gsize length;
 	gboolean bFlushConfFileNeeded = FALSE;  // si un champ n'existe pas, on le rajoute au fichier de conf.
-
 	
 	//\___________________ On ouvre le fichier de conf.
 	GKeyFile *pKeyFile = g_key_file_new ();
@@ -749,7 +749,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 		system (cCommand);
 		g_free (cCommand);
 		
-		cairo_dock_replace_values_in_conf_file (conf_file, pKeyFile, TRUE);
+		cairo_dock_replace_values_in_conf_file (conf_file, pKeyFile, TRUE, 0);
 		
 		cairo_dock_update_conf_file_with_modules (conf_file, g_hModuleTable);
 		cairo_dock_update_conf_file_with_translations (conf_file, CAIRO_DOCK_SHARE_DATA_DIR);
@@ -757,6 +757,8 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	g_free (cPreviousLanguage);
 	
 	g_key_file_free (pKeyFile);
+	
+	cairo_dock_mark_theme_as_modified (TRUE);
 }
 
 
@@ -808,7 +810,7 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 		g_free (user_data);
 	}
 }
-gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar *cTitle, int iWindowWidth, int iWindowHeight, gboolean bFullConfig, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc)
+gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc)
 {
 	GSList *pWidgetList = NULL;
 	GtkTextBuffer *pTextBuffer = NULL;  // le buffer est lie au widget, donc au pDialog.
@@ -820,11 +822,11 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 	{
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
-		erreur = NULL;
+		return FALSE;
 	}
 	g_key_file_remove_key (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", NULL);
 	
-	GtkWidget *pDialog = cairo_dock_generate_advanced_ihm_from_keyfile (pKeyFile, cTitle, pWidget, &pWidgetList, (pConfigFunc != NULL), bFullConfig);
+	GtkWidget *pDialog = cairo_dock_generate_advanced_ihm_from_keyfile (pKeyFile, cTitle, pWidget, &pWidgetList, (pConfigFunc != NULL), iIdentifier);
 	if (pDialog == NULL || pWidgetList == NULL)
 	{
 		pDialog = cairo_dock_generate_basic_ihm_from_keyfile (conf_file, cTitle, pWidget, &pTextBuffer, (pConfigFunc != NULL));
@@ -964,7 +966,7 @@ void cairo_dock_write_one_theme_name (gchar *cName, gchar *cThemePath, GString *
 	g_string_append_printf (pString, "%s;%s/readme;", cName, cThemePath);
 }
 
-void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, int iNbAvailableChoices, gchar *cNewUsefullComment, gboolean bAllowNewChoice, gboolean bWriteDescription, GHFunc pWritingFunc)
+void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, gchar *cNewUsefullComment, GHFunc pWritingFunc)
 {
 	//g_print ("%s (%s)\n", __func__, cConfFile);
 	GError *erreur = NULL;
@@ -980,43 +982,56 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 		return ;
 	}
 	
-	gchar *cUsefullComment = NULL;
+	gchar *cUsefullComment;
+	gchar *cOldComment = g_key_file_get_comment (pKeyFile, cGroupName, cKeyName, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+	}
+	g_return_if_fail (cOldComment != NULL);
+	cOldComment[strlen (cOldComment) - 1] = '\0';
+	
+	gchar *cPrefix= cOldComment;
+	while (*cPrefix == ' ')
+		cPrefix ++;
+	gchar *str = strchr (cPrefix, '[');
+	if (str != NULL)
+	{
+		cPrefix = g_strndup (cPrefix, str - cPrefix + 1);
+	}
+	else
+	{
+		cPrefix = g_strdup ("s99[");  // par defaut.
+	}
+	
+	//\___________________ On recupere le commentaire explicatif.
 	if (cNewUsefullComment == NULL)
 	{
-		gchar *cOldComment = g_key_file_get_comment (pKeyFile, cGroupName, cKeyName, &erreur);
-		if (erreur != NULL)
+		cUsefullComment = strchr (cOldComment, ']');
+		if (cUsefullComment == NULL)
 		{
-			g_print ("Attention : %s\n", erreur->message);
-			g_error_free (erreur);
-			erreur = NULL;
+			cUsefullComment = cOldComment;
+			while (*cUsefullComment == ' ')
+				cUsefullComment ++;
 		}
-		//g_print ("cOldComment : %s\n", cOldComment);
-		if (cOldComment != NULL)
-		{
-			cOldComment[strlen (cOldComment) - 1] = '\0';
-			cUsefullComment = strchr (cOldComment, ']');
-			if (cUsefullComment == NULL)
-			{
-				cUsefullComment = cOldComment;
-				while (*cUsefullComment == ' ')
-					cUsefullComment ++;
-			}
-			if (*cUsefullComment != '\0')
-				cUsefullComment ++;  // on saute le caractere de type ou le crochet.
-			else
-				cUsefullComment = NULL;
-			if (cUsefullComment != NULL)
-				cUsefullComment = g_strdup (cUsefullComment);
-			g_free (cOldComment);
-		}
+		if (*cUsefullComment != '\0')
+			cUsefullComment ++;  // on saute le caractere de type ou le crochet.
+		else
+			cUsefullComment = NULL;
+		if (cUsefullComment != NULL)
+			cUsefullComment = g_strdup (cUsefullComment);
 	}
 	else
 	{
 		cUsefullComment = g_strdup (cNewUsefullComment);
 	}
+	g_free (cOldComment);
 	
-	GString *sComment = g_string_new ("");
-	g_string_printf (sComment, "%c%d[", (bAllowNewChoice ? 'E' : (bWriteDescription ? 'R' : 's')), iNbAvailableChoices);
+	//\___________________ On ecrit la liste des possibilites.
+	GString *sComment = g_string_new (cPrefix);
+	g_free (cPrefix);
 	g_hash_table_foreach (pModuleTable, (pWritingFunc != NULL ? pWritingFunc : (GHFunc) cairo_dock_write_one_name), sComment);
 	if (sComment->str[sComment->len-1] == ';')  // peut etre faux si aucune valeur n'a ete ecrite.
 		sComment->len --;
@@ -1038,7 +1053,7 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 
 void cairo_dock_update_conf_file_with_modules (gchar *cConfFile, GHashTable *pModuleTable)
 {
-	cairo_dock_update_conf_file_with_hash_table (cConfFile, pModuleTable, "Applets", "active modules", 999, NULL, FALSE, TRUE, (GHFunc) cairo_dock_write_one_module_name);
+	cairo_dock_update_conf_file_with_hash_table (cConfFile, pModuleTable, "Applets", "active modules", NULL, (GHFunc) cairo_dock_write_one_module_name);
 }
 
 void cairo_dock_update_conf_file_with_translations (gchar *cConfFile, gchar *cTranslationsDir)
@@ -1046,7 +1061,7 @@ void cairo_dock_update_conf_file_with_translations (gchar *cConfFile, gchar *cTr
 	GError *erreur = NULL;
 	GHashTable *pTranslationTable = cairo_dock_list_available_translations (cTranslationsDir, "cairo-dock-", &erreur);
 	
-	cairo_dock_update_conf_file_with_hash_table (cConfFile, pTranslationTable, "Cairo Dock", "language", 1, NULL, FALSE, FALSE, (GHFunc) cairo_dock_write_one_name);
+	cairo_dock_update_conf_file_with_hash_table (cConfFile, pTranslationTable, "Cairo Dock", "language", NULL, (GHFunc) cairo_dock_write_one_name);
 	
 	g_hash_table_destroy (pTranslationTable);
 }
@@ -1146,7 +1161,7 @@ void cairo_dock_apply_translation_on_conf_file (gchar *cConfFilePath, gchar *cTr
 	g_key_file_free (pTranslatedKeyFile);
 }
 
-void cairo_dock_replace_values_in_conf_file (gchar *cConfFilePath, GKeyFile *pValidKeyFile, gboolean bUseFileKeys)
+void cairo_dock_replace_values_in_conf_file (gchar *cConfFilePath, GKeyFile *pValidKeyFile, gboolean bUseFileKeys, gchar iIdentifier)
 {
 	GKeyFile *pConfKeyFile = g_key_file_new ();
 	
@@ -1159,13 +1174,30 @@ void cairo_dock_replace_values_in_conf_file (gchar *cConfFilePath, GKeyFile *pVa
 		return ;
 	}
 	
-	cairo_dock_replace_key_values (pConfKeyFile, pValidKeyFile, bUseFileKeys);
+	cairo_dock_replace_key_values (pConfKeyFile, pValidKeyFile, bUseFileKeys, iIdentifier);
 	
 	cairo_dock_write_keys_to_file (pConfKeyFile, cConfFilePath);
 	
 	g_key_file_free (pConfKeyFile);
 }
 
+
+void cairo_dock_replace_keys_by_identifier (gchar *cConfFilePath, gchar *cReplacementConfFilePath, gchar iIdentifier)
+{
+	GError *erreur = NULL;
+	GKeyFile *pReplacementKeyFile = g_key_file_new ();
+	g_key_file_load_from_file (pReplacementKeyFile, cReplacementConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		return ;
+	}
+	
+	cairo_dock_replace_values_in_conf_file (cConfFilePath, pReplacementKeyFile, TRUE, iIdentifier);
+	
+	g_key_file_free (pReplacementKeyFile);
+}
 
 GHashTable *cairo_dock_list_available_translations (gchar *cTranslationsDir, gchar *cFilePrefix, GError **erreur)
 {

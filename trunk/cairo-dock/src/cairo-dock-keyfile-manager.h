@@ -5,7 +5,7 @@
 #include <gtk/gtk.h>
 
 
-GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWidget *pParentWidget, GSList **pWidgetList, gboolean bApplyButtonPresent, gboolean bFullConfig);
+GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWidget *pParentWidget, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier);
 
 gboolean cairo_dock_is_advanced_keyfile (GKeyFile *pKeyFile);
 
@@ -20,7 +20,8 @@ void cairo_dock_free_generated_widget_list (GSList *pWidgetList);
 
 
 void cairo_dock_replace_comments (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile);
-void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile, gboolean bUseOriginalKeys);
+void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile, gboolean bUseOriginalKeys, gchar iIdentifier);
+
 
 #endif
 

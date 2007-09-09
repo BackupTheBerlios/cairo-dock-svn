@@ -86,6 +86,7 @@
 #include "cairo-dock-themes-manager.h"
 
 #define CAIRO_DOCK_DATA_DIR ".cairo-dock"
+#define CAIRO_DOCK_CURRENT_THEME_NAME "current_theme"
 //#define CAIRO_DOCK_CONF_FILE "cairo-dock.conf"
 
 CairoDock *g_pMainDock;  // pointeur sur le dock principal.
@@ -314,40 +315,32 @@ main (int argc, char** argv)
 	{
 		g_mkdir (g_cCairoDockDataDir, 7*8*8+7*8+5);
 	}
-	gchar *cThemeDir = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_THEMES_DIR);
-	if (! g_file_test (cThemeDir, G_FILE_TEST_IS_DIR))
+	gchar *cThemesDir = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_THEMES_DIR);
+	if (! g_file_test (cThemesDir, G_FILE_TEST_IS_DIR))
 	{
-		g_mkdir (cThemeDir, 7*8*8+7*8+5);
+		g_mkdir (cThemesDir, 7*8*8+7*8+5);
 	}
-	g_free (cThemeDir);
+	g_free (cThemesDir);
+	g_cCurrentThemePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_CURRENT_THEME_NAME);
+	if (! g_file_test (cThemesDir, G_FILE_TEST_IS_DIR))
+	{
+		g_mkdir (cThemesDir, 7*8*8+7*8+5);
+	}
 	
 	//\___________________ On charge le dernier theme ou on demande a l'utilisateur d'en choisir un.
-	gchar *cLastThemeName = cairo_dock_get_last_theme_name (g_cCairoDockDataDir);
-	g_cCurrentThemePath = cairo_dock_get_theme_path (cLastThemeName, NULL);
-	g_free (cLastThemeName);
-	
-	if (g_cCurrentThemePath != NULL)
-		g_cConfFile = cairo_dock_load_theme (g_cCurrentThemePath);
-	
-	if (g_cConfFile == NULL || ! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS))
+	g_cConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
+	if (! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS))
 	{
-		g_cCurrentThemePath = cairo_dock_ask_initial_theme ();
-		
-		if (g_cCurrentThemePath == NULL)
+		int r;
+		while (r = (cairo_dock_ask_initial_theme ()) == 0);
+		if (r == -1)
 		{
-			g_print ("Mata ne.\n");
+			g_print ("mata ne !\n");
 			exit (0);
-		}
-		else
-		{
-			g_cConfFile = cairo_dock_load_theme (g_cCurrentThemePath);
-			if (g_cConfFile == NULL || ! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS))
-			{
-				g_error ("failed to open theme\n");
-			}
 		}
 	}
 	
+	cairo_dock_load_theme (g_cCurrentThemePath);
 	
 	gtk_main ();
 	/*Window root = DefaultRootWindow (g_XDisplay);

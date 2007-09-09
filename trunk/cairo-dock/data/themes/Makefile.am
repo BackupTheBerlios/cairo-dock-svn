@@ -1,8 +1,8 @@
 SUBDIRS = \
-	default\
-	Fabounet\
-	Ubuntu\
-	Verde\
-	Djoole\
-	Cobalt\
-	Glattering
+	_default_\
+	_Azur_\
+	_Ubuntu_\
+	_Verde_\
+	_Djoole_\
+	_Cobalt_\
+	_Glattering_
