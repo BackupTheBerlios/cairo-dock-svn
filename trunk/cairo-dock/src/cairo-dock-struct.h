@@ -108,7 +108,7 @@ typedef enum {
 typedef struct _Icon {
 	//\____________ renseignes lors de la creation de l'icone.
 	gchar *acDesktopFileName;
-	gboolean bIsURI;
+	gchar *cBaseURI;
 	gboolean bIsMountingPoint;
 	gchar* acFileName;
 	gchar* acName;

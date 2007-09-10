@@ -24,7 +24,7 @@ gboolean cairo_dock_theme_need_save (void);
 
 int cairo_dock_ask_initial_theme (void);
 
-void cairo_dock_manage_themes (GtkWidget *pWidget);
+gboolean cairo_dock_manage_themes (GtkWidget *pWidget);
 
 
 #endif

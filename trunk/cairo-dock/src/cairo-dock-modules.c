@@ -356,7 +356,7 @@ void cairo_dock_configure_module (CairoDockModule *module, CairoDock *pDock, GEr
 	gpointer *user_data = g_new (gpointer, 2);
 	user_data[0]= module;
 	user_data[1] = pDock;
-	gboolean configuration_ok = cairo_dock_edit_conf_file (NULL, module->cConfFilePath, cTitle, 450, 450, 0,  (CairoDockConfigFunc) cairo_dock_reload_module, user_data, (GFunc) g_free);
+	gboolean configuration_ok = cairo_dock_edit_conf_file (NULL, module->cConfFilePath, cTitle, 450, 450, 0, NULL, (CairoDockConfigFunc) cairo_dock_reload_module, user_data, (GFunc) g_free);
 	g_free (cTitle);
 }
 

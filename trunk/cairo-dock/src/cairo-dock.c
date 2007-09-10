@@ -82,8 +82,10 @@
 #include "cairo-dock-modules.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-load.h"
+#include "cairo-dock-menu.h"
 #include "cairo-dock-config.h"
 #include "cairo-dock-themes-manager.h"
+#include "cairo-dock-notifications.h"
 
 #define CAIRO_DOCK_DATA_DIR ".cairo-dock"
 #define CAIRO_DOCK_CURRENT_THEME_NAME "current_theme"
@@ -324,15 +326,21 @@ main (int argc, char** argv)
 	g_cCurrentThemePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_CURRENT_THEME_NAME);
 	if (! g_file_test (cThemesDir, G_FILE_TEST_IS_DIR))
 	{
+		g_print ("creation de %s\n", g_cCurrentThemePath);
 		g_mkdir (cThemesDir, 7*8*8+7*8+5);
 	}
+	
+	//\___________________ On enregistre nos notifications.
+	cairo_dock_register_notification (CAIRO_DOCK_BUILD_MENU, (CairoDockNotificationFunc) cairo_dock_notification_build_menu, CAIRO_DOCK_RUN_AFTER);
+	
+	
 	
 	//\___________________ On charge le dernier theme ou on demande a l'utilisateur d'en choisir un.
 	g_cConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
 	if (! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS))
 	{
 		int r;
-		while (r = (cairo_dock_ask_initial_theme ()) == 0);
+		while ((r = cairo_dock_ask_initial_theme ()) == 0);
 		if (r == -1)
 		{
 			g_print ("mata ne !\n");

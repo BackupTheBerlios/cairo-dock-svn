@@ -322,7 +322,7 @@ static void _cairo_dock_recup_current_color (GtkColorButton *pColorButton, GSLis
 }
 
 
-GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWidget *pParentWidget, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier)
+GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWidget *pParentWidget, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier, gchar *cPresentedGroup)
 {
 	static GPtrArray *s_pBufferArray = NULL;  // pour empecher les fuites memoires.
 	
@@ -356,6 +356,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	gchar *cGroupName, *cKeyName, *cKeyComment, *cUsefulComment, *cAuthorizedValuesChain, **pAuthorizedValuesList;
 	gpointer *pGroupKeyWidget;
 	int i, j, k, iNbElements;
+	int iNumPage=0, iPresentedNumPage=0;
 	char iElementType;
 	gboolean bIsAligned;
 	gboolean bValue, *bValueList;
@@ -389,7 +390,6 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	
 	GtkWidget *pNoteBook = gtk_notebook_new ();
 	gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), pNoteBook);
-	
 	
 	i = 0;
 	while (pGroupList[i] != NULL)
@@ -438,6 +438,9 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (pScrolledWindow), pVBox);
 					
 					gtk_notebook_append_page (GTK_NOTEBOOK (pNoteBook), pScrolledWindow, pLabel);
+					if (cPresentedGroup != NULL && strcmp (cPresentedGroup, cGroupName) == 0)
+						iPresentedNumPage = iNumPage;
+					iNumPage ++;
 				}
 				
 				if (g_ascii_isdigit (*cUsefulComment))
@@ -677,7 +680,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									GtkTreeIter iter;
 									gtk_list_store_append (GTK_LIST_STORE (modele), &iter);
 									if (iSelectedItem == 0 && strcmp (cValue, pAuthorizedValuesList[k]) == 0)
-										iSelectedItem = k;
+										iSelectedItem = (iElementType == 'R' ? k / 2 : k);
 									
 									gtk_list_store_set (GTK_LIST_STORE (modele), &iter,
 										CAIRO_DOCK_MODEL_NAME, pAuthorizedValuesList[k],
@@ -1022,9 +1025,10 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 		i ++;
 	}
 	
-	g_strfreev (pGroupList);
-	
 	gtk_widget_show_all (dialog);
+	gtk_notebook_set_current_page (pNoteBook, iPresentedNumPage);
+	
+	g_strfreev (pGroupList);
 	
 	return dialog;
 }

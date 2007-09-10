@@ -373,7 +373,14 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboo
 	//\_____________________ On dessine les etiquettes, avec un alpha proportionnel au facteur d'echelle de leur icone.
 	if (icon->pTextBuffer != NULL && icon->fScale > 1.01 && (! g_bLabelForPointedIconOnly || icon->bPointed))  // 1.01 car sin(pi) = 1+epsilon :-/
 	{
-		if (bHorizontalDock || g_bTextAlwaysHorizontal)
+		if (! bHorizontalDock && g_bTextAlwaysHorizontal)
+		{
+			cairo_set_source_surface (pCairoContext,
+				icon->pTextBuffer,
+				0,
+				0);
+		}
+		else if (bHorizontalDock)
 			cairo_set_source_surface (pCairoContext,
 				icon->pTextBuffer,
 				-icon->fTextXOffset + icon->fWidthFactor * icon->fWidth * icon->fScale * 0.5,
@@ -884,9 +891,16 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 
 static gboolean _cairo_dock_hide_dock (gchar *cDockName, CairoDock *pDock, CairoDock *pChildDock)
 {
+	if (pDock->bInside)
+		return FALSE;
+	
 	Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
-	if (pPointedIcon != NULL && pPointedIcon->pSubDock == pChildDock && ! pDock->bInside)
+	if (pPointedIcon == NULL || pPointedIcon->pSubDock != pChildDock)
+		pPointedIcon = cairo_dock_get_icon_with_subdock (pDock->icons, pChildDock);
+	
+	if (pPointedIcon != NULL)
 	{
+		//g_print (" il faut cacher ce dock parent\n");
 		if (pDock->iRefCount == 0)  // pDock->bIsMainDock
 		{
 			cairo_dock_leave_from_main_dock (pDock);
@@ -901,7 +915,6 @@ static gboolean _cairo_dock_hide_dock (gchar *cDockName, CairoDock *pDock, Cairo
 			}
 			
 			//g_print ("on cache %s par parente\n", cDockName);
-			//gdk_window_hide (pDock->pWidget->window);
 			gtk_widget_hide (pDock->pWidget);
 			cairo_dock_hide_parent_docks (pDock);
 		}

@@ -431,7 +431,7 @@ void cairo_dock_load_icon_info_from_desktop_file (gchar *cDesktopFileName, Icon 
 		g_error_free (erreur);
 		erreur = NULL;
 	}
-	if (icon->acCommand == NULL || strcmp (icon->acCommand, "") == 0)
+	if (icon->acCommand != NULL && strcmp (icon->acCommand, "") == 0)
 	{
 		g_free (icon->acCommand);
 		icon->acCommand = NULL;
@@ -445,13 +445,19 @@ void cairo_dock_load_icon_info_from_desktop_file (gchar *cDesktopFileName, Icon 
 		erreur = NULL;
 	}
 	
-	icon->bIsURI = g_key_file_get_boolean (keyfile, "Desktop Entry", "Is URI", &erreur);
+	icon->cBaseURI = g_key_file_get_string (keyfile, "Desktop Entry", "Base URI", &erreur);
 	if (erreur != NULL)
 	{
-		icon->bIsURI = FALSE;
+		icon->cBaseURI = NULL;
 		g_error_free (erreur);
 		erreur = NULL;
 	}
+	if (icon->cBaseURI != NULL && strcmp (icon->cBaseURI, "") == 0)
+	{
+		g_free (icon->cBaseURI);
+		icon->cBaseURI = NULL;
+	}
+	
 	icon->bIsMountingPoint = g_key_file_get_boolean (keyfile, "Desktop Entry", "Is mounting point", &erreur);
 	if (erreur != NULL)
 	{
@@ -474,7 +480,7 @@ void cairo_dock_load_icon_info_from_desktop_file (gchar *cDesktopFileName, Icon 
 		if (pChildDock == NULL)
 		{
 			g_print ("le dock fils (%s) n'existe pas, on le cree\n", icon->acName);
-			if (icon->bIsURI && cairo_dock_load_directory_func != NULL)
+			if (icon->cBaseURI != NULL && cairo_dock_load_directory_func != NULL)
 			{
 				cairo_dock_load_directory_func (icon);
 			}

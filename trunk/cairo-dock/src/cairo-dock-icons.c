@@ -67,6 +67,7 @@ void cairo_dock_free_icon (Icon *icon)
 	g_free (icon->acFileName);
 	g_free (icon->acName);
 	g_free (icon->acCommand);
+	g_free (icon->cBaseURI);
 	
 	cairo_surface_destroy (icon->pIconBuffer);
 	cairo_surface_destroy (icon->pTextBuffer);
@@ -246,6 +247,7 @@ Icon *cairo_dock_get_previous_icon (GList *pIconList, Icon *pIcon)
 
 Icon *cairo_dock_get_icon_with_command (GList *pIconList, gchar *cCommand)
 {
+	g_return_val_if_fail (cCommand != NULL, NULL);
 	GList* ic;
 	Icon *icon;
 	for (ic = pIconList; ic != NULL; ic = ic->next)
@@ -257,6 +259,32 @@ Icon *cairo_dock_get_icon_with_command (GList *pIconList, gchar *cCommand)
 	return NULL;
 }
 
+Icon *cairo_dock_get_icon_with_base_uri (GList *pIconList, gchar *cBaseURI)
+{
+	g_return_val_if_fail (cBaseURI != NULL, NULL);
+	GList* ic;
+	Icon *icon;
+	for (ic = pIconList; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (icon->cBaseURI != NULL && strcmp (icon->cBaseURI, cBaseURI) == 0)
+			return icon;
+	}
+	return NULL;
+}
+
+Icon *cairo_dock_get_icon_with_subdock (GList *pIconList, CairoDock *pSubDock)
+{
+	GList* ic;
+	Icon *icon;
+	for (ic = pIconList; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (icon->pSubDock == pSubDock)
+			return icon;
+	}
+	return NULL;
+}
 
 void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 {
@@ -585,7 +613,7 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 	//g_print (">>>>>%s (%d, %dx%d)\n", __func__, x_abs, iWidth, iHeight);
 	if (pIconList == NULL)
 		return NULL;
-	float x_cumulated = 0, fXMiddle;
+	float x_cumulated = 0, fXMiddle, fDeltaExtremum;
 	int iXMinSinusoid = x_abs - g_iSinusoidWidth / 2;
 	int iXMaxSinusoid = x_abs + g_iSinusoidWidth / 2;
 	//g_print ("%d <-> %d\n", iXMinSinusoid, iXMaxSinusoid);
@@ -641,13 +669,15 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 				prev_icon = (ic->prev != NULL ? ic->prev->data : cairo_dock_get_last_icon (pIconList));
 				icon->fX = prev_icon->fX + prev_icon->fWidth * prev_icon->fScale + g_iIconGap;
 				
-				if (icon->fX + icon->fWidth * icon->fScale > icon->fXMax - g_fAmplitude * icon->fWidth / 10 && iWidth != 0 && icon->fPhase == G_PI)
+				if (icon->fX + icon->fWidth * icon->fScale > icon->fXMax - g_fAmplitude * icon->fWidth / 6 && iWidth != 0)  /// && icon->fPhase == G_PI
 				{
 					//g_print ("  on contraint %s (fXMax=%.2f , fX=%.2f\n", prev_icon->acName, prev_icon->fXMax, prev_icon->fX);
-					icon->fX = icon->fXMax - icon->fWidth * icon->fScale - g_fAmplitude * icon->fWidth / 20;
+					fDeltaExtremum = icon->fX + icon->fWidth * icon->fScale - (icon->fXMax - g_fAmplitude * icon->fWidth / 12);
+					icon->fX -= fDeltaExtremum * (1 - (prev_icon->fScale - 1) / g_fAmplitude);
+					///icon->fX = icon->fXMax - icon->fWidth * icon->fScale - g_fAmplitude * icon->fWidth / 16;
 				}
 			}
-			icon->fX = fAlign * iWidth + (icon->fX - fAlign * iWidth) * (1 - fLateralFactor);
+			icon->fX = fAlign * iWidth + (icon->fX - fAlign * iWidth) * (1. - fLateralFactor);
 		}
 		
 		//\_______________ On regarde si on pointe sur cette icone.
@@ -656,7 +686,7 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 			pointed_ic = ic;
 			icon->bPointed = TRUE;
 			icon->fX = x_cumulated - (iMinDockWidth - iWidth) / 2 + (1 - icon->fScale) * (x_abs - x_cumulated);
-			icon->fX = fAlign * iWidth + (icon->fX - fAlign * iWidth) * (1 - fLateralFactor);
+			icon->fX = fAlign * iWidth + (icon->fX - fAlign * iWidth) * (1. - fLateralFactor);
 			//g_print ("icone pointee : fX=%.2f\n", icon->fX);
 		}
 		else
@@ -696,12 +726,14 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 		
 		prev_icon->fX = icon->fX - g_iIconGap - prev_icon->fWidth * prev_icon->fScale;
 		//g_print ("fX <- %.2f; fXMin : %.2f\n", prev_icon->fX, prev_icon->fXMin);
-		if (prev_icon->fX < prev_icon->fXMin + g_fAmplitude * prev_icon->fWidth / 10 && iWidth != 0 && prev_icon->fPhase == 0 && x_abs < iWidth)
+		if (prev_icon->fX < prev_icon->fXMin + g_fAmplitude * prev_icon->fWidth / 6 && iWidth != 0 && x_abs < iWidth)  /// && prev_icon->fPhase == 0 
 		{
 			//g_print ("  on contraint %s (fXMin=%.2f , fX=%.2f\n", prev_icon->acName, prev_icon->fXMin, prev_icon->fX);
-			prev_icon->fX = prev_icon->fXMin + g_fAmplitude * prev_icon->fWidth / 20;
+			fDeltaExtremum = prev_icon->fX - (prev_icon->fXMin + g_fAmplitude * prev_icon->fWidth / 12);
+			prev_icon->fX -= fDeltaExtremum * (1 - (prev_icon->fScale - 1) / g_fAmplitude);
+			///prev_icon->fX = prev_icon->fXMin + g_fAmplitude * prev_icon->fWidth / 16;
 		}
-		prev_icon->fX = fAlign * iWidth + (prev_icon->fX - fAlign * iWidth) * (1 - fLateralFactor);
+		prev_icon->fX = fAlign * iWidth + (prev_icon->fX - fAlign * iWidth) * (1. - fLateralFactor);
 	}
 	
 	return pointed_ic->data;

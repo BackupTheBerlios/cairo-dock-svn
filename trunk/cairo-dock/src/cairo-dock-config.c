@@ -810,7 +810,7 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 		g_free (user_data);
 	}
 }
-gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc)
+gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc)
 {
 	GSList *pWidgetList = NULL;
 	GtkTextBuffer *pTextBuffer = NULL;  // le buffer est lie au widget, donc au pDialog.
@@ -826,7 +826,7 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 	}
 	g_key_file_remove_key (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", NULL);
 	
-	GtkWidget *pDialog = cairo_dock_generate_advanced_ihm_from_keyfile (pKeyFile, cTitle, pWidget, &pWidgetList, (pConfigFunc != NULL), iIdentifier);
+	GtkWidget *pDialog = cairo_dock_generate_advanced_ihm_from_keyfile (pKeyFile, cTitle, pWidget, &pWidgetList, (pConfigFunc != NULL), iIdentifier, cPresentedGroup);
 	if (pDialog == NULL || pWidgetList == NULL)
 	{
 		pDialog = cairo_dock_generate_basic_ihm_from_keyfile (conf_file, cTitle, pWidget, &pTextBuffer, (pConfigFunc != NULL));

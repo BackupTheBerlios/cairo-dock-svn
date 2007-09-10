@@ -333,7 +333,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	
 	if (pEvent != NULL && pDock->iRefCount > 0)  // on ne le fait que pour les containers.
 	{
-		g_print ("  on retarde la sortie\n");
+		//g_print ("  on retarde la sortie\n");
 		if (pDock->iSidLeaveDemand == 0)
 			pDock->iSidLeaveDemand = g_timeout_add (g_iLeaveSubDockDelay, (GSourceFunc) _cairo_dock_emit_leave_signal, (gpointer) pDock);
 		return FALSE;

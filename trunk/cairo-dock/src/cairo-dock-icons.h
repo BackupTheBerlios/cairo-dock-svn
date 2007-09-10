@@ -12,7 +12,7 @@
 #define CAIRO_DOCK_IS_SEPARATOR(icon) (icon->iType & 1)
 #define CAIRO_DOCK_IS_APPLET(icon) (icon->iType  == CAIRO_DOCK_APPLET && icon->pModule != NULL)
 #define CAIRO_DOCK_IS_NORMAL_LAUNCHER(icon) (icon->iType == CAIRO_DOCK_LAUNCHER && icon->acDesktopFileName != NULL)
-#define CAIRO_DOCK_IS_URI_LAUNCHER(icon) (icon->iType == CAIRO_DOCK_LAUNCHER && icon->bIsURI)
+#define CAIRO_DOCK_IS_URI_LAUNCHER(icon) (icon->iType == CAIRO_DOCK_LAUNCHER && icon->cBaseURI != NULL)
 #define CAIRO_DOCK_IS_VALID_APPLI(icon) (CAIRO_DOCK_IS_APPLI (icon) && icon->Xid != 0)
 
 void cairo_dock_free_icon (Icon *icon);
@@ -35,6 +35,8 @@ Icon *cairo_dock_get_previous_icon (GList *pIconList, Icon *pIcon);
 #define cairo_dock_get_next_element(ic, list) (ic->next == NULL ? list : ic->next);
 #define cairo_dock_get_previous_element(ic, list) (ic->prev == NULL ? g_list_last (list) : ic->prev);
 Icon *cairo_dock_get_icon_with_command (GList *pIconList, gchar *cCommand);
+Icon *cairo_dock_get_icon_with_base_uri (GList *pIconList, gchar *cBaseURI);
+Icon *cairo_dock_get_icon_with_subdock (GList *pIconList, CairoDock *pSubDock);
 
 #define cairo_dock_none_clicked(pIconList) (cairo_dock_get_bouncing_icon (pIconList) == NULL)
 #define cairo_dock_none_removed_or_inserted(pIconList) (cairo_dock_get_removing_or_inserting_icon (pIconList) == NULL)

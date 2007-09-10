@@ -39,6 +39,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-modules.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-themes-manager.h"
+#include "cairo-dock-notifications.h"
 #include "cairo-dock-menu.h"
 
 extern gchar *g_cCurrentThemeName;
@@ -63,7 +64,7 @@ static void cairo_dock_edit_and_reload_appearance (GtkMenuItem *menu_item, gpoin
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Appearance", 400, 600, '+', (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Appearance", 400, 600, '+', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
 	/*if (config_ok)
 	{
 		cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
@@ -74,7 +75,7 @@ static void cairo_dock_edit_and_reload_behaviour (GtkMenuItem *menu_item, gpoint
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Behaviour", 400, 600, '-', (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Behaviour", 400, 600, '-', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
 	/*if (config_ok)
 	{
 		cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
@@ -85,7 +86,7 @@ static void cairo_dock_edit_and_reload_conf (GtkMenuItem *menu_item, gpointer *d
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", 400, 600, 0, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", 400, 600, 0, NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
 	/*if (config_ok)
 	{
 		cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
@@ -97,7 +98,11 @@ static void cairo_dock_initiate_theme_management(GtkMenuItem *menu_item, gpointe
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
 	
-	cairo_dock_manage_themes (pDock->pWidget);
+	gboolean bRefreshGUI;
+	do
+	{
+		bRefreshGUI = cairo_dock_manage_themes (pDock->pWidget);
+	} while (bRefreshGUI);
 }
 
 static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
@@ -121,7 +126,8 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 	gtk_label_set_use_markup (GTK_LABEL (pLabel), TRUE);
 	gchar *cAboutText = g_strdup_printf ("<b>Original idea/first development :</b>\n  Mac Slow\n\
 <b>Main developer :</b>\n  Fabounet (Fabrice Rey)\n\
-<b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole (Julien Barrau)\n\
+<b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole (Julien Barrau)\n  Glattering\n\
+<b>Applets :</b>\n  Fabounet\n\
 <b>Translations :</b>\n  Fabounet\n\
 <b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Necropotame\n  Ppmt\n  Sombrero\n  Vilraleur");
 	gtk_label_set_markup (GTK_LABEL (pLabel), cAboutText);
@@ -192,6 +198,8 @@ static void cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 		icon->fPersonnalScale = 1.0;
 		if (pDock->iSidShrinkDown == 0)
 			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+		
+		cairo_dock_mark_theme_as_modified (TRUE);
 	}
 }
 
@@ -213,7 +221,7 @@ static void cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data)
 	
 	//\___________________ On ouvre automatiquement l'IHM pour permettre de modifier ses champs.
 	gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cNewDesktopFileName);
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cNewDesktopFilePath, "Fill this launcher", 300, 400, 0, NULL, NULL, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cNewDesktopFilePath, "Fill this launcher", 300, 400, 0, NULL, NULL, NULL, NULL);
 	if (config_ok)
 	{
 		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
@@ -224,6 +232,7 @@ static void cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data)
 		
 		if (pDock->iSidShrinkDown == 0)
 			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+		cairo_dock_mark_theme_as_modified (TRUE);
 	}
 	else
 	{
@@ -283,6 +292,7 @@ static void cairo_dock_add_launcher (GtkMenuItem *menu_item, gpointer *data)
 			
 			cairo_dock_insert_icon_in_dock (pNewIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 			
+			cairo_dock_mark_theme_as_modified (TRUE);
 			g_free (cFilePath);
 		}
 		g_slist_free (selected_files);
@@ -316,7 +326,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	
 	cairo_dock_update_launcher_desktop_file (cDesktopFilePath, g_cLanguage);
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", 300, 400, 0, NULL, NULL, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", 300, 400, 0, NULL, NULL, NULL, NULL);
 	g_free (cDesktopFilePath);
 	
 	if (! pDock->bInside)
@@ -387,6 +397,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 		gtk_widget_queue_draw (pDock->pWidget);
 		if (pNewContainer != pDock)
 			gtk_widget_queue_draw (pNewContainer->pWidget);
+		cairo_dock_mark_theme_as_modified (TRUE);
 	}
 }
 
@@ -545,7 +556,7 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
 	
 	if (data == NULL)
-		data = g_new (gpointer, 2);
+		data = g_new (gpointer, 3);
 	data[0] = pDock;
 	data[1] = icon;
 	
@@ -592,12 +603,26 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	menu_item = gtk_separator_menu_item_new ();
 	gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 	
+	data[2] = menu;
+	cairo_dock_notify (CAIRO_DOCK_BUILD_MENU, data);
+	
+	return menu;
+}
+
+
+gboolean cairo_dock_notification_build_menu (gpointer *data)
+{
+	CairoDock *pDock = data[0];
+	Icon *icon = data[1];
+	GtkWidget *menu = data[2];
+	
+	GtkWidget *menu_item;
 	if (icon == NULL)
 	{
 		menu_item = gtk_menu_item_new_with_label ("Add a launcher");
 		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_add_launcher), data);
-		return menu;
+		return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 	}
 	
 	if (CAIRO_DOCK_IS_SEPARATOR (icon))
@@ -672,7 +697,7 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 		menu_item = gtk_menu_item_new_with_label ("Move this icon");
 		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 		
-		pSubMenu = gtk_menu_new ();
+		GtkWidget *pSubMenu = gtk_menu_new ();
 		gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), pSubMenu);
 		
 		menu_item = gtk_menu_item_new_with_label ("To the left");
@@ -694,6 +719,6 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_move_icon_to_end), data);
 	}
 	
-	
-	return menu;
+	return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 }
+
