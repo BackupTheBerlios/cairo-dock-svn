@@ -286,6 +286,8 @@ Icon *cairo_dock_get_icon_with_subdock (GList *pIconList, CairoDock *pSubDock)
 	return NULL;
 }
 
+
+
 void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 {
 	//g_print ("%s (%s, %s) : %.2f <-> %.2f\n", __func__, icon1->acName, icon2->acName, icon1->fOrder, icon2->fOrder);

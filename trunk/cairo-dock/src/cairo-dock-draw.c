@@ -809,78 +809,80 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 	GList *pFirstDrawnElement = (pDock->pFirstDrawnElement != NULL ? pDock->pFirstDrawnElement : pDock->icons);
 	ic = pFirstDrawnElement;
 	
-	double fRatio = (pDock->iRefCount == 0 ? 1 : g_fSubDockSizeRatio);
-	double fXLeft, fXRight;  // il faut tenir compte de l'inversion si l'icone est en arriere-plan.
-	do
+	if (ic != NULL)
 	{
-		icon = (Icon*) ic->data;
-		
-		if (icon->fWidthFactor < 0)
+		double fRatio = (pDock->iRefCount == 0 ? 1 : g_fSubDockSizeRatio);
+		double fXLeft, fXRight;  // il faut tenir compte de l'inversion si l'icone est en arriere-plan.
+		do
 		{
-			fXLeft = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor;
-			fXRight = icon->fDrawX;
-		}
-		else
-		{
-			fXLeft = icon->fDrawX;
-			fXRight = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor;
-		}
-		
-		//g_print ("test a gauche de %s (%.2f -> %.2f)\n", icon->acName, fXLeft, fXRight);
-		if (fXLeft <= fXMax && floor (fXRight) > fXMin)
-		{
-			cairo_save (pCairoContext);
+			icon = (Icon*) ic->data;
 			
-			//g_print ("  redessin a gauche de %s\n", icon->acName);
-			cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fLateralFactor, pDock->fAlign);
-			cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio);
+			if (icon->fWidthFactor < 0)
+			{
+				fXLeft = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor;
+				fXRight = icon->fDrawX;
+			}
+			else
+			{
+				fXLeft = icon->fDrawX;
+				fXRight = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor;
+			}
 			
-			cairo_restore (pCairoContext);
+			//g_print ("test a gauche de %s (%.2f -> %.2f)\n", icon->acName, fXLeft, fXRight);
+			if (fXLeft <= fXMax && floor (fXRight) > fXMin)
+			{
+				cairo_save (pCairoContext);
+				
+				//g_print ("  redessin a gauche de %s\n", icon->acName);
+				cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fLateralFactor, pDock->fAlign);
+				cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio);
+				
+				cairo_restore (pCairoContext);
+			}
+			ic = ic->next;
+			if (ic == NULL)
+				ic = pDock->icons;
 		}
-		ic = ic->next;
-		if (ic == NULL)
-			ic = pDock->icons;
-	}
-	while (icon->fX + icon->fWidth * icon->fScale - (pDock->iMaxDockWidth - pDock->iCurrentWidth) / 2 < 0 && ic != pFirstDrawnElement);
-	
-	GList *pMiddleElement = ic;
-	ic = pFirstDrawnElement->prev;
-	if (ic == NULL)
-		ic = g_list_last (pDock->icons);
-	do
-	{
-		icon = (Icon*) ic->data;
+		while (icon->fX + icon->fWidth * icon->fScale - (pDock->iMaxDockWidth - pDock->iCurrentWidth) / 2 < 0 && ic != pFirstDrawnElement);
 		
-		if (icon->fWidthFactor < 0)
-		{
-			fXLeft = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor;
-			fXRight = icon->fDrawX;
-		}
-		else
-		{
-			fXLeft = icon->fDrawX;
-			fXRight = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor;
-		}
-		
-		//g_print ("test a droite de %s (%.2f -> %.2f)\n", icon->acName, fXLeft, fXRight);
-		if (fXLeft <= fXMax && floor (fXRight) > fXMin)
-		{
-			cairo_save (pCairoContext);
-			
-			//g_print ("  redessin a droite de %s\n", icon->acName);
-			cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fLateralFactor, pDock->fAlign);
-			cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio);
-			
-			cairo_restore (pCairoContext);
-		}
-		if (ic == pMiddleElement)
-			break;
-		ic = ic->prev;
+		GList *pMiddleElement = ic;
+		ic = pFirstDrawnElement->prev;
 		if (ic == NULL)
 			ic = g_list_last (pDock->icons);
+		do
+		{
+			icon = (Icon*) ic->data;
+			
+			if (icon->fWidthFactor < 0)
+			{
+				fXLeft = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor;
+				fXRight = icon->fDrawX;
+			}
+			else
+			{
+				fXLeft = icon->fDrawX;
+				fXRight = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor;
+			}
+			
+			//g_print ("test a droite de %s (%.2f -> %.2f)\n", icon->acName, fXLeft, fXRight);
+			if (fXLeft <= fXMax && floor (fXRight) > fXMin)
+			{
+				cairo_save (pCairoContext);
+				
+				//g_print ("  redessin a droite de %s\n", icon->acName);
+				cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fLateralFactor, pDock->fAlign);
+				cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio);
+				
+				cairo_restore (pCairoContext);
+			}
+			if (ic == pMiddleElement)
+				break;
+			ic = ic->prev;
+			if (ic == NULL)
+				ic = g_list_last (pDock->icons);
+		}
+		while (TRUE);
 	}
-	while (TRUE);
-	
 	cairo_destroy (pCairoContext);
 #ifdef HAVE_GLITZ
 	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)

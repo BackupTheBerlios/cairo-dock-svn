@@ -10,7 +10,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <stdlib.h>
 #include <glib/gstdio.h>
 
-
 #include "cairo-dock-applet-factory.h"
 #include "cairo-dock-config.h"
 #include "cairo-dock-dock-factory.h"
@@ -385,37 +384,37 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 			//\___________________ On charge les parametres de comportement.
 			if (g_key_file_get_boolean (pKeyFile, "Themes", "use theme behaviour", NULL))
 			{
-				cCommand = g_strdup_printf ("/bin/cp %s/%s %s", cNewThemePath, CAIRO_DOCK_CONF_FILE, g_cCurrentThemePath);
+				cCommand = g_strdup_printf ("/bin/cp '%s'/%s '%s'", cNewThemePath, CAIRO_DOCK_CONF_FILE, g_cCurrentThemePath);
 				g_print ("%s\n", cCommand);
 				system (cCommand);
 				g_free (cCommand);
 			}
 			else
 			{
-				gchar *cNewConfFilePath = g_strdup_printf ("%s/%s", cNewThemePath, CAIRO_DOCK_CONF_FILE);
+				gchar *cNewConfFilePath = g_strdup_printf ("'%s'/%s", cNewThemePath, CAIRO_DOCK_CONF_FILE);
 				cairo_dock_replace_keys_by_identifier (g_cConfFile, cNewConfFilePath, '+');
 				g_free (cNewConfFilePath);
 			}
 			//\___________________ On charge les lanceurs.
 			if (g_key_file_get_boolean (pKeyFile, "Themes", "use theme launchers", NULL))
 			{
-				cCommand = g_strdup_printf ("rm -f %s/*.desktop", g_cCurrentThemePath);
+				cCommand = g_strdup_printf ("rm -f '%s'/*.desktop", g_cCurrentThemePath);
 				g_print ("%s\n", cCommand);
 				system (cCommand);
 				g_free (cCommand);
 				
-				cCommand = g_strdup_printf ("cp %s/*.desktop %s", cNewThemePath, g_cCurrentThemePath);
+				cCommand = g_strdup_printf ("cp '%s'/*.desktop '%s'", cNewThemePath, g_cCurrentThemePath);
 				g_print ("%s\n", cCommand);
 				system (cCommand);
 				g_free (cCommand);
 			}
 			//\___________________ On remplace tous les autres fichiers par les nouveaux.
-			cCommand = g_strdup_printf ("find %s -mindepth 1 -maxdepth 1  ! -name '*.conf' ! -name '*.desktop' -exec rm -rf {} \\;", g_cCurrentThemePath);
+			cCommand = g_strdup_printf ("find '%s' -mindepth 1 -maxdepth 1  ! -name '*.conf' ! -name '*.desktop' -exec rm -rf '{}' \\;", g_cCurrentThemePath);
 			g_print ("%s\n", cCommand);
 			system (cCommand);
 			g_free (cCommand);
 			
-			cCommand = g_strdup_printf ("find '%s'/* -prune ! -name '*.conf' ! -name '*.desktop' -exec /bin/cp -r {} %s \\;", cNewThemePath, g_cCurrentThemePath);
+			cCommand = g_strdup_printf ("find '%s'/* -prune ! -name '*.conf' ! -name '*.desktop' -exec /bin/cp -r '{}' '%s' \\;", cNewThemePath, g_cCurrentThemePath);
 			g_print ("%s\n", cCommand);
 			system (cCommand);
 			g_free (cCommand);
@@ -489,13 +488,13 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 							system (cCommand);
 							g_free (cCommand);
 							
-							cCommand = g_strdup_printf ("cp %s/*.desktop '%s'", g_cCurrentThemePath, cNewConfFilePath);
+							cCommand = g_strdup_printf ("cp '%s'/*.desktop '%s'", g_cCurrentThemePath, cNewConfFilePath);
 							g_print ("%s\n", cCommand);
 							system (cCommand);
 							g_free (cCommand);
 						}
 						
-						cCommand = g_strdup_printf ("find %s -mindepth 1 -maxdepth 1  ! -name '*.conf' ! -name '*.desktop' -exec /bin/cp -r {} %s \\;", g_cCurrentThemePath, cNewThemePath);
+						cCommand = g_strdup_printf ("find '%s' -mindepth 1 -maxdepth 1  ! -name '*.conf' ! -name '*.desktop' -exec /bin/cp -r '{}' '%s' \\;", g_cCurrentThemePath, cNewThemePath);
 						g_print ("%s\n", cCommand);
 						system (cCommand);
 						g_free (cCommand);
@@ -510,7 +509,7 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 				cNewThemePath = g_strdup_printf ("%s/%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_THEMES_DIR, cNewThemeName);
 				
 				g_mkdir_with_parents (cNewThemePath, 7*8*8+7*8+5);
-				cCommand = g_strdup_printf ("cp -r %s/* '%s'", g_cCurrentThemePath, cNewThemePath);
+				cCommand = g_strdup_printf ("cp -r '%s'/* '%s'", g_cCurrentThemePath, cNewThemePath);
 				g_print ("%s\n", cCommand);
 				system (cCommand);
 				g_free (cCommand);

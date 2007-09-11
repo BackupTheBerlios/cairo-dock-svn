@@ -315,19 +315,21 @@ main (int argc, char** argv)
 	g_cCairoDockDataDir = g_strdup_printf ("%s/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR);
 	if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_IS_DIR))
 	{
-		g_mkdir (g_cCairoDockDataDir, 7*8*8+7*8+5);
+		if (g_mkdir (g_cCairoDockDataDir, 7*8*8+7*8+5) != 0)
+			g_print ("Attention : couldn't create directory %s\n", g_cCairoDockDataDir);
 	}
 	gchar *cThemesDir = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_THEMES_DIR);
 	if (! g_file_test (cThemesDir, G_FILE_TEST_IS_DIR))
 	{
-		g_mkdir (cThemesDir, 7*8*8+7*8+5);
+		if (g_mkdir (cThemesDir, 7*8*8+7*8+5) != 0)
+			g_print ("Attention : couldn't create directory %s\n", cThemesDir);
 	}
 	g_free (cThemesDir);
 	g_cCurrentThemePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_CURRENT_THEME_NAME);
-	if (! g_file_test (cThemesDir, G_FILE_TEST_IS_DIR))
+	if (! g_file_test (g_cCurrentThemePath, G_FILE_TEST_IS_DIR))
 	{
-		g_print ("creation de %s\n", g_cCurrentThemePath);
-		g_mkdir (cThemesDir, 7*8*8+7*8+5);
+		if (g_mkdir (g_cCurrentThemePath, 7*8*8+7*8+5) != 0)
+			g_print ("Attention : couldn't create directory %s\n", g_cCurrentThemePath);
 	}
 	
 	//\___________________ On enregistre nos notifications.

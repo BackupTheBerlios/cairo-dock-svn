@@ -49,6 +49,8 @@ gboolean on_configure (GtkWidget* pWidget,
 
 
 void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, GtkSelectionData *selection_data, guint info, guint t, CairoDock *pDock);
+gboolean cairo_dock_notification_drop_data (gpointer *data);
+
 void on_drag_motion (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, guint t, CairoDock *pDock);
 
 

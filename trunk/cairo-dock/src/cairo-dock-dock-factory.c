@@ -316,6 +316,28 @@ CairoDock *cairo_dock_search_dock_from_name (gchar *cDockName)
 	return g_hash_table_lookup (g_hDocksTable, cDockName);
 }
 
+static gboolean _cairo_dock_search_icon_from_subdock (gchar *cDockName, CairoDock *pDock, gpointer *data)
+{
+	if (pDock == data[0])
+		return FALSE;
+	Icon *icon = cairo_dock_get_icon_with_subdock (pDock->icons, data[0]);
+	if (icon != NULL)
+	{
+		* ((Icon **) data[1]) = icon;
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+Icon *cairo_dock_search_icon_pointing_on_dock (CairoDock *pDock)
+{
+	if (pDock->iRefCount == 0)  // inutile de chercher dans ce cas-la.
+		return NULL;
+	Icon *pPointingIcon = NULL;
+	gpointer data[2] = {pDock, &pPointingIcon};
+	g_hash_table_find (g_hDocksTable, (GHRFunc)_cairo_dock_search_icon_from_subdock, data);
+	return pPointingIcon;
+}
 
 
 void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)

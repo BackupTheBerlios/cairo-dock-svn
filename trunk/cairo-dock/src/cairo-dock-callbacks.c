@@ -34,6 +34,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-config.h"
 #include "cairo-dock-dock-factory.h"
+#include "cairo-dock-notifications.h"
+#include "cairo-dock-themes-manager.h"
 #include "cairo-dock-callbacks.h"
 
 static Icon *s_pIconClicked = NULL;  // pour savoir quand on deplace une icone a la souris.
@@ -977,6 +979,7 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 	//\_________________ On calcule la position a laquelle on l'a lache.
 	double fOrder = 0;
 	CairoDock *pReceivingDock = pDock;
+	Icon *pPointedIcon = NULL, *pNeighboorIcon = NULL;
 	GList *ic;
 	Icon *icon, *next_icon, *prev_icon;
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
@@ -985,28 +988,29 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 		if (icon->bPointed)
 		{
 			//g_print ("On pointe sur %s\n", icon->acName);
+			pPointedIcon = icon;
 			double fMargin;
 			if (g_str_has_suffix (cReceivedData, ".desktop"))  // si c'est un .desktop, on l'ajoute.
-				fMargin = 0.5;
+				fMargin = 0.5;  // on ne sera jamais dessus.
 			else  // sinon on le lance si on est sur l'icone, et on l'ajoute autrement.
 				fMargin = 0.25;
 			
 			if (x > icon->fX + icon->fWidth * icon->fScale * (1 - fMargin))  // on est apres.
 			{
-				next_icon = (ic->next != NULL ? ic->next->data : NULL);
-				fOrder = (next_icon != NULL ? (icon->fOrder + next_icon->fOrder) / 2 : icon->fOrder + 1);
+				pNeighboorIcon = (ic->next != NULL ? ic->next->data : NULL);
+				fOrder = (pNeighboorIcon != NULL ? (icon->fOrder + pNeighboorIcon->fOrder) / 2 : icon->fOrder + 1);
 			}
 			else if (x < icon->fX + icon->fWidth * icon->fScale * fMargin)  // on est avant.
 			{
-				prev_icon = (ic->prev != NULL ? ic->prev->data : NULL);
-				fOrder = (prev_icon != NULL ? (icon->fOrder + prev_icon->fOrder) / 2 : icon->fOrder - 1);
+				pNeighboorIcon = (ic->prev != NULL ? ic->prev->data : NULL);
+				fOrder = (pNeighboorIcon != NULL ? (icon->fOrder + pNeighboorIcon->fOrder) / 2 : icon->fOrder - 1);
 			}
 			else  // on est dessus.
 			{
-				if (icon->pSubDock != NULL)
+				fOrder = CAIRO_DOCK_LAST_ORDER;
+				/*if (icon->pSubDock != NULL)
 				{
 					pReceivingDock = icon->pSubDock;
-					fOrder = CAIRO_DOCK_LAST_ORDER;
 				}
 				else
 				{
@@ -1018,12 +1022,14 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 					if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
 						pDock->iSidShrinkDown = g_timeout_add (40, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 					return ;
-				}
+				}*/
 			}
 		}
 	}
+	gpointer data[4] = {cReceivedData, pPointedIcon, &fOrder, pDock};
+	cairo_dock_register_notification (CAIRO_DOCK_DROP_DATA, cairo_dock_notification_drop_data, CAIRO_DOCK_RUN_AFTER);
 	
-	//\_________________ On l'ajoute dans le repertoire .cairo-dock.
+	/*//\_________________ On l'ajoute dans le repertoire .cairo-dock.
 	GError *erreur = NULL;
 	const gchar *cDockName = cairo_dock_search_dock_name (pReceivingDock);
 	gchar *cNewDesktopFileName = cairo_dock_add_desktop_file_from_uri (cReceivedData, cDockName, fOrder, pDock, &erreur);
@@ -1049,7 +1055,64 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 		
 		if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
 			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+	}*/
+}
+
+gboolean cairo_dock_notification_drop_data (gpointer *data)
+{
+	gchar *cReceivedData = data[0];
+	Icon *icon = data[1];
+	double fOrder = *((double *) data[2]);
+	CairoDock *pDock = data[3];
+	
+	CairoDock *pReceivingDock = pDock;
+	if (fOrder == CAIRO_DOCK_LAST_ORDER)  // on a lache dessus.
+	{
+		if (icon->pSubDock != NULL)  // on essaiera de l'ajouter au sous-dock.
+		{
+			pReceivingDock = icon->pSubDock;
+		}
+		else if (icon->acDesktopFileName != NULL)  // on le lance avec les infos du lanceurs.
+		{
+			gchar *cCommand = g_strdup_printf ("%s '%s'", icon->acCommand, cReceivedData);
+			g_spawn_command_line_async (cCommand, NULL);
+			g_free (cCommand);
+			icon->iAnimationType = CAIRO_DOCK_BLINK;
+			icon->iCount = g_tNbIterInOneRound[icon->iAnimationType] * 2 - 1;  // 2 clignotements.
+			if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
+				pDock->iSidShrinkDown = g_timeout_add (40, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+			return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
+		}
 	}
+	
+	//\_________________ On l'ajoute dans le repertoire .cairo-dock.
+	GError *erreur = NULL;
+	const gchar *cDockName = cairo_dock_search_dock_name (pReceivingDock);
+	gchar *cNewDesktopFileName = cairo_dock_add_desktop_file_from_uri (cReceivedData, cDockName, fOrder, pDock, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		return CAIRO_DOCK_LET_PASS_NOTIFICATION;
+	}
+	
+	//\_________________ On charge ce nouveau lanceur.
+	if (cNewDesktopFileName != NULL)
+	{
+		cairo_dock_mark_theme_as_modified (TRUE);
+		
+		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
+		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cNewDesktopFileName, pCairoContext);
+		g_free (cNewDesktopFileName);
+		cairo_destroy (pCairoContext);
+		
+		if (pNewIcon != NULL)
+			cairo_dock_insert_icon_in_dock (pNewIcon, pReceivingDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+		
+		if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
+			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+	}
+	return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 }
 
 
@@ -1057,7 +1120,7 @@ void on_drag_motion (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, gui
 {
 	//g_print ("%s (%dx%d)\n", __func__, x, y);
 	//\_________________ On simule les evenements souris habituels.
-	on_enter_notify2 (pWidget, NULL, pDock);  // ne sera effectif que la 1ere fois.
+	on_enter_notify2 (pWidget, NULL, pDock);  // ne sera effectif que la 1ere fois a chaque entree dans un dock.
 	on_motion_notify2 (pWidget, NULL, pDock);
 }
 

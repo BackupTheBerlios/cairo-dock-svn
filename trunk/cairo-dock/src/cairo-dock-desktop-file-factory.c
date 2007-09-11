@@ -110,7 +110,7 @@ gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, gchar *cDockName, doub
 		g_free (cDesktopFileTemplate);
 		g_free (cNewDesktopFilePath);
 	}
-	else if (cairo_dock_add_uri_func != NULL)
+	/*else if (cairo_dock_add_uri_func != NULL)
 	{
 		cNewDesktopFileName = cairo_dock_add_uri_func (cURI, cDockName, fEffectiveOrder, pDock, &tmp_erreur);
 		if (tmp_erreur != NULL)
@@ -118,11 +118,7 @@ gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, gchar *cDockName, doub
 			g_propagate_error (erreur, tmp_erreur);
 			return NULL;
 		}
-	}
-	else
-	{
-		g_print ("no back-end function for managing this type of file\n");
-	}
+	}*/
 	
 	return cNewDesktopFileName;
 }
