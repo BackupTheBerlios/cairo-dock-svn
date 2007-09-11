@@ -1,0 +1,25 @@
+launchersdir = $(pkgdatadir)/themes/_Glattering_/launchers
+
+launchers_DATA = \
+	01launcher.desktop\
+	05firefox.desktop\
+	02fichiers.desktop\
+	06launcher.desktop\
+	ekiga.desktop\
+	03terminal.desktop\
+	07launcher.desktop\
+	gimp-2.2.desktop\
+	vlc.desktop\
+	04thunderbid.desktop\
+	amarok.desktop\
+	amarok.svg\
+	nautilus-cd-burner.svg\
+	ekiga.svg\
+	pidgin.svg\
+	firefox.svg\
+	synaptic.svg\
+	gimp.svg\
+	terminal.svg\
+	home.svg\
+	vlc.svg\
+	mail.svg

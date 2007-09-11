@@ -1,0 +1,15 @@
+#!
+[Desktop Entry]
+#s Launcher's name :
+Name=Calculator
+Name[fr]=Calculatrice
+#s Exec command :
+Exec=gcalctool
+#S Image's name or path :
+Icon=gnome-calculator.svg
+#f Order you want for this launcher among the other launchers :
+Order=9
+#s Name of the container it belongs to:
+Container=_MainDock_
+#b Is this icon a container ?
+Is container=false

@@ -1,0 +1,33 @@
+launchersdir = $(pkgdatadir)/themes/_Verde_/launchers
+
+launchers_DATA = \
+	00launcher.desktop\
+	mozilla-thunderbird.svg\
+	oow.svg\
+	01launcher.desktop\
+	pidgin.desktop\
+	02fichiers.desktop\
+	pidgin.svg\
+	03terminal.desktop\
+	04launcher.desktop\
+	amule.desktop\
+	mozilla-thunderbird.desktop\
+	synaptic.desktop\
+	amule.svg\
+	mv.svg\
+	synaptic.svg\
+	bmp.desktop\
+	nautilus.svg\
+	torrent.svg\
+	bmp.svg\
+	net.svg\
+	totem.desktop\
+	ooc.svg\
+	totem.svg\
+	terminal.svg\
+	ooo-calc.desktop\
+	transmission-gtk.desktop\
+	firefox.desktop\
+	ooo.svg\
+	firefox.svg\
+	ooo-writer.desktop

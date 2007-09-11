@@ -1,0 +1,27 @@
+launchersdir = $(pkgdatadir)/themes/_Azur_/launchers
+
+launchers_DATA = \
+	01BitTorrent.desktop\
+	transmission.png\
+	02fichiers.desktop\
+	nautilus.svg\
+	03terminal.desktop\
+	terminal.svg\
+	06musique.desktop\
+	music.svg\
+	05web.desktop\
+	web-browser.svg\
+	04thunderbid.desktop\
+	mozilla-thunderbird.svg\
+	07firefox.desktop\
+	firefox.svg\
+	08gaim.desktop\
+	gaim.svg\
+	09system.desktop\
+	gnome-main-menu.svg\
+	10synaptic.desktop\
+	synaptic.png\
+	11gnome-system-monitor.desktop\
+	utilities-system-monitor.svg\
+	12beryl-settings.desktop\
+	beryl-settings.svg

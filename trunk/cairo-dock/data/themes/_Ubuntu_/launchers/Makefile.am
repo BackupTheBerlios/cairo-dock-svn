@@ -1,0 +1,16 @@
+launchersdir = $(pkgdatadir)/themes/_Ubuntu_/launchers
+
+launchers_DATA = \
+	01gaim.desktop\
+	05firefox.desktop\
+	music.svg\
+	02fichiers.desktop\
+	nautilus.svg\
+	03terminal.desktop\
+	04thunderbid.desktop\
+	mozilla-thunderbird.svg\
+	firefox.svg\
+	06musique.desktop\
+	terminal.svg\
+	gaim.svg\
+	07synaptic.desktop

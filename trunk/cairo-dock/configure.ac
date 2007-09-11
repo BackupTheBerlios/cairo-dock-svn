@@ -38,12 +38,18 @@ AC_CONFIG_FILES([Makefile
 		data/Makefile
 		data/themes/Makefile
 		data/themes/_default_/Makefile
+		data/themes/_default_/launchers/Makefile
 		data/themes/_Azur_/Makefile
+		data/themes/_Azur_/launchers/Makefile
 		data/themes/_Ubuntu_/Makefile
+		data/themes/_Ubuntu_/launchers/Makefile
 		data/themes/_Verde_/Makefile
+		data/themes/_Verde_/launchers/Makefile
 		data/themes/_Djoole_/Makefile
+		data/themes/_Djoole_/launchers/Makefile
 		data/themes/_Cobalt_/Makefile
+		data/themes/_Cobalt_/launchers/Makefile
 		data/themes/_Glattering_/Makefile
-		data/themes/_Glattering_/icons/Makefile
+		data/themes/_Glattering_/launchers/Makefile
 		])
 AC_OUTPUT

@@ -1,0 +1,47 @@
+launchersdir = $(pkgdatadir)/themes/_Cobalt_/launchers
+
+launchers_DATA = \
+	00launcher.desktop\
+	f-spot.svg\
+	ooo-draw.desktop\
+	01launcher.desktop\
+	gimp-2.2.desktop\
+	ooo-draw.svg\
+	02fichiers.desktop\
+	gimp.svg\
+	ooo.svg\
+	03terminal.desktop\
+	gnome-system-monitor.desktop\
+	ooo-writer.desktop\
+	04launcher.desktop\
+	gthumb.desktop\
+	oow.svg\
+	05launcher.desktop\
+	gthumb.svg\
+	pidgin.desktop\
+	06launcher.desktop\
+	mozilla-thunderbird.svg\
+	pidgin.svg\
+	bmp.desktop\
+	maj.svg\
+	bmp.svg\
+	brasero.desktop\
+	synaptic.desktop\
+	brasero.svg\
+	synaptic.svg\
+	sysmon.svg\
+	mozilla-thunderbird.desktop\
+	system.svg\
+	terminal.svg\
+	mv.svg\
+	totem.desktop\
+	dessin.svg\
+	nautilus.svg\
+	totem.svg\
+	firefox.desktop\
+	net.svg\
+	update-manager.desktop\
+	firefox.svg\
+	ooc.svg\
+	f-spot.desktop\
+	ooo-calc.desktop
