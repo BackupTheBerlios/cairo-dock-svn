@@ -151,11 +151,15 @@ typedef struct _Icon {
 } Icon;
 
 
-#define CAIRO_DOCK_LAST_ORDER -1e9
+
+#define CAIRO_DOCK_DATA_DIR ".cairo-dock"
+#define CAIRO_DOCK_THEMES_DIR "themes"
+#define CAIRO_DOCK_CURRENT_THEME_NAME "current_theme"
+#define CAIRO_DOCK_LAUNCHERS_DIR "launchers"
 
 #define CAIRO_DOCK_MAIN_DOCK_NAME "_MainDock_"
 
-#define CAIRO_DOCK_THEMES_DIR "themes"
+#define CAIRO_DOCK_LAST_ORDER -1e9
 
 #define CAIRO_DOCK_UPDATE_DOCK_SIZE TRUE
 #define CAIRO_DOCK_ANIMATE_ICON TRUE

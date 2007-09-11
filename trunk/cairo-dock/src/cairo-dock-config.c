@@ -569,7 +569,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 			}
 			else if (strncmp (directoryList[i], "_ThemeDirectory_", 16) == 0)
 			{
-				g_cDefaultIconDirectory[j] = g_strdup_printf ("%s%s", g_cCurrentThemePath, directoryList[i]+16);
+				g_cDefaultIconDirectory[j] = g_strdup_printf ("%s/%s%s", g_cCurrentThemePath, CAIRO_DOCK_LAUNCHERS_DIR, directoryList[i]+16);
 			}
 			else
 			{
@@ -687,7 +687,11 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	g_fBackgroundImageWidth = 1e4;  // inutile de mettre a jour les decorations maintenant.
 	g_fBackgroundImageHeight = 1e4;
 	if (pDock->icons == NULL)
-		cairo_dock_build_docks_tree_with_desktop_files (pDock, g_cCurrentThemePath);
+	{
+		gchar *cLaunchersDir = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_LAUNCHERS_DIR);
+		cairo_dock_build_docks_tree_with_desktop_files (pDock, cLaunchersDir);
+		g_free (cLaunchersDir);
+	}
 	else
 		cairo_dock_reload_buffers_in_all_dock (g_hDocksTable);
 	

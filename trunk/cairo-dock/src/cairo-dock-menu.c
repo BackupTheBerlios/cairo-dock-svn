@@ -42,14 +42,13 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-notifications.h"
 #include "cairo-dock-menu.h"
 
-extern gchar *g_cCurrentThemeName;
-
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
 extern gchar *g_cLanguage;
 
 extern gchar *g_cConfFile;
-extern gchar *g_cCurrentThemePath;
+extern gchar *g_cCurrentLaunchersPath;
+
 
 extern gboolean g_bDirectionUp;
 
@@ -175,7 +174,7 @@ static void cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 	{
 		if (icon->acDesktopFileName != NULL)
 		{
-			gchar *icon_path = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon->acDesktopFileName);
+			gchar *icon_path = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
 			g_remove (icon_path);
 			g_free (icon_path);
 		}
@@ -221,7 +220,7 @@ static void cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data)
 	}
 	
 	//\___________________ On ouvre automatiquement l'IHM pour permettre de modifier ses champs.
-	gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cNewDesktopFileName);
+	gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, cNewDesktopFileName);
 	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cNewDesktopFilePath, "Fill this launcher", 300, 400, 0, NULL, NULL, NULL, NULL);
 	if (config_ok)
 	{
@@ -323,7 +322,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	CairoDock *pDock = data[0];
 	Icon *icon = data[1];
 	
-	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon->acDesktopFileName);
+	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
 	
 	cairo_dock_update_launcher_desktop_file (cDesktopFilePath, g_cLanguage);
 	

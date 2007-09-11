@@ -1027,7 +1027,7 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 		}
 	}
 	gpointer data[4] = {cReceivedData, pPointedIcon, &fOrder, pDock};
-	cairo_dock_register_notification (CAIRO_DOCK_DROP_DATA, cairo_dock_notification_drop_data, CAIRO_DOCK_RUN_AFTER);
+	cairo_dock_notify (CAIRO_DOCK_DROP_DATA, data);
 	
 	/*//\_________________ On l'ajoute dans le repertoire .cairo-dock.
 	GError *erreur = NULL;

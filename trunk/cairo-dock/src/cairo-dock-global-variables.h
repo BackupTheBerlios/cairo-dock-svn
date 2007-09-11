@@ -31,6 +31,7 @@ extern int g_iVisibleZoneHeight;
 extern GtkIconTheme *g_pIconTheme;
 extern gchar *g_cCairoDockDataDir;
 extern gchar *g_cCurrentThemePath;
+extern gchar *g_cCurrentLaunchersPath;
 
 extern cairo_surface_t *g_pVisibleZoneSurface;
 extern double g_fVisibleZoneImageWidth, g_fVisibleZoneImageHeight;

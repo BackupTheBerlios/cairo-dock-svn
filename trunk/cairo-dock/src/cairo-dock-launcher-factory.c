@@ -41,6 +41,7 @@ extern gchar *g_cLabelPolice;
 
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentThemePath;
+extern gchar *g_cCurrentLaunchersPath;
 extern gchar **g_cDefaultIconDirectory;
 extern GtkIconTheme *g_pIconTheme;
 
@@ -375,7 +376,7 @@ cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t 
 
 void cairo_dock_load_icon_info_from_desktop_file (gchar *cDesktopFileName, Icon *icon)
 {
-	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cDesktopFileName);
+	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, cDesktopFileName);
 	
 	GError *erreur = NULL;
 	GKeyFile* keyfile = g_key_file_new();

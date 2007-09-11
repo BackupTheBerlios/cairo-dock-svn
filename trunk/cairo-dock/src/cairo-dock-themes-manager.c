@@ -153,36 +153,6 @@ gchar *cairo_dock_get_chosen_theme (gchar *cConfFile, gboolean *bUseThemeBehavio
 }
 
 
-/*gchar *cairo_dock_get_theme_path (gchar *cThemeName, GHashTable *hThemeTable)
-{
-	if (cThemeName == NULL)
-		return NULL;
-	gchar *cUserThemePath;
-	const gchar *cThemePath = NULL;
-	if (hThemeTable != NULL)
-	{
-		cThemePath = g_hash_table_lookup (hThemeTable, cThemeName);
-		g_return_val_if_fail (cThemePath != NULL && g_file_test (cThemePath, G_FILE_TEST_IS_DIR), NULL);
-	}
-	
-	cUserThemePath = g_strdup_printf ("%s/%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_THEMES_DIR, cThemeName);
-	if (! g_file_test (cUserThemePath, G_FILE_TEST_EXISTS) && cThemePath != NULL)
-	{
-		gchar *cCommand = g_strdup_printf ("cp -r %s %s", cThemePath, cUserThemePath);
-		system (cCommand);
-		g_free (cCommand);
-	}
-	
-	gchar *cRememberFileName = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_REMEMBER_THEME_FILE);
-	g_file_set_contents (cRememberFileName,
-		cThemeName,
-		-1,
-		NULL);
-	g_free (cRememberFileName);
-	
-	return cUserThemePath;
-}*/
-
 void cairo_dock_load_theme (gchar *cThemePath)
 {
 	//g_print ("%s (%s)\n", __func__, cThemePath);
@@ -398,23 +368,23 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 			//\___________________ On charge les lanceurs.
 			if (g_key_file_get_boolean (pKeyFile, "Themes", "use theme launchers", NULL))
 			{
-				cCommand = g_strdup_printf ("rm -f '%s'/*.desktop", g_cCurrentThemePath);
+				cCommand = g_strdup_printf ("rm -f '%s/%s'/*", g_cCurrentThemePath, CAIRO_DOCK_LAUNCHERS_DIR);
 				g_print ("%s\n", cCommand);
 				system (cCommand);
 				g_free (cCommand);
 				
-				cCommand = g_strdup_printf ("cp '%s'/*.desktop '%s'", cNewThemePath, g_cCurrentThemePath);
+				cCommand = g_strdup_printf ("cp '%s/%s'/* '%s/%s'", cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR, g_cCurrentThemePath, CAIRO_DOCK_LAUNCHERS_DIR);
 				g_print ("%s\n", cCommand);
 				system (cCommand);
 				g_free (cCommand);
 			}
 			//\___________________ On remplace tous les autres fichiers par les nouveaux.
-			cCommand = g_strdup_printf ("find '%s' -mindepth 1 -maxdepth 1  ! -name '*.conf' ! -name '*.desktop' -exec rm -rf '{}' \\;", g_cCurrentThemePath);
+			cCommand = g_strdup_printf ("find '%s' -mindepth 1 -maxdepth 1  ! -name '*.conf' ! -name %s -exec rm -rf '{}' \\;", g_cCurrentThemePath, CAIRO_DOCK_LAUNCHERS_DIR);
 			g_print ("%s\n", cCommand);
 			system (cCommand);
 			g_free (cCommand);
 			
-			cCommand = g_strdup_printf ("find '%s'/* -prune ! -name '*.conf' ! -name '*.desktop' -exec /bin/cp -r '{}' '%s' \\;", cNewThemePath, g_cCurrentThemePath);
+			cCommand = g_strdup_printf ("find '%s'/* -prune ! -name '*.conf' ! -name %s -exec /bin/cp -r '{}' '%s' \\;", cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR, g_cCurrentThemePath);
 			g_print ("%s\n", cCommand);
 			system (cCommand);
 			g_free (cCommand);

@@ -87,10 +87,6 @@
 #include "cairo-dock-themes-manager.h"
 #include "cairo-dock-notifications.h"
 
-#define CAIRO_DOCK_DATA_DIR ".cairo-dock"
-#define CAIRO_DOCK_CURRENT_THEME_NAME "current_theme"
-//#define CAIRO_DOCK_CONF_FILE "cairo-dock.conf"
-
 CairoDock *g_pMainDock;  // pointeur sur le dock principal.
 GHashTable *g_hDocksTable = NULL;  // table des docks existant.
 int g_iWmHint;  // hint pour la fenetre du dock principal.
@@ -107,6 +103,7 @@ double g_fScrollAcceleration;  // acceleration du defilement quand il revient a 
 gboolean g_bForceLoop;
 
 gchar *g_cCurrentThemePath = NULL;  // le chemin vers le repertoire du theme courant.
+gchar *g_cCurrentLaunchersPath = NULL;  // le chemin vers le repertoire des lanceurs/icones du theme courant.
 gchar *g_cConfFile = NULL;  // le chemin du fichier de conf.
 gchar **g_cDefaultIconDirectory = NULL;  // les repertoires ou on va chercher les icones avant d'aller chercher dans le theme d'icones.
 GtkIconTheme *g_pIconTheme = NULL;  // le theme d'icone choisi.
@@ -331,11 +328,19 @@ main (int argc, char** argv)
 		if (g_mkdir (g_cCurrentThemePath, 7*8*8+7*8+5) != 0)
 			g_print ("Attention : couldn't create directory %s\n", g_cCurrentThemePath);
 	}
+	g_cCurrentLaunchersPath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_LAUNCHERS_DIR);
+	if (! g_file_test (g_cCurrentLaunchersPath, G_FILE_TEST_IS_DIR))
+	{
+		g_print ("\nMessage à caractère informatif : les fichiers .desktop et leurs icônes sont désormais dans le sous-répertoire 'launchers' du theme courant\nDésolé pour la gêne occasionnée ^_^\n\n");
+		if (g_mkdir (g_cCurrentLaunchersPath, 7*8*8+7*8+5) != 0)
+			g_print ("Attention : couldn't create directory %s\n", g_cCurrentLaunchersPath);
+	}
+	
 	
 	//\___________________ On enregistre nos notifications.
 	cairo_dock_register_notification (CAIRO_DOCK_BUILD_MENU, (CairoDockNotificationFunc) cairo_dock_notification_build_menu, CAIRO_DOCK_RUN_AFTER);
-	
-	
+	cairo_dock_register_notification (CAIRO_DOCK_DROP_DATA, (CairoDockNotificationFunc) cairo_dock_notification_drop_data, CAIRO_DOCK_RUN_AFTER);
+
 	
 	//\___________________ On charge le dernier theme ou on demande a l'utilisateur d'en choisir un.
 	g_cConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);

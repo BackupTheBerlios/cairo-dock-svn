@@ -304,8 +304,24 @@ void cairo_dock_reload_buffers_in_all_dock (GHashTable *hDocksTable)
 	g_hash_table_foreach (hDocksTable, (GHFunc) cairo_dock_reload_buffers_in_dock, NULL);
 }
 
-
-
+gchar *cairo_dock_generate_file_path (gchar *cImageFile)
+{
+	g_return_val_if_fail (cImageFile != NULL, NULL);
+	gchar *cImagePath;
+	if (*cImageFile == '~')
+	{
+		cImagePath = g_strdup_printf ("%s%s", getenv("HOME"), cImageFile + 1);
+	}
+	else if (*cImageFile == '/')
+	{
+		cImagePath = g_strdup (cImageFile);
+	}
+	else
+	{
+		cImagePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cImageFile);
+	}
+	return cImagePath;
+}
 
 cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFile, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern)
 {
@@ -314,19 +330,7 @@ cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFi
 	
 	if (cImageFile != NULL)
 	{
-		gchar *cImagePath;
-		if (*cImageFile == '~')
-		{
-			cImagePath = g_strdup_printf ("%s%s", getenv("HOME"), cImageFile + 1);
-		}
-		else if (*cImageFile == '/')
-		{
-			cImagePath = g_strdup (cImageFile);
-		}
-		else
-		{
-			cImagePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cImageFile);
-		}
+		gchar *cImagePath = cairo_dock_generate_file_path (cImageFile);
 		
 		pNewSurface = cairo_dock_create_surface_from_image (cImagePath,
 			pSourceContext,

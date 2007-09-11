@@ -671,10 +671,10 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 				prev_icon = (ic->prev != NULL ? ic->prev->data : cairo_dock_get_last_icon (pIconList));
 				icon->fX = prev_icon->fX + prev_icon->fWidth * prev_icon->fScale + g_iIconGap;
 				
-				if (icon->fX + icon->fWidth * icon->fScale > icon->fXMax - g_fAmplitude * icon->fWidth / 6 && iWidth != 0)  /// && icon->fPhase == G_PI
+				if (icon->fX + icon->fWidth * icon->fScale > icon->fXMax - g_fAmplitude * icon->fWidth / 10 && iWidth != 0)  /// && icon->fPhase == G_PI
 				{
 					//g_print ("  on contraint %s (fXMax=%.2f , fX=%.2f\n", prev_icon->acName, prev_icon->fXMax, prev_icon->fX);
-					fDeltaExtremum = icon->fX + icon->fWidth * icon->fScale - (icon->fXMax - g_fAmplitude * icon->fWidth / 12);
+					fDeltaExtremum = icon->fX + icon->fWidth * icon->fScale - (icon->fXMax - g_fAmplitude * icon->fWidth / 20);
 					icon->fX -= fDeltaExtremum * (1 - (prev_icon->fScale - 1) / g_fAmplitude);
 					///icon->fX = icon->fXMax - icon->fWidth * icon->fScale - g_fAmplitude * icon->fWidth / 16;
 				}
@@ -728,10 +728,10 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 		
 		prev_icon->fX = icon->fX - g_iIconGap - prev_icon->fWidth * prev_icon->fScale;
 		//g_print ("fX <- %.2f; fXMin : %.2f\n", prev_icon->fX, prev_icon->fXMin);
-		if (prev_icon->fX < prev_icon->fXMin + g_fAmplitude * prev_icon->fWidth / 6 && iWidth != 0 && x_abs < iWidth)  /// && prev_icon->fPhase == 0 
+		if (prev_icon->fX < prev_icon->fXMin + g_fAmplitude * prev_icon->fWidth / 10 && iWidth != 0 && x_abs < iWidth)  /// && prev_icon->fPhase == 0 
 		{
 			//g_print ("  on contraint %s (fXMin=%.2f , fX=%.2f\n", prev_icon->acName, prev_icon->fXMin, prev_icon->fX);
-			fDeltaExtremum = prev_icon->fX - (prev_icon->fXMin + g_fAmplitude * prev_icon->fWidth / 12);
+			fDeltaExtremum = prev_icon->fX - (prev_icon->fXMin + g_fAmplitude * prev_icon->fWidth / 20);
 			prev_icon->fX -= fDeltaExtremum * (1 - (prev_icon->fScale - 1) / g_fAmplitude);
 			///prev_icon->fX = prev_icon->fXMin + g_fAmplitude * prev_icon->fWidth / 16;
 		}

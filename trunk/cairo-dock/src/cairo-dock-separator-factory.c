@@ -51,7 +51,8 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 	cairo_surface_t *pNewSurface = NULL;
 	if (g_cSeparatorImage != NULL)
 	{
-		gchar *cImagePath = cairo_dock_search_image_path (g_cSeparatorImage);
+		//gchar *cImagePath = cairo_dock_search_image_path (g_cSeparatorImage);
+		gchar *cImagePath = cairo_dock_generate_file_path (g_cSeparatorImage);
 		double fRotationAngle;
 		if (! g_bRevolveSeparator)
 			fRotationAngle = 0;
@@ -79,30 +80,6 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 			FALSE);
 		g_free (cImagePath);
 	}
-	/*else
-	{
-		int iLineWidth = g_iDockLineWidth;
-		
-		double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
-		cairo_dock_calculate_contrainted_icon_size (fWidth, fHeight, g_tMinIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12], g_tMinIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12], g_tMaxIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12], g_tMaxIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12], &fIconWidthSaturationFactor, &fIconHeightSaturationFactor);
-		
-		pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-			CAIRO_CONTENT_COLOR_ALPHA,
-			ceil ((*fWidth) * fMaxScale),
-			ceil ((*fHeight) * fMaxScale));
-		cairo_t *pCairoContext = cairo_create (pNewSurface);
-		cairo_save (pCairoContext);
-		cairo_translate (pCairoContext, fMaxScale * (*fWidth) / 2, fMaxScale * (*fHeight) / 2);
-		cairo_scale (pCairoContext, fMaxScale * (*fWidth) / 2., fMaxScale * (*fHeight - iLineWidth) / 2.);
-		cairo_arc (pCairoContext, 0., 0., 1., 0., 2 * G_PI);
-		cairo_restore (pCairoContext);
-		
-		cairo_set_source_rgba (pCairoContext, g_fLineColor[0], g_fLineColor[1], g_fLineColor[2], g_fLineColor[3]);
-		cairo_set_line_width (pCairoContext, iLineWidth);
-		cairo_stroke (pCairoContext);
-		
-		cairo_destroy (pCairoContext);
-	}*/
 	return pNewSurface;
 }
 
@@ -121,8 +98,8 @@ Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorT
 	icon->pIconBuffer = pSeparatorSurface;
 	icon->fWidth = fWidth;
 	icon->fHeight = fHeight;
-	Icon * pLastLauncher = cairo_dock_get_last_launcher (pDock->icons);
-	icon->fOrder = (pLastLauncher != NULL ? pLastLauncher->fOrder + 1 : 1);
+	//Icon * pLastLauncher = cairo_dock_get_last_launcher (pDock->icons);
+	//icon->fOrder = (pLastLauncher != NULL ? pLastLauncher->fOrder + 1 : 1);
 	icon->iType = iSeparatorType;
 	
 	return icon;

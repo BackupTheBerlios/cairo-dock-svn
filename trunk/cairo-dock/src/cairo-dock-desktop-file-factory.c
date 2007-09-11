@@ -32,8 +32,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 extern GHashTable *g_hDocksTable;
 extern gchar *g_cCurrentThemePath;
+extern gchar *g_cCurrentLaunchersPath;
 extern gchar *g_cLanguage;
-extern CairoDockFileManagerFunc cairo_dock_add_uri_func;
 
 
 gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur)
@@ -75,10 +75,10 @@ gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, gchar *cDockName, doub
 		g_key_file_set_string (pKeyFile, "Desktop Entry", "Exec command", "echo 'edit me !'");
 		
 		//\___________________ On lui choisit un nom de fichier tel qu'il n'y ait pas de collision.
-		cNewDesktopFileName = cairo_dock_generate_desktop_filename (g_cCurrentThemePath);
+		cNewDesktopFileName = cairo_dock_generate_desktop_filename (g_cCurrentLaunchersPath);
 		
 		//\___________________ On ecrit tout.
-		gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cNewDesktopFileName);
+		gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, cNewDesktopFileName);
 		cairo_dock_write_keys_to_file (pKeyFile, cNewDesktopFilePath);
 		g_free (cNewDesktopFilePath);
 		g_key_file_free (pKeyFile);
@@ -101,7 +101,7 @@ gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, gchar *cDockName, doub
 		g_key_file_set_boolean (pKeyFile, "Desktop Entry", "Is container", FALSE);
 		g_key_file_set_boolean (pKeyFile, "Desktop Entry", "Is URI", FALSE);
 		
-		gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cNewDesktopFileName);
+		gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, cNewDesktopFileName);
 		cairo_dock_write_keys_to_file (pKeyFile, cNewDesktopFilePath);
 		g_key_file_free (pKeyFile);
 		
@@ -110,15 +110,6 @@ gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, gchar *cDockName, doub
 		g_free (cDesktopFileTemplate);
 		g_free (cNewDesktopFilePath);
 	}
-	/*else if (cairo_dock_add_uri_func != NULL)
-	{
-		cNewDesktopFileName = cairo_dock_add_uri_func (cURI, cDockName, fEffectiveOrder, pDock, &tmp_erreur);
-		if (tmp_erreur != NULL)
-		{
-			g_propagate_error (erreur, tmp_erreur);
-			return NULL;
-		}
-	}*/
 	
 	return cNewDesktopFileName;
 }
