@@ -13,4 +13,5 @@ launchers_DATA = \
 	06musique.desktop\
 	terminal.svg\
 	gaim.svg\
-	07synaptic.desktop
+	07synaptic.desktop\
+	synaptic.png

@@ -41,7 +41,7 @@ extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
 extern int g_iIconGap;
 
-extern gchar *g_cCurrentThemePath;
+extern gchar *g_cCurrentLaunchersPath;
 
 extern double g_fAmplitude;
 extern int g_iSinusoidWidth;
@@ -308,7 +308,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 		
 		if (icon1->acDesktopFileName != NULL)
 		{
-			cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon1->acDesktopFileName);
+			cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon1->acDesktopFileName);
 			pKeyFile = g_key_file_new();
 			g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 			if (erreur != NULL)
@@ -326,7 +326,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 		
 		if (icon2->acDesktopFileName != NULL)
 		{
-			cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon2->acDesktopFileName);
+			cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon2->acDesktopFileName);
 			pKeyFile = g_key_file_new();
 			g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 			if (erreur != NULL)
@@ -392,7 +392,7 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 	if (CAIRO_DOCK_IS_LAUNCHER (icon1) && icon1->acDesktopFileName != NULL)
 	{
 		GError *erreur = NULL;
-		gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon1->acDesktopFileName);
+		gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon1->acDesktopFileName);
 		GKeyFile* pKeyFile = g_key_file_new();
 		g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 		if (erreur != NULL)
@@ -675,7 +675,7 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 				{
 					//g_print ("  on contraint %s (fXMax=%.2f , fX=%.2f\n", prev_icon->acName, prev_icon->fXMax, prev_icon->fX);
 					fDeltaExtremum = icon->fX + icon->fWidth * icon->fScale - (icon->fXMax - g_fAmplitude * icon->fWidth / 20);
-					icon->fX -= fDeltaExtremum * (1 - (prev_icon->fScale - 1) / g_fAmplitude);
+					icon->fX -= fDeltaExtremum * (1 - (icon->fScale - 1) / g_fAmplitude);
 					///icon->fX = icon->fXMax - icon->fWidth * icon->fScale - g_fAmplitude * icon->fWidth / 16;
 				}
 			}
@@ -950,7 +950,7 @@ void cairo_dock_update_icon_s_container_name (Icon *icon, gchar *cNewParentDockN
 	
 	if (icon->acDesktopFileName != NULL)
 	{
-		gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon->acDesktopFileName);
+		gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
 		
 		GError *erreur = NULL;
 		GKeyFile *pKeyFile = g_key_file_new ();

@@ -64,7 +64,7 @@ extern gboolean g_bTextAlwaysHorizontal;
 extern gchar **g_cDefaultIconDirectory;
 extern GtkIconTheme *g_pIconTheme;
 static gboolean s_bUserTheme = FALSE;
-extern gchar *g_cCurrentThemePath;
+extern gchar *g_cCurrentLaunchersPath;
 extern gchar *g_cConfFile;
 
 extern int g_iVisibleZoneWidth;
@@ -569,7 +569,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 			}
 			else if (strncmp (directoryList[i], "_ThemeDirectory_", 16) == 0)
 			{
-				g_cDefaultIconDirectory[j] = g_strdup_printf ("%s/%s%s", g_cCurrentThemePath, CAIRO_DOCK_LAUNCHERS_DIR, directoryList[i]+16);
+				g_cDefaultIconDirectory[j] = g_strdup_printf ("%s%s", g_cCurrentLaunchersPath, directoryList[i]+16);
 			}
 			else
 			{
@@ -688,9 +688,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	g_fBackgroundImageHeight = 1e4;
 	if (pDock->icons == NULL)
 	{
-		gchar *cLaunchersDir = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_LAUNCHERS_DIR);
-		cairo_dock_build_docks_tree_with_desktop_files (pDock, cLaunchersDir);
-		g_free (cLaunchersDir);
+		cairo_dock_build_docks_tree_with_desktop_files (pDock, g_cCurrentLaunchersPath);
 	}
 	else
 		cairo_dock_reload_buffers_in_all_dock (g_hDocksTable);
@@ -1188,6 +1186,7 @@ void cairo_dock_replace_values_in_conf_file (gchar *cConfFilePath, GKeyFile *pVa
 
 void cairo_dock_replace_keys_by_identifier (gchar *cConfFilePath, gchar *cReplacementConfFilePath, gchar iIdentifier)
 {
+	g_print ("%s (%s <- %s, '%c')\n", __func__, cConfFilePath, cReplacementConfFilePath, iIdentifier);
 	GError *erreur = NULL;
 	GKeyFile *pReplacementKeyFile = g_key_file_new ();
 	g_key_file_load_from_file (pReplacementKeyFile, cReplacementConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);

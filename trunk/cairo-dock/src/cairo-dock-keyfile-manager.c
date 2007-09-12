@@ -217,6 +217,23 @@ static gboolean _cairo_dock_select_one_item_in_tree (GtkTreeSelection * selectio
 	return TRUE;
 }
 
+
+static void _cairo_dock_show_image_preview (GtkFileChooser *pFileChooser, GtkImage *pPreviewImage)
+{
+	gchar *cFileName = gtk_file_chooser_get_preview_filename (pFileChooser);
+	if (cFileName == NULL)
+		return ;
+	GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_size (cFileName, 64, 64, NULL);
+	g_free (cFileName);
+	if (pixbuf != NULL)
+	{
+		gtk_image_set_from_pixbuf (pPreviewImage, pixbuf);
+		gdk_pixbuf_unref (pixbuf);
+		gtk_file_chooser_set_preview_widget_active (pFileChooser, TRUE);
+	}
+	else
+		gtk_file_chooser_set_preview_widget_active (pFileChooser, FALSE);
+}
 static void _cairo_dock_pick_a_file (GtkButton *button, gpointer *data)
 {
 	GtkEntry *pEntry = data[0];
@@ -236,6 +253,11 @@ static void _cairo_dock_pick_a_file (GtkButton *button, gpointer *data)
 	gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (pFileChooserDialog), cDirectoryPath);
 	g_free (cDirectoryPath);
 	gtk_file_chooser_set_select_multiple (GTK_FILE_CHOOSER (pFileChooserDialog), FALSE);
+	
+	GtkWidget *pPreviewImage = gtk_image_new ();
+	gtk_file_chooser_set_preview_widget (GTK_FILE_CHOOSER (pFileChooserDialog), pPreviewImage);
+	g_signal_connect (GTK_FILE_CHOOSER (pFileChooserDialog), "update-preview", G_CALLBACK (_cairo_dock_show_image_preview), pPreviewImage);
+	
 	gtk_widget_show (pFileChooserDialog);
 	int answer = gtk_dialog_run (GTK_DIALOG (pFileChooserDialog));
 	if (answer == GTK_RESPONSE_OK)
@@ -674,7 +696,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								}
 								
 								k = 0;
-								int iSelectedItem = 0;
+								int iSelectedItem = -1;
 								while (pAuthorizedValuesList[k] != NULL)
 								{
 									GtkTreeIter iter;
@@ -697,17 +719,6 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									gtk_label_set_use_markup  (GTK_LABEL (pDescriptionLabel), TRUE);
 									g_signal_connect (G_OBJECT (pOneWidget), "changed", G_CALLBACK (_cairo_dock_select_one_item_in_combo), pDescriptionLabel);
 								}
-								/*pOneWidget = (iElementType != 'E' ? gtk_combo_box_new_text () : gtk_combo_box_entry_new_text ());
-								int iSelectedElement = -1;
-								k = 0;
-								while (pAuthorizedValuesList[k] != NULL)
-								{
-									gtk_combo_box_append_text (GTK_COMBO_BOX (pOneWidget), pAuthorizedValuesList[k]);
-									if (iSelectedElement == -1 && strcmp (cValue, pAuthorizedValuesList[k]) == 0)
-										iSelectedElement = k;
-									k ++;
-								}
-								gtk_combo_box_set_active (GTK_COMBO_BOX (pOneWidget), iSelectedElement);*/
 							}
 							pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
 							gtk_box_pack_start (GTK_BOX (pHBox),
@@ -1026,7 +1037,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	}
 	
 	gtk_widget_show_all (dialog);
-	gtk_notebook_set_current_page (pNoteBook, iPresentedNumPage);
+	gtk_notebook_set_current_page (GTK_NOTEBOOK (pNoteBook), iPresentedNumPage);
 	
 	g_strfreev (pGroupList);
 	
@@ -1190,13 +1201,16 @@ static void _cairo_dock_get_each_widget_value (gpointer *data, GKeyFile *pKeyFil
 	{
 		GtkTreeIter iter;
 		gchar *cValue =  NULL;
-		if (gtk_combo_box_get_active_iter   (GTK_COMBO_BOX (pOneWidget), &iter))
+		if (GTK_IS_COMBO_BOX_ENTRY (pOneWidget))
+		{
+			cValue = gtk_combo_box_get_active_text (GTK_COMBO_BOX (pOneWidget));
+		}
+		else if (gtk_combo_box_get_active_iter (GTK_COMBO_BOX (pOneWidget), &iter))
 		{
 			GtkTreeModel *model = gtk_combo_box_get_model (GTK_COMBO_BOX (pOneWidget));
 			if (model != NULL)
 				gtk_tree_model_get (model, &iter, CAIRO_DOCK_MODEL_NAME, &cValue, -1);
 		}
-		///gchar *cValue = gtk_combo_box_get_active_text (GTK_COMBO_BOX (pOneWidget));
 		g_key_file_set_string (pKeyFile, cGroupName, cKeyName, (cValue != NULL ? cValue : ""));
 		g_free (cValue);
 	}
@@ -1361,7 +1375,7 @@ void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pRepla
 				
 				if (cComment == NULL || strlen (cComment) < 2 || cComment[1] != iIdentifier)
 				{
-					g_print ("  on saute %s;%s (%s)\n", cGroupName, cKeyName, cComment);
+					//g_print ("  on saute %s;%s (%s)\n", cGroupName, cKeyName, cComment);
 					g_free (cComment);
 					j ++;
 					continue ;

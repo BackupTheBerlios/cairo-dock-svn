@@ -54,7 +54,7 @@ extern gboolean g_bTextAlwaysHorizontal;
 
 extern gboolean g_bAutoHide;
 
-extern gchar *g_cCurrentThemePath;
+extern gchar *g_cCurrentLaunchersPath;
 
 extern gboolean g_bDirectionUp;
 
@@ -566,6 +566,7 @@ static void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDo
 }
 void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar *cDirectory)
 {
+	//g_print ("%s (%s)\n", __func__, cDirectory);
 	GDir *dir = g_dir_open (cDirectory, 0, NULL);
 	g_return_if_fail (dir != NULL);
 	
@@ -671,7 +672,7 @@ void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *Rec
 			icon->pSubDock = NULL;
 		}
 		
-		cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon->acDesktopFileName);
+		cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
 		
 		if (ReceivingDock == NULL || cReceivingDockName == NULL)  // alors on les jete.
 		{
