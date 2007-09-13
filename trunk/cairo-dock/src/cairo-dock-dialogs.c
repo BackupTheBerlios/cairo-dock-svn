@@ -192,7 +192,7 @@ CairoDockDialog *cairo_dock_build_dialog (gchar *cText, Icon *pIcon, CairoDock *
 	gtk_widget_show_all (pWindow);
 	
 	
-	//\________________ On dessine le texte une fois pour toutes.
+	//\________________ On dessine le texte dans une surface tampon.
 	int iLabelSize = (g_iLabelSize > 0 ? g_iLabelSize : 14);
 	cairo_t *pSourceContext = gdk_cairo_create (pWindow->window);
 	cairo_set_source_rgba (pSourceContext, 0., 0., 0., 0.);

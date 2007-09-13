@@ -163,8 +163,8 @@ static void cairo_dock_show_subdock (Icon *pPointedIcon, int iMouseX, gboolean b
 	//g_print ("MaJ de pLastPointedDock\n");
 	
 	pSubDock->bAtBottom = FALSE;
-	///gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
-	GtkWidget *dialog = cairo_dock_build_dialog ("Pouet poueT", pPointedIcon, pDock);  // pour test seulement.
+	gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
+	///GtkWidget *dialog = cairo_dock_build_dialog ("Pouet poueT", pPointedIcon, pDock);  // pour test seulement.
 }
 
 gboolean on_motion_notify2 (GtkWidget* pWidget,
