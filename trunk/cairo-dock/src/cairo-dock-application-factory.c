@@ -259,6 +259,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	Icon * pLastAppli = cairo_dock_get_last_appli (pDock->icons);
 	icon->fOrder = (pLastAppli != NULL ? pLastAppli->fOrder + 1 : 1);
 	icon->iType = CAIRO_DOCK_APPLI;
+	icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
 	
 	icon->fWidth = fWidth;
 	icon->fHeight = fHeight;

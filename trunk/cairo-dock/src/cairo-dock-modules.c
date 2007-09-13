@@ -284,6 +284,7 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 	{
 		icon->pModule = module;
 		icon->iType = CAIRO_DOCK_APPLET;
+		icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
 	}
 	module->bActive = TRUE;
 	return icon;

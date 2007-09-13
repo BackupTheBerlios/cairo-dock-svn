@@ -7,6 +7,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 ******************************************************************************/
 #include <stdlib.h>
+#include <math.h>
 
 #ifdef HAVE_GLITZ
 #include <gdk/gdkx.h>
@@ -21,6 +22,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 extern gboolean g_bSticky;
 extern gboolean g_bKeepAbove;
 extern gboolean g_bAutoHide;
+extern int g_iVisibleZoneWidth, g_iVisibleZoneHeight;
+extern double g_fAmplitude;
 
 extern int g_iLabelSize;
 extern gchar *g_cLabelPolice;
@@ -31,8 +34,19 @@ extern int g_iDockLineWidth;
 extern int g_iDockRadius;
 extern double g_fLineColor[4];
 
-#define CAIRO_DOCK_DIALOG_GAP 20
+#define CAIRO_DOCK_DIALOG_DEFAULT_GAP 20
+#define CAIRO_DOCK_DIALOG_TIP_MARGIN 20
+#define CAIRO_DOCK_DIALOG_TIP_BASE 20
 
+
+void cairo_dock_free_dialog (CairoDockDialog *pDialog)
+{
+	cairo_surface_destroy (pDialog->pTextBuffer);
+	pDialog->pTextBuffer = NULL;
+	gtk_widget_destroy (pDialog->pWidget);
+	pDialog->pWidget = NULL;
+	g_free (pDialog);
+}
 
 static gboolean on_button_press_dialog (GtkWidget* pWidget,
 	GdkEventButton* pButton,
@@ -54,6 +68,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	CairoDockDialog *pDialog)
 {
 	g_print ("%s ()\n", __func__);
+	
 	
 	double fLineWidth = g_iDockLineWidth;
 	double fRadius = (pDialog->iTextHeight + fLineWidth - 2 * g_iDockRadius > 0 ? g_iDockRadius : (pDialog->iTextHeight + fLineWidth) / 2 - 1);
@@ -82,7 +97,25 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 		0, sens * fRadius,
 		-fRadius, sens * fRadius);
 	
-	cairo_rel_line_to (pCairoContext, -iWidth + fLineWidth + 2 * fRadius, 0);
+	// La pointe.
+	double cos_gamma = 1 / sqrt (1. + 1. * (CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE) / pDialog->iGapFromDock * (CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE) / pDialog->iGapFromDock);
+	double cos_theta = 1 / sqrt (1. + 1. * CAIRO_DOCK_DIALOG_TIP_MARGIN / pDialog->iGapFromDock * CAIRO_DOCK_DIALOG_TIP_MARGIN / pDialog->iGapFromDock);
+	double fTipHeight = pDialog->iGapFromDock / (1. + fLineWidth / 2. / CAIRO_DOCK_DIALOG_TIP_BASE * (1./cos_gamma + 1./cos_theta));
+	if (pDialog->bRight)
+	{
+		cairo_rel_line_to (pCairoContext, -iWidth + fLineWidth + 2. * fRadius + CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE, 0);
+		cairo_rel_line_to (pCairoContext, - (CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE), fTipHeight);
+		cairo_rel_line_to (pCairoContext, CAIRO_DOCK_DIALOG_TIP_MARGIN, - fTipHeight);
+		cairo_rel_line_to (pCairoContext, - CAIRO_DOCK_DIALOG_TIP_MARGIN, 0);
+	}
+	else
+	{
+		cairo_rel_line_to (pCairoContext, - CAIRO_DOCK_DIALOG_TIP_MARGIN, 0);
+		cairo_rel_line_to (pCairoContext, CAIRO_DOCK_DIALOG_TIP_MARGIN, fTipHeight);
+		cairo_rel_line_to (pCairoContext, - (CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE), - fTipHeight);
+		cairo_rel_line_to (pCairoContext, -iWidth + fLineWidth + 2 * fRadius + CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE, 0);
+	}
+	
 	// Bottom Left
 	cairo_rel_curve_to (pCairoContext,
 		0, 0,
@@ -98,7 +131,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 		cairo_close_path (pCairoContext);
 	
 	cairo_save (pCairoContext);
-	cairo_set_source_rgba (pCairoContext, 1., 1., 1., .5);
+	cairo_set_source_rgba (pCairoContext, 1., 1., 1., .6);
 	cairo_fill_preserve (pCairoContext);
 	cairo_restore (pCairoContext);
 	
@@ -125,15 +158,18 @@ static gboolean on_configure_dialog (GtkWidget* pWidget,
 	pDialog->iWidth = pEvent->width;
 	pDialog->iHeight = pEvent->height;
 	
-	
 	return FALSE;
 }
 
 
-GtkWidget *cairo_dock_build_dialog (gchar *cText, Icon *pIcon, CairoDock *pDock)
+CairoDockDialog *cairo_dock_build_dialog (gchar *cText, Icon *pIcon, CairoDock *pDock)
 {
 	g_return_val_if_fail (cText != NULL, NULL);
+	CairoDockDialog *pDialog = g_new0 (CairoDockDialog, 1);
+	
+	//\________________ On construit la fenetre du dialogue.
 	GtkWidget* pWindow = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+	pDialog->pWidget = pWindow;
 	
 	if (g_bSticky)
 		gtk_window_stick (GTK_WINDOW (pWindow));
@@ -152,15 +188,11 @@ GtkWidget *cairo_dock_build_dialog (gchar *cText, Icon *pIcon, CairoDock *pDock)
 	gtk_window_set_resizable (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_title (GTK_WINDOW (pWindow), "cairo-dock-dialog");
 	
-	
 	gtk_widget_add_events (pWindow, GDK_BUTTON_PRESS_MASK);
-	
-	CairoDockDialog *pDialog = g_new0 (CairoDockDialog, 1);
-	pDialog->pWidget = pWindow;
-	
-	
 	gtk_widget_show_all (pWindow);
 	
+	
+	//\________________ On dessine le texte une fois pour toutes.
 	int iLabelSize = (g_iLabelSize > 0 ? g_iLabelSize : 14);
 	cairo_t *pSourceContext = gdk_cairo_create (pWindow->window);
 	cairo_set_source_rgba (pSourceContext, 0., 0., 0., 0.);
@@ -196,22 +228,30 @@ GtkWidget *cairo_dock_build_dialog (gchar *cText, Icon *pIcon, CairoDock *pDock)
 	cairo_destroy (pSurfaceContext);
 	
 	
+	//\________________ On definit les parametres de notre dialogue.
+	cairo_dock_dialog_calculate_aimed_point (pIcon, pDock, &pDialog->iAimedX, &pDialog->iAimedY, &pDialog->bRight, &pDialog->iGapFromDock);
+	
 	double fLineWidth = g_iDockLineWidth;
 	double fRadius = (pDialog->iTextHeight + fLineWidth - 2 * g_iDockRadius > 0 ? g_iDockRadius : (pDialog->iTextHeight + fLineWidth) / 2 - 1);
-	int iDialogPositionX, iDialogPositionY, iWidth, iHeight;
-	iWidth = ink.width + 2 * fRadius + fLineWidth;
-	iHeight = ink.height + CAIRO_DOCK_DIALOG_GAP;
-	if ((pDock->iRefCount > 0 && ! pDock->bInside) || (pDock->iRefCount == 0 && (pDock->bInside || ! g_bAutoHide)))
+	pDialog->iWidth = ink.width + 2 * fRadius + fLineWidth;
+	pDialog->iHeight = ink.height + pDialog->iGapFromDock;
+	
+	if (pDialog->bRight)
 	{
-		iDialogPositionX = pDock->iWindowPositionX + pIcon->fDrawX + pIcon->fWidth * pIcon->fScale / 2 - iWidth / 2;
-		iDialogPositionY = pDock->iWindowPositionY - iHeight;
+		pDialog->iPositionX = pDialog->iAimedX - fRadius - fLineWidth / 2;
 	}
+	else
+	{
+		pDialog->iPositionX = pDialog->iAimedX - fRadius - fLineWidth / 2 - ink.width;
+	}
+	pDialog->iPositionY = pDock->iWindowPositionY - pDialog->iHeight;
+	
 	gdk_window_move_resize (pWindow->window,
-		iDialogPositionX,
-		iDialogPositionY,
-		iWidth,
-		iHeight);
-	g_print ("%s () : (%d;%d) %dx%d\n", __func__, iDialogPositionX, iDialogPositionY, iWidth, iHeight);
+		pDialog->iPositionX,
+		pDialog->iPositionY,
+		pDialog->iWidth,
+		pDialog->iHeight);
+	g_print ("%s () : (%d;%d) %dx%d\n", __func__, pDialog->iPositionX, pDialog->iPositionY, pDialog->iWidth, pDialog->iHeight);
 	
 	g_signal_connect (G_OBJECT (pWindow),
 		"expose-event",
@@ -227,4 +267,37 @@ GtkWidget *cairo_dock_build_dialog (gchar *cText, Icon *pIcon, CairoDock *pDock)
 		pDialog);
 	
 	return pDialog;
+}
+
+
+void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int *iX, int *iY, gboolean *bRight, int *iGapFromDock)
+{
+	if (pDock->iRefCount == 0 && pDock->bAtBottom && g_bAutoHide)  // un dock principal au repos.
+	{
+		if (g_bAutoHide)
+		{
+			*iX = pDock->iWindowPositionX + (pIcon->fXAtRest + pIcon->fWidth / 2) / pDock->iMinDockWidth * g_iVisibleZoneWidth;
+			*iGapFromDock = pDock->iMaxIconHeight * (1 + g_fAmplitude) + g_iLabelSize - g_iVisibleZoneHeight;
+		}
+		else
+		{
+			*iX = pDock->iWindowPositionX + pIcon->fXAtRest + pIcon->fWidth / 2;
+			*iGapFromDock = pDock->iMaxIconHeight * g_fAmplitude + g_iLabelSize;
+		}
+		*iY = pDock->iWindowPositionY - pDock->iCurrentHeight;
+		*bRight = (pIcon->fXAtRest > pDock->iMinDockWidth / 2);
+	}
+	else if (pDock->iRefCount > 0 && pDock->bAtBottom)  // sous-dock invisible.
+	{
+		CairoDock *pParentDock = NULL;
+		Icon *pPointingIcon = cairo_dock_search_icon_pointing_on_dock (pDock, &pParentDock);
+		cairo_dock_dialog_calculate_aimed_point (pPointingIcon, pParentDock, iX, iY, bRight, iGapFromDock);
+	}
+	else  // dock actif.
+	{
+		*iX = pDock->iWindowPositionX + pIcon->fDrawX + pIcon->fWidth * pIcon->fScale / 2;
+		*iY = pDock->iWindowPositionY - pDock->iCurrentHeight;
+		*bRight = (pIcon->fXAtRest > pDock->iMinDockWidth / 2);
+		*iGapFromDock = CAIRO_DOCK_DIALOG_DEFAULT_GAP;
+	}
 }

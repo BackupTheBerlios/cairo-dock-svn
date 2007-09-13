@@ -12,17 +12,24 @@ typedef struct
 	int iHeight;
 	int iPositionX;
 	int iPositionY;
+	int iAimedX;
+	int iAimedY;
+	gboolean bRight;
+	int iGapFromDock;
 	cairo_surface_t* pTextBuffer;
 	int iTextWidth;
 	int iTextHeight;
 	gdouble fTextXOffset;
 	gdouble fTextYOffset;
 	GtkWidget *pWidget;
+	int iSidTimer;
 	} CairoDockDialog;
 
 
-GtkWidget *cairo_dock_build_dialog (gchar *cText, Icon *pIcon, CairoDock *pDock);
+CairoDockDialog *cairo_dock_build_dialog (gchar *cText, Icon *pIcon, CairoDock *pDock);
 
+
+void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int *iX, int *iY, gboolean *bRight, int *iGapFromDock);
 
 #endif
 

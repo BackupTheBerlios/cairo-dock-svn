@@ -68,6 +68,7 @@ void cairo_dock_free_icon (Icon *icon)
 	g_free (icon->acName);
 	g_free (icon->acCommand);
 	g_free (icon->cBaseURI);
+	g_free (icon->cParentDockName);
 	
 	cairo_surface_destroy (icon->pIconBuffer);
 	cairo_surface_destroy (icon->pTextBuffer);

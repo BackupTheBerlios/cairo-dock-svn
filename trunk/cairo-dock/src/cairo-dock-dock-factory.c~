@@ -54,7 +54,7 @@ extern gboolean g_bTextAlwaysHorizontal;
 
 extern gboolean g_bAutoHide;
 
-extern gchar *g_cCurrentThemePath;
+extern gchar *g_cCurrentLaunchersPath;
 
 extern gboolean g_bDirectionUp;
 
@@ -69,6 +69,17 @@ extern gboolean g_bSkipTaskbar;
 extern gboolean g_bSticky;
 
 extern gboolean g_bUseGlitz;
+
+
+void cairo_dock_set_colormap_for_window (GtkWidget *pWidget)
+{
+	GdkScreen* pScreen = gtk_widget_get_screen (pWidget);
+	GdkColormap* pColormap = gdk_screen_get_rgba_colormap (pScreen);
+	if (!pColormap)
+		pColormap = gdk_screen_get_rgb_colormap (pScreen);
+		
+	gtk_widget_set_colormap (pWidget, pColormap);
+}
 
 static void _cairo_dock_set_colormap (CairoDock *pDock)
 {
@@ -134,12 +145,7 @@ static void _cairo_dock_set_colormap (CairoDock *pDock)
 	}
 #endif
 	
-	GdkScreen* pScreen = gtk_widget_get_screen (pDock->pWidget);
-	pColormap = gdk_screen_get_rgba_colormap (pScreen);
-	if (!pColormap)
-		pColormap = gdk_screen_get_rgb_colormap (pScreen);
-		
-	gtk_widget_set_colormap (pDock->pWidget, pColormap);
+	cairo_dock_set_colormap_for_window (pDock->pWidget);
 }
 CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 {
@@ -316,6 +322,32 @@ CairoDock *cairo_dock_search_dock_from_name (gchar *cDockName)
 	return g_hash_table_lookup (g_hDocksTable, cDockName);
 }
 
+static gboolean _cairo_dock_search_icon_from_subdock (gchar *cDockName, CairoDock *pDock, gpointer *data)
+{
+	if (pDock == data[0])
+		return FALSE;
+	Icon **pIconFound = data[1];
+	CairoDock **pDockFound = data[2];
+	Icon *icon = cairo_dock_get_icon_with_subdock (pDock->icons, data[0]);
+	if (icon != NULL)
+	{
+		*pIconFound = icon;
+		if (pDockFound != NULL)
+			*pDockFound = pDock;
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+Icon *cairo_dock_search_icon_pointing_on_dock (CairoDock *pDock, CairoDock **pParentDock)  // pParentDock peut etre NULL.
+{
+	if (pDock->iRefCount == 0)  // inutile de chercher dans ce cas-la.
+		return NULL;
+	Icon *pPointingIcon = NULL;
+	gpointer data[2] = {pDock, &pPointingIcon, pParentDock};
+	g_hash_table_find (g_hDocksTable, (GHRFunc)_cairo_dock_search_icon_from_subdock, data);
+	return pPointingIcon;
+}
 
 
 void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
@@ -544,6 +576,7 @@ static void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDo
 }
 void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar *cDirectory)
 {
+	//g_print ("%s (%s)\n", __func__, cDirectory);
 	GDir *dir = g_dir_open (cDirectory, 0, NULL);
 	g_return_if_fail (dir != NULL);
 	
@@ -564,19 +597,6 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 			g_return_if_fail (icon->cParentDockName != NULL);
 			
 			pParentDock = g_hash_table_lookup (g_hDocksTable, icon->cParentDockName);
-			/*if (pParentDock == NULL)
-			{
-				g_print ("le dock parent (%s) n'existe pas, on le cree\n", icon->cParentDockName);
-				pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->cParentDockName);
-				pParentDock->iRefCount --;
-				pParentDock->bHorizontalDock = g_pMainDock->bHorizontalDock;
-				pParentDock->fAlign = g_pMainDock->fAlign;
-			}
-			else if (pParentDock->iRefCount > 0)
-			{
-				icon->fWidth *= g_fSubDockSizeRatio;
-				icon->fHeight *= g_fSubDockSizeRatio;
-			}*/
 			
 			if (pParentDock != NULL)  // a priori toujours vrai.
 				cairo_dock_insert_icon_in_dock (icon, pParentDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
@@ -662,7 +682,7 @@ void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *Rec
 			icon->pSubDock = NULL;
 		}
 		
-		cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, icon->acDesktopFileName);
+		cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
 		
 		if (ReceivingDock == NULL || cReceivingDockName == NULL)  // alors on les jete.
 		{
@@ -717,7 +737,10 @@ static gboolean _cairo_dock_search_icon_in_a_dock (gchar *cDockName, CairoDock *
 }
 CairoDock *cairo_dock_search_container_from_icon (Icon *icon)
 {
-	return g_hash_table_find (g_hDocksTable, (GHRFunc) _cairo_dock_search_icon_in_a_dock, icon);
+	if (icon->cParentDockName != NULL)
+		return g_hash_tabke_lookup (g_hDocksTable, icon->cParentDockName);
+	else
+		return g_hash_table_find (g_hDocksTable, (GHRFunc) _cairo_dock_search_icon_in_a_dock, icon);
 }
 
 

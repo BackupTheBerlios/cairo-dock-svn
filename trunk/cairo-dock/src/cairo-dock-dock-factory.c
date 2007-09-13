@@ -326,21 +326,25 @@ static gboolean _cairo_dock_search_icon_from_subdock (gchar *cDockName, CairoDoc
 {
 	if (pDock == data[0])
 		return FALSE;
+	Icon **pIconFound = data[1];
+	CairoDock **pDockFound = data[2];
 	Icon *icon = cairo_dock_get_icon_with_subdock (pDock->icons, data[0]);
 	if (icon != NULL)
 	{
-		* ((Icon **) data[1]) = icon;
+		*pIconFound = icon;
+		if (pDockFound != NULL)
+			*pDockFound = pDock;
 		return TRUE;
 	}
 	else
 		return FALSE;
 }
-Icon *cairo_dock_search_icon_pointing_on_dock (CairoDock *pDock)
+Icon *cairo_dock_search_icon_pointing_on_dock (CairoDock *pDock, CairoDock **pParentDock)  // pParentDock peut etre NULL.
 {
 	if (pDock->iRefCount == 0)  // inutile de chercher dans ce cas-la.
 		return NULL;
 	Icon *pPointingIcon = NULL;
-	gpointer data[2] = {pDock, &pPointingIcon};
+	gpointer data[2] = {pDock, &pPointingIcon, pParentDock};
 	g_hash_table_find (g_hDocksTable, (GHRFunc)_cairo_dock_search_icon_from_subdock, data);
 	return pPointingIcon;
 }
@@ -733,7 +737,10 @@ static gboolean _cairo_dock_search_icon_in_a_dock (gchar *cDockName, CairoDock *
 }
 CairoDock *cairo_dock_search_container_from_icon (Icon *icon)
 {
-	return g_hash_table_find (g_hDocksTable, (GHRFunc) _cairo_dock_search_icon_in_a_dock, icon);
+	if (icon->cParentDockName != NULL)
+		return g_hash_table_lookup (g_hDocksTable, icon->cParentDockName);
+	else
+		return g_hash_table_find (g_hDocksTable, (GHRFunc) _cairo_dock_search_icon_in_a_dock, icon);
 }
 
 
