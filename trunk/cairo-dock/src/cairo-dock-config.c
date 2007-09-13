@@ -122,6 +122,7 @@ extern GHashTable *g_hModuleTable;
 
 int cairo_dock_get_number_from_name (gchar *cName, gchar **tNamesList)
 {
+	g_return_val_if_fail (cName != NULL, 0);
 	int i = 0;
 	while (tNamesList[i] != NULL)
 	{
@@ -641,7 +642,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	g_bRevolveSeparator = cairo_dock_get_boolean_key_value (pKeyFile, "Separators", "revolve separator image", &bFlushConfFileNeeded, TRUE);
 	
 	//\___________________ On (re)charge tout, car n'importe quel parametre peut avoir change.
-	if (strcmp (cScreenBorder, "bottom") == 0)
+	if (cScreenBorder == NULL || strcmp (cScreenBorder, "bottom") == 0)
 	{
 		pDock->bHorizontalDock = CAIRO_DOCK_HORIZONTAL;
 		g_bDirectionUp = TRUE;

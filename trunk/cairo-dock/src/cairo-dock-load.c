@@ -183,11 +183,6 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 	pango_font_description_free (pDesc);
 	
 	
-	cairo_surface_t* pNewSurface = NULL;
-	cairo_t* pCairoContext;
-	gint i;
-	PangoRectangle ink, log;
-	
 	if (CAIRO_DOCK_IS_APPLI (icon) && g_iAppliMaxNameLength > 0 && strlen (icon->acName) > g_iAppliMaxNameLength)  // marchera pas avec les caracteres non latins, mais avec la glib c'est la galere...
 	{
 		gchar *cTruncatedName = g_new0 (gchar, g_iAppliMaxNameLength + 4);
@@ -201,16 +196,19 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 	else
 		pango_layout_set_text (pLayout, icon->acName, -1);
 	
+	
+	PangoRectangle ink, log;
 	pango_layout_get_pixel_extents (pLayout, &ink, &log);
 	
-	pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+	cairo_surface_t* pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 		CAIRO_CONTENT_COLOR_ALPHA,
 		ink.width + 2, ink.height + 2);
-	pCairoContext = cairo_create (pNewSurface);
+	cairo_t* pCairoContext = cairo_create (pNewSurface);
 	cairo_translate (pCairoContext, -ink.x, -ink.y);
 	
 	cairo_push_group (pCairoContext);
 	cairo_set_source_rgb (pCairoContext, 0.2, 0.2, 0.2);
+	int i;
 	for (i = 0; i < 4; i++)
 	{
 		cairo_move_to (pCairoContext, i&2, 2*(i&1));

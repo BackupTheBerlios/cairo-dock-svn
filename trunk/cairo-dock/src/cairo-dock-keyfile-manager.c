@@ -701,7 +701,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								{
 									GtkTreeIter iter;
 									gtk_list_store_append (GTK_LIST_STORE (modele), &iter);
-									if (iSelectedItem == 0 && strcmp (cValue, pAuthorizedValuesList[k]) == 0)
+									if (iSelectedItem == -1 && strcmp (cValue, pAuthorizedValuesList[k]) == 0)
 										iSelectedItem = (iElementType == 'R' ? k / 2 : k);
 									
 									gtk_list_store_set (GTK_LIST_STORE (modele), &iter,
@@ -711,6 +711,8 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									
 									k += (iElementType == 'R') + 1;
 								}
+								if (iElementType != 'E' && iSelectedItem == -1)
+									iSelectedItem = 0;
 								gtk_combo_box_set_active (GTK_COMBO_BOX (pOneWidget), iSelectedItem);
 								
 								if (iElementType == 'R')

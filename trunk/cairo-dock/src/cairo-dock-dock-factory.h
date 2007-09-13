@@ -6,8 +6,10 @@
 
 #include "cairo-dock-struct.h"
 
+void cairo_dock_set_colormap_for_window (GtkWidget *pWidget);
 
 CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName);
+
 
 const gchar *cairo_dock_search_dock_name (CairoDock *pDock);
 CairoDock *cairo_dock_search_dock_from_name (gchar *cDockName);

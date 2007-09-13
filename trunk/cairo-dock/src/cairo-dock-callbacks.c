@@ -36,6 +36,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-notifications.h"
 #include "cairo-dock-themes-manager.h"
+#include "cairo-dock-dialogs.h"
 #include "cairo-dock-callbacks.h"
 
 static Icon *s_pIconClicked = NULL;  // pour savoir quand on deplace une icone a la souris.
@@ -163,6 +164,7 @@ static void cairo_dock_show_subdock (Icon *pPointedIcon, int iMouseX, gboolean b
 	
 	pSubDock->bAtBottom = FALSE;
 	gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
+	///GtkWidget *dialog = cairo_dock_build_dialog ("Pouet poueT", pPointedIcon, pDock);  // pour test seulement.
 }
 
 gboolean on_motion_notify2 (GtkWidget* pWidget,

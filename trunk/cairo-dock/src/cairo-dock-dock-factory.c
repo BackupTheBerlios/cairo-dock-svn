@@ -70,6 +70,17 @@ extern gboolean g_bSticky;
 
 extern gboolean g_bUseGlitz;
 
+
+void cairo_dock_set_colormap_for_window (GtkWidget *pWidget)
+{
+	GdkScreen* pScreen = gtk_widget_get_screen (pWidget);
+	GdkColormap* pColormap = gdk_screen_get_rgba_colormap (pScreen);
+	if (!pColormap)
+		pColormap = gdk_screen_get_rgb_colormap (pScreen);
+		
+	gtk_widget_set_colormap (pWidget, pColormap);
+}
+
 static void _cairo_dock_set_colormap (CairoDock *pDock)
 {
 	//g_print ("%s f%d)\n", __func__, g_bUseGlitz);
@@ -134,12 +145,7 @@ static void _cairo_dock_set_colormap (CairoDock *pDock)
 	}
 #endif
 	
-	GdkScreen* pScreen = gtk_widget_get_screen (pDock->pWidget);
-	pColormap = gdk_screen_get_rgba_colormap (pScreen);
-	if (!pColormap)
-		pColormap = gdk_screen_get_rgb_colormap (pScreen);
-		
-	gtk_widget_set_colormap (pDock->pWidget, pColormap);
+	cairo_dock_set_colormap_for_window (pDock->pWidget);
 }
 CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 {

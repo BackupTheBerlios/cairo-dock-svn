@@ -6,15 +6,12 @@ released under the terms of the GNU General Public License.
 Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
 
 ******************************************************************************/
-#include <math.h>
 #include <string.h>
 #include <cairo.h>
-#include <pango/pango.h>
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/types.h>
 #include <dirent.h>
 
