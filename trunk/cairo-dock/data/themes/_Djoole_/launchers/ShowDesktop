@@ -1,0 +1,3 @@
+#!/bin/bash
+xvkbd  -no-repeat -text "\C\Ad"
+xvkbd  -no-repeat -text "[Down]"
