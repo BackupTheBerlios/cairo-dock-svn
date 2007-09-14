@@ -69,7 +69,7 @@ gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, gchar *cDockName, doub
 		//\___________________ On renseigne ce qu'on peut.
 		g_key_file_set_double (pKeyFile, "Desktop Entry", "Order", fEffectiveOrder);
 		g_key_file_set_string (pKeyFile, "Desktop Entry", "Container", cDockName);
-		g_key_file_set_string (pKeyFile, "Desktop Entry", "Exec command", "echo 'edit me !'");
+		g_key_file_set_string (pKeyFile, "Desktop Entry", "Exec", "echo 'edit me !'");
 		
 		//\___________________ On lui choisit un nom de fichier tel qu'il n'y ait pas de collision.
 		cNewDesktopFileName = cairo_dock_generate_desktop_filename (g_cCurrentLaunchersPath);
