@@ -75,7 +75,7 @@ void cairo_dock_free_icon (Icon *icon)
 	
 	if (CAIRO_DOCK_IS_APPLI (icon) && g_bUniquePid)
 		g_hash_table_remove (g_hAppliTable, &icon->iPid);
-	if (CAIRO_DOCK_IS_APPLET (icon) && icon->pModule != NULL)
+	if (CAIRO_DOCK_IS_VALID_APPLET (icon))
 		cairo_dock_free_module (icon->pModule);
 	
 	g_free (icon);
@@ -361,7 +361,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 	pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
 	
 	//\_________________ On met a jour l'ordre des applets dans le fichier de conf.
-	if (CAIRO_DOCK_IS_APPLET (icon1))
+	if (CAIRO_DOCK_IS_VALID_APPLET (icon1))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module.
 		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons, g_hModuleTable);
 }
 
@@ -420,7 +420,7 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
 	pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
 	
-	if (CAIRO_DOCK_IS_APPLET (icon1))
+	if (CAIRO_DOCK_IS_VALID_APPLET (icon1))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module.
 		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons, g_hModuleTable);
 }
 
@@ -775,18 +775,21 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, pDock);
 	}
 	
-	if (bMouseInsideDock && pDock->fMagnitude < 1 && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons) && pDock->iSidMoveDown == 0)  // on est dedans en x et la taille des icones est non maximale bien qu'aucune icone  ne soit animee.  // && pDock->iSidShrinkDown == 0 && ! pDock->bAtBottom
+	if (bMouseInsideDock && pDock->fMagnitude < 1 && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons))  // on est dedans en x et la taille des icones est non maximale bien qu'aucune icone  ne soit animee.  ///  && pDock->iSidMoveDown == 0
 	{
 		if ( (g_bDirectionUp && pPointedIcon != NULL && iMouseY > 0 && iMouseY < iHeight) || (! g_bDirectionUp && pPointedIcon != NULL && iMouseY < iHeight && iMouseY > 0) )  // et en plus on est dedans en y.
 		{
-			//g_print ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone  ne soit animee (iMouseX=%d => x_abs=%d)\n", iMouseX, x_abs);
+			g_print ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone  ne soit animee (iMouseX=%d => x_abs=%d)\n", iMouseX, x_abs);
 			//pDock->bInside = TRUE;
-			if (pDock->bAtBottom)  // on emule une re-rentree.
+			/*if (pDock->bAtBottom)  // on emule une re-rentree.
 			{
+				g_print ("  on emule une re-rentree (pDock->fMagnitude:%f)\n", pDock->fMagnitude);
+				cairo_dock_render_blank (pDock);
 				g_signal_emit_by_name (pDock->pWidget, "enter-notify-event", NULL, &bReturn);
 			}
-			else  // on se contente de faire grossir les icones.
+			else  // on se contente de faire grossir les icones.*/
 			{
+				g_print ("  on se contente de faire grossir les icones\n");
 				pDock->bAtBottom = FALSE;
 				if (pDock->iSidShrinkDown != 0)
 				{
@@ -886,7 +889,7 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 	return fMaxDockWidth;
 }
 
-void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX)
+void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX, CairoDockIconType iType)
 {
 	if (pDock->icons == NULL)
 		return;
@@ -898,7 +901,7 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX)
 	do
 	{
 		icon = ic->data;
-		if (x_abs >= icon->fXAtRest && x_abs <= icon->fXAtRest + icon->fWidth)  // on n'utilise pas icon->bPointed, pour pouvoir remettre a zero.
+		if (x_abs >= icon->fXAtRest && x_abs <= icon->fXAtRest + icon->fWidth && icon->iAnimationType != CAIRO_DOCK_FOLLOW_MOUSE)  // on n'utilise pas icon->bPointed, pour pouvoir remettre a zero.
 		{
 			icon->iAnimationType = 0;
 			
@@ -909,7 +912,7 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX)
 					prev_icon = ic->prev->data;
 				else
 					prev_icon = g_list_last (pDock->icons)->data;
-				if (CAIRO_DOCK_IS_LAUNCHER (icon) || CAIRO_DOCK_IS_LAUNCHER (prev_icon))
+				if ((icon->iType == iType || prev_icon->iType == iType) && prev_icon->iAnimationType != CAIRO_DOCK_FOLLOW_MOUSE)
 				{
 					icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
 					prev_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
@@ -922,7 +925,7 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX)
 					next_icon = ic->next->data;
 				else
 					next_icon = pDock->icons->data;
-				if (CAIRO_DOCK_IS_LAUNCHER (icon) || CAIRO_DOCK_IS_LAUNCHER (next_icon))
+				if ((icon->iType == iType || next_icon->iType == iType) && next_icon->iAnimationType != CAIRO_DOCK_FOLLOW_MOUSE)
 				{
 					icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
 					next_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
@@ -934,7 +937,7 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX)
 					break ;
 			}
 		}
-		else
+		else if (icon->iAnimationType != CAIRO_DOCK_FOLLOW_MOUSE)
 			icon->iAnimationType = 0;
 		
 		ic = ic->next;

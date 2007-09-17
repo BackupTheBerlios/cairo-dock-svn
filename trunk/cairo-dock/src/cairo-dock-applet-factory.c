@@ -60,19 +60,24 @@ cairo_surface_t *cairo_dock_create_applet_surface (cairo_t *pSourceContext, doub
 
 
 
-Icon *cairo_dock_create_icon_for_applet (CairoDock *pDock, int iWidth, int iHeight, gchar *cName, GtkWidget *pMenu)
+Icon *cairo_dock_create_icon_for_applet (CairoDock *pDock, int iWidth, int iHeight, gchar *cName, gchar *cIconName, GtkWidget *pMenu)
 {
 	Icon *icon = g_new0 (Icon, 1);
 	icon->iType = CAIRO_DOCK_APPLET;
 	
 	icon->acName = g_strdup (cName);
+	icon->acFileName = g_strdup (cIconName);
 	icon->pMenu = pMenu;
 	
 	icon->fWidth =iWidth;
 	icon->fHeight =iHeight;
 	cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock);
 	
-	icon->pIconBuffer = cairo_dock_create_applet_surface (pSourceContext, 1 + g_fAmplitude, &icon->fWidth, &icon->fHeight);
+	if (cIconName == NULL)
+		icon->pIconBuffer = cairo_dock_create_applet_surface (pSourceContext, 1 + g_fAmplitude, &icon->fWidth, &icon->fHeight);
+	else
+		cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
+	
 	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 	
 	cairo_destroy (pSourceContext);
@@ -80,10 +85,18 @@ Icon *cairo_dock_create_icon_for_applet (CairoDock *pDock, int iWidth, int iHeig
 }
 
 
-gboolean cairo_dock_read_header_applet_conf_file (GKeyFile *pKeyFile, int *iWidth, int *iHeight, gchar **cName)
+GKeyFile *cairo_dock_read_header_applet_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cName, gboolean *bFlushConfFileNeeded)
 {
-	gboolean bFlushConfFileNeeded = FALSE;
 	GError *erreur = NULL;
+	GKeyFile *pKeyFile = g_key_file_new ();
+	g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		return NULL;
+	}
+	
 	
 	*iWidth = g_key_file_get_integer (pKeyFile, "ICON", "width", &erreur);
 	if (erreur != NULL)
@@ -93,7 +106,7 @@ gboolean cairo_dock_read_header_applet_conf_file (GKeyFile *pKeyFile, int *iWidt
 		erreur = NULL;
 		*iWidth = 48;  // valeur par defaut.
 		g_key_file_set_integer (pKeyFile, "ICON", "width", *iWidth);
-		bFlushConfFileNeeded = TRUE;
+		*bFlushConfFileNeeded = TRUE;
 	}
 	
 	*iHeight = g_key_file_get_integer (pKeyFile, "ICON", "height", &erreur);
@@ -104,7 +117,7 @@ gboolean cairo_dock_read_header_applet_conf_file (GKeyFile *pKeyFile, int *iWidt
 		erreur = NULL;
 		*iHeight = 48;  // valeur par defaut.
 		g_key_file_set_integer (pKeyFile, "ICON", "height", *iHeight);
-		bFlushConfFileNeeded = TRUE;
+		*bFlushConfFileNeeded = TRUE;
 	}
 	
 	*cName = g_key_file_get_locale_string (pKeyFile, "ICON", "name", NULL, &erreur);
@@ -115,7 +128,7 @@ gboolean cairo_dock_read_header_applet_conf_file (GKeyFile *pKeyFile, int *iWidt
 		erreur = NULL;
 		*cName = NULL;  // valeur par defaut.
 		g_key_file_set_string (pKeyFile, "ICON", "name", "");
-		bFlushConfFileNeeded = TRUE;
+		*bFlushConfFileNeeded = TRUE;
 	}
 	if (*cName != NULL && strcmp (*cName, "") == 0)
 	{
@@ -123,7 +136,7 @@ gboolean cairo_dock_read_header_applet_conf_file (GKeyFile *pKeyFile, int *iWidt
 		*cName = NULL;
 	}
 	
-	return bFlushConfFileNeeded;
+	return pKeyFile;
 }
 
 

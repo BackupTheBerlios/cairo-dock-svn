@@ -677,7 +677,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 			gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenuOtherActions), menu_item);
 			g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_move_appli_to_current_desktop), data);
 		}
-		else if (CAIRO_DOCK_IS_APPLET (icon))
+		else if (CAIRO_DOCK_IS_VALID_APPLET (icon))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module.
 		{
 			menu_item = gtk_menu_item_new_with_label ("Configure this module");
 			gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);

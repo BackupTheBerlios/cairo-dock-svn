@@ -42,6 +42,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 static Icon *s_pIconClicked = NULL;  // pour savoir quand on deplace une icone a la souris.
 static CairoDock *s_pLastPointedDock = NULL;  // pour savoir quand on passe d'un dock a un autre.
 static int s_iSidNonStopScrolling = 0;
+static int s_iInternMovingIconType = -1;
 
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
@@ -103,7 +104,9 @@ gboolean on_expose (GtkWidget *pWidget,
 		if ((g_bAutoHide && pDock->iRefCount == 0))
 		{
 			if (pDock->bInside)
-				cairo_dock_render_blank (pDock);
+			{
+				//cairo_dock_render_blank (pDock);
+			}
 			else
 				cairo_dock_render_background (pDock);
 		}
@@ -200,6 +203,9 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		}
 		pPointedIcon = cairo_dock_calculate_icons (pDock, iX, iY);
 		
+		if (s_iInternMovingIconType != -1)
+			cairo_dock_mark_icons_as_avoiding_mouse (pDock, iX, s_iInternMovingIconType);
+		
 		gtk_widget_queue_draw (pWidget);
 		fLastTime = pMotion->time;
 		
@@ -213,7 +219,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		else
 			gdk_window_get_pointer (pWidget->window, &iY, &iX, NULL);
 		pPointedIcon = cairo_dock_calculate_icons (pDock, iX, iY);
-		cairo_dock_mark_icons_as_avoiding_mouse (pDock, iX);
+		cairo_dock_mark_icons_as_avoiding_mouse (pDock, iX, CAIRO_DOCK_LAUNCHER);
 		gtk_widget_queue_draw (pWidget);
 	}
 	
@@ -371,7 +377,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	//g_print ("%s (iSidMoveDown:%d; bInside:%d)\n", __func__, pDock->iSidMoveDown, pDock->bInside);
+	g_print ("%s (bAtTop:%d; bInside:%d; iSidMoveDown:%d; fMagnitude:%f)\n", __func__, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->fMagnitude);
 	if (pDock->iSidLeaveDemand != 0)
 	{
 		g_source_remove (pDock->iSidLeaveDemand);
@@ -381,7 +387,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	{
 		return FALSE;
 	}
-	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
 	
 	
@@ -597,6 +603,34 @@ gboolean on_key_press (GtkWidget *pWidget,
 }
 
 
+gboolean cairo_dock_notification_click_icon (gpointer *data)
+{
+	Icon *icon = data[0];
+	
+	if (CAIRO_DOCK_IS_LAUNCHER (icon))
+	{
+		if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
+			cairo_dock_launch_uri_func (icon);
+		else if (icon->acCommand != NULL)
+			g_spawn_command_line_async (icon->acCommand, NULL);
+		else
+		{
+			icon->iCount = 0;
+			return CAIRO_DOCK_LET_PASS_NOTIFICATION;
+		}
+	}
+	else if (CAIRO_DOCK_IS_VALID_APPLI (icon))
+		cairo_dock_show_appli (icon->Xid);
+	else if (CAIRO_DOCK_IS_VALID_APPLET (icon) && icon->pModule->actionModule != NULL)
+		icon->pModule->actionModule ();
+	else
+	{
+		g_print ("No known action\n");
+		icon->iCount = 0;
+		return CAIRO_DOCK_LET_PASS_NOTIFICATION;
+	}
+}
+
 gboolean on_button_press2 (GtkWidget* pWidget,
 				GdkEventButton* pButton,
 				CairoDock *pDock)
@@ -608,8 +642,11 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 		if (pButton->type == GDK_BUTTON_RELEASE)
 		{
 			if (s_pIconClicked != NULL)
+			{
 				s_pIconClicked->iAnimationType = 0;  // stoppe les animations de suivi/evitement du curseur.
-			
+				s_iInternMovingIconType = -1;
+				cairo_dock_mark_icons_as_avoiding_mouse (pDock, -1e4, s_iInternMovingIconType);
+			}
 			if (icon != NULL && ! CAIRO_DOCK_IS_SEPARATOR (icon) && icon == s_pIconClicked)
 			{
 				icon->iAnimationType = g_tAnimationType[icon->iType];
@@ -617,56 +654,37 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 					icon->iAnimationType =  g_random_int_range (0, CAIRO_DOCK_NB_ANIMATIONS);  // [a;b[
 				icon->iCount = g_tNbIterInOneRound[icon->iAnimationType] * g_tNbAnimationRounds[icon->iType] - 1;
 				
-				if (CAIRO_DOCK_IS_LAUNCHER (icon))
+				if (icon->pSubDock != NULL)
 				{
-					if (icon->pSubDock != NULL)
-					{
-						if (GTK_WIDGET_VISIBLE (icon->pSubDock->pWidget))
-							gtk_widget_hide (icon->pSubDock->pWidget);
-						else
-						{
-							if (bShowSubDockOnMouseOver)
-								gtk_window_present (GTK_WINDOW (icon->pSubDock->pWidget));
-							else
-								cairo_dock_show_subdock (icon, pButton->x, FALSE, pDock);
-						}
-						icon->iAnimationType = CAIRO_DOCK_BLINK;
-						icon->iCount = g_tNbIterInOneRound[icon->iAnimationType] - 1;  // 1 clignotement.
-					}
+					if (GTK_WIDGET_VISIBLE (icon->pSubDock->pWidget))
+						gtk_widget_hide (icon->pSubDock->pWidget);
 					else
 					{
-						if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
-							cairo_dock_launch_uri_func (icon);
-						else if (icon->acCommand != NULL)
-							g_spawn_command_line_async (icon->acCommand, NULL);
+						if (bShowSubDockOnMouseOver)
+							gtk_window_present (GTK_WINDOW (icon->pSubDock->pWidget));
 						else
-						{
-							icon->iCount = 0;
-							return FALSE;
-						}
+							cairo_dock_show_subdock (icon, pButton->x, FALSE, pDock);
 					}
+					icon->iAnimationType = CAIRO_DOCK_BLINK;
+					icon->iCount = g_tNbIterInOneRound[icon->iAnimationType] - 1;  // 1 clignotement.
 				}
-				else if (CAIRO_DOCK_IS_VALID_APPLI (icon))
-					cairo_dock_show_appli (icon->Xid);
-				else if (CAIRO_DOCK_IS_APPLET (icon) && icon->pModule->actionModule != NULL)
-					icon->pModule->actionModule ();
 				else
 				{
-					g_print ("No known action\n");
-					icon->iCount = 0;
-					return FALSE;
+					gpointer data[2] = {icon, pDock};
+					cairo_dock_notify (CAIRO_DOCK_CLICK_ICON, data);
 				}
 				
-				if (pDock->iSidGrowUp != 0)
+				if (icon->iCount > 0)
 				{
-					pDock->fLateralFactor = 0;
-					g_source_remove (pDock->iSidGrowUp);
-					pDock->iSidGrowUp = 0;
+					if (pDock->iSidGrowUp != 0)
+					{
+						pDock->fLateralFactor = 0;
+						g_source_remove (pDock->iSidGrowUp);
+						pDock->iSidGrowUp = 0;
+					}
 					if (pDock->iSidShrinkDown == 0)
-						pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+						pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);  // fera diminuer de taille les icones, et rebondir/tourner/clignoter celle qui est cliquee.
 				}
-				else if (pDock->iSidShrinkDown == 0 && icon->iCount > 0)
-					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);  // fera diminuer de taille les icones, et rebondir/tourner/clignoter celle qui est cliquee.
 			}
 			else if (s_pIconClicked != NULL && icon != NULL && icon != s_pIconClicked && icon->iType == s_pIconClicked->iType)
 			{
@@ -707,11 +725,11 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				}
 				
 				if (iX > icon->fX + icon->fWidth * icon->fScale / 2)
-					cairo_dock_move_icon_after_icon (pDock, s_pIconClicked, icon);
+					cairo_dock_move_icon_after_icon (pDock, s_pIconClicked, (CAIRO_DOCK_IS_SEPARATOR (icon) ? NULL : icon));
 				else
 				{
 					Icon *prev_icon = cairo_dock_get_previous_icon (pDock->icons, icon);
-					cairo_dock_move_icon_after_icon (pDock, s_pIconClicked, prev_icon);
+					cairo_dock_move_icon_after_icon (pDock, s_pIconClicked, (CAIRO_DOCK_IS_SEPARATOR (prev_icon) ? NULL : prev_icon));
 				}
 				
 				//if (pDock != pOriginDock)
@@ -728,7 +746,10 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 		{
 			s_pIconClicked = icon;
 			if (s_pIconClicked != NULL)
+			{
 				s_pIconClicked->iAnimationType = CAIRO_DOCK_FOLLOW_MOUSE;
+				s_iInternMovingIconType = s_pIconClicked->iType;
+			}
 		}
 		else if (pButton->type == GDK_2BUTTON_PRESS)
 		{
@@ -918,7 +939,7 @@ gboolean on_configure (GtkWidget* pWidget,
 			GdkEventConfigure* pEvent,
 			CairoDock *pDock)
 {
-	//g_print ("%s (main dock : %d) : (%d;%d) (%dx%d)\n", __func__, pDock->bIsMainDock, pEvent->x, pEvent->y, pEvent->width, pEvent->height);
+	g_print ("%s (main dock : %d) : (%d;%d) (%dx%d)\n", __func__, pDock->bIsMainDock, pEvent->x, pEvent->y, pEvent->width, pEvent->height);
 	gint iNewWidth, iNewHeight;
 	if (pDock->bHorizontalDock)
 	{
@@ -933,7 +954,7 @@ gboolean on_configure (GtkWidget* pWidget,
 	
 	if (iNewWidth != pDock->iCurrentWidth || iNewHeight != pDock->iCurrentHeight)
 	{
-		//g_print ("-> %dx%d\n", iNewWidth, iNewHeight);
+		g_print ("-> %dx%d\n", iNewWidth, iNewHeight);
 		pDock->iCurrentWidth = iNewWidth;
 		pDock->iCurrentHeight = iNewHeight;
 		
@@ -969,7 +990,7 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 	//g_print ("%s (%dx%d)\n", __func__, x, y);
 	
 	//\_________________ On arrete l'animation.
-	cairo_dock_mark_icons_as_avoiding_mouse (pDock, -1e4);
+	cairo_dock_mark_icons_as_avoiding_mouse (pDock, -1e4, -1);
 	
 	//\_________________ On recupere l'URI.
 	gchar *cReceivedData = (gchar *) selection_data->data;

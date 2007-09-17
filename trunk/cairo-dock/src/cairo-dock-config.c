@@ -134,7 +134,7 @@ int cairo_dock_get_number_from_name (gchar *cName, gchar **tNamesList)
 }
 
 
-static gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gboolean bDefaultValue)
+gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gboolean bDefaultValue)
 {
 	GError *erreur = NULL;
 	gboolean bValue = g_key_file_get_boolean (pKeyFile, cGroupName, cKeyName, &erreur);
@@ -158,7 +158,7 @@ static gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGr
 	}
 	return bValue;
 }
-static int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, int iDefaultValue)
+int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, int iDefaultValue)
 {
 	GError *erreur = NULL;
 	int iValue = g_key_file_get_integer (pKeyFile, cGroupName, cKeyName, &erreur);
@@ -182,7 +182,7 @@ static int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupNa
 	}
 	return iValue;
 }
-static double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, double fDefaultValue)
+double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, double fDefaultValue)
 {
 	GError *erreur = NULL;
 	double fValue = g_key_file_get_double (pKeyFile, cGroupName, cKeyName, &erreur);
@@ -206,7 +206,7 @@ static double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroup
 	}
 	return fValue;
 }
-static gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultValue)
+gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultValue)
 {
 	GError *erreur = NULL;
 	gchar *cValue = g_key_file_get_string (pKeyFile, cGroupName, cKeyName, &erreur);
@@ -235,7 +235,7 @@ static gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroup
 	}
 	return cValue;
 }
-static void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, int *iValueBuffer, int iNbElements, int *iDefaultValues)
+void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, int *iValueBuffer, int iNbElements, int *iDefaultValues)
 {
 	GError *erreur = NULL;
 	gsize length = 0;
@@ -272,7 +272,7 @@ static void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cG
 	}
 	g_free (iValuesList);
 }
-static void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, double *fValueBuffer, int iNbElements, double *fDefaultValues)
+void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, double *fValueBuffer, int iNbElements, double *fDefaultValues)
 {
 	GError *erreur = NULL;
 	gsize length = 0;
@@ -309,7 +309,7 @@ static void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGr
 	}
 	g_free (fValuesList);
 }
-static gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gsize *length, gchar *cDefaultValues)
+gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gsize *length, gchar *cDefaultValues)
 {
 	GError *erreur = NULL;
 	*length = 0;

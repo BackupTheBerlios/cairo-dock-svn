@@ -328,6 +328,7 @@ static void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboo
 {
 	//\_____________________ On dessine l'icone en fonction de son placement, son angle, et sa transparence.
 	//cairo_push_group (pCairoContext);
+	//g_print ("%s (%.2f;%.2f)\n", __func__, icon->fDrawX, icon->fDrawY);
 	if (bHorizontalDock)
 	{
 		cairo_translate (pCairoContext, icon->fDrawX, icon->fDrawY);

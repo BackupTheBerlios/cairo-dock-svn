@@ -73,7 +73,7 @@ gboolean cairo_dock_move_up (CairoDock *pDock)
 
 gboolean cairo_dock_move_down (CairoDock *pDock)
 {
-	//g_print ("%s ()\n", __func__);
+	g_print ("%s ()\n", __func__);
 	if (pDock->fMagnitude > 0.0)  // on retarde le cachage du dock pour apercevoir les effets.
 		return TRUE;
 	int deltaY_possible = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - pDock->iGapY - g_iVisibleZoneHeight : pDock->iGapY + g_iVisibleZoneHeight - pDock->iMaxDockHeight) - pDock->iWindowPositionY;
@@ -90,7 +90,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 	}
 	else  // on se fixe en bas, et on montre la zone visible.
 	{
-		//g_print ("  on se fixe en bas\n");
+		g_print ("  on se fixe en bas\n");
 		pDock->bAtBottom = TRUE;
 		int iNewWidth, iNewHeight;
 		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MIN_SIZE, &iNewWidth, &iNewHeight);
@@ -110,7 +110,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 		
 		if (g_bAutoHide && pDock->iRefCount == 0)
 		{
-			//g_print ("on arrete les animations\n");
+			g_print ("on arrete les animations\n");
 			Icon *pBouncingIcon = cairo_dock_get_bouncing_icon (pDock->icons);
 			if (pBouncingIcon != NULL)  // s'il y'a une icone en cours d'animation, on l'arrete.
 			{

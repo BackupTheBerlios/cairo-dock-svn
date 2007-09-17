@@ -33,5 +33,6 @@ CairoDock *cairo_dock_search_container_from_icon (Icon *icon);
 
 void cairo_dock_reference_dock (CairoDock *pChildDock);
 
+CairoDock *cairo_dock_create_subdock_from_scratch (GList *pIconList, gchar *cDockName);
 
 #endif

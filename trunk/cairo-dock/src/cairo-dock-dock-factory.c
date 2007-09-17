@@ -344,7 +344,7 @@ Icon *cairo_dock_search_icon_pointing_on_dock (CairoDock *pDock, CairoDock **pPa
 	if (pDock->iRefCount == 0)  // inutile de chercher dans ce cas-la.
 		return NULL;
 	Icon *pPointingIcon = NULL;
-	gpointer data[2] = {pDock, &pPointingIcon, pParentDock};
+	gpointer data[3] = {pDock, &pPointingIcon, pParentDock};
 	g_hash_table_find (g_hDocksTable, (GHRFunc)_cairo_dock_search_icon_from_subdock, data);
 	return pPointingIcon;
 }
@@ -682,32 +682,36 @@ void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *Rec
 			icon->pSubDock = NULL;
 		}
 		
-		cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
+		cDesktopFilePath = (icon->acDesktopFileName != NULL ? g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName) : NULL);
 		
 		if (ReceivingDock == NULL || cReceivingDockName == NULL)  // alors on les jete.
 		{
-			g_remove (cDesktopFilePath);
+			if (cDesktopFilePath != NULL)
+				g_remove (cDesktopFilePath);
 			
 			cairo_dock_free_icon (icon);
 		}
 		else  // on les re-attribue au dock receveur.
 		{
-			pKeyFile = g_key_file_new();
-			g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
-			if (erreur != NULL)
+			if (cDesktopFilePath != NULL)
 			{
-				g_print ("Attention : %s\n", erreur->message);
-				g_error_free (erreur);
-				erreur = NULL;
+				pKeyFile = g_key_file_new();
+				g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+				if (erreur != NULL)
+				{
+					g_print ("Attention : %s\n", erreur->message);
+					g_error_free (erreur);
+					erreur = NULL;
+				}
+				else
+				{
+					g_free (icon->cParentDockName);
+					icon->cParentDockName = g_strdup (cReceivingDockName);
+					g_key_file_set_string (pKeyFile, "Desktop Entry", "Container", icon->cParentDockName);
+					cairo_dock_write_keys_to_file (pKeyFile, cDesktopFilePath);
+				}
+				g_key_file_free (pKeyFile);
 			}
-			else
-			{
-				g_free (icon->cParentDockName);
-				icon->cParentDockName = g_strdup (cReceivingDockName);
-				g_key_file_set_string (pKeyFile, "Desktop Entry", "Container", icon->cParentDockName);
-				cairo_dock_write_keys_to_file (pKeyFile, cDesktopFilePath);
-			}
-			g_key_file_free (pKeyFile);
 			
 			if (pDock->iRefCount > 0)
 			{
@@ -771,5 +775,21 @@ void cairo_dock_reference_dock (CairoDock *pChildDock)
 		}
 		pChildDock->iMaxIconHeight *= g_fSubDockSizeRatio;
 	}
+}
+
+
+CairoDock *cairo_dock_create_subdock_from_scratch (GList *pIconList, gchar *cDockName)
+{
+	CairoDock *pSubDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, cDockName);
+	cairo_dock_reference_dock (pSubDock);  // on le fait tout de suite pour avoir la bonne reference avant le 'load'.
+	
+	pSubDock->icons = pIconList;
+	cairo_dock_load_buffers_in_one_dock (pSubDock);
+	
+	while (gtk_events_pending ())
+		gtk_main_iteration ();
+	gtk_widget_hide (pSubDock->pWidget);
+	
+	return pSubDock;
 }
 
