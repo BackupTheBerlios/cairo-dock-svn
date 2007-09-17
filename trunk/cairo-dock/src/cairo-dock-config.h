@@ -48,4 +48,7 @@ void cairo_dock_replace_keys_by_identifier (gchar *cConfFilePath, gchar *cReplac
 
 GHashTable *cairo_dock_list_available_translations (gchar *cTranslationsDir, gchar *cFilePrefix, GError **erreur);
 
+
+CairoDockDesktopEnv cairo_dock_guess_environment (void);
+
 #endif

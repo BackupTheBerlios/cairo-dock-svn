@@ -27,7 +27,7 @@ static void _cairo_dock_activate_one_element (GtkCellRendererToggle * cell_rende
 	gtk_tree_model_get_iter_from_string (model, &iter, path);
 	gboolean bState;
 	gtk_tree_model_get (model, &iter, CAIRO_DOCK_MODEL_ACTIVE, &bState, -1);
-
+	
 	gtk_list_store_set (GTK_LIST_STORE (model), &iter, CAIRO_DOCK_MODEL_ACTIVE, !bState, -1);
 }
 
@@ -556,7 +556,8 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						g_free (bValueList);
 					break;
 					
-					case 'i' :
+					case 'i' :  // integer
+					case 'I' :  // integer dans un HScale
 						//g_print ("  + integer\n");
 						length = 0;
 						iValueList = g_key_file_get_integer_list (pKeyFile, cGroupName, cKeyName, &length, NULL);
@@ -585,9 +586,9 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						g_free (iValueList);
 					break;
 					
-					case 'f' :
-					case 'c' :
-					case 'e' :
+					case 'f' :  // float.
+					case 'c' :  // float avec un bouton de choix de couleur.
+					case 'e' :  // float dans un HScale.
 						//g_print ("  + float\n");
 						length = 0;
 						fValueList = g_key_file_get_double_list (pKeyFile, cGroupName, cKeyName, &length, NULL);

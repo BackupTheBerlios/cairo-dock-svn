@@ -755,10 +755,9 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	int dx = iMouseX - iWidth / 2;  // ecart par rapport au milieu du dock a plat.
 	int x_abs = dx + pDock->iMinDockWidth / 2;  // ecart par rapport a la gauche du dock minimal.
 	
-	///pDock->fDecorationsOffsetX = iMouseX - pDock->iCurrentWidth / 2;
-	
 	//\_______________ On calcule l'ensemble des parametres des icones.
-	Icon *pPointedIcon = cairo_dock_calculate_icons_with_position (pDock->icons, pDock->pFirstDrawnElement, x_abs, pDock->fMagnitude, pDock->iMinDockWidth, pDock->iMaxDockWidth, iHeight, iMouseY, pDock->fAlign, pDock->fLateralFactor);
+	double fMagnitude = cairo_dock_calculate_magnitude (pDock->iMagnitudeIndex);
+	Icon *pPointedIcon = cairo_dock_calculate_icons_with_position (pDock->icons, pDock->pFirstDrawnElement, x_abs, /**pDock->fMagnitude*/fMagnitude, pDock->iMinDockWidth, pDock->iMaxDockWidth, iHeight, iMouseY, pDock->fAlign, pDock->fLateralFactor);
 	
 	//\_______________ On regarde si le curseur est dans le dock ou pas, et on joue sur la taille des icones en consequence.
 	
@@ -766,7 +765,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	if (! bMouseInsideDock)
 		pDock->fDecorationsOffsetX = - pDock->iMinDockWidth / 2;  // on fixe les decorations.
 	
-	if (! bMouseInsideDock && pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0 && pDock->fMagnitude > 0)
+	if (! bMouseInsideDock && pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0 && pDock->/**fMagnitude*/iMagnitudeIndex > 0)
 	{
 		double fSideMargin = (pDock->fAlign - .5) * (iWidth - pDock->iMinDockWidth);
 		if (x_abs < fSideMargin || x_abs > pDock->iMinDockWidth + fSideMargin)
@@ -775,19 +774,19 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, pDock);
 	}
 	
-	if (bMouseInsideDock && pDock->fMagnitude < 1 && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons))  // on est dedans en x et la taille des icones est non maximale bien qu'aucune icone  ne soit animee.  ///  && pDock->iSidMoveDown == 0
+	if (bMouseInsideDock && pDock->/**fMagnitude*/iMagnitudeIndex < CAIRO_DOCK_NB_MAX_ITERATIONS && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons))  // on est dedans en x et la taille des icones est non maximale bien qu'aucune icone ne soit animee.  ///  && pDock->iSidMoveDown == 0
 	{
 		if ( (g_bDirectionUp && pPointedIcon != NULL && iMouseY > 0 && iMouseY < iHeight) || (! g_bDirectionUp && pPointedIcon != NULL && iMouseY < iHeight && iMouseY > 0) )  // et en plus on est dedans en y.
 		{
 			g_print ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone  ne soit animee (iMouseX=%d => x_abs=%d)\n", iMouseX, x_abs);
 			//pDock->bInside = TRUE;
-			/*if (pDock->bAtBottom)  // on emule une re-rentree.
+			if (pDock->bAtBottom && pDock->iRefCount == 0 && ! g_bAutoHide)  // on le fait pas avec l'auto-hide, car un signal d'entree est deja emis a cause des mouvements/redimensionnements de la fenetre, et en rajouter un ici fout le boxon.
 			{
-				g_print ("  on emule une re-rentree (pDock->fMagnitude:%f)\n", pDock->fMagnitude);
+				g_print ("  on emule une re-rentree (pDock->iMagnitudeIndex:%f)\n", pDock->iMagnitudeIndex);
 				cairo_dock_render_blank (pDock);
 				g_signal_emit_by_name (pDock->pWidget, "enter-notify-event", NULL, &bReturn);
 			}
-			else  // on se contente de faire grossir les icones.*/
+			else  // on se contente de faire grossir les icones.
 			{
 				g_print ("  on se contente de faire grossir les icones\n");
 				pDock->bAtBottom = FALSE;

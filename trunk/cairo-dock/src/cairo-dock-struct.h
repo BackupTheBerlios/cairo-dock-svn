@@ -46,7 +46,8 @@ typedef struct _CairoDock {
 	gboolean bInside;  // lorsque la souris est dans le dock.
 	gboolean bMenuVisible;  // lorsque le menu du clique droit est visible.
 	
-	gfloat fMagnitude; // coef multiplicateur de l'amplitude de la sinusoide (entre 0 et 1)
+	///gfloat fMagnitude;  // coef multiplicateur de l'amplitude de la sinusoide (entre 0 et 1).
+	gint iMagnitudeIndex; // indice de calcul du coef multiplicateur de l'amplitude de la sinusoide (entre 0 et 1000).
 	gdouble fDecorationsOffsetX;  // decalage des decorations pour les faire suivre la souris.
 	gint iMouseX;  // derniere position du curseur, dans le cas de decorations non asservies.
 	gdouble fLateralFactor;  // un facteur d'acceleration lateral des icones lors du grossissement initial.
@@ -160,6 +161,7 @@ typedef struct _Icon {
 #define CAIRO_DOCK_MAIN_DOCK_NAME "_MainDock_"
 
 #define CAIRO_DOCK_LAST_ORDER -1e9
+#define CAIRO_DOCK_NB_MAX_ITERATIONS 1000
 
 #define CAIRO_DOCK_UPDATE_DOCK_SIZE TRUE
 #define CAIRO_DOCK_ANIMATE_ICON TRUE
@@ -203,6 +205,12 @@ typedef void (*CairoDockCalculateShapeFunc) (CairoDock *pDock, CairoDockSizeType
 typedef void (*CairoDockCalculateParametersFunc) (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth, gboolean bInside);
 typedef void (*CairoDockRender) (CairoDock *pDock);
 
+
+typedef enum {
+	CAIRO_DOCK_UNKNOWN_ENV=0,
+	CAIRO_DOCK_GNOME,
+	CAIRO_DOCK_KDE
+	} CairoDockDesktopEnv;
 
 #endif
 

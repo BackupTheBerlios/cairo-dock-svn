@@ -96,8 +96,8 @@ extern int g_iScreenWidth[2];
 extern int g_iScreenHeight[2];
 
 extern double g_fUnfoldAcceleration;
-extern double g_fGrowUpFactor;
-extern double g_fShrinkDownFactor;
+extern int g_iGrowUpInterval;
+extern int g_iShrinkDownInterval;
 extern double g_fMoveUpSpeed;
 extern double g_fMoveDownSpeed;
 extern double g_fRefreshInterval;
@@ -476,10 +476,10 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	double fUserValue = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "unfold factor", &bFlushConfFileNeeded, 8.);
 	g_fUnfoldAcceleration = 1 - pow (2, - fUserValue);
 	
-	g_fGrowUpFactor = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "grow up factor", &bFlushConfFileNeeded, 1.45);
-	g_fGrowUpFactor = MAX (1.02, g_fGrowUpFactor);
-	g_fShrinkDownFactor = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "shrink down factor", &bFlushConfFileNeeded, 0.65);
-	g_fShrinkDownFactor = MAX (0, MIN (g_fShrinkDownFactor, 0.99));
+	int iNbSteps = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "grow up steps", &bFlushConfFileNeeded, 8);
+	g_iGrowUpInterval = MAX (1, CAIRO_DOCK_NB_MAX_ITERATIONS / iNbSteps);
+	iNbSteps = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "shrink down steps", &bFlushConfFileNeeded, 10);
+	g_iShrinkDownInterval = MAX (1, CAIRO_DOCK_NB_MAX_ITERATIONS / iNbSteps);
 	g_fMoveUpSpeed = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "move up speed", &bFlushConfFileNeeded, 0.35);
 	g_fMoveUpSpeed = MAX (0.01, MIN (g_fMoveUpSpeed, 1));
 	g_fMoveDownSpeed = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "move down speed", &bFlushConfFileNeeded, 0.35);
@@ -1240,4 +1240,26 @@ GHashTable *cairo_dock_list_available_translations (gchar *cTranslationsDir, gch
 	g_dir_close (dir);
 	
 	return pTranslationTable;
+}
+
+
+CairoDockDesktopEnv cairo_dock_guess_environment (void)
+{
+	const gchar * cEnv = g_getenv ("GNOME_DESKTOP_SESSION_ID");
+	CairoDockDesktopEnv iDesktopEnv;
+	if (cEnv == NULL || *cEnv == '\0')
+	{
+		cEnv = g_getenv ("KDE_FULL_SESSION");
+		if (cEnv == NULL || *cEnv == '\0')
+		{
+			iDesktopEnv = CAIRO_DOCK_UNKNOWN_ENV;
+		}
+		else
+			iDesktopEnv = CAIRO_DOCK_KDE;
+	}
+	else
+	{
+		iDesktopEnv = CAIRO_DOCK_GNOME;
+	}
+	return iDesktopEnv;
 }

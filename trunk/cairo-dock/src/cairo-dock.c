@@ -173,8 +173,8 @@ double g_fLabelAlphaThreshold;  // seuil de visibilité de etiquettes.
 gboolean g_bTextAlwaysHorizontal;  // true <=> tetiquettes horizontales meme pour les docks verticaux.
 
 double g_fUnfoldAcceleration = 0;
-double g_fGrowUpFactor = 1.4;
-double g_fShrinkDownFactor = 0.6;
+int g_iGrowUpInterval;
+int g_iShrinkDownInterval;
 double g_fMoveUpSpeed = 0.5;
 double g_fMoveDownSpeed = 0.33;
 double g_fRefreshInterval = .04;

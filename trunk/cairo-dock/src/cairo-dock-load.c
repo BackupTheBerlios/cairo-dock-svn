@@ -116,7 +116,7 @@ void cairo_dock_calculate_contrainted_icon_size (double *fImageWidth, double *fI
 
 void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdouble fMaxScale, gboolean bHorizontalDock)
 {
-	g_print ("%s (%.2f, %s)\n", __func__, fMaxScale, icon->acFileName);
+	//g_print ("%s (%.2f, %s)\n", __func__, fMaxScale, icon->acFileName);
 	icon->fWidth = 48.;  // valeur par defaut au cas ou l'icone est inexistante ou ne se chargerait pas comme il faut.
 	icon->fHeight = 48.;
 	cairo_surface_destroy (icon->pIconBuffer);

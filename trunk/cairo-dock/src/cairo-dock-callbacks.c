@@ -128,7 +128,8 @@ static void cairo_dock_show_subdock (Icon *pPointedIcon, int iMouseX, gboolean b
 	{
 		g_source_remove (pSubDock->iSidShrinkDown);
 		pSubDock->iSidShrinkDown = 0;
-		pSubDock->fMagnitude = 0.0;
+		///pSubDock->fMagnitude = 0.0;
+		pSubDock->iMagnitudeIndex = 0;
 		cairo_dock_shrink_down (pSubDock);
 	}
 	
@@ -377,19 +378,17 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	g_print ("%s (bAtTop:%d; bInside:%d; iSidMoveDown:%d; fMagnitude:%f)\n", __func__, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->fMagnitude);
+	//g_print ("%s (bAtTop:%d; bInside:%d; iSidMoveDown:%d; fMagnitude:%f)\n", __func__, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->fMagnitude);
 	if (pDock->iSidLeaveDemand != 0)
 	{
 		g_source_remove (pDock->iSidLeaveDemand);
 		pDock->iSidLeaveDemand = 0;
 	}
-	if (pDock->bAtTop || pDock->bInside || (pDock->iSidMoveDown != 0 && pDock->fMagnitude == 0))  // le 'iSidMoveDown != 0' est la pour empecher le dock de "vibrer" si l'utilisateur sort par en bas avec l'auto-hide active.
+	if (pDock->bAtTop || pDock->bInside || (pDock->iSidMoveDown != 0/** && pDock->fMagnitude == 0*/))  // le 'iSidMoveDown != 0' est la pour empecher le dock de "vibrer" si l'utilisateur sort par en bas avec l'auto-hide active.
 	{
 		return FALSE;
 	}
-	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
-	
-	
+	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
 	pDock->fDecorationsOffsetX = 0;
 	if (! pDock->bIsMainDock)
@@ -805,7 +804,7 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 	//pScroll->time += 10 * g_fRefreshInterval;
 	
 	//g_print ("%s (%d, %.2f)\n", __func__, pDock->iSidShrinkDown, pDock->fMagnitude);
-	if (pDock->iSidShrinkDown != 0 || pDock->fMagnitude == 0)
+	if (pDock->iSidShrinkDown != 0 || pDock->/**fMagnitude*/iMagnitudeIndex == 0)
 		return FALSE;
 	
 	Icon *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
@@ -939,7 +938,7 @@ gboolean on_configure (GtkWidget* pWidget,
 			GdkEventConfigure* pEvent,
 			CairoDock *pDock)
 {
-	g_print ("%s (main dock : %d) : (%d;%d) (%dx%d)\n", __func__, pDock->bIsMainDock, pEvent->x, pEvent->y, pEvent->width, pEvent->height);
+	//g_print ("%s (main dock : %d) : (%d;%d) (%dx%d)\n", __func__, pDock->bIsMainDock, pEvent->x, pEvent->y, pEvent->width, pEvent->height);
 	gint iNewWidth, iNewHeight;
 	if (pDock->bHorizontalDock)
 	{
@@ -954,7 +953,7 @@ gboolean on_configure (GtkWidget* pWidget,
 	
 	if (iNewWidth != pDock->iCurrentWidth || iNewHeight != pDock->iCurrentHeight)
 	{
-		g_print ("-> %dx%d\n", iNewWidth, iNewHeight);
+		//g_print ("-> %dx%d\n", iNewWidth, iNewHeight);
 		pDock->iCurrentWidth = iNewWidth;
 		pDock->iCurrentHeight = iNewHeight;
 		
@@ -997,7 +996,7 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 	gchar *str = strrchr (cReceivedData, '\n');
 	if (str != NULL)
 		*(str-1) = '\0';  // on vire les retrours chariot.
-	g_print ("cReceivedData : %s\n", cReceivedData);
+	//g_print ("cReceivedData : %s\n", cReceivedData);
 	
 	//\_________________ On calcule la position a laquelle on l'a lache.
 	double fOrder = 0;
@@ -1031,54 +1030,11 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 			else  // on est dessus.
 			{
 				fOrder = CAIRO_DOCK_LAST_ORDER;
-				/*if (icon->pSubDock != NULL)
-				{
-					pReceivingDock = icon->pSubDock;
-				}
-				else
-				{
-					gchar *cCommand = g_strdup_printf ("%s '%s'", icon->acCommand, cReceivedData);
-					g_spawn_command_line_async (cCommand, NULL);
-					g_free (cCommand);
-					icon->iAnimationType = CAIRO_DOCK_BLINK;
-					icon->iCount = g_tNbIterInOneRound[icon->iAnimationType] * 2 - 1;  // 2 clignotements.
-					if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
-						pDock->iSidShrinkDown = g_timeout_add (40, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
-					return ;
-				}*/
 			}
 		}
 	}
 	gpointer data[4] = {cReceivedData, pPointedIcon, &fOrder, pDock};
 	cairo_dock_notify (CAIRO_DOCK_DROP_DATA, data);
-	
-	/*//\_________________ On l'ajoute dans le repertoire .cairo-dock.
-	GError *erreur = NULL;
-	const gchar *cDockName = cairo_dock_search_dock_name (pReceivingDock);
-	gchar *cNewDesktopFileName = cairo_dock_add_desktop_file_from_uri (cReceivedData, cDockName, fOrder, pDock, &erreur);
-	if (erreur != NULL)
-	{
-		g_print ("Attention : %s\n", erreur->message);
-		g_error_free (erreur);
-		return ;
-	}
-	
-	//\_________________ On charge ce nouveau lanceur.
-	if (cNewDesktopFileName != NULL)
-	{
-		cairo_dock_mark_theme_as_modified (TRUE);
-		
-		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
-		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cNewDesktopFileName, pCairoContext);
-		g_free (cNewDesktopFileName);
-		cairo_destroy (pCairoContext);
-		
-		if (pNewIcon != NULL)
-			cairo_dock_insert_icon_in_dock (pNewIcon, pReceivingDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
-		
-		if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
-			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
-	}*/
 }
 
 gboolean cairo_dock_notification_drop_data (gpointer *data)
