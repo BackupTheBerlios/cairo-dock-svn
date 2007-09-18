@@ -60,8 +60,8 @@ extern gboolean g_bUseGlitz;
 
 static void cairo_dock_edit_and_reload_appearance (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	
 	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Appearance", 400, 600, '+', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
 	/*if (config_ok)
@@ -71,8 +71,8 @@ static void cairo_dock_edit_and_reload_appearance (GtkMenuItem *menu_item, gpoin
 }
 static void cairo_dock_edit_and_reload_behaviour (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	
 	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Behaviour", 400, 600, '-', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
 	/*if (config_ok)
@@ -82,8 +82,8 @@ static void cairo_dock_edit_and_reload_behaviour (GtkMenuItem *menu_item, gpoint
 }
 static void cairo_dock_edit_and_reload_conf (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	
 	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", 400, 600, 0, NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
 	/*if (config_ok)
@@ -94,8 +94,8 @@ static void cairo_dock_edit_and_reload_conf (GtkMenuItem *menu_item, gpointer *d
 
 static void cairo_dock_initiate_theme_management(GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	
 	gboolean bRefreshGUI;
 	do
@@ -106,8 +106,8 @@ static void cairo_dock_initiate_theme_management(GtkMenuItem *menu_item, gpointe
 
 static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	
 	gchar *cTitle = g_strdup_printf ("\nCairo-Dock (2007)\n version %s", CAIRO_DOCK_VERSION);
 	GtkWidget *pDialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
@@ -141,16 +141,16 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 
 static void cairo_dock_update (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	
 	system ("xterm -e cairo-dock-update.sh &");
 }
 
 static void cairo_dock_help (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	
 	system ("firefox http://doc.ubuntu-fr.org/gnome_dock");
 }
@@ -158,8 +158,8 @@ static void cairo_dock_help (GtkMenuItem *menu_item, gpointer *data)
 
 static void cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	
 	gchar *question = g_strdup_printf ("You're about to remove this icon (%s) from the dock. Sure ?", icon->acName);
 	GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
@@ -205,8 +205,8 @@ static void cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 
 static void cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	
 	//\___________________ On cree un fichier de lanceur avec des valeurs par defaut.
 	GError *erreur = NULL;
@@ -245,8 +245,8 @@ static void cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data)
 
 static void cairo_dock_add_launcher (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	
 	GtkWidget *pFileChooserDialog = gtk_file_chooser_dialog_new ("Choose or Create a launcher",
 		GTK_WINDOW (pDock->pWidget),
@@ -319,8 +319,8 @@ static void cairo_dock_add_launcher (GtkMenuItem *menu_item, gpointer *data)
 
 static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	
 	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
 	
@@ -404,8 +404,8 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 
 static void cairo_dock_initiate_config_module (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	
 	GError *erreur = NULL;
 	cairo_dock_configure_module (icon->pModule, pDock, &erreur);
@@ -418,8 +418,8 @@ static void cairo_dock_initiate_config_module (GtkMenuItem *menu_item, gpointer 
 
 static void cairo_dock_remove_module (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	
 	gchar *question = g_strdup_printf ("You're about to remove this icon (%s) from the dock. Sure ?", icon->acName);
 	GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
@@ -443,8 +443,8 @@ static void cairo_dock_remove_module (GtkMenuItem *menu_item, gpointer *data)
 
 static void cairo_dock_close_appli (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	
 	if (icon->Xid > 0)
 		cairo_dock_close_xwindow (icon->Xid);
@@ -452,16 +452,16 @@ static void cairo_dock_close_appli (GtkMenuItem *menu_item, gpointer *data)
 
 static void cairo_dock_minimize_appli (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	if (icon->Xid > 0)
 		cairo_dock_minimize_xwindow (icon->Xid);
 }
 
 static void cairo_dock_maximize_appli (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	if (icon->Xid > 0)
 	{
 		gboolean bIsMaximized = cairo_dock_window_is_maximized (icon->Xid);
@@ -471,8 +471,8 @@ static void cairo_dock_maximize_appli (GtkMenuItem *menu_item, gpointer *data)
 
 static void cairo_dock_set_appli_fullscreen (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	if (icon->Xid > 0)
 	{
 		gboolean bIsFullScreen = cairo_dock_window_is_fullscreen (icon->Xid);
@@ -483,8 +483,8 @@ static void cairo_dock_set_appli_fullscreen (GtkMenuItem *menu_item, gpointer *d
 static void cairo_dock_move_appli_to_current_desktop (GtkMenuItem *menu_item, gpointer *data)
 {
 	//g_print ("%s ()\n", __func__);
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	if (icon->Xid > 0)
 	{
 		int iCurrentDesktop, iDesktopViewportX, iDesktopViewportY;
@@ -497,31 +497,31 @@ static void cairo_dock_move_appli_to_current_desktop (GtkMenuItem *menu_item, gp
 
 static void cairo_dock_swap_with_prev_icon (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	Icon *prev_icon = cairo_dock_get_previous_icon (pDock->icons, icon);
 	cairo_dock_swap_icons (pDock, icon, prev_icon);
 }
 
 static void cairo_dock_swap_with_next_icon (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	Icon *next_icon = cairo_dock_get_next_icon (pDock->icons, icon);
 	cairo_dock_swap_icons (pDock, icon, next_icon);
 }
 
 static void cairo_dock_move_icon_to_beginning (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	cairo_dock_move_icon_after_icon (pDock, icon, NULL);
 }
 
 static void cairo_dock_move_icon_to_end (GtkMenuItem *menu_item, gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	Icon* pLastIcon = cairo_dock_get_last_icon_of_type (pDock->icons, icon->iType);
 	if (pLastIcon != NULL && pLastIcon != icon)
 		cairo_dock_move_icon_after_icon (pDock, icon, pLastIcon);
@@ -557,8 +557,9 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	
 	if (data == NULL)
 		data = g_new (gpointer, 3);
-	data[0] = pDock;
-	data[1] = icon;
+	data[0] = icon;
+	data[1] = pDock;
+	data[2] = menu;
 	
 	GtkWidget *menu_item;
 	menu_item = gtk_menu_item_new_with_label ("Cairo-Dock");
@@ -603,7 +604,6 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	menu_item = gtk_separator_menu_item_new ();
 	gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 	
-	data[2] = menu;
 	cairo_dock_notify (CAIRO_DOCK_BUILD_MENU, data);
 	
 	return menu;
@@ -612,8 +612,8 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 
 gboolean cairo_dock_notification_build_menu (gpointer *data)
 {
-	CairoDock *pDock = data[0];
-	Icon *icon = data[1];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 	GtkWidget *menu = data[2];
 	
 	GtkWidget *menu_item;

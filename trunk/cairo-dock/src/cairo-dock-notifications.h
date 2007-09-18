@@ -12,8 +12,8 @@ typedef enum {
 	CAIRO_DOCK_CLICK_ICON,  // data : Icon
 	CAIRO_DOCK_ADD_ICON,  // data : {Icon, CairoDock}
 	CAIRO_DOCK_MODIFY_ICON,  // data : {Icon, CairoDock}
-	CAIRO_DOCK_BUILD_MENU,  // data : {CairoDock, Icon}
-	CAIRO_DOCK_BUILD_MENU_END,  // data : {CairoDock, Icon}
+	CAIRO_DOCK_BUILD_MENU,  // data : {Icon, CairoDock, GtkMenu}
+	CAIRO_DOCK_BUILD_MENU_END,  // data : {Icon, CairoDock, GtkMenu}
 	CAIRO_DOCK_DROP_DATA,  // data : {gchar, Icon, double, CairoDock}
 	CAIRO_DOCK_NB_NOTIFICATIONS
 	} CairoDockNotificationType;
