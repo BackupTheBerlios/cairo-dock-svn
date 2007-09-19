@@ -218,7 +218,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, GHashTabl
 			Icon *pIcon = cairo_dock_activate_module (pModule, pDock, &erreur);
 			if (erreur != NULL)
 			{
-				g_print ("Attention : %s", erreur->message);
+				g_print ("Attention : %s\n", erreur->message);
 				g_error_free (erreur);
 				erreur = NULL;
 			}

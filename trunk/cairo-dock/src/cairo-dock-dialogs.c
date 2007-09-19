@@ -35,6 +35,8 @@ extern int g_iDockRadius;
 extern double g_fLineColor[4];
 
 #define CAIRO_DOCK_DIALOG_DEFAULT_GAP 20
+#define CAIRO_DOCK_DIALOG_TEXT_MARGIN 3
+#define CAIRO_DOCK_DIALOG_TIP_ROUNDING_MARGIN 10
 #define CAIRO_DOCK_DIALOG_TIP_MARGIN 20
 #define CAIRO_DOCK_DIALOG_TIP_BASE 20
 
@@ -43,7 +45,8 @@ void cairo_dock_free_dialog (CairoDockDialog *pDialog)
 {
 	cairo_surface_destroy (pDialog->pTextBuffer);
 	pDialog->pTextBuffer = NULL;
-	gtk_widget_destroy (pDialog->pWidget);
+	if (pDialog->pWidget != NULL)
+		gtk_widget_destroy (pDialog->pWidget);
 	pDialog->pWidget = NULL;
 	g_free (pDialog);
 }
@@ -57,6 +60,7 @@ static gboolean on_button_press_dialog (GtkWidget* pWidget,
 	{
 		if (pButton->type == GDK_BUTTON_PRESS)
 		{
+			pDialog->pWidget = NULL;
 			gtk_widget_destroy (pWidget);
 		}
 	}
@@ -103,17 +107,33 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	double fTipHeight = pDialog->iGapFromDock / (1. + fLineWidth / 2. / CAIRO_DOCK_DIALOG_TIP_BASE * (1./cos_gamma + 1./cos_theta));
 	if (pDialog->bRight)
 	{
-		cairo_rel_line_to (pCairoContext, -iWidth + fLineWidth + 2. * fRadius + CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE, 0);
-		cairo_rel_line_to (pCairoContext, - (CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE), fTipHeight);
-		cairo_rel_line_to (pCairoContext, CAIRO_DOCK_DIALOG_TIP_MARGIN, - fTipHeight);
-		cairo_rel_line_to (pCairoContext, - CAIRO_DOCK_DIALOG_TIP_MARGIN, 0);
+		cairo_rel_line_to (pCairoContext, -iWidth + fLineWidth + 2. * fRadius + CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE + CAIRO_DOCK_DIALOG_TIP_ROUNDING_MARGIN , 0);
+		///cairo_rel_line_to (pCairoContext, - (CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE), fTipHeight);
+		cairo_rel_curve_to (pCairoContext,
+			0, 0,
+			- CAIRO_DOCK_DIALOG_TIP_ROUNDING_MARGIN, 0,
+			- (CAIRO_DOCK_DIALOG_TIP_ROUNDING_MARGIN + CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE), fTipHeight);
+		///cairo_rel_line_to (pCairoContext, CAIRO_DOCK_DIALOG_TIP_MARGIN, - fTipHeight);
+		cairo_rel_curve_to (pCairoContext,
+			0, 0,
+			CAIRO_DOCK_DIALOG_TIP_MARGIN, - fTipHeight,
+			CAIRO_DOCK_DIALOG_TIP_MARGIN - CAIRO_DOCK_DIALOG_TIP_ROUNDING_MARGIN, - fTipHeight);
+		cairo_rel_line_to (pCairoContext, - CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_ROUNDING_MARGIN, 0);
 	}
 	else
 	{
-		cairo_rel_line_to (pCairoContext, - CAIRO_DOCK_DIALOG_TIP_MARGIN, 0);
-		cairo_rel_line_to (pCairoContext, CAIRO_DOCK_DIALOG_TIP_MARGIN, fTipHeight);
-		cairo_rel_line_to (pCairoContext, - (CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE), - fTipHeight);
-		cairo_rel_line_to (pCairoContext, -iWidth + fLineWidth + 2 * fRadius + CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE, 0);
+		cairo_rel_line_to (pCairoContext, - CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_ROUNDING_MARGIN, 0);
+		///cairo_rel_line_to (pCairoContext, CAIRO_DOCK_DIALOG_TIP_MARGIN, fTipHeight);
+		cairo_rel_curve_to (pCairoContext,
+			0, 0,
+			-CAIRO_DOCK_DIALOG_TIP_ROUNDING_MARGIN, 0,
+			CAIRO_DOCK_DIALOG_TIP_MARGIN - CAIRO_DOCK_DIALOG_TIP_ROUNDING_MARGIN, fTipHeight);
+		///cairo_rel_line_to (pCairoContext, - (CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE), - fTipHeight);
+		cairo_rel_curve_to (pCairoContext,
+			0, 0,
+			- (CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE), - fTipHeight,
+			- (CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE) - CAIRO_DOCK_DIALOG_TIP_ROUNDING_MARGIN, - fTipHeight);
+		cairo_rel_line_to (pCairoContext, -iWidth + fLineWidth + 2 * fRadius + CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE + CAIRO_DOCK_DIALOG_TIP_ROUNDING_MARGIN, 0);
 	}
 	
 	// Bottom Left
@@ -141,7 +161,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	cairo_restore (pCairoContext);
 	
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
-	cairo_set_source_surface (pCairoContext, pDialog->pTextBuffer, fOffsetX, fLineWidth);
+	cairo_set_source_surface (pCairoContext, pDialog->pTextBuffer, fOffsetX + CAIRO_DOCK_DIALOG_TEXT_MARGIN, fLineWidth + CAIRO_DOCK_DIALOG_TEXT_MARGIN);
 	cairo_paint (pCairoContext);
 	
 	cairo_destroy (pCairoContext);
@@ -150,8 +170,8 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 }
 
 static gboolean on_configure_dialog (GtkWidget* pWidget,
-			GdkEventConfigure* pEvent,
-			CairoDockDialog *pDialog)
+	GdkEventConfigure* pEvent,
+	CairoDockDialog *pDialog)
 {
 	g_print ("%s ()\n", __func__);
 	
@@ -213,8 +233,8 @@ CairoDockDialog *cairo_dock_build_dialog (gchar *cText, Icon *pIcon, CairoDock *
 	
 	PangoRectangle ink, log;
 	pango_layout_get_pixel_extents (pLayout, &ink, &log);
-	pDialog->iTextWidth = ink.width;
-	pDialog->iTextHeight = ink.height;
+	pDialog->iTextWidth = ink.width + 2 * CAIRO_DOCK_DIALOG_TEXT_MARGIN;
+	pDialog->iTextHeight = ink.height + 2 * CAIRO_DOCK_DIALOG_TEXT_MARGIN;
 	
 	pDialog->pTextBuffer = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 		CAIRO_CONTENT_COLOR_ALPHA,
@@ -233,8 +253,8 @@ CairoDockDialog *cairo_dock_build_dialog (gchar *cText, Icon *pIcon, CairoDock *
 	
 	double fLineWidth = g_iDockLineWidth;
 	double fRadius = (pDialog->iTextHeight + fLineWidth - 2 * g_iDockRadius > 0 ? g_iDockRadius : (pDialog->iTextHeight + fLineWidth) / 2 - 1);
-	pDialog->iWidth = ink.width + 2 * fRadius + fLineWidth;
-	pDialog->iHeight = ink.height + pDialog->iGapFromDock;
+	pDialog->iWidth = pDialog->iTextWidth + 2 * fRadius + fLineWidth;
+	pDialog->iHeight = pDialog->iTextHeight + 2 * fLineWidth + pDialog->iGapFromDock;
 	
 	if (pDialog->bRight)
 	{
@@ -300,4 +320,21 @@ void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int
 		*bRight = (pIcon->fXAtRest > pDock->iMinDockWidth / 2);
 		*iGapFromDock = CAIRO_DOCK_DIALOG_DEFAULT_GAP;
 	}
+}
+
+
+
+
+
+static gboolean cairo_dock_dialog_auto_delete (CairoDockDialog *pDialog)
+{
+	cairo_dock_free_dialog (pDialog);  // on pourrait eventuellement faire un fondu.
+	return FALSE;
+}
+
+void cairo_dock_show_temporary_dialog (gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength)
+{
+	CairoDockDialog *pDialog = cairo_dock_build_dialog (cText, pIcon, pDock);
+	
+	g_timeout_add ((fTimeLength > 0 ? fTimeLength : 2000), (GSourceFunc) cairo_dock_dialog_auto_delete, (gpointer) pDialog);
 }

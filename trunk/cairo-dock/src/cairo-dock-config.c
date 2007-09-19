@@ -52,6 +52,7 @@ extern gboolean g_bSameHorizontality;
 extern double g_fSubDockSizeRatio;
 extern gboolean bShowSubDockOnMouseOver;
 extern int g_iLeaveSubDockDelay;
+extern int g_iShowSubDockDelay;
 
 extern int g_iLabelSize;
 extern gchar *g_cLabelPolice;
@@ -497,6 +498,7 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	bShowSubDockOnMouseOver = cairo_dock_get_boolean_key_value (pKeyFile, "Sub-Docks", "on mouse over", &bFlushConfFileNeeded, TRUE);
 	
 	g_iLeaveSubDockDelay = cairo_dock_get_integer_key_value (pKeyFile, "Sub-Docks", "leaving delay", &bFlushConfFileNeeded, 250);
+	g_iShowSubDockDelay = cairo_dock_get_integer_key_value (pKeyFile, "Sub-Docks", "show delay", &bFlushConfFileNeeded, 300);
 	
 	//\___________________ On recupere les parametres du fond.
 	g_fStripesSpeedFactor = cairo_dock_get_double_key_value (pKeyFile, "Background", "scroll speed factor", &bFlushConfFileNeeded, 1.0);

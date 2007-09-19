@@ -136,7 +136,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 }
 
 
-gfloat cairo_dock_calculate_magnitude (gint iMagnitudeIndex)
+gfloat cairo_dock_calculate_magnitude (gint iMagnitudeIndex)  // merci a Robrob pour le patch !
 {
 	gfloat tmp= ((gfloat)iMagnitudeIndex)/CAIRO_DOCK_NB_MAX_ITERATIONS;
 	

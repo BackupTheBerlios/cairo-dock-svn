@@ -85,6 +85,7 @@
 #include "cairo-dock-menu.h"
 #include "cairo-dock-config.h"
 #include "cairo-dock-themes-manager.h"
+#include "cairo-dock-dialogs.h"
 #include "cairo-dock-notifications.h"
 
 CairoDock *g_pMainDock;  // pointeur sur le dock principal.
@@ -163,6 +164,7 @@ gboolean g_bSameHorizontality = TRUE;  // dit si les sous-docks ont la meme hori
 double g_fSubDockSizeRatio;  // ratio de la taille des icones des sous-docks par rapport a celles du dock principal.
 gboolean bShowSubDockOnMouseOver;
 int g_iLeaveSubDockDelay;
+int g_iShowSubDockDelay;
 
 int g_iLabelSize;  // taille de la police des etiquettes.
 gchar *g_cLabelPolice;  // police de caracteres des etiquettes.
@@ -205,6 +207,17 @@ CairoDockLoadDirectoryFunc cairo_dock_load_directory_func = NULL;
 gboolean g_bUseGlitz = FALSE;
 gboolean g_bVerbose = FALSE;
 
+
+static gboolean random_dialog (gpointer user_data)
+{
+	g_return_val_if_fail (g_pMainDock != NULL && g_pMainDock->icons != NULL, TRUE);
+	
+	int num_icone = g_random_int_range (0, g_list_length (g_pMainDock->icons));
+	
+	Icon *icon = g_list_nth_data (g_pMainDock->icons, num_icone);
+	cairo_dock_show_temporary_dialog ("Pouic pouic", icon, g_pMainDock, 2000);
+	return TRUE;
+}
 
 int
 main (int argc, char** argv)
@@ -356,6 +369,8 @@ main (int argc, char** argv)
 	}
 	
 	cairo_dock_load_theme (g_cCurrentThemePath);
+	
+	g_timeout_add (4000, (GSourceFunc) random_dialog, NULL);
 	
 	gtk_main ();
 	/*Window root = DefaultRootWindow (g_XDisplay);
