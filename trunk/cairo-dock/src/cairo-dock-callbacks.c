@@ -107,7 +107,7 @@ gboolean on_expose (GtkWidget *pWidget,
 		{
 			if (pDock->bInside)
 			{
-				//cairo_dock_render_blank (pDock);
+				cairo_dock_render_blank (pDock);
 			}
 			else
 				cairo_dock_render_background (pDock);
@@ -171,11 +171,10 @@ static void cairo_dock_show_subdock (Icon *pPointedIcon, int iMouseX, gboolean b
 	
 	pSubDock->bAtBottom = FALSE;
 	gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
-	///GtkWidget *dialog = cairo_dock_build_dialog ("Pouet poueT", pPointedIcon, pDock);  // pour test seulement.
 }
 gboolean _cairo_dock_show_sub_dock_delayed (CairoDock *pDock)
 {
-	g_print ("%s ()\n", __func__);
+	//g_print ("%s ()\n", __func__);
 	
 	Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
 	g_return_val_if_fail (icon != NULL && icon->pSubDock != NULL, FALSE);

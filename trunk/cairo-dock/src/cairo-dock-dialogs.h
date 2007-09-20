@@ -6,25 +6,6 @@
 
 #include "cairo-dock-struct.h"
 
-typedef struct 
-{
-	int iWidth;
-	int iHeight;
-	int iPositionX;
-	int iPositionY;
-	int iAimedX;
-	int iAimedY;
-	gboolean bRight;
-	int iGapFromDock;
-	cairo_surface_t* pTextBuffer;
-	int iTextWidth;
-	int iTextHeight;
-	gdouble fTextXOffset;
-	gdouble fTextYOffset;
-	GtkWidget *pWidget;
-	int iSidTimer;
-	} CairoDockDialog;
-
 
 void cairo_dock_free_dialog (CairoDockDialog *pDialog);
 

@@ -95,7 +95,25 @@ typedef struct _CairoDockModule {
 	gboolean bActive;
 } CairoDockModule;
 
-
+typedef struct 
+{
+	int iWidth;
+	int iHeight;
+	int iPositionX;
+	int iPositionY;
+	int iAimedX;
+	int iAimedY;
+	gboolean bRight;
+	int iGapFromDock;
+	cairo_surface_t* pTextBuffer;
+	int iTextWidth;
+	int iTextHeight;
+	gdouble fTextXOffset;
+	gdouble fTextYOffset;
+	GtkWidget *pWidget;
+	int iSidTimer;
+	int iRefCount;
+	} CairoDockDialog;
 
 typedef enum {
 	CAIRO_DOCK_LAUNCHER = 0,
@@ -149,6 +167,8 @@ typedef struct _Icon {
 	//\____________ Pour les modules.
 	CairoDockModule *pModule;
 	GtkWidget *pMenu;
+	//\____________ Pour les bulles de dialogues.
+	CairoDockDialog *pDialog;
 } Icon;
 
 

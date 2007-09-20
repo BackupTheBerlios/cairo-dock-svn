@@ -370,7 +370,7 @@ main (int argc, char** argv)
 	
 	cairo_dock_load_theme (g_cCurrentThemePath);
 	
-	g_timeout_add (4000, (GSourceFunc) random_dialog, NULL);
+	///g_timeout_add (4000, (GSourceFunc) random_dialog, NULL);  // pour tests seulement.
 	
 	gtk_main ();
 	/*Window root = DefaultRootWindow (g_XDisplay);

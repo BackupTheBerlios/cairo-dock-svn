@@ -107,21 +107,19 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 	}
 	g_free (cConfigFuncName);
 	
-	
-	CairoDockModuleAction function_action;
-	gchar *cActionFuncName = g_strdup_printf ("%s_action", pCairoDockModule->cModuleName);
-	if (!g_module_symbol (module, cActionFuncName, (gpointer) &function_action))
-	{
-		function_action = NULL;
-	}
-	g_free (cActionFuncName);
-	
-	
 	pCairoDockModule->pModule = module;
 	pCairoDockModule->initModule = function_init;
 	pCairoDockModule->stopModule = function_stop;
-	pCairoDockModule->actionModule = function_action;
 }
+
+static void cairo_dock_close_module (CairoDockModule *pCairoDockModule)
+{
+	g_module_close (pCairoDockModule->pModule);
+	pCairoDockModule->pModule = NULL;
+	pCairoDockModule->initModule = NULL;
+	pCairoDockModule->stopModule = NULL;
+}
+
 
 
 CairoDockModule * cairo_dock_load_module (gchar *cSoFilePath, GHashTable *pModuleTable, GError **erreur)  // cFilePath vers un fichier de la forme 'libtruc.so'. Le module est rajoute en debut de la liste si il n'est pas deja dedans. La liste peut neanmoins etre NULL.
@@ -213,7 +211,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, GHashTabl
 		cModuleName = cActiveModuleList[i];
 		//g_print (" + %s\n", cModuleName);
 		pModule = g_hash_table_lookup (pModuleTable, cModuleName);
-		if (pModule != NULL)
+		if (pModule != NULL && ! pModule->bActive)  // les modules qui n'ont pas d'icones ne sont pas desactives lors de la configuuration du dock, et donc peuvent etre deja actives.
 		{
 			Icon *pIcon = cairo_dock_activate_module (pModule, pDock, &erreur);
 			if (erreur != NULL)
@@ -241,6 +239,8 @@ void cairo_dock_free_module (CairoDockModule *module)
 	
 	cairo_dock_deactivate_module (module);
 	
+	cairo_dock_close_module (module);
+	
 	g_free (module->cModuleName);
 	g_free (module->cSoFilePath);
 	g_free (module);
@@ -256,12 +256,12 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 	
 	if (module->bActive)
 	{
-		g_set_error (erreur, 1, 1, "%s () : this module is already active !", __func__);
+		g_set_error (erreur, 1, 1, "%s () : module %s is already active !", __func__, module->cModuleName);
 		return NULL;
 	}
 	
 	GError *tmp_erreur = NULL;
-	if (module->pModule == NULL)
+	if (module->pModule == NULL)  // normalement impossible.
 	{
 		cairo_dock_open_module (module, &tmp_erreur);
 		if (tmp_erreur != NULL)
@@ -302,11 +302,6 @@ void cairo_dock_deactivate_module (CairoDockModule *module)
 	module->bActive = FALSE;
 	g_free (module->cConfFilePath);
 	module->cConfFilePath = NULL;
-	
-	g_module_close (module->pModule);
-	module->pModule = NULL;
-	module->initModule = NULL;
-	module->stopModule = NULL;
 }
 
 
@@ -339,7 +334,7 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 	
 	if (pNewIcon != NULL)
 	{
-		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, ! CAIRO_DOCK_APPLY_RATIO);
+		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 		//cairo_dock_redraw_my_icon (pNewIcon, pDock->pWidget);
 	}
 	

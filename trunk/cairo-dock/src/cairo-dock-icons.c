@@ -434,7 +434,7 @@ void cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon)
 		g_hash_table_remove (g_hXWindowTable, &icon->Xid);
 	if (icon->pModule != NULL)
 	{
-		cairo_dock_deactivate_module (icon->pModule);  // desactive le module mais ne le decharge pas.
+		cairo_dock_deactivate_module (icon->pModule);  // desactive le module mais ne le ferme pas.
 		icon->pModule = NULL;  // pour ne pas le liberer lors du free_icon.
 	}
 	

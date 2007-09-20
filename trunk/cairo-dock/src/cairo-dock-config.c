@@ -478,8 +478,10 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	g_fUnfoldAcceleration = 1 - pow (2, - fUserValue);
 	
 	int iNbSteps = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "grow up steps", &bFlushConfFileNeeded, 8);
+	iNbSteps = MAX (iNbSteps, 1);
 	g_iGrowUpInterval = MAX (1, CAIRO_DOCK_NB_MAX_ITERATIONS / iNbSteps);
 	iNbSteps = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "shrink down steps", &bFlushConfFileNeeded, 10);
+	iNbSteps = MAX (iNbSteps, 1);
 	g_iShrinkDownInterval = MAX (1, CAIRO_DOCK_NB_MAX_ITERATIONS / iNbSteps);
 	g_fMoveUpSpeed = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "move up speed", &bFlushConfFileNeeded, 0.35);
 	g_fMoveUpSpeed = MAX (0.01, MIN (g_fMoveUpSpeed, 1));
