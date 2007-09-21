@@ -104,7 +104,8 @@ typedef struct
 	int iAimedX;
 	int iAimedY;
 	gboolean bRight;
-	int iGapFromDock;
+	double fRadius;
+	double fTipHeight;
 	cairo_surface_t* pTextBuffer;
 	int iTextWidth;
 	int iTextHeight;
@@ -113,6 +114,7 @@ typedef struct
 	GtkWidget *pWidget;
 	int iSidTimer;
 	int iRefCount;
+	gboolean bBuildComplete;
 	} CairoDockDialog;
 
 typedef enum {

@@ -215,7 +215,7 @@ static gboolean random_dialog (gpointer user_data)
 	int num_icone = g_random_int_range (0, g_list_length (g_pMainDock->icons));
 	
 	Icon *icon = g_list_nth_data (g_pMainDock->icons, num_icone);
-	cairo_dock_show_temporary_dialog ("Pouic pouic", icon, g_pMainDock, 2000);
+	cairo_dock_show_temporary_dialog (icon->acName, icon, g_pMainDock, 8000);
 	return TRUE;
 }
 
@@ -232,6 +232,7 @@ main (int argc, char** argv)
 	
 	//\___________________ On recupere quelques options.
 	g_iWmHint = GDK_WINDOW_TYPE_HINT_NORMAL;
+	gboolean bDialogTest = FALSE;
 	for (i = 0; i < argc; i++)
 	{
 		if (strcmp (argv[i], "--glitz") == 0)
@@ -259,6 +260,8 @@ main (int argc, char** argv)
 			g_iWmHint = GDK_WINDOW_TYPE_HINT_TOOLBAR;
 		else if (strcmp (argv[i], "--dock-hint") == 0)
 			g_iWmHint = GDK_WINDOW_TYPE_HINT_DOCK;
+		else if (strcmp (argv[i], "--dialog") == 0)
+			bDialogTest = TRUE;
 		else if (strcmp (argv[i], "--version") == 0)  // le dock restera devant quoiqu'il arrive, mais ne recupere plus les touches clavier.
 		{
 			system ("pkg-config --modversion cairo-dock");
@@ -370,7 +373,8 @@ main (int argc, char** argv)
 	
 	cairo_dock_load_theme (g_cCurrentThemePath);
 	
-	///g_timeout_add (4000, (GSourceFunc) random_dialog, NULL);  // pour tests seulement.
+	if (bDialogTest)
+		g_timeout_add (3000, (GSourceFunc) random_dialog, NULL);  // pour tests seulement.
 	
 	gtk_main ();
 	/*Window root = DefaultRootWindow (g_XDisplay);
