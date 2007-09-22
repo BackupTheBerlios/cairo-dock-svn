@@ -36,6 +36,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-dock-factory.h"
 
+extern int g_iWmHint;
 extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
 extern gboolean g_bSameHorizontality;
@@ -396,7 +397,15 @@ void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
 		pDock->iWindowPositionX = iWindowPositionX;
 		pDock->iWindowPositionY = iWindowPositionY;
 	}
+	
 	cairo_dock_set_strut_partial (Xid, left, right, top, bottom, left_start_y, left_end_y, right_start_y, right_end_y, top_start_x, top_end_x, bottom_start_x, bottom_end_x);
+	
+	if ((bReserve && ! g_bDirectionUp) || (g_iWmHint == GDK_WINDOW_TYPE_HINT_DOCK))  // merci a Robrob pour le patch !
+		cairo_dock_set_window_type_hint (Xid, "_NET_WM_WINDOW_TYPE_DOCK");  // gtk_window_set_type_hint ne marche que sur une fenetre avant de la rendre visible !
+	else if (g_iWmHint == GDK_WINDOW_TYPE_HINT_NORMAL)
+		cairo_dock_set_window_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");  // idem.
+	else if (g_iWmHint == GDK_WINDOW_TYPE_HINT_TOOLBAR)
+		cairo_dock_set_window_type_hint (Xid, "_NET_WM_WINDOW_TYPE_TOOLBAR");  // idem.
 }
 
 void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMinDockWidth)

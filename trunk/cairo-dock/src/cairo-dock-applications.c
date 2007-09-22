@@ -624,7 +624,8 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 			{
 				//g_print ("c'est une nouvelle fenetre qui apparait\n");
 				cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
-				icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xmap.window, pDock);
+				if (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS)
+					icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xmap.window, pDock);
 				if (icon != NULL)
 				{
 					//g_print (" -> %s\n", icon->acName);
@@ -684,6 +685,7 @@ void cairo_dock_show_all_applis (CairoDock *pDock)
 	Window Xid;
 	Icon *pIcon;
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 	
 	//\__________________ On cree les icones de toutes les applis existantes.
 	for (i = 0; i < iNbWindows; i ++)
@@ -715,4 +717,17 @@ void cairo_dock_set_strut_partial (int Xid, int left, int right, int top, int bo
 		(guchar *) iGeometryStrut, 12);
 	
 	//cairo_dock_set_xwindow_timestamp (Xid, cairo_dock_get_xwindow_timestamp (root));
+}
+
+void cairo_dock_set_window_type_hint (int Xid, gchar *cWindowTypeName)
+{
+	g_return_if_fail (Xid > 0);
+	
+	gulong iwindowType = XInternAtom(g_XDisplay, cWindowTypeName, False);
+	
+	XChangeProperty (g_XDisplay,
+		Xid,
+		XInternAtom (g_XDisplay, "_NET_WM_WINDOW_TYPE", False),
+		XA_ATOM, 32, PropModeReplace,
+		(guchar *) &iwindowType, 1);
 }

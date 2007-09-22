@@ -168,7 +168,6 @@ typedef struct _Icon {
 	gboolean bIsMapped;
 	//\____________ Pour les modules.
 	CairoDockModule *pModule;
-	GtkWidget *pMenu;
 	//\____________ Pour les bulles de dialogues.
 	CairoDockDialog *pDialog;
 } Icon;

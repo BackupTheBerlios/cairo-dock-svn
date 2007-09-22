@@ -228,6 +228,9 @@ main (int argc, char** argv)
 	
 	
 	gtk_init (&argc, &argv);
+	GTimeVal time;
+	if (g_time_val_from_iso8601 ("2007-09-22T20:55:25Z", &time))
+		g_print ("OK\n");
 	
 	
 	//\___________________ On recupere quelques options.

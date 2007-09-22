@@ -26,6 +26,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 #include "cairo-dock-load.h"
 #include "cairo-dock-draw.h"
+#include "cairo-dock-config.h"
 #include "cairo-dock-applet-factory.h"
 
 
@@ -60,20 +61,20 @@ cairo_surface_t *cairo_dock_create_applet_surface (cairo_t *pSourceContext, doub
 
 
 
-Icon *cairo_dock_create_icon_for_applet (CairoDock *pDock, int iWidth, int iHeight, gchar *cName, gchar *cIconName, GtkWidget *pMenu)
+Icon *cairo_dock_create_icon_for_applet (CairoDock *pDock, int iWidth, int iHeight, gchar *cName, gchar *cIconFileName)
 {
 	Icon *icon = g_new0 (Icon, 1);
 	icon->iType = CAIRO_DOCK_APPLET;
 	
 	icon->acName = g_strdup (cName);
-	icon->acFileName = g_strdup (cIconName);
-	icon->pMenu = pMenu;
+	icon->acFileName = g_strdup (cIconFileName);  // NULL si cIconFileName = NULL.
 	
 	icon->fWidth =iWidth;
 	icon->fHeight =iHeight;
 	cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock);
+	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, icon);
 	
-	if (cIconName == NULL)
+	if (cIconFileName == NULL)
 		icon->pIconBuffer = cairo_dock_create_applet_surface (pSourceContext, 1 + g_fAmplitude, &icon->fWidth, &icon->fHeight);
 	else
 		cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
@@ -97,44 +98,11 @@ GKeyFile *cairo_dock_read_header_applet_conf_file (gchar *cConfFilePath, int *iW
 		return NULL;
 	}
 	
+	*iWidth = cairo_dock_get_integer_key_value (pKeyFile, "ICON", "width", bFlushConfFileNeeded, 48);
 	
-	*iWidth = g_key_file_get_integer (pKeyFile, "ICON", "width", &erreur);
-	if (erreur != NULL)
-	{
-		g_print ("Attention : %s\n", erreur->message);
-		g_error_free (erreur);
-		erreur = NULL;
-		*iWidth = 48;  // valeur par defaut.
-		g_key_file_set_integer (pKeyFile, "ICON", "width", *iWidth);
-		*bFlushConfFileNeeded = TRUE;
-	}
+	*iHeight = cairo_dock_get_integer_key_value (pKeyFile, "ICON", "height", bFlushConfFileNeeded, 48);
 	
-	*iHeight = g_key_file_get_integer (pKeyFile, "ICON", "height", &erreur);
-	if (erreur != NULL)
-	{
-		g_print ("Attention : %s\n", erreur->message);
-		g_error_free (erreur);
-		erreur = NULL;
-		*iHeight = 48;  // valeur par defaut.
-		g_key_file_set_integer (pKeyFile, "ICON", "height", *iHeight);
-		*bFlushConfFileNeeded = TRUE;
-	}
-	
-	*cName = g_key_file_get_locale_string (pKeyFile, "ICON", "name", NULL, &erreur);
-	if (erreur != NULL)
-	{
-		g_print ("Attention : %s\n", erreur->message);
-		g_error_free (erreur);
-		erreur = NULL;
-		*cName = NULL;  // valeur par defaut.
-		g_key_file_set_string (pKeyFile, "ICON", "name", "");
-		*bFlushConfFileNeeded = TRUE;
-	}
-	if (*cName != NULL && strcmp (*cName, "") == 0)
-	{
-		g_free (*cName);
-		*cName = NULL;
-	}
+	*cName = cairo_dock_get_string_key_value (pKeyFile, "ICON", "name", bFlushConfFileNeeded, NULL);
 	
 	return pKeyFile;
 }

@@ -431,7 +431,7 @@ void cairo_dock_render (CairoDock *pDock)
 	
 	//\____________________ On cree le contexte du dessin.
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
-	g_return_if_fail (pCairoContext != NULL);
+	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 	
 	cairo_set_tolerance (pCairoContext, 0.5);  // avec moins que 0.5 on ne voit pas la difference.
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
@@ -638,6 +638,7 @@ void cairo_dock_render_background (CairoDock *pDock)
 {
 	//g_print ("%s (%.2f)\n", __func__, g_fVisibleZoneAlpha);
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 	
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
@@ -661,6 +662,7 @@ void cairo_dock_render_blank (CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 	
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
@@ -705,7 +707,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 	gboolean bIsLoop = pDock->iRefCount == 0 && 1. * pDock->iCurrentWidth / pDock->iMaxDockWidth < .6 && pDock->bInside;
 	
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
-	g_return_if_fail (pCairoContext != NULL);
+	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 	/* set rendering-"fidelity" and clear canvas */
 	cairo_set_tolerance (pCairoContext, 0.5);
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
