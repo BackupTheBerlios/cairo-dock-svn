@@ -80,7 +80,6 @@ extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS];
 
 extern gboolean g_bUseGlitz;
-extern CairoDockClickFunc cairo_dock_launch_uri_func;
 
 
 gboolean on_expose (GtkWidget *pWidget,
@@ -638,26 +637,27 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 	
 	if (CAIRO_DOCK_IS_LAUNCHER (icon))
 	{
-		if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
-			cairo_dock_launch_uri_func (icon);
-		else if (icon->acCommand != NULL)
+		if (icon->acCommand != NULL)
+		{
 			g_spawn_command_line_async (icon->acCommand, NULL);
+			return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
+		}
 		else
 		{
 			icon->iCount = 0;
-			return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 		}
 	}
 	else if (CAIRO_DOCK_IS_VALID_APPLI (icon))
+	{
 		cairo_dock_show_appli (icon->Xid);
-	else if (CAIRO_DOCK_IS_VALID_APPLET (icon) && icon->pModule->actionModule != NULL)
-		icon->pModule->actionModule ();
+		return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
+	}
 	else
 	{
 		g_print ("No known action\n");
 		icon->iCount = 0;
-		return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 	}
+	return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 }
 
 gboolean on_button_press2 (GtkWidget* pWidget,
@@ -793,10 +793,8 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 		{
 			if (icon->pSubDock != NULL)
 			{
-				if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
-					cairo_dock_launch_uri_func (icon);
-				else if (icon->acCommand != NULL)
-					g_spawn_command_line_async (icon->acCommand, NULL);
+				gpointer data[2] = {icon, pDock};
+				cairo_dock_notify (CAIRO_DOCK_CLICK_ICON, data);
 			}
 		}
 	}

@@ -1408,3 +1408,16 @@ void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pRepla
 	}
 	g_strfreev (pGroupList);
 }
+
+
+gchar *cairo_dock_get_conf_file_language (GKeyFile *pKeyFile)
+{
+	gchar *cConfFileLanguage = NULL;
+	gchar *cFirstComment =  g_key_file_get_comment (pKeyFile, NULL, NULL, NULL);
+	if (cFirstComment == NULL || *cFirstComment != '!')
+	{
+		sscanf (cFirstComment, "!%s;", &cConfFileLanguage);
+	}
+	g_free (cFirstComment);
+	return cConfFileLanguage;
+}

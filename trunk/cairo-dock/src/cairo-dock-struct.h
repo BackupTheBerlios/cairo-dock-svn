@@ -89,7 +89,6 @@ typedef struct _CairoDockModule {
 	GModule *pModule;
 	CairoDockModuleInit initModule;
 	CairoDockModuleStop stopModule;
-	CairoDockModuleAction actionModule;
 	gchar *cConfFilePath;
 	gchar *cReadmeFilePath;
 	gboolean bActive;
@@ -131,6 +130,7 @@ typedef struct _Icon {
 	gchar *acDesktopFileName;
 	gchar *cBaseURI;
 	gboolean bIsMountingPoint;
+	gint iVolumeID;
 	gchar* acFileName;
 	gchar* acName;
 	gchar* acCommand;
