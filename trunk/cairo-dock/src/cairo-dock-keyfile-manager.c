@@ -615,7 +615,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							{
 								pOneWidget = gtk_hscale_new (GTK_ADJUSTMENT (pAdjustment));
 								gtk_scale_set_digits (GTK_SCALE (pOneWidget), 3);
-								gtk_widget_set (pOneWidget, "width-request", 150);
+								gtk_widget_set (pOneWidget, "width-request", 150, NULL);
 							}
 							else
 							{

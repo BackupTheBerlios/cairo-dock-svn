@@ -21,5 +21,6 @@
 #include "cairo-dock-themes-manager.h"
 #include "cairo-dock-animations.h"
 #include "cairo-dock-notifications.h"
+#include "cairo-dock-dialogs.h"
 
 #endif

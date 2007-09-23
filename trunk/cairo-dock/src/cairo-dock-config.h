@@ -19,7 +19,7 @@ gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupN
 
 
 
-void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock);
+void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock);
 
 
 gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc);

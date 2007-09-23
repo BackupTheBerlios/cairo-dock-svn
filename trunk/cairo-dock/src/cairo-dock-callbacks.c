@@ -142,7 +142,8 @@ static void cairo_dock_show_subdock (Icon *pPointedIcon, int iMouseX, gboolean b
 		cairo_dock_calculate_construction_parameters (pPointedIcon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fAlign, pDock->fLateralFactor);  // c'est un peu un hack pourri, l'idee c'est de recalculer la position exacte de l'icone pointee pour pouvoir placer le sous-dock precisement, car sa derniere position connue est decalee d'un coup de molette par rapport a la nouvelle, ce qui fait beaucoup.
 	}
 	
-	int iX = iMouseX + (iMouseX < pPointedIcon->fDrawX + pPointedIcon->fWidth / 2 ? (g_bDirectionUp ? 1 : 0) : (g_bDirectionUp ? 0 : -1)) * pPointedIcon->fWidth * pPointedIcon->fScale / 2;
+	int iX = iMouseX + (-iMouseX + (pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2)) / 2;
+	//int iX = iMouseX + (iMouseX < pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 ? (g_bDirectionUp ? 1 : 0) : (g_bDirectionUp ? 0 : -1)) * pPointedIcon->fWidth * pPointedIcon->fScale / 2;
 	if (pSubDock->bHorizontalDock == pDock->bHorizontalDock)
 	{
 		pSubDock->fAlign = 0.5;
@@ -175,11 +176,9 @@ static void cairo_dock_show_subdock (Icon *pPointedIcon, int iMouseX, gboolean b
 gboolean _cairo_dock_show_sub_dock_delayed (CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
-	
 	Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
-	g_return_val_if_fail (icon != NULL && icon->pSubDock != NULL, FALSE);
-	
-	cairo_dock_show_subdock (icon, pDock->iMouseX, FALSE, pDock);
+	if (icon != NULL && icon->pSubDock != NULL)
+		cairo_dock_show_subdock (icon, pDock->iMouseX, FALSE, pDock);
 	return FALSE;
 }
 gboolean on_motion_notify2 (GtkWidget* pWidget,
@@ -195,6 +194,8 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	int iX, iY;
 	if (pMotion != NULL)
 	{
+		if (g_iShowSubDockDelay > 0)
+			pDock->iMouseX = (pDock->bHorizontalDock ? pMotion->x : pMotion->y);
 		if (pDock->iSidShrinkDown > 0 || pMotion->time - fLastTime < g_fRefreshInterval)  // si les icones sont en train de diminuer de taille (suite a un clic) on ne redimensionne pas les icones, le temps que l'animation se finisse.  // || ! pDock->bInside || pDock->bAtBottom
 		{
 			if (pDock->iSidShrinkDown == 0)
@@ -322,6 +323,7 @@ gboolean _cairo_dock_emit_leave_signal (CairoDock *pDock)
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
 	//g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
+	s_iInternMovingIconType = -1;
 	pDock->bInside = FALSE;
 	pDock->bAtTop = FALSE;
 	if (pDock->bMenuVisible)
@@ -389,6 +391,11 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	while (gtk_events_pending ())  // on laisse le temps au signal d'entree dans le sous-dock d'etre traite.
 		gtk_main_iteration ();
 	
+	if (s_iSidShowSubDockDemand != 0)
+	{
+		g_source_remove (s_iSidShowSubDockDemand);
+		s_iSidShowSubDockDemand = 0;
+	}
 	if (! cairo_dock_hide_child_docks (pDock))  // on quitte si on entre dans un sous-dock, pour rester en position "haute".
 		return FALSE;
 	
@@ -425,7 +432,6 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	if ((g_bAutoHide && pDock->iRefCount == 0) && pDock->bAtBottom)
 		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - g_iVisibleZoneHeight - pDock->iGapY : g_iVisibleZoneHeight + pDock->iGapY - pDock->iMaxDockHeight);
 	
-	///if (pDock->bAtBottom || ! (g_bAutoHide && pDock->iRefCount == 0))
 	if (pDock->bHorizontalDock)
 		gdk_window_move_resize (pWidget->window,
 			pDock->iWindowPositionX,

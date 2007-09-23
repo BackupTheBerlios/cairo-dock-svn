@@ -354,16 +354,16 @@ gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupN
 
 
 
-void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
+void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 {
-	//g_print ("%s (%s)\n", __func__, conf_file);
+	//g_print ("%s (%s)\n", __func__, cConfFilePath);
 	GError *erreur = NULL;
 	gsize length;
 	gboolean bFlushConfFileNeeded = FALSE;  // si un champ n'existe pas, on le rajoute au fichier de conf.
 	
 	//\___________________ On ouvre le fichier de conf.
 	GKeyFile *pKeyFile = g_key_file_new ();
-	g_key_file_load_from_file (pKeyFile, conf_file, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+	g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
@@ -752,14 +752,14 @@ void cairo_dock_read_conf_file (gchar *conf_file, CairoDock *pDock)
 	
 	if ((cPreviousLanguage != NULL && g_cLanguage != NULL && strcmp (cPreviousLanguage, g_cLanguage) != 0) || bFlushConfFileNeeded)
 	{
-		gchar *cCommand = g_strdup_printf ("/bin/cp %s/cairo-dock-%s.conf %s", CAIRO_DOCK_SHARE_DATA_DIR, g_cLanguage, conf_file);
+		gchar *cCommand = g_strdup_printf ("/bin/cp %s/cairo-dock-%s.conf %s", CAIRO_DOCK_SHARE_DATA_DIR, g_cLanguage, cConfFilePath);
 		system (cCommand);
 		g_free (cCommand);
 		
-		cairo_dock_replace_values_in_conf_file (conf_file, pKeyFile, TRUE, 0);
+		cairo_dock_replace_values_in_conf_file (cConfFilePath, pKeyFile, TRUE, 0);
 		
-		cairo_dock_update_conf_file_with_modules (conf_file, g_hModuleTable);
-		cairo_dock_update_conf_file_with_translations (conf_file, CAIRO_DOCK_SHARE_DATA_DIR);
+		cairo_dock_update_conf_file_with_modules (cConfFilePath, g_hModuleTable);
+		cairo_dock_update_conf_file_with_translations (cConfFilePath, CAIRO_DOCK_SHARE_DATA_DIR);
 	}
 	g_free (cPreviousLanguage);
 	

@@ -679,7 +679,7 @@ void cairo_dock_render_blank (CairoDock *pDock)
 
 void cairo_dock_redraw_my_icon (Icon *icon, CairoDock *pDock)
 {
-	if (pDock->bAtBottom && g_bAutoHide)
+	if (pDock->bAtBottom && (pDock->iRefCount > 0 || g_bAutoHide))
 		return ;
 	GdkRectangle rect = {(int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor)), (int) icon->fDrawY, (int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)), (int) icon->fHeight * icon->fScale};
 	if (! pDock->bHorizontalDock)
@@ -700,7 +700,7 @@ void cairo_dock_redraw_my_icon (Icon *icon, CairoDock *pDock)
 
 void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 {
-	//g_print ("%s ((%d;%d) x (%d;%d) / (%dx%d))\n", __func__, pArea->x, pArea->y, pArea->width, pArea->height, pDock->iCurrentWidth, pDock->iCurrentHeight);
+	g_print ("%s ((%d;%d) x (%d;%d) / (%dx%d))\n", __func__, pArea->x, pArea->y, pArea->width, pArea->height, pDock->iCurrentWidth, pDock->iCurrentHeight);
 	double fLineWidth = g_iDockLineWidth;
 	int iWidth = pDock->iCurrentWidth;
 	int iHeight = pDock->iCurrentHeight;
