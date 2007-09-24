@@ -129,7 +129,6 @@ typedef struct _Icon {
 	//\____________ renseignes lors de la creation de l'icone.
 	gchar *acDesktopFileName;
 	gchar *cBaseURI;
-	gboolean bIsMountingPoint;
 	gint iVolumeID;
 	gchar* acFileName;
 	gchar* acName;

@@ -311,11 +311,13 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 	CairoDockModule *module = data[0];
 	CairoDock *pDock = data[1];
 	GError *erreur = NULL;
+	if (! module->bActive)
+		return;
 	
 	cairo_dock_deactivate_module (module);
 	Icon *pNewIcon = cairo_dock_activate_module (module, pDock, &erreur);
 	if (erreur != NULL)
-	{
+ 	{
 		module->bActive = FALSE;
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
@@ -335,7 +337,7 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 	if (pNewIcon != NULL)
 	{
 		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
-		//cairo_dock_redraw_my_icon (pNewIcon, pDock->pWidget);
+		cairo_dock_redraw_my_icon (pNewIcon, pDock->pWidget);
 	}
 	
 	//gtk_widget_queue_draw (pDock->pWidget);

@@ -458,10 +458,10 @@ void cairo_dock_load_icon_info_from_desktop_file (gchar *cDesktopFileName, Icon 
 		icon->cBaseURI = NULL;
 	}
 	
-	icon->bIsMountingPoint = g_key_file_get_boolean (keyfile, "Desktop Entry", "Is mounting point", &erreur);
+	icon->iVolumeID = g_key_file_get_boolean (keyfile, "Desktop Entry", "Is mounting point", &erreur);
 	if (erreur != NULL)
 	{
-		icon->bIsMountingPoint = FALSE;
+		icon->iVolumeID = FALSE;
 		g_error_free (erreur);
 		erreur = NULL;
 	}

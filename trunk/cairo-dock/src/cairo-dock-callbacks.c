@@ -408,7 +408,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	//g_print ("%s (bAtTop:%d; bInside:%d; iSidMoveDown:%d; fMagnitude:%f)\n", __func__, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->fMagnitude);
+	g_print ("%s (bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
 	if (pDock->iSidLeaveDemand != 0)
 	{
 		g_source_remove (pDock->iSidLeaveDemand);
@@ -418,7 +418,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	{
 		return FALSE;
 	}
-	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
 	pDock->fDecorationsOffsetX = 0;
 	if (! pDock->bIsMainDock)
@@ -659,7 +659,14 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 	}
 	return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 }
-
+gboolean cairo_dock_notification_double_click_icon (gpointer *data)
+{
+	Icon *icon = data[0];
+	if (icon->pSubDock != NULL)
+		return cairo_dock_notification_click_icon (data);
+	else
+		return CAIRO_DOCK_LET_PASS_NOTIFICATION;
+}
 gboolean on_button_press2 (GtkWidget* pWidget,
 				GdkEventButton* pButton,
 				CairoDock *pDock)
@@ -791,11 +798,8 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 		}
 		else if (pButton->type == GDK_2BUTTON_PRESS)
 		{
-			if (icon->pSubDock != NULL)
-			{
-				gpointer data[2] = {icon, pDock};
-				cairo_dock_notify (CAIRO_DOCK_CLICK_ICON, data);
-			}
+			gpointer data[2] = {icon, pDock};
+			cairo_dock_notify (CAIRO_DOCK_DOUBLE_CLICK_ICON, data);
 		}
 	}
 	else if (pButton->button == 3 && pButton->type == GDK_BUTTON_PRESS)  // clique droit.

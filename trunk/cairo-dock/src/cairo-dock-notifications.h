@@ -10,6 +10,7 @@ typedef gboolean (* CairoDockNotificationFunc) (gpointer *data);
 typedef enum {
 	CAIRO_DOCK_REMOVE_ICON=0,  // data : {Icon, CairoDock}
 	CAIRO_DOCK_CLICK_ICON,  // data : Icon
+	CAIRO_DOCK_DOUBLE_CLICK_ICON,  // data : Icon
 	CAIRO_DOCK_ADD_ICON,  // data : {Icon, CairoDock}
 	CAIRO_DOCK_MODIFY_ICON,  // data : {Icon, CairoDock}
 	CAIRO_DOCK_BUILD_MENU,  // data : {Icon, CairoDock, GtkMenu}

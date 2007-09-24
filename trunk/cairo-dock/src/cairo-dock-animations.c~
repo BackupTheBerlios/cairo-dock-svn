@@ -136,7 +136,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 }
 
 
-gfloat cairo_dock_calculate_magnitude (gint iMagnitudeIndex)
+gfloat cairo_dock_calculate_magnitude (gint iMagnitudeIndex)  // merci a Robrob pour le patch !
 {
 	gfloat tmp= ((gfloat)iMagnitudeIndex)/CAIRO_DOCK_NB_MAX_ITERATIONS;
 	
@@ -201,7 +201,6 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 		pDock->fMagnitude *= g_fShrinkDownFactor; //  0.6
 	else
 		pDock->fMagnitude = 0.0;*/
-	g_print ("g_iShrinkDownInterval : %d\n", g_iShrinkDownInterval);
 	pDock->iMagnitudeIndex -= g_iShrinkDownInterval;
 	if (pDock->iMagnitudeIndex < 0)
 		pDock->iMagnitudeIndex = 0;
@@ -214,6 +213,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 	
 	if (pDock->iScrollOffset != 0 && g_bResetScrollOnLeave)
 	{
+		g_print ("iScrollOffset : %d\n", pDock->iScrollOffset);
 		if (pDock->iScrollOffset < pDock->iMinDockWidth / 2)
 			pDock->iScrollOffset = pDock->iScrollOffset * g_fScrollAcceleration;
 		else
@@ -269,7 +269,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 				gtk_widget_hide (pDock->pWidget);
 				cairo_dock_hide_parent_docks (pDock);
 			}
-			//g_print ("fin du shrink down\n");
+			
 			pDock->iSidShrinkDown = 0;
 			return FALSE;
 		}

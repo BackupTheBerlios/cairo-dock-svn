@@ -73,8 +73,12 @@ void cairo_dock_free_icon (Icon *icon)
 	cairo_surface_destroy (icon->pIconBuffer);
 	cairo_surface_destroy (icon->pTextBuffer);
 	
-	if (CAIRO_DOCK_IS_APPLI (icon) && g_bUniquePid)
-		g_hash_table_remove (g_hAppliTable, &icon->iPid);
+	if (CAIRO_DOCK_IS_VALID_APPLI (icon))
+	{
+		g_hash_table_remove (g_hXWindowTable, &icon->Xid);
+		if (g_bUniquePid)
+			g_hash_table_remove (g_hAppliTable, &icon->iPid);
+	}
 	if (CAIRO_DOCK_IS_VALID_APPLET (icon))
 		cairo_dock_free_module (icon->pModule);
 	
@@ -287,6 +291,19 @@ Icon *cairo_dock_get_icon_with_subdock (GList *pIconList, CairoDock *pSubDock)
 	return NULL;
 }
 
+Icon *cairo_dock_get_icon_with_module (GList *pIconList, CairoDockModule *pModule)
+{
+	GList* ic;
+	Icon *icon;
+	for (ic = pIconList; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (icon->pModule == pModule)
+			return icon;
+	}
+	return NULL;
+}
+
 
 
 void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
@@ -429,9 +446,15 @@ void cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon)
 {
 	//\___________________ On effectue les taches de fermeture de l'icone suivant son type.
 	if (icon->iPid != 0 && g_bUniquePid)
+	{
 		g_hash_table_remove (g_hAppliTable, &icon->iPid);
+		icon->iPid = 0;
+	}
 	if (icon->Xid != 0)
+	{
 		g_hash_table_remove (g_hXWindowTable, &icon->Xid);
+		icon->Xid = 0;
+	}
 	if (icon->pModule != NULL)
 	{
 		cairo_dock_deactivate_module (icon->pModule);  // desactive le module mais ne le ferme pas.

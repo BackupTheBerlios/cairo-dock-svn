@@ -19,5 +19,8 @@ GKeyFile *cairo_dock_read_header_applet_conf_file (gchar *cConfFilePath, int *iW
 GHashTable *cairo_dock_list_themes (gchar *cThemesDir, GHashTable *hProvidedTable, GError **erreur);
 
 
+gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShareDataDir, gchar *cConfFileName);
+
+
 #endif
 

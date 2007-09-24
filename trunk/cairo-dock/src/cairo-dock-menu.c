@@ -182,15 +182,18 @@ static void cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 		if (icon->pSubDock != NULL)
 		{
 			gboolean bDestroyIcons = TRUE;
-			dialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
-				GTK_DIALOG_DESTROY_WITH_PARENT,
-				GTK_MESSAGE_QUESTION,
-				GTK_BUTTONS_YES_NO,
-				"Do you want to re-dispatch the icons contained inside this container into the dock (otherwise they will be destroyed) ?");
-			int answer = gtk_dialog_run (GTK_DIALOG (dialog));
-			gtk_widget_destroy (dialog);
-			if (answer == GTK_RESPONSE_YES)
-				bDestroyIcons = FALSE;
+			if (icon->cBaseURI == NULL)
+			{
+				dialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
+					GTK_DIALOG_DESTROY_WITH_PARENT,
+					GTK_MESSAGE_QUESTION,
+					GTK_BUTTONS_YES_NO,
+					"Do you want to re-dispatch the icons contained inside this container into the dock (otherwise they will be destroyed) ?");
+				int answer = gtk_dialog_run (GTK_DIALOG (dialog));
+				gtk_widget_destroy (dialog);
+				if (answer == GTK_RESPONSE_YES)
+					bDestroyIcons = FALSE;
+			}
 			cairo_dock_destroy_dock (icon->pSubDock, icon->acName, (bDestroyIcons ? NULL : g_pMainDock), (bDestroyIcons ? NULL : CAIRO_DOCK_MAIN_DOCK_NAME));
 			icon->pSubDock = NULL;
 		}
@@ -402,6 +405,16 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 }
 
 
+static void cairo_dock_initiate_config_module_from_module (GtkMenuItem *menu_item, CairoDockModule *pModule)
+{
+	GError *erreur = NULL;
+	cairo_dock_configure_module (pModule, g_pMainDock, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+	}
+}
 static void cairo_dock_initiate_config_module (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
@@ -543,6 +556,16 @@ static void cairo_dock_delete_menu (GtkMenuShell *menu, CairoDock *pDock)
 }
 
 
+static void _cairo_dock_insert_module_in_menu (gchar *cModuleName, CairoDockModule *pModule, GtkWidget *pModuleSubMenu)
+{
+	if (pModule->cConfFilePath != NULL)
+	{
+		GtkWidget *menu_item;
+		menu_item = gtk_menu_item_new_with_label (cModuleName);
+		gtk_menu_shell_append  (GTK_MENU_SHELL (pModuleSubMenu), menu_item);
+		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_initiate_config_module_from_module), pModule);
+	}
+}
 GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 {
 	static gpointer *data = NULL;
@@ -583,6 +606,14 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	menu_item = gtk_menu_item_new_with_label ("Behaviour");
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pConfSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_edit_and_reload_behaviour), data);
+	
+	menu_item = gtk_menu_item_new_with_label ("Modules");
+	gtk_menu_shell_append  (GTK_MENU_SHELL (pConfSubMenu), menu_item);
+	GtkWidget *pModuleSubMenu = gtk_menu_new ();
+	gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), pModuleSubMenu);
+	
+	g_hash_table_foreach (g_hModuleTable, _cairo_dock_insert_module_in_menu, pModuleSubMenu);
+	
 	
 	menu_item = gtk_menu_item_new_with_label ("Manage themes");
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);

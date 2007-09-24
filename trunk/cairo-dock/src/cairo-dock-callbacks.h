@@ -34,6 +34,7 @@ gboolean on_key_press (GtkWidget *pWidget,
 				CairoDock *pDock);
 
 gboolean cairo_dock_notification_click_icon (gpointer *data);
+gboolean cairo_dock_notification_double_click_icon (gpointer *data);
 gboolean on_button_press2 (GtkWidget* pWidget,
 					GdkEventButton* pButton,
 					CairoDock *pDock);

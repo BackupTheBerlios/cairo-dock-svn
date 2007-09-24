@@ -40,6 +40,7 @@ Icon *cairo_dock_get_previous_icon (GList *pIconList, Icon *pIcon);
 Icon *cairo_dock_get_icon_with_command (GList *pIconList, gchar *cCommand);
 Icon *cairo_dock_get_icon_with_base_uri (GList *pIconList, gchar *cBaseURI);
 Icon *cairo_dock_get_icon_with_subdock (GList *pIconList, CairoDock *pSubDock);
+Icon *cairo_dock_get_icon_with_module (GList *pIconList, CairoDockModule *pModule);
 
 #define cairo_dock_none_clicked(pIconList) (cairo_dock_get_bouncing_icon (pIconList) == NULL)
 #define cairo_dock_none_removed_or_inserted(pIconList) (cairo_dock_get_removing_or_inserting_icon (pIconList) == NULL)

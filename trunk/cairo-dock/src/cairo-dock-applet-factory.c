@@ -29,6 +29,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-config.h"
 #include "cairo-dock-applet-factory.h"
 
+extern gchar *g_cCurrentThemePath;
 
 extern double g_fAmplitude;
 extern int g_iLabelSize;
@@ -138,4 +139,30 @@ GHashTable *cairo_dock_list_themes (gchar *cThemesDir, GHashTable *hProvidedTabl
 	g_dir_close (dir);
 	
 	return pThemeTable;
+}
+
+
+
+gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShareDataDir, gchar *cConfFileName)
+{
+	gchar *cUserDataDirPath = g_strdup_printf ("%s/plug-ins/%s", g_cCurrentThemePath, cUserDataDirName);
+	if (! g_file_test (cUserDataDirPath, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
+	{
+		g_print ("directory %s doesn't exist, I will try to add it.\n", cUserDataDirPath);
+		
+		gchar *command = g_strdup_printf ("mkdir -p %s", cUserDataDirPath);
+		system (command);
+		g_free (command);
+	}
+	
+	gchar *cConfFilePath = g_strdup_printf ("%s/%s", cUserDataDirPath, cConfFileName);
+	if (! g_file_test (*cConfFilePath, G_FILE_TEST_EXISTS))
+	{
+		gchar *command = g_strdup_printf ("cp %s/%s %s", cShareDataDir, cConfFileName, cUserDataDirPath);
+		system (command);
+		g_free (command);
+	}
+	
+	g_free (cUserDataDirPath);
+	return cConfFilePath;
 }

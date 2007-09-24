@@ -75,7 +75,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
 	///if (pDock->fMagnitude > 0.0)  // on retarde le cachage du dock pour apercevoir les effets.
-	if (pDock->iMagnitudeIndex > 0)  // on retarde le cachage du dock pour apercevoir les effets.
+	if (pDock->iMagnitudeIndex > 0 || (g_bResetScrollOnLeave && pDock->iScrollOffset != 0))  // on retarde le cachage du dock pour apercevoir les effets.
 		return TRUE;
 	int deltaY_possible = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - pDock->iGapY - g_iVisibleZoneHeight : pDock->iGapY + g_iVisibleZoneHeight - pDock->iMaxDockHeight) - pDock->iWindowPositionY;
 	//g_print ("%s (%d)\n", __func__, deltaY_possible);
@@ -213,6 +213,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 	
 	if (pDock->iScrollOffset != 0 && g_bResetScrollOnLeave)
 	{
+		g_print ("iScrollOffset : %d\n", pDock->iScrollOffset);
 		if (pDock->iScrollOffset < pDock->iMinDockWidth / 2)
 			pDock->iScrollOffset = pDock->iScrollOffset * g_fScrollAcceleration;
 		else
@@ -268,7 +269,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 				gtk_widget_hide (pDock->pWidget);
 				cairo_dock_hide_parent_docks (pDock);
 			}
-			//g_print ("fin du shrink down\n");
+			
 			pDock->iSidShrinkDown = 0;
 			return FALSE;
 		}
