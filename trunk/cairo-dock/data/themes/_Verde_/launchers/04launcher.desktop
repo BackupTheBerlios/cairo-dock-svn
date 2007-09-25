@@ -2,8 +2,7 @@
 
 [Desktop Entry]
 #s Launcher's name :
-Name[fr]=music et video
-Name[en]=New Launcher
+Name=music et video
 #s Exec command :
 Exec=
 #s Image's name or path :

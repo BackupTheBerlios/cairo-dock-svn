@@ -156,6 +156,44 @@ static void cairo_dock_help (GtkMenuItem *menu_item, gpointer *data)
 }
 
 
+gboolean cairo_dock_notification_remove_icon (gpointer *data)
+{
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
+	
+	if (icon->acDesktopFileName != NULL)
+	{
+		gchar *icon_path = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
+		g_remove (icon_path);
+		g_free (icon_path);
+	}
+	
+	if (icon->pSubDock != NULL)
+	{
+		gboolean bDestroyIcons = TRUE;
+		if (icon->cBaseURI == NULL)
+		{
+			GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
+				GTK_DIALOG_DESTROY_WITH_PARENT,
+				GTK_MESSAGE_QUESTION,
+				GTK_BUTTONS_YES_NO,
+				"Do you want to re-dispatch the icons contained inside this container into the dock (otherwise they will be destroyed) ?");
+			int answer = gtk_dialog_run (GTK_DIALOG (dialog));
+			gtk_widget_destroy (dialog);
+			if (answer == GTK_RESPONSE_YES)
+				bDestroyIcons = FALSE;
+		}
+		cairo_dock_destroy_dock (icon->pSubDock, icon->acName, (bDestroyIcons ? NULL : g_pMainDock), (bDestroyIcons ? NULL : CAIRO_DOCK_MAIN_DOCK_NAME));
+		icon->pSubDock = NULL;
+	}
+	
+	icon->fPersonnalScale = 1.0;
+	if (pDock->iSidShrinkDown == 0)
+		pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+	
+	cairo_dock_mark_theme_as_modified (TRUE);
+	return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
+}
 static void cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
@@ -172,37 +210,7 @@ static void cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 	gtk_widget_destroy (dialog);
 	if (answer == GTK_RESPONSE_YES)
 	{
-		if (icon->acDesktopFileName != NULL)
-		{
-			gchar *icon_path = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
-			g_remove (icon_path);
-			g_free (icon_path);
-		}
-		
-		if (icon->pSubDock != NULL)
-		{
-			gboolean bDestroyIcons = TRUE;
-			if (icon->cBaseURI == NULL)
-			{
-				dialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
-					GTK_DIALOG_DESTROY_WITH_PARENT,
-					GTK_MESSAGE_QUESTION,
-					GTK_BUTTONS_YES_NO,
-					"Do you want to re-dispatch the icons contained inside this container into the dock (otherwise they will be destroyed) ?");
-				int answer = gtk_dialog_run (GTK_DIALOG (dialog));
-				gtk_widget_destroy (dialog);
-				if (answer == GTK_RESPONSE_YES)
-					bDestroyIcons = FALSE;
-			}
-			cairo_dock_destroy_dock (icon->pSubDock, icon->acName, (bDestroyIcons ? NULL : g_pMainDock), (bDestroyIcons ? NULL : CAIRO_DOCK_MAIN_DOCK_NAME));
-			icon->pSubDock = NULL;
-		}
-		
-		icon->fPersonnalScale = 1.0;
-		if (pDock->iSidShrinkDown == 0)
-			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
-		
-		cairo_dock_mark_theme_as_modified (TRUE);
+		cairo_dock_notify (CAIRO_DOCK_REMOVE_ICON, data);
 	}
 }
 
@@ -612,7 +620,7 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	GtkWidget *pModuleSubMenu = gtk_menu_new ();
 	gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), pModuleSubMenu);
 	
-	g_hash_table_foreach (g_hModuleTable, _cairo_dock_insert_module_in_menu, pModuleSubMenu);
+	g_hash_table_foreach (g_hModuleTable, (GHFunc)_cairo_dock_insert_module_in_menu, pModuleSubMenu);
 	
 	
 	menu_item = gtk_menu_item_new_with_label ("Manage themes");

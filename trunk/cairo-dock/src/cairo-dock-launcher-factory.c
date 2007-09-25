@@ -51,7 +51,6 @@ extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 
 extern gboolean g_bUseGlitz;
-extern CairoDockLoadDirectoryFunc cairo_dock_load_directory_func;
 
 
 gchar *cairo_dock_search_image_path (gchar *cFileName)
@@ -480,22 +479,10 @@ void cairo_dock_load_icon_info_from_desktop_file (gchar *cDesktopFileName, Icon 
 		if (pChildDock == NULL)
 		{
 			g_print ("le dock fils (%s) n'existe pas, on le cree\n", icon->acName);
-			if (icon->cBaseURI != NULL && cairo_dock_load_directory_func != NULL)
-			{
-				cairo_dock_load_directory_func (icon);
-			}
-			else
-			{
-				pChildDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->acName);
-				cairo_dock_reference_dock (pChildDock);
-				icon->pSubDock = pChildDock;
-			}
+			pChildDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->acName);
 		}
-		else
-		{
-			cairo_dock_reference_dock (pChildDock);
-			icon->pSubDock = pChildDock;
-		}
+		cairo_dock_reference_dock (pChildDock);
+		icon->pSubDock = pChildDock;
 	}
 	
 	icon->cParentDockName = g_key_file_get_string (keyfile, "Desktop Entry", "Container", &erreur);

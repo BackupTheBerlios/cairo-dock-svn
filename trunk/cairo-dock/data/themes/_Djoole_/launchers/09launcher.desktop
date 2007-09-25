@@ -2,7 +2,6 @@
 [Desktop Entry]
 #s Launcher's name :
 Name=HellaNZB
-Name[fr]=HellaNZB
 #s Exec command :
 Exec=alltray -i /usr/share/icons/Neu/scalable/categories/gnome-globe.svg -stask "gnome-terminal -t HellaNZB -x hellanzb"
 #S Image's name or path :

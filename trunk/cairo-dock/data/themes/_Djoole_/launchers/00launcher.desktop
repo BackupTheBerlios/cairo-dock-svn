@@ -1,8 +1,7 @@
 #!
 [Desktop Entry]
 #s Launcher's name :
-Name=Linux Server
-Name[fr]=Serveur Linux
+Name=Serveur Linux
 #s Exec command :
 Exec=gnome-terminal -x ssh julien-serveur
 #S Image's name or path :

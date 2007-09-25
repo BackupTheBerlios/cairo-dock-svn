@@ -47,7 +47,8 @@ static int s_iSidShowSubDockDemand = 0;
 
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
-extern gboolean bShowSubDockOnMouseOver;
+extern gboolean g_bShowSubDockOnMouseOver;
+extern gboolean g_bAnimateSubDock;
 extern double g_fUnfoldAcceleration;
 extern int g_iLeaveSubDockDelay;
 extern int g_iShowSubDockDelay;
@@ -146,7 +147,7 @@ static void cairo_dock_show_subdock (Icon *pPointedIcon, int iMouseX, gboolean b
 	if (pSubDock->bHorizontalDock == pDock->bHorizontalDock)
 	{
 		pSubDock->fAlign = 0.5;
-		pSubDock->iGapX = iX + pDock->iWindowPositionX - g_iScreenWidth[pDock->bHorizontalDock] / 2; // les sous-dock ont un alignement egal a 0.5.  // pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2
+		pSubDock->iGapX = iX + pDock->iWindowPositionX - g_iScreenWidth[pDock->bHorizontalDock] / 2;  // les sous-dock ont un alignement egal a 0.5.  // pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2
 		pSubDock->iGapY = pDock->iGapY + pDock->iMaxDockHeight;
 	}
 	else
@@ -158,19 +159,43 @@ static void cairo_dock_show_subdock (Icon *pPointedIcon, int iMouseX, gboolean b
 		else
 			pSubDock->iGapY = iX + pDock->iWindowPositionX;  // les sous-dock ont un alignement egal a 0.
 	}
+	
 	pSubDock->fLateralFactor = g_fUnfoldAcceleration;
-	int iNewWidth, iNewHeight;
-	cairo_dock_calculate_window_position_at_balance (pSubDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
-	
-	//g_print ("  -> Gap %d;%d -> W(%d;%d) (%d)\n", pSubDock->iGapX, pSubDock->iGapY, pSubDock->iWindowPositionX, pSubDock->iWindowPositionY, pSubDock->bHorizontalDock);
-	if (pSubDock->bHorizontalDock)
-		gtk_window_move (GTK_WINDOW (pSubDock->pWidget), pSubDock->iWindowPositionX, pSubDock->iWindowPositionY);
-	else
-		gtk_window_move (GTK_WINDOW (pSubDock->pWidget), pSubDock->iWindowPositionY, pSubDock->iWindowPositionX);
-	//g_print ("MaJ de pLastPointedDock\n");
-	
 	pSubDock->bAtBottom = FALSE;
-	gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
+	int iNewWidth, iNewHeight;
+	if (! g_bAnimateSubDock || g_fUnfoldAcceleration == 0)
+	{
+		cairo_dock_calculate_window_position_at_balance (pSubDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
+		
+		if (pSubDock->bHorizontalDock)
+			gtk_window_move (GTK_WINDOW (pSubDock->pWidget), pSubDock->iWindowPositionX, pSubDock->iWindowPositionY);
+		else
+			gtk_window_move (GTK_WINDOW (pSubDock->pWidget), pSubDock->iWindowPositionY, pSubDock->iWindowPositionX);
+		
+		gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
+	}
+	else
+	{
+		cairo_dock_calculate_window_position_at_balance (pSubDock, CAIRO_DOCK_MAX_SIZE, &iNewWidth, &iNewHeight);
+		
+		gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
+		if (pSubDock->bHorizontalDock)
+			gdk_window_move_resize (pSubDock->pWidget->window,
+				pSubDock->iWindowPositionX,
+				pSubDock->iWindowPositionY,
+				iNewWidth,
+				iNewHeight);
+		else
+			gdk_window_move_resize (pSubDock->pWidget->window,
+				pSubDock->iWindowPositionY,
+				pSubDock->iWindowPositionX,
+				iNewHeight,
+				iNewWidth);
+		
+		if (pSubDock->iSidGrowUp == 0)  // on commence a faire grossir les icones.  //  && pDock->iSidShrinkDown == 0
+			pSubDock->iSidGrowUp = g_timeout_add (40, (GSourceFunc) cairo_dock_grow_up, (gpointer) pSubDock);
+	}
+	//g_print ("  -> Gap %d;%d -> W(%d;%d) (%d)\n", pSubDock->iGapX, pSubDock->iGapY, pSubDock->iWindowPositionX, pSubDock->iWindowPositionY, pSubDock->bHorizontalDock);
 }
 gboolean _cairo_dock_show_sub_dock_delayed (CairoDock *pDock)
 {
@@ -276,19 +301,30 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		}
 		if ((pDock == s_pLastPointedDock || s_pLastPointedDock == NULL) && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
 		{
-			if (GTK_WIDGET_VISIBLE (pLastPointedIcon->pSubDock->pWidget))
+			CairoDock *pSubDock = pLastPointedIcon->pSubDock;
+			if (GTK_WIDGET_VISIBLE (pSubDock->pWidget))
 			{
 				//g_print ("on cache %s en changeant d'icône\n", pLastPointedIcon->acName);
-				pLastPointedIcon->pSubDock->iScrollOffset = 0;
-				pLastPointedIcon->pSubDock->fLateralFactor = 0;
-				gtk_widget_hide (pLastPointedIcon->pSubDock->pWidget);
+				if (pSubDock->iSidGrowUp != 0)
+				{
+					g_source_remove (pSubDock->iSidGrowUp);
+					pSubDock->iSidGrowUp = 0;
+				}
+				if (pSubDock->iSidShrinkDown != 0)
+				{
+					g_source_remove (pSubDock->iSidShrinkDown);
+					pSubDock->iSidShrinkDown = 0;
+				}
+				pSubDock->iScrollOffset = 0;
+				pSubDock->fLateralFactor = 0;
+				gtk_widget_hide (pSubDock->pWidget);
 			}
 			//else
 			//	g_print ("pas encore visible !\n");
 		}
 		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL && pPointedIcon->pSubDock != s_pLastPointedDock)
 		{
-			if (bShowSubDockOnMouseOver)
+			if (g_bShowSubDockOnMouseOver)
 			{
 				if (g_iShowSubDockDelay > 0)
 				{
@@ -408,7 +444,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	g_print ("%s (bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
+	//g_print ("%s (bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
 	if (pDock->iSidLeaveDemand != 0)
 	{
 		g_source_remove (pDock->iSidLeaveDemand);
@@ -418,7 +454,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	{
 		return FALSE;
 	}
-	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
 	pDock->fDecorationsOffsetX = 0;
 	if (! pDock->bIsMainDock)
@@ -468,7 +504,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 		pDock->bAtTop = TRUE;
 		pDock->bAtBottom = FALSE;
 	}
-	if (pDock->iSidGrowUp == 0)  // on commence a faire grossir les icones.  //  && pDock->iSidShrinkDown == 0
+	if (pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0)  // on commence a faire grossir les icones.
 	{
 		pDock->iSidGrowUp = g_timeout_add (40, (GSourceFunc) cairo_dock_grow_up, (gpointer) pDock);
 	}
@@ -696,7 +732,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 						gtk_widget_hide (icon->pSubDock->pWidget);
 					else
 					{
-						if (bShowSubDockOnMouseOver)
+						if (g_bShowSubDockOnMouseOver)
 						{
 							if (s_iSidShowSubDockDemand != 0)
 							{
@@ -774,7 +810,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				else
 				{
 					Icon *prev_icon = cairo_dock_get_previous_icon (pDock->icons, icon);
-					cairo_dock_move_icon_after_icon (pDock, s_pIconClicked, (CAIRO_DOCK_IS_SEPARATOR (prev_icon) ? NULL : prev_icon));
+					cairo_dock_move_icon_after_icon (pDock, s_pIconClicked, (prev_icon == NULL || CAIRO_DOCK_IS_SEPARATOR (prev_icon) ? NULL : prev_icon));
 				}
 				
 				//if (pDock != pOriginDock)
@@ -915,7 +951,7 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 		}
 		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL)
 		{
-			if (bShowSubDockOnMouseOver)
+			if (g_bShowSubDockOnMouseOver)
 			{
 				if (g_iShowSubDockDelay > 0)
 				{

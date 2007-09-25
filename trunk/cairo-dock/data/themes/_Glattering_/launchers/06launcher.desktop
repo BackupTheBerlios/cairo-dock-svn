@@ -1,10 +1,8 @@
 #!fr
 
-
-
 [Desktop Entry]
 #s Nom de ce lanceur :
-Name=New Launcher
+Name=Pidgin
 #s Commande à exécuter lors du clique :
 Exec=pidgin
 #S Nom ou chemin de l'image :
@@ -18,5 +16,3 @@ Is container=false
 
 Is URI=false
 Is mounting point=false
-Name[fr]=Pidgin
-Name[en]=New Launcher

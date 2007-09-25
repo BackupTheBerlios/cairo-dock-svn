@@ -1,10 +1,8 @@
 #!
 
-
 [Desktop Entry]
 #s Launcher's name :
-Name[fr]=system
-Name[en]=New Launcher
+Name=system
 #s Exec command :
 Exec=
 #s Image's name or path :

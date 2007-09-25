@@ -704,36 +704,19 @@ void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *Rec
 			icon->pSubDock = NULL;
 		}
 		
-		cDesktopFilePath = (icon->acDesktopFileName != NULL ? g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName) : NULL);
-		
 		if (ReceivingDock == NULL || cReceivingDockName == NULL)  // alors on les jete.
 		{
-			if (cDesktopFilePath != NULL)
+			if (icon->acDesktopFileName != NULL)
+			{
+				cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
 				g_remove (cDesktopFilePath);
-			
+				g_free (cDesktopFilePath);
+			}
 			cairo_dock_free_icon (icon);
 		}
 		else  // on les re-attribue au dock receveur.
 		{
-			if (cDesktopFilePath != NULL)
-			{
-				pKeyFile = g_key_file_new();
-				g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
-				if (erreur != NULL)
-				{
-					g_print ("Attention : %s\n", erreur->message);
-					g_error_free (erreur);
-					erreur = NULL;
-				}
-				else
-				{
-					g_free (icon->cParentDockName);
-					icon->cParentDockName = g_strdup (cReceivingDockName);
-					g_key_file_set_string (pKeyFile, "Desktop Entry", "Container", icon->cParentDockName);
-					cairo_dock_write_keys_to_file (pKeyFile, cDesktopFilePath);
-				}
-				g_key_file_free (pKeyFile);
-			}
+			cairo_dock_update_icon_s_container_name (icon, cReceivingDockName);
 			
 			if (pDock->iRefCount > 0)
 			{
@@ -742,8 +725,6 @@ void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *Rec
 			}
 			cairo_dock_insert_icon_in_dock (icon, ReceivingDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 		}
-		
-		g_free (cDesktopFilePath);
 	}
 	if (ReceivingDock != NULL)
 		cairo_dock_update_dock_size (ReceivingDock, ReceivingDock->iMaxIconHeight, ReceivingDock->iMinDockWidth);

@@ -156,7 +156,7 @@ gfloat cairo_dock_calculate_magnitude (gint iMagnitudeIndex)  // merci a Robrob 
 
 gboolean cairo_dock_grow_up (CairoDock *pDock)
 {
-	//g_print ("%s (%f ; %f ; %d)\n", __func__, pDock->fMagnitude, pDock->fLateralFactor, pDock->iSidShrinkDown);
+	//g_print ("%s (%d ; %f ; %d)\n", __func__, pDock->iMagnitudeIndex, pDock->fLateralFactor, pDock->iSidShrinkDown);
 	if (pDock->iSidShrinkDown != 0)
 		return TRUE;  // on se met en attente de fin d'animation.
 	
@@ -169,16 +169,22 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 	if (pDock->fMagnitude > 1.0)
 		pDock->fMagnitude = 1.0;*/
 	
-	pDock->fLateralFactor *= pDock->fLateralFactor;
+	pDock->fLateralFactor *= sqrt (pDock->fLateralFactor);
 	///pDock->fLateralFactor = (pDock->fLateralFactor != 0 ? pow (1.5, - 1. / pDock->fLateralFactor) : 0);  // f(x)-x < 0 pour a > exp(exp(-1)) ~ 1.445.
 	if (pDock->fLateralFactor < 0.03)
 		pDock->fLateralFactor = 0;
 	
 	gint iMouseX, iMouseY;
-	if (pDock->bHorizontalDock)
-		gdk_window_get_pointer (pDock->pWidget->window, &iMouseX, &iMouseY, NULL);
-	else
-		gdk_window_get_pointer (pDock->pWidget->window, &iMouseY, &iMouseX, NULL);
+	
+	//if (pDock->iRefCount > 0 && ! pDock->bInside)  // pour l'animation des sous-docks a leur apparition.
+		iMouseX = -1e4;
+	//else
+	{
+		if (pDock->bHorizontalDock)
+			gdk_window_get_pointer (pDock->pWidget->window, &iMouseX, &iMouseY, NULL);
+		else
+			gdk_window_get_pointer (pDock->pWidget->window, &iMouseY, &iMouseX, NULL);
+	}
 	
 	cairo_dock_calculate_icons (pDock, iMouseX, iMouseY);
 	gtk_widget_queue_draw (pDock->pWidget);
@@ -196,7 +202,7 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 
 gboolean cairo_dock_shrink_down (CairoDock *pDock)
 {
-	//g_print ("%s (%f)\n", __func__, pDock->fMagnitude);
+	//g_print ("%s (%d)\n", __func__, pDock->iMagnitudeIndex);
 	/**if (pDock->fMagnitude > 0.05)
 		pDock->fMagnitude *= g_fShrinkDownFactor; //  0.6
 	else
@@ -213,13 +219,22 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 	
 	if (pDock->iScrollOffset != 0 && g_bResetScrollOnLeave)
 	{
-		g_print ("iScrollOffset : %d\n", pDock->iScrollOffset);
+		//g_print ("iScrollOffset : %d\n", pDock->iScrollOffset);
 		if (pDock->iScrollOffset < pDock->iMinDockWidth / 2)
-			pDock->iScrollOffset = pDock->iScrollOffset * g_fScrollAcceleration;
+		{
+			//pDock->iScrollOffset = pDock->iScrollOffset * g_fScrollAcceleration;
+			pDock->iScrollOffset -= MAX (2, ceil (pDock->iScrollOffset * (1 - g_fScrollAcceleration)));
+			if (pDock->iScrollOffset < 0)
+				pDock->iScrollOffset = 0;
+		}
 		else
-			pDock->iScrollOffset += ceil ((pDock->iMinDockWidth - pDock->iScrollOffset) * (1 - g_fScrollAcceleration));
-		if (pDock->iScrollOffset < 5 || pDock->iMinDockWidth - pDock->iScrollOffset < 5)
-			pDock->iScrollOffset = 0;
+		{
+			pDock->iScrollOffset += MAX (2, ceil ((pDock->iMinDockWidth - pDock->iScrollOffset) * (1 - g_fScrollAcceleration)));
+			if (pDock->iScrollOffset > pDock->iMinDockWidth)
+				pDock->iScrollOffset = 0;
+		}
+		//if (pDock->iScrollOffset < 5 || pDock->iMinDockWidth - pDock->iScrollOffset < 5)
+		//	pDock->iScrollOffset = 0;
 		pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
 		pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
 	}

@@ -148,7 +148,7 @@ gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShare
 	gchar *cUserDataDirPath = g_strdup_printf ("%s/plug-ins/%s", g_cCurrentThemePath, cUserDataDirName);
 	if (! g_file_test (cUserDataDirPath, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
 	{
-		g_print ("directory %s doesn't exist, I will try to add it.\n", cUserDataDirPath);
+		g_print ("directory %s doesn't exist, it will be added.\n", cUserDataDirPath);
 		
 		gchar *command = g_strdup_printf ("mkdir -p %s", cUserDataDirPath);
 		system (command);
@@ -156,9 +156,9 @@ gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShare
 	}
 	
 	gchar *cConfFilePath = g_strdup_printf ("%s/%s", cUserDataDirPath, cConfFileName);
-	if (! g_file_test (*cConfFilePath, G_FILE_TEST_EXISTS))
+	if (! g_file_test (cConfFilePath, G_FILE_TEST_EXISTS))
 	{
-		gchar *command = g_strdup_printf ("cp %s/%s %s", cShareDataDir, cConfFileName, cUserDataDirPath);
+		gchar *command = g_strdup_printf ("cp %s/%s %s", cShareDataDir, cConfFileName, cConfFilePath);
 		system (command);
 		g_free (command);
 	}

@@ -1,7 +1,5 @@
 #!fr
 
-
-
 [Desktop Entry]
 #s Nom de ce lanceur :
 Name=New Launcher
@@ -18,5 +16,3 @@ Is container=false
 
 Is URI=false
 Is mounting point=false
-Name[fr]=Graveur CD
-Name[en]=New Launcher

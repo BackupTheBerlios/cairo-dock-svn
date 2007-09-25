@@ -3,13 +3,14 @@
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
+Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
 
 ******************************************************************************/
 #ifndef __CAIRO_DOCK_STRUCT__
 #define  __CAIRO_DOCK_STRUCT__
 
 #include <glib.h>
-#include <gdk/gdkx.h>
+#include <X11/Xlib.h>
 #include <gtk/gtk.h>
 #include <cairo.h>
 #include <librsvg/rsvg.h>
@@ -212,13 +213,6 @@ typedef enum {
 	} CairoDockAnimationType;
 
 typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
-
-typedef void (*CairoDockClickFunc) (Icon *icon);
-
-typedef gchar * (*CairoDockFileManagerFunc) (gchar *cURI, gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur);
-
-typedef void (*CairoDockLoadDirectoryFunc) (Icon *pIcon);
-
 
 
 typedef void (*CairoDockCalculateShapeFunc) (CairoDock *pDock, CairoDockSizeType iSizeType, int *iNewWidth, int *iNewHeight);

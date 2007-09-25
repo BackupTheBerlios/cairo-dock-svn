@@ -1,8 +1,7 @@
 #!
 [Desktop Entry]
 #s Launcher's name :
-Name=Calculator
-Name[fr]=Calculatrice
+Name=Calculatrice
 #s Exec command :
 Exec=gcalctool
 #S Image's name or path :
