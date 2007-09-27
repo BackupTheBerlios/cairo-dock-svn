@@ -379,11 +379,13 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	
 	if (g_bAutoHide && pDock->iRefCount == 0)
 	{
+		pDock->fLateralFactor = (g_fUnfoldAcceleration != 0. ? 0.03 : 0.);
 		if (pDock->iSidMoveDown == 0)  // on commence a descendre.
 			pDock->iSidMoveDown = g_timeout_add (40, (GSourceFunc) cairo_dock_move_down, (gpointer) pDock);
 	}
 	else
 	{
+		pDock->fLateralFactor = 0;
 		pDock->bAtBottom = TRUE;
 	}
 	

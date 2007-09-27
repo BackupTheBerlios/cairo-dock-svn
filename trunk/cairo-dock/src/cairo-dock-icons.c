@@ -783,7 +783,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	int iWidth, iHeight;
 	iWidth = pDock->iCurrentWidth;
 	iHeight = pDock->iCurrentHeight;
-	//g_print ("%s (%dx%d, %dx%d)\n", __func__, iMouseX, iMouseY, iWidth, iHeight);
+	//g_print ("%s (%dx%d, %dx%d, %f)\n", __func__, iMouseX, iMouseY, iWidth, iHeight, pDock->fLateralFactor);
 	
 	int dx = iMouseX - iWidth / 2;  // ecart par rapport au milieu du dock a plat.
 	int x_abs = dx + pDock->iMinDockWidth / 2;  // ecart par rapport a la gauche du dock minimal.
@@ -890,7 +890,7 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 		} while (ic2 != pFirstDrawnElement);
 		fMaxBorderX = MAX (fMaxBorderX, icon->fX + icon->fWidth * icon->fScale);
 	}
-	cairo_dock_calculate_icons_with_position (pIconList, pFirstDrawnElement, iFlatDockWidth - 1, 1, iFlatDockWidth, 0, 0, 0, pDock->fAlign, pDock->fLateralFactor);
+	cairo_dock_calculate_icons_with_position (pIconList, pFirstDrawnElement, iFlatDockWidth - 1, 1, iFlatDockWidth, 0, 0, 0, pDock->fAlign, 0);  // pDock->fLateralFactor
 	ic = pFirstDrawnElement;
 	do
 	{

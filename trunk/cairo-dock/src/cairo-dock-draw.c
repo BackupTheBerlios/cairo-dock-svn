@@ -689,7 +689,7 @@ void cairo_dock_redraw_my_icon (Icon *icon, CairoDock *pDock)
 		rect.width = (int) icon->fHeight * icon->fScale;
 		rect.height = (int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor));
 	}
-	g_print ("rect (%d;%d) (%dx%d)\n", rect.x, rect.y, rect.width, rect.height);
+	//g_print ("rect (%d;%d) (%dx%d)\n", rect.x, rect.y, rect.width, rect.height);
 #ifdef HAVE_GLITZ
 	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
 		gtk_widget_queue_draw (pDock->pWidget);
@@ -701,7 +701,7 @@ void cairo_dock_redraw_my_icon (Icon *icon, CairoDock *pDock)
 
 void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 {
-	g_print ("%s ((%d;%d) x (%d;%d) / (%dx%d))\n", __func__, pArea->x, pArea->y, pArea->width, pArea->height, pDock->iCurrentWidth, pDock->iCurrentHeight);
+	//g_print ("%s ((%d;%d) x (%d;%d) / (%dx%d))\n", __func__, pArea->x, pArea->y, pArea->width, pArea->height, pDock->iCurrentWidth, pDock->iCurrentHeight);
 	double fLineWidth = g_iDockLineWidth;
 	int iWidth = pDock->iCurrentWidth;
 	int iHeight = pDock->iCurrentHeight;
