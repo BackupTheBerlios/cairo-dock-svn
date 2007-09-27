@@ -215,7 +215,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 	{
 		pDock->fLateralFactor = pow (pDock->fLateralFactor, 2./3);
 		if (pDock->fLateralFactor > g_fUnfoldAcceleration)
-			pDock->fLateralFactor = 1.;
+			pDock->fLateralFactor = g_fUnfoldAcceleration;
 	}
 	
 	

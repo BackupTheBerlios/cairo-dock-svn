@@ -210,7 +210,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 	pDock->iMagnitudeIndex -= g_iShrinkDownInterval;
 	if (pDock->iMagnitudeIndex < 0)
 		pDock->iMagnitudeIndex = 0;
-	g_print ("pDock->fLateralFactor : %f\n", pDock->fLateralFactor);
+	//g_print ("pDock->fLateralFactor : %f\n", pDock->fLateralFactor);
 	if (pDock->fLateralFactor != 0 && (! g_bResetScrollOnLeave || pDock->iScrollOffset == 0))
 	{
 		pDock->fLateralFactor = pow (pDock->fLateralFactor, 2./3);
