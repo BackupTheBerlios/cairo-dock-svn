@@ -330,17 +330,26 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 	Icon *pOldIcon = cairo_dock_find_icon_from_module (module, pDock->icons);
 	if (pOldIcon != NULL)
 	{
-		g_print ("  effacement de l'ancienne icone\n");
+		//g_print ("  enlevement de l'ancienne icone\n");
 		pOldIcon->pModule = NULL;
-		if (pNewIcon != NULL)
-			pNewIcon->fOrder = pOldIcon->fOrder;
 		cairo_dock_remove_icon_from_dock (pDock, pOldIcon);
-		cairo_dock_free_icon (pOldIcon);
 	}
 	
 	if (pNewIcon != NULL)
 	{
 		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+		
+		if (pOldIcon != NULL)
+		{
+			pNewIcon->fOrder = pOldIcon->fOrder;
+			pNewIcon->fX = pOldIcon->fX;
+			pNewIcon->fY = pOldIcon->fY;
+			pNewIcon->fScale = pOldIcon->fScale;
+			pNewIcon->fDrawX = pOldIcon->fDrawX;
+			pNewIcon->fDrawY = pOldIcon->fDrawY;
+			pNewIcon->fWidthFactor = pOldIcon->fWidthFactor;
+			pNewIcon->fAlpha = pOldIcon->fAlpha;
+		}
 		cairo_dock_redraw_my_icon (pNewIcon, pDock);
 	}
 	else if (pOldIcon != NULL)
@@ -348,6 +357,7 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 		gtk_widget_queue_draw (pDock->pWidget);
 	}
+	cairo_dock_free_icon (pOldIcon);
 	
 	//gtk_widget_queue_draw (pDock->pWidget);
 }

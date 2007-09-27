@@ -72,6 +72,7 @@ Icon *cairo_dock_create_icon_for_applet (CairoDock *pDock, int iWidth, int iHeig
 	
 	icon->fWidth =iWidth;
 	icon->fHeight =iHeight;
+	icon->fWidthFactor = 1.;
 	cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock);
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, icon);
 	

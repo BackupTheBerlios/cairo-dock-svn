@@ -7,13 +7,13 @@
 #include "cairo-dock-struct.h"
 
 
-#define CAIRO_DOCK_IS_APPLI(icon) (icon->iType == CAIRO_DOCK_APPLI)
-#define CAIRO_DOCK_IS_LAUNCHER(icon) (icon->iType == CAIRO_DOCK_LAUNCHER)
-#define CAIRO_DOCK_IS_SEPARATOR(icon) (icon->iType & 1)
-#define CAIRO_DOCK_IS_APPLET(icon) (icon->iType  == CAIRO_DOCK_APPLET)
+#define CAIRO_DOCK_IS_APPLI(icon) (icon != NULL && icon->iType == CAIRO_DOCK_APPLI)
+#define CAIRO_DOCK_IS_LAUNCHER(icon) (icon != NULL && icon->iType == CAIRO_DOCK_LAUNCHER)
+#define CAIRO_DOCK_IS_SEPARATOR(icon) (icon != NULL && icon->iType & 1)
+#define CAIRO_DOCK_IS_APPLET(icon) (icon != NULL && icon->iType  == CAIRO_DOCK_APPLET)
 
-#define CAIRO_DOCK_IS_NORMAL_LAUNCHER(icon) (icon->iType == CAIRO_DOCK_LAUNCHER && icon->acDesktopFileName != NULL)
-#define CAIRO_DOCK_IS_URI_LAUNCHER(icon) (icon->iType == CAIRO_DOCK_LAUNCHER && icon->cBaseURI != NULL)
+#define CAIRO_DOCK_IS_NORMAL_LAUNCHER(icon) (icon != NULL && icon->iType == CAIRO_DOCK_LAUNCHER && icon->acDesktopFileName != NULL)
+#define CAIRO_DOCK_IS_URI_LAUNCHER(icon) (icon != NULL && icon->iType == CAIRO_DOCK_LAUNCHER && icon->cBaseURI != NULL)
 #define CAIRO_DOCK_IS_VALID_APPLI(icon) (CAIRO_DOCK_IS_APPLI (icon) && icon->Xid != 0)
 #define CAIRO_DOCK_IS_VALID_APPLET(icon) (CAIRO_DOCK_IS_APPLET (icon) && icon->pModule != NULL)
 
