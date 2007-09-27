@@ -1089,6 +1089,7 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 	Icon *pPointedIcon = NULL, *pNeighboorIcon = NULL;
 	GList *ic;
 	Icon *icon, *next_icon, *prev_icon;
+	int iDropX = (pDock->bHorizontalDock ? x : y);
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
@@ -1102,12 +1103,12 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 			else  // sinon on le lance si on est sur l'icone, et on l'ajoute autrement.
 				fMargin = 0.25;
 			
-			if (x > icon->fX + icon->fWidth * icon->fScale * (1 - fMargin))  // on est apres.
+			if (iDropX > icon->fX + icon->fWidth * icon->fScale * (1 - fMargin))  // on est apres.
 			{
 				pNeighboorIcon = (ic->next != NULL ? ic->next->data : NULL);
 				fOrder = (pNeighboorIcon != NULL ? (icon->fOrder + pNeighboorIcon->fOrder) / 2 : icon->fOrder + 1);
 			}
-			else if (x < icon->fX + icon->fWidth * icon->fScale * fMargin)  // on est avant.
+			else if (iDropX < icon->fX + icon->fWidth * icon->fScale * fMargin)  // on est avant.
 			{
 				pNeighboorIcon = (ic->prev != NULL ? ic->prev->data : NULL);
 				fOrder = (pNeighboorIcon != NULL ? (icon->fOrder + pNeighboorIcon->fOrder) / 2 : icon->fOrder - 1);

@@ -30,6 +30,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-modules.h"
 #include "cairo-dock-callbacks.h"
 #include "cairo-dock-dock-factory.h"
+#include "cairo-dock-dialogs.h"
 #include "cairo-dock-icons.h"
 
 
@@ -63,6 +64,11 @@ void cairo_dock_free_icon (Icon *icon)
 {
 	if (icon == NULL)
 		return ;
+	
+	cairo_dock_dialog_unreference (icon);
+	if (icon->pDialog != NULL)
+		cairo_dock_isolate_dialog (icon);
+	
 	g_free (icon->acDesktopFileName);
 	g_free (icon->acFileName);
 	g_free (icon->acName);
@@ -460,6 +466,10 @@ void cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon)
 		cairo_dock_deactivate_module (icon->pModule);  // desactive le module mais ne le ferme pas.
 		icon->pModule = NULL;  // pour ne pas le liberer lors du free_icon.
 	}
+	
+	cairo_dock_dialog_unreference (icon);
+	if (icon->pDialog != NULL)
+		cairo_dock_isolate_dialog (icon);
 	
 	//\___________________ On l'enleve de la liste.
 	if (pDock->pFirstDrawnElement != NULL && pDock->pFirstDrawnElement->data == icon)

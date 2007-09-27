@@ -163,6 +163,23 @@ gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShare
 		g_free (command);
 	}
 	
+	if (! g_file_test (cConfFilePath, G_FILE_TEST_EXISTS))  // la copie ne s'est pas bien passee.
+	{
+		g_print ("Attention : couldn't copy s/%s in %s; check permissions and file's existence\n", cShareDataDir, cConfFileName, cUserDataDirPath);
+		g_free (cUserDataDirPath);
+		g_free (cConfFilePath);
+		return NULL;
+	}
+	
 	g_free (cUserDataDirPath);
 	return cConfFilePath;
+}
+
+
+
+void cairo_dock_write_info_on_icon (Icon *icon, gchar *cText)
+{
+	g_return_if_fail (icon != NULL && icon->pIconBuffer != NULL);
+	
+	
 }

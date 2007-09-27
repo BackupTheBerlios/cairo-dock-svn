@@ -212,7 +212,9 @@ static gboolean random_dialog (gpointer user_data)
 	int num_icone = g_random_int_range (0, g_list_length (g_pMainDock->icons));
 	
 	Icon *icon = g_list_nth_data (g_pMainDock->icons, num_icone);
-	cairo_dock_show_temporary_dialog (icon->acName, icon, g_pMainDock, 8000);
+	if (CAIRO_DOCK_IS_SEPARATOR (icon))
+		return random_dialog (user_data);
+	cairo_dock_show_temporary_dialog (icon->acName, icon, g_pMainDock, 7000);
 	return TRUE;
 }
 
@@ -225,9 +227,6 @@ main (int argc, char** argv)
 	
 	
 	gtk_init (&argc, &argv);
-	GTimeVal time;
-	if (g_time_val_from_iso8601 ("2007-09-22T20:55:25Z", &time))
-		g_print ("OK\n");
 	
 	
 	//\___________________ On recupere quelques options.
@@ -376,7 +375,7 @@ main (int argc, char** argv)
 	cairo_dock_load_theme (g_cCurrentThemePath);
 	
 	if (bDialogTest)
-		g_timeout_add (3000, (GSourceFunc) random_dialog, NULL);  // pour tests seulement.
+		g_timeout_add (2000, (GSourceFunc) random_dialog, NULL);  // pour tests seulement.
 	
 	gtk_main ();
 	/*Window root = DefaultRootWindow (g_XDisplay);

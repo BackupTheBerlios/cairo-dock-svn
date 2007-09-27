@@ -26,6 +26,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-modules.h"
 
+extern GHashTable *g_hModuleTable;
+extern gchar *g_cConfFile;
+
 
 gchar *cairo_dock_extract_module_name_from_path (gchar *cSoFilePath)
 {
@@ -319,14 +322,15 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 	if (erreur != NULL)
  	{
 		module->bActive = FALSE;
+		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons, g_hModuleTable);
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
-		return ;
 	}
 	
 	Icon *pOldIcon = cairo_dock_find_icon_from_module (module, pDock->icons);
 	if (pOldIcon != NULL)
 	{
+		g_print ("  effacement de l'ancienne icone\n");
 		pOldIcon->pModule = NULL;
 		if (pNewIcon != NULL)
 			pNewIcon->fOrder = pOldIcon->fOrder;
@@ -337,7 +341,12 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 	if (pNewIcon != NULL)
 	{
 		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
-		cairo_dock_redraw_my_icon (pNewIcon, pDock->pWidget);
+		cairo_dock_redraw_my_icon (pNewIcon, pDock);
+	}
+	else if (pOldIcon != NULL)
+	{
+		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+		gtk_widget_queue_draw (pDock->pWidget);
 	}
 	
 	//gtk_widget_queue_draw (pDock->pWidget);

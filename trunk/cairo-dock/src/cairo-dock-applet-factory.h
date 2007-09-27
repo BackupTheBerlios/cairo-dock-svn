@@ -22,5 +22,8 @@ GHashTable *cairo_dock_list_themes (gchar *cThemesDir, GHashTable *hProvidedTabl
 gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShareDataDir, gchar *cConfFileName);
 
 
+void cairo_dock_write_info_on_icon (Icon *icon, gchar *cText);
+
+
 #endif
 
