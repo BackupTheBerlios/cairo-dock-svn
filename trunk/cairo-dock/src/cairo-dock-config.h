@@ -7,7 +7,9 @@
 #include "cairo-dock-struct.h"
 
 
-int cairo_dock_get_number_from_name (gchar *cName, gchar **tNamesList);
+guint cairo_dock_get_number_from_name (gchar *cName, gchar **tNamesList);
+const gchar **cairo_dock_get_animations_names (void);
+CairoDockAnimationType cairo_dock_get_animation_type_from_name (gchar *cAnimationName);
 
 gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gboolean bDefaultValue);
 int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, int iDefaultValue);

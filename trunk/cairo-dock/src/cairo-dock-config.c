@@ -122,7 +122,7 @@ extern gboolean g_bRevolveSeparator;
 extern GHashTable *g_hModuleTable;
 
 
-int cairo_dock_get_number_from_name (gchar *cName, gchar **tNamesList)
+guint cairo_dock_get_number_from_name (gchar *cName, gchar **tNamesList)
 {
 	g_return_val_if_fail (cName != NULL, 0);
 	int i = 0;
@@ -135,6 +135,14 @@ int cairo_dock_get_number_from_name (gchar *cName, gchar **tNamesList)
 	return 0;
 }
 
+const gchar **cairo_dock_get_animations_names (void)
+{
+	return (const gchar **) s_tAnimationNames;
+}
+CairoDockAnimationType cairo_dock_get_animation_type_from_name (gchar *cAnimationName)
+{
+	return cairo_dock_get_number_from_name (cAnimationName, s_tAnimationNames);
+}
 
 gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gboolean bDefaultValue)
 {
@@ -597,7 +605,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	gchar *cAnimationName;
 	cAnimationName = cairo_dock_get_string_key_value (pKeyFile, "Launchers", "animation type", &bFlushConfFileNeeded, s_tAnimationNames[0]);
-	g_tAnimationType[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_number_from_name (cAnimationName, s_tAnimationNames);
+	g_tAnimationType[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_animation_type_from_name (cAnimationName);
 	g_free (cAnimationName);
 	
 	g_tNbAnimationRounds[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_integer_key_value (pKeyFile, "Launchers", "number of animation rounds", &bFlushConfFileNeeded, 4);
@@ -611,7 +619,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Applications", "min icon size", &bFlushConfFileNeeded, 0);
 	
 	cAnimationName = cairo_dock_get_string_key_value (pKeyFile, "Applications", "animation type", &bFlushConfFileNeeded, s_tAnimationNames[0]);
-	g_tAnimationType[CAIRO_DOCK_APPLI] = cairo_dock_get_number_from_name (cAnimationName, s_tAnimationNames);
+	g_tAnimationType[CAIRO_DOCK_APPLI] = cairo_dock_get_animation_type_from_name (cAnimationName);
 	g_free (cAnimationName);
 	
 	g_tNbAnimationRounds[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Applications", "number of animation rounds", &bFlushConfFileNeeded, 2);
@@ -628,7 +636,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLET] = cairo_dock_get_integer_key_value (pKeyFile, "Applets", "min icon size", &bFlushConfFileNeeded, 0);
 	
 	cAnimationName = cairo_dock_get_string_key_value (pKeyFile, "Applets", "animation type", &bFlushConfFileNeeded, s_tAnimationNames[0]);
-	g_tAnimationType[CAIRO_DOCK_APPLET] = cairo_dock_get_number_from_name (cAnimationName, s_tAnimationNames);
+	g_tAnimationType[CAIRO_DOCK_APPLET] = cairo_dock_get_animation_type_from_name (cAnimationName);
 	g_free (cAnimationName);
 	
 	g_tNbAnimationRounds[CAIRO_DOCK_APPLET] = cairo_dock_get_integer_key_value (pKeyFile, "Applets", "number of animation rounds", &bFlushConfFileNeeded, 1);
@@ -772,7 +780,17 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	cairo_dock_mark_theme_as_modified (TRUE);
 }
-
+/* ///En cours...
+void cairo_dock_flush_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath, gchar *cConfFileName)
+{
+	gchar *cTranslatedConfFilePath = g_strdup_printf ("");
+	
+	gchar *cCommand = g_strdup_printf ("/bin/cp %s/cairo-dock-%s.conf %s", cShareDataDirPath, g_cLanguage, cConfFilePath);
+	system (cCommand);
+	g_free (cCommand);
+	
+	cairo_dock_replace_values_in_conf_file (cConfFilePath, pKeyFile, TRUE, 0);
+}*/
 
 static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, gpointer *user_data)
 {
