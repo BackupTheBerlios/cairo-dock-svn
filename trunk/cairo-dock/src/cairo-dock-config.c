@@ -765,11 +765,12 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	if ((cPreviousLanguage != NULL && g_cLanguage != NULL && strcmp (cPreviousLanguage, g_cLanguage) != 0) || bFlushConfFileNeeded)
 	{
-		gchar *cCommand = g_strdup_printf ("/bin/cp %s/cairo-dock-%s.conf %s", CAIRO_DOCK_SHARE_DATA_DIR, g_cLanguage, cConfFilePath);
+		cairo_dock_flush_conf_file (pKeyFile, cConfFilePath, CAIRO_DOCK_SHARE_DATA_DIR);
+		/*gchar *cCommand = g_strdup_printf ("/bin/cp %s/cairo-dock-%s.conf %s", CAIRO_DOCK_SHARE_DATA_DIR, g_cLanguage, cConfFilePath);
 		system (cCommand);
 		g_free (cCommand);
 		
-		cairo_dock_replace_values_in_conf_file (cConfFilePath, pKeyFile, TRUE, 0);
+		cairo_dock_replace_values_in_conf_file (cConfFilePath, pKeyFile, TRUE, 0);*/
 		
 		cairo_dock_update_conf_file_with_modules (cConfFilePath, g_hModuleTable);
 		cairo_dock_update_conf_file_with_translations (cConfFilePath, CAIRO_DOCK_SHARE_DATA_DIR);
@@ -780,17 +781,62 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	cairo_dock_mark_theme_as_modified (TRUE);
 }
-/* ///En cours...
-void cairo_dock_flush_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath, gchar *cConfFileName)
+void cairo_dock_flush_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath)
 {
-	gchar *cTranslatedConfFilePath = g_strdup_printf ("");
+	gchar *cConfFileName = g_path_get_basename (cConfFilePath);
+	gchar *cBaseName = g_strdup (cConfFileName);
+	gchar *cExtension = NULL;
+	gchar *str = strrchr (cBaseName, '.');
+	if (str != NULL)
+	{
+		cExtension = g_strdup (str);
+		*str = '\0';
+	}
 	
-	gchar *cCommand = g_strdup_printf ("/bin/cp %s/cairo-dock-%s.conf %s", cShareDataDirPath, g_cLanguage, cConfFilePath);
-	system (cCommand);
-	g_free (cCommand);
+	gchar *cTranslatedConfFilePath = g_strdup_printf ("%s/%s-%s%s", cShareDataDirPath, cBaseName, g_cLanguage, (cExtension != NULL ? cExtension : ""));
+	if (! g_file_test (cTranslatedConfFilePath, G_FILE_TEST_EXISTS))
+	{
+		g_free (cTranslatedConfFilePath);
+		cTranslatedConfFilePath = NULL;
+		if (strcmp (g_cLanguage, "en") != 0)
+		{
+			cTranslatedConfFilePath = g_strdup_printf ("%s/%s-en%s", cShareDataDirPath, cBaseName, (cExtension != NULL ? cExtension : ""));
+			if (! g_file_test (cTranslatedConfFilePath, G_FILE_TEST_EXISTS))
+			{
+				g_free (cTranslatedConfFilePath);
+				cTranslatedConfFilePath = NULL;
+			}
+		}
+		
+		if (cTranslatedConfFilePath == NULL)
+		{
+			cTranslatedConfFilePath = g_strdup_printf ("%s/%s%s", cShareDataDirPath, cBaseName, (cExtension != NULL ? cExtension : ""));
+			if (! g_file_test (cTranslatedConfFilePath, G_FILE_TEST_EXISTS))
+			{
+				g_free (cTranslatedConfFilePath);
+				cTranslatedConfFilePath = NULL;
+			}
+		}
+	}
 	
-	cairo_dock_replace_values_in_conf_file (cConfFilePath, pKeyFile, TRUE, 0);
-}*/
+	if (cTranslatedConfFilePath == NULL)
+	{
+		g_print ("Attention : couldn't find any installed conf file\n");
+	}
+	else
+	{
+		gchar *cCommand = g_strdup_printf ("/bin/cp %s %s", cTranslatedConfFilePath, cConfFilePath);
+		system (cCommand);
+		g_free (cCommand);
+		g_free (cTranslatedConfFilePath);
+		
+		cairo_dock_replace_values_in_conf_file (cConfFilePath, pKeyFile, TRUE, 0);
+	}
+	
+	g_free (cConfFileName);
+	g_free (cBaseName);
+	g_free (cExtension);
+}
 
 static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, gpointer *user_data)
 {
