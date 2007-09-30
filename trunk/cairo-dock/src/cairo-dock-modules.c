@@ -318,6 +318,15 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 		return;
 	
 	cairo_dock_deactivate_module (module);
+	Icon *pOldIcon = cairo_dock_find_icon_from_module (module, pDock->icons);
+	if (pOldIcon != NULL)
+	{
+		//g_print ("  enlevement de l'ancienne icone\n");
+		pOldIcon->pModule = NULL;
+		cairo_dock_remove_icon_from_dock (pDock, pOldIcon);
+	}
+	
+	
 	Icon *pNewIcon = cairo_dock_activate_module (module, pDock, &erreur);
 	if (erreur != NULL)
  	{
@@ -327,13 +336,6 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 		g_error_free (erreur);
 	}
 	
-	Icon *pOldIcon = cairo_dock_find_icon_from_module (module, pDock->icons);
-	if (pOldIcon != NULL)
-	{
-		//g_print ("  enlevement de l'ancienne icone\n");
-		pOldIcon->pModule = NULL;
-		cairo_dock_remove_icon_from_dock (pDock, pOldIcon);
-	}
 	
 	if (pNewIcon != NULL)
 	{

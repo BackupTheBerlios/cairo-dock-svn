@@ -126,10 +126,10 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 	gtk_label_set_use_markup (GTK_LABEL (pLabel), TRUE);
 	gchar *cAboutText = g_strdup_printf ("<b>Original idea/first development :</b>\n  Mac Slow\n\
 <b>Main developer :</b>\n  Fabounet (Fabrice Rey)\n\
-<b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole (Julien Barrau)\n  Glattering\n\
-<b>Applets :</b>\n  Fabounet\n\
-<b>Translations :</b>\n  Fabounet\n\
-<b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Necropotame\n  Ppmt\n  Sombrero\n  Vilraleur");
+<b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole\n  Glattering\n\
+<b>Applets :</b>\n  Fabounet\n  Necropotame\n\
+<b>Translations :</b>\n  Fabounet\n  Ppmt\
+<b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Necropotame\n  Ppmt\n  Sombrero\n  Vilraleur");  // Djoole <=> (Julien Barrau)
 	gtk_label_set_markup (GTK_LABEL (pLabel), cAboutText);
 	g_free (cAboutText);
 	gtk_container_add (GTK_CONTAINER (GTK_DIALOG (pDialog)->vbox), pLabel);
