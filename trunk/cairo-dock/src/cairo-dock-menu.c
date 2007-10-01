@@ -155,6 +155,14 @@ static void cairo_dock_help (GtkMenuItem *menu_item, gpointer *data)
 	system ("firefox http://doc.ubuntu-fr.org/gnome_dock");
 }
 
+static void cairo_dock_quit (GtkMenuItem *menu_item, gpointer *data)
+{
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
+	
+	on_delete (pDock->pWidget, NULL, pDock);
+}
+
 
 gboolean cairo_dock_notification_remove_icon (gpointer *data)
 {
@@ -638,6 +646,10 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	menu_item = gtk_menu_item_new_with_label ("Help");
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_help), data);
+	
+	menu_item = gtk_menu_item_new_with_label ("Quit");
+	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
+	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_quit), data);
 	
 	
 	menu_item = gtk_separator_menu_item_new ();

@@ -21,9 +21,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dialogs.h"
 
 static GSList *s_pDialogList = NULL;
+static GStaticMutex s_mDialogsMutex = G_STATIC_MUTEX_INIT;
 
-extern gint g_iScreenWidth[2];
-extern gboolean g_bDirectionUp;
+extern gint g_iScreenWidth[2], g_iScreenHeight[2];
 extern gboolean g_bSticky;
 extern gboolean g_bKeepAbove;
 extern gboolean g_bAutoHide;
@@ -88,8 +88,8 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	
 	cairo_save (pCairoContext);
 	double fOffsetX = fRadius + fLineWidth / 2;
-	double fOffsetY = (g_bDirectionUp ? fLineWidth / 2 : pDialog->iHeight - .5*fLineWidth);
-	int sens = (g_bDirectionUp ? 1 : -1);
+	double fOffsetY = (pDialog->bDirectionUp ? fLineWidth / 2 : pDialog->iHeight - .5*fLineWidth);
+	int sens = (pDialog->bDirectionUp ? 1 : -1);
 	cairo_move_to (pCairoContext, fOffsetX, fOffsetY);
 	int iWidth = pDialog->iWidth;
 	
@@ -167,7 +167,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	cairo_restore (pCairoContext);
 	
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
-	cairo_set_source_surface (pCairoContext, pDialog->pTextBuffer, fOffsetX + CAIRO_DOCK_DIALOG_TEXT_MARGIN, fOffsetY + fLineWidth / 2 + CAIRO_DOCK_DIALOG_TEXT_MARGIN - (g_bDirectionUp ? 0 : fLineWidth + pDialog->iTextHeight));
+	cairo_set_source_surface (pCairoContext, pDialog->pTextBuffer, fOffsetX + CAIRO_DOCK_DIALOG_TEXT_MARGIN, fOffsetY + fLineWidth / 2 + CAIRO_DOCK_DIALOG_TEXT_MARGIN - (pDialog->bDirectionUp ? 0 : fLineWidth + pDialog->iTextHeight));
 	cairo_paint (pCairoContext);
 	
 	cairo_destroy (pCairoContext);
@@ -189,6 +189,7 @@ static gboolean on_configure_dialog (GtkWidget* pWidget,
 	
 	return FALSE;
 }
+
 
 gboolean cairo_dock_dialog_reference (Icon *pIcon)
 {
@@ -225,7 +226,10 @@ CairoDockDialog *cairo_dock_isolate_dialog (Icon *pIcon)
 		return NULL;
 	
 	pIcon->pDialog = NULL;
+	
+	g_static_mutex_lock (&s_mDialogsMutex);
 	s_pDialogList = g_slist_remove (s_pDialogList, pIcon);
+	g_static_mutex_unlock (&s_mDialogsMutex);
 	
 	if (pDialog->iSidTimer > 0)
 	{
@@ -343,18 +347,33 @@ CairoDockDialog *cairo_dock_build_dialog (gchar *cText, Icon *pIcon, CairoDock *
 	cairo_dock_place_dialog (pDialog, pIcon, pDock);
 	
 	pIcon->pDialog = pDialog;
-	s_pDialogList = g_slist_prepend (s_pDialogList, pIcon);  // attention il y'a une course d'acces avec l'icone ...
+	g_static_mutex_lock (&s_mDialogsMutex);
+	s_pDialogList = g_slist_prepend (s_pDialogList, pIcon);
+	g_static_mutex_unlock (&s_mDialogsMutex);
 	
 	return pDialog;
 }
 
 
-void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int *iX, int *iY, gboolean *bRight)
+void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int *iX, int *iY, gboolean *bRight, gboolean *bIsPerpendicular, gboolean *bDirectionUp)
 {
 	//g_print ("%s (%.2f)\n", __func__, pIcon->fXAtRest);
 	if (pDock->iRefCount == 0 && pDock->bAtBottom)  // un dock principal au repos.
 	{
-		*bRight = (pIcon->fXAtRest > pDock->iMinDockWidth / 2);
+		*bIsPerpendicular = (pDock->bHorizontalDock == CAIRO_DOCK_VERTICAL);
+		if (pDock->bHorizontalDock)
+		{
+			*bRight = (pIcon->fXAtRest > pDock->iMinDockWidth / 2);
+			*bDirectionUp = (pDock->iWindowPositionY > g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] / 2);
+			*iY = (*bDirectionUp ? pDock->iWindowPositionY : pDock->iWindowPositionY + pDock->iCurrentHeight);
+		}
+		else
+		{
+			*bRight = (pDock->iWindowPositionY < g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] / 2);
+			*bDirectionUp = (pIcon->fXAtRest > pDock->iMinDockWidth / 2);
+			*iY = (! (*bRight) ? pDock->iWindowPositionY : pDock->iWindowPositionY + pDock->iCurrentHeight);
+		}
+		
 		if (g_bAutoHide)
 		{
 			*iX = pDock->iWindowPositionX + (pIcon->fXAtRest + pIcon->fWidth * (*bRight ? .7 : .3)) / pDock->iMinDockWidth * g_iVisibleZoneWidth;
@@ -363,20 +382,29 @@ void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int
 		{
 			*iX = pDock->iWindowPositionX + pIcon->fDrawX + pIcon->fWidth * (*bRight ? .7 : .3);
 		}
-		*iY = (g_bDirectionUp ? pDock->iWindowPositionY : pDock->iWindowPositionY + pDock->iCurrentHeight);
-		
 	}
 	else if (pDock->iRefCount > 0 && pDock->bAtBottom)  // sous-dock invisible.
 	{
 		CairoDock *pParentDock = NULL;
 		Icon *pPointingIcon = cairo_dock_search_icon_pointing_on_dock (pDock, &pParentDock);
-		cairo_dock_dialog_calculate_aimed_point (pPointingIcon, pParentDock, iX, iY, bRight);
+		cairo_dock_dialog_calculate_aimed_point (pPointingIcon, pParentDock, iX, iY, bRight, bIsPerpendicular, bDirectionUp);
 	}
 	else  // dock actif.
 	{
-		*bRight = (pIcon->fXAtRest > pDock->iMinDockWidth / 2);
+		*bIsPerpendicular = (pDock->bHorizontalDock == CAIRO_DOCK_VERTICAL);
+		if (pDock->bHorizontalDock)
+		{
+			*bRight = (pIcon->fXAtRest > pDock->iMinDockWidth / 2);
+			*bDirectionUp = (pDock->iWindowPositionY > g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] / 2);
+			*iY = (*bDirectionUp ? pDock->iWindowPositionY : pDock->iWindowPositionY + pDock->iCurrentHeight);
+		}
+		else
+		{
+			*bRight = (pDock->iWindowPositionY < g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] / 2);
+			*bDirectionUp = (pIcon->fXAtRest > pDock->iMinDockWidth / 2);
+			*iY = (! (*bRight) ? pDock->iWindowPositionY : pDock->iWindowPositionY + pDock->iCurrentHeight);
+		}
 		*iX = pDock->iWindowPositionX + pIcon->fDrawX + pIcon->fWidth * pIcon->fScale * (*bRight ? .7 : .3);
-		*iY = (g_bDirectionUp ? pDock->iWindowPositionY : pDock->iWindowPositionY + pDock->iCurrentHeight);
 	}
 }
 
@@ -402,17 +430,18 @@ void cairo_dock_dialog_find_optimal_placement  (CairoDockDialog *pDialog, Icon *
 		fXRight = 1e4;
 	}
 	gboolean bCollision = FALSE;
-	double fNextYStep = (g_bDirectionUp ? -1e4 : 1e4);
+	double fNextYStep = (pDialog->bDirectionUp ? -1e4 : 1e4);
 	int iYInf, iYSup;
 	GSList *ic;
+	g_static_mutex_lock (&s_mDialogsMutex);
 	for (ic = s_pDialogList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
 		pDialogOnOurWay = icon->pDialog;
 		if (pDialogOnOurWay == NULL)
 			continue;
-		iYInf = (g_bDirectionUp ? pDialogOnOurWay->iPositionY : pDialogOnOurWay->iPositionY + pDialogOnOurWay->iHeight - (pDialogOnOurWay->iTextHeight + 2 * g_iDockLineWidth));
-		iYSup = (g_bDirectionUp ? pDialogOnOurWay->iPositionY + pDialogOnOurWay->iTextHeight + 2 * g_iDockLineWidth : pDialogOnOurWay->iPositionY + pDialogOnOurWay->iHeight);
+		iYInf = (pDialog->bDirectionUp ? pDialogOnOurWay->iPositionY : pDialogOnOurWay->iPositionY + pDialogOnOurWay->iHeight - (pDialogOnOurWay->iTextHeight + 2 * g_iDockLineWidth));
+		iYSup = (pDialog->bDirectionUp ? pDialogOnOurWay->iPositionY + pDialogOnOurWay->iTextHeight + 2 * g_iDockLineWidth : pDialogOnOurWay->iPositionY + pDialogOnOurWay->iHeight);
 		if (iYInf < pDialog->iPositionY + pDialog->iTextHeight + 2 * g_iDockLineWidth && iYSup > pDialog->iPositionY)
 		{
 			g_print ("pDialogOnOurWay : %d - %d ; pDialog : %d - %d\n", iYInf, iYSup, pDialog->iPositionY, pDialog->iPositionY + (pDialog->iTextHeight + 2 * g_iDockLineWidth));
@@ -421,9 +450,10 @@ void cairo_dock_dialog_find_optimal_placement  (CairoDockDialog *pDialog, Icon *
 			else
 				fXRight = MIN (fXRight, icon->pDialog->iPositionX);
 			bCollision = TRUE;
-			fNextYStep = (g_bDirectionUp ? MAX (fNextYStep, iYInf) : MIN (fNextYStep, iYSup));
+			fNextYStep = (pDialog->bDirectionUp ? MAX (fNextYStep, iYInf) : MIN (fNextYStep, iYSup));
 		}
 	}
+	g_static_mutex_unlock (&s_mDialogsMutex);
 	
 	//g_print (" -> [%.2f ; %.2f]\n", fXLeft, fXRight);
 	
@@ -441,23 +471,35 @@ void cairo_dock_dialog_find_optimal_placement  (CairoDockDialog *pDialog, Icon *
 	else
 	{
 		//g_print ("Aim : (%d ; %d) ; Width : %d\n", pDialog->iAimedX, pDialog->iAimedY, pDialog->iWidth);
-		pDialog->iPositionY = fNextYStep - (g_bDirectionUp ? pDialog->iTextHeight + 2*g_iDockLineWidth : 0);
+		pDialog->iPositionY = fNextYStep - (pDialog->bDirectionUp ? pDialog->iTextHeight + 2*g_iDockLineWidth : 0);
 		cairo_dock_dialog_find_optimal_placement  (pDialog, pIcon, pDock);
 	}
 }
 
 void cairo_dock_place_dialog (CairoDockDialog *pDialog, Icon *pIcon, CairoDock *pDock)
 {
-	cairo_dock_dialog_calculate_aimed_point (pIcon, pDock, &pDialog->iAimedX, &pDialog->iAimedY, &pDialog->bRight);
+	cairo_dock_dialog_calculate_aimed_point (pIcon, pDock, &pDialog->iAimedX, &pDialog->iAimedY, &pDialog->bRight, &pDialog->bIsPerpendicular, &pDialog->bDirectionUp);
 	g_print (" Aim (%d;%d)\n", pDialog->iAimedX, pDialog->iAimedY);
 	
 	double fLineWidth = g_iDockLineWidth;
-	pDialog->iPositionY = (g_bDirectionUp ? pDialog->iAimedY - (pDialog->iTextHeight + 2 * fLineWidth + CAIRO_DOCK_DIALOG_DEFAULT_GAP) : pDialog->iAimedY + CAIRO_DOCK_DIALOG_DEFAULT_GAP);  // on place la bulle d'abord sans prendre en compte la pointe.
-	cairo_dock_dialog_find_optimal_placement (pDialog, pIcon, pDock);
+	if (pDialog->bIsPerpendicular)
+	{
+		int tmp = pDialog->iAimedX;
+		pDialog->iAimedX = pDialog->iAimedY;
+		pDialog->iAimedY = tmp;
+		pDialog->iPositionX = (pDialog->bRight ? pDialog->iAimedX : pDialog->iAimedX - pDialog->iWidth);
+		pDialog->iPositionY = (pDialog->bDirectionUp ? pDialog->iAimedY - (pDialog->iTextHeight + 2 * fLineWidth + CAIRO_DOCK_DIALOG_DEFAULT_GAP) : pDialog->iAimedY + CAIRO_DOCK_DIALOG_DEFAULT_GAP);  // on place la bulle sans faire d'optimisation.
+	}
+	else
+	{
+		pDialog->iPositionY = (pDialog->bDirectionUp ? pDialog->iAimedY - (pDialog->iTextHeight + 2 * fLineWidth + CAIRO_DOCK_DIALOG_DEFAULT_GAP) : pDialog->iAimedY + CAIRO_DOCK_DIALOG_DEFAULT_GAP);  // on place la bulle d'abord sans prendre en compte la pointe.
+		cairo_dock_dialog_find_optimal_placement (pDialog, pIcon, pDock);
+	}
 	
-	pDialog->iHeight = (g_bDirectionUp ? pDialog->iAimedY - pDialog->iPositionY : pDialog->iPositionY + pDialog->iTextHeight + 2 * fLineWidth - pDialog->iAimedY);
-	if (! g_bDirectionUp)
+	pDialog->iHeight = (pDialog->bDirectionUp ? pDialog->iAimedY - pDialog->iPositionY : pDialog->iPositionY + pDialog->iTextHeight + 2 * fLineWidth - pDialog->iAimedY);
+	if (! pDialog->bDirectionUp)
 		pDialog->iPositionY = pDialog->iAimedY;
+	
 	double fGapFromDock = pDialog->iHeight - (pDialog->iTextHeight + 1.5 * fLineWidth);
 	double cos_gamma = 1 / sqrt (1. + 1. * (CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE) / fGapFromDock * (CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE) / fGapFromDock);
 	double cos_theta = 1 / sqrt (1. + 1. * CAIRO_DOCK_DIALOG_TIP_MARGIN / fGapFromDock * CAIRO_DOCK_DIALOG_TIP_MARGIN / fGapFromDock);
@@ -501,4 +543,36 @@ void cairo_dock_show_temporary_dialog (gchar *cText, Icon *pIcon, CairoDock *pDo
 	
 	if (pDialog != NULL && fTimeLength > 0)
 		pDialog->iSidTimer = g_timeout_add (fTimeLength, (GSourceFunc) _cairo_dock_dialog_auto_delete, (gpointer) pIcon);
+}
+
+
+void cairo_dock_replace_all_dialogs (void)
+{
+	if (s_pDialogList == NULL)
+		return ;
+	g_print ("%s ()\n", __func__);
+	
+	GSList *ic;
+	CairoDockDialog *pDialog;
+	CairoDock *pDock;
+	Icon *pIcon;
+	
+	g_static_mutex_lock (&s_mDialogsMutex);
+	GSList *pListOfDialogs = s_pDialogList;
+	s_pDialogList = NULL;
+	for (ic = pListOfDialogs; ic != NULL; ic = ic->next)
+	{
+		pIcon = ic->data;
+		
+		if (cairo_dock_dialog_reference (pIcon))
+		{
+			pDialog = pIcon->pDialog;
+			pDock = cairo_dock_search_container_from_icon (pIcon);
+			cairo_dock_place_dialog (pDialog, pIcon, pDock);
+			s_pDialogList = g_slist_prepend (s_pDialogList, pIcon);
+			cairo_dock_dialog_unreference (pIcon);
+		}
+	}
+	g_static_mutex_unlock (&s_mDialogsMutex);
+	g_slist_free (pListOfDialogs);
 }

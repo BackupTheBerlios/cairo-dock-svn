@@ -193,17 +193,157 @@ static void _cairo_dock_draw_frame_vertical (CairoDock *pDock, cairo_t *pCairoCo
 	if (fRadius < 1)
 		cairo_close_path (pCairoContext);
 }
-void cairo_dock_calculate_construction_parameters (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth, gboolean bLoop, gboolean bInside, double fLateralFactor, double fAlign)
+
+void cairo_dock_calculate_construction_parameters_generic (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth)
+{
+	icon->fDrawX = icon->fX + (iCurrentWidth - iMaxDockWidth) / 2;
+	icon->fDrawY = icon->fY;
+	icon->fWidthFactor = 1.;
+	if (icon->fDrawX >= 0 && icon->fDrawX + icon->fWidth * icon->fScale <= iCurrentWidth)
+	{
+		icon->fAlpha = 1;
+	}
+	else
+	{
+		icon->fAlpha = .25;
+	}
+}
+
+void cairo_dock_calculate_construction_parameters_caroussel (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth, gboolean bInside)
+{
+	double fDeltaLeft = (iMaxDockWidth - iCurrentWidth - icon->fWidth * icon->fScale) / 2, fDeltaRight = fDeltaLeft;
+	double fTheta;
+	icon->fDrawX = icon->fX + (iCurrentWidth - iMaxDockWidth) / 2;
+	if (icon->fDrawX >= 0 && icon->fDrawX + icon->fWidth * icon->fScale <= iCurrentWidth)
+	{
+		icon->fAlpha = 1;
+		icon->fWidthFactor = 1.;
+		icon->fDrawY = icon->fY;
+		if (icon->fDrawX < iCurrentWidth / 2)
+			fTheta = (icon->fDrawX + icon->fWidth * icon->fScale / 2 - iCurrentWidth / 2) / iCurrentWidth * G_PI;
+		else
+			fTheta = (icon->fDrawX + icon->fWidth * icon->fScale / 2 - iCurrentWidth / 2) / iCurrentWidth * G_PI;
+		//g_print ("fX = %.2f (iCurrentWidth=%d) -> fTheta = %.2f\n", fX, iCurrentWidth, fTheta);
+	}
+	else
+	{
+		double a, b;  // parametres de la demi-ellipse.
+		if (! bInside)
+		{
+			icon->fAlpha = 0.25;
+			icon->fDrawY = icon->fY;
+			if (icon->fDrawX < iCurrentWidth / 2)
+				fTheta = (icon->fDrawX + icon->fWidth * icon->fScale / 2 - iCurrentWidth / 2) / iCurrentWidth * G_PI;
+			else
+				fTheta = (icon->fDrawX + icon->fWidth * icon->fScale / 2 - iCurrentWidth / 2) / iCurrentWidth * G_PI;
+		}
+		else if (icon->fDrawX <= 0)
+		{
+			a = iCurrentHeight - icon->fHeight * icon->fScale;
+			b = (iCurrentWidth - icon->fWidth * icon->fScale) / 2;
+			fTheta = ((icon->fDrawX + icon->fWidth * icon->fScale / 2) / fDeltaLeft - 1) * G_PI / 2;
+			icon->fDrawX = b * (1 + sin (fTheta));
+			icon->fDrawY = (g_bDirectionUp ? a * (1 + MIN (0, cos (fTheta))) : - a * cos (fTheta) + g_iDockLineWidth);
+			icon->fAlpha = MAX (0.25, MIN (0.75, sin (fTheta) * sin (fTheta)));
+			//g_print ("  theta = %.2fdeg -> fX = %.2f; fY = %.2f; alpha = %.2f\n", fTheta / G_PI*180, fX, fY, fAlpha);
+		}
+		else
+		{
+			a = iCurrentHeight - icon->fHeight * icon->fScale;
+			b = (iCurrentWidth - icon->fWidth * icon->fScale) / 2;
+			fTheta = ((icon->fDrawX + icon->fWidth * icon->fScale / 2 - iCurrentWidth) / fDeltaLeft + 1) * G_PI / 2;
+			icon->fDrawX = b * (1 + sin (fTheta));
+			icon->fDrawY = (g_bDirectionUp ? a * (1 + MIN (0, cos (fTheta))) : - a * cos (fTheta) + g_iDockLineWidth);
+			icon->fAlpha = MAX (0.25, MIN (0.75, sin (fTheta) * sin (fTheta)));
+			//g_print ("  theta = %.2fdeg -> fX = %.2f; fY = %.2f; alpha = %.2f\n", fTheta / G_PI*180, fX, fY, fAlpha);
+		}
+		icon->fWidthFactor = (G_PI / 2 - fabs (fTheta)) * 2 / G_PI;
+	}
+}
+
+void cairo_dock_manage_animations (Icon *icon, int iCurrentHeight, int iCurrentWidth, int iMaxDockWidth)
+{
+	//\_____________________ On gere l'animation de rebond.
+	if (icon->iAnimationType == CAIRO_DOCK_BOUNCE && icon->iCount > 0)
+	{
+		int n = g_tNbIterInOneRound[CAIRO_DOCK_BOUNCE];  // nbre d'iteration pour une montree+descente.
+		int k = n - (icon->iCount % n);
+		
+		double fPossibleDeltaY = MIN (50, (g_bDirectionUp ? icon->fDrawY : iCurrentHeight - (icon->fDrawY + icon->fHeight * icon->fScale)));  // on borne a 50 pixels.
+		
+		icon->fDrawY += (g_bDirectionUp ? -1. : 1.) * k / (n/2) * fPossibleDeltaY * (2 - 1.*k/(n/2));
+		icon->iCount --;  // c'est une loi de type acceleration dans le champ de pesanteur. 'g' et 'v0' n'interviennent pas directement, car s'expriment en fonction de 'fPossibleDeltaY' et 'n'.
+	}
+	
+	//\_____________________ On gere l'animation de rotation sur elle-meme.
+	if (icon->iAnimationType == CAIRO_DOCK_ROTATE && icon->iCount > 0)
+	{
+		int c = icon->iCount;
+		int n = g_tNbIterInOneRound[CAIRO_DOCK_ROTATE] / 4;  // nbre d'iteration pour 1/2 tour.
+		if ((c/n) & 1)
+		{
+			icon->fWidthFactor *= ((c/(2*n)) & 1 ? 1. : -1.) * (c%n) / n;
+		}
+		else
+		{
+			icon->fWidthFactor *= ((c/(2*n)) & 1 ? 1. : -1.) * ((c%n) - n) / n;
+		}
+		icon->iCount --;
+	}
+	
+	if (icon->fWidthFactor >= 0 && icon->fWidthFactor < 0.05)
+		icon->fWidthFactor = 0.05;
+	else if (icon->fWidthFactor < 0 && icon->fWidthFactor > -0.05)
+		icon->fWidthFactor = -0.05;
+	
+	icon->fDrawX += (1 - icon->fWidthFactor) / 2 * icon->fWidth * icon->fScale;
+	
+	//\_____________________ On gere l'animation de l'icone qui suit ou evite le curseur.
+	if (icon->iAnimationType == CAIRO_DOCK_FOLLOW_MOUSE)
+	{
+		icon->fDrawX = icon->fDrawX + (iCurrentWidth - iMaxDockWidth) / 2 - icon->fWidth * icon->fScale / 2;
+		icon->fDrawY = icon->fDrawY -icon->fHeight * icon->fScale / 2 ;
+		icon->fAlpha = 0.4;
+	}
+	else if (icon->iAnimationType == CAIRO_DOCK_AVOID_MOUSE)
+	{
+		icon->fAlpha = 0.4;
+		icon->fDrawX += icon->fWidth / 2 * (icon->fScale - 1) / g_fAmplitude * (icon->fPhase < G_PI/2 ? -1 : 1);
+	}
+	
+	//\_____________________ On gere l'animation d'ondelette.
+	if (icon->iCount > 0 && icon->iAnimationType == CAIRO_DOCK_PULSE)
+	{
+		icon->fAlpha = 1. * (icon->iCount % g_tNbIterInOneRound[CAIRO_DOCK_PULSE]) / g_tNbIterInOneRound[CAIRO_DOCK_PULSE];
+		icon->iCount --;
+	}
+	
+	//\_____________________ On gere l'animation de clignotement.
+	if (icon->iCount > 0 && icon->iAnimationType == CAIRO_DOCK_BLINK)
+	{
+		int c = icon->iCount;
+		int n = g_tNbIterInOneRound[CAIRO_DOCK_BLINK] / 2;  // nbre d'iteration pour une inversion d'alpha.
+		if ( (c/n) & 1)
+			icon->fAlpha *= 1. * (c%n) / n;
+		else
+			icon->fAlpha *= 1. * (n - 1 - (c%n)) / n;
+		icon->fAlpha *= icon->fAlpha;  // pour accentuer.
+		icon->iCount --;
+	}
+}
+
+void cairo_dock_calculate_construction_parameters (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth, gboolean bLoop, gboolean bInside)
 {
 	//\_____________________ On calcule leur position : en ligne droite sur l'avant-plan ou sur une ellipse en arriere-plan.
 	double fDeltaLeft = (iMaxDockWidth - iCurrentWidth - icon->fWidth * icon->fScale) / 2, fDeltaRight = fDeltaLeft;
-	double fX, fY, fAlpha, fTheta;
+	double fX, fY, fAlpha, fTheta, fWidthFactor;
 	fX = icon->fX + (iCurrentWidth - iMaxDockWidth) / 2;
 	//fX = fAlign * iCurrentWidth + (fX - fAlign * iCurrentWidth) * (1 - fLateralFactor);
 	//g_print ("(%s) icon->fX : %.2f -> %.2f\n", icon->acName, icon->fX, fX);
 	if (fX >= 0 && fX + icon->fWidth * icon->fScale <= iCurrentWidth)
 	{
 		fAlpha = 1;
+		fWidthFactor = 1.;
 		fY = icon->fY;
 		if (! bLoop)
 			fTheta = 0;
@@ -248,6 +388,7 @@ void cairo_dock_calculate_construction_parameters (Icon *icon, int iCurrentWidth
 			//g_print ("  theta = %.2fdeg -> fX = %.2f; fY = %.2f; alpha = %.2f\n", fTheta / G_PI*180, fX, fY, fAlpha);
 		}
 	}
+	fWidthFactor = (G_PI / 2 - fabs (fTheta)) * 2 / G_PI;
 	
 	//\_____________________ On gere l'animation de rebond.
 	if (icon->iAnimationType == CAIRO_DOCK_BOUNCE && icon->iCount > 0)
@@ -262,7 +403,6 @@ void cairo_dock_calculate_construction_parameters (Icon *icon, int iCurrentWidth
 	}
 	
 	//\_____________________ On gere l'animation de rotation sur elle-meme.
-	double fWidthFactor = 1.;
 	if (icon->iAnimationType == CAIRO_DOCK_ROTATE && icon->iCount > 0)
 	{
 		int c = icon->iCount;
@@ -278,7 +418,6 @@ void cairo_dock_calculate_construction_parameters (Icon *icon, int iCurrentWidth
 		icon->iCount --;
 	}
 	
-	fWidthFactor *= (G_PI / 2 - fabs (fTheta)) * 2 / G_PI;
 	if (fWidthFactor >= 0 && fWidthFactor < 0.05)
 		fWidthFactor = 0.05;
 	else if (fWidthFactor < 0 && fWidthFactor > -0.05)
@@ -493,7 +632,7 @@ void cairo_dock_render (CairoDock *pDock)
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
-		cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fLateralFactor, pDock->fAlign);
+		cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside);
 	}
 	
 	//\____________________ On dessine la ficelle qui les joint.
@@ -838,7 +977,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 				cairo_save (pCairoContext);
 				
 				//g_print ("  redessin a gauche de %s\n", icon->acName);
-				cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fLateralFactor, pDock->fAlign);
+				cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside);
 				cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio);
 				
 				cairo_restore (pCairoContext);
@@ -874,7 +1013,7 @@ void cairo_dock_render_optimized (CairoDock *pDock, GdkRectangle *pArea)
 				cairo_save (pCairoContext);
 				
 				//g_print ("  redessin a droite de %s\n", icon->acName);
-				cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside, pDock->fLateralFactor, pDock->fAlign);
+				cairo_dock_calculate_construction_parameters (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside);
 				cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio);
 				
 				cairo_restore (pCairoContext);

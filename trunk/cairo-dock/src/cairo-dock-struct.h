@@ -50,7 +50,8 @@ typedef struct _CairoDock {
 	///gfloat fMagnitude;  // coef multiplicateur de l'amplitude de la sinusoide (entre 0 et 1).
 	gint iMagnitudeIndex; // indice de calcul du coef multiplicateur de l'amplitude de la sinusoide (entre 0 et 1000).
 	gdouble fDecorationsOffsetX;  // decalage des decorations pour les faire suivre la souris.
-	gint iMouseX;  // derniere position du curseur, dans le cas de decorations non asservies.
+	gint iMouseX;  // derniere position du curseur (pour l'instant, dans le cas de decorations non asservies).
+	gint iMouseY;
 	gdouble fLateralFactor;  // un facteur d'acceleration lateral des icones lors du grossissement initial.
 	
 	CairoDockTypeHorizontality bHorizontalDock;  // dit si le dock est horizontal ou vertical.
@@ -104,6 +105,8 @@ typedef struct
 	int iAimedX;
 	int iAimedY;
 	gboolean bRight;
+	gboolean bIsPerpendicular;
+	gboolean bDirectionUp;
 	double fRadius;
 	double fTipHeight;
 	cairo_surface_t* pTextBuffer;
@@ -227,4 +230,3 @@ typedef enum {
 	} CairoDockDesktopEnv;
 
 #endif
-

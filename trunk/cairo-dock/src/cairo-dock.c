@@ -217,6 +217,11 @@ static gboolean random_dialog (gpointer user_data)
 	cairo_dock_show_temporary_dialog (icon->acName, icon, g_pMainDock, 7000);
 	return TRUE;
 }
+static gboolean init_mutex (gpointer user_data)
+{
+	cairo_dock_init_dialogs_mutex ();
+	return FALSE;
+}
 
 int
 main (int argc, char** argv)
@@ -346,7 +351,6 @@ main (int argc, char** argv)
 	g_cCurrentLaunchersPath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_LAUNCHERS_DIR);
 	if (! g_file_test (g_cCurrentLaunchersPath, G_FILE_TEST_IS_DIR))
 	{
-		g_print ("\nMessage à caractère informatif : les fichiers .desktop et leurs icônes sont désormais dans le sous-répertoire 'launchers' du theme courant\nDésolé pour la gêne occasionnée ^_^\n\n");
 		if (g_mkdir (g_cCurrentLaunchersPath, 7*8*8+7*8+5) != 0)
 			g_print ("Attention : couldn't create directory %s\n", g_cCurrentLaunchersPath);
 	}
@@ -376,6 +380,7 @@ main (int argc, char** argv)
 	
 	if (bDialogTest)
 		g_timeout_add (2000, (GSourceFunc) random_dialog, NULL);  // pour tests seulement.
+	
 	
 	gtk_main ();
 	/*Window root = DefaultRootWindow (g_XDisplay);

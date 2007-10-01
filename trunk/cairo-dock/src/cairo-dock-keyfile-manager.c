@@ -1414,10 +1414,18 @@ gchar *cairo_dock_get_conf_file_language (GKeyFile *pKeyFile)
 {
 	gchar *cConfFileLanguage = NULL;
 	gchar *cFirstComment =  g_key_file_get_comment (pKeyFile, NULL, NULL, NULL);
-	if (cFirstComment == NULL || *cFirstComment != '!')
+	if (cFirstComment != NULL && *cFirstComment == '!')
 	{
-		sscanf (cFirstComment, "!%s;", &cConfFileLanguage);
+		///sscanf (cFirstComment, "!%s;", &cConfFileLanguage);
+		int iStringLenght = strlen (cFirstComment);
+		if (cFirstComment[iStringLenght-1] == '\n')
+			cFirstComment[iStringLenght-1] = '\0';
+		gchar *str = strchr (cFirstComment, ';');
+		if (str != NULL)
+			*str = '\0';
+		cConfFileLanguage = g_strdup (cFirstComment+1);
 	}
 	g_free (cFirstComment);
+	g_print (" -> cConfFileLanguage : %s\n", cConfFileLanguage);
 	return cConfFileLanguage;
 }
