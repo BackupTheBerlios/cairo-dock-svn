@@ -106,6 +106,7 @@ extern double g_fRefreshInterval;
 
 extern gboolean g_bShowAppli;
 extern gboolean g_bUniquePid;
+extern gboolean g_bGroupAppliByClass;
 extern int g_iAppliMaxNameLength;
 extern int g_iSidUpdateAppliList;
 
@@ -113,7 +114,6 @@ extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
-extern GList *g_tIconsSubList[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 
 extern gchar *g_cSeparatorImage;
@@ -625,7 +625,10 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_tNbAnimationRounds[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Applications", "number of animation rounds", &bFlushConfFileNeeded, 2);
 	
 	gboolean bUniquePidOld = g_bUniquePid;
-	g_bUniquePid = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "unique PID", &bFlushConfFileNeeded, 2);
+	g_bUniquePid = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "unique PID", &bFlushConfFileNeeded, FALSE);
+	
+	gboolean bGroupAppliByClassOld = g_bGroupAppliByClass;
+	g_bGroupAppliByClass = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "group by class", &bFlushConfFileNeeded, FALSE);
 	
 	g_iAppliMaxNameLength = cairo_dock_get_integer_key_value (pKeyFile, "Applications", "max name length", &bFlushConfFileNeeded, 15);
 	
@@ -691,7 +694,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	cairo_dock_remove_all_applets (pDock);  // on est obliges d'arreter tous les applets.
 	
-	if (bUniquePidOld != g_bUniquePid || (g_iSidUpdateAppliList != 0 && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
+	if (bUniquePidOld != g_bUniquePid || bGroupAppliByClassOld != g_bGroupAppliByClass || (g_iSidUpdateAppliList != 0 && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
 	{
 		cairo_dock_remove_all_applis (pDock);
 	}
@@ -738,13 +741,13 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		int iNewWidth, iNewHeight;
 		if (g_bAutoHide && pDock->iRefCount == 0)
 		{
-			cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MIN_SIZE, &iNewWidth, &iNewHeight);
-			pDock->fLateralFactor = g_fUnfoldAcceleration;
+			cairo_dock_get_window_position_and_geometry_at_balance (pDock, CAIRO_DOCK_MIN_SIZE, &iNewWidth, &iNewHeight);
+			pDock->fFoldingFactor = g_fUnfoldAcceleration;
 		}
 		else
 		{
-			pDock->fLateralFactor = 0;
-			cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
+			pDock->fFoldingFactor = 0;
+			cairo_dock_get_window_position_and_geometry_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
 		}
 		
 		//g_print ("on commence en bas a %dx%d (%d;%d)\n", g_iVisibleZoneWidth, g_iVisibleZoneHeight, pDock->iWindowPositionX, pDock->iWindowPositionY);

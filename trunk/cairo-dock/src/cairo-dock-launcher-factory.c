@@ -117,9 +117,21 @@ gchar *cairo_dock_search_image_path (gchar *cFileName)
 			}
 			//g_print ("on recherche %s dans le theme d'icones\n", sIconPath->str);
 			GtkIconInfo* pIconInfo = gtk_icon_theme_lookup_icon  (g_pIconTheme,
-			sIconPath->str,
-			64,
-			GTK_ICON_LOOKUP_FORCE_SVG);
+				sIconPath->str,
+				64,
+				GTK_ICON_LOOKUP_FORCE_SVG);
+			if (pIconInfo == NULL)
+			{
+				GtkIconTheme *pDefaultIconTheme = gtk_icon_theme_get_default ();
+				if (g_pIconTheme != pDefaultIconTheme)
+				{
+					pIconInfo = gtk_icon_theme_lookup_icon  (pDefaultIconTheme,
+						sIconPath->str,
+						64,
+						GTK_ICON_LOOKUP_FORCE_SVG);
+				}
+			}
+			
 			if (pIconInfo != NULL)
 			{
 				g_string_printf (sIconPath, "%s", gtk_icon_info_get_filename (pIconInfo));

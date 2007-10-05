@@ -30,6 +30,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 #include "cairo-dock-load.h"
 #include "cairo-dock-icons.h"
+#include "cairo-dock-dock-factory.h"
 #include "cairo-dock-application-factory.h"
 
 
@@ -42,6 +43,7 @@ extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 
 extern gboolean g_bUniquePid;
+extern gboolean g_bGroupAppliByClass;
 extern Display *g_XDisplay;
 extern GHashTable *g_hAppliTable;
 extern GHashTable *g_hXWindowTable;
@@ -259,7 +261,6 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	Icon * pLastAppli = cairo_dock_get_last_appli (pDock->icons);
 	icon->fOrder = (pLastAppli != NULL ? pLastAppli->fOrder + 1 : 1);
 	icon->iType = CAIRO_DOCK_APPLI;
-	icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
 	
 	icon->fWidth = fWidth;
 	icon->fHeight = fHeight;
@@ -274,6 +275,34 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	g_hash_table_insert (g_hXWindowTable, pXid, icon);
 	XFree (pNameBuffer);
 	
+	//\__________________ On regarde si il faut la grouper avec une autre.
+	XClassHint class_hint;
+	XGetClassHint (g_XDisplay, Xid, &class_hint);
+	g_print ("  res_name : %s; res_class : %s\n", class_hint.res_name, class_hint.res_class);
+	icon->cClass = g_strdup (class_hint.res_class);
+	XFree (class_hint.res_name);
+	XFree (class_hint.res_class);
+	
+	if (g_bGroupAppliByClass)
+	{
+		Icon *pSameClassIcon = cairo_dock_get_icon_with_class (pDock->icons, icon->cClass);
+		if (pSameClassIcon == NULL)
+		{
+			icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
+		}
+		else
+		{
+			icon->cParentDockName = g_strdup (icon->cClass);
+			
+			if (cairo_dock_search_dock_from_name (icon->cClass) == NULL)  // alors il faut creer le sous-dock, et on decide de  l'associer a pSameClassIcon.
+			{
+				g_print ("  creation du dock pour la classe %s\n", icon->cClass);
+				pSameClassIcon->pSubDock = cairo_dock_create_subdock_from_scratch (NULL, icon->cClass);
+			}
+		}
+	}
+	else
+		icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
+	
 	return icon;
 }
-

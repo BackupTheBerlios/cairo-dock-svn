@@ -46,6 +46,9 @@ extern int g_iShrinkDownInterval;
 extern double g_fMoveUpSpeed;
 extern double g_fMoveDownSpeed;
 
+extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
+extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
+extern int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS];
 
 gboolean cairo_dock_move_up (CairoDock *pDock)
 {
@@ -94,7 +97,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 		//g_print ("  on se fixe en bas\n");
 		pDock->bAtBottom = TRUE;
 		int iNewWidth, iNewHeight;
-		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MIN_SIZE, &iNewWidth, &iNewHeight);
+		cairo_dock_get_window_position_and_geometry_at_balance (pDock, CAIRO_DOCK_MIN_SIZE, &iNewWidth, &iNewHeight);
 		if (pDock->bHorizontalDock)
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionX,
@@ -124,9 +127,10 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 			}
 			pDock->iScrollOffset = 0;
 			
-			pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
-			pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
-			pDock->fLateralFactor = g_fUnfoldAcceleration;
+			//pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
+			//pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
+			cairo_dock_calculate_max_dock_size_generic (pDock);
+			pDock->fFoldingFactor = g_fUnfoldAcceleration;
 		}
 		
 		gtk_widget_queue_draw (pDock->pWidget);
@@ -156,23 +160,18 @@ gfloat cairo_dock_calculate_magnitude (gint iMagnitudeIndex)  // merci a Robrob 
 
 gboolean cairo_dock_grow_up (CairoDock *pDock)
 {
-	//g_print ("%s (%d ; %f ; %d)\n", __func__, pDock->iMagnitudeIndex, pDock->fLateralFactor, pDock->iSidShrinkDown);
+	//g_print ("%s (%d ; %f ; %d)\n", __func__, pDock->iMagnitudeIndex, pDock->fFoldingFactor, pDock->iSidShrinkDown);
 	if (pDock->iSidShrinkDown != 0)
 		return TRUE;  // on se met en attente de fin d'animation.
 	
-	///pDock->fMagnitude *= g_fGrowUpFactor;  // 1.4
 	pDock->iMagnitudeIndex += g_iGrowUpInterval;
 	if (pDock->iMagnitudeIndex > CAIRO_DOCK_NB_MAX_ITERATIONS)
 		pDock->iMagnitudeIndex = CAIRO_DOCK_NB_MAX_ITERATIONS;
-	/**if (pDock->fMagnitude < 0.05)
-		pDock->fMagnitude = 0.05;
-	if (pDock->fMagnitude > 1.0)
-		pDock->fMagnitude = 1.0;*/
 	
-	pDock->fLateralFactor *= sqrt (pDock->fLateralFactor);
-	///pDock->fLateralFactor = (pDock->fLateralFactor != 0 ? pow (1.5, - 1. / pDock->fLateralFactor) : 0);  // f(x)-x < 0 pour a > exp(exp(-1)) ~ 1.445.
-	if (pDock->fLateralFactor < 0.03)
-		pDock->fLateralFactor = 0;
+	pDock->fFoldingFactor *= sqrt (pDock->fFoldingFactor);
+	///pDock->fFoldingFactor = (pDock->fFoldingFactor != 0 ? pow (1.5, - 1. / pDock->fFoldingFactor) : 0);  // f(x)-x < 0 pour a > exp(exp(-1)) ~ 1.445.
+	if (pDock->fFoldingFactor < 0.03)
+		pDock->fFoldingFactor = 0;
 	
 	gint iMouseX, iMouseY;
 	
@@ -189,8 +188,8 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 	cairo_dock_calculate_icons (pDock, iMouseX, iMouseY);
 	gtk_widget_queue_draw (pDock->pWidget);
 	
-	///if (pDock->fMagnitude == 1 && pDock->fLateralFactor == 0)
-	if (pDock->iMagnitudeIndex == CAIRO_DOCK_NB_MAX_ITERATIONS && pDock->fLateralFactor == 0)
+	///if (pDock->fMagnitude == 1 && pDock->fFoldingFactor == 0)
+	if (pDock->iMagnitudeIndex == CAIRO_DOCK_NB_MAX_ITERATIONS && pDock->fFoldingFactor == 0)
 	{
 		pDock->iMagnitudeIndex = CAIRO_DOCK_NB_MAX_ITERATIONS;
 		pDock->iSidGrowUp = 0;
@@ -210,12 +209,12 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 	pDock->iMagnitudeIndex -= g_iShrinkDownInterval;
 	if (pDock->iMagnitudeIndex < 0)
 		pDock->iMagnitudeIndex = 0;
-	//g_print ("pDock->fLateralFactor : %f\n", pDock->fLateralFactor);
-	if (pDock->fLateralFactor != 0 && (! g_bResetScrollOnLeave || pDock->iScrollOffset == 0))
+	//g_print ("pDock->fFoldingFactor : %f\n", pDock->fFoldingFactor);
+	if (pDock->fFoldingFactor != 0 && (! g_bResetScrollOnLeave || pDock->iScrollOffset == 0))
 	{
-		pDock->fLateralFactor = pow (pDock->fLateralFactor, 2./3);
-		if (pDock->fLateralFactor > g_fUnfoldAcceleration)
-			pDock->fLateralFactor = g_fUnfoldAcceleration;
+		pDock->fFoldingFactor = pow (pDock->fFoldingFactor, 2./3);
+		if (pDock->fFoldingFactor > g_fUnfoldAcceleration)
+			pDock->fFoldingFactor = g_fUnfoldAcceleration;
 	}
 	
 	
@@ -243,8 +242,9 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 		}
 		//if (pDock->iScrollOffset < 5 || pDock->iMinDockWidth - pDock->iScrollOffset < 5)
 		//	pDock->iScrollOffset = 0;
-		pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
-		pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
+		//pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
+		//pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
+		cairo_dock_calculate_max_dock_size_generic (pDock);
 	}
 	
 	cairo_dock_calculate_icons (pDock, iMouseX, iMouseY);
@@ -264,7 +264,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 			
 			if (! (g_bAutoHide && pDock->iRefCount == 0) && ! pDock->bInside)
 			{
-				cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
+				cairo_dock_get_window_position_and_geometry_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
 				if (pDock->bHorizontalDock)
 					gdk_window_move_resize (pDock->pWidget->window,
 						pDock->iWindowPositionX,
@@ -305,6 +305,18 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 			{
 				//g_print ("  fin\n");
 				cairo_dock_remove_icon_from_dock (pDock, pRemovingIcon);
+				if (CAIRO_DOCK_IS_APPLI (pRemovingIcon) && pRemovingIcon->cClass != NULL)
+				{
+					if (pDock == cairo_dock_search_dock_from_name (pRemovingIcon->cClass) && pDock->icons == NULL)  // il n'y a plus aucune icone de cette classe.
+					{
+						Icon *pPointedIcon = cairo_dock_search_icon_pointing_on_dock (pDock, NULL);
+						pPointedIcon->pSubDock = NULL;
+						
+						cairo_dock_destroy_dock (pDock, pRemovingIcon->cClass, NULL, NULL);
+						cairo_dock_free_icon (pRemovingIcon);
+						return FALSE;
+					}
+				}
 				cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 				cairo_dock_free_icon (pRemovingIcon);
 			}
@@ -320,4 +332,36 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 	}
 	else
 		return TRUE;
+}
+
+
+void cairo_dock_arm_animation (Icon *icon, CairoDockAnimationType iAnimationType, int iNbRounds)
+{
+	if (iAnimationType == -1)
+		icon->iAnimationType = g_tAnimationType[icon->iType];
+	else
+		icon->iAnimationType = iAnimationType;
+	
+	if (icon->iAnimationType == CAIRO_DOCK_RANDOM)
+		icon->iAnimationType =  g_random_int_range (0, CAIRO_DOCK_NB_ANIMATIONS);  // [a;b[
+	
+	
+	if (iNbRounds == -1)
+		iNbRounds = g_tNbAnimationRounds[icon->iType];
+	icon->iCount = g_tNbIterInOneRound[icon->iAnimationType] * iNbRounds - 1;
+}
+
+void cairo_dock_start_animation (Icon *icon, CairoDock *pDock)
+{
+	if (icon->iCount > 0)
+	{
+		if (pDock->iSidGrowUp != 0)
+		{
+			pDock->fFoldingFactor = 0;
+			g_source_remove (pDock->iSidGrowUp);
+			pDock->iSidGrowUp = 0;
+		}
+		if (pDock->iSidShrinkDown == 0)
+			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);  // fera diminuer de taille les icones, et rebondir/tourner/clignoter celle qui est cliquee.
+	}
 }

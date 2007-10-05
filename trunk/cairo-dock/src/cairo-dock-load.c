@@ -291,9 +291,9 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 	
 	if (! pDock->bIsMainDock)
 	{
-		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 		pDock->iCurrentWidth = pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth;
 		pDock->iCurrentHeight= pDock->iMaxIconHeight + 2 * g_iDockLineWidth;
+		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 		cairo_dock_calculate_icons (pDock, 0, 0);
 	}
 }

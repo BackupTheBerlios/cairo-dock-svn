@@ -22,13 +22,22 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <cairo-glitz.h>
 #endif
 
+typedef struct _CairoDock CairoDock;
+typedef struct _CairoDockModule CairoDockModule;
+typedef struct _CairoDockDialog CairoDockDialog;
+typedef struct _Icon Icon;
+
 
 typedef enum {
 	CAIRO_DOCK_VERTICAL = 0,
 	CAIRO_DOCK_HORIZONTAL
 	} CairoDockTypeHorizontality;
 
-typedef struct _CairoDock {
+typedef void (*CairoDockCalculateMaxDockSizeFunc) (CairoDock *pDock);
+typedef void (*CairoDockRenderFunc) (CairoDock *pDock);
+typedef void (*CairoDockSetSubDockPositionFunc) (Icon *pPointedIcon, CairoDock *pParentDock);
+
+struct _CairoDock {
 	GList* icons;  // la liste de ses icones.
 	GtkWidget *pWidget;  // sa fenetre de dessin.
 	gboolean bIsMainDock;  // si le dock est le dock racine.
@@ -47,12 +56,11 @@ typedef struct _CairoDock {
 	gboolean bInside;  // lorsque la souris est dans le dock.
 	gboolean bMenuVisible;  // lorsque le menu du clique droit est visible.
 	
-	///gfloat fMagnitude;  // coef multiplicateur de l'amplitude de la sinusoide (entre 0 et 1).
 	gint iMagnitudeIndex; // indice de calcul du coef multiplicateur de l'amplitude de la sinusoide (entre 0 et 1000).
 	gdouble fDecorationsOffsetX;  // decalage des decorations pour les faire suivre la souris.
 	gint iMouseX;  // derniere position du curseur (pour l'instant, dans le cas de decorations non asservies).
 	gint iMouseY;
-	gdouble fLateralFactor;  // un facteur d'acceleration lateral des icones lors du grossissement initial.
+	gdouble fFoldingFactor;  // un facteur d'acceleration lateral des icones lors du grossissement initial.
 	
 	CairoDockTypeHorizontality bHorizontalDock;  // dit si le dock est horizontal ou vertical.
 	gint iMaxIconHeight;  // max des hauteurs des icones.
@@ -67,12 +75,16 @@ typedef struct _CairoDock {
 	gint iSidGrowUp;  // serial ID du thread de grossisement des icones.
 	gint iSidShrinkDown;  // serial ID du thread de diminution des icones.
 	gint iSidLeaveDemand;  // serial ID du thread qui enverra le signal de sortie retarde.
+	
+	CairoDockRenderFunc render;
+	CairoDockCalculateMaxDockSizeFunc calculate_max_dock_size;
+	CairoDockSetSubDockPositionFunc set_subdock_position;
 #ifdef HAVE_GLITZ
 	glitz_drawable_format_t *pDrawFormat;
 	glitz_drawable_t* pGlitzDrawable;
 	glitz_format_t* pGlitzFormat;
 #endif // HAVE_GLITZ
-	} CairoDock;
+	};
 
 
 typedef gchar * (* CairoDockModulePreInit) (void);
@@ -81,11 +93,7 @@ typedef gpointer (*CairoDockModuleInit) (CairoDock *pDock, gchar **cConfFilePath
 
 typedef void (*CairoDockModuleStop) ();
 
-typedef gboolean (*CairoDockModuleConfig) (void);
-
-typedef gboolean (*CairoDockModuleAction) (void);
-
-typedef struct _CairoDockModule {
+struct _CairoDockModule {
 	gchar *cModuleName;  // le nom du module : libtruc.so => cModuleName = 'truc'.
 	gchar *cSoFilePath;  // le chemin du .so.
 	GModule *pModule;
@@ -94,9 +102,9 @@ typedef struct _CairoDockModule {
 	gchar *cConfFilePath;
 	gchar *cReadmeFilePath;
 	gboolean bActive;
-} CairoDockModule;
+};
 
-typedef struct 
+struct _CairoDockDialog
 {
 	int iWidth;
 	int iHeight;
@@ -118,7 +126,8 @@ typedef struct
 	int iSidTimer;
 	int iRefCount;
 	gboolean bBuildComplete;
-	} CairoDockDialog;
+	};
+
 
 typedef enum {
 	CAIRO_DOCK_LAUNCHER = 0,
@@ -129,7 +138,18 @@ typedef enum {
 	CAIRO_DOCK_NB_TYPES
 	} CairoDockIconType;
 
-typedef struct _Icon {
+typedef enum {
+	CAIRO_DOCK_BOUNCE = 0,
+	CAIRO_DOCK_ROTATE,
+	CAIRO_DOCK_BLINK,
+	CAIRO_DOCK_PULSE,
+	CAIRO_DOCK_RANDOM,
+	CAIRO_DOCK_NB_ANIMATIONS,
+	CAIRO_DOCK_FOLLOW_MOUSE,
+	CAIRO_DOCK_AVOID_MOUSE
+	} CairoDockAnimationType;
+
+struct _Icon {
 	//\____________ renseignes lors de la creation de l'icone.
 	gchar *acDesktopFileName;
 	gchar *cBaseURI;
@@ -163,17 +183,18 @@ typedef struct _Icon {
 	gdouble fAlpha;
 	gboolean bPointed;
 	gint iCount;
-	gint iAnimationType;
+	CairoDockAnimationType iAnimationType;
 	gdouble fPersonnalScale;
 	//\____________ Pour les fenetres.
 	gint iPid;
 	Window Xid;
 	gboolean bIsMapped;
+	gchar *cClass;
 	//\____________ Pour les modules.
 	CairoDockModule *pModule;
 	//\____________ Pour les bulles de dialogues.
 	CairoDockDialog *pDialog;
-} Icon;
+};
 
 
 
@@ -204,24 +225,7 @@ typedef enum {
 	CAIRO_DOCK_MIN_SIZE
 	} CairoDockSizeType;
 
-typedef enum {
-	CAIRO_DOCK_BOUNCE = 0,
-	CAIRO_DOCK_ROTATE,
-	CAIRO_DOCK_BLINK,
-	CAIRO_DOCK_PULSE,
-	CAIRO_DOCK_RANDOM,
-	CAIRO_DOCK_NB_ANIMATIONS,
-	CAIRO_DOCK_FOLLOW_MOUSE,
-	CAIRO_DOCK_AVOID_MOUSE
-	} CairoDockAnimationType;
-
 typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
-
-
-typedef void (*CairoDockCalculateShapeFunc) (CairoDock *pDock, CairoDockSizeType iSizeType, int *iNewWidth, int *iNewHeight);
-typedef void (*CairoDockCalculateParametersFunc) (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth, gboolean bInside);
-typedef void (*CairoDockRender) (CairoDock *pDock);
-
 
 typedef enum {
 	CAIRO_DOCK_UNKNOWN_ENV=0,

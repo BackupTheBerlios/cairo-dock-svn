@@ -180,6 +180,9 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 	gtk_window_set_resizable (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_title (GTK_WINDOW (pWindow), "cairo-dock");
 	
+	pDock->render = cairo_dock_render_generic;
+	pDock->calculate_max_dock_size = cairo_dock_calculate_max_dock_size_generic;
+	pDock->set_subdock_position = cairo_dock_set_subdock_position_generic;
 	
 	gtk_widget_add_events (pWindow,
 		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | 
@@ -374,7 +377,7 @@ void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
 	if (bReserve)
 	{
 		int iWindowPositionX = pDock->iWindowPositionX, iWindowPositionY = pDock->iWindowPositionY;
-		cairo_dock_calculate_window_position_at_balance (pDock, (g_bAutoHide ? CAIRO_DOCK_MIN_SIZE : CAIRO_DOCK_NORMAL_SIZE), &iWidth, &iHeight);
+		cairo_dock_get_window_position_and_geometry_at_balance (pDock, (g_bAutoHide ? CAIRO_DOCK_MIN_SIZE : CAIRO_DOCK_NORMAL_SIZE), &iWidth, &iHeight);
 		if (g_bDirectionUp)
 		{
 			if (pDock->bHorizontalDock)
@@ -424,38 +427,19 @@ void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
 void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMinDockWidth)
 {
 	//g_print ("%s (%d, %d)\n", __func__, iMaxIconHeight, iMinDockWidth);
-	
-	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, iMinDockWidth, pDock->iScrollOffset);
-	pDock->iMaxDockHeight = (int) ((1 + g_fAmplitude) * iMaxIconHeight) + g_iLabelSize + g_iDockLineWidth;
-	pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, iMinDockWidth)) + 1;  // + 1 pour gerer les largeurs impaires.
+	//pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, iMinDockWidth, pDock->iScrollOffset);
+	//pDock->iMaxDockHeight = (int) ((1 + g_fAmplitude) * iMaxIconHeight) + g_iLabelSize + g_iDockLineWidth;
+	//pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, iMinDockWidth)) + 1;  // + 1 pour gerer les largeurs impaires.
+	cairo_dock_calculate_max_dock_size_generic (pDock);
 	int iNewMaxWidth = (g_bForceLoop && pDock->iRefCount == 0 ? pDock->iMaxDockWidth / 2 : MIN (g_iMaxAuthorizedWidth, pDock->iMaxDockWidth));
 	
 	if (! pDock->bInside && (g_bAutoHide && pDock->iRefCount == 0))
 		return;
-	else if (pDock->bInside)
-	{
-		int iNewWidth, iNewHeight;
-		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_MAX_SIZE, &iNewWidth, &iNewHeight);  // inutile de recalculer Y mais bon...
-		//g_print ("%s () -> %dx%d\n", __func__, g_iMaxDockWidth, g_iMaxDockHeight);
-		if (pDock->bHorizontalDock)
-			gdk_window_move_resize (pDock->pWidget->window,
-				pDock->iWindowPositionX,
-				pDock->iWindowPositionY,
-				iNewWidth,
-				iNewHeight);
-		else
-			gdk_window_move_resize (pDock->pWidget->window,
-				pDock->iWindowPositionY,
-				pDock->iWindowPositionX,
-				iNewHeight,
-				iNewWidth);
-	}
 	else
 	{
 		int iNewWidth, iNewHeight;
-		cairo_dock_calculate_window_position_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);  // inutile de recalculer Y mais bon...
+		cairo_dock_get_window_position_and_geometry_at_balance (pDock, (pDock->bInside ? CAIRO_DOCK_MAX_SIZE : CAIRO_DOCK_NORMAL_SIZE), &iNewWidth, &iNewHeight);  // inutile de recalculer Y mais bon...
 		//g_print ("%s () -> %dx%d\n", __func__, g_iMaxDockWidth, g_iMaxDockHeight);
-		//g_print ("  W(%d;%d) (%d)\n", pDock->iWindowPositionX, pDock->iWindowPositionY, pDock->iRefCount == 0);
 		if (pDock->bHorizontalDock)
 			gdk_window_move_resize (pDock->pWidget->window,
 				pDock->iWindowPositionX,
@@ -567,7 +551,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 		}
 	}
 	
-	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
+	///pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
 	
 	//\______________ On effectue les actions demandees.
 	if (bAnimated)
@@ -668,6 +652,7 @@ void cairo_dock_free_all_docks (CairoDock *pMainDock)
 
 void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *ReceivingDock, gchar *cReceivingDockName)
 {
+	//g_print ("%s (%s, %d)\n", __func__, cDockName, pDock->iRefCount);
 	pDock->iRefCount --;  // peut-etre qu'il faudrait en faire une operation atomique...
 	if (pDock->iRefCount > 0)
 		return ;
@@ -774,7 +759,8 @@ CairoDock *cairo_dock_create_subdock_from_scratch (GList *pIconList, gchar *cDoc
 	cairo_dock_reference_dock (pSubDock);  // on le fait tout de suite pour avoir la bonne reference avant le 'load'.
 	
 	pSubDock->icons = pIconList;
-	cairo_dock_load_buffers_in_one_dock (pSubDock);
+	if (pIconList != NULL)
+		cairo_dock_load_buffers_in_one_dock (pSubDock);
 	
 	while (gtk_events_pending ())
 		gtk_main_iteration ();

@@ -519,12 +519,17 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 				//g_print ("c'est %s qui se fait exploser\n", icon->acName);
 				icon->bIsMapped = FALSE;
 				xDestroyedWindow = event.xdestroywindow.window;
-				if (pDock->bInside || ! g_bAutoHide || ! pDock->bAtBottom)
-					icon->fPersonnalScale = 1.0;
-				else
+				
+				CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+				if (pParentDock == NULL)
+					pParentDock = pDock;
+				
+				if (! pParentDock->bInside && (g_bAutoHide || pParentDock->iRefCount != 0) && pParentDock->bAtBottom)
 					icon->fPersonnalScale = 0.05;
-				if (pDock->iSidShrinkDown == 0)
-					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+				else
+					icon->fPersonnalScale = 1.0;
+				if (pParentDock->iSidShrinkDown == 0)
+					pParentDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pParentDock);
 			}
 		}
 	}
@@ -570,7 +575,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 		if (bEventPresent)
 		{
 			bInterestedEvent = TRUE;
-			//g_print ("Destroy (%d)\n", event.xunmap.window);
+			//g_print ("Unmap (%d)\n", event.xunmap.window);
 			Icon *icon = g_hash_table_lookup (g_hXWindowTable, &event.xunmap.window);
 			if (icon != NULL)
 			{
@@ -583,12 +588,16 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 				{
 					// Ce qu'il faudrait faire : reduire son icone de moitie et la deplacer a droite des applis. Cependant, la zone de notification de gnome reduit la fenetre des qu'on veut la remapper nous-memes ! Du coup pas le choix, on l'enleve de la barre.
 					//g_print ("c'est %s qui se fait degager (%d)\n", icon->acName, event.xunmap.from_configure);
-					if (pDock->bInside || ! g_bAutoHide || ! pDock->bAtBottom)
-						icon->fPersonnalScale = 1.0;
-					else
+					CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+					if (pParentDock == NULL)
+						pParentDock = pDock;
+					
+					if (! pParentDock->bInside && (g_bAutoHide || pParentDock->iRefCount != 0) && pParentDock->bAtBottom)
 						icon->fPersonnalScale = 0.05;
-					if (pDock->iSidShrinkDown == 0)
-						pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+					else
+						icon->fPersonnalScale = 1.0;
+					if (pParentDock->iSidShrinkDown == 0)
+						pParentDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pParentDock);
 				}
 			}
 		}
@@ -628,12 +637,14 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 					icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xmap.window, pDock);
 				if (icon != NULL)
 				{
-					//g_print (" -> %s\n", icon->acName);
-					cairo_dock_insert_icon_in_dock (icon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
-					if (! pDock->bInside && g_bAutoHide && pDock->bAtBottom)
+					g_print ("insertion de %s dans %s\n", icon->acName, icon->cParentDockName);
+					CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+					g_return_val_if_fail (pParentDock != NULL, TRUE);
+					cairo_dock_insert_icon_in_dock (icon, pParentDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+					if (! pParentDock->bInside && g_bAutoHide && pParentDock->bAtBottom)
 						icon->fPersonnalScale = - 0.05;
-					if (pDock->iSidShrinkDown == 0)
-						pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+					if (pParentDock->iSidShrinkDown == 0)
+						pParentDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pParentDock);
 				}
 			}
 		}
@@ -694,9 +705,12 @@ void cairo_dock_show_all_applis (CairoDock *pDock)
 		pIcon = cairo_dock_create_icon_from_xwindow (pCairoContext, Xid, pDock);
 		
 		if (pIcon != NULL)
-			cairo_dock_insert_icon_in_dock (pIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
-		//if (pIcon != NULL)
-		//	g_print (">>>>>>>>>>>> Xid : %d\n", Xid);
+		{
+			CairoDock *pParentDock = cairo_dock_search_dock_from_name (pIcon->cParentDockName);
+			g_return_if_fail (pParentDock != NULL);
+			cairo_dock_insert_icon_in_dock (pIcon, pParentDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+			//g_print (">>>>>>>>>>>> Xid : %d\n", Xid);
+		}
 	}
 	
 	cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);

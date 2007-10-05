@@ -128,7 +128,7 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 <b>Main developer :</b>\n  Fabounet (Fabrice Rey)\n\
 <b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole\n  Glattering\n\
 <b>Applets :</b>\n  Fabounet\n  Necropotame\n\
-<b>Translations :</b>\n  Fabounet\n  Ppmt\
+<b>Translations :</b>\n  Fabounet\n  Ppmt\n\
 <b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Necropotame\n  Ppmt\n  Sombrero\n  Vilraleur");  // Djoole <=> (Julien Barrau)
 	gtk_label_set_markup (GTK_LABEL (pLabel), cAboutText);
 	g_free (cAboutText);
@@ -200,7 +200,7 @@ gboolean cairo_dock_notification_remove_icon (gpointer *data)
 		pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 	
 	cairo_dock_mark_theme_as_modified (TRUE);
-	return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
+	return CAIRO_DOCK_INTERCEPT_NOTIFICATION;  // on l'intercepte car on ne peut plus garantir la validite de l'icone apres cela.
 }
 static void cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 {

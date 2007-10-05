@@ -21,7 +21,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dialogs.h"
 
 static GSList *s_pDialogList = NULL;
-static GStaticMutex s_mDialogsMutex = G_STATIC_MUTEX_INIT;
+static GStaticRWLock s_mDialogsMutex = G_STATIC_RW_LOCK_INIT;
 
 extern gint g_iScreenWidth[2], g_iScreenHeight[2];
 extern gboolean g_bSticky;
@@ -227,9 +227,9 @@ CairoDockDialog *cairo_dock_isolate_dialog (Icon *pIcon)
 	
 	pIcon->pDialog = NULL;
 	
-	g_static_mutex_lock (&s_mDialogsMutex);
+	g_static_rw_lock_writer_lock (&s_mDialogsMutex);
 	s_pDialogList = g_slist_remove (s_pDialogList, pIcon);
-	g_static_mutex_unlock (&s_mDialogsMutex);
+	g_static_rw_lock_writer_unlock (&s_mDialogsMutex);
 	
 	if (pDialog->iSidTimer > 0)
 	{
@@ -347,9 +347,9 @@ CairoDockDialog *cairo_dock_build_dialog (gchar *cText, Icon *pIcon, CairoDock *
 	cairo_dock_place_dialog (pDialog, pIcon, pDock);
 	
 	pIcon->pDialog = pDialog;
-	g_static_mutex_lock (&s_mDialogsMutex);
+	g_static_rw_lock_writer_lock (&s_mDialogsMutex);
 	s_pDialogList = g_slist_prepend (s_pDialogList, pIcon);
-	g_static_mutex_unlock (&s_mDialogsMutex);
+	g_static_rw_lock_writer_unlock (&s_mDialogsMutex);
 	
 	return pDialog;
 }
@@ -433,7 +433,7 @@ void cairo_dock_dialog_find_optimal_placement  (CairoDockDialog *pDialog, Icon *
 	double fNextYStep = (pDialog->bDirectionUp ? -1e4 : 1e4);
 	int iYInf, iYSup;
 	GSList *ic;
-	g_static_mutex_lock (&s_mDialogsMutex);
+	g_static_rw_lock_reader_lock (&s_mDialogsMutex);
 	for (ic = s_pDialogList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
@@ -453,7 +453,7 @@ void cairo_dock_dialog_find_optimal_placement  (CairoDockDialog *pDialog, Icon *
 			fNextYStep = (pDialog->bDirectionUp ? MAX (fNextYStep, iYInf) : MIN (fNextYStep, iYSup));
 		}
 	}
-	g_static_mutex_unlock (&s_mDialogsMutex);
+	g_static_rw_lock_reader_unlock (&s_mDialogsMutex);
 	
 	//g_print (" -> [%.2f ; %.2f]\n", fXLeft, fXRight);
 	
@@ -557,7 +557,7 @@ void cairo_dock_replace_all_dialogs (void)
 	CairoDock *pDock;
 	Icon *pIcon;
 	
-	g_static_mutex_lock (&s_mDialogsMutex);
+	g_static_rw_lock_reader_lock (&s_mDialogsMutex);
 	GSList *pListOfDialogs = s_pDialogList;
 	s_pDialogList = NULL;
 	for (ic = pListOfDialogs; ic != NULL; ic = ic->next)
@@ -573,6 +573,6 @@ void cairo_dock_replace_all_dialogs (void)
 			cairo_dock_dialog_unreference (pIcon);
 		}
 	}
-	g_static_mutex_unlock (&s_mDialogsMutex);
+	g_static_rw_lock_reader_unlock (&s_mDialogsMutex);
 	g_slist_free (pListOfDialogs);
 }

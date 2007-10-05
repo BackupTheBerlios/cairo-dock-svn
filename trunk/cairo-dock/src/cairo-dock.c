@@ -159,8 +159,8 @@ int g_iVisibleZoneHeight = 0;
 //		 ---------------.----------------
 //		                 ^-- gapX
 
-gboolean g_bDirectionUp = TRUE;  // la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.
-gboolean g_bSameHorizontality = TRUE;  // dit si les sous-docks ont la meme horizontalite que les docks racines.
+gboolean g_bDirectionUp;  // la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.
+gboolean g_bSameHorizontality;  // dit si les sous-docks ont la meme horizontalite que les docks racines.
 double g_fSubDockSizeRatio;  // ratio de la taille des icones des sous-docks par rapport a celles du dock principal.
 gboolean g_bShowSubDockOnMouseOver;
 gboolean g_bAnimateSubDock;
@@ -184,6 +184,7 @@ double g_fRefreshInterval = .04;
 
 gboolean g_bShowAppli = FALSE;  // au debut on ne montre pas les applis, il faut que cairo-dock le sache.
 gboolean g_bUniquePid;
+gboolean g_bGroupAppliByClass = TRUE;  /// en cours...
 int unsigned g_iAppliMaxNameLength;
 Display *g_XDisplay = NULL;
 Screen *g_XScreen = NULL;
@@ -216,11 +217,6 @@ static gboolean random_dialog (gpointer user_data)
 		return random_dialog (user_data);
 	cairo_dock_show_temporary_dialog (icon->acName, icon, g_pMainDock, 7000);
 	return TRUE;
-}
-static gboolean init_mutex (gpointer user_data)
-{
-	cairo_dock_init_dialogs_mutex ();
-	return FALSE;
 }
 
 int
@@ -284,7 +280,7 @@ main (int argc, char** argv)
 		{
 			gboolean help = (strcmp (argv[i], "--help") == 0);
 			fprintf (help ? stdout : stderr,
-				 "Usage: %s [--glitz] [--no-keep-above] [--no-skip-pager] [--no-skip-taskbar] [--no-sticky] [--dock-hint] [--toolbar-hint] [--help]\n",
+				 "Usage:\n%s\n  [--glitz] (use hardware acceleration (needs a glitz-enabled libcairo))\n  [--no-keep-above] (don't keep the dock above other windows)\n  [--no-skip-pager] (show the dock in the pager)\n  [--no-skip-taskbar] (show the dock in taskbar)\n  [--no-sticky] (don't show the dock on all desktops)\n  [--dock-hint] (force the window manager to consider cairo-dock as a dock)\n  [--toolbar-hint] (force the window manager to consider cairo-dock as a toolbar)\n  [--help] (print this help and quit)\n",
 				 argv[0]);
 			return help ? 0 : 1;
 		}

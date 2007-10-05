@@ -12,8 +12,8 @@
 #define CAIRO_DOCK_IS_SEPARATOR(icon) (icon != NULL && icon->iType & 1)
 #define CAIRO_DOCK_IS_APPLET(icon) (icon != NULL && icon->iType  == CAIRO_DOCK_APPLET)
 
-#define CAIRO_DOCK_IS_NORMAL_LAUNCHER(icon) (icon != NULL && icon->iType == CAIRO_DOCK_LAUNCHER && icon->acDesktopFileName != NULL)
-#define CAIRO_DOCK_IS_URI_LAUNCHER(icon) (icon != NULL && icon->iType == CAIRO_DOCK_LAUNCHER && icon->cBaseURI != NULL)
+#define CAIRO_DOCK_IS_NORMAL_LAUNCHER(icon) (CAIRO_DOCK_IS_LAUNCHER (icon) && icon->acDesktopFileName != NULL)
+#define CAIRO_DOCK_IS_URI_LAUNCHER(icon) (CAIRO_DOCK_IS_LAUNCHER (icon) && icon->cBaseURI != NULL)
 #define CAIRO_DOCK_IS_VALID_APPLI(icon) (CAIRO_DOCK_IS_APPLI (icon) && icon->Xid != 0)
 #define CAIRO_DOCK_IS_VALID_APPLET(icon) (CAIRO_DOCK_IS_APPLET (icon) && icon->pModule != NULL)
 
@@ -41,6 +41,7 @@ Icon *cairo_dock_get_icon_with_command (GList *pIconList, gchar *cCommand);
 Icon *cairo_dock_get_icon_with_base_uri (GList *pIconList, gchar *cBaseURI);
 Icon *cairo_dock_get_icon_with_subdock (GList *pIconList, CairoDock *pSubDock);
 Icon *cairo_dock_get_icon_with_module (GList *pIconList, CairoDockModule *pModule);
+Icon *cairo_dock_get_icon_with_class (GList *pIconList, gchar *cClass);
 
 #define cairo_dock_none_clicked(pIconList) (cairo_dock_get_bouncing_icon (pIconList) == NULL)
 #define cairo_dock_none_removed_or_inserted(pIconList) (cairo_dock_get_removing_or_inserting_icon (pIconList) == NULL)
@@ -55,7 +56,7 @@ Icon *cairo_dock_get_icon_with_module (GList *pIconList, CairoDockModule *pModul
 void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2);
 void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2);
 
-
+void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bCheckUnusedSeparator);
 void cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon);
 void cairo_dock_remove_icon_from_dock (CairoDock *pDock, Icon *icon);
 void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType);
@@ -76,6 +77,8 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY);
 
 double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawnElement, int iFlatDockWidth);
+
+void cairo_dock_calculate_max_dock_size_generic (CairoDock *pDock);
 
 
 void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX, CairoDockIconType iType);

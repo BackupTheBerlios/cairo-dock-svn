@@ -102,14 +102,6 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 	g_free (cStopFuncName);
 	
 	
-	CairoDockModuleConfig function_config;
-	gchar *cConfigFuncName = g_strdup_printf ("%s_config", pCairoDockModule->cModuleName);
-	if (!g_module_symbol (module, cConfigFuncName, (gpointer) &function_config))
-	{
-		function_config = NULL;
-	}
-	g_free (cConfigFuncName);
-	
 	pCairoDockModule->pModule = module;
 	pCairoDockModule->initModule = function_init;
 	pCairoDockModule->stopModule = function_stop;
