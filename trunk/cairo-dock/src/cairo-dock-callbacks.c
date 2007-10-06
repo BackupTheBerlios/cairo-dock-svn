@@ -266,7 +266,6 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			if (pDock->iSidShrinkDown > 0)
 			{
 				Icon *pPointedIcon = cairo_dock_calculate_icons (pDock, iX, iY);
-				g_print ("pPointedIcon <- %s\n", pPointedIcon->acName);
 			}
 			//else
 				gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);
