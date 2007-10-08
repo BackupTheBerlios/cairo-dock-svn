@@ -324,7 +324,7 @@ void cairo_dock_calculate_construction_parameters_caroussel (Icon *icon, int iCu
 	}
 }
 
-void cairo_dock_manage_animations (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth)
+void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 {
 	//\_____________________ On gere l'animation de rebond.
 	if (icon->iAnimationType == CAIRO_DOCK_BOUNCE && icon->iCount > 0)
@@ -332,7 +332,7 @@ void cairo_dock_manage_animations (Icon *icon, int iCurrentWidth, int iCurrentHe
 		int n = g_tNbIterInOneRound[CAIRO_DOCK_BOUNCE];  // nbre d'iteration pour une montree+descente.
 		int k = n - (icon->iCount % n);
 		
-		double fPossibleDeltaY = MIN (50, (g_bDirectionUp ? icon->fDrawY : iCurrentHeight - (icon->fDrawY + icon->fHeight * icon->fScale)));  // on borne a 50 pixels.
+		double fPossibleDeltaY = MIN (100, (g_bDirectionUp ? icon->fDrawY : pDock->iCurrentHeight - (icon->fDrawY + icon->fHeight * icon->fScale)));  // on borne a 50 pixels.
 		
 		icon->fDrawY += (g_bDirectionUp ? -1. : 1.) * k / (n/2) * fPossibleDeltaY * (2 - 1.*k/(n/2));
 		icon->iCount --;  // c'est une loi de type acceleration dans le champ de pesanteur. 'g' et 'v0' n'interviennent pas directement, car s'expriment en fonction de 'fPossibleDeltaY' et 'n'.
@@ -364,8 +364,10 @@ void cairo_dock_manage_animations (Icon *icon, int iCurrentWidth, int iCurrentHe
 	//\_____________________ On gere l'animation de l'icone qui suit ou evite le curseur.
 	if (icon->iAnimationType == CAIRO_DOCK_FOLLOW_MOUSE)
 	{
-		icon->fDrawX = icon->fDrawX + (iCurrentWidth - iMaxDockWidth) / 2 - icon->fWidth * icon->fScale / 2;
-		icon->fDrawY = icon->fDrawY -icon->fHeight * icon->fScale / 2 ;
+		icon->fDrawX = pDock->iMouseX  - icon->fWidth * icon->fScale / 2;
+		///icon->fDrawX = icon->fDrawX + (iCurrentWidth - iMaxDockWidth) / 2 - icon->fWidth * icon->fScale / 2;  // Il faudrait se debarasser de ce changement de repere ...
+		icon->fDrawY = pDock->iMouseY - icon->fHeight * icon->fScale / 2 ;
+		///icon->fDrawY = icon->fDrawY - icon->fHeight * icon->fScale / 2 ;
 		icon->fAlpha = 0.4;
 	}
 	else if (icon->iAnimationType == CAIRO_DOCK_AVOID_MOUSE)
@@ -891,6 +893,7 @@ void cairo_dock_render_generic (CairoDock *pDock)
 	{
 		icon = ic->data;
 		cairo_dock_calculate_construction_parameters_generic (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth);
+		cairo_dock_manage_animations (icon, pDock);
 	}
 	
 	//\____________________ On dessine la ficelle qui les joint.

@@ -35,8 +35,8 @@ Icon *cairo_dock_get_removing_or_inserting_icon (GList *pIconList);
 Icon *cairo_dock_get_animated_icon (GList *pIconList);
 Icon *cairo_dock_get_next_icon (GList *pIconList, Icon *pIcon);
 Icon *cairo_dock_get_previous_icon (GList *pIconList, Icon *pIcon);
-#define cairo_dock_get_next_element(ic, list) (ic->next == NULL ? list : ic->next);
-#define cairo_dock_get_previous_element(ic, list) (ic->prev == NULL ? g_list_last (list) : ic->prev);
+#define cairo_dock_get_next_element(ic, list) (ic->next == NULL ? list : ic->next)
+#define cairo_dock_get_previous_element(ic, list) (ic->prev == NULL ? g_list_last (list) : ic->prev)
 Icon *cairo_dock_get_icon_with_command (GList *pIconList, gchar *cCommand);
 Icon *cairo_dock_get_icon_with_base_uri (GList *pIconList, gchar *cBaseURI);
 Icon *cairo_dock_get_icon_with_subdock (GList *pIconList, CairoDock *pSubDock);
@@ -79,9 +79,11 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY);
 double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawnElement, int iFlatDockWidth);
 
 void cairo_dock_calculate_max_dock_size_generic (CairoDock *pDock);
+void cairo_dock_calculate_max_dock_size_caroussel (CairoDock *pDock);
 
 
-void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX, CairoDockIconType iType);
+void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, CairoDockIconType iType, double fMargin);
+void cairo_dock_stop_marking_icons (CairoDock *pDock, CairoDockIconType iType);
 
 void cairo_dock_update_icon_s_container_name (Icon *icon, gchar *cNewParentDockName);
 

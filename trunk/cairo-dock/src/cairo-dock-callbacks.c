@@ -99,11 +99,12 @@ gboolean on_expose (GtkWidget *pWidget,
 	
 	if (!pDock->bAtBottom)
 	{
-		cairo_dock_render (pDock);
+		pDock->render (pDock);
+		//cairo_dock_render (pDock);
 	}
 	else
 	{
-		if ((g_bAutoHide && pDock->iRefCount == 0))
+		if (g_bAutoHide && pDock->iRefCount == 0)
 		{
 			if (pDock->bInside)
 			{
@@ -113,7 +114,8 @@ gboolean on_expose (GtkWidget *pWidget,
 				cairo_dock_render_background (pDock);
 		}
 		else
-			cairo_dock_render (pDock);
+			pDock->render (pDock);
+			//cairo_dock_render (pDock);
 	}
 	
 	return FALSE;
@@ -185,7 +187,8 @@ static void cairo_dock_show_subdock (Icon *pPointedIcon, gboolean bUpdate, Cairo
 		cairo_dock_calculate_construction_parameters (pPointedIcon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside);  // c'est un peu un hack pourri, l'idee c'est de recalculer la position exacte de l'icone pointee pour pouvoir placer le sous-dock precisement, car sa derniere position connue est decalee d'un coup de molette par rapport a la nouvelle, ce qui fait beaucoup.
 	}
 	
-	cairo_dock_set_subdock_position_generic (pPointedIcon, pDock);
+	///cairo_dock_set_subdock_position_generic (pPointedIcon, pDock);
+	pSubDock->set_subdock_position (pPointedIcon, pDock);
 	
 	pSubDock->fFoldingFactor = g_fUnfoldAcceleration;
 	pSubDock->bAtBottom = FALSE;
@@ -238,45 +241,37 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 {
 	static double fLastTime = 0;
 	Icon *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
+	int iLastMouseX = pDock->iMouseX;
 	//g_print ("%s (%d,%d) (%d, %.2fms, bAtBottom:%d; iSidShrinkDown:%d)\n", __func__, (int) pMotion->x, (int) pMotion->y, pMotion->is_hint, pMotion->time - fLastTime, pDock->bAtBottom, pDock->iSidShrinkDown);
 	
 	//\_______________ On elague le flux des MotionNotify, sinon X en envoie autant que le permet le CPU !
 	Icon *pPointedIcon;
-	int iX, iY;
 	if (pMotion != NULL)
 	{
 		//if (g_iShowSubDockDelay > 0)
 		//	pDock->iMouseX = (pDock->bHorizontalDock ? pMotion->x : pMotion->y);
 		if (pDock->bHorizontalDock)
 		{
-			iX = (int) pMotion->x;
-			iY = (int) pMotion->y;
+			pDock->iMouseX = (int) pMotion->x;
+			pDock->iMouseY = (int) pMotion->y;
 		}
 		else
 		{
-			iX = (int) pMotion->y;
-			iY = (int) pMotion->x;
+			pDock->iMouseX = (int) pMotion->y;
+			pDock->iMouseY = (int) pMotion->x;
 		}
 		
 		if (pDock->iSidShrinkDown > 0 || pMotion->time - fLastTime < g_fRefreshInterval)  // si les icones sont en train de diminuer de taille (suite a un clic) on on laisse l'animation se finir, sinon elle va trop vite.  // || ! pDock->bInside || pDock->bAtBottom
 		{
-			pDock->iMouseX = iX;
-			pDock->iMouseY = iY;
-			//if (pDock->iSidShrinkDown == 0)
-			if (pDock->iSidShrinkDown > 0)
-			{
-				Icon *pPointedIcon = cairo_dock_calculate_icons (pDock, iX, iY);
-			}
-			//else
-				gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);
+			gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);
 			return FALSE;
 		}
 		
 		//\_______________ On recalcule toutes les icones.
-		pPointedIcon = cairo_dock_calculate_icons (pDock, iX, iY);
+		pPointedIcon = cairo_dock_calculate_icons (pDock, pDock->iMouseX, pDock->iMouseY);
 		
 		if (s_iInternMovingIconType != -1)
-			cairo_dock_mark_icons_as_avoiding_mouse (pDock, iX, s_iInternMovingIconType);
+			cairo_dock_mark_icons_as_avoiding_mouse (pDock, s_iInternMovingIconType, .25);
 		
 		gtk_widget_queue_draw (pWidget);
 		fLastTime = pMotion->time;
@@ -287,21 +282,22 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	else  // cas d'un drag and drop.
 	{
 		if (pDock->bHorizontalDock)
-			gdk_window_get_pointer (pWidget->window, &iX, &iY, NULL);
+			gdk_window_get_pointer (pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
 		else
-			gdk_window_get_pointer (pWidget->window, &iY, &iX, NULL);
-		pPointedIcon = cairo_dock_calculate_icons (pDock, iX, iY);
-		cairo_dock_mark_icons_as_avoiding_mouse (pDock, iX, CAIRO_DOCK_LAUNCHER);
+			gdk_window_get_pointer (pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);
+		pPointedIcon = cairo_dock_calculate_icons (pDock, pDock->iMouseX, pDock->iMouseY);
+		s_iInternMovingIconType = CAIRO_DOCK_LAUNCHER;
+		cairo_dock_mark_icons_as_avoiding_mouse (pDock, s_iInternMovingIconType, .5);
 		gtk_widget_queue_draw (pWidget);
 	}
 	
 	if (g_bDecorationsFollowMouse)
 	{
-		pDock->fDecorationsOffsetX = iX - pDock->iCurrentWidth / 2;
+		pDock->fDecorationsOffsetX = pDock->iMouseX - pDock->iCurrentWidth / 2;
 	}
 	else
 	{
-		if (iX > pDock->iMouseX)
+		if (pDock->iMouseX > iLastMouseX)
 		{
 			pDock->fDecorationsOffsetX += 10;
 			if (pDock->fDecorationsOffsetX > pDock->iCurrentWidth / 2)
@@ -325,8 +321,6 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		}
 		//pDock->iMouseX = iX;
 	}
-	pDock->iMouseX = iX;
-	pDock->iMouseY = iY;
 	
 	if (pPointedIcon != pLastPointedIcon || s_pLastPointedDock == NULL)
 	{
@@ -758,9 +752,11 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 		{
 			if (s_pIconClicked != NULL)
 			{
+				g_print ("release sur %s\n", s_pIconClicked->acName);
 				s_pIconClicked->iAnimationType = 0;  // stoppe les animations de suivi/evitement du curseur.
+				//cairo_dock_mark_icons_as_avoiding_mouse (pDock, -1e4, -1);
+				cairo_dock_stop_marking_icons (pDock, s_iInternMovingIconType);
 				s_iInternMovingIconType = -1;
-				cairo_dock_mark_icons_as_avoiding_mouse (pDock, -1e4, s_iInternMovingIconType);
 			}
 			if (icon != NULL && ! CAIRO_DOCK_IS_SEPARATOR (icon) && icon == s_pIconClicked)
 			{
@@ -803,7 +799,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 			}
 			else if (s_pIconClicked != NULL && icon != NULL && icon != s_pIconClicked)  //  && icon->iType == s_pIconClicked->iType
 			{
-				//g_print ("deplacement de %s\n", s_pIconClicked->acName);
+				g_print ("deplacement de %s\n", s_pIconClicked->acName);
 				CairoDock *pOriginDock = cairo_dock_search_container_from_icon (s_pIconClicked);
 				if (pDock != pOriginDock)
 				{
@@ -852,7 +848,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 					s_pIconClicked = NULL;
 					return FALSE;
 				}
-				
+				g_print ("deplacement de %s\n", s_pIconClicked->acName);
 				if (prev_icon != NULL && prev_icon->iType != s_pIconClicked->iType)
 					prev_icon = NULL;
 				s_pIconClicked->iAnimationType = CAIRO_DOCK_BOUNCE;
@@ -875,6 +871,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 			s_pIconClicked = icon;
 			if (s_pIconClicked != NULL)
 			{
+				g_print ("s_pIconClicked <- %s\n", s_pIconClicked->acName);
 				s_pIconClicked->iAnimationType = CAIRO_DOCK_FOLLOW_MOUSE;
 				s_iInternMovingIconType = s_pIconClicked->iType;
 			}
@@ -1123,7 +1120,8 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 	//g_print ("%s (%dx%d)\n", __func__, x, y);
 	
 	//\_________________ On arrete l'animation.
-	cairo_dock_mark_icons_as_avoiding_mouse (pDock, -1e4, -1);
+	//cairo_dock_mark_icons_as_avoiding_mouse (pDock, -1e4, -1);
+	cairo_dock_stop_marking_icons (pDock, s_iInternMovingIconType);
 	
 	//\_________________ On recupere l'URI.
 	gchar *cReceivedData = (gchar *) selection_data->data;

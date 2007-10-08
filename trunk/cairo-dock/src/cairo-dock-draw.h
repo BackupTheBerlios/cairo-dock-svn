@@ -30,7 +30,7 @@ void cairo_dock_calculate_construction_parameters_generic (Icon *icon, int iCurr
 void cairo_dock_calculate_construction_parameters_caroussel (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth, gboolean bInside);
 
 
-void cairo_dock_manage_animations (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth);
+void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock);
 
 
 void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio);

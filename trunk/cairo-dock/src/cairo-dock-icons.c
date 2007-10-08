@@ -43,6 +43,7 @@ extern gint g_iDockRadius;
 extern int g_iLabelSize;
 extern int g_iIconGap;
 extern double g_fSubDockSizeRatio;
+extern int g_iMaxAuthorizedWidth;
 
 extern gchar *g_cCurrentLaunchersPath;
 
@@ -398,7 +399,8 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 	//\_________________ On recalcule la largeur max, qui peut avoir ete influencee par le changement d'ordre.
 	//pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
 	//pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
-	cairo_dock_calculate_max_dock_size_generic (pDock);
+	///cairo_dock_calculate_max_dock_size_generic (pDock);
+	pDock->calculate_max_dock_size (pDock);
 	
 	//\_________________ On met a jour l'ordre des applets dans le fichier de conf.
 	if (CAIRO_DOCK_IS_VALID_APPLET (icon1))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module.
@@ -407,7 +409,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 
 void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2)
 {
-	//g_print ("%s (%s, %s) : %.2f <-> %.2f\n", __func__, icon1->acName, icon2->acName, icon1->fOrder, icon2->fOrder);
+	//g_print ("%s (%s, %.2f)\n", __func__, icon1->acName, icon1->fOrder);
 	if ((icon2 != NULL) && (! ( (CAIRO_DOCK_IS_APPLI (icon1) && CAIRO_DOCK_IS_APPLI (icon2)) || (CAIRO_DOCK_IS_LAUNCHER (icon1) && CAIRO_DOCK_IS_LAUNCHER (icon2)) || (CAIRO_DOCK_IS_APPLET (icon1) && CAIRO_DOCK_IS_APPLET (icon2)) ) ))
 		return ;
 	
@@ -461,7 +463,8 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 	//\_________________ On recalcule la largeur max, qui peut avoir ete influencee par le changement d'ordre.
 	//pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
 	//pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
-	cairo_dock_calculate_max_dock_size_generic (pDock);
+	///cairo_dock_calculate_max_dock_size_generic (pDock);
+	pDock->calculate_max_dock_size (pDock);
 	
 	if (CAIRO_DOCK_IS_VALID_APPLET (icon1))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module.
 		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons, g_hModuleTable);
@@ -997,15 +1000,84 @@ void cairo_dock_calculate_max_dock_size_generic (CairoDock *pDock)
 {
 	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
 	pDock->iMaxDockWidth = ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
+	pDock->iMaxDockWidth = MIN (pDock->iMaxDockWidth, g_iMaxAuthorizedWidth);
+	
+	pDock->iMaxDockHeight = (int) ((1 + g_fAmplitude) * pDock->iMaxIconHeight) + g_iLabelSize + g_iDockLineWidth;
+}
+
+void cairo_dock_calculate_max_dock_size_caroussel (CairoDock *pDock)
+{
+	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
+	pDock->iMaxDockWidth = ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth) / 2) + 1;
+	pDock->iMaxDockWidth = MIN (pDock->iMaxDockWidth, g_iMaxAuthorizedWidth);
 	
 	pDock->iMaxDockHeight = (int) ((1 + g_fAmplitude) * pDock->iMaxIconHeight) + g_iLabelSize + g_iDockLineWidth;
 }
 
 
 
-
-
-void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX, CairoDockIconType iType)
+void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, CairoDockIconType iType, double fMargin)
+{
+	if (pDock->icons == NULL)
+		return;
+	
+	Icon *icon;
+	GList *pFirstDrawnElement = (pDock->pFirstDrawnElement != NULL ? pDock->pFirstDrawnElement : pDock->icons);
+	GList *ic = pFirstDrawnElement;
+	do
+	{
+		icon = ic->data;
+		if (icon->bPointed && icon->iAnimationType != CAIRO_DOCK_FOLLOW_MOUSE)
+		{
+			icon->iAnimationType = 0;
+			
+			if (pDock->iMouseX < icon->fDrawX + icon->fWidth * icon->fScale * fMargin)  // on est a gauche.
+			{
+				Icon *prev_icon = cairo_dock_get_previous_element (ic, pDock->icons) -> data;
+				if ((icon->iType == iType || prev_icon->iType == iType) && prev_icon->iAnimationType != CAIRO_DOCK_FOLLOW_MOUSE)
+				{
+					icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
+					prev_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
+				}
+			}
+			else if (pDock->iMouseX > icon->fDrawX + icon->fWidth * icon->fScale * (1 - fMargin))  // on est a droite.
+			{
+				Icon *next_icon = cairo_dock_get_next_element (ic, pDock->icons) -> data;
+				if ((icon->iType == iType || next_icon->iType == iType) && next_icon->iAnimationType != CAIRO_DOCK_FOLLOW_MOUSE)
+				{
+					icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
+					next_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
+				}
+				ic = cairo_dock_get_next_element (ic, pDock->icons);  // on la saute.
+				if (ic == pFirstDrawnElement)
+					break ;
+			}
+		}
+		else if (icon->iAnimationType == CAIRO_DOCK_AVOID_MOUSE)
+			icon->iAnimationType = 0;
+		
+		ic = cairo_dock_get_next_element (ic, pDock->icons);
+	} while (ic != pFirstDrawnElement);
+}
+void cairo_dock_stop_marking_icons (CairoDock *pDock, CairoDockIconType iType)
+{
+	if (pDock->icons == NULL)
+		return;
+	g_print ("%s (%d)\n", __func__, iType);
+	
+	Icon *icon;
+	GList *ic;
+	for (ic = pDock->icons; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (icon->iType == iType && icon->iAnimationType > CAIRO_DOCK_NB_ANIMATIONS)
+		{
+			g_print ("stop marking\n");
+			icon->iAnimationType = 0;
+		}
+	}
+}
+/*void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX, CairoDockIconType iType)
 {
 	if (pDock->icons == NULL)
 		return;
@@ -1053,14 +1125,16 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX, Cai
 					break ;
 			}
 		}
-		else if (icon->iAnimationType != CAIRO_DOCK_FOLLOW_MOUSE)
+		///else if (icon->iAnimationType != CAIRO_DOCK_FOLLOW_MOUSE)
+		else if (icon->iAnimationType == CAIRO_DOCK_AVOID_MOUSE)
 			icon->iAnimationType = 0;
 		
 		ic = ic->next;
 		if (ic == NULL)
 			ic = pDock->icons;
 	} while (ic != pFirstDrawnElement);
-}
+}*/
+
 
 
 void cairo_dock_update_icon_s_container_name (Icon *icon, gchar *cNewParentDockName)

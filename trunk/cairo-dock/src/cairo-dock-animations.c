@@ -129,7 +129,8 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 			
 			//pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
 			//pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
-			cairo_dock_calculate_max_dock_size_generic (pDock);
+			pDock->calculate_max_dock_size (pDock);
+			//cairo_dock_calculate_max_dock_size_generic (pDock);
 			pDock->fFoldingFactor = g_fUnfoldAcceleration;
 		}
 		
@@ -244,7 +245,8 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 		//	pDock->iScrollOffset = 0;
 		//pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
 		//pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
-		cairo_dock_calculate_max_dock_size_generic (pDock);
+		//cairo_dock_calculate_max_dock_size_generic (pDock);
+		pDock->calculate_max_dock_size (pDock);
 	}
 	
 	cairo_dock_calculate_icons (pDock, iMouseX, iMouseY);

@@ -253,6 +253,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 			
 		if (!gdk_pixbuf_get_has_alpha (pixbuf))  // on lui rajoute un canal alpha si elle n'en a pas.
 		{
+			g_print ("  ajout d'un canal alpha\n");
 			GdkPixbuf *pixbuf2 = gdk_pixbuf_add_alpha (pixbuf, TRUE, 255, 255, 255);  // TRUE <=> les pixels blancs deviennent transparents.906.00x299.00
 			gdk_pixbuf_unref (pixbuf);
 			pixbuf = pixbuf2;
