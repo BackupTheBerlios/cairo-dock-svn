@@ -116,6 +116,7 @@ int g_iSinusoidWidth;  // largeur de la sinusoide en pixels. On va de 0 a pi en 
 int g_iNbAnimationRounds;
 gint g_iDockLineWidth;  // thickness of dock-bg outline.
 gint g_iDockRadius;  // radius of dock-bg corners.
+gint g_iFrameMargin;  // marge entre le cadre et les icones.
 gboolean g_bRoundedBottomCorner;  // vrai ssi les coins du bas sont arrondis.
 double g_fLineColor[4];  // la couleur du cadre.
 gint g_iStringLineWidth;  // epaisseur de la ficelle.

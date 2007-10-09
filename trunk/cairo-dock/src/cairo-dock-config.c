@@ -42,8 +42,6 @@ extern gboolean g_bForceLoop;
 extern int g_iSinusoidWidth;
 extern double g_fAmplitude;
 
-extern gint g_iDockLineWidth;
-extern gint g_iDockRadius;
 extern int g_iIconGap;
 extern gboolean g_bAutoHide;
 extern double g_fVisibleZoneAlpha;
@@ -75,6 +73,7 @@ extern int g_fBackgroundImageWidth;
 extern int g_fBackgroundImageHeight;
 
 extern int g_iDockRadius;
+extern gint g_iFrameMargin;
 extern int g_iDockLineWidth;
 extern gboolean g_bRoundedBottomCorner;
 extern double g_fLineColor[4];
@@ -470,9 +469,11 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_iSinusoidWidth = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "sinusoid width", &bFlushConfFileNeeded, 250);
 	g_iSinusoidWidth = MAX (1, g_iSinusoidWidth);
 	
-	g_iDockRadius = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "corner radius", &bFlushConfFileNeeded, 250);
+	g_iDockRadius = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "corner radius", &bFlushConfFileNeeded, 12);
 
-	g_iDockLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "line width", &bFlushConfFileNeeded, 1);
+	g_iDockLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "line width", &bFlushConfFileNeeded, 2);
+	
+	g_iFrameMargin = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "frame margin", &bFlushConfFileNeeded, 2);
 	
 	double couleur[4] = {0., 0., 0.6, 0.4};
 	cairo_dock_get_double_list_key_value (pKeyFile, "Cairo Dock", "line color", &bFlushConfFileNeeded, g_fLineColor, 4, couleur);

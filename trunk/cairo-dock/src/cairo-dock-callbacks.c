@@ -269,9 +269,8 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		
 		//\_______________ On recalcule toutes les icones.
 		pPointedIcon = cairo_dock_calculate_icons (pDock, pDock->iMouseX, pDock->iMouseY);
-		
 		if (s_iInternMovingIconType != -1)
-			cairo_dock_mark_icons_as_avoiding_mouse (pDock, s_iInternMovingIconType, .25);
+			cairo_dock_mark_icons_as_avoiding_mouse (pDock, s_iInternMovingIconType, .5);
 		
 		gtk_widget_queue_draw (pWidget);
 		fLastTime = pMotion->time;
@@ -287,7 +286,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			gdk_window_get_pointer (pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);
 		pPointedIcon = cairo_dock_calculate_icons (pDock, pDock->iMouseX, pDock->iMouseY);
 		s_iInternMovingIconType = CAIRO_DOCK_LAUNCHER;
-		cairo_dock_mark_icons_as_avoiding_mouse (pDock, s_iInternMovingIconType, .5);
+		cairo_dock_mark_icons_as_avoiding_mouse (pDock, s_iInternMovingIconType, .25);
 		gtk_widget_queue_draw (pWidget);
 	}
 	
@@ -452,11 +451,6 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 		s_iSidNonStopScrolling = 0;
 	}
 	
-	/*if (pDock->iRefCount > 0)
-	{
-		cairo_dock_calculate_icons (pDock, 0, 0);
-		gtk_widget_queue_draw (pDock->pWidget);
-	}*/
 	while (gtk_events_pending ())  // on laisse le temps au signal d'entree dans le sous-dock d'etre traite.
 		gtk_main_iteration ();
 	
@@ -848,15 +842,13 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 					s_pIconClicked = NULL;
 					return FALSE;
 				}
-				g_print ("deplacement de %s\n", s_pIconClicked->acName);
+				//g_print ("deplacement de %s\n", s_pIconClicked->acName);
 				if (prev_icon != NULL && prev_icon->iType != s_pIconClicked->iType)
 					prev_icon = NULL;
 				s_pIconClicked->iAnimationType = CAIRO_DOCK_BOUNCE;
 				s_pIconClicked->iCount = 2 * g_tNbIterInOneRound[icon->iAnimationType] - 1;  // 2 rebonds.
 				cairo_dock_move_icon_after_icon (pDock, s_pIconClicked, prev_icon);
 				
-				
-				//if (pDock != pOriginDock)
 				cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
 				cairo_dock_calculate_icons (pDock, iX, iY);
 				gtk_widget_queue_draw (pWidget);

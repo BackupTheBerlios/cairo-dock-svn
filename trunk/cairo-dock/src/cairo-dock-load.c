@@ -46,6 +46,7 @@ extern gboolean g_bSameHorizontality;
 extern int g_iSinusoidWidth;
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
+extern gint g_iFrameMargin;
 extern double g_fAmplitude;
 extern int g_iIconGap;
 
@@ -471,10 +472,10 @@ cairo_surface_t *cairo_dock_load_stripes (cairo_t* pSourceContext, int iStripesW
 
 void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, int iNewMaxDockWidth, int iNewMaxIconHeight, double fRotationAngle)
 {
-	if (2 * iNewMaxDockWidth > g_fBackgroundImageWidth || iNewMaxIconHeight > g_fBackgroundImageHeight)
+	if (2 * iNewMaxDockWidth > g_fBackgroundImageWidth || iNewMaxIconHeight + 2 * g_iFrameMargin > g_fBackgroundImageHeight)
 	{
 		int iDecorationsWidth = MAX (iDecorationsWidth, iNewMaxDockWidth);
-		int iDecorationsHeight = MAX (iDecorationsHeight, iNewMaxIconHeight);
+		int iDecorationsHeight = MAX (iDecorationsHeight, iNewMaxIconHeight + 2 * g_iFrameMargin);
 		
 		cairo_surface_destroy (g_pBackgroundSurface[0]);
 		g_pBackgroundSurface[0] = NULL;
