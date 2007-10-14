@@ -177,19 +177,19 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 	gint iMouseX, iMouseY;
 	
 	//if (pDock->iRefCount > 0 && ! pDock->bInside)  // pour l'animation des sous-docks a leur apparition.
-		iMouseX = -1e4;
+		pDock->iMouseX = -1e4;
 	//else
 	{
 		if (pDock->bHorizontalDock)
-			gdk_window_get_pointer (pDock->pWidget->window, &iMouseX, &iMouseY, NULL);
+			gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
 		else
-			gdk_window_get_pointer (pDock->pWidget->window, &iMouseY, &iMouseX, NULL);
+			gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);
 	}
 	
-	cairo_dock_calculate_icons (pDock, iMouseX, iMouseY);
+	pDock->calculate_icons (pDock);
+	//cairo_dock_apply_wave_effect (pDock);
 	gtk_widget_queue_draw (pDock->pWidget);
 	
-	///if (pDock->fMagnitude == 1 && pDock->fFoldingFactor == 0)
 	if (pDock->iMagnitudeIndex == CAIRO_DOCK_NB_MAX_ITERATIONS && pDock->fFoldingFactor == 0)
 	{
 		pDock->iMagnitudeIndex = CAIRO_DOCK_NB_MAX_ITERATIONS;
@@ -203,10 +203,6 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 gboolean cairo_dock_shrink_down (CairoDock *pDock)
 {
 	//g_print ("%s (%d)\n", __func__, pDock->iMagnitudeIndex);
-	/**if (pDock->fMagnitude > 0.05)
-		pDock->fMagnitude *= g_fShrinkDownFactor; //  0.6
-	else
-		pDock->fMagnitude = 0.0;*/
 	pDock->iMagnitudeIndex -= g_iShrinkDownInterval;
 	if (pDock->iMagnitudeIndex < 0)
 		pDock->iMagnitudeIndex = 0;
@@ -218,12 +214,10 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 			pDock->fFoldingFactor = g_fUnfoldAcceleration;
 	}
 	
-	
-	gint iMouseX, iMouseY;
-	if (pDock->bHorizontalDock)
-		gdk_window_get_pointer (pDock->pWidget->window, &iMouseX, &iMouseY, NULL);
+	if (pDock->bHorizontalDock)  // ce n'est pas le motion_notify qui va nous donner des coordonnees en dehors du dock, et donc le fait d'etre dedans va nous faire interrompre le shrink_down et re-grossir, du coup il faut le faire ici. L'inconvenient, c'est que quand on sort par les cotes, il n'y a soudain plus d'icone pointee, et donc le dock devient tout plat subitement au lieu de la faire doucement.
+		gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
 	else
-		gdk_window_get_pointer (pDock->pWidget->window, &iMouseY, &iMouseX, NULL);
+		gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);
 	
 	if (pDock->iScrollOffset != 0 && g_bResetScrollOnLeave)
 	{
@@ -249,23 +243,21 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 		pDock->calculate_max_dock_size (pDock);
 	}
 	
-	cairo_dock_calculate_icons (pDock, iMouseX, iMouseY);
+	pDock->calculate_icons (pDock);
+	//cairo_dock_apply_wave_effect (pDock);
 	gtk_widget_queue_draw (pDock->pWidget);
 	
-	///if (pDock->fMagnitude < 0.05)
 	if (pDock->iMagnitudeIndex == 0)
 	{
 		pDock->iMagnitudeIndex = 0;
 		Icon *pBouncingIcon = cairo_dock_get_bouncing_icon (pDock->icons);
 		Icon *pRemovingIcon = cairo_dock_get_removing_or_inserting_icon (pDock->icons);
 		
-		if (pBouncingIcon == NULL && pRemovingIcon == NULL && (! g_bResetScrollOnLeave || pDock->iScrollOffset == 0))
+		if (pBouncingIcon == NULL && pRemovingIcon == NULL && (! g_bResetScrollOnLeave || pDock->iScrollOffset == 0))  // plau aucune animation en cours.
 		{
-			///pDock->fMagnitude = 0;
-			int iNewWidth, iNewHeight;
-			
 			if (! (g_bAutoHide && pDock->iRefCount == 0) && ! pDock->bInside)
 			{
+				int iNewWidth, iNewHeight;
 				cairo_dock_get_window_position_and_geometry_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
 				if (pDock->bHorizontalDock)
 					gdk_window_move_resize (pDock->pWidget->window,
@@ -281,13 +273,12 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 						iNewWidth);
 			}
 			
-			gint iMouseX, iMouseY;
-			if (pDock->bHorizontalDock)
-				gdk_window_get_pointer (pDock->pWidget->window, &iMouseX, &iMouseY, NULL);
+			/**if (pDock->bHorizontalDock)
+				gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
 			else
-				gdk_window_get_pointer (pDock->pWidget->window, &iMouseY, &iMouseX, NULL);
+				gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);*/
 			
-			cairo_dock_calculate_icons (pDock, iMouseX, iMouseY);  // relance le grossissement si on est dedans.
+			///cairo_dock_apply_wave_effect (pDock);  // relance le grossissement si on est dedans.
 			if (! pDock->bInside && pDock->iRefCount > 0)
 			{
 				//g_print ("on cache ce sous-dock en sortant par lui\n");

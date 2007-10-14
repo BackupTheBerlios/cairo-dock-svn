@@ -154,6 +154,7 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 	CairoDock *pDock = g_new0 (CairoDock, 1);
 	pDock->bAtBottom = TRUE;
 	pDock->iRefCount = 0;  // c'est un dock racine par defaut.
+	pDock->iAvoidingMouseIconType = -1;
 	if (g_pMainDock != NULL)
 	{
 		pDock->bHorizontalDock = g_pMainDock->bHorizontalDock;
@@ -180,9 +181,11 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 	gtk_window_set_resizable (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_title (GTK_WINDOW (pWindow), "cairo-dock");
 	
-	pDock->render = cairo_dock_render_generic;
-	pDock->calculate_max_dock_size = cairo_dock_calculate_max_dock_size_generic;
-	pDock->set_subdock_position = cairo_dock_set_subdock_position_generic;
+	pDock->calculate_max_dock_size = cairo_dock_calculate_max_dock_size_linear;
+	pDock->calculate_icons = cairo_dock_apply_wave_effect;
+	pDock->render = cairo_dock_render_linear;
+	pDock->set_subdock_position = cairo_dock_set_subdock_position_linear;
+	
 	
 	gtk_widget_add_events (pWindow,
 		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | 
@@ -571,7 +574,10 @@ static void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDo
 	if (! pDock->bIsMainDock)
 	{
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
-		cairo_dock_calculate_icons (pDock, 0, 0);
+		pDock->iMouseX = 0; // utile ?
+		pDock->iMouseY = 0;
+		pDock->calculate_icons (pDock);
+		//cairo_dock_apply_wave_effect (pDock);
 		gtk_window_present (GTK_WINDOW (pDock->pWidget));
 		while (gtk_events_pending ())
 			gtk_main_iteration ();

@@ -733,7 +733,10 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	cairo_dock_load_background_decorations (pDock);
 	
 	
-	cairo_dock_calculate_icons (pDock, 0, 0);
+	pDock->iMouseX = 0;  // utile ?
+	pDock->iMouseY = 0;
+	//cairo_dock_apply_wave_effect (pDock);
+	pDock->calculate_icons (pDock);
 	gtk_widget_queue_draw (pDock->pWidget);
 	
 	

@@ -398,7 +398,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 		(GCompareFunc) cairo_dock_compare_icons_order);
 	
 	//\_________________ On recalcule la largeur max, qui peut avoir ete influencee par le changement d'ordre.
-	//pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
+	//pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest_linear (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
 	//pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
 	///cairo_dock_calculate_max_dock_size_generic (pDock);
 	pDock->calculate_max_dock_size (pDock);
@@ -462,7 +462,7 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 		(GCompareFunc) cairo_dock_compare_icons_order);
 	
 	//\_________________ On recalcule la largeur max, qui peut avoir ete influencee par le changement d'ordre.
-	//pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
+	//pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest_linear (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
 	//pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
 	///cairo_dock_calculate_max_dock_size_generic (pDock);
 	pDock->calculate_max_dock_size (pDock);
@@ -693,7 +693,7 @@ void cairo_dock_remove_all_applets (CairoDock *pDock)
 
 
 
-GList *cairo_dock_calculate_icons_positions_at_rest (GList *pIconList, int iMinDockWidth, int iXOffset)
+GList *cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, int iMinDockWidth, int iXOffset)
 {
 	double x_cumulated = iXOffset;
 	double fXMin = 99999;
@@ -722,7 +722,7 @@ GList *cairo_dock_calculate_icons_positions_at_rest (GList *pIconList, int iMinD
 	return pFirstDrawnElement;
 }
 
-Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight, int iMouseY, double fAlign, double fFoldingFactor)
+Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight, int iMouseY, double fAlign, double fFoldingFactor)
 {
 	//g_print (">>>>>%s (%d, %dx%d)\n", __func__, x_abs, iWidth, iHeight);
 	if (pIconList == NULL)
@@ -747,9 +747,19 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 		//\_______________ On calcule sa phase (pi/2 au niveau du curseur).
 		icon->fPhase = (fXMiddle - x_abs) / g_iSinusoidWidth * G_PI + G_PI / 2;
 		if (icon->fPhase < 0)
-			icon->fPhase = 0;
+		{
+			if (ic != pointed_ic)
+				icon->fPhase = 0;
+			else
+				icon->fPhase = G_PI / 2;
+		}
 		else if (icon->fPhase > G_PI)
-			icon->fPhase = G_PI;
+		{
+			if (ic != pointed_ic)
+				icon->fPhase = G_PI;
+			else
+				icon->fPhase = G_PI / 2;
+		}
 		
 		//\_______________ On en deduit l'amplitude de la sinusoide au niveau de cette icone, et donc son echelle.
 		icon->fScale = 1 + fMagnitude * g_fAmplitude * sin (icon->fPhase);
@@ -851,14 +861,14 @@ Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirst
 	return pointed_ic->data;
 }
 
-
-Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
+Icon *cairo_dock_apply_wave_effect (CairoDock *pDock)
 {
 	//\_______________ On calcule la position du curseur dans le referentiel du dock a plat.
 	static gboolean bReturn = FALSE;
-	int iWidth, iHeight;
-	iWidth = pDock->iCurrentWidth;
-	iHeight = pDock->iCurrentHeight;
+	int iWidth = pDock->iCurrentWidth;
+	int iHeight = pDock->iCurrentHeight;
+	int iMouseX = pDock->iMouseX;
+	int iMouseY = pDock->iMouseY;
 	//g_print ("%s (%dx%d, %dx%d, %f)\n", __func__, iMouseX, iMouseY, iWidth, iHeight, pDock->fFoldingFactor);
 	
 	int dx = iMouseX - iWidth / 2;  // ecart par rapport au milieu du dock a plat.
@@ -866,7 +876,7 @@ Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY)
 	
 	//\_______________ On calcule l'ensemble des parametres des icones.
 	double fMagnitude = cairo_dock_calculate_magnitude (pDock->iMagnitudeIndex);
-	Icon *pPointedIcon = cairo_dock_calculate_icons_with_position (pDock->icons, pDock->pFirstDrawnElement, x_abs, fMagnitude, pDock->iMinDockWidth, pDock->iMaxDockWidth, iHeight, iMouseY, pDock->fAlign, pDock->fFoldingFactor);
+	Icon *pPointedIcon = cairo_dock_calculate_wave_with_position_linear (pDock->icons, pDock->pFirstDrawnElement, x_abs, fMagnitude, pDock->iMinDockWidth, pDock->iMaxDockWidth, iHeight, iMouseY, pDock->fAlign, pDock->fFoldingFactor);
 	
 	//\_______________ On regarde si le curseur est dans le dock ou pas, et on joue sur la taille des icones en consequence.
 	gboolean bMouseInsideDock = (x_abs >= 0 && x_abs <= pDock->iMinDockWidth && iMouseX > 0 && iMouseX < iWidth);
@@ -948,7 +958,7 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 	{
 		icon = ic->data;
 		
-		cairo_dock_calculate_icons_with_position (pIconList, pFirstDrawnElement, icon->fXAtRest, 1, iFlatDockWidth, 0, 0, 0, 0.5, 0);
+		cairo_dock_calculate_wave_with_position_linear (pIconList, pFirstDrawnElement, icon->fXAtRest, 1, iFlatDockWidth, 0, 0, 0, 0.5, 0);
 		ic2 = pFirstDrawnElement;
 		do
 		{
@@ -963,7 +973,7 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 		} while (ic2 != pFirstDrawnElement);
 		fMaxBorderX = MAX (fMaxBorderX, icon->fX + icon->fWidth * icon->fScale);
 	}
-	cairo_dock_calculate_icons_with_position (pIconList, pFirstDrawnElement, iFlatDockWidth - 1, 1, iFlatDockWidth, 0, 0, 0, pDock->fAlign, 0);  // pDock->fFoldingFactor
+	cairo_dock_calculate_wave_with_position_linear (pIconList, pFirstDrawnElement, iFlatDockWidth - 1, 1, iFlatDockWidth, 0, 0, 0, pDock->fAlign, 0);  // pDock->fFoldingFactor
 	ic = pFirstDrawnElement;
 	do
 	{
@@ -993,9 +1003,9 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 }
 
 
-void cairo_dock_calculate_max_dock_size_generic (CairoDock *pDock)
+void cairo_dock_calculate_max_dock_size_linear (CairoDock *pDock)
 {
-	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
+	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest_linear (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
 	pDock->iMaxDockWidth = ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
 	pDock->iMaxDockWidth = MIN (pDock->iMaxDockWidth, g_iMaxAuthorizedWidth);
 	
@@ -1004,13 +1014,12 @@ void cairo_dock_calculate_max_dock_size_generic (CairoDock *pDock)
 
 void cairo_dock_calculate_max_dock_size_caroussel (CairoDock *pDock)
 {
-	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
+	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest_linear (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
 	pDock->iMaxDockWidth = ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth) / 2) + 1;
 	pDock->iMaxDockWidth = MIN (pDock->iMaxDockWidth, g_iMaxAuthorizedWidth);
 	
 	pDock->iMaxDockHeight = (int) ((1 + g_fAmplitude) * pDock->iMaxIconHeight) + g_iLabelSize + g_iDockLineWidth + g_iFrameMargin;
 }
-
 
 
 void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, CairoDockIconType iType, double fMargin)
@@ -1056,6 +1065,14 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, CairoDockIconTyp
 		ic = cairo_dock_get_next_element (ic, pDock->icons);
 	} while (ic != pFirstDrawnElement);
 }
+void cairo_dock_mark_avoiding_mouse_icons_linear (CairoDock *pDock)
+{
+	if (pDock->bInside && pDock->iAvoidingMouseIconType != -1 && pDock->fAvoidingMouseMargin > 0)
+	{
+		cairo_dock_mark_icons_as_avoiding_mouse (pDock, pDock->iAvoidingMouseIconType, pDock->fAvoidingMouseMargin);
+	}
+}
+
 void cairo_dock_stop_marking_icons (CairoDock *pDock, CairoDockIconType iType)
 {
 	if (pDock->icons == NULL)

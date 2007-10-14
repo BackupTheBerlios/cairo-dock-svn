@@ -836,7 +836,7 @@ void cairo_dock_render_icons_caroussel (cairo_t *pCairoContext, CairoDock *pDock
 #endif
 }*/
 
-void cairo_dock_render_generic (CairoDock *pDock)
+void cairo_dock_render_linear (CairoDock *pDock)
 {
 	//\____________________ On cree le contexte du dessin.
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
@@ -888,6 +888,8 @@ void cairo_dock_render_generic (CairoDock *pDock)
 	cairo_restore (pCairoContext);
 	
 	//\____________________ On calcule les position/etirements/alpha des icones.
+	cairo_dock_mark_avoiding_mouse_icons_linear (pDock);
+	
 	Icon* icon;
 	GList* ic;
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
@@ -959,6 +961,8 @@ void cairo_dock_render_caroussel (CairoDock *pDock)
 	cairo_restore (pCairoContext);
 	
 	//\____________________ On calcule les position/etirements/alpha des icones.
+	cairo_dock_mark_avoiding_mouse_icons_linear (pDock);
+	
 	Icon* icon;
 	GList* ic;
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
@@ -1266,9 +1270,12 @@ static gboolean _cairo_dock_hide_dock (gchar *cDockName, CairoDock *pDock, Cairo
 			if (pDock->iScrollOffset != 0)  // on remet systematiquement a 0 l'offset pour les containers.
 			{
 				pDock->iScrollOffset = 0;
-				cairo_dock_calculate_icons (pDock, pDock->iCurrentWidth / 2, 0);
+				pDock->iMouseX = pDock->iCurrentWidth / 2;  // utile ?
+				pDock->iMouseY = 0;
+				pDock->calculate_icons (pDock);
+				//cairo_dock_apply_wave_effect (pDock);
 				//cairo_dock_render (pDock);
-				pDock->render (pDock);
+				pDock->render (pDock);  // foirreux, il faudrait je pense juste calculer les fXYDraw et compagnie, ou alors faire un redraw.
 			}
 			
 			//g_print ("on cache %s par parente\n", cDockName);

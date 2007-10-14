@@ -39,10 +39,11 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dialogs.h"
 #include "cairo-dock-callbacks.h"
 
-static Icon *s_pIconClicked = NULL;  // pour savoir quand on deplace une icone a la souris.
+static Icon *s_pIconClicked = NULL;  // pour savoir quand on deplace une icone a la souris. Dangereux si l'icone se fait effacer en cours ...
 static CairoDock *s_pLastPointedDock = NULL;  // pour savoir quand on passe d'un dock a un autre.
 static int s_iSidNonStopScrolling = 0;
-static int s_iInternMovingIconType = -1;
+///static int s_iInternMovingIconType = -1;
+///static double s_fInternAvoidingMouseMargin = 0.;
 static int s_iSidShowSubDockDemand = 0;
 
 extern CairoDock *g_pMainDock;
@@ -123,7 +124,7 @@ gboolean on_expose (GtkWidget *pWidget,
 
 
 
-void cairo_dock_set_subdock_position_generic (Icon *pPointedIcon, CairoDock *pDock)
+void cairo_dock_set_subdock_position_linear (Icon *pPointedIcon, CairoDock *pDock)
 {
 	CairoDock *pSubDock = pPointedIcon->pSubDock;
 	///int iX = iMouseX + (-iMouseX + (pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2)) / 2;
@@ -268,9 +269,10 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		}
 		
 		//\_______________ On recalcule toutes les icones.
-		pPointedIcon = cairo_dock_calculate_icons (pDock, pDock->iMouseX, pDock->iMouseY);
-		if (s_iInternMovingIconType != -1)
-			cairo_dock_mark_icons_as_avoiding_mouse (pDock, s_iInternMovingIconType, .5);
+		//pPointedIcon = cairo_dock_apply_wave_effect (pDock);
+		pPointedIcon = pDock->calculate_icons (pDock);
+		///if (s_iInternMovingIconType != -1)
+		///	cairo_dock_mark_icons_as_avoiding_mouse (pDock, s_iInternMovingIconType, .5);
 		
 		gtk_widget_queue_draw (pWidget);
 		fLastTime = pMotion->time;
@@ -284,9 +286,14 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			gdk_window_get_pointer (pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
 		else
 			gdk_window_get_pointer (pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);
-		pPointedIcon = cairo_dock_calculate_icons (pDock, pDock->iMouseX, pDock->iMouseY);
-		s_iInternMovingIconType = CAIRO_DOCK_LAUNCHER;
-		cairo_dock_mark_icons_as_avoiding_mouse (pDock, s_iInternMovingIconType, .25);
+		//pPointedIcon = cairo_dock_apply_wave_effect (pDock);
+		pPointedIcon = pDock->calculate_icons (pDock);
+		pDock->iAvoidingMouseIconType = CAIRO_DOCK_LAUNCHER;
+		pDock->fAvoidingMouseMargin = .25;
+		///s_iInternMovingIconType = CAIRO_DOCK_LAUNCHER;
+		///s_fInternAvoidingMouseMargin = .25;
+		///cairo_dock_mark_icons_as_avoiding_mouse (pDock, s_iInternMovingIconType, .25);
+		
 		gtk_widget_queue_draw (pWidget);
 	}
 	
@@ -389,7 +396,9 @@ gboolean _cairo_dock_emit_leave_signal (CairoDock *pDock)
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
 	//g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
-	s_iInternMovingIconType = -1;
+	///s_iInternMovingIconType = -1;
+	pDock->iAvoidingMouseIconType = -1;
+	pDock->fAvoidingMouseMargin = 0;
 	pDock->bInside = FALSE;
 	pDock->bAtTop = FALSE;
 	if (pDock->bMenuVisible)
@@ -479,7 +488,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 		g_source_remove (pDock->iSidLeaveDemand);
 		pDock->iSidLeaveDemand = 0;
 	}
-	if (pDock->bAtTop || pDock->bInside || (pDock->iSidMoveDown != 0/** && pDock->fMagnitude == 0*/))  // le 'iSidMoveDown != 0' est la pour empecher le dock de "vibrer" si l'utilisateur sort par en bas avec l'auto-hide active.
+	if (pDock->bAtTop || pDock->bInside || (pDock->iSidMoveDown != 0))  // le 'iSidMoveDown != 0' est la pour empecher le dock de "vibrer" si l'utilisateur sort par en bas avec l'auto-hide active.
 	{
 		return FALSE;
 	}
@@ -489,6 +498,13 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	if (! pDock->bIsMainDock)
 		gtk_window_present (GTK_WINDOW (pWidget));
 	pDock->bInside = TRUE;
+	
+	if (s_pIconClicked != NULL)  // on pourrait le faire a chaque motion aussi.
+	{
+		pDock->iAvoidingMouseIconType = s_pIconClicked->iType;
+		pDock->fAvoidingMouseMargin = .5;
+	}
+	
 	
 	int iNewWidth, iNewHeight;
 	int iActualPositionY = pDock->iWindowPositionY;
@@ -747,10 +763,10 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 			if (s_pIconClicked != NULL)
 			{
 				g_print ("release sur %s\n", s_pIconClicked->acName);
-				s_pIconClicked->iAnimationType = 0;  // stoppe les animations de suivi/evitement du curseur.
+				s_pIconClicked->iAnimationType = 0;  // stoppe les animations de suivi du curseur.
 				//cairo_dock_mark_icons_as_avoiding_mouse (pDock, -1e4, -1);
-				cairo_dock_stop_marking_icons (pDock, s_iInternMovingIconType);
-				s_iInternMovingIconType = -1;
+				cairo_dock_stop_marking_icons (pDock, pDock->iAvoidingMouseIconType);
+				pDock->iAvoidingMouseIconType = -1;
 			}
 			if (icon != NULL && ! CAIRO_DOCK_IS_SEPARATOR (icon) && icon == s_pIconClicked)
 			{
@@ -850,7 +866,10 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				cairo_dock_move_icon_after_icon (pDock, s_pIconClicked, prev_icon);
 				
 				cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
-				cairo_dock_calculate_icons (pDock, iX, iY);
+				pDock->iMouseX = iX;  // utile ?
+				pDock->iMouseY = iY;
+				//cairo_dock_apply_wave_effect (pDock);
+				pDock->calculate_icons (pDock);
 				gtk_widget_queue_draw (pWidget);
 				
 				if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
@@ -865,7 +884,10 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 			{
 				g_print ("s_pIconClicked <- %s\n", s_pIconClicked->acName);
 				s_pIconClicked->iAnimationType = CAIRO_DOCK_FOLLOW_MOUSE;
-				s_iInternMovingIconType = s_pIconClicked->iType;
+				///s_iInternMovingIconType = s_pIconClicked->iType;
+				pDock->iAvoidingMouseIconType = s_pIconClicked->iType;  // on pourrait le faire lors du 'motion' aussi.
+				pDock->fAvoidingMouseMargin = .5;
+				
 			}
 		}
 		else if (pButton->type == GDK_2BUTTON_PRESS)
@@ -893,16 +915,19 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 	{
 		pDock->iScrollOffset = 0;
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
-		if (pDock->bHorizontalDock)
-			cairo_dock_calculate_icons (pDock, (int) pButton->x, (int) pButton->y);
+		if (pDock->bHorizontalDock)  // utile ?
+		{
+			pDock->iMouseX = (int) pButton->x;
+			pDock->iMouseY = (int) pButton->y;
+		}
 		else
-			cairo_dock_calculate_icons (pDock, (int) pButton->y, (int) pButton->x);
+		{
+			pDock->iMouseX = (int) pButton->y;
+			pDock->iMouseY = (int) pButton->x;
+		}
+		//cairo_dock_apply_wave_effect (pDock);
+		pDock->calculate_icons (pDock);
 		gtk_widget_queue_draw (pWidget);
-		/*gtk_window_begin_move_drag (GTK_WINDOW (pWidget),
-			pButton->button,
-			pButton->x_root,
-			pButton->y_root,
-			pButton->time);  // permet de déplacer la fenetre, marche avec Metacity, mais pas avec Beryl !*/
 	}
 	
 	return FALSE;
@@ -975,7 +1000,8 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 	}
 	pDock->iMouseX = iX;
 	pDock->iMouseY = iY;
-	pPointedIcon = cairo_dock_calculate_icons (pDock,  iX, iY);
+	//pPointedIcon = cairo_dock_apply_wave_effect (pDock);
+	pPointedIcon = pDock->calculate_icons (pDock);
 	gtk_widget_queue_draw (pDock->pWidget);
 	
 	//\_______________ On montre les sous-docks.
@@ -1012,8 +1038,8 @@ gboolean on_scroll (GtkWidget* pWidget,
 {
 	static double fLastTime = 0;
 	static int iNbSimultaneousScroll = 0;
-	static GdkEventScroll my_scroll;
-	static gpointer data[3] = {&my_scroll, NULL, NULL};
+	static GdkEventScroll scrollBuffer;
+	static gpointer data[3] = {&scrollBuffer, NULL, NULL};
 	if (pDock->icons == NULL)
 		return FALSE;
 	
@@ -1028,13 +1054,13 @@ gboolean on_scroll (GtkWidget* pWidget,
 		iNbSimultaneousScroll = -999;
 		data[1] = pDock;
 		data[2] = GINT_TO_POINTER (1);
-		memcpy (&my_scroll, pScroll, sizeof (GdkEventScroll));
+		memcpy (&scrollBuffer, pScroll, sizeof (GdkEventScroll));
 		s_iSidNonStopScrolling = g_timeout_add (g_fRefreshInterval, (GSourceFunc)_cairo_dock_autoscroll, data);
 		return FALSE;
 	}
 	
-	//g_print ("%d / %d\n", pScroll->direction, my_scroll.direction);
-	if (s_iSidNonStopScrolling != 0 && pScroll->direction != my_scroll.direction)
+	//g_print ("%d / %d\n", pScroll->direction, scrollBuffer.direction);
+	if (s_iSidNonStopScrolling != 0 && pScroll->direction != scrollBuffer.direction)
 	{
 		//g_print ("on arrete\n");
 		g_source_remove (s_iSidNonStopScrolling);
@@ -1058,8 +1084,8 @@ gboolean on_scroll (GtkWidget* pWidget,
 
 
 gboolean on_configure (GtkWidget* pWidget,
-			GdkEventConfigure* pEvent,
-			CairoDock *pDock)
+					GdkEventConfigure* pEvent,
+					CairoDock *pDock)
 {
 	//g_print ("%s (main dock : %d) : (%d;%d) (%dx%d)\n", __func__, pDock->bIsMainDock, pEvent->x, pEvent->y, pEvent->width, pEvent->height);
 	gint iNewWidth, iNewHeight;
@@ -1082,14 +1108,14 @@ gboolean on_configure (GtkWidget* pWidget,
 		
 		int iX, iY;
 		if (pDock->bHorizontalDock)
-			gdk_window_get_pointer (pWidget->window, &iX, &iY, NULL);
+			gdk_window_get_pointer (pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
 		else
-			gdk_window_get_pointer (pWidget->window, &iY, &iX, NULL);
-		if (iX < 0 || iX > pDock->iCurrentWidth)
-			iX = 0;
+			gdk_window_get_pointer (pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);
+		if (pDock->iMouseX < 0 || pDock->iMouseX > pDock->iCurrentWidth)  // utile ?
+			pDock->iMouseX = 0;
 		
-		cairo_dock_calculate_icons (pDock, iX, iY);
-		
+		//cairo_dock_apply_wave_effect (pDock);
+		pDock->calculate_icons (pDock);
 		///if (gdk_window_is_visible (pWidget->window))
 		///	gtk_window_present (GTK_WINDOW (pWidget));
 		gtk_widget_queue_draw (pWidget);
@@ -1113,7 +1139,8 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 	
 	//\_________________ On arrete l'animation.
 	//cairo_dock_mark_icons_as_avoiding_mouse (pDock, -1e4, -1);
-	cairo_dock_stop_marking_icons (pDock, s_iInternMovingIconType);
+	cairo_dock_stop_marking_icons (pDock, pDock->iAvoidingMouseIconType);
+	pDock->iAvoidingMouseIconType = -1;
 	
 	//\_________________ On recupere l'URI.
 	gchar *cReceivedData = (gchar *) selection_data->data;

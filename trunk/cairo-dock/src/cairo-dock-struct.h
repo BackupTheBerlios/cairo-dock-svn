@@ -35,6 +35,7 @@ typedef enum {
 
 typedef void (*CairoDockCalculateMaxDockSizeFunc) (CairoDock *pDock);
 typedef void (*CairoDockRenderFunc) (CairoDock *pDock);
+typedef Icon * (*CairoDockCalculateIconsFunc) (CairoDock *pDock);
 typedef void (*CairoDockSetSubDockPositionFunc) (Icon *pPointedIcon, CairoDock *pParentDock);
 
 struct _CairoDock {
@@ -42,13 +43,31 @@ struct _CairoDock {
 	GtkWidget *pWidget;  // sa fenetre de dessin.
 	gboolean bIsMainDock;  // si le dock est le dock racine.
 	gint iRefCount;  // le nombre d'icones pointant sur lui.
+	
+	//\_______________ Les parametres de position et de geometrie de la fenetre du dock.
 	gint iGapX;  // decalage de la zone par rapport au milieu bas de l'ecran.
 	gint iGapY;
 	gdouble fAlign;  // alignement, entre 0 et 1, du dock sur le bord de l'ecran.
-	
+	CairoDockTypeHorizontality bHorizontalDock;  // dit si le dock est horizontal ou vertical.
+	gint iMaxIconHeight;  // max des hauteurs des icones.
+	gint iMinDockWidth;  // taille minimale du dock.
+	gint iMaxDockWidth;  // taille maximale du dock.
+	gint iMaxDockHeight;
+	gint iWindowPositionX;  // dock-windows current y-position
+	gint iWindowPositionY;  // dock-windows current y-position
 	gint iCurrentWidth;  // taille de la fenetre, _apres_ le redimensionnement par GTK.
 	gint iCurrentHeight;
+	
+	//\_______________ Les parametres lies a une animation du dock.
 	gint iScrollOffset;  // pour faire defiler les icones avec la molette.
+	gint iMagnitudeIndex; // indice de calcul du coef multiplicateur de l'amplitude de la sinusoide (entre 0 et 1000).
+	gdouble fDecorationsOffsetX;  // decalage des decorations pour les faire suivre la souris.
+	gdouble fFoldingFactor;  // un facteur d'acceleration lateral des icones lors du grossissement initial.
+	gint iMouseX;  // derniere position du curseur (pour l'instant, dans le cas de decorations non asservies).
+	gint iMouseY;
+	gint iAvoidingMouseIconType;  // type d'icone devant eviter la souris, -1 si aucun.
+	gdouble fAvoidingMouseMargin;  // marge d'evitement de la souris, en fraction de la largeur d'une icone (entre 0 et 0.5) 
+	
 	GList *pFirstDrawnElement;  // pointeur sur le 1er element de la liste des icones a etre dessine, en partant de la gauche.
 	
 	gboolean bAtBottom;  // le dock est en bas au repos.
@@ -56,29 +75,19 @@ struct _CairoDock {
 	gboolean bInside;  // lorsque la souris est dans le dock.
 	gboolean bMenuVisible;  // lorsque le menu du clique droit est visible.
 	
-	gint iMagnitudeIndex; // indice de calcul du coef multiplicateur de l'amplitude de la sinusoide (entre 0 et 1000).
-	gdouble fDecorationsOffsetX;  // decalage des decorations pour les faire suivre la souris.
-	gint iMouseX;  // derniere position du curseur (pour l'instant, dans le cas de decorations non asservies).
-	gint iMouseY;
-	gdouble fFoldingFactor;  // un facteur d'acceleration lateral des icones lors du grossissement initial.
-	
-	CairoDockTypeHorizontality bHorizontalDock;  // dit si le dock est horizontal ou vertical.
-	gint iMaxIconHeight;  // max des hauteurs des icones.
-	gint iMinDockWidth;  // taille minimale du dock.
-	gint iMaxDockWidth;  // taille maximale du dock.
-	gint iMaxDockHeight;
-	
-	gint iWindowPositionX;  // dock-windows current y-position
-	gint iWindowPositionY;  // dock-windows current y-position
+	//\_______________ Les ID des threads en cours sur le dock.
 	gint iSidMoveDown;  // serial ID du thread de descente de la fenetre.
 	gint iSidMoveUp;  // serial ID du thread de montee de la fenetre.
 	gint iSidGrowUp;  // serial ID du thread de grossisement des icones.
 	gint iSidShrinkDown;  // serial ID du thread de diminution des icones.
 	gint iSidLeaveDemand;  // serial ID du thread qui enverra le signal de sortie retarde.
 	
-	CairoDockRenderFunc render;
+	//\_______________ Les fonctions de dessin du dock.
 	CairoDockCalculateMaxDockSizeFunc calculate_max_dock_size;
+	CairoDockCalculateIconsFunc calculate_icons;
+	CairoDockRenderFunc render;
 	CairoDockSetSubDockPositionFunc set_subdock_position;
+	
 #ifdef HAVE_GLITZ
 	glitz_drawable_format_t *pDrawFormat;
 	glitz_drawable_t* pGlitzDrawable;

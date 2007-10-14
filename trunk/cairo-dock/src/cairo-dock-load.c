@@ -290,12 +290,15 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 	}
 	cairo_destroy (pCairoContext);
 	
-	if (! pDock->bIsMainDock)
+	if (! pDock->bIsMainDock)  // on le fait pas pour le dock principal, ce sera fait a la fin de la fonction 'read_conf'.
 	{
 		pDock->iCurrentWidth = pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth;
 		pDock->iCurrentHeight= pDock->iMaxIconHeight + 2 * g_iDockLineWidth;
 		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
-		cairo_dock_calculate_icons (pDock, 0, 0);
+		//pDock->iMouseX = 0;  // utile ?
+		//pDock->iMouseY = 0;
+		//pDock->calculate_icons (pDock);
+		//cairo_dock_apply_wave_effect (pDock);  // utile ? faudrait alors appeler un gtk_widget_queue_draw, mais il l'est deja par le redimensionnent non ?
 	}
 }
 void cairo_dock_reload_buffers_in_all_dock (GHashTable *hDocksTable)

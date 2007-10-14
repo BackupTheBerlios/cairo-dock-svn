@@ -9,7 +9,7 @@ gboolean on_expose (GtkWidget *pWidget,
 			GdkEventExpose *pExpose,
 			CairoDock *pDock);
 
-void cairo_dock_set_subdock_position_generic (Icon *pPointedIcon, CairoDock *pParentDock);
+void cairo_dock_set_subdock_position_linear (Icon *pPointedIcon, CairoDock *pParentDock);
 void cairo_dock_set_subdock_position_caroussel (Icon *pPointedIcon, CairoDock *pParentDock);
 gboolean on_motion_notify2 (GtkWidget* pWidget,
 					GdkEventMotion* pMotion,

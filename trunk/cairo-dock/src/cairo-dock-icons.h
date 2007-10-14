@@ -70,20 +70,22 @@ void cairo_dock_remove_all_applis (CairoDock *pDock);
 void cairo_dock_remove_all_applets (CairoDock *pDock);
 
 
-GList * cairo_dock_calculate_icons_positions_at_rest (GList *pIconList, int iMinDockWidth, int iXOffset);
+GList * cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, int iMinDockWidth, int iXOffset);
 
-Icon * cairo_dock_calculate_icons_with_position (GList *pIconList, GList *pFirstDrawnElement, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight, int iMouseY, double fAlign, double fLateralFactor);
+Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElement, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight, int iMouseY, double fAlign, double fLateralFactor);
 
-Icon *cairo_dock_calculate_icons (CairoDock *pDock, int iMouseX, int iMouseY);
+Icon *cairo_dock_apply_wave_effect (CairoDock *pDock);
 
 double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawnElement, int iFlatDockWidth);
 
-void cairo_dock_calculate_max_dock_size_generic (CairoDock *pDock);
+void cairo_dock_calculate_max_dock_size_linear (CairoDock *pDock);
 void cairo_dock_calculate_max_dock_size_caroussel (CairoDock *pDock);
 
 
 void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, CairoDockIconType iType, double fMargin);
+void cairo_dock_mark_avoiding_mouse_icons_linear (CairoDock *pDock);
 void cairo_dock_stop_marking_icons (CairoDock *pDock, CairoDockIconType iType);
+
 
 void cairo_dock_update_icon_s_container_name (Icon *icon, gchar *cNewParentDockName);
 

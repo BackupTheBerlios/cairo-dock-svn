@@ -43,7 +43,7 @@ void cairo_dock_render_icons_caroussel (cairo_t *pCairoContext, CairoDock *pDock
 void cairo_dock_calculate_construction_parameters (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth, gboolean bLoop, gboolean bInside);
 
 void cairo_dock_render (CairoDock *pDock);
-void cairo_dock_render_generic (CairoDock *pDock);
+void cairo_dock_render_linear (CairoDock *pDock);
 void cairo_dock_render_caroussel (CairoDock *pDock);
 
 void cairo_dock_render_background (CairoDock *pDock);
