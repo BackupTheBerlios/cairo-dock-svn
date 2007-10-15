@@ -496,13 +496,13 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 	{
 		icon->fWidth *= g_fSubDockSizeRatio;
 		icon->fHeight *= g_fSubDockSizeRatio;
-		
-		if (! g_bSameHorizontality)
-		{
-			cairo_t* pSourceContext = cairo_dock_create_context_from_window (pDock);
-			cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
-			cairo_destroy (pSourceContext);
-		}
+	}
+	
+	if (! g_bSameHorizontality)
+	{
+		cairo_t* pSourceContext = cairo_dock_create_context_from_window (pDock);
+		cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
+		cairo_destroy (pSourceContext);
 	}
 	
 	pDock->iMinDockWidth += g_iIconGap + icon->fWidth;

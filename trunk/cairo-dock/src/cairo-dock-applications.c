@@ -604,7 +604,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 	}
 	//\_____________________ On regarde si une fenetre apparait.
 	bEventPresent = TRUE;
-	//while (bEventPresent)
+	while (bEventPresent)
 	{
 		bEventPresent = XCheckTypedEvent(g_XDisplay, MapNotify, &event);
 		if (bEventPresent && event.xmap.window != xUnwantedWindow)

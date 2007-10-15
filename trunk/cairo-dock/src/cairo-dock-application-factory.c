@@ -277,13 +277,14 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	
 	//\__________________ On regarde si il faut la grouper avec une autre.
 	XClassHint class_hint;
-	XGetClassHint (g_XDisplay, Xid, &class_hint);
-	g_print ("  res_name : %s; res_class : %s\n", class_hint.res_name, class_hint.res_class);
-	icon->cClass = g_strdup (class_hint.res_class);
-	XFree (class_hint.res_name);
-	XFree (class_hint.res_class);
-	
-	if (g_bGroupAppliByClass)
+	if (XGetClassHint (g_XDisplay, Xid, &class_hint) != 0)
+	{
+		g_print ("  res_name : %s; res_class : %s\n", class_hint.res_name, class_hint.res_class);
+		icon->cClass = g_strdup (class_hint.res_class);
+		XFree (class_hint.res_name);
+		XFree (class_hint.res_class);
+	}
+	if (g_bGroupAppliByClass && icon->cClass != NULL)
 	{
 		Icon *pSameClassIcon = cairo_dock_get_icon_with_class (pDock->icons, icon->cClass);
 		if (pSameClassIcon == NULL)

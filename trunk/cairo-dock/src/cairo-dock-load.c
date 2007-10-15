@@ -203,9 +203,9 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 	
 	cairo_surface_t* pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 		CAIRO_CONTENT_COLOR_ALPHA,
-		ink.width + 2, ink.height + 2);
+		ink.width + 2, ink.height + 2 + 1);  // le +1 est la pour palier aux erreurs d'arrondis qui apparaissent avec certaines polices.
 	cairo_t* pCairoContext = cairo_create (pNewSurface);
-	cairo_translate (pCairoContext, -ink.x, -ink.y);
+	cairo_translate (pCairoContext, -ink.x, -ink.y+1);  // meme remarque.
 	
 	cairo_push_group (pCairoContext);
 	cairo_set_source_rgb (pCairoContext, 0.2, 0.2, 0.2);

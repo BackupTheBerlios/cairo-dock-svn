@@ -163,7 +163,6 @@ int g_iVisibleZoneHeight = 0;
 gboolean g_bDirectionUp;  // la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.
 gboolean g_bSameHorizontality;  // dit si les sous-docks ont la meme horizontalite que les docks racines.
 double g_fSubDockSizeRatio;  // ratio de la taille des icones des sous-docks par rapport a celles du dock principal.
-gboolean g_bShowSubDockOnMouseOver;
 gboolean g_bAnimateSubDock;
 int g_iLeaveSubDockDelay;
 int g_iShowSubDockDelay;

@@ -725,8 +725,13 @@ GList *cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, in
 Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight, int iMouseY, double fAlign, double fFoldingFactor)
 {
 	//g_print (">>>>>%s (%d, %dx%d)\n", __func__, x_abs, iWidth, iHeight);
+	if (x_abs < 0 && iWidth > 0)
+		x_abs = -1;
+	else if (x_abs > iMinDockWidth && iWidth > 0)
+		x_abs = iMinDockWidth+1;
 	if (pIconList == NULL)
 		return NULL;
+	
 	float x_cumulated = 0, fXMiddle, fDeltaExtremum;
 	int iXMinSinusoid = x_abs - g_iSinusoidWidth / 2;
 	int iXMaxSinusoid = x_abs + g_iSinusoidWidth / 2;
@@ -748,17 +753,19 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 		icon->fPhase = (fXMiddle - x_abs) / g_iSinusoidWidth * G_PI + G_PI / 2;
 		if (icon->fPhase < 0)
 		{
-			if (ic != pointed_ic)
+			icon->fPhase = 0;
+			/*if (ic != pointed_ic)
 				icon->fPhase = 0;
 			else
-				icon->fPhase = G_PI / 2;
+				icon->fPhase += G_PI / 2;*/
 		}
 		else if (icon->fPhase > G_PI)
 		{
-			if (ic != pointed_ic)
+			icon->fPhase = G_PI;
+			/*if (ic != pointed_ic)
 				icon->fPhase = G_PI;
 			else
-				icon->fPhase = G_PI / 2;
+				icon->fPhase -= G_PI / 2;*/
 		}
 		
 		//\_______________ On en deduit l'amplitude de la sinusoide au niveau de cette icone, et donc son echelle.

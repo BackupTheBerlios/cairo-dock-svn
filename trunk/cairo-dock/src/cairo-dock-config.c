@@ -48,7 +48,6 @@ extern double g_fVisibleZoneAlpha;
 extern gboolean g_bDirectionUp;
 extern gboolean g_bSameHorizontality;
 extern double g_fSubDockSizeRatio;
-extern gboolean g_bShowSubDockOnMouseOver;
 extern gboolean g_bAnimateSubDock;
 extern int g_iLeaveSubDockDelay;
 extern int g_iShowSubDockDelay;
@@ -508,8 +507,6 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_fSubDockSizeRatio = cairo_dock_get_double_key_value (pKeyFile, "Sub-Docks", "relative icon size", &bFlushConfFileNeeded, 0.8);
 	
 	g_bAnimateSubDock = cairo_dock_get_boolean_key_value (pKeyFile, "Sub-Docks", "animate subdocks", &bFlushConfFileNeeded, TRUE);
-	
-	g_bShowSubDockOnMouseOver = cairo_dock_get_boolean_key_value (pKeyFile, "Sub-Docks", "on mouse over", &bFlushConfFileNeeded, TRUE);
 	
 	g_iLeaveSubDockDelay = cairo_dock_get_integer_key_value (pKeyFile, "Sub-Docks", "leaving delay", &bFlushConfFileNeeded, 250);
 	g_iShowSubDockDelay = cairo_dock_get_integer_key_value (pKeyFile, "Sub-Docks", "show delay", &bFlushConfFileNeeded, 300);

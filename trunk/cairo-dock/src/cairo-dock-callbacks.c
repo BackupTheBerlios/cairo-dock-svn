@@ -48,7 +48,6 @@ static int s_iSidShowSubDockDemand = 0;
 
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
-extern gboolean g_bShowSubDockOnMouseOver;
 extern gboolean g_bAnimateSubDock;
 extern double g_fUnfoldAcceleration;
 extern int g_iLeaveSubDockDelay;
@@ -362,16 +361,13 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		}
 		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL && pPointedIcon->pSubDock != s_pLastPointedDock)
 		{
-			if (g_bShowSubDockOnMouseOver)
+			if (g_iShowSubDockDelay > 0)
 			{
-				if (g_iShowSubDockDelay > 0)
-				{
-					//pDock->iMouseX = iX;
-					s_iSidShowSubDockDemand = g_timeout_add (g_iShowSubDockDelay, (GSourceFunc) _cairo_dock_show_sub_dock_delayed, pDock);
-				}
-				else
-					cairo_dock_show_subdock (pPointedIcon, FALSE, pDock);
+				//pDock->iMouseX = iX;
+				s_iSidShowSubDockDemand = g_timeout_add (g_iShowSubDockDelay, (GSourceFunc) _cairo_dock_show_sub_dock_delayed, pDock);
 			}
+			else
+				cairo_dock_show_subdock (pPointedIcon, FALSE, pDock);
 			s_pLastPointedDock = pDock;
 		}
 		pLastPointedIcon = pPointedIcon;
@@ -772,38 +768,8 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 			{
 				cairo_dock_arm_animation (icon, -1, -1);
 				
-				if (icon->pSubDock != NULL)
-				{
-					if (GTK_WIDGET_VISIBLE (icon->pSubDock->pWidget))
-						gtk_widget_hide (icon->pSubDock->pWidget);
-					else
-					{
-						if (g_bShowSubDockOnMouseOver)
-						{
-							if (s_iSidShowSubDockDemand != 0)
-							{
-								g_source_remove (s_iSidShowSubDockDemand);
-								s_iSidShowSubDockDemand = 0;
-								///pDock->iMouseX = pButton->x;
-								cairo_dock_show_subdock (icon, FALSE, pDock);
-							}
-							else
-								gtk_window_present (GTK_WINDOW (icon->pSubDock->pWidget));
-						}
-						else
-						{
-							///pDock->iMouseX = pButton->x;
-							cairo_dock_show_subdock (icon, FALSE, pDock);
-						}
-					}
-					icon->iAnimationType = CAIRO_DOCK_BLINK;
-					icon->iCount = g_tNbIterInOneRound[icon->iAnimationType] - 1;  // 1 clignotement.
-				}
-				else
-				{
-					gpointer data[2] = {icon, pDock};
-					cairo_dock_notify (CAIRO_DOCK_CLICK_ICON, data);
-				}
+				gpointer data[2] = {icon, pDock};
+				cairo_dock_notify (CAIRO_DOCK_CLICK_ICON, data);
 				
 				cairo_dock_start_animation (icon, pDock);
 			}
@@ -1015,16 +981,13 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 		}
 		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL)
 		{
-			if (g_bShowSubDockOnMouseOver)
+			if (g_iShowSubDockDelay > 0)
 			{
-				if (g_iShowSubDockDelay > 0)
-				{
-					//pDock->iMouseX = iX;
-					s_iSidShowSubDockDemand = g_timeout_add (g_iShowSubDockDelay, (GSourceFunc) _cairo_dock_show_sub_dock_delayed, pDock);
-				}
-				else
-					cairo_dock_show_subdock (pPointedIcon, TRUE, pDock);
+				//pDock->iMouseX = iX;
+				s_iSidShowSubDockDemand = g_timeout_add (g_iShowSubDockDelay, (GSourceFunc) _cairo_dock_show_sub_dock_delayed, pDock);
 			}
+			else
+				cairo_dock_show_subdock (pPointedIcon, TRUE, pDock);
 			s_pLastPointedDock = pDock;
 		}
 		pLastPointedIcon = pPointedIcon;
