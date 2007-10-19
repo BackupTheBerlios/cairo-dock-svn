@@ -127,7 +127,7 @@ void cairo_dock_set_subdock_position_linear (Icon *pPointedIcon, CairoDock *pDoc
 {
 	CairoDock *pSubDock = pPointedIcon->pSubDock;
 	///int iX = iMouseX + (-iMouseX + (pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2)) / 2;
-	int iX = pPointedIcon->fXAtRest - (pDock->iMinDockWidth - pDock->iMaxDockWidth) / 2 + pPointedIcon->fWidth / 2;
+	int iX = pPointedIcon->fXAtRest - (pDock->iFlatDockWidth - pDock->iMaxDockWidth) / 2 + pPointedIcon->fWidth / 2;
 	//int iX = iMouseX + (iMouseX < pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 ? (g_bDirectionUp ? 1 : 0) : (g_bDirectionUp ? 0 : -1)) * pPointedIcon->fWidth * pPointedIcon->fScale / 2;
 	if (pSubDock->bHorizontalDock == pDock->bHorizontalDock)
 	{
@@ -299,6 +299,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	if (g_bDecorationsFollowMouse)
 	{
 		pDock->fDecorationsOffsetX = pDock->iMouseX - pDock->iCurrentWidth / 2;
+		//g_print ("fDecorationsOffsetX <- %.2f\n", pDock->fDecorationsOffsetX);
 	}
 	else
 	{
@@ -655,19 +656,23 @@ gboolean on_key_press (GtkWidget *pWidget,
 		switch (pKey->keyval)
 		{
 			case GDK_Down :
-				iMoveByArrow = (pDock->bHorizontalDock ? _move_down_by_arrow (++iMoveByArrow, pDock) : _move_right_by_arrow (++iMoveByArrow, pDock));
+				if (pKey->state & GDK_CONTROL_MASK)
+					iMoveByArrow = (pDock->bHorizontalDock ? _move_down_by_arrow (++iMoveByArrow, pDock) : _move_right_by_arrow (++iMoveByArrow, pDock));
 			break;
 
 			case GDK_Up :
-				iMoveByArrow = (pDock->bHorizontalDock ? _move_up_by_arrow (++iMoveByArrow, pDock) : _move_left_by_arrow (++iMoveByArrow, pDock));
+				if (pKey->state & GDK_CONTROL_MASK)
+					iMoveByArrow = (pDock->bHorizontalDock ? _move_up_by_arrow (++iMoveByArrow, pDock) : _move_left_by_arrow (++iMoveByArrow, pDock));
 			break;
 			
 			case GDK_Left :
-				iMoveByArrow = (pDock->bHorizontalDock ? _move_left_by_arrow (++iMoveByArrow, pDock) : _move_up_by_arrow (++iMoveByArrow, pDock));
+				if (pKey->state & GDK_CONTROL_MASK)
+					iMoveByArrow = (pDock->bHorizontalDock ? _move_left_by_arrow (++iMoveByArrow, pDock) : _move_up_by_arrow (++iMoveByArrow, pDock));
 			break;
 			
 			case GDK_Right :
-				iMoveByArrow = (pDock->bHorizontalDock ? _move_right_by_arrow (++iMoveByArrow, pDock) : _move_down_by_arrow (++iMoveByArrow, pDock));
+				if (pKey->state & GDK_CONTROL_MASK)
+					iMoveByArrow = (pDock->bHorizontalDock ? _move_right_by_arrow (++iMoveByArrow, pDock) : _move_down_by_arrow (++iMoveByArrow, pDock));
 			break;
 			
 			case GDK_Page_Up :
@@ -781,7 +786,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				{
 					cairo_dock_detach_icon_from_dock (s_pIconClicked, pOriginDock, TRUE);  // plutot que 'cairo_dock_remove_icon_from_dock', afin de ne pas la fermer.
 					///cairo_dock_remove_icon_from_dock (pOriginDock, s_pIconClicked);
-					cairo_dock_update_dock_size (pOriginDock, pOriginDock->iMaxIconHeight, pOriginDock->iMinDockWidth);
+					cairo_dock_update_dock_size (pOriginDock);
 					
 					///s_pIconClicked->fWidth /= (pOriginDock->iRefCount == 0 ? 1. : g_fSubDockSizeRatio);
 					///s_pIconClicked->fHeight /= (pOriginDock->iRefCount == 0 ? 1. : g_fSubDockSizeRatio);
@@ -831,7 +836,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				s_pIconClicked->iCount = 2 * g_tNbIterInOneRound[icon->iAnimationType] - 1;  // 2 rebonds.
 				cairo_dock_move_icon_after_icon (pDock, s_pIconClicked, prev_icon);
 				
-				cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+				cairo_dock_update_dock_size (pDock);
 				pDock->iMouseX = iX;  // utile ?
 				pDock->iMouseY = iY;
 				//cairo_dock_apply_wave_effect (pDock);
@@ -880,7 +885,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 	else if (pButton->button == 2 && pButton->type == GDK_BUTTON_PRESS)  // clique milieu.
 	{
 		pDock->iScrollOffset = 0;
-		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+		cairo_dock_update_dock_size (pDock);
 		if (pDock->bHorizontalDock)  // utile ?
 		{
 			pDock->iMouseX = (int) pButton->x;
@@ -905,10 +910,9 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 	GdkEventScroll* pScroll = data[0];
 	CairoDock *pDock = data[1];
 	gboolean bAutoScroll = GPOINTER_TO_INT (data[2]);
-	//pScroll->time += 10 * g_fRefreshInterval;
 	
 	//g_print ("%s (%d, %.2f)\n", __func__, pDock->iSidShrinkDown, pDock->fMagnitude);
-	if (pDock->iSidShrinkDown != 0 || pDock->/**fMagnitude*/iMagnitudeIndex == 0)
+	if (pDock->iSidShrinkDown != 0 || pDock->iMagnitudeIndex == 0)
 		return FALSE;
 	
 	Icon *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
@@ -933,13 +937,13 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 		return FALSE;
 	}
 	
-	if (pDock->iScrollOffset >= pDock->iMinDockWidth)
-		pDock->iScrollOffset -= pDock->iMinDockWidth;
+	if (pDock->iScrollOffset >= pDock->iFlatDockWidth)
+		pDock->iScrollOffset -= pDock->iFlatDockWidth;
 	if (pDock->iScrollOffset < 0)
-		pDock->iScrollOffset += pDock->iMinDockWidth;
+		pDock->iScrollOffset += pDock->iFlatDockWidth;
 	//g_print ("iScrollOffset <- %d, (%d;%d) (%x)\n", pDock->iScrollOffset, (int) pScroll->x, (int) pScroll->y, pDock->icons);
 	
-	cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+	cairo_dock_update_dock_size (pDock);
 	
 	//\_______________ On recalcule toutes les icones.
 	Icon *pPointedIcon;

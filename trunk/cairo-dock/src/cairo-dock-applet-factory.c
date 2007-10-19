@@ -44,6 +44,7 @@ extern gboolean g_bUseGlitz;
 
 cairo_surface_t *cairo_dock_create_applet_surface (cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
 {
+	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
 	cairo_dock_calculate_contrainted_icon_size (fWidth,
 		fHeight,

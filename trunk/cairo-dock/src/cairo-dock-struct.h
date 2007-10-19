@@ -49,10 +49,15 @@ struct _CairoDock {
 	gint iGapY;
 	gdouble fAlign;  // alignement, entre 0 et 1, du dock sur le bord de l'ecran.
 	CairoDockTypeHorizontality bHorizontalDock;  // dit si le dock est horizontal ou vertical.
+	
 	gint iMaxIconHeight;  // max des hauteurs des icones.
-	gint iMinDockWidth;  // taille minimale du dock.
-	gint iMaxDockWidth;  // taille maximale du dock.
+	gint iFlatDockWidth;  // largeur du dock a plat, avec juste les icones.
+	gint iMinDockWidth;  // taille du dock au repos.
+	gint iMinDockHeight;
+	gint iMaxDockWidth;  // taille du dock actif.
 	gint iMaxDockHeight;
+	gint iDecorationsWidth;  // la taille des decorations.
+	gint iDecorationsHeight;
 	gint iWindowPositionX;  // dock-windows current y-position
 	gint iWindowPositionY;  // dock-windows current y-position
 	gint iCurrentWidth;  // taille de la fenetre, _apres_ le redimensionnement par GTK.
@@ -61,7 +66,6 @@ struct _CairoDock {
 	//\_______________ Les parametres lies a une animation du dock.
 	gint iScrollOffset;  // pour faire defiler les icones avec la molette.
 	gint iMagnitudeIndex; // indice de calcul du coef multiplicateur de l'amplitude de la sinusoide (entre 0 et 1000).
-	gdouble fDecorationsOffsetX;  // decalage des decorations pour les faire suivre la souris.
 	gdouble fFoldingFactor;  // un facteur d'acceleration lateral des icones lors du grossissement initial.
 	gint iMouseX;  // derniere position du curseur (pour l'instant, dans le cas de decorations non asservies).
 	gint iMouseY;
@@ -69,6 +73,7 @@ struct _CairoDock {
 	gdouble fAvoidingMouseMargin;  // marge d'evitement de la souris, en fraction de la largeur d'une icone (entre 0 et 0.5) 
 	
 	GList *pFirstDrawnElement;  // pointeur sur le 1er element de la liste des icones a etre dessine, en partant de la gauche.
+	gdouble fDecorationsOffsetX;  // decalage des decorations pour les faire suivre la souris.
 	
 	gboolean bAtBottom;  // le dock est en bas au repos.
 	gboolean bAtTop;  // le dock est en haut pret a etre utilise.

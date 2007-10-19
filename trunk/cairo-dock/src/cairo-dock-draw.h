@@ -23,17 +23,18 @@ void cairo_dock_draw_frame (cairo_t *pCairoContext, double fRadius, double fLine
 void cairo_dock_draw_string (cairo_t *pCairoContext, CairoDock *pDock, double fStringLineWidth, gboolean bIsLoop);
 
 
-void cairo_dock_render_decorations_in_frame (cairo_t *pCairoContext, CairoDock *pDock, double fLineWidth);
+void cairo_dock_render_decorations_in_frame (cairo_t *pCairoContext, CairoDock *pDock, double fLineWidth, double fOffsetY);
 
 
 void cairo_dock_calculate_construction_parameters_generic (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth);
-void cairo_dock_calculate_construction_parameters_caroussel (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth, gboolean bInside);
+void cairo_dock_calculate_construction_parameters_caroussel (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxIconHeight);
+//void cairo_dock_calculate_construction_parameters_caroussel (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth, gboolean bInside);
 
 
 void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock);
 
 
-void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio);
+void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude);
 void cairo_dock_render_icons_generic (cairo_t *pCairoContext, CairoDock *pDock, double fRatio);
 void cairo_dock_render_icons_caroussel (cairo_t *pCairoContext, CairoDock *pDock, double fRatio);
 
@@ -42,7 +43,7 @@ void cairo_dock_render_icons_caroussel (cairo_t *pCairoContext, CairoDock *pDock
 
 void cairo_dock_calculate_construction_parameters (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth, gboolean bLoop, gboolean bInside);
 
-void cairo_dock_render (CairoDock *pDock);
+//void cairo_dock_render (CairoDock *pDock);
 void cairo_dock_render_linear (CairoDock *pDock);
 void cairo_dock_render_caroussel (CairoDock *pDock);
 

@@ -18,7 +18,7 @@ CairoDock *cairo_dock_search_container_from_icon (Icon *icon);
 
 
 void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve);
-void cairo_dock_update_dock_size (CairoDock *pDock, int iMaxIconHeight, int iMinDockWidth);
+void cairo_dock_update_dock_size (CairoDock *pDock);
 
 
 void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpdateSize, gboolean bAnimated, gboolean bApplyRatio);

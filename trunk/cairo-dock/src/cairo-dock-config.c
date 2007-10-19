@@ -41,8 +41,8 @@ extern gboolean g_bForceLoop;
 
 extern int g_iSinusoidWidth;
 extern double g_fAmplitude;
-
 extern int g_iIconGap;
+
 extern gboolean g_bAutoHide;
 extern double g_fVisibleZoneAlpha;
 extern gboolean g_bDirectionUp;
@@ -468,6 +468,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_iSinusoidWidth = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "sinusoid width", &bFlushConfFileNeeded, 250);
 	g_iSinusoidWidth = MAX (1, g_iSinusoidWidth);
 	
+	g_iIconGap = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "icon gap", &bFlushConfFileNeeded, 0);
+	
 	g_iDockRadius = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "corner radius", &bFlushConfFileNeeded, 12);
 
 	g_iDockLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "line width", &bFlushConfFileNeeded, 2);
@@ -705,6 +707,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_fBackgroundImageHeight = 1e4;
 	if (pDock->icons == NULL)
 	{
+		pDock->iFlatDockWidth = - g_iIconGap;  // car on ne le connaissais pas encore au moment de la creation du dock.
 		cairo_dock_build_docks_tree_with_desktop_files (pDock, g_cCurrentLaunchersPath);
 	}
 	else
@@ -721,7 +724,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_strfreev (cActiveModuleList);
 	
 	cairo_dock_reserve_space_for_dock (pDock, g_bReserveSpace);
-	cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+	cairo_dock_update_dock_size (pDock);
 	
 	
 	cairo_dock_load_visible_zone (pDock, cVisibleZoneImageFile, g_iVisibleZoneWidth, g_iVisibleZoneHeight, g_fVisibleZoneAlpha);
@@ -730,7 +733,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	cairo_dock_load_background_decorations (pDock);
 	
 	
-	pDock->iMouseX = 0;  // utile ?
+	pDock->iMouseX = 0;  // on se place hors du dock initialement.
 	pDock->iMouseY = 0;
 	//cairo_dock_apply_wave_effect (pDock);
 	pDock->calculate_icons (pDock);
@@ -917,8 +920,15 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 		gtk_window_resize (GTK_WINDOW (pDialog), iWindowWidth, iWindowHeight);
 	gint iWidth, iHeight;
 	gtk_window_get_size (GTK_WINDOW (pDialog), &iWidth, &iHeight);
-	iWidth = MAX (iWidth, iWindowWidth);  // car la taille n'est pas encore effective.
-	iHeight = MAX (iWidth, iWindowHeight);
+	iWidth = MAX (iWidth, iWindowWidth);  // car la taille n'est peut-etre pas encore effective.
+	iHeight = MAX (iHeight, iWindowHeight);
+	
+	if (g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] <= 0 || g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] <= 0)  // peut arriver avec le panneau de choix du theme initial.
+	{
+		GdkScreen *gdkscreen = gdk_screen_get_default ();
+		g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] = gdk_screen_get_width (gdkscreen);
+		g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] = gdk_screen_get_height (gdkscreen);
+	}
 	gtk_window_move (GTK_WINDOW (pDialog), (g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] - iWidth) / 2, (g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] - iHeight) / 2);
 	
 	if (pConfigFunc != NULL)  // alors on autorise la modification a la volee, avec un bouton "Appliquer". La fenetre doit donc laisser l'appli se derouler.

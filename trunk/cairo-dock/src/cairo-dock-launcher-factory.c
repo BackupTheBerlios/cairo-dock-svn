@@ -151,7 +151,7 @@ gchar *cairo_dock_search_image_path (gchar *cFileName)
 cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern)
 {
 	//g_print ("%s (%s  : %d)\n", __func__, cImagePath, strlen (cImagePath));
-	g_return_val_if_fail (cImagePath != NULL, NULL);
+	g_return_val_if_fail (cImagePath != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	GError *erreur = NULL;
 	RsvgDimensionData rsvg_dimension_data;
 	RsvgHandle *rsvg_handle;
@@ -335,6 +335,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 
 cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fRotationAngle)
 {
+	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	if (fRotationAngle != 0)
 	{
 		cairo_surface_t *pNewSurfaceRotated;
@@ -492,7 +493,7 @@ void cairo_dock_load_icon_info_from_desktop_file (gchar *cDesktopFileName, Icon 
 		if (pChildDock == NULL)
 		{
 			g_print ("le dock fils (%s) n'existe pas, on le cree\n", icon->acName);
-			pChildDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->acName);
+			pChildDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_DOCK, icon->acName);
 		}
 		cairo_dock_reference_dock (pChildDock);
 		icon->pSubDock = pChildDock;
@@ -538,7 +539,7 @@ Icon * cairo_dock_create_icon_from_desktop_file (gchar *cDesktopFileName, cairo_
 	if (pParentDock == NULL)
 	{
 		g_print ("le dock parent (%s) n'existe pas, on le cree\n", icon->cParentDockName);
-		pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->cParentDockName);
+		pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_DOCK, icon->cParentDockName);
 	}
 	
 	return icon;

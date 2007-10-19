@@ -317,7 +317,7 @@ static void cairo_dock_add_launcher (GtkMenuItem *menu_item, gpointer *data)
 		g_slist_free (selected_files);
 		cairo_destroy (pCairoContext);
 		
-		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+		cairo_dock_update_dock_size (pDock);
 		
 		if (pDock->iSidShrinkDown == 0)
 			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
@@ -409,7 +409,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 		cairo_dock_insert_icon_in_dock (pNewIcon, pNewContainer, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);  // on n'empeche pas les bouclages.
 		
 		if (pDock != pNewContainer)
-			cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+			cairo_dock_update_dock_size (pDock);
 		
 		cairo_dock_free_icon (icon);  // on le fait maintenant pour plus de surete.
 		cairo_destroy (pCairoContext);
@@ -463,7 +463,7 @@ static void cairo_dock_remove_module (GtkMenuItem *menu_item, gpointer *data)
 	{
 		cairo_dock_remove_icon_from_dock (pDock, icon);  // desactive le module.
 		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons, g_hModuleTable);
-		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+		cairo_dock_update_dock_size (pDock);
 		gtk_widget_queue_draw (pDock->pWidget);
 		cairo_dock_free_icon (icon);
 	}

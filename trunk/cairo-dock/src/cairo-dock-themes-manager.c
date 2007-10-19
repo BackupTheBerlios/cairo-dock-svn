@@ -238,7 +238,7 @@ int cairo_dock_ask_initial_theme (void)
 	}
 	
 	g_hash_table_destroy (hThemeTable);
-	return iInitialChoiceOK;  // cCurrentThemePath
+	return iInitialChoiceOK;
 }
 
 static void _cairo_dock_delete_one_theme (gchar *cThemeName, gchar *cThemePath, gpointer *data)

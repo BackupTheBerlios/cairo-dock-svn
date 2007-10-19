@@ -348,7 +348,7 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 	}
 	else if (pOldIcon != NULL)
 	{
-		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+		cairo_dock_update_dock_size (pDock);
 		gtk_widget_queue_draw (pDock->pWidget);
 	}
 	cairo_dock_free_icon (pOldIcon);

@@ -398,9 +398,6 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 		(GCompareFunc) cairo_dock_compare_icons_order);
 	
 	//\_________________ On recalcule la largeur max, qui peut avoir ete influencee par le changement d'ordre.
-	//pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest_linear (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
-	//pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
-	///cairo_dock_calculate_max_dock_size_generic (pDock);
 	pDock->calculate_max_dock_size (pDock);
 	
 	//\_________________ On met a jour l'ordre des applets dans le fichier de conf.
@@ -462,12 +459,9 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 		(GCompareFunc) cairo_dock_compare_icons_order);
 	
 	//\_________________ On recalcule la largeur max, qui peut avoir ete influencee par le changement d'ordre.
-	//pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest_linear (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
-	//pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
-	///cairo_dock_calculate_max_dock_size_generic (pDock);
 	pDock->calculate_max_dock_size (pDock);
 	
-	if (CAIRO_DOCK_IS_VALID_APPLET (icon1))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module.
+	if (CAIRO_DOCK_IS_VALID_APPLET (icon1))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module, au cas ou plusieurs icones pour un module.
 		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons, g_hModuleTable);
 }
 
@@ -489,7 +483,7 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 		}
 	}
 	pDock->icons = g_list_remove (pDock->icons, icon);
-	pDock->iMinDockWidth -= g_iIconGap + icon->fWidth;
+	pDock->iFlatDockWidth -= icon->fWidth + g_iIconGap;
 	
 	//\___________________ Cette icone realisait peut-etre le max des hauteurs, comme on l'enleve on recalcule ce max.
 	Icon *pOtherIcon;
@@ -531,7 +525,6 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 				if (pSeparatorIcon != NULL)
 				{
 					//g_print ("  on enleve un separateur\n");
-					///cairo_dock_remove_one_icon_from_dock (pDock, pSeparatorIcon);
 					cairo_dock_detach_icon_from_dock (pSeparatorIcon, pDock, FALSE);
 					cairo_dock_free_icon (pSeparatorIcon);
 				}
@@ -693,7 +686,7 @@ void cairo_dock_remove_all_applets (CairoDock *pDock)
 
 
 
-GList *cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, int iMinDockWidth, int iXOffset)
+GList *cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, int iFlatDockWidth, int iXOffset)
 {
 	double x_cumulated = iXOffset;
 	double fXMin = 99999;
@@ -704,9 +697,9 @@ GList *cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, in
 		icon = ic->data;
 		
 		if (x_cumulated + icon->fWidth / 2 < 0)
-			icon->fXAtRest = x_cumulated + iMinDockWidth;
-		else if (x_cumulated + icon->fWidth / 2 > iMinDockWidth)
-			icon->fXAtRest = x_cumulated - iMinDockWidth;
+			icon->fXAtRest = x_cumulated + iFlatDockWidth;
+		else if (x_cumulated + icon->fWidth / 2 > iFlatDockWidth)
+			icon->fXAtRest = x_cumulated - iFlatDockWidth;
 		else
 			icon->fXAtRest = x_cumulated;
 		
@@ -715,6 +708,7 @@ GList *cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, in
 			fXMin = icon->fXAtRest;
 			pFirstDrawnElement = ic;
 		}
+		//g_print ("%s : fXAtRest = %.2f\n", icon->acName, icon->fXAtRest);
 		
 		x_cumulated += icon->fWidth + g_iIconGap;
 	}
@@ -722,13 +716,13 @@ GList *cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, in
 	return pFirstDrawnElement;
 }
 
-Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight, int iMouseY, double fAlign, double fFoldingFactor)
+Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, int iFlatDockWidth, int iWidth, int iHeight, double fAlign, double fFoldingFactor)
 {
-	//g_print (">>>>>%s (%d, %dx%d)\n", __func__, x_abs, iWidth, iHeight);
+	//g_print (">>>>>%s (%d/%d, %dx%d)\n", __func__, x_abs, iFlatDockWidth, iWidth, iHeight);
 	if (x_abs < 0 && iWidth > 0)
 		x_abs = -1;
-	else if (x_abs > iMinDockWidth && iWidth > 0)
-		x_abs = iMinDockWidth+1;
+	else if (x_abs > iFlatDockWidth && iWidth > 0)
+		x_abs = iFlatDockWidth+1;
 	if (pIconList == NULL)
 		return NULL;
 	
@@ -793,42 +787,37 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 		{
 			if (ic == pFirstDrawnElement)  // peut arriver si on est en dehors a gauche du dock.
 			{
-				icon->fX = x_cumulated - 1. * (iMinDockWidth - iWidth) / 2;
+				icon->fX = x_cumulated - 1. * (iFlatDockWidth - iWidth) / 2;
+				//g_print ("  icon->fX = %.2f (%.2f)\n", icon->fX, x_cumulated);
 			}
 			else
 			{
 				prev_icon = (ic->prev != NULL ? ic->prev->data : cairo_dock_get_last_icon (pIconList));
-				icon->fX = prev_icon->fX + prev_icon->fWidth * prev_icon->fScale + g_iIconGap;
+				icon->fX = prev_icon->fX + (prev_icon->fWidth + g_iIconGap) * prev_icon->fScale;
 				
-				if (icon->fX + icon->fWidth * icon->fScale > icon->fXMax - g_fAmplitude * icon->fWidth / 8 && iWidth != 0)  /// && icon->fPhase == G_PI
+				if (icon->fX + icon->fWidth * icon->fScale > icon->fXMax - g_fAmplitude * (icon->fWidth + 1.5*g_iIconGap) / 8 && iWidth != 0)  /// && icon->fPhase == G_PI
 				{
 					//g_print ("  on contraint %s (fXMax=%.2f , fX=%.2f\n", prev_icon->acName, prev_icon->fXMax, prev_icon->fX);
-					fDeltaExtremum = icon->fX + icon->fWidth * icon->fScale - (icon->fXMax - g_fAmplitude * icon->fWidth / 16);
+					fDeltaExtremum = icon->fX + icon->fWidth * icon->fScale - (icon->fXMax - g_fAmplitude * (icon->fWidth + 1.5*g_iIconGap) / 16);
 					icon->fX -= fDeltaExtremum * (1 - (icon->fScale - 1) / g_fAmplitude);
 					///icon->fX = icon->fXMax - icon->fWidth * icon->fScale - g_fAmplitude * icon->fWidth / 16;
 				}
 			}
 			icon->fX = fAlign * iWidth + (icon->fX - fAlign * iWidth) * (1. - fFoldingFactor);
+			//g_print ("  icon->fX = %.2f (%.2f)\n", icon->fX, x_cumulated);
 		}
 		
 		//\_______________ On regarde si on pointe sur cette icone.
-		if (x_cumulated + icon->fWidth + g_iIconGap >= x_abs && x_cumulated <= x_abs && pointed_ic == NULL)  // on a trouve l'icone sur laquelle on pointe.
+		if (x_cumulated + icon->fWidth + .5*g_iIconGap >= x_abs && x_cumulated - .5*g_iIconGap <= x_abs && pointed_ic == NULL)  // on a trouve l'icone sur laquelle on pointe.
 		{
 			pointed_ic = ic;
 			icon->bPointed = TRUE;
-			icon->fX = x_cumulated - (iMinDockWidth - iWidth) / 2 + (1 - icon->fScale) * (x_abs - x_cumulated);
+			icon->fX = x_cumulated - (iFlatDockWidth - iWidth) / 2 + (1 - icon->fScale) * (x_abs - x_cumulated + .5*g_iIconGap);
 			icon->fX = fAlign * iWidth + (icon->fX - fAlign * iWidth) * (1. - fFoldingFactor);
-			//g_print ("icone pointee : fX=%.2f\n", icon->fX);
+			//g_print ("  icone pointee : fX = %.2f (%.2f)\n", icon->fX, x_cumulated);
 		}
 		else
 			icon->bPointed = FALSE;
-		
-		if (icon->iAnimationType == CAIRO_DOCK_FOLLOW_MOUSE)
-		{
-			icon->fScale = 1 + g_fAmplitude;
-			icon->fDrawX = x_abs - (iMinDockWidth - iWidth) / 2;
-			icon->fDrawY = iMouseY;
-		}
 		
 		ic = cairo_dock_get_next_element (ic, pIconList);
 	} while (ic != pFirstDrawnElement);
@@ -838,8 +827,9 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 	{
 		pointed_ic = (pFirstDrawnElement->prev == NULL ? g_list_last (pIconList) : pFirstDrawnElement->prev);
 		icon = pointed_ic->data;
-		icon->fX = x_cumulated - (iMinDockWidth - iWidth) / 2 + (1 - icon->fScale) * icon->fWidth;
+		icon->fX = x_cumulated - (iFlatDockWidth - iWidth) / 2 + (1 - icon->fScale) * (icon->fWidth + .5*g_iIconGap);
 		icon->fX = fAlign * iWidth + (icon->fX - fAlign * iWidth) * (1 - fFoldingFactor);
+		//g_print ("  icon->fX = %.2f (%.2f)\n", icon->fX, x_cumulated);
 	}
 	
 	ic = pointed_ic;
@@ -853,16 +843,17 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 		
 		prev_icon = ic->data;
 		
-		prev_icon->fX = icon->fX - g_iIconGap - prev_icon->fWidth * prev_icon->fScale;
+		prev_icon->fX = icon->fX - (prev_icon->fWidth + g_iIconGap) * prev_icon->fScale;
 		//g_print ("fX <- %.2f; fXMin : %.2f\n", prev_icon->fX, prev_icon->fXMin);
-		if (prev_icon->fX < prev_icon->fXMin + g_fAmplitude * prev_icon->fWidth / 8 && iWidth != 0 && x_abs < iWidth)  /// && prev_icon->fPhase == 0 
+		if (prev_icon->fX < prev_icon->fXMin + g_fAmplitude * (prev_icon->fWidth + 2*g_iIconGap) / 8 && iWidth != 0 && x_abs < iWidth)  /// && prev_icon->fPhase == 0 
 		{
 			//g_print ("  on contraint %s (fXMin=%.2f , fX=%.2f\n", prev_icon->acName, prev_icon->fXMin, prev_icon->fX);
-			fDeltaExtremum = prev_icon->fX - (prev_icon->fXMin + g_fAmplitude * prev_icon->fWidth / 16);
+			fDeltaExtremum = prev_icon->fX - (prev_icon->fXMin + g_fAmplitude * (prev_icon->fWidth + 2*g_iIconGap) / 16);
 			prev_icon->fX -= fDeltaExtremum * (1 - (prev_icon->fScale - 1) / g_fAmplitude);
 			///prev_icon->fX = prev_icon->fXMin + g_fAmplitude * prev_icon->fWidth / 16;
 		}
 		prev_icon->fX = fAlign * iWidth + (prev_icon->fX - fAlign * iWidth) * (1. - fFoldingFactor);
+		//g_print ("  prev_icon->fX : %.2f\n", prev_icon->fX);
 	}
 	
 	return pointed_ic->data;
@@ -879,21 +870,21 @@ Icon *cairo_dock_apply_wave_effect (CairoDock *pDock)
 	//g_print ("%s (%dx%d, %dx%d, %f)\n", __func__, iMouseX, iMouseY, iWidth, iHeight, pDock->fFoldingFactor);
 	
 	int dx = iMouseX - iWidth / 2;  // ecart par rapport au milieu du dock a plat.
-	int x_abs = dx + pDock->iMinDockWidth / 2;  // ecart par rapport a la gauche du dock minimal.
+	int x_abs = dx + pDock->iFlatDockWidth / 2;  // ecart par rapport a la gauche du dock minimal  plat.
 	
 	//\_______________ On calcule l'ensemble des parametres des icones.
 	double fMagnitude = cairo_dock_calculate_magnitude (pDock->iMagnitudeIndex);
-	Icon *pPointedIcon = cairo_dock_calculate_wave_with_position_linear (pDock->icons, pDock->pFirstDrawnElement, x_abs, fMagnitude, pDock->iMinDockWidth, pDock->iMaxDockWidth, iHeight, iMouseY, pDock->fAlign, pDock->fFoldingFactor);
+	Icon *pPointedIcon = cairo_dock_calculate_wave_with_position_linear (pDock->icons, pDock->pFirstDrawnElement, x_abs, fMagnitude, pDock->iFlatDockWidth, pDock->iCurrentWidth, iHeight, pDock->fAlign, pDock->fFoldingFactor);  // iMaxDockWidth
 	
 	//\_______________ On regarde si le curseur est dans le dock ou pas, et on joue sur la taille des icones en consequence.
-	gboolean bMouseInsideDock = (x_abs >= 0 && x_abs <= pDock->iMinDockWidth && iMouseX > 0 && iMouseX < iWidth);
+	gboolean bMouseInsideDock = (x_abs >= 0 && x_abs <= pDock->iFlatDockWidth && iMouseX > 0 && iMouseX < iWidth);
 	if (! bMouseInsideDock)
-		pDock->fDecorationsOffsetX = - pDock->iMinDockWidth / 2;  // on fixe les decorations.
+		pDock->fDecorationsOffsetX = - pDock->iCurrentWidth / 2;  // on fixe les decorations.
 	
 	if (! bMouseInsideDock && pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0 && pDock->iMagnitudeIndex > 0)
 	{
-		double fSideMargin = (pDock->fAlign - .5) * (iWidth - pDock->iMinDockWidth);
-		if (x_abs < fSideMargin || x_abs > pDock->iMinDockWidth + fSideMargin)
+		double fSideMargin = (pDock->fAlign - .5) * (iWidth - pDock->iFlatDockWidth);
+		if (x_abs < fSideMargin || x_abs > pDock->iFlatDockWidth + fSideMargin)
 			g_signal_emit_by_name (pDock->pWidget, "leave-notify-event", NULL, &bReturn);
 		else
 			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, pDock);
@@ -937,7 +928,7 @@ Icon *cairo_dock_apply_wave_effect (CairoDock *pDock)
 }
 
 
-double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawnElementGiven, int iFlatDockWidth)
+double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawnElementGiven, int iFlatDockWidth, double fWidthConstraintFactor)
 {
 	double fMaxDockWidth = 0.;
 	//g_print ("%s (%d)\n", __func__, iFlatDockWidth);
@@ -957,7 +948,6 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 	
 	//\_______________ On simule le passage du curseur sur toute la largeur du dock, et on chope la largeur maximale qui s'en degage, ainsi que les positions d'equilibre de chaque icone.
 	int iVirtualMouseX;
-	double fMaxBorderX = 0;
 	GList *pFirstDrawnElement = (pFirstDrawnElementGiven != NULL ? pFirstDrawnElementGiven : pIconList);
 	//for (iVirtualMouseX = 0; iVirtualMouseX < iFlatDockWidth; iVirtualMouseX ++)
 	GList *ic2;
@@ -965,7 +955,7 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 	{
 		icon = ic->data;
 		
-		cairo_dock_calculate_wave_with_position_linear (pIconList, pFirstDrawnElement, icon->fXAtRest, 1, iFlatDockWidth, 0, 0, 0, 0.5, 0);
+		cairo_dock_calculate_wave_with_position_linear (pIconList, pFirstDrawnElement, icon->fXAtRest, 1, iFlatDockWidth, 0, 0, 0.5, 0);
 		ic2 = pFirstDrawnElement;
 		do
 		{
@@ -978,9 +968,8 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 			
 			ic2 = cairo_dock_get_next_element (ic2, pDock->icons);
 		} while (ic2 != pFirstDrawnElement);
-		fMaxBorderX = MAX (fMaxBorderX, icon->fX + icon->fWidth * icon->fScale);
 	}
-	cairo_dock_calculate_wave_with_position_linear (pIconList, pFirstDrawnElement, iFlatDockWidth - 1, 1, iFlatDockWidth, 0, 0, 0, pDock->fAlign, 0);  // pDock->fFoldingFactor
+	cairo_dock_calculate_wave_with_position_linear (pIconList, pFirstDrawnElement, iFlatDockWidth - 1, 1, iFlatDockWidth, 0, 0, pDock->fAlign, 0);  // pDock->fFoldingFactor
 	ic = pFirstDrawnElement;
 	do
 	{
@@ -993,9 +982,8 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 		
 		ic = cairo_dock_get_next_element (ic, pDock->icons);
 	} while (ic != pFirstDrawnElement);
-	fMaxBorderX = MAX (fMaxBorderX, icon->fX + icon->fWidth * icon->fScale);
 	
-	fMaxDockWidth = icon->fXMax - ((Icon *) pFirstDrawnElement->data)->fXMin + 2 * g_iDockRadius + 2 * g_iFrameMargin + g_iDockLineWidth;
+	fMaxDockWidth = (icon->fXMax - ((Icon *) pFirstDrawnElement->data)->fXMin + 2 * g_iDockRadius + 2 * g_iFrameMargin + g_iDockLineWidth) * fWidthConstraintFactor;
 	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
@@ -1012,20 +1000,35 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 
 void cairo_dock_calculate_max_dock_size_linear (CairoDock *pDock)
 {
-	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest_linear (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
-	pDock->iMaxDockWidth = ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
+	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest_linear (pDock->icons, pDock->iFlatDockWidth, pDock->iScrollOffset);
+	pDock->iMaxDockWidth = ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iFlatDockWidth, 1.)) + 1;
 	pDock->iMaxDockWidth = MIN (pDock->iMaxDockWidth, g_iMaxAuthorizedWidth);
 	
 	pDock->iMaxDockHeight = (int) ((1 + g_fAmplitude) * pDock->iMaxIconHeight) + g_iLabelSize + g_iDockLineWidth + g_iFrameMargin;
+	
+	pDock->iDecorationsWidth = pDock->iMaxDockWidth;
+	pDock->iDecorationsHeight = pDock->iMaxIconHeight + 2 * g_iFrameMargin;
+	
+	pDock->iMinDockWidth = pDock->iFlatDockWidth + 2 * g_iDockRadius + 2 * g_iFrameMargin + g_iDockLineWidth;
+	pDock->iMinDockHeight = pDock->iMaxIconHeight + 2 * g_iFrameMargin + 2 * g_iDockLineWidth;
 }
 
+#define CAIRO_DOCK_VERTICAL_GAP_ON_ELLIPSE_FOR_CAROUSSEL 10
 void cairo_dock_calculate_max_dock_size_caroussel (CairoDock *pDock)
 {
-	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest_linear (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
-	pDock->iMaxDockWidth = ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth) / 2) + 1;
+	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest_linear (pDock->icons, pDock->iFlatDockWidth, pDock->iScrollOffset);
+	pDock->iMaxDockWidth = ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iFlatDockWidth, 0.5)) + 1;
 	pDock->iMaxDockWidth = MIN (pDock->iMaxDockWidth, g_iMaxAuthorizedWidth);
 	
-	pDock->iMaxDockHeight = (int) ((1 + g_fAmplitude) * pDock->iMaxIconHeight) + g_iLabelSize + g_iDockLineWidth + g_iFrameMargin;
+	int iEllipseHeight = (1 + g_fAmplitude) * pDock->iMaxIconHeight + CAIRO_DOCK_VERTICAL_GAP_ON_ELLIPSE_FOR_CAROUSSEL;  // le gap est a ajuster, pourrait etre negatif meme.
+	pDock->iMaxDockHeight = g_iDockLineWidth + g_iFrameMargin + iEllipseHeight + pDock->iMaxIconHeight;  // de bas en haut;
+	pDock->iMaxDockHeight = MAX (pDock->iMaxDockHeight, g_iDockLineWidth + g_iFrameMargin + (1 + g_fAmplitude) * pDock->iMaxIconHeight + g_iLabelSize);
+	
+	pDock->iDecorationsWidth = pDock->iMaxDockWidth;
+	pDock->iDecorationsHeight = iEllipseHeight + 2 * g_iFrameMargin;
+	
+	pDock->iMinDockWidth = MIN (pDock->iMaxDockWidth, pDock->iFlatDockWidth + 2 * g_iDockRadius + 2 * g_iFrameMargin + g_iDockLineWidth);
+	pDock->iMinDockHeight = pDock->iMaxIconHeight + 2 * g_iFrameMargin + 2 * g_iDockLineWidth;
 }
 
 
@@ -1051,6 +1054,7 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, CairoDockIconTyp
 				{
 					icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
 					prev_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
+					g_print ("%s;%s\n", prev_icon->acName, icon->acName);
 				}
 			}
 			else if (pDock->iMouseX > icon->fDrawX + icon->fWidth * icon->fScale * (1 - fMargin))  // on est a droite.
@@ -1060,6 +1064,7 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, CairoDockIconTyp
 				{
 					icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
 					next_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
+					g_print ("%s;%s\n", icon->acName, next_icon->acName);
 				}
 				ic = cairo_dock_get_next_element (ic, pDock->icons);  // on la saute.
 				if (ic == pFirstDrawnElement)
@@ -1084,77 +1089,19 @@ void cairo_dock_stop_marking_icons (CairoDock *pDock, CairoDockIconType iType)
 {
 	if (pDock->icons == NULL)
 		return;
-	g_print ("%s (%d)\n", __func__, iType);
+	//g_print ("%s (%d)\n", __func__, iType);
 	
 	Icon *icon;
 	GList *ic;
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
-		if (icon->iType == iType && icon->iAnimationType > CAIRO_DOCK_NB_ANIMATIONS)
+		if ((icon->iType == iType || (icon->iType & 1)) && icon->iAnimationType > CAIRO_DOCK_NB_ANIMATIONS)
 		{
-			g_print ("stop marking\n");
 			icon->iAnimationType = 0;
 		}
 	}
 }
-/*void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, int iMouseX, CairoDockIconType iType)
-{
-	if (pDock->icons == NULL)
-		return;
-	int x_abs = iMouseX - (pDock->iCurrentWidth - pDock->iMinDockWidth) / 2;  // ecart par rapport a la gauche du dock minimal.
-	
-	Icon *icon;
-	GList *pFirstDrawnElement = (pDock->pFirstDrawnElement != NULL ? pDock->pFirstDrawnElement : pDock->icons);
-	GList *ic = pFirstDrawnElement;
-	do
-	{
-		icon = ic->data;
-		if (x_abs >= icon->fXAtRest && x_abs <= icon->fXAtRest + icon->fWidth && icon->iAnimationType != CAIRO_DOCK_FOLLOW_MOUSE)  // on n'utilise pas icon->bPointed, pour pouvoir remettre a zero.
-		{
-			icon->iAnimationType = 0;
-			
-			if (x_abs < icon->fXAtRest + icon->fWidth / 4)  // on est a gauche.
-			{
-				Icon *prev_icon;
-				if (ic->prev != NULL)
-					prev_icon = ic->prev->data;
-				else
-					prev_icon = g_list_last (pDock->icons)->data;
-				if ((icon->iType == iType || prev_icon->iType == iType) && prev_icon->iAnimationType != CAIRO_DOCK_FOLLOW_MOUSE)
-				{
-					icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
-					prev_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
-				}
-			}
-			else if (x_abs > icon->fXAtRest + 3. * icon->fWidth / 4)  // on est a droite.
-			{
-				Icon *next_icon;
-				if (ic->next != NULL)
-					next_icon = ic->next->data;
-				else
-					next_icon = pDock->icons->data;
-				if ((icon->iType == iType || next_icon->iType == iType) && next_icon->iAnimationType != CAIRO_DOCK_FOLLOW_MOUSE)
-				{
-					icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
-					next_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
-				}
-				ic = ic->next;  // on la saute.
-				if (ic == NULL)
-					ic = pDock->icons;
-				if (ic == pFirstDrawnElement)
-					break ;
-			}
-		}
-		///else if (icon->iAnimationType != CAIRO_DOCK_FOLLOW_MOUSE)
-		else if (icon->iAnimationType == CAIRO_DOCK_AVOID_MOUSE)
-			icon->iAnimationType = 0;
-		
-		ic = ic->next;
-		if (ic == NULL)
-			ic = pDock->icons;
-	} while (ic != pFirstDrawnElement);
-}*/
 
 
 

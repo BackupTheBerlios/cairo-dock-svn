@@ -48,6 +48,7 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 	*fWidth = 10;
 	*fHeight = 48;
 	
+	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	cairo_surface_t *pNewSurface = NULL;
 	if (g_cSeparatorImage != NULL)
 	{

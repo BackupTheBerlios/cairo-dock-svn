@@ -363,20 +363,20 @@ void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int
 		*bIsPerpendicular = (pDock->bHorizontalDock == CAIRO_DOCK_VERTICAL);
 		if (pDock->bHorizontalDock)
 		{
-			*bRight = (pIcon->fXAtRest > pDock->iMinDockWidth / 2);
+			*bRight = (pIcon->fXAtRest > pDock->iFlatDockWidth / 2);
 			*bDirectionUp = (pDock->iWindowPositionY > g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] / 2);
 			*iY = (*bDirectionUp ? pDock->iWindowPositionY : pDock->iWindowPositionY + pDock->iCurrentHeight);
 		}
 		else
 		{
 			*bRight = (pDock->iWindowPositionY < g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] / 2);
-			*bDirectionUp = (pIcon->fXAtRest > pDock->iMinDockWidth / 2);
+			*bDirectionUp = (pIcon->fXAtRest > pDock->iFlatDockWidth / 2);
 			*iY = (! (*bRight) ? pDock->iWindowPositionY : pDock->iWindowPositionY + pDock->iCurrentHeight);
 		}
 		
 		if (g_bAutoHide)
 		{
-			*iX = pDock->iWindowPositionX + (pIcon->fXAtRest + pIcon->fWidth * (*bRight ? .7 : .3)) / pDock->iMinDockWidth * g_iVisibleZoneWidth;
+			*iX = pDock->iWindowPositionX + (pIcon->fXAtRest + pIcon->fWidth * (*bRight ? .7 : .3)) / pDock->iFlatDockWidth * g_iVisibleZoneWidth;
 		}
 		else
 		{
@@ -394,14 +394,14 @@ void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int
 		*bIsPerpendicular = (pDock->bHorizontalDock == CAIRO_DOCK_VERTICAL);
 		if (pDock->bHorizontalDock)
 		{
-			*bRight = (pIcon->fXAtRest > pDock->iMinDockWidth / 2);
+			*bRight = (pIcon->fXAtRest > pDock->iFlatDockWidth / 2);
 			*bDirectionUp = (pDock->iWindowPositionY > g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] / 2);
 			*iY = (*bDirectionUp ? pDock->iWindowPositionY : pDock->iWindowPositionY + pDock->iCurrentHeight);
 		}
 		else
 		{
 			*bRight = (pDock->iWindowPositionY < g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] / 2);
-			*bDirectionUp = (pIcon->fXAtRest > pDock->iMinDockWidth / 2);
+			*bDirectionUp = (pIcon->fXAtRest > pDock->iFlatDockWidth / 2);
 			*iY = (! (*bRight) ? pDock->iWindowPositionY : pDock->iWindowPositionY + pDock->iCurrentHeight);
 		}
 		*iX = pDock->iWindowPositionX + pIcon->fDrawX + pIcon->fWidth * pIcon->fScale * (*bRight ? .7 : .3);

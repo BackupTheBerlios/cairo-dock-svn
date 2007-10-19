@@ -138,7 +138,7 @@ cairo_surface_t *g_pBackgroundSurface[2] = {NULL, NULL};  // surface associee a 
 cairo_surface_t *g_pBackgroundSurfaceFull[2] = {NULL, NULL};  // surface associee aux decorations, de 2 fois la taille de la fenetre.
 gboolean g_bDecorationsFollowMouse;  // dis si les decorations sont asservies au curseur, ou si le delta de deplacement ne depend que de la direction de celui-ci.
 
-int g_iIconGap = 0;  // ecart en pixels entre les icones (pour l'instant une valeur > 0 cree des decalages intempestifs).
+int g_iIconGap;  // ecart en pixels entre les icones.
 int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];  // les tailles min et max pour chaque type d'icone.
 int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 int g_tAnimationType[CAIRO_DOCK_NB_TYPES];  // le type de l'animation pour chaque type d'icone.
@@ -320,9 +320,6 @@ main (int argc, char** argv)
 		erreur = NULL;
 	}
 	
-	//\___________________ On cree le dock principal.
-	g_pMainDock = cairo_dock_create_new_dock (g_iWmHint, CAIRO_DOCK_MAIN_DOCK_NAME);
-	g_pMainDock->bIsMainDock = TRUE;
 	
 	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
 	g_cCairoDockDataDir = g_strdup_printf ("%s/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR);

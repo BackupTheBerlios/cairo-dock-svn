@@ -267,7 +267,7 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 	else
 		pDock->bHorizontalDock = g_pMainDock->bHorizontalDock;
 	
-	pDock->iMinDockWidth = - g_iIconGap;
+	pDock->iFlatDockWidth = - g_iIconGap;
 	pDock->iMaxIconHeight = 0;
 	
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
@@ -283,7 +283,7 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 		cairo_dock_fill_one_icon_buffer (icon, pCairoContext, fMaxScale, pDock->bHorizontalDock);
 		icon->fWidth *= fRatio;
 		icon->fHeight *= fRatio;
-		pDock->iMinDockWidth += g_iIconGap + icon->fWidth;
+		pDock->iFlatDockWidth += g_iIconGap + icon->fWidth;
 		pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, icon->fHeight);
 		
 		cairo_dock_fill_one_text_buffer (icon, pCairoContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
@@ -292,13 +292,9 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 	
 	if (! pDock->bIsMainDock)  // on le fait pas pour le dock principal, ce sera fait a la fin de la fonction 'read_conf'.
 	{
-		pDock->iCurrentWidth = pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth;
-		pDock->iCurrentHeight= pDock->iMaxIconHeight + 2 * g_iDockLineWidth;
-		cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
-		//pDock->iMouseX = 0;  // utile ?
-		//pDock->iMouseY = 0;
-		//pDock->calculate_icons (pDock);
-		//cairo_dock_apply_wave_effect (pDock);  // utile ? faudrait alors appeler un gtk_widget_queue_draw, mais il l'est deja par le redimensionnent non ?
+		///pDock->iCurrentWidth = pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth;
+		///pDock->iCurrentHeight= pDock->iMaxIconHeight + 2 * g_iDockLineWidth;
+		cairo_dock_update_dock_size (pDock);
 	}
 }
 void cairo_dock_reload_buffers_in_all_dock (GHashTable *hDocksTable)
@@ -328,6 +324,7 @@ gchar *cairo_dock_generate_file_path (gchar *cImageFile)
 cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFile, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern)
 {
 	//g_print ("%s (%dx%d)\n", __func__, image_width, image_height);
+	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	cairo_surface_t *pNewSurface = NULL;
 	
 	if (cImageFile != NULL)
@@ -370,6 +367,7 @@ void cairo_dock_load_visible_zone (CairoDock *pDock, gchar *cVisibleZoneImageFil
 
 cairo_surface_t *cairo_dock_load_stripes (cairo_t* pSourceContext, int iStripesWidth, int iStripesHeight, double fRotationAngle)
 {
+	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	cairo_pattern_t *pStripesPattern;
 	double fWidth = (g_iNbStripes > 0 ? 200. : iStripesWidth);
 	if (fabs (g_fStripesAngle) != 90)
@@ -473,13 +471,11 @@ cairo_surface_t *cairo_dock_load_stripes (cairo_t* pSourceContext, int iStripesW
 
 
 
-void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, int iNewMaxDockWidth, int iNewMaxIconHeight, double fRotationAngle)
+void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, int iNewDecorationsWidth, int iNewDecorationsHeight)
 {
-	if (2 * iNewMaxDockWidth > g_fBackgroundImageWidth || iNewMaxIconHeight + 2 * g_iFrameMargin > g_fBackgroundImageHeight)
+	//g_print ("%s (%dx%d)\n", __func__, iNewDecorationsWidth, iNewDecorationsHeight);
+	if (2 * iNewDecorationsWidth > g_fBackgroundImageWidth || iNewDecorationsHeight > g_fBackgroundImageHeight)
 	{
-		int iDecorationsWidth = MAX (iDecorationsWidth, iNewMaxDockWidth);
-		int iDecorationsHeight = MAX (iDecorationsHeight, iNewMaxIconHeight + 2 * g_iFrameMargin);
-		
 		cairo_surface_destroy (g_pBackgroundSurface[0]);
 		g_pBackgroundSurface[0] = NULL;
 		cairo_surface_destroy (g_pBackgroundSurface[1]);
@@ -494,8 +490,8 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 		{
 			if (g_bBackgroundImageRepeat)
 			{
-				g_fBackgroundImageWidth = 2 * iDecorationsWidth;
-				g_fBackgroundImageHeight = iDecorationsHeight;
+				g_fBackgroundImageWidth = 2 * iNewDecorationsWidth;
+				g_fBackgroundImageHeight = iNewDecorationsHeight;
 				g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL] = cairo_dock_load_image (pCairoContext,
 					g_cBackgroundImageFile,
 					&g_fBackgroundImageWidth,
@@ -509,7 +505,7 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 			else if (g_fBackgroundImageWidth == 0 || g_fBackgroundImageHeight == 0)
 			{
 				g_fBackgroundImageWidth = 0;
-				g_fBackgroundImageHeight = iDecorationsHeight;
+				g_fBackgroundImageHeight = iNewDecorationsHeight;
 				g_pBackgroundSurface[CAIRO_DOCK_HORIZONTAL] = cairo_dock_load_image (pCairoContext,
 					g_cBackgroundImageFile,
 					&g_fBackgroundImageWidth,
@@ -523,8 +519,8 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 		}
 		else
 		{
-			g_fBackgroundImageWidth = 2 * iDecorationsWidth;
-			g_fBackgroundImageHeight = iDecorationsHeight;
+			g_fBackgroundImageWidth = 2 * iNewDecorationsWidth;
+			g_fBackgroundImageHeight = iNewDecorationsHeight;
 			g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL] = cairo_dock_load_stripes (pCairoContext, g_fBackgroundImageWidth, g_fBackgroundImageHeight, 0);  // (pDock->bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2))
 			
 			g_pBackgroundSurfaceFull[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL], pCairoContext, g_fBackgroundImageWidth, g_fBackgroundImageHeight, (g_bDirectionUp ? -G_PI/2 : G_PI/2));
@@ -534,20 +530,19 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 	}
 }
 
-static void _cairo_dock_search_max_docks_size (gchar *cDockName, CairoDock *pDock, int *data)
+static void _cairo_dock_search_max_decorations_size (gchar *cDockName, CairoDock *pDock, int *data)
 {
-	if (pDock->iMaxDockWidth > data[0])
-		data[0] = pDock->iMaxDockWidth;
-	if (pDock->iMaxIconHeight > data[1])
-		data[1] = pDock->iMaxIconHeight;
+	if (pDock->iDecorationsWidth > data[0])
+		data[0] = pDock->iDecorationsWidth;
+	if (pDock->iDecorationsHeight > data[1])
+		data[1] = pDock->iDecorationsHeight;
 }
 void cairo_dock_load_background_decorations (CairoDock *pDock)
 {
-	int iMaxDocksWidth = 0, iMaxIconsHeight = 0;
-	int data[2] = {0, 0};  // iMaxDocksWidth, iMaxIconsHeight.
-	g_hash_table_foreach (g_hDocksTable, (GHFunc) _cairo_dock_search_max_docks_size, &data);
+	int data[2] = {0, 0};
+	g_hash_table_foreach (g_hDocksTable, (GHFunc) _cairo_dock_search_max_decorations_size, &data);
 	
 	g_fBackgroundImageWidth = 0;
 	g_fBackgroundImageHeight = 0;
-	cairo_dock_update_background_decorations_if_necessary (pDock, data[0], data[1], (pDock->bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)));
+	cairo_dock_update_background_decorations_if_necessary (pDock, data[0], data[1]);
 }

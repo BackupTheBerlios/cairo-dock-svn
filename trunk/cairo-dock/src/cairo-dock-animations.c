@@ -127,10 +127,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 			}
 			pDock->iScrollOffset = 0;
 			
-			//pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
-			//pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
 			pDock->calculate_max_dock_size (pDock);
-			//cairo_dock_calculate_max_dock_size_generic (pDock);
 			pDock->fFoldingFactor = g_fUnfoldAcceleration;
 		}
 		
@@ -222,7 +219,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 	if (pDock->iScrollOffset != 0 && g_bResetScrollOnLeave)
 	{
 		//g_print ("iScrollOffset : %d\n", pDock->iScrollOffset);
-		if (pDock->iScrollOffset < pDock->iMinDockWidth / 2)
+		if (pDock->iScrollOffset < pDock->iFlatDockWidth / 2)
 		{
 			//pDock->iScrollOffset = pDock->iScrollOffset * g_fScrollAcceleration;
 			pDock->iScrollOffset -= MAX (2, ceil (pDock->iScrollOffset * (1 - g_fScrollAcceleration)));
@@ -231,20 +228,14 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 		}
 		else
 		{
-			pDock->iScrollOffset += MAX (2, ceil ((pDock->iMinDockWidth - pDock->iScrollOffset) * (1 - g_fScrollAcceleration)));
-			if (pDock->iScrollOffset > pDock->iMinDockWidth)
+			pDock->iScrollOffset += MAX (2, ceil ((pDock->iFlatDockWidth - pDock->iScrollOffset) * (1 - g_fScrollAcceleration)));
+			if (pDock->iScrollOffset > pDock->iFlatDockWidth)
 				pDock->iScrollOffset = 0;
 		}
-		//if (pDock->iScrollOffset < 5 || pDock->iMinDockWidth - pDock->iScrollOffset < 5)
-		//	pDock->iScrollOffset = 0;
-		//pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest (pDock->icons, pDock->iMinDockWidth, pDock->iScrollOffset);
-		//pDock->iMaxDockWidth = (int) ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iMinDockWidth)) + 1;
-		//cairo_dock_calculate_max_dock_size_generic (pDock);
 		pDock->calculate_max_dock_size (pDock);
 	}
 	
 	pDock->calculate_icons (pDock);
-	//cairo_dock_apply_wave_effect (pDock);
 	gtk_widget_queue_draw (pDock->pWidget);
 	
 	if (pDock->iMagnitudeIndex == 0)
@@ -310,7 +301,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 						return FALSE;
 					}
 				}
-				cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+				cairo_dock_update_dock_size (pDock);
 				cairo_dock_free_icon (pRemovingIcon);
 			}
 			else if (pRemovingIcon->fPersonnalScale == -0.05)

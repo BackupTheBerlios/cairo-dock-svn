@@ -713,7 +713,7 @@ void cairo_dock_show_all_applis (CairoDock *pDock)
 		}
 	}
 	
-	cairo_dock_update_dock_size (pDock, pDock->iMaxIconHeight, pDock->iMinDockWidth);
+	cairo_dock_update_dock_size (pDock);
 	g_iSidUpdateAppliList = g_timeout_add (CAIRO_DOCK_TASKBAR_CHECK_INTERVAL, (GSourceFunc) cairo_dock_update_applis_list, (gpointer) pDock);  // un g_idle_add () consomme 90% de CPU ! :-/
 }
 

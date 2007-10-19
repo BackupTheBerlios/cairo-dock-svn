@@ -54,6 +54,7 @@ extern gboolean g_bUseGlitz;
 cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuffer, int iBufferNbElements, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
 {
 	//g_print ("%s (%d)\n", __func__, iBufferNbElements);
+	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	int iNbChannels = 4;
 	
 	//\____________________ On recupere la plus grosse des icones presentes dans le tampon (meilleur rendu).
@@ -126,6 +127,8 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 
 cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
 {
+	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
+	
 	Atom aNetWmIcon = XInternAtom (g_XDisplay, "_NET_WM_ICON", False);
 	Atom aReturnedType = 0;
 	int aReturnedFormat = 0;
@@ -226,26 +229,32 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	else
 	{
 		//g_print (" pas de type defini -> elle degage\n");
-		return NULL;
+		///return NULL;
 	}
 	
 	//\__________________ On recupere son nom.
-	Atom aNetWmName = XInternAtom (g_XDisplay, "_NET_WM_NAME", False);  // _NET_WM_CLASS marche pas :-(
+	Atom aNetWmName = XInternAtom (g_XDisplay, "_NET_WM_NAME", False);
 	Atom aUtf8String = XInternAtom (g_XDisplay, "UTF8_STRING", False);
 	XGetWindowProperty (g_XDisplay, Xid, aNetWmName, 0, G_MAXULONG, False, aUtf8String, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
+	if (iBufferNbElements == 0)
+	{
+		Atom aWmName = XInternAtom (g_XDisplay, "WM_NAME", False);
+		Atom aString = XInternAtom (g_XDisplay, "STRING", False);
+		XGetWindowProperty (g_XDisplay, Xid, aWmName, 0, G_MAXULONG, False, aString, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
+	}
 	if (iBufferNbElements == 0)
 	{
 		if (g_bUniquePid)
 			g_hash_table_insert (g_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
 		return NULL;
 	}
-	//g_print ("ajout de %s\n", pNameBuffer);
+	g_print ("ajout de %s\n", pNameBuffer);
 	
 	//\__________________ On recupere son icone.
 	pNewSurface = cairo_dock_create_surface_from_xwindow (Xid, pSourceContext, 1 + g_fAmplitude, &fWidth, &fHeight);
 	if (pNewSurface == NULL)
 	{
-		//g_print ("pas d'icones\n");
+		g_print ("pas d'icone\n");
 		XFree (pNameBuffer);
 		if (g_bUniquePid)
 			g_hash_table_insert (g_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
@@ -265,7 +274,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	icon->fWidth = fWidth;
 	icon->fHeight = fHeight;
 	icon->pIconBuffer = pNewSurface;
-	icon->bIsMapped = TRUE;  // si elle n'est pas visible, le 2eme UnmapNotify sera juste ignore.
+	icon->bIsMapped = TRUE;  // si elle n'est en fait pas visible, le 2eme UnmapNotify sera juste ignore.
 	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 	
 	if (g_bUniquePid)
@@ -295,7 +304,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 		{
 			icon->cParentDockName = g_strdup (icon->cClass);
 			
-			if (cairo_dock_search_dock_from_name (icon->cClass) == NULL)  // alors il faut creer le sous-dock, et on decide de  l'associer a pSameClassIcon.
+			if (cairo_dock_search_dock_from_name (icon->cClass) == NULL)  // alors il faut creer le sous-dock, et on decide de l'associer a pSameClassIcon.
 			{
 				g_print ("  creation du dock pour la classe %s\n", icon->cClass);
 				pSameClassIcon->pSubDock = cairo_dock_create_subdock_from_scratch (NULL, icon->cClass);
