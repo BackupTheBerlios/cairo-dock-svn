@@ -1,6 +1,6 @@
 /***********************************************************************************
 
-This file is a part of the cairo-dock program, 
+This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
 Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
@@ -12,6 +12,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 #include "cairo-dock-applet-factory.h"
 #include "cairo-dock-config.h"
+#include "cairo-dock-keyfile-manager.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-themes-manager.h"
 

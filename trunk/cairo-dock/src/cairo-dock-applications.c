@@ -36,6 +36,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #define CAIRO_DOCK_TASKBAR_CHECK_INTERVAL 350
 
 extern gboolean g_bAutoHide;
+extern double g_fAmplitude;
 
 extern int g_iScreenWidth[2], g_iScreenHeight[2];
 extern gboolean g_bDirectionUp;
@@ -759,17 +760,16 @@ static void _cairo_dock_set_one_icon_geometry_for_appli (int Xid, int iX, int iY
 		XInternAtom (g_XDisplay, "_NET_WM_ICON_GEOMETRY", False),
 		XA_CARDINAL, 32, PropModeReplace,
 		(guchar *) iIconGeometry, 4);
-	///x y widht height
 }
 void cairo_dock_set_one_icon_geometry_for_window_manager (Icon *icon, CairoDock *pDock)
 {
 	if (CAIRO_DOCK_IS_VALID_APPLI (icon))
 	{
 		int iX, iY, iWidth, iHeight;
-		iX = pDock->iWindowPositionX + icon->fXAtRest;
-		iY = pDock->iWindowPositionY + (g_bDirectionUp ? pDock->iCurrentHeight : 0);  // il faudrait un fYAtRest ...
-		iWidth = icon->fWidth * icon->fScale;
-		iHeight = icon->fHeight * icon->fScale;
+		iX = pDock->iWindowPositionX + icon->fXAtRest + (pDock->iCurrentWidth - pDock->iFlatDockWidth) / 2;
+		iY = pDock->iWindowPositionY + icon->fDrawY - icon->fHeight * g_fAmplitude;  // il faudrait un fYAtRest ...
+		iWidth = icon->fWidth;
+		iHeight = icon->fHeight * (1 + 2 * g_fAmplitude);  // on elargit en haut et en bas, pour gerer les cas ou l'icone grossirait vers le haut ou vers le bas.
 		
 		if (pDock->bHorizontalDock)
 			_cairo_dock_set_one_icon_geometry_for_appli (icon->Xid, iX, iY, iWidth, iHeight);

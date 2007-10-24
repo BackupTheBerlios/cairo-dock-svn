@@ -41,6 +41,15 @@ typedef void (*CairoDockRenderFunc) (CairoDock *pDock);
 typedef void (*CairoDockRenderOptimizedFunc) (CairoDock *pDock, GdkRectangle *pArea);
 typedef void (*CairoDockSetSubDockPositionFunc) (Icon *pPointedIcon, CairoDock *pParentDock);
 
+typedef struct _CairoDockRenderer {
+	CairoDockCalculateMaxDockSizeFunc calculate_max_dock_size;
+	CairoDockCalculateIconsFunc calculate_icons;
+	CairoDockRenderFunc render;
+	CairoDockRenderOptimizedFunc render_optimized;
+	CairoDockSetSubDockPositionFunc set_subdock_position;
+	} CairoDockRenderer;
+
+
 struct _CairoDock {
 	GList* icons;  // la liste de ses icones.
 	GtkWidget *pWidget;  // sa fenetre de dessin.

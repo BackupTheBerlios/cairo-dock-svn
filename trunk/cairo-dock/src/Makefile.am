@@ -76,7 +76,9 @@ cairo_dock_SOURCES = \
 	cairo-dock-notifications.c\
 	cairo-dock-notifications.h\
 	cairo-dock-dialogs.c\
-	cairo-dock-dialogs.h
+	cairo-dock-dialogs.h\
+	cairo-dock-gui-factory.c\
+	cairo-dock-gui-factory.h
 	
 
 cairo_dockincludedir =\
@@ -109,4 +111,5 @@ cairo_docksubinclude_HEADERS =\
 	cairo-dock-themes-manager.h\
 	cairo-dock-animations.h\
 	cairo-dock-notifications.h\
-	cairo-dock-dialogs.h
+	cairo-dock-dialogs.h\
+	cairo-dock-gui-factory.h

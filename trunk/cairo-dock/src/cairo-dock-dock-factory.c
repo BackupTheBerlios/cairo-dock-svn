@@ -181,16 +181,16 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 	gtk_window_set_resizable (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_title (GTK_WINDOW (pWindow), "cairo-dock");
 	
-	pDock->calculate_max_dock_size = cairo_dock_calculate_max_dock_size_caroussel;
+	/*pDock->calculate_max_dock_size = cairo_dock_calculate_max_dock_size_caroussel;
 	pDock->calculate_icons = cairo_dock_apply_wave_effect;
 	pDock->render = cairo_dock_render_caroussel;
 	pDock->set_subdock_position = cairo_dock_set_subdock_position_caroussel;
-	pDock->render_optimized = NULL;
-	/*pDock->calculate_max_dock_size = cairo_dock_calculate_max_dock_size_linear;
+	pDock->render_optimized = NULL;*/
+	pDock->calculate_max_dock_size = cairo_dock_calculate_max_dock_size_linear;
 	pDock->calculate_icons = cairo_dock_apply_wave_effect;
 	pDock->render = cairo_dock_render_linear;
 	pDock->set_subdock_position = cairo_dock_set_subdock_position_linear;
-	pDock->render_optimized = cairo_dock_render_optimized_linear;*/
+	pDock->render_optimized = cairo_dock_render_optimized_linear;
 	
 	gtk_widget_add_events (pWindow,
 		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | 
@@ -760,9 +760,9 @@ void cairo_dock_reference_dock (CairoDock *pChildDock)
 }
 
 
-CairoDock *cairo_dock_create_subdock_from_scratch (GList *pIconList, gchar *cDockName)
+CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, gchar *cDockName, int iWindowTypeHint)
 {
-	CairoDock *pSubDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, cDockName);
+	CairoDock *pSubDock = cairo_dock_create_new_dock (iWindowTypeHint, cDockName);
 	cairo_dock_reference_dock (pSubDock);  // on le fait tout de suite pour avoir la bonne reference avant le 'load'.
 	
 	pSubDock->icons = pIconList;
@@ -775,4 +775,3 @@ CairoDock *cairo_dock_create_subdock_from_scratch (GList *pIconList, gchar *cDoc
 	
 	return pSubDock;
 }
-

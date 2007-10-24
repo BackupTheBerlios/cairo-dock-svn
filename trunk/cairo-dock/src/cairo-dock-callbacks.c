@@ -426,8 +426,6 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 		pDock->bAtBottom = TRUE;
 	}
 	
-	cairo_dock_set_icons_geometry_for_window_manager (pDock);
-	
 	pDock->fDecorationsOffsetX = 0;
 	if (pDock->iSidShrinkDown == 0)  // on commence a faire diminuer la taille des icones.
 		pDock->iSidShrinkDown = g_timeout_add (40, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
@@ -538,8 +536,6 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	}*/
 	
 	cairo_dock_replace_all_dialogs ();
-	
-	cairo_dock_set_icons_geometry_for_window_manager (pDock);
 	
 	if (g_bAutoHide && pDock->iRefCount == 0)
 	{
@@ -1085,10 +1081,7 @@ gboolean on_configure (GtkWidget* pWidget,
 		if (pDock->iMouseX < 0 || pDock->iMouseX > pDock->iCurrentWidth)  // utile ?
 			pDock->iMouseX = 0;
 		
-		//cairo_dock_apply_wave_effect (pDock);
 		pDock->calculate_icons (pDock);
-		///if (gdk_window_is_visible (pWidget->window))
-		///	gtk_window_present (GTK_WINDOW (pWidget));
 		gtk_widget_queue_draw (pWidget);
 #ifdef HAVE_GLITZ
 		if (pDock->pGlitzDrawable)

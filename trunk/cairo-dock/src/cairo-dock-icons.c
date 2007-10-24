@@ -27,6 +27,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-draw.h"
 #include "cairo-dock-animations.h"
 #include "cairo-dock-config.h"
+#include "cairo-dock-keyfile-manager.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-callbacks.h"
 #include "cairo-dock-dock-factory.h"

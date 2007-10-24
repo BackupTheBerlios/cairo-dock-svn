@@ -1,7 +1,6 @@
 #ifndef __CAIRO_DOCK_H__
 #define __CAIRO_DOCK_H__
 
-
 #include "cairo-dock-struct.h"
 #include "cairo-dock-callbacks.h"
 #include "cairo-dock-draw.h"
@@ -22,5 +21,7 @@
 #include "cairo-dock-animations.h"
 #include "cairo-dock-notifications.h"
 #include "cairo-dock-dialogs.h"
+#include "cairo-dock-keyfile-manager.h"
+#include "cairo-dock-gui-factory.h"
 
 #endif

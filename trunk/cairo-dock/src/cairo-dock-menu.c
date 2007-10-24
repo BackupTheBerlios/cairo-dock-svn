@@ -42,6 +42,11 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-notifications.h"
 #include "cairo-dock-menu.h"
 
+#define CAIRO_DOCK_CONF_PANEL_WIDTH 800
+#define CAIRO_DOCK_CONF_PANEL_HEIGHT 600
+#define CAIRO_DOCK_LAUNCHER_PANEL_WIDTH 350
+#define CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT 550
+
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
 extern gchar *g_cLanguage;
@@ -49,13 +54,7 @@ extern gchar *g_cLanguage;
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentLaunchersPath;
 
-
-extern gboolean g_bDirectionUp;
-
-extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern GHashTable *g_hModuleTable;
-
-extern gboolean g_bUseGlitz;
 
 
 static void cairo_dock_edit_and_reload_appearance (GtkMenuItem *menu_item, gpointer *data)
@@ -63,36 +62,24 @@ static void cairo_dock_edit_and_reload_appearance (GtkMenuItem *menu_item, gpoin
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Appearance", 400, 600, '+', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
-	/*if (config_ok)
-	{
-		cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
-	}*/
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Appearance", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '+', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
 }
 static void cairo_dock_edit_and_reload_behaviour (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Behaviour", 400, 600, '-', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
-	/*if (config_ok)
-	{
-		cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
-	}*/
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Behaviour", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '-', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
 }
 static void cairo_dock_edit_and_reload_conf (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", 400, 600, 0, NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
-	/*if (config_ok)
-	{
-		cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);
-	}*/
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
 }
 
-static void cairo_dock_initiate_theme_management(GtkMenuItem *menu_item, gpointer *data)
+static void cairo_dock_initiate_theme_management (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
@@ -152,7 +139,13 @@ static void cairo_dock_help (GtkMenuItem *menu_item, gpointer *data)
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
 	
-	system ("firefox http://doc.ubuntu-fr.org/gnome_dock");
+	GError *erreur = NULL;
+	g_spawn_command_line_async ("firefox http://doc.ubuntu-fr.org/gnome_dock", &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n  you can consult the wiki at http://doc.ubuntu-fr.org/gnome_dock\n", erreur->message);
+		g_error_free (erreur);
+	}
 }
 
 static void cairo_dock_quit (GtkMenuItem *menu_item, gpointer *data)
@@ -240,7 +233,7 @@ static void cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data)
 	
 	//\___________________ On ouvre automatiquement l'IHM pour permettre de modifier ses champs.
 	gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, cNewDesktopFileName);
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cNewDesktopFilePath, "Fill this launcher", 300, 400, 0, NULL, NULL, NULL, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cNewDesktopFilePath, "Fill this launcher", CAIRO_DOCK_LAUNCHER_PANEL_WIDTH, CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT, 0, NULL, NULL, NULL, NULL);
 	if (config_ok)
 	{
 		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
@@ -345,7 +338,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	
 	cairo_dock_update_launcher_desktop_file (cDesktopFilePath, g_cLanguage);
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", 300, 400, 0, NULL, NULL, NULL, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", CAIRO_DOCK_LAUNCHER_PANEL_WIDTH, CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT, 0, NULL, NULL, NULL, NULL);
 	g_free (cDesktopFilePath);
 	
 	if (! pDock->bInside)

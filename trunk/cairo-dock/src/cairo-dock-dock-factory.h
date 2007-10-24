@@ -32,6 +32,8 @@ void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *Rec
 
 void cairo_dock_reference_dock (CairoDock *pChildDock);
 
-CairoDock *cairo_dock_create_subdock_from_scratch (GList *pIconList, gchar *cDockName);
+CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, gchar *cDockName, int iWindowTypeHint);
+#define cairo_dock_create_subdock_from_scratch(pIconList, cDockName) cairo_dock_create_subdock_from_scratch_with_type (pIconList, cDockName, GDK_WINDOW_TYPE_HINT_MENU)
+#define cairo_dock_create_subdock_for_class_appli(cClassName) cairo_dock_create_subdock_from_scratch_with_type (NULL, cClassName, GDK_WINDOW_TYPE_HINT_DOCK)
 
 #endif
