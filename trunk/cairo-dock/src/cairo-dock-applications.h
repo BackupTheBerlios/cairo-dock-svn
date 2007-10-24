@@ -45,4 +45,8 @@ void cairo_dock_set_strut_partial (int Xid, int left, int right, int top, int bo
 void cairo_dock_set_window_type_hint (int Xid, gchar *cWindowTypeName);
 
 
+void cairo_dock_set_one_icon_geometry_for_window_manager (Icon *icon, CairoDock *pDock);
+void cairo_dock_set_icons_geometry_for_window_manager (CairoDock *pDock);
+
+
 #endif

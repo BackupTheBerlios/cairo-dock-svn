@@ -9,8 +9,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <math.h>
 #include <string.h>
 #include <cairo.h>
-#include <pango/pango.h>
-#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,9 +19,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
+#include <gdk/gdkx.h>
 
 #ifdef HAVE_GLITZ
-#include <gdk/gdkx.h>
 #include <glitz-glx.h>
 #include <cairo-glitz.h>
 #endif
@@ -31,6 +29,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-load.h"
 #include "cairo-dock-icons.h"
 #include "cairo-dock-dock-factory.h"
+#include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-application-factory.h"
 
 
@@ -94,7 +93,7 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 		(int) pXIconBuffer[iBestIndex] * iNbChannels);
 	
 	double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
-	cairo_dock_calculate_contrainted_icon_size (fWidth, 
+	cairo_dock_calculate_contrainted_icon_size (fWidth,
 		fHeight,
 		g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLI],
 		g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLI],
@@ -108,10 +107,6 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 		ceil (*fWidth * fMaxScale),
 		ceil (*fHeight * fMaxScale));
 	cairo_t *pCairoContext = cairo_create (pNewSurface);
-	/*cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
-	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
-	cairo_paint (pCairoContext);
-	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);*/
 	
 	cairo_scale (pCairoContext, fMaxScale * fIconWidthSaturationFactor, fMaxScale * fIconHeightSaturationFactor);
 	cairo_set_source_surface (pCairoContext, surface_ini, 0, 0);
@@ -142,8 +137,93 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 		XFree (pXIconBuffer);
 		return pNewSurface;
 	}
-	else
+	else  // sinon on tente avec l'icone eventuellement presente dans les WMHints.
 	{
+		XWMHints *pWMHints = XGetWMHints (g_XDisplay, Xid);
+		if (pWMHints == NULL)
+			return NULL;
+		
+		if (pWMHints->flags & IconWindowHint)
+		{
+			Window XIconID = pWMHints->icon_window;
+			g_print ("  pas de _NET_WM_ICON, mais une fenetre d'ID %d\n", XIconID);
+		}
+		else if (pWMHints->flags & IconPixmapHint)
+		{
+			Pixmap XPixmapID = pWMHints->icon_pixmap;
+			
+			//\__________________ On recupere ses dimensions.
+			Window root;  // inutile.
+			int x, y;  // inutile.
+			guint border_width;  // inutile.
+			guint iWidth, iHeight, iDepth;
+			XGetGeometry (g_XDisplay,
+				XPixmapID, &root, &x, &y,
+				&iWidth, &iHeight, &border_width, &iDepth);
+			g_print ("  pas de _NET_WM_ICON, mais un pixmap (ID:%d) de %dx%dx%d pixels (%d;%d)\n", XPixmapID, iWidth, iHeight, iDepth, x, y);
+			
+			//\__________________ On recupere le drawable associe.
+			GdkDrawable *pGdkDrawable = gdk_xid_table_lookup (XPixmapID);
+			if (pGdkDrawable)
+				g_object_ref (G_OBJECT (pGdkDrawable));
+			else
+				pGdkDrawable = gdk_pixmap_foreign_new (XPixmapID);
+			
+			//\__________________ On recupere la colormap.
+			GdkColormap* pColormap = gdk_drawable_get_colormap (pGdkDrawable);
+			if (pColormap == NULL)  // au pire on a un colormap nul.
+			{
+				GdkScreen* pScreen = gdk_screen_get_default ();  // ou sinon celui associe au widget du dock ...
+				pColormap = gdk_screen_get_rgba_colormap (pScreen);
+				if (pColormap == NULL)
+					pColormap = gdk_screen_get_rgb_colormap (pScreen);
+			}
+			
+			//\__________________ On recupere le buffer dans un GdkPixbuf.
+			GdkPixbuf *pIconPixbuf = gdk_pixbuf_get_from_drawable (NULL,
+				pGdkDrawable,
+				pColormap,
+				0,
+				0,
+				0,
+				0,
+				iWidth,
+				iHeight);
+			g_return_val_if_fail (pIconPixbuf != NULL, NULL);
+			
+			//\__________________ On lui ajoute un canal alpha si necessaire.
+			if (! gdk_pixbuf_get_has_alpha (pIconPixbuf))
+			{
+				GdkPixbuf *tmp_pixbuf = gdk_pixbuf_add_alpha (pIconPixbuf, FALSE, 255, 255, 255);
+				g_object_unref (pIconPixbuf);
+				pIconPixbuf = tmp_pixbuf;
+			}
+			
+			//\____________________ On lui applique le masque s'il existe.
+			if (pWMHints->flags & IconMaskHint)
+			{
+				Pixmap XPixmapMaskID = pWMHints->icon_mask;
+				guint iMaskWidth, iMaskHeight, iMaskDepth;
+				XGetGeometry (g_XDisplay,
+					XPixmapMaskID, &root, &x, &y,
+					&iMaskWidth, &iMaskHeight, &border_width, &iMaskDepth);
+				g_print ("  et aussi un masque (ID:%d) de taille %dx%d\n", XPixmapMaskID, iMaskWidth, iMaskHeight);
+				
+			}
+			
+			//\____________________ On cree la surface.
+			cairo_surface_t *pNewSurface = cairo_dock_create_surface_from_pixbuf (pIconPixbuf, pSourceContext, fMaxScale,
+				g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLI],
+				g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLI],
+				g_tMaxIconAuthorizedSize[CAIRO_DOCK_APPLI],
+				g_tMaxIconAuthorizedSize[CAIRO_DOCK_APPLI],
+				fWidth,
+				fHeight);
+			
+			g_object_unref (G_OBJECT (pGdkDrawable));
+			return pNewSurface;
+		}
+		XFree (pWMHints);
 		return NULL;
 	}
 }

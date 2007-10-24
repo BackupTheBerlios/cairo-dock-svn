@@ -10,6 +10,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #define  __CAIRO_DOCK_STRUCT__
 
 #include <glib.h>
+#include <gdk/gdk.h>
 #include <X11/Xlib.h>
 #include <gtk/gtk.h>
 #include <cairo.h>
@@ -33,9 +34,11 @@ typedef enum {
 	CAIRO_DOCK_HORIZONTAL
 	} CairoDockTypeHorizontality;
 
+
 typedef void (*CairoDockCalculateMaxDockSizeFunc) (CairoDock *pDock);
-typedef void (*CairoDockRenderFunc) (CairoDock *pDock);
 typedef Icon * (*CairoDockCalculateIconsFunc) (CairoDock *pDock);
+typedef void (*CairoDockRenderFunc) (CairoDock *pDock);
+typedef void (*CairoDockRenderOptimizedFunc) (CairoDock *pDock, GdkRectangle *pArea);
 typedef void (*CairoDockSetSubDockPositionFunc) (Icon *pPointedIcon, CairoDock *pParentDock);
 
 struct _CairoDock {
@@ -91,6 +94,7 @@ struct _CairoDock {
 	CairoDockCalculateMaxDockSizeFunc calculate_max_dock_size;
 	CairoDockCalculateIconsFunc calculate_icons;
 	CairoDockRenderFunc render;
+	CairoDockRenderOptimizedFunc render_optimized;
 	CairoDockSetSubDockPositionFunc set_subdock_position;
 	
 #ifdef HAVE_GLITZ

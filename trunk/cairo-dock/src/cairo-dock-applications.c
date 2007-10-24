@@ -38,6 +38,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 extern gboolean g_bAutoHide;
 
 extern int g_iScreenWidth[2], g_iScreenHeight[2];
+extern gboolean g_bDirectionUp;
 
 extern Display *g_XDisplay;
 extern Screen *g_XScreen;
@@ -744,4 +745,49 @@ void cairo_dock_set_window_type_hint (int Xid, gchar *cWindowTypeName)
 		XInternAtom (g_XDisplay, "_NET_WM_WINDOW_TYPE", False),
 		XA_ATOM, 32, PropModeReplace,
 		(guchar *) &iwindowType, 1);
+}
+
+
+static void _cairo_dock_set_one_icon_geometry_for_appli (int Xid, int iX, int iY, int iWidth, int iHeight)
+{
+	g_return_if_fail (Xid > 0);
+	
+	gulong iIconGeometry[4] = {iX, iY, iWidth, iHeight};
+	
+	XChangeProperty (g_XDisplay,
+		Xid,
+		XInternAtom (g_XDisplay, "_NET_WM_ICON_GEOMETRY", False),
+		XA_CARDINAL, 32, PropModeReplace,
+		(guchar *) iIconGeometry, 4);
+	///x y widht height
+}
+void cairo_dock_set_one_icon_geometry_for_window_manager (Icon *icon, CairoDock *pDock)
+{
+	if (CAIRO_DOCK_IS_VALID_APPLI (icon))
+	{
+		int iX, iY, iWidth, iHeight;
+		iX = pDock->iWindowPositionX + icon->fXAtRest;
+		iY = pDock->iWindowPositionY + (g_bDirectionUp ? pDock->iCurrentHeight : 0);  // il faudrait un fYAtRest ...
+		iWidth = icon->fWidth * icon->fScale;
+		iHeight = icon->fHeight * icon->fScale;
+		
+		if (pDock->bHorizontalDock)
+			_cairo_dock_set_one_icon_geometry_for_appli (icon->Xid, iX, iY, iWidth, iHeight);
+		else
+			_cairo_dock_set_one_icon_geometry_for_appli (icon->Xid, iY, iX, iHeight, iWidth);
+	}
+}
+void cairo_dock_set_icons_geometry_for_window_manager (CairoDock *pDock)
+{
+	if (g_iSidUpdateAppliList <= 0)
+		return ;
+	
+	Icon *icon;
+	GList *ic;
+	for (ic = pDock->icons; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (CAIRO_DOCK_IS_VALID_APPLI (icon))
+			cairo_dock_set_one_icon_geometry_for_window_manager (icon, pDock);
+	}
 }

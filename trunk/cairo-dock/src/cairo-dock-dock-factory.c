@@ -44,7 +44,6 @@ extern double g_fSubDockSizeRatio;
 extern gboolean g_bReserveSpace;
 
 extern int g_iMaxAuthorizedWidth;
-extern gboolean g_bForceLoop;
 extern gint g_iDockLineWidth;
 extern int g_iIconGap;
 extern double g_fAmplitude;
@@ -182,14 +181,16 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 	gtk_window_set_resizable (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_title (GTK_WINDOW (pWindow), "cairo-dock");
 	
-	/*pDock->calculate_max_dock_size = cairo_dock_calculate_max_dock_size_caroussel;
+	pDock->calculate_max_dock_size = cairo_dock_calculate_max_dock_size_caroussel;
 	pDock->calculate_icons = cairo_dock_apply_wave_effect;
 	pDock->render = cairo_dock_render_caroussel;
-	pDock->set_subdock_position = cairo_dock_set_subdock_position_caroussel;*/
-	pDock->calculate_max_dock_size = cairo_dock_calculate_max_dock_size_linear;
+	pDock->set_subdock_position = cairo_dock_set_subdock_position_caroussel;
+	pDock->render_optimized = NULL;
+	/*pDock->calculate_max_dock_size = cairo_dock_calculate_max_dock_size_linear;
 	pDock->calculate_icons = cairo_dock_apply_wave_effect;
 	pDock->render = cairo_dock_render_linear;
 	pDock->set_subdock_position = cairo_dock_set_subdock_position_linear;
+	pDock->render_optimized = cairo_dock_render_optimized_linear;*/
 	
 	gtk_widget_add_events (pWindow,
 		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | 
@@ -433,9 +434,8 @@ void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
 
 void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et iFlatDockWidth doivent avoir ete mis a jour au prealable.
 {
-	//g_print ("%s ()\n", __func__);
+	g_print ("%s ()\n", __func__);
 	pDock->calculate_max_dock_size (pDock);
-	int iNewMaxWidth = (g_bForceLoop && pDock->iRefCount == 0 ? pDock->iMaxDockWidth / 2 : MIN (g_iMaxAuthorizedWidth, pDock->iMaxDockWidth));
 	
 	if (! pDock->bInside && (g_bAutoHide && pDock->iRefCount == 0))
 		return;
@@ -443,20 +443,28 @@ void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et iFlatD
 	{
 		int iNewWidth, iNewHeight;
 		cairo_dock_get_window_position_and_geometry_at_balance (pDock, (pDock->bInside ? CAIRO_DOCK_MAX_SIZE : CAIRO_DOCK_NORMAL_SIZE), &iNewWidth, &iNewHeight);  // inutile de recalculer Y mais bon...
-		//g_print ("%s () -> %dx%d\n", __func__, g_iMaxDockWidth, g_iMaxDockHeight);
+		
 		if (pDock->bHorizontalDock)
-			gdk_window_move_resize (pDock->pWidget->window,
-				pDock->iWindowPositionX,
-				pDock->iWindowPositionY,
-				iNewWidth,
-				iNewHeight);
+		{
+			if (pDock->iCurrentWidth != iNewWidth || pDock->iCurrentHeight != iNewHeight)
+				gdk_window_move_resize (pDock->pWidget->window,
+					pDock->iWindowPositionX,
+					pDock->iWindowPositionY,
+					iNewWidth,
+					iNewHeight);
+		}
 		else
-			gdk_window_move_resize (pDock->pWidget->window,
-				pDock->iWindowPositionY,
-				pDock->iWindowPositionX,
-				iNewHeight,
-				iNewWidth);
+		{
+			if (pDock->iCurrentWidth != iNewHeight || pDock->iCurrentHeight != iNewWidth)
+				gdk_window_move_resize (pDock->pWidget->window,
+					pDock->iWindowPositionY,
+					pDock->iWindowPositionX,
+					iNewHeight,
+					iNewWidth);
+		}
 	}
+	
+	cairo_dock_set_icons_geometry_for_window_manager (pDock);
 	
 	cairo_dock_update_background_decorations_if_necessary (pDock, pDock->iDecorationsWidth, pDock->iDecorationsHeight);
 }

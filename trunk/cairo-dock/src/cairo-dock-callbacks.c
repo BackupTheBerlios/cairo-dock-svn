@@ -88,19 +88,21 @@ gboolean on_expose (GtkWidget *pWidget,
 	CairoDock *pDock)
 {
 	//g_print ("%s ((%d;%d) %dx%d) (%d)\n", __func__, pExpose->area.x, pExpose->area.y, pExpose->area.width, pExpose->area.height, pDock->bAtBottom);
-	
 	if (pExpose->area.x + pExpose->area.y != 0)  // x et y sont >= 0.
 	{
 		if (! (g_bAutoHide && pDock->iRefCount == 0) || ! pDock->bAtBottom)
-			cairo_dock_render_optimized (pDock, &pExpose->area);
-		
+		{
+			if (pDock->render_optimized != NULL)
+				pDock->render_optimized (pDock, &pExpose->area);
+			else
+				pDock->render (pDock);
+		}
 		return FALSE;
 	}
 	
 	if (!pDock->bAtBottom)
 	{
 		pDock->render (pDock);
-		//cairo_dock_render (pDock);
 	}
 	else
 	{
@@ -115,7 +117,6 @@ gboolean on_expose (GtkWidget *pWidget,
 		}
 		else
 			pDock->render (pDock);
-			//cairo_dock_render (pDock);
 	}
 	
 	return FALSE;
@@ -183,8 +184,7 @@ static void cairo_dock_show_subdock (Icon *pPointedIcon, gboolean bUpdate, Cairo
 	
 	if (bUpdate)
 	{
-		gboolean bIsLoop = (pDock->iRefCount == 0 && 1. * pDock->iCurrentWidth / pDock->iMaxDockWidth < .6 && pDock->bInside);
-		cairo_dock_calculate_construction_parameters (pPointedIcon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth, bIsLoop, pDock->bInside);  // c'est un peu un hack pourri, l'idee c'est de recalculer la position exacte de l'icone pointee pour pouvoir placer le sous-dock precisement, car sa derniere position connue est decalee d'un coup de molette par rapport a la nouvelle, ce qui fait beaucoup.
+		pDock->calculate_icons (pDock);  // c'est un peu un hack pourri, l'idee c'est de recalculer la position exacte de l'icone pointee pour pouvoir placer le sous-dock precisement, car sa derniere position connue est decalee d'un coup de molette par rapport a la nouvelle, ce qui fait beaucoup. Il faudrait ne le faire que pour l'icone concernee ...
 	}
 	
 	///cairo_dock_set_subdock_position_generic (pPointedIcon, pDock);
@@ -426,6 +426,8 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 		pDock->bAtBottom = TRUE;
 	}
 	
+	cairo_dock_set_icons_geometry_for_window_manager (pDock);
+	
 	pDock->fDecorationsOffsetX = 0;
 	if (pDock->iSidShrinkDown == 0)  // on commence a faire diminuer la taille des icones.
 		pDock->iSidShrinkDown = g_timeout_add (40, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
@@ -536,6 +538,8 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	}*/
 	
 	cairo_dock_replace_all_dialogs ();
+	
+	cairo_dock_set_icons_geometry_for_window_manager (pDock);
 	
 	if (g_bAutoHide && pDock->iRefCount == 0)
 	{
@@ -836,10 +840,8 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				s_pIconClicked->iCount = 2 * g_tNbIterInOneRound[icon->iAnimationType] - 1;  // 2 rebonds.
 				cairo_dock_move_icon_after_icon (pDock, s_pIconClicked, prev_icon);
 				
-				cairo_dock_update_dock_size (pDock);
 				pDock->iMouseX = iX;  // utile ?
 				pDock->iMouseY = iY;
-				//cairo_dock_apply_wave_effect (pDock);
 				pDock->calculate_icons (pDock);
 				gtk_widget_queue_draw (pWidget);
 				
@@ -943,7 +945,9 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 		pDock->iScrollOffset += pDock->iFlatDockWidth;
 	//g_print ("iScrollOffset <- %d, (%d;%d) (%x)\n", pDock->iScrollOffset, (int) pScroll->x, (int) pScroll->y, pDock->icons);
 	
-	cairo_dock_update_dock_size (pDock);
+	///cairo_dock_update_dock_size (pDock);  // gourmand en ressources a cause de X.
+	pDock->calculate_max_dock_size (pDock);  // recalcule le pFirstDrawnElement.
+	cairo_dock_set_icons_geometry_for_window_manager (pDock);
 	
 	//\_______________ On recalcule toutes les icones.
 	Icon *pPointedIcon;
@@ -1095,7 +1099,10 @@ gboolean on_configure (GtkWidget* pWidget,
 		}
 #endif
 	}
-
+	
+	if (pDock->iSidMoveDown == 0 && pDock->iSidMoveUp == 0)  // ce n'est pas du a une animation.
+		cairo_dock_set_icons_geometry_for_window_manager (pDock);
+	
 	return FALSE;
 }
 

@@ -148,6 +148,52 @@ gchar *cairo_dock_search_image_path (gchar *cFileName)
 }
 
 
+
+cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo_t *pSourceContext, double fMaxScale, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fImageWidth, double *fImageHeight)
+{
+	*fImageWidth = gdk_pixbuf_get_width (pixbuf);
+	*fImageHeight = gdk_pixbuf_get_height (pixbuf);
+	
+	double fIconWidthSaturationFactor = 1., fIconHeightSaturationFactor = 1.;
+	cairo_dock_calculate_contrainted_icon_size (fImageWidth, 
+		fImageHeight,
+		iMinIconAuthorizedWidth,
+		iMinIconAuthorizedHeight,
+		iMaxIconAuthorizedWidth,
+		iMaxIconAuthorizedHeight,
+		&fIconWidthSaturationFactor,
+		&fIconHeightSaturationFactor);
+	
+	GdkPixbuf *pPixbufWithAlpha = pixbuf;
+	if (! gdk_pixbuf_get_has_alpha (pixbuf))  // on lui rajoute un canal alpha s'il n'en a pas.
+	{
+		g_print ("  ajout d'un canal alpha\n");
+		pPixbufWithAlpha = gdk_pixbuf_add_alpha (pixbuf, TRUE, 255, 255, 255);  // TRUE <=> les pixels blancs deviennent transparents.
+	}
+	
+	guchar *pixels = gdk_pixbuf_get_pixels (pPixbufWithAlpha);
+	cairo_surface_t *surface_ini = cairo_image_surface_create_for_data (pixels,
+		CAIRO_FORMAT_ARGB32,
+		gdk_pixbuf_get_width (pPixbufWithAlpha),
+		gdk_pixbuf_get_height (pPixbufWithAlpha),
+		gdk_pixbuf_get_rowstride (pPixbufWithAlpha));
+	
+	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+		CAIRO_CONTENT_COLOR_ALPHA,
+		ceil ((*fImageWidth) * fMaxScale),
+		ceil ((*fImageHeight) * fMaxScale));
+	cairo_t *pCairoContext = cairo_create (pNewSurface);
+	
+	cairo_scale (pCairoContext, fMaxScale * fIconWidthSaturationFactor, fMaxScale * fIconHeightSaturationFactor);
+	cairo_set_source_surface (pCairoContext, surface_ini, 0, 0);
+	cairo_paint (pCairoContext);
+	cairo_surface_destroy (surface_ini);
+	
+	if (pPixbufWithAlpha != pixbuf)
+		g_object_unref (pPixbufWithAlpha);
+	return pNewSurface;
+}
+
 cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern)
 {
 	//g_print ("%s (%s  : %d)\n", __func__, cImagePath, strlen (cImagePath));
@@ -254,7 +300,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 		if (!gdk_pixbuf_get_has_alpha (pixbuf))  // on lui rajoute un canal alpha si elle n'en a pas.
 		{
 			g_print ("  ajout d'un canal alpha\n");
-			GdkPixbuf *pixbuf2 = gdk_pixbuf_add_alpha (pixbuf, TRUE, 255, 255, 255);  // TRUE <=> les pixels blancs deviennent transparents.906.00x299.00
+			GdkPixbuf *pixbuf2 = gdk_pixbuf_add_alpha (pixbuf, TRUE, 255, 255, 255);  // TRUE <=> les pixels blancs deviennent transparents.
 			gdk_pixbuf_unref (pixbuf);
 			pixbuf = pixbuf2;
 		}
@@ -277,6 +323,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 		cairo_paint (pCairoContext);
 		cairo_surface_destroy (surface_ini);
 	}
+	cairo_destroy (pCairoContext);
 	
 	if (bReapeatAsPattern)
 	{
@@ -293,15 +340,14 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 			CAIRO_CONTENT_COLOR_ALPHA,
 			*fImageWidth* fMaxScale,
 			*fImageHeight* fMaxScale);
-		cairo_destroy (pCairoContext);
 		pCairoContext = cairo_create (pNewSurfaceFilled);
-		
 		
 		cairo_pattern_t* pPattern = cairo_pattern_create_for_surface (pNewSurface);
 		cairo_pattern_set_extend (pPattern, CAIRO_EXTEND_REPEAT);
 		
 		cairo_set_source (pCairoContext, pPattern);
 		cairo_paint (pCairoContext);
+		cairo_destroy (pCairoContext);
 		
 		cairo_surface_destroy (pNewSurface);
 		pNewSurface = pNewSurfaceFilled;
@@ -313,11 +359,12 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 			CAIRO_CONTENT_COLOR_ALPHA,
 			*fImageWidth * fMaxScale,
 			*fImageHeight * fMaxScale);
-		cairo_destroy (pCairoContext);
 		pCairoContext = cairo_create (pNewSurfaceAlpha);
 		
 		cairo_set_source_surface (pCairoContext, pNewSurface, 0, 0);
 		cairo_paint_with_alpha (pCairoContext, fAlpha);
+		cairo_destroy (pCairoContext);
+		
 		cairo_surface_destroy (pNewSurface);
 		pNewSurface = pNewSurfaceAlpha;
 	}
@@ -329,7 +376,6 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 		pNewSurface = pNewSurfaceRotated;
 	}
 	
-	cairo_destroy (pCairoContext);
 	return pNewSurface;
 }
 

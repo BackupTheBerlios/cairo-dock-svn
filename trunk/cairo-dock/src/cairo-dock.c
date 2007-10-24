@@ -101,7 +101,6 @@ int g_iMaxAuthorizedWidth;  // largeur maximale autorisee pour la fenetre (0 pou
 int g_iScrollAmount;  // de combien de pixels fait defiler un coup de molette.
 gboolean g_bResetScrollOnLeave;  // revenir a un defilement nul lorsqu'on quitte la fenetre.
 double g_fScrollAcceleration;  // acceleration du defilement quand il revient a la normale.
-gboolean g_bForceLoop;
 
 gchar *g_cCurrentThemePath = NULL;  // le chemin vers le repertoire du theme courant.
 gchar *g_cCurrentLaunchersPath = NULL;  // le chemin vers le repertoire des lanceurs/icones du theme courant.
@@ -231,7 +230,7 @@ main (int argc, char** argv)
 	
 	
 	//\___________________ On recupere quelques options.
-	g_iWmHint = GDK_WINDOW_TYPE_HINT_NORMAL;
+	g_iWmHint = GDK_WINDOW_TYPE_HINT_DOCK;
 	gboolean bDialogTest = FALSE;
 	for (i = 0; i < argc; i++)
 	{
@@ -258,8 +257,10 @@ main (int argc, char** argv)
 			g_bSticky = FALSE;
 		else if (strcmp (argv[i], "--toolbar-hint") == 0)
 			g_iWmHint = GDK_WINDOW_TYPE_HINT_TOOLBAR;
+		else if (strcmp (argv[i], "--normal-hint") == 0)
+			g_iWmHint = GDK_WINDOW_TYPE_HINT_NORMAL;
 		else if (strcmp (argv[i], "--dock-hint") == 0)
-			g_iWmHint = GDK_WINDOW_TYPE_HINT_DOCK;
+			g_print ("Attention : the '--dock-hint' option is deprecated since 1.3.7\n  It is now the default behaviour.");
 		else if (strcmp (argv[i], "--dialog") == 0)
 			bDialogTest = TRUE;
 		else if (strcmp (argv[i], "--version") == 0)  // le dock restera devant quoiqu'il arrive, mais ne recupere plus les touches clavier.
@@ -280,7 +281,7 @@ main (int argc, char** argv)
 		{
 			gboolean help = (strcmp (argv[i], "--help") == 0);
 			fprintf (help ? stdout : stderr,
-				 "Usage:\n%s\n  [--glitz] (use hardware acceleration (needs a glitz-enabled libcairo))\n  [--no-keep-above] (don't keep the dock above other windows)\n  [--no-skip-pager] (show the dock in the pager)\n  [--no-skip-taskbar] (show the dock in taskbar)\n  [--no-sticky] (don't show the dock on all desktops)\n  [--dock-hint] (force the window manager to consider cairo-dock as a dock)\n  [--toolbar-hint] (force the window manager to consider cairo-dock as a toolbar)\n  [--help] (print this help and quit)\n",
+				 "Usage:\n%s\n  [--glitz] (use hardware acceleration (needs a glitz-enabled libcairo))\n  [--no-keep-above] (don't keep the dock above other windows)\n  [--no-skip-pager] (show the dock in the pager)\n  [--no-skip-taskbar] (show the dock in taskbar)\n  [--no-sticky] (don't show the dock on all desktops)\n  [--normal-hint] (force the window manager to consider cairo-dock as a normal appli instead of a dock)\n  [--toolbar-hint] (force the window manager to consider cairo-dock as a toolbar instead of a dock)\n  [--help] (print this help and quit)\n",
 				 argv[0]);
 			return help ? 0 : 1;
 		}
@@ -373,7 +374,6 @@ main (int argc, char** argv)
 	
 	if (bDialogTest)
 		g_timeout_add (2000, (GSourceFunc) random_dialog, NULL);  // pour tests seulement.
-	
 	
 	gtk_main ();
 	/*Window root = DefaultRootWindow (g_XDisplay);

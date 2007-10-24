@@ -244,7 +244,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 		Icon *pBouncingIcon = cairo_dock_get_bouncing_icon (pDock->icons);
 		Icon *pRemovingIcon = cairo_dock_get_removing_or_inserting_icon (pDock->icons);
 		
-		if (pBouncingIcon == NULL && pRemovingIcon == NULL && (! g_bResetScrollOnLeave || pDock->iScrollOffset == 0))  // plau aucune animation en cours.
+		if (pBouncingIcon == NULL && pRemovingIcon == NULL && (! g_bResetScrollOnLeave || pDock->iScrollOffset == 0))  // plus aucune animation en cours.
 		{
 			if (! (g_bAutoHide && pDock->iRefCount == 0) && ! pDock->bInside)
 			{
@@ -332,7 +332,7 @@ void cairo_dock_arm_animation (Icon *icon, CairoDockAnimationType iAnimationType
 	
 	if (iNbRounds == -1)
 		iNbRounds = g_tNbAnimationRounds[icon->iType];
-	icon->iCount = g_tNbIterInOneRound[icon->iAnimationType] * iNbRounds - 1;
+	icon->iCount = MAX (0, g_tNbIterInOneRound[icon->iAnimationType] * iNbRounds - 1);
 }
 
 void cairo_dock_start_animation (Icon *icon, CairoDock *pDock)

@@ -37,7 +37,6 @@ extern int g_iMaxAuthorizedWidth;
 extern int g_iScrollAmount;
 extern gboolean g_bResetScrollOnLeave;
 extern double g_fScrollAcceleration;
-extern gboolean g_bForceLoop;
 
 extern int g_iSinusoidWidth;
 extern double g_fAmplitude;
@@ -454,8 +453,6 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_strfreev (cIconsTypesList);
 	
 	g_iMaxAuthorizedWidth = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "max autorized width", &bFlushConfFileNeeded, 0);
-	
-	g_bForceLoop = cairo_dock_get_boolean_key_value (pKeyFile, "Cairo Dock", "force loop", &bFlushConfFileNeeded, FALSE);
 	
 	g_iScrollAmount = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "scroll amount", &bFlushConfFileNeeded, FALSE);
 	
