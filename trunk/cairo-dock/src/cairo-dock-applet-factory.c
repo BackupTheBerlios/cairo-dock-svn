@@ -8,15 +8,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 ******************************************************************************/
 #include <math.h>
 #include <string.h>
-#include <cairo.h>
-#include <pango/pango.h>
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <dirent.h>
+#include <cairo.h>
 
 #ifdef HAVE_GLITZ
 #include <gdk/gdkx.h>
@@ -27,6 +20,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-load.h"
 #include "cairo-dock-draw.h"
 #include "cairo-dock-config.h"
+#include "cairo-dock-surface-factory.h"
 #include "cairo-dock-applet-factory.h"
 
 extern gchar *g_cCurrentThemePath;

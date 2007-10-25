@@ -59,12 +59,8 @@
 
 #include <math.h>
 #include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <dirent.h>
 
-#include <pango/pango.h>
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <gtk/gtk.h>
@@ -77,13 +73,12 @@
 
 #include "cairo-dock-struct.h"
 #include "cairo-dock-icons.h"
+#include "cairo-dock-draw.h"
 #include "cairo-dock-applications.h"
 #include "cairo-dock-callbacks.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-dock-factory.h"
-#include "cairo-dock-load.h"
 #include "cairo-dock-menu.h"
-#include "cairo-dock-config.h"
 #include "cairo-dock-themes-manager.h"
 #include "cairo-dock-dialogs.h"
 #include "cairo-dock-notifications.h"
@@ -172,7 +167,7 @@ int g_iLabelWeight;  // epaisseur des traits.
 int g_iLabelStyle;  // italique ou droit.
 gboolean g_bLabelForPointedIconOnly;  // n'afficher les etiquettes que pour l'icone pointee.
 double g_fLabelAlphaThreshold;  // seuil de visibilité de etiquettes.
-gboolean g_bTextAlwaysHorizontal;  // true <=> tetiquettes horizontales meme pour les docks verticaux.
+gboolean g_bTextAlwaysHorizontal;  // true <=> etiquettes horizontales meme pour les docks verticaux.
 
 double g_fUnfoldAcceleration = 0;
 int g_iGrowUpInterval;
@@ -183,11 +178,11 @@ double g_fRefreshInterval = .04;
 
 gboolean g_bShowAppli = FALSE;  // au debut on ne montre pas les applis, il faut que cairo-dock le sache.
 gboolean g_bUniquePid;
-gboolean g_bGroupAppliByClass = TRUE;  /// en cours...
+gboolean g_bGroupAppliByClass = TRUE;
 int unsigned g_iAppliMaxNameLength;
 Display *g_XDisplay = NULL;
 Screen *g_XScreen = NULL;
-Atom g_aNetClientList = 0;
+Atom g_aNetClientList;
 GHashTable *g_hAppliTable = NULL;  // table des PID connus de cairo-dock (affichees ou non dans le dock).
 GHashTable *g_hXWindowTable = NULL;  // table des fenetres X affichees dans le dock.
 int g_iSidUpdateAppliList = 0;
@@ -259,13 +254,13 @@ main (int argc, char** argv)
 			g_iWmHint = GDK_WINDOW_TYPE_HINT_TOOLBAR;
 		else if (strcmp (argv[i], "--normal-hint") == 0)
 			g_iWmHint = GDK_WINDOW_TYPE_HINT_NORMAL;
-		else if (strcmp (argv[i], "--dock-hint") == 0)
-			g_print ("Attention : the '--dock-hint' option is deprecated since 1.3.7\n  It is now the default behaviour.");
+		else if (strcmp (argv[i], "--dock-hint") == 0)  // le dock restera devant quoiqu'il arrive, mais ne recuperera plus les touches clavier.
+			g_print ("Attention : the '--dock-hint' option is deprecated since v1.3.7\n  It is now the default behaviour.");
 		else if (strcmp (argv[i], "--dialog") == 0)
 			bDialogTest = TRUE;
-		else if (strcmp (argv[i], "--version") == 0)  // le dock restera devant quoiqu'il arrive, mais ne recupere plus les touches clavier.
+		else if (strcmp (argv[i], "--version") == 0)
 		{
-			system ("pkg-config --modversion cairo-dock");
+			g_print ("v%s\n", CAIRO_DOCK_VERSION);
 			return 0;
 		}
 		else if (strcmp (argv[i], "--verbose") == 0)
@@ -287,7 +282,7 @@ main (int argc, char** argv)
 		}
 	}
 	
-	//\___________________ On definit quelques structures et quelques variables necessaires aux applis.
+	//\___________________ On definit quelques structures et quelques variables globales.
 	g_hAppliTable = g_hash_table_new_full (g_int_hash,
 		g_int_equal,
 		g_free,
@@ -310,6 +305,7 @@ main (int argc, char** argv)
 		g_str_equal,
 		g_free,
 		NULL);
+	
 	
 	//\___________________ On pre-charge les modules existant.
 	GError *erreur = NULL;

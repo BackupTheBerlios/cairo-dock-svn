@@ -78,7 +78,9 @@ cairo_dock_SOURCES = \
 	cairo-dock-dialogs.c\
 	cairo-dock-dialogs.h\
 	cairo-dock-gui-factory.c\
-	cairo-dock-gui-factory.h
+	cairo-dock-gui-factory.h\
+	cairo-dock-surface-factory.c\
+	cairo-dock-surface-factory.h
 	
 
 cairo_dockincludedir =\
@@ -112,4 +114,5 @@ cairo_docksubinclude_HEADERS =\
 	cairo-dock-animations.h\
 	cairo-dock-notifications.h\
 	cairo-dock-dialogs.h\
-	cairo-dock-gui-factory.h
+	cairo-dock-gui-factory.h\
+	cairo-dock-surface-factory.h

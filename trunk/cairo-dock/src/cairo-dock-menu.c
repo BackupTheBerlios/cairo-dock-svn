@@ -8,17 +8,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 ******************************************************************************/
 #include <math.h>
 #include <string.h>
-#include <stdio.h>
+#include <stdlib.h>
 #include <glib.h>
 #include <cairo.h>
-#include <pango/pango.h>
-#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <dirent.h>
 #include <glib/gstdio.h>
 
 #ifdef HAVE_GLITZ
@@ -44,8 +37,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 #define CAIRO_DOCK_CONF_PANEL_WIDTH 800
 #define CAIRO_DOCK_CONF_PANEL_HEIGHT 600
-#define CAIRO_DOCK_LAUNCHER_PANEL_WIDTH 350
-#define CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT 550
+#define CAIRO_DOCK_LAUNCHER_PANEL_WIDTH 550
+#define CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT 350
 
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;

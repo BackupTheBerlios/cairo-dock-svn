@@ -8,17 +8,12 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 ******************************************************************************/
 #include <math.h>
 #include <string.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 #include <gtk/gtk.h>
 
 #include <cairo.h>
 #include <pango/pango.h>
-#include <librsvg/rsvg.h>
-#include <librsvg/rsvg-cairo.h>
 
 #ifdef HAVE_GLITZ
 #include <gdk/gdkx.h>
@@ -30,11 +25,11 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-draw.h"
 #include "cairo-dock-icons.h"
 #include "cairo-dock-applications.h"
+#include "cairo-dock-surface-factory.h"
 #include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-application-factory.h"
 #include "cairo-dock-separator-factory.h"
 #include "cairo-dock-applet-factory.h"
-#include "cairo-dock-modules.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-load.h"
 
@@ -85,33 +80,53 @@ extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern gboolean g_bUseGlitz;
 
 
-void cairo_dock_calculate_contrainted_icon_size (double *fImageWidth, double *fImageHeight, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fIconWidthSaturationFactor, double *fIconHeightSaturationFactor)
+gchar *cairo_dock_generate_file_path (gchar *cImageFile)
 {
-	*fIconWidthSaturationFactor = 1;
-	*fIconHeightSaturationFactor = 1;
-	
-	if (iMaxIconAuthorizedWidth > 0 && (*fImageWidth) > iMaxIconAuthorizedWidth)
+	g_return_val_if_fail (cImageFile != NULL, NULL);
+	gchar *cImagePath;
+	if (*cImageFile == '~')
 	{
-		*fIconWidthSaturationFactor = 1. * iMaxIconAuthorizedWidth / (*fImageWidth);
-		*fImageWidth = (double) iMaxIconAuthorizedWidth;
+		cImagePath = g_strdup_printf ("%s%s", getenv("HOME"), cImageFile + 1);
 	}
-	if (iMaxIconAuthorizedHeight > 0 && (*fImageHeight) > iMaxIconAuthorizedHeight)
+	else if (*cImageFile == '/')
 	{
-		*fIconHeightSaturationFactor = 1. * iMaxIconAuthorizedHeight / (*fImageHeight);
-		*fImageHeight = (double) iMaxIconAuthorizedHeight;
+		cImagePath = g_strdup (cImageFile);
 	}
-	if (iMinIconAuthorizedWidth > 0 && (*fImageWidth) < iMinIconAuthorizedWidth)
+	else
 	{
-		*fIconWidthSaturationFactor = 1. * iMinIconAuthorizedWidth / (*fImageWidth);
-		*fImageWidth = (double) iMinIconAuthorizedWidth;
+		cImagePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cImageFile);
 	}
-	if (iMinIconAuthorizedHeight > 0 && (*fImageHeight) < iMinIconAuthorizedHeight)
-	{
-		*fIconHeightSaturationFactor = 1. * iMinIconAuthorizedHeight / (*fImageHeight);
-		*fImageHeight = (double) iMinIconAuthorizedHeight;
-	}
+	return cImagePath;
 }
 
+cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFile, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern)
+{
+	//g_print ("%s (%dx%d)\n", __func__, image_width, image_height);
+	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
+	cairo_surface_t *pNewSurface = NULL;
+	
+	if (cImageFile != NULL)
+	{
+		gchar *cImagePath = cairo_dock_generate_file_path (cImageFile);
+		
+		pNewSurface = cairo_dock_create_surface_from_image (cImagePath,
+			pSourceContext,
+			1.,
+			(int) (*fImageWidth),
+			(int) (*fImageHeight),
+			(int) (*fImageWidth),
+			(int) (*fImageHeight),
+			fImageWidth,
+			fImageHeight,
+			fRotationAngle,
+			fAlpha,
+			bReapeatAsPattern);
+		
+		g_free (cImagePath);
+	}
+	
+	return pNewSurface;
+}
 
 
 
@@ -126,7 +141,7 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	if (CAIRO_DOCK_IS_LAUNCHER (icon) || (CAIRO_DOCK_IS_APPLET (icon) && icon->acFileName != NULL))  // c'est l'icone d'un .desktop.
 	{
 		//\_______________________ On recherche une icone.
-		gchar *cIconPath = cairo_dock_search_image_path (icon->acFileName);
+		gchar *cIconPath = cairo_dock_search_icon_s_path (icon->acFileName);
 		
 		//\_______________________ On cree la surface cairo a afficher.
 		if (cIconPath != NULL && strlen (cIconPath) > 0)
@@ -161,7 +176,6 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	}
 }
 
-
 void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, gboolean bHorizontalDock)
 {
 	//g_print ("%s (%s, %d)\n", __func__, cLabelPolice, iLabelSize);
@@ -184,7 +198,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 	pango_font_description_free (pDesc);
 	
 	
-	if (CAIRO_DOCK_IS_APPLI (icon) && g_iAppliMaxNameLength > 0 && strlen (icon->acName) > g_iAppliMaxNameLength)  // marchera pas avec les caracteres non latins, mais avec la glib c'est la galere...
+	if (CAIRO_DOCK_IS_APPLI (icon) && g_iAppliMaxNameLength > 0 && strlen (icon->acName) > g_iAppliMaxNameLength)  /// Attention : marchera pas avec les caracteres non ascii ...
 	{
 		gchar *cTruncatedName = g_new0 (gchar, g_iAppliMaxNameLength + 4);
 		strncpy (cTruncatedName, icon->acName, g_iAppliMaxNameLength);
@@ -259,7 +273,6 @@ void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDock *pDock)
 	cairo_destroy (pCairoContext);
 }
 
-
 void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpointer data)
 {
 	if (pDock->iRefCount > 0)
@@ -292,8 +305,6 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 	
 	if (! pDock->bIsMainDock)  // on le fait pas pour le dock principal, ce sera fait a la fin de la fonction 'read_conf'.
 	{
-		///pDock->iCurrentWidth = pDock->iMinDockWidth + 2 * g_iDockRadius + g_iDockLineWidth;
-		///pDock->iCurrentHeight= pDock->iMaxIconHeight + 2 * g_iDockLineWidth;
 		cairo_dock_update_dock_size (pDock);
 	}
 }
@@ -302,53 +313,7 @@ void cairo_dock_reload_buffers_in_all_dock (GHashTable *hDocksTable)
 	g_hash_table_foreach (hDocksTable, (GHFunc) cairo_dock_reload_buffers_in_dock, NULL);
 }
 
-gchar *cairo_dock_generate_file_path (gchar *cImageFile)
-{
-	g_return_val_if_fail (cImageFile != NULL, NULL);
-	gchar *cImagePath;
-	if (*cImageFile == '~')
-	{
-		cImagePath = g_strdup_printf ("%s%s", getenv("HOME"), cImageFile + 1);
-	}
-	else if (*cImageFile == '/')
-	{
-		cImagePath = g_strdup (cImageFile);
-	}
-	else
-	{
-		cImagePath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, cImageFile);
-	}
-	return cImagePath;
-}
 
-cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFile, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern)
-{
-	//g_print ("%s (%dx%d)\n", __func__, image_width, image_height);
-	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
-	cairo_surface_t *pNewSurface = NULL;
-	
-	if (cImageFile != NULL)
-	{
-		gchar *cImagePath = cairo_dock_generate_file_path (cImageFile);
-		
-		pNewSurface = cairo_dock_create_surface_from_image (cImagePath,
-			pSourceContext,
-			1.,
-			(int) (*fImageWidth),
-			(int) (*fImageHeight),
-			(int) (*fImageWidth),
-			(int) (*fImageHeight),
-			fImageWidth,
-			fImageHeight,
-			fRotationAngle,
-			fAlpha,
-			bReapeatAsPattern);
-		
-		g_free (cImagePath);
-	}
-	
-	return pNewSurface;
-}
 
 void cairo_dock_load_visible_zone (CairoDock *pDock, gchar *cVisibleZoneImageFile, int iVisibleZoneWidth, int iVisibleZoneHeight, double fVisibleZoneAlpha)
 {

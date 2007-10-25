@@ -232,6 +232,8 @@ struct _Icon {
 
 #define CAIRO_DOCK_MAIN_DOCK_NAME "_MainDock_"
 
+#define CAIRO_DOCK_DEFAULT_RENDERER_NAME "default"
+
 #define CAIRO_DOCK_LAST_ORDER -1e9
 #define CAIRO_DOCK_NB_MAX_ITERATIONS 1000
 

@@ -9,14 +9,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <math.h>
 #include <string.h>
 #include <cairo.h>
-#include <pango/pango.h>
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <dirent.h>
 
 #ifdef HAVE_GLITZ
 #include <gdk/gdkx.h>
@@ -26,7 +19,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 #include "cairo-dock-icons.h"
 #include "cairo-dock-load.h"
-#include "cairo-dock-launcher-factory.h"
+#include "cairo-dock-surface-factory.h"
 #include "cairo-dock-separator-factory.h"
 
 extern double g_fAmplitude;
@@ -52,7 +45,6 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 	cairo_surface_t *pNewSurface = NULL;
 	if (g_cSeparatorImage != NULL)
 	{
-		//gchar *cImagePath = cairo_dock_search_image_path (g_cSeparatorImage);
 		gchar *cImagePath = cairo_dock_generate_file_path (g_cSeparatorImage);
 		double fRotationAngle;
 		if (! g_bRevolveSeparator)
@@ -99,8 +91,6 @@ Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorT
 	icon->pIconBuffer = pSeparatorSurface;
 	icon->fWidth = fWidth;
 	icon->fHeight = fHeight;
-	//Icon * pLastLauncher = cairo_dock_get_last_launcher (pDock->icons);
-	//icon->fOrder = (pLastLauncher != NULL ? pLastLauncher->fOrder + 1 : 1);
 	icon->iType = iSeparatorType;
 	
 	return icon;

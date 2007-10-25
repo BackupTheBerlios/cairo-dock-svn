@@ -84,7 +84,7 @@ void cairo_dock_calculate_max_dock_size_caroussel (CairoDock *pDock);
 
 void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, CairoDockIconType iType, double fMargin);
 void cairo_dock_mark_avoiding_mouse_icons_linear (CairoDock *pDock);
-void cairo_dock_stop_marking_icons (CairoDock *pDock, CairoDockIconType iType);
+void cairo_dock_stop_marking_icons (CairoDock *pDock);
 
 
 void cairo_dock_update_icon_s_container_name (Icon *icon, gchar *cNewParentDockName);

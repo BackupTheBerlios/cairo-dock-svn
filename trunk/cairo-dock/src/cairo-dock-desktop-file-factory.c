@@ -6,14 +6,10 @@ released under the terms of the GNU General Public License.
 Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
 
 ******************************************************************************/
+#include <stdlib.h>
 #include <string.h>
 #include <cairo.h>
-#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <dirent.h>
 
 #ifdef HAVE_GLITZ
 #include <gdk/gdkx.h>
@@ -33,7 +29,7 @@ extern gchar *g_cCurrentLaunchersPath;
 extern gchar *g_cLanguage;
 
 
-gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur)
+gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, const gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur)
 {
 	//g_print ("%s (%s)\n", __func__, cFilePath);
 	double fEffectiveOrder;
@@ -114,30 +110,20 @@ gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, gchar *cDockName, doub
 
 gchar *cairo_dock_generate_desktop_filename (gchar *cCairoDockDataDir)
 {
-	int iPrefixNumber, i = -1;
-	gchar *cFileName;
-	struct dirent *dirpointer;
-	DIR* dir = opendir (cCairoDockDataDir);
-	g_return_val_if_fail (dir != NULL, NULL);
+	int iPrefixNumber = 0;
+	GString *sFileName = g_string_new ("");
+	
 	do
 	{
-		i ++;
-		rewinddir (dir);
-
-		while ((dirpointer = readdir (dir)) != NULL)
-		{
-			cFileName = dirpointer->d_name;
-			if (g_str_has_suffix (cFileName, ".desktop"))
-			{
-				iPrefixNumber = atoi (cFileName);
-				if (i == iPrefixNumber)
-					break;
-			}
-		}
-	}
-	while (dirpointer != NULL);  // si on a pas parcouru tout le repertoire, c'est qu'on a trouve une collision.
+		iPrefixNumber ++;
+		g_string_printf (sFileName, "%s/%02dlauncher.desktop", cCairoDockDataDir, iPrefixNumber);
+	} while (iPrefixNumber < 99 && g_file_test (sFileName->str, G_FILE_TEST_EXISTS));
 	
-	return g_strdup_printf ("%02d%s", i, "launcher.desktop");
+	g_string_free (sFileName, TRUE);
+	if (iPrefixNumber == 99)
+		return NULL;
+	else
+		return g_strdup_printf ("%02dlauncher.desktop", iPrefixNumber);
 }
 
 

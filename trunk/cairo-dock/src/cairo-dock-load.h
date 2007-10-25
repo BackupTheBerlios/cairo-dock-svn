@@ -7,7 +7,9 @@
 #include "cairo-dock-struct.h"
 
 
-void cairo_dock_calculate_contrainted_icon_size (double *fImageWidth, double *fImageHeight, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fIconWidthSaturationFactor, double *fIconHeightSaturationFactor);
+gchar *cairo_dock_generate_file_path (gchar *cImageFile);
+
+cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFile, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern);
 
 
 
@@ -17,14 +19,11 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 
 void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDock *pDock);
 
-
 void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpointer data);
 #define cairo_dock_load_buffers_in_one_dock(pDock) cairo_dock_reload_buffers_in_dock (NULL, pDock, NULL)
 void cairo_dock_reload_buffers_in_all_dock (GHashTable *hDocksTable);
 
 
-gchar *cairo_dock_generate_file_path (gchar *cImageFile);
-cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFile, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern);
 
 void cairo_dock_load_visible_zone (CairoDock *pDock, gchar *cVisibleZoneImageFile, int iVisibleZoneWidth, int iVisibleZoneHeight, double fVisibleZoneAlpha);
 
@@ -36,4 +35,3 @@ void cairo_dock_load_background_decorations (CairoDock *pDock);
 
 
 #endif
-

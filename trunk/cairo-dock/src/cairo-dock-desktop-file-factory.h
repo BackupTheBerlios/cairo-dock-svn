@@ -7,7 +7,7 @@
 #include "cairo-dock-struct.h"
 
 
-gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur);
+gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, const gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur);
 
 
 gchar *cairo_dock_generate_desktop_filename (gchar *cCairoDockDataDir);

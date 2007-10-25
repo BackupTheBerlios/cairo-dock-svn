@@ -9,12 +9,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <stdlib.h>
 #include <math.h>
 
-#ifdef HAVE_GLITZ
-#include <gdk/gdkx.h>
-#include <glitz-glx.h>
-#include <cairo-glitz.h>
-#endif
-
 #include "cairo-dock-struct.h"
 #include "cairo-dock-icons.h"
 #include "cairo-dock-dock-factory.h"

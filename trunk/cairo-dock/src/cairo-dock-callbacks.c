@@ -8,15 +8,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 ******************************************************************************/
 #include <math.h>
 #include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <dirent.h>
 #include <cairo.h>
-#include <pango/pango.h>
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-#include </usr/include/X11/Xlib.h>
 
 #ifdef HAVE_GLITZ
 #include <gdk/gdkx.h>
@@ -521,7 +516,6 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 			pDock->iWindowPositionX,
 			iNewHeight,
 			iNewWidth);
-	//gtk_widget_queue_draw (pWidget);
 	
 	if (pDock->iSidMoveDown > 0)  // si on est en train de descendre, on arrete.
 	{
@@ -535,7 +529,6 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 		g_iSidShrinkDown = 0;
 	}*/
 	
-	cairo_dock_replace_all_dialogs ();
 	
 	if (g_bAutoHide && pDock->iRefCount == 0)
 	{
@@ -733,7 +726,10 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 	}
 	else if (CAIRO_DOCK_IS_VALID_APPLI (icon))
 	{
-		cairo_dock_show_appli (icon->Xid);
+		if (cairo_dock_get_active_window () == icon->Xid)  // ne marche que si le dock est une fenêtre de type 'dock', sinon il prend le focus.
+			cairo_dock_minimize_xwindow (icon->Xid);
+		else
+			cairo_dock_show_appli (icon->Xid);
 		return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
 	}
 	else
@@ -765,8 +761,8 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 			{
 				g_print ("release sur %s\n", s_pIconClicked->acName);
 				s_pIconClicked->iAnimationType = 0;  // stoppe les animations de suivi du curseur.
-				//cairo_dock_mark_icons_as_avoiding_mouse (pDock, -1e4, -1);
-				cairo_dock_stop_marking_icons (pDock, pDock->iAvoidingMouseIconType);
+				s_pIconClicked->iCount = 0;  // precaution.
+				cairo_dock_stop_marking_icons (pDock);
 				pDock->iAvoidingMouseIconType = -1;
 			}
 			if (icon != NULL && ! CAIRO_DOCK_IS_SEPARATOR (icon) && icon == s_pIconClicked)
@@ -1094,7 +1090,11 @@ gboolean on_configure (GtkWidget* pWidget,
 	}
 	
 	if (pDock->iSidMoveDown == 0 && pDock->iSidMoveUp == 0)  // ce n'est pas du a une animation.
+	{
 		cairo_dock_set_icons_geometry_for_window_manager (pDock);
+		
+		cairo_dock_replace_all_dialogs ();
+	}
 	
 	return FALSE;
 }
@@ -1105,8 +1105,7 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 	//g_print ("%s (%dx%d)\n", __func__, x, y);
 	
 	//\_________________ On arrete l'animation.
-	//cairo_dock_mark_icons_as_avoiding_mouse (pDock, -1e4, -1);
-	cairo_dock_stop_marking_icons (pDock, pDock->iAvoidingMouseIconType);
+	cairo_dock_stop_marking_icons (pDock);
 	pDock->iAvoidingMouseIconType = -1;
 	
 	//\_________________ On recupere l'URI.

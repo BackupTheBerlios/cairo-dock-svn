@@ -14,9 +14,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <gtk/gtk.h>
 
 #include <cairo.h>
-#include <pango/pango.h>
-#include <librsvg/rsvg.h>
-#include <librsvg/rsvg-cairo.h>
 
 #ifdef HAVE_GLITZ
 #include <gdk/gdkx.h>
@@ -1087,7 +1084,7 @@ void cairo_dock_mark_avoiding_mouse_icons_linear (CairoDock *pDock)
 	}
 }
 
-void cairo_dock_stop_marking_icons (CairoDock *pDock, CairoDockIconType iType)
+void cairo_dock_stop_marking_icons (CairoDock *pDock)
 {
 	if (pDock->icons == NULL)
 		return;
@@ -1098,7 +1095,7 @@ void cairo_dock_stop_marking_icons (CairoDock *pDock, CairoDockIconType iType)
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
-		if ((icon->iType == iType || (icon->iType & 1)) && icon->iAnimationType > CAIRO_DOCK_NB_ANIMATIONS)
+		if (icon->iAnimationType > CAIRO_DOCK_NB_ANIMATIONS)
 		{
 			icon->iAnimationType = 0;
 		}

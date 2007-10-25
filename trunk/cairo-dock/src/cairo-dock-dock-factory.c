@@ -150,6 +150,11 @@ static void _cairo_dock_set_colormap (CairoDock *pDock)
 CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 {
 	//g_print ("%s ()\n", __func__);
+	
+	CairoDock *pExistingDock = g_hash_table_lookup (g_hDocksTable, cDockName);
+	if (pExistingDock != NULL)
+		return pExistingDock;
+	
 	CairoDock *pDock = g_new0 (CairoDock, 1);
 	pDock->bAtBottom = TRUE;
 	pDock->iRefCount = 0;  // c'est un dock racine par defaut.
@@ -189,8 +194,8 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 	pDock->calculate_max_dock_size = cairo_dock_calculate_max_dock_size_linear;
 	pDock->calculate_icons = cairo_dock_apply_wave_effect;
 	pDock->render = cairo_dock_render_linear;
-	pDock->set_subdock_position = cairo_dock_set_subdock_position_linear;
 	pDock->render_optimized = cairo_dock_render_optimized_linear;
+	pDock->set_subdock_position = cairo_dock_set_subdock_position_linear;
 	
 	gtk_widget_add_events (pWindow,
 		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | 
@@ -672,7 +677,7 @@ void cairo_dock_free_all_docks (CairoDock *pMainDock)
 	g_hash_table_foreach_remove (g_hDocksTable, (GHRFunc) _cairo_dock_free_one_dock, NULL);
 }
 
-void cairo_dock_destroy_dock (CairoDock *pDock, gchar *cDockName, CairoDock *ReceivingDock, gchar *cReceivingDockName)
+void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDock *ReceivingDock, gchar *cReceivingDockName)
 {
 	//g_print ("%s (%s, %d)\n", __func__, cDockName, pDock->iRefCount);
 	pDock->iRefCount --;  // peut-etre qu'il faudrait en faire une operation atomique...

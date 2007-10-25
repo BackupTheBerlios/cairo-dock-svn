@@ -9,12 +9,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <math.h>
 #include <string.h>
 #include <cairo.h>
-#include <gtk/gtk.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <dirent.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -29,7 +24,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-load.h"
 #include "cairo-dock-icons.h"
 #include "cairo-dock-dock-factory.h"
-#include "cairo-dock-launcher-factory.h"
+#include "cairo-dock-surface-factory.h"
 #include "cairo-dock-application-factory.h"
 
 
@@ -48,75 +43,6 @@ extern GHashTable *g_hAppliTable;
 extern GHashTable *g_hXWindowTable;
 
 extern gboolean g_bUseGlitz;
-
-
-cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuffer, int iBufferNbElements, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
-{
-	//g_print ("%s (%d)\n", __func__, iBufferNbElements);
-	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
-	int iNbChannels = 4;
-	
-	//\____________________ On recupere la plus grosse des icones presentes dans le tampon (meilleur rendu).
-	int iIndex = 0, iBestIndex = 0;
-	while (iIndex + 2 < iBufferNbElements)
-	{
-		if (pXIconBuffer[iIndex] > pXIconBuffer[iBestIndex])
-			iBestIndex = iIndex;
-		iIndex += 2 + pXIconBuffer[iIndex] * pXIconBuffer[iIndex+1];
-	}
-	
-	//\____________________ On pre-multiplie chaque composante par le alpha (necessaire pour libcairo).
-	*fWidth = (double) pXIconBuffer[iBestIndex];
-	*fHeight = (double) pXIconBuffer[iBestIndex+1];
-	
-	int i;
-	int alpha, red, green, blue;
-	float fAlphaFactor;
-	for (i = 0; i < (int) (*fHeight) * (*fWidth); i ++)
-	{
-		alpha = (pXIconBuffer[iBestIndex+2+i] & 0xFF000000) >> 24;
-		red = (pXIconBuffer[iBestIndex+2+i] & 0x00FF0000) >> 16;
-		green = (pXIconBuffer[iBestIndex+2+i] & 0x0000FF00) >> 8;
-		blue = pXIconBuffer[iBestIndex+2+i] & 0x000000FF;
-		fAlphaFactor = (float) alpha / 255;
-		red *= fAlphaFactor;
-		green *= fAlphaFactor;
-		blue *= fAlphaFactor;
-		pXIconBuffer[iBestIndex+2+i] = (pXIconBuffer[iBestIndex+2+i] & 0xFF000000) + (red << 16) + (green << 8) + blue;
-	}
-	
-	//\____________________ On cree la surface a partir du tampon.
-	cairo_surface_t *surface_ini = cairo_image_surface_create_for_data ((guchar *)&pXIconBuffer[iBestIndex+2],
-		CAIRO_FORMAT_ARGB32,
-		(int) pXIconBuffer[iBestIndex],
-		(int) pXIconBuffer[iBestIndex+1],
-		(int) pXIconBuffer[iBestIndex] * iNbChannels);
-	
-	double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
-	cairo_dock_calculate_contrainted_icon_size (fWidth,
-		fHeight,
-		g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLI],
-		g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLI],
-		g_tMaxIconAuthorizedSize[CAIRO_DOCK_APPLI],
-		g_tMaxIconAuthorizedSize[CAIRO_DOCK_APPLI],
-		&fIconWidthSaturationFactor,
-		&fIconHeightSaturationFactor);
-	
-	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-		CAIRO_CONTENT_COLOR_ALPHA,
-		ceil (*fWidth * fMaxScale),
-		ceil (*fHeight * fMaxScale));
-	cairo_t *pCairoContext = cairo_create (pNewSurface);
-	
-	cairo_scale (pCairoContext, fMaxScale * fIconWidthSaturationFactor, fMaxScale * fIconHeightSaturationFactor);
-	cairo_set_source_surface (pCairoContext, surface_ini, 0, 0);
-	cairo_paint (pCairoContext);
-	
-	cairo_surface_destroy (surface_ini);
-	cairo_destroy (pCairoContext);
-	
-	return pNewSurface;
-}
 
 
 static GdkPixbuf *_cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bAddAlpha)  // cette fonction est inspiree par celle de libwnck.
@@ -243,7 +169,10 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 		//\____________________ On cree la surface.
 		if (pIconPixbuf != NULL)
 		{
-			cairo_surface_t *pNewSurface = cairo_dock_create_surface_from_pixbuf (pIconPixbuf, pSourceContext, fMaxScale,
+			cairo_surface_t *pNewSurface = cairo_dock_create_surface_from_pixbuf (pIconPixbuf,
+				pSourceContext,
+				fMaxScale,
+				TRUE,
 				g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLI],
 				g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLI],
 				g_tMaxIconAuthorizedSize[CAIRO_DOCK_APPLI],
@@ -262,7 +191,7 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 
 Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid, CairoDock *pDock)
 {
-	//g_print ("%s (%d)\n", __func__, Xid);
+	g_print ("%s (%d)\n", __func__, Xid);
 	guchar *pNameBuffer;
 	gulong *pPidBuffer = NULL;
 	double fWidth, fHeight;
@@ -286,7 +215,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 		{
 			if (pXStateBuffer[i] == aNetWmSkipPager)
 				bSkip = TRUE;
-			if (pXStateBuffer[i] == aNetWmSkipTaskbar)
+			else if (pXStateBuffer[i] == aNetWmSkipTaskbar)
 				bSkip = TRUE;
 		}
 		//g_print (" -------- bSkip : %d\n",  bSkip);
@@ -336,10 +265,8 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 		}
 		XFree (pTypeBuffer);
 	}
-	else
-	{
-		//g_print (" pas de type defini -> on suppose que son type est 'normal'\n");
-	}
+	//else
+	//	g_print (" pas de type defini -> on suppose que son type est 'normal'\n");
 	
 	//\__________________ On recupere son nom.
 	Atom aNetWmName = XInternAtom (g_XDisplay, "_NET_WM_NAME", False);
@@ -363,7 +290,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	pNewSurface = cairo_dock_create_surface_from_xwindow (Xid, pSourceContext, 1 + g_fAmplitude, &fWidth, &fHeight);
 	if (pNewSurface == NULL)
 	{
-		g_print ("pas d'icone\n");
+		//g_print ("pas d'icone\n");
 		XFree (pNameBuffer);
 		if (g_bUniquePid)
 			g_hash_table_insert (g_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
@@ -398,7 +325,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	if (XGetClassHint (g_XDisplay, Xid, &class_hint) != 0)
 	{
 		g_print ("  res_name : %s; res_class : %s\n", class_hint.res_name, class_hint.res_class);
-		icon->cClass = g_ascii_strdown (class_hint.res_class, -1);  // on la passe en minuscule, car certaines applis (Glade2 par exemple) ont la bonne idee de donner des classes avec une majuscule ou non suivant les fenetres.
+		icon->cClass = g_ascii_strdown (class_hint.res_class, -1);  // on la passe en minuscule, car certaines applis ont la bonne idee de donner des classes avec une majuscule ou non suivant les fenetres. Il reste le cas des aplis telles que Glade2 ('Glade' et 'Glade-2' ...)
 		XFree (class_hint.res_name);
 		XFree (class_hint.res_class);
 	}

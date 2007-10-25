@@ -12,7 +12,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <stdlib.h>
 
 #include <cairo.h>
-#include <gtk/gtk.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
@@ -484,8 +483,8 @@ void cairo_dock_set_root_window_mask (void)
 	
 	Window root = DefaultRootWindow (g_XDisplay);
 	XGetWindowAttributes(g_XDisplay, root, &wattr);
-	//if (wattr.all_event_masks & ButtonPressMask)
-	//	attr.event_mask &= ~ButtonPressMask;
+	if (wattr.all_event_masks & ButtonPressMask)
+		attr.event_mask &= ~ButtonPressMask;  // l'utilite reste a demontrer.
 	attr.event_mask &= ~SubstructureRedirectMask;
 	XSelectInput(g_XDisplay, root, attr.event_mask);
 }
