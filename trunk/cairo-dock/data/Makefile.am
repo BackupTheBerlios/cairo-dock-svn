@@ -10,4 +10,5 @@ essentialdata_DATA = \
 	launcher-fr.conf\
 	themes-fr.conf\
 	themes-en.conf\
-	cairo-dock.svg
+	cairo-dock.svg\
+	readme-basic-view

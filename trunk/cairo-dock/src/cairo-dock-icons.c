@@ -59,7 +59,6 @@ extern int g_iSidUpdateAppliList;
 
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 extern gchar *g_cConfFile;
-extern GHashTable *g_hModuleTable;
 
 
 void cairo_dock_free_icon (Icon *icon)
@@ -400,7 +399,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 	
 	//\_________________ On met a jour l'ordre des applets dans le fichier de conf.
 	if (CAIRO_DOCK_IS_VALID_APPLET (icon1))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module.
-		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons, g_hModuleTable);
+		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons);
 }
 
 void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2)
@@ -461,7 +460,7 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 	
 	//\_________________ On prend en compte le changement de position pour les applets.
 	if (CAIRO_DOCK_IS_VALID_APPLET (icon1))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module, au cas ou il y'aurait plusieurs icones pour un meme module.
-		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons, g_hModuleTable);
+		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons);
 }
 
 

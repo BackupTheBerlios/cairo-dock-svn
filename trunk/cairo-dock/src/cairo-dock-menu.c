@@ -47,8 +47,6 @@ extern gchar *g_cLanguage;
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentLaunchersPath;
 
-extern GHashTable *g_hModuleTable;
-
 
 static void cairo_dock_edit_and_reload_appearance (GtkMenuItem *menu_item, gpointer *data)
 {
@@ -448,7 +446,7 @@ static void cairo_dock_remove_module (GtkMenuItem *menu_item, gpointer *data)
 	if (answer == GTK_RESPONSE_YES)
 	{
 		cairo_dock_remove_icon_from_dock (pDock, icon);  // desactive le module.
-		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons, g_hModuleTable);
+		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons);
 		cairo_dock_update_dock_size (pDock);
 		gtk_widget_queue_draw (pDock->pWidget);
 		cairo_dock_free_icon (icon);
@@ -614,7 +612,7 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	GtkWidget *pModuleSubMenu = gtk_menu_new ();
 	gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), pModuleSubMenu);
 	
-	g_hash_table_foreach (g_hModuleTable, (GHFunc)_cairo_dock_insert_module_in_menu, pModuleSubMenu);
+	cairo_dock_foreach_module ((GHFunc)_cairo_dock_insert_module_in_menu, pModuleSubMenu);
 	
 	
 	menu_item = gtk_menu_item_new_with_label ("Manage themes");

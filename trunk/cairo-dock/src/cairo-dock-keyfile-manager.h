@@ -16,6 +16,7 @@ void cairo_dock_write_one_name (gchar *cName, gpointer value, GString *pString);
 void cairo_dock_write_one_name_description (gchar *cName, gchar *cDescriptionFilePath, GString *pString);
 void cairo_dock_write_one_module_name (gchar *cName, CairoDockModule *pModule, GString *pString);
 void cairo_dock_write_one_theme_name (gchar *cName, gchar *cThemePath, GString *pString);
+void cairo_dock_write_one_renderer_name (gchar *cName, CairoDockRenderer *pRenderer, GString *pString);
 void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, gchar *cNewUsefullComment, GHFunc pWritingFunc);
 
 void cairo_dock_apply_translation_on_conf_file (gchar *cConfFilePath, gchar *cCommentsFilePath);

@@ -734,7 +734,7 @@ void cairo_dock_set_strut_partial (int Xid, int left, int right, int top, int bo
 	//cairo_dock_set_xwindow_timestamp (Xid, cairo_dock_get_xwindow_timestamp (root));
 }
 
-void cairo_dock_set_window_type_hint (int Xid, gchar *cWindowTypeName)
+void cairo_dock_set_xwindow_type_hint (int Xid, gchar *cWindowTypeName)
 {
 	g_return_if_fail (Xid > 0);
 	

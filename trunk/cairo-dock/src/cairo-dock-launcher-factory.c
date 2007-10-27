@@ -324,7 +324,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		if (pChildDock == NULL)
 		{
 			g_print ("le dock fils (%s) n'existe pas, on le cree\n", icon->acName);
-			pChildDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_DOCK, icon->acName);
+			pChildDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->acName, NULL);
 		}
 		cairo_dock_reference_dock (pChildDock);
 		icon->pSubDock = pChildDock;
@@ -370,7 +370,7 @@ Icon * cairo_dock_create_icon_from_desktop_file (const gchar *cDesktopFileName, 
 	if (pParentDock == NULL)
 	{
 		g_print ("le dock parent (%s) n'existe pas, on le cree\n", icon->cParentDockName);
-		pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_DOCK, icon->cParentDockName);
+		pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->cParentDockName, NULL);
 	}
 	
 	return icon;

@@ -7,13 +7,23 @@
 #include "cairo-dock-struct.h"
 
 
+void cairo_dock_initialize_module_manager (gchar *cModuleDirPath);
+
 gchar *cairo_dock_extract_module_name_from_path (gchar *cSoFilePath);
 
 CairoDockModule * cairo_dock_load_module (gchar *cSoFilePath, GHashTable *pModuleTable, GError **erreur);
 
 void cairo_dock_preload_module_from_directory (gchar *cModuleDirPath, GHashTable *pModuleTable, GError **erreur);
 
-void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, GHashTable *pModuleTable, CairoDock *pDock);
+
+
+void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock *pDock);
+
+void cairo_dock_update_conf_file_with_available_modules (gchar *cConfFile);
+
+void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *pIconList);
+
+void cairo_dock_foreach_module (GHFunc pFunction, gpointer data);
 
 
 

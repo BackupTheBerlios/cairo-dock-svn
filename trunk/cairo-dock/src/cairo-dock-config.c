@@ -23,6 +23,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-gui-factory.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-themes-manager.h"
+#include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-config.h"
 
 static gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "pulse", "random", NULL};
@@ -33,6 +34,8 @@ extern GHashTable *g_hDocksTable;
 extern gchar *g_cLanguage;
 extern gboolean g_bReverseVisibleImage;
 extern gboolean g_bReserveSpace;
+extern gchar *g_cMainDockDefaultRendererName;
+extern gchar *g_cSubDockDefaultRendererName;
 
 extern int g_iMaxAuthorizedWidth;
 extern int g_iScrollAmount;
@@ -116,8 +119,6 @@ extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 
 extern gchar *g_cSeparatorImage;
 extern gboolean g_bRevolveSeparator;
-
-extern GHashTable *g_hModuleTable;
 
 
 guint cairo_dock_get_number_from_name (gchar *cName, gchar **tNamesList)
@@ -406,6 +407,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_fLabelAlphaThreshold = cairo_dock_get_double_key_value (pKeyFile, "Labels", "alpha threshold", &bFlushConfFileNeeded, 10.);
 	
+	g_free (g_cLabelPolice);
 	g_cLabelPolice = cairo_dock_get_string_key_value (pKeyFile, "Labels", "police", &bFlushConfFileNeeded, "sans");
 	
 	g_iLabelSize = cairo_dock_get_integer_key_value (pKeyFile, "Labels", "size", &bFlushConfFileNeeded, 14);
@@ -432,7 +434,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	
 	//\___________________ On recupere les parametres du dock en lui-meme.
-	gchar *cPreviousLanguage = cairo_dock_get_conf_file_language (pKeyFile);  // g_cLanguage
+	gchar *cPreviousLanguage = cairo_dock_get_conf_file_language (pKeyFile);
+	g_free (g_cLanguage);
 	g_cLanguage = cairo_dock_get_string_key_value (pKeyFile, "Cairo Dock", "language", &bFlushConfFileNeeded, "en");
 	
 	gchar **cIconsTypesList = cairo_dock_get_string_list_key_value (pKeyFile, "Cairo Dock", "icon's type order", &bFlushConfFileNeeded, &length, NULL);
@@ -451,6 +454,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		}
 	}
 	g_strfreev (cIconsTypesList);
+	
+	g_free (g_cMainDockDefaultRendererName);
+	g_cMainDockDefaultRendererName = cairo_dock_get_string_key_value (pKeyFile, "Cairo Dock", "main dock view", &bFlushConfFileNeeded, CAIRO_DOCK_DEFAULT_RENDERER_NAME);
 	
 	g_iMaxAuthorizedWidth = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "max autorized width", &bFlushConfFileNeeded, 0);
 	
@@ -501,6 +507,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	
 	//\___________________ On recupere les parametres propres aux sous-docks.
+	g_free (g_cSubDockDefaultRendererName);
+	g_cSubDockDefaultRendererName = cairo_dock_get_string_key_value (pKeyFile, "Sub-Docks", "sub-dock view", &bFlushConfFileNeeded, CAIRO_DOCK_DEFAULT_RENDERER_NAME);
+	
 	g_bSameHorizontality = cairo_dock_get_boolean_key_value (pKeyFile, "Sub-Docks", "same horizontality", &bFlushConfFileNeeded, TRUE);
 	
 	g_fSubDockSizeRatio = cairo_dock_get_double_key_value (pKeyFile, "Sub-Docks", "relative icon size", &bFlushConfFileNeeded, 0.8);
@@ -519,6 +528,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	double couleur2[4] = {.7, .9, .7, .4};
 	cairo_dock_get_double_list_key_value (pKeyFile, "Background", "stripes color bright", &bFlushConfFileNeeded, g_fStripesColorBright, 4, couleur2);
 	
+	g_free (g_cBackgroundImageFile);
 	g_cBackgroundImageFile = cairo_dock_get_string_key_value (pKeyFile, "Background", "background image", &bFlushConfFileNeeded, NULL);
 	
 	g_fBackgroundImageAlpha = cairo_dock_get_double_key_value (pKeyFile, "Background", "image alpha", &bFlushConfFileNeeded, 0.5);
@@ -717,7 +727,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	}
 	
 	
-	cairo_dock_activate_modules_from_list (cActiveModuleList, g_hModuleTable, pDock);
+	cairo_dock_activate_modules_from_list (cActiveModuleList, pDock);
 	g_strfreev (cActiveModuleList);
 	
 	cairo_dock_reserve_space_for_dock (pDock, g_bReserveSpace);
@@ -775,8 +785,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		
 		cairo_dock_replace_values_in_conf_file (cConfFilePath, pKeyFile, TRUE, 0);*/
 		
-		cairo_dock_update_conf_file_with_modules (cConfFilePath, g_hModuleTable);
+		cairo_dock_update_conf_file_with_available_modules (cConfFilePath);
 		cairo_dock_update_conf_file_with_translations (cConfFilePath, CAIRO_DOCK_SHARE_DATA_DIR);
+		cairo_dock_update_conf_file_with_renderers (cConfFilePath);
 	}
 	g_free (cPreviousLanguage);
 	
@@ -945,68 +956,6 @@ void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int
 	g_key_file_set_integer (pKeyFile, "Position", "y gap", y);
 	
 	cairo_dock_write_keys_to_file (pKeyFile, g_cConfFile);
-	g_key_file_free (pKeyFile);
-}
-
-void cairo_dock_update_conf_file_with_modules (gchar *cConfFile, GHashTable *pModuleTable)
-{
-	cairo_dock_update_conf_file_with_hash_table (cConfFile, pModuleTable, "Applets", "active modules", NULL, (GHFunc) cairo_dock_write_one_module_name);
-}
-
-static void _cairo_dock_add_one_module_name_if_active (gchar *cModuleName, CairoDockModule *pModule, GSList **pListeModule)
-{
-	if (pModule->bActive)
-	{
-		if (g_slist_find (*pListeModule, cModuleName) == NULL)
-			*pListeModule = g_slist_prepend (*pListeModule, cModuleName);
-	}
-}
-void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *pIconList, GHashTable *pModuleTable)
-{
-	g_print ("%s ()\n", __func__);
-	GError *erreur = NULL;
-	
-	//\___________________ On ouvre le fichier de conf.
-	GKeyFile *pKeyFile = g_key_file_new ();
-	g_key_file_load_from_file (pKeyFile, cConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
-	if (erreur != NULL)
-	{
-		g_print ("Attention : %s\n", erreur->message);
-		g_error_free (erreur);
-		return ;
-	}
-	
-	//\___________________ On dresse la liste des modules actifs, en conservant leur ordre dans le dock.
-	GSList *pListeModule = NULL;
-	Icon *icon;
-	gboolean bInside = FALSE;
-	GList *pList = NULL;
-	for (pList = pIconList; pList != NULL; pList = pList->next)
-	{
-		icon = pList->data;
-		if (CAIRO_DOCK_IS_APPLET (icon))
-		{
-			bInside = TRUE;
-			pListeModule = g_slist_append (pListeModule, icon->pModule->cModuleName);
-		}
-		else if (bInside)
-			break ;
-	}
-	g_hash_table_foreach (pModuleTable, (GHFunc) _cairo_dock_add_one_module_name_if_active, &pListeModule);  // on complete.
-	
-	//\___________________ On ecrit tout ca dans le fichier de conf.
-	GSList *pSList;
-	GString *cActiveModules = g_string_new ("");
-	for (pSList = pListeModule; pSList != NULL; pSList = pSList->next)
-	{
-		g_string_append_printf (cActiveModules, "%s;", (gchar *) pSList->data);
-	}
-	
-	g_key_file_set_string (pKeyFile, "Applets", "active modules", cActiveModules->str);
-	cairo_dock_write_keys_to_file (pKeyFile, cConfFile);
-	
-	g_slist_free (pListeModule);
-	g_string_free (cActiveModules, TRUE);
 	g_key_file_free (pKeyFile);
 }
 

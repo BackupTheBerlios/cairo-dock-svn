@@ -42,6 +42,7 @@ typedef void (*CairoDockRenderOptimizedFunc) (CairoDock *pDock, GdkRectangle *pA
 typedef void (*CairoDockSetSubDockPositionFunc) (Icon *pPointedIcon, CairoDock *pParentDock);
 
 typedef struct _CairoDockRenderer {
+	gchar *cReadmeFilePath;
 	CairoDockCalculateMaxDockSizeFunc calculate_max_dock_size;
 	CairoDockCalculateIconsFunc calculate_icons;
 	CairoDockRenderFunc render;

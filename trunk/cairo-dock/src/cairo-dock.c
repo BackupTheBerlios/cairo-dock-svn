@@ -82,12 +82,15 @@
 #include "cairo-dock-themes-manager.h"
 #include "cairo-dock-dialogs.h"
 #include "cairo-dock-notifications.h"
+#include "cairo-dock-renderer-manager.h"
 
 CairoDock *g_pMainDock;  // pointeur sur le dock principal.
 GHashTable *g_hDocksTable = NULL;  // table des docks existant.
 int g_iWmHint;  // hint pour la fenetre du dock principal.
 gchar *g_cLanguage = NULL;  // langue courante.
 gboolean g_bReserveSpace;
+gchar *g_cMainDockDefaultRendererName = NULL;
+gchar *g_cSubDockDefaultRendererName = NULL;
 
 gboolean g_bReverseVisibleImage;  // retrouner l'image de la zone de rappel quand le dock est en haut.
 gint g_iScreenWidth[2];  // dimensions de l'ecran.
@@ -162,7 +165,7 @@ int g_iLeaveSubDockDelay;
 int g_iShowSubDockDelay;
 
 int g_iLabelSize;  // taille de la police des etiquettes.
-gchar *g_cLabelPolice;  // police de caracteres des etiquettes.
+gchar *g_cLabelPolice = NULL;  // police de caracteres des etiquettes.
 int g_iLabelWeight;  // epaisseur des traits.
 int g_iLabelStyle;  // italique ou droit.
 gboolean g_bLabelForPointedIconOnly;  // n'afficher les etiquettes que pour l'icone pointee.
@@ -188,8 +191,6 @@ GHashTable *g_hXWindowTable = NULL;  // table des fenetres X affichees dans le d
 int g_iSidUpdateAppliList = 0;
 gchar *g_cSeparatorImage = NULL;
 gboolean g_bRevolveSeparator;
-
-GHashTable *g_hModuleTable = NULL;  // table des modules charges dans l'appli.
 
 gboolean g_bKeepAbove = TRUE;
 gboolean g_bSkipPager = TRUE;
@@ -296,26 +297,16 @@ main (int argc, char** argv)
 	g_aNetClientList = XInternAtom (g_XDisplay, "_NET_CLIENT_LIST", False);
 	XSetErrorHandler (cairo_dock_xerror_handler);
 	
-	g_hModuleTable = g_hash_table_new_full (g_str_hash,
-		g_str_equal,
-		NULL,  // la cle est le nom du module, et pointe directement sur le champ 'cModuleName' du module.
-		(GDestroyNotify) cairo_dock_free_module);
-	
 	g_hDocksTable = g_hash_table_new_full (g_str_hash,
 		g_str_equal,
 		g_free,
 		NULL);
 	
+	//\___________________ On initialise le gestionnaire de modules et on pre-charge les modules existant.
+	cairo_dock_initialize_module_manager (CAIRO_DOCK_MODULES_DIR);
 	
-	//\___________________ On pre-charge les modules existant.
-	GError *erreur = NULL;
-	cairo_dock_preload_module_from_directory (CAIRO_DOCK_MODULES_DIR, g_hModuleTable, &erreur);
-	if (erreur != NULL)
-	{
-		g_print ("Attention : %s\n", erreur->message);
-		g_error_free (erreur);
-		erreur = NULL;
-	}
+	//\___________________ On initialise le gestionnaire de vues.
+	cairo_dock_initialize_renderer_manager ();
 	
 	
 	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.

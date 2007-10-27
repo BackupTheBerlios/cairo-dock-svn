@@ -27,11 +27,7 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 
 void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int y);
 
-void cairo_dock_update_conf_file_with_modules (gchar *cConfFile, GHashTable *pModuleTable);
-
 void cairo_dock_update_conf_file_with_translations (gchar *cConfFile, gchar *cTranslationsDir);
-
-void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *pIconList, GHashTable *pModuleTable);
 
 
 CairoDockDesktopEnv cairo_dock_guess_environment (void);

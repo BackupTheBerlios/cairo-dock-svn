@@ -34,6 +34,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-icons.h"
 #include "cairo-dock-separator-factory.h"
 #include "cairo-dock-launcher-factory.h"
+#include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-dock-factory.h"
 
 extern int g_iWmHint;
@@ -42,6 +43,9 @@ extern GHashTable *g_hDocksTable;
 extern gboolean g_bSameHorizontality;
 extern double g_fSubDockSizeRatio;
 extern gboolean g_bReserveSpace;
+extern gchar *g_cMainDockDefaultRendererName;
+extern gchar *g_cSubDockDefaultRendererName;
+
 
 extern int g_iMaxAuthorizedWidth;
 extern gint g_iDockLineWidth;
@@ -61,7 +65,6 @@ extern gboolean g_bDirectionUp;
 extern int g_iSidUpdateAppliList;
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 extern gchar *g_cConfFile;
-extern GHashTable *g_hModuleTable;
 
 extern gboolean g_bKeepAbove;
 extern gboolean g_bSkipPager;
@@ -147,10 +150,9 @@ static void _cairo_dock_set_colormap (CairoDock *pDock)
 	
 	cairo_dock_set_colormap_for_window (pDock->pWidget);
 }
-CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
+CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName, gchar *cRendererName)
 {
 	//g_print ("%s ()\n", __func__);
-	
 	CairoDock *pExistingDock = g_hash_table_lookup (g_hDocksTable, cDockName);
 	if (pExistingDock != NULL)
 		return pExistingDock;
@@ -186,16 +188,13 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName)
 	gtk_window_set_resizable (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_title (GTK_WINDOW (pWindow), "cairo-dock");
 	
-	/*pDock->calculate_max_dock_size = cairo_dock_calculate_max_dock_size_caroussel;
-	pDock->calculate_icons = cairo_dock_apply_wave_effect;
-	pDock->render = cairo_dock_render_caroussel;
-	pDock->set_subdock_position = cairo_dock_set_subdock_position_caroussel;
-	pDock->render_optimized = NULL;*/
-	pDock->calculate_max_dock_size = cairo_dock_calculate_max_dock_size_linear;
-	pDock->calculate_icons = cairo_dock_apply_wave_effect;
-	pDock->render = cairo_dock_render_linear;
-	pDock->render_optimized = cairo_dock_render_optimized_linear;
-	pDock->set_subdock_position = cairo_dock_set_subdock_position_linear;
+	CairoDockRenderer *pRenderer = cairo_dock_get_renderer (cRendererName);
+	g_return_val_if_fail (pRenderer != NULL, NULL);
+	pDock->calculate_max_dock_size = pRenderer->calculate_max_dock_size;
+	pDock->calculate_icons = pRenderer->calculate_icons;
+	pDock->render = pRenderer->render;
+	pDock->render_optimized = pRenderer->render_optimized;
+	pDock->set_subdock_position = pRenderer->set_subdock_position;
 	
 	gtk_widget_add_events (pWindow,
 		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | 
@@ -358,7 +357,7 @@ static gboolean _cairo_dock_search_icon_from_subdock (gchar *cDockName, CairoDoc
 }
 Icon *cairo_dock_search_icon_pointing_on_dock (CairoDock *pDock, CairoDock **pParentDock)  // pParentDock peut etre NULL.
 {
-	if (pDock->iRefCount == 0)  // inutile de chercher dans ce cas-la.
+	if (pDock->iRefCount == 0)  // par definition.
 		return NULL;
 	Icon *pPointingIcon = NULL;
 	gpointer data[3] = {pDock, &pPointingIcon, pParentDock};
@@ -430,11 +429,11 @@ void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
 	cairo_dock_set_strut_partial (Xid, left, right, top, bottom, left_start_y, left_end_y, right_start_y, right_end_y, top_start_x, top_end_x, bottom_start_x, bottom_end_x);
 	
 	if ((bReserve && ! g_bDirectionUp) || (g_iWmHint == GDK_WINDOW_TYPE_HINT_DOCK))  // merci a Robrob pour le patch !
-		cairo_dock_set_window_type_hint (Xid, "_NET_WM_WINDOW_TYPE_DOCK");  // gtk_window_set_type_hint ne marche que sur une fenetre avant de la rendre visible !
+		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_DOCK");  // gtk_window_set_type_hint ne marche que sur une fenetre avant de la rendre visible !
 	else if (g_iWmHint == GDK_WINDOW_TYPE_HINT_NORMAL)
-		cairo_dock_set_window_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");  // idem.
+		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");  // idem.
 	else if (g_iWmHint == GDK_WINDOW_TYPE_HINT_TOOLBAR)
-		cairo_dock_set_window_type_hint (Xid, "_NET_WM_WINDOW_TYPE_TOOLBAR");  // idem.
+		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_TOOLBAR");  // idem.
 }
 
 void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et iFlatDockWidth doivent avoir ete mis a jour au prealable.
@@ -736,38 +735,40 @@ void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDoc
 
 
 
-void cairo_dock_reference_dock (CairoDock *pChildDock)
+void cairo_dock_reference_dock (CairoDock *pDock)
 {
-	pChildDock->iRefCount ++;  // peut-etre qu'il faudrait en faire une operation atomique...
-	if (pChildDock->iRefCount == 1)  // il devient un sous-dock.
+	pDock->iRefCount ++;  // peut-etre qu'il faudrait en faire une operation atomique...
+	if (pDock->iRefCount == 1)  // il devient un sous-dock.
 	{
-		pChildDock->bHorizontalDock = (g_bSameHorizontality ? g_pMainDock->bHorizontalDock : ! g_pMainDock->bHorizontalDock);
+		pDock->bHorizontalDock = (g_bSameHorizontality ? g_pMainDock->bHorizontalDock : ! g_pMainDock->bHorizontalDock);
 		
 		Icon *icon;
 		GList *ic;
-		pChildDock->iFlatDockWidth = -g_iIconGap;
-		for (ic = pChildDock->icons; ic != NULL; ic = ic->next)
+		pDock->iFlatDockWidth = -g_iIconGap;
+		for (ic = pDock->icons; ic != NULL; ic = ic->next)
 		{
 			icon = ic->data;
 			icon->fWidth *= g_fSubDockSizeRatio;
 			icon->fHeight *= g_fSubDockSizeRatio;
-			pChildDock->iFlatDockWidth += icon->fWidth + g_iIconGap;
+			pDock->iFlatDockWidth += icon->fWidth + g_iIconGap;
 			
 			if (! g_bSameHorizontality)
 			{
-				cairo_t* pSourceContext = cairo_dock_create_context_from_window (pChildDock);
-				cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pChildDock->bHorizontalDock));
+				cairo_t* pSourceContext = cairo_dock_create_context_from_window (pDock);
+				cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 				cairo_destroy (pSourceContext);
 			}
 		}
-		pChildDock->iMaxIconHeight *= g_fSubDockSizeRatio;
+		pDock->iMaxIconHeight *= g_fSubDockSizeRatio;
+		
+		cairo_dock_set_default_renderer (pDock);
 	}
 }
 
 
 CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, gchar *cDockName, int iWindowTypeHint)
 {
-	CairoDock *pSubDock = cairo_dock_create_new_dock (iWindowTypeHint, cDockName);
+	CairoDock *pSubDock = cairo_dock_create_new_dock (iWindowTypeHint, cDockName, NULL);
 	cairo_dock_reference_dock (pSubDock);  // on le fait tout de suite pour avoir la bonne reference avant le 'load'.
 	
 	pSubDock->icons = pIconList;

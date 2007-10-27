@@ -8,7 +8,7 @@
 
 void cairo_dock_set_colormap_for_window (GtkWidget *pWidget);
 
-CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName);
+CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName, gchar *cRendererName);
 
 
 const gchar *cairo_dock_search_dock_name (CairoDock *pDock);

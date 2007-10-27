@@ -241,6 +241,10 @@ void cairo_dock_write_one_theme_name (gchar *cName, gchar *cThemePath, GString *
 {
 	g_string_append_printf (pString, "%s;%s/readme;", cName, cThemePath);
 }
+void cairo_dock_write_one_renderer_name (gchar *cName, CairoDockRenderer *pRenderer, GString *pString)
+{
+	g_string_append_printf (pString, "%s;%s;", cName, (pRenderer->cReadmeFilePath != NULL ? pRenderer->cReadmeFilePath : "none"));
+}
 
 void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, gchar *cNewUsefullComment, GHFunc pWritingFunc)
 {

@@ -23,5 +23,7 @@
 #include "cairo-dock-dialogs.h"
 #include "cairo-dock-keyfile-manager.h"
 #include "cairo-dock-gui-factory.h"
+#include "cairo-dock-surface-factory.h"
+#include "cairo-dock-renderer-manager.h"
 
 #endif
