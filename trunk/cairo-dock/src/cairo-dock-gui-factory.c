@@ -715,9 +715,6 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									
 									k += (iElementType == 'R') + 1;
 								}
-								if (iElementType != 'E' && iSelectedItem == -1)
-									iSelectedItem = 0;
-								gtk_combo_box_set_active (GTK_COMBO_BOX (pOneWidget), iSelectedItem);
 								
 								if (iElementType == 'R')
 								{
@@ -725,6 +722,10 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									gtk_label_set_use_markup  (GTK_LABEL (pDescriptionLabel), TRUE);
 									g_signal_connect (G_OBJECT (pOneWidget), "changed", G_CALLBACK (_cairo_dock_select_one_item_in_combo), pDescriptionLabel);
 								}
+								
+								if (iElementType != 'E' && iSelectedItem == -1)
+									iSelectedItem = 0;
+								gtk_combo_box_set_active (GTK_COMBO_BOX (pOneWidget), iSelectedItem);
 							}
 							pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
 							gtk_box_pack_start (GTK_BOX (pHBox),
