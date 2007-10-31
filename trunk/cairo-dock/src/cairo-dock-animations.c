@@ -331,7 +331,7 @@ void cairo_dock_arm_animation (Icon *icon, CairoDockAnimationType iAnimationType
 
 void cairo_dock_start_animation (Icon *icon, CairoDock *pDock)
 {
-	if (icon->iCount > 0)
+	if ((icon->iCount > 0 && icon->iAnimationType < CAIRO_DOCK_RANDOM) || icon->fPersonnalScale != 0)
 	{
 		if (pDock->iSidGrowUp != 0)
 		{

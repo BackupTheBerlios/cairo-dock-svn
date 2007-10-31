@@ -1,13 +1,14 @@
-#dnl Process this file with automake to produce Makefile.in
 
+SUBDIRS = . themes
 
-SUBDIRS = . src data
+essentialdatadir = $(pkgdatadir)
 
-
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = cairo-dock.pc
-
-scriptdir = ${bindir}
-script_DATA = \
-	launch-cairo-dock-after-beryl.sh\
-	cairo-dock-update.sh
+essentialdata_DATA = \
+	cairo-dock-en.conf\
+	cairo-dock-fr.conf\
+	launcher-en.conf\
+	launcher-fr.conf\
+	themes-fr.conf\
+	themes-en.conf\
+	cairo-dock.svg\
+	readme-basic-view

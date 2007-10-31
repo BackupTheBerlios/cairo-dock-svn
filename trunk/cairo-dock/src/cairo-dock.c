@@ -71,10 +71,8 @@
 #include <cairo-glitz.h>
 #endif
 
-#include "cairo-dock-struct.h"
 #include "cairo-dock-icons.h"
-#include "cairo-dock-draw.h"
-#include "cairo-dock-applications.h"
+#include "cairo-dock-applications-manager.h"
 #include "cairo-dock-callbacks.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-dock-factory.h"
@@ -146,17 +144,6 @@ int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS] = {14, 20, 20, 12, 0};  // mul
 int g_iVisibleZoneWidth = 0;  // dimensions de la zone ou on place le curseur pour faire apparaitre le dock.
 int g_iVisibleZoneHeight = 0;
 
-//		|                                |
-//		|                                |
-//		|                                |
-//		|                                |
-//		|                                |
-//		|              ______            |
-//		|             |______|  <-- zone |
-//		|        barre des taches        | <-- gapY
-//		 ---------------.----------------
-//		                 ^-- gapX
-
 gboolean g_bDirectionUp;  // la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.
 gboolean g_bSameHorizontality;  // dit si les sous-docks ont la meme horizontalite que les docks racines.
 double g_fSubDockSizeRatio;  // ratio de la taille des icones des sous-docks par rapport a celles du dock principal.
@@ -183,12 +170,6 @@ gboolean g_bShowAppli = FALSE;  // au debut on ne montre pas les applis, il faut
 gboolean g_bUniquePid;
 gboolean g_bGroupAppliByClass = TRUE;
 int unsigned g_iAppliMaxNameLength;
-Display *g_XDisplay = NULL;
-Screen *g_XScreen = NULL;
-Atom g_aNetClientList;
-GHashTable *g_hAppliTable = NULL;  // table des PID connus de cairo-dock (affichees ou non dans le dock).
-GHashTable *g_hXWindowTable = NULL;  // table des fenetres X affichees dans le dock.
-int g_iSidUpdateAppliList = 0;
 gchar *g_cSeparatorImage = NULL;
 gboolean g_bRevolveSeparator;
 
@@ -283,24 +264,14 @@ main (int argc, char** argv)
 		}
 	}
 	
-	//\___________________ On definit quelques structures et quelques variables globales.
-	g_hAppliTable = g_hash_table_new_full (g_int_hash,
-		g_int_equal,
-		g_free,
-		NULL);
-	g_hXWindowTable = g_hash_table_new_full (g_int_hash,
-		g_int_equal,
-		g_free,
-		NULL);
-	g_XDisplay = XOpenDisplay (0);
-	g_XScreen = DefaultScreenOfDisplay (g_XDisplay);
-	g_aNetClientList = XInternAtom (g_XDisplay, "_NET_CLIENT_LIST", False);
-	XSetErrorHandler (cairo_dock_xerror_handler);
-	
+	//\___________________ On initialise la table des docks..
 	g_hDocksTable = g_hash_table_new_full (g_str_hash,
 		g_str_equal,
 		g_free,
 		NULL);
+	
+	//\___________________ On initialise le gestionnaire des applications ouvertes.
+	cairo_dock_initialize_application_manager ();
 	
 	//\___________________ On initialise le gestionnaire de modules et on pre-charge les modules existant.
 	cairo_dock_initialize_module_manager (CAIRO_DOCK_MODULES_DIR);
@@ -363,68 +334,6 @@ main (int argc, char** argv)
 		g_timeout_add (2000, (GSourceFunc) random_dialog, NULL);  // pour tests seulement.
 	
 	gtk_main ();
-	/*Window root = DefaultRootWindow (g_XDisplay);
-	Window w = GDK_WINDOW_XID (GTK_WIDGET (pWindow)->window);
-	XSetWindowAttributes attr;
-	attr.event_mask = 
-		KeyPressMask | KeyReleaseMask | ButtonPressMask
-		| ButtonReleaseMask | EnterWindowMask
-		| LeaveWindowMask | PointerMotionMask
-		| Button1MotionMask
-		//| Button2MotionMask | Button3MotionMask
-		//| Button4MotionMask | Button5MotionMask
-		| ButtonMotionMask | KeymapStateMask
-		| ExposureMask //VisibilityChangeMask
-		| StructureNotifyMask // | ResizeRedirectMask
-		| SubstructureNotifyMask | SubstructureRedirectMask
-		//| FocusChangeMask | PropertyChangeMask
-		//| ColormapChangeMask | OwnerGrabButtonMask
-		;
-	XSelectInput(g_XDisplay, w, attr.event_mask);
-	XEvent event;
-	while (1)
-	{
-		XNextEvent (g_XDisplay, &event);
-		if (event.xany.window != root)
-		{
-			g_print ("w (%d)\n", event.type);
-			switch (event.type)
-			{
-				case MotionNotify :
-					on_xmotion_notify (&event.xmotion);
-				break;
-				
-				case Expose : 
-					on_xexpose (&event.xexpose);
-				break;
-				
-				case ConfigureNotify :
-					on_xconfigure (&event.xconfigure);
-				break;
-				
-				case EnterNotify :
-					on_xenter_notify (&event.xcrossing);
-				break;
-				
-				case LeaveNotify :
-					on_xleave_notify (&event.xcrossing);
-				break;
-				
-				default :
-				break;
-			}
-		}
-		else //if (event.xany.window == root)
-		{
-			g_print ("root (%d)\n", event.type);
-			switch (event.type)
-			{
-				
-				default :
-				break;
-			}
-		}
-	}*/
 	
 	rsvg_term ();
 	

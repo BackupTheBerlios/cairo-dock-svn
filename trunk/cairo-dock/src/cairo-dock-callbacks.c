@@ -24,7 +24,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-animations.h"
 #include "cairo-dock-load.h"
 #include "cairo-dock-icons.h"
-#include "cairo-dock-applications.h"
+#include "cairo-dock-applications-manager.h"
 #include "cairo-dock-desktop-file-factory.h"
 #include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-config.h"
@@ -119,50 +119,6 @@ gboolean on_expose (GtkWidget *pWidget,
 
 
 
-void cairo_dock_set_subdock_position_linear (Icon *pPointedIcon, CairoDock *pDock)
-{
-	CairoDock *pSubDock = pPointedIcon->pSubDock;
-	///int iX = iMouseX + (-iMouseX + (pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2)) / 2;
-	int iX = pPointedIcon->fXAtRest - (pDock->iFlatDockWidth - pDock->iMaxDockWidth) / 2 + pPointedIcon->fWidth / 2;
-	//int iX = iMouseX + (iMouseX < pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 ? (g_bDirectionUp ? 1 : 0) : (g_bDirectionUp ? 0 : -1)) * pPointedIcon->fWidth * pPointedIcon->fScale / 2;
-	if (pSubDock->bHorizontalDock == pDock->bHorizontalDock)
-	{
-		pSubDock->fAlign = 0.5;
-		pSubDock->iGapX = iX + pDock->iWindowPositionX - g_iScreenWidth[pDock->bHorizontalDock] / 2;  // les sous-dock ont un alignement egal a 0.5.  // pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2
-		pSubDock->iGapY = pDock->iGapY + pDock->iMaxDockHeight;
-	}
-	else
-	{
-		pSubDock->fAlign = (g_bDirectionUp ? 1 : 0);
-		pSubDock->iGapX = (pDock->iGapY + pDock->iMaxDockHeight) * (g_bDirectionUp ? -1 : 1);
-		if (g_bDirectionUp)
-			pSubDock->iGapY = g_iScreenWidth[pDock->bHorizontalDock] - (iX + pDock->iWindowPositionX) - pSubDock->iMaxDockHeight / 2;  // les sous-dock ont un alignement egal a 1.
-		else
-			pSubDock->iGapY = iX + pDock->iWindowPositionX - pSubDock->iMaxDockHeight / 2;  // les sous-dock ont un alignement egal a 0.
-	}
-}
-void cairo_dock_set_subdock_position_caroussel (Icon *pPointedIcon, CairoDock *pDock)
-{
-	CairoDock *pSubDock = pPointedIcon->pSubDock;
-	int iMouseX = pDock->iMouseX;
-	int iX = iMouseX + (-iMouseX + pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2) / 2;
-	//int iX = iMouseX + (iMouseX < pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2 ? (g_bDirectionUp ? 1 : 0) : (g_bDirectionUp ? 0 : -1)) * pPointedIcon->fWidth * pPointedIcon->fScale / 2;
-	if (pSubDock->bHorizontalDock == pDock->bHorizontalDock)
-	{
-		pSubDock->fAlign = 0.5;
-		pSubDock->iGapX = iX + pDock->iWindowPositionX - g_iScreenWidth[pDock->bHorizontalDock] / 2;  // les sous-dock ont un alignement egal a 0.5.  // pPointedIcon->fDrawX + pPointedIcon->fWidth * pPointedIcon->fScale / 2
-		pSubDock->iGapY = pDock->iGapY + pDock->iMaxDockHeight;
-	}
-	else
-	{
-		pSubDock->fAlign = (g_bDirectionUp ? 1 : 0);
-		pSubDock->iGapX = (pDock->iGapY + pDock->iMaxDockHeight) * (g_bDirectionUp ? -1 : 1);
-		if (g_bDirectionUp)
-			pSubDock->iGapY = g_iScreenWidth[pDock->bHorizontalDock] - (iX + pDock->iWindowPositionX) - pSubDock->iMaxDockHeight / 2;  // les sous-dock ont un alignement egal a 1.
-		else
-			pSubDock->iGapY = iX + pDock->iWindowPositionX - pSubDock->iMaxDockHeight / 2;  // les sous-dock ont un alignement egal a 0.
-	}
-}
 static void cairo_dock_show_subdock (Icon *pPointedIcon, gboolean bUpdate, CairoDock *pDock)
 {
 	//g_print ("on montre le dock fils\n");
@@ -243,8 +199,6 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	Icon *pPointedIcon;
 	if (pMotion != NULL)
 	{
-		//if (g_iShowSubDockDelay > 0)
-		//	pDock->iMouseX = (pDock->bHorizontalDock ? pMotion->x : pMotion->y);
 		if (pDock->bHorizontalDock)
 		{
 			pDock->iMouseX = (int) pMotion->x;
@@ -256,6 +210,11 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			pDock->iMouseY = (int) pMotion->x;
 		}
 		
+		if ((pMotion->state & GDK_CONTROL_MASK) && (pMotion->state & GDK_BUTTON1_MASK))
+		{
+			g_print ("drag\n");
+		}
+		
 		if (pDock->iSidShrinkDown > 0 || pMotion->time - fLastTime < g_fRefreshInterval)  // si les icones sont en train de diminuer de taille (suite a un clic) on on laisse l'animation se finir, sinon elle va trop vite.  // || ! pDock->bInside || pDock->bAtBottom
 		{
 			gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);
@@ -263,10 +222,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		}
 		
 		//\_______________ On recalcule toutes les icones.
-		//pPointedIcon = cairo_dock_apply_wave_effect (pDock);
 		pPointedIcon = pDock->calculate_icons (pDock);
-		///if (s_iInternMovingIconType != -1)
-		///	cairo_dock_mark_icons_as_avoiding_mouse (pDock, s_iInternMovingIconType, .5);
 		
 		gtk_widget_queue_draw (pWidget);
 		fLastTime = pMotion->time;
@@ -284,9 +240,6 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		pPointedIcon = pDock->calculate_icons (pDock);
 		pDock->iAvoidingMouseIconType = CAIRO_DOCK_LAUNCHER;
 		pDock->fAvoidingMouseMargin = .25;
-		///s_iInternMovingIconType = CAIRO_DOCK_LAUNCHER;
-		///s_fInternAvoidingMouseMargin = .25;
-		///cairo_dock_mark_icons_as_avoiding_mouse (pDock, s_iInternMovingIconType, .25);
 		
 		gtk_widget_queue_draw (pWidget);
 	}
@@ -388,7 +341,6 @@ gboolean _cairo_dock_emit_leave_signal (CairoDock *pDock)
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
 	//g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
-	///s_iInternMovingIconType = -1;
 	pDock->iAvoidingMouseIconType = -1;
 	pDock->fAvoidingMouseMargin = 0;
 	pDock->bInside = FALSE;
@@ -759,7 +711,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 		{
 			if (s_pIconClicked != NULL)
 			{
-				g_print ("release sur %s\n", s_pIconClicked->acName);
+				//g_print ("release sur %s\n", s_pIconClicked->acName);
 				s_pIconClicked->iAnimationType = 0;  // stoppe les animations de suivi du curseur.
 				s_pIconClicked->iCount = 0;  // precaution.
 				cairo_dock_stop_marking_icons (pDock);
@@ -847,9 +799,8 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 			s_pIconClicked = icon;
 			if (s_pIconClicked != NULL)
 			{
-				g_print ("s_pIconClicked <- %s\n", s_pIconClicked->acName);
+				//g_print ("s_pIconClicked <- %s\n", s_pIconClicked->acName);
 				s_pIconClicked->iAnimationType = CAIRO_DOCK_FOLLOW_MOUSE;
-				///s_iInternMovingIconType = s_pIconClicked->iType;
 				pDock->iAvoidingMouseIconType = s_pIconClicked->iType;  // on pourrait le faire lors du 'motion' aussi.
 				pDock->fAvoidingMouseMargin = .5;
 				
@@ -890,7 +841,6 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 			pDock->iMouseX = (int) pButton->y;
 			pDock->iMouseY = (int) pButton->x;
 		}
-		//cairo_dock_apply_wave_effect (pDock);
 		pDock->calculate_icons (pDock);
 		gtk_widget_queue_draw (pWidget);
 	}
@@ -966,7 +916,6 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 	}
 	pDock->iMouseX = iX;
 	pDock->iMouseY = iY;
-	//pPointedIcon = cairo_dock_apply_wave_effect (pDock);
 	pPointedIcon = pDock->calculate_icons (pDock);
 	gtk_widget_queue_draw (pDock->pWidget);
 	

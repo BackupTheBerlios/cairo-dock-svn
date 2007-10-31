@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([cairo-dock], [1.3.8], [Fabrice Rey (fabounet_03@yahoo.fr)])
+AC_INIT([cairo-dock], [1.4.0], [Fabrice Rey (fabounet_03@yahoo.fr)])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
 

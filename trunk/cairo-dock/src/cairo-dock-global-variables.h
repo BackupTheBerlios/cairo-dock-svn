@@ -7,9 +7,10 @@
 
 extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
+extern gchar *g_cLanguage;
 
-extern gint g_iScreenWidth;
-extern gint g_iScreenHeight;
+extern gint g_iScreenWidth[2];
+extern gint g_iScreenHeight[2];
 
 extern gchar *g_cCairoDockModuleDataDir;
 
@@ -47,8 +48,6 @@ extern gboolean g_bHorizontalDock;
 extern gboolean g_bUseText;
 extern int g_iLabelSize;
 extern gchar *g_cLabelPolice;
-extern GHashTable *g_hAppliTable;
-extern GHashTable *g_hXWindowTable;
 
 extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];

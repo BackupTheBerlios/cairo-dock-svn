@@ -26,7 +26,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #endif
 
 #include "cairo-dock-draw.h"
-#include "cairo-dock-applications.h"
+#include "cairo-dock-applications-manager.h"
 #include "cairo-dock-load.h"
 #include "cairo-dock-config.h"
 #include "cairo-dock-modules.h"
@@ -35,6 +35,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-separator-factory.h"
 #include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-renderer-manager.h"
+#include "cairo-dock-dock-factory.h"
 #include "cairo-dock-dock-factory.h"
 
 extern int g_iWmHint;
@@ -45,7 +46,6 @@ extern double g_fSubDockSizeRatio;
 extern gboolean g_bReserveSpace;
 extern gchar *g_cMainDockDefaultRendererName;
 extern gchar *g_cSubDockDefaultRendererName;
-
 
 extern int g_iMaxAuthorizedWidth;
 extern gint g_iDockLineWidth;
@@ -62,7 +62,6 @@ extern gchar *g_cCurrentLaunchersPath;
 
 extern gboolean g_bDirectionUp;
 
-extern int g_iSidUpdateAppliList;
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 extern gchar *g_cConfFile;
 
@@ -188,13 +187,7 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName, gchar *cRe
 	gtk_window_set_resizable (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_title (GTK_WINDOW (pWindow), "cairo-dock");
 	
-	CairoDockRenderer *pRenderer = cairo_dock_get_renderer (cRendererName);
-	g_return_val_if_fail (pRenderer != NULL, NULL);
-	pDock->calculate_max_dock_size = pRenderer->calculate_max_dock_size;
-	pDock->calculate_icons = pRenderer->calculate_icons;
-	pDock->render = pRenderer->render;
-	pDock->render_optimized = pRenderer->render_optimized;
-	pDock->set_subdock_position = pRenderer->set_subdock_position;
+	cairo_dock_set_renderer (pDock, cRendererName);
 	
 	gtk_widget_add_events (pWindow,
 		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | 
@@ -438,15 +431,15 @@ void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
 
 void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et iFlatDockWidth doivent avoir ete mis a jour au prealable.
 {
-	g_print ("%s ()\n", __func__);
+	//g_print ("%s ()\n", __func__);
 	pDock->calculate_max_dock_size (pDock);
 	
 	if (! pDock->bInside && (g_bAutoHide && pDock->iRefCount == 0))
 		return;
-	else
+	else if (GTK_WIDGET_VISIBLE (pDock->pWidget))
 	{
 		int iNewWidth, iNewHeight;
-		cairo_dock_get_window_position_and_geometry_at_balance (pDock, (pDock->bInside ? CAIRO_DOCK_MAX_SIZE : CAIRO_DOCK_NORMAL_SIZE), &iNewWidth, &iNewHeight);  // inutile de recalculer Y mais bon...
+		cairo_dock_get_window_position_and_geometry_at_balance (pDock, (pDock->bInside || pDock->iSidShrinkDown > 0 ? CAIRO_DOCK_MAX_SIZE : CAIRO_DOCK_NORMAL_SIZE), &iNewWidth, &iNewHeight);  // inutile de recalculer Y mais bon...
 		
 		if (pDock->bHorizontalDock)
 		{
@@ -644,10 +637,9 @@ static void _cairo_dock_deactivate_one_dock (CairoDock *pDock)
 		g_source_remove (pDock->iSidShrinkDown);
 	if (pDock->iSidLeaveDemand != 0)
 		g_source_remove (pDock->iSidLeaveDemand);
-	if (pDock->bIsMainDock && g_iSidUpdateAppliList != 0)
+	if (pDock->bIsMainDock && cairo_dock_application_manager_is_running ())
 	{
-		g_source_remove (g_iSidUpdateAppliList);
-		g_iSidUpdateAppliList = 0;
+		cairo_dock_pause_application_manager ();
 	}
 	
 	gtk_widget_destroy (pDock->pWidget);
@@ -668,10 +660,9 @@ void cairo_dock_free_all_docks (CairoDock *pMainDock)
 {
 	if (pMainDock == NULL)
 		return ;
-	cairo_dock_remove_all_applets (pMainDock);
+	cairo_dock_remove_all_applets (pMainDock);  // pour arreter les applets; on pourrait se contenter de faire un stop() sur chacun ...
 	
-	if (g_iSidUpdateAppliList != 0)
-		cairo_dock_remove_all_applis (pMainDock);
+	///cairo_dock_pause_application_manager ();  // sera fait lors de la liberation du dock.
 	
 	g_hash_table_foreach_remove (g_hDocksTable, (GHRFunc) _cairo_dock_free_one_dock, NULL);
 }

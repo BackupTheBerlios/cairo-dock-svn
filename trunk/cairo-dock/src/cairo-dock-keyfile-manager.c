@@ -441,21 +441,36 @@ GHashTable *cairo_dock_list_available_translations (gchar *cTranslationsDir, gch
 	return pTranslationTable;
 }
 
-gchar *cairo_dock_get_conf_file_language (GKeyFile *pKeyFile)
+void cairo_dock_get_conf_file_language_and_version (GKeyFile *pKeyFile, gchar **cConfFileLanguage, gchar **cConfFileVersion)
 {
-	gchar *cConfFileLanguage = NULL;
+	*cConfFileLanguage = NULL;
+	*cConfFileVersion = NULL;
+	
 	gchar *cFirstComment =  g_key_file_get_comment (pKeyFile, NULL, NULL, NULL);
 	if (cFirstComment != NULL && *cFirstComment == '!')
 	{
-		int iStringLenght = strlen (cFirstComment);
-		if (cFirstComment[iStringLenght-1] == '\n')
-			cFirstComment[iStringLenght-1] = '\0';
 		gchar *str = strchr (cFirstComment, ';');
 		if (str != NULL)
+		{
 			*str = '\0';
-		cConfFileLanguage = g_strdup (cFirstComment+1);
+			if (cConfFileVersion != NULL)
+			{
+				gchar *str2 = strchr (str+1, '\n');
+				if (str2 == NULL)
+					strchr (str+1, ';');
+				if (str2 != NULL)
+					*str2 = '\0';
+				*cConfFileVersion = g_strdup (str+1);
+			}
+		}
+		else
+		{
+			int iStringLenght = strlen (cFirstComment);
+			if (cFirstComment[iStringLenght-1] == '\n')
+				cFirstComment[iStringLenght-1] = '\0';
+		}
+		if (cConfFileLanguage != NULL)
+			*cConfFileLanguage = g_strdup (cFirstComment+1);
 	}
 	g_free (cFirstComment);
-	g_print (" -> cConfFileLanguage : %s\n", cConfFileLanguage);
-	return cConfFileLanguage;
 }

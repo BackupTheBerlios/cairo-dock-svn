@@ -21,10 +21,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <cairo-glitz.h>
 #endif
 
-#include "cairo-dock-config.h"
 #include "cairo-dock-draw.h"
 #include "cairo-dock-icons.h"
-#include "cairo-dock-applications.h"
 #include "cairo-dock-surface-factory.h"
 #include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-application-factory.h"
@@ -308,7 +306,7 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 		cairo_dock_update_dock_size (pDock);
 	}
 }
-void cairo_dock_reload_buffers_in_all_dock (GHashTable *hDocksTable)
+void cairo_dock_reload_buffers_in_all_docks (GHashTable *hDocksTable)
 {
 	g_hash_table_foreach (hDocksTable, (GHFunc) cairo_dock_reload_buffers_in_dock, NULL);
 }

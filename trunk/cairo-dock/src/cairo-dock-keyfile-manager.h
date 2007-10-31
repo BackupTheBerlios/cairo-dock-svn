@@ -24,7 +24,7 @@ void cairo_dock_replace_values_in_conf_file (gchar *cConfFilePath, GKeyFile *pVa
 void cairo_dock_replace_keys_by_identifier (gchar *cConfFilePath, gchar *cReplacementConfFilePath, gchar iIdentifier);
 
 GHashTable *cairo_dock_list_available_translations (gchar *cTranslationsDir, gchar *cFilePrefix, GError **erreur);
-gchar *cairo_dock_get_conf_file_language (GKeyFile *pKeyFile);
+void cairo_dock_get_conf_file_language_and_version (GKeyFile *pKeyFile, gchar **cConfFileLanguage, gchar **cConfFileVersion);
 
 
 #endif

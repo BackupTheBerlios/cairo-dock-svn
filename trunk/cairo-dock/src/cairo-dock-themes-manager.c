@@ -15,10 +15,13 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-keyfile-manager.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-modules.h"
+#include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-themes-manager.h"
 
 //#define CAIRO_DOCK_REMEMBER_THEME_FILE ".cairo-dock.last"
 #define CAIRO_DOCK_MODIFIED_THEME_FILE ".cairo-dock-need-save"
+#define CAIRO_DOCK_THEME_PANEL_WIDTH 600
+#define CAIRO_DOCK_THEME_PANEL_HEIGHT 400
 
 extern gchar *g_cCairoDockDataDir;
 extern gchar *g_cConfFile;
@@ -99,9 +102,10 @@ gchar *cairo_dock_edit_themes (gchar *cLanguage, GHashTable **hThemeTable)
 	
 	//\___________________ On laisse l'utilisateur l'editer.
 	gchar *cPresentedGroup = (cairo_dock_theme_need_save () ? "Save" : NULL);
-	gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTmpConfFile, "Manage themes", 600, 400, 0, cPresentedGroup, NULL, NULL, NULL);
+	gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTmpConfFile, "Manage themes", CAIRO_DOCK_THEME_PANEL_WIDTH, CAIRO_DOCK_THEME_PANEL_HEIGHT, 0, cPresentedGroup, NULL, NULL, NULL);
 	if (! bChoiceOK)
 	{
+		g_remove (cTmpConfFile);
 		g_free (cTmpConfFile);
 		cTmpConfFile = NULL;
 	}
@@ -235,6 +239,8 @@ int cairo_dock_ask_initial_theme (void)
 		system (cCommand);
 		g_free (cCommand);
 		
+		g_remove (cInitConfFile);
+		
 		g_free (cThemeName);
 		g_free (cInitConfFile);
 		iInitialChoiceOK = 1;
@@ -292,6 +298,8 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 		GKeyFile *pKeyFile = g_key_file_new ();
 		
 		g_key_file_load_from_file (pKeyFile, cInitConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+		g_remove (cInitConfFile);
+		g_free (cInitConfFile);
 		if (erreur != NULL)
 		{
 			g_print ("Attention : %s\n", erreur->message);
@@ -317,11 +325,6 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 		{
 			if (bNeedSave)
 			{
-				/*GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (pWidget),
-					GTK_DIALOG_DESTROY_WITH_PARENT,
-					GTK_MESSAGE_QUESTION,
-					GTK_BUTTONS_YES_NO,
-					"Discard changes in current theme and load this one ?");*/
 				GtkWidget *dialog = gtk_dialog_new_with_buttons ("Confirm discarding changes",
 					GTK_WINDOW (pWidget),
 					GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
@@ -343,7 +346,6 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 				gtk_widget_destroy (dialog);
 				if (answer != GTK_RESPONSE_YES)
 				{
-					g_free (cInitConfFile);
 					g_hash_table_destroy (hThemeTable);
 					return TRUE;
 				}
@@ -394,7 +396,6 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 			cairo_dock_load_theme (g_cCurrentThemePath);
 			
 			g_free (cNewThemeName);
-			g_free (cInitConfFile);
 			g_hash_table_destroy (hThemeTable);
 			return FALSE;
 		}
@@ -533,7 +534,6 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 		g_key_file_free (pKeyFile);
 	}
 	
-	g_free (cInitConfFile);
 	g_hash_table_destroy (hThemeTable);
 	return FALSE;
 }

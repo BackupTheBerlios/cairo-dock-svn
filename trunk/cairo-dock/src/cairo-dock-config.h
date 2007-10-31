@@ -32,5 +32,6 @@ void cairo_dock_update_conf_file_with_translations (gchar *cConfFile, gchar *cTr
 
 CairoDockDesktopEnv cairo_dock_guess_environment (void);
 
+gboolean cairo_dock_conf_file_needs_update (GKeyFile *pKeyFile);
 
 #endif

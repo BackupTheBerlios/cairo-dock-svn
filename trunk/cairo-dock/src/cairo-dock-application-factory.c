@@ -16,17 +16,12 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <X11/Xutil.h>
 #include <gdk/gdkx.h>
 
-#ifdef HAVE_GLITZ
-#include <glitz-glx.h>
-#include <cairo-glitz.h>
-#endif
-
 #include "cairo-dock-load.h"
 #include "cairo-dock-icons.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-surface-factory.h"
+#include "cairo-dock-applications-manager.h"
 #include "cairo-dock-application-factory.h"
-
 
 extern double g_fAmplitude;
 extern int g_iLabelSize;
@@ -38,11 +33,56 @@ extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 
 extern gboolean g_bUniquePid;
 extern gboolean g_bGroupAppliByClass;
-extern Display *g_XDisplay;
-extern GHashTable *g_hAppliTable;
-extern GHashTable *g_hXWindowTable;
 
-extern gboolean g_bUseGlitz;
+static GHashTable *s_hAppliTable = NULL;  // table des PID connus de cairo-dock (affichees ou non dans le dock).
+static Display *s_XDisplay = NULL;
+static Atom s_aNetWmIcon;
+static Atom s_aNetWmState;
+static Atom s_aNetWmSkipPager;
+static Atom s_aNetWmSkipTaskbar;
+static Atom s_aNetWmPid;
+static Atom s_aNetWmWindowType;
+static Atom s_aNetWmWindowTypeNormal;
+static Atom s_aNetWmName;
+static Atom s_aUtf8String;
+static Atom s_aWmName;
+static Atom s_aString;
+
+
+void cairo_dock_initialize_application_factory (Display *pXDisplay)
+{
+	s_XDisplay = pXDisplay;
+	g_return_if_fail (s_XDisplay != NULL);
+	
+	s_hAppliTable = g_hash_table_new_full (g_int_hash,
+		g_int_equal,
+		g_free,
+		NULL);
+	
+	s_aNetWmIcon = XInternAtom (s_XDisplay, "_NET_WM_ICON", False);
+	
+	s_aNetWmState = XInternAtom (s_XDisplay, "_NET_WM_STATE", False);
+	s_aNetWmSkipPager = XInternAtom (s_XDisplay, "_NET_WM_STATE_SKIP_PAGER", False);
+	s_aNetWmSkipTaskbar = XInternAtom (s_XDisplay, "_NET_WM_STATE_SKIP_TASKBAR", False);
+	
+	s_aNetWmPid = XInternAtom (s_XDisplay, "_NET_WM_PID", False);
+	
+	s_aNetWmWindowType = XInternAtom (s_XDisplay, "_NET_WM_WINDOW_TYPE", False);
+	s_aNetWmWindowTypeNormal = XInternAtom (s_XDisplay, "_NET_WM_WINDOW_TYPE_NORMAL", False);
+	
+	s_aNetWmName = XInternAtom (s_XDisplay, "_NET_WM_NAME", False);
+	s_aUtf8String = XInternAtom (s_XDisplay, "UTF8_STRING", False);
+	s_aWmName = XInternAtom (s_XDisplay, "WM_NAME", False);
+	s_aString = XInternAtom (s_XDisplay, "STRING", False);
+}
+
+void cairo_dock_unregister_pid (Icon *icon)
+{
+	if (g_bUniquePid && CAIRO_DOCK_IS_APPLI (icon) && icon->iPid != 0)
+	{
+		g_hash_table_remove (s_hAppliTable, &icon->iPid);
+	}
+}
 
 
 static GdkPixbuf *_cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bAddAlpha)  // cette fonction est inspiree par celle de libwnck.
@@ -51,7 +91,7 @@ static GdkPixbuf *_cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bA
 	int x, y;  // inutile.
 	guint border_width;  // inutile.
 	guint iWidth, iHeight, iDepth;
-	XGetGeometry (g_XDisplay,
+	XGetGeometry (s_XDisplay,
 		XPixmapID, &root, &x, &y,
 		&iWidth, &iHeight, &border_width, &iDepth);
 	g_print ("%s (%d) : %dx%dx%d pixels (%d;%d)\n", __func__, XPixmapID, iWidth, iHeight, iDepth, x, y);
@@ -98,12 +138,11 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 {
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	
-	Atom aNetWmIcon = XInternAtom (g_XDisplay, "_NET_WM_ICON", False);
 	Atom aReturnedType = 0;
 	int aReturnedFormat = 0;
 	unsigned long iLeftBytes, iBufferNbElements = 0;
 	gulong *pXIconBuffer = NULL;
-	XGetWindowProperty (g_XDisplay, Xid, aNetWmIcon, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXIconBuffer);
+	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmIcon, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXIconBuffer);
 	
 	if (iBufferNbElements > 2)
 	{
@@ -113,7 +152,7 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 	}
 	else  // sinon on tente avec l'icone eventuellement presente dans les WMHints.
 	{
-		XWMHints *pWMHints = XGetWMHints (g_XDisplay, Xid);
+		XWMHints *pWMHints = XGetWMHints (s_XDisplay, Xid);
 		if (pWMHints == NULL)
 			return NULL;
 		
@@ -194,28 +233,25 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	//g_print ("%s (%d)\n", __func__, Xid);
 	guchar *pNameBuffer;
 	gulong *pPidBuffer = NULL;
-	double fWidth, fHeight;
-	cairo_surface_t *pNewSurface = NULL;
 	Atom aReturnedType = 0;
 	int aReturnedFormat = 0;
-	unsigned long iLeftBytes, iBufferNbElements = 0;
+	unsigned long iLeftBytes, iBufferNbElements;
+	cairo_surface_t *pNewSurface;
+	double fWidth, fHeight;
 	
 	//\__________________ On regarde si on doit l'afficher ou la sauter.
-	Atom aNetWmMState = XInternAtom (g_XDisplay, "_NET_WM_STATE", False);
 	gulong *pXStateBuffer = NULL;
 	iBufferNbElements = 0;
-	XGetWindowProperty (g_XDisplay, Xid, aNetWmMState, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXStateBuffer);
+	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmState, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXStateBuffer);
 	gboolean bSkip = FALSE;
 	if (iBufferNbElements > 0)
 	{
 		int i;
-		Atom aNetWmSkipPager = XInternAtom (g_XDisplay, "_NET_WM_STATE_SKIP_PAGER", False);
-		Atom aNetWmSkipTaskbar = XInternAtom (g_XDisplay, "_NET_WM_STATE_SKIP_TASKBAR", False);
 		for (i = 0; i < iBufferNbElements && ! bSkip; i ++)
 		{
-			if (pXStateBuffer[i] == aNetWmSkipPager)
+			if (pXStateBuffer[i] == s_aNetWmSkipPager)
 				bSkip = TRUE;
-			else if (pXStateBuffer[i] == aNetWmSkipTaskbar)
+			else if (pXStateBuffer[i] == s_aNetWmSkipTaskbar)
 				bSkip = TRUE;
 		}
 		//g_print (" -------- bSkip : %d\n",  bSkip);
@@ -229,14 +265,13 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	//\__________________ On recupere son PID si on est en mode "PID unique".
 	if (g_bUniquePid)
 	{
-		Atom aNetWmPid = XInternAtom (g_XDisplay, "_NET_WM_PID", False);
 		iBufferNbElements = 0;
-		XGetWindowProperty (g_XDisplay, Xid, aNetWmPid, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pPidBuffer);
+		XGetWindowProperty (s_XDisplay, Xid, s_aNetWmPid, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pPidBuffer);
 		if (iBufferNbElements > 0)
 		{
 			//g_print (" +++ PID %d\n", *pPidBuffer);
 			
-			Icon *pIcon = g_hash_table_lookup (g_hAppliTable, pPidBuffer);
+			Icon *pIcon = g_hash_table_lookup (s_hAppliTable, pPidBuffer);
 			if (pIcon != NULL)  // si c'est une fenetre d'une appli deja referencee, on ne rajoute pas d'icones.
 			{
 				XFree (pPidBuffer);
@@ -252,15 +287,14 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	
 	//\__________________ On regarde son type.
 	gulong *pTypeBuffer;
-	Atom aNetWmWindowType = XInternAtom (g_XDisplay, "_NET_WM_WINDOW_TYPE", False);
-	XGetWindowProperty (g_XDisplay, Xid, aNetWmWindowType, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pTypeBuffer);
+	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmWindowType, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pTypeBuffer);
 	if (iBufferNbElements != 0)
 	{
-		if (*pTypeBuffer != XInternAtom (g_XDisplay, "_NET_WM_WINDOW_TYPE_NORMAL", False))
+		if (*pTypeBuffer != s_aNetWmWindowTypeNormal)
 		{
 			XFree (pTypeBuffer);
 			if (g_bUniquePid)
-				g_hash_table_insert (g_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
+				g_hash_table_insert (s_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
 			return NULL;
 		}
 		XFree (pTypeBuffer);
@@ -269,19 +303,15 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	//	g_print (" pas de type defini -> on suppose que son type est 'normal'\n");
 	
 	//\__________________ On recupere son nom.
-	Atom aNetWmName = XInternAtom (g_XDisplay, "_NET_WM_NAME", False);
-	Atom aUtf8String = XInternAtom (g_XDisplay, "UTF8_STRING", False);
-	XGetWindowProperty (g_XDisplay, Xid, aNetWmName, 0, G_MAXULONG, False, aUtf8String, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
+	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmName, 0, G_MAXULONG, False, s_aUtf8String, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
 	if (iBufferNbElements == 0)
 	{
-		Atom aWmName = XInternAtom (g_XDisplay, "WM_NAME", False);
-		Atom aString = XInternAtom (g_XDisplay, "STRING", False);
-		XGetWindowProperty (g_XDisplay, Xid, aWmName, 0, G_MAXULONG, False, aString, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
+		XGetWindowProperty (s_XDisplay, Xid, s_aWmName, 0, G_MAXULONG, False, s_aString, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
 	}
 	if (iBufferNbElements == 0)
 	{
 		if (g_bUniquePid)
-			g_hash_table_insert (g_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
+			g_hash_table_insert (s_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
 		return NULL;
 	}
 	//g_print ("recuperation de %s\n", pNameBuffer);
@@ -293,7 +323,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 		//g_print ("pas d'icone\n");
 		XFree (pNameBuffer);
 		if (g_bUniquePid)
-			g_hash_table_insert (g_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
+			g_hash_table_insert (s_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
 		return NULL;
 	}
 	
@@ -314,15 +344,13 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 	
 	if (g_bUniquePid)
-		g_hash_table_insert (g_hAppliTable, pPidBuffer, icon);
-	Window *pXid = g_new (Window, 1);
-	*pXid = Xid;
-	g_hash_table_insert (g_hXWindowTable, pXid, icon);
+		g_hash_table_insert (s_hAppliTable, pPidBuffer, icon);
+	cairo_dock_register_appli (icon);
 	XFree (pNameBuffer);
 	
 	//\__________________ On regarde si il faut la grouper avec une autre.
 	XClassHint class_hint;
-	if (XGetClassHint (g_XDisplay, Xid, &class_hint) != 0)
+	if (XGetClassHint (s_XDisplay, Xid, &class_hint) != 0)
 	{
 		g_print ("  res_name : %s; res_class : %s\n", class_hint.res_name, class_hint.res_class);
 		icon->cClass = g_ascii_strdown (class_hint.res_class, -1);  // on la passe en minuscule, car certaines applis ont la bonne idee de donner des classes avec une majuscule ou non suivant les fenetres. Il reste le cas des aplis telles que Glade2 ('Glade' et 'Glade-2' ...)

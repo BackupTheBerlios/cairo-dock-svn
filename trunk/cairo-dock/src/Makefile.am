@@ -49,8 +49,8 @@ cairo_dock_SOURCES = \
 	cairo-dock-load.h \
 	cairo-dock-icons.h \
 	cairo-dock-icons.c \
-	cairo-dock-applications.c \
-	cairo-dock-applications.h \
+	cairo-dock-applications-manager.c \
+	cairo-dock-applications-manager.h \
 	cairo-dock-menu.c \
 	cairo-dock-menu.h \
 	cairo-dock-modules.c \
@@ -82,7 +82,9 @@ cairo_dock_SOURCES = \
 	cairo-dock-surface-factory.c\
 	cairo-dock-surface-factory.h\
 	cairo-dock-renderer-manager.c\
-	cairo-dock-renderer-manager.h
+	cairo-dock-renderer-manager.h\
+	cairo-dock-default-view.c\
+	cairo-dock-default-view.h
 	
 
 cairo_dockincludedir =\
@@ -101,7 +103,7 @@ cairo_docksubinclude_HEADERS =\
 	cairo-dock-config.h\
 	cairo-dock-load.h\
 	cairo-dock-icons.h\
-	cairo-dock-applications.h\
+	cairo-dock-applications-manager.h\
 	cairo-dock-menu.h\
 	cairo-dock-modules.h\
 	cairo-dock-global-variables.h\
@@ -118,4 +120,5 @@ cairo_docksubinclude_HEADERS =\
 	cairo-dock-dialogs.h\
 	cairo-dock-gui-factory.h\
 	cairo-dock-surface-factory.h\
-	cairo-dock-renderer-manager.h
+	cairo-dock-renderer-manager.h\
+	cairo-dock-default-view.h

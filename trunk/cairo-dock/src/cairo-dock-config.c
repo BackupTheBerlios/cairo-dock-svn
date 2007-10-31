@@ -17,7 +17,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-draw.h"
 #include "cairo-dock-load.h"
 #include "cairo-dock-icons.h"
-#include "cairo-dock-applications.h"
+#include "cairo-dock-applications-manager.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-keyfile-manager.h"
 #include "cairo-dock-gui-factory.h"
@@ -109,7 +109,6 @@ extern gboolean g_bShowAppli;
 extern gboolean g_bUniquePid;
 extern gboolean g_bGroupAppliByClass;
 extern int g_iAppliMaxNameLength;
-extern int g_iSidUpdateAppliList;
 
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
@@ -434,7 +433,6 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	
 	//\___________________ On recupere les parametres du dock en lui-meme.
-	gchar *cPreviousLanguage = cairo_dock_get_conf_file_language (pKeyFile);
 	g_free (g_cLanguage);
 	g_cLanguage = cairo_dock_get_string_key_value (pKeyFile, "Cairo Dock", "language", &bFlushConfFileNeeded, "en");
 	
@@ -550,7 +548,6 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_fStripesAngle = cairo_dock_get_double_key_value (pKeyFile, "Background", "stripes angle", &bFlushConfFileNeeded, 30.);
 	
 	
-		
 	//\___________________ On recupere les parametres des lanceurs.
 	gchar *cIconThemeName = cairo_dock_get_string_key_value (pKeyFile, "Launchers", "icon theme", &bFlushConfFileNeeded, NULL);
 	if (s_bUserTheme)
@@ -701,9 +698,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	cairo_dock_remove_all_applets (pDock);  // on est obliges d'arreter tous les applets.
 	
-	if (bUniquePidOld != g_bUniquePid || bGroupAppliByClassOld != g_bGroupAppliByClass || (g_iSidUpdateAppliList != 0 && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
+	if (bUniquePidOld != g_bUniquePid || bGroupAppliByClassOld != g_bGroupAppliByClass || (cairo_dock_application_manager_is_running () && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
 	{
-		cairo_dock_remove_all_applis (pDock);
+		cairo_dock_stop_application_manager (pDock);
 	}
 	else  // il reste 2 types distincts dans la liste, on reordonne car l'ordre des types a pu changer.
 	{
@@ -718,17 +715,19 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		cairo_dock_build_docks_tree_with_desktop_files (pDock, g_cCurrentLaunchersPath);
 	}
 	else
-		cairo_dock_reload_buffers_in_all_dock (g_hDocksTable);
+		cairo_dock_reload_buffers_in_all_docks (g_hDocksTable);
 	
 	
-	if (g_iSidUpdateAppliList == 0 && g_bShowAppli)  // maintenant on veut voir les applis !
+	if (! cairo_dock_application_manager_is_running () && g_bShowAppli)  // maintenant on veut voir les applis !
 	{
-		cairo_dock_show_all_applis (pDock);
+		cairo_dock_start_application_manager (pDock);
 	}
 	
 	
 	cairo_dock_activate_modules_from_list (cActiveModuleList, pDock);
 	g_strfreev (cActiveModuleList);
+	
+	cairo_dock_set_all_views_to_default ();
 	
 	cairo_dock_reserve_space_for_dock (pDock, g_bReserveSpace);
 	cairo_dock_update_dock_size (pDock);
@@ -776,7 +775,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	}
 	
 	
-	if (bFlushConfFileNeeded || (g_cLanguage != NULL && (cPreviousLanguage == NULL || strcmp (cPreviousLanguage, g_cLanguage) != 0)))
+	if (! bFlushConfFileNeeded)
+		bFlushConfFileNeeded = cairo_dock_conf_file_needs_update (pKeyFile);
+	if (bFlushConfFileNeeded)
 	{
 		cairo_dock_flush_conf_file (pKeyFile, cConfFilePath, CAIRO_DOCK_SHARE_DATA_DIR);
 		/*gchar *cCommand = g_strdup_printf ("/bin/cp %s/cairo-dock-%s.conf %s", CAIRO_DOCK_SHARE_DATA_DIR, g_cLanguage, cConfFilePath);
@@ -784,13 +785,12 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		g_free (cCommand);
 		
 		cairo_dock_replace_values_in_conf_file (cConfFilePath, pKeyFile, TRUE, 0);*/
-		
 		cairo_dock_update_conf_file_with_available_modules (cConfFilePath);
 		cairo_dock_update_conf_file_with_translations (cConfFilePath, CAIRO_DOCK_SHARE_DATA_DIR);
-		cairo_dock_update_conf_file_with_renderers (cConfFilePath);
 	}
-	g_free (cPreviousLanguage);
 	
+	cairo_dock_update_conf_file_with_renderers (cConfFilePath);
+
 	g_key_file_free (pKeyFile);
 	
 	cairo_dock_mark_theme_as_modified (TRUE);
@@ -990,4 +990,23 @@ CairoDockDesktopEnv cairo_dock_guess_environment (void)
 		iDesktopEnv = CAIRO_DOCK_GNOME;
 	}
 	return iDesktopEnv;
+}
+
+
+gboolean cairo_dock_conf_file_needs_update (GKeyFile *pKeyFile)
+{
+	gchar *cPreviousLanguage = NULL, *cPreviousVersion = NULL;
+	cairo_dock_get_conf_file_language_and_version (pKeyFile, &cPreviousLanguage, &cPreviousVersion);
+	
+	gboolean bNeedsUpdate;
+	if ( (g_cLanguage != NULL && (cPreviousLanguage == NULL || strcmp (cPreviousLanguage, g_cLanguage) != 0)) ||
+		cPreviousVersion == NULL ||
+		strcmp (cPreviousVersion, CAIRO_DOCK_VERSION) != 0)
+		bNeedsUpdate = TRUE;
+	else
+		bNeedsUpdate = FALSE;
+	
+	g_free (cPreviousLanguage);
+	g_free (cPreviousVersion);
+	return bNeedsUpdate;
 }

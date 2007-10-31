@@ -364,7 +364,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	GtkWidget *pOneWidget;
 	GSList * pSubWidgetList;
 	GtkWidget *pLabel;
-	GtkWidget *pVBox, *pHBox, *pSmallVBox;
+	GtkWidget *pVBox, *pHBox, *pSmallVBox, *pEventBox;
 	GtkWidget *pEntry;
 	GtkWidget *pTable;
 	GtkWidget *pButtonAdd, *pButtonRemove;
@@ -375,7 +375,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	GtkWidget *pColorButton;
 	GtkWidget *pFontButton;
 	GtkWidget *pDescriptionLabel;
-	gchar *cGroupName, *cKeyName, *cKeyComment, *cUsefulComment, *cAuthorizedValuesChain, **pAuthorizedValuesList;
+	gchar *cGroupName, *cKeyName, *cKeyComment, *cUsefulComment, *cAuthorizedValuesChain, *pTipString, **pAuthorizedValuesList;
 	gpointer *pGroupKeyWidget;
 	int i, j, k, iNbElements;
 	int iNumPage=0, iPresentedNumPage=0;
@@ -409,6 +409,8 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 			GTK_RESPONSE_REJECT,
 			NULL);
 	gtk_container_set_border_width (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), 3);
+	
+	GtkTooltips *pToolTipsGroup = gtk_tooltips_new ();
 	
 	GtkWidget *pNoteBook = gtk_notebook_new ();
 	gtk_notebook_set_scrollable (GTK_NOTEBOOK (pNoteBook), TRUE);
@@ -514,7 +516,34 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					bIsAligned = FALSE;
 				//g_print ("cUsefulComment : %s\n", cUsefulComment);
 				
+				pTipString = strchr (cUsefulComment, '{');
+				if (pTipString != NULL)
+				{
+					if (*(pTipString-1) == '\n')
+						*(pTipString-1) ='\0';
+					else
+						*pTipString = '\0';
+					
+					pTipString ++;
+					
+					gchar *pTipEnd = strrchr (pTipString, '}');
+					if (pTipEnd != NULL)
+						*pTipEnd = '\0';
+				}
+				
 				pHBox = gtk_hbox_new (FALSE, 3);
+				if (pTipString != NULL)
+				{
+					//g_print ("pTipString : '%s'\n", pTipString);
+					pEventBox = gtk_event_box_new ();
+					gtk_container_add (GTK_CONTAINER (pEventBox), pHBox);
+					gtk_tooltips_set_tip (GTK_TOOLTIPS (pToolTipsGroup),
+						pEventBox,
+						pTipString,
+						"pouet");
+				}
+				else
+					pEventBox = NULL;
 				
 				if (*cUsefulComment != '\0' && strcmp (cUsefulComment, "...") != 0 && iElementType != 'F')
 				{
@@ -529,10 +558,10 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 				}
 				
 				gtk_box_pack_start (pFrameVBox == NULL ? GTK_BOX (pVBox) : GTK_BOX (pFrameVBox),
-						pHBox,
-						FALSE,
-						FALSE,
-						0);
+					(pEventBox != NULL ? pEventBox : pHBox),
+					FALSE,
+					FALSE,
+					0);
 				
 				pSubWidgetList = NULL;
 				
@@ -1024,14 +1053,23 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					break ;
 				}
 				
+				/*if (pTipString != NULL && ! GTK_WIDGET_NO_WINDOW (pOneWidget))
+				{
+					g_print ("pTipString : '%s'\n", pTipString);
+					gtk_tooltips_set_tip (GTK_TOOLTIPS (pToolTipsGroup), pOneWidget,
+						pTipString,
+						"pouet");
+				}*/
+				
 				if (pSubWidgetList != NULL)
 				{
-					pGroupKeyWidget = g_new (gpointer, 2);
+					pGroupKeyWidget = g_new (gpointer, 3);
 					pGroupKeyWidget[0] = g_strdup (cGroupName);  // car on ne pourra pas le liberer s'il est partage entre plusieurs 'data'.
 					pGroupKeyWidget[1] = cKeyName;
 					pGroupKeyWidget[2] = pSubWidgetList;
 					*pWidgetList = g_slist_prepend (*pWidgetList, pGroupKeyWidget);
 				}
+				
 				g_strfreev (pAuthorizedValuesList);
 				g_free (cKeyComment);
 			}
@@ -1043,6 +1081,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 		i ++;
 	}
 	
+	gtk_tooltips_enable (GTK_TOOLTIPS (pToolTipsGroup));
 	gtk_widget_show_all (dialog);
 	gtk_notebook_set_current_page (GTK_NOTEBOOK (pNoteBook), iPresentedNumPage);
 	
@@ -1280,6 +1319,7 @@ static void _cairo_dock_free_widget_list (gpointer *data, gpointer user_data)
 	//g_print ("%s - %s\n", (gchar *)data[0], (gchar *)data[1]);
 	g_free (data[0]);
 	g_free (data[1]);  // data[2] est le widget, et il se fera liberer lors de la destruction de la fenetre.
+	g_slist_free (data[2]);  // les elements de data[2] sont les widgets, et se feront liberer lors de la destruction de la fenetre.
 }
 
 void cairo_dock_free_generated_widget_list (GSList *pWidgetList)

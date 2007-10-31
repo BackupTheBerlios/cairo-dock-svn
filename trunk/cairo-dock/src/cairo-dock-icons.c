@@ -29,6 +29,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-callbacks.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-dialogs.h"
+#include "cairo-dock-applications-manager.h"
 #include "cairo-dock-icons.h"
 
 
@@ -52,10 +53,7 @@ extern double g_fUnfoldAcceleration;
 extern gboolean g_bAutoHide;
 
 extern gboolean g_bDirectionUp;
-extern GHashTable *g_hAppliTable;
 extern gboolean g_bUniquePid;
-extern GHashTable *g_hXWindowTable;
-extern int g_iSidUpdateAppliList;
 
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 extern gchar *g_cConfFile;
@@ -80,15 +78,9 @@ void cairo_dock_free_icon (Icon *icon)
 	cairo_surface_destroy (icon->pIconBuffer);
 	cairo_surface_destroy (icon->pTextBuffer);
 	
-	if (CAIRO_DOCK_IS_VALID_APPLI (icon))
-	{
-		g_hash_table_remove (g_hXWindowTable, &icon->Xid);
-		if (g_bUniquePid)
-			g_hash_table_remove (g_hAppliTable, &icon->iPid);
-		g_free (icon->cClass);
-	}
-	if (CAIRO_DOCK_IS_VALID_APPLET (icon))
-		cairo_dock_free_module (icon->pModule);
+	cairo_dock_unregister_appli (icon);
+	
+	cairo_dock_free_module (icon->pModule);
 	
 	g_free (icon);
 }
@@ -533,42 +525,33 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 static void _cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon, gboolean bCheckUnusedSeparator)
 {
 	//\___________________ On effectue les taches de fermeture de l'icone suivant son type.
-	if (CAIRO_DOCK_IS_APPLI (icon))
+	if (CAIRO_DOCK_IS_VALID_APPLI (icon))
 	{
-		if (icon->iPid != 0 && g_bUniquePid)
+		cairo_dock_unregister_appli (icon);
+		CairoDock *pClassSubDock = icon->pSubDock;
+		if (pClassSubDock != NULL)  // cette icone pointe sur le sous-dock de sa classe, il faut enlever la 1ere icone de ce sous-dock, la deplacer au dock parent, et lui affecter le sous-dock si il est non vide, ou sinon le detruire.
 		{
-			g_hash_table_remove (g_hAppliTable, &icon->iPid);
-			icon->iPid = 0;
-		}
-		if (icon->Xid != 0)
-		{
-			g_hash_table_remove (g_hXWindowTable, &icon->Xid);
-			icon->Xid = 0;
-			CairoDock *pClassSubDock = icon->pSubDock;
-			if (pClassSubDock != NULL)  // cette icone pointe sur le sous-dock de sa classe, il faut enlever la 1ere icone de ce sous-dock, la deplacer au dock parent, et lui affecter le sous-dock si il est non vide, ou sinon le detruire.
+			Icon *pSameClassIcon = cairo_dock_get_first_icon (pClassSubDock->icons);
+			if (pSameClassIcon != NULL)  // a priori toujours vrai.
 			{
-				Icon *pSameClassIcon = cairo_dock_get_first_icon (pClassSubDock->icons);
-				if (pSameClassIcon != NULL)  // a priori toujours vrai.
+				icon->pSubDock = NULL;  // on detache le sous-dock de l'icone, il sera detruit ou rattache.
+				
+				cairo_dock_detach_icon_from_dock (pSameClassIcon, pClassSubDock, FALSE);  // inutile de verifier si un separateur est present.
+				
+				pSameClassIcon->fOrder = icon->fOrder;
+				pSameClassIcon->cParentDockName = g_strdup (cairo_dock_search_dock_name (pDock));
+				cairo_dock_insert_icon_in_dock (pSameClassIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+				
+				if (pClassSubDock->icons != NULL)
 				{
-					icon->pSubDock = NULL;  // on detache le sous-dock de l'icone, il sera detruit ou rattache.
-					
-					cairo_dock_detach_icon_from_dock (pSameClassIcon, pClassSubDock, FALSE);  // inutile de verifier si un separateur est present.
-					
-					pSameClassIcon->fOrder = icon->fOrder;
-					pSameClassIcon->cParentDockName = g_strdup (cairo_dock_search_dock_name (pDock));
-					cairo_dock_insert_icon_in_dock (pSameClassIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
-					
-					if (pClassSubDock->icons != NULL)
-					{
-						g_print ("  on re-attribue le sous-dock de la classe a l'icone deplacee\n");
-						pSameClassIcon->pSubDock = pClassSubDock;
-					}
-					else
-					{
-						g_print ("  plus d'icone de cette classe\n");
-						const gchar *cClassSubDockName = cairo_dock_search_dock_name (pClassSubDock);  // on aurait pu utiliser l'ancien 'cParentDockName' de pSameClassIcon mais bon ...
-						cairo_dock_destroy_dock (pClassSubDock, cClassSubDockName, NULL, NULL);
-					}
+					g_print ("  on re-attribue le sous-dock de la classe a l'icone deplacee\n");
+					pSameClassIcon->pSubDock = pClassSubDock;
+				}
+				else
+				{
+					g_print ("  plus d'icone de cette classe\n");
+					const gchar *cClassSubDockName = cairo_dock_search_dock_name (pClassSubDock);  // on aurait pu utiliser l'ancien 'cParentDockName' de pSameClassIcon mais bon ...
+					cairo_dock_destroy_dock (pClassSubDock, cClassSubDockName, NULL, NULL);
 				}
 			}
 		}
@@ -643,44 +626,6 @@ void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType)
 	}
 }
 
-void cairo_dock_remove_separator (CairoDock *pDock, CairoDockIconType iType)
-{
-	GList* ic;
-	Icon *icon;
-	for (ic = pDock->icons; ic != NULL; ic = ic->next)
-	{
-		icon = ic->data;
-		if (icon->iType == iType)
-			pDock->icons = g_list_remove (pDock->icons, icon);
-	}
-}
-
-
-void cairo_dock_remove_all_separators (CairoDock *pDock)
-{
-	GList* ic;
-	Icon *icon;
-	for (ic = pDock->icons; ic != NULL; ic = ic->next)
-	{
-		icon = ic->data;
-		if (CAIRO_DOCK_IS_SEPARATOR (icon))
-			cairo_dock_remove_icon_from_dock (pDock, icon);
-	}
-}
-
-void cairo_dock_remove_all_applis (CairoDock *pDock)
-{
-	if (g_iSidUpdateAppliList != 0)
-		g_source_remove (g_iSidUpdateAppliList);
-	g_iSidUpdateAppliList = 0;
-	
-	cairo_dock_remove_icons_of_type (pDock, CAIRO_DOCK_APPLI);
-}
-
-void cairo_dock_remove_all_applets (CairoDock *pDock)
-{
-	cairo_dock_remove_icons_of_type (pDock, CAIRO_DOCK_APPLET);
-}
 
 
 
@@ -843,7 +788,7 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 		
 		prev_icon->fX = icon->fX - (prev_icon->fWidth + g_iIconGap) * prev_icon->fScale;
 		//g_print ("fX <- %.2f; fXMin : %.2f\n", prev_icon->fX, prev_icon->fXMin);
-		if (prev_icon->fX < prev_icon->fXMin + g_fAmplitude * (prev_icon->fWidth + 2*g_iIconGap) / 8 && iWidth != 0 && x_abs < iWidth)  /// && prev_icon->fPhase == 0 
+		if (prev_icon->fX < prev_icon->fXMin + g_fAmplitude * (prev_icon->fWidth + 2*g_iIconGap) / 8 && iWidth != 0 && x_abs < iWidth && fMagnitude > 0)  /// && prev_icon->fPhase == 0   // on rajoute 'fMagnitude > 0' sinon il y'a un leger "saut" du aux contraintes a gauche de l'icone pointee.
 		{
 			//g_print ("  on contraint %s (fXMin=%.2f , fX=%.2f\n", prev_icon->acName, prev_icon->fXMin, prev_icon->fX);
 			fDeltaExtremum = prev_icon->fX - (prev_icon->fXMin + g_fAmplitude * (prev_icon->fWidth + 2*g_iIconGap) / 16);
@@ -996,38 +941,7 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 }
 
 
-void cairo_dock_calculate_max_dock_size_linear (CairoDock *pDock)
-{
-	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest_linear (pDock->icons, pDock->iFlatDockWidth, pDock->iScrollOffset);
-	pDock->iMaxDockWidth = ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iFlatDockWidth, 1.)) + 1;
-	pDock->iMaxDockWidth = MIN (pDock->iMaxDockWidth, g_iMaxAuthorizedWidth);
-	
-	pDock->iMaxDockHeight = (int) ((1 + g_fAmplitude) * pDock->iMaxIconHeight) + g_iLabelSize + g_iDockLineWidth + g_iFrameMargin;
-	
-	pDock->iDecorationsWidth = pDock->iMaxDockWidth;
-	pDock->iDecorationsHeight = pDock->iMaxIconHeight + 2 * g_iFrameMargin;
-	
-	pDock->iMinDockWidth = pDock->iFlatDockWidth + 2 * g_iDockRadius + 2 * g_iFrameMargin + g_iDockLineWidth;
-	pDock->iMinDockHeight = pDock->iMaxIconHeight + 2 * g_iFrameMargin + 2 * g_iDockLineWidth;
-}
 
-#define CAIRO_DOCK_VERTICAL_GAP_ON_ELLIPSE_FOR_CAROUSSEL 10
-void cairo_dock_calculate_max_dock_size_caroussel (CairoDock *pDock)
-{
-	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest_linear (pDock->icons, pDock->iFlatDockWidth, pDock->iScrollOffset);
-	pDock->iMaxDockWidth = ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iFlatDockWidth, 0.5)) + 1;
-	pDock->iMaxDockWidth = MIN (pDock->iMaxDockWidth, g_iMaxAuthorizedWidth);
-	
-	int iEllipseHeight = (1 + g_fAmplitude) * pDock->iMaxIconHeight + CAIRO_DOCK_VERTICAL_GAP_ON_ELLIPSE_FOR_CAROUSSEL;  // le gap est a ajuster, pourrait etre negatif meme.
-	pDock->iMaxDockHeight = g_iDockLineWidth + g_iFrameMargin + iEllipseHeight + pDock->iMaxIconHeight;  // de bas en haut;
-	pDock->iMaxDockHeight = MAX (pDock->iMaxDockHeight, g_iDockLineWidth + g_iFrameMargin + (1 + g_fAmplitude) * pDock->iMaxIconHeight + g_iLabelSize);
-	
-	pDock->iDecorationsWidth = pDock->iMaxDockWidth;
-	pDock->iDecorationsHeight = iEllipseHeight + 2 * g_iFrameMargin;
-	
-	pDock->iMinDockWidth = MIN (pDock->iMaxDockWidth, pDock->iFlatDockWidth + 2 * g_iDockRadius + 2 * g_iFrameMargin + g_iDockLineWidth);
-	pDock->iMinDockHeight = pDock->iMaxIconHeight + 2 * g_iFrameMargin + 2 * g_iDockLineWidth;
-}
 
 
 void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, CairoDockIconType iType, double fMargin)
