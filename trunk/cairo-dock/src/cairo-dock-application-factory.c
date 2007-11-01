@@ -240,10 +240,10 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	double fWidth, fHeight;
 	
 	//\__________________ On regarde si on doit l'afficher ou la sauter.
+	gboolean bSkip = FALSE;
 	gulong *pXStateBuffer = NULL;
 	iBufferNbElements = 0;
 	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmState, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXStateBuffer);
-	gboolean bSkip = FALSE;
 	if (iBufferNbElements > 0)
 	{
 		int i;
@@ -287,6 +287,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	
 	//\__________________ On regarde son type.
 	gulong *pTypeBuffer;
+	gboolean bNormalTypeWindow = FALSE;
 	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmWindowType, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pTypeBuffer);
 	if (iBufferNbElements != 0)
 	{
@@ -297,6 +298,8 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 				g_hash_table_insert (s_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
 			return NULL;
 		}
+		else
+			bNormalTypeWindow = TRUE;
 		XFree (pTypeBuffer);
 	}
 	//else
@@ -320,7 +323,8 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	pNewSurface = cairo_dock_create_surface_from_xwindow (Xid, pSourceContext, 1 + g_fAmplitude, &fWidth, &fHeight);
 	if (pNewSurface == NULL)
 	{
-		//g_print ("pas d'icone\n");
+		if (bNormalTypeWindow)
+			g_print ("pas d'icone mais pourtant son type est normal.\n");
 		XFree (pNameBuffer);
 		if (g_bUniquePid)
 			g_hash_table_insert (s_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
@@ -352,7 +356,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	XClassHint class_hint;
 	if (XGetClassHint (s_XDisplay, Xid, &class_hint) != 0)
 	{
-		g_print ("  res_name : %s; res_class : %s\n", class_hint.res_name, class_hint.res_class);
+		g_print ("  res_name : %s(%x); res_class : %s(%x)\n", class_hint.res_name, class_hint.res_name, class_hint.res_class, class_hint.res_class);
 		icon->cClass = g_ascii_strdown (class_hint.res_class, -1);  // on la passe en minuscule, car certaines applis ont la bonne idee de donner des classes avec une majuscule ou non suivant les fenetres. Il reste le cas des aplis telles que Glade2 ('Glade' et 'Glade-2' ...)
 		XFree (class_hint.res_name);
 		XFree (class_hint.res_class);

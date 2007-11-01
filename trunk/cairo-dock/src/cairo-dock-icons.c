@@ -63,6 +63,7 @@ void cairo_dock_free_icon (Icon *icon)
 {
 	if (icon == NULL)
 		return ;
+	g_print ("%s (%s)\n", __func__, icon->acName);
 	
 	cairo_dock_dialog_unreference (icon);
 	if (icon->pDialog != NULL)
@@ -817,7 +818,7 @@ Icon *cairo_dock_apply_wave_effect (CairoDock *pDock)
 	
 	//\_______________ On calcule l'ensemble des parametres des icones.
 	double fMagnitude = cairo_dock_calculate_magnitude (pDock->iMagnitudeIndex);
-	Icon *pPointedIcon = cairo_dock_calculate_wave_with_position_linear (pDock->icons, pDock->pFirstDrawnElement, x_abs, fMagnitude, pDock->iFlatDockWidth, pDock->iCurrentWidth, iHeight, pDock->fAlign, pDock->fFoldingFactor);  // iMaxDockWidth
+	Icon *pPointedIcon = cairo_dock_calculate_wave_with_position_linear (pDock->icons, pDock->pFirstDrawnElement, x_abs, fMagnitude, pDock->iFlatDockWidth, iWidth, iHeight, pDock->fAlign, pDock->fFoldingFactor);  // iMaxDockWidth
 	
 	//\_______________ On regarde si le curseur est dans le dock ou pas, et on joue sur la taille des icones en consequence.
 	gboolean bMouseInsideDock = (x_abs >= 0 && x_abs <= pDock->iFlatDockWidth && iMouseX > 0 && iMouseX < iWidth);

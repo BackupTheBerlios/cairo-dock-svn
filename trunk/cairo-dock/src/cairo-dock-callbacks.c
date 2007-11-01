@@ -135,10 +135,9 @@ static void cairo_dock_show_subdock (Icon *pPointedIcon, gboolean bUpdate, Cairo
 	
 	if (bUpdate)
 	{
-		pDock->calculate_icons (pDock);  // c'est un peu un hack pourri, l'idee c'est de recalculer la position exacte de l'icone pointee pour pouvoir placer le sous-dock precisement, car sa derniere position connue est decalee d'un coup de molette par rapport a la nouvelle, ce qui fait beaucoup. Il faudrait ne le faire que pour l'icone concernee ...
+		pDock->calculate_icons (pDock);  // c'est un peu un hack pourri, l'idee c'est de recalculer la position exacte de l'icone pointee pour pouvoir placer le sous-dock precisement, car sa derniere position connue est decalee d'un coup de molette par rapport a la nouvelle, ce qui fait beaucoup. L'ideal etant de le faire que pour l'icone concernee ...
 	}
 	
-	///cairo_dock_set_subdock_position_generic (pPointedIcon, pDock);
 	pSubDock->set_subdock_position (pPointedIcon, pDock);
 	
 	pSubDock->fFoldingFactor = g_fUnfoldAcceleration;

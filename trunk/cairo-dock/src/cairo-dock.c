@@ -40,7 +40,7 @@
 *********************** VERSION 2 (2007)*********************
 **
 ** author(s) :
-**     Fabrice Rey <fabounet_03@yahoo.fr>, 
+**     Fabrice Rey <fabounet@users.berlios.de>
 **
 ** notes :
 **     I've completely rewritten the calculation part, and the callback system.
@@ -49,10 +49,9 @@
 **     Plus a menu and the drag'n'drop ability.
 **     Also I've separated functions in several files in order to make the code more readable.
 **     Now it sems more like a real dock !
-**     Feel free to upgrade it according to your wishes !
 **
 **     Edit : plus a taskbar, plus an applet system,
-**            plus the container ability, plus the carousel view, plus the top and vertical view.
+**            plus the container ability, plus the caroussel view, plus the top and vertical view, ...
 **
 **
 *******************************************************************************/

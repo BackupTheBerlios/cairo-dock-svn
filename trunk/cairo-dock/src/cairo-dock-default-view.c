@@ -154,17 +154,7 @@ void cairo_dock_render_linear (CairoDock *pDock)
 	}
 	cairo_restore (pCairoContext);
 	
-	//\____________________ On calcule les position/etirements/alpha des icones.
-	cairo_dock_mark_avoiding_mouse_icons_linear (pDock);
-	
-	Icon* icon;
-	GList* ic;
-	for (ic = pDock->icons; ic != NULL; ic = ic->next)
-	{
-		icon = ic->data;
-		cairo_dock_calculate_construction_parameters_generic (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth);
-		cairo_dock_manage_animations (icon, pDock);
-	}
+	//\____________________ ...
 	
 	//\____________________ On dessine la ficelle qui les joint.
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
@@ -299,13 +289,31 @@ void cairo_dock_render_optimized_linear (CairoDock *pDock, GdkRectangle *pArea)
 }
 
 
+Icon *cairo_dock_calculate_icons_linear (CairoDock *pDock)
+{
+	Icon *pPointedIcon = cairo_dock_apply_wave_effect (pDock);
+	
+	//\____________________ On calcule les position/etirements/alpha des icones.
+	cairo_dock_mark_avoiding_mouse_icons_linear (pDock);
+	
+	Icon* icon;
+	GList* ic;
+	for (ic = pDock->icons; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		cairo_dock_calculate_construction_parameters_generic (icon, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->iMaxDockWidth);
+		cairo_dock_manage_animations (icon, pDock);
+	}
+	
+	return pPointedIcon;
+}
 
 void cairo_dock_register_default_renderer (void)
 {
 	CairoDockRenderer *pDefaultRenderer = g_new0 (CairoDockRenderer, 1);
 	pDefaultRenderer->cReadmeFilePath = g_strdup_printf ("%s/readme-basic-view", CAIRO_DOCK_SHARE_DATA_DIR);
 	pDefaultRenderer->calculate_max_dock_size = cairo_dock_calculate_max_dock_size_linear;
-	pDefaultRenderer->calculate_icons = cairo_dock_apply_wave_effect;
+	pDefaultRenderer->calculate_icons = cairo_dock_calculate_icons_linear;  // cairo_dock_apply_wave_effect
 	pDefaultRenderer->render = cairo_dock_render_linear;
 	pDefaultRenderer->render_optimized = cairo_dock_render_optimized_linear;
 	pDefaultRenderer->set_subdock_position = cairo_dock_set_subdock_position_linear;

@@ -7,7 +7,7 @@
 #include "cairo-dock-config.h"
 #include "cairo-dock-load.h"
 #include "cairo-dock-icons.h"
-#include "cairo-dock-applications.h"
+#include "cairo-dock-applications-manager.h"
 #include "cairo-dock-menu.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-global-variables.h"

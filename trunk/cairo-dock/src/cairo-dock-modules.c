@@ -45,7 +45,7 @@ void cairo_dock_initialize_module_manager (gchar *cModuleDirPath)
 		cairo_dock_preload_module_from_directory (cModuleDirPath, s_hModuleTable, &erreur);
 		if (erreur != NULL)
 		{
-			g_print ("Attention : %s\n  no module will be available", erreur->message);
+			g_print ("Attention : %s\n  no module will be available\n", erreur->message);
 			g_error_free (erreur);
 		}
 	}

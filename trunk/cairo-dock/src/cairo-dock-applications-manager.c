@@ -26,7 +26,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-applications-manager.h"
 
-#define CAIRO_DOCK_TASKBAR_CHECK_INTERVAL 350
+#define CAIRO_DOCK_TASKBAR_CHECK_INTERVAL 250
 
 extern gboolean g_bAutoHide;
 extern double g_fAmplitude;
@@ -495,20 +495,66 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 	bInProgress = TRUE;
 	
 	g_return_val_if_fail (pDock != NULL, FALSE);
-	Bool bEventPresent;
+	/*Bool bEventPresent;
 	gboolean bInterestedEvent = FALSE;
 	Window root = DefaultRootWindow (s_XDisplay);
 	//Window xUnwantedWindow = 0;
 	
-	//\_____________________ On regarde si une fenetre s'est faite effacee.
+	//\_____________________ On regarde si une fenetre apparait.
 	bEventPresent = TRUE;
 	while (bEventPresent)
+	{
+		bEventPresent = XCheckTypedEvent(s_XDisplay, MapNotify, &event);
+		if (bEventPresent)  // && event.xmap.window != xUnwantedWindow
+		{
+			bInterestedEvent = TRUE;
+			g_print ("Map (%d)\n", event.xmap.window);
+			Icon *icon = g_hash_table_lookup (s_hXWindowTable, &event.xmap.window);
+			if (icon != NULL)
+			{
+				//g_print ("c'est %s qui re-apparait\n", icon->acName);
+				icon->bIsMapped = TRUE;
+				if (icon->fPersonnalScale > 0)  // elle est en train de disparaitre, on inverse le processus.
+				{
+					//if (pDock->iSidShrinkDown > 0)
+					//	g_source_remove (pDock->iSidShrinkDown);
+					//pDock->iSidShrinkDown = 0;
+					if (! pDock->bInside && g_bAutoHide && pDock->bAtBottom)
+						icon->fPersonnalScale = - 0.05;
+					else
+						icon->fPersonnalScale = -0.95;
+					//pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+				}
+			}
+			else
+			{
+				g_print ("c'est une nouvelle fenetre qui apparait\n");
+				cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+				if (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS)
+					icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xmap.window, pDock);
+				if (icon != NULL)
+				{
+					g_print ("insertion de %s dans %s\n", icon->acName, icon->cParentDockName);
+					CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+					g_return_val_if_fail (pParentDock != NULL, TRUE);
+					cairo_dock_insert_icon_in_dock (icon, pParentDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+					if (! pParentDock->bInside && g_bAutoHide && pParentDock->bAtBottom)
+						icon->fPersonnalScale = - 0.05;
+					cairo_dock_start_animation (icon, pParentDock);
+				}
+			}
+		}
+	}
+	
+	//\_____________________ On regarde si une fenetre s'est faite effacee.
+	bEventPresent = TRUE;
+	///while (bEventPresent)
 	{
 		bEventPresent = XCheckTypedEvent(s_XDisplay, DestroyNotify, &event);
 		if (bEventPresent)
 		{
 			bInterestedEvent = TRUE;
-			//g_print ("Destroy (%d)\n", event.xdestroywindow.window);
+			g_print ("Destroy (%d)\n", event.xdestroywindow.window);
 			Icon *icon = g_hash_table_lookup (s_hXWindowTable, &event.xdestroywindow.window);
 			if (icon != NULL && icon->fPersonnalScale <= 0)
 			{
@@ -529,7 +575,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 		}
 	}
 	//\_____________________ On regarde si une fenetre est creee.
-	/*bEventPresent = TRUE;
+	bEventPresent = TRUE;
 	//while (bEventPresent)
 	{
 		bEventPresent = XCheckTypedEvent(s_XDisplay, CreateNotify, &event);
@@ -561,16 +607,16 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 					xUnwantedWindow = event.xcreatewindow.window;
 			}
 		}
-	}*/
+	}
 	//\_____________________ On regarde si une fenetre se cache.
 	bEventPresent = TRUE;
-	while (bEventPresent)
+	///while (bEventPresent)
 	{
 		bEventPresent = XCheckTypedEvent(s_XDisplay, UnmapNotify, &event);
 		if (bEventPresent)
 		{
 			bInterestedEvent = TRUE;
-			//g_print ("Unmap (%d)\n", event.xunmap.window);
+			g_print ("Unmap (%d)\n", event.xunmap.window);
 			Icon *icon = g_hash_table_lookup (s_hXWindowTable, &event.xunmap.window);
 			if (icon != NULL)
 			{
@@ -597,51 +643,6 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 			}
 		}
 	}
-	//\_____________________ On regarde si une fenetre apparait.
-	bEventPresent = TRUE;
-	while (bEventPresent)
-	{
-		bEventPresent = XCheckTypedEvent(s_XDisplay, MapNotify, &event);
-		if (bEventPresent/* && event.xmap.window != xUnwantedWindow*/)
-		{
-			bInterestedEvent = TRUE;
-			//g_print ("Map (%d)\n", event.xmap.window);
-			Icon *icon = g_hash_table_lookup (s_hXWindowTable, &event.xmap.window);
-			if (icon != NULL)
-			{
-				//g_print ("c'est %s qui re-apparait\n", icon->acName);
-				icon->bIsMapped = TRUE;
-				if (icon->fPersonnalScale > 0)  // elle est en train de disparaitre, on inverse le processus.
-				{
-					/*if (pDock->iSidShrinkDown > 0)
-						g_source_remove (pDock->iSidShrinkDown);
-					pDock->iSidShrinkDown = 0;*/
-					if (! pDock->bInside && g_bAutoHide && pDock->bAtBottom)
-						icon->fPersonnalScale = - 0.05;
-					else
-						icon->fPersonnalScale = -0.95;
-					//pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
-				}
-			}
-			else
-			{
-				//g_print ("c'est une nouvelle fenetre qui apparait\n");
-				cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
-				if (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS)
-					icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xmap.window, pDock);
-				if (icon != NULL)
-				{
-					g_print ("insertion de %s dans %s\n", icon->acName, icon->cParentDockName);
-					CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
-					g_return_val_if_fail (pParentDock != NULL, TRUE);
-					cairo_dock_insert_icon_in_dock (icon, pParentDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
-					if (! pParentDock->bInside && g_bAutoHide && pParentDock->bAtBottom)
-						icon->fPersonnalScale = - 0.05;
-					cairo_dock_start_animation (icon, pParentDock);
-				}
-			}
-		}
-	}
 	
 	
 	//g_print ("%d events\n", XEventsQueued (s_XDisplay, QueuedAlready));
@@ -654,10 +655,10 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 		while (XCheckMaskEvent (s_XDisplay, event_mask, &event))
 		{
 			//g_print ("on vide un evenement\n");
-			if (/*event.type == CreateNotify || */event.type == DestroyNotify || event.type == UnmapNotify || event.type == MapNotify)
+			if (event.type == DestroyNotify || event.type == UnmapNotify || event.type == MapNotify)  // event.type == CreateNotify || 
 			{
 				XPutBackEvent (s_XDisplay, &event);
-				g_print ("  on le remet dans la queue\n");
+				g_print ("  on le remet dans la queue (%d/%d,%d,%d)\n", event.type, MapNotify, UnmapNotify, DestroyNotify);
 				bEventPresent = TRUE;
 				break ;
 			}
@@ -666,7 +667,104 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 	if (! bEventPresent)
 	{
 		XSync (s_XDisplay, True);
+	}*/
+	
+	long event_mask = 0xFFFFFFFF;
+	Icon *icon;
+	while (XCheckMaskEvent (s_XDisplay, event_mask, &event))
+	{
+		switch (event.type)
+		{
+			case MapNotify :
+				//g_print ("Map (%d)\n", event.xmap.window);
+				icon = g_hash_table_lookup (s_hXWindowTable, &event.xmap.window);
+				if (icon != NULL)
+				{
+					//g_print ("c'est %s qui re-apparait\n", icon->acName);
+					icon->bIsMapped = TRUE;
+					if (icon->fPersonnalScale > 0)  // elle est en train de disparaitre, on inverse le processus.
+					{
+						/*if (pDock->iSidShrinkDown > 0)
+							g_source_remove (pDock->iSidShrinkDown);
+						pDock->iSidShrinkDown = 0;*/
+						if (! pDock->bInside && g_bAutoHide && pDock->bAtBottom)
+							icon->fPersonnalScale = - 0.05;
+						else
+							icon->fPersonnalScale = -0.95;
+						//pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+					}
+				}
+				else
+				{
+					//g_print ("c'est une nouvelle fenetre qui apparait\n");
+					cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+					if (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS)
+						icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xmap.window, pDock);
+					if (icon != NULL)
+					{
+						g_print ("  insertion de %s dans %s\n", icon->acName, icon->cParentDockName);
+						CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+						g_return_val_if_fail (pParentDock != NULL, TRUE);
+						cairo_dock_insert_icon_in_dock (icon, pParentDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+						if (! pParentDock->bInside && g_bAutoHide && pParentDock->bAtBottom)
+							icon->fPersonnalScale = - 0.05;
+						g_print ("  insertion complete (%.2f)\n", icon->fPersonnalScale);
+						cairo_dock_start_animation (icon, pParentDock);
+					}
+				}
+			break;
+			
+			case UnmapNotify :
+				//g_print ("Unmap (%d)\n", event.xunmap.window);
+				icon = g_hash_table_lookup (s_hXWindowTable, &event.xunmap.window);
+				if (icon != NULL)
+				{
+					if (icon->bIsMapped)
+					{
+						//g_print ("est %s qui se cache\n", icon->acName);
+						icon->bIsMapped = FALSE;
+					}
+					else if (icon->fPersonnalScale <= 0)
+					{
+						// Ce qu'il faudrait faire : reduire son icone de moitie et la deplacer a droite des applis. Cependant, la zone de notification de gnome reduit la fenetre des qu'on veut la remapper nous-memes ! Du coup pas le choix, on l'enleve de la barre.
+						//g_print ("c'est %s qui se fait degager (%d)\n", icon->acName, event.xunmap.from_configure);
+						CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+						if (pParentDock == NULL)
+							pParentDock = pDock;
+						
+						if (! pParentDock->bInside && (g_bAutoHide || pParentDock->iRefCount != 0) && pParentDock->bAtBottom)
+							icon->fPersonnalScale = 0.05;
+						else
+							icon->fPersonnalScale = 1.0;
+						
+						cairo_dock_start_animation (icon, pParentDock);
+					}
+				}
+			break;
+			
+			case DestroyNotify :
+				//g_print ("Destroy (%d)\n", event.xdestroywindow.window);
+				icon = g_hash_table_lookup (s_hXWindowTable, &event.xdestroywindow.window);
+				if (icon != NULL && icon->fPersonnalScale <= 0)
+				{
+					//g_print ("c'est %s qui se fait exploser\n", icon->acName);
+					icon->bIsMapped = FALSE;
+					
+					CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+					if (pParentDock == NULL)
+						pParentDock = pDock;
+					
+					if (! pParentDock->bInside && (g_bAutoHide || pParentDock->iRefCount != 0) && pParentDock->bAtBottom)
+						icon->fPersonnalScale = 0.05;
+					else
+						icon->fPersonnalScale = 1.0;
+					
+					cairo_dock_start_animation (icon, pParentDock);
+				}
+			break;
+		}
 	}
+	XSync (s_XDisplay, True);
 	
 	bInProgress = FALSE;
 	return TRUE;
@@ -712,6 +810,7 @@ Window *cairo_dock_get_windows_list (gulong *iNbWindows)
 void cairo_dock_start_application_manager (CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
+	g_return_if_fail (s_iSidUpdateAppliList == 0);
 	cairo_dock_set_root_window_mask ();
 	gulong i, iNbWindows = 0;
 	Window *pXWindowsList = cairo_dock_get_windows_list (&iNbWindows);
@@ -811,7 +910,7 @@ void cairo_dock_set_one_icon_geometry_for_window_manager (Icon *icon, CairoDock 
 	{
 		int iX, iY, iWidth, iHeight;
 		iX = pDock->iWindowPositionX + icon->fXAtRest + (pDock->iCurrentWidth - pDock->iFlatDockWidth) / 2;
-		iY = pDock->iWindowPositionY + icon->fDrawY - icon->fHeight * g_fAmplitude;  // il faudrait un fYAtRest ...
+		iY = pDock->iWindowPositionY + icon->fDrawY - icon->fHeight * g_fAmplitude;  // il faudrait un fYAtRest ...  /// il faudrait calculer fDrawY avant ...
 		iWidth = icon->fWidth;
 		iHeight = icon->fHeight * (1. + 2. * g_fAmplitude);  // on elargit en haut et en bas, pour gerer les cas ou l'icone grossirait vers le haut ou vers le bas.
 		
@@ -825,6 +924,7 @@ void cairo_dock_set_icons_geometry_for_window_manager (CairoDock *pDock)
 {
 	if (s_iSidUpdateAppliList <= 0)
 		return ;
+	g_print ("%s ()\n", __func__);
 	
 	Icon *icon;
 	GList *ic;

@@ -21,6 +21,9 @@ void cairo_dock_render_linear (CairoDock *pDock);
 void cairo_dock_render_optimized_linear (CairoDock *pDock, GdkRectangle *pArea);
 
 
+Icon *cairo_dock_calculate_icons_linear (CairoDock *pDock);
+
+
 void cairo_dock_register_default_renderer (void);
 
 
