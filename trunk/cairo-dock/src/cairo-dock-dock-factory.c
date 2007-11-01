@@ -13,6 +13,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 #include <glib/gstdio.h>
 #include <gtk/gtk.h>
+#include <gdk/gdkx.h>
 
 #include <cairo.h>
 #include <pango/pango.h>
@@ -20,7 +21,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <librsvg/rsvg-cairo.h>
 
 #ifdef HAVE_GLITZ
-#include <gdk/gdkx.h>
 #include <glitz-glx.h>
 #include <cairo-glitz.h>
 #endif
