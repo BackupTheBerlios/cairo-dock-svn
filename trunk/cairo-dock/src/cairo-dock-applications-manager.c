@@ -673,26 +673,22 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 	Icon *icon;
 	while (XCheckMaskEvent (s_XDisplay, event_mask, &event))
 	{
+		icon = NULL;
 		switch (event.type)
 		{
+			//case CreateNotify :
 			case MapNotify :
-				//g_print ("Map (%d)\n", event.xmap.window);
+				g_print ("Map/Create (%d)\n", event.xmap.window);
 				icon = g_hash_table_lookup (s_hXWindowTable, &event.xmap.window);
 				if (icon != NULL)
 				{
-					//g_print ("c'est %s qui re-apparait\n", icon->acName);
+					if (event.type == MapNotify)
+						g_print ("c'est %s qui re-apparait\n", icon->acName);
+					else
+						g_print ("c'est %s qui ressucite d'entre les morts\n", icon->acName);
 					icon->bIsMapped = TRUE;
-					if (icon->fPersonnalScale > 0)  // elle est en train de disparaitre, on inverse le processus.
-					{
-						/*if (pDock->iSidShrinkDown > 0)
-							g_source_remove (pDock->iSidShrinkDown);
-						pDock->iSidShrinkDown = 0;*/
-						if (! pDock->bInside && g_bAutoHide && pDock->bAtBottom)
-							icon->fPersonnalScale = - 0.05;
-						else
-							icon->fPersonnalScale = -0.95;
-						//pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
-					}
+					if (icon->fPersonnalScale > 0)  // elle etait en train de disparaitre, on inverse le processus.
+						icon->fPersonnalScale = - icon->fPersonnalScale;
 				}
 				else
 				{
@@ -715,7 +711,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 			break;
 			
 			case UnmapNotify :
-				//g_print ("Unmap (%d)\n", event.xunmap.window);
+				g_print ("Unmap (%d)\n", event.xunmap.window);
 				icon = g_hash_table_lookup (s_hXWindowTable, &event.xunmap.window);
 				if (icon != NULL)
 				{
@@ -724,7 +720,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 						//g_print ("est %s qui se cache\n", icon->acName);
 						icon->bIsMapped = FALSE;
 					}
-					else if (icon->fPersonnalScale <= 0)
+					else if (icon->fPersonnalScale <= 0)  // pas deja en cours de suppression.
 					{
 						// Ce qu'il faudrait faire : reduire son icone de moitie et la deplacer a droite des applis. Cependant, la zone de notification de gnome reduit la fenetre des qu'on veut la remapper nous-memes ! Du coup pas le choix, on l'enleve de la barre.
 						//g_print ("c'est %s qui se fait degager (%d)\n", icon->acName, event.xunmap.from_configure);
@@ -743,9 +739,9 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 			break;
 			
 			case DestroyNotify :
-				//g_print ("Destroy (%d)\n", event.xdestroywindow.window);
+				g_print ("Destroy (%d)\n", event.xdestroywindow.window);
 				icon = g_hash_table_lookup (s_hXWindowTable, &event.xdestroywindow.window);
-				if (icon != NULL && icon->fPersonnalScale <= 0)
+				if (icon != NULL && icon->fPersonnalScale <= 0)  // pas deja en cours de suppression.
 				{
 					//g_print ("c'est %s qui se fait exploser\n", icon->acName);
 					icon->bIsMapped = FALSE;
@@ -760,6 +756,19 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 						icon->fPersonnalScale = 1.0;
 					
 					cairo_dock_start_animation (icon, pParentDock);
+				}
+			break;
+			
+			case PropertyNotify :
+				//g_print ("PropertyNotify (%d)\n", event.xproperty.window);
+				//g_print ("  type : %d; atom : %s\n", event.xproperty.type, gdk_x11_get_xatom_name (event.xproperty.atom));
+				icon = g_hash_table_lookup (s_hXWindowTable, &event.xproperty.window);
+				if (icon != NULL)
+				{
+					CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+					if (pParentDock == NULL)
+						pParentDock = pDock;
+					cairo_dock_Xproperty_changed (icon, event.xproperty.atom, pParentDock);
 				}
 			break;
 		}
@@ -777,8 +786,8 @@ void cairo_dock_set_root_window_mask (void)
 		return ;
 	bAlreadySet = TRUE;
 	
+	//XWindowAttributes wattr;
 	XSetWindowAttributes attr;
-	XWindowAttributes wattr;
 	memset (&attr.event_mask, 0, sizeof (attr.event_mask));
 	
 	attr.event_mask = 
@@ -788,12 +797,32 @@ void cairo_dock_set_root_window_mask (void)
 		SubstructureNotifyMask;
 	
 	Window root = DefaultRootWindow (s_XDisplay);
-	XGetWindowAttributes(s_XDisplay, root, &wattr);
-	if (wattr.all_event_masks & ButtonPressMask)
-		attr.event_mask &= ~ButtonPressMask;  // l'utilite reste a demontrer.
-	attr.event_mask &= ~SubstructureRedirectMask;
+	//XGetWindowAttributes(s_XDisplay, root, &wattr);
+	//if (wattr.all_event_masks & ButtonPressMask)
+	//	attr.event_mask &= ~ButtonPressMask;  // l'utilite reste a demontrer.
 	XSelectInput(s_XDisplay, root, attr.event_mask);
 }
+
+void cairo_dock_set_normal_window_mask (Window Xid)
+{
+	XSetWindowAttributes attr;
+	//XWindowAttributes wattr;
+	memset (&attr.event_mask, 0, sizeof (attr.event_mask));
+	
+	attr.event_mask = 
+		//StructureNotifyMask | /* ResizeRedirectMask | */
+		//SubstructureRedirectMask |
+		PropertyChangeMask |
+		SubstructureNotifyMask;
+	
+	//XGetWindowAttributes (s_XDisplay, Xid, &wattr);
+	//if (wattr.all_event_masks & ButtonPressMask)
+	//	attr.event_mask &= ~ButtonPressMask;  // l'utilite reste a demontrer.
+	//attr.event_mask &= ~SubstructureRedirectMask;  // inutile.
+	XSelectInput (s_XDisplay, Xid, attr.event_mask);
+}
+
+
 
 Window *cairo_dock_get_windows_list (gulong *iNbWindows)
 {
@@ -924,7 +953,7 @@ void cairo_dock_set_icons_geometry_for_window_manager (CairoDock *pDock)
 {
 	if (s_iSidUpdateAppliList <= 0)
 		return ;
-	g_print ("%s ()\n", __func__);
+	//g_print ("%s ()\n", __func__);
 	
 	Icon *icon;
 	GList *ic;

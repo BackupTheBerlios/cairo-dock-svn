@@ -35,6 +35,7 @@ void cairo_dock_get_current_desktop (int *iDesktopNumber, int *iDesktopViewportX
 
 gboolean cairo_dock_update_applis_list (CairoDock *pDock);
 void cairo_dock_set_root_window_mask (void);
+void cairo_dock_set_normal_window_mask (Window Xid);
 Window *cairo_dock_get_windows_list (gulong *iNbWindows);
 void cairo_dock_start_application_manager (CairoDock *pDock);
 

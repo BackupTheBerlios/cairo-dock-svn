@@ -11,4 +11,5 @@ essentialdata_DATA = \
 	themes-fr.conf\
 	themes-en.conf\
 	cairo-dock.svg\
-	readme-basic-view
+	readme-basic-view\
+	default-icon.svg

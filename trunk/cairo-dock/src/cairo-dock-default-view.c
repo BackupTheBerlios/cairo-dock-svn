@@ -92,6 +92,7 @@ void cairo_dock_calculate_construction_parameters_generic (Icon *icon, int iCurr
 	icon->fDrawX = icon->fX;
 	icon->fDrawY = icon->fY;
 	icon->fWidthFactor = 1.;
+	icon->fHeightFactor = 1.;
 	if (icon->fDrawX >= 0 && icon->fDrawX + icon->fWidth * icon->fScale <= iCurrentWidth)
 	{
 		icon->fAlpha = 1;
@@ -153,8 +154,6 @@ void cairo_dock_render_linear (CairoDock *pDock)
 		cairo_stroke (pCairoContext);
 	}
 	cairo_restore (pCairoContext);
-	
-	//\____________________ ...
 	
 	//\____________________ On dessine la ficelle qui les joint.
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);

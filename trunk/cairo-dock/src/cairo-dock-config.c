@@ -26,7 +26,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-config.h"
 
-static gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "pulse", "random", NULL};
+static gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "pulse", "upside-down", "random", NULL};
 static gchar * s_cIconTypeNames[(CAIRO_DOCK_NB_TYPES+1)/2] = {"launchers", "applications", "applets"};
 
 extern CairoDock *g_pMainDock;
@@ -737,6 +737,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_free (cVisibleZoneImageFile);
 	
 	cairo_dock_load_background_decorations (pDock);
+	cairo_dock_load_default_icon (pDock);
 	
 	
 	pDock->iMouseX = 0;  // on se place hors du dock initialement.

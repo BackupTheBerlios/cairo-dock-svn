@@ -148,8 +148,6 @@ struct _CairoDockDialog
 	cairo_surface_t* pTextBuffer;
 	int iTextWidth;
 	int iTextHeight;
-	gdouble fTextXOffset;
-	gdouble fTextYOffset;
 	GtkWidget *pWidget;
 	int iSidTimer;
 	int iRefCount;
@@ -171,6 +169,7 @@ typedef enum {
 	CAIRO_DOCK_ROTATE,
 	CAIRO_DOCK_BLINK,
 	CAIRO_DOCK_PULSE,
+	CAIRO_DOCK_UPSIDE_DOWN,
 	CAIRO_DOCK_RANDOM,
 	CAIRO_DOCK_NB_ANIMATIONS,
 	CAIRO_DOCK_FOLLOW_MOUSE,
@@ -194,6 +193,8 @@ struct _Icon {
 	gdouble fHeight;
 	cairo_surface_t* pIconBuffer;
 	cairo_surface_t* pTextBuffer;
+	int iTextWidth;
+	int iTextHeight;
 	gdouble fTextXOffset;
 	gdouble fTextYOffset;
 	gdouble fXMax;
@@ -208,6 +209,7 @@ struct _Icon {
 	gdouble fDrawX;
 	gdouble fDrawY;
 	gdouble fWidthFactor;
+	gdouble fHeightFactor;
 	gdouble fAlpha;
 	gboolean bPointed;
 	gint iCount;
@@ -234,6 +236,7 @@ struct _Icon {
 #define CAIRO_DOCK_MAIN_DOCK_NAME "_MainDock_"
 
 #define CAIRO_DOCK_DEFAULT_RENDERER_NAME "default"
+
 
 #define CAIRO_DOCK_LAST_ORDER -1e9
 #define CAIRO_DOCK_NB_MAX_ITERATIONS 1000

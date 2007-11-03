@@ -264,6 +264,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 				gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);*/
 			
 			///cairo_dock_apply_wave_effect (pDock);  // relance le grossissement si on est dedans.
+			pDock->calculate_icons (pDock);  // relance le grossissement si on est dedans.
 			if (! pDock->bInside && pDock->iRefCount > 0)
 			{
 				//g_print ("on cache ce sous-dock en sortant par lui\n");
@@ -321,7 +322,7 @@ void cairo_dock_arm_animation (Icon *icon, CairoDockAnimationType iAnimationType
 		icon->iAnimationType = iAnimationType;
 	
 	if (icon->iAnimationType == CAIRO_DOCK_RANDOM)
-		icon->iAnimationType =  g_random_int_range (0, CAIRO_DOCK_NB_ANIMATIONS);  // [a;b[
+		icon->iAnimationType = g_random_int_range (0, CAIRO_DOCK_NB_ANIMATIONS-1);  // [a;b[
 	
 	
 	if (iNbRounds == -1)
@@ -331,6 +332,7 @@ void cairo_dock_arm_animation (Icon *icon, CairoDockAnimationType iAnimationType
 
 void cairo_dock_start_animation (Icon *icon, CairoDock *pDock)
 {
+	g_print ("%s (%s, %d)\n", __func__, icon->acName, icon->iAnimationType);
 	if ((icon->iCount > 0 && icon->iAnimationType < CAIRO_DOCK_RANDOM) || icon->fPersonnalScale != 0)
 	{
 		if (pDock->iSidGrowUp != 0)

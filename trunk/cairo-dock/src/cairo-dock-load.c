@@ -35,6 +35,7 @@ extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
 extern double g_fSubDockSizeRatio;
 extern gboolean g_bSameHorizontality;
+extern cairo_surface_t *g_pDefaultIcon;
 
 extern int g_iSinusoidWidth;
 extern gint g_iDockLineWidth;
@@ -213,9 +214,11 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 	PangoRectangle ink, log;
 	pango_layout_get_pixel_extents (pLayout, &ink, &log);
 	
+	icon->iTextWidth = ink.width + 2;
+	icon->iTextHeight = ink.height + 2 + 1;  // le +1 est la pour palier aux erreurs d'arrondis qui apparaissent avec certaines polices.
 	cairo_surface_t* pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 		CAIRO_CONTENT_COLOR_ALPHA,
-		ink.width + 2, ink.height + 2 + 1);  // le +1 est la pour palier aux erreurs d'arrondis qui apparaissent avec certaines polices.
+		icon->iTextWidth, icon->iTextHeight);
 	cairo_t* pCairoContext = cairo_create (pNewSurface);
 	cairo_translate (pCairoContext, -ink.x, -ink.y+1);  // meme remarque.
 	
@@ -247,7 +250,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 	//g_print ("%s -> %.2f (%d;%d)\n", icon->acName, icon->fTextYOffset, log.height, ink.y);
 	
 	double fRotationAngle = (bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2));
-	cairo_surface_t *pNewSurfaceRotated = cairo_dock_rotate_surface (pNewSurface, pSourceContext, ink.width + 2, ink.height + 2, fRotationAngle);
+	cairo_surface_t *pNewSurfaceRotated = cairo_dock_rotate_surface (pNewSurface, pSourceContext, icon->iTextWidth, icon->iTextHeight, fRotationAngle);
 	if (pNewSurfaceRotated != NULL)
 	{
 		cairo_surface_destroy (pNewSurface);
@@ -508,4 +511,38 @@ void cairo_dock_load_background_decorations (CairoDock *pDock)
 	g_fBackgroundImageWidth = 0;
 	g_fBackgroundImageHeight = 0;
 	cairo_dock_update_background_decorations_if_necessary (pDock, data[0], data[1]);
+}
+
+
+void cairo_dock_load_default_icon (CairoDock *pDock)
+{
+	cairo_surface_destroy (g_pDefaultIcon);
+	g_pDefaultIcon = NULL;
+	
+	int i, iMinSize = 48, iMaxSize = 48;
+	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i += 2)
+	{
+		if (g_tMinIconAuthorizedSize[i] > 0)
+			iMinSize = MIN (iMinSize, g_tMinIconAuthorizedSize[i]);
+		if (g_tMaxIconAuthorizedSize[i] > 0)
+			iMaxSize = MAX (iMaxSize, g_tMaxIconAuthorizedSize[i]);
+	}
+	
+	gchar *cIconPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_DEFAULT_ICON_NAME);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+	double fDefaultIconWidth, fDefaultIconHeight;
+	g_pDefaultIcon = cairo_dock_create_surface_from_image (cIconPath,
+		pCairoContext,
+		1 + g_fAmplitude,
+		iMinSize,
+		iMinSize,
+		iMaxSize,
+		iMaxSize,
+		&fDefaultIconWidth,
+		&fDefaultIconHeight,
+		0,
+		1,
+		FALSE);
+	cairo_destroy (pCairoContext);
+	g_free (cIconPath);
 }

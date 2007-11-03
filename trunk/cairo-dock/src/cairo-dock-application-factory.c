@@ -18,7 +18,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 #include "cairo-dock-load.h"
 #include "cairo-dock-icons.h"
+#include "cairo-dock-draw.h"
 #include "cairo-dock-dock-factory.h"
+#include "cairo-dock-dialogs.h"
 #include "cairo-dock-surface-factory.h"
 #include "cairo-dock-applications-manager.h"
 #include "cairo-dock-application-factory.h"
@@ -43,10 +45,12 @@ static Atom s_aNetWmSkipTaskbar;
 static Atom s_aNetWmPid;
 static Atom s_aNetWmWindowType;
 static Atom s_aNetWmWindowTypeNormal;
+static Atom s_aNetWmWindowTypeDialog;
 static Atom s_aNetWmName;
 static Atom s_aUtf8String;
 static Atom s_aWmName;
 static Atom s_aString;
+static Atom s_aWmHints;
 
 
 void cairo_dock_initialize_application_factory (Display *pXDisplay)
@@ -69,11 +73,14 @@ void cairo_dock_initialize_application_factory (Display *pXDisplay)
 	
 	s_aNetWmWindowType = XInternAtom (s_XDisplay, "_NET_WM_WINDOW_TYPE", False);
 	s_aNetWmWindowTypeNormal = XInternAtom (s_XDisplay, "_NET_WM_WINDOW_TYPE_NORMAL", False);
+	s_aNetWmWindowTypeDialog = XInternAtom (s_XDisplay, "_NET_WM_WINDOW_TYPE_DIALOG", False);
 	
 	s_aNetWmName = XInternAtom (s_XDisplay, "_NET_WM_NAME", False);
 	s_aUtf8String = XInternAtom (s_XDisplay, "UTF8_STRING", False);
 	s_aWmName = XInternAtom (s_XDisplay, "WM_NAME", False);
 	s_aString = XInternAtom (s_XDisplay, "STRING", False);
+	
+	s_aWmHints = XInternAtom (s_XDisplay, "WM_HINTS", False);
 }
 
 void cairo_dock_unregister_pid (Icon *icon)
@@ -249,9 +256,9 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 		int i;
 		for (i = 0; i < iBufferNbElements && ! bSkip; i ++)
 		{
-			if (pXStateBuffer[i] == s_aNetWmSkipPager)
+			if (pXStateBuffer[i] == s_aNetWmSkipTaskbar)
 				bSkip = TRUE;
-			else if (pXStateBuffer[i] == s_aNetWmSkipTaskbar)
+			else if (pXStateBuffer[i] == s_aNetWmSkipPager)  // contestable ...
 				bSkip = TRUE;
 		}
 		//g_print (" -------- bSkip : %d\n",  bSkip);
@@ -260,7 +267,35 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	//else
 	//	g_print ("pas d'etat defini, donc on continue\n");
 	if (bSkip)
+	{
+		g_print ("  cette fenetre est timide\n");
 		return NULL;
+	}
+	
+	//\__________________ On regarde son type.
+	gulong *pTypeBuffer;
+	gboolean bNormalTypeWindow = FALSE;
+	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmWindowType, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pTypeBuffer);
+	if (iBufferNbElements != 0)
+	{
+		if (*pTypeBuffer == s_aNetWmWindowTypeDialog)
+		{
+			g_print ("dialogue\n");
+			return NULL;
+		}
+		else if (*pTypeBuffer != s_aNetWmWindowTypeNormal)
+		{
+			XFree (pTypeBuffer);
+			if (g_bUniquePid)
+				g_hash_table_insert (s_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
+			return NULL;
+		}
+		else
+			bNormalTypeWindow = TRUE;
+		XFree (pTypeBuffer);
+	}
+	//else
+	//	g_print (" pas de type defini -> on suppose que son type est 'normal'\n");
 	
 	//\__________________ On recupere son PID si on est en mode "PID unique".
 	if (g_bUniquePid)
@@ -284,26 +319,6 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 			return NULL;
 		}
 	}
-	
-	//\__________________ On regarde son type.
-	gulong *pTypeBuffer;
-	gboolean bNormalTypeWindow = FALSE;
-	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmWindowType, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pTypeBuffer);
-	if (iBufferNbElements != 0)
-	{
-		if (*pTypeBuffer != s_aNetWmWindowTypeNormal)
-		{
-			XFree (pTypeBuffer);
-			if (g_bUniquePid)
-				g_hash_table_insert (s_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
-			return NULL;
-		}
-		else
-			bNormalTypeWindow = TRUE;
-		XFree (pTypeBuffer);
-	}
-	//else
-	//	g_print (" pas de type defini -> on suppose que son type est 'normal'\n");
 	
 	//\__________________ On recupere son nom.
 	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmName, 0, G_MAXULONG, False, s_aUtf8String, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
@@ -382,5 +397,62 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	else
 		icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
 	
+	cairo_dock_set_normal_window_mask (Xid);
+	
 	return icon;
+}
+
+
+void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, CairoDock *pDock)
+{
+	//g_print ("%s (%s, %s)\n", __func__, icon->acName, gdk_x11_get_xatom_name (aProperty));
+	Atom aReturnedType = 0;
+	int aReturnedFormat = 0;
+	unsigned long iLeftBytes, iBufferNbElements=0;
+	
+	cairo_t* pCairoContext;
+	
+	if (aProperty == s_aNetWmName || aProperty == s_aWmName)
+	{
+		guchar *pNameBuffer = NULL;
+		XGetWindowProperty (s_XDisplay, icon->Xid, aProperty, 0, G_MAXULONG, False, (aProperty == s_aNetWmName ? s_aUtf8String : s_aString), &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
+		if (iBufferNbElements > 0)
+		{
+			g_free (icon->acName);
+			icon->acName = g_strdup ((gchar *)pNameBuffer);
+			XFree (pNameBuffer);
+			
+			pCairoContext = cairo_dock_create_context_from_window (pDock);
+			cairo_dock_fill_one_text_buffer (icon, pCairoContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
+			cairo_destroy (pCairoContext);
+		}
+	}
+	else if (aProperty == s_aNetWmIcon)
+	{
+		//g_print ("%s change son icone\n", icon->acName);
+		pCairoContext = cairo_dock_create_context_from_window (pDock);
+		cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
+		cairo_destroy (pCairoContext);
+		cairo_dock_redraw_my_icon (icon, pDock);
+	}
+	else if (aProperty == s_aWmHints)
+	{
+		XWMHints *pWMHints = XGetWMHints (s_XDisplay, icon->Xid);
+		if (pWMHints != NULL)
+		{
+			if (pWMHints->flags & XUrgencyHint)
+			{
+				g_print ("%s vous interpelle !\n", icon->acName);
+				cairo_dock_show_temporary_dialog (icon->acName, icon, pDock, 2000);
+			}
+			else if (pWMHints->flags & (IconPixmapHint | IconMaskHint | IconWindowHint))
+			{
+				//g_print ("%s change son icone\n", icon->acName);
+				pCairoContext = cairo_dock_create_context_from_window (pDock);
+				cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
+				cairo_destroy (pCairoContext);
+				cairo_dock_redraw_my_icon (icon, pDock);
+			}
+		}
+	}
 }

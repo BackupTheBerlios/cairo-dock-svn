@@ -23,6 +23,7 @@ cairo_dock_CFLAGS = \
 	-DCAIRO_DOCK_SHARE_THEMES_DIR=\""$(pkgdatadir)/themes"\"\
 	-DCAIRO_DOCK_MODULES_DIR=\""$(pkgdatadir)/plug-in"\"\
 	-DCAIRO_DOCK_CONF_FILE=\""cairo-dock.conf"\"\
+	-DCAIRO_DOCK_DEFAULT_ICON_NAME=\""default-icon.svg"\"\
 	-DCAIRO_DOCK_VERSION=\""$(VERSION)"\"\
 	-std=c99\
 	-O3

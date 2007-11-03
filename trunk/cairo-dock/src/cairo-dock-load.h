@@ -33,5 +33,6 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 
 void cairo_dock_load_background_decorations (CairoDock *pDock);
 
+void cairo_dock_load_default_icon (CairoDock *pDock);
 
 #endif

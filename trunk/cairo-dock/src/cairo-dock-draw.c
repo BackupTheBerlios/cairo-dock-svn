@@ -30,6 +30,7 @@ extern GHashTable *g_hDocksTable;
 extern double g_fSubDockSizeRatio;
 extern gboolean g_bAutoHide;
 extern gboolean g_bTextAlwaysHorizontal;
+extern cairo_surface_t *g_pDefaultIcon;
 
 extern gint g_iScreenWidth[2];
 extern gint g_iScreenHeight[2];
@@ -51,7 +52,6 @@ extern cairo_surface_t *g_pBackgroundSurfaceFull[2];
 
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
-
 extern cairo_surface_t *g_pVisibleZoneSurface;
 extern double g_fVisibleZoneAlpha;
 extern double g_fAmplitude;
@@ -301,6 +301,29 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 	
 	icon->fDrawX += (1 - icon->fWidthFactor) / 2 * icon->fWidth * icon->fScale;
 	
+	//\_____________________ On gere l'animation de rotation horizontale.
+	if (icon->iAnimationType == CAIRO_DOCK_UPSIDE_DOWN && icon->iCount > 0)
+	{
+		int c = icon->iCount;
+		int n = g_tNbIterInOneRound[CAIRO_DOCK_UPSIDE_DOWN] / 4;  // nbre d'iteration pour 1/2 tour.
+		if ((c/n) & 1)
+		{
+			icon->fHeightFactor *= ((c/(2*n)) & 1 ? 1. : -1.) * (c%n) / n;
+		}
+		else
+		{
+			icon->fHeightFactor *= ((c/(2*n)) & 1 ? 1. : -1.) * ((c%n) - n) / n;
+		}
+		icon->iCount --;
+	}
+	
+	if (icon->fHeightFactor >= 0 && icon->fHeightFactor < 0.05)
+		icon->fHeightFactor = 0.05;
+	else if (icon->fHeightFactor < 0 && icon->fHeightFactor > -0.05)
+		icon->fHeightFactor = -0.05;
+	
+	icon->fDrawY += (1 - icon->fHeightFactor) / 2 * icon->fHeight * icon->fScale;
+	
 	//\_____________________ On gere l'animation de l'icone qui suit ou evite le curseur.
 	if (icon->iAnimationType == CAIRO_DOCK_FOLLOW_MOUSE)
 	{
@@ -346,13 +369,13 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	{
 		cairo_translate (pCairoContext, icon->fDrawX, icon->fDrawY);
 		cairo_save (pCairoContext);
-		cairo_scale (pCairoContext, fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fScale / (1 + g_fAmplitude));
+		cairo_scale (pCairoContext, fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude));
 	}
 	else
 	{
 		cairo_translate (pCairoContext, icon->fDrawY, icon->fDrawX);
 		cairo_save (pCairoContext);
-		cairo_scale (pCairoContext, fRatio * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude));
+		cairo_scale (pCairoContext, fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude));
 	}
 	
 	if (icon->iAnimationType == CAIRO_DOCK_PULSE)
@@ -376,6 +399,8 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	
 	if (icon->pIconBuffer != NULL)
 		cairo_set_source_surface (pCairoContext, icon->pIconBuffer, 0.0, 0.0);
+	else
+		cairo_set_source_surface (pCairoContext, g_pDefaultIcon, 0.0, 0.0);
 	//cairo_pop_group (pCairoContext);
 	
 	if (icon->fAlpha == 1)
