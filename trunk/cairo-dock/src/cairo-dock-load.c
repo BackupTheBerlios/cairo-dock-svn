@@ -519,7 +519,7 @@ void cairo_dock_load_default_icon (CairoDock *pDock)
 	cairo_surface_destroy (g_pDefaultIcon);
 	g_pDefaultIcon = NULL;
 	
-	int i, iMinSize = 48, iMaxSize = 48;
+	int i, iMinSize = 1e4, iMaxSize = 0;
 	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i += 2)
 	{
 		if (g_tMinIconAuthorizedSize[i] > 0)
@@ -527,6 +527,11 @@ void cairo_dock_load_default_icon (CairoDock *pDock)
 		if (g_tMaxIconAuthorizedSize[i] > 0)
 			iMaxSize = MAX (iMaxSize, g_tMaxIconAuthorizedSize[i]);
 	}
+	if (iMinSize == 1e4)
+		iMinSize = 48;
+	if (iMaxSize == 0)
+		iMaxSize = 48;
+	//g_print ("=> %dx%d\n", iMinSize, iMaxSize);
 	
 	gchar *cIconPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_DEFAULT_ICON_NAME);
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
@@ -543,6 +548,7 @@ void cairo_dock_load_default_icon (CairoDock *pDock)
 		0,
 		1,
 		FALSE);
+	//g_print ("=> %.1fx%.1f\n", fDefaultIconWidth, fDefaultIconHeight);
 	cairo_destroy (pCairoContext);
 	g_free (cIconPath);
 }

@@ -678,21 +678,21 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 		{
 			//case CreateNotify :
 			case MapNotify :
-				g_print ("Map/Create (%d)\n", event.xmap.window);
+				//g_print ("Map/Create (%d)\n", event.xmap.window);
 				icon = g_hash_table_lookup (s_hXWindowTable, &event.xmap.window);
 				if (icon != NULL)
 				{
-					if (event.type == MapNotify)
-						g_print ("c'est %s qui re-apparait\n", icon->acName);
-					else
-						g_print ("c'est %s qui ressucite d'entre les morts\n", icon->acName);
+					//if (event.type == MapNotify)
+					//	g_print ("c'est %s qui re-apparait\n", icon->acName);
+					//else
+					//	g_print ("c'est %s qui ressucite d'entre les morts\n", icon->acName);
 					icon->bIsMapped = TRUE;
 					if (icon->fPersonnalScale > 0)  // elle etait en train de disparaitre, on inverse le processus.
 						icon->fPersonnalScale = - icon->fPersonnalScale;
 				}
 				else
 				{
-					//g_print ("c'est une nouvelle fenetre qui apparait\n");
+					g_print ("c'est une nouvelle fenetre qui apparait\n");
 					cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 					if (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS)
 						icon = cairo_dock_create_icon_from_xwindow (pCairoContext, event.xmap.window, pDock);
@@ -711,7 +711,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 			break;
 			
 			case UnmapNotify :
-				g_print ("Unmap (%d)\n", event.xunmap.window);
+				//g_print ("Unmap (%d)\n", event.xunmap.window);
 				icon = g_hash_table_lookup (s_hXWindowTable, &event.xunmap.window);
 				if (icon != NULL)
 				{
@@ -739,7 +739,7 @@ gboolean cairo_dock_update_applis_list (CairoDock *pDock)
 			break;
 			
 			case DestroyNotify :
-				g_print ("Destroy (%d)\n", event.xdestroywindow.window);
+				//g_print ("Destroy (%d)\n", event.xdestroywindow.window);
 				icon = g_hash_table_lookup (s_hXWindowTable, &event.xdestroywindow.window);
 				if (icon != NULL && icon->fPersonnalScale <= 0)  // pas deja en cours de suppression.
 				{
