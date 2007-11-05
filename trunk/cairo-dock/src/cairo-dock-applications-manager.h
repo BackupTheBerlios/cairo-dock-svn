@@ -11,6 +11,7 @@ int cairo_dock_xerror_handler (Display * pDisplay, XErrorEvent *pXError);
 void cairo_dock_initialize_application_manager (void);
 
 void cairo_dock_register_appli (Icon *icon);
+void cairo_dock_blacklist_appli (Window Xid);
 void cairo_dock_unregister_appli (Icon *icon);
 
 
@@ -33,10 +34,11 @@ Window cairo_dock_get_active_window (void);
 void cairo_dock_get_current_desktop (int *iDesktopNumber, int *iDesktopViewportX, int *iDesktopViewportY);
 
 
-gboolean cairo_dock_update_applis_list (CairoDock *pDock);
+gboolean cairo_dock_unstack_Xevents (CairoDock *pDock);
 void cairo_dock_set_root_window_mask (void);
 void cairo_dock_set_normal_window_mask (Window Xid);
 Window *cairo_dock_get_windows_list (gulong *iNbWindows);
+void cairo_dock_update_applis_list (CairoDock *pDock, double fTime);
 void cairo_dock_start_application_manager (CairoDock *pDock);
 
 void cairo_dock_pause_application_manager (void);
@@ -53,6 +55,9 @@ void cairo_dock_set_xwindow_type_hint (int Xid, gchar *cWindowTypeName);
 
 void cairo_dock_set_one_icon_geometry_for_window_manager (Icon *icon, CairoDock *pDock);
 void cairo_dock_set_icons_geometry_for_window_manager (CairoDock *pDock);
+
+
+gboolean cairo_dock_update_screen_geometry (CairoDock *pDock);
 
 
 #endif

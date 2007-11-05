@@ -215,11 +215,12 @@ struct _Icon {
 	gint iCount;
 	CairoDockAnimationType iAnimationType;
 	gdouble fPersonnalScale;
-	//\____________ Pour les fenetres.
+	//\____________ Pour les applis.
 	gint iPid;
 	Window Xid;
-	gboolean bIsMapped;
+	///gboolean bIsMapped;
 	gchar *cClass;
+	double fLastCheckTime;
 	//\____________ Pour les modules.
 	CairoDockModule *pModule;
 	//\____________ Pour les bulles de dialogues.

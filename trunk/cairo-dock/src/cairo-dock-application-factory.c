@@ -35,6 +35,7 @@ extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 
 extern gboolean g_bUniquePid;
 extern gboolean g_bGroupAppliByClass;
+extern gboolean g_bDemandsAttentionWithDialog;
 
 static GHashTable *s_hAppliTable = NULL;  // table des PID connus de cairo-dock (affichees ou non dans le dock).
 static Display *s_XDisplay = NULL;
@@ -361,7 +362,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	icon->fWidth = fWidth;
 	icon->fHeight = fHeight;
 	icon->pIconBuffer = pNewSurface;
-	icon->bIsMapped = TRUE;  // si elle n'est en fait pas visible, le 2eme UnmapNotify sera juste ignore.
+	///icon->bIsMapped = TRUE;  // si elle n'est en fait pas visible, le 2eme UnmapNotify sera juste ignore.
 	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 	
 	if (g_bUniquePid)
@@ -370,15 +371,17 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	XFree (pNameBuffer);
 	
 	//\__________________ On regarde si il faut la grouper avec une autre.
-	XClassHint class_hint;
-	if (XGetClassHint (s_XDisplay, Xid, &class_hint) != 0)
+	XClassHint *pClassHint = XAllocClassHint ();
+	if (XGetClassHint (s_XDisplay, Xid, pClassHint) != 0)
 	{
-		g_print ("  res_name : %s(%x); res_class : %s(%x)", class_hint.res_name, class_hint.res_name, class_hint.res_class, class_hint.res_class);
-		icon->cClass = g_ascii_strdown (class_hint.res_class, -1);  // on la passe en minuscule, car certaines applis ont la bonne idee de donner des classes avec une majuscule ou non suivant les fenetres. Il reste le cas des aplis telles que Glade2 ('Glade' et 'Glade-2' ...)
-		XFree (class_hint.res_name);
-		XFree (class_hint.res_class);
+		g_print ("  res_name : %s(%x); res_class : %s(%x)", pClassHint->res_name, pClassHint->res_name, pClassHint->res_class, pClassHint->res_class);
+		icon->cClass = g_ascii_strdown (pClassHint->res_class, -1);  // on la passe en minuscule, car certaines applis ont la bonne idee de donner des classes avec une majuscule ou non suivant les fenetres. Il reste le cas des aplis telles que Glade2 ('Glade' et 'Glade-2' ...)
+		XFree (pClassHint->res_name);
+		XFree (pClassHint->res_class);
 		g_print (".\n");
 	}
+	XFree (pClassHint);
+	
 	if (g_bGroupAppliByClass && icon->cClass != NULL)
 	{
 		Icon *pSameClassIcon = cairo_dock_get_icon_with_class (pDock->icons, icon->cClass);
@@ -421,13 +424,16 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, CairoDock *pDock)
 		XGetWindowProperty (s_XDisplay, icon->Xid, aProperty, 0, G_MAXULONG, False, (aProperty == s_aNetWmName ? s_aUtf8String : s_aString), &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
 		if (iBufferNbElements > 0)
 		{
-			g_free (icon->acName);
-			icon->acName = g_strdup ((gchar *)pNameBuffer);
-			XFree (pNameBuffer);
-			
-			pCairoContext = cairo_dock_create_context_from_window (pDock);
-			cairo_dock_fill_one_text_buffer (icon, pCairoContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
-			cairo_destroy (pCairoContext);
+			if (strcmp (icon->acName, (gchar *)pNameBuffer) != 0)
+			{
+				g_free (icon->acName);
+				icon->acName = g_strdup ((gchar *)pNameBuffer);
+				XFree (pNameBuffer);
+				
+				pCairoContext = cairo_dock_create_context_from_window (pDock);
+				cairo_dock_fill_one_text_buffer (icon, pCairoContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
+				cairo_destroy (pCairoContext);
+			}
 		}
 	}
 	else if (aProperty == s_aNetWmIcon)
@@ -443,12 +449,13 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, CairoDock *pDock)
 		XWMHints *pWMHints = XGetWMHints (s_XDisplay, icon->Xid);
 		if (pWMHints != NULL)
 		{
-			if (pWMHints->flags & XUrgencyHint)
+			if (pWMHints->flags & XUrgencyHint && g_bDemandsAttentionWithDialog)
 			{
+				
 				g_print ("%s vous interpelle !\n", icon->acName);
 				cairo_dock_show_temporary_dialog (icon->acName, icon, pDock, 2000);
 			}
-			else if (pWMHints->flags & (IconPixmapHint | IconMaskHint | IconWindowHint))
+			if (pWMHints->flags & (IconPixmapHint | IconMaskHint | IconWindowHint))
 			{
 				//g_print ("%s change son icone\n", icon->acName);
 				pCairoContext = cairo_dock_create_context_from_window (pDock);

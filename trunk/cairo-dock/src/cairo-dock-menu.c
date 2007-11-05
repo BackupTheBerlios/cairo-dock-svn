@@ -107,6 +107,7 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 	gtk_container_add (GTK_CONTAINER (GTK_DIALOG (pDialog)->vbox), pLabel);
 	
 	gtk_widget_show_all (pDialog);
+	gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER_ALWAYS);  // un GTK_WIN_POS_CENTER simple ne marche pas, probablement parceque la fenetre n'est pas encore realisee. le 'always' ne pose pas de probleme, puisqu'on ne peut pas redimensionner le dialogue.
 	gtk_dialog_run (GTK_DIALOG (pDialog));
 	gtk_widget_destroy (pDialog);
 }
@@ -159,13 +160,14 @@ gboolean cairo_dock_notification_remove_icon (gpointer *data)
 		gboolean bDestroyIcons = TRUE;
 		if (icon->cBaseURI == NULL)
 		{
-			GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
+			GtkWidget *pDialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
 				GTK_DIALOG_DESTROY_WITH_PARENT,
 				GTK_MESSAGE_QUESTION,
 				GTK_BUTTONS_YES_NO,
 				"Do you want to re-dispatch the icons contained inside this container into the dock (otherwise they will be destroyed) ?");
-			int answer = gtk_dialog_run (GTK_DIALOG (dialog));
-			gtk_widget_destroy (dialog);
+			gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER_ALWAYS);  // meme remarque que plus haut.
+			int answer = gtk_dialog_run (GTK_DIALOG (pDialog));
+			gtk_widget_destroy (pDialog);
 			if (answer == GTK_RESPONSE_YES)
 				bDestroyIcons = FALSE;
 		}
@@ -186,14 +188,15 @@ static void cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 	CairoDock *pDock = data[1];
 	
 	gchar *question = g_strdup_printf ("You're about to remove this icon (%s) from the dock. Sure ?", icon->acName);
-	GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
+	GtkWidget *pDialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
 		GTK_DIALOG_DESTROY_WITH_PARENT,
 		GTK_MESSAGE_QUESTION,
 		GTK_BUTTONS_YES_NO,
 		question);
 	g_free (question);
-	int answer = gtk_dialog_run (GTK_DIALOG (dialog));
-	gtk_widget_destroy (dialog);
+	gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER_ALWAYS);  // meme remarque que plus haut.
+	int answer = gtk_dialog_run (GTK_DIALOG (pDialog));
+	gtk_widget_destroy (pDialog);
 	if (answer == GTK_RESPONSE_YES)
 	{
 		cairo_dock_notify (CAIRO_DOCK_REMOVE_ICON, data);
@@ -351,13 +354,14 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 			if (pNewIcon->pSubDock == NULL)  // ce n'est plus un container.
 			{
 				gboolean bDestroyIcons = TRUE;
-				GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
+				GtkWidget *pDialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
 					GTK_DIALOG_DESTROY_WITH_PARENT,
 					GTK_MESSAGE_QUESTION,
 					GTK_BUTTONS_YES_NO,
 					"Do you want to re-dispatch the icons contained inside this container into the dock (otherwise they will be destroyed) ?");
-				int answer = gtk_dialog_run (GTK_DIALOG (dialog));
-				gtk_widget_destroy (dialog);
+				gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER_ALWAYS);  // meme remarque que plus haut.
+				int answer = gtk_dialog_run (GTK_DIALOG (pDialog));
+				gtk_widget_destroy (pDialog);
 				if (answer == GTK_RESPONSE_YES)
 					bDestroyIcons = FALSE;
 				cairo_dock_destroy_dock (icon->pSubDock, icon->acName, (bDestroyIcons ? NULL : g_pMainDock), (bDestroyIcons ? NULL : CAIRO_DOCK_MAIN_DOCK_NAME));
@@ -429,14 +433,15 @@ static void cairo_dock_remove_module (GtkMenuItem *menu_item, gpointer *data)
 	CairoDock *pDock = data[1];
 	
 	gchar *question = g_strdup_printf ("You're about to remove this icon (%s) from the dock. Sure ?", icon->acName);
-	GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
+	GtkWidget *pDialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
 		GTK_DIALOG_DESTROY_WITH_PARENT,
 		GTK_MESSAGE_QUESTION,
 		GTK_BUTTONS_YES_NO,
 		question);
 	g_free (question);
-	int answer = gtk_dialog_run (GTK_DIALOG (dialog));
-	gtk_widget_destroy (dialog);
+	gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER_ALWAYS);  // meme remarque que plus haut.
+	int answer = gtk_dialog_run (GTK_DIALOG (pDialog));
+	gtk_widget_destroy (pDialog);
 	if (answer == GTK_RESPONSE_YES)
 	{
 		cairo_dock_remove_icon_from_dock (pDock, icon);  // desactive le module.
