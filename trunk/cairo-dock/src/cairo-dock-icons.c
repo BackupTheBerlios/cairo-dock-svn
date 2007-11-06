@@ -65,9 +65,10 @@ void cairo_dock_free_icon (Icon *icon)
 		return ;
 	g_print ("%s (%s)\n", __func__, icon->acName);
 	
-	cairo_dock_dialog_unreference (icon);
-	if (icon->pDialog != NULL)
-		cairo_dock_isolate_dialog (icon);
+	if (icon->pSubDock != NULL)
+		g_print ("Attention : cette icone n'a pas ete liberee proprement !!!\n");
+	
+	cairo_dock_remove_dialog_if_any (icon);
 	
 	g_free (icon->acDesktopFileName);
 	g_free (icon->acFileName);

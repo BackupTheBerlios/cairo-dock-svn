@@ -570,3 +570,12 @@ void cairo_dock_replace_all_dialogs (void)
 	g_static_rw_lock_reader_unlock (&s_mDialogsMutex);
 	g_slist_free (pListOfDialogs);
 }
+
+
+void cairo_dock_remove_dialog_if_any (Icon *icon)
+{
+	g_return_if_fail (icon != NULL);
+	cairo_dock_dialog_unreference (icon);
+	if (icon->pDialog != NULL)
+		cairo_dock_isolate_dialog (icon);
+}

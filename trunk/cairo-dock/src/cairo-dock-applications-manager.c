@@ -645,12 +645,12 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 				else
 				{
 					icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
-					if (icon != NULL)
+					if (icon != NULL && icon->fPersonnalScale <= 0)  // pour une icône en cours de supression, on ne fait rien.
 					{
 						CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 						if (pParentDock == NULL)
 							pParentDock = pDock;
-						cairo_dock_Xproperty_changed (icon, event.xproperty.atom, pParentDock);
+						cairo_dock_Xproperty_changed (icon, event.xproperty.atom, event.xproperty.state, pParentDock);
 					}
 				}
 			break;

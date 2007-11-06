@@ -18,6 +18,6 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 
 Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid, CairoDock *pDock);
 
-void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, CairoDock *pDock);
+void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, CairoDock *pDock);
 
 #endif

@@ -28,4 +28,7 @@ void cairo_dock_show_temporary_dialog (gchar *cText, Icon *pIcon, CairoDock *pDo
 
 void cairo_dock_replace_all_dialogs (void);
 
+void cairo_dock_remove_dialog_if_any (Icon *icon);
+
+
 #endif

@@ -266,15 +266,27 @@ void cairo_dock_render_decorations_in_frame (cairo_t *pCairoContext, CairoDock *
 
 void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 {
+	
 	//\_____________________ On gere l'animation de rebond.
 	if (icon->iAnimationType == CAIRO_DOCK_BOUNCE && icon->iCount > 0)
 	{
-		int n = g_tNbIterInOneRound[CAIRO_DOCK_BOUNCE];  // nbre d'iteration pour une montree+descente.
-		int k = n - (icon->iCount % n);
+		int n = g_tNbIterInOneRound[CAIRO_DOCK_BOUNCE];  // nbre d'iteration pour 1 aplatissement+montree+descente.
+		int k = n - (icon->iCount % n) - 3;  // 3 iterations pour s'aplatir.
+		n -= 3;   // nbre d'iteration pour 1 montree+descente.
 		
-		double fPossibleDeltaY = MIN (100, (g_bDirectionUp ? icon->fDrawY : pDock->iCurrentHeight - (icon->fDrawY + icon->fHeight * icon->fScale)));  // on borne a 50 pixels.
-		
-		icon->fDrawY += (g_bDirectionUp ? -1. : 1.) * k / (n/2) * fPossibleDeltaY * (2 - 1.*k/(n/2));
+		if (k > 0)
+		{
+			double fPossibleDeltaY = MIN (100, (g_bDirectionUp ? icon->fDrawY : pDock->iCurrentHeight - (icon->fDrawY + icon->fHeight * icon->fScale)));  // on borne a 100 pixels pour les rendus qui ont des fenetres grandes..
+			
+			icon->fDrawY += (g_bDirectionUp ? -1. : 1.) * k / (n/2) * fPossibleDeltaY * (2 - 1.*k/(n/2));
+			//g_print ("%d) + %.2f (%d)\n", icon->iCount, (g_bDirectionUp ? -1. : 1.) * k / (n/2) * fPossibleDeltaY * (2 - 1.*k/(n/2)), k);
+		}
+		else  // on commence par s'aplatir.
+		{
+			icon->fHeightFactor *= 1.*(2 - 1.5*k) / 10;
+			icon->fDrawY += (1 - icon->fHeightFactor) / 2 * icon->fHeight * icon->fScale;
+			//g_print ("%d) * %.2f (%d)\n", icon->iCount, icon->fHeightFactor, k);
+		}
 		icon->iCount --;  // c'est une loi de type acceleration dans le champ de pesanteur. 'g' et 'v0' n'interviennent pas directement, car s'expriment en fonction de 'fPossibleDeltaY' et 'n'.
 	}
 	
@@ -294,13 +306,6 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 		icon->iCount --;
 	}
 	
-	if (icon->fWidthFactor >= 0 && icon->fWidthFactor < 0.05)
-		icon->fWidthFactor = 0.05;
-	else if (icon->fWidthFactor < 0 && icon->fWidthFactor > -0.05)
-		icon->fWidthFactor = -0.05;
-	
-	icon->fDrawX += (1 - icon->fWidthFactor) / 2 * icon->fWidth * icon->fScale;
-	
 	//\_____________________ On gere l'animation de rotation horizontale.
 	if (icon->iAnimationType == CAIRO_DOCK_UPSIDE_DOWN && icon->iCount > 0)
 	{
@@ -316,6 +321,49 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 		}
 		icon->iCount --;
 	}
+	
+	//\_____________________ On gere l'animation wobbly.
+	if (icon->iAnimationType == CAIRO_DOCK_WOBBLY && icon->iCount > 0)  // merci a Tshirtman cette animation !
+	{
+		int c = icon->iCount;
+		int n = g_tNbIterInOneRound[CAIRO_DOCK_WOBBLY] / 4;  // nbre d'iteration pour 1 etirement/retrecissement.
+		int k = c%n;
+		
+		double fSizeFactor = ((c/n) & 1 ? 1. / (n - k) : 1. / (1 + k));
+		double fMinSize = .2;
+		//fSizeFactor = ((c/n) & 1 ? 1.*(k+1)/n : 1.*(n-k)/n);
+		fSizeFactor *= 1 - fMinSize;
+		if ((c/(2*n)) & 1)
+		{
+			g_print ("%d) width * %.2f ; height *= %.2f (%d)\n", c, 1 - fSizeFactor,  (1. + 1./n - fSizeFactor), k);
+			icon->fWidthFactor *= 1 - fSizeFactor;
+			icon->fHeightFactor *= fMinSize;
+		}
+		else
+		{
+			g_print ("%d) height * %.2f ; width *= %.2f (%d)\n", c, 1 - fSizeFactor,  (1. + 1./n - fSizeFactor), k);
+			icon->fHeightFactor *= 1 - fSizeFactor;
+			icon->fWidthFactor *= fMinSize;
+		}
+		/*if ((c/((3/2)*n)) & 1)
+		{
+			icon->fWidthFactor *= (float) 2 * (c%n) / n;//0.25 / n;
+			icon->fHeightFactor *= (float) 2 * ( n - (c%n)) / n;//1.25 / n;
+		}
+		else
+		{
+			icon->fWidthFactor *= (float) 2 * ( n - (c%n)) / n;//1.25 / n;
+			icon->fHeightFactor *= (float) 2 * (c%n) / n;//0.25 / n;
+		}*/
+		icon->iCount --;
+	}
+	
+	if (icon->fWidthFactor >= 0 && icon->fWidthFactor < 0.05)
+		icon->fWidthFactor = 0.05;
+	else if (icon->fWidthFactor < 0 && icon->fWidthFactor > -0.05)
+		icon->fWidthFactor = -0.05;
+	
+	icon->fDrawX += (1 - icon->fWidthFactor) / 2 * icon->fWidth * icon->fScale;
 	
 	if (icon->fHeightFactor >= 0 && icon->fHeightFactor < 0.05)
 		icon->fHeightFactor = 0.05;

@@ -100,8 +100,9 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 <b>Main developer :</b>\n  Fabounet (Fabrice Rey)\n\
 <b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole\n  Glattering\n\
 <b>Applets :</b>\n  Fabounet\n  Necropotame\n\
+<b>Patchs :</b>\n  Robrob\n  Tshirtman\n\
 <b>Translations :</b>\n  Fabounet\n  Ppmt\n\
-<b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Necropotame\n  Ppmt\n  Sombrero\n  Vilraleur");  // Djoole <=> (Julien Barrau)
+<b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Mav\n  Necropotame\n  Ppmt\n  Sombrero\n  Vilraleur");  // Djoole <=> (Julien Barrau)
 	gtk_label_set_markup (GTK_LABEL (pLabel), cAboutText);
 	g_free (cAboutText);
 	gtk_container_add (GTK_CONTAINER (GTK_DIALOG (pDialog)->vbox), pLabel);

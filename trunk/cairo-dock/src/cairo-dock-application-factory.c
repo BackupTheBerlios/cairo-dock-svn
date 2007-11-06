@@ -21,6 +21,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-draw.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-dialogs.h"
+#include "cairo-dock-animations.h"
 #include "cairo-dock-surface-factory.h"
 #include "cairo-dock-applications-manager.h"
 #include "cairo-dock-application-factory.h"
@@ -36,6 +37,7 @@ extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern gboolean g_bUniquePid;
 extern gboolean g_bGroupAppliByClass;
 extern gboolean g_bDemandsAttentionWithDialog;
+extern gboolean g_bDemandsAttentionWithAnimation;
 
 static GHashTable *s_hAppliTable = NULL;  // table des PID connus de cairo-dock (affichees ou non dans le dock).
 static Display *s_XDisplay = NULL;
@@ -409,7 +411,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 }
 
 
-void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, CairoDock *pDock)
+void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, CairoDock *pDock)
 {
 	//g_print ("%s (%s, %s)\n", __func__, icon->acName, gdk_x11_get_xatom_name (aProperty));
 	Atom aReturnedType = 0;
@@ -418,13 +420,13 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, CairoDock *pDock)
 	
 	cairo_t* pCairoContext;
 	
-	if (aProperty == s_aNetWmName || aProperty == s_aWmName)
+	if (iState == PropertyNewValue && (aProperty == s_aNetWmName || aProperty == s_aWmName))
 	{
 		guchar *pNameBuffer = NULL;
 		XGetWindowProperty (s_XDisplay, icon->Xid, aProperty, 0, G_MAXULONG, False, (aProperty == s_aNetWmName ? s_aUtf8String : s_aString), &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
 		if (iBufferNbElements > 0)
 		{
-			if (strcmp (icon->acName, (gchar *)pNameBuffer) != 0)
+			if (icon->acName == NULL || strcmp (icon->acName, (gchar *)pNameBuffer) != 0)
 			{
 				g_free (icon->acName);
 				icon->acName = g_strdup ((gchar *)pNameBuffer);
@@ -436,7 +438,7 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, CairoDock *pDock)
 			}
 		}
 	}
-	else if (aProperty == s_aNetWmIcon)
+	else if (iState == PropertyNewValue && aProperty == s_aNetWmIcon)  // on prefere garder l'ancienne icone que de l'effacer.
 	{
 		//g_print ("%s change son icone\n", icon->acName);
 		pCairoContext = cairo_dock_create_context_from_window (pDock);
@@ -449,13 +451,31 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, CairoDock *pDock)
 		XWMHints *pWMHints = XGetWMHints (s_XDisplay, icon->Xid);
 		if (pWMHints != NULL)
 		{
-			if (pWMHints->flags & XUrgencyHint && g_bDemandsAttentionWithDialog)
+			if (pWMHints->flags & XUrgencyHint && (g_bDemandsAttentionWithDialog || g_bDemandsAttentionWithAnimation))
 			{
-				
-				g_print ("%s vous interpelle !\n", icon->acName);
-				cairo_dock_show_temporary_dialog (icon->acName, icon, pDock, 2000);
+				if (iState == PropertyNewValue)
+				{
+					g_print ("%s vous interpelle !\n", icon->acName);
+					if (g_bDemandsAttentionWithDialog)
+						cairo_dock_show_temporary_dialog (icon->acName, icon, pDock, 2000);
+					if (g_bDemandsAttentionWithAnimation)
+					{
+						cairo_dock_arm_animation (icon, -1, 1e6);  // animation sans fin.
+						cairo_dock_start_animation (icon, pDock);
+					}
+				}
+				else if (iState == PropertyDelete)
+				{
+					g_print ("%s arrette de vous interpeler.\n", icon->acName);
+					if (g_bDemandsAttentionWithDialog)
+						cairo_dock_remove_dialog_if_any (icon);
+					if (g_bDemandsAttentionWithAnimation)
+						cairo_dock_arm_animation (icon, -1, 0);  // arrete son animation quelqu'elle soit.
+				}
+				else
+					g_print ("  etat du changement inconnu !\n");
 			}
-			if (pWMHints->flags & (IconPixmapHint | IconMaskHint | IconWindowHint))
+			if (iState == PropertyNewValue && (pWMHints->flags & (IconPixmapHint | IconMaskHint | IconWindowHint)))
 			{
 				//g_print ("%s change son icone\n", icon->acName);
 				pCairoContext = cairo_dock_create_context_from_window (pDock);

@@ -139,7 +139,7 @@ int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 int g_tAnimationType[CAIRO_DOCK_NB_TYPES];  // le type de l'animation pour chaque type d'icone.
 int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];  // le nombre de rebonds/rotation/etc lors d'un clique gauche.
 int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];  // l'ordre de chaque type dans le dock.
-int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS] = {14, 20, 20, 12, 20, 0};  // multiples de 2,4,2,2,4
+int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS] = {17, 20, 20, 12, 20, 28, 0};  // 2n+3, 4n, 2n, 2n, 4n, 4n.
 
 int g_iVisibleZoneWidth = 0;  // dimensions de la zone ou on place le curseur pour faire apparaitre le dock.
 int g_iVisibleZoneHeight = 0;
@@ -172,6 +172,7 @@ gboolean g_bGroupAppliByClass = TRUE;  // une seule icone par classe, les autres
 int g_iAppliMaxNameLength;  // longueur max de la chaine de caractere du nom des applis.
 gboolean g_bMinimizeOnClick;  // minimiser l'appli lorsqu'on clique sur son icone si elle est deja active.
 gboolean g_bDemandsAttentionWithDialog;  // attirer l'attention avec une bulle de dialogue.
+gboolean g_bDemandsAttentionWithAnimation;  // attirer l'attention avec une animation.
 gboolean g_bAnimateOnActiveWindow;  // jouer une breve animation de l'icone lorsque la fenetre correspondante devient active.
 
 gchar *g_cSeparatorImage = NULL;

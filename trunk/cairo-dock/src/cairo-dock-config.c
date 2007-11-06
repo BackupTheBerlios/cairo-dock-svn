@@ -26,7 +26,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-config.h"
 
-static gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "pulse", "upside-down", "random", NULL};
+static gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "pulse", "upside-down", "wobbly", "random", NULL};
 static gchar * s_cIconTypeNames[(CAIRO_DOCK_NB_TYPES+1)/2] = {"launchers", "applications", "applets"};
 
 extern CairoDock *g_pMainDock;
@@ -111,6 +111,7 @@ extern gboolean g_bGroupAppliByClass;
 extern int g_iAppliMaxNameLength;
 extern gboolean g_bMinimizeOnClick;
 extern gboolean g_bDemandsAttentionWithDialog;
+extern gboolean g_bDemandsAttentionWithAnimation;
 extern gboolean g_bAnimateOnActiveWindow;
 
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
@@ -641,7 +642,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_bMinimizeOnClick = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "minimize on click", &bFlushConfFileNeeded, TRUE);
 	
-	g_bDemandsAttentionWithDialog = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "demands attention", &bFlushConfFileNeeded, TRUE);
+	g_bDemandsAttentionWithDialog = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "demands attention with dialog", &bFlushConfFileNeeded, TRUE);
+	g_bDemandsAttentionWithAnimation = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "demands attention with animation", &bFlushConfFileNeeded, TRUE);
 	
 	g_bAnimateOnActiveWindow = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "animate on active window", &bFlushConfFileNeeded, TRUE);
 	
