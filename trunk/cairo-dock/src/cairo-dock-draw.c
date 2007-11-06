@@ -329,20 +329,26 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 		int n = g_tNbIterInOneRound[CAIRO_DOCK_WOBBLY] / 4;  // nbre d'iteration pour 1 etirement/retrecissement.
 		int k = c%n;
 		
+		double fMinSize = .3, fMaxSize = MIN (1.75, pDock->iCurrentHeight / icon->fWidth);  // au plus 1.75, soit 3/8 de l'icone qui deborde de part et d'autre de son emplacement. c'est suffisamment faible pour ne pa trop empieter sur ses voisines.
+		
 		double fSizeFactor = ((c/n) & 1 ? 1. / (n - k) : 1. / (1 + k));
-		double fMinSize = .2;
-		//fSizeFactor = ((c/n) & 1 ? 1.*(k+1)/n : 1.*(n-k)/n);
-		fSizeFactor *= 1 - fMinSize;
+		//double fSizeFactor = ((c/n) & 1 ? 1.*(k+1)/n : 1.*(n-k)/n);
+		
+		//double b = fMaxSize - fMinSize;
+		//double a = (1 - fMaxSize) / b;
+		//fSizeFactor += a;
+		//fSizeFactor *= b;
+		fSizeFactor = (fMinSize - fMaxSize) * fSizeFactor + fMaxSize;
 		if ((c/(2*n)) & 1)
 		{
-			g_print ("%d) width * %.2f ; height *= %.2f (%d)\n", c, 1 - fSizeFactor,  (1. + 1./n - fSizeFactor), k);
-			icon->fWidthFactor *= 1 - fSizeFactor;
+			icon->fWidthFactor *= fSizeFactor;
 			icon->fHeightFactor *= fMinSize;
+			g_print ("%d) width <- %.2f ; height <- %.2f (%d)\n", c, icon->fWidthFactor, icon->fHeightFactor, k);
 		}
 		else
 		{
-			g_print ("%d) height * %.2f ; width *= %.2f (%d)\n", c, 1 - fSizeFactor,  (1. + 1./n - fSizeFactor), k);
-			icon->fHeightFactor *= 1 - fSizeFactor;
+			g_print ("%d) height <- %.2f ; width <- %.2f (%d)\n", c, icon->fHeightFactor, icon->fWidthFactor, k);
+			icon->fHeightFactor *= fSizeFactor;
 			icon->fWidthFactor *= fMinSize;
 		}
 		/*if ((c/((3/2)*n)) & 1)

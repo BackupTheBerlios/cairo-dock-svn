@@ -139,7 +139,7 @@ int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 int g_tAnimationType[CAIRO_DOCK_NB_TYPES];  // le type de l'animation pour chaque type d'icone.
 int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];  // le nombre de rebonds/rotation/etc lors d'un clique gauche.
 int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];  // l'ordre de chaque type dans le dock.
-int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS] = {17, 20, 20, 12, 20, 28, 0};  // 2n+3, 4n, 2n, 2n, 4n, 4n.
+int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS] = {17, 20, 20, 12, 20, 20, 0};  // 2n+3, 4n, 2n, 2n, 4n, 4n.
 
 int g_iVisibleZoneWidth = 0;  // dimensions de la zone ou on place le curseur pour faire apparaitre le dock.
 int g_iVisibleZoneHeight = 0;
