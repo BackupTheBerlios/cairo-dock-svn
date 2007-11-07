@@ -329,38 +329,23 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 		int n = g_tNbIterInOneRound[CAIRO_DOCK_WOBBLY] / 4;  // nbre d'iteration pour 1 etirement/retrecissement.
 		int k = c%n;
 		
-		double fMinSize = .3, fMaxSize = MIN (1.75, pDock->iCurrentHeight / icon->fWidth);  // au plus 1.75, soit 3/8 de l'icone qui deborde de part et d'autre de son emplacement. c'est suffisamment faible pour ne pa trop empieter sur ses voisines.
+		double fMinSize = .3, fMaxSize = MIN (1.75, pDock->iCurrentHeight / icon->fWidth);  // au plus 1.75, soit 3/8 de l'icone qui deborde de part et d'autre de son emplacement. c'est suffisamment faible pour ne pas trop empieter sur ses voisines.
 		
 		double fSizeFactor = ((c/n) & 1 ? 1. / (n - k) : 1. / (1 + k));
 		//double fSizeFactor = ((c/n) & 1 ? 1.*(k+1)/n : 1.*(n-k)/n);
-		
-		//double b = fMaxSize - fMinSize;
-		//double a = (1 - fMaxSize) / b;
-		//fSizeFactor += a;
-		//fSizeFactor *= b;
 		fSizeFactor = (fMinSize - fMaxSize) * fSizeFactor + fMaxSize;
 		if ((c/(2*n)) & 1)
 		{
 			icon->fWidthFactor *= fSizeFactor;
 			icon->fHeightFactor *= fMinSize;
-			g_print ("%d) width <- %.2f ; height <- %.2f (%d)\n", c, icon->fWidthFactor, icon->fHeightFactor, k);
+			//g_print ("%d) width <- %.2f ; height <- %.2f (%d)\n", c, icon->fWidthFactor, icon->fHeightFactor, k);
 		}
 		else
 		{
-			g_print ("%d) height <- %.2f ; width <- %.2f (%d)\n", c, icon->fHeightFactor, icon->fWidthFactor, k);
 			icon->fHeightFactor *= fSizeFactor;
 			icon->fWidthFactor *= fMinSize;
+			//g_print ("%d) height <- %.2f ; width <- %.2f (%d)\n", c, icon->fHeightFactor, icon->fWidthFactor, k);
 		}
-		/*if ((c/((3/2)*n)) & 1)
-		{
-			icon->fWidthFactor *= (float) 2 * (c%n) / n;//0.25 / n;
-			icon->fHeightFactor *= (float) 2 * ( n - (c%n)) / n;//1.25 / n;
-		}
-		else
-		{
-			icon->fWidthFactor *= (float) 2 * ( n - (c%n)) / n;//1.25 / n;
-			icon->fHeightFactor *= (float) 2 * (c%n) / n;//0.25 / n;
-		}*/
 		icon->iCount --;
 	}
 	
@@ -703,9 +688,7 @@ static gboolean _cairo_dock_hide_dock (gchar *cDockName, CairoDock *pDock, Cairo
 				pDock->iMouseX = pDock->iCurrentWidth / 2;  // utile ?
 				pDock->iMouseY = 0;
 				pDock->calculate_icons (pDock);
-				//cairo_dock_apply_wave_effect (pDock);
-				//cairo_dock_render (pDock);
-				pDock->render (pDock);  // foirreux, il faudrait je pense juste calculer les fXYDraw et compagnie, ou alors faire un redraw.
+				pDock->render (pDock);  // peut-etre qu'il faudrait faire un redraw.
 			}
 			
 			//g_print ("on cache %s par parente\n", cDockName);

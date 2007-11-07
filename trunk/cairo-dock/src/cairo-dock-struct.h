@@ -260,6 +260,12 @@ typedef enum {
 	CAIRO_DOCK_MIN_SIZE
 	} CairoDockSizeType;
 
+typedef enum {
+	CAIRO_DOCK_MOUSE_INSIDE,
+	CAIRO_DOCK_MOUSE_ON_THE_EDGE,
+	CAIRO_DOCK_MOUSE_OUTSIDE
+	} CairoDockMousePositionType;
+
 typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
 
 typedef enum {

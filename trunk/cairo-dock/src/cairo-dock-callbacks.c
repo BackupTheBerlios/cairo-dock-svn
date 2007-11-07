@@ -37,8 +37,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 static Icon *s_pIconClicked = NULL;  // pour savoir quand on deplace une icone a la souris. Dangereux si l'icone se fait effacer en cours ...
 static CairoDock *s_pLastPointedDock = NULL;  // pour savoir quand on passe d'un dock a un autre.
 static int s_iSidNonStopScrolling = 0;
-///static int s_iInternMovingIconType = -1;
-///static double s_fInternAvoidingMouseMargin = 0.;
 static int s_iSidShowSubDockDemand = 0;
 
 extern CairoDock *g_pMainDock;
@@ -250,6 +248,13 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		gtk_widget_queue_draw (pWidget);
 		fLastTime = pMotion->time;
 		
+		if (s_pIconClicked != NULL && pDock->iAvoidingMouseIconType == -1)
+		{
+			s_pIconClicked->iAnimationType = CAIRO_DOCK_FOLLOW_MOUSE;
+			pDock->iAvoidingMouseIconType = s_pIconClicked->iType;  // on pourrait le faire lors du 'motion' aussi.
+			pDock->fAvoidingMouseMargin = .5;
+		}
+		
 		//gdk_event_request_motions (pMotion);  // ce sera pour GDK 2.12.
 		gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);  // pour recevoir d'autres MotionNotify.
 	}
@@ -259,7 +264,6 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			gdk_window_get_pointer (pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
 		else
 			gdk_window_get_pointer (pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);
-		//pPointedIcon = cairo_dock_apply_wave_effect (pDock);
 		pPointedIcon = pDock->calculate_icons (pDock);
 		pDock->iAvoidingMouseIconType = CAIRO_DOCK_LAUNCHER;
 		pDock->fAvoidingMouseMargin = .25;
@@ -830,14 +834,14 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 			case GDK_BUTTON_PRESS :
 				if ( ! (pButton->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK)))
 				{
-					s_pIconClicked = icon;
-					if (s_pIconClicked != NULL)
+					s_pIconClicked = icon;  // on ne definit pas l'animation CAIRO_DOCK_FOLLOW_MOUSE ici , on le fera apres le 1er mouvement, pour eviter que l'icone soit dessinee comme tel quand on clique dessus alors que le dock ets en train de jouer une animation (ca provoque un flash desagreable).
+					/*if (s_pIconClicked != NULL)
 					{
 						//g_print ("s_pIconClicked <- %s\n", s_pIconClicked->acName);
 						s_pIconClicked->iAnimationType = CAIRO_DOCK_FOLLOW_MOUSE;
 						pDock->iAvoidingMouseIconType = s_pIconClicked->iType;  // on pourrait le faire lors du 'motion' aussi.
 						pDock->fAvoidingMouseMargin = .5;
-					}
+					}*/
 				}
 			break ;
 			
