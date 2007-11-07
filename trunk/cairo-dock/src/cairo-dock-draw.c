@@ -432,7 +432,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		cairo_scale (pCairoContext, fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude));
 	}
 	
-	if (icon->iAnimationType == CAIRO_DOCK_PULSE)
+	if (icon->iCount > 0 && icon->iAnimationType == CAIRO_DOCK_PULSE)
 	{
 		if (icon->fAlpha > 0)
 		{
