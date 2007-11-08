@@ -263,7 +263,6 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 			else
 				gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);*/
 			
-			///cairo_dock_apply_wave_effect (pDock);  // relance le grossissement si on est dedans.
 			pDock->calculate_icons (pDock);  // relance le grossissement si on est dedans.
 			if (! pDock->bInside && pDock->iRefCount > 0)
 			{

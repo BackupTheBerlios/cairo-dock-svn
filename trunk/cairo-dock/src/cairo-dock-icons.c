@@ -12,6 +12,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <stdlib.h>
 
 #include <gtk/gtk.h>
+#include <glib/gstdio.h>
 
 #include <cairo.h>
 
@@ -63,10 +64,10 @@ void cairo_dock_free_icon (Icon *icon)
 {
 	if (icon == NULL)
 		return ;
-	g_print ("%s (%s)\n", __func__, icon->acName);
 	
 	if (icon->pSubDock != NULL)
-		g_print ("Attention : cette icone n'a pas ete liberee proprement !!!\n");
+		g_print ("/!\\ /!\\ Attention : cette icone n'a pas ete liberee proprement !!! /!\\ /!\\\n");
+	g_print ("%s (%s)\n", __func__, icon->acName);
 	
 	cairo_dock_remove_dialog_if_any (icon);
 	
@@ -333,7 +334,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 	icon2->fOrder = fSwap;
 	
 	//\_________________ On change l'ordre dans les fichiers des 2 lanceurs.
-	if (CAIRO_DOCK_IS_LAUNCHER (icon1))
+	if (CAIRO_DOCK_IS_LAUNCHER (icon1))  // ce sont des lanceurs.
 	{
 		GError *erreur = NULL;
 		gchar *cDesktopFilePath;
@@ -461,6 +462,9 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 
 void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bCheckUnusedSeparator)
 {
+	//\___________________ On efface son eventuel dialogue, puisqu'elle n'appartiendra bientot plus a aucun dock.
+	cairo_dock_remove_dialog_if_any (icon);
+	
 	//\___________________ On l'enleve de la liste.
 	if (pDock->pFirstDrawnElement != NULL && pDock->pFirstDrawnElement->data == icon)
 	{
@@ -527,7 +531,13 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 static void _cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon, gboolean bCheckUnusedSeparator)
 {
 	//\___________________ On effectue les taches de fermeture de l'icone suivant son type.
-	if (CAIRO_DOCK_IS_VALID_APPLI (icon))
+	if (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon))
+	{
+		gchar *icon_path = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
+		g_remove (icon_path);
+		g_free (icon_path);
+	}
+	else if (CAIRO_DOCK_IS_VALID_APPLI (icon))
 	{
 		cairo_dock_unregister_appli (icon);
 		CairoDock *pClassSubDock = icon->pSubDock;
@@ -558,18 +568,13 @@ static void _cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon,
 			}
 		}
 	}
-	
-	if (CAIRO_DOCK_IS_VALID_APPLET (icon))
+	else if (CAIRO_DOCK_IS_VALID_APPLET (icon))
 	{
 		cairo_dock_deactivate_module (icon->pModule);  // desactive le module mais ne le ferme pas.
 		icon->pModule = NULL;  // pour ne pas le liberer lors du free_icon.
 	}
 	
-	cairo_dock_dialog_unreference (icon);
-	if (icon->pDialog != NULL)
-		cairo_dock_isolate_dialog (icon);
-	
-	//\___________________ On enleve l'icone du dock.
+	//\___________________ On detache l'icone du dock.
 	cairo_dock_detach_icon_from_dock (icon, pDock, bCheckUnusedSeparator);
 	
 	if (pDock->bIsMainDock && g_bReserveSpace)
@@ -905,7 +910,7 @@ void cairo_dock_manage_mouse_position (CairoDock *pDock, CairoDockMousePositionT
 
 
 
-double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawnElementGiven, int iFlatDockWidth, double fWidthConstraintFactor)
+double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawnElementGiven, int iFlatDockWidth, double fWidthConstraintFactor, double fExtraWidth)
 {
 	double fMaxDockWidth = 0.;
 	//g_print ("%s (%d)\n", __func__, iFlatDockWidth);
@@ -913,7 +918,7 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 	if (pIconList == NULL)
 		return 2 * g_iDockRadius + g_iDockLineWidth + 2 * g_iFrameMargin;
 	
-	//\_______________ On remet a zero les positions d'equilibre des icones.
+	//\_______________ On remet a zero les positions extremales des icones.
 	GList* ic;
 	Icon *icon;
 	for (ic = pIconList; ic != NULL; ic = ic->next)
@@ -960,7 +965,10 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 		ic = cairo_dock_get_next_element (ic, pDock->icons);
 	} while (ic != pFirstDrawnElement);
 	
-	fMaxDockWidth = (icon->fXMax - ((Icon *) pFirstDrawnElement->data)->fXMin + 2 * g_iDockRadius + 2 * g_iFrameMargin + g_iDockLineWidth) * fWidthConstraintFactor;
+	///fMaxDockWidth = (icon->fXMax - ((Icon *) pFirstDrawnElement->data)->fXMin + 2 * g_iDockRadius + 2 * g_iFrameMargin + g_iDockLineWidth) * fWidthConstraintFactor;
+	fMaxDockWidth = (icon->fXMax - ((Icon *) pFirstDrawnElement->data)->fXMin) * fWidthConstraintFactor + fExtraWidth;
+	fMaxDockWidth = ceil (fMaxDockWidth) + 1;
+	
 	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;

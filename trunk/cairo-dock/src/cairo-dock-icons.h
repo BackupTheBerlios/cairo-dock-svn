@@ -80,7 +80,7 @@ CairoDockMousePositionType cairo_dock_check_if_mouse_inside_linear (CairoDock *p
 void cairo_dock_manage_mouse_position (CairoDock *pDock, CairoDockMousePositionType iMousePositionType);
 
 
-double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawnElement, int iFlatDockWidth, double fWidthConstraintFactor);
+double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawnElement, int iFlatDockWidth, double fWidthConstraintFactor, double fExtraWidth);
 
 
 void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, CairoDockIconType iType, double fMargin);

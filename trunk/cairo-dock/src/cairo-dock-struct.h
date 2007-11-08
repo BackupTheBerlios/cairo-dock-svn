@@ -219,7 +219,6 @@ struct _Icon {
 	//\____________ Pour les applis.
 	gint iPid;
 	Window Xid;
-	///gboolean bIsMapped;
 	gchar *cClass;
 	double fLastCheckTime;
 	//\____________ Pour les modules.

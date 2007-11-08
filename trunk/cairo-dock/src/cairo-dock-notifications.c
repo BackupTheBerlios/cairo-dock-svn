@@ -8,42 +8,44 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 ******************************************************************************/
 #include "cairo-dock-notifications.h"
 
-static GPtrArray *pNotificationsTab = NULL;
+static GPtrArray *s_pNotificationsTab = NULL;
 
 
 void cairo_dock_register_notification (CairoDockNotificationType iNotifType, CairoDockNotificationFunc pFunction, gboolean bRunFirst)
 {
-	if (pNotificationsTab == NULL)
-		pNotificationsTab = g_ptr_array_sized_new (CAIRO_DOCK_NB_NOTIFICATIONS);
+	if (s_pNotificationsTab == NULL)
+	{
+		s_pNotificationsTab = g_ptr_array_new ();  // un 'g_ptr_array_sized_new' ne met pas a 0 les pointeurs, et laisse 'len' a 0.
+		g_ptr_array_set_size (s_pNotificationsTab, CAIRO_DOCK_NB_NOTIFICATIONS);
+	}
 	
-	if (pNotificationsTab->len < iNotifType + 1)
-		g_ptr_array_set_size (pNotificationsTab, iNotifType + 1);
+	g_return_if_fail (iNotifType < s_pNotificationsTab->len);
 	
-	GSList *pFunctionListForNotification = g_ptr_array_index (pNotificationsTab, iNotifType);
+	GSList *pFunctionListForNotification = g_ptr_array_index (s_pNotificationsTab, iNotifType);
 	if (bRunFirst)
-		pNotificationsTab->pdata[iNotifType] = g_slist_prepend (pFunctionListForNotification, pFunction);
+		s_pNotificationsTab->pdata[iNotifType] = g_slist_prepend (pFunctionListForNotification, pFunction);
 	else
-		pNotificationsTab->pdata[iNotifType] = g_slist_append (pFunctionListForNotification, pFunction);
+		s_pNotificationsTab->pdata[iNotifType] = g_slist_append (pFunctionListForNotification, pFunction);
 }
 
 void cairo_dock_remove_notification_func (CairoDockNotificationType iNotifType, CairoDockNotificationFunc pFunction)
 {
-	if (pNotificationsTab != NULL)
+	if (s_pNotificationsTab != NULL)
 	{
-		GSList *pFunctionListForNotification = g_ptr_array_index (pNotificationsTab, iNotifType);
-		pNotificationsTab->pdata[iNotifType] = g_slist_remove (pFunctionListForNotification, pFunction);
+		GSList *pFunctionListForNotification = g_ptr_array_index (s_pNotificationsTab, iNotifType);
+		s_pNotificationsTab->pdata[iNotifType] = g_slist_remove (pFunctionListForNotification, pFunction);
 	}
 }
 
 gboolean cairo_dock_notify (CairoDockNotificationType iNotifType, gpointer data)
 {
-	gboolean bNotificationCaught = FALSE;
-	
-	if (pNotificationsTab != NULL)
+	if (s_pNotificationsTab != NULL)
 	{
-		GSList *pFunctionListForNotification = g_ptr_array_index (pNotificationsTab, iNotifType);
-		if (pFunctionListForNotification != NULL)
-			bNotificationCaught = TRUE;
+		g_return_val_if_fail (iNotifType < s_pNotificationsTab->len, FALSE);
+		
+		GSList *pFunctionListForNotification = g_ptr_array_index (s_pNotificationsTab, iNotifType);
+		if (pFunctionListForNotification == NULL)
+			return FALSE;
 		
 		gboolean bStop = FALSE;
 		CairoDockNotificationFunc pFunction;
@@ -56,7 +58,10 @@ gboolean cairo_dock_notify (CairoDockNotificationType iNotifType, gpointer data)
 			
 			pElementList = pElementList->next;
 		}
+		return TRUE;
 	}
-	
-	return bNotificationCaught;
+	else
+	{
+		return FALSE;
+	}
 }

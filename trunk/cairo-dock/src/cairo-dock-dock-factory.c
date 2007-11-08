@@ -639,7 +639,7 @@ static void _cairo_dock_deactivate_one_dock (CairoDock *pDock)
 		g_source_remove (pDock->iSidLeaveDemand);
 	if (pDock->bIsMainDock && cairo_dock_application_manager_is_running ())
 	{
-		cairo_dock_pause_application_manager ();
+		cairo_dock_pause_application_manager ();  // inutile d'enlever les icones des applis, ce sera fait de toute maniere.
 	}
 	
 	gtk_widget_destroy (pDock->pWidget);

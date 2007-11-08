@@ -472,6 +472,7 @@ void cairo_dock_dialog_find_optimal_placement  (CairoDockDialog *pDialog, Icon *
 
 void cairo_dock_place_dialog (CairoDockDialog *pDialog, Icon *pIcon, CairoDock *pDock)
 {
+	g_return_if_fail (pDock != NULL);
 	cairo_dock_dialog_calculate_aimed_point (pIcon, pDock, &pDialog->iAimedX, &pDialog->iAimedY, &pDialog->bRight, &pDialog->bIsPerpendicular, &pDialog->bDirectionUp);
 	g_print (" Aim (%d;%d)\n", pDialog->iAimedX, pDialog->iAimedY);
 	

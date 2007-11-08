@@ -1217,13 +1217,7 @@ void on_drag_motion (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, gui
 
 gboolean on_delete (GtkWidget *pWidget, GdkEvent *event, CairoDock *pDock)
 {
-	GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (pWidget),
-		GTK_DIALOG_DESTROY_WITH_PARENT,
-		GTK_MESSAGE_QUESTION,
-		GTK_BUTTONS_YES_NO,
-		"Quit Cairo-Dock ?");
-	int answer = gtk_dialog_run (GTK_DIALOG (dialog));
-	gtk_widget_destroy (dialog);
+	int answer = cairo_dock_ask_question (pDock, "Quit Cairo-Dock ?");
 	if (answer == GTK_RESPONSE_YES)
 		gtk_main_quit ();
 	return FALSE;

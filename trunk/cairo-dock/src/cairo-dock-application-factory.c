@@ -164,8 +164,10 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 	{
 		XWMHints *pWMHints = XGetWMHints (s_XDisplay, Xid);
 		if (pWMHints == NULL)
+		{
+			g_print ("  aucun WMHints\n");
 			return NULL;
-		
+		}
 		//\__________________ On recupere les donnees dans un  pixbuf.
 		GdkPixbuf *pIconPixbuf = NULL;
 		if (pWMHints->flags & IconWindowHint)
@@ -261,8 +263,8 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 		{
 			if (pXStateBuffer[i] == s_aNetWmSkipTaskbar)
 				bSkip = TRUE;
-			else if (pXStateBuffer[i] == s_aNetWmSkipPager)  // contestable ...
-				bSkip = TRUE;
+			//else if (pXStateBuffer[i] == s_aNetWmSkipPager)  // contestable ...
+			//	bSkip = TRUE;
 		}
 		//g_print (" -------- bSkip : %d\n",  bSkip);
 		XFree (pXStateBuffer);
@@ -277,25 +279,23 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	
 	//\__________________ On regarde son type.
 	gulong *pTypeBuffer = NULL;
-	gboolean bNormalTypeWindow = FALSE;
 	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmWindowType, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pTypeBuffer);
 	if (iBufferNbElements != 0)
 	{
 		if (*pTypeBuffer == s_aNetWmWindowTypeDialog)
 		{
 			g_print ("dialogue\n");
+			XFree (pTypeBuffer);
 			return NULL;
 		}
 		else if (*pTypeBuffer != s_aNetWmWindowTypeNormal)
 		{
-			//g_print ("type indesirable\n");
+			g_print ("type indesirable\n");
 			XFree (pTypeBuffer);
 			if (g_bUniquePid)
 				g_hash_table_insert (s_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
 			return NULL;
 		}
-		else
-			bNormalTypeWindow = TRUE;
 		XFree (pTypeBuffer);
 	}
 	//else
@@ -343,8 +343,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	pNewSurface = cairo_dock_create_surface_from_xwindow (Xid, pSourceContext, 1 + g_fAmplitude, &fWidth, &fHeight);
 	if (pNewSurface == NULL)
 	{
-		if (bNormalTypeWindow)
-			g_print ("pas d'icone mais pourtant son type est normal.\n");
+		g_print ("pas d'icone\n");
 		XFree (pNameBuffer);
 		if (g_bUniquePid)
 			g_hash_table_insert (s_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
@@ -364,7 +363,6 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	icon->fWidth = fWidth;
 	icon->fHeight = fHeight;
 	icon->pIconBuffer = pNewSurface;
-	///icon->bIsMapped = TRUE;  // si elle n'est en fait pas visible, le 2eme UnmapNotify sera juste ignore.
 	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 	
 	if (g_bUniquePid)
@@ -405,7 +403,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	else
 		icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
 	
-	cairo_dock_set_normal_window_mask (Xid);
+	cairo_dock_set_window_mask (Xid, PropertyChangeMask);
 	
 	return icon;
 }
