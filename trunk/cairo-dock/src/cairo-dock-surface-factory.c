@@ -114,6 +114,77 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 }
 
 
+cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo_t *pSourceContext, double fMaxScale, gboolean bConstraintSize, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fImageWidth, double *fImageHeight)
+{
+	*fImageWidth = gdk_pixbuf_get_width (pixbuf);
+	*fImageHeight = gdk_pixbuf_get_height (pixbuf);
+	
+	double fIconWidthSaturationFactor = 1., fIconHeightSaturationFactor = 1.;
+	if (bConstraintSize)
+		cairo_dock_calculate_contrainted_icon_size (fImageWidth, 
+			fImageHeight,
+			iMinIconAuthorizedWidth,
+			iMinIconAuthorizedHeight,
+			iMaxIconAuthorizedWidth,
+			iMaxIconAuthorizedHeight,
+			&fIconWidthSaturationFactor,
+			&fIconHeightSaturationFactor);
+	
+	GdkPixbuf *pPixbufWithAlpha = pixbuf;
+	if (! gdk_pixbuf_get_has_alpha (pixbuf))  // on lui rajoute un canal alpha s'il n'en a pas.
+	{
+		//g_print ("  ajout d'un canal alpha\n");
+		pPixbufWithAlpha = gdk_pixbuf_add_alpha (pixbuf, TRUE, 255, 255, 255);  // TRUE <=> les pixels blancs deviennent transparents.
+	}
+	
+	//\____________________ On pre-multiplie chaque composante par le alpha (necessaire pour libcairo).
+	int iNbChannels = gdk_pixbuf_get_n_channels (pPixbufWithAlpha);
+	int iRowstride = gdk_pixbuf_get_rowstride (pPixbufWithAlpha);
+	guchar *p, *pixels = gdk_pixbuf_get_pixels (pPixbufWithAlpha);
+	
+	int w = gdk_pixbuf_get_width (pPixbufWithAlpha);
+	int h = gdk_pixbuf_get_height (pPixbufWithAlpha);
+	int x, y;
+	int red, green, blue;
+	float fAlphaFactor;
+	for (y = 0; y < h; y ++)
+	{
+		for (x = 0; x < w; x ++)
+		{
+			p = pixels + y * iRowstride + x * iNbChannels;
+			fAlphaFactor = (float) p[3] / 255;
+			red = p[0] * fAlphaFactor;
+			green = p[1] * fAlphaFactor;
+			blue = p[2] * fAlphaFactor;
+			p[0] = blue;
+			p[1] = green;
+			p[2] = red;
+		}
+	}
+	
+	cairo_surface_t *surface_ini = cairo_image_surface_create_for_data (pixels,
+		CAIRO_FORMAT_ARGB32,
+		gdk_pixbuf_get_width (pPixbufWithAlpha),
+		gdk_pixbuf_get_height (pPixbufWithAlpha),
+		gdk_pixbuf_get_rowstride (pPixbufWithAlpha));
+	
+	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+		CAIRO_CONTENT_COLOR_ALPHA,
+		ceil ((*fImageWidth) * fMaxScale),
+		ceil ((*fImageHeight) * fMaxScale));
+	cairo_t *pCairoContext = cairo_create (pNewSurface);
+	
+	cairo_scale (pCairoContext, fMaxScale * fIconWidthSaturationFactor, fMaxScale * fIconHeightSaturationFactor);
+	cairo_set_source_surface (pCairoContext, surface_ini, 0, 0);
+	cairo_paint (pCairoContext);
+	cairo_surface_destroy (surface_ini);
+	
+	if (pPixbufWithAlpha != pixbuf)
+		g_object_unref (pPixbufWithAlpha);
+	return pNewSurface;
+}
+
+
 cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern)
 {
 	g_print ("%s (%s)\n", __func__, cImagePath);

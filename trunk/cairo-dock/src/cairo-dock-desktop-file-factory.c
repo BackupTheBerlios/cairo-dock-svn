@@ -51,7 +51,7 @@ gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, const gchar *cDockName
 	if (cURI == NULL)
 	{
 		//\___________________ On ouvre le patron.
-		gchar *cDesktopFileTemplate = cairo_dock_get_template_path ("launcher");
+		gchar *cDesktopFileTemplate = cairo_dock_get_translated_conf_file_path (CAIRO_DOCK_LAUNCHER_CONF_FILE, CAIRO_DOCK_SHARE_DATA_DIR);
 		
 		GKeyFile *pKeyFile = g_key_file_new ();
 		g_key_file_load_from_file (pKeyFile, cDesktopFileTemplate, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &tmp_erreur);
@@ -68,7 +68,7 @@ gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, const gchar *cDockName
 		g_key_file_set_string (pKeyFile, "Desktop Entry", "Exec", "echo 'edit me !'");
 		
 		//\___________________ On lui choisit un nom de fichier tel qu'il n'y ait pas de collision.
-		cNewDesktopFileName = cairo_dock_generate_desktop_filename (g_cCurrentLaunchersPath);
+		cNewDesktopFileName = cairo_dock_generate_desktop_filename ("launcher.desktop", g_cCurrentLaunchersPath);
 		
 		//\___________________ On ecrit tout.
 		gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, cNewDesktopFileName);
@@ -81,6 +81,7 @@ gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, const gchar *cDockName
 		gchar *cFilePath = cURI + 7;  // on saute le "file://".
 		cNewDesktopFileName = g_path_get_basename (cFilePath);
 		
+		//\___________________ On ouvre le fichier .desktop pour lui rajouter nos champs.
 		GKeyFile *pKeyFile = g_key_file_new ();
 		g_key_file_load_from_file (pKeyFile, cFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &tmp_erreur);
 		if (tmp_erreur != NULL)
@@ -88,27 +89,47 @@ gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, const gchar *cDockName
 			g_propagate_error (erreur, tmp_erreur);
 			return NULL;
 		}
-		g_key_file_remove_key (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", NULL);
 		g_key_file_set_double (pKeyFile, "Desktop Entry", "Order", fEffectiveOrder);
 		g_key_file_set_string (pKeyFile, "Desktop Entry", "Container", cDockName);
 		g_key_file_set_boolean (pKeyFile, "Desktop Entry", "Is container", FALSE);
 		g_key_file_set_boolean (pKeyFile, "Desktop Entry", "Is URI", FALSE);
 		
+		//\___________________ On elimine les indesirables.
+		g_key_file_remove_key (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", NULL);
+		GError *erreur = NULL;
+		gchar *cCommand = g_key_file_get_string (pKeyFile, "Desktop Entry", "Exec", &erreur);
+		if (erreur != NULL)
+		{
+			g_print ("Attention : invalid desktop file (%s)\n", erreur->message);
+			g_error_free (erreur);
+			g_key_file_free (pKeyFile);
+			g_free (cNewDesktopFileName);
+			return NULL;
+		}
+		gchar *str = strchr (cCommand, '%');
+		if (str != NULL)
+		{
+			*str = '\0';
+			g_key_file_set_string (pKeyFile, "Desktop Entry", "Exec", cCommand);
+		}
+		g_free (cCommand);
+		
+		//\___________________ On ecrit tout ca dans un fichier.
 		gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, cNewDesktopFileName);
 		cairo_dock_write_keys_to_file (pKeyFile, cNewDesktopFilePath);
-		g_key_file_free (pKeyFile);
 		
-		gchar *cDesktopFileTemplate = g_strdup_printf ("%s/launcher-%s.conf", CAIRO_DOCK_SHARE_DATA_DIR, g_cLanguage);
-		cairo_dock_apply_translation_on_conf_file (cNewDesktopFilePath, cDesktopFileTemplate);
+		gchar *cDesktopFileTemplate = cairo_dock_get_translated_conf_file_path (CAIRO_DOCK_LAUNCHER_CONF_FILE, CAIRO_DOCK_SHARE_DATA_DIR);
+		cairo_dock_apply_translation_on_conf_file (cNewDesktopFilePath, cDesktopFileTemplate);  // ecrit tous les commentaires utiles.
 		g_free (cDesktopFileTemplate);
 		g_free (cNewDesktopFilePath);
+		g_key_file_free (pKeyFile);
 	}
 	
 	return cNewDesktopFileName;
 }
 
 
-gchar *cairo_dock_generate_desktop_filename (gchar *cCairoDockDataDir)
+gchar *cairo_dock_generate_desktop_filename (gchar *cBaseName, gchar *cCairoDockDataDir)
 {
 	int iPrefixNumber = 0;
 	GString *sFileName = g_string_new ("");
@@ -116,14 +137,14 @@ gchar *cairo_dock_generate_desktop_filename (gchar *cCairoDockDataDir)
 	do
 	{
 		iPrefixNumber ++;
-		g_string_printf (sFileName, "%s/%02dlauncher.desktop", cCairoDockDataDir, iPrefixNumber);
+		g_string_printf (sFileName, "%s/%02d%s", cCairoDockDataDir, iPrefixNumber, cBaseName);
 	} while (iPrefixNumber < 99 && g_file_test (sFileName->str, G_FILE_TEST_EXISTS));
 	
 	g_string_free (sFileName, TRUE);
 	if (iPrefixNumber == 99)
 		return NULL;
 	else
-		return g_strdup_printf ("%02dlauncher.desktop", iPrefixNumber);
+		return g_strdup_printf ("%02d%s", iPrefixNumber, cBaseName);
 }
 
 
@@ -155,7 +176,7 @@ void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath, gchar *cL
 }
 
 
-gchar *cairo_dock_get_template_path (gchar *cGenericFileName)
+gchar *cairo_dock_get_launcher_template_conf_file (void)
 {
-	return g_strdup_printf ("%s/%s-%s.conf", CAIRO_DOCK_SHARE_DATA_DIR, cGenericFileName, g_cLanguage);
+	return cairo_dock_get_translated_conf_file_path (CAIRO_DOCK_LAUNCHER_CONF_FILE, CAIRO_DOCK_SHARE_DATA_DIR);
 }

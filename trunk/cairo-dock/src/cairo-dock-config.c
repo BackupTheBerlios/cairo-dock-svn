@@ -643,7 +643,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_bMinimizeOnClick = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "minimize on click", &bFlushConfFileNeeded, TRUE);
 	
 	g_bDemandsAttentionWithDialog = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "demands attention with dialog", &bFlushConfFileNeeded, TRUE);
-	g_bDemandsAttentionWithAnimation = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "demands attention with animation", &bFlushConfFileNeeded, TRUE);
+	g_bDemandsAttentionWithAnimation = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "demands attention with animation", &bFlushConfFileNeeded, FALSE);
 	
 	g_bAnimateOnActiveWindow = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "animate on active window", &bFlushConfFileNeeded, TRUE);
 	
@@ -744,7 +744,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_free (cVisibleZoneImageFile);
 	
 	cairo_dock_load_background_decorations (pDock);
-	cairo_dock_load_default_icon (pDock);
+	///cairo_dock_load_default_icon (pDock);
 	
 	
 	pDock->iMouseX = 0;  // on se place hors du dock initialement.

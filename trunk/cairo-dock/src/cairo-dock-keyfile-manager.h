@@ -7,7 +7,9 @@
 
 
 void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file);
-void cairo_dock_flush_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath);
+gchar *cairo_dock_get_translated_conf_file_path (gchar *cConfFileName, gchar *cShareDataDirPath);
+void cairo_dock_flush_conf_file_full (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath, gboolean bUseFileKeys);
+#define cairo_dock_flush_conf_file(pKeyFile, cConfFilePath, cShareDataDirPath) cairo_dock_flush_conf_file_full (pKeyFile, cConfFilePath, cShareDataDirPath, TRUE)
 
 void cairo_dock_replace_comments (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile);
 void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile, gboolean bUseOriginalKeys, gchar iIdentifier);

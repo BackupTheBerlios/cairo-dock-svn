@@ -44,9 +44,8 @@ void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file)
 	}
 }
 
-void cairo_dock_flush_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath)
+gchar *cairo_dock_get_translated_conf_file_path (gchar *cConfFileName, gchar *cShareDataDirPath)
 {
-	gchar *cConfFileName = g_path_get_basename (cConfFilePath);
 	gchar *cBaseName = g_strdup (cConfFileName);
 	gchar *cExtension = NULL;
 	gchar *str = strrchr (cBaseName, '.');
@@ -82,6 +81,17 @@ void cairo_dock_flush_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar
 		}
 	}
 	
+	g_free (cBaseName);
+	g_free (cExtension);
+	return cTranslatedConfFilePath;
+}
+
+void cairo_dock_flush_conf_file_full (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath, gboolean bUseFileKeys)
+{
+	gchar *cConfFileName = g_path_get_basename (cConfFilePath);
+	gchar *cTranslatedConfFilePath = cairo_dock_get_translated_conf_file_path (cConfFileName, cShareDataDirPath);
+	g_free (cConfFileName);
+	
 	if (cTranslatedConfFilePath == NULL)
 	{
 		g_print ("Attention : couldn't find any installed conf file\n");
@@ -93,12 +103,8 @@ void cairo_dock_flush_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar
 		g_free (cCommand);
 		g_free (cTranslatedConfFilePath);
 		
-		cairo_dock_replace_values_in_conf_file (cConfFilePath, pKeyFile, TRUE, 0);
+		cairo_dock_replace_values_in_conf_file (cConfFilePath, pKeyFile, bUseFileKeys, 0);
 	}
-	
-	g_free (cConfFileName);
-	g_free (cBaseName);
-	g_free (cExtension);
 }
 
 void cairo_dock_replace_comments (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile)

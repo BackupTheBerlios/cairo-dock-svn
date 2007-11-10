@@ -73,6 +73,10 @@ void cairo_dock_initialize_application_manager (void)
 	cairo_dock_initialize_application_factory (s_XDisplay);
 }
 
+const Display *cairo_dock_get_Xdisplay (void)
+{
+	return s_XDisplay;
+}
 
 void cairo_dock_register_appli (Icon *icon)
 {
@@ -803,7 +807,7 @@ void cairo_dock_set_one_icon_geometry_for_window_manager (Icon *icon, CairoDock 
 	{
 		int iX, iY, iWidth, iHeight;
 		iX = pDock->iWindowPositionX + icon->fXAtRest + (pDock->iCurrentWidth - pDock->iFlatDockWidth) / 2;
-		iY = pDock->iWindowPositionY + icon->fDrawY - icon->fHeight * g_fAmplitude;  // il faudrait un fYAtRest ...  /// il faudrait calculer fDrawY avant ...
+		iY = pDock->iWindowPositionY + icon->fDrawY - icon->fHeight * g_fAmplitude;  // il faudrait un fYAtRest ...
 		iWidth = icon->fWidth;
 		iHeight = icon->fHeight * (1. + 2. * g_fAmplitude);  // on elargit en haut et en bas, pour gerer les cas ou l'icone grossirait vers le haut ou vers le bas.
 		

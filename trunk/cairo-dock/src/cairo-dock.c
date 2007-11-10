@@ -103,7 +103,6 @@ gchar *g_cConfFile = NULL;  // le chemin du fichier de conf.
 gchar **g_cDefaultIconDirectory = NULL;  // les repertoires ou on va chercher les icones avant d'aller chercher dans le theme d'icones.
 GtkIconTheme *g_pIconTheme = NULL;  // le theme d'icone choisi.
 gchar *g_cCairoDockDataDir = NULL;  // le repertoire ou on va chercher les .desktop.
-cairo_surface_t *g_pDefaultIcon = NULL;
 
 gboolean g_bAutoHide;
 double g_fAmplitude;  // amplitude de la siunsoide.

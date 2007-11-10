@@ -68,21 +68,22 @@ gchar *cairo_dock_edit_themes (gchar *cLanguage, GHashTable **hThemeTable)
 	g_hash_table_foreach (hUserThemeTable, (GHFunc) _cairo_dock_write_one_theme_name, sThemeNames);
 	sThemeNames->str[sThemeNames->len-1] = '\0';
 	
-	
-	//\___________________ On met a jour le fichier de conf.
+	//\___________________ On cree un fichier de conf temporaire.
 	const gchar *cTmpDir = g_get_tmp_dir ();
 	gchar *cTmpConfFile = g_strdup_printf ("%s/cairo-dock-init", cTmpDir);
-	gchar *cCommand = g_strdup_printf ("cp %s/themes-%s.conf %s", CAIRO_DOCK_SHARE_DATA_DIR, cLanguage, cTmpConfFile);
+	
+	gchar *cDesktopFileTemplate = cairo_dock_get_translated_conf_file_path (CAIRO_DOCK_THEME_CONF_FILE, CAIRO_DOCK_SHARE_DATA_DIR);
+	gchar *cCommand = g_strdup_printf ("cp %s %s", cDesktopFileTemplate, cTmpConfFile);
+	g_free (cDesktopFileTemplate);
 	system (cCommand);
 	g_free (cCommand);
 	
-	
+	//\___________________ On met a jour ce fichier de conf.
 	cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, *hThemeTable, "Themes", "chosen theme", NULL, (GHFunc) cairo_dock_write_one_theme_name);
 	cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, hUserThemeTable, "Delete", "wanted themes", NULL, (GHFunc) cairo_dock_write_one_name);
 	//g_hash_table_insert (hUserThemeTable, g_strdup (""), g_strdup (""));
 	cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, hUserThemeTable, "Save", "theme name", NULL, (GHFunc) cairo_dock_write_one_name);
 	g_hash_table_destroy (hUserThemeTable);
-	
 	
 	GKeyFile *pKeyFile = g_key_file_new ();
 	g_key_file_load_from_file (pKeyFile, cTmpConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
@@ -95,7 +96,6 @@ gchar *cairo_dock_edit_themes (gchar *cLanguage, GHashTable **hThemeTable)
 	
 	g_key_file_set_string (pKeyFile, "Delete", "wanted themes", sThemeNames->str);
 	g_string_free (sThemeNames, TRUE);
-	
 	
 	cairo_dock_write_keys_to_file (pKeyFile, cTmpConfFile);
 	g_key_file_free (pKeyFile);

@@ -30,7 +30,7 @@ extern GHashTable *g_hDocksTable;
 extern double g_fSubDockSizeRatio;
 extern gboolean g_bAutoHide;
 extern gboolean g_bTextAlwaysHorizontal;
-extern cairo_surface_t *g_pDefaultIcon;
+///extern cairo_surface_t *g_pDefaultIcon;
 
 extern gint g_iScreenWidth[2];
 extern gint g_iScreenHeight[2];
@@ -438,8 +438,8 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	
 	if (icon->pIconBuffer != NULL)
 		cairo_set_source_surface (pCairoContext, icon->pIconBuffer, 0.0, 0.0);
-	else
-		cairo_set_source_surface (pCairoContext, g_pDefaultIcon, 0.0, 0.0);
+	///else
+	///	cairo_set_source_surface (pCairoContext, g_pDefaultIcon, 0.0, 0.0);
 	//cairo_pop_group (pCairoContext);
 	
 	if (icon->fAlpha == 1)

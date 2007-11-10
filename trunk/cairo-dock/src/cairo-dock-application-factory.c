@@ -282,24 +282,46 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmWindowType, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pTypeBuffer);
 	if (iBufferNbElements != 0)
 	{
-		if (*pTypeBuffer == s_aNetWmWindowTypeDialog)
+		if (*pTypeBuffer != s_aNetWmWindowTypeNormal)
 		{
-			g_print ("dialogue\n");
-			XFree (pTypeBuffer);
-			return NULL;
-		}
-		else if (*pTypeBuffer != s_aNetWmWindowTypeNormal)
-		{
-			g_print ("type indesirable\n");
-			XFree (pTypeBuffer);
-			if (g_bUniquePid)
-				g_hash_table_insert (s_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
-			return NULL;
+			if (*pTypeBuffer == s_aNetWmWindowTypeDialog)
+			{
+				Window XMainAppliWindow;
+				if (XGetTransientForHint (s_XDisplay, Xid, &XMainAppliWindow) != 0)
+					XMainAppliWindow = 0;
+				
+				if (XMainAppliWindow != 0)
+				{
+					g_print ("dialogue modal => on ignore\n");
+					XFree (pTypeBuffer);
+					return NULL;  // inutile de rajouter le PID ici, c'est le meme que la fenetre principale.
+				}
+				g_print ("dialogue autorise\n");
+			}
+			else if (*pTypeBuffer != s_aNetWmWindowTypeNormal)
+			{
+				g_print ("type indesirable\n");
+				XFree (pTypeBuffer);
+				if (g_bUniquePid)
+					g_hash_table_insert (s_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
+				return NULL;
+			}
 		}
 		XFree (pTypeBuffer);
 	}
-	//else
-	//	g_print (" pas de type defini -> on suppose que son type est 'normal'\n");
+	else
+	{
+		Window XMainAppliWindow;
+		if (XGetTransientForHint (s_XDisplay, Xid, &XMainAppliWindow) != 0)
+			XMainAppliWindow = 0;
+		if (XMainAppliWindow != 0)
+		{
+			g_print ("fenetre modale => on saute.\n");
+			return NULL;  // meme remarque.
+		}
+		//else
+		//	g_print (" pas de type defini -> on suppose que son type est 'normal'\n");
+	}
 	
 	//\__________________ On recupere son PID si on est en mode "PID unique".
 	if (g_bUniquePid)

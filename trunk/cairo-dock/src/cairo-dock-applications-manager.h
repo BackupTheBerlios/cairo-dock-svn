@@ -9,6 +9,7 @@
 
 int cairo_dock_xerror_handler (Display * pDisplay, XErrorEvent *pXError);
 void cairo_dock_initialize_application_manager (void);
+const Display *cairo_dock_get_Xdisplay (void);
 
 void cairo_dock_register_appli (Icon *icon);
 void cairo_dock_blacklist_appli (Window Xid);

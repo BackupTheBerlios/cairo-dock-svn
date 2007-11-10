@@ -81,17 +81,12 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorType, CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
-	double fWidth, fHeight;
-	cairo_surface_t *pSeparatorSurface = cairo_dock_create_separator_surface (pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock, &fWidth, &fHeight);
-	
-	if (pSeparatorSurface == NULL)
+	if (g_cSeparatorImage == NULL)
 		return NULL;
 	
 	Icon *icon = g_new0 (Icon, 1);
-	icon->pIconBuffer = pSeparatorSurface;
-	icon->fWidth = fWidth;
-	icon->fHeight = fHeight;
 	icon->iType = iSeparatorType;
+	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
 	
 	return icon;
 }

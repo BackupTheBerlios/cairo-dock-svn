@@ -36,7 +36,7 @@ extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern gboolean g_bUseGlitz;
 
 
-cairo_surface_t *cairo_dock_create_applet_surface (cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
+cairo_surface_t *cairo_dock_create_applet_surface (gchar *cImageFilePath, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
 {
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
@@ -48,10 +48,25 @@ cairo_surface_t *cairo_dock_create_applet_surface (cairo_t *pSourceContext, doub
 		g_tMaxIconAuthorizedSize[CAIRO_DOCK_APPLET],
 		&fIconWidthSaturationFactor, &fIconHeightSaturationFactor);
 	
-	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-		CAIRO_CONTENT_COLOR_ALPHA,
-		ceil (*fWidth * fMaxScale),
-		ceil (*fHeight * fMaxScale));
+	cairo_surface_t *pNewSurface;
+	if (cImageFilePath == NULL)
+		pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+			CAIRO_CONTENT_COLOR_ALPHA,
+			ceil (*fWidth * fMaxScale),
+			ceil (*fHeight * fMaxScale));
+	else
+		pNewSurface = cairo_dock_create_surface_from_image (cImageFilePath,
+			pSourceContext,
+			fMaxScale,
+			*fWidth,
+			*fHeight,
+			*fWidth,
+			*fHeight,
+			fWidth,
+			fHeight,
+			0,
+			1,
+			FALSE);
 	return pNewSurface;
 }
 
@@ -71,10 +86,7 @@ Icon *cairo_dock_create_icon_for_applet (CairoDock *pDock, int iWidth, int iHeig
 	cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock);
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, icon);
 	
-	if (cIconFileName == NULL)
-		icon->pIconBuffer = cairo_dock_create_applet_surface (pSourceContext, 1 + g_fAmplitude, &icon->fWidth, &icon->fHeight);
-	else
-		cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
+	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
 	
 	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 	

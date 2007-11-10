@@ -35,7 +35,6 @@ extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
 extern double g_fSubDockSizeRatio;
 extern gboolean g_bSameHorizontality;
-extern cairo_surface_t *g_pDefaultIcon;
 
 extern int g_iSinusoidWidth;
 extern gint g_iDockLineWidth;
@@ -132,12 +131,10 @@ cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFi
 void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdouble fMaxScale, gboolean bHorizontalDock)
 {
 	//g_print ("%s (%.2f, %s)\n", __func__, fMaxScale, icon->acFileName);
-	icon->fWidth = 48.;  // valeur par defaut au cas ou l'icone est inexistante ou ne se chargerait pas comme il faut.
-	icon->fHeight = 48.;
 	cairo_surface_destroy (icon->pIconBuffer);
 	icon->pIconBuffer = NULL;
 	
-	if (CAIRO_DOCK_IS_LAUNCHER (icon) || (CAIRO_DOCK_IS_APPLET (icon) && icon->acFileName != NULL))  // c'est l'icone d'un .desktop.
+	if (CAIRO_DOCK_IS_LAUNCHER (icon))
 	{
 		//\_______________________ On recherche une icone.
 		gchar *cIconPath = cairo_dock_search_icon_s_path (icon->acFileName);
@@ -167,11 +164,29 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	}
 	else if (CAIRO_DOCK_IS_APPLET (icon))  // c'est l'icône d'une applet.
 	{
-		icon->pIconBuffer = cairo_dock_create_applet_surface (pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight);
+		icon->pIconBuffer = cairo_dock_create_applet_surface (icon->acFileName, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight);
 	}
 	else  // c'est une icone de separation.
 	{
 		icon->pIconBuffer = cairo_dock_create_separator_surface (pSourceContext, fMaxScale, bHorizontalDock, &icon->fWidth, &icon->fHeight);
+	}
+	
+	if (icon->pIconBuffer == NULL)
+	{
+		gchar *cIconPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_DEFAULT_ICON_NAME);
+		icon->pIconBuffer = cairo_dock_create_surface_from_image (cIconPath,
+			pSourceContext,
+			fMaxScale,
+			g_tMinIconAuthorizedSize[icon->iType],
+			g_tMinIconAuthorizedSize[icon->iType],
+			g_tMaxIconAuthorizedSize[icon->iType],
+			g_tMaxIconAuthorizedSize[icon->iType],
+			(bHorizontalDock ? &icon->fWidth : &icon->fHeight),
+			(bHorizontalDock ? &icon->fHeight : &icon->fWidth),
+			0,
+			1,
+			FALSE);
+		g_free (cIconPath);
 	}
 }
 
@@ -511,44 +526,4 @@ void cairo_dock_load_background_decorations (CairoDock *pDock)
 	g_fBackgroundImageWidth = 0;
 	g_fBackgroundImageHeight = 0;
 	cairo_dock_update_background_decorations_if_necessary (pDock, data[0], data[1]);
-}
-
-
-void cairo_dock_load_default_icon (CairoDock *pDock)
-{
-	cairo_surface_destroy (g_pDefaultIcon);
-	g_pDefaultIcon = NULL;
-	
-	int i, iMinSize = 1e4, iMaxSize = 0;
-	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i += 2)
-	{
-		if (g_tMinIconAuthorizedSize[i] > 0)
-			iMinSize = MIN (iMinSize, g_tMinIconAuthorizedSize[i]);
-		if (g_tMaxIconAuthorizedSize[i] > 0)
-			iMaxSize = MAX (iMaxSize, g_tMaxIconAuthorizedSize[i]);
-	}
-	if (iMinSize == 1e4)
-		iMinSize = 48;
-	if (iMaxSize == 0)
-		iMaxSize = 48;
-	//g_print ("=> %dx%d\n", iMinSize, iMaxSize);
-	
-	gchar *cIconPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_DEFAULT_ICON_NAME);
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
-	double fDefaultIconWidth, fDefaultIconHeight;
-	g_pDefaultIcon = cairo_dock_create_surface_from_image (cIconPath,
-		pCairoContext,
-		1 + g_fAmplitude,
-		iMinSize,
-		iMinSize,
-		iMaxSize,
-		iMaxSize,
-		&fDefaultIconWidth,
-		&fDefaultIconHeight,
-		0,
-		1,
-		FALSE);
-	//g_print ("=> %.1fx%.1f\n", fDefaultIconWidth, fDefaultIconHeight);
-	cairo_destroy (pCairoContext);
-	g_free (cIconPath);
 }
