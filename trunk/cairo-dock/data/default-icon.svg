@@ -1,13 +1,54 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
-   width="128"
-   height="128"
-   id="svg2">
+   width="48"
+   height="48"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.45.1"
+   sodipodi:docname="default-icon.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   sodipodi:docbase="/opt/cairo-dock/cairo-dock/data">
+  <metadata
+     id="metadata36">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     inkscape:window-height="739"
+     inkscape:window-width="937"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     guidetolerance="10.0"
+     gridtolerance="10.0"
+     objecttolerance="10.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base"
+     width="48px"
+     height="48px"
+     inkscape:zoom="5.890625"
+     inkscape:cx="14.72679"
+     inkscape:cy="24.904934"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:current-layer="svg2" />
   <defs
      id="defs5">
     <linearGradient
@@ -135,7 +176,7 @@
        id="linearGradient4142"
        xlink:href="#linearGradient3161"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.7201599,0,0,0.7201599,10.973242,46.173243)"
+       gradientTransform="matrix(0.2677723,0,0,0.2677723,4.6263759,17.510331)"
        spreadMethod="reflect" />
     <linearGradient
        x1="35.237492"
@@ -145,7 +186,7 @@
        id="linearGradient3163"
        xlink:href="#linearGradient6072"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.7493706,0,0,0.7493706,11.199245,45.143517)" />
+       gradientTransform="matrix(0.2786336,0,0,0.2786336,4.7104086,17.127447)" />
     <radialGradient
        cx="80.727989"
        cy="86.201538"
@@ -177,14 +218,14 @@
        gradientTransform="matrix(0.4561705,0,0,0.4561703,62.260438,102.26014)" />
   </defs>
   <text
-     x="-7.0411091"
-     y="160.29697"
+     x="-2.0717785"
+     y="59.944206"
      transform="scale(1.2641647,0.7910362)"
-     style="font-size:215.60279846px;font-style:normal;font-weight:normal;fill:url(#linearGradient4142);fill-opacity:1;stroke:url(#linearGradient3163);stroke-width:0.74937063px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Vrinda"
+     style="font-size:80.16619873px;font-style:normal;font-weight:normal;fill:url(#linearGradient4142);fill-opacity:1;stroke:url(#linearGradient3163);stroke-width:0.27863365px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Vrinda"
      id="text2194"
      xml:space="preserve"><tspan
-       x="-7.0411091"
-       y="160.29697"
-       style="font-size:215.60279846px;fill:url(#linearGradient4142);fill-opacity:1;stroke:url(#linearGradient3163);stroke-width:0.74937063;font-family:Vrinda"
+       x="-2.0717785"
+       y="59.944206"
+       style="font-size:80.16619873px;fill:url(#linearGradient4142);fill-opacity:1;stroke:url(#linearGradient3163);stroke-width:0.27863365;font-family:Vrinda"
        id="tspan2196">?</tspan></text>
 </svg>

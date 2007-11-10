@@ -20,6 +20,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-load.h"
 #include "cairo-dock-draw.h"
 #include "cairo-dock-config.h"
+#include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-surface-factory.h"
 #include "cairo-dock-applet-factory.h"
 
@@ -36,7 +37,7 @@ extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern gboolean g_bUseGlitz;
 
 
-cairo_surface_t *cairo_dock_create_applet_surface (gchar *cImageFilePath, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
+cairo_surface_t *cairo_dock_create_applet_surface (gchar *cIconFileName, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
 {
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
@@ -49,13 +50,15 @@ cairo_surface_t *cairo_dock_create_applet_surface (gchar *cImageFilePath, cairo_
 		&fIconWidthSaturationFactor, &fIconHeightSaturationFactor);
 	
 	cairo_surface_t *pNewSurface;
-	if (cImageFilePath == NULL)
+	if (cIconFileName == NULL)
 		pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 			CAIRO_CONTENT_COLOR_ALPHA,
 			ceil (*fWidth * fMaxScale),
 			ceil (*fHeight * fMaxScale));
 	else
-		pNewSurface = cairo_dock_create_surface_from_image (cImageFilePath,
+	{
+		gchar *cIconPath = cairo_dock_search_icon_s_path (cIconFileName);
+		pNewSurface = cairo_dock_create_surface_from_image (cIconPath,
 			pSourceContext,
 			fMaxScale,
 			*fWidth,
@@ -67,6 +70,8 @@ cairo_surface_t *cairo_dock_create_applet_surface (gchar *cImageFilePath, cairo_
 			0,
 			1,
 			FALSE);
+		g_free (cIconPath);
+	}
 	return pNewSurface;
 }
 
