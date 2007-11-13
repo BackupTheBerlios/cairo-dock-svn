@@ -277,6 +277,29 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 		return NULL;
 	}
 	
+	//\__________________ On recupere son PID si on est en mode "PID unique".
+	if (g_bUniquePid)
+	{
+		iBufferNbElements = 0;
+		XGetWindowProperty (s_XDisplay, Xid, s_aNetWmPid, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pPidBuffer);
+		if (iBufferNbElements > 0)
+		{
+			//g_print (" +++ PID %d\n", *pPidBuffer);
+			
+			Icon *pIcon = g_hash_table_lookup (s_hAppliTable, pPidBuffer);
+			if (pIcon != NULL)  // si c'est une fenetre d'une appli deja referencee, on ne rajoute pas d'icones.
+			{
+				XFree (pPidBuffer);
+				return NULL;
+			}
+		}
+		else
+		{
+			//g_print ("pas de PID defini -> elle degage\n");
+			return NULL;
+		}
+	}
+	
 	//\__________________ On regarde son type.
 	gulong *pTypeBuffer = NULL;
 	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmWindowType, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pTypeBuffer);
@@ -321,29 +344,6 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 		}
 		//else
 		//	g_print (" pas de type defini -> on suppose que son type est 'normal'\n");
-	}
-	
-	//\__________________ On recupere son PID si on est en mode "PID unique".
-	if (g_bUniquePid)
-	{
-		iBufferNbElements = 0;
-		XGetWindowProperty (s_XDisplay, Xid, s_aNetWmPid, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pPidBuffer);
-		if (iBufferNbElements > 0)
-		{
-			//g_print (" +++ PID %d\n", *pPidBuffer);
-			
-			Icon *pIcon = g_hash_table_lookup (s_hAppliTable, pPidBuffer);
-			if (pIcon != NULL)  // si c'est une fenetre d'une appli deja referencee, on ne rajoute pas d'icones.
-			{
-				XFree (pPidBuffer);
-				return NULL;
-			}
-		}
-		else
-		{
-			//g_print ("pas de PID defini -> elle degage\n");
-			return NULL;
-		}
 	}
 	
 	//\__________________ On recupere son nom.

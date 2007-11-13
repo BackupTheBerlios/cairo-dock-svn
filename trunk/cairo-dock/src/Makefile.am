@@ -28,8 +28,10 @@ cairo_dock_CFLAGS = \
 	-DCAIRO_DOCK_DEFAULT_ICON_NAME=\""default-icon.svg"\"\
 	-DCAIRO_DOCK_VERSION=\""$(VERSION)"\"\
 	-std=c99\
-	-O3
-#	-g -ggdb -W -Wall -Wno-unused-parameter
+	-O3\
+	-g -ggdb\
+	-Wall -Wwrite-strings -Wuninitialized -Wno-unused-parameter
+#	 -Wunreachable-code -Wextra -O -Wstrict-prototypes
 
 cairo_dock_LDFLAGS = \
 	-Wl,--export-dynamic

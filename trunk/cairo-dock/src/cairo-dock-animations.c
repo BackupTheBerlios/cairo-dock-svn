@@ -123,6 +123,8 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 			
 			pDock->calculate_max_dock_size (pDock);
 			pDock->fFoldingFactor = g_fUnfoldAcceleration;
+			
+			cairo_dock_allow_entrance ();
 		}
 		
 		gtk_widget_queue_draw (pDock->pWidget);

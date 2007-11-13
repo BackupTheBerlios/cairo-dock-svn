@@ -119,7 +119,7 @@ typedef gchar * (* CairoDockModulePreInit) (void);
 
 typedef gpointer (*CairoDockModuleInit) (CairoDock *pDock, gchar **cConfFilePath, GError **erreur);  // renvoie son icone si il en a.
 
-typedef void (*CairoDockModuleStop) ();
+typedef void (*CairoDockModuleStop) (void);
 
 struct _CairoDockModule {
 	gchar *cModuleName;  // le nom du module : libtruc.so => cModuleName = 'truc'.

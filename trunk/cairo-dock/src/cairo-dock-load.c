@@ -212,14 +212,47 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 	pango_font_description_free (pDesc);
 	
 	
-	if (CAIRO_DOCK_IS_APPLI (icon) && g_iAppliMaxNameLength > 0 && strlen (icon->acName) > g_iAppliMaxNameLength)  /// Attention : marchera pas avec les caracteres non ascii ...
+	if (CAIRO_DOCK_IS_APPLI (icon) && g_iAppliMaxNameLength > 0)
 	{
-		gchar *cTruncatedName = g_new0 (gchar, g_iAppliMaxNameLength + 4);
-		strncpy (cTruncatedName, icon->acName, g_iAppliMaxNameLength);
-		cTruncatedName[g_iAppliMaxNameLength] = '.';
-		cTruncatedName[g_iAppliMaxNameLength+1] = '.';
-		cTruncatedName[g_iAppliMaxNameLength+2] = '.';
-		pango_layout_set_text (pLayout, cTruncatedName, -1);
+		gsize bytes_read, bytes_written;
+		gchar *cUtf8Name = g_locale_to_utf8 (icon->acName,
+			-1,
+			&bytes_read,
+			&bytes_written,
+			NULL);  // inutile sur Ubuntu, qui est nativement UTF8, mais sur les autres on ne sait pas.
+		if (cUtf8Name == NULL)  // une erreur s'est produite, on tente avec la chaine brute.
+			cUtf8Name = g_strdup (icon->acName);
+		
+		gchar *cTruncatedName = NULL;
+		const gchar *cEndValidChain = NULL;
+		if (g_utf8_validate (cUtf8Name, -1, &cEndValidChain))
+		{
+			if (g_utf8_strlen (cUtf8Name, -1) > g_iAppliMaxNameLength)
+			{
+				cTruncatedName = g_new0 (gchar, 8 * (g_iAppliMaxNameLength + 4));  // 8 octets par caractere.
+				g_utf8_strncpy (cTruncatedName, cUtf8Name, g_iAppliMaxNameLength);
+				
+				gchar *cTruncature = g_utf8_offset_to_pointer (cTruncatedName, g_iAppliMaxNameLength);
+				*cTruncature = '.';
+				*(cTruncature+1) = '.';
+				*(cTruncature+2) = '.';
+			}
+		}
+		else
+		{
+			if (strlen (icon->acName) > g_iAppliMaxNameLength)
+			{
+				cTruncatedName = g_new0 (gchar, g_iAppliMaxNameLength + 4);
+				strncpy (cTruncatedName, icon->acName, g_iAppliMaxNameLength);
+				
+				cTruncatedName[g_iAppliMaxNameLength] = '.';
+				cTruncatedName[g_iAppliMaxNameLength+1] = '.';
+				cTruncatedName[g_iAppliMaxNameLength+2] = '.';
+			}
+		}
+		g_free (cUtf8Name);
+		
+		pango_layout_set_text (pLayout, (cTruncatedName != NULL ? cTruncatedName : icon->acName), -1);
 		g_free (cTruncatedName);
 	}
 	else

@@ -57,5 +57,10 @@ void on_drag_motion (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, gui
 
 gboolean on_delete (GtkWidget *pWidget, GdkEvent *event, CairoDock *pDock);
 
-#endif
 
+void cairo_dock_activate_temporary_auto_hide (CairoDock *pDock);
+void cairo_dock_deactivate_temporary_auto_hide (void);
+void cairo_dock_allow_entrance (void);
+
+
+#endif

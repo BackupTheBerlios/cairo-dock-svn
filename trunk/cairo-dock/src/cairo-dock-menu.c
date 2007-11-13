@@ -38,6 +38,7 @@ extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
 extern gchar *g_cLanguage;
 
+extern gboolean g_bAutoHide;
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentLaunchersPath;
 
@@ -115,17 +116,11 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 
 static void cairo_dock_update (GtkMenuItem *menu_item, gpointer *data)
 {
-	Icon *icon = data[0];
-	CairoDock *pDock = data[1];
-	
 	system ("xterm -e cairo-dock-update.sh &");
 }
 
 static void cairo_dock_help (GtkMenuItem *menu_item, gpointer *data)
 {
-	Icon *icon = data[0];
-	CairoDock *pDock = data[1];
-	
 	GError *erreur = NULL;
 	g_spawn_command_line_async ("firefox http://doc.ubuntu-fr.org/gnome_dock", &erreur);
 	if (erreur != NULL)
@@ -135,11 +130,17 @@ static void cairo_dock_help (GtkMenuItem *menu_item, gpointer *data)
 	}
 }
 
+static void cairo_dock_quick_hide (GtkMenuItem *menu_item, gpointer *data)
+{
+	CairoDock *pDock = data[1];
+	g_print ("%s ()\n", __func__);
+	pDock->bMenuVisible = FALSE;
+	cairo_dock_activate_temporary_auto_hide (g_pMainDock);
+}
+
 static void cairo_dock_quit (GtkMenuItem *menu_item, gpointer *data)
 {
-	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
-	
 	on_delete (pDock->pWidget, NULL, pDock);
 }
 
@@ -591,6 +592,13 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_help), data);
 	
+	if (! g_bAutoHide)
+	{
+		menu_item = gtk_menu_item_new_with_label ("Hide");
+		gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
+		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_quick_hide), data);
+	}
+	
 	menu_item = gtk_menu_item_new_with_label ("Quit");
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_quit), data);
@@ -710,7 +718,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 }
 
 
-int cairo_dock_ask_question (CairoDock *pDock, gchar *cQuestion)
+int cairo_dock_ask_question (CairoDock *pDock, const gchar *cQuestion)
 {
 	GtkWidget *pDialog = gtk_message_dialog_new ((pDock != NULL ? GTK_WINDOW (pDock->pWidget) : NULL),
 		GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -722,3 +730,5 @@ int cairo_dock_ask_question (CairoDock *pDock, gchar *cQuestion)
 	gtk_widget_destroy (pDialog);
 	return iAnswer;
 }
+
+

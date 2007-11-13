@@ -1008,7 +1008,7 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, CairoDockIconTyp
 				{
 					icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
 					prev_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
-					g_print ("%s;%s\n", prev_icon->acName, icon->acName);
+					//g_print ("%s> <%s\n", prev_icon->acName, icon->acName);
 				}
 			}
 			else if (pDock->iMouseX > icon->fDrawX + icon->fWidth * icon->fScale * (1 - fMargin))  // on est a droite.
@@ -1018,7 +1018,7 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, CairoDockIconTyp
 				{
 					icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
 					next_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
-					g_print ("%s;%s\n", icon->acName, next_icon->acName);
+					//g_print ("%s> <%s\n", icon->acName, next_icon->acName);
 				}
 				ic = cairo_dock_get_next_element (ic, pDock->icons);  // on la saute.
 				if (ic == pFirstDrawnElement)

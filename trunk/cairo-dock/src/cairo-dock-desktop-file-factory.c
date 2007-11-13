@@ -79,7 +79,9 @@ gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, const gchar *cDockName
 	else if (g_str_has_suffix (cURI, ".desktop") && strncmp (cURI, "file://", 7) == 0)
 	{
 		gchar *cFilePath = cURI + 7;  // on saute le "file://".
-		cNewDesktopFileName = g_path_get_basename (cFilePath);
+		gchar *cBaseName = g_path_get_basename (cFilePath);
+		cNewDesktopFileName = cairo_dock_generate_desktop_filename (cBaseName, g_cCurrentLaunchersPath);
+		g_free (cBaseName);
 		
 		//\___________________ On ouvre le fichier .desktop pour lui rajouter nos champs.
 		GKeyFile *pKeyFile = g_key_file_new ();

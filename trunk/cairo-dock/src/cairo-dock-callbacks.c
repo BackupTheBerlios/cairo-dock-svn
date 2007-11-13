@@ -77,6 +77,9 @@ extern int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS];
 
 extern gboolean g_bUseGlitz;
 
+static gboolean s_bTemporaryAutoHide = FALSE;
+static gboolean s_bEntranceAllowed = TRUE;
+
 
 gboolean on_expose (GtkWidget *pWidget,
 	GdkEventExpose *pExpose,
@@ -397,7 +400,8 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	else
 	{
 		pDock->fFoldingFactor = 0;
-		pDock->bAtBottom = TRUE;
+		///pDock->bAtBottom = TRUE;  // mis en commentaire le 12/11/07 pour permettre le quick-hide.
+		//g_print ("on force bAtBottom\n");
 	}
 	
 	pDock->fDecorationsOffsetX = 0;
@@ -411,7 +415,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	//g_print ("%s (bInside:%d)\n", __func__, pDock->bInside);
+	//g_print ("%s (bInside:%d; bAtBottom:%d)\n", __func__, pDock->bInside, pDock->bAtBottom);
 	if (pDock->bAtBottom )  // || ! pDock->bInside
 		return FALSE;
 	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
@@ -448,22 +452,32 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 }
 
 
+
 gboolean on_enter_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
 	//g_print ("%s (bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
 	s_pLastPointedDock = NULL;  // ajoute le 04/10/07 pour permettre aux sous-docks d'apparaitre si on entre en pointant tout de suite sur l'icone.
+	
+	if (! s_bEntranceAllowed)
+	{
+		g_print ("* entree non autorisee\n");
+		return FALSE;
+	}
+	
 	if (pDock->iSidLeaveDemand != 0)
 	{
 		g_source_remove (pDock->iSidLeaveDemand);
 		pDock->iSidLeaveDemand = 0;
 	}
+	cairo_dock_deactivate_temporary_auto_hide ();
+	
 	if (pDock->bAtTop || pDock->bInside || (pDock->iSidMoveDown != 0))  // le 'iSidMoveDown != 0' est la pour empecher le dock de "vibrer" si l'utilisateur sort par en bas avec l'auto-hide active.
 	{
 		return FALSE;
 	}
-	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
 	pDock->fDecorationsOffsetX = 0;
 	if (! pDock->bIsMainDock)
@@ -478,7 +492,6 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	
 	
 	int iNewWidth, iNewHeight;
-	int iActualPositionY = pDock->iWindowPositionY;
 	cairo_dock_get_window_position_and_geometry_at_balance (pDock, CAIRO_DOCK_MAX_SIZE, &iNewWidth, &iNewHeight);
 	if ((g_bAutoHide && pDock->iRefCount == 0) && pDock->bAtBottom)
 		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - g_iVisibleZoneHeight - pDock->iGapY : g_iVisibleZoneHeight + pDock->iGapY - pDock->iMaxDockHeight);
@@ -1062,7 +1075,6 @@ gboolean on_configure (GtkWidget* pWidget,
 		pDock->iCurrentWidth = iNewWidth;
 		pDock->iCurrentHeight = iNewHeight;
 		
-		int iX, iY;
 		if (pDock->bHorizontalDock)
 			gdk_window_get_pointer (pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
 		else
@@ -1110,10 +1122,9 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 	
 	//\_________________ On calcule la position a laquelle on l'a lache.
 	double fOrder = 0;
-	CairoDock *pReceivingDock = pDock;
 	Icon *pPointedIcon = NULL, *pNeighboorIcon = NULL;
 	GList *ic;
-	Icon *icon, *next_icon, *prev_icon;
+	Icon *icon;
 	int iDropX = (pDock->bHorizontalDock ? x : y);
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
@@ -1221,4 +1232,32 @@ gboolean on_delete (GtkWidget *pWidget, GdkEvent *event, CairoDock *pDock)
 	if (answer == GTK_RESPONSE_YES)
 		gtk_main_quit ();
 	return FALSE;
+}
+
+
+
+
+void cairo_dock_activate_temporary_auto_hide (CairoDock *pDock)
+{
+	if (! g_bAutoHide)
+	{
+		s_bTemporaryAutoHide = TRUE;
+		g_bAutoHide = TRUE;
+		s_bEntranceAllowed = FALSE;
+		_cairo_dock_emit_leave_signal (pDock);
+	}
+}
+
+void cairo_dock_deactivate_temporary_auto_hide (void)
+{
+	if (s_bTemporaryAutoHide)
+	{
+		s_bTemporaryAutoHide = FALSE;
+		g_bAutoHide = FALSE;
+	}
+}
+
+void cairo_dock_allow_entrance (void)
+{
+	s_bEntranceAllowed = TRUE;
 }

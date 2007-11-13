@@ -24,6 +24,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-themes-manager.h"
 #include "cairo-dock-renderer-manager.h"
+#include "cairo-dock-menu.h"
 #include "cairo-dock-config.h"
 
 static gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "pulse", "upside-down", "wobbly", "random", NULL};
@@ -400,6 +401,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_fVisibleZoneAlpha = cairo_dock_get_double_key_value (pKeyFile, "Auto-Hide", "alpha", &bFlushConfFileNeeded, 0.5);
 	
+	cairo_dock_deactivate_temporary_auto_hide ();
 	g_bAutoHide = cairo_dock_get_boolean_key_value (pKeyFile, "Auto-Hide", "auto-hide", &bFlushConfFileNeeded, FALSE);
 	
 	g_bReverseVisibleImage = cairo_dock_get_boolean_key_value (pKeyFile, "Auto-Hide", "reverse visible image", &bFlushConfFileNeeded, TRUE);

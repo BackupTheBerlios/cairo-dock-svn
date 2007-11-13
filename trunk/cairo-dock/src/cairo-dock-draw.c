@@ -615,6 +615,8 @@ void cairo_dock_render_background (CairoDock *pDock)
 		cairo_paint_with_alpha (pCairoContext, g_fVisibleZoneAlpha);
 	}
 	cairo_destroy (pCairoContext);
+	
+	//cairo_dock_allow_entrance ();
 #ifdef HAVE_GLITZ
 	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
 		glitz_drawable_swap_buffers (pDock->pGlitzDrawable);
