@@ -2,17 +2,23 @@ launchersdir = $(pkgdatadir)/themes/_Verde_/launchers
 
 launchers_DATA = \
 	00launcher.desktop\
-	mozilla-thunderbird.svg\
-	oow.svg\
+	01firefox.desktop\
+	01gnome-terminal.desktop\
 	01launcher.desktop\
-	pidgin.desktop\
-	02fichiers.desktop\
-	pidgin.svg\
-	03terminal.desktop\
+	01nautilus.desktop\
+	01thunderbird.desktop\
 	04launcher.desktop\
 	amule.desktop\
-	mozilla-thunderbird.desktop\
+	bmp.desktop\
+	ooo-calc.desktop\
+	ooo-writer.desktop\
+	pidgin.desktop\
 	synaptic.desktop\
+	totem.desktop\
+	transmission-gtk.desktop\
+	mozilla-thunderbird.svg\
+	oow.svg\
+	pidgin.svg\
 	amule.svg\
 	mv.svg\
 	synaptic.svg\
@@ -21,13 +27,8 @@ launchers_DATA = \
 	torrent.svg\
 	bmp.svg\
 	net.svg\
-	totem.desktop\
 	ooc.svg\
 	totem.svg\
 	terminal.svg\
-	ooo-calc.desktop\
-	transmission-gtk.desktop\
-	firefox.desktop\
 	ooo.svg\
-	firefox.svg\
-	ooo-writer.desktop
+	firefox.svg

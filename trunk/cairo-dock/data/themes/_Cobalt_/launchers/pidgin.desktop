@@ -1,40 +1,23 @@
-#!
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#!fr
 
 
 [Desktop Entry]
-Encoding=UTF-8
-#s Launcher's name :
+#s Nom de ce lanceur :
 Name=Pidgin Internet Messenger
+#s Commande à exécuter lors du clique :
+Exec=pidgin
+#S Nom ou chemin de l'image :
+Icon=pidgin
+#f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
+Order=-1
+#E[music et video;dessin;_MainDock_;OOo;system;Internet]  Nom du container auquel il appartient :
+Container=Internet
+#b Cette icône est-elle un container ?
+Is container=false
+
+Base URI=
+Is mounting point=false
+Encoding=UTF-8
 Name[af]=Pidgin Internetboodskapper
 Name[ca]=Missatger d'Internet Pidgin
 Name[de]=Pidgin Internet-Sofortnachrichtendienst
@@ -145,18 +128,8 @@ Comment[th]=ส่งข้อความด่วนหลายรูปแ�
 Comment[zh_CN]=通过多种协议发送即时消息
 Comment[zh_HK]=透過多種通訊協定發送即時訊息
 Comment[zh_TW]=透過多種通訊協定發送即時訊息
-#s Exec command :
-Exec=pidgin
-#s Image's name or path :
-Icon=pidgin
 StartupNotify=true
 Terminal=false
 Type=Application
 Categories=Network;InstantMessaging;
 X-Ubuntu-Gettext-Domain=pidgin
-#f Order you want for this launcher among the other launchers :
-Order=-1
-#s Name of the container it belongs to:
-Container=Internet
-#b Is this icon a container ?
-Is container=false

@@ -214,12 +214,20 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 	
 	if (CAIRO_DOCK_IS_APPLI (icon) && g_iAppliMaxNameLength > 0)
 	{
+		//g_print ("troncature de %s\n", icon->acName);
 		gsize bytes_read, bytes_written;
+		GError *erreur = NULL;
 		gchar *cUtf8Name = g_locale_to_utf8 (icon->acName,
 			-1,
 			&bytes_read,
 			&bytes_written,
-			NULL);  // inutile sur Ubuntu, qui est nativement UTF8, mais sur les autres on ne sait pas.
+			&erreur);  // inutile sur Ubuntu, qui est nativement UTF8, mais sur les autres on ne sait pas.
+		if (erreur != NULL)
+		{
+			g_print ("Attention : %s\n", erreur->message);
+			g_error_free (erreur);
+			erreur = NULL;
+		}
 		if (cUtf8Name == NULL)  // une erreur s'est produite, on tente avec la chaine brute.
 			cUtf8Name = g_strdup (icon->acName);
 		
@@ -253,6 +261,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 		g_free (cUtf8Name);
 		
 		pango_layout_set_text (pLayout, (cTruncatedName != NULL ? cTruncatedName : icon->acName), -1);
+		g_print ("-> %s\n", cTruncatedName);
 		g_free (cTruncatedName);
 	}
 	else

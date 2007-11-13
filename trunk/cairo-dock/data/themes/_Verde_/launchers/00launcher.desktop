@@ -1,15 +1,20 @@
-#!
+#!fr
+
+
 
 [Desktop Entry]
-#s Launcher's name :
+#s Nom de ce lanceur :
 Name=OOo
-#s Exec command :
+#s Commande à exécuter lors du clique :
 Exec=
-#s Image's name or path :
+#S Nom ou chemin de l'image :
 Icon=ooo.svg
-#f Order you want for this launcher among the other launchers :
-Order=2
-#s Name of the container it belongs to:
+#f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
+Order=3
+#E[music et video;_MainDock_;OOo;Internet]  Nom du container auquel il appartient :
 Container=_MainDock_
-#b Is this icon a container ?
+#b Cette icône est-elle un container ?
 Is container=true
+
+Base URI=
+Is mounting point=false

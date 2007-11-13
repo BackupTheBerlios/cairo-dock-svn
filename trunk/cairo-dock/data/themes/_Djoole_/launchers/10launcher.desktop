@@ -1,14 +1,19 @@
-#!
+#!fr
+
+
 [Desktop Entry]
-#s Launcher's name :
+#s Nom de ce lanceur :
 Name=Grisbi
-#s Exec command :
+#s Commande à exécuter lors du clique :
 Exec=grisbi
-#S Image's name or path :
+#S Nom ou chemin de l'image :
 Icon=grisbi.png
-#f Order you want for this launcher among the other launchers :
+#f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
 Order=11
-#s Name of the container it belongs to:
+#E[_MainDock_;_V.F.S._]  Nom du container auquel il appartient :
 Container=_MainDock_
-#b Is this icon a container ?
+#b Cette icône est-elle un container ?
 Is container=false
+
+Base URI=
+Is mounting point=false

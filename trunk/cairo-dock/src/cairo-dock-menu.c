@@ -353,10 +353,8 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 		CairoDock *pNewContainer = cairo_dock_search_dock_from_name (pNewIcon->cParentDockName);
 		g_return_if_fail (pNewContainer != NULL);
 		
-		if (pDock != pNewContainer)
-		{
+		if (pDock != pNewContainer && pNewIcon->fOrder > g_list_length (pNewContainer->icons) + 1)
 			pNewIcon->fOrder = CAIRO_DOCK_LAST_ORDER;
-		}
 		
 		cairo_dock_insert_icon_in_dock (pNewIcon, pNewContainer, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);  // on n'empeche pas les bouclages.
 		
@@ -594,7 +592,7 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	
 	if (! g_bAutoHide)
 	{
-		menu_item = gtk_menu_item_new_with_label ("Hide");
+		menu_item = gtk_menu_item_new_with_label ("Quick-Hide");
 		gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_quick_hide), data);
 	}

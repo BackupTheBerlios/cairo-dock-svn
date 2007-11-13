@@ -1,17 +1,17 @@
 launchersdir = $(pkgdatadir)/themes/_Ubuntu_/launchers
 
 launchers_DATA = \
-	01gaim.desktop\
-	05firefox.desktop\
+	01bmp.desktop\
+	01firefox.desktop\
+	01gnome-terminal.desktop\
+	01nautilus.desktop\
+	01pidgin.desktop\
+	01thunderbird.desktop\
+	01synaptic.desktop\
 	music.svg\
-	02fichiers.desktop\
 	nautilus.svg\
-	03terminal.desktop\
-	04thunderbid.desktop\
 	mozilla-thunderbird.svg\
 	firefox.svg\
-	06musique.desktop\
 	terminal.svg\
 	gaim.svg\
-	07synaptic.desktop\
 	synaptic.png

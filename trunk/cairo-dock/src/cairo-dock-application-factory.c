@@ -442,8 +442,11 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 	
 	if (iState == PropertyNewValue && (aProperty == s_aNetWmName || aProperty == s_aWmName))
 	{
+		//g_print ("chgt de nom (%d)\n", aProperty);
 		guchar *pNameBuffer = NULL;
-		XGetWindowProperty (s_XDisplay, icon->Xid, aProperty, 0, G_MAXULONG, False, (aProperty == s_aNetWmName ? s_aUtf8String : s_aString), &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
+		XGetWindowProperty (s_XDisplay, icon->Xid, s_aNetWmName, 0, G_MAXULONG, False, s_aUtf8String, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);  // on cherche en priorite le nom en UTF8, car on est notifie des 2, mais il vaut mieux eviter le WM_NAME qui, ne l'etant pas, contient des caracteres bizarres qu'on ne peut pas convertir avec g_locale_to_utf8, puisque notre locale _est_ UTF8.
+		if (iBufferNbElements == 0 && aProperty == s_aWmName)
+			XGetWindowProperty (s_XDisplay, icon->Xid, aProperty, 0, G_MAXULONG, False, s_aString, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
 		if (iBufferNbElements > 0)
 		{
 			if (icon->acName == NULL || strcmp (icon->acName, (gchar *)pNameBuffer) != 0)

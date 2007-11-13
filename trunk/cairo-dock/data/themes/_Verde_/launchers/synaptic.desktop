@@ -1,12 +1,23 @@
-#!
-
-
+#!fr
 
 
 
 [Desktop Entry]
-#s Launcher's name :
+#s Nom de ce lanceur :
 Name=Synaptic Package Manager
+#s Commande à exécuter lors du clique :
+Exec=gksu /usr/sbin/synaptic
+#S Nom ou chemin de l'image :
+Icon=synaptic.svg
+#f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
+Order=1
+#E[music et video;_MainDock_;OOo;Internet]  Nom du container auquel il appartient :
+Container=_MainDock_
+#b Cette icône est-elle un container ?
+Is container=false
+
+Base URI=
+Is mounting point=false
 Name[ar]=مدير الحزم Synaptic
 Name[be]=Кіраўнік пакетаў Synaptic
 Name[bg]=Мениджър на пакети (Synaptic)
@@ -17,7 +28,7 @@ Name[de]=Synaptic-Paketverwaltung
 Name[el]=Synaptic Package Manager
 Name[es]=Gestor de Paquetes Synaptic
 Name[fi]=Synaptic-pakettienhallinta
-Name[fr]=Synaptic
+Name[fr]=Gestionnaire de paquets Synaptic
 Name[gl]=Xestor de paquetes Synaptic
 Name[he]=מנהל החבילות Synaptic
 Name[hi]=सिनेप्टिक पैकेज प्रबन्धक
@@ -116,10 +127,6 @@ Comment[tr]=Paketleri kur, kaldır ya da yükselt
 Comment[xh]=Faka, susa uze uphucule imiqulu yesoftware
 Comment[zh_CN]=安装，删除和升级软件包
 Comment[zh_TW]=安裝、移除及升級套件
-#s Exec command :
-Exec=gksu /usr/sbin/synaptic
-#s Image's name or path :
-Icon=synaptic.svg
 Terminal=false
 MultipleArgs=false
 Type=Application
@@ -127,10 +134,3 @@ Encoding=UTF-8
 Categories=PackageManager;Applications;GTK;System;Settings
 NotShowIn=KDE
 X-KDE-SubstituteUID=true
-X-Ubuntu-Gettext-Domain=synaptic
-#f Order you want for this launcher among the other launchers :
-Order=0
-#s Name of the container it belongs to:
-Container=_MainDock_
-#b Is this icon a container ?
-Is container=false

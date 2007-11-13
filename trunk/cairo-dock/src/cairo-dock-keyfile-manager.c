@@ -60,7 +60,7 @@ gchar *cairo_dock_get_translated_conf_file_path (gchar *cConfFileName, gchar *cS
 	{
 		g_free (cTranslatedConfFilePath);
 		cTranslatedConfFilePath = NULL;
-		if (strcmp (g_cLanguage, "en") != 0)
+		if (g_cLanguage == NULL || strcmp (g_cLanguage, "en") != 0)
 		{
 			cTranslatedConfFilePath = g_strdup_printf ("%s/%s-en%s", cShareDataDirPath, cBaseName, (cExtension != NULL ? cExtension : ""));
 			if (! g_file_test (cTranslatedConfFilePath, G_FILE_TEST_EXISTS))
