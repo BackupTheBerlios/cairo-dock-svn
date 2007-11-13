@@ -1,0 +1,136 @@
+#!fr
+
+
+
+[Desktop Entry]
+#s Nom de ce lanceur :
+Name=Calculator
+#s Commande à exécuter lors du clique :
+Exec=gcalctool
+#S Nom ou chemin de l'image :
+Icon=gnome-calculator.svg
+#f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
+Order=8
+#E[_MainDock_]  Nom du container auquel il appartient :
+Container=_MainDock_
+#b Cette icône est-elle un container ?
+Is container=false
+
+Base URI=
+Is mounting point=false
+Encoding=UTF-8
+Name[ar]=آلة حاسبة
+Name[az]=Hesaplayıcı
+Name[be]=Калькулятар
+Name[bg]=Калкулатор
+Name[bn]=ক্যালকুলেটর
+Name[bn_IN]=ক্যালকুলেটর
+Name[bs]=Računalo
+Name[ca]=Calculadora
+Name[cs]=Kalkulačka
+Name[cy]=Cyfrifiannell
+Name[da]=Lommeregner
+Name[de]=Taschenrechner
+Name[dz]=རྩིས་འཕྲུལ།
+Name[el]=Αριθμομηχανή
+Name[en_CA]=Calculator
+Name[en_GB]=Calculator
+Name[en_US]=Calculator
+Name[es]=Calculadora
+Name[et]=Taskuarvuti
+Name[eu]=Kalkulagailua
+Name[fa]=ماشین‌حساب
+Name[fi]=Laskin
+Name[fr]=Calculatrice
+Name[ga]=Áireammhán
+Name[gl]=Calculadora
+Name[gu]=કેલ્ક્યુલેટર
+Name[he]=מחשבון
+Name[hi]=गणक
+Name[hr]=Kalkulator
+Name[hu]=Számológép
+Name[id]=Kalkulator
+Name[it]=Calcolatrice
+Name[ja]=関数電卓
+Name[ka]=კალკულატორი
+Name[ko]=계산기
+Name[lt]=Skaičiuotuvas
+Name[lv]=Kalkulators
+Name[mg]=Milina mpikajy
+Name[mk]=Калкулатор
+Name[ml]=ഗണനി
+Name[mn]=Тооны машин
+Name[ms]=Kalkulator
+Name[nb]=Kalkulator
+Name[ne]=गणक यन्त्र
+Name[nl]=Rekenmachine
+Name[or]=କାଲ୍କୁଲେଟର
+Name[pa]=ਕੈਲਕੂਲੇਟਰ
+Name[pl]=Kalkulator
+Name[pt]=Calculadora
+Name[pt_BR]=Calculadora
+Name[ro]=Calculator
+Name[ru]=Калькулятор
+Name[si]=ගණනය
+Name[sk]=Kalkulačka
+Name[sl]=Kalkulator
+Name[sq]=Kalkulator (llogaritës)
+Name[sr]=Калкулатор
+Name[sr@Latn]=Kalkulator
+Name[sv]=Miniräknare
+Name[ta]=கணிப்பான்
+Name[te]=గణన పరికరం
+Name[th]=เครื่องคิดเลข
+Name[tk]=Çot
+Name[tr]=Hesap Makinesi
+Name[uk]=Калькулятор
+Name[vi]=Máy tính
+Name[xh]=Ikhaltyuleyitha
+Name[zh_CN]=计算器
+Name[zh_HK]=計數機
+Name[zh_TW]=計算機
+Comment=Perform arithmetic, scientific or financial calculations
+Comment[ar]=قم بحسابات رياضية , علمية و رياضية
+Comment[ca]=Realitza càlculs aritmètics, científics o financers
+Comment[da]=Udfør aritmetiske, videnskabelige eller finansielle udregninger
+Comment[de]=Arithmetische, wissenschaftliche und finanztechnische Berechnungen durchführen
+Comment[el]=Εκτελεί, αριθμητικούς, επιστημονικούς ή εμπορικούς υπολογισμούς
+Comment[en_CA]=Perform arithmetic, scientific or financial calculations
+Comment[es]=Realice cálculos aritméticos, científicos o financieros
+Comment[et]=Aritmeetilised, teaduslikud ja finantsarvutused
+Comment[eu]=Landu kalkulu aritmetikoak, zientifikoak edo finantzal erakoak
+Comment[fi]=Suorita aritmeettisia, tieteellisiä tai talouslaskutoimituksia
+Comment[fr]=Effectue des calculs arithmétiques, scientifiques ou financiers
+Comment[gu]=ગાણિતીક, વૈજ્ઞાનિક અથવા આર્થિક ગણતરીઓ કરો
+Comment[hu]=Aritmetikai, tudományos vagy pénzügyi számítások végrehajtása
+Comment[ja]=算術/科学/財務の計算を行います
+Comment[lt]=Atlikti aritmetinius, mokslinius ar finansinius skaičiavimus
+Comment[mk]=Извршете аритметички, научни или финансиски пресметки
+Comment[nb]=Utfør aritmetiske, vitenskapelige eller finansielle utregninger
+Comment[nl]=Rekenkundige, wetenschappelijke of financiële berekeningen uitvoeren
+Comment[pl]=Wykonuje obliczenia arytmetyczne, naukowe lub finansowe
+Comment[pt]=Realize cálculos aritméticos, científicos ou financeiros
+Comment[pt_BR]=Efetuar cálculos aritiméticos, científicos, ou financeiros
+Comment[ro]=Efectuează calcule aritmetice, ştiinţifice şi financiare
+Comment[ru]=Вычисления: арифметические, научные и финансовые
+Comment[sk]=Vykonať aritmetické, vedecké alebo finančné výpočty
+Comment[sq]=Kryen llogari aritmetikore, shkencore ose financiare
+Comment[sr]=Обави аритметичке, научне или финансијске прорачуне
+Comment[sr@Latn]=Obavi aritmetičke, naučne ili finansijske proračune
+Comment[sv]=Utför aritmetiska, vetenskapliga eller finansiella beräkningar
+Comment[ta]=கணித, அறிவியல் அல்லது பொருளாதார கணக்குகளை செய்கிறது.
+Comment[th]=คำนวณเลขคณิต ฟังก์ชันวิทยาศาสตร์ หรือการเงิน
+Comment[uk]=Виконання арифметичних, наукових або фінансових розрахунків
+Comment[vi]=Chạy phép tính số học, khoa học hay tài chính
+Comment[zh_CN]=执行算术、科学或金融计算
+OnlyShowIn=GNOME;XFCE;
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=GNOME;GTK;Utility;
+X-GNOME-DocPath=gcalctool/gcalctool.xml
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-Product=gcalctool
+X-GNOME-Bugzilla-Component=general
+X-GNOME-Bugzilla-OtherBinaries=gnome-calculator
+Is URI=false
