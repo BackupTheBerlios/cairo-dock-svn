@@ -313,7 +313,7 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 		{
 			g_print ("Attention : %s\n", erreur->message);
 			g_error_free (erreur);
-			erreur == NULL;
+			erreur = NULL;
 		}
 		if (cNewThemeName != NULL && *cNewThemeName == '\0')
 		{
@@ -407,7 +407,7 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 		{
 			g_print ("Attention : %s\n", erreur->message);
 			g_error_free (erreur);
-			erreur == NULL;
+			erreur = NULL;
 		}
 		if (cNewThemeName != NULL && *cNewThemeName == '\0')
 		{
@@ -506,7 +506,7 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 		{
 			g_print ("Attention : %s\n", erreur->message);
 			g_error_free (erreur);
-			erreur == NULL;
+			erreur = NULL;
 		}
 		else if (cThemesList != NULL)
 		{

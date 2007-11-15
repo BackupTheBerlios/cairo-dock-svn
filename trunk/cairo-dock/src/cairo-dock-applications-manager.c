@@ -157,7 +157,7 @@ void cairo_dock_close_xwindow (Window Xid)
 		XGetWindowProperty (s_XDisplay, Xid, aNetWmPid, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pPidBuffer);
 		if (iBufferNbElements > 0)
 		{
-			g_print ("kill (%d)\n", pPidBuffer[0]);
+			g_print ("kill (%ld)\n", pPidBuffer[0]);
 			kill (pPidBuffer[0], 1);  // 1 : HUP, 2 : INT, 3 : QUIT, 15 : TERM.
 		}
 		XFree (pPidBuffer);
@@ -629,7 +629,7 @@ static void _cairo_dock_remove_old_applis (Window *Xid, Icon *icon, double *fTim
 		//g_print ("%s (%s, %f / %f)\n", __func__, icon->acName, icon->fLastCheckTime, *fTime);
 		if (icon->fLastCheckTime > 0 && icon->fLastCheckTime < *fTime && icon->fPersonnalScale <= 0)
 		{
-			g_print ("cette fenetre (%d) est trop vieille\n", *Xid);
+			g_print ("cette fenetre (%ld) est trop vieille\n", *Xid);
 			CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 			g_return_if_fail (pParentDock != NULL);
 			
@@ -661,7 +661,7 @@ void cairo_dock_update_applis_list (CairoDock *pDock, double fTime)
 		//icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
 		if (! bAppliAlreadyRegistered)
 		{
-			g_print (" cette fenetre (%d) de la pile n'est pas dans la liste\n", Xid);
+			g_print (" cette fenetre (%ld) de la pile n'est pas dans la liste\n", Xid);
 			cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 			if (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS)
 				icon = cairo_dock_create_icon_from_xwindow (pCairoContext, Xid, pDock);
@@ -810,6 +810,7 @@ void cairo_dock_set_one_icon_geometry_for_window_manager (Icon *icon, CairoDock 
 		iY = pDock->iWindowPositionY + icon->fDrawY - icon->fHeight * g_fAmplitude;  // il faudrait un fYAtRest ...
 		iWidth = icon->fWidth;
 		iHeight = icon->fHeight * (1. + 2. * g_fAmplitude);  // on elargit en haut et en bas, pour gerer les cas ou l'icone grossirait vers le haut ou vers le bas.
+		//g_print (" -> (%d;%d)\n", iX, iY);
 		
 		if (pDock->bHorizontalDock)
 			_cairo_dock_set_one_icon_geometry_for_appli (icon->Xid, iX, iY, iWidth, iHeight);

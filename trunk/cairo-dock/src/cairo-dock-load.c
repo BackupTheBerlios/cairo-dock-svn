@@ -42,6 +42,7 @@ extern gint g_iDockRadius;
 extern gint g_iFrameMargin;
 extern double g_fAmplitude;
 extern int g_iIconGap;
+extern gboolean g_bUseReflection;
 
 extern cairo_surface_t *g_pVisibleZoneSurface;
 extern gboolean g_bReverseVisibleImage;
@@ -133,6 +134,8 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	//g_print ("%s (%.2f, %s)\n", __func__, fMaxScale, icon->acFileName);
 	cairo_surface_destroy (icon->pIconBuffer);
 	icon->pIconBuffer = NULL;
+	cairo_surface_destroy (icon->pReflectionBuffer);
+	icon->pReflectionBuffer = NULL;
 	
 	if (CAIRO_DOCK_IS_LAUNCHER (icon))
 	{
@@ -187,6 +190,14 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 			1,
 			FALSE);
 		g_free (cIconPath);
+	}
+	
+	if (g_bUseReflection && icon->pIconBuffer != NULL)
+	{
+		icon->pReflectionBuffer = cairo_dock_create_reflection_surface (icon->pIconBuffer, 
+			pSourceContext,
+			(bHorizontalDock ? icon->fWidth : icon->fHeight) * fMaxScale,
+			(bHorizontalDock ? icon->fHeight : icon->fWidth) * fMaxScale);
 	}
 }
 

@@ -116,6 +116,10 @@ double g_fLineColor[4];  // la couleur du cadre.
 gint g_iStringLineWidth;  // epaisseur de la ficelle.
 double g_fStringColor[4];  // la couleur de la ficelle.
 
+double g_fFieldDepth;  // profondeur de champ de la vue en plan incline, en fraction de la hauteur max des icones.
+double g_fInclinationOnHorizon;  // inclinaison de la ligne de fuite vers l'horizon.
+gboolean g_bUseReflection;  // utiliser les reflets ou pas.
+
 cairo_surface_t *g_pVisibleZoneSurface = NULL;  // surface de la zone de rappel.
 double g_fVisibleZoneAlpha;  // transparence de la zone de rappel.
 int g_iNbStripes;  // le nombre de rayures a dessiner en fond dans chaque motif elementaire.
@@ -208,7 +212,7 @@ main (int argc, char** argv)
 	
 	
 	gtk_init (&argc, &argv);
-	
+	g_fInclinationOnHorizon = tan (35. * G_PI / 180.);
 	
 	//\___________________ On recupere quelques options.
 	g_iWmHint = GDK_WINDOW_TYPE_HINT_DOCK;

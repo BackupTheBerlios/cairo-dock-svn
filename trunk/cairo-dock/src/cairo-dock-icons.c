@@ -50,6 +50,8 @@ extern gchar *g_cCurrentLaunchersPath;
 
 extern double g_fAmplitude;
 extern int g_iSinusoidWidth;
+extern double g_fFieldDepth;
+
 extern double g_fUnfoldAcceleration;
 extern gboolean g_bAutoHide;
 
@@ -666,7 +668,7 @@ GList *cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, in
 	return pFirstDrawnElement;
 }
 
-Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, int iFlatDockWidth, int iWidth, int iHeight, double fAlign, double fFoldingFactor)
+Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, int iFlatDockWidth, int iWidth, int iHeight, double fAlign, double fFoldingFactor, int iMaxIconHeight)
 {
 	//g_print (">>>>>%s (%d/%d, %dx%d)\n", __func__, x_abs, iFlatDockWidth, iWidth, iHeight);
 	if (x_abs < 0 && iWidth > 0)
@@ -677,12 +679,8 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 		return NULL;
 	
 	float x_cumulated = 0, fXMiddle, fDeltaExtremum;
-	int iXMinSinusoid = x_abs - g_iSinusoidWidth / 2;
-	int iXMaxSinusoid = x_abs + g_iSinusoidWidth / 2;
-	//g_print ("%d <-> %d\n", iXMinSinusoid, iXMaxSinusoid);
-	int c;
 	GList* ic, *pointed_ic;
-	Icon *icon, *prev_icon, *next_icon;
+	Icon *icon, *prev_icon;
 	
 	GList *pFirstDrawnElement = (pFirstDrawnElementGiven != NULL ? pFirstDrawnElementGiven : pIconList);
 	ic = pFirstDrawnElement;
@@ -730,7 +728,7 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 			if (icon->fPersonnalScale > -0.05)
 				icon->fPersonnalScale = -0.05;
 		}
-		icon->fY = (g_bDirectionUp ? iHeight - g_iDockLineWidth - g_iFrameMargin - icon->fScale * icon->fHeight : g_iDockLineWidth + g_iFrameMargin);
+		icon->fY = (g_bDirectionUp ? iHeight - g_iDockLineWidth - (iMaxIconHeight * g_fFieldDepth + g_iFrameMargin) - icon->fScale * icon->fHeight : g_iDockLineWidth + (iMaxIconHeight * g_fFieldDepth + g_iFrameMargin));
 		
 		//\_______________ Si on avait deja defini l'icone pointee, on peut placer l'icone courante par rapport a la precedente.
 		if (pointed_ic != NULL)
@@ -817,7 +815,7 @@ Icon *cairo_dock_apply_wave_effect (CairoDock *pDock)
 	
 	//\_______________ On calcule l'ensemble des parametres des icones.
 	double fMagnitude = cairo_dock_calculate_magnitude (pDock->iMagnitudeIndex);
-	Icon *pPointedIcon = cairo_dock_calculate_wave_with_position_linear (pDock->icons, pDock->pFirstDrawnElement, x_abs, fMagnitude, pDock->iFlatDockWidth, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->fAlign, pDock->fFoldingFactor);  // iMaxDockWidth
+	Icon *pPointedIcon = cairo_dock_calculate_wave_with_position_linear (pDock->icons, pDock->pFirstDrawnElement, x_abs, fMagnitude, pDock->iFlatDockWidth, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->fAlign, pDock->fFoldingFactor, pDock->iMaxIconHeight);  // iMaxDockWidth
 	return pPointedIcon;
 }
 
@@ -848,6 +846,8 @@ CairoDockMousePositionType cairo_dock_check_if_mouse_inside_linear (CairoDock *p
 		//pDock->bInside = TRUE;
 		iMousePositionType = CAIRO_DOCK_MOUSE_INSIDE;
 	}
+	else
+		iMousePositionType = CAIRO_DOCK_MOUSE_OUTSIDE;
 	
 	return iMousePositionType;
 }
@@ -929,15 +929,14 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 	}
 	
 	//\_______________ On simule le passage du curseur sur toute la largeur du dock, et on chope la largeur maximale qui s'en degage, ainsi que les positions d'equilibre de chaque icone.
-	int iVirtualMouseX;
 	GList *pFirstDrawnElement = (pFirstDrawnElementGiven != NULL ? pFirstDrawnElementGiven : pIconList);
-	//for (iVirtualMouseX = 0; iVirtualMouseX < iFlatDockWidth; iVirtualMouseX ++)
+	//for (int iVirtualMouseX = 0; iVirtualMouseX < iFlatDockWidth; iVirtualMouseX ++)
 	GList *ic2;
 	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
 		
-		cairo_dock_calculate_wave_with_position_linear (pIconList, pFirstDrawnElement, icon->fXAtRest, 1, iFlatDockWidth, 0, 0, 0.5, 0);
+		cairo_dock_calculate_wave_with_position_linear (pIconList, pFirstDrawnElement, icon->fXAtRest, 1, iFlatDockWidth, 0, 0, 0.5, 0, 0);
 		ic2 = pFirstDrawnElement;
 		do
 		{
@@ -951,7 +950,7 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 			ic2 = cairo_dock_get_next_element (ic2, pDock->icons);
 		} while (ic2 != pFirstDrawnElement);
 	}
-	cairo_dock_calculate_wave_with_position_linear (pIconList, pFirstDrawnElement, iFlatDockWidth - 1, 1, iFlatDockWidth, 0, 0, pDock->fAlign, 0);  // pDock->fFoldingFactor
+	cairo_dock_calculate_wave_with_position_linear (pIconList, pFirstDrawnElement, iFlatDockWidth - 1, 1, iFlatDockWidth, 0, 0, pDock->fAlign, 0, 0);  // pDock->fFoldingFactor
 	ic = pFirstDrawnElement;
 	do
 	{

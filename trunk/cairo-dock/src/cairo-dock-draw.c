@@ -278,13 +278,15 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 		{
 			double fPossibleDeltaY = MIN (100, (g_bDirectionUp ? icon->fDrawY : pDock->iCurrentHeight - (icon->fDrawY + icon->fHeight * icon->fScale)));  // on borne a 100 pixels pour les rendus qui ont des fenetres grandes..
 			
-			icon->fDrawY += (g_bDirectionUp ? -1. : 1.) * k / (n/2) * fPossibleDeltaY * (2 - 1.*k/(n/2));
+			icon->fDeltaYReflection = (g_bDirectionUp ? -1. : 1.) * k / (n/2) * fPossibleDeltaY * (2 - 1.*k/(n/2));
+			icon->fDrawY += icon->fDeltaYReflection;
 			//g_print ("%d) + %.2f (%d)\n", icon->iCount, (g_bDirectionUp ? -1. : 1.) * k / (n/2) * fPossibleDeltaY * (2 - 1.*k/(n/2)), k);
 		}
 		else  // on commence par s'aplatir.
 		{
 			icon->fHeightFactor *= 1.*(2 - 1.5*k) / 10;
 			icon->fDrawY += (1 - icon->fHeightFactor) / 2 * icon->fHeight * icon->fScale;
+			icon->fDeltaYReflection = 0;
 			//g_print ("%d) * %.2f (%d)\n", icon->iCount, icon->fHeightFactor, k);
 		}
 		icon->iCount --;  // c'est une loi de type acceleration dans le champ de pesanteur. 'g' et 'v0' n'interviennent pas directement, car s'expriment en fonction de 'fPossibleDeltaY' et 'n'.
@@ -438,15 +440,30 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	
 	if (icon->pIconBuffer != NULL)
 		cairo_set_source_surface (pCairoContext, icon->pIconBuffer, 0.0, 0.0);
-	///else
-	///	cairo_set_source_surface (pCairoContext, g_pDefaultIcon, 0.0, 0.0);
 	//cairo_pop_group (pCairoContext);
 	
 	if (icon->fAlpha == 1)
 		cairo_paint (pCairoContext);
 	else
 		cairo_paint_with_alpha (pCairoContext, icon->fAlpha);
+	
 	cairo_restore (pCairoContext);
+	
+	
+	if (icon->pReflectionBuffer != NULL)
+	{
+		cairo_save (pCairoContext);
+		cairo_translate (pCairoContext, 0, - 1.25 * icon->fDeltaYReflection + icon->fHeight * icon->fScale);  // 25% de la hauteur au sol.
+		cairo_scale (pCairoContext, fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude));
+		
+		cairo_set_source_surface (pCairoContext, icon->pReflectionBuffer, 0.0, 0.0);
+		if (icon->fAlpha == 1)
+			cairo_paint (pCairoContext);
+		else
+			cairo_paint_with_alpha (pCairoContext, icon->fAlpha);
+		cairo_restore (pCairoContext);
+	}
+	
 	
 	//\_____________________ On dessine les etiquettes, avec un alpha proportionnel au facteur d'echelle de leur icone.
 	if (icon->pTextBuffer != NULL && icon->fScale > 1.01 && (! g_bLabelForPointedIconOnly || icon->bPointed))  // 1.01 car sin(pi) = 1+epsilon :-/

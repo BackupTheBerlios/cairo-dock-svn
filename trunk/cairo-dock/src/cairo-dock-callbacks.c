@@ -1094,7 +1094,7 @@ gboolean on_configure (GtkWidget* pWidget,
 #endif
 	}
 	
-	if (pDock->iSidMoveDown == 0 && pDock->iSidMoveUp == 0)  // ce n'est pas du a une animation.
+	if (pDock->iSidMoveDown == 0 && pDock->iSidMoveUp == 0)  // ce n'est pas du a une animation. Donc en cas d'apparition due a l'auto-hide, ceci ne sera pas fait ici, mais a la fin de l'animation.
 	{
 		cairo_dock_set_icons_geometry_for_window_manager (pDock);
 		

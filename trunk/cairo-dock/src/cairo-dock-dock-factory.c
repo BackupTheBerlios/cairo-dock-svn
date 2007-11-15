@@ -600,7 +600,7 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 	
 	Icon* icon;
 	const gchar *cFileName;
-	CairoDock *pParentDock, *pChildDock;
+	CairoDock *pParentDock;
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pMainDock);
 	
 	do
@@ -679,8 +679,6 @@ void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDoc
 	Icon *icon;
 	GList *ic;
 	gchar *cDesktopFilePath;
-	GKeyFile *pKeyFile;
-	GError *erreur = NULL;
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;

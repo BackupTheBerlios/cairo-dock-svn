@@ -150,11 +150,6 @@ gchar *cairo_dock_generate_desktop_filename (gchar *cBaseName, gchar *cCairoDock
 }
 
 
-
-static void _cairo_dock_write_container_name (gchar *cDockName, CairoDock *pDock, GString *pString)
-{
-	g_string_append_printf (pString, "%s;", cDockName);
-}
 void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath, gchar *cLanguage)
 {
 	GError *erreur = NULL;

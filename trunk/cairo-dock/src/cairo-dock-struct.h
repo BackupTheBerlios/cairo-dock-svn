@@ -194,6 +194,7 @@ struct _Icon {
 	gdouble fHeight;
 	cairo_surface_t* pIconBuffer;
 	cairo_surface_t* pTextBuffer;
+	cairo_surface_t* pReflectionBuffer;
 	int iTextWidth;
 	int iTextHeight;
 	gdouble fTextXOffset;
@@ -216,6 +217,7 @@ struct _Icon {
 	gint iCount;
 	CairoDockAnimationType iAnimationType;
 	gdouble fPersonnalScale;
+	gdouble fDeltaYReflection;
 	//\____________ Pour les applis.
 	gint iPid;
 	Window Xid;

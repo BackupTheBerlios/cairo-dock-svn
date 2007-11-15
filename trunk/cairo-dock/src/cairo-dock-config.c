@@ -25,10 +25,11 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-themes-manager.h"
 #include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-menu.h"
+#include "cairo-dock-callbacks.h"
 #include "cairo-dock-config.h"
 
-static gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "pulse", "upside-down", "wobbly", "random", NULL};
-static gchar * s_cIconTypeNames[(CAIRO_DOCK_NB_TYPES+1)/2] = {"launchers", "applications", "applets"};
+static const gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "pulse", "upside-down", "wobbly", "random", NULL};
+static const gchar * s_cIconTypeNames[(CAIRO_DOCK_NB_TYPES+1)/2] = {"launchers", "applications", "applets"};
 
 extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
@@ -46,6 +47,10 @@ extern double g_fScrollAcceleration;
 extern int g_iSinusoidWidth;
 extern double g_fAmplitude;
 extern int g_iIconGap;
+
+extern double g_fFieldDepth;
+extern double g_fInclinationOnHorizon;
+extern gboolean g_bUseReflection;
 
 extern gboolean g_bAutoHide;
 extern double g_fVisibleZoneAlpha;
@@ -125,7 +130,7 @@ extern gchar *g_cSeparatorImage;
 extern gboolean g_bRevolveSeparator;
 
 
-guint cairo_dock_get_number_from_name (gchar *cName, gchar **tNamesList)
+guint cairo_dock_get_number_from_name (gchar *cName, const gchar **tNamesList)
 {
 	g_return_val_if_fail (cName != NULL, 0);
 	int i = 0;
@@ -351,7 +356,7 @@ gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupN
 		g_free (cGroupNameUpperCase);
 		
 		if (*length > 0)
-			g_key_file_set_string_list (pKeyFile, cGroupName, cKeyName, cValuesList, *length);
+			g_key_file_set_string_list (pKeyFile, cGroupName, cKeyName, (const gchar **)cValuesList, *length);
 		else
 			g_key_file_set_string (pKeyFile, cGroupName, cKeyName, "");
 		*bFlushConfFileNeeded = TRUE;
@@ -445,7 +450,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	gchar **cIconsTypesList = cairo_dock_get_string_list_key_value (pKeyFile, "Cairo Dock", "icon's type order", &bFlushConfFileNeeded, &length, NULL);
 	if (cIconsTypesList != NULL && length > 0)
 	{
-		int i, j;
+		unsigned int i, j;
 		for (i = 0; i < length; i ++)
 		{
 			for (j = 0; j < ((CAIRO_DOCK_NB_TYPES + 1) / 2); j ++)
@@ -482,6 +487,13 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_iDockLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "line width", &bFlushConfFileNeeded, 2);
 	
 	g_iFrameMargin = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "frame margin", &bFlushConfFileNeeded, 2);
+	
+	g_fFieldDepth = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "field depth", &bFlushConfFileNeeded, 0.75);
+	
+	 double fInclinationAngle = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "inclination", &bFlushConfFileNeeded, 45.);
+	 g_fInclinationOnHorizon = tan (fInclinationAngle * G_PI / 180.);
+	
+	g_bUseReflection = cairo_dock_get_boolean_key_value (pKeyFile, "Cairo Dock", "use reflection", &bFlushConfFileNeeded, TRUE);
 	
 	double couleur[4] = {0., 0., 0.6, 0.4};
 	cairo_dock_get_double_list_key_value (pKeyFile, "Cairo Dock", "line color", &bFlushConfFileNeeded, g_fLineColor, 4, couleur);

@@ -30,8 +30,8 @@ cairo_dock_CFLAGS = \
 	-std=c99\
 	-O3\
 	-g -ggdb\
-	-Wall -Wwrite-strings -Wuninitialized -Wno-unused-parameter
-#	 -Wunreachable-code -Wextra -O -Wstrict-prototypes
+	-Wno-unused-parameter
+#	-Wall -Wunreachable-code -Wstrict-prototypes -Wextra -Wwrite-strings -Wuninitialized 
 
 cairo_dock_LDFLAGS = \
 	-Wl,--export-dynamic

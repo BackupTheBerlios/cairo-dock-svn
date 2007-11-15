@@ -17,5 +17,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 
 cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fRotationAngle);
 
+cairo_surface_t * cairo_dock_create_reflection_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight);
+
 
 #endif

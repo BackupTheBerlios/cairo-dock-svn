@@ -22,6 +22,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-callbacks.h"
 #include "cairo-dock-draw.h"
+#include "cairo-dock-dialogs.h"
+#include "cairo-dock-applications-manager.h"
 #include "cairo-dock-animations.h"
 
 extern double g_fScrollAcceleration;
@@ -167,10 +169,8 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 	if (pDock->fFoldingFactor < 0.03)
 		pDock->fFoldingFactor = 0;
 	
-	gint iMouseX, iMouseY;
-	
 	//if (pDock->iRefCount > 0 && ! pDock->bInside)  // pour l'animation des sous-docks a leur apparition.
-		pDock->iMouseX = -1e4;
+	//	pDock->iMouseX = -1e4;
 	//else
 	{
 		if (pDock->bHorizontalDock)
@@ -180,13 +180,17 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 	}
 	
 	pDock->calculate_icons (pDock);
-	//cairo_dock_apply_wave_effect (pDock);
 	gtk_widget_queue_draw (pDock->pWidget);
 	
 	if (pDock->iMagnitudeIndex == CAIRO_DOCK_NB_MAX_ITERATIONS && pDock->fFoldingFactor == 0)
 	{
 		pDock->iMagnitudeIndex = CAIRO_DOCK_NB_MAX_ITERATIONS;
 		pDock->iSidGrowUp = 0;
+		if (pDock->iRefCount == 0 && g_bAutoHide)  // on arrive en fin de l'animation qui montre le dock, les icones sont bien placees a partir de maintenant.
+		{
+			cairo_dock_set_icons_geometry_for_window_manager (pDock);
+			cairo_dock_replace_all_dialogs ();
+		}
 		return FALSE;
 	}
 	else
