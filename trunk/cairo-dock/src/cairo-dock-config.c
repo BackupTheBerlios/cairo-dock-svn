@@ -50,7 +50,7 @@ extern int g_iIconGap;
 
 extern double g_fFieldDepth;
 extern double g_fInclinationOnHorizon;
-extern gboolean g_bUseReflection;
+extern double g_fAlbedo;
 
 extern gboolean g_bAutoHide;
 extern double g_fVisibleZoneAlpha;
@@ -493,7 +493,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	 double fInclinationAngle = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "inclination", &bFlushConfFileNeeded, 45.);
 	 g_fInclinationOnHorizon = tan (fInclinationAngle * G_PI / 180.);
 	
-	g_bUseReflection = cairo_dock_get_boolean_key_value (pKeyFile, "Cairo Dock", "use reflection", &bFlushConfFileNeeded, TRUE);
+	g_fAlbedo = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "albedo", &bFlushConfFileNeeded, .9);
 	
 	double couleur[4] = {0., 0., 0.6, 0.4};
 	cairo_dock_get_double_list_key_value (pKeyFile, "Cairo Dock", "line color", &bFlushConfFileNeeded, g_fLineColor, 4, couleur);

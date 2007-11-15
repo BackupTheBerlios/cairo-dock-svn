@@ -42,7 +42,7 @@ extern gint g_iDockRadius;
 extern gint g_iFrameMargin;
 extern double g_fAmplitude;
 extern int g_iIconGap;
-extern gboolean g_bUseReflection;
+extern double g_fAlbedo;
 
 extern cairo_surface_t *g_pVisibleZoneSurface;
 extern gboolean g_bReverseVisibleImage;
@@ -192,12 +192,13 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 		g_free (cIconPath);
 	}
 	
-	if (g_bUseReflection && icon->pIconBuffer != NULL)
+	if (g_fAlbedo > 0 && icon->pIconBuffer != NULL)
 	{
 		icon->pReflectionBuffer = cairo_dock_create_reflection_surface (icon->pIconBuffer, 
 			pSourceContext,
 			(bHorizontalDock ? icon->fWidth : icon->fHeight) * fMaxScale,
-			(bHorizontalDock ? icon->fHeight : icon->fWidth) * fMaxScale);
+			(bHorizontalDock ? icon->fHeight : icon->fWidth) * fMaxScale,
+			bHorizontalDock);
 	}
 }
 
@@ -272,7 +273,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 		g_free (cUtf8Name);
 		
 		pango_layout_set_text (pLayout, (cTruncatedName != NULL ? cTruncatedName : icon->acName), -1);
-		g_print ("-> %s\n", cTruncatedName);
+		//g_print (" -> etiquette : %s\n", cTruncatedName);
 		g_free (cTruncatedName);
 	}
 	else

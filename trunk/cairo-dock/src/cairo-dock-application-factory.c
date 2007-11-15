@@ -309,9 +309,8 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 		{
 			if (*pTypeBuffer == s_aNetWmWindowTypeDialog)
 			{
-				Window XMainAppliWindow;
-				if (XGetTransientForHint (s_XDisplay, Xid, &XMainAppliWindow) != 0)
-					XMainAppliWindow = 0;
+				Window XMainAppliWindow = 0;
+				XGetTransientForHint (s_XDisplay, Xid, &XMainAppliWindow);
 				
 				if (XMainAppliWindow != 0)
 				{
@@ -354,23 +353,12 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	}
 	if (iBufferNbElements == 0)
 	{
-		g_print ("pas de nom\n");
+		g_print ("pas de nom, elle degage\n");
 		if (g_bUniquePid)
 			g_hash_table_insert (s_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
 		return NULL;
 	}
 	g_print ("recuperation de '%s'\n", pNameBuffer);
-	
-	//\__________________ On recupere son icone.
-	/**pNewSurface = cairo_dock_create_surface_from_xwindow (Xid, pSourceContext, 1 + g_fAmplitude, &fWidth, &fHeight);
-	if (pNewSurface == NULL)
-	{
-		g_print ("pas d'icone\n");
-		XFree (pNameBuffer);
-		if (g_bUniquePid)
-			g_hash_table_insert (s_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
-		return NULL;
-	}*/
 	
 	//\__________________ On cree et on remplit l'icone, et on l'insere apres les autres applis.
 	Icon *icon = g_new0 (Icon, 1);
@@ -383,9 +371,6 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	icon->iType = CAIRO_DOCK_APPLI;
 	
 	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
-	/**icon->fWidth = fWidth;
-	icon->fHeight = fHeight;
-	icon->pIconBuffer = pNewSurface;*/
 	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 	
 	if (g_bUniquePid)

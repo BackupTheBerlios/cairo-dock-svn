@@ -350,7 +350,7 @@ static gboolean _cairo_dock_search_icon_from_subdock (gchar *cDockName, CairoDoc
 }
 Icon *cairo_dock_search_icon_pointing_on_dock (CairoDock *pDock, CairoDock **pParentDock)  // pParentDock peut etre NULL.
 {
-	if (pDock->iRefCount == 0)  // par definition.
+	if (pDock->bIsMainDock)  // par definition. On n'utilise pas iRefCount, car si on est en train de detruire un dock, sa reference est deja decrementee.
 		return NULL;
 	Icon *pPointingIcon = NULL;
 	gpointer data[3] = {pDock, &pPointingIcon, pParentDock};
@@ -640,6 +640,12 @@ static void _cairo_dock_deactivate_one_dock (CairoDock *pDock)
 	if (pDock->bIsMainDock && cairo_dock_application_manager_is_running ())
 	{
 		cairo_dock_pause_application_manager ();  // inutile d'enlever les icones des applis, ce sera fait de toute maniere.
+	}
+	
+	Icon *pPointedIcon;
+	while ((pPointedIcon = cairo_dock_search_icon_pointing_on_dock (pDock, NULL)) != NULL)
+	{
+		pPointedIcon->pSubDock = NULL;
 	}
 	
 	gtk_widget_destroy (pDock->pWidget);

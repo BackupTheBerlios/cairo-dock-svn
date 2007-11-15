@@ -107,8 +107,8 @@ void cairo_dock_unregister_appli (Icon *icon)
 		
 		cairo_dock_unregister_pid (icon);
 		
-		g_free (icon->cClass);
-		icon->cClass = NULL;
+		///g_free (icon->cClass);
+		///icon->cClass = NULL;
 	}
 }
 

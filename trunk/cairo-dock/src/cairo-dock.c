@@ -118,7 +118,7 @@ double g_fStringColor[4];  // la couleur de la ficelle.
 
 double g_fFieldDepth;  // profondeur de champ de la vue en plan incline, en fraction de la hauteur max des icones.
 double g_fInclinationOnHorizon;  // inclinaison de la ligne de fuite vers l'horizon.
-gboolean g_bUseReflection;  // utiliser les reflets ou pas.
+double g_fAlbedo;  // pouvoir reflechissant du plan.
 
 cairo_surface_t *g_pVisibleZoneSurface = NULL;  // surface de la zone de rappel.
 double g_fVisibleZoneAlpha;  // transparence de la zone de rappel.

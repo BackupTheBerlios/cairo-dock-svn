@@ -370,7 +370,7 @@ gboolean _cairo_dock_emit_leave_signal (CairoDock *pDock)
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
-	//g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
+	g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
 	pDock->iAvoidingMouseIconType = -1;
 	pDock->fAvoidingMouseMargin = 0;
 	pDock->bInside = FALSE;
@@ -400,7 +400,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	else
 	{
 		pDock->fFoldingFactor = 0;
-		///pDock->bAtBottom = TRUE;  // mis en commentaire le 12/11/07 pour permettre le quick-hide.
+		pDock->bAtBottom = TRUE;  // mis en commentaire le 12/11/07 pour permettre le quick-hide.
 		//g_print ("on force bAtBottom\n");
 	}
 	
@@ -416,16 +416,21 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	CairoDock *pDock)
 {
 	//g_print ("%s (bInside:%d; bAtBottom:%d)\n", __func__, pDock->bInside, pDock->bAtBottom);
-	if (pDock->bAtBottom )  // || ! pDock->bInside
-		return FALSE;
-	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
-	
-	if (pEvent != NULL && pDock->iRefCount > 0)  // on ne le fait que pour les containers.
+	if (pDock->bAtBottom)  // || ! pDock->bInside
 	{
-		//g_print ("  on retarde la sortie\n");
-		if (pDock->iSidLeaveDemand == 0)
-			pDock->iSidLeaveDemand = g_timeout_add (g_iLeaveSubDockDelay, (GSourceFunc) _cairo_dock_emit_leave_signal, (gpointer) pDock);
+		pDock->iSidLeaveDemand = 0;
 		return FALSE;
+	}
+	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	
+	if (pDock->iRefCount > 0)  // on ne le fait que pour les containers.  // pEvent != NULL && 
+	{
+		if (pDock->iSidLeaveDemand == 0)
+		{
+			g_print ("  on retarde la sortie\n");
+			pDock->iSidLeaveDemand = g_timeout_add (g_iLeaveSubDockDelay, (GSourceFunc) _cairo_dock_emit_leave_signal, (gpointer) pDock);
+			return FALSE;
+		}
 	}
 	pDock->iSidLeaveDemand = 0;
 	
@@ -1260,4 +1265,9 @@ void cairo_dock_deactivate_temporary_auto_hide (void)
 void cairo_dock_allow_entrance (void)
 {
 	s_bEntranceAllowed = TRUE;
+}
+
+gboolean cairo_dock_entrance_is_allowed (void)
+{
+	return s_bEntranceAllowed;
 }

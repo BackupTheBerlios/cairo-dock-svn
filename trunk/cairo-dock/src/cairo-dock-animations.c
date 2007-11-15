@@ -293,9 +293,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 				{
 					if (pDock == cairo_dock_search_dock_from_name (pRemovingIcon->cClass) && pDock->icons == NULL)  // il n'y a plus aucune icone de cette classe.
 					{
-						Icon *pPointedIcon = cairo_dock_search_icon_pointing_on_dock (pDock, NULL);
-						pPointedIcon->pSubDock = NULL;
-						
+						g_print ("le sous-dock de la classe %s n'a plus d'element\n", pRemovingIcon->cClass);
 						cairo_dock_destroy_dock (pDock, pRemovingIcon->cClass, NULL, NULL);
 						cairo_dock_free_icon (pRemovingIcon);
 						return FALSE;

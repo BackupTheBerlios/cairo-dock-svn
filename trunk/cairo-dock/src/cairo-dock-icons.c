@@ -858,14 +858,14 @@ void cairo_dock_manage_mouse_position (CairoDock *pDock, CairoDockMousePositionT
 	switch (iMousePositionType)
 	{
 		case CAIRO_DOCK_MOUSE_INSIDE :
-			if (pDock->iMagnitudeIndex < CAIRO_DOCK_NB_MAX_ITERATIONS && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons))  // on est dedans et la taille des icones est non maximale bien qu'aucune icone ne soit animee.  ///  && pDock->iSidMoveDown == 0
+			if (cairo_dock_entrance_is_allowed () && pDock->iMagnitudeIndex < CAIRO_DOCK_NB_MAX_ITERATIONS && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons))  // on est dedans et la taille des icones est non maximale bien qu'aucune icone ne soit animee.  ///  && pDock->iSidMoveDown == 0
 			{
 				//g_print ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone  ne soit animee \n");
 				//pDock->bInside = TRUE;
 				if (pDock->bAtBottom && pDock->iRefCount == 0 && ! g_bAutoHide)  // on le fait pas avec l'auto-hide, car un signal d'entree est deja emis a cause des mouvements/redimensionnements de la fenetre, et en rajouter un ici fout le boxon.
 				{
 					//g_print ("  on emule une re-rentree (pDock->iMagnitudeIndex:%f)\n", pDock->iMagnitudeIndex);
-					cairo_dock_render_blank (pDock);
+					///cairo_dock_render_blank (pDock);  // utile ?
 					g_signal_emit_by_name (pDock->pWidget, "enter-notify-event", NULL, &bReturn);
 				}
 				else  // on se contente de faire grossir les icones.
@@ -894,14 +894,16 @@ void cairo_dock_manage_mouse_position (CairoDock *pDock, CairoDockMousePositionT
 			pDock->fDecorationsOffsetX = - pDock->iCurrentWidth / 2;  // on fixe les decorations.
 			if (pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0 && pDock->iMagnitudeIndex > 0)  // pDock->iMagnitudeIndex == CAIRO_DOCK_NB_MAX_ITERATIONS
 			{
+				//g_print ("on dezoome le dock\n");
 				pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, pDock);
 			}
 		break ;
 		
 		case CAIRO_DOCK_MOUSE_OUTSIDE :
 			pDock->fDecorationsOffsetX = - pDock->iCurrentWidth / 2;  // on fixe les decorations.
-			if (pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0 && pDock->iMagnitudeIndex > 0)  // pDock->iMagnitudeIndex == CAIRO_DOCK_NB_MAX_ITERATIONS
+			if (pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0 && pDock->iMagnitudeIndex > 0 && pDock->iSidLeaveDemand == 0)  // pDock->iMagnitudeIndex == CAIRO_DOCK_NB_MAX_ITERATIONS
 			{
+				g_print ("on force a quitter\n");
 				g_signal_emit_by_name (pDock->pWidget, "leave-notify-event", NULL, &bReturn);
 			}
 		break ;
