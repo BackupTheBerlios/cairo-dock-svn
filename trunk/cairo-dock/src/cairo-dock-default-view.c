@@ -79,16 +79,7 @@ void cairo_dock_calculate_max_dock_size_linear (CairoDock *pDock)
 	
 	pDock->iDecorationsHeight = (pDock->iMaxIconHeight * (1. + g_fFieldDepth) + 2 * g_iFrameMargin) / sqrt (1 + g_fInclinationOnHorizon * g_fInclinationOnHorizon);
 	
-	double fRadius = g_iDockRadius;
-	double fLineWidth = g_iDockLineWidth;
-	double fFrameHeight = pDock->iDecorationsHeight;
-	if (2 * fRadius > fFrameHeight + fLineWidth)
-		fRadius = (fFrameHeight + fLineWidth) / 2 - 1;
-	double fDeltaXForLoop = (fFrameHeight + fLineWidth - 2 * fRadius) * g_fInclinationOnHorizon;
-	double fDeltaCornerForLoop = fRadius / (fFrameHeight + fLineWidth - 2 * fRadius) * fDeltaXForLoop;  // soit R * tan(alpha).
-	
-	double fExtraWidth = 2 * (fRadius + fLineWidth/2 + fDeltaXForLoop + fDeltaCornerForLoop/2 + g_iFrameMargin);
-	
+	double fExtraWidth = cairo_dock_calculate_extra_width_for_trapeze (pDock->iDecorationsHeight, g_fInclinationOnHorizon, g_iDockRadius, g_iDockLineWidth);
 	pDock->iMaxDockWidth = ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iFlatDockWidth, 1., fExtraWidth));
 	pDock->iMaxDockWidth = MIN (pDock->iMaxDockWidth, g_iMaxAuthorizedWidth);
 	
@@ -96,9 +87,7 @@ void cairo_dock_calculate_max_dock_size_linear (CairoDock *pDock)
 	
 	pDock->iDecorationsWidth = pDock->iMaxDockWidth;
 	
-	
 	pDock->iMinDockWidth = pDock->iFlatDockWidth + fExtraWidth;
-	//pDock->iMinDockHeight = pDock->iDecorationsHeight + 2 * g_iDockLineWidth;
 	pDock->iMinDockHeight = pDock->iMaxIconHeight * (1. + g_fFieldDepth) + 2 * g_iFrameMargin + 2 * g_iDockLineWidth;
 }
 
@@ -292,7 +281,7 @@ void cairo_dock_render_optimized_linear (CairoDock *pDock, GdkRectangle *pArea)
 			if (fXLeft <= fXMax && floor (fXRight) > fXMin)
 			{
 				cairo_save (pCairoContext);
-				cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude);
+				cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect);
 				cairo_restore (pCairoContext);
 			}
 			
@@ -340,6 +329,7 @@ void cairo_dock_register_default_renderer (void)
 	pDefaultRenderer->render = cairo_dock_render_linear;
 	pDefaultRenderer->render_optimized = cairo_dock_render_optimized_linear;
 	pDefaultRenderer->set_subdock_position = cairo_dock_set_subdock_position_linear;
+	pDefaultRenderer->bUseReflect = TRUE;
 	
 	cairo_dock_register_renderer (CAIRO_DOCK_DEFAULT_RENDERER_NAME, pDefaultRenderer);
 }

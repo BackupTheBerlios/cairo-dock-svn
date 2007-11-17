@@ -194,7 +194,7 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	
 	if (g_fAlbedo > 0 && icon->pIconBuffer != NULL)
 	{
-		icon->pReflectionBuffer = cairo_dock_create_reflection_surface (icon->pIconBuffer, 
+		icon->pReflectionBuffer = cairo_dock_create_reflection_surface (icon->pIconBuffer,
 			pSourceContext,
 			(bHorizontalDock ? icon->fWidth : icon->fHeight) * fMaxScale,
 			(bHorizontalDock ? icon->fHeight : icon->fWidth) * fMaxScale,

@@ -48,6 +48,7 @@ typedef struct _CairoDockRenderer {
 	CairoDockRenderFunc render;
 	CairoDockRenderOptimizedFunc render_optimized;
 	CairoDockSetSubDockPositionFunc set_subdock_position;
+	gboolean bUseReflect;
 	} CairoDockRenderer;
 
 
@@ -62,6 +63,7 @@ struct _CairoDock {
 	gint iGapY;
 	gdouble fAlign;  // alignement, entre 0 et 1, du dock sur le bord de l'ecran.
 	CairoDockTypeHorizontality bHorizontalDock;  // dit si le dock est horizontal ou vertical.
+	gboolean bUseReflect;  // dit si la vue courante utilise les reflets ou pas (utile pour les plug-ins).
 	
 	gint iMaxIconHeight;  // max des hauteurs des icones.
 	gint iFlatDockWidth;  // largeur du dock a plat, avec juste les icones.

@@ -22,6 +22,10 @@ extern int g_iLabelSize;
 extern gboolean g_bRoundedBottomCorner;
 extern gboolean g_bAutoHide;
 
+extern double g_fFieldDepth;
+extern double g_fInclinationOnHorizon;
+extern double g_fAlbedo;
+
 extern double g_fStripesColorBright[4];
 extern double g_fStripesColorDark[4];
 

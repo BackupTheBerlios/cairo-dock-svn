@@ -136,38 +136,38 @@ void cairo_dock_draw_frame_horizontal (cairo_t *pCairoContext, double fRadius, d
 	if (2*fRadius > fFrameHeight + fLineWidth)
 		fRadius = (fFrameHeight + fLineWidth) / 2 - 1;
 	double fDeltaXForLoop = (fFrameHeight + fLineWidth - 2 * fRadius) * fInclination;
-	//double fDeltaCornerForLoop = fRadius / (fFrameHeight + fLineWidth - 2 * fRadius) * fDeltaXForLoop;  // soit R * tan(alpha).
-	double fDeltaCornerForLoop = fRadius * (-1 + sqrt (1 + fInclination * fInclination));  // miam, de la bonne trigo !
+	double cosa = 1. / sqrt (1 + fInclination * fInclination);
+	double sina = cosa * fInclination;
 	
-	cairo_move_to (pCairoContext, fDockOffsetX, fDockOffsetY);  // on commence par le coin haut gauche  //  + fDeltaXForLoop + fDeltaCornerForLoop / 2
+	cairo_move_to (pCairoContext, fDockOffsetX, fDockOffsetY);
 	
-	cairo_rel_line_to (pCairoContext, fFrameWidth, 0);  //  - (2 * fRadius + fLineWidth + 2 * fDeltaXForLoop + fDeltaCornerForLoop)
-	// Top Right.
+	cairo_rel_line_to (pCairoContext, fFrameWidth, 0);
+	//\_________________ Coin haut droit.
 	cairo_rel_curve_to (pCairoContext,
 		0, 0,
-		fRadius - fDeltaCornerForLoop, 0,
-		fRadius, sens * fRadius);
+		fRadius * (1. / cosa - fInclination), 0,
+		fRadius * cosa, sens * fRadius * (1 - sina));
 	cairo_rel_line_to (pCairoContext, fDeltaXForLoop, sens * (fFrameHeight + fLineWidth - fRadius * (g_bRoundedBottomCorner ? 2 : 1)));
-	// Bottom Right.
+	//\_________________ Coin bas droit.
 	if (g_bRoundedBottomCorner)
 		cairo_rel_curve_to (pCairoContext,
 			0, 0,
-			fDeltaCornerForLoop, sens * fRadius,
-			-fRadius, sens * fRadius);
+			fRadius * (1 + sina) * fInclination, sens * fRadius * (1 + sina),
+			-fRadius * cosa, sens * fRadius * (1 + sina));
 	
-	cairo_rel_line_to (pCairoContext, - fFrameWidth -  2 * fDeltaXForLoop - (g_bRoundedBottomCorner ? 0 : 2 * fRadius), 0);
-	// Bottom Left
+	cairo_rel_line_to (pCairoContext, - fFrameWidth -  2 * fDeltaXForLoop - (g_bRoundedBottomCorner ? 0 : 2 * fRadius * cosa), 0);
+	//\_________________ Coin bas gauche.
 	if (g_bRoundedBottomCorner)
 		cairo_rel_curve_to (pCairoContext,
 			0, 0,
-			-(fRadius + fDeltaCornerForLoop), 0,
-			-fRadius, -sens * fRadius);
+			-fRadius * (fInclination + 1. / cosa), 0,
+			-fRadius * cosa, -sens * fRadius * (1 + sina));
 	cairo_rel_line_to (pCairoContext, fDeltaXForLoop, sens * (- fFrameHeight - fLineWidth + fRadius * (g_bRoundedBottomCorner ? 2 : 1)));
-	// Top Left.
+	//\_________________ Coin haut gauche.
 	cairo_rel_curve_to (pCairoContext,
 		0, 0,
-		fDeltaCornerForLoop, -sens * fRadius,
-		fRadius, -sens * fRadius);
+		fRadius * (1 - sina) * fInclination, -sens * fRadius * (1 - sina),
+		fRadius * cosa, -sens * fRadius * (1 - sina));
 	if (fRadius < 1)
 		cairo_close_path (pCairoContext);
 }
@@ -176,37 +176,38 @@ void cairo_dock_draw_frame_vertical (cairo_t *pCairoContext, double fRadius, dou
 	if (2*fRadius > fFrameHeight + fLineWidth)
 		fRadius = (fFrameHeight + fLineWidth) / 2 - 1;
 	double fDeltaXForLoop = (fFrameHeight + fLineWidth - 2 * fRadius) * fInclination;
-	double fDeltaCornerForLoop = fRadius / (fFrameHeight + fLineWidth - 2 * fRadius) * fDeltaXForLoop;  // soit R * tan(alpha).
+	double cosa = 1. / sqrt (1 + fInclination * fInclination);
+	double sina = cosa * fInclination;
 	
 	cairo_move_to (pCairoContext, fDockOffsetY, fDockOffsetX);
 	
 	cairo_rel_line_to (pCairoContext, 0, fFrameWidth);
-	// Top Right.
+	//\_________________ Coin haut droit.
 	cairo_rel_curve_to (pCairoContext,
 		0, 0,
-		0, fRadius - fDeltaCornerForLoop,
-		sens * fRadius, fRadius);
+		0, fRadius * (1. / cosa - fInclination),
+		sens * fRadius * (1 - sina), fRadius * cosa);
 	cairo_rel_line_to (pCairoContext, sens * (fFrameHeight + fLineWidth - fRadius * (g_bRoundedBottomCorner ? 2 : 1)), fDeltaXForLoop);
-	// Bottom Right.
+	//\_________________ Coin bas droit.
 	if (g_bRoundedBottomCorner)
 		cairo_rel_curve_to (pCairoContext,
 			0, 0,
-			sens * fRadius, fDeltaCornerForLoop,
-			sens * fRadius, -fRadius);
+			sens * fRadius * (1 + sina), fRadius * (1 + sina) * fInclination,
+			sens * fRadius * (1 + sina), -fRadius * cosa);
 	
 	cairo_rel_line_to (pCairoContext, 0, - fFrameWidth -  2 * fDeltaXForLoop);
-	// Bottom Left
+	//\_________________ Coin bas gauche.
 	if (g_bRoundedBottomCorner)
 		cairo_rel_curve_to (pCairoContext,
 			0, 0,
-			0, -(fRadius + fDeltaCornerForLoop),
-			-sens * fRadius, -fRadius);
+			0, -fRadius * (fInclination + 1. / cosa),
+			-sens * fRadius * (1 + sina), -fRadius * cosa);
 	cairo_rel_line_to (pCairoContext, sens * (- fFrameHeight - fLineWidth + fRadius * (g_bRoundedBottomCorner ? 2 : 1)), fDeltaXForLoop);
-	// Top Left.
+	//\_________________ Coin haut gauche.
 	cairo_rel_curve_to (pCairoContext,
 		0, 0,
-		-sens * fRadius, fDeltaCornerForLoop,
-		-sens * fRadius, fRadius);
+		-sens * fRadius * (1 - sina), fRadius * (1 - sina) * fInclination,
+		-sens * fRadius * (1 - sina), fRadius * cosa);
 	if (fRadius < 1)
 		cairo_close_path (pCairoContext);
 }
@@ -397,7 +398,7 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 }
 
 
-void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude)
+void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect)
 {
 	//\_____________________ On dessine l'icone en fonction de son placement, son angle, et sa transparence.
 	//cairo_push_group (pCairoContext);
@@ -447,7 +448,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	cairo_restore (pCairoContext);
 	
 	
-	if (icon->pReflectionBuffer != NULL)
+	if (bUseReflect && icon->pReflectionBuffer != NULL)
 	{
 		cairo_save (pCairoContext);
 		if (bHorizontalDock)
@@ -628,7 +629,7 @@ void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, d
 		icon = ic->data;
 		
 		cairo_save (pCairoContext);
-		cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude);
+		cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect);
 		cairo_restore (pCairoContext);
 		
 		ic = cairo_dock_get_next_element (ic, pDock->icons);
@@ -686,12 +687,12 @@ void cairo_dock_redraw_my_icon (Icon *icon, CairoDock *pDock)
 {
 	if (pDock->bAtBottom && (pDock->iRefCount > 0 || g_bAutoHide))
 		return ;
-	GdkRectangle rect = {(int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor)), (int) icon->fDrawY, (int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)), (int) icon->fHeight * icon->fScale};
+	GdkRectangle rect = {(int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor)), (int) icon->fDrawY, (int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)), (int) icon->fHeight * (icon->fScale + g_fFieldDepth)};
 	if (! pDock->bHorizontalDock)
 	{
 		rect.x = (int) icon->fDrawY;
 		rect.y = (int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor));
-		rect.width = (int) icon->fHeight * icon->fScale;
+		rect.width = (int) icon->fHeight * (icon->fScale + g_fFieldDepth);
 		rect.height = (int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor));
 	}
 	//g_print ("rect (%d;%d) (%dx%d)\n", rect.x, rect.y, rect.width, rect.height);
@@ -811,4 +812,16 @@ void cairo_dock_get_window_position_and_geometry_at_balance (CairoDock *pDock, C
 	}
 	
 	cairo_dock_set_window_position_at_balance (pDock, *iNewWidth, *iNewHeight);
+}
+
+double cairo_dock_calculate_extra_width_for_trapeze (double fFrameHeight, double fInclination, double fRadius, double fLineWidth)
+{
+	if (2 * fRadius > fFrameHeight + fLineWidth)
+		fRadius = (fFrameHeight + fLineWidth) / 2 - 1;
+	double fDeltaXForLoop = (fFrameHeight + fLineWidth - 2 * fRadius) * fInclination;
+	//double fDeltaCornerForLoop = fRadius * (1 + fInclination / sqrt (1 + fInclination * fInclination)) * fInclination;
+	double cosa = 1. / sqrt (1 + fInclination * fInclination);
+	double sina = cosa * fInclination;
+	double fDeltaCornerForLoop = fRadius * cosa + fRadius * (1 + sina) * fInclination;
+	return (2 * (fLineWidth/2 + fDeltaXForLoop + fDeltaCornerForLoop + g_iFrameMargin));
 }

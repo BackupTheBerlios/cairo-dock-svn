@@ -69,6 +69,7 @@ void cairo_dock_set_renderer (CairoDock *pDock, gchar *cRendererName)
 	pDock->render = pRenderer->render;
 	pDock->render_optimized = pRenderer->render_optimized;
 	pDock->set_subdock_position = pRenderer->set_subdock_position;
+	pDock->bUseReflect = pRenderer->bUseReflect;
 }
 
 
