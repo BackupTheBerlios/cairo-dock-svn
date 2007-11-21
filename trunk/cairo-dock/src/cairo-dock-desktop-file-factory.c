@@ -31,7 +31,7 @@ extern gchar *g_cLanguage;
 
 gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, const gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur)
 {
-	//g_print ("%s (%s)\n", __func__, cFilePath);
+	g_print ("%s (%s)\n", __func__, cURI);
 	double fEffectiveOrder;
 	if (fOrder == CAIRO_DOCK_LAST_ORDER)
 	{
@@ -76,9 +76,9 @@ gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, const gchar *cDockName
 		g_free (cNewDesktopFilePath);
 		g_key_file_free (pKeyFile);
 	}
-	else if (g_str_has_suffix (cURI, ".desktop") && strncmp (cURI, "file://", 7) == 0)
+	else if (g_str_has_suffix (cURI, ".desktop") && (strncmp (cURI, "file://", 7) == 0 || *cURI == '/'))
 	{
-		gchar *cFilePath = cURI + 7;  // on saute le "file://".
+		gchar *cFilePath = (*cURI == '/' ? cURI : cURI + 7);  // on saute le "file://".
 		gchar *cBaseName = g_path_get_basename (cFilePath);
 		cNewDesktopFileName = cairo_dock_generate_desktop_filename (cBaseName, g_cCurrentLaunchersPath);
 		g_free (cBaseName);

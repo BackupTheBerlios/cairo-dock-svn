@@ -260,7 +260,7 @@ static void cairo_dock_add_launcher (GtkMenuItem *menu_item, gpointer *data)
 		{
 			cFilePath = pSelectedFile->data;
 			cDockName = cairo_dock_search_dock_name (pDock);
-			cairo_dock_add_desktop_file_from_uri (cFilePath, cDockName, CAIRO_DOCK_LAST_ORDER, pDock, &erreur);
+			cDesktopFileName = cairo_dock_add_desktop_file_from_uri (cFilePath, cDockName, CAIRO_DOCK_LAST_ORDER, pDock, &erreur);
 			if (erreur != NULL)
 			{
 				g_print ("Attention : %s\n", erreur->message);
@@ -269,8 +269,8 @@ static void cairo_dock_add_launcher (GtkMenuItem *menu_item, gpointer *data)
 				continue;
 			}
 			
-			cDesktopFileName = g_path_get_basename (cFilePath);
 			pNewIcon = cairo_dock_create_icon_from_desktop_file (cDesktopFileName, pCairoContext);
+			g_free (cDesktopFileName);
 			
 			cairo_dock_insert_icon_in_dock (pNewIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 			
