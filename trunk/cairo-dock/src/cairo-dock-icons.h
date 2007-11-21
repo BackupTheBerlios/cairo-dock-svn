@@ -71,7 +71,7 @@ void cairo_dock_remove_all_separators (CairoDock *pDock);
 
 GList * cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, int iMinDockWidth, int iXOffset);
 
-Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElement, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight, double fAlign, double fLateralFactor, int iMaxIconHeight);
+Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElement, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight, double fAlign, double fLateralFactor);
 
 Icon *cairo_dock_apply_wave_effect (CairoDock *pDock);
 

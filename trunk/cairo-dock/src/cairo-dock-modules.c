@@ -79,7 +79,7 @@ gchar *cairo_dock_extract_module_name_from_path (gchar *cSoFilePath)
 
 static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **erreur)
 {
-	GModule *module = g_module_open (pCairoDockModule->cSoFilePath, G_MODULE_BIND_LAZY);
+	GModule *module = g_module_open (pCairoDockModule->cSoFilePath, G_MODULE_BIND_LAZY | G_MODULE_BIND_LOCAL);
 	if (!module)
 	{
 		g_set_error (erreur, 1, 1, "Attention : while opening module '%s' : (%s)", pCairoDockModule->cSoFilePath, g_module_error ());

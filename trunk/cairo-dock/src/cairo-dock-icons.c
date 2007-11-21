@@ -50,7 +50,6 @@ extern gchar *g_cCurrentLaunchersPath;
 
 extern double g_fAmplitude;
 extern int g_iSinusoidWidth;
-extern double g_fFieldDepth;
 
 extern double g_fUnfoldAcceleration;
 extern gboolean g_bAutoHide;
@@ -72,6 +71,7 @@ void cairo_dock_free_icon (Icon *icon)
 	g_print ("%s (%s)\n", __func__, icon->acName);
 	
 	cairo_dock_remove_dialog_if_any (icon);
+	cairo_dock_unregister_appli (icon);
 	
 	g_free (icon->acDesktopFileName);
 	g_free (icon->acFileName);
@@ -79,11 +79,12 @@ void cairo_dock_free_icon (Icon *icon)
 	g_free (icon->acCommand);
 	g_free (icon->cBaseURI);
 	g_free (icon->cParentDockName);  // on ne liberera pas le sous-dock ici sous peine de se mordre la queue, donc il faut le faire avant.
+	g_free (icon->cClass);
 	
 	cairo_surface_destroy (icon->pIconBuffer);
+	cairo_surface_destroy (icon->pReflectionBuffer);
+	cairo_surface_destroy (icon->pFullIconBuffer);
 	cairo_surface_destroy (icon->pTextBuffer);
-	
-	cairo_dock_unregister_appli (icon);
 	
 	cairo_dock_free_module (icon->pModule);
 	
@@ -668,7 +669,7 @@ GList *cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, in
 	return pFirstDrawnElement;
 }
 
-Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, int iFlatDockWidth, int iWidth, int iHeight, double fAlign, double fFoldingFactor, int iMaxIconHeight)
+Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, int iFlatDockWidth, int iWidth, int iHeight, double fAlign, double fFoldingFactor)
 {
 	//g_print (">>>>>%s (%d/%d, %dx%d)\n", __func__, x_abs, iFlatDockWidth, iWidth, iHeight);
 	if (x_abs < 0 && iWidth > 0)
@@ -728,7 +729,7 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 			if (icon->fPersonnalScale > -0.05)
 				icon->fPersonnalScale = -0.05;
 		}
-		icon->fY = (g_bDirectionUp ? iHeight - g_iDockLineWidth - (iMaxIconHeight * g_fFieldDepth + g_iFrameMargin) - icon->fScale * icon->fHeight : g_iDockLineWidth + (iMaxIconHeight * g_fFieldDepth + g_iFrameMargin));
+		icon->fY = (g_bDirectionUp ? iHeight - g_iDockLineWidth - g_iFrameMargin - icon->fScale * icon->fHeight : g_iDockLineWidth + g_iFrameMargin);
 		
 		//\_______________ Si on avait deja defini l'icone pointee, on peut placer l'icone courante par rapport a la precedente.
 		if (pointed_ic != NULL)
@@ -815,7 +816,7 @@ Icon *cairo_dock_apply_wave_effect (CairoDock *pDock)
 	
 	//\_______________ On calcule l'ensemble des parametres des icones.
 	double fMagnitude = cairo_dock_calculate_magnitude (pDock->iMagnitudeIndex);
-	Icon *pPointedIcon = cairo_dock_calculate_wave_with_position_linear (pDock->icons, pDock->pFirstDrawnElement, x_abs, fMagnitude, pDock->iFlatDockWidth, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->fAlign, pDock->fFoldingFactor, pDock->iMaxIconHeight);  // iMaxDockWidth
+	Icon *pPointedIcon = cairo_dock_calculate_wave_with_position_linear (pDock->icons, pDock->pFirstDrawnElement, x_abs, fMagnitude, pDock->iFlatDockWidth, pDock->iCurrentWidth, pDock->iCurrentHeight, pDock->fAlign, pDock->fFoldingFactor);  // iMaxDockWidth
 	return pPointedIcon;
 }
 
@@ -938,7 +939,7 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 	{
 		icon = ic->data;
 		
-		cairo_dock_calculate_wave_with_position_linear (pIconList, pFirstDrawnElement, icon->fXAtRest, 1, iFlatDockWidth, 0, 0, 0.5, 0, 0);
+		cairo_dock_calculate_wave_with_position_linear (pIconList, pFirstDrawnElement, icon->fXAtRest, 1, iFlatDockWidth, 0, 0, 0.5, 0);
 		ic2 = pFirstDrawnElement;
 		do
 		{
@@ -952,7 +953,7 @@ double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawn
 			ic2 = cairo_dock_get_next_element (ic2, pDock->icons);
 		} while (ic2 != pFirstDrawnElement);
 	}
-	cairo_dock_calculate_wave_with_position_linear (pIconList, pFirstDrawnElement, iFlatDockWidth - 1, 1, iFlatDockWidth, 0, 0, pDock->fAlign, 0, 0);  // pDock->fFoldingFactor
+	cairo_dock_calculate_wave_with_position_linear (pIconList, pFirstDrawnElement, iFlatDockWidth - 1, 1, iFlatDockWidth, 0, 0, pDock->fAlign, 0);  // pDock->fFoldingFactor
 	ic = pFirstDrawnElement;
 	do
 	{

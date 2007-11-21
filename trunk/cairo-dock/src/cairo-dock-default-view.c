@@ -40,9 +40,6 @@ extern gint g_iFrameMargin;
 extern gint g_iStringLineWidth;
 extern double g_fStringColor[4];
 
-extern double g_fFieldDepth;
-extern double g_fInclinationOnHorizon;
-
 extern gboolean g_bDirectionUp;
 extern double g_fAmplitude;
 extern int g_iLabelSize;
@@ -77,18 +74,19 @@ void cairo_dock_calculate_max_dock_size_linear (CairoDock *pDock)
 {
 	pDock->pFirstDrawnElement = cairo_dock_calculate_icons_positions_at_rest_linear (pDock->icons, pDock->iFlatDockWidth, pDock->iScrollOffset);
 	
-	pDock->iDecorationsHeight = (pDock->iMaxIconHeight * (1. + g_fFieldDepth) + 2 * g_iFrameMargin) / sqrt (1 + g_fInclinationOnHorizon * g_fInclinationOnHorizon);
+	pDock->iDecorationsHeight = pDock->iMaxIconHeight + 2 * g_iFrameMargin;
 	
-	double fExtraWidth = cairo_dock_calculate_extra_width_for_trapeze (pDock->iDecorationsHeight, g_fInclinationOnHorizon, g_iDockRadius, g_iDockLineWidth);
+	double fRadius = MIN (g_iDockRadius, (pDock->iDecorationsHeight + g_iDockLineWidth) / 2 - 1);
+	double fExtraWidth = g_iDockLineWidth + 2 * (fRadius + g_iFrameMargin);
 	pDock->iMaxDockWidth = ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->iFlatDockWidth, 1., fExtraWidth));
 	pDock->iMaxDockWidth = MIN (pDock->iMaxDockWidth, g_iMaxAuthorizedWidth);
 	
-	pDock->iMaxDockHeight = (int) ((1 + g_fAmplitude + g_fFieldDepth) * pDock->iMaxIconHeight) + g_iLabelSize + g_iDockLineWidth + g_iFrameMargin;
+	pDock->iMaxDockHeight = (int) ((1 + g_fAmplitude) * pDock->iMaxIconHeight) + g_iLabelSize + g_iDockLineWidth + g_iFrameMargin;
 	
 	pDock->iDecorationsWidth = pDock->iMaxDockWidth;
 	
 	pDock->iMinDockWidth = pDock->iFlatDockWidth + fExtraWidth;
-	pDock->iMinDockHeight = pDock->iMaxIconHeight * (1. + g_fFieldDepth) + 2 * g_iFrameMargin + 2 * g_iDockLineWidth;
+	pDock->iMinDockHeight = pDock->iMaxIconHeight + 2 * g_iFrameMargin + 2 * g_iDockLineWidth;
 }
 
 
@@ -131,12 +129,11 @@ void cairo_dock_render_linear (CairoDock *pDock)
 	int sens;
 	double fDockOffsetX, fDockOffsetY;  // Offset du coin haut gauche du cadre.
 	Icon *pFirstIcon = cairo_dock_get_first_drawn_icon (pDock);
-	//fDockOffsetX = (pFirstIcon != NULL ? pFirstIcon->fX + fChangeAxes - fMargin + g_fInclinationOnHorizon * (pDock->iDecorationsHeight - (g_iFrameMargin + .5*g_iDockLineWidth + pDock->iMaxIconHeight * g_fFieldDepth)) : fRadius + fLineWidth / 2);
 	fDockOffsetX = (pFirstIcon != NULL ? pFirstIcon->fX + 0 - fMargin : fRadius + fLineWidth / 2);  // fChangeAxes
-	/*if (fDockOffsetX - (fRadius + fLineWidth / 2) < 0)
+	if (fDockOffsetX - (fRadius + fLineWidth / 2) < 0)
 		fDockOffsetX = fRadius + fLineWidth / 2;
-	if (fDockOffsetX + fDockWidth - (fRadius + fLineWidth / 2) > pDock->iCurrentWidth)
-		fDockWidth = MAX (pDock->iCurrentWidth - fDockOffsetX + (fRadius + fLineWidth / 2), 2 * fRadius + fLineWidth);*/
+	if (fDockOffsetX + fDockWidth + (fRadius + fLineWidth / 2) > pDock->iCurrentWidth)
+		fDockWidth = pDock->iCurrentWidth - fDockOffsetX - (fRadius + fLineWidth / 2);
 	if (g_bDirectionUp)
 	{
 		sens = 1;
@@ -149,7 +146,7 @@ void cairo_dock_render_linear (CairoDock *pDock)
 	}
 	
 	cairo_save (pCairoContext);
-	cairo_dock_draw_frame (pCairoContext, fRadius, fLineWidth, fDockWidth, pDock->iDecorationsHeight, fDockOffsetX, fDockOffsetY, sens, g_fInclinationOnHorizon, pDock->bHorizontalDock);
+	cairo_dock_draw_frame (pCairoContext, fRadius, fLineWidth, fDockWidth, pDock->iDecorationsHeight, fDockOffsetX, fDockOffsetY, sens, 0., pDock->bHorizontalDock);
 	
 	//\____________________ On dessine les decorations dedans.
 	fDockOffsetY = (g_bDirectionUp ? pDock->iCurrentHeight - pDock->iDecorationsHeight - fLineWidth : fLineWidth);
@@ -329,7 +326,7 @@ void cairo_dock_register_default_renderer (void)
 	pDefaultRenderer->render = cairo_dock_render_linear;
 	pDefaultRenderer->render_optimized = cairo_dock_render_optimized_linear;
 	pDefaultRenderer->set_subdock_position = cairo_dock_set_subdock_position_linear;
-	pDefaultRenderer->bUseReflect = TRUE;
+	pDefaultRenderer->bUseReflect = FALSE;
 	
 	cairo_dock_register_renderer (CAIRO_DOCK_DEFAULT_RENDERER_NAME, pDefaultRenderer);
 }

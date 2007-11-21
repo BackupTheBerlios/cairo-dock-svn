@@ -25,5 +25,6 @@
 #include "cairo-dock-gui-factory.h"
 #include "cairo-dock-surface-factory.h"
 #include "cairo-dock-renderer-manager.h"
+#include "cairo-dock-default-view.h"
 
 #endif

@@ -197,6 +197,7 @@ struct _Icon {
 	cairo_surface_t* pIconBuffer;
 	cairo_surface_t* pTextBuffer;
 	cairo_surface_t* pReflectionBuffer;
+	cairo_surface_t* pFullIconBuffer;
 	int iTextWidth;
 	int iTextHeight;
 	gdouble fTextXOffset;

@@ -47,10 +47,10 @@ extern double g_fScrollAcceleration;
 extern int g_iSinusoidWidth;
 extern double g_fAmplitude;
 extern int g_iIconGap;
-
-extern double g_fFieldDepth;
-extern double g_fInclinationOnHorizon;
+extern double g_fReflectSize;
 extern double g_fAlbedo;
+extern gboolean g_bDynamicReflection;
+extern double g_fAlphaAtRest;
 
 extern gboolean g_bAutoHide;
 extern double g_fVisibleZoneAlpha;
@@ -165,12 +165,20 @@ gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 		
 		gchar* cGroupNameUpperCase = g_ascii_strup (cGroupName, -1);
 		bValue = g_key_file_get_boolean (pKeyFile, cGroupNameUpperCase, cKeyName, &erreur);
+		g_free (cGroupNameUpperCase);
 		if (erreur != NULL)
 		{
 			g_error_free (erreur);
-			bValue = bDefaultValue;
+			erreur = NULL;
+			bValue = g_key_file_get_boolean (pKeyFile, "Cairo Dock", cKeyName, &erreur);
+			if (erreur != NULL)
+			{
+				g_error_free (erreur);
+				bValue = bDefaultValue;
+			}
+			else
+				g_print (" (recuperee)\n");
 		}
-		g_free (cGroupNameUpperCase);
 		
 		g_key_file_set_boolean (pKeyFile, cGroupName, cKeyName, bValue);
 		*bFlushConfFileNeeded = TRUE;
@@ -192,7 +200,15 @@ int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gch
 		if (erreur != NULL)
 		{
 			g_error_free (erreur);
-			iValue = iDefaultValue;
+			erreur = NULL;
+			iValue = g_key_file_get_integer (pKeyFile, "Cairo Dock", cKeyName, &erreur);
+			if (erreur != NULL)
+			{
+				g_error_free (erreur);
+				iValue = iDefaultValue;
+			}
+			else
+				g_print (" (recuperee)\n");
 		}
 		g_free (cGroupNameUpperCase);
 		
@@ -216,7 +232,15 @@ double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 		if (erreur != NULL)
 		{
 			g_error_free (erreur);
-			fValue = fDefaultValue;
+			erreur = NULL;
+			fValue = g_key_file_get_double (pKeyFile, "Cairo Dock", cKeyName, &erreur);
+			if (erreur != NULL)
+			{
+				g_error_free (erreur);
+				fValue = fDefaultValue;
+			}
+			else
+				g_print (" (recuperee)\n");
 		}
 		g_free (cGroupNameUpperCase);
 		
@@ -240,7 +264,15 @@ gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 		if (erreur != NULL)
 		{
 			g_error_free (erreur);
-			cValue = g_strdup (cDefaultValue);
+			erreur = NULL;
+			cValue = g_key_file_get_string (pKeyFile, "Cairo Dock", cKeyName, &erreur);
+			if (erreur != NULL)
+			{
+				g_error_free (erreur);
+				cValue = g_strdup (cDefaultValue);
+			}
+			else
+				g_print (" (recuperee)\n");
 		}
 		g_free (cGroupNameUpperCase);
 		
@@ -273,6 +305,18 @@ void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cGroupNam
 		if (erreur != NULL)
 		{
 			g_error_free (erreur);
+			erreur = NULL;
+			iValuesList = g_key_file_get_integer_list (pKeyFile, "Cairo Dock", cKeyName, &length, &erreur);
+			if (erreur != NULL)
+			{
+				g_error_free (erreur);
+			}
+			else
+			{
+				g_print (" (recuperee)\n");
+				if (length > 0)
+					memcpy (iValueBuffer, iValuesList, MIN (iNbElements, length) * sizeof (int));
+			}
 		}
 		else
 		{
@@ -310,6 +354,18 @@ void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 		if (erreur != NULL)
 		{
 			g_error_free (erreur);
+			erreur = NULL;
+			fValuesList = g_key_file_get_double_list (pKeyFile, "Cairo Dock", cKeyName, &length, &erreur);
+			if (erreur != NULL)
+			{
+				g_error_free (erreur);
+			}
+			else
+			{
+				g_print (" (recuperee)\n");
+				if (length > 0)
+					memcpy (fValueBuffer, fValuesList, MIN (iNbElements, length) * sizeof (double));
+			}
 		}
 		else
 		{
@@ -467,43 +523,6 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_free (g_cMainDockDefaultRendererName);
 	g_cMainDockDefaultRendererName = cairo_dock_get_string_key_value (pKeyFile, "Cairo Dock", "main dock view", &bFlushConfFileNeeded, CAIRO_DOCK_DEFAULT_RENDERER_NAME);
 	
-	g_iMaxAuthorizedWidth = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "max autorized width", &bFlushConfFileNeeded, 0);
-	
-	g_iScrollAmount = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "scroll amount", &bFlushConfFileNeeded, FALSE);
-	
-	g_bResetScrollOnLeave = cairo_dock_get_boolean_key_value (pKeyFile, "Cairo Dock", "reset scroll", &bFlushConfFileNeeded, TRUE);
-	
-	g_fScrollAcceleration = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "reset scroll acceleration", &bFlushConfFileNeeded, 0.9);
-	
-	g_fAmplitude = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "amplitude", &bFlushConfFileNeeded, 1.0);
-	
-	g_iSinusoidWidth = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "sinusoid width", &bFlushConfFileNeeded, 250);
-	g_iSinusoidWidth = MAX (1, g_iSinusoidWidth);
-	
-	g_iIconGap = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "icon gap", &bFlushConfFileNeeded, 0);
-	
-	g_iDockRadius = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "corner radius", &bFlushConfFileNeeded, 12);
-
-	g_iDockLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "line width", &bFlushConfFileNeeded, 2);
-	
-	g_iFrameMargin = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "frame margin", &bFlushConfFileNeeded, 2);
-	
-	g_fFieldDepth = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "field depth", &bFlushConfFileNeeded, 0.75);
-	
-	 double fInclinationAngle = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "inclination", &bFlushConfFileNeeded, 45.);
-	 g_fInclinationOnHorizon = tan (fInclinationAngle * G_PI / 180.);
-	
-	g_fAlbedo = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "albedo", &bFlushConfFileNeeded, .9);
-	
-	double couleur[4] = {0., 0., 0.6, 0.4};
-	cairo_dock_get_double_list_key_value (pKeyFile, "Cairo Dock", "line color", &bFlushConfFileNeeded, g_fLineColor, 4, couleur);
-	
-	g_bRoundedBottomCorner = cairo_dock_get_boolean_key_value (pKeyFile, "Cairo Dock", "rounded bottom corner", &bFlushConfFileNeeded, TRUE);
-	
-	g_iStringLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "string width", &bFlushConfFileNeeded, 0);
-	
-	cairo_dock_get_double_list_key_value (pKeyFile, "Cairo Dock", "string color", &bFlushConfFileNeeded, g_fStringColor, 4, couleur);
-	
 	double fUserValue = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "unfold factor", &bFlushConfFileNeeded, 8.);
 	g_fUnfoldAcceleration = 1 - pow (2, - fUserValue);
 	
@@ -535,11 +554,20 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_iLeaveSubDockDelay = cairo_dock_get_integer_key_value (pKeyFile, "Sub-Docks", "leaving delay", &bFlushConfFileNeeded, 250);
 	g_iShowSubDockDelay = cairo_dock_get_integer_key_value (pKeyFile, "Sub-Docks", "show delay", &bFlushConfFileNeeded, 300);
 	
-	//\___________________ On recupere les parametres du fond.
-	g_fStripesSpeedFactor = cairo_dock_get_double_key_value (pKeyFile, "Background", "scroll speed factor", &bFlushConfFileNeeded, 1.0);
-	g_fStripesSpeedFactor = MIN (1., g_fStripesSpeedFactor);
 	
-	g_bDecorationsFollowMouse = cairo_dock_get_boolean_key_value (pKeyFile, "Background", "decorations enslaved", &bFlushConfFileNeeded, TRUE);
+	//\___________________ On recupere les parametres du fond.
+	g_iDockRadius = cairo_dock_get_integer_key_value (pKeyFile, "Background", "corner radius", &bFlushConfFileNeeded, 12);
+
+	g_iDockLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Background", "line width", &bFlushConfFileNeeded, 2);
+	
+	g_iFrameMargin = cairo_dock_get_integer_key_value (pKeyFile, "Background", "frame margin", &bFlushConfFileNeeded, 2);
+	
+	double couleur[4] = {0., 0., 0.6, 0.4};
+	cairo_dock_get_double_list_key_value (pKeyFile, "Background", "line color", &bFlushConfFileNeeded, g_fLineColor, 4, couleur);
+	
+	g_bRoundedBottomCorner = cairo_dock_get_boolean_key_value (pKeyFile, "Background", "rounded bottom corner", &bFlushConfFileNeeded, TRUE);
+	
+	g_iMaxAuthorizedWidth = cairo_dock_get_integer_key_value (pKeyFile, "Background", "max autorized width", &bFlushConfFileNeeded, 0);
 	
 	double couleur2[4] = {.7, .9, .7, .4};
 	cairo_dock_get_double_list_key_value (pKeyFile, "Background", "stripes color bright", &bFlushConfFileNeeded, g_fStripesColorBright, 4, couleur2);
@@ -564,6 +592,38 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	cairo_dock_get_double_list_key_value (pKeyFile, "Background", "stripes color dark", &bFlushConfFileNeeded, g_fStripesColorDark, 4, couleur3);
 	
 	g_fStripesAngle = cairo_dock_get_double_key_value (pKeyFile, "Background", "stripes angle", &bFlushConfFileNeeded, 30.);
+	
+	g_fStripesSpeedFactor = cairo_dock_get_double_key_value (pKeyFile, "Background", "scroll speed factor", &bFlushConfFileNeeded, 1.0);
+	g_fStripesSpeedFactor = MIN (1., g_fStripesSpeedFactor);
+	
+	g_bDecorationsFollowMouse = cairo_dock_get_boolean_key_value (pKeyFile, "Background", "decorations enslaved", &bFlushConfFileNeeded, TRUE);
+	
+	
+	//\___________________ On recupere les parametres des icones.
+	double fFieldDepth = cairo_dock_get_double_key_value (pKeyFile, "Icons", "field depth", &bFlushConfFileNeeded, 0.7);
+	
+	g_bDynamicReflection = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "dynamic reflection", &bFlushConfFileNeeded, FALSE);
+	
+	g_fAlbedo = cairo_dock_get_double_key_value (pKeyFile, "Icons", "albedo", &bFlushConfFileNeeded, .6);
+	
+	g_fAmplitude = cairo_dock_get_double_key_value (pKeyFile, "Icons", "amplitude", &bFlushConfFileNeeded, 1.0);
+	
+	g_iSinusoidWidth = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "sinusoid width", &bFlushConfFileNeeded, 250);
+	g_iSinusoidWidth = MAX (1, g_iSinusoidWidth);
+	
+	g_iIconGap = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "icon gap", &bFlushConfFileNeeded, 0);
+	
+	g_iStringLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "string width", &bFlushConfFileNeeded, 0);
+	
+	cairo_dock_get_double_list_key_value (pKeyFile, "Icons", "string color", &bFlushConfFileNeeded, g_fStringColor, 4, couleur);
+	
+	g_fAlphaAtRest = cairo_dock_get_double_key_value (pKeyFile, "Icons", "alpha at rest", &bFlushConfFileNeeded, 1.);
+	
+	g_iScrollAmount = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "scroll amount", &bFlushConfFileNeeded, FALSE);
+	
+	g_bResetScrollOnLeave = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "reset scroll", &bFlushConfFileNeeded, TRUE);
+	
+	g_fScrollAcceleration = cairo_dock_get_double_key_value (pKeyFile, "Icons", "reset scroll acceleration", &bFlushConfFileNeeded, 0.9);
 	
 	
 	//\___________________ On recupere les parametres des lanceurs.
@@ -688,6 +748,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_bRevolveSeparator = cairo_dock_get_boolean_key_value (pKeyFile, "Separators", "revolve separator image", &bFlushConfFileNeeded, TRUE);
 	
+	
 	//\___________________ On (re)charge tout, car n'importe quel parametre peut avoir change.
 	if (cScreenBorder == NULL || strcmp (cScreenBorder, "bottom") == 0)
 	{
@@ -716,6 +777,27 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	if (g_iMaxAuthorizedWidth == 0)
 		g_iMaxAuthorizedWidth = g_iScreenWidth[pDock->bHorizontalDock];
 	
+	g_fReflectSize = 0;
+	guint i;
+	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)
+	{
+		if (g_tMinIconAuthorizedSize[i] > 0)
+			g_fReflectSize = MAX (g_fReflectSize, g_tMinIconAuthorizedSize[i]);
+	}
+	if (g_fReflectSize == 0)  // on n'a pas trouve de taille minimale, on va essayer avec la taille max.
+	{
+		for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)
+		{
+			if (g_tMaxIconAuthorizedSize[i] > 0)
+				g_fReflectSize = MAX (g_fReflectSize, g_tMaxIconAuthorizedSize[i]);
+		}
+		if (g_fReflectSize > 0)
+			g_fReflectSize = MIN (48, g_fReflectSize);
+		else
+			g_fReflectSize = 48;
+	}
+	g_fReflectSize *= fFieldDepth;
+	g_print ("  g_fReflectSize : %.2f pixels\n", g_fReflectSize);
 	
 	cairo_dock_remove_all_applets (pDock);  // on est obliges d'arreter tous les applets.
 	
@@ -758,7 +840,6 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_free (cVisibleZoneImageFile);
 	
 	cairo_dock_load_background_decorations (pDock);
-	///cairo_dock_load_default_icon (pDock);
 	
 	
 	pDock->iMouseX = 0;  // on se place hors du dock initialement.
@@ -802,11 +883,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	if (bFlushConfFileNeeded)
 	{
 		cairo_dock_flush_conf_file (pKeyFile, cConfFilePath, CAIRO_DOCK_SHARE_DATA_DIR);
-		/*gchar *cCommand = g_strdup_printf ("/bin/cp %s/cairo-dock-%s.conf %s", CAIRO_DOCK_SHARE_DATA_DIR, g_cLanguage, cConfFilePath);
-		system (cCommand);
-		g_free (cCommand);
 		
-		cairo_dock_replace_values_in_conf_file (cConfFilePath, pKeyFile, TRUE, 0);*/
 		cairo_dock_update_conf_file_with_available_modules (cConfFilePath);
 		cairo_dock_update_conf_file_with_translations (cConfFilePath, CAIRO_DOCK_SHARE_DATA_DIR);
 	}

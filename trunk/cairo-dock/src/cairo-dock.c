@@ -116,9 +116,9 @@ double g_fLineColor[4];  // la couleur du cadre.
 gint g_iStringLineWidth;  // epaisseur de la ficelle.
 double g_fStringColor[4];  // la couleur de la ficelle.
 
-double g_fFieldDepth;  // profondeur de champ de la vue en plan incline, en fraction de la hauteur max des icones.
-double g_fInclinationOnHorizon;  // inclinaison de la ligne de fuite vers l'horizon.
+double g_fReflectSize;  // taille des reflets, en pixels, calcules par rapport a la hauteur max des icones.
 double g_fAlbedo;  // pouvoir reflechissant du plan.
+gboolean g_bDynamicReflection;  // dis s'il faut recalculer en temps reel le degrade en transparence des reflets.
 
 cairo_surface_t *g_pVisibleZoneSurface = NULL;  // surface de la zone de rappel.
 double g_fVisibleZoneAlpha;  // transparence de la zone de rappel.
@@ -161,6 +161,8 @@ int g_iLabelStyle;  // italique ou droit.
 gboolean g_bLabelForPointedIconOnly;  // n'afficher les etiquettes que pour l'icone pointee.
 double g_fLabelAlphaThreshold;  // seuil de visibilité de etiquettes.
 gboolean g_bTextAlwaysHorizontal;  // true <=> etiquettes horizontales meme pour les docks verticaux.
+
+double g_fAlphaAtRest;
 
 double g_fUnfoldAcceleration = 0;
 int g_iGrowUpInterval;
@@ -212,7 +214,6 @@ main (int argc, char** argv)
 	
 	
 	gtk_init (&argc, &argv);
-	g_fInclinationOnHorizon = tan (35. * G_PI / 180.);
 	
 	//\___________________ On recupere quelques options.
 	g_iWmHint = GDK_WINDOW_TYPE_HINT_DOCK;
@@ -230,7 +231,7 @@ main (int argc, char** argv)
 		}
 		else if (strcmp (argv[i], "--no-glitz") == 0)
 		{
-			g_bUseGlitz = FALSE;
+			g_print ("Attention : this option is useless, glitz being not activated by default\n");
 		}
 		else if (strcmp (argv[i], "--no-keep-above") == 0)
 			g_bKeepAbove = FALSE;
@@ -327,6 +328,7 @@ main (int argc, char** argv)
 	g_cConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
 	if (! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS))
 	{
+		cairo_dock_mark_theme_as_modified (FALSE);
 		int r;
 		while ((r = cairo_dock_ask_initial_theme ()) == 0);
 		if (r == -1)

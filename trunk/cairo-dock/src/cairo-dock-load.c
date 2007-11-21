@@ -136,6 +136,8 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	icon->pIconBuffer = NULL;
 	cairo_surface_destroy (icon->pReflectionBuffer);
 	icon->pReflectionBuffer = NULL;
+	cairo_surface_destroy (icon->pFullIconBuffer);
+	icon->pFullIconBuffer = NULL;
 	
 	if (CAIRO_DOCK_IS_LAUNCHER (icon))
 	{
@@ -192,9 +194,16 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 		g_free (cIconPath);
 	}
 	
-	if (g_fAlbedo > 0 && icon->pIconBuffer != NULL)
+	if (g_fAlbedo > 0 && icon->pIconBuffer != NULL && ! (CAIRO_DOCK_IS_APPLET (icon) && icon->acFileName == NULL))
 	{
 		icon->pReflectionBuffer = cairo_dock_create_reflection_surface (icon->pIconBuffer,
+			pSourceContext,
+			(bHorizontalDock ? icon->fWidth : icon->fHeight) * fMaxScale,
+			(bHorizontalDock ? icon->fHeight : icon->fWidth) * fMaxScale,
+			bHorizontalDock);
+		
+		icon->pFullIconBuffer = cairo_dock_create_icon_surface_with_reflection (icon->pIconBuffer,
+			icon->pReflectionBuffer,
 			pSourceContext,
 			(bHorizontalDock ? icon->fWidth : icon->fHeight) * fMaxScale,
 			(bHorizontalDock ? icon->fHeight : icon->fWidth) * fMaxScale,

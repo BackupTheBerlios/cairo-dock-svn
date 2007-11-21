@@ -423,6 +423,19 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	}
 	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
+	if (pDock->iRefCount == 0)
+	{
+		Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
+		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL)
+		{
+			if (pDock->iSidLeaveDemand == 0)
+			{
+				g_print ("  on retarde la sortie\n");
+				pDock->iSidLeaveDemand = g_timeout_add (g_iLeaveSubDockDelay, (GSourceFunc) _cairo_dock_emit_leave_signal, (gpointer) pDock);
+				return FALSE;
+			}
+		}
+	}
 	if (pDock->iRefCount > 0)  // on ne le fait que pour les containers.  // pEvent != NULL && 
 	{
 		if (pDock->iSidLeaveDemand == 0)
