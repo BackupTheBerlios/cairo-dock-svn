@@ -343,6 +343,43 @@ main (int argc, char** argv)
 	if (bDialogTest)
 		g_timeout_add (2000, (GSourceFunc) random_dialog, NULL);  // pour tests seulement.
 	
+	gchar *cSillyMessageFilePath = g_strdup_printf ("%s/.cairo-dock-silly-question", g_cCairoDockDataDir);
+	const gchar *cNumSilllyMessage = "1";
+	const gchar *cSillyMessage = "Le saviez-vous ?\nUtiliser cairo-dock vous rendra beau et intelligent !";
+	gboolean bWriteSillyMessage;
+	if (! g_file_test (cSillyMessageFilePath, G_FILE_TEST_EXISTS))
+	{
+		bWriteSillyMessage = TRUE;
+	}
+	else
+	{
+		gsize length = 0;
+		gchar *cContent = NULL;
+		g_file_get_contents (cSillyMessageFilePath,
+			&cContent,
+			&length,
+			NULL);
+		if (length > 0 && strcmp (cContent, cNumSilllyMessage) == 0)
+			bWriteSillyMessage = FALSE;
+		else
+			bWriteSillyMessage = TRUE;
+		g_free (cContent);
+	}
+	
+	g_file_set_contents (cSillyMessageFilePath,
+		cNumSilllyMessage,
+		-1,
+		NULL);
+	g_free (cSillyMessageFilePath);
+	
+	if (bWriteSillyMessage)
+	{
+		Icon *pFirstIcon = cairo_dock_get_first_icon (g_pMainDock->icons);
+		if (pFirstIcon != NULL)
+			cairo_dock_show_temporary_dialog (cSillyMessage, pFirstIcon, g_pMainDock, 5000);
+	}
+	
+	
 	gtk_main ();
 	
 	rsvg_term ();

@@ -21,6 +21,8 @@
 void cairo_dock_free_icon (Icon *icon);
 
 int cairo_dock_compare_icons_order (Icon *icon1, Icon *icon2);
+GList *cairo_dock_sort_icons_by_order (GList *pIconList);
+GList *cairo_dock_sort_icons_by_name (GList *pIconList);
 
 
 Icon *cairo_dock_get_first_icon (GList *pIconList);

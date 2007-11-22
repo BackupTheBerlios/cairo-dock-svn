@@ -23,6 +23,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-icons.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-surface-factory.h"
+#include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-launcher-factory.h"
 
 extern CairoDock *g_pMainDock;
@@ -247,14 +248,18 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 	}
 	if (bIsContainer && icon->acName != NULL)
 	{
+		gchar *cRendererName = g_key_file_get_string (keyfile, "Desktop Entry", "Renderer", NULL);
 		CairoDock *pChildDock = cairo_dock_search_dock_from_name (icon->acName);
 		if (pChildDock == NULL)
 		{
-			g_print ("le dock fils (%s) n'existe pas, on le cree\n", icon->acName);
-			pChildDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->acName, NULL);
+			g_print ("le dock fils (%s) n'existe pas, on le cree avec la vue %s\n", icon->acName, cRendererName);
+			pChildDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->acName, cRendererName);
 		}
+		else if (cRendererName != NULL)
+			cairo_dock_set_renderer (pChildDock, cRendererName);
 		cairo_dock_reference_dock (pChildDock);
 		icon->pSubDock = pChildDock;
+		g_free (cRendererName);
 	}
 	
 	icon->cParentDockName = g_key_file_get_string (keyfile, "Desktop Entry", "Container", &erreur);

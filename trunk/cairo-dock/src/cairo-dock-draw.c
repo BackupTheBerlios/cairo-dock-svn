@@ -449,7 +449,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		icon->fAlpha = .8;
 	}
 	
-	double fAlpha = icon->fAlpha * fDockMagnitude + g_fAlphaAtRest * (1 - fDockMagnitude);
+	double fAlpha = icon->fAlpha * (fDockMagnitude + g_fAlphaAtRest * (1 - fDockMagnitude));
 	
 	if (bUseReflect && icon->pReflectionBuffer != NULL)  // on dessine les reflets.
 	{

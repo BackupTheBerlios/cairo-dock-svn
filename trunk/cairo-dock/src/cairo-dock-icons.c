@@ -107,6 +107,40 @@ int cairo_dock_compare_icons_order (Icon *icon1, Icon *icon2)
 			return 0;
 	}
 }
+static int cairo_dock_compare_icons_name (Icon *icon1, Icon *icon2)
+{
+	if (icon1->acName == NULL)
+		return -1;
+	if (icon2->acName == NULL)
+		return 1;
+	gchar *cURI_1 = g_ascii_strdown (icon1->acName, -1);
+	gchar *cURI_2 = g_ascii_strdown (icon2->acName, -1);
+	int iOrder = strcmp (cURI_1, cURI_2);
+	g_free (cURI_1);
+	g_free (cURI_2);
+	return iOrder;
+}
+GList *cairo_dock_sort_icons_by_order (GList *pIconList)
+{
+	return g_list_sort (pIconList, (GCompareFunc) cairo_dock_compare_icons_order);
+}
+GList *cairo_dock_sort_icons_by_name (GList *pIconList)
+{
+	GList *pSortedIconList;
+	{
+		pSortedIconList = g_list_sort (pIconList, (GCompareFunc) cairo_dock_compare_icons_name);
+		int iOrder = 0;
+		Icon *icon;
+		GList *ic;
+		for (ic = pIconList; ic != NULL; ic = ic->next)
+		{
+			icon = ic->data;
+			icon->fOrder = iOrder ++;
+		}
+	}
+	return pSortedIconList;
+}
+
 
 
 Icon* cairo_dock_get_first_icon (GList *pIconList)

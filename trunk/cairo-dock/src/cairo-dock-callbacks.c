@@ -370,7 +370,7 @@ gboolean _cairo_dock_emit_leave_signal (CairoDock *pDock)
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
-	g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
+	//g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
 	pDock->iAvoidingMouseIconType = -1;
 	pDock->fAvoidingMouseMargin = 0;
 	pDock->bInside = FALSE;
@@ -421,7 +421,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 		pDock->iSidLeaveDemand = 0;
 		return FALSE;
 	}
-	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
 	if (pDock->iRefCount == 0)
 	{
@@ -430,17 +430,17 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 		{
 			if (pDock->iSidLeaveDemand == 0)
 			{
-				g_print ("  on retarde la sortie\n");
+				//g_print ("  on retarde la sortie\n");
 				pDock->iSidLeaveDemand = g_timeout_add (g_iLeaveSubDockDelay, (GSourceFunc) _cairo_dock_emit_leave_signal, (gpointer) pDock);
 				return FALSE;
 			}
 		}
 	}
-	if (pDock->iRefCount > 0)  // on ne le fait que pour les containers.  // pEvent != NULL && 
+	else  // pEvent != NULL
 	{
 		if (pDock->iSidLeaveDemand == 0)
 		{
-			g_print ("  on retarde la sortie\n");
+			//g_print ("  on retarde la sortie\n");
 			pDock->iSidLeaveDemand = g_timeout_add (g_iLeaveSubDockDelay, (GSourceFunc) _cairo_dock_emit_leave_signal, (gpointer) pDock);
 			return FALSE;
 		}
@@ -495,7 +495,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	{
 		return FALSE;
 	}
-	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
 	pDock->fDecorationsOffsetX = 0;
 	if (! pDock->bIsMainDock)

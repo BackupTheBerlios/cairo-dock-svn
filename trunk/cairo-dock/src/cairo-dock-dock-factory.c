@@ -650,6 +650,9 @@ static void _cairo_dock_deactivate_one_dock (CairoDock *pDock)
 	
 	gtk_widget_destroy (pDock->pWidget);
 	pDock->pWidget = NULL;
+	
+	g_free (pDock->cRendererName);
+	pDock->cRendererName = NULL;
 }
 static gboolean _cairo_dock_free_one_dock (gchar *cDockName, CairoDock *pDock, gpointer data)
 {

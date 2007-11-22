@@ -799,7 +799,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_fReflectSize *= fFieldDepth;
 	g_print ("  g_fReflectSize : %.2f pixels\n", g_fReflectSize);
 	
-	cairo_dock_remove_all_applets (pDock);  // on est obliges d'arreter tous les applets.
+	cairo_dock_remove_all_applets (pDock);  // on est obliges d'arreter tous les applets (c.a.d. les modules ayant une icone dans le dock).
 	
 	if (bUniquePidOld != g_bUniquePid || bGroupAppliByClassOld != g_bGroupAppliByClass || (cairo_dock_application_manager_is_running () && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
 	{
@@ -830,10 +830,10 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	cairo_dock_activate_modules_from_list (cActiveModuleList, pDock);
 	g_strfreev (cActiveModuleList);
 	
-	cairo_dock_set_all_views_to_default ();
+	cairo_dock_set_all_views_to_default ();  // met a jour les tailles des docks.
 	
 	cairo_dock_reserve_space_for_dock (pDock, g_bReserveSpace);
-	cairo_dock_update_dock_size (pDock);
+	///cairo_dock_update_dock_size (pDock);
 	
 	
 	cairo_dock_load_visible_zone (pDock, cVisibleZoneImageFile, g_iVisibleZoneWidth, g_iVisibleZoneHeight, g_fVisibleZoneAlpha);
@@ -845,8 +845,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	pDock->iMouseX = 0;  // on se place hors du dock initialement.
 	pDock->iMouseY = 0;
 	pDock->calculate_icons (pDock);
-	gtk_widget_queue_draw (pDock->pWidget);
-	
+	gtk_widget_queue_draw (pDock->pWidget);  //   // le 'gdk_window_move_resize' ci-dessous ne provoquera pas le redessin si la taille n'a pas change.
 	
 	if (pDock->bAtBottom)
 	{

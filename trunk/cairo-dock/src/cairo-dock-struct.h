@@ -63,7 +63,6 @@ struct _CairoDock {
 	gint iGapY;
 	gdouble fAlign;  // alignement, entre 0 et 1, du dock sur le bord de l'ecran.
 	CairoDockTypeHorizontality bHorizontalDock;  // dit si le dock est horizontal ou vertical.
-	gboolean bUseReflect;  // dit si la vue courante utilise les reflets ou pas (utile pour les plug-ins).
 	
 	gint iMaxIconHeight;  // max des hauteurs des icones.
 	gint iFlatDockWidth;  // largeur du dock a plat, avec juste les icones.
@@ -103,11 +102,13 @@ struct _CairoDock {
 	gint iSidLeaveDemand;  // serial ID du thread qui enverra le signal de sortie retarde.
 	
 	//\_______________ Les fonctions de dessin du dock.
+	gchar *cRendererName;  // nom de la vue, utile pour charger les fonctions de rendu posterieurement a la creation du dock.
 	CairoDockCalculateMaxDockSizeFunc calculate_max_dock_size;
 	CairoDockCalculateIconsFunc calculate_icons;
 	CairoDockRenderFunc render;
 	CairoDockRenderOptimizedFunc render_optimized;
 	CairoDockSetSubDockPositionFunc set_subdock_position;
+	gboolean bUseReflect;  // dit si la vue courante utilise les reflets ou pas (utile pour les plug-ins).
 	
 #ifdef HAVE_GLITZ
 	glitz_drawable_format_t *pDrawFormat;

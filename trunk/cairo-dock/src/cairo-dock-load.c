@@ -517,9 +517,10 @@ cairo_surface_t *cairo_dock_load_stripes (cairo_t* pSourceContext, int iStripesW
 
 void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, int iNewDecorationsWidth, int iNewDecorationsHeight)
 {
-	//g_print ("%s (%dx%d)\n", __func__, iNewDecorationsWidth, iNewDecorationsHeight);
+	g_print ("%s (%dx%d)\n", __func__, iNewDecorationsWidth, iNewDecorationsHeight);
 	if (2 * iNewDecorationsWidth > g_fBackgroundImageWidth || iNewDecorationsHeight > g_fBackgroundImageHeight)
 	{
+		g_print ("  MaJ des decorations du fond\n");
 		cairo_surface_destroy (g_pBackgroundSurface[0]);
 		g_pBackgroundSurface[0] = NULL;
 		cairo_surface_destroy (g_pBackgroundSurface[1]);
