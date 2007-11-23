@@ -344,8 +344,9 @@ main (int argc, char** argv)
 		g_timeout_add (2000, (GSourceFunc) random_dialog, NULL);  // pour tests seulement.
 	
 	gchar *cSillyMessageFilePath = g_strdup_printf ("%s/.cairo-dock-silly-question", g_cCairoDockDataDir);
-	const gchar *cNumSilllyMessage = "1";
-	const gchar *cSillyMessage = "Le saviez-vous ?\nUtiliser cairo-dock vous rendra beau et intelligent !";
+	//const gchar *cSillyMessage = "Le saviez-vous ?\nUtiliser cairo-dock vous rendra beau et intelligent !";
+	const gchar *cSillyMessage = "Le saviez-vous ?\nUtiliser cairo-dock augmentera votre popularité auprès de la gente féminine !";
+	const gchar *cNumSilllyMessage = "2";
 	gboolean bWriteSillyMessage;
 	if (! g_file_test (cSillyMessageFilePath, G_FILE_TEST_EXISTS))
 	{

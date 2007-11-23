@@ -1280,6 +1280,11 @@ void cairo_dock_allow_entrance (void)
 	s_bEntranceAllowed = TRUE;
 }
 
+void cairo_dock_disable_entrance (void)
+{
+	s_bEntranceAllowed = FALSE;
+}
+
 gboolean cairo_dock_entrance_is_allowed (void)
 {
 	return s_bEntranceAllowed;

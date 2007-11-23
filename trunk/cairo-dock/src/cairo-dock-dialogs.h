@@ -14,7 +14,9 @@ CairoDockDialog *cairo_dock_isolate_dialog (Icon *pIcon);
 void cairo_dock_free_dialog (CairoDockDialog *pDialog);
 
 
-CairoDockDialog *cairo_dock_build_dialog (gchar *cText, Icon *pIcon, CairoDock *pDock);
+GtkWidget *cairo_dock_build_interactive_widget_for_dialog (gchar *cInitialAnswer);
+
+CairoDockDialog *cairo_dock_build_dialog (gchar *cText, Icon *pIcon, CairoDock *pDock, gchar *cImageFilePath, GtkWidget *pInteractiveWidget, GtkButtonsType iButtonsType, CairoDockActionOnAnswerFunc pActionFunc);
 
 
 void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int *iX, int *iY, gboolean *bRight, gboolean *bIsPerpendicular, gboolean *bDirectionUp);

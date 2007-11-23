@@ -135,26 +135,35 @@ struct _CairoDockModule {
 	gboolean bActive;
 };
 
+
+typedef void (* CairoDockActionOnAnswerFunc) (const gchar *cAnswer, gpointer data);  // NULL <=> Annuler ou Non.
+
 struct _CairoDockDialog
 {
-	int iWidth;
+	int iWidth;  // dimensions de la fenetre GTK du dialogue.
 	int iHeight;
-	int iPositionX;
+	int iPositionX;  // position de la fenetre GTK du dialogue.
 	int iPositionY;
-	int iAimedX;
+	int iAimedX;  // position visee par la pointe.
 	int iAimedY;
-	gboolean bRight;
-	gboolean bIsPerpendicular;
-	gboolean bDirectionUp;
-	double fRadius;
-	double fTipHeight;
-	cairo_surface_t* pTextBuffer;
-	int iTextWidth;
+	gboolean bRight;  // dialogue a droite <=> pointe a gauche.
+	gboolean bIsPerpendicular;  // TRUE <=> dialogue perpendiculaire au dock.
+	gboolean bDirectionUp;  // TRUE <=> pointe vers le bas.
+	double fRadius;  // rayon des coins.
+	double fTipHeight;  // hauteur de la pointe, sans la partie "aiguisee".
+	cairo_surface_t* pTextBuffer;  // surface du message + icone.
+	int iTextWidth;  // taille de la zone de texte globale (widgets et boutons compris).
 	int iTextHeight;
-	GtkWidget *pWidget;
-	int iSidTimer;
-	int iRefCount;
-	gboolean bBuildComplete;
+	int iMessageHeight;  // hauteur du message + double marge.
+	int iButtonOkOffset;  // decalage pour l'effet de clique sur le bouton.
+	int iButtonCancelOffset;
+	GtkWidget *pWidget;  // la fenetre GTK.
+	int iSidTimer;  // le timer pour la destruction du dialogue.
+	int iRefCount;  // reference atomique.
+	gboolean bBuildComplete;  // TRUE quand la fenetre GTK a atteint sa dimension definitive.
+	GtkWidget *pInteractiveWidget;  // le widget d'interaction utilisateur.
+	int iButtonsType;  // le type des boutons (aucun, oui/non, ok/annuler).
+	CairoDockActionOnAnswerFunc action_on_answer;  // fonction appelee au clique sur l'un des 2 boutons.
 	};
 
 

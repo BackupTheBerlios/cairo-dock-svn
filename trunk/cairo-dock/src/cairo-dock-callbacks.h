@@ -61,6 +61,7 @@ gboolean on_delete (GtkWidget *pWidget, GdkEvent *event, CairoDock *pDock);
 void cairo_dock_activate_temporary_auto_hide (CairoDock *pDock);
 void cairo_dock_deactivate_temporary_auto_hide (void);
 void cairo_dock_allow_entrance (void);
+void cairo_dock_disable_entrance (void);
 gboolean cairo_dock_entrance_is_allowed (void);
 
 
