@@ -1246,7 +1246,8 @@ void on_drag_motion (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, gui
 
 gboolean on_delete (GtkWidget *pWidget, GdkEvent *event, CairoDock *pDock)
 {
-	int answer = cairo_dock_ask_question (pDock, "Quit Cairo-Dock ?");
+	///int answer = cairo_dock_ask_question (pDock, "Quit Cairo-Dock ?");
+	int answer = cairo_dock_ask_general_question_and_wait ("Quit Cairo-Dock ?");
 	if (answer == GTK_RESPONSE_YES)
 		gtk_main_quit ();
 	return FALSE;

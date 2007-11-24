@@ -127,6 +127,11 @@ cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFi
 	return pNewSurface;
 }
 
+cairo_surface_t *cairo_dock_load_image_for_icon (cairo_t *pSourceContext, gchar *cImageFile, double fImageWidth, double fImageHeight)
+{
+	double fImageWidth_ = fImageWidth, fImageHeight_ = fImageHeight;
+	return cairo_dock_load_image (pSourceContext, cImageFile, &fImageWidth_, &fImageHeight_, 0., 1., FALSE);
+}
 
 
 void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdouble fMaxScale, gboolean bHorizontalDock)

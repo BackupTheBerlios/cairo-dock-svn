@@ -27,6 +27,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-themes-manager.h"
 #include "cairo-dock-notifications.h"
+#include "cairo-dock-dialogs.h"
 #include "cairo-dock-menu.h"
 
 #define CAIRO_DOCK_CONF_PANEL_WIDTH 800
@@ -122,7 +123,7 @@ static void cairo_dock_update (GtkMenuItem *menu_item, gpointer *data)
 static void cairo_dock_help (GtkMenuItem *menu_item, gpointer *data)
 {
 	GError *erreur = NULL;
-	g_spawn_command_line_async ("firefox http://doc.ubuntu-fr.org/cairo_dock", &erreur);
+	g_spawn_command_line_async ("firefox http://doc.ubuntu-fr.org/cairo-dock", &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n  you can consult the wiki at http://doc.ubuntu-fr.org/cairo_dock\n", erreur->message);
@@ -154,9 +155,11 @@ gboolean cairo_dock_notification_remove_icon (gpointer *data)
 	if (icon->pSubDock != NULL)
 	{
 		gboolean bDestroyIcons = TRUE;
-		if (icon->cBaseURI == NULL)
+		if (! CAIRO_DOCK_IS_URI_LAUNCHER (icon))  // alors on propose de repartir les icones de son sous-dock dans le dock principal.
 		{
-			int answer = cairo_dock_ask_question (pDock, "Do you want to re-dispatch the icons contained inside this container into the dock (otherwise they will be destroyed) ?");
+			///int answer = cairo_dock_ask_question (pDock, "Do you want to re-dispatch the icons contained inside this container into the dock (otherwise they will be destroyed) ?");
+			int answer = cairo_dock_ask_question_and_wait ("Do you want to re-dispatch the icons contained inside this container into the dock ?\n (otherwise they will be destroyed)", icon, pDock);
+			g_return_val_if_fail (answer != GTK_RESPONSE_NONE, CAIRO_DOCK_LET_PASS_NOTIFICATION);
 			if (answer == GTK_RESPONSE_YES)
 				bDestroyIcons = FALSE;
 		}
@@ -177,8 +180,11 @@ static void cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 	CairoDock *pDock = data[1];
 	
 	gchar *question = g_strdup_printf ("You're about to remove this icon (%s) from the dock. Sure ?", icon->acName);
-	int answer = cairo_dock_ask_question (pDock, question);
+	///int answer = cairo_dock_ask_question (pDock, question);
+	int answer = cairo_dock_ask_question_and_wait (question, icon, pDock);
+	g_print ("reponse : %d\n", answer);
 	g_free (question);
+	g_print ("reponse : %d\n", answer);
 	if (answer == GTK_RESPONSE_YES)
 	{
 		cairo_dock_notify (CAIRO_DOCK_REMOVE_ICON, data);
@@ -337,7 +343,10 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 			if (pNewIcon->pSubDock == NULL)  // ce n'est plus un container.
 			{
 				gboolean bDestroyIcons = TRUE;
-				int answer = cairo_dock_ask_question (pDock, "Do you want to re-dispatch the icons contained inside this container into the dock (otherwise they will be destroyed) ?");
+				///int answer = cairo_dock_ask_question (pDock, "Do you want to re-dispatch the icons contained inside this container into the dock (otherwise they will be destroyed) ?");
+				int answer = GTK_RESPONSE_NONE;
+				while (answer == GTK_RESPONSE_NONE)
+					answer = cairo_dock_ask_question_and_wait ("Do you want to re-dispatch the icons contained inside this container into the dock ?\n (otherwise they will be destroyed)", icon, pDock);
 				if (answer == GTK_RESPONSE_YES)
 					bDestroyIcons = FALSE;
 				cairo_dock_destroy_dock (icon->pSubDock, icon->acName, (bDestroyIcons ? NULL : g_pMainDock), (bDestroyIcons ? NULL : CAIRO_DOCK_MAIN_DOCK_NAME));
@@ -401,8 +410,9 @@ static void cairo_dock_remove_module (GtkMenuItem *menu_item, gpointer *data)
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
 	
-	gchar *question = g_strdup_printf ("You're about to remove this icon (%s) from the dock. Sure ?", icon->acName);
-	int answer = cairo_dock_ask_question (pDock, question);
+	gchar *question = g_strdup_printf ("You're about to remove this module (%s) from the dock. Sure ?", icon->acName);
+	///int answer = cairo_dock_ask_question (pDock, question);
+	int answer = cairo_dock_ask_question_and_wait (question, icon, pDock);
 	if (answer == GTK_RESPONSE_YES)
 	{
 		cairo_dock_remove_icon_from_dock (pDock, icon);  // desactive le module.
@@ -766,7 +776,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 }
 
 
-int cairo_dock_ask_question (CairoDock *pDock, const gchar *cQuestion)
+/*int cairo_dock_ask_question (CairoDock *pDock, const gchar *cQuestion)
 {
 	GtkWidget *pDialog = gtk_message_dialog_new ((pDock != NULL ? GTK_WINDOW (pDock->pWidget) : NULL),
 		GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -777,6 +787,4 @@ int cairo_dock_ask_question (CairoDock *pDock, const gchar *cQuestion)
 	int iAnswer = gtk_dialog_run (GTK_DIALOG (pDialog));
 	gtk_widget_destroy (pDialog);
 	return iAnswer;
-}
-
-
+}*/

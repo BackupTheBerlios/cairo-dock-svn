@@ -136,7 +136,7 @@ struct _CairoDockModule {
 };
 
 
-typedef void (* CairoDockActionOnAnswerFunc) (const gchar *cAnswer, gpointer data);  // NULL <=> Annuler ou Non.
+typedef void (* CairoDockActionOnAnswerFunc) (gchar *cAnswer, gpointer data);  // NULL <=> Annuler ou Non.
 
 struct _CairoDockDialog
 {
@@ -164,6 +164,7 @@ struct _CairoDockDialog
 	GtkWidget *pInteractiveWidget;  // le widget d'interaction utilisateur.
 	int iButtonsType;  // le type des boutons (aucun, oui/non, ok/annuler).
 	CairoDockActionOnAnswerFunc action_on_answer;  // fonction appelee au clique sur l'un des 2 boutons.
+	gpointer pUserData;
 	};
 
 

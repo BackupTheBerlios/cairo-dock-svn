@@ -314,7 +314,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 				
 				if (XMainAppliWindow != 0)
 				{
-					g_print ("dialogue modal => on ignore\n");
+					g_print ("dialogue 'transient for' => on ignore\n");
 					XFree (pTypeBuffer);
 					return NULL;  // inutile de rajouter le PID ici, c'est le meme que la fenetre principale.
 				}
