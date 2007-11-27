@@ -118,6 +118,7 @@ void cairo_dock_render_linear (CairoDock *pDock)
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 	cairo_paint (pCairoContext);
+	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 	
 	//\____________________ On trace le cadre.
 	double fChangeAxes = 0.5 * (pDock->iCurrentWidth - pDock->iMaxDockWidth);
@@ -193,6 +194,7 @@ void cairo_dock_render_optimized_linear (CairoDock *pDock, GdkRectangle *pArea)
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 	cairo_paint (pCairoContext);
+	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 	
 	//\____________________ On dessine les decorations du fond sur la portion de fenetre.
 	cairo_save (pCairoContext);

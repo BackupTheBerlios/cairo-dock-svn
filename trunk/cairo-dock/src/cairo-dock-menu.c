@@ -126,7 +126,7 @@ static void cairo_dock_help (GtkMenuItem *menu_item, gpointer *data)
 	g_spawn_command_line_async ("firefox http://doc.ubuntu-fr.org/cairo-dock", &erreur);
 	if (erreur != NULL)
 	{
-		g_print ("Attention : %s\n  you can consult the wiki at http://doc.ubuntu-fr.org/cairo_dock\n", erreur->message);
+		g_print ("Attention : %s\n  you can consult the wiki at http://doc.ubuntu-fr.org/cairo-dock\n", erreur->message);
 		g_error_free (erreur);
 	}
 }

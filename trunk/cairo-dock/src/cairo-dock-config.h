@@ -8,9 +8,6 @@
 
 
 guint cairo_dock_get_number_from_name (gchar *cName, const gchar **tNamesList);
-const gchar **cairo_dock_get_animations_names (void);
-CairoDockAnimationType cairo_dock_get_animation_type_from_name (gchar *cAnimationName);
-
 
 gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gboolean bDefaultValue);
 int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, int iDefaultValue);
@@ -19,6 +16,7 @@ gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, int *iValueBuffer, int iNbElements, int *iDefaultValues);
 void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, double *fValueBuffer, int iNbElements, double *fDefaultValues);
 gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gsize *length, gchar *cDefaultValues);
+CairoDockAnimationType cairo_dock_get_animation_type_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, const gchar *cDefaultAnimation);
 
 void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock);
 
@@ -32,6 +30,5 @@ void cairo_dock_update_conf_file_with_translations (gchar *cConfFile, gchar *cTr
 
 CairoDockDesktopEnv cairo_dock_guess_environment (void);
 
-gboolean cairo_dock_conf_file_needs_update (GKeyFile *pKeyFile);
 
 #endif

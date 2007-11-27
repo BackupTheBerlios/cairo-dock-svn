@@ -8,8 +8,8 @@
 
 void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file);
 gchar *cairo_dock_get_translated_conf_file_path (gchar *cConfFileName, gchar *cShareDataDirPath);
-void cairo_dock_flush_conf_file_full (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath, gboolean bUseFileKeys);
-#define cairo_dock_flush_conf_file(pKeyFile, cConfFilePath, cShareDataDirPath) cairo_dock_flush_conf_file_full (pKeyFile, cConfFilePath, cShareDataDirPath, TRUE)
+void cairo_dock_flush_conf_file_full (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath, gboolean bUseFileKeys, gchar *cTemplateFileName);
+void cairo_dock_flush_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath);
 
 void cairo_dock_replace_comments (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile);
 void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile, gboolean bUseOriginalKeys, gchar iIdentifier);
@@ -27,6 +27,7 @@ void cairo_dock_replace_keys_by_identifier (gchar *cConfFilePath, gchar *cReplac
 
 GHashTable *cairo_dock_list_available_translations (gchar *cTranslationsDir, gchar *cFilePrefix, GError **erreur);
 void cairo_dock_get_conf_file_language_and_version (GKeyFile *pKeyFile, gchar **cConfFileLanguage, gchar **cConfFileVersion);
+gboolean cairo_dock_conf_file_needs_update (GKeyFile *pKeyFile);
 
 
 #endif

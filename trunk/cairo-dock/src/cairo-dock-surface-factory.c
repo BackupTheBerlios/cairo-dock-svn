@@ -414,9 +414,9 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_
 		fReflectHeight);
 	cairo_t *pCairoContext = cairo_create (pNewSurface);
 	
-	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
+	/**cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
-	cairo_paint (pCairoContext);
+	cairo_paint (pCairoContext);*/
 	
 	
 	//\_______________ On dessine l'image originale inversee.
@@ -481,9 +481,9 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_vertical (cairo_su
 		fImageHeight);
 	cairo_t *pCairoContext = cairo_create (pNewSurface);
 	
-	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
+	/**cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
-	cairo_paint (pCairoContext);
+	cairo_paint (pCairoContext);*/
 	
 	
 	//\_______________ On dessine l'image originale inversee.
@@ -555,9 +555,9 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_horizontal (cai
 		fImageHeight + fReflectHeight);
 	cairo_t *pCairoContext = cairo_create (pNewSurface);
 	
-	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
+	/**cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
-	cairo_paint (pCairoContext);
+	cairo_paint (pCairoContext);*/
 	
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 	cairo_set_source_surface (pCairoContext, pIconSurface, 0, (g_bDirectionUp ? 0. : fReflectHeight));
@@ -584,9 +584,9 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_vertical (cairo
 		fImageHeight);
 	cairo_t *pCairoContext = cairo_create (pNewSurface);
 	
-	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
+	/**cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
-	cairo_paint (pCairoContext);
+	cairo_paint (pCairoContext);*/
 	
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 	cairo_set_source_surface (pCairoContext, pIconSurface, (g_bDirectionUp ? 0. : fReflectWidth), 0);

@@ -431,7 +431,7 @@ void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
 
 void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et iFlatDockWidth doivent avoir ete mis a jour au prealable.
 {
-	//g_print ("%s ()\n", __func__);
+	g_print ("%s ()\n", __func__);
 	pDock->calculate_max_dock_size (pDock);
 	
 	if (! pDock->bInside && (g_bAutoHide && pDock->iRefCount == 0))

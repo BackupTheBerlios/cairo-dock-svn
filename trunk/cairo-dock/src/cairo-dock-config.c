@@ -143,11 +143,7 @@ guint cairo_dock_get_number_from_name (gchar *cName, const gchar **tNamesList)
 	return 0;
 }
 
-const gchar **cairo_dock_get_animations_names (void)
-{
-	return (const gchar **) s_tAnimationNames;
-}
-CairoDockAnimationType cairo_dock_get_animation_type_from_name (gchar *cAnimationName)
+static CairoDockAnimationType cairo_dock_get_animation_type_from_name (gchar *cAnimationName)
 {
 	return cairo_dock_get_number_from_name (cAnimationName, s_tAnimationNames);
 }
@@ -426,6 +422,14 @@ gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupN
 	return cValuesList;
 }
 
+CairoDockAnimationType cairo_dock_get_animation_type_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, const gchar *cDefaultAnimation)
+{
+	gchar *cAnimationName = cairo_dock_get_string_key_value (pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, cDefaultAnimation);
+	int iAnimationType = cairo_dock_get_animation_type_from_name (cAnimationName);  // cAnimationName peut etre NULL.
+	g_free(cAnimationName);
+	return iAnimationType;
+}
+
 void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 {
 	//g_print ("%s (%s)\n", __func__, cConfFilePath);
@@ -685,10 +689,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_tMinIconAuthorizedSize[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_integer_key_value (pKeyFile, "Launchers", "min icon size", &bFlushConfFileNeeded, 0);
 	
-	gchar *cAnimationName;
-	cAnimationName = cairo_dock_get_string_key_value (pKeyFile, "Launchers", "animation type", &bFlushConfFileNeeded, s_tAnimationNames[0]);
-	g_tAnimationType[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_animation_type_from_name (cAnimationName);
-	g_free (cAnimationName);
+	g_tAnimationType[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_animation_type_key_value (pKeyFile, "Launchers", "animation type", &bFlushConfFileNeeded, s_tAnimationNames[0]);
 	
 	g_tNbAnimationRounds[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_integer_key_value (pKeyFile, "Launchers", "number of animation rounds", &bFlushConfFileNeeded, 4);
 	
@@ -700,9 +701,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Applications", "min icon size", &bFlushConfFileNeeded, 0);
 	
-	cAnimationName = cairo_dock_get_string_key_value (pKeyFile, "Applications", "animation type", &bFlushConfFileNeeded, s_tAnimationNames[0]);
-	g_tAnimationType[CAIRO_DOCK_APPLI] = cairo_dock_get_animation_type_from_name (cAnimationName);
-	g_free (cAnimationName);
+	g_tAnimationType[CAIRO_DOCK_APPLI] = cairo_dock_get_animation_type_key_value (pKeyFile, "Applications", "animation type", &bFlushConfFileNeeded, s_tAnimationNames[1]);
 	
 	g_tNbAnimationRounds[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Applications", "number of animation rounds", &bFlushConfFileNeeded, 2);
 	
@@ -727,9 +726,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLET] = cairo_dock_get_integer_key_value (pKeyFile, "Applets", "min icon size", &bFlushConfFileNeeded, 0);
 	
-	cAnimationName = cairo_dock_get_string_key_value (pKeyFile, "Applets", "animation type", &bFlushConfFileNeeded, s_tAnimationNames[0]);
-	g_tAnimationType[CAIRO_DOCK_APPLET] = cairo_dock_get_animation_type_from_name (cAnimationName);
-	g_free (cAnimationName);
+	g_tAnimationType[CAIRO_DOCK_APPLET] = cairo_dock_get_animation_type_key_value (pKeyFile, "Applications", "animation type", &bFlushConfFileNeeded, s_tAnimationNames[2]);
 	
 	g_tNbAnimationRounds[CAIRO_DOCK_APPLET] = cairo_dock_get_integer_key_value (pKeyFile, "Applets", "number of animation rounds", &bFlushConfFileNeeded, 1);
 	
@@ -1088,23 +1085,4 @@ CairoDockDesktopEnv cairo_dock_guess_environment (void)
 		iDesktopEnv = CAIRO_DOCK_GNOME;
 	}
 	return iDesktopEnv;
-}
-
-
-gboolean cairo_dock_conf_file_needs_update (GKeyFile *pKeyFile)
-{
-	gchar *cPreviousLanguage = NULL, *cPreviousVersion = NULL;
-	cairo_dock_get_conf_file_language_and_version (pKeyFile, &cPreviousLanguage, &cPreviousVersion);
-	
-	gboolean bNeedsUpdate;
-	if ( (g_cLanguage != NULL && (cPreviousLanguage == NULL || strcmp (cPreviousLanguage, g_cLanguage) != 0)) ||
-		cPreviousVersion == NULL ||
-		strcmp (cPreviousVersion, CAIRO_DOCK_VERSION) != 0)
-		bNeedsUpdate = TRUE;
-	else
-		bNeedsUpdate = FALSE;
-	
-	g_free (cPreviousLanguage);
-	g_free (cPreviousVersion);
-	return bNeedsUpdate;
 }

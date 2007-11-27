@@ -532,15 +532,23 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 		pDialog->iWidth = pDialog->iTextWidth + 2 * pDialog->fRadius + fLineWidth;
 		
 		if (pButtonOkSurface == NULL)
+		{
+			gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-ok.svg", CAIRO_DOCK_SHARE_DATA_DIR);
 			pButtonOkSurface = cairo_dock_load_image_for_icon (pSourceContext,
-				"/opt/cairo-dock/cairo-dock/data/cairo-dock-ok.svg",
+				cIconPath,
 				CAIRO_DOCK_DIALOG_BUTTON_WIDTH,
 				CAIRO_DOCK_DIALOG_BUTTON_HEIGHT);
+			g_free (cIconPath);
+		}
 		if (pButtonCancelSurface == NULL)
+		{
+			gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-cancel.svg", CAIRO_DOCK_SHARE_DATA_DIR);
 			pButtonCancelSurface = cairo_dock_load_image_for_icon (pSourceContext,
-				"/opt/cairo-dock/cairo-dock/data/cairo-dock-cancel.svg",
+				cIconPath,
 				CAIRO_DOCK_DIALOG_BUTTON_WIDTH,
 				CAIRO_DOCK_DIALOG_BUTTON_HEIGHT);
+			g_free (cIconPath);
+		}
 	}
 	g_print ("iTextWidth: %d , iTextHeight : %d\n", pDialog->iTextWidth, pDialog->iTextHeight);
 	

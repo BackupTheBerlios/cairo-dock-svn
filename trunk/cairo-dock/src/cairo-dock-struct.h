@@ -232,6 +232,7 @@ struct _Icon {
 	CairoDockAnimationType iAnimationType;
 	gdouble fPersonnalScale;
 	gdouble fDeltaYReflection;
+	gdouble fOrientation;
 	//\____________ Pour les applis.
 	gint iPid;
 	Window Xid;

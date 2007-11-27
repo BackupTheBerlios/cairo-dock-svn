@@ -359,6 +359,7 @@ void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDock *pDock)
 
 void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpointer data)
 {
+	g_print ("%s (%s)\n", __func__, cDockName);
 	if (pDock->iRefCount > 0)
 		pDock->bHorizontalDock = (g_bSameHorizontality ? g_pMainDock->bHorizontalDock : ! g_pMainDock->bHorizontalDock);
 	else

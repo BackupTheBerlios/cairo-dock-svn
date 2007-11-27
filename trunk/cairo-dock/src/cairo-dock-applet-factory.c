@@ -22,6 +22,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-config.h"
 #include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-surface-factory.h"
+#include "cairo-dock-animations.h"
 #include "cairo-dock-applet-factory.h"
 
 extern gchar *g_cCurrentThemePath;
@@ -195,4 +196,56 @@ void cairo_dock_write_info_on_icon (Icon *icon, gchar *cText)
 	g_return_if_fail (icon != NULL && icon->pIconBuffer != NULL);
 	
 	
+}
+
+
+void cairo_dock_set_icon_surface (cairo_t *pIconContext, cairo_surface_t *pSurface)  // fonction proposee par Necropotame.
+{
+	//\________________ On efface l'ancienne image.
+	cairo_set_source_rgba (pIconContext, 0.0, 0.0, 0.0, 0.0);
+	cairo_set_operator (pIconContext, CAIRO_OPERATOR_SOURCE);
+	cairo_paint (pIconContext);
+	cairo_set_operator (pIconContext, CAIRO_OPERATOR_OVER);
+	
+	//\________________ On applique la nouvelle image.
+	cairo_set_source_surface (
+		pIconContext,
+		pSurface,
+		0.,
+		0.);
+	cairo_paint (pIconContext);
+}
+
+void cairo_dock_set_icon_name (cairo_t *pIconContext, const gchar *cIconName, Icon *pIcon, CairoDock *pDock)  // fonction proposee par Necropotame.
+{
+	g_free (pIcon->acName);
+	pIcon->acName = g_strdup (cIconName);
+	
+	cairo_dock_fill_one_text_buffer(
+		pIcon,
+		pIconContext,
+		g_iLabelSize,
+		g_cLabelPolice,
+		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
+}
+
+void cairo_dock_animate_icon (Icon *pIcon, CairoDock *pDock, CairoDockAnimationType iAnimationType, int iNbRounds)
+{
+	cairo_dock_arm_animation (pIcon, iAnimationType, iNbRounds);
+	cairo_dock_start_animation (pIcon, pDock);
+}
+
+void cairo_dock_add_reflection_to_icon (Icon *pIcon, CairoDock *pDock, cairo_t *pCairoContext)
+{
+	pIcon->pReflectionBuffer = cairo_dock_create_reflection_surface (pIcon->pIconBuffer,
+		pCairoContext,
+		(pDock->bHorizontalDock ? pIcon->fWidth : pIcon->fHeight) * (1 + g_fAmplitude),
+		(pDock->bHorizontalDock ? pIcon->fHeight : pIcon->fWidth) * (1 + g_fAmplitude),
+		pDock->bHorizontalDock);
+	pIcon->pFullIconBuffer = cairo_dock_create_icon_surface_with_reflection (pIcon->pIconBuffer,
+		pIcon->pReflectionBuffer,
+		pCairoContext,
+		(pDock->bHorizontalDock ? pIcon->fWidth : pIcon->fHeight) * (1 + g_fAmplitude),
+		(pDock->bHorizontalDock ? pIcon->fHeight : pIcon->fWidth) * (1 + g_fAmplitude),
+		pDock->bHorizontalDock);
 }

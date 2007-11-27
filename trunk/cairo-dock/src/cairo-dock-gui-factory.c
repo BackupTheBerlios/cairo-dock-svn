@@ -1053,14 +1053,6 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					break ;
 				}
 				
-				/*if (pTipString != NULL && ! GTK_WIDGET_NO_WINDOW (pOneWidget))
-				{
-					g_print ("pTipString : '%s'\n", pTipString);
-					gtk_tooltips_set_tip (GTK_TOOLTIPS (pToolTipsGroup), pOneWidget,
-						pTipString,
-						"pouet");
-				}*/
-				
 				if (pSubWidgetList != NULL)
 				{
 					pGroupKeyWidget = g_new (gpointer, 3);

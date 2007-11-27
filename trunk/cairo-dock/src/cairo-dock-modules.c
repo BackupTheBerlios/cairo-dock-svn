@@ -88,10 +88,12 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 	
 	g_free (pCairoDockModule->cReadmeFilePath);
 	pCairoDockModule->cReadmeFilePath = NULL;
+	gboolean bSymbolFound;
 	
 	CairoDockModulePreInit function_pre_init;
 	gchar *cPreInitFuncName = g_strdup_printf ("%s_pre_init", pCairoDockModule->cModuleName);
-	if (!g_module_symbol (module, cPreInitFuncName, (gpointer) &function_pre_init))
+	bSymbolFound = g_module_symbol (module, cPreInitFuncName, (gpointer) &function_pre_init) || g_module_symbol (module, "pre_init", (gpointer) &function_pre_init);
+	if (! bSymbolFound)
 	{
 		function_pre_init = NULL;
 	}
@@ -104,7 +106,8 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 	
 	CairoDockModuleInit function_init;
 	gchar *cInitFuncName = g_strdup_printf ("%s_init", pCairoDockModule->cModuleName);
-	if (!g_module_symbol (module, cInitFuncName, (gpointer) &function_init))
+	bSymbolFound = g_module_symbol (module, cInitFuncName, (gpointer) &function_init) || g_module_symbol (module, "init", (gpointer) &function_init);
+	if (! bSymbolFound)
 	{
 		g_set_error (erreur, 1, 1, "Attention : the module '%s' is not valid : (%s)", pCairoDockModule->cSoFilePath, g_module_error ());
 		g_free (cInitFuncName);
@@ -117,7 +120,8 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 	
 	CairoDockModuleStop function_stop;
 	gchar *cStopFuncName = g_strdup_printf ("%s_stop", pCairoDockModule->cModuleName);
-	if (!g_module_symbol (module, cStopFuncName, (gpointer) &function_stop))
+	bSymbolFound = g_module_symbol (module, cStopFuncName, (gpointer) &function_stop) || g_module_symbol (module, "stop", (gpointer) &function_stop);
+	if (! bSymbolFound)
 	{
 		function_stop = NULL;
 	}

@@ -16,7 +16,7 @@ launchers_DATA = \
 	firefox.desktop\
 	firefox.svg\
 	pidgin.desktop\
-	gaim.svg\
+	pidgin.svg\
 	09system.desktop\
 	gnome-main-menu.svg\
 	10synaptic.desktop\

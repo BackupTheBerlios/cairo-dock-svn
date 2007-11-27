@@ -21,6 +21,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-keyfile-manager.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-config.h"
+#include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-desktop-file-factory.h"
 
 extern GHashTable *g_hDocksTable;
@@ -162,14 +163,18 @@ void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath, gchar *cL
 		return ;
 	}
 	
-	gchar *cCommand = g_strdup_printf ("/bin/cp %s/launcher-%s.conf %s\n", CAIRO_DOCK_SHARE_DATA_DIR, cLanguage, cDesktopFilePath);
+	if (cairo_dock_conf_file_needs_update (pKeyFile))
+		cairo_dock_flush_conf_file_full (pKeyFile, cDesktopFilePath, CAIRO_DOCK_SHARE_DATA_DIR, FALSE, CAIRO_DOCK_LAUNCHER_CONF_FILE);
+	/**gchar *cCommand = g_strdup_printf ("/bin/cp %s/launcher-%s.conf %s\n", CAIRO_DOCK_SHARE_DATA_DIR, cLanguage, cDesktopFilePath);
 	system (cCommand);
 	g_free (cCommand);
 	
 	cairo_dock_replace_values_in_conf_file (cDesktopFilePath, pKeyFile, FALSE, 0);
-	g_key_file_free (pKeyFile);
+	g_key_file_free (pKeyFile);*/
+	
 	
 	cairo_dock_update_conf_file_with_hash_table (cDesktopFilePath, g_hDocksTable, "Desktop Entry", "Container", NULL, (GHFunc)cairo_dock_write_one_name);
+	cairo_dock_update_launcher_conf_file_with_renderers (cDesktopFilePath);
 }
 
 
