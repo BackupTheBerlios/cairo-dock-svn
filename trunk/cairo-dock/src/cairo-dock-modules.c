@@ -253,10 +253,12 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 	}
 }
 
-void cairo_dock_update_conf_file_with_available_modules (gchar *cConfFile)
+void cairo_dock_update_conf_file_with_available_modules_full (gchar *cConfFile, gchar *cGroupName, gchar *cKeyName)
 {
-	cairo_dock_update_conf_file_with_hash_table (cConfFile, s_hModuleTable, "Applets", "active modules", NULL, (GHFunc) cairo_dock_write_one_module_name);
+	cairo_dock_update_conf_file_with_hash_table (cConfFile, s_hModuleTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_module_name);
 }
+
+
 
 static void _cairo_dock_add_one_module_name_if_active (gchar *cModuleName, CairoDockModule *pModule, GSList **pListeModule)
 {

@@ -89,7 +89,7 @@ void cairo_dock_set_default_renderer (CairoDock *pDock)
 }
 
 
-
+#define _cairo_dock_update_conf_file_with_renderers(cConfFile, cGroupName, cKeyName) cairo_dock_update_conf_file_with_hash_table (cConfFile, s_hRendererTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_renderer_name)
 void cairo_dock_update_conf_file_with_renderers (gchar *cConfFile)
 {
 	_cairo_dock_update_conf_file_with_renderers (cConfFile, "Cairo Dock", "main dock view");
@@ -101,7 +101,12 @@ void cairo_dock_update_launcher_conf_file_with_renderers (gchar *cConfFile)
 	_cairo_dock_update_conf_file_with_renderers (cConfFile, "Desktop Entry", "Renderer");
 }
 
-
+void cairo_dock_update_easy_conf_file_with_renderers (gchar *cConfFile)
+{
+	g_print ("%s (%s)\n", __func__, cConfFile);
+	_cairo_dock_update_conf_file_with_renderers (cConfFile, "Personnalisation", "main dock view");
+	_cairo_dock_update_conf_file_with_renderers (cConfFile, "Personnalisation", "sub-dock view");
+}
 
 static void _cairo_dock_reset_one_dock_view (gchar *cDockName, CairoDock *pDock, gpointer data)
 {

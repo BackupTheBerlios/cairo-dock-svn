@@ -198,7 +198,6 @@ void cairo_dock_mark_theme_as_modified (gboolean bModified)
 gboolean cairo_dock_theme_need_save (void)
 {
 	gchar *cModifiedFile = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_MODIFIED_THEME_FILE);
-	GError *erreur = NULL;
 	gsize length = 0;
 	gchar *cContent = NULL;
 	g_file_get_contents (cModifiedFile,

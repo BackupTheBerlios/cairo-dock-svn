@@ -28,6 +28,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-callbacks.h"
 #include "cairo-dock-config.h"
 
+#define CAIRO_DOCK_TYPE_CONF_FILE_FILE ".cairo-dock-conf-file"
+
 static const gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "pulse", "upside-down", "wobbly", "random", NULL};
 static const gchar * s_cIconTypeNames[(CAIRO_DOCK_NB_TYPES+1)/2] = {"launchers", "applications", "applets"};
 
@@ -38,6 +40,9 @@ extern gboolean g_bReverseVisibleImage;
 extern gboolean g_bReserveSpace;
 extern gchar *g_cMainDockDefaultRendererName;
 extern gchar *g_cSubDockDefaultRendererName;
+extern gchar *g_cCurrentThemePath;
+extern gchar *g_cEasyConfFile;
+extern gchar *g_cCairoDockDataDir;
 
 extern int g_iMaxAuthorizedWidth;
 extern int g_iScrollAmount;
@@ -873,7 +878,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 				iNewWidth);
 	}
 	
-	
+	//\___________________ On ecrit si necessaire.
 	if (! bFlushConfFileNeeded)
 		bFlushConfFileNeeded = cairo_dock_conf_file_needs_update (pKeyFile);
 	if (bFlushConfFileNeeded)
@@ -885,7 +890,10 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	}
 	
 	cairo_dock_update_conf_file_with_renderers (cConfFilePath);
-
+	
+	//\___________________ On applique les modifs au fichier de conf easy.
+	cairo_dock_copy_to_easy_conf_file (pKeyFile, g_cEasyConfFile);
+	
 	g_key_file_free (pKeyFile);
 	
 	cairo_dock_mark_theme_as_modified (TRUE);
@@ -896,19 +904,29 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 {
 	GKeyFile *pKeyFile = user_data[0];
 	GSList *pWidgetList = user_data[1];
-	gchar *conf_file = user_data[2];
+	gchar *cConfFilePath = user_data[2];
 	GtkTextBuffer *pTextBuffer = user_data[3];
 	CairoDockConfigFunc pConfigFunc = user_data[4];
 	gpointer data = user_data[5];
 	GFunc pFreeUserDataFunc = user_data[6];
+	gchar *cConfFilePath2 = user_data[7];
+	CairoDockConfigFunc pConfigFunc2 = user_data[8];
+	GtkWidget *pWidget = user_data[9];
+	gchar *cTitle = user_data[10];
+	int iWindowWidth = GPOINTER_TO_INT (user_data[11]);
+	int iWindowHeight = GPOINTER_TO_INT (user_data[12]);
+	gchar iIdentifier = GPOINTER_TO_INT (user_data[13]);
+	gchar *cButtonConvert = user_data[14];
+	gchar *cButtonRevert = user_data[15];
 	
-	gtk_window_set_modal (GTK_WINDOW (pDialog), TRUE);  // pour prevenir tout interaction avec l'appli pendant sa re-configuration.
 	if (action == GTK_RESPONSE_ACCEPT || action == GTK_RESPONSE_APPLY)
 	{
+		gtk_window_set_modal (GTK_WINDOW (pDialog), TRUE);  // pour prevenir tout interaction avec l'appli pendant sa re-configuration.
+		
 		if (pWidgetList != NULL)
 		{
 			cairo_dock_update_keyfile_from_widget_list (pKeyFile, pWidgetList);
-			cairo_dock_write_keys_to_file (pKeyFile, conf_file);
+			cairo_dock_write_keys_to_file (pKeyFile, cConfFilePath);
 		}
 		else
 		{
@@ -918,48 +936,67 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 			
 			gchar *cConfiguration = gtk_text_buffer_get_text (pTextBuffer, &start, &end, FALSE);
 			
-			gboolean write_ok = g_file_set_contents (conf_file, cConfiguration, -1, NULL);
+			gboolean write_ok = g_file_set_contents (cConfFilePath, cConfiguration, -1, NULL);
 			g_free (cConfiguration);
 			if (! write_ok)
-				g_print ("error while writing to %s\n", conf_file);
+				g_print ("error while writing to %s\n", cConfFilePath);
 		}
 		
 		if (pConfigFunc != NULL)
-			pConfigFunc (conf_file, data);
+			pConfigFunc (cConfFilePath, data);
+		
+		gtk_window_set_modal (GTK_WINDOW (pDialog), FALSE);
 	}
-	gtk_window_set_modal (GTK_WINDOW (pDialog), FALSE);
 	
-	if (action != GTK_RESPONSE_APPLY)
+	if (action == GTK_RESPONSE_ACCEPT || action == GTK_RESPONSE_REJECT || action == GTK_RESPONSE_NONE)
 	{
+		cairo_dock_mark_prefered_conf_file (cConfFilePath);
+		
 		gtk_widget_destroy (GTK_WIDGET (pDialog));
 		g_key_file_free (pKeyFile);
 		cairo_dock_free_generated_widget_list (pWidgetList);
-		g_free (conf_file);
+		g_free (cConfFilePath);
+		g_free (cConfFilePath2);
+		g_free (cTitle);
+		g_free (cButtonConvert);
+		g_free (cButtonRevert);
 		if (pFreeUserDataFunc != NULL)
 			pFreeUserDataFunc (data, NULL);
 		g_free (user_data);
 	}
+	else if (action == GTK_RESPONSE_HELP)
+	{
+		gtk_widget_destroy (GTK_WIDGET (pDialog));
+		g_key_file_free (pKeyFile);
+		cairo_dock_free_generated_widget_list (pWidgetList);
+		g_free (user_data);
+		
+		cairo_dock_edit_conf_file_core (pWidget, cConfFilePath2, cTitle, iWindowWidth, iWindowHeight, iIdentifier, NULL, pConfigFunc2, data, pFreeUserDataFunc, pConfigFunc, cConfFilePath, cButtonRevert, cButtonConvert);
+	}
 }
-gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc)
+
+
+gboolean cairo_dock_edit_conf_file_core (GtkWidget *pWidget, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert)
 {
+	g_print ("%s (%s; %s)\n", __func__, cConfFilePath, cConfFilePath2);
 	GSList *pWidgetList = NULL;
 	GtkTextBuffer *pTextBuffer = NULL;  // le buffer est lie au widget, donc au pDialog.
 	GKeyFile *pKeyFile = g_key_file_new ();
 	
 	GError *erreur = NULL;
-	g_key_file_load_from_file (pKeyFile, conf_file, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+	g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		return FALSE;
 	}
-	g_key_file_remove_key (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", NULL);
+	g_key_file_remove_key (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", NULL);  // salete de traducteur automatique.
 	
-	GtkWidget *pDialog = cairo_dock_generate_advanced_ihm_from_keyfile (pKeyFile, cTitle, pWidget, &pWidgetList, (pConfigFunc != NULL), iIdentifier, cPresentedGroup);
+	GtkWidget *pDialog = cairo_dock_generate_advanced_ihm_from_keyfile (pKeyFile, cTitle, pWidget, &pWidgetList, (pConfigFunc != NULL), iIdentifier, cPresentedGroup, (pConfigFunc2 != NULL), cButtonConvert);
 	if (pDialog == NULL || pWidgetList == NULL)
 	{
-		pDialog = cairo_dock_generate_basic_ihm_from_keyfile (conf_file, cTitle, pWidget, &pTextBuffer, (pConfigFunc != NULL));
+		pDialog = cairo_dock_generate_basic_ihm_from_keyfile (cConfFilePath, cTitle, pWidget, &pTextBuffer, (pConfigFunc != NULL), (pConfigFunc2 != NULL), cButtonConvert);
 	}
 	g_return_val_if_fail (pDialog != NULL, FALSE);
 	
@@ -980,14 +1017,24 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 	
 	if (pConfigFunc != NULL)  // alors on autorise la modification a la volee, avec un bouton "Appliquer". La fenetre doit donc laisser l'appli se derouler.
 	{
-		gpointer *user_data = g_new (gpointer, 7);
+		gpointer *user_data = g_new (gpointer, 16);
 		user_data[0] = pKeyFile;
 		user_data[1] = pWidgetList;
-		user_data[2] = g_strdup (conf_file);
+		user_data[2] = cConfFilePath;
 		user_data[3] = pTextBuffer;
 		user_data[4] = pConfigFunc;
 		user_data[5] = data;
 		user_data[6] = pFreeUserDataFunc;
+		user_data[7] = cConfFilePath2;
+		user_data[8] = pConfigFunc2;
+		user_data[9] = pWidget;
+		user_data[10] = cTitle;
+		user_data[11] = GINT_TO_POINTER (iWindowWidth);
+		user_data[12] = GINT_TO_POINTER (iWindowHeight);
+		user_data[13] = GINT_TO_POINTER ((int) iIdentifier);
+		user_data[14] = cButtonConvert;
+		user_data[15] = cButtonRevert;
+		
 		g_signal_connect (pDialog, "response", G_CALLBACK (_cairo_dock_user_action_on_config), user_data);
 		return FALSE;
 	}
@@ -1001,7 +1048,7 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 			if (pWidgetList != NULL)
 			{
 				cairo_dock_update_keyfile_from_widget_list (pKeyFile, pWidgetList);
-				cairo_dock_write_keys_to_file (pKeyFile, conf_file);
+				cairo_dock_write_keys_to_file (pKeyFile, cConfFilePath);
 			}
 			else
 			{
@@ -1011,11 +1058,11 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 				
 				gchar *cConfiguration = gtk_text_buffer_get_text (pTextBuffer, &start, &end, FALSE);
 				
-				gboolean write_ok = g_file_set_contents (conf_file, cConfiguration, -1, NULL);
+				gboolean write_ok = g_file_set_contents (cConfFilePath, cConfiguration, -1, NULL);
 				g_free (cConfiguration);
 				if (! write_ok)
 				{
-					g_print ("error while writing to %s\n", conf_file);
+					g_print ("error while writing to %s\n", cConfFilePath);
 					config_ok = FALSE;
 				}
 			}
@@ -1028,8 +1075,18 @@ gboolean cairo_dock_edit_conf_file (GtkWidget *pWidget, gchar *conf_file, gchar 
 		g_key_file_free (pKeyFile);
 		cairo_dock_free_generated_widget_list (pWidgetList);
 		gtk_widget_destroy (GTK_WIDGET (pDialog));
+		g_free (cConfFilePath);
+		g_free (cConfFilePath2);
+		g_free (cTitle);
+		g_free (cButtonConvert);
+		g_free (cButtonRevert);
 		return config_ok;
 	}
+}
+
+gboolean cairo_dock_edit_conf_file_full (GtkWidget *pWidget, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert)
+{
+	return cairo_dock_edit_conf_file_core (pWidget, g_strdup (cConfFilePath), g_strdup (cTitle), iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc, pConfigFunc2, g_strdup (cConfFilePath2), g_strdup (cButtonConvert), g_strdup (cButtonRevert));
 }
 
 
@@ -1054,12 +1111,12 @@ void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int
 	g_key_file_free (pKeyFile);
 }
 
-void cairo_dock_update_conf_file_with_translations (gchar *cConfFile, gchar *cTranslationsDir)
+void cairo_dock_update_conf_file_with_translations_full (gchar *cConfFile, gchar *cTranslationsDir, gchar *cGroupName, gchar *cKeyName)
 {
 	GError *erreur = NULL;
 	GHashTable *pTranslationTable = cairo_dock_list_available_translations (cTranslationsDir, "cairo-dock-", &erreur);
 	
-	cairo_dock_update_conf_file_with_hash_table (cConfFile, pTranslationTable, "Cairo Dock", "language", NULL, (GHFunc) cairo_dock_write_one_name);
+	cairo_dock_update_conf_file_with_hash_table (cConfFile, pTranslationTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_name);
 	
 	g_hash_table_destroy (pTranslationTable);
 }
@@ -1085,4 +1142,232 @@ CairoDockDesktopEnv cairo_dock_guess_environment (void)
 		iDesktopEnv = CAIRO_DOCK_GNOME;
 	}
 	return iDesktopEnv;
+}
+
+
+static void cairo_dock_copy_value_to_keyfile (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, GKeyFile *pKeyFile2, gchar *cGroupName2, gchar *cKeyName2)
+{
+	GError *erreur = NULL;
+	gchar *cValue = g_key_file_get_string (pKeyFile, cGroupName, cKeyName, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+	}
+	else
+	{
+		g_key_file_set_string (pKeyFile2, cGroupName2, cKeyName2, cValue);
+	}
+	g_free (cValue);
+}
+void cairo_dock_copy_easy_conf_file (gchar *cEasyConfFilePath, GKeyFile *pMainKeyFile)
+{
+	//g_print ("%s (%s)\n", __func__, cEasyConfFilePath);
+
+	//\___________________ On ouvre le fichier de conf.
+	GError *erreur = NULL;
+	GKeyFile *pKeyFile = g_key_file_new ();
+	g_key_file_load_from_file (pKeyFile, cEasyConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+	}
+	
+	//\___________________ On recupere les parametres systeme.
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "language", pMainKeyFile, "Cairo Dock", "language");
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "screen border", pMainKeyFile, "Position", "screen border");
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "auto-hide", pMainKeyFile, "Auto-Hide", "auto-hide");
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "show applications", pMainKeyFile, "Applications", "show applications");
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "active modules", pMainKeyFile, "Applets", "active modules");
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "active modules", pMainKeyFile, "Applets", "active modules");
+	
+	//\___________________ On recupere les parametres de personnalisation.
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "callback image", pMainKeyFile, "Auto-Hide", "background image");
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "background image", pMainKeyFile, "Background", "background image");
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "separator image", pMainKeyFile, "Separators", "separator image");
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "main dock view", pMainKeyFile, "Cairo Dock", "main dock view");
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "sub-dock view", pMainKeyFile, "Sub-Docks", "sub-dock view");
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Launchers", "min icon size");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Launchers", "max icon size");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Applications", "min icon size");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Applications", "max icon size");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Applets", "max icon size");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Launchers", "max icon size");
+	
+	gboolean bFlushConfFileNeeded;
+	double fValue = cairo_dock_get_double_key_value (pKeyFile, "Personnalisation", "zoom", &bFlushConfFileNeeded, 2.0);
+	g_key_file_set_double (pMainKeyFile, "Icons", "amplitude", fValue - 1);
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon gap", pMainKeyFile, "Icons", "icon gap");
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "launcher animation", pMainKeyFile, "Launchers", "animation type");
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "appli animation", pMainKeyFile, "Applications", "animation type");
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "corner radius", pMainKeyFile, "Background", "corner radius");
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "line color", pMainKeyFile, "Background", "line color");
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "police", pMainKeyFile, "Labels", "police");
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "font size", pMainKeyFile, "Labels", "size");
+	
+	g_key_file_free (pKeyFile);
+}
+
+void cairo_dock_copy_to_easy_conf_file (GKeyFile *pMainKeyFile, gchar *cEasyConfFilePath)
+{
+	//\___________________ On recupere le patron.
+	gchar *cEasyConfTemplate = cairo_dock_get_translated_conf_file_path (CAIRO_DOCK_EASY_CONF_FILE, CAIRO_DOCK_SHARE_DATA_DIR);
+	
+	//\___________________ On ouvre le fichier de conf.
+	GKeyFile *pKeyFile = g_key_file_new ();
+	GError *erreur = NULL;
+	g_key_file_load_from_file (pKeyFile, cEasyConfTemplate, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+	g_free (cEasyConfTemplate);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		return ;
+	}
+	
+	//\___________________ On ecrit les parametres systeme.
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Cairo Dock", "language", pKeyFile, "System", "language");
+	
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Position", "screen border", pKeyFile, "System", "screen border");
+	
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Auto-Hide", "auto-hide", pKeyFile, "System", "auto-hide");
+	
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Applications", "show applications", pKeyFile, "System", "show applications");
+	
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Applets", "active modules", pKeyFile, "System", "active modules");
+	
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Applets", "active modules", pKeyFile, "System", "active modules");
+	
+	//\___________________ On ecrit les parametres de personnalisation.
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Auto-Hide", "background image", pKeyFile, "Personnalisation", "callback image");
+	
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Background", "background image", pKeyFile, "Personnalisation", "background image");
+	
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Separators", "separator image", pKeyFile, "Personnalisation", "separator image");
+	
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Cairo Dock", "main dock view", pKeyFile, "Personnalisation", "main dock view");
+	
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Sub-Docks", "sub-dock view", pKeyFile, "Personnalisation", "sub-dock view");
+	
+	g_key_file_set_integer (pKeyFile, "Personnalisation", "icon size", MAX (g_tMaxIconAuthorizedSize[CAIRO_DOCK_LAUNCHER], g_tMaxIconAuthorizedSize[CAIRO_DOCK_APPLI]));
+	
+	g_key_file_set_double (pKeyFile, "Personnalisation", "zoom", 1 + g_fAmplitude);
+	
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Icons", "icon gap", pKeyFile, "Personnalisation", "icon gap");
+	
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Launchers", "animation type", pKeyFile, "Personnalisation", "launcher animation");
+	
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Applications", "animation type", pKeyFile, "Personnalisation", "appli animation");
+	
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Background", "corner radius", pKeyFile, "Personnalisation", "corner radius");
+	
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Background", "line color", pKeyFile, "Personnalisation", "line color");
+	
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Labels", "police", pKeyFile, "Personnalisation", "police");
+	
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Labels", "size", pKeyFile, "Personnalisation", "font size");
+	
+	//\___________________ On ecrit tout.
+	cairo_dock_write_keys_to_file (pKeyFile, cEasyConfFilePath);
+	g_key_file_free (pKeyFile);
+	
+	//\___________________ On complete.
+	cairo_dock_update_easy_conf_file_with_available_modules (cEasyConfFilePath);
+	cairo_dock_update_easy_conf_file_with_translations (cEasyConfFilePath, CAIRO_DOCK_SHARE_DATA_DIR);
+	
+	cairo_dock_update_easy_conf_file_with_renderers (cEasyConfFilePath);
+}
+
+void cairo_dock_build_easy_conf_file (gchar *cMainConfFilePath, gchar *cEasyConfFilePath)
+{
+	GKeyFile *pMainKeyFile = g_key_file_new ();
+	GError *erreur = NULL;
+	g_key_file_load_from_file (pMainKeyFile, cMainConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		return ;
+	}
+	
+	cairo_dock_copy_to_easy_conf_file (pMainKeyFile, cEasyConfFilePath);
+	g_key_file_free (pMainKeyFile);
+}
+
+void cairo_dock_read_easy_conf_file (gchar *cEasyConfFilePath, gpointer data)
+{
+	//\___________________ On ouvre le fichier de conf principal.
+	GKeyFile *pMainKeyFile = g_key_file_new ();
+	GError *erreur = NULL;
+	g_key_file_load_from_file (pMainKeyFile, g_cConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		return ;
+	}
+	
+	//\___________________ On remplit les champs fournis par le fichier de conf easy.
+	cairo_dock_copy_easy_conf_file (cEasyConfFilePath, pMainKeyFile);
+	
+	//\___________________ On ecrit tout.
+	cairo_dock_write_keys_to_file (pMainKeyFile, g_cConfFile);
+	g_key_file_free (pMainKeyFile);
+	
+	//\___________________ On recharge l'appli.
+	cairo_dock_read_conf_file (g_cConfFile, data);
+}
+
+
+
+gboolean cairo_dock_use_full_conf_file (void)
+{
+	gchar *cFile = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_TYPE_CONF_FILE_FILE);
+	gsize length = 0;
+	gchar *cContent = NULL;
+	g_file_get_contents (cFile,
+		&cContent,
+		&length,
+		NULL);
+	g_free (cFile);
+	
+	gboolean bFullConfFile = (length > 0 && strcmp (cContent, CAIRO_DOCK_CONF_FILE) == 0);
+	g_free (cContent);
+	return bFullConfFile;
+}
+void cairo_dock_mark_prefered_conf_file (gchar *cConfFilePath)
+{
+	gchar *cConfFileName = g_path_get_basename (cConfFilePath);
+	g_return_if_fail (cConfFileName != NULL);
+	if (strcmp (cConfFileName, CAIRO_DOCK_CONF_FILE) == 0 || strcmp (cConfFileName, CAIRO_DOCK_EASY_CONF_FILE) == 0)
+	{
+		gchar *cFile = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_TYPE_CONF_FILE_FILE);
+		
+		g_file_set_contents (cFile,
+			cConfFileName,
+			-1,
+			NULL);
+		
+		g_free (cFile);
+	}
+	g_free (cConfFileName);
 }

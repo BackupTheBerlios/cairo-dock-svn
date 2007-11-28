@@ -100,6 +100,7 @@ double g_fScrollAcceleration;  // acceleration du defilement quand il revient a 
 gchar *g_cCurrentThemePath = NULL;  // le chemin vers le repertoire du theme courant.
 gchar *g_cCurrentLaunchersPath = NULL;  // le chemin vers le repertoire des lanceurs/icones du theme courant.
 gchar *g_cConfFile = NULL;  // le chemin du fichier de conf.
+gchar *g_cEasyConfFile = NULL;  // le chemin du fichier de conf pour les noobs ;-)
 gchar **g_cDefaultIconDirectory = NULL;  // les repertoires ou on va chercher les icones avant d'aller chercher dans le theme d'icones.
 GtkIconTheme *g_pIconTheme = NULL;  // le theme d'icone choisi.
 gchar *g_cCairoDockDataDir = NULL;  // le repertoire ou on va chercher les .desktop.
@@ -326,6 +327,7 @@ main (int argc, char** argv)
 	
 	//\___________________ On charge le dernier theme ou on demande a l'utilisateur d'en choisir un.
 	g_cConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
+	g_cEasyConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_EASY_CONF_FILE);
 	if (! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS))
 	{
 		cairo_dock_mark_theme_as_modified (FALSE);

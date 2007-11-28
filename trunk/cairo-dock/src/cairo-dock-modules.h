@@ -19,7 +19,9 @@ void cairo_dock_preload_module_from_directory (gchar *cModuleDirPath, GHashTable
 
 void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock *pDock);
 
-void cairo_dock_update_conf_file_with_available_modules (gchar *cConfFile);
+void cairo_dock_update_conf_file_with_available_modules_full (gchar *cConfFile, gchar *cGroupName, gchar *cKeyName);
+#define cairo_dock_update_conf_file_with_available_modules(cConfFile) cairo_dock_update_conf_file_with_available_modules_full (cConfFile, "Applets", "active modules")
+#define cairo_dock_update_easy_conf_file_with_available_modules(cConfFile) cairo_dock_update_conf_file_with_available_modules_full (cConfFile, "System", "active modules")
 
 void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *pIconList);
 

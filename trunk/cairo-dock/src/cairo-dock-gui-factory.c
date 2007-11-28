@@ -344,7 +344,7 @@ static void _cairo_dock_recup_current_color (GtkColorButton *pColorButton, GSLis
 }
 
 
-GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWidget *pParentWidget, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier, gchar *cPresentedGroup)
+GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWidget *pParentWidget, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier, gchar *cPresentedGroup, gboolean bSwitchButtonPresent, gchar *cButtonConvert)
 {
 	static GPtrArray *s_pBufferArray = NULL;  // pour empecher les fuites memoires.
 	
@@ -387,20 +387,37 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	gchar *cValue, **cValueList;
 	GdkColor gdkColor;
 	
-	GtkWidget *dialog;
+	GtkWidget *pDialog;
 	if (bApplyButtonPresent)
-		dialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
-			(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
-			GTK_DIALOG_DESTROY_WITH_PARENT,
-			GTK_STOCK_APPLY,
-			GTK_RESPONSE_APPLY,
-			GTK_STOCK_OK,
-			GTK_RESPONSE_ACCEPT,
-			GTK_STOCK_CANCEL,
-			GTK_RESPONSE_REJECT,
-			NULL);
+	{
+		if (bSwitchButtonPresent)
+			pDialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
+				(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
+				GTK_DIALOG_DESTROY_WITH_PARENT,
+				(cButtonConvert != NULL ? cButtonConvert : GTK_STOCK_CONVERT),
+				GTK_RESPONSE_HELP,
+				GTK_STOCK_APPLY,
+				GTK_RESPONSE_APPLY,
+				GTK_STOCK_OK,
+				GTK_RESPONSE_ACCEPT,
+				GTK_STOCK_CANCEL,
+				GTK_RESPONSE_REJECT,
+				NULL);
+		else
+			pDialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
+				(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
+				GTK_DIALOG_DESTROY_WITH_PARENT,
+				GTK_STOCK_APPLY,
+				GTK_RESPONSE_APPLY,
+				GTK_STOCK_OK,
+				GTK_RESPONSE_ACCEPT,
+				GTK_STOCK_CANCEL,
+				GTK_RESPONSE_REJECT,
+				NULL);
+	}
 	else
-		dialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
+	{
+		pDialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
 			(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
 			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_OK,
@@ -408,7 +425,8 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 			GTK_STOCK_CANCEL,
 			GTK_RESPONSE_REJECT,
 			NULL);
-	gtk_container_set_border_width (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), 3);
+	}
+	gtk_container_set_border_width (GTK_CONTAINER (GTK_DIALOG(pDialog)->vbox), 3);
 	
 	GtkTooltips *pToolTipsGroup = gtk_tooltips_new ();
 	
@@ -416,7 +434,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	gtk_notebook_set_scrollable (GTK_NOTEBOOK (pNoteBook), TRUE);
 	gtk_notebook_popup_enable (GTK_NOTEBOOK (pNoteBook));
 	g_object_set (G_OBJECT (pNoteBook), "tab-pos", GTK_POS_LEFT, NULL);
-	gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), pNoteBook);
+	gtk_container_add (GTK_CONTAINER (GTK_DIALOG(pDialog)->vbox), pNoteBook);
 	
 	i = 0;
 	while (pGroupList[i] != NULL)
@@ -742,7 +760,14 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 										CAIRO_DOCK_MODEL_DESCRIPTION_FILE, (iElementType == 'R' ? pAuthorizedValuesList[k+1] : NULL),
 										-1);
 									
-									k += (iElementType == 'R') + 1;
+									if (iElementType == 'R')
+									{
+										k += 2;
+										if (pAuthorizedValuesList[k-1] == NULL)  // ne devrait pas arriver si le fichier de conf est bien rempli.
+											break;
+									}
+									else
+										k ++;
 								}
 								
 								if (iElementType == 'R')
@@ -975,7 +1000,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							iNbBuffers ++;
 							data[0] = pEntry;
 							data[1] = GINT_TO_POINTER (iElementType == 'S' ? 0 : 1);
-							data[2] = GTK_WINDOW (dialog);
+							data[2] = GTK_WINDOW (pDialog);
 							pButtonFileChooser = gtk_button_new_from_stock (GTK_STOCK_OPEN);
 							g_signal_connect (G_OBJECT (pButtonFileChooser),
 								"clicked",
@@ -1074,12 +1099,12 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	}
 	
 	gtk_tooltips_enable (GTK_TOOLTIPS (pToolTipsGroup));
-	gtk_widget_show_all (dialog);
+	gtk_widget_show_all (pDialog);
 	gtk_notebook_set_current_page (GTK_NOTEBOOK (pNoteBook), iPresentedNumPage);
 	
 	g_strfreev (pGroupList);
 	
-	return dialog;
+	return pDialog;
 }
 
 
@@ -1096,7 +1121,7 @@ gboolean cairo_dock_is_advanced_keyfile (GKeyFile *pKeyFile)
 }
 
 
-GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, gchar *cTitle, GtkWidget *pParentWidget, GtkTextBuffer **pTextBuffer, gboolean bApplyButtonPresent)
+GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, gchar *cTitle, GtkWidget *pParentWidget, GtkTextBuffer **pTextBuffer, gboolean bApplyButtonPresent, gboolean bSwitchButtonPresent, gchar *cButtonConvert)
 {
 	gchar *cConfiguration;
 	gboolean read_ok = g_file_get_contents (cConfFilePath, &cConfiguration, NULL, NULL);
@@ -1110,17 +1135,34 @@ GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, gch
 	GtkTextBuffer *buffer = NULL;
 	GtkWidget *pDialog;
 	if (bApplyButtonPresent)
-		pDialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
-			(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
-			GTK_DIALOG_DESTROY_WITH_PARENT,
-			GTK_STOCK_APPLY,
-			GTK_RESPONSE_APPLY,
-			GTK_STOCK_OK,
-			GTK_RESPONSE_ACCEPT,
-			GTK_STOCK_CANCEL,
-			GTK_RESPONSE_REJECT,
-			NULL);
+	{
+		if (bSwitchButtonPresent)
+			pDialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
+				(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
+				GTK_DIALOG_DESTROY_WITH_PARENT,
+				(cButtonConvert != NULL ? cButtonConvert : GTK_STOCK_CONVERT),
+				GTK_RESPONSE_HELP,
+				GTK_STOCK_APPLY,
+				GTK_RESPONSE_APPLY,
+				GTK_STOCK_OK,
+				GTK_RESPONSE_ACCEPT,
+				GTK_STOCK_CANCEL,
+				GTK_RESPONSE_REJECT,
+				NULL);
+		else
+			pDialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
+				(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
+				GTK_DIALOG_DESTROY_WITH_PARENT,
+				GTK_STOCK_APPLY,
+				GTK_RESPONSE_APPLY,
+				GTK_STOCK_OK,
+				GTK_RESPONSE_ACCEPT,
+				GTK_STOCK_CANCEL,
+				GTK_RESPONSE_REJECT,
+				NULL);
+	}
 	else
+	{
 		pDialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
 			(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
 			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -1129,6 +1171,7 @@ GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, gch
 			GTK_STOCK_CANCEL,
 			GTK_RESPONSE_REJECT,
 			NULL);
+	}
 	gtk_window_resize (GTK_WINDOW (pDialog), 400, 300);
 	
 	view = gtk_text_view_new ();
