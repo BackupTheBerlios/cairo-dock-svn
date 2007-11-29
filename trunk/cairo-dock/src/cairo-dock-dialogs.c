@@ -354,6 +354,9 @@ void cairo_dock_free_dialog (CairoDockDialog *pDialog)
 		gtk_widget_destroy (pDialog->pWidget);
 	pDialog->pWidget = NULL;
 	
+	if (pDialog->pUserData != NULL && pDialog->pFreeUserDataFunc != NULL)
+		pDialog->pFreeUserDataFunc (pDialog->pUserData);
+	
 	g_free (pDialog);
 }
 
@@ -367,7 +370,7 @@ void cairo_dock_remove_dialog_if_any (Icon *icon)
 
 
 
-GtkWidget *cairo_dock_build_interactive_widget_for_dialog (gchar *cInitialAnswer)
+GtkWidget *cairo_dock_build_interactive_widget_for_dialog (const gchar *cInitialAnswer)
 {
 	int iBoxWidth = 0, iBoxHeight = 0;
 	GtkWidget *pEntry = NULL;
@@ -795,7 +798,7 @@ static gboolean _cairo_dock_dialog_auto_delete (Icon *pIcon)
 	}
 	return FALSE;
 }
-CairoDockDialog *cairo_dock_show_dialog_full (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength, gchar *cIconPath, GtkButtonsType iButtonsType, gchar *cTextForEntry, CairoDockActionOnAnswerFunc pActionFunc, gpointer data)
+CairoDockDialog *cairo_dock_show_dialog_full (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength, gchar *cIconPath, GtkButtonsType iButtonsType, const gchar *cTextForEntry, CairoDockActionOnAnswerFunc pActionFunc, gpointer data, GFreeFunc pFreeDataFunc)
 {
 	g_print ("%s (%s; %s)\n", __func__, cText, cTextForEntry);
 	g_return_val_if_fail (cText != NULL, NULL);
@@ -848,7 +851,7 @@ gchar *cairo_dock_show_dialog_and_wait (const gchar *cText, Icon *pIcon, CairoDo
 {
 	gchar *cAnswer = NULL;
 	GMainLoop *pBlockingLoop = g_main_loop_new (NULL, FALSE);
-	gpointer data[2] = {&cAnswer, pBlockingLoop};
+	gpointer data[2] = {&cAnswer, pBlockingLoop};  // inutile d'allouer 'data' puisqu'on va bloquer.
 	CairoDockDialog *pDialog = cairo_dock_show_dialog_full (cText,
 		pIcon,
 		pDock,
@@ -857,7 +860,8 @@ gchar *cairo_dock_show_dialog_and_wait (const gchar *cText, Icon *pIcon, CairoDo
 		iButtonsType,
 		cTextForEntry,
 		(CairoDockActionOnAnswerFunc)_cairo_dock_get_answer_from_dialog,
-		data);
+		(gpointer) data,
+		(GFreeFunc) NULL);
 	
 	if (pDialog != NULL)
 	{

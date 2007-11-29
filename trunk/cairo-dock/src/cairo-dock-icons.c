@@ -78,13 +78,15 @@ void cairo_dock_free_icon (Icon *icon)
 	g_free (icon->acName);
 	g_free (icon->acCommand);
 	g_free (icon->cBaseURI);
-	g_free (icon->cParentDockName);  // on ne liberera pas le sous-dock ici sous peine de se mordre la queue, donc il faut le faire avant.
+	g_free (icon->cParentDockName);  // on ne liberera pas le sous-dock ici sous peine de se mordre la queue, donc il faut l'avoir fait avant.
 	g_free (icon->cClass);
+	g_free (icon->cQuickInfo);
 	
 	cairo_surface_destroy (icon->pIconBuffer);
 	cairo_surface_destroy (icon->pReflectionBuffer);
 	cairo_surface_destroy (icon->pFullIconBuffer);
 	cairo_surface_destroy (icon->pTextBuffer);
+	cairo_surface_destroy (icon->pQuickInfoBuffer);
 	
 	cairo_dock_free_module (icon->pModule);
 	

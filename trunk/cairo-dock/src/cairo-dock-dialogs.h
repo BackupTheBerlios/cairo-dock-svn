@@ -15,7 +15,7 @@ void cairo_dock_free_dialog (CairoDockDialog *pDialog);
 void cairo_dock_remove_dialog_if_any (Icon *icon);
 
 
-GtkWidget *cairo_dock_build_interactive_widget_for_dialog (gchar *cInitialAnswer);
+GtkWidget *cairo_dock_build_interactive_widget_for_dialog (const gchar *cInitialAnswer);
 
 CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, CairoDock *pDock, gchar *cImageFilePath, GtkWidget *pInteractiveWidget, GtkButtonsType iButtonsType, CairoDockActionOnAnswerFunc pActionFunc, gpointer data);
 
@@ -29,14 +29,14 @@ void cairo_dock_place_dialog (CairoDockDialog *pDialog, Icon *pIcon, CairoDock *
 void cairo_dock_replace_all_dialogs (void);
 
 
-CairoDockDialog *cairo_dock_show_dialog_full (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength, gchar *cIconPath, GtkButtonsType iButtonsType, gchar *cTextForEntry, CairoDockActionOnAnswerFunc pActionFunc, gpointer data);
+CairoDockDialog *cairo_dock_show_dialog_full (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength, gchar *cIconPath, GtkButtonsType iButtonsType, const gchar *cTextForEntry, CairoDockActionOnAnswerFunc pActionFunc, gpointer data, GFreeFunc pFreeDataFunc);
 
-#define cairo_dock_show_temporary_dialog_with_icon(cText, pIcon, pDock, fTimeLength, cIconPath) cairo_dock_show_dialog_full (cText, pIcon, pDock, fTimeLength, cIconPath, GTK_BUTTONS_NONE, NULL, NULL, NULL)
+#define cairo_dock_show_temporary_dialog_with_icon(cText, pIcon, pDock, fTimeLength, cIconPath) cairo_dock_show_dialog_full (cText, pIcon, pDock, fTimeLength, cIconPath, GTK_BUTTONS_NONE, NULL, NULL, NULL, NULL)
 #define cairo_dock_show_temporary_dialog(cText, pIcon, pDock, fTimeLength) cairo_dock_show_temporary_dialog_with_icon (cText, pIcon, pDock, fTimeLength, NULL)
 void cairo_dock_show_temporary_dialog_with_default_icon (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength);
 
-#define cairo_dock_show_dialog_with_question(cText, pIcon, pDock, cIconPath, pActionFunc, data) cairo_dock_show_dialog_full (cText, pIcon, pDock, 0, cIconPath, GTK_BUTTONS_YES_NO, NULL, pActionFunc, data)
-#define cairo_dock_show_dialog_with_entry(cText, pIcon, pDock, cIconPath, cTextForEntry, pActionFunc, data) cairo_dock_show_dialog_full (cText, pIcon, pDock, 0, cIconPath, GTK_BUTTONS_OK_CANCEL, cTextForEntry, pActionFunc, data)
+#define cairo_dock_show_dialog_with_question(cText, pIcon, pDock, cIconPath, pActionFunc, data, pFreeDataFunc) cairo_dock_show_dialog_full (cText, pIcon, pDock, 0, cIconPath, GTK_BUTTONS_YES_NO, NULL, pActionFunc, data, pFreeDataFunc)
+#define cairo_dock_show_dialog_with_entry(cText, pIcon, pDock, cIconPath, cTextForEntry, pActionFunc, data, pFreeDataFunc) cairo_dock_show_dialog_full (cText, pIcon, pDock, 0, cIconPath, GTK_BUTTONS_OK_CANCEL, cTextForEntry, pActionFunc, data, pFreeDataFunc)
 
 gchar *cairo_dock_show_dialog_and_wait (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength, gchar *cIconPath, GtkButtonsType iButtonsType, const gchar *cTextForEntry);
 gchar *cairo_dock_show_demand_and_wait (const gchar *cMessage, Icon *pIcon, CairoDock *pDock, const gchar *cInitialAnswer);

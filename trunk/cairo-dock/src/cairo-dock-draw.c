@@ -262,7 +262,10 @@ void cairo_dock_render_decorations_in_frame (cairo_t *pCairoContext, CairoDock *
 	}
 }
 
-
+/**
+*Dessine entierement une icone, dont toutes les caracteristiques ont ete prealablement calculees. Gere sa position, sa transparence (modulee par la transparence du dock au repos), son reflet, son placement de profil, son etiquette, et son info-rapide.
+*@param 
+*/
 
 void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 {
@@ -402,7 +405,15 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 }
 
 
-
+/**
+*Dessine entierement une icone, dont toutes les caracteristiques ont ete prealablement calculees. Gere sa position, sa transparence (modulee par la transparence du dock au repos), son reflet, son placement de profil, son etiquette, et son info-rapide.
+*@param icon l'icone a dessiner.
+*@param pCairoContext le contexte du dessin, est altere pendant le dessin.
+*@param bHorizontalDock l'horizontalite du dock contenant l'icone.
+*@param fRatio le ratio de taille des icones dans ce dock.
+*@param fDockMagnitude la magnitude actuelle du dock.
+*@param bUseReflect TRUE pour dessiner les reflets.
+*/
 void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect)
 {
 	//\_____________________ On separe 2 cas : dessin avec le tampon complet, et dessin avec le ou les petits tampons.
@@ -470,7 +481,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			else
 				cairo_paint_with_alpha (pCairoContext, fAlpha);
 			
-			cairo_restore (pCairoContext);
+			cairo_restore (pCairoContext);  // retour juste apres la translation (fDrawX, fDrawY).
 			
 			cairo_save (pCairoContext);
 			if (bHorizontalDock)
@@ -518,7 +529,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 					0.,
 					0.,
 					0.,
-					(g_bDirectionUp ? 1. : 1 - (icon->fScale - 1) / g_fAmplitude));  // astuce.
+					(g_bDirectionUp ? 1. : 1 - (icon->fScale - 1) / g_fAmplitude));  // astuce pour ne pas avoir a re-creer la surface de la reflection.
 				cairo_pattern_add_color_stop_rgba (pGradationPattern,
 					1.,
 					0.,
@@ -554,8 +565,9 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	}
 	//cairo_pop_group (pCairoContext);
 	
-	cairo_restore (pCairoContext);
+	cairo_restore (pCairoContext);  // retour juste apres la translation (fDrawX, fDrawY).
 	
+	cairo_save (pCairoContext);
 	
 	//\_____________________ On dessine les etiquettes, avec un alpha proportionnel au facteur d'echelle de leur icone.
 	if (icon->pTextBuffer != NULL && icon->fScale > 1.01 && (! g_bLabelForPointedIconOnly || icon->bPointed))  // 1.01 car sin(pi) = 1+epsilon :-/
@@ -589,10 +601,36 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			fMagnitude = (fMagnitude > 1. - 1. / g_fLabelAlphaThreshold ? 1.0 : fRatio / (1. - fMagnitude) / g_fLabelAlphaThreshold);
 		}
 		cairo_paint_with_alpha (pCairoContext, fMagnitude);
-		//cairo_paint_with_alpha (pCairoContext, (g_bLabelForPointedIconOnly ? 1.0 : pow (fMagnitude, 3)));
+	}
+	
+	//\_____________________ On dessine les infos additionnelles.
+	cairo_restore (pCairoContext);  // retour juste apres la translation (fDrawX, fDrawY).
+	if (icon->pQuickInfoBuffer != NULL)
+	{
+		cairo_scale (pCairoContext,
+			fRatio * icon->fScale,
+			fRatio * icon->fScale);
+		cairo_translate (pCairoContext,
+			//-icon->fQuickInfoXOffset + icon->fWidth / 2,
+			//icon->fHeight - icon->fQuickInfoYOffset);
+			(- icon->iQuickInfoWidth + icon->fWidth) / 2,
+			icon->fHeight - icon->iQuickInfoHeight);
+		cairo_set_source_surface (pCairoContext,
+			icon->pQuickInfoBuffer,
+			0,
+			0);
+		cairo_paint (pCairoContext);
 	}
 }
 
+
+/**
+*Dessine une ficelle reliant le centre de toutes les icones, en commencant par la 1ere dessinee.
+*@param pCairoContext le contexte du dessin, n'est pas altere par la fonction.
+*@param pDock le dock contenant les icônes a relier.
+*@param fStringLineWidth epaisseur de la ligne.
+*@param bIsLoop TRUE si on veut boucler (relier la derniere icone a la 1ere).
+*/
 void cairo_dock_draw_string (cairo_t *pCairoContext, CairoDock *pDock, double fStringLineWidth, gboolean bIsLoop)
 {
 	GList *ic, *pFirstDrawnElement = (pDock->pFirstDrawnElement != NULL ? pDock->pFirstDrawnElement : pDock->icons);
@@ -852,6 +890,7 @@ void cairo_dock_set_window_position_at_balance (CairoDock *pDock, int iNewWidth,
 {
 	pDock->iWindowPositionX = (g_iScreenWidth[pDock->bHorizontalDock] - iNewWidth) * pDock->fAlign + pDock->iGapX;
 	pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - iNewHeight - pDock->iGapY : pDock->iGapY);
+	g_print ("pDock->iGapX : %d => iWindowPositionX <- %d\n", pDock->iGapX, pDock->iWindowPositionX);
 	
 	if (pDock->iWindowPositionX < 0)
 		pDock->iWindowPositionX = 0;

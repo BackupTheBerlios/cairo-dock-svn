@@ -191,16 +191,10 @@ gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShare
 
 
 
-void cairo_dock_write_info_on_icon (Icon *icon, gchar *cText)
-{
-	g_return_if_fail (icon != NULL && icon->pIconBuffer != NULL);
-	
-	
-}
-
-
 void cairo_dock_set_icon_surface (cairo_t *pIconContext, cairo_surface_t *pSurface)  // fonction proposee par Necropotame.
 {
+	g_return_if_fail (cairo_status (pIconContext) == CAIRO_STATUS_SUCCESS);
+	
 	//\________________ On efface l'ancienne image.
 	cairo_set_source_rgba (pIconContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pIconContext, CAIRO_OPERATOR_SOURCE);
@@ -208,16 +202,21 @@ void cairo_dock_set_icon_surface (cairo_t *pIconContext, cairo_surface_t *pSurfa
 	cairo_set_operator (pIconContext, CAIRO_OPERATOR_OVER);
 	
 	//\________________ On applique la nouvelle image.
-	cairo_set_source_surface (
-		pIconContext,
-		pSurface,
-		0.,
-		0.);
-	cairo_paint (pIconContext);
+	if (pSurface != NULL)
+	{
+		cairo_set_source_surface (
+			pIconContext,
+			pSurface,
+			0.,
+			0.);
+		cairo_paint (pIconContext);
+	}
 }
 
 void cairo_dock_set_icon_name (cairo_t *pIconContext, const gchar *cIconName, Icon *pIcon, CairoDock *pDock)  // fonction proposee par Necropotame.
 {
+	g_return_if_fail (pIcon != NULL);  // le contexte sera verifie plus loin.
+	
 	g_free (pIcon->acName);
 	pIcon->acName = g_strdup (cIconName);
 	
@@ -229,6 +228,21 @@ void cairo_dock_set_icon_name (cairo_t *pIconContext, const gchar *cIconName, Ic
 		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 }
 
+void cairo_dock_set_quick_info (cairo_t *pIconContext, const gchar *cQuickInfo, Icon *pIcon)
+{
+	g_return_if_fail (pIcon != NULL);  // le contexte sera verifie plus loin.
+	
+	g_free (pIcon->cQuickInfo);
+	pIcon->cQuickInfo = g_strdup (cQuickInfo);
+	
+	cairo_dock_fill_one_extra_info_buffer (pIcon,
+		pIconContext,
+		12,
+		g_cLabelPolice,
+		PANGO_WEIGHT_HEAVY,
+		.4);
+}
+
 void cairo_dock_animate_icon (Icon *pIcon, CairoDock *pDock, CairoDockAnimationType iAnimationType, int iNbRounds)
 {
 	cairo_dock_arm_animation (pIcon, iAnimationType, iNbRounds);
@@ -237,11 +251,22 @@ void cairo_dock_animate_icon (Icon *pIcon, CairoDock *pDock, CairoDockAnimationT
 
 void cairo_dock_add_reflection_to_icon (Icon *pIcon, CairoDock *pDock, cairo_t *pCairoContext)
 {
+	if (pIcon->pReflectionBuffer != NULL)
+	{
+		cairo_surface_destroy (pIcon->pReflectionBuffer);
+		pIcon->pReflectionBuffer = NULL;
+	}
 	pIcon->pReflectionBuffer = cairo_dock_create_reflection_surface (pIcon->pIconBuffer,
 		pCairoContext,
 		(pDock->bHorizontalDock ? pIcon->fWidth : pIcon->fHeight) * (1 + g_fAmplitude),
 		(pDock->bHorizontalDock ? pIcon->fHeight : pIcon->fWidth) * (1 + g_fAmplitude),
 		pDock->bHorizontalDock);
+	
+	if (pIcon->pFullIconBuffer != NULL)
+	{
+		cairo_surface_destroy (pIcon->pFullIconBuffer);
+		pIcon->pFullIconBuffer = NULL;
+	}
 	pIcon->pFullIconBuffer = cairo_dock_create_icon_surface_with_reflection (pIcon->pIconBuffer,
 		pIcon->pReflectionBuffer,
 		pCairoContext,

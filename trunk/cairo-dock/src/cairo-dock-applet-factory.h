@@ -22,11 +22,10 @@ GHashTable *cairo_dock_list_themes (gchar *cThemesDir, GHashTable *hProvidedTabl
 gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShareDataDir, gchar *cConfFileName);
 
 
-void cairo_dock_write_info_on_icon (Icon *icon, gchar *cText);
-
-
 void cairo_dock_set_icon_surface (cairo_t *pIconContext, cairo_surface_t *pSurface);
 void cairo_dock_set_icon_name (cairo_t *pIconContext, const gchar *cIconName, Icon *pIcon, CairoDock *pDock);
+void cairo_dock_set_quick_info (cairo_t *pIconContext, const gchar *cExtraInfo, Icon *pIcon);
+#define cairo_dock_remove_quick_info(pIcon) cairo_dock_set_quick_info (NULL, NULL, pIcon)
 
 void cairo_dock_animate_icon (Icon *pIcon, CairoDock *pDock, CairoDockAnimationType iAnimationType, int iNbRounds);
 

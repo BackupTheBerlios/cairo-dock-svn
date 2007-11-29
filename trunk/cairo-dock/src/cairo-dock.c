@@ -349,8 +349,9 @@ main (int argc, char** argv)
 	//const gchar *cSillyMessage = "Le saviez-vous ?\nUtiliser cairo-dock vous rendra beau et intelligent !";
 	//const gchar *cSillyMessage = "Le saviez-vous ?\nUtiliser cairo-dock augmentera votre popularité auprès de la gente féminine !";
 	//const gchar *cSillyMessage = "Le saviez-vous ?\nCairo-Dock contribue à réduire le trou de la couche d'ozone !";
-	const gchar *cSillyMessage = "Montrer Cairo-Dock à un utilisateur de Mac est le meilleur moyen de s'en faire un ennemi;\nN'oubliez pas qu'il a payé 129$ pour avoir la même chose !";
-	const gchar *cNumSilllyMessage = "4";
+	//const gchar *cSillyMessage = "Montrer Cairo-Dock à un utilisateur de Mac est le meilleur moyen de s'en faire un ennemi;\nN'oubliez pas qu'il a payé 129$ pour avoir la même chose !";  // 7500
+	const gchar *cSillyMessage = "Petite annonce :\n  Projet sérieux recherche secrétaire pour rédiger documentation.\n  Niveau d'étude exigé : 95C.";  // 7500
+	const gchar *cNumSilllyMessage = "5";
 	gboolean bWriteSillyMessage;
 	if (! g_file_test (cSillyMessageFilePath, G_FILE_TEST_EXISTS))
 	{
@@ -383,6 +384,10 @@ main (int argc, char** argv)
 		if (pFirstIcon != NULL)
 		{
 			cairo_dock_show_temporary_dialog_with_default_icon (cSillyMessage, pFirstIcon, g_pMainDock, 7500);
+			
+			/*cairo_t *pIconContext = cairo_dock_create_context_from_window (g_pMainDock);
+			cairo_dock_set_quick_info (pIconContext, "69°C", pFirstIcon, g_pMainDock);
+			cairo_destroy (pIconContext);*/
 		}
 	}
 	
@@ -390,6 +395,8 @@ main (int argc, char** argv)
 	gtk_main ();
 	
 	rsvg_term ();
+	
+	g_print ("Bye bye !\n");
 	
 	return 0;
 }

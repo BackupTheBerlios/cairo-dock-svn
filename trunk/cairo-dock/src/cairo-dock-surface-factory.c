@@ -9,8 +9,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <math.h>
 #include <librsvg/rsvg.h>
 #include <librsvg/rsvg-cairo.h>
+#include <pango/pango.h>
 
 #include "cairo-dock-struct.h"
+#include "cairo-dock-draw.h"
 #include "cairo-dock-surface-factory.h"
 
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
@@ -20,6 +22,9 @@ extern double g_fReflectSize;
 extern double g_fAlbedo;
 extern gboolean g_bDirectionUp;
 
+extern int g_iLabelWeight;
+extern int g_iLabelStyle;
+extern int g_iDockRadius;
 
 void cairo_dock_calculate_contrainted_icon_size (double *fImageWidth, double *fImageHeight, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fIconWidthSaturationFactor, double *fIconHeightSaturationFactor)
 {
@@ -69,7 +74,7 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 	*fHeight = (double) pXIconBuffer[iBestIndex+1];
 	
 	int i;
-	int alpha, red, green, blue;
+	gulong alpha, red, green, blue;
 	float fAlphaFactor;
 	for (i = 0; i < (int) (*fHeight) * (*fWidth); i ++)
 	{
@@ -402,7 +407,7 @@ cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t 
 
 static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight)
 {
-	g_return_val_if_fail (pSurface != NULL && pSourceContext != NULL, NULL);
+	g_return_val_if_fail (pSurface != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	
 	//\_______________ On cree la surface d'une fraction hauteur de l'image originale.
 	double fReflectHeight = g_fReflectSize * (1 + g_fAmplitude);
@@ -469,7 +474,7 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_
 
 static cairo_surface_t * cairo_dock_create_reflection_surface_vertical (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight)
 {
-	g_return_val_if_fail (pSurface != NULL && pSourceContext != NULL, NULL);
+	g_return_val_if_fail (pSurface != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	
 	//\_______________ On cree la surface d'une fraction hauteur de l'image originale.
 	double fReflectWidth = g_fReflectSize * (1 + g_fAmplitude);
@@ -545,7 +550,7 @@ cairo_surface_t * cairo_dock_create_reflection_surface (cairo_surface_t *pSurfac
 
 cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_horizontal (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight)
 {
-	g_return_val_if_fail (pIconSurface != NULL && pReflectionSurface!= NULL && pSourceContext != NULL, NULL);
+	g_return_val_if_fail (pIconSurface != NULL && pReflectionSurface!= NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	
 	//\_______________ On cree la surface de telle facon qu'elle contienne les 2 surfaces.
 	double fReflectHeight = g_fReflectSize * (1 + g_fAmplitude);
@@ -574,7 +579,7 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_horizontal (cai
 }
 cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_vertical (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight)
 {
-	g_return_val_if_fail (pIconSurface != NULL && pReflectionSurface!= NULL && pSourceContext != NULL, NULL);
+	g_return_val_if_fail (pIconSurface != NULL && pReflectionSurface!= NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	
 	//\_______________ On cree la surface de telle facon qu'elle contienne les 2 surfaces.
 	double fReflectWidth = g_fReflectSize * (1 + g_fAmplitude);
@@ -608,4 +613,82 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection (cairo_surface_
 		return cairo_dock_create_icon_surface_with_reflection_horizontal (pIconSurface, pReflectionSurface, pSourceContext, fImageWidth, fImageHeight);
 	else
 		return cairo_dock_create_icon_surface_with_reflection_vertical (pIconSurface, pReflectionSurface, pSourceContext, fImageWidth, fImageHeight);
+}
+
+
+cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double fBackgroundAlpha, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset)
+{
+	g_return_val_if_fail (cText != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
+	
+	//\_________________ On ecrit le texte dans un calque Pango.
+	PangoLayout *pLayout = pango_cairo_create_layout (pSourceContext);
+	
+	PangoFontDescription *pDesc = pango_font_description_new ();
+	pango_font_description_set_absolute_size (pDesc, iLabelSize * PANGO_SCALE);
+	pango_font_description_set_family_static (pDesc, cLabelPolice);
+	pango_font_description_set_weight (pDesc, iLabelWeight);
+	pango_font_description_set_style (pDesc, g_iLabelStyle);
+	pango_layout_set_font_description (pLayout, pDesc);
+	pango_font_description_free (pDesc);
+	
+	pango_layout_set_text (pLayout, cText, -1);
+	
+	//\_________________ On recupere la taille effective du calque.
+	PangoRectangle ink, log;
+	pango_layout_get_pixel_extents (pLayout, &ink, &log);
+	
+	*iTextWidth = ink.width + 2;
+	*iTextHeight = ink.height + 2 + 1;  // +1 car certaines polices "debordent".
+	
+	//\_________________ On dessine le calque dans une surface cairo.
+	cairo_surface_t* pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+		CAIRO_CONTENT_COLOR_ALPHA,
+		*iTextWidth, *iTextHeight);
+	cairo_t* pCairoContext = cairo_create (pNewSurface);
+	
+	if (fBackgroundAlpha > 0)
+	{
+		cairo_save (pCairoContext);
+		double fRadius = MIN (.5 * g_iDockRadius, 5.);  // bon compromis.
+		double fLineWidth = 1.;
+		double fFrameWidth = *iTextWidth - 2 * fRadius - fLineWidth;
+		double fFrameHeight = *iTextHeight - fLineWidth;
+		double fDockOffsetX = fRadius + fLineWidth/2;
+		double fDockOffsetY = 0.;
+		cairo_dock_draw_frame_horizontal (pCairoContext, fRadius, fLineWidth, fFrameWidth, fFrameHeight, fDockOffsetX, fDockOffsetY, 1, 0.);
+		cairo_set_source_rgba (pCairoContext, 0., 0., 0., fBackgroundAlpha);
+		cairo_fill_preserve (pCairoContext);
+		cairo_restore(pCairoContext);
+	}
+	
+	cairo_translate (pCairoContext, -ink.x, -ink.y+1);  // meme remarque.
+	
+	cairo_push_group (pCairoContext);
+	cairo_set_source_rgb (pCairoContext, 0.2, 0.2, 0.2);
+	int i;
+	for (i = 0; i < 4; i++)
+	{
+		cairo_move_to (pCairoContext, i&2, 2*(i&1));
+		pango_cairo_show_layout (pCairoContext, pLayout);
+	}
+	cairo_pop_group_to_source (pCairoContext);
+	cairo_paint_with_alpha (pCairoContext, .75);
+	
+	cairo_set_source_rgb (pCairoContext, 1., 1., 1.);
+	cairo_move_to (pCairoContext, 1., 1.);
+	pango_cairo_show_layout (pCairoContext, pLayout);
+	
+	cairo_destroy (pCairoContext);
+	
+	/* set_device_offset is buggy, doesn't work for positive offsets. so we use explicit offsets... so unfortunate.
+	cairo_surface_set_device_offset (pNewSurface, 
+					 log.width / 2. - ink.x,
+					 log.height     - ink.y);*/
+	*fTextXOffset = log.width / 2. - ink.x;
+	*fTextYOffset = log.height     - ink.y;
+	//*fTextYOffset = iLabelSize - (log.height + 1) + ink.y ;  // en tenant compte de l'ecart du bas du texte.
+	//g_print ("%s -> %.2f (%d;%d)\n", icon->acName, icon->fTextYOffset, log.height, ink.y);
+	
+	g_object_unref (pLayout);
+	return pNewSurface;
 }

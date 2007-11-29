@@ -12,9 +12,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 #include <gtk/gtk.h>
 
-#include <cairo.h>
-#include <pango/pango.h>
-
 #ifdef HAVE_GLITZ
 #include <gdk/gdkx.h>
 #include <glitz-glx.h>
@@ -224,20 +221,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 	if (icon->acName == NULL || (iLabelSize == 0))
 		return ;
 	
-	PangoFontDescription *pDesc;
-	PangoLayout *pLayout;
-	
-	pLayout = pango_cairo_create_layout (pSourceContext);
-	
-	pDesc = pango_font_description_new ();
-	pango_font_description_set_absolute_size (pDesc, iLabelSize * PANGO_SCALE);
-	pango_font_description_set_family_static (pDesc, cLabelPolice);
-	pango_font_description_set_weight (pDesc, g_iLabelWeight);
-	pango_font_description_set_style (pDesc, g_iLabelStyle);
-	pango_layout_set_font_description (pLayout, pDesc);
-	pango_font_description_free (pDesc);
-	
-	
+	gchar *cTruncatedName = NULL;
 	if (CAIRO_DOCK_IS_APPLI (icon) && g_iAppliMaxNameLength > 0)
 	{
 		//g_print ("troncature de %s\n", icon->acName);
@@ -257,7 +241,6 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 		if (cUtf8Name == NULL)  // une erreur s'est produite, on tente avec la chaine brute.
 			cUtf8Name = g_strdup (icon->acName);
 		
-		gchar *cTruncatedName = NULL;
 		const gchar *cEndValidChain = NULL;
 		if (g_utf8_validate (cUtf8Name, -1, &cEndValidChain))
 		{
@@ -285,52 +268,11 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 			}
 		}
 		g_free (cUtf8Name);
-		
-		pango_layout_set_text (pLayout, (cTruncatedName != NULL ? cTruncatedName : icon->acName), -1);
 		//g_print (" -> etiquette : %s\n", cTruncatedName);
-		g_free (cTruncatedName);
 	}
-	else
-		pango_layout_set_text (pLayout, icon->acName, -1);
 	
-	
-	PangoRectangle ink, log;
-	pango_layout_get_pixel_extents (pLayout, &ink, &log);
-	
-	icon->iTextWidth = ink.width + 2;
-	icon->iTextHeight = ink.height + 2 + 1;  // le +1 est la pour palier aux erreurs d'arrondis qui apparaissent avec certaines polices.
-	cairo_surface_t* pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-		CAIRO_CONTENT_COLOR_ALPHA,
-		icon->iTextWidth, icon->iTextHeight);
-	cairo_t* pCairoContext = cairo_create (pNewSurface);
-	cairo_translate (pCairoContext, -ink.x, -ink.y+1);  // meme remarque.
-	
-	cairo_push_group (pCairoContext);
-	cairo_set_source_rgb (pCairoContext, 0.2, 0.2, 0.2);
-	int i;
-	for (i = 0; i < 4; i++)
-	{
-		cairo_move_to (pCairoContext, i&2, 2*(i&1));
-		pango_cairo_show_layout (pCairoContext, pLayout);
-	}
-	cairo_pop_group_to_source (pCairoContext);
-	cairo_paint_with_alpha (pCairoContext, .75);
-	
-	cairo_set_source_rgb (pCairoContext, 1., 1., 1.);
-	cairo_move_to (pCairoContext, 1., 1.);
-	pango_cairo_show_layout (pCairoContext, pLayout);
-	
-	cairo_destroy (pCairoContext);
-	
-	/* set_device_offset is buggy, doesn't work for positive
-	 * offsets.  so we use explicit offsets... so unfortunate.
-	cairo_surface_set_device_offset (pNewSurface, 
-					 log.width / 2. - ink.x,
-					 log.height     - ink.y);*/
-	icon->fTextXOffset = log.width / 2. - ink.x;
-	//icon->fTextYOffset = log.height     - ink.y;
-	icon->fTextYOffset = iLabelSize - (log.height + 1) + ink.y ;  // en tenant compte de l'ecart du bas du texte.
-	//g_print ("%s -> %.2f (%d;%d)\n", icon->acName, icon->fTextYOffset, log.height, ink.y);
+	cairo_surface_t* pNewSurface = cairo_dock_create_surface_from_text ((cTruncatedName != NULL ? cTruncatedName : icon->acName), pSourceContext, iLabelSize, cLabelPolice, g_iLabelWeight, 0., &icon->iTextWidth, &icon->iTextHeight, &icon->fTextXOffset, &icon->fTextYOffset);
+	g_free (cTruncatedName);
 	
 	double fRotationAngle = (bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2));
 	cairo_surface_t *pNewSurfaceRotated = cairo_dock_rotate_surface (pNewSurface, pSourceContext, icon->iTextWidth, icon->iTextHeight, fRotationAngle);
@@ -341,9 +283,18 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 	}
 	
 	icon->pTextBuffer = pNewSurface;
-	
-	g_object_unref (pLayout);
 }
+
+void cairo_dock_fill_one_extra_info_buffer (Icon *icon, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double fBackgroundAlpha)
+{
+	cairo_surface_destroy (icon->pQuickInfoBuffer);
+	icon->pQuickInfoBuffer = NULL;
+	if (icon->cQuickInfo == NULL)
+		return ;
+	
+	icon->pQuickInfoBuffer = cairo_dock_create_surface_from_text (icon->cQuickInfo, pSourceContext, iLabelSize, cLabelPolice, iLabelWeight, fBackgroundAlpha, &icon->iQuickInfoWidth, &icon->iQuickInfoHeight, &icon->fQuickInfoXOffset, &icon->fQuickInfoYOffset);
+}
+
 
 void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDock *pDock)
 {
@@ -353,6 +304,8 @@ void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDock *pDock)
 	cairo_dock_fill_one_icon_buffer (pIcon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
 	
 	cairo_dock_fill_one_text_buffer (pIcon, pCairoContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
+	
+	cairo_dock_fill_one_extra_info_buffer (pIcon, pCairoContext, 12, g_cLabelPolice, PANGO_WEIGHT_HEAVY, .4);
 	
 	cairo_destroy (pCairoContext);
 }

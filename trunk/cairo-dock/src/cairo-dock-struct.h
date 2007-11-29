@@ -165,6 +165,7 @@ struct _CairoDockDialog
 	int iButtonsType;  // le type des boutons (aucun, oui/non, ok/annuler).
 	CairoDockActionOnAnswerFunc action_on_answer;  // fonction appelee au clique sur l'un des 2 boutons.
 	gpointer pUserData;
+	GFreeFunc pFreeUserDataFunc;
 	};
 
 
@@ -240,6 +241,12 @@ struct _Icon {
 	double fLastCheckTime;
 	//\____________ Pour les modules.
 	CairoDockModule *pModule;
+	gchar *cQuickInfo;
+	cairo_surface_t* pQuickInfoBuffer;
+	int iQuickInfoWidth;
+	int iQuickInfoHeight;
+	double fQuickInfoXOffset;
+	double fQuickInfoYOffset;
 	//\____________ Pour les bulles de dialogues.
 	CairoDockDialog *pDialog;
 };
