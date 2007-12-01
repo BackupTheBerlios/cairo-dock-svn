@@ -352,6 +352,24 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 	return pNewSurface;
 }
 
+cairo_surface_t *cairo_dock_create_surface_for_icon (gchar *cImagePath, cairo_t* pSourceContext, double fImageWidth, double fImageHeight)
+{
+	double fImageWidth_ = fImageWidth, fImageHeight_ = fImageHeight;
+	return cairo_dock_create_surface_from_image (cImagePath,
+		pSourceContext,
+		1.,
+		fImageWidth,
+		fImageHeight,
+		fImageWidth,
+		fImageHeight,
+		&fImageWidth_,
+		&fImageHeight_,
+		0.,
+		1.,
+		FALSE);
+}
+
+
 cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fRotationAngle)
 {
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
@@ -616,7 +634,7 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection (cairo_surface_
 }
 
 
-cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double fBackgroundAlpha, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset)
+cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double fBackgroundAlpha, double fMaxScale, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset)
 {
 	g_return_val_if_fail (cText != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	
@@ -624,7 +642,7 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 	PangoLayout *pLayout = pango_cairo_create_layout (pSourceContext);
 	
 	PangoFontDescription *pDesc = pango_font_description_new ();
-	pango_font_description_set_absolute_size (pDesc, iLabelSize * PANGO_SCALE);
+	pango_font_description_set_absolute_size (pDesc, fMaxScale * iLabelSize * PANGO_SCALE);
 	pango_font_description_set_family_static (pDesc, cLabelPolice);
 	pango_font_description_set_weight (pDesc, iLabelWeight);
 	pango_font_description_set_style (pDesc, g_iLabelStyle);
@@ -649,7 +667,7 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 	if (fBackgroundAlpha > 0)
 	{
 		cairo_save (pCairoContext);
-		double fRadius = MIN (.5 * g_iDockRadius, 5.);  // bon compromis.
+		double fRadius = fMaxScale * MIN (.5 * g_iDockRadius, 5.);  // bon compromis.
 		double fLineWidth = 1.;
 		double fFrameWidth = *iTextWidth - 2 * fRadius - fLineWidth;
 		double fFrameHeight = *iTextHeight - fLineWidth;
@@ -684,10 +702,13 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 	cairo_surface_set_device_offset (pNewSurface, 
 					 log.width / 2. - ink.x,
 					 log.height     - ink.y);*/
-	*fTextXOffset = log.width / 2. - ink.x;
-	*fTextYOffset = log.height     - ink.y;
+	*fTextXOffset = (log.width / 2. - ink.x) / fMaxScale;
+	*fTextYOffset = (log.height     - ink.y) / fMaxScale;
 	//*fTextYOffset = iLabelSize - (log.height + 1) + ink.y ;  // en tenant compte de l'ecart du bas du texte.
 	//g_print ("%s -> %.2f (%d;%d)\n", icon->acName, icon->fTextYOffset, log.height, ink.y);
+	
+	*iTextWidth = *iTextWidth / fMaxScale;
+	*iTextHeight = *iTextHeight / fMaxScale;
 	
 	g_object_unref (pLayout);
 	return pNewSurface;

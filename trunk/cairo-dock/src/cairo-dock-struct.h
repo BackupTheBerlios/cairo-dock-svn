@@ -297,4 +297,13 @@ typedef enum {
 	CAIRO_DOCK_KDE
 	} CairoDockDesktopEnv;
 
+typedef enum
+{
+	CAIRO_DOCK_BOTTOM = 0,
+	CAIRO_DOCK_TOP,
+	CAIRO_DOCK_LEFT,
+	CAIRO_DOCK_RIGHT,
+	CAIRO_DOCK_NB_POSITIONS
+	} CairoDockPositionType;
+
 #endif

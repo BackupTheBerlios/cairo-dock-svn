@@ -271,7 +271,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 		//g_print (" -> etiquette : %s\n", cTruncatedName);
 	}
 	
-	cairo_surface_t* pNewSurface = cairo_dock_create_surface_from_text ((cTruncatedName != NULL ? cTruncatedName : icon->acName), pSourceContext, iLabelSize, cLabelPolice, g_iLabelWeight, 0., &icon->iTextWidth, &icon->iTextHeight, &icon->fTextXOffset, &icon->fTextYOffset);
+	cairo_surface_t* pNewSurface = cairo_dock_create_surface_from_text ((cTruncatedName != NULL ? cTruncatedName : icon->acName), pSourceContext, iLabelSize, cLabelPolice, g_iLabelWeight, 0., 1., &icon->iTextWidth, &icon->iTextHeight, &icon->fTextXOffset, &icon->fTextYOffset);
 	g_free (cTruncatedName);
 	
 	double fRotationAngle = (bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2));
@@ -292,7 +292,7 @@ void cairo_dock_fill_one_extra_info_buffer (Icon *icon, cairo_t* pSourceContext,
 	if (icon->cQuickInfo == NULL)
 		return ;
 	
-	icon->pQuickInfoBuffer = cairo_dock_create_surface_from_text (icon->cQuickInfo, pSourceContext, iLabelSize, cLabelPolice, iLabelWeight, fBackgroundAlpha, &icon->iQuickInfoWidth, &icon->iQuickInfoHeight, &icon->fQuickInfoXOffset, &icon->fQuickInfoYOffset);
+	icon->pQuickInfoBuffer = cairo_dock_create_surface_from_text (icon->cQuickInfo, pSourceContext, iLabelSize, cLabelPolice, iLabelWeight, fBackgroundAlpha, 1+g_fAmplitude, &icon->iQuickInfoWidth, &icon->iQuickInfoHeight, &icon->fQuickInfoXOffset, &icon->fQuickInfoYOffset);
 }
 
 

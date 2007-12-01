@@ -156,7 +156,7 @@ gfloat cairo_dock_calculate_magnitude (gint iMagnitudeIndex)  // merci a Robrob 
 
 gboolean cairo_dock_grow_up (CairoDock *pDock)
 {
-	//g_print ("%s (%d ; %f ; %d)\n", __func__, pDock->iMagnitudeIndex, pDock->fFoldingFactor, pDock->iSidShrinkDown);
+	//g_print ("%s (%d ; %f ; %d)\n", __func__, pDock->iMagnitudeIndex, pDock->fFoldingFactor, pDock->bInside);
 	if (pDock->iSidShrinkDown != 0)
 		return TRUE;  // on se met en attente de fin d'animation.
 	
@@ -169,15 +169,10 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 	if (pDock->fFoldingFactor < 0.03)
 		pDock->fFoldingFactor = 0;
 	
-	//if (pDock->iRefCount > 0 && ! pDock->bInside)  // pour l'animation des sous-docks a leur apparition.
-	//	pDock->iMouseX = -1e4;
-	//else
-	{
-		if (pDock->bHorizontalDock)
-			gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
-		else
-			gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);
-	}
+	if (pDock->bHorizontalDock)
+		gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
+	else
+		gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);
 	
 	pDock->calculate_icons (pDock);
 	gtk_widget_queue_draw (pDock->pWidget);

@@ -607,14 +607,16 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	cairo_restore (pCairoContext);  // retour juste apres la translation (fDrawX, fDrawY).
 	if (icon->pQuickInfoBuffer != NULL)
 	{
-		cairo_scale (pCairoContext,
-			fRatio * icon->fScale,
-			fRatio * icon->fScale);
 		cairo_translate (pCairoContext,
 			//-icon->fQuickInfoXOffset + icon->fWidth / 2,
 			//icon->fHeight - icon->fQuickInfoYOffset);
-			(- icon->iQuickInfoWidth + icon->fWidth) / 2,
-			icon->fHeight - icon->iQuickInfoHeight);
+			(- icon->iQuickInfoWidth + icon->fWidth) / 2 * icon->fScale,
+			(icon->fHeight - icon->iQuickInfoHeight) * icon->fScale);
+		
+		cairo_scale (pCairoContext,
+			fRatio * icon->fScale / (1 + g_fAmplitude),
+			fRatio * icon->fScale / (1 + g_fAmplitude));
+		
 		cairo_set_source_surface (pCairoContext,
 			icon->pQuickInfoBuffer,
 			0,

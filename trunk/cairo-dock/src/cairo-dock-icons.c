@@ -708,7 +708,7 @@ GList *cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, in
 Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, int iFlatDockWidth, int iWidth, int iHeight, double fAlign, double fFoldingFactor)
 {
 	//g_print (">>>>>%s (%d/%d, %dx%d)\n", __func__, x_abs, iFlatDockWidth, iWidth, iHeight);
-	if (x_abs < 0 && iWidth > 0)
+	if (x_abs < 0 && iWidth > 0)  // ces cas limite sont la pour empecher les icones de retrecir trop rapidement quend on sort par les cotes.
 		x_abs = -1;
 	else if (x_abs > iFlatDockWidth && iWidth > 0)
 		x_abs = iFlatDockWidth+1;

@@ -14,6 +14,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 typedef enum
 {
 	CAIRO_DOCK_MODEL_NAME = 0,
+	CAIRO_DOCK_MODEL_RESULT,
 	CAIRO_DOCK_MODEL_DESCRIPTION_FILE,
 	CAIRO_DOCK_MODEL_ACTIVE,
 	CAIRO_DOCK_MODEL_ORDER,
@@ -717,6 +718,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					case 'E' :  // string, mais avec un GtkComboBoxEntry pour le choix unique.
 					case 'R' :  // string, avec un label pour la description.
 					case 'P' :  // string avec un selecteur de font a cote du GtkEntry.
+					case 'r' : // string representee par son numero dans une liste de choix.
 						//g_print ("  + string\n");
 						pEntry = NULL;
 						pDescriptionLabel = NULL;
@@ -733,7 +735,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							}
 							else
 							{
-								GtkListStore *modele = gtk_list_store_new (CAIRO_DOCK_MODEL_NB_COLUMNS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_INT);
+								GtkListStore *modele = gtk_list_store_new (CAIRO_DOCK_MODEL_NB_COLUMNS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_INT);
 								if (iElementType == 'E')
 								{
 									pOneWidget = gtk_combo_box_entry_new_with_model (GTK_TREE_MODEL (modele), CAIRO_DOCK_MODEL_NAME);
@@ -748,6 +750,9 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								
 								k = 0;
 								int iSelectedItem = -1;
+								if (iElementType == 'r')
+									iSelectedItem = atoi (cValue);
+								gchar *cResult = (iElementType == 'r' ? g_new0 (gchar , 10) : NULL);
 								while (pAuthorizedValuesList[k] != NULL)
 								{
 									GtkTreeIter iter;
@@ -755,8 +760,13 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									if (iSelectedItem == -1 && strcmp (cValue, pAuthorizedValuesList[k]) == 0)
 										iSelectedItem = (iElementType == 'R' ? k / 2 : k);
 									
+									if (cResult != NULL)
+									{
+										snprintf (cResult, 10, "%d", k);
+									}
 									gtk_list_store_set (GTK_LIST_STORE (modele), &iter,
 										CAIRO_DOCK_MODEL_NAME, pAuthorizedValuesList[k],
+										CAIRO_DOCK_MODEL_RESULT, (cResult != NULL ? cResult : pAuthorizedValuesList[k]),
 										CAIRO_DOCK_MODEL_DESCRIPTION_FILE, (iElementType == 'R' ? pAuthorizedValuesList[k+1] : NULL),
 										-1);
 									
@@ -769,6 +779,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									else
 										k ++;
 								}
+								g_free (cResult);
 								
 								if (iElementType == 'R')
 								{
@@ -869,6 +880,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 										gtk_list_store_set (modele, &iter, 
 											CAIRO_DOCK_MODEL_ACTIVE, TRUE,
 											CAIRO_DOCK_MODEL_NAME, cValue,
+											CAIRO_DOCK_MODEL_RESULT, cValue,
 											CAIRO_DOCK_MODEL_DESCRIPTION_FILE, pAuthorizedValuesList[k+1],
 											CAIRO_DOCK_MODEL_ORDER, iOrder ++, -1);
 									}
@@ -892,6 +904,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 										gtk_list_store_set (modele, &iter,
 											CAIRO_DOCK_MODEL_ACTIVE, FALSE,
 											CAIRO_DOCK_MODEL_NAME, cValue,
+											CAIRO_DOCK_MODEL_RESULT, cValue,
 											CAIRO_DOCK_MODEL_DESCRIPTION_FILE, pAuthorizedValuesList[k+1],
 											CAIRO_DOCK_MODEL_ORDER, iOrder ++, -1);
 									}
@@ -918,6 +931,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 										gtk_list_store_set (modele, &iter,
 											CAIRO_DOCK_MODEL_ACTIVE, TRUE,
 											CAIRO_DOCK_MODEL_NAME, cValue,
+											CAIRO_DOCK_MODEL_RESULT, cValue,
 											CAIRO_DOCK_MODEL_ORDER, k, -1);
 									}
 								}
@@ -1290,7 +1304,7 @@ static void _cairo_dock_get_each_widget_value (gpointer *data, GKeyFile *pKeyFil
 		{
 			GtkTreeModel *model = gtk_combo_box_get_model (GTK_COMBO_BOX (pOneWidget));
 			if (model != NULL)
-				gtk_tree_model_get (model, &iter, CAIRO_DOCK_MODEL_NAME, &cValue, -1);
+				gtk_tree_model_get (model, &iter, CAIRO_DOCK_MODEL_RESULT, &cValue, -1);
 		}
 		g_key_file_set_string (pKeyFile, cGroupName, cKeyName, (cValue != NULL ? cValue : ""));
 		g_free (cValue);

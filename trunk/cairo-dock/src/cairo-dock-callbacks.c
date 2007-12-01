@@ -148,18 +148,34 @@ static void cairo_dock_show_subdock (Icon *pPointedIcon, gboolean bUpdate, Cairo
 	int iNewWidth, iNewHeight;
 	if (! g_bAnimateSubDock || g_fUnfoldAcceleration == 0)
 	{
+		g_print ("  on montre le sous-dock sans animation\n");
 		cairo_dock_get_window_position_and_geometry_at_balance (pSubDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
 		
+		gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
 		if (pSubDock->bHorizontalDock)
+			gdk_window_move_resize (pSubDock->pWidget->window,
+				pSubDock->iWindowPositionX,
+				pSubDock->iWindowPositionY,
+				iNewWidth,
+				iNewHeight);
+		else
+			gdk_window_move_resize (pSubDock->pWidget->window,
+				pSubDock->iWindowPositionY,
+				pSubDock->iWindowPositionX,
+				iNewHeight,
+				iNewWidth);
+		
+		/*if (pSubDock->bHorizontalDock)
 			gtk_window_move (GTK_WINDOW (pSubDock->pWidget), pSubDock->iWindowPositionX, pSubDock->iWindowPositionY);
 		else
 			gtk_window_move (GTK_WINDOW (pSubDock->pWidget), pSubDock->iWindowPositionY, pSubDock->iWindowPositionX);
 		
-		gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
+		gtk_window_present (GTK_WINDOW (pSubDock->pWidget));*/
 		///gtk_widget_show (GTK_WIDGET (pSubDock->pWidget));
 	}
 	else
 	{
+		g_print ("  on montre le sous-dock avec animation\n");
 		cairo_dock_get_window_position_and_geometry_at_balance (pSubDock, CAIRO_DOCK_MAX_SIZE, &iNewWidth, &iNewHeight);
 		
 		gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
@@ -1289,4 +1305,34 @@ void cairo_dock_disable_entrance (void)
 gboolean cairo_dock_entrance_is_allowed (void)
 {
 	return s_bEntranceAllowed;
+}
+
+
+
+void on_selection_get (GtkWidget *pWidget, GtkSelectionData *data, guint info, guint time, gpointer user_data)
+{
+	g_print ("***%s ()\n", __func__);
+}
+
+void on_selection_received (GtkWidget *pWidget, GtkSelectionData *data, guint time, gpointer user_data)
+{
+	g_print ("***%s ()\n", __func__);
+}
+
+gboolean on_selection_clear_event (GtkWidget *pWidget, GdkEventSelection *event, gpointer user_data)
+{
+	g_print ("***%s ()\n", __func__);
+	return FALSE;
+}
+
+gboolean on_selection_request_event (GtkWidget *pWidget, GdkEventSelection *event, gpointer user_data)
+{
+	g_print ("***%s ()\n", __func__);
+	return FALSE;
+}
+
+gboolean on_selection_notify_event (GtkWidget *pWidget, GdkEventSelection *event, gpointer user_data)
+{
+	g_print ("***%s ()\n", __func__);
+	return FALSE;
 }

@@ -8,7 +8,7 @@
 
 void cairo_dock_set_colormap_for_window (GtkWidget *pWidget);
 
-CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName, gchar *cRendererName);
+CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockName, gchar *cRendererName);
 
 
 const gchar *cairo_dock_search_dock_name (CairoDock *pDock);
@@ -32,7 +32,7 @@ void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDoc
 
 void cairo_dock_reference_dock (CairoDock *pChildDock);
 
-CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, gchar *cDockName, int iWindowTypeHint);
+CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, gchar *cDockName, GdkWindowTypeHint iWindowTypeHint);
 #define cairo_dock_create_subdock_from_scratch(pIconList, cDockName) cairo_dock_create_subdock_from_scratch_with_type (pIconList, cDockName, GDK_WINDOW_TYPE_HINT_MENU)
 #define cairo_dock_create_subdock_for_class_appli(cClassName) cairo_dock_create_subdock_from_scratch_with_type (NULL, cClassName, GDK_WINDOW_TYPE_HINT_DOCK)
 

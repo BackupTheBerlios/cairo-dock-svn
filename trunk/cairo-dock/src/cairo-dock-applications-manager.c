@@ -29,6 +29,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 #define CAIRO_DOCK_TASKBAR_CHECK_INTERVAL 250
 
+extern CairoDock *g_pMainDock;  // temporaire.
 extern gboolean g_bAutoHide;
 extern double g_fAmplitude;
 
@@ -530,7 +531,8 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 	{
 		icon = NULL;
 		Xid = event.xany.window;
-		//g_print ("event.type : %d\n", event.type);
+		if (event.type == ClientMessage)
+			g_print ("\n\n\n >>>>>>>>>>>< event.type : %d\n\n", event.type);
 		if (event.type == PropertyNotify)  // a priori on ne peut pas en recevoir d'autre.
 		{
 			//g_print ("  type : %d; atom : %s; window : %d\n", event.xproperty.type, gdk_x11_get_xatom_name (event.xproperty.atom), Xid);
@@ -730,6 +732,11 @@ void cairo_dock_start_application_manager (CairoDock *pDock)
 	
 	//\__________________ On lance le gestionnaire d'evenements X.
 	s_iSidUpdateAppliList = g_timeout_add (CAIRO_DOCK_TASKBAR_CHECK_INTERVAL, (GSourceFunc) cairo_dock_unstack_Xevents, (gpointer) pDock);  // un g_idle_add () consomme 90% de CPU ! :-/
+	
+	/*Atom aNetSystemTray = XInternAtom (s_XDisplay, "_NET_SYSTEM_TRAY_SELECTION_S1", False);
+	GdkAtom gdk_atom = gdk_x11_xatom_to_atom (aNetSystemTray);
+	gboolean bSelectionOk = gtk_selection_owner_set (g_pMainDock->pWidget, gdk_atom, GDK_CURRENT_TIME);
+	g_print ("bSelectionOk : %d\n", bSelectionOk);*/
 }
 
 void cairo_dock_pause_application_manager (void)

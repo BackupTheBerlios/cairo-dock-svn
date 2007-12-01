@@ -65,4 +65,15 @@ void cairo_dock_disable_entrance (void);
 gboolean cairo_dock_entrance_is_allowed (void);
 
 
+void on_selection_get (GtkWidget *pWidget, GtkSelectionData *data, guint info, guint time, gpointer user_data);
+
+void on_selection_received (GtkWidget *pWidget, GtkSelectionData *data, guint time, gpointer user_data);
+
+gboolean on_selection_clear_event (GtkWidget *pWidget, GdkEventSelection *event, gpointer user_data);
+
+gboolean on_selection_request_event (GtkWidget *pWidget, GdkEventSelection *event, gpointer user_data);
+
+gboolean on_selection_notify_event (GtkWidget *pWidget, GdkEventSelection *event, gpointer user_data);
+
+
 #endif

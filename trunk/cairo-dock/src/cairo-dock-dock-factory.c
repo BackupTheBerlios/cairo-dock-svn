@@ -149,13 +149,22 @@ static void _cairo_dock_set_colormap (CairoDock *pDock)
 	
 	cairo_dock_set_colormap_for_window (pDock->pWidget);
 }
-CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName, gchar *cRendererName)
+/**
+* Cree un nouveau dock principal.
+* @param iWmHint indicateur du type de fenetre pour le WM.
+* @param cDockName nom du dock, qui pourra etre utilise pour retrouver celui-ci rapidement.
+* @param cRendererName nom de la fonction de rendu a applisuer au dock. si NULL, le rendu par defaut sera applique.
+* @Returns le dock nouvellement alloué, a detruire avec <cairo_dock_destroy_dock>
+*/
+CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockName, gchar *cRendererName)
 {
+	static pouet = 0;
 	//g_print ("%s ()\n", __func__);
 	CairoDock *pExistingDock = g_hash_table_lookup (g_hDocksTable, cDockName);
 	if (pExistingDock != NULL)
 		return pExistingDock;
 	
+	//\__________________ On cree le dock.
 	CairoDock *pDock = g_new0 (CairoDock, 1);
 	pDock->bAtBottom = TRUE;
 	pDock->iRefCount = 0;  // c'est un dock racine par defaut.
@@ -167,6 +176,7 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName, gchar *cRe
 		pDock->fAlign = g_pMainDock->fAlign;
 	}
 	
+	//\__________________ On cree la fenetre GTK.
 	GtkWidget* pWindow = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 	pDock->pWidget = pWindow;
 	
@@ -179,7 +189,6 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName, gchar *cRe
 	
 	gtk_window_set_type_hint (GTK_WINDOW (pWindow), iWmHint);
 	
-	
 	_cairo_dock_set_colormap (pDock);
 	
 	gtk_widget_set_app_paintable (pWindow, TRUE);
@@ -189,10 +198,11 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName, gchar *cRe
 	
 	cairo_dock_set_renderer (pDock, cRendererName);
 	
+	//\__________________ On connecte les evenements a la fenetre.
 	gtk_widget_add_events (pWindow,
-		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | 
-		GDK_POINTER_MOTION_MASK |
-		GDK_POINTER_MOTION_HINT_MASK);
+		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
+		//GDK_STRUCTURE_MASK | GDK_PROPERTY_CHANGE_MASK |
+		GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
 	
 	g_signal_connect (G_OBJECT (pWindow),
 		"delete-event",
@@ -247,6 +257,15 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName, gchar *cRe
 		G_CALLBACK (on_drag_motion),
 		pDock);
 	
+	/*g_signal_connect (G_OBJECT (pWindow),
+		"selection_request_event",
+		G_CALLBACK (on_selection_request_event),
+		pDock);
+	g_signal_connect (G_OBJECT (pWindow),
+		"selection_notify_event",
+		G_CALLBACK (on_selection_notify_event),
+		pDock);*/
+	
 	GtkTargetEntry *pTargetEntry = g_new0 (GtkTargetEntry, 1);
 	pTargetEntry[0].target = g_strdup ("text/uri-list");
 	pTargetEntry[0].flags = (GtkTargetFlags) 0;
@@ -261,6 +280,57 @@ CairoDock *cairo_dock_create_new_dock (int iWmHint, gchar *cDockName, gchar *cRe
 	gtk_window_get_size (GTK_WINDOW (pWindow), &pDock->iCurrentWidth, &pDock->iCurrentHeight);  // ca n'est que la taille initiale allouee par GTK.
 	gtk_widget_show_all (pWindow);
 	
+	/*if (!pouet)
+	{
+		pouet = 1;
+		GdkAtom selection = gdk_atom_intern ("_NET_SYSTEM_TRAY_S0", FALSE);
+		gboolean bOwnerOK = gtk_selection_owner_set (pWindow,
+			selection,
+			GDK_CURRENT_TIME);
+		g_print ("bOwnerOK : %d\n", bOwnerOK);
+		
+		gtk_selection_add_target (pWindow,
+			selection,
+			GDK_SELECTION_TYPE_ATOM,
+			1);
+		gtk_selection_add_target (pWindow,
+			selection,
+			GDK_SELECTION_TYPE_BITMAP,
+			2);
+		gtk_selection_add_target (pWindow,
+			selection,
+			GDK_SELECTION_TYPE_DRAWABLE,
+			3);
+		gtk_selection_add_target (pWindow,
+			selection,
+			GDK_SELECTION_TYPE_INTEGER,
+			4);
+		gtk_selection_add_target (pWindow,
+			selection,
+			GDK_SELECTION_TYPE_STRING,
+			4);
+		gtk_selection_add_target (pWindow,
+			selection,
+			GDK_SELECTION_TYPE_WINDOW,
+			4);
+		gtk_selection_add_target (pWindow,
+			selection,
+			GDK_SELECTION_TYPE_PIXMAP,
+			4);
+		
+		g_signal_connect (G_OBJECT (pWindow),
+			"selection_get",
+			G_CALLBACK (on_selection_get),
+			pDock);
+		g_signal_connect (G_OBJECT (pWindow),
+			"selection_received",
+			G_CALLBACK (on_selection_received),
+			pDock);
+		g_signal_connect (G_OBJECT (pWindow),
+			"selection_clear_event",
+			G_CALLBACK (on_selection_clear_event),
+			pDock);
+	}*/
 	
 #ifdef HAVE_GLITZ
 	if (g_bUseGlitz && pDock->pDrawFormat != NULL)
@@ -317,6 +387,11 @@ static gboolean _cairo_dock_search_dock_name_from_subdock (gchar *cDockName, Cai
 	else
 		return FALSE;
 }
+/**
+* Cherche le nom d'un dock, en parcourant la table des docks jusqu'a trouver celui passe en entree.
+* @param pDock le dock.
+* @Returns le nom du dock, ou NULL si ce dock n'existe pas. Ne _pas_ desallouer la chaine.
+*/
 const gchar *cairo_dock_search_dock_name (CairoDock *pDock)
 {
 	gchar *cDockName = NULL;
@@ -326,6 +401,11 @@ const gchar *cairo_dock_search_dock_name (CairoDock *pDock)
 	return cDockName;
 }
 
+/**
+* Cherche un dock etant donne son nom.
+* @param cDockName le nom du dock.
+* @Returns le dock qui a ete enregistre sous ce nom, ou NULL si aucun ne correspond.
+*/
 CairoDock *cairo_dock_search_dock_from_name (gchar *cDockName)
 {
 	return g_hash_table_lookup (g_hDocksTable, cDockName);
@@ -348,6 +428,12 @@ static gboolean _cairo_dock_search_icon_from_subdock (gchar *cDockName, CairoDoc
 	else
 		return FALSE;
 }
+/**
+* Cherche l'icone pointant sur un dock. Si plusieurs icones pointent sur ce dock, la premiere sera renvoyee.
+* @param pDock le dock.
+* @param pParentDock si non NULL, sera renseigne avec le dock contenant l'icone.
+* @Returns l'icone pointant sur le dock.
+*/
 Icon *cairo_dock_search_icon_pointing_on_dock (CairoDock *pDock, CairoDock **pParentDock)  // pParentDock peut etre NULL.
 {
 	if (pDock->bIsMainDock)  // par definition. On n'utilise pas iRefCount, car si on est en train de detruire un dock, sa reference est deja decrementee.
@@ -362,6 +448,11 @@ static gboolean _cairo_dock_search_icon_in_a_dock (gchar *cDockName, CairoDock *
 {
 	return (g_list_find (pDock->icons, icon) != NULL);
 }
+/**
+* Cherche le dock contenant l'icone donnee, en parcourant la liste des icones de tous les docks jusqu'a trouver celle passee en entree.
+* @param icon l'icone.
+* @Returns le dock contenant cette icone, ou NULL si aucun n'a ete trouve.
+*/
 CairoDock *cairo_dock_search_container_from_icon (Icon *icon)
 {
 	if (icon->cParentDockName != NULL)
@@ -371,7 +462,13 @@ CairoDock *cairo_dock_search_container_from_icon (Icon *icon)
 }
 
 
-
+/**
+* Demande au WM d'empecher les autres fenetres d'empieter sur l'espace du dock.
+* L'espace reserve est pris sur la taille minimale du dock, c'est-a-dire la taille de la zone de rappel si l'auto-hide est active,
+* ou la taille du dock au repos sinon.
+* @param pDock le dock.
+* @param bReserve TRUE pour reserver l'espace, FALSE pour annuler la reservation.
+*/
 void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
 {
 	int Xid = GDK_WINDOW_XID (pDock->pWidget->window);
@@ -429,6 +526,11 @@ void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
 		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_TOOLBAR");  // idem.
 }
 
+/**
+* Recalcule la taille maximale du dock, si par exemple une icone a ete enlevee/rajoutee. Met a jour la taille des decorations si necessaire.
+* Le dock est deplace de maniere a rester centre sur la meme position, et les coordonnees des icones des applis sont recalculees et renvoyees au WM
+* @param pDock le dock.
+*/
 void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et iFlatDockWidth doivent avoir ete mis a jour au prealable.
 {
 	g_print ("%s ()\n", __func__);
@@ -467,7 +569,15 @@ void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et iFlatD
 }
 
 
-
+/**
+* Insere une icone dans le dock, a la position indiquee par le champ /a fOrder.
+* Insere un separateur si necessaire, et reserve l'espace correspondant aux nouvelles dimensions du dock si necessaire.
+* @param icon l'icone a inserer.
+* @param pDock le dock dans lequel l'inserer.
+* @param bUpdateSize TRUE pour recalculer la taille du dock apres insertion.
+* @param bAnimated TRUE pour regler la taille de l'icone au minimum de facon a la faire grossir apres.
+* @param bApplyRatio TRUE pour appliquer le facteur de taille propre au sous-dock.
+*/
 void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpdateSize, gboolean bAnimated, gboolean bApplyRatio)
 {
 	g_return_if_fail (icon != NULL);
@@ -569,7 +679,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 	if (bUpdateSize)
 		cairo_dock_update_dock_size (pDock);
 	
-	if (pDock->bIsMainDock && g_bReserveSpace && ! g_bAutoHide && ! pDock->bInside && pDock->iFlatDockWidth != iPreviousMinWidth && pDock->iMaxIconHeight != iPreviousMaxIconHeight)
+	if (pDock->bIsMainDock && g_bReserveSpace && ! g_bAutoHide && ! pDock->bInside && (pDock->iFlatDockWidth != iPreviousMinWidth || pDock->iMaxIconHeight != iPreviousMaxIconHeight))
 		cairo_dock_reserve_space_for_dock (pDock, TRUE);
 }
 
@@ -579,8 +689,8 @@ static void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDo
 	if (! pDock->bIsMainDock)
 	{
 		cairo_dock_update_dock_size (pDock);
-		pDock->iMouseX = 0; // utile ?
-		pDock->iMouseY = 0;
+		pDock->iMouseX = -1; // utile ?
+		pDock->iMouseY = -1;
 		pDock->calculate_icons (pDock);
 		//cairo_dock_apply_wave_effect (pDock);
 		gtk_window_present (GTK_WINDOW (pDock->pWidget));
@@ -592,6 +702,14 @@ static void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDo
 			gtk_window_move (GTK_WINDOW (pDock->pWidget), 500, 500);  // sinon ils n'apparaisesent pas.
 	}
 }
+/**
+* Charge un ensemble de fichiers .desktop definissant des icones, et construit l'arborescence des docks.
+* Toutes les icones sont creees et placees dans leur conteneur repectif, qui est cree si necessaire. Cette fonction peut tres bien s'utiliser pour 
+* A la fin du processus, chaque dock est calcule, et place a la position qui lui est assignee.
+* Il faut fournir un dock pour avoir ujn contexte de dessin, car les icones sont crees avant leur conteneur.
+* @param pMainDock un dock quelconque.
+* @param cDirectory le repertoire contenant les fichiers .desktop.
+*/
 void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar *cDirectory)
 {
 	//g_print ("%s (%s)\n", __func__, cDirectory);
@@ -665,6 +783,10 @@ static gboolean _cairo_dock_free_one_dock (gchar *cDockName, CairoDock *pDock, g
 	g_free (pDock);
 	return TRUE;
 }
+/**
+* Detruit tous les docks et toutes les icones contenues dedans, et libere la memoire qui leur etait allouee. Les applets sont stoppees au prealable, ainsi que la barre des taches.
+* @param pMainDock le dock principal contenant les applets.
+*/
 void cairo_dock_free_all_docks (CairoDock *pMainDock)
 {
 	if (pMainDock == NULL)
@@ -676,6 +798,13 @@ void cairo_dock_free_all_docks (CairoDock *pMainDock)
 	g_hash_table_foreach_remove (g_hDocksTable, (GHRFunc) _cairo_dock_free_one_dock, NULL);
 }
 
+/**
+* Diminue le nombre d'icones pointant sur un dock de 1. Si aucune icone ne pointe plus sur lui apres ca, le detruit et libere la memoire qui lui etait allouee.
+* @param pMainDock le dock a detruire.
+* @param cDockName son nom.
+* @param ReceivingDock un dock qui recuperera les icones, ou NULL pour detruire toutes les icones contenues dans le dock.
+* @param cReceivingDockName le nom du dock qui recuperera les icones, ou NULL si aucun n'est fourni.
+*/
 void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDock *ReceivingDock, gchar *cReceivingDockName)
 {
 	//g_print ("%s (%s, %d)\n", __func__, cDockName, pDock->iRefCount);
@@ -732,7 +861,10 @@ void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDoc
 }
 
 
-
+/**
+* Augmente la reference d'un dock, c'est-a-dire le nombre d'icones pointant sur ce dock. Si le dock etait auparavant un dock principal, il devient un sous-dock, prenant du meme coup les parametres propres aux sous-docks.
+* @param pDock le dock.
+*/
 void cairo_dock_reference_dock (CairoDock *pDock)
 {
 	pDock->iRefCount ++;  // peut-etre qu'il faudrait en faire une operation atomique...
@@ -763,8 +895,14 @@ void cairo_dock_reference_dock (CairoDock *pDock)
 	}
 }
 
-
-CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, gchar *cDockName, int iWindowTypeHint)
+/**
+* Cree un nouveau dock de type "sous-dock", et y insere la liste des icones fournie. La liste est appropriee par le dock, et ne doit donc _pas_ etre liberee apres cela. Chaque icone est chargee, et a donc juste besoin d'avoir un nom et un fichier d'image.
+* @param pIconList une liste d'icones qui seront entierement chargees et inserees dans le dock.
+* @param cDockName le nom desire pour le dock.
+* @param iWindowTypeHint indicateur du type de fenetre pour le WM.
+* @Returns le dock nouvellement alloue.
+*/
+CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, gchar *cDockName, GdkWindowTypeHint iWindowTypeHint)
 {
 	CairoDock *pSubDock = cairo_dock_create_new_dock (iWindowTypeHint, cDockName, NULL);
 	cairo_dock_reference_dock (pSubDock);  // on le fait tout de suite pour avoir la bonne reference avant le 'load'.

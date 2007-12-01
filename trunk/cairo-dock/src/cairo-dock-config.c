@@ -30,7 +30,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 #define CAIRO_DOCK_TYPE_CONF_FILE_FILE ".cairo-dock-conf-file"
 
-static const gchar *s_tAnimationNames[CAIRO_DOCK_NB_ANIMATIONS + 1] = {"bounce", "rotate", "blink", "pulse", "upside-down", "wobbly", "random", NULL};
 static const gchar * s_cIconTypeNames[(CAIRO_DOCK_NB_TYPES+1)/2] = {"launchers", "applications", "applets"};
 
 extern CairoDock *g_pMainDock;
@@ -133,25 +132,6 @@ extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 
 extern gchar *g_cSeparatorImage;
 extern gboolean g_bRevolveSeparator;
-
-
-guint cairo_dock_get_number_from_name (gchar *cName, const gchar **tNamesList)
-{
-	g_return_val_if_fail (cName != NULL, 0);
-	int i = 0;
-	while (tNamesList[i] != NULL)
-	{
-		if (strcmp (cName,tNamesList[i]) == 0)
-			return i;
-		i ++;
-	}
-	return 0;
-}
-
-static CairoDockAnimationType cairo_dock_get_animation_type_from_name (gchar *cAnimationName)
-{
-	return cairo_dock_get_number_from_name (cAnimationName, s_tAnimationNames);
-}
 
 
 gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gboolean bDefaultValue)
@@ -427,11 +407,14 @@ gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupN
 	return cValuesList;
 }
 
-CairoDockAnimationType cairo_dock_get_animation_type_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, const gchar *cDefaultAnimation)
+CairoDockAnimationType cairo_dock_get_animation_type_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, CairoDockAnimationType iDefaultAnimation)
 {
-	gchar *cAnimationName = cairo_dock_get_string_key_value (pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, cDefaultAnimation);
+	/*gchar *cAnimationName = cairo_dock_get_string_key_value (pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, cDefaultAnimation);
 	int iAnimationType = cairo_dock_get_animation_type_from_name (cAnimationName);  // cAnimationName peut etre NULL.
-	g_free(cAnimationName);
+	g_free(cAnimationName);*/
+	CairoDockAnimationType iAnimationType = cairo_dock_get_integer_key_value (pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, iDefaultAnimation);
+	if (iAnimationType < 0 || iAnimationType >= CAIRO_DOCK_NB_ANIMATIONS)
+		iAnimationType = 0;
 	return iAnimationType;
 }
 
@@ -456,7 +439,10 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	pDock->iGapX = cairo_dock_get_integer_key_value (pKeyFile, "Position", "x gap", &bFlushConfFileNeeded, 0);
 	pDock->iGapY = cairo_dock_get_integer_key_value (pKeyFile, "Position", "y gap", &bFlushConfFileNeeded, 0);
 	
-	gchar *cScreenBorder = cairo_dock_get_string_key_value (pKeyFile, "Position", "screen border", &bFlushConfFileNeeded, "bottom");
+	///gchar *cScreenBorder = cairo_dock_get_string_key_value (pKeyFile, "Position", "screen border", &bFlushConfFileNeeded, "bottom");
+	CairoDockPositionType iScreenBorder = cairo_dock_get_integer_key_value (pKeyFile, "Position", "screen border", &bFlushConfFileNeeded, 0);
+	if (iScreenBorder < 0 || iScreenBorder >= CAIRO_DOCK_NB_POSITIONS)
+		iScreenBorder = 0;
 	
 	pDock->fAlign = cairo_dock_get_double_key_value (pKeyFile, "Position", "alignment", &bFlushConfFileNeeded, 0.5);
 	
@@ -694,7 +680,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_tMinIconAuthorizedSize[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_integer_key_value (pKeyFile, "Launchers", "min icon size", &bFlushConfFileNeeded, 0);
 	
-	g_tAnimationType[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_animation_type_key_value (pKeyFile, "Launchers", "animation type", &bFlushConfFileNeeded, s_tAnimationNames[0]);
+	g_tAnimationType[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_animation_type_key_value (pKeyFile, "Launchers", "animation type", &bFlushConfFileNeeded, CAIRO_DOCK_BOUNCE);
 	
 	g_tNbAnimationRounds[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_integer_key_value (pKeyFile, "Launchers", "number of animation rounds", &bFlushConfFileNeeded, 4);
 	
@@ -706,7 +692,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Applications", "min icon size", &bFlushConfFileNeeded, 0);
 	
-	g_tAnimationType[CAIRO_DOCK_APPLI] = cairo_dock_get_animation_type_key_value (pKeyFile, "Applications", "animation type", &bFlushConfFileNeeded, s_tAnimationNames[1]);
+	g_tAnimationType[CAIRO_DOCK_APPLI] = cairo_dock_get_animation_type_key_value (pKeyFile, "Applications", "animation type", &bFlushConfFileNeeded, CAIRO_DOCK_ROTATE);
 	
 	g_tNbAnimationRounds[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Applications", "number of animation rounds", &bFlushConfFileNeeded, 2);
 	
@@ -731,7 +717,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLET] = cairo_dock_get_integer_key_value (pKeyFile, "Applets", "min icon size", &bFlushConfFileNeeded, 0);
 	
-	g_tAnimationType[CAIRO_DOCK_APPLET] = cairo_dock_get_animation_type_key_value (pKeyFile, "Applications", "animation type", &bFlushConfFileNeeded, s_tAnimationNames[2]);
+	g_tAnimationType[CAIRO_DOCK_APPLET] = cairo_dock_get_animation_type_key_value (pKeyFile, "Applets", "animation type", &bFlushConfFileNeeded, CAIRO_DOCK_BLINK);
 	
 	g_tNbAnimationRounds[CAIRO_DOCK_APPLET] = cairo_dock_get_integer_key_value (pKeyFile, "Applets", "number of animation rounds", &bFlushConfFileNeeded, 1);
 	
@@ -752,7 +738,26 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	
 	//\___________________ On (re)charge tout, car n'importe quel parametre peut avoir change.
-	if (cScreenBorder == NULL || strcmp (cScreenBorder, "bottom") == 0)
+	switch (iScreenBorder)
+	{
+		case CAIRO_DOCK_BOTTOM :
+			pDock->bHorizontalDock = CAIRO_DOCK_HORIZONTAL;
+			g_bDirectionUp = TRUE;
+		break;
+		case CAIRO_DOCK_TOP :
+			pDock->bHorizontalDock = CAIRO_DOCK_HORIZONTAL;
+		g_bDirectionUp = FALSE;
+		break;
+		case CAIRO_DOCK_LEFT :
+			pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
+		g_bDirectionUp = FALSE;
+		break;
+		case CAIRO_DOCK_RIGHT :
+			pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
+		g_bDirectionUp = TRUE;
+		break;
+	}
+	/*if (iScreenBorder == CAIRO_DOCK_BOTTOM)
 	{
 		pDock->bHorizontalDock = CAIRO_DOCK_HORIZONTAL;
 		g_bDirectionUp = TRUE;
@@ -772,9 +777,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
 		g_bDirectionUp = FALSE;
 	}
-	g_free (cScreenBorder);
+	g_free (cScreenBorder);*/
 	
-	cairo_dock_update_screen_geometry (pDock);  // on le fait ici, ca permet de remettre a jour le dock en le reconfigurant si l'on a change la resolution de l'ecran.
+	cairo_dock_update_screen_geometry (pDock);
 	
 	if (g_iMaxAuthorizedWidth == 0)
 		g_iMaxAuthorizedWidth = g_iScreenWidth[pDock->bHorizontalDock];
