@@ -378,16 +378,16 @@ main (int argc, char** argv)
 		NULL);
 	g_free (cSillyMessageFilePath);
 	
-	//if (bWriteSillyMessage)
+	if (bWriteSillyMessage)
 	{
 		Icon *pFirstIcon = cairo_dock_get_first_icon (g_pMainDock->icons);
 		if (pFirstIcon != NULL)
 		{
 			cairo_dock_show_temporary_dialog_with_default_icon (cSillyMessage, pFirstIcon, g_pMainDock, 7500);
 			
-			cairo_t *pIconContext = cairo_dock_create_context_from_window (g_pMainDock);
+			/*cairo_t *pIconContext = cairo_dock_create_context_from_window (g_pMainDock);
 			cairo_dock_set_quick_info (pIconContext, "69°C", pFirstIcon, g_pMainDock);
-			cairo_destroy (pIconContext);
+			cairo_destroy (pIconContext);*/
 		}
 	}
 	
