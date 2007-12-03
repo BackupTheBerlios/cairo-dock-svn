@@ -51,5 +51,12 @@ AC_CONFIG_FILES([Makefile
 		data/themes/_Cobalt_/launchers/Makefile
 		data/themes/_Glattering_/Makefile
 		data/themes/_Glattering_/launchers/Makefile
+		data/themes/_TapisVert_/Makefile
+		data/themes/_TapisVert_/launchers/Makefile
+		data/themes/_TapisVert_/plug-ins/Makefile
+		data/themes/_TapisVert_/plug-ins/file-manager/Makefile
+		data/themes/_TapisVert_/plug-ins/rendering/Makefile
+		data/themes/_TapisVert_/plug-ins/logout/Makefile
+		data/themes/_TapisVert_/plug-ins/dustbin/Makefile
 		])
 AC_OUTPUT
