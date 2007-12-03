@@ -5,4 +5,5 @@ SUBDIRS = \
 	_Verde_\
 	_Djoole_\
 	_Cobalt_\
-	_Glattering_
+	_Glattering_\
+	_TapisVert_
