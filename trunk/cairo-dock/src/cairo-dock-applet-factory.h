@@ -33,6 +33,10 @@ void cairo_dock_animate_icon (Icon *pIcon, CairoDock *pDock, CairoDockAnimationT
 void cairo_dock_add_reflection_to_icon (Icon *pIcon, CairoDock *pDock, cairo_t *pCairoContext);
 
 
+int cairo_dock_get_number_from_name (gchar *cValue, gchar **cValuesList);
+
+
+
 #define CD_CONFIG_APPLET \
 void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar *cName)
 

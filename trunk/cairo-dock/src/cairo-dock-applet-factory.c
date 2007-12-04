@@ -305,3 +305,10 @@ void cairo_dock_add_reflection_to_icon (Icon *pIcon, CairoDock *pDock, cairo_t *
 		(pDock->bHorizontalDock ? pIcon->fHeight : pIcon->fWidth) * (1 + g_fAmplitude),
 		pDock->bHorizontalDock);
 }
+
+int cairo_dock_get_number_from_name (gchar *cValue, gchar **cValuesList)
+{
+	return 0;
+}
+
+
