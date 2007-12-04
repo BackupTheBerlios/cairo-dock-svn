@@ -343,7 +343,7 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 	
 	if (! pDock->bIsMainDock)  // on le fait pas pour le dock principal, ce sera fait a la fin de la fonction 'read_conf'.
 	{
-		cairo_dock_update_dock_size (pDock);
+		///cairo_dock_update_dock_size (pDock);
 	}
 }
 void cairo_dock_reload_buffers_in_all_docks (GHashTable *hDocksTable)

@@ -273,7 +273,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	//	g_print ("pas d'etat defini, donc on continue\n");
 	if (bSkip)
 	{
-		g_print ("  cette fenetre est timide\n");
+		//g_print ("  cette fenetre est /de\n");
 		return NULL;
 	}
 	
@@ -314,15 +314,15 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 				
 				if (XMainAppliWindow != 0)
 				{
-					g_print ("dialogue 'transient for' => on ignore\n");
+					//g_print ("dialogue 'transient for' => on ignore\n");
 					XFree (pTypeBuffer);
 					return NULL;  // inutile de rajouter le PID ici, c'est le meme que la fenetre principale.
 				}
-				g_print ("dialogue autorise\n");
+				//g_print ("dialogue autorise\n");
 			}
 			else if (*pTypeBuffer != s_aNetWmWindowTypeNormal)
 			{
-				g_print ("type indesirable\n");
+				//g_print ("type indesirable\n");
 				XFree (pTypeBuffer);
 				if (g_bUniquePid)
 					g_hash_table_insert (s_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
@@ -338,7 +338,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 			XMainAppliWindow = 0;
 		if (XMainAppliWindow != 0)
 		{
-			g_print ("fenetre modale => on saute.\n");
+			//g_print ("fenetre modale => on saute.\n");
 			return NULL;  // meme remarque.
 		}
 		//else
@@ -353,12 +353,12 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	}
 	if (iBufferNbElements == 0)
 	{
-		g_print ("pas de nom, elle degage\n");
+		//g_print ("pas de nom, elle degage\n");
 		if (g_bUniquePid)
 			g_hash_table_insert (s_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
 		return NULL;
 	}
-	g_print ("recuperation de '%s'\n", pNameBuffer);
+	//g_print ("recuperation de '%s'\n", pNameBuffer);
 	
 	//\__________________ On cree et on remplit l'icone, et on l'insere apres les autres applis.
 	Icon *icon = g_new0 (Icon, 1);
@@ -382,11 +382,11 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	XClassHint *pClassHint = XAllocClassHint ();
 	if (XGetClassHint (s_XDisplay, Xid, pClassHint) != 0)
 	{
-		g_print ("  res_name : %s(%x); res_class : %s(%x)", pClassHint->res_name, pClassHint->res_name, pClassHint->res_class, pClassHint->res_class);
+		//g_print ("  res_name : %s(%x); res_class : %s(%x)", pClassHint->res_name, pClassHint->res_name, pClassHint->res_class, pClassHint->res_class);
 		icon->cClass = g_ascii_strdown (pClassHint->res_class, -1);  // on la passe en minuscule, car certaines applis ont la bonne idee de donner des classes avec une majuscule ou non suivant les fenetres. Il reste le cas des aplis telles que Glade2 ('Glade' et 'Glade-2' ...)
 		XFree (pClassHint->res_name);
 		XFree (pClassHint->res_class);
-		g_print (".\n");
+		//g_print (".\n");
 	}
 	XFree (pClassHint);
 	

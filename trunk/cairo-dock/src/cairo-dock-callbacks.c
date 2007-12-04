@@ -1105,7 +1105,7 @@ gboolean on_configure (GtkWidget* pWidget,
 	
 	if (iNewWidth != pDock->iCurrentWidth || iNewHeight != pDock->iCurrentHeight)
 	{
-		//g_print ("-> %dx%d\n", iNewWidth, iNewHeight);
+		g_print ("-> %dx%d\n", iNewWidth, iNewHeight);
 		pDock->iCurrentWidth = iNewWidth;
 		pDock->iCurrentHeight = iNewHeight;
 		

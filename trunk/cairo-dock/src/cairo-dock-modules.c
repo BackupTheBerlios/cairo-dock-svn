@@ -26,7 +26,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #define CAIRO_DOCK_MODULE_PANEL_HEIGHT 450
 
 extern gchar *g_cConfFile;
-
+extern short g_iMajorVersion, g_iMinorVersion, g_iMicroVersion;
 static GHashTable *s_hModuleTable = NULL;
 
 
@@ -52,7 +52,7 @@ void cairo_dock_initialize_module_manager (gchar *cModuleDirPath)
 }
 
 
-gchar *cairo_dock_extract_module_name_from_path (gchar *cSoFilePath)
+static gchar *cairo_dock_extract_default_module_name_from_path (gchar *cSoFilePath)
 {
 	gchar *ptr = g_strrstr (cSoFilePath, "/");
 	if (ptr == NULL)
@@ -62,19 +62,29 @@ gchar *cairo_dock_extract_module_name_from_path (gchar *cSoFilePath)
 	if (strncmp (ptr, "lib", 3) == 0)
 		ptr += 3;
 	
+	if (strncmp (ptr, "cd-", 3) == 0)
+		ptr += 3;
+	else if (strncmp (ptr, "cd_", 3) == 0)
+		ptr += 3;
+	
 	gchar *cModuleName = g_strdup (ptr);
 	
 	ptr = g_strrstr (cModuleName, ".so");
 	if (ptr != NULL)
 		*ptr = '\0';
 	
-	ptr = cModuleName;
-	while ((ptr = g_strrstr (ptr, "-")) != NULL)
-	{
-		*ptr = '_';
-	}
+	//ptr = cModuleName;
+	//while ((ptr = g_strrstr (ptr, "-")) != NULL)
+	//	*ptr = '_';
 	
 	return cModuleName;
+}
+
+void cairo_dock_free_visit_card (CairoDockVisitCard *pVisitCard)
+{
+	g_free (pVisitCard->cReadmeFilePath);
+	g_free (pVisitCard->cModuleName);
+	g_free (pVisitCard);
 }
 
 static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **erreur)
@@ -86,46 +96,54 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 		return ;
 	}
 	
-	g_free (pCairoDockModule->cReadmeFilePath);
-	pCairoDockModule->cReadmeFilePath = NULL;
 	gboolean bSymbolFound;
 	
-	CairoDockModulePreInit function_pre_init;
-	gchar *cPreInitFuncName = g_strdup_printf ("%s_pre_init", pCairoDockModule->cModuleName);
-	bSymbolFound = g_module_symbol (module, cPreInitFuncName, (gpointer) &function_pre_init) || g_module_symbol (module, "pre_init", (gpointer) &function_pre_init);
-	if (! bSymbolFound)
+	CairoDockModulePreInit function_pre_init = NULL;
+	bSymbolFound = g_module_symbol (module, "pre_init", (gpointer) &function_pre_init);
+	CairoDockVisitCard *pVisitCard = NULL;
+	if (bSymbolFound && function_pre_init != NULL)
 	{
-		function_pre_init = NULL;
+		pVisitCard = function_pre_init ();
+	}
+	if (pVisitCard != NULL)
+	{
+		if (pVisitCard->iMajorVersionNeeded > g_iMajorVersion || pVisitCard->iMinorVersionNeeded > g_iMinorVersion || pVisitCard->iMicroVersionNeeded > g_iMicroVersion)
+		{
+			g_set_error (erreur, 1, 1, "Attention : this module ('%s') needs at least Cairo-Dock v%d.%d.%d, but Cairo-Dock is in v%s\n  It will be ignored", pCairoDockModule->cSoFilePath, pVisitCard->iMajorVersionNeeded, pVisitCard->iMinorVersionNeeded, pVisitCard->iMicroVersionNeeded, CAIRO_DOCK_VERSION);
+			cairo_dock_free_visit_card (pVisitCard);
+			return ;
+		}
+		pCairoDockModule->cReadmeFilePath = g_strdup (pVisitCard->cReadmeFilePath);
+		if (pVisitCard->cModuleName == NULL)
+			pCairoDockModule->cModuleName = cairo_dock_extract_default_module_name_from_path (pCairoDockModule->cSoFilePath);
+		else
+			pCairoDockModule->cModuleName = g_strdup (pVisitCard->cModuleName);
+		cairo_dock_free_visit_card (pVisitCard);
 	}
 	else
 	{
-		pCairoDockModule->cReadmeFilePath = function_pre_init ();
+		g_print ("Attention : this module does not have any visit card, it may be broken or icompatible with cairo-dock\n");
+		pCairoDockModule->cModuleName = cairo_dock_extract_default_module_name_from_path (pCairoDockModule->cSoFilePath);
 	}
-	g_free (cPreInitFuncName);
 	
 	
 	CairoDockModuleInit function_init;
-	gchar *cInitFuncName = g_strdup_printf ("%s_init", pCairoDockModule->cModuleName);
-	bSymbolFound = g_module_symbol (module, cInitFuncName, (gpointer) &function_init) || g_module_symbol (module, "init", (gpointer) &function_init);
+	bSymbolFound = g_module_symbol (module, "init", (gpointer) &function_init);
 	if (! bSymbolFound)
 	{
 		g_set_error (erreur, 1, 1, "Attention : the module '%s' is not valid : (%s)", pCairoDockModule->cSoFilePath, g_module_error ());
-		g_free (cInitFuncName);
 		if (!g_module_close (module))
 			g_warning ("%s: %s", pCairoDockModule->cSoFilePath, g_module_error ());
 		return ;
 	}
-	g_free (cInitFuncName);
 	
 	
 	CairoDockModuleStop function_stop;
-	gchar *cStopFuncName = g_strdup_printf ("%s_stop", pCairoDockModule->cModuleName);
-	bSymbolFound = g_module_symbol (module, cStopFuncName, (gpointer) &function_stop) || g_module_symbol (module, "stop", (gpointer) &function_stop);
+	bSymbolFound = g_module_symbol (module, "stop", (gpointer) &function_stop);
 	if (! bSymbolFound)
 	{
 		function_stop = NULL;
 	}
-	g_free (cStopFuncName);
 	
 	
 	pCairoDockModule->pModule = module;
@@ -152,17 +170,7 @@ CairoDockModule * cairo_dock_load_module (gchar *cSoFilePath, GHashTable *pModul
 		return NULL;
 	}
 	
-	
-	gchar *cModuleName = cairo_dock_extract_module_name_from_path (cSoFilePath);
-	if (pModuleTable != NULL && g_hash_table_lookup (pModuleTable, cModuleName) != NULL)
-	{
-		g_set_error (erreur, 1, 1, "%s () : this module has already been loaded", __func__);
-		return NULL;
-	}
-	
-	
 	CairoDockModule *pCairoDockModule = g_new0 (CairoDockModule, 1);
-	pCairoDockModule->cModuleName = cModuleName;
 	pCairoDockModule->cSoFilePath = g_strdup (cSoFilePath);
 	
 	GError *tmp_erreur = NULL;
@@ -175,7 +183,7 @@ CairoDockModule * cairo_dock_load_module (gchar *cSoFilePath, GHashTable *pModul
 	
 	
 	if (pModuleTable != NULL)
-		g_hash_table_insert (pModuleTable, cModuleName, pCairoDockModule);
+		g_hash_table_insert (pModuleTable, pCairoDockModule->cModuleName, pCairoDockModule);
 	
 	return pCairoDockModule;
 }

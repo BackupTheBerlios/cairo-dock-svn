@@ -693,6 +693,22 @@ void cairo_dock_update_applis_list (CairoDock *pDock, double fTime)
 	XFree (pXWindowsList);
 }
 
+
+GdkFilterReturn filter (GdkXEvent *gdkxevent, GdkEvent *event, gpointer data)
+{
+	XEvent *xevent = (XEvent *) gdkxevent;
+	
+	g_print ("**************** %s () : type : %d ; window : %d ; message_type : %d(%d) ; format : %d\n", __func__, xevent->type, xevent->xclient.window, xevent->xclient.message_type, XInternAtom (s_XDisplay, "_NET_SYSTEM_TRAY_OPCODE", False), xevent->xclient.format);
+	g_print ("  data : %ld; %ld; %ld; %ld; %ld\n", xevent->xclient.data.l[0], xevent->xclient.data.l[1], xevent->xclient.data.l[2], xevent->xclient.data.l[3], xevent->xclient.data.l[4]);
+	return GDK_FILTER_CONTINUE;  // GDK_FILTER_REMOVE
+}
+GdkFilterReturn filter2 (GdkXEvent *gdkxevent, GdkEvent *event, gpointer data)
+{
+	XEvent *xevent = (XEvent *) gdkxevent;
+	
+	g_print ("**************** %s () : type : %d ; window : %d\n", __func__, xevent->type, xevent->xclient.window);
+	return GDK_FILTER_CONTINUE;  // GDK_FILTER_REMOVE
+}
 void cairo_dock_start_application_manager (CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
@@ -733,10 +749,15 @@ void cairo_dock_start_application_manager (CairoDock *pDock)
 	//\__________________ On lance le gestionnaire d'evenements X.
 	s_iSidUpdateAppliList = g_timeout_add (CAIRO_DOCK_TASKBAR_CHECK_INTERVAL, (GSourceFunc) cairo_dock_unstack_Xevents, (gpointer) pDock);  // un g_idle_add () consomme 90% de CPU ! :-/
 	
-	/*Atom aNetSystemTray = XInternAtom (s_XDisplay, "_NET_SYSTEM_TRAY_SELECTION_S1", False);
-	GdkAtom gdk_atom = gdk_x11_xatom_to_atom (aNetSystemTray);
-	gboolean bSelectionOk = gtk_selection_owner_set (g_pMainDock->pWidget, gdk_atom, GDK_CURRENT_TIME);
-	g_print ("bSelectionOk : %d\n", bSelectionOk);*/
+	/*GdkAtom selection = gdk_atom_intern ("_NET_SYSTEM_TRAY_S0", FALSE);
+	gboolean bSelectionOk = gtk_selection_owner_set (g_pMainDock->pWidget, selection, GDK_CURRENT_TIME);
+	g_print ("bSelectionOk : %d\n", bSelectionOk);
+	
+	GdkAtom message_type = gdk_atom_intern ("_NET_SYSTEM_TRAY_OPCODE", False);
+	gdk_add_client_message_filter (message_type, filter, pDock);
+	
+	message_type = gdk_atom_intern ("_NET_SYSTEM_TRAY_MESSAGE_DATA", False );
+	gdk_add_client_message_filter (message_type, filter2, pDock);*/
 }
 
 void cairo_dock_pause_application_manager (void)

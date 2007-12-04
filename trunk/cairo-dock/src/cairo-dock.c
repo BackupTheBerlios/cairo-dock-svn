@@ -192,6 +192,7 @@ gboolean g_bSticky = TRUE;
 gboolean g_bUseGlitz = FALSE;
 gboolean g_bVerbose = FALSE;
 
+short g_iMajorVersion, g_iMinorVersion, g_iMicroVersion;
 
 static gboolean random_dialog (gpointer user_data)
 {
@@ -212,7 +213,6 @@ main (int argc, char** argv)
 	gint i;
 	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)
 		g_tIconTypeOrder[i] = i;
-	
 	
 	gtk_init (&argc, &argv);
 	
@@ -250,6 +250,21 @@ main (int argc, char** argv)
 			g_print ("Attention : the '--dock-hint' option is deprecated since v1.3.7\n  It is now the default behaviour.");
 		else if (strcmp (argv[i], "--dialog") == 0)
 			bDialogTest = TRUE;
+		else if (strcmp (argv[i], "--capuccino") == 0)
+		{
+			g_print ("Veuillez Insérer 1 euro dans la fente de votre ordinateur.\n");
+			return 0;
+		}
+		else if (strcmp (argv[i], "--cafe_latte") == 0)
+		{
+			g_print ("Désolé, plus de sucre disponible\nVeuillez retenter plus tard.\n");
+			return 0;
+		}
+		else if (strcmp (argv[i], "--expresso") == 0)
+		{
+			g_print ("Franchement, vous faites confiance à un gars qui met des options pareilles dans son programme ?\n");
+			return 0;
+		}
 		else if (strcmp (argv[i], "--version") == 0)
 		{
 			g_print ("v%s\n", CAIRO_DOCK_VERSION);
@@ -274,7 +289,17 @@ main (int argc, char** argv)
 		}
 	}
 	
-	//\___________________ On initialise la table des docks..
+	//\___________________ On initialise les numeros de version.
+	gchar **cVersions = g_strsplit (CAIRO_DOCK_VERSION, ".", -1);
+	if (cVersions[0] != NULL)
+		g_iMajorVersion = atoi (cVersions[0]);
+	if (cVersions[1] != NULL)
+		g_iMinorVersion = atoi (cVersions[1]);
+	if (cVersions[2] != NULL)
+		g_iMicroVersion = atoi (cVersions[2]);
+	g_strfreev (cVersions);
+	
+	//\___________________ On initialise la table des docks.
 	g_hDocksTable = g_hash_table_new_full (g_str_hash,
 		g_str_equal,
 		g_free,
@@ -350,8 +375,11 @@ main (int argc, char** argv)
 	//const gchar *cSillyMessage = "Le saviez-vous ?\nUtiliser cairo-dock augmentera votre popularité auprès de la gente féminine !";
 	//const gchar *cSillyMessage = "Le saviez-vous ?\nCairo-Dock contribue à réduire le trou de la couche d'ozone !";
 	//const gchar *cSillyMessage = "Montrer Cairo-Dock à un utilisateur de Mac est le meilleur moyen de s'en faire un ennemi;\nN'oubliez pas qu'il a payé 129$ pour avoir la même chose !";  // 7500
-	const gchar *cSillyMessage = "Petite annonce :\n  Projet sérieux recherche secrétaire pour rédiger documentation.\n  Niveau d'étude exigé : 95C.";  // 7500
-	const gchar *cNumSilllyMessage = "5";
+	//const gchar *cSillyMessage = "Petite annonce :\n  Projet sérieux recherche secrétaire pour rédiger documentation.\n  Niveau d'étude exigé : 95C.";  // 7500
+	const gchar *cSillyMessage = "Cairo-Dock fait même le café ! Au choix :\n cairo-dock --capuccino , cairo-dock --expresso , cairo-dock --cafe_latte";  // 8000
+	//const gchar *cSillyMessage = "Cairo-Dock : just launch it !";  // 4000
+	//const gchar *cSillyMessage = "Cairo-Dock lave plus blanc que blanc";  // 4000
+	const gchar *cNumSilllyMessage = "6";
 	gboolean bWriteSillyMessage;
 	if (! g_file_test (cSillyMessageFilePath, G_FILE_TEST_EXISTS))
 	{
@@ -378,12 +406,15 @@ main (int argc, char** argv)
 		NULL);
 	g_free (cSillyMessageFilePath);
 	
-	if (bWriteSillyMessage)
+ 	if (bWriteSillyMessage)
 	{
 		Icon *pFirstIcon = cairo_dock_get_first_icon (g_pMainDock->icons);
 		if (pFirstIcon != NULL)
 		{
-			cairo_dock_show_temporary_dialog_with_default_icon (cSillyMessage, pFirstIcon, g_pMainDock, 7500);
+			cairo_dock_show_temporary_dialog_with_default_icon (cSillyMessage, pFirstIcon, g_pMainDock, 8000);
+			
+			/*double fValue = cairo_dock_show_value_and_wait ("pouet pouet", pFirstIcon, g_pMainDock, .3);
+			g_print (" ==> %f\n", fValue);*/
 			
 			/*cairo_t *pIconContext = cairo_dock_create_context_from_window (g_pMainDock);
 			cairo_dock_set_quick_info (pIconContext, "69°C", pFirstIcon, g_pMainDock);

@@ -111,6 +111,8 @@ static gboolean on_button_press_dialog (GtkWidget* pWidget,
 					
 					if (GTK_IS_ENTRY (pDialog->pInteractiveWidget))
 						pDialog->action_on_answer (g_strdup (gtk_entry_get_text (GTK_ENTRY (pDialog->pInteractiveWidget))), pDialog->pUserData);
+					else if (GTK_IS_RANGE (pDialog->pInteractiveWidget))
+						pDialog->action_on_answer (g_strdup_printf ("%f", gtk_range_get_value (GTK_RANGE (pDialog->pInteractiveWidget))), pDialog->pUserData);
 					else
 						pDialog->action_on_answer (g_strdup ("yes"), pDialog->pUserData);
 					cairo_dock_dialog_unreference (pIcon);
@@ -121,6 +123,8 @@ static gboolean on_button_press_dialog (GtkWidget* pWidget,
 					gtk_widget_queue_draw (pDialog->pWidget);
 					if (GTK_IS_ENTRY (pDialog->pInteractiveWidget))
 						pDialog->action_on_answer (g_strdup (""), pDialog->pUserData);
+					else if (GTK_IS_RANGE (pDialog->pInteractiveWidget))
+						pDialog->action_on_answer (g_strdup_printf ("-1"), pDialog->pUserData);
 					else
 						pDialog->action_on_answer (g_strdup ("no"), pDialog->pUserData);
 					cairo_dock_dialog_unreference (pIcon);
@@ -370,30 +374,39 @@ void cairo_dock_remove_dialog_if_any (Icon *icon)
 
 
 
-GtkWidget *cairo_dock_build_interactive_widget_for_dialog (const gchar *cInitialAnswer)
+GtkWidget *cairo_dock_build_interactive_widget_for_dialog (const gchar *cInitialAnswer, double fValueForHScale)
 {
 	int iBoxWidth = 0, iBoxHeight = 0;
-	GtkWidget *pEntry = NULL;
+	GtkWidget *pWidget = NULL;
 	if (cInitialAnswer != NULL)  // presence d'une GtkEntry.
 	{
-		pEntry = gtk_entry_new ();
-		gtk_entry_set_has_frame (GTK_ENTRY (pEntry), FALSE);
+		pWidget = gtk_entry_new ();
+		gtk_entry_set_has_frame (GTK_ENTRY (pWidget), FALSE);
 		
-		gtk_entry_set_text (GTK_ENTRY (pEntry), "|_°");  // ces caracteres donnent presque surement la hauteur max.
-		PangoLayout *pLayout = gtk_entry_get_layout (GTK_ENTRY (pEntry));
+		gtk_entry_set_text (GTK_ENTRY (pWidget), "|_°");  // ces caracteres donnent presque surement la hauteur max.
+		PangoLayout *pLayout = gtk_entry_get_layout (GTK_ENTRY (pWidget));
 		PangoRectangle ink, log;
 		pango_layout_get_pixel_extents (pLayout, &ink, &log);
 		
-		gtk_widget_set (pEntry, "width-request", CAIRO_DOCK_DIALOG_ENTRY_WIDTH, NULL);
-		gtk_widget_set (pEntry, "height-request", ink.height, NULL);
+		gtk_widget_set (pWidget, "width-request", CAIRO_DOCK_DIALOG_ENTRY_WIDTH, NULL);
+		gtk_widget_set (pWidget, "height-request", ink.height, NULL);
 		
 		iBoxWidth = MAX (iBoxWidth, CAIRO_DOCK_DIALOG_ENTRY_WIDTH);
 		iBoxHeight += ink.height;
 		
-		gtk_entry_set_text (GTK_ENTRY (pEntry), cInitialAnswer);
+		gtk_entry_set_text (GTK_ENTRY (pWidget), cInitialAnswer);
 	}
-	
-	return pEntry;
+	else if (fValueForHScale >= 0 && fValueForHScale <= 1)
+	{
+		pWidget = gtk_hscale_new_with_range (0, 1, .01);
+		gtk_scale_set_digits (GTK_SCALE (pWidget), 2);
+		gtk_range_set_value (GTK_RANGE (pWidget), fValueForHScale);
+		
+		gtk_widget_set (pWidget, "width-request", 150, NULL);
+		//gtk_widget_set (pWidget, "height-request", 25, NULL);
+		
+	}
+	return pWidget;
 }
 
 
@@ -798,7 +811,7 @@ static gboolean _cairo_dock_dialog_auto_delete (Icon *pIcon)
 	}
 	return FALSE;
 }
-CairoDockDialog *cairo_dock_show_dialog_full (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength, gchar *cIconPath, GtkButtonsType iButtonsType, const gchar *cTextForEntry, CairoDockActionOnAnswerFunc pActionFunc, gpointer data, GFreeFunc pFreeDataFunc)
+CairoDockDialog *cairo_dock_show_dialog_full (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength, gchar *cIconPath, GtkButtonsType iButtonsType, const gchar *cTextForEntry, double fValueForHScale, CairoDockActionOnAnswerFunc pActionFunc, gpointer data, GFreeFunc pFreeDataFunc)
 {
 	g_print ("%s (%s; %s)\n", __func__, cText, cTextForEntry);
 	g_return_val_if_fail (cText != NULL, NULL);
@@ -811,7 +824,7 @@ CairoDockDialog *cairo_dock_show_dialog_full (const gchar *cText, Icon *pIcon, C
 		cairo_dock_isolate_dialog (pIcon);  // si le dialogue avait une reference > 1, on l'isole, sinon il a deja ete isole et rien ne se passera.
 	}
 	
-	GtkWidget *pWidget = cairo_dock_build_interactive_widget_for_dialog (cTextForEntry);
+	GtkWidget *pWidget = cairo_dock_build_interactive_widget_for_dialog (cTextForEntry, fValueForHScale);
 	
 	CairoDockDialog *pDialog = cairo_dock_build_dialog (cText, pIcon, pDock, cIconPath, pWidget, iButtonsType, pActionFunc, data);
 	
@@ -847,7 +860,7 @@ static gboolean _cairo_dock_dialog_is_destroyed (GMainLoop *pBlockingLoop)
 		g_main_loop_quit (pBlockingLoop);
 	return FALSE;
 }
-gchar *cairo_dock_show_dialog_and_wait (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength, gchar *cIconPath, GtkButtonsType iButtonsType, const gchar *cTextForEntry)
+gchar *cairo_dock_show_dialog_and_wait (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength, gchar *cIconPath, GtkButtonsType iButtonsType, const gchar *cTextForEntry, double fValueForHScale)
 {
 	gchar *cAnswer = NULL;
 	GMainLoop *pBlockingLoop = g_main_loop_new (NULL, FALSE);
@@ -859,6 +872,7 @@ gchar *cairo_dock_show_dialog_and_wait (const gchar *cText, Icon *pIcon, CairoDo
 		cIconPath,
 		iButtonsType,
 		cTextForEntry,
+		fValueForHScale,
 		(CairoDockActionOnAnswerFunc)_cairo_dock_get_answer_from_dialog,
 		(gpointer) data,
 		(GFreeFunc) NULL);
@@ -886,15 +900,26 @@ gchar *cairo_dock_show_dialog_and_wait (const gchar *cText, Icon *pIcon, CairoDo
 gchar *cairo_dock_show_demand_and_wait (const gchar *cMessage, Icon *pIcon, CairoDock *pDock, const gchar *cInitialAnswer)
 {
 	gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-icon.svg", CAIRO_DOCK_SHARE_DATA_DIR);
-	gchar *cAnswer = cairo_dock_show_dialog_and_wait (cMessage, pIcon, pDock, 0, cIconPath, GTK_BUTTONS_OK_CANCEL, (cInitialAnswer != NULL ? cInitialAnswer : ""));
+	gchar *cAnswer = cairo_dock_show_dialog_and_wait (cMessage, pIcon, pDock, 0, cIconPath, GTK_BUTTONS_OK_CANCEL, (cInitialAnswer != NULL ? cInitialAnswer : ""), -1);
 	g_free (cIconPath);
 	return cAnswer;
+}
+
+double cairo_dock_show_value_and_wait (const gchar *cMessage, Icon *pIcon, CairoDock *pDock, double fInitialValue)
+{
+	gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-icon.svg", CAIRO_DOCK_SHARE_DATA_DIR);
+	gchar *cAnswer = cairo_dock_show_dialog_and_wait (cMessage, pIcon, pDock, 0, cIconPath, GTK_BUTTONS_OK_CANCEL, NULL, fInitialValue);
+	g_free (cIconPath);
+	g_print ("cAnswer : %s\n", cAnswer);
+	double fValue = atof (cAnswer);
+	g_free (cAnswer);
+	return fValue;
 }
 
 int cairo_dock_ask_question_and_wait (const gchar *cQuestion, Icon *pIcon, CairoDock *pDock)
 {
 	gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-icon.svg", CAIRO_DOCK_SHARE_DATA_DIR);  // trouver une icone de question.
-	gchar *cAnswer = cairo_dock_show_dialog_and_wait (cQuestion, pIcon, pDock, 0, cIconPath, GTK_BUTTONS_YES_NO, NULL);
+	gchar *cAnswer = cairo_dock_show_dialog_and_wait (cQuestion, pIcon, pDock, 0, cIconPath, GTK_BUTTONS_YES_NO, NULL, -1);
 	g_free (cIconPath);
 	
 	int iAnswer;

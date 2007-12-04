@@ -23,6 +23,7 @@ gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShare
 
 
 void cairo_dock_set_icon_surface (cairo_t *pIconContext, cairo_surface_t *pSurface);
+void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoDock *pDock);
 void cairo_dock_set_icon_name (cairo_t *pIconContext, const gchar *cIconName, Icon *pIcon, CairoDock *pDock);
 void cairo_dock_set_quick_info (cairo_t *pIconContext, const gchar *cExtraInfo, Icon *pIcon);
 #define cairo_dock_remove_quick_info(pIcon) cairo_dock_set_quick_info (NULL, NULL, pIcon)
@@ -52,13 +53,25 @@ void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar *cNa
 #define CD_CONFIG_GET_ANIMATION(cGroupName, cKeyName) cairo_dock_get_animation_type_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, NULL);
 
 
+#define CD_APPLET_DEFINITION(cName, iMajorVersion, iMinorVersion, iMicroVersion) \
+CairoDockVisitCard *pre_init (void)\
+{\
+	CairoDockVisitCard *pVisitCard = g_new0 (CairoDockVisitCard, 1);\
+	pVisitCard->cModuleName = g_strdup (cName);\
+	pVisitCard->cReadmeFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_README_FILE);\
+	pVisitCard->iMajorVersionNeeded = iMajorVersion;\
+	pVisitCard->iMinorVersionNeeded = iMinorVersion;\
+	pVisitCard->iMicroVersionNeeded = iMicroVersion;\
+	return pVisitCard;\
+}
+
 #define CD_INIT_APPLET Icon *init (CairoDock *pDock, gchar **cConfFilePath, GError **erreur)
 #define CD_STOP_APPLET void stop (void)
 #define CD_PRE_INIT_APPLET gchar *pre_init (void)
 
 #define CD_APPLET_INIT_BEGIN \
 	myDock = pDock; \
-	*cConfFilePath = cairo_dock_check_conf_file_exists (APPLET_USER_DATA_DIR, APPLET_SHARE_DATA_DIR, APPLET_CONF_FILE); \
+	*cConfFilePath = cairo_dock_check_conf_file_exists (MY_APPLET_USER_DATA_DIR, MY_APPLET_SHARE_DATA_DIR, APPLET_CONF_FILE); \
 	int iOriginalWidth = 48, iOriginalHeight = 48; \
 	gchar *cAppletName = NULL; \
 	read_conf_file (*cConfFilePath, &iOriginalWidth, &iOriginalHeight, &cAppletName); \

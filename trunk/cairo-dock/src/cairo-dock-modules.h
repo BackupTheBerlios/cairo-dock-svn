@@ -9,7 +9,7 @@
 
 void cairo_dock_initialize_module_manager (gchar *cModuleDirPath);
 
-gchar *cairo_dock_extract_module_name_from_path (gchar *cSoFilePath);
+void cairo_dock_free_visit_card (CairoDockVisitCard *pVisitCard);
 
 CairoDockModule * cairo_dock_load_module (gchar *cSoFilePath, GHashTable *pModuleTable, GError **erreur);
 

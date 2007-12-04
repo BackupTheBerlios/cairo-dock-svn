@@ -32,6 +32,8 @@ extern int g_iLabelSize;
 extern gchar *g_cLabelPolice;
 extern gboolean g_bTextAlwaysHorizontal;
 
+extern double g_fAlbedo;
+
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 
@@ -99,6 +101,7 @@ Icon *cairo_dock_create_icon_for_applet (CairoDock *pDock, int iWidth, int iHeig
 	cairo_destroy (pSourceContext);
 	return icon;
 }
+
 
 
 GKeyFile *cairo_dock_read_header_applet_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cName, gboolean *bFlushConfFileNeeded)
@@ -210,6 +213,34 @@ void cairo_dock_set_icon_surface (cairo_t *pIconContext, cairo_surface_t *pSurfa
 			0.,
 			0.);
 		cairo_paint (pIconContext);
+	}
+}
+
+void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoDock *pDock)
+{
+	cairo_dock_set_icon_surface (pIconContext, pSurface);
+	
+	if (g_fAlbedo > 0 && pIcon->pIconBuffer != NULL)
+	{
+		double fMaxScale = 1 + g_fAmplitude;
+		
+		cairo_surface_destroy (pIcon->pReflectionBuffer);
+		pIcon->pReflectionBuffer = NULL;
+		pIcon->pReflectionBuffer = cairo_dock_create_reflection_surface (pIcon->pIconBuffer,
+			pIconContext,
+			(pDock->bHorizontalDock ? pIcon->fWidth : pIcon->fHeight) * fMaxScale,
+			(pDock->bHorizontalDock ? pIcon->fHeight : pIcon->fWidth) * fMaxScale,
+			pDock->bHorizontalDock);
+		
+		
+		cairo_surface_destroy (pIcon->pFullIconBuffer);
+		pIcon->pFullIconBuffer = NULL;
+		pIcon->pFullIconBuffer = cairo_dock_create_icon_surface_with_reflection (pIcon->pIconBuffer,
+			pIcon->pReflectionBuffer,
+			pIconContext,
+			(pDock->bHorizontalDock ? pIcon->fWidth : pIcon->fHeight) * fMaxScale,
+			(pDock->bHorizontalDock ? pIcon->fHeight : pIcon->fWidth) * fMaxScale,
+			pDock->bHorizontalDock);
 	}
 }
 

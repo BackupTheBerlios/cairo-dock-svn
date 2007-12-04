@@ -27,7 +27,7 @@ typedef struct _CairoDock CairoDock;
 typedef struct _CairoDockModule CairoDockModule;
 typedef struct _CairoDockDialog CairoDockDialog;
 typedef struct _Icon Icon;
-
+typedef struct _CairoDockVisitCard CairoDockVisitCard;
 
 typedef enum {
 	CAIRO_DOCK_VERTICAL = 0,
@@ -118,7 +118,15 @@ struct _CairoDock {
 	};
 
 
-typedef gchar * (* CairoDockModulePreInit) (void);
+struct _CairoDockVisitCard {
+	gchar *cModuleName;
+	gchar *cReadmeFilePath;
+	short iMajorVersionNeeded;
+	short iMinorVersionNeeded;
+	short iMicroVersionNeeded;
+};
+
+typedef CairoDockVisitCard * (* CairoDockModulePreInit) (void);
 
 typedef gpointer (*CairoDockModuleInit) (CairoDock *pDock, gchar **cConfFilePath, GError **erreur);  // renvoie son icone si il en a.
 
