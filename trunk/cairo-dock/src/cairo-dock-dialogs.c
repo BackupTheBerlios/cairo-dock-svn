@@ -35,8 +35,13 @@ extern int g_iDockLineWidth;
 extern int g_iDockRadius;
 extern double g_fLineColor[4];
 
-cairo_surface_t *pButtonOkSurface = NULL;
-cairo_surface_t *pButtonCancelSurface = NULL;
+extern int g_iDialogButtonWidth;
+extern int g_iDialogButtonHeight;
+extern double g_fDialogAlpha;
+extern int g_iDialogIconSize;
+
+static cairo_surface_t *s_pButtonOkSurface = NULL;
+static cairo_surface_t *s_pButtonCancelSurface = NULL;
 
 #define CAIRO_DOCK_DIALOG_DEFAULT_GAP 20
 #define CAIRO_DOCK_DIALOG_TEXT_MARGIN 3
@@ -45,10 +50,7 @@ cairo_surface_t *pButtonCancelSurface = NULL;
 #define CAIRO_DOCK_DIALOG_TIP_BASE 20
 
 #define CAIRO_DOCK_DIALOG_ENTRY_WIDTH 80
-#define CAIRO_DOCK_DIALOG_BUTTON_WIDTH 48
-#define CAIRO_DOCK_DIALOG_BUTTON_HEIGHT 32
 #define CAIRO_DOCK_DIALOG_BUTTON_OFFSET 3
-#define CAIRO_DOCK_DIALOG_ICON_SIZE 48
 #define CAIRO_DOCK_DIALOG_HGAP 2
 #define CAIRO_DOCK_DIALOG_VGAP 4
 
@@ -76,13 +78,13 @@ static gboolean on_button_press_dialog (GtkWidget* pWidget,
 				if (pDialog->pInteractiveWidget != NULL)
 					gtk_widget_size_request (pDialog->pInteractiveWidget, &requisition);
 				
-				int iButtonX = .5*pDialog->iWidth - CAIRO_DOCK_DIALOG_BUTTON_WIDTH - .5*CAIRO_DOCK_DIALOG_HGAP;
+				int iButtonX = .5*pDialog->iWidth - g_iDialogButtonWidth - .5*CAIRO_DOCK_DIALOG_HGAP;
 				int iButtonY = g_iDockLineWidth + pDialog->iMessageHeight + requisition.height + CAIRO_DOCK_DIALOG_VGAP;
 				if (! pDialog->bDirectionUp)
 					iButtonY +=  pDialog->iHeight - pDialog->iTextHeight - g_iDockLineWidth;
 					
 				//g_print ("clic (%d;%d) bouton Ok (%d;%d)\n", (int) pButton->x, (int) pButton->y, iButtonX, iButtonY);
-				if (pButton->x >= iButtonX && pButton->x <= iButtonX + CAIRO_DOCK_DIALOG_BUTTON_WIDTH && pButton->y >= iButtonY && pButton->y <= iButtonY + CAIRO_DOCK_DIALOG_BUTTON_HEIGHT)
+				if (pButton->x >= iButtonX && pButton->x <= iButtonX + g_iDialogButtonWidth && pButton->y >= iButtonY && pButton->y <= iButtonY + g_iDialogButtonHeight)
 				{
 					pDialog->iButtonOkOffset = CAIRO_DOCK_DIALOG_BUTTON_OFFSET;
 					gtk_widget_queue_draw (pDialog->pWidget);
@@ -91,7 +93,7 @@ static gboolean on_button_press_dialog (GtkWidget* pWidget,
 				{
 					iButtonX = .5*pDialog->iWidth + .5*CAIRO_DOCK_DIALOG_HGAP;
 					//g_print ("clic (%d;%d) bouton Cancel (%d;%d)\n", (int) pButton->x, (int) pButton->y, iButtonX, iButtonY);
-					if (pButton->x >= iButtonX && pButton->x <= iButtonX + CAIRO_DOCK_DIALOG_BUTTON_WIDTH && pButton->y >= iButtonY && pButton->y <= iButtonY + CAIRO_DOCK_DIALOG_BUTTON_HEIGHT)
+					if (pButton->x >= iButtonX && pButton->x <= iButtonX + g_iDialogButtonWidth && pButton->y >= iButtonY && pButton->y <= iButtonY + g_iDialogButtonHeight)
 					{
 						pDialog->iButtonCancelOffset = CAIRO_DOCK_DIALOG_BUTTON_OFFSET;
 						gtk_widget_queue_draw (pDialog->pWidget);
@@ -256,10 +258,10 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 		if (! pDialog->bDirectionUp)
 			iButtonY +=  pDialog->iHeight - pDialog->iTextHeight - g_iDockLineWidth;
 		
-		cairo_set_source_surface (pCairoContext, pButtonOkSurface, .5*pDialog->iWidth - CAIRO_DOCK_DIALOG_BUTTON_WIDTH - .5*CAIRO_DOCK_DIALOG_HGAP + pDialog->iButtonOkOffset, iButtonY + pDialog->iButtonOkOffset);
+		cairo_set_source_surface (pCairoContext, s_pButtonOkSurface, .5*pDialog->iWidth - g_iDialogButtonWidth - .5*CAIRO_DOCK_DIALOG_HGAP + pDialog->iButtonOkOffset, iButtonY + pDialog->iButtonOkOffset);
 		cairo_paint (pCairoContext);
 		
-		cairo_set_source_surface (pCairoContext, pButtonCancelSurface, .5*pDialog->iWidth + .5*CAIRO_DOCK_DIALOG_HGAP + pDialog->iButtonCancelOffset, iButtonY + pDialog->iButtonCancelOffset);
+		cairo_set_source_surface (pCairoContext, s_pButtonCancelSurface, .5*pDialog->iWidth + .5*CAIRO_DOCK_DIALOG_HGAP + pDialog->iButtonCancelOffset, iButtonY + pDialog->iButtonCancelOffset);
 		cairo_paint (pCairoContext);
 	}
 	
@@ -281,6 +283,46 @@ static gboolean on_configure_dialog (GtkWidget* pWidget,
 	
 	cairo_dock_dialog_unreference (pIcon);
 	return FALSE;
+}
+
+static cairo_surface_t *_cairo_dock_load_button_icon (cairo_t *pCairoContext, gchar *cButtonImage, gchar *cDefaultButtonImage)
+{
+	cairo_surface_t *pButtonSurface = cairo_dock_load_image_for_icon (pCairoContext,
+		cButtonImage,
+		g_iDialogButtonWidth,
+		g_iDialogButtonHeight);
+	
+	if (pButtonSurface == NULL)
+	{
+		gchar *cIconPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, cDefaultButtonImage);
+		pButtonSurface = cairo_dock_load_image_for_icon (pCairoContext,
+			cDefaultButtonImage,
+			g_iDialogButtonWidth,
+			g_iDialogButtonHeight);
+		g_free (cIconPath);
+	}
+	
+	return pButtonSurface;
+}
+void cairo_dock_load_dialog_buttons (CairoDock *pDock, gchar *cButtonOkImage, gchar *cButtonCancelImage)
+{
+	cairo_t *pCairoContext = gdk_cairo_create (pDock->pWidget->window);
+	
+	if (s_pButtonOkSurface != NULL)
+	{
+		cairo_surface_destroy (s_pButtonOkSurface);
+		s_pButtonOkSurface = NULL;
+	}
+	s_pButtonOkSurface = _cairo_dock_load_button_icon (pCairoContext, cButtonOkImage, "cairo-dock-ok.svg");
+	
+	if (s_pButtonCancelSurface != NULL)
+	{
+		cairo_surface_destroy (s_pButtonCancelSurface);
+		s_pButtonCancelSurface = NULL;
+	}
+	s_pButtonCancelSurface = _cairo_dock_load_button_icon (pCairoContext, cButtonCancelImage, "cairo-dock-cancel.svg");
+	
+	cairo_destroy (pCairoContext);
 }
 
 
@@ -476,10 +518,10 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 	
 	//\________________ On recupere l'icone a afficher sur le cote.
 	double fImageSize;
-	if (CAIRO_DOCK_DIALOG_ICON_SIZE == 0)
+	if (g_iDialogIconSize == 0)
 		fImageSize= ink.height;
 	else
-		fImageSize = CAIRO_DOCK_DIALOG_ICON_SIZE;
+		fImageSize = g_iDialogIconSize;
 	
 	cairo_surface_t *pIconSurface = NULL;
 	if (cImageFilePath != NULL)
@@ -543,28 +585,9 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 	pDialog->iButtonsType = iButtonsType;
 	if (pDialog->iButtonsType != GTK_BUTTONS_NONE)
 	{
-		pDialog->iTextHeight += CAIRO_DOCK_DIALOG_BUTTON_HEIGHT + CAIRO_DOCK_DIALOG_VGAP;
-		pDialog->iTextWidth = MAX (pDialog->iTextWidth, 2 * CAIRO_DOCK_DIALOG_BUTTON_WIDTH + CAIRO_DOCK_DIALOG_HGAP + 2 * CAIRO_DOCK_DIALOG_TEXT_MARGIN + 2 * pDialog->fRadius + fLineWidth);
+		pDialog->iTextHeight += g_iDialogButtonHeight + CAIRO_DOCK_DIALOG_VGAP;
+		pDialog->iTextWidth = MAX (pDialog->iTextWidth, 2 * g_iDialogButtonWidth + CAIRO_DOCK_DIALOG_HGAP + 2 * CAIRO_DOCK_DIALOG_TEXT_MARGIN + 2 * pDialog->fRadius + fLineWidth);
 		pDialog->iWidth = pDialog->iTextWidth + 2 * pDialog->fRadius + fLineWidth;
-		
-		if (pButtonOkSurface == NULL)
-		{
-			gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-ok.svg", CAIRO_DOCK_SHARE_DATA_DIR);
-			pButtonOkSurface = cairo_dock_load_image_for_icon (pSourceContext,
-				cIconPath,
-				CAIRO_DOCK_DIALOG_BUTTON_WIDTH,
-				CAIRO_DOCK_DIALOG_BUTTON_HEIGHT);
-			g_free (cIconPath);
-		}
-		if (pButtonCancelSurface == NULL)
-		{
-			gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-cancel.svg", CAIRO_DOCK_SHARE_DATA_DIR);
-			pButtonCancelSurface = cairo_dock_load_image_for_icon (pSourceContext,
-				cIconPath,
-				CAIRO_DOCK_DIALOG_BUTTON_WIDTH,
-				CAIRO_DOCK_DIALOG_BUTTON_HEIGHT);
-			g_free (cIconPath);
-		}
 	}
 	g_print ("iTextWidth: %d , iTextHeight : %d\n", pDialog->iTextWidth, pDialog->iTextHeight);
 	

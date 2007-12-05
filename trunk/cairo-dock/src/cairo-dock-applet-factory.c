@@ -216,32 +216,37 @@ void cairo_dock_set_icon_surface (cairo_t *pIconContext, cairo_surface_t *pSurfa
 	}
 }
 
+void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, CairoDock *pDock)
+{
+	if (pIcon->pReflectionBuffer != NULL)
+	{
+		cairo_surface_destroy (pIcon->pReflectionBuffer);
+		pIcon->pReflectionBuffer = NULL;
+	}
+	pIcon->pReflectionBuffer = cairo_dock_create_reflection_surface (pIcon->pIconBuffer,
+		pIconContext,
+		(pDock->bHorizontalDock ? pIcon->fWidth : pIcon->fHeight) * (1 + g_fAmplitude),
+		(pDock->bHorizontalDock ? pIcon->fHeight : pIcon->fWidth) * (1 + g_fAmplitude),
+		pDock->bHorizontalDock);
+	
+	if (pIcon->pFullIconBuffer != NULL)
+	{
+		cairo_surface_destroy (pIcon->pFullIconBuffer);
+		pIcon->pFullIconBuffer = NULL;
+	}
+	pIcon->pFullIconBuffer = cairo_dock_create_icon_surface_with_reflection (pIcon->pIconBuffer,
+		pIcon->pReflectionBuffer,
+		pIconContext,
+		(pDock->bHorizontalDock ? pIcon->fWidth : pIcon->fHeight) * (1 + g_fAmplitude),
+		(pDock->bHorizontalDock ? pIcon->fHeight : pIcon->fWidth) * (1 + g_fAmplitude),
+		pDock->bHorizontalDock);
+}
+
 void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoDock *pDock)
 {
 	cairo_dock_set_icon_surface (pIconContext, pSurface);
 	
-	if (g_fAlbedo > 0 && pIcon->pIconBuffer != NULL)
-	{
-		double fMaxScale = 1 + g_fAmplitude;
-		
-		cairo_surface_destroy (pIcon->pReflectionBuffer);
-		pIcon->pReflectionBuffer = NULL;
-		pIcon->pReflectionBuffer = cairo_dock_create_reflection_surface (pIcon->pIconBuffer,
-			pIconContext,
-			(pDock->bHorizontalDock ? pIcon->fWidth : pIcon->fHeight) * fMaxScale,
-			(pDock->bHorizontalDock ? pIcon->fHeight : pIcon->fWidth) * fMaxScale,
-			pDock->bHorizontalDock);
-		
-		
-		cairo_surface_destroy (pIcon->pFullIconBuffer);
-		pIcon->pFullIconBuffer = NULL;
-		pIcon->pFullIconBuffer = cairo_dock_create_icon_surface_with_reflection (pIcon->pIconBuffer,
-			pIcon->pReflectionBuffer,
-			pIconContext,
-			(pDock->bHorizontalDock ? pIcon->fWidth : pIcon->fHeight) * fMaxScale,
-			(pDock->bHorizontalDock ? pIcon->fHeight : pIcon->fWidth) * fMaxScale,
-			pDock->bHorizontalDock);
-	}
+	cairo_dock_add_reflection_to_icon (pIconContext, pIcon, pDock);
 }
 
 void cairo_dock_set_icon_name (cairo_t *pIconContext, const gchar *cIconName, Icon *pIcon, CairoDock *pDock)  // fonction proposee par Necropotame.
@@ -278,32 +283,6 @@ void cairo_dock_animate_icon (Icon *pIcon, CairoDock *pDock, CairoDockAnimationT
 {
 	cairo_dock_arm_animation (pIcon, iAnimationType, iNbRounds);
 	cairo_dock_start_animation (pIcon, pDock);
-}
-
-void cairo_dock_add_reflection_to_icon (Icon *pIcon, CairoDock *pDock, cairo_t *pCairoContext)
-{
-	if (pIcon->pReflectionBuffer != NULL)
-	{
-		cairo_surface_destroy (pIcon->pReflectionBuffer);
-		pIcon->pReflectionBuffer = NULL;
-	}
-	pIcon->pReflectionBuffer = cairo_dock_create_reflection_surface (pIcon->pIconBuffer,
-		pCairoContext,
-		(pDock->bHorizontalDock ? pIcon->fWidth : pIcon->fHeight) * (1 + g_fAmplitude),
-		(pDock->bHorizontalDock ? pIcon->fHeight : pIcon->fWidth) * (1 + g_fAmplitude),
-		pDock->bHorizontalDock);
-	
-	if (pIcon->pFullIconBuffer != NULL)
-	{
-		cairo_surface_destroy (pIcon->pFullIconBuffer);
-		pIcon->pFullIconBuffer = NULL;
-	}
-	pIcon->pFullIconBuffer = cairo_dock_create_icon_surface_with_reflection (pIcon->pIconBuffer,
-		pIcon->pReflectionBuffer,
-		pCairoContext,
-		(pDock->bHorizontalDock ? pIcon->fWidth : pIcon->fHeight) * (1 + g_fAmplitude),
-		(pDock->bHorizontalDock ? pIcon->fHeight : pIcon->fWidth) * (1 + g_fAmplitude),
-		pDock->bHorizontalDock);
 }
 
 int cairo_dock_get_number_from_name (gchar *cValue, gchar **cValuesList)

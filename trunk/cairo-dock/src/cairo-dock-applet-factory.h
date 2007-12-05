@@ -13,6 +13,7 @@ cairo_surface_t *cairo_dock_create_applet_surface (gchar *cImageFilePath, cairo_
 Icon *cairo_dock_create_icon_for_applet (CairoDock *pDock, int iWidth, int iHeight, gchar *cName, gchar *cIconName);
 
 
+
 GKeyFile *cairo_dock_read_header_applet_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cName, gboolean *bFlushConfFileNeeded);
 
 
@@ -23,15 +24,15 @@ gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShare
 
 
 void cairo_dock_set_icon_surface (cairo_t *pIconContext, cairo_surface_t *pSurface);
+void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, CairoDock *pDock);
 void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoDock *pDock);
+
 void cairo_dock_set_icon_name (cairo_t *pIconContext, const gchar *cIconName, Icon *pIcon, CairoDock *pDock);
+
 void cairo_dock_set_quick_info (cairo_t *pIconContext, const gchar *cExtraInfo, Icon *pIcon);
 #define cairo_dock_remove_quick_info(pIcon) cairo_dock_set_quick_info (NULL, NULL, pIcon)
 
 void cairo_dock_animate_icon (Icon *pIcon, CairoDock *pDock, CairoDockAnimationType iAnimationType, int iNbRounds);
-
-void cairo_dock_add_reflection_to_icon (Icon *pIcon, CairoDock *pDock, cairo_t *pCairoContext);
-
 
 int cairo_dock_get_number_from_name (gchar *cValue, gchar **cValuesList);
 
@@ -93,10 +94,10 @@ gboolean action_on_click (gpointer *data)
 #define CD_CLICK_ON_APPLET_BEGIN \
 	if (data[0] == myIcon) \
 	{
+
 #define CD_CLICK_ON_APPLET_END \
 	} \
 	return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 
 
 #endif
-

@@ -183,6 +183,12 @@ gboolean g_bAnimateOnActiveWindow;  // jouer une breve animation de l'icone lors
 
 gchar *g_cSeparatorImage = NULL;
 gboolean g_bRevolveSeparator;  // faire pivoter l'image des separateurs.
+gboolean g_bConstantSeparatorSize;  // garder les separateurs de taille constante.
+
+int g_iDialogButtonWidth;
+int g_iDialogButtonHeight;
+double g_fDialogAlpha;
+int g_iDialogIconSize;
 
 gboolean g_bKeepAbove = TRUE;
 gboolean g_bSkipPager = TRUE;

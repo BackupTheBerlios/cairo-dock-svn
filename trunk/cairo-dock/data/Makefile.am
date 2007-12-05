@@ -16,5 +16,5 @@ essentialdata_DATA = \
 	default-icon.svg\
 	cairo-dock-ok.svg\
 	cairo-dock-cancel.svg\
-	cairo-dock-easy-en.conf\
-        cairo-dock-easy-fr.conf
+	cairo-dock_easy-en.conf\
+        cairo-dock_easy-fr.conf

@@ -11,6 +11,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 #include "cairo-dock-gui-factory.h"
 
+#define CAIRO_DOCK_GUI_MARGIN 3
+
 typedef enum
 {
 	CAIRO_DOCK_MODEL_NAME = 0,
@@ -427,7 +429,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 			GTK_RESPONSE_REJECT,
 			NULL);
 	}
-	gtk_container_set_border_width (GTK_CONTAINER (GTK_DIALOG(pDialog)->vbox), 3);
+	gtk_container_set_border_width (GTK_CONTAINER (GTK_DIALOG(pDialog)->vbox), CAIRO_DOCK_GUI_MARGIN);
 	
 	GtkTooltips *pToolTipsGroup = gtk_tooltips_new ();
 	
@@ -477,7 +479,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 				if (pVBox == NULL)  // maintenant qu'on a au moins un element dans ce groupe, on cree sa page dans le notebook.
 				{
 					pLabel = gtk_label_new (cGroupName);
-					pVBox = gtk_vbox_new (FALSE, 3);
+					pVBox = gtk_vbox_new (FALSE, CAIRO_DOCK_GUI_MARGIN);
 					
 					pScrolledWindow = gtk_scrolled_window_new (NULL, NULL);
 					gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (pScrolledWindow), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -550,7 +552,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						*pTipEnd = '\0';
 				}
 				
-				pHBox = gtk_hbox_new (FALSE, 3);
+				pHBox = gtk_hbox_new (FALSE, CAIRO_DOCK_GUI_MARGIN);
 				if (pTipString != NULL)
 				{
 					//g_print ("pTipString : '%s'\n", pTipString);
@@ -564,7 +566,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 				else
 					pEventBox = NULL;
 				
-				if (*cUsefulComment != '\0' && strcmp (cUsefulComment, "...") != 0 && iElementType != 'F')
+				if (*cUsefulComment != '\0' && strcmp (cUsefulComment, "...") != 0 && iElementType != 'F' && iElementType != 'X')
 				{
 					pLabel = gtk_label_new (cUsefulComment);
 					GtkWidget *pAlign = gtk_alignment_new (0., 0.5, 0., 0.);
@@ -1054,6 +1056,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					break;
 					
 					case 'F' :
+					case 'X' :
 						//g_print ("  + frame\n");
 						if (pAuthorizedValuesList == NULL)
 						{
@@ -1066,22 +1069,36 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								cValue = g_key_file_get_string (pKeyFile, cGroupName, cKeyName, NULL);
 							else
 								cValue = pAuthorizedValuesList[0];
-							gchar *cFrameTitle = g_strdup_printf ("<b>%s</b>", cValue);
-							pLabel= gtk_label_new (NULL);
-							gtk_label_set_markup (GTK_LABEL (pLabel), cFrameTitle);
+							gchar *cFrameTitle;
 							
-							pFrame = gtk_frame_new (NULL);
-							gtk_container_set_border_width (GTK_CONTAINER (pFrame), 3);
-							gtk_frame_set_label_widget (GTK_FRAME (pFrame), pLabel);
-							gtk_frame_set_shadow_type (GTK_FRAME (pFrame), GTK_SHADOW_OUT);
+							if (iElementType == 'F')
+							{
+								cFrameTitle = g_strdup_printf ("<b>%s</b>", cValue);
+								pLabel= gtk_label_new (NULL);
+								gtk_label_set_markup (GTK_LABEL (pLabel), cFrameTitle);
+								
+								pFrame = gtk_frame_new (NULL);
+								gtk_container_set_border_width (GTK_CONTAINER (pFrame), CAIRO_DOCK_GUI_MARGIN);
+								gtk_frame_set_label_widget (GTK_FRAME (pFrame), pLabel);
+								gtk_frame_set_shadow_type (GTK_FRAME (pFrame), GTK_SHADOW_OUT);
+							}
+							else
+							{
+								cFrameTitle = g_strdup_printf ("<u><b>%s</b></u>", cValue);
+								pFrame = gtk_expander_new (cFrameTitle);
+								gtk_expander_set_use_markup (GTK_EXPANDER (pFrame), TRUE);
+								gtk_expander_set_expanded (GTK_EXPANDER (pFrame), FALSE);
+							}
 							gtk_box_pack_start (GTK_BOX (pVBox),
 								pFrame,
 								FALSE,
 								FALSE,
 								0);
-							pFrameVBox = gtk_vbox_new (FALSE, 3);
+								
+							pFrameVBox = gtk_vbox_new (FALSE, CAIRO_DOCK_GUI_MARGIN);
 							gtk_container_add (GTK_CONTAINER (pFrame),
 								pFrameVBox);
+							g_free (cFrameTitle);
 							if (pAuthorizedValuesList[0] == NULL || *pAuthorizedValuesList[0] == '\0')
 								g_free (cValue);
 						}

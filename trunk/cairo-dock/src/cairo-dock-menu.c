@@ -67,9 +67,9 @@ static void cairo_dock_edit_and_reload_conf (GtkMenuItem *menu_item, gpointer *d
 	cairo_dock_build_easy_conf_file (g_cConfFile, g_cEasyConfFile);
 	
 	if (cairo_dock_use_full_conf_file ())
-		cairo_dock_edit_conf_file_full (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL, cairo_dock_read_easy_conf_file, g_cEasyConfFile, "My head is hurting !", "I'm a master of the universe");
+		cairo_dock_edit_conf_file_full (pDock->pWidget, g_cConfFile, "Configuration of Cairo-Dock", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL, cairo_dock_read_easy_conf_file, g_cEasyConfFile, "Well, maybe not ...", "I want more !");
 	else
-		cairo_dock_edit_conf_file_full (pDock->pWidget, g_cEasyConfFile, "Configuration of Cairo-Dock", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_easy_conf_file, g_pMainDock, NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_cConfFile, "I'm a master of the universe", "My head is hurting !");
+		cairo_dock_edit_conf_file_full (pDock->pWidget, g_cEasyConfFile, "Configuration of Cairo-Dock", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_easy_conf_file, g_pMainDock, NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_cConfFile, "I want more !", "Well, maybe not ...");
 	
 }
 

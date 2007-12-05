@@ -7,6 +7,8 @@
 #include "cairo-dock-struct.h"
 
 
+void cairo_dock_load_dialog_buttons (CairoDock *pDock, gchar *cButtonOkImage, gchar *cButtonCancelImage);
+
 gboolean cairo_dock_dialog_reference (Icon *pIcon);
 void cairo_dock_dialog_unreference (Icon *pIcon);
 

@@ -26,6 +26,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-menu.h"
 #include "cairo-dock-callbacks.h"
+#include "cairo-dock-dialogs.h"
 #include "cairo-dock-config.h"
 
 #define CAIRO_DOCK_TYPE_CONF_FILE_FILE ".cairo-dock-conf-file"
@@ -132,6 +133,12 @@ extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 
 extern gchar *g_cSeparatorImage;
 extern gboolean g_bRevolveSeparator;
+extern gboolean g_bConstantSeparatorSize;
+
+extern int g_iDialogButtonWidth;
+extern int g_iDialogButtonHeight;
+extern double g_fDialogAlpha;
+extern int g_iDialogIconSize;
 
 
 gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gboolean bDefaultValue)
@@ -736,6 +743,20 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_bRevolveSeparator = cairo_dock_get_boolean_key_value (pKeyFile, "Separators", "revolve separator image", &bFlushConfFileNeeded, TRUE);
 	
+	g_bConstantSeparatorSize = cairo_dock_get_boolean_key_value (pKeyFile, "Separators", "force size", &bFlushConfFileNeeded, TRUE);
+	
+	
+	//\___________________ On recupere les parametres des dialogues.
+	gchar *cButtonOkImage = cairo_dock_get_string_key_value (pKeyFile, "Dialogs", "button_ok image", &bFlushConfFileNeeded, NULL);
+	gchar *cButtonCancelImage = cairo_dock_get_string_key_value (pKeyFile, "Dialogs", "button_cancel image", &bFlushConfFileNeeded, NULL);
+	
+	g_iDialogButtonWidth = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "button width", &bFlushConfFileNeeded, 48);
+	g_iDialogButtonHeight = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "button height", &bFlushConfFileNeeded, 32);
+	
+	g_fDialogAlpha = cairo_dock_get_double_key_value (pKeyFile, "Dialogs", "alpha", &bFlushConfFileNeeded, .6);
+	
+	g_iDialogIconSize = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "icon size", &bFlushConfFileNeeded, 48);
+	
 	
 	//\___________________ On (re)charge tout, car n'importe quel parametre peut avoir change.
 	switch (iScreenBorder)
@@ -757,32 +778,15 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		g_bDirectionUp = TRUE;
 		break;
 	}
-	/*if (iScreenBorder == CAIRO_DOCK_BOTTOM)
-	{
-		pDock->bHorizontalDock = CAIRO_DOCK_HORIZONTAL;
-		g_bDirectionUp = TRUE;
-	}
-	else if (strcmp (cScreenBorder, "top") == 0)
-	{
-		pDock->bHorizontalDock = CAIRO_DOCK_HORIZONTAL;
-		g_bDirectionUp = FALSE;
-	}
-	else if (strcmp (cScreenBorder, "right") == 0)
-	{
-		pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
-		g_bDirectionUp = TRUE;
-	}
-	else if (strcmp (cScreenBorder, "left") == 0)
-	{
-		pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
-		g_bDirectionUp = FALSE;
-	}
-	g_free (cScreenBorder);*/
 	
 	cairo_dock_update_screen_geometry (pDock);
 	
 	if (g_iMaxAuthorizedWidth == 0)
 		g_iMaxAuthorizedWidth = g_iScreenWidth[pDock->bHorizontalDock];
+	
+	cairo_dock_load_dialog_buttons (pDock, cButtonOkImage, cButtonCancelImage);
+	g_free (cButtonOkImage);
+	g_free (cButtonCancelImage);
 	
 	g_fReflectSize = 0;
 	guint i;
