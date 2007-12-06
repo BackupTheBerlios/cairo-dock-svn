@@ -280,7 +280,7 @@ void cairo_dock_render_optimized_linear (CairoDock *pDock, GdkRectangle *pArea)
 			if (fXLeft <= fXMax && floor (fXRight) > fXMin)
 			{
 				cairo_save (pCairoContext);
-				cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect);
+				cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect, pDock->iDecorationsHeight, 0.);
 				cairo_restore (pCairoContext);
 			}
 			

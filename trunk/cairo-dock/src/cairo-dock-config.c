@@ -121,6 +121,7 @@ extern gboolean g_bUniquePid;
 extern gboolean g_bGroupAppliByClass;
 extern int g_iAppliMaxNameLength;
 extern gboolean g_bMinimizeOnClick;
+extern gboolean g_bCloseAppliOnMiddleClick;
 extern gboolean g_bDemandsAttentionWithDialog;
 extern gboolean g_bDemandsAttentionWithAnimation;
 extern gboolean g_bAnimateOnActiveWindow;
@@ -712,6 +713,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_iAppliMaxNameLength = cairo_dock_get_integer_key_value (pKeyFile, "Applications", "max name length", &bFlushConfFileNeeded, 15);
 	
 	g_bMinimizeOnClick = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "minimize on click", &bFlushConfFileNeeded, TRUE);
+	
+	g_bCloseAppliOnMiddleClick = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "close on middle click", &bFlushConfFileNeeded, TRUE);
 	
 	g_bDemandsAttentionWithDialog = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "demands attention with dialog", &bFlushConfFileNeeded, TRUE);
 	g_bDemandsAttentionWithAnimation = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "demands attention with animation", &bFlushConfFileNeeded, FALSE);

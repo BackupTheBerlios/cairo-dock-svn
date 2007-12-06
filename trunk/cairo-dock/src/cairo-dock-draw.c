@@ -436,12 +436,12 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 *@param fDockMagnitude la magnitude actuelle du dock.
 *@param bUseReflect TRUE pour dessiner les reflets.
 */
-void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect)
+void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect, int iDecorationsHeight, double fInclinationOnHorizon)
 {
 	//\_____________________ On separe 2 cas : dessin avec le tampon complet, et dessin avec le ou les petits tampons.
 	gboolean bDrawFullBuffer;
 	bDrawFullBuffer  = (bUseReflect && icon->pFullIconBuffer != NULL && (! g_bDynamicReflection || icon->fScale == 1) && (icon->iCount == 0 || icon->iAnimationType == CAIRO_DOCK_ROTATE || icon->iAnimationType == CAIRO_DOCK_BLINK));
-	
+	int iCurrentWidth= 1;
 	//\_____________________ On dessine l'icone en fonction de son placement, son angle, et sa transparence.
 	//cairo_push_group (pCairoContext);
 	//g_print ("%s (%.2f;%.2f)\n", __func__, icon->fDrawX, icon->fDrawY);
@@ -455,6 +455,29 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		{
 			cairo_translate (pCairoContext, fRatio * icon->fWidthFactor * icon->fWidth * (icon->fScale - 1) / 2, (g_bDirectionUp ? fRatio * icon->fHeightFactor * icon->fHeight * (icon->fScale - 1) : 0));
 			cairo_scale (pCairoContext, fRatio / (1 + g_fAmplitude), fRatio / (1 + g_fAmplitude));
+		}
+		else if (FALSE && CAIRO_DOCK_IS_SEPARATOR (icon))
+		{
+			g_print ("separateur incruste\n");
+			if (icon->fDrawX + icon->fWidth * icon->fScale / 2 > iCurrentWidth / 2)  // on est a droite.
+			{
+				g_print ("  a droite\n");
+				cairo_save (pCairoContext);
+				cairo_move_to (pCairoContext, icon->fWidth * icon->fScale, icon->fHeight * icon->fScale);  // coin bas droit.
+				
+				cairo_rel_line_to (pCairoContext, - icon->fWidth * icon->fScale + iDecorationsHeight * fInclinationOnHorizon, 0);
+				cairo_rel_line_to (pCairoContext, - iDecorationsHeight * fInclinationOnHorizon + icon->fWidth * icon->fScale * .1, - iDecorationsHeight);
+				cairo_rel_line_to (pCairoContext, icon->fWidth * icon->fScale - iDecorationsHeight * fInclinationOnHorizon - 2 * icon->fWidth * icon->fScale * .1, 0);
+				cairo_close_path (pCairoContext);
+				
+				cairo_set_source_rgba (pCairoContext, 1., 1., 1., 1.);
+				cairo_fill_preserve (pCairoContext);
+				cairo_restore (pCairoContext);
+			}
+			else  // a gauche.
+			{
+				g_print ("  a gauche\n");
+			}
 		}
 		else
 			cairo_scale (pCairoContext, fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude));
@@ -771,7 +794,7 @@ void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, d
 		icon = ic->data;
 		
 		cairo_save (pCairoContext);
-		cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect);
+		cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect, pDock->iDecorationsHeight, 0.);
 		cairo_restore (pCairoContext);
 		
 		ic = cairo_dock_get_next_element (ic, pDock->icons);

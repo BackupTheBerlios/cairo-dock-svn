@@ -70,6 +70,7 @@ extern gboolean g_bDirectionUp;
 extern double g_fRefreshInterval;
 
 extern gboolean g_bMinimizeOnClick;
+extern gboolean g_bCloseAppliOnMiddleClick;
 
 extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
@@ -765,22 +766,43 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 	}
 	return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 }
-gboolean cairo_dock_notification_double_click_icon (gpointer *data)
+
+gboolean cairo_dock_notification_middle_click_icon (gpointer *data)
 {
 	Icon *icon = data[0];
-	if (icon->pSubDock != NULL)
-		return cairo_dock_notification_click_icon (data);
-	else
-		return CAIRO_DOCK_LET_PASS_NOTIFICATION;
+	CairoDock *pDock = data[1];
+	/*pDock->iScrollOffset = 0;
+	cairo_dock_update_dock_size (pDock);
+	pDock->calculate_icons (pDock);
+	gtk_widget_queue_draw (pDock->pWidget);*/
+	if (CAIRO_DOCK_IS_VALID_APPLI (icon) && g_bCloseAppliOnMiddleClick)
+	{
+		cairo_dock_close_xwindow (icon->Xid);
+		return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
+	}
+	return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 }
+
 gboolean on_button_press2 (GtkWidget* pWidget,
 				GdkEventButton* pButton,
 				CairoDock *pDock)
 {
 	//g_print ("%s (%d/%d)\n", __func__, pButton->type, pButton->button);
+	
+	if (pDock->bHorizontalDock)  // utile ?
+	{
+		pDock->iMouseX = (int) pButton->x;
+		pDock->iMouseY = (int) pButton->y;
+	}
+	else
+	{
+		pDock->iMouseX = (int) pButton->y;
+		pDock->iMouseY = (int) pButton->x;
+	}
+	
+	Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
 	if (pButton->button == 1)  // clique gauche.
 	{
-		Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
 		switch (pButton->type)
 		{
 			case GDK_BUTTON_RELEASE :
@@ -826,20 +848,8 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 							cairo_dock_insert_icon_in_dock (s_pIconClicked, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 						}
 						
-						int iX, iY;
-						if (pDock->bHorizontalDock)
-						{
-							iX = pButton->x;
-							iY = pButton->y;
-						}
-						else
-						{
-							iX = pButton->y;
-							iY = pButton->x;
-						}
-						
 						Icon *prev_icon, *next_icon;
-						if (iX > icon->fX + icon->fWidth * icon->fScale / 2)
+						if (pDock->iMouseX > icon->fX + icon->fWidth * icon->fScale / 2)
 						{
 							prev_icon = icon;
 							next_icon = cairo_dock_get_next_icon (pDock->icons, icon);
@@ -861,8 +871,6 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 						s_pIconClicked->iCount = 2 * g_tNbIterInOneRound[icon->iAnimationType] - 1;  // 2 rebonds.
 						cairo_dock_move_icon_after_icon (pDock, s_pIconClicked, prev_icon);
 						
-						pDock->iMouseX = iX;  // utile ?
-						pDock->iMouseY = iY;
 						pDock->calculate_icons (pDock);
 						gtk_widget_queue_draw (pWidget);
 						
@@ -882,13 +890,6 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				if ( ! (pButton->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK)))
 				{
 					s_pIconClicked = icon;  // on ne definit pas l'animation CAIRO_DOCK_FOLLOW_MOUSE ici , on le fera apres le 1er mouvement, pour eviter que l'icone soit dessinee comme tel quand on clique dessus alors que le dock ets en train de jouer une animation (ca provoque un flash desagreable).
-					/*if (s_pIconClicked != NULL)
-					{
-						//g_print ("s_pIconClicked <- %s\n", s_pIconClicked->acName);
-						s_pIconClicked->iAnimationType = CAIRO_DOCK_FOLLOW_MOUSE;
-						pDock->iAvoidingMouseIconType = s_pIconClicked->iType;  // on pourrait le faire lors du 'motion' aussi.
-						pDock->fAvoidingMouseMargin = .5;
-					}*/
 				}
 			break ;
 			
@@ -906,7 +907,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 	else if (pButton->button == 3 && pButton->type == GDK_BUTTON_PRESS)  // clique droit.
 	{
 		pDock->bMenuVisible = TRUE;
-		GtkWidget *menu = cairo_dock_build_menu (pDock);
+		GtkWidget *menu = cairo_dock_build_menu (icon, pDock);  // genere un CAIRO_DOCK_BUILD_MENU.
 		
 		gtk_widget_show_all (menu);
 		
@@ -920,20 +921,8 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 	}
 	else if (pButton->button == 2 && pButton->type == GDK_BUTTON_PRESS)  // clique milieu.
 	{
-		pDock->iScrollOffset = 0;
-		cairo_dock_update_dock_size (pDock);
-		if (pDock->bHorizontalDock)  // utile ?
-		{
-			pDock->iMouseX = (int) pButton->x;
-			pDock->iMouseY = (int) pButton->y;
-		}
-		else
-		{
-			pDock->iMouseX = (int) pButton->y;
-			pDock->iMouseY = (int) pButton->x;
-		}
-		pDock->calculate_icons (pDock);
-		gtk_widget_queue_draw (pWidget);
+		gpointer data[2] = {icon, pDock};
+		cairo_dock_notify (CAIRO_DOCK_MIDDLE_CLICK_ICON, data);
 	}
 	
 	return FALSE;

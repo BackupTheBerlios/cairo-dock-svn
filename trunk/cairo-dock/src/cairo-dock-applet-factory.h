@@ -27,9 +27,9 @@ void cairo_dock_set_icon_surface (cairo_t *pIconContext, cairo_surface_t *pSurfa
 void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, CairoDock *pDock);
 void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoDock *pDock);
 
-void cairo_dock_set_icon_name (cairo_t *pIconContext, const gchar *cIconName, Icon *pIcon, CairoDock *pDock);
+void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, Icon *pIcon, CairoDock *pDock);
 
-void cairo_dock_set_quick_info (cairo_t *pIconContext, const gchar *cExtraInfo, Icon *pIcon);
+void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cExtraInfo, Icon *pIcon);
 #define cairo_dock_remove_quick_info(pIcon) cairo_dock_set_quick_info (NULL, NULL, pIcon)
 
 void cairo_dock_animate_icon (Icon *pIcon, CairoDock *pDock, CairoDockAnimationType iAnimationType, int iNbRounds);

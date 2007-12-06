@@ -9,6 +9,12 @@ AC_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE([foreign])
 AC_PROG_LIBTOOL
 
+IT_PROG_INTLTOOL([0.35.0])
+AC_SUBST(ALL_LINGUAS)
+AM_GLIB_GNU_GETTEXT
+GETTEXT_PACKAGE=cairo-dock
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [Gettext package.])
+AC_SUBST(GETTEXT_PACKAGE)
 
 # Checks for programs.
 AC_PROG_CC
@@ -35,6 +41,7 @@ PKG_CHECK_MODULES(GLITZ, "glitz-glx")
 AC_CONFIG_FILES([Makefile
 		cairo-dock.pc
 		src/Makefile
+		po/Makefile.in
 		data/Makefile
 		data/themes/Makefile
 		data/themes/_default_/Makefile

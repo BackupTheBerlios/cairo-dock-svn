@@ -234,7 +234,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 		cairo_close_path (pCairoContext);
 	
 	cairo_save (pCairoContext);
-	cairo_set_source_rgba (pCairoContext, 1., 1., 1., .6);
+	cairo_set_source_rgba (pCairoContext, 1., 1., 1., g_fDialogAlpha);
 	cairo_fill_preserve (pCairoContext);
 	cairo_restore (pCairoContext);
 	

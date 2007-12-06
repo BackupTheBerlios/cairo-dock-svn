@@ -11,7 +11,7 @@
 ** Original idea :
 **    Mirco Mueller, June 2006.
 **
-*********************** VERSION 1 (2006)*********************
+*********************** VERSION 0 (2006)*********************
 ** author(s):
 **    Mirco "MacSlow" Mueller <macslow@bangang.de>
 **    Behdad Esfahbod <behdad@behdad.org>
@@ -37,7 +37,7 @@
 **    great deal by sending me additional tweaked and optimized versions. I've
 **    now merged all that with my recent additions.
 **
-*********************** VERSION 2 (2007)*********************
+*********************** VERSION 1.x.x (2007)*********************
 **
 ** author(s) :
 **     Fabrice Rey <fabounet@users.berlios.de>
@@ -51,7 +51,7 @@
 **     Now it sems more like a real dock !
 **
 **     Edit : plus a taskbar, plus an applet system,
-**            plus the container ability, plus the caroussel view, plus the top and vertical view, ...
+**            plus the container ability, plus different views, plus the top and vertical position, ...
 **
 **
 *******************************************************************************/
@@ -63,6 +63,7 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <gtk/gtk.h>
+#include <glib/gi18n.h>
 
 #ifdef HAVE_GLITZ
 #include <gdk/gdkx.h>
@@ -177,6 +178,7 @@ gboolean g_bUniquePid;  // une seule icone par PID.
 gboolean g_bGroupAppliByClass = TRUE;  // une seule icone par classe, les autres dans un container.
 int g_iAppliMaxNameLength;  // longueur max de la chaine de caractere du nom des applis.
 gboolean g_bMinimizeOnClick;  // minimiser l'appli lorsqu'on clique sur son icone si elle est deja active.
+gboolean g_bCloseAppliOnMiddleClick;  // utiliser le clique du milieu pour fermer une appli.
 gboolean g_bDemandsAttentionWithDialog;  // attirer l'attention avec une bulle de dialogue.
 gboolean g_bDemandsAttentionWithAnimation;  // attirer l'attention avec une animation.
 gboolean g_bAnimateOnActiveWindow;  // jouer une breve animation de l'icone lorsque la fenetre correspondante devient active.
@@ -295,6 +297,11 @@ main (int argc, char** argv)
 		}
 	}
 	
+	bindtextdomain ( GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR );
+	bind_textdomain_codeset ( GETTEXT_PACKAGE, "UTF-8" );
+	textdomain ( GETTEXT_PACKAGE );
+	
+	
 	//\___________________ On initialise les numeros de version.
 	gchar **cVersions = g_strsplit (CAIRO_DOCK_VERSION, ".", -1);
 	if (cVersions[0] != NULL)
@@ -353,7 +360,7 @@ main (int argc, char** argv)
 	cairo_dock_register_notification (CAIRO_DOCK_BUILD_MENU, (CairoDockNotificationFunc) cairo_dock_notification_build_menu, CAIRO_DOCK_RUN_AFTER);
 	cairo_dock_register_notification (CAIRO_DOCK_DROP_DATA, (CairoDockNotificationFunc) cairo_dock_notification_drop_data, CAIRO_DOCK_RUN_AFTER);
 	cairo_dock_register_notification (CAIRO_DOCK_CLICK_ICON, (CairoDockNotificationFunc) cairo_dock_notification_click_icon, CAIRO_DOCK_RUN_FIRST);
-	cairo_dock_register_notification (CAIRO_DOCK_DOUBLE_CLICK_ICON, (CairoDockNotificationFunc) cairo_dock_notification_double_click_icon, CAIRO_DOCK_RUN_FIRST);
+	cairo_dock_register_notification (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) cairo_dock_notification_middle_click_icon, CAIRO_DOCK_RUN_FIRST);
 	cairo_dock_register_notification (CAIRO_DOCK_REMOVE_ICON, (CairoDockNotificationFunc) cairo_dock_notification_remove_icon, CAIRO_DOCK_RUN_FIRST);
 	
 	//\___________________ On charge le dernier theme ou on demande a l'utilisateur d'en choisir un.

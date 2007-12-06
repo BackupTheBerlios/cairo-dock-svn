@@ -73,6 +73,11 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 			FALSE);
 		g_free (cImagePath);
 	}
+	else if (FALSE)
+	{
+		
+	}
+	
 	return pNewSurface;
 }
 

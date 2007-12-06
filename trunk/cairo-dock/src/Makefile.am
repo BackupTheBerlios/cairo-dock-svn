@@ -4,7 +4,6 @@ SUBDIRS = .
 bin_PROGRAMS = \
 	cairo-dock
 
-
 if COMPIL_VERBOSE
 include_verbose = -DCAIRO_DOCK_VERBOSE=TRUE
 endif
@@ -28,6 +27,8 @@ cairo_dock_CFLAGS = \
 	-DCAIRO_DOCK_THEME_CONF_FILE=\""themes.conf"\"\
 	-DCAIRO_DOCK_DEFAULT_ICON_NAME=\""default-icon.svg"\"\
 	-DCAIRO_DOCK_VERSION=\""$(VERSION)"\"\
+	-DPACKAGE_LOCALE_DIR=\""$(datadir)/locale"\"\
+	-DGETTEXT_PACKAGE=\""$(GETTEXT_PACKAGE)"\"\
 	-std=c99\
 	-O3\
 	-g -ggdb\

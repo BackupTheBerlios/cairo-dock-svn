@@ -29,7 +29,7 @@ void cairo_dock_render_decorations_in_frame (cairo_t *pCairoContext, CairoDock *
 void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock);
 
 
-void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect);
+void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect, int iDecorationsHeight, double fInclinationOnHorizon);
 void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, double fRatio);
 
 

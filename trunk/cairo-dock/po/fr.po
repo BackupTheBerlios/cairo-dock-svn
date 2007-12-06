@@ -1,0 +1,133 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-12-05 15:40+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: cairo-dock-menu.c:572
+msgid "Configure"
+msgstr "Configurer"
+
+#: cairo-dock-menu.c:579
+msgid "All"
+msgstr "Tout"
+
+#: cairo-dock-menu.c:583
+msgid "Appearance"
+msgstr "Apparence"
+
+#: cairo-dock-menu.c:587
+msgid "Behaviour"
+msgstr "Comportement"
+
+#: cairo-dock-menu.c:591
+msgid "Modules"
+msgstr "Modules"
+
+#: cairo-dock-menu.c:601
+msgid "Manage themes"
+msgstr "Gestion des themes"
+
+#: cairo-dock-menu.c:607
+msgid "Check updates"
+msgstr "Verifier MaJ"
+
+#: cairo-dock-menu.c:613
+msgid "About"
+msgstr "A propos"
+
+#: cairo-dock-menu.c:619
+msgid "Help"
+msgstr "Aide"
+
+#: cairo-dock-menu.c:627
+msgid "Quick-Hide"
+msgstr "Cachage rapide"
+
+#: cairo-dock-menu.c:634
+msgid "Quit"
+msgstr "Quiter"
+
+#: cairo-dock-menu.c:659 cairo-dock-menu.c:669 cairo-dock-menu.c:678
+msgid "Add a launcher"
+msgstr "Ajouter un lanceur"
+
+#: cairo-dock-menu.c:684
+msgid "Remove this launcher"
+msgstr "Supprimer ce lanceur"
+
+#: cairo-dock-menu.c:690
+msgid "Modify this launcher"
+msgstr "Modifier ce lanceur"
+
+#: cairo-dock-menu.c:698
+msgid "Close"
+msgstr "Fermer"
+
+#: cairo-dock-menu.c:704
+msgid "Minimize"
+msgstr "Minimiser"
+
+#: cairo-dock-menu.c:711
+msgid "Unmaximize"
+msgstr "De-maximiser"
+
+#: cairo-dock-menu.c:711
+msgid "Maximize"
+msgstr "Maximiser"
+
+#: cairo-dock-menu.c:718
+msgid "Other actions"
+msgstr "Autres actions"
+
+#: cairo-dock-menu.c:724
+msgid "Not Fullscreen"
+msgstr "Pas plein ecran"
+
+#: cairo-dock-menu.c:724
+msgid "Fullscreen"
+msgstr "Plein ecran"
+
+#: cairo-dock-menu.c:728
+msgid "Move to this desktop"
+msgstr "Deplacer sur ce bureau"
+
+#: cairo-dock-menu.c:734
+msgid "Configure this module"
+msgstr "Configurer ce module"
+
+#: cairo-dock-menu.c:740
+msgid "Remove this module"
+msgstr "Enlever ce module"
+
+#: cairo-dock-menu.c:746
+msgid "Move this icon"
+msgstr "Deplacer cette icone"
+
+#: cairo-dock-menu.c:754
+msgid "To the left"
+msgstr "A gauche"
+
+#: cairo-dock-menu.c:760
+msgid "To the right"
+msgstr "A droite"
+
+#: cairo-dock-menu.c:767
+msgid "To the beginning"
+msgstr "Au debut"
+
+#: cairo-dock-menu.c:774
+msgid "To the end"
+msgstr "A la fin"

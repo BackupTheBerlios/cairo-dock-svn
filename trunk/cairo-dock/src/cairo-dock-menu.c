@@ -10,6 +10,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <string.h>
 #include <stdlib.h>
 #include <glib.h>
+#include <glib/gi18n.h>
 #include <cairo.h>
 #include <gtk/gtk.h>
 #include <glib/gstdio.h>
@@ -89,7 +90,6 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
-	
 	gchar *cTitle = g_strdup_printf ("\nCairo-Dock (2007)\n version %s", CAIRO_DOCK_VERSION);
 	GtkWidget *pDialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
 		GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -141,7 +141,7 @@ static void cairo_dock_help (GtkMenuItem *menu_item, gpointer *data)
 static void cairo_dock_quick_hide (GtkMenuItem *menu_item, gpointer *data)
 {
 	CairoDock *pDock = data[1];
-	g_print ("%s ()\n", __func__);
+	//g_print ("%s ()\n", __func__);
 	pDock->bMenuVisible = FALSE;
 	pDock->bAtBottom = FALSE;  // car on a deja quitte le dock lors de la fermeture du menu, donc le "leave-notify" serait ignore.
 	cairo_dock_activate_temporary_auto_hide (g_pMainDock);
@@ -165,7 +165,7 @@ gboolean cairo_dock_notification_remove_icon (gpointer *data)
 		if (! CAIRO_DOCK_IS_URI_LAUNCHER (icon))  // alors on propose de repartir les icones de son sous-dock dans le dock principal.
 		{
 			///int answer = cairo_dock_ask_question (pDock, "Do you want to re-dispatch the icons contained inside this container into the dock (otherwise they will be destroyed) ?");
-			int answer = cairo_dock_ask_question_and_wait ("Do you want to re-dispatch the icons contained inside this container into the dock ?\n (otherwise they will be destroyed)", icon, pDock);
+			int answer = cairo_dock_ask_question_and_wait (_("Do you want to re-dispatch the icons contained inside this container into the dock ?\n (otherwise they will be destroyed)"), icon, pDock);
 			g_return_val_if_fail (answer != GTK_RESPONSE_NONE, CAIRO_DOCK_LET_PASS_NOTIFICATION);
 			if (answer == GTK_RESPONSE_YES)
 				bDestroyIcons = FALSE;
@@ -186,12 +186,11 @@ static void cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
 	
-	gchar *question = g_strdup_printf ("You're about to remove this icon (%s) from the dock. Sure ?", icon->acName);
+	gchar *question = g_strdup_printf (_("You're about to remove this icon (%s) from the dock. Sure ?"), icon->acName);
 	///int answer = cairo_dock_ask_question (pDock, question);
 	int answer = cairo_dock_ask_question_and_wait (question, icon, pDock);
 	g_print ("reponse : %d\n", answer);
 	g_free (question);
-	g_print ("reponse : %d\n", answer);
 	if (answer == GTK_RESPONSE_YES)
 	{
 		cairo_dock_notify (CAIRO_DOCK_REMOVE_ICON, data);
@@ -243,7 +242,7 @@ static void cairo_dock_add_launcher (GtkMenuItem *menu_item, gpointer *data)
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
 	
-	GtkWidget *pFileChooserDialog = gtk_file_chooser_dialog_new ("Choose or Create a launcher",
+	GtkWidget *pFileChooserDialog = gtk_file_chooser_dialog_new (_("Choose or Create a launcher"),
 		GTK_WINDOW (pDock->pWidget),
 		GTK_FILE_CHOOSER_ACTION_OPEN,
 		GTK_STOCK_NEW,
@@ -254,7 +253,7 @@ static void cairo_dock_add_launcher (GtkMenuItem *menu_item, gpointer *data)
 		GTK_RESPONSE_CANCEL,
 		NULL);
 	
-	gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (pFileChooserDialog),"/usr/share/app-install/");
+	gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (pFileChooserDialog), "/usr/share/app-install/");
 	gtk_file_chooser_set_select_multiple (GTK_FILE_CHOOSER (pFileChooserDialog), TRUE);
 	gtk_widget_show (pFileChooserDialog);
 	
@@ -321,7 +320,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	
 	cairo_dock_update_launcher_desktop_file (cDesktopFilePath, g_cLanguage);
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, "Modify this launcher", CAIRO_DOCK_LAUNCHER_PANEL_WIDTH, CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT, 0, NULL, NULL, NULL, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, cDesktopFilePath, _("Modify this launcher"), CAIRO_DOCK_LAUNCHER_PANEL_WIDTH, CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT, 0, NULL, NULL, NULL, NULL);
 	g_free (cDesktopFilePath);
 	
 	if (! pDock->bInside)
@@ -353,7 +352,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 				///int answer = cairo_dock_ask_question (pDock, "Do you want to re-dispatch the icons contained inside this container into the dock (otherwise they will be destroyed) ?");
 				int answer = GTK_RESPONSE_NONE;
 				while (answer == GTK_RESPONSE_NONE)
-					answer = cairo_dock_ask_question_and_wait ("Do you want to re-dispatch the icons contained inside this container into the dock ?\n (otherwise they will be destroyed)", icon, pDock);
+					answer = cairo_dock_ask_question_and_wait (_("Do you want to re-dispatch the icons contained inside this container into the dock ?\n (otherwise they will be destroyed)"), icon, pDock);
 				if (answer == GTK_RESPONSE_YES)
 					bDestroyIcons = FALSE;
 				cairo_dock_destroy_dock (icon->pSubDock, icon->acName, (bDestroyIcons ? NULL : g_pMainDock), (bDestroyIcons ? NULL : CAIRO_DOCK_MAIN_DOCK_NAME));
@@ -417,7 +416,7 @@ static void cairo_dock_remove_module (GtkMenuItem *menu_item, gpointer *data)
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
 	
-	gchar *question = g_strdup_printf ("You're about to remove this module (%s) from the dock. Sure ?", icon->acName);
+	gchar *question = g_strdup_printf (_("You're about to remove this module (%s) from the dock. Sure ?"), icon->acName);
 	///int answer = cairo_dock_ask_question (pDock, question);
 	int answer = cairo_dock_ask_question_and_wait (question, icon, pDock);
 	if (answer == GTK_RESPONSE_YES)
@@ -436,7 +435,7 @@ static void cairo_dock_close_appli (GtkMenuItem *menu_item, gpointer *data)
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
 	
-	if (icon->Xid > 0)
+	if (CAIRO_DOCK_IS_VALID_APPLI (icon))
 		cairo_dock_close_xwindow (icon->Xid);
 }
 
@@ -544,7 +543,7 @@ static void _cairo_dock_insert_module_in_menu (gchar *cModuleName, CairoDockModu
 		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_initiate_config_module_from_module), pModule);
 	}
 }
-GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
+GtkWidget *cairo_dock_build_menu (Icon *icon, CairoDock *pDock)
 {
 	static gpointer *data = NULL;
 	
@@ -553,8 +552,6 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 		"deactivate",
 		G_CALLBACK (cairo_dock_delete_menu),
 		pDock);
-	
-	Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
 	
 	if (data == NULL)
 		data = g_new (gpointer, 3);
@@ -570,26 +567,26 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	GtkWidget *pSubMenu = gtk_menu_new ();
 	gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), pSubMenu);
 	
-	menu_item = gtk_image_menu_item_new_with_label ("Configure");
+	menu_item = gtk_image_menu_item_new_with_label (_("Configure"));
 	image = gtk_image_new_from_stock (GTK_STOCK_PREFERENCES, GTK_ICON_SIZE_MENU);
 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 	GtkWidget *pConfSubMenu = gtk_menu_new ();
 	gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), pConfSubMenu);
 	
-	menu_item = gtk_menu_item_new_with_label ("All");
+	menu_item = gtk_menu_item_new_with_label (_("All"));
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pConfSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_edit_and_reload_conf), data);
 	
-	menu_item = gtk_menu_item_new_with_label ("Appearance");
+	menu_item = gtk_menu_item_new_with_label (_("Appearance"));
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pConfSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_edit_and_reload_appearance), data);
 	
-	menu_item = gtk_menu_item_new_with_label ("Behaviour");
+	menu_item = gtk_menu_item_new_with_label (_("Behaviour"));
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pConfSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_edit_and_reload_behaviour), data);
 	
-	menu_item = gtk_image_menu_item_new_with_label ("Modules");
+	menu_item = gtk_image_menu_item_new_with_label (_("Modules"));
 	image = gtk_image_new_from_stock (GTK_STOCK_CONNECT, GTK_ICON_SIZE_MENU);
 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pConfSubMenu), menu_item);
@@ -599,25 +596,25 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	cairo_dock_foreach_module ((GHFunc)_cairo_dock_insert_module_in_menu, pModuleSubMenu);
 	
 	
-	menu_item = gtk_image_menu_item_new_with_label ("Manage themes");
+	menu_item = gtk_image_menu_item_new_with_label (_("Manage themes"));
 	image = gtk_image_new_from_stock (GTK_STOCK_EXECUTE, GTK_ICON_SIZE_MENU);
 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_initiate_theme_management), data);
 	
-	menu_item = gtk_image_menu_item_new_with_label ("Check updates");
+	menu_item = gtk_image_menu_item_new_with_label (_("Check updates"));
 	image = gtk_image_new_from_stock (GTK_STOCK_REFRESH, GTK_ICON_SIZE_MENU);
 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_update), data);
 	
-	menu_item = gtk_image_menu_item_new_with_label ("About");
+	menu_item = gtk_image_menu_item_new_with_label (_("About"));
 	image = gtk_image_new_from_stock (GTK_STOCK_ABOUT, GTK_ICON_SIZE_MENU);
 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_about), data);
 	
-	menu_item = gtk_image_menu_item_new_with_label ("Help");
+	menu_item = gtk_image_menu_item_new_with_label (_("Help"));
 	image = gtk_image_new_from_stock (GTK_STOCK_HELP, GTK_ICON_SIZE_MENU);
 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
@@ -625,14 +622,14 @@ GtkWidget *cairo_dock_build_menu (CairoDock *pDock)
 	
 	if (! g_bAutoHide)
 	{
-		menu_item = gtk_image_menu_item_new_with_label ("Quick-Hide");
+		menu_item = gtk_image_menu_item_new_with_label (_("Quick-Hide"));
 		image = gtk_image_new_from_stock (GTK_STOCK_GOTO_BOTTOM, GTK_ICON_SIZE_MENU);
 		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 		gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_quick_hide), data);
 	}
 	
-	menu_item = gtk_image_menu_item_new_with_label ("Quit");
+	menu_item = gtk_image_menu_item_new_with_label (_("Quit"));
 	image = gtk_image_new_from_stock (GTK_STOCK_QUIT, GTK_ICON_SIZE_MENU);
 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
@@ -657,7 +654,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	GtkWidget *menu_item, *image;
 	if (icon == NULL)
 	{
-		menu_item = gtk_image_menu_item_new_with_label ("Add a launcher");
+		menu_item = gtk_image_menu_item_new_with_label (_("Add a launcher"));
 		image = gtk_image_new_from_stock (GTK_STOCK_ADD, GTK_ICON_SIZE_MENU);
 		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
@@ -667,7 +664,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	
 	if (CAIRO_DOCK_IS_SEPARATOR (icon))
 	{
-		menu_item = gtk_image_menu_item_new_with_label ("Add a launcher");
+		menu_item = gtk_image_menu_item_new_with_label (_("Add a launcher"));
 		
 		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_add_launcher), data);
@@ -676,19 +673,19 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	{
 		if (CAIRO_DOCK_IS_LAUNCHER (icon))
 		{
-			menu_item = gtk_image_menu_item_new_with_label ("Add a launcher");
+			menu_item = gtk_image_menu_item_new_with_label (_("Add a launcher"));
 			image = gtk_image_new_from_stock (GTK_STOCK_ADD, GTK_ICON_SIZE_MENU);
 			gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 			gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 			g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_add_launcher), data);
 			
-			menu_item = gtk_image_menu_item_new_with_label ("Remove this launcher");
+			menu_item = gtk_image_menu_item_new_with_label (_("Remove this launcher"));
 			image = gtk_image_new_from_stock (GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU);
 			gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 			gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 			g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_remove_launcher), data);
 			
-			menu_item = gtk_image_menu_item_new_with_label ("Modify this launcher");
+			menu_item = gtk_image_menu_item_new_with_label (_("Modify this launcher"));
 			image = gtk_image_new_from_stock (GTK_STOCK_EDIT, GTK_ICON_SIZE_MENU);
 			gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 			gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
@@ -696,55 +693,55 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		}
 		else if (CAIRO_DOCK_IS_VALID_APPLI (icon))
 		{
-			menu_item = gtk_image_menu_item_new_with_label ("Close");
+			menu_item = gtk_image_menu_item_new_with_label (_("Close"));
 			image = gtk_image_new_from_stock (GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
 			gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 			gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 			g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_close_appli), data);
 			
-			menu_item = gtk_image_menu_item_new_with_label ("Minimize");
+			menu_item = gtk_image_menu_item_new_with_label (_("Minimize"));
 			image = gtk_image_new_from_stock (GTK_STOCK_GO_DOWN, GTK_ICON_SIZE_MENU);
 			gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 			gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 			g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_minimize_appli), data);
 			
 			gboolean bIsMaximized = cairo_dock_window_is_maximized (icon->Xid);
-			menu_item = gtk_image_menu_item_new_with_label (bIsMaximized ? "Unmaximize" : "Maximize");
+			menu_item = gtk_image_menu_item_new_with_label (bIsMaximized ? _("Unmaximize") : _("Maximize"));
 			image = gtk_image_new_from_stock (GTK_STOCK_GO_UP, GTK_ICON_SIZE_MENU);
 			gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 			gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 			g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_maximize_appli), data);
 			
 			
-			menu_item = gtk_menu_item_new_with_label ("Other actions");
+			menu_item = gtk_menu_item_new_with_label (_("Other actions"));
 			gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 			GtkWidget *pSubMenuOtherActions = gtk_menu_new ();
 			gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), pSubMenuOtherActions);
 			
 			gboolean bIsFullScreen = cairo_dock_window_is_fullscreen (icon->Xid);
-			menu_item = gtk_menu_item_new_with_label (bIsFullScreen ? "Not Fullscreen" : "Fullscreen");
+			menu_item = gtk_menu_item_new_with_label (bIsFullScreen ? _("Not Fullscreen") : _("Fullscreen"));
 			gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenuOtherActions), menu_item);
 			g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_set_appli_fullscreen), data);
 			
-			menu_item = gtk_menu_item_new_with_label ("Move to this desktop");
+			menu_item = gtk_menu_item_new_with_label (_("Move to this desktop"));
 			gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenuOtherActions), menu_item);
 			g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_move_appli_to_current_desktop), data);
 		}
 		else if (CAIRO_DOCK_IS_VALID_APPLET (icon))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module.
 		{
-			menu_item = gtk_image_menu_item_new_with_label ("Configure this module");
+			menu_item = gtk_image_menu_item_new_with_label (_("Configure this module"));
 			image = gtk_image_new_from_stock (GTK_STOCK_PROPERTIES, GTK_ICON_SIZE_MENU);
 			gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 			gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 			g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_initiate_config_module), data);
 			
-			menu_item = gtk_image_menu_item_new_with_label ("Remove this module");
+			menu_item = gtk_image_menu_item_new_with_label (_("Remove this module"));
 			image = gtk_image_new_from_stock (GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU);
 			gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 			gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 			g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_remove_module), data);
 		}
-		menu_item = gtk_image_menu_item_new_with_label ("Move this icon");
+		menu_item = gtk_image_menu_item_new_with_label (_("Move this icon"));
 		
 		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 		image = gtk_image_new_from_stock (GTK_STOCK_JUMP_TO, GTK_ICON_SIZE_MENU);
@@ -752,27 +749,27 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		GtkWidget *pSubMenu = gtk_menu_new ();
 		gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), pSubMenu);
 		
-		menu_item = gtk_image_menu_item_new_with_label ("To the left");
+		menu_item = gtk_image_menu_item_new_with_label (_("To the left"));
 		image = gtk_image_new_from_stock (GTK_STOCK_GO_BACK, GTK_ICON_SIZE_MENU);
 		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 		gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_swap_with_prev_icon), data);
 		
-		menu_item = gtk_image_menu_item_new_with_label ("To the right");
+		menu_item = gtk_image_menu_item_new_with_label (_("To the right"));
 		image = gtk_image_new_from_stock (GTK_STOCK_GO_FORWARD, GTK_ICON_SIZE_MENU);
 		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 		gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_swap_with_next_icon), data);
 		gtk_widget_show_all (menu);
 		
-		menu_item = gtk_image_menu_item_new_with_label ("To the beginning");
+		menu_item = gtk_image_menu_item_new_with_label (_("To the beginning"));
 		image = gtk_image_new_from_stock (GTK_STOCK_GOTO_FIRST, GTK_ICON_SIZE_MENU);
 		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 		gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_move_icon_to_beginning), data);
 		gtk_widget_show_all (menu);
 		
-		menu_item = gtk_image_menu_item_new_with_label ("To the end");
+		menu_item = gtk_image_menu_item_new_with_label (_("To the end"));
 		image = gtk_image_new_from_stock (GTK_STOCK_GOTO_LAST, GTK_ICON_SIZE_MENU);
 		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 		gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
@@ -781,7 +778,6 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	
 	return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 }
-
 
 /*int cairo_dock_ask_question (CairoDock *pDock, const gchar *cQuestion)
 {

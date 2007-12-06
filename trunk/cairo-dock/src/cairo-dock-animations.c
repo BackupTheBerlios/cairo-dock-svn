@@ -46,6 +46,7 @@ extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS];
 
+
 gboolean cairo_dock_move_up (CairoDock *pDock)
 {
 	int deltaY_possible;
@@ -312,6 +313,12 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 }
 
 
+/**
+*Arme l'animation d'une icone 
+*@param icon l'icone dont on veut preparer l'animation.
+*@param iAnimationType le type d'animation voulu, ou -1 pour utiliser l'animtion correspondante au type de l'icone.
+*@param iNbRounds le nombre de fois ou l'animation sera jouee, ou -1 pour utiliser la valeur correspondante au type de l'icone.
+*/
 void cairo_dock_arm_animation (Icon *icon, CairoDockAnimationType iAnimationType, int iNbRounds)
 {
 	if (iAnimationType == -1)
@@ -328,6 +335,11 @@ void cairo_dock_arm_animation (Icon *icon, CairoDockAnimationType iAnimationType
 	icon->iCount = MAX (0, g_tNbIterInOneRound[icon->iAnimationType] * iNbRounds - 1);
 }
 
+/**
+*Lance l'animation de l'icone. Ne fait rien si l'icone ne sera pas animee.
+*@param icon l'icone a animer.
+*@param pDock le dock contenant l'icone.
+*/
 void cairo_dock_start_animation (Icon *icon, CairoDock *pDock)
 {
 	g_print ("%s (%s, %d)\n", __func__, icon->acName, icon->iAnimationType);
