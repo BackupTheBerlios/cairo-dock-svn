@@ -61,6 +61,10 @@ extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 extern gchar *g_cConfFile;
 
 
+/**
+*Libere toutes les ressources liees a une icone, ainsi que cette derniere. Le sous-dock pointee par elle n'est pas dereferencee, cela doit etre fait au prealable.
+*@param icon l'icone a liberer.
+*/
 void cairo_dock_free_icon (Icon *icon)
 {
 	if (icon == NULL)
@@ -93,6 +97,12 @@ void cairo_dock_free_icon (Icon *icon)
 	g_free (icon);
 }
 
+/**
+*Compare 2 icones grace a la relation d'ordre sur le couple (position du type , ordre).
+*@param icon1 une icone.
+*@param icon2 une autre icone.
+*@Returns -1 si icone1 < icone2, 1 si icone1 > icone2, 0 si icone1 = icone2 (au sens de la relation d'ordre).
+*/
 int cairo_dock_compare_icons_order (Icon *icon1, Icon *icon2)
 {
 	if (g_tIconTypeOrder[icon1->iType] < g_tIconTypeOrder[icon2->iType])
@@ -122,41 +132,60 @@ static int cairo_dock_compare_icons_name (Icon *icon1, Icon *icon2)
 	g_free (cURI_2);
 	return iOrder;
 }
+/**
+*Trie une liste en se basant sur la relation d'ordre sur le couple (position du type , ordre).
+*@param pIconList la liste d'icones.
+*@Returns la liste triee. Les elements sont les memes que ceux de la liste initiale, seul leur ordre a change.
+*/
 GList *cairo_dock_sort_icons_by_order (GList *pIconList)
 {
 	return g_list_sort (pIconList, (GCompareFunc) cairo_dock_compare_icons_order);
 }
+/**
+*Trie une liste en se basant sur la relation d'ordre alphanumerique sur le nom des icones.
+*@param pIconList la liste d'icones.
+*@Returns la liste triee. Les elements sont les memes que ceux de la liste initiale, seul leur ordre a change. Les ordres des icones sont mis a jour pour refleter le nouvel ordre global.
+*/
 GList *cairo_dock_sort_icons_by_name (GList *pIconList)
 {
-	GList *pSortedIconList;
+	GList *pSortedIconList = g_list_sort (pIconList, (GCompareFunc) cairo_dock_compare_icons_name);
+	int iOrder = 0;
+	Icon *icon;
+	GList *ic;
+	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
-		pSortedIconList = g_list_sort (pIconList, (GCompareFunc) cairo_dock_compare_icons_name);
-		int iOrder = 0;
-		Icon *icon;
-		GList *ic;
-		for (ic = pIconList; ic != NULL; ic = ic->next)
-		{
-			icon = ic->data;
-			icon->fOrder = iOrder ++;
-		}
+		icon = ic->data;
+		icon->fOrder = iOrder ++;
 	}
 	return pSortedIconList;
 }
 
 
-
+/**
+*Renvoie la 1ere icone d'une liste d'icones.
+*@param pIconList la liste d'icones.
+*@Returns la 1ere icone, ou NULL si la liste est vide.
+*/
 Icon* cairo_dock_get_first_icon (GList *pIconList)
 {
 	GList *pListHead = g_list_first(pIconList);
 	return (pListHead != NULL ? pListHead->data : NULL);
 }
-
+/**
+*Renvoie la derniere icone d'une liste d'icones.
+*@param pIconList la liste d'icones.
+*@Returns la derniere icone, ou NULL si la liste est vide.
+*/
 Icon* cairo_dock_get_last_icon (GList *pIconList)
 {
 	GList *pListTail = g_list_last(pIconList);
 	return (pListTail != NULL ? pListTail->data : NULL);
 }
-
+/**
+*Renvoie la 1ere icone a etre dessinee d'une liste d'icones (qui n'est pas forcement la 1ere icone de la liste, si l'utilisateur a scrolle).
+*@param pIconList la liste d'icones.
+*@Returns la 1ere icone a etre dessinee, ou NULL si la liste est vide.
+*/
 Icon *cairo_dock_get_first_drawn_icon (CairoDock *pDock)
 {
 	if (pDock->pFirstDrawnElement != NULL)
@@ -164,6 +193,11 @@ Icon *cairo_dock_get_first_drawn_icon (CairoDock *pDock)
 	else
 		return cairo_dock_get_first_icon (pDock->icons);
 }
+/**
+*Renvoie la derniere icone a etre dessinee d'une liste d'icones (qui n'est pas forcement la derniere icone de la liste, si l'utilisateur a scrolle).
+*@param pIconList la liste d'icones.
+*@Returns la derniere icone a etre dessinee, ou NULL si la liste est vide.
+*/
 Icon *cairo_dock_get_last_drawn_icon (CairoDock *pDock)
 {
 	if (pDock->pFirstDrawnElement != NULL)
@@ -176,7 +210,12 @@ Icon *cairo_dock_get_last_drawn_icon (CairoDock *pDock)
 	else
 		return cairo_dock_get_last_icon (pDock->icons);;
 }
-
+/**
+*Renvoie la 1ere icone du type donne.
+*@param pIconList la liste d'icones.
+*@param iType le type d'icone recherche.
+*@Returns la 1ere icone trouvee ayant ce type, ou NULL si aucune icone n'est trouvee.
+*/
 Icon* cairo_dock_get_first_icon_of_type (GList *pIconList, CairoDockIconType iType)
 {
 	GList* ic;
