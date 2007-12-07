@@ -144,7 +144,7 @@ struct _CairoDockModule {
 };
 
 
-typedef void (* CairoDockActionOnAnswerFunc) (gchar *cAnswer, gpointer data);  // NULL <=> Annuler ou Non.
+typedef void (* CairoDockActionOnAnswerFunc) (int iAnswer, GtkWidget *pWidget, gpointer data);
 
 struct _CairoDockDialog
 {

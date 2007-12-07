@@ -456,29 +456,6 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			cairo_translate (pCairoContext, fRatio * icon->fWidthFactor * icon->fWidth * (icon->fScale - 1) / 2, (g_bDirectionUp ? fRatio * icon->fHeightFactor * icon->fHeight * (icon->fScale - 1) : 0));
 			cairo_scale (pCairoContext, fRatio / (1 + g_fAmplitude), fRatio / (1 + g_fAmplitude));
 		}
-		else if (FALSE && CAIRO_DOCK_IS_SEPARATOR (icon))
-		{
-			g_print ("separateur incruste\n");
-			if (icon->fDrawX + icon->fWidth * icon->fScale / 2 > iCurrentWidth / 2)  // on est a droite.
-			{
-				g_print ("  a droite\n");
-				cairo_save (pCairoContext);
-				cairo_move_to (pCairoContext, icon->fWidth * icon->fScale, icon->fHeight * icon->fScale);  // coin bas droit.
-				
-				cairo_rel_line_to (pCairoContext, - icon->fWidth * icon->fScale + iDecorationsHeight * fInclinationOnHorizon, 0);
-				cairo_rel_line_to (pCairoContext, - iDecorationsHeight * fInclinationOnHorizon + icon->fWidth * icon->fScale * .1, - iDecorationsHeight);
-				cairo_rel_line_to (pCairoContext, icon->fWidth * icon->fScale - iDecorationsHeight * fInclinationOnHorizon - 2 * icon->fWidth * icon->fScale * .1, 0);
-				cairo_close_path (pCairoContext);
-				
-				cairo_set_source_rgba (pCairoContext, 1., 1., 1., 1.);
-				cairo_fill_preserve (pCairoContext);
-				cairo_restore (pCairoContext);
-			}
-			else  // a gauche.
-			{
-				g_print ("  a gauche\n");
-			}
-		}
 		else
 			cairo_scale (pCairoContext, fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude));
 	}
@@ -711,7 +688,7 @@ void cairo_dock_draw_string (cairo_t *pCairoContext, CairoDock *pDock, double fS
 	double y1, y2, y3;
 	double dx, dy;
 	x = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor / 2;
-	y = icon->fDrawY + icon->fHeight * icon->fScale / 2;
+	y = icon->fDrawY + icon->fHeight * icon->fScale / 2 + (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (icon) ? icon->fHeight * (icon->fScale - 1) / 2 : 0);
 	if (pDock->bHorizontalDock)
 		cairo_move_to (pCairoContext, x, y);
 	else
@@ -721,7 +698,7 @@ void cairo_dock_draw_string (cairo_t *pCairoContext, CairoDock *pDock, double fS
 		if (prev_icon != NULL)
 		{
 			x1 = prev_icon->fDrawX + prev_icon->fWidth * prev_icon->fScale * prev_icon->fWidthFactor / 2;
-			y1 = prev_icon->fDrawY + prev_icon->fHeight * prev_icon->fScale / 2;
+			y1 = prev_icon->fDrawY + prev_icon->fHeight * prev_icon->fScale / 2 + (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (prev_icon) ? prev_icon->fHeight * (prev_icon->fScale - 1) / 2 : 0);
 		}
 		else
 		{
@@ -735,7 +712,7 @@ void cairo_dock_draw_string (cairo_t *pCairoContext, CairoDock *pDock, double fS
 			break;
 		icon = ic->data;
 		x2 = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor / 2;
-		y2 = icon->fDrawY + icon->fHeight * icon->fScale / 2;
+		y2 = icon->fDrawY + icon->fHeight * icon->fScale / 2 + (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (icon) ? icon->fHeight * (icon->fScale - 1) / 2 : 0);
 		
 		dx = x2 - x;
 		dy = y2 - y;
@@ -745,7 +722,7 @@ void cairo_dock_draw_string (cairo_t *pCairoContext, CairoDock *pDock, double fS
 		if (next_icon != NULL)
 		{
 			x3 = next_icon->fDrawX + next_icon->fWidth * next_icon->fScale * next_icon->fWidthFactor / 2;
-			y3 = next_icon->fDrawY + next_icon->fHeight * next_icon->fScale / 2;
+			y3 = next_icon->fDrawY + next_icon->fHeight * next_icon->fScale / 2 + (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (next_icon) ? next_icon->fHeight * (next_icon->fScale - 1) / 2 : 0);
 		}
 		else
 		{

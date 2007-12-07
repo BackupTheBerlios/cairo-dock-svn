@@ -385,7 +385,6 @@ cairo_surface_t *cairo_dock_load_stripes (cairo_t* pSourceContext, int iStripesW
 			(g_fStripesAngle == 90) ? iStripesHeight : - iStripesHeight);
 	g_return_val_if_fail (cairo_pattern_status (pStripesPattern) == CAIRO_STATUS_SUCCESS, NULL);
 	
-	
 	cairo_pattern_set_extend (pStripesPattern, CAIRO_EXTEND_REPEAT);
 	
 	if (g_iNbStripes > 0)

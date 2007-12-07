@@ -389,10 +389,11 @@ main (int argc, char** argv)
 	//const gchar *cSillyMessage = "Le saviez-vous ?\nCairo-Dock contribue à réduire le trou de la couche d'ozone !";
 	//const gchar *cSillyMessage = "Montrer Cairo-Dock à un utilisateur de Mac est le meilleur moyen de s'en faire un ennemi;\nN'oubliez pas qu'il a payé 129$ pour avoir la même chose !";  // 7500
 	//const gchar *cSillyMessage = "Petite annonce :\n  Projet sérieux recherche secrétaire pour rédiger documentation.\n  Niveau d'étude exigé : 95C.";  // 7500
-	const gchar *cSillyMessage = "Cairo-Dock fait même le café ! Au choix :\n cairo-dock --capuccino , cairo-dock --expresso , cairo-dock --cafe_latte";  // 8000
+	//const gchar *cSillyMessage = "Cairo-Dock fait même le café ! Au choix :\n cairo-dock --capuccino , cairo-dock --expresso , cairo-dock --cafe_latte";  // 8000
+	const gchar *cSillyMessage = "Veuillez rentrer un compliment élogieux à la gloire Fab pour pouvoir utiliser cairo-dock.";
 	//const gchar *cSillyMessage = "Cairo-Dock : just launch it !";  // 4000
 	//const gchar *cSillyMessage = "Cairo-Dock lave plus blanc que blanc";  // 4000
-	const gchar *cNumSilllyMessage = "6";
+	const gchar *cNumSilllyMessage = "7";
 	gboolean bWriteSillyMessage;
 	if (! g_file_test (cSillyMessageFilePath, G_FILE_TEST_EXISTS))
 	{
@@ -424,11 +425,12 @@ main (int argc, char** argv)
 		Icon *pFirstIcon = cairo_dock_get_first_icon (g_pMainDock->icons);
 		if (pFirstIcon != NULL)
 		{
-			cairo_dock_show_temporary_dialog_with_default_icon (cSillyMessage, pFirstIcon, g_pMainDock, 8000);
+			//cairo_dock_show_temporary_dialog_with_default_icon (cSillyMessage, pFirstIcon, g_pMainDock, 4000);
 			
-			/*double fValue = cairo_dock_show_value_and_wait ("pouet pouet", pFirstIcon, g_pMainDock, .3);
-			g_print (" ==> %f\n", fValue);*/
-			
+			gchar *cAnswer = cairo_dock_show_demand_and_wait (cSillyMessage, pFirstIcon, g_pMainDock, NULL);
+			g_print (" ==> %s\n", cAnswer);
+			if (cAnswer == NULL)
+				g_print ("mechant ! ;-)\n");
 			/*cairo_t *pIconContext = cairo_dock_create_context_from_window (g_pMainDock);
 			cairo_dock_set_quick_info (pIconContext, "69°C", pFirstIcon, g_pMainDock);
 			cairo_destroy (pIconContext);*/
