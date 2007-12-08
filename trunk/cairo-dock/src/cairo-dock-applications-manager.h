@@ -31,6 +31,7 @@ void cairo_dock_move_xwindow_to_nth_desktop (Window Xid, int iDesktopNumber, int
 
 gboolean cairo_dock_window_is_maximized (Window Xid);
 gboolean cairo_dock_window_is_fullscreen (Window Xid);
+void cairo_dock_window_is_fullscreen_or_hidden (Window Xid, gboolean *bIsFullScreen, gboolean *bIsHidden);
 Window cairo_dock_get_active_window (void);
 void cairo_dock_get_current_desktop (int *iDesktopNumber, int *iDesktopViewportX, int *iDesktopViewportY);
 

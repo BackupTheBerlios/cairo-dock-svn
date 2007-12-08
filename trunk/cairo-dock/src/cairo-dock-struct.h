@@ -53,62 +53,107 @@ typedef struct _CairoDockRenderer {
 
 
 struct _CairoDock {
-	GList* icons;  // la liste de ses icones.
-	GtkWidget *pWidget;  // sa fenetre de dessin.
-	gboolean bIsMainDock;  // si le dock est le dock racine.
-	gint iRefCount;  // le nombre d'icones pointant sur lui.
+	/// la liste de ses icones.
+	GList* icons;
+	/// sa fenetre de dessin.
+	GtkWidget *pWidget;
+	/// si le dock est le dock racine.
+	gboolean bIsMainDock;
+	/// le nombre d'icones pointant sur lui.
+	gint iRefCount;
 	
 	//\_______________ Les parametres de position et de geometrie de la fenetre du dock.
-	gint iGapX;  // decalage de la zone par rapport au milieu bas de l'ecran.
+	/// ecart de la fenetre par rapport au bord de l'ecran.
+	gint iGapX;
+	/// decalage de la fenetre par rapport au point d'alignement sur le bord de l'ecran.
 	gint iGapY;
-	gdouble fAlign;  // alignement, entre 0 et 1, du dock sur le bord de l'ecran.
-	CairoDockTypeHorizontality bHorizontalDock;  // dit si le dock est horizontal ou vertical.
+	/// alignement, entre 0 et 1, du dock sur le bord de l'ecran.
+	gdouble fAlign;  
+	/// dit si le dock est horizontal ou vertical.
+	CairoDockTypeHorizontality bHorizontalDock;  
 	
-	gint iMaxIconHeight;  // max des hauteurs des icones.
-	gint iFlatDockWidth;  // largeur du dock a plat, avec juste les icones.
-	gint iMinDockWidth;  // taille du dock au repos.
+	/// max des hauteurs des icones.
+	gint iMaxIconHeight;
+	/// largeur du dock a plat, avec juste les icones.
+	gint iFlatDockWidth;
+	/// largeur du dock au repos.
+	gint iMinDockWidth;
+	/// hauteur du dock au repos.
 	gint iMinDockHeight;
-	gint iMaxDockWidth;  // taille du dock actif.
+	/// largeur du dock actif.
+	gint iMaxDockWidth;
+	/// hauteur du dock actif.
 	gint iMaxDockHeight;
-	gint iDecorationsWidth;  // la taille des decorations.
+	/// largeur des decorations.
+	gint iDecorationsWidth;
+	/// hauteur des decorations.
 	gint iDecorationsHeight;
-	gint iWindowPositionX;  // dock-windows current y-position
-	gint iWindowPositionY;  // dock-windows current y-position
-	gint iCurrentWidth;  // taille de la fenetre, _apres_ le redimensionnement par GTK.
+	/// position courante en X du coin haut gauche de la fenetre sur l'ecran.
+	gint iWindowPositionX;
+	/// position courante en Y du coin haut gauche de la fenetre sur l'ecran.
+	gint iWindowPositionY;
+	/// largeur de la fenetre, _apres_ le redimensionnement par GTK.
+	gint iCurrentWidth;
+	/// hauteur de la fenetre, _apres_ le redimensionnement par GTK.
 	gint iCurrentHeight;
 	
 	//\_______________ Les parametres lies a une animation du dock.
-	gint iScrollOffset;  // pour faire defiler les icones avec la molette.
-	gint iMagnitudeIndex; // indice de calcul du coef multiplicateur de l'amplitude de la sinusoide (entre 0 et 1000).
-	gdouble fFoldingFactor;  // un facteur d'acceleration lateral des icones lors du grossissement initial.
-	gint iMouseX;  // derniere position du curseur (pour l'instant, dans le cas de decorations non asservies).
+	/// pour faire defiler les icones avec la molette.
+	gint iScrollOffset;
+	/// indice de calcul du coef multiplicateur de l'amplitude de la sinusoide (entre 0 et CAIRO_DOCK_NB_MAX_ITERATIONS).
+	gint iMagnitudeIndex;
+	/// un facteur d'acceleration lateral des icones lors du grossissement initial.
+	gdouble fFoldingFactor;
+	/// derniere position en X du curseur dans le referentiel du dock.
+	gint iMouseX;
+	/// derniere position en Y du curseur dans le referentiel du dock.
 	gint iMouseY;
-	gint iAvoidingMouseIconType;  // type d'icone devant eviter la souris, -1 si aucun.
-	gdouble fAvoidingMouseMargin;  // marge d'evitement de la souris, en fraction de la largeur d'une icone (entre 0 et 0.5) 
+	/// type d'icone devant eviter la souris, -1 si aucun.
+	gint iAvoidingMouseIconType;
+	/// marge d'evitement de la souris, en fraction de la largeur d'une icone (entre 0 et 0.5) 
+	gdouble fAvoidingMouseMargin;
 	
-	GList *pFirstDrawnElement;  // pointeur sur le 1er element de la liste des icones a etre dessine, en partant de la gauche.
-	gdouble fDecorationsOffsetX;  // decalage des decorations pour les faire suivre la souris.
+	/// pointeur sur le 1er element de la liste des icones a etre dessine, en partant de la gauche.
+	GList *pFirstDrawnElement;
+	/// decalage des decorations pour les faire suivre la souris.
+	gdouble fDecorationsOffsetX;
 	
-	gboolean bAtBottom;  // le dock est en bas au repos.
-	gboolean bAtTop;  // le dock est en haut pret a etre utilise.
-	gboolean bInside;  // lorsque la souris est dans le dock.
-	gboolean bMenuVisible;  // lorsque le menu du clique droit est visible.
+	/// le dock est en bas au repos.
+	gboolean bAtBottom;
+	/// le dock est en haut pret a etre utilise.
+	gboolean bAtTop;
+	/// lorsque la souris est dans le dock.
+	gboolean bInside;
+	/// lorsque le menu du clique droit est visible.
+	gboolean bMenuVisible;
 	
 	//\_______________ Les ID des threads en cours sur le dock.
-	gint iSidMoveDown;  // serial ID du thread de descente de la fenetre.
-	gint iSidMoveUp;  // serial ID du thread de montee de la fenetre.
-	gint iSidGrowUp;  // serial ID du thread de grossisement des icones.
-	gint iSidShrinkDown;  // serial ID du thread de diminution des icones.
-	gint iSidLeaveDemand;  // serial ID du thread qui enverra le signal de sortie retarde.
+	/// serial ID du thread de descente de la fenetre.
+	gint iSidMoveDown;
+	/// serial ID du thread de montee de la fenetre.
+	gint iSidMoveUp;
+	/// serial ID du thread de grossisement des icones.
+	gint iSidGrowUp;
+	/// serial ID du thread de diminution des icones.
+	gint iSidShrinkDown;
+	/// serial ID du thread qui enverra le signal de sortie retarde.
+	gint iSidLeaveDemand;
 	
 	//\_______________ Les fonctions de dessin du dock.
-	gchar *cRendererName;  // nom de la vue, utile pour charger les fonctions de rendu posterieurement a la creation du dock.
+	/// nom de la vue, utile pour charger les fonctions de rendu posterieurement a la creation du dock.
+	gchar *cRendererName;
+	/// recalculer la taille maximale du dock.
 	CairoDockCalculateMaxDockSizeFunc calculate_max_dock_size;
+	/// calculer tous les parametres des icones.
 	CairoDockCalculateIconsFunc calculate_icons;
+	/// dessiner le tout.
 	CairoDockRenderFunc render;
+	/// dessiner une portion du dock de maniere optimisee.
 	CairoDockRenderOptimizedFunc render_optimized;
+	/// calculer la position d'un sous-dock.
 	CairoDockSetSubDockPositionFunc set_subdock_position;
-	gboolean bUseReflect;  // dit si la vue courante utilise les reflets ou pas (utile pour les plug-ins).
+	/// dit si la vue courante utilise les reflets ou pas (utile pour les plug-ins).
+	gboolean bUseReflect;
 	
 #ifdef HAVE_GLITZ
 	glitz_drawable_format_t *pDrawFormat;
@@ -119,10 +164,15 @@ struct _CairoDock {
 
 
 struct _CairoDockVisitCard {
+	/// nom du module qui servira a l'identifier.
 	gchar *cModuleName;
+	/// chemin d'un fichier readme destine a presenter de maniere succinte le module.
 	gchar *cReadmeFilePath;
+	/// numero de version majeur de cairo-dock necessaire au bon fonctionnement du module.
 	short iMajorVersionNeeded;
+	/// numero de version mineure de cairo-dock necessaire au bon fonctionnement du module.
 	short iMinorVersionNeeded;
+	/// numero de version micro de cairo-dock necessaire au bon fonctionnement du module.
 	short iMicroVersionNeeded;
 };
 
@@ -133,13 +183,21 @@ typedef gpointer (*CairoDockModuleInit) (CairoDock *pDock, gchar **cConfFilePath
 typedef void (*CairoDockModuleStop) (void);
 
 struct _CairoDockModule {
-	gchar *cModuleName;  // le nom du module : libtruc.so => cModuleName = 'truc'.
-	gchar *cSoFilePath;  // le chemin du .so.
+	/// nom du module qui sert a l'identifier.
+	gchar *cModuleName;
+	/// chemin du .so
+	gchar *cSoFilePath;
+	/// structure du module, contenant les pointeurs vers les fonctions du module.
 	GModule *pModule;
+	/// fonction d'initialisation du module. Appelee a chaque reconfiguration du module.
 	CairoDockModuleInit initModule;
+	/// fonction d'arret du module. Appelee a chaque reconfiguration du module.
 	CairoDockModuleStop stopModule;
+	/// chemin du fichier de conf du module.
 	gchar *cConfFilePath;
+	/// chemin du fichier readme destine a presenter de maniere succinte le module.
 	gchar *cReadmeFilePath;
+	/// TRUE si le module est actif (c'est-a-dire utilise).
 	gboolean bActive;
 };
 
@@ -148,31 +206,57 @@ typedef void (* CairoDockActionOnAnswerFunc) (int iAnswer, GtkWidget *pWidget, g
 
 struct _CairoDockDialog
 {
-	int iWidth;  // dimensions de la fenetre GTK du dialogue.
+	/// largeur de la fenetre GTK du dialogue (pointe comprise).
+	int iWidth;
+	/// hauteur de la fenetre GTK du dialogue (pointe comprise).
 	int iHeight;
-	int iPositionX;  // position de la fenetre GTK du dialogue.
+	/// position en X du coin haut gauche de la fenetre GTK du dialogue.
+	int iPositionX;
+	/// position en Y du coin haut gauche de la fenetre GTK du dialogue.
 	int iPositionY;
-	int iAimedX;  // position visee par la pointe.
+	/// position en X visee par la pointe dans le référentiel de l'écran.
+	int iAimedX;
+	/// position en Y visee par la pointe dans le référentiel de l'écran.
 	int iAimedY;
-	gboolean bRight;  // dialogue a droite <=> pointe a gauche.
-	gboolean bIsPerpendicular;  // TRUE <=> dialogue perpendiculaire au dock.
-	gboolean bDirectionUp;  // TRUE <=> pointe vers le bas.
-	double fRadius;  // rayon des coins.
-	double fTipHeight;  // hauteur de la pointe, sans la partie "aiguisee".
-	cairo_surface_t* pTextBuffer;  // surface du message + icone.
-	int iTextWidth;  // taille de la zone de texte globale (widgets et boutons compris).
+	/// TRUE ssi le dialogue est a droite de l'écran; dialogue a droite <=> pointe a gauche.
+	gboolean bRight;
+	/// TRUE ssi le dialogue est perpendiculaire au dock.
+	gboolean bIsPerpendicular;
+	/// TRUE ssi la pointe est orientée vers le bas.
+	gboolean bDirectionUp;
+	/// rayon des coins.
+	double fRadius;
+	/// hauteur de la pointe, sans la partie "aiguisee".
+	double fTipHeight;
+	/// surface representant le message + l'icone dans la marge a gauche du texte.
+	cairo_surface_t* pTextBuffer;
+	/// largeur de la zone de texte globale (widgets et boutons compris).
+	int iTextWidth;
+	/// hauteur de la zone de texte globale (widgets et boutons compris).
 	int iTextHeight;
-	int iMessageHeight;  // hauteur du message + double marge.
-	int iButtonOkOffset;  // decalage pour l'effet de clique sur le bouton.
+	/// hauteur du message + double marge en haut et en bas.
+	int iMessageHeight; 
+	/// decalage pour l'effet de clique sur le bouton Ok.
+	int iButtonOkOffset;
+	/// decalage pour l'effet de clique sur le bouton Annuler.
 	int iButtonCancelOffset;
-	GtkWidget *pWidget;  // la fenetre GTK.
-	int iSidTimer;  // le timer pour la destruction du dialogue.
-	int iRefCount;  // reference atomique.
-	gboolean bBuildComplete;  // TRUE quand la fenetre GTK a atteint sa dimension definitive.
-	GtkWidget *pInteractiveWidget;  // le widget d'interaction utilisateur.
-	int iButtonsType;  // le type des boutons (aucun, oui/non, ok/annuler).
-	CairoDockActionOnAnswerFunc action_on_answer;  // fonction appelee au clique sur l'un des 2 boutons.
+	/// la fenetre GTK du dialogue.
+	GtkWidget *pWidget;
+	/// le timer pour la destruction automatique du dialogue.
+	int iSidTimer;
+	/// reference atomique.
+	int iRefCount;
+	/// TRUE quand la fenetre GTK a atteint sa dimension definitive.
+	gboolean bBuildComplete;
+	/// le widget d'interaction utilisateur (GtkEntry, GtkHScale, etc).
+	GtkWidget *pInteractiveWidget;
+	/// le type des boutons (GTK_BUTTONS_NONE, GTK_BUTTONS_OK_CANCEL ou GTK_BUTTONS_YES_NO).
+	int iButtonsType;
+	/// fonction appelee au clique sur l'un des 2 boutons.
+	CairoDockActionOnAnswerFunc action_on_answer;
+	/// donnees transmises a la fonction.
 	gpointer pUserData;
+	/// fonction appelee pour liberer les donnees.
 	GFreeFunc pFreeUserDataFunc;
 	};
 
@@ -201,61 +285,115 @@ typedef enum {
 
 struct _Icon {
 	//\____________ renseignes lors de la creation de l'icone.
+	/// 
 	gchar *acDesktopFileName;
+	/// 
 	gchar *cBaseURI;
+	/// 
 	gint iVolumeID;
+	/// 
 	gchar* acFileName;
+	/// 
 	gchar* acName;
+	/// 
 	gchar* acCommand;
+	/// 
 	CairoDockIconType iType;
+	/// 
 	gdouble fOrder;
+	/// 
 	CairoDock *pSubDock;
+	/// 
 	gchar *cParentDockName;
 	//\____________ calcules lors du chargement de l'icone.
+	/// 
 	gdouble fWidth;
+	/// 
 	gdouble fHeight;
+	/// 
 	cairo_surface_t* pIconBuffer;
+	/// 
 	cairo_surface_t* pTextBuffer;
+	/// 
 	cairo_surface_t* pReflectionBuffer;
+	/// 
+	/// 
 	cairo_surface_t* pFullIconBuffer;
+	/// 
 	int iTextWidth;
+	/// 
 	int iTextHeight;
+	/// 
 	gdouble fTextXOffset;
+	/// 
 	gdouble fTextYOffset;
+	/// 
+	/// 
 	gdouble fXMax;
+	/// 
 	gdouble fXMin;
 	//\____________ calcules a chaque scroll et insertion/suppression d'une icone.
+	/// 
 	gdouble fXAtRest;
 	//\____________ calcules a chaque fois.
+	/// 
 	gdouble fPhase;
+	/// 
 	gdouble fX;
+	/// 
 	gdouble fY;
+	/// 
 	gdouble fScale;
+	/// 
 	gdouble fDrawX;
+	/// 
 	gdouble fDrawY;
+	/// 
 	gdouble fWidthFactor;
+	/// 
 	gdouble fHeightFactor;
+	/// 
 	gdouble fAlpha;
+	/// 
 	gboolean bPointed;
+	/// 
 	gint iCount;
+	/// 
 	CairoDockAnimationType iAnimationType;
+	/// 
 	gdouble fPersonnalScale;
+	/// 
 	gdouble fDeltaYReflection;
+	/// 
 	gdouble fOrientation;
 	//\____________ Pour les applis.
+	/// 
 	gint iPid;
+	/// 
 	Window Xid;
+	/// 
 	gchar *cClass;
+	/// 
 	double fLastCheckTime;
+	/// 
+	gboolean bIsHidden;
 	//\____________ Pour les modules.
+	/// 
 	CairoDockModule *pModule;
+	/// 
 	gchar *cQuickInfo;
+	/// 
 	cairo_surface_t* pQuickInfoBuffer;
+	/// 
 	int iQuickInfoWidth;
+	/// 
 	int iQuickInfoHeight;
+	/// 
 	double fQuickInfoXOffset;
+	/// 
 	double fQuickInfoYOffset;
 	//\____________ Pour les bulles de dialogues.
+	/// 
 	CairoDockDialog *pDialog;
 };
 

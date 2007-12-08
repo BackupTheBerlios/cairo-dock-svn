@@ -1265,6 +1265,7 @@ void cairo_dock_activate_temporary_auto_hide (CairoDock *pDock)
 {
 	if (! g_bAutoHide)
 	{
+		pDock->bAtBottom = FALSE;  // car on a deja quitte le dock lors de la fermeture du menu, donc le "leave-notify" serait ignore.
 		s_bTemporaryAutoHide = TRUE;
 		g_bAutoHide = TRUE;
 		s_bEntranceAllowed = FALSE;

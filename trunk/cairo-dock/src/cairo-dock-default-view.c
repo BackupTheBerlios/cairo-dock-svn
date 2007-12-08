@@ -165,7 +165,7 @@ void cairo_dock_render_linear (CairoDock *pDock)
 	//\____________________ On dessine la ficelle qui les joint.
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 	if (g_iStringLineWidth > 0)
-		cairo_dock_draw_string (pCairoContext, pDock, g_iStringLineWidth, FALSE);
+		cairo_dock_draw_string (pCairoContext, pDock, g_iStringLineWidth, FALSE, FALSE);
 	
 	//\____________________ On dessine les icones et les etiquettes, en tenant compte de l'ordre pour dessiner celles en arriere-plan avant celles en avant-plan.
 	double fRatio = (pDock->iRefCount == 0 ? 1 : g_fSubDockSizeRatio);

@@ -25,11 +25,12 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-separator-factory.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-notifications.h"
+#include "cairo-dock-callbacks.h"
 #include "cairo-dock-applications-manager.h"
 
 #define CAIRO_DOCK_TASKBAR_CHECK_INTERVAL 250
 
-extern CairoDock *g_pMainDock;  // temporaire.
+extern CairoDock *g_pMainDock;
 extern gboolean g_bAutoHide;
 extern double g_fAmplitude;
 
@@ -37,6 +38,7 @@ extern int g_iScreenWidth[2], g_iScreenHeight[2];
 
 extern gboolean g_bUniquePid;
 extern gboolean g_bAnimateOnActiveWindow;
+extern gboolean g_bAutoHideOnFullScreen;
 
 static GHashTable *s_hXWindowTable = NULL;  // table des fenetres X affichees dans le dock.
 static Display *s_XDisplay = NULL;
@@ -46,7 +48,9 @@ static Atom s_aNetActiveWindow;
 static Atom s_aNetCurrentDesktop;
 static Atom s_aNetDesktopViewport;
 static Atom s_aNetDesktopGeometry;
-
+static Atom s_aNetWmState;
+static Atom s_aNetWmFullScreen;
+static Atom s_aNetWmHidden;
 
 int cairo_dock_xerror_handler (Display * pDisplay, XErrorEvent *pXError)
 {
@@ -70,6 +74,9 @@ void cairo_dock_initialize_application_manager (void)
 	s_aNetCurrentDesktop = XInternAtom (s_XDisplay, "_NET_CURRENT_DESKTOP", False);
 	s_aNetDesktopViewport = XInternAtom (s_XDisplay, "_NET_DESKTOP_VIEWPORT", False);
 	s_aNetDesktopGeometry = XInternAtom (s_XDisplay, "_NET_DESKTOP_GEOMETRY", False);
+	s_aNetWmState = XInternAtom (s_XDisplay, "_NET_WM_STATE", False);
+	s_aNetWmFullScreen = XInternAtom (s_XDisplay, "_NET_WM_STATE_FULLSCREEN", False);
+	s_aNetWmHidden = XInternAtom (s_XDisplay, "_NET_WM_STATE_HIDDEN", False);
 	
 	cairo_dock_initialize_application_factory (s_XDisplay);
 }
@@ -107,7 +114,6 @@ void cairo_dock_unregister_appli (Icon *icon)
 		icon->Xid = 0;
 		
 		cairo_dock_unregister_pid (icon);
-		
 		///g_free (icon->cClass);
 		///icon->cClass = NULL;
 	}
@@ -276,7 +282,7 @@ void cairo_dock_maximize_xwindow (Window Xid, gboolean bMaximize)
 	xClientMessage.xclient.send_event = True;
 	xClientMessage.xclient.display = s_XDisplay;
 	xClientMessage.xclient.window = Xid;
-	xClientMessage.xclient.message_type = XInternAtom (s_XDisplay, "_NET_WM_STATE", False);
+	xClientMessage.xclient.message_type = s_aNetWmState;
 	xClientMessage.xclient.format = 32;
 	xClientMessage.xclient.data.l[0] = bMaximize;
 	xClientMessage.xclient.data.l[1] = XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_VERT", False);
@@ -304,10 +310,10 @@ void cairo_dock_set_xwindow_fullscreen (Window Xid, gboolean bFullScreen)
 	xClientMessage.xclient.send_event = True;
 	xClientMessage.xclient.display = s_XDisplay;
 	xClientMessage.xclient.window = Xid;
-	xClientMessage.xclient.message_type = XInternAtom (s_XDisplay, "_NET_WM_STATE", False);
+	xClientMessage.xclient.message_type = s_aNetWmState;
 	xClientMessage.xclient.format = 32;
 	xClientMessage.xclient.data.l[0] = bFullScreen;
-	xClientMessage.xclient.data.l[1] = XInternAtom (s_XDisplay, "_NET_WM_STATE_FULLSCREEN", False);
+	xClientMessage.xclient.data.l[1] = s_aNetWmFullScreen;
 	xClientMessage.xclient.data.l[2] = 0;
 	xClientMessage.xclient.data.l[3] = 2;
 	xClientMessage.xclient.data.l[4] = 0;
@@ -387,13 +393,12 @@ void cairo_dock_move_xwindow_to_nth_desktop (Window Xid, int iDesktopNumber, int
 gboolean cairo_dock_window_is_maximized (Window Xid)
 {
 	g_return_val_if_fail (Xid > 0, FALSE);
-	Atom aNetWmMState = XInternAtom (s_XDisplay, "_NET_WM_STATE", False);
 	
 	Atom aReturnedType = 0;
 	int aReturnedFormat = 0;
 	unsigned long iLeftBytes, iBufferNbElements = 0;
 	gulong *pXStateBuffer = NULL;
-	XGetWindowProperty (s_XDisplay, Xid, aNetWmMState, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXStateBuffer);
+	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmState, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXStateBuffer);
 	int iIsMaximized = 0;
 	if (iBufferNbElements > 0)
 	{
@@ -416,28 +421,64 @@ gboolean cairo_dock_window_is_maximized (Window Xid)
 gboolean cairo_dock_window_is_fullscreen (Window Xid)
 {
 	g_return_val_if_fail (Xid > 0, FALSE);
-	Atom aNetWmMState = XInternAtom (s_XDisplay, "_NET_WM_STATE", False);
 	Atom aReturnedType = 0;
 	int aReturnedFormat = 0;
 	unsigned long iLeftBytes, iBufferNbElements = 0;
 	gulong *pXStateBuffer = NULL;
-	XGetWindowProperty (s_XDisplay, Xid, aNetWmMState, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXStateBuffer);
+	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmState, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXStateBuffer);
 	
 	gboolean bIsFullScreen = FALSE;
 	if (iBufferNbElements > 0)
 	{
 		int i;
-		Atom aNetWmFullScreen = XInternAtom (s_XDisplay, "_NET_WM_STATE_FULLSCREEN", False);
-		for (i = 0; i < iBufferNbElements && ! bIsFullScreen; i ++)
+		for (i = 0; i < iBufferNbElements; i ++)
 		{
-			if (pXStateBuffer[i] == aNetWmFullScreen)
+			if (pXStateBuffer[i] == s_aNetWmFullScreen)
+			{
 				bIsFullScreen = TRUE;
+				break;
+			}
 		}
 	}
 	
 	XFree (pXStateBuffer);
 	return bIsFullScreen;
 }
+
+void cairo_dock_window_is_fullscreen_or_hidden (Window Xid, gboolean *bIsFullScreen, gboolean *bIsHidden)
+{
+	g_return_if_fail (Xid > 0);
+	Atom aReturnedType = 0;
+	int aReturnedFormat = 0;
+	unsigned long iLeftBytes, iBufferNbElements = 0;
+	gulong *pXStateBuffer = NULL;
+	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmState, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXStateBuffer);
+	
+	*bIsFullScreen = FALSE;
+	*bIsHidden = FALSE;
+	if (iBufferNbElements > 0)
+	{
+		int i;
+		for (i = 0; i < iBufferNbElements; i ++)
+		{
+			if (pXStateBuffer[i] == s_aNetWmFullScreen)
+			{
+				g_print (  "s_aNetWmFullScreen\n");
+				*bIsFullScreen = TRUE;
+				break ;
+			}
+			else if (pXStateBuffer[i] == s_aNetWmHidden)
+			{
+				g_print (  "s_aNetWmHidden\n");
+				*bIsHidden = TRUE;
+				break ;
+			}
+		}
+	}
+	
+	XFree (pXStateBuffer);
+}
+
 
 Window cairo_dock_get_active_window (void)
 {
@@ -531,8 +572,8 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 	{
 		icon = NULL;
 		Xid = event.xany.window;
-		if (event.type == ClientMessage)
-			g_print ("\n\n\n >>>>>>>>>>>< event.type : %d\n\n", event.type);
+		//if (event.type == ClientMessage)
+		//	g_print ("\n\n\n >>>>>>>>>>>< event.type : %d\n\n", event.type);
 		if (event.type == PropertyNotify)  // a priori on ne peut pas en recevoir d'autre.
 		{
 			//g_print ("  type : %d; atom : %s; window : %d\n", event.xproperty.type, gdk_x11_get_xatom_name (event.xproperty.atom), Xid);
@@ -585,13 +626,44 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 			}
 			else
 			{
-				icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
-				if (icon != NULL && icon->fPersonnalScale <= 0)  // pour une icône en cours de supression, on ne fait rien.
+				if (event.xproperty.atom == s_aNetWmState)
 				{
-					CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
-					if (pParentDock == NULL)
-						pParentDock = pDock;
-					cairo_dock_Xproperty_changed (icon, event.xproperty.atom, event.xproperty.state, pParentDock);
+					gboolean bIsFullScreen, bIsHidden;
+					cairo_dock_window_is_fullscreen_or_hidden (Xid, &bIsFullScreen, &bIsHidden);
+					g_print ("changement d'etat de %d => %d ; %d\n", Xid, bIsFullScreen, bIsHidden);
+					if (! g_bAutoHide && g_bAutoHideOnFullScreen && bIsFullScreen)
+					{
+						g_print (" => devient plein ecran\n");
+						
+						cairo_dock_activate_temporary_auto_hide (g_pMainDock);
+					}
+					else
+					{
+						icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
+						if (icon != NULL && icon->fPersonnalScale <= 0)  // pour une icône en cours de supression, on ne fait rien.
+						{
+							CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+							if (pParentDock == NULL)
+								pParentDock = pDock;
+							
+							if (bIsHidden != icon->bIsHidden)
+							{
+								icon->bIsHidden = bIsHidden;
+								cairo_dock_redraw_my_icon (icon, pParentDock);
+							}
+						}
+					}
+				}
+				else
+				{
+					icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
+					if (icon != NULL && icon->fPersonnalScale <= 0)  // pour une icône en cours de supression, on ne fait rien.
+					{
+						CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+						if (pParentDock == NULL)
+							pParentDock = pDock;
+						cairo_dock_Xproperty_changed (icon, event.xproperty.atom, event.xproperty.state, pParentDock);
+					}
 				}
 			}
 		}

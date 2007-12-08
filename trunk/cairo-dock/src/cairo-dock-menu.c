@@ -143,7 +143,6 @@ static void cairo_dock_quick_hide (GtkMenuItem *menu_item, gpointer *data)
 	CairoDock *pDock = data[1];
 	//g_print ("%s ()\n", __func__);
 	pDock->bMenuVisible = FALSE;
-	pDock->bAtBottom = FALSE;  // car on a deja quitte le dock lors de la fermeture du menu, donc le "leave-notify" serait ignore.
 	cairo_dock_activate_temporary_auto_hide (g_pMainDock);
 }
 

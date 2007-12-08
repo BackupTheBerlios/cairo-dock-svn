@@ -439,6 +439,8 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect, int iDecorationsHeight, double fInclinationOnHorizon)
 {
 	//\_____________________ On separe 2 cas : dessin avec le tampon complet, et dessin avec le ou les petits tampons.
+	if (icon->bIsHidden)
+		icon->fAlpha *= .5;
 	gboolean bDrawFullBuffer;
 	bDrawFullBuffer  = (bUseReflect && icon->pFullIconBuffer != NULL && (! g_bDynamicReflection || icon->fScale == 1) && (icon->iCount == 0 || icon->iAnimationType == CAIRO_DOCK_ROTATE || icon->iAnimationType == CAIRO_DOCK_BLINK));
 	int iCurrentWidth= 1;
@@ -454,7 +456,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		if (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (icon))
 		{
 			cairo_translate (pCairoContext, fRatio * icon->fWidthFactor * icon->fWidth * (icon->fScale - 1) / 2, (g_bDirectionUp ? fRatio * icon->fHeightFactor * icon->fHeight * (icon->fScale - 1) : 0));
-			cairo_scale (pCairoContext, fRatio / (1 + g_fAmplitude), fRatio / (1 + g_fAmplitude));
+			cairo_scale (pCairoContext, fRatio * icon->fWidthFactor / (1 + g_fAmplitude), fRatio * icon->fHeightFactor / (1 + g_fAmplitude));
 		}
 		else
 			cairo_scale (pCairoContext, fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude));
@@ -468,7 +470,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		if (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (icon))
 		{
 			cairo_translate (pCairoContext, fRatio * icon->fHeightFactor * icon->fHeight * (icon->fScale - 1) / 2, (g_bDirectionUp ? fRatio * icon->fWidthFactor * icon->fWidth * (icon->fScale - 1) : 0));
-			cairo_scale (pCairoContext, fRatio / (1 + g_fAmplitude), fRatio / (1 + g_fAmplitude));
+			cairo_scale (pCairoContext, fRatio * icon->fHeightFactor / (1 + g_fAmplitude), fRatio * icon->fWidthFactor / (1 + g_fAmplitude));
 		}
 		else
 			cairo_scale (pCairoContext, fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude));
@@ -667,8 +669,9 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 *@param fStringLineWidth epaisseur de la ligne.
 *@param bIsLoop TRUE si on veut boucler (relier la derniere icone a la 1ere).
 */
-void cairo_dock_draw_string (cairo_t *pCairoContext, CairoDock *pDock, double fStringLineWidth, gboolean bIsLoop)
+void cairo_dock_draw_string (cairo_t *pCairoContext, CairoDock *pDock, double fStringLineWidth, gboolean bIsLoop, gboolean bForceConstantSeparator)
 {
+	bForceConstantSeparator = bForceConstantSeparator || g_bConstantSeparatorSize;
 	GList *ic, *pFirstDrawnElement = (pDock->pFirstDrawnElement != NULL ? pDock->pFirstDrawnElement : pDock->icons);
 	if (pFirstDrawnElement == NULL || fStringLineWidth <= 0)
 		return ;
@@ -688,7 +691,7 @@ void cairo_dock_draw_string (cairo_t *pCairoContext, CairoDock *pDock, double fS
 	double y1, y2, y3;
 	double dx, dy;
 	x = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor / 2;
-	y = icon->fDrawY + icon->fHeight * icon->fScale / 2 + (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (icon) ? icon->fHeight * (icon->fScale - 1) / 2 : 0);
+	y = icon->fDrawY + icon->fHeight * icon->fScale / 2 + (bForceConstantSeparator && CAIRO_DOCK_IS_SEPARATOR (icon) ? icon->fHeight * (icon->fScale - 1) / 2 : 0);
 	if (pDock->bHorizontalDock)
 		cairo_move_to (pCairoContext, x, y);
 	else
@@ -698,7 +701,7 @@ void cairo_dock_draw_string (cairo_t *pCairoContext, CairoDock *pDock, double fS
 		if (prev_icon != NULL)
 		{
 			x1 = prev_icon->fDrawX + prev_icon->fWidth * prev_icon->fScale * prev_icon->fWidthFactor / 2;
-			y1 = prev_icon->fDrawY + prev_icon->fHeight * prev_icon->fScale / 2 + (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (prev_icon) ? prev_icon->fHeight * (prev_icon->fScale - 1) / 2 : 0);
+			y1 = prev_icon->fDrawY + prev_icon->fHeight * prev_icon->fScale / 2 + (bForceConstantSeparator && CAIRO_DOCK_IS_SEPARATOR (prev_icon) ? prev_icon->fHeight * (prev_icon->fScale - 1) / 2 : 0);
 		}
 		else
 		{
@@ -712,7 +715,7 @@ void cairo_dock_draw_string (cairo_t *pCairoContext, CairoDock *pDock, double fS
 			break;
 		icon = ic->data;
 		x2 = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor / 2;
-		y2 = icon->fDrawY + icon->fHeight * icon->fScale / 2 + (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (icon) ? icon->fHeight * (icon->fScale - 1) / 2 : 0);
+		y2 = icon->fDrawY + icon->fHeight * icon->fScale / 2 + (bForceConstantSeparator && CAIRO_DOCK_IS_SEPARATOR (icon) ? icon->fHeight * (icon->fScale - 1) / 2 : 0);
 		
 		dx = x2 - x;
 		dy = y2 - y;
@@ -722,7 +725,7 @@ void cairo_dock_draw_string (cairo_t *pCairoContext, CairoDock *pDock, double fS
 		if (next_icon != NULL)
 		{
 			x3 = next_icon->fDrawX + next_icon->fWidth * next_icon->fScale * next_icon->fWidthFactor / 2;
-			y3 = next_icon->fDrawY + next_icon->fHeight * next_icon->fScale / 2 + (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (next_icon) ? next_icon->fHeight * (next_icon->fScale - 1) / 2 : 0);
+			y3 = next_icon->fDrawY + next_icon->fHeight * next_icon->fScale / 2 + (bForceConstantSeparator && CAIRO_DOCK_IS_SEPARATOR (next_icon) ? next_icon->fHeight * (next_icon->fScale - 1) / 2 : 0);
 		}
 		else
 		{

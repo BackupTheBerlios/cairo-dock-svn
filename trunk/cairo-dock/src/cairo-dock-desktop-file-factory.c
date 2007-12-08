@@ -117,6 +117,22 @@ gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, const gchar *cDockName
 		}
 		g_free (cCommand);
 		
+		gchar *cIconName = g_key_file_get_string (pKeyFile, "Desktop Entry", "Icon", &erreur);
+		if (erreur != NULL)
+		{
+			g_print ("Attention : invalid desktop file (%s)\n", erreur->message);
+			g_error_free (erreur);
+			g_key_file_free (pKeyFile);
+			g_free (cNewDesktopFileName);
+			return NULL;
+		}
+		if (g_str_has_suffix (cIconName, ".png") || g_str_has_suffix (cIconName, ".xpm"))  // on prefere les svg si possible.
+		{
+			cIconName[strlen(cIconName) - 4] = '\0';
+			g_key_file_set_string (pKeyFile, "Desktop Entry", "Icon", cIconName);
+		}
+		g_free (cIconName);
+		
 		//\___________________ On ecrit tout ca dans un fichier.
 		gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, cNewDesktopFileName);
 		cairo_dock_write_keys_to_file (pKeyFile, cNewDesktopFilePath);

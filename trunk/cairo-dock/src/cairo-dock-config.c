@@ -122,6 +122,7 @@ extern gboolean g_bGroupAppliByClass;
 extern int g_iAppliMaxNameLength;
 extern gboolean g_bMinimizeOnClick;
 extern gboolean g_bCloseAppliOnMiddleClick;
+extern gboolean g_bAutoHideOnFullScreen;
 extern gboolean g_bDemandsAttentionWithDialog;
 extern gboolean g_bDemandsAttentionWithAnimation;
 extern gboolean g_bAnimateOnActiveWindow;
@@ -142,6 +143,15 @@ extern double g_fDialogAlpha;
 extern int g_iDialogIconSize;
 
 
+/**
+*Recupere une cle booleene d'un fichier de cles.
+*@param pKeyFile le fichier de cles.
+*@param cGroupName le com du groupe.
+*@param cKeyName le nom de la cle.
+*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
+*@param bDefaultValue valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
+@Returns la valeur booleene de la cle.
+*/
 gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gboolean bDefaultValue)
 {
 	GError *erreur = NULL;
@@ -174,6 +184,15 @@ gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 	}
 	return bValue;
 }
+/**
+*Recupere une cle entiere d'un fichier de cles.
+*@param pKeyFile le fichier de cles.
+*@param cGroupName le com du groupe.
+*@param cKeyName le nom de la cle.
+*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
+*@param iDefaultValue valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
+@Returns la valeur entiere de la cle.
+*/
 int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, int iDefaultValue)
 {
 	GError *erreur = NULL;
@@ -206,6 +225,15 @@ int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gch
 	}
 	return iValue;
 }
+/**
+*Recupere une cle flottante d'un fichier de cles.
+*@param pKeyFile le fichier de cles.
+*@param cGroupName le com du groupe.
+*@param cKeyName le nom de la cle.
+*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
+*@param fDefaultValue valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
+@Returns la valeur flottante de la cle.
+*/
 double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, double fDefaultValue)
 {
 	GError *erreur = NULL;
@@ -238,6 +266,15 @@ double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 	}
 	return fValue;
 }
+/**
+*Recupere une cle d'un fichier de cles sous la forme d'une chaine de caractere.
+*@param pKeyFile le fichier de cles.
+*@param cGroupName le com du groupe.
+*@param cKeyName le nom de la cle.
+*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
+*@param cDefaultValue valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
+@Returns la chaine de caractere nouvellement allouee correspondante a la cle.
+*/
 gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, const gchar *cDefaultValue)
 {
 	GError *erreur = NULL;
@@ -275,6 +312,16 @@ gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 	}
 	return cValue;
 }
+/**
+*Recupere une cle d'un fichier de cles sous la forme d'un tableau d'entiers.
+*@param pKeyFile le fichier de cles.
+*@param cGroupName le com du groupe.
+*@param cKeyName le nom de la cle.
+*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
+*@param iValueBuffer tableau qui sera rempli.
+*@param iNbElements nombre d'elements a recuperer; c'est le nombre d'elements du tableau passe en entree.
+*@param iDefaultValues valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
+*/
 void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, int *iValueBuffer, int iNbElements, int *iDefaultValues)
 {
 	GError *erreur = NULL;
@@ -324,6 +371,16 @@ void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cGroupNam
 	}
 	g_free (iValuesList);
 }
+/**
+*Recupere une cle d'un fichier de cles sous la forme d'un tableau de doubles.
+*@param pKeyFile le fichier de cles.
+*@param cGroupName le com du groupe.
+*@param cKeyName le nom de la cle.
+*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
+*@param fValueBuffer tableau qui sera rempli.
+*@param iNbElements nombre d'elements a recuperer; c'est le nombre d'elements du tableau passe en entree.
+*@param fDefaultValues valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
+*/
 void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, double *fValueBuffer, int iNbElements, double *fDefaultValues)
 {
 	GError *erreur = NULL;
@@ -373,6 +430,16 @@ void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 	}
 	g_free (fValuesList);
 }
+/**
+*Recupere une cle d'un fichier de cles sous la forme d'un tableau de chaines de caracteres.
+*@param pKeyFile le fichier de cles.
+*@param cGroupName le com du groupe.
+*@param cKeyName le nom de la cle.
+*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
+*@param length nombre de chaines de caracteres recuperees.
+*@param cDefaultValues valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
+@Returns un tableau de chaines de caracteres; a liberer avec g_strfreev().
+*/
 gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gsize *length, gchar *cDefaultValues)
 {
 	GError *erreur = NULL;
@@ -414,17 +481,23 @@ gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupN
 	}
 	return cValuesList;
 }
-
+/**
+*Recupere une cle d'un fichier de cles sous la forme d'un tableau de chaines de caracteres.
+*@param pKeyFile le fichier de cles.
+*@param cGroupName le com du groupe.
+*@param cKeyName le nom de la cle.
+*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
+*@param iDefaultAnimation valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
+*@Returns le type de l'animation correspondante a la cle.
+*/
 CairoDockAnimationType cairo_dock_get_animation_type_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, CairoDockAnimationType iDefaultAnimation)
 {
-	/*gchar *cAnimationName = cairo_dock_get_string_key_value (pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, cDefaultAnimation);
-	int iAnimationType = cairo_dock_get_animation_type_from_name (cAnimationName);  // cAnimationName peut etre NULL.
-	g_free(cAnimationName);*/
 	CairoDockAnimationType iAnimationType = cairo_dock_get_integer_key_value (pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, iDefaultAnimation);
 	if (iAnimationType < 0 || iAnimationType >= CAIRO_DOCK_NB_ANIMATIONS)
 		iAnimationType = 0;
 	return iAnimationType;
 }
+
 
 void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 {
@@ -716,6 +789,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_bCloseAppliOnMiddleClick = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "close on middle click", &bFlushConfFileNeeded, TRUE);
 	
+	g_bAutoHideOnFullScreen = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "auto quick hide", &bFlushConfFileNeeded, TRUE);
+	
 	g_bDemandsAttentionWithDialog = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "demands attention with dialog", &bFlushConfFileNeeded, TRUE);
 	g_bDemandsAttentionWithAnimation = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "demands attention with animation", &bFlushConfFileNeeded, FALSE);
 	
@@ -912,83 +987,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 }
 
 
-static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, gpointer *user_data)
-{
-	GKeyFile *pKeyFile = user_data[0];
-	GSList *pWidgetList = user_data[1];
-	gchar *cConfFilePath = user_data[2];
-	GtkTextBuffer *pTextBuffer = user_data[3];
-	CairoDockConfigFunc pConfigFunc = user_data[4];
-	gpointer data = user_data[5];
-	GFunc pFreeUserDataFunc = user_data[6];
-	gchar *cConfFilePath2 = user_data[7];
-	CairoDockConfigFunc pConfigFunc2 = user_data[8];
-	GtkWidget *pWidget = user_data[9];
-	gchar *cTitle = user_data[10];
-	int iWindowWidth = GPOINTER_TO_INT (user_data[11]);
-	int iWindowHeight = GPOINTER_TO_INT (user_data[12]);
-	gchar iIdentifier = GPOINTER_TO_INT (user_data[13]);
-	gchar *cButtonConvert = user_data[14];
-	gchar *cButtonRevert = user_data[15];
-	
-	if (action == GTK_RESPONSE_ACCEPT || action == GTK_RESPONSE_APPLY)
-	{
-		gtk_window_set_modal (GTK_WINDOW (pDialog), TRUE);  // pour prevenir tout interaction avec l'appli pendant sa re-configuration.
-		
-		if (pWidgetList != NULL)
-		{
-			cairo_dock_update_keyfile_from_widget_list (pKeyFile, pWidgetList);
-			cairo_dock_write_keys_to_file (pKeyFile, cConfFilePath);
-		}
-		else
-		{
-			GtkTextIter start, end;
-			gtk_text_buffer_get_iter_at_offset (pTextBuffer, &start, 0);
-			gtk_text_buffer_get_iter_at_offset (pTextBuffer, &end, -1);
-			
-			gchar *cConfiguration = gtk_text_buffer_get_text (pTextBuffer, &start, &end, FALSE);
-			
-			gboolean write_ok = g_file_set_contents (cConfFilePath, cConfiguration, -1, NULL);
-			g_free (cConfiguration);
-			if (! write_ok)
-				g_print ("error while writing to %s\n", cConfFilePath);
-		}
-		
-		if (pConfigFunc != NULL)
-			pConfigFunc (cConfFilePath, data);
-		
-		gtk_window_set_modal (GTK_WINDOW (pDialog), FALSE);
-	}
-	
-	if (action == GTK_RESPONSE_ACCEPT || action == GTK_RESPONSE_REJECT || action == GTK_RESPONSE_NONE)
-	{
-		cairo_dock_mark_prefered_conf_file (cConfFilePath);
-		
-		gtk_widget_destroy (GTK_WIDGET (pDialog));
-		g_key_file_free (pKeyFile);
-		cairo_dock_free_generated_widget_list (pWidgetList);
-		g_free (cConfFilePath);
-		g_free (cConfFilePath2);
-		g_free (cTitle);
-		g_free (cButtonConvert);
-		g_free (cButtonRevert);
-		if (pFreeUserDataFunc != NULL)
-			pFreeUserDataFunc (data, NULL);
-		g_free (user_data);
-	}
-	else if (action == GTK_RESPONSE_HELP)
-	{
-		gtk_widget_destroy (GTK_WIDGET (pDialog));
-		g_key_file_free (pKeyFile);
-		cairo_dock_free_generated_widget_list (pWidgetList);
-		g_free (user_data);
-		
-		cairo_dock_edit_conf_file_core (pWidget, cConfFilePath2, cTitle, iWindowWidth, iWindowHeight, iIdentifier, NULL, pConfigFunc2, data, pFreeUserDataFunc, pConfigFunc, cConfFilePath, cButtonRevert, cButtonConvert);
-	}
-}
+static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, gpointer *user_data);  // declaree en amont, car les 2 s'appellent mutuellement.
 
-
-gboolean cairo_dock_edit_conf_file_core (GtkWidget *pWidget, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert)
+static gboolean cairo_dock_edit_conf_file_core (GtkWidget *pWidget, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert)
 {
 	g_print ("%s (%s; %s)\n", __func__, cConfFilePath, cConfFilePath2);
 	GSList *pWidgetList = NULL;
@@ -1096,6 +1097,100 @@ gboolean cairo_dock_edit_conf_file_core (GtkWidget *pWidget, gchar *cConfFilePat
 	}
 }
 
+static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, gpointer *user_data)
+{
+	GKeyFile *pKeyFile = user_data[0];
+	GSList *pWidgetList = user_data[1];
+	gchar *cConfFilePath = user_data[2];
+	GtkTextBuffer *pTextBuffer = user_data[3];
+	CairoDockConfigFunc pConfigFunc = user_data[4];
+	gpointer data = user_data[5];
+	GFunc pFreeUserDataFunc = user_data[6];
+	gchar *cConfFilePath2 = user_data[7];
+	CairoDockConfigFunc pConfigFunc2 = user_data[8];
+	GtkWidget *pWidget = user_data[9];
+	gchar *cTitle = user_data[10];
+	int iWindowWidth = GPOINTER_TO_INT (user_data[11]);
+	int iWindowHeight = GPOINTER_TO_INT (user_data[12]);
+	gchar iIdentifier = GPOINTER_TO_INT (user_data[13]);
+	gchar *cButtonConvert = user_data[14];
+	gchar *cButtonRevert = user_data[15];
+	
+	if (action == GTK_RESPONSE_ACCEPT || action == GTK_RESPONSE_APPLY)
+	{
+		gtk_window_set_modal (GTK_WINDOW (pDialog), TRUE);  // pour prevenir tout interaction avec l'appli pendant sa re-configuration.
+		
+		if (pWidgetList != NULL)
+		{
+			cairo_dock_update_keyfile_from_widget_list (pKeyFile, pWidgetList);
+			cairo_dock_write_keys_to_file (pKeyFile, cConfFilePath);
+		}
+		else
+		{
+			GtkTextIter start, end;
+			gtk_text_buffer_get_iter_at_offset (pTextBuffer, &start, 0);
+			gtk_text_buffer_get_iter_at_offset (pTextBuffer, &end, -1);
+			
+			gchar *cConfiguration = gtk_text_buffer_get_text (pTextBuffer, &start, &end, FALSE);
+			
+			gboolean write_ok = g_file_set_contents (cConfFilePath, cConfiguration, -1, NULL);
+			g_free (cConfiguration);
+			if (! write_ok)
+				g_print ("error while writing to %s\n", cConfFilePath);
+		}
+		
+		if (pConfigFunc != NULL)
+			pConfigFunc (cConfFilePath, data);
+		
+		gtk_window_set_modal (GTK_WINDOW (pDialog), FALSE);
+	}
+	
+	if (action == GTK_RESPONSE_ACCEPT || action == GTK_RESPONSE_REJECT || action == GTK_RESPONSE_NONE)
+	{
+		cairo_dock_mark_prefered_conf_file (cConfFilePath);
+		
+		gtk_widget_destroy (GTK_WIDGET (pDialog));
+		g_key_file_free (pKeyFile);
+		cairo_dock_free_generated_widget_list (pWidgetList);
+		g_free (cConfFilePath);
+		g_free (cConfFilePath2);
+		g_free (cTitle);
+		g_free (cButtonConvert);
+		g_free (cButtonRevert);
+		if (pFreeUserDataFunc != NULL)
+			pFreeUserDataFunc (data, NULL);
+		g_free (user_data);
+	}
+	else if (action == GTK_RESPONSE_HELP)
+	{
+		gtk_widget_destroy (GTK_WIDGET (pDialog));
+		g_key_file_free (pKeyFile);
+		cairo_dock_free_generated_widget_list (pWidgetList);
+		g_free (user_data);
+		
+		cairo_dock_edit_conf_file_core (pWidget, cConfFilePath2, cTitle, iWindowWidth, iWindowHeight, iIdentifier, NULL, pConfigFunc2, data, pFreeUserDataFunc, pConfigFunc, cConfFilePath, cButtonRevert, cButtonConvert);
+	}
+}
+
+
+/**
+*Lis un fichier de conf, construit l'IHM appropriee, et la presente a l'utilisateur.
+*@param pWidget 
+*@param cConfFilePath 
+*@param cTitle 
+*@param iWindowWidth 
+*@param iWindowHeight 
+*@param iIdentifier 
+*@param cPresentedGroup 
+*@param pConfigFunc 
+*@param data 
+*@param pFreeUserDataFunc 
+*@param pConfigFunc2 
+*@param cConfFilePath2 
+*@param cButtonConvert 
+*@param  cButtonRevert 
+@Returns TRUE si l'utilisateur a ferme le panneau de conf en appuyant sur OK, FALSE sinon.
+*/
 gboolean cairo_dock_edit_conf_file_full (GtkWidget *pWidget, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert)
 {
 	return cairo_dock_edit_conf_file_core (pWidget, g_strdup (cConfFilePath), g_strdup (cTitle), iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc, pConfigFunc2, g_strdup (cConfFilePath2), g_strdup (cButtonConvert), g_strdup (cButtonRevert));

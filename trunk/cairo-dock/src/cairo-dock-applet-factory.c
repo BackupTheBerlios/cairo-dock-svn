@@ -359,16 +359,3 @@ void cairo_dock_animate_icon (Icon *pIcon, CairoDock *pDock, CairoDockAnimationT
 	cairo_dock_arm_animation (pIcon, iAnimationType, iNbRounds);
 	cairo_dock_start_animation (pIcon, pDock);
 }
-
-int cairo_dock_get_number_from_name (gchar *cValue, gchar **cValuesList)
-{
-	if (cValue == NULL || cValuesList == NULL)
-		return 0;
-	int i;
-	for (i = 0; cValuesList[i] != NULL; i ++)
-	{
-		if (strcmp (cValue, cValuesList[i]) == 0)
-			return i;
-	}
-	return 0;
-}
