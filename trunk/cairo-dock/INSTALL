@@ -1,0 +1,10 @@
+Basically, you just copy-paste these lines into a terminal (assuming you are in the sources directory) :
+autoreconf -isvf && ./configure && make
+sudo make install
+
+you can provide directory installation by adding --prefix=/path/of/the/directory after the 'configure'.
+
+If your libcairo is compiled with glitz support (that is, with --enable-glitz option), you can benefit from glitz hardware acceleration in cairo-dock too.
+Just add the --enable-glitz option after the 'configure'.
+
+To build the Cairo-Dock documentation, type "doxygen generate-doc.config" in the cairo-dock directory; doc will be generated in the "doc" directory.
