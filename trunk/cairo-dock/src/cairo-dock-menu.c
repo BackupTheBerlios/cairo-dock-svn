@@ -188,7 +188,6 @@ static void cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 	gchar *question = g_strdup_printf (_("You're about to remove this icon (%s) from the dock. Sure ?"), icon->acName);
 	///int answer = cairo_dock_ask_question (pDock, question);
 	int answer = cairo_dock_ask_question_and_wait (question, icon, pDock);
-	g_print ("reponse : %d\n", answer);
 	g_free (question);
 	if (answer == GTK_RESPONSE_YES)
 	{

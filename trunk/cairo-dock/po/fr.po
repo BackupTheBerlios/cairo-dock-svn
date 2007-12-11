@@ -131,3 +131,4 @@ msgstr "Au debut"
 #: cairo-dock-menu.c:774
 msgid "To the end"
 msgstr "A la fin"
+

@@ -129,3 +129,9 @@ void cairo_dock_set_all_views_to_default (void)
 	g_print ("%s ()\n", __func__);
 	g_hash_table_foreach (g_hDocksTable, (GHFunc) _cairo_dock_set_one_dock_view_to_default, NULL);
 }
+
+
+int cairo_dock_get_number_of_renderers (void)
+{
+	return g_hash_table_size (s_hRendererTable);
+}

@@ -6,15 +6,46 @@
 
 #include "cairo-dock-struct.h"
 
-
+/**
+*TRUE ssi l'icone est une icone de lanceur.
+*@param icon une icone.
+*/
 #define CAIRO_DOCK_IS_APPLI(icon) (icon != NULL && icon->iType == CAIRO_DOCK_APPLI)
+/**
+*TRUE ssi l'icone est une icone d'appli.
+*@param icon une icone.
+*/
 #define CAIRO_DOCK_IS_LAUNCHER(icon) (icon != NULL && icon->iType == CAIRO_DOCK_LAUNCHER)
+/**
+*TRUE ssi l'icone est une icone de separateur.
+*@param icon une icone.
+*/
 #define CAIRO_DOCK_IS_SEPARATOR(icon) (icon != NULL && icon->iType & 1)
+/**
+*TRUE ssi l'icone est une icone d'applet.
+*@param icon une icone.
+*/
 #define CAIRO_DOCK_IS_APPLET(icon) (icon != NULL && icon->iType  == CAIRO_DOCK_APPLET)
 
+/**
+*TRUE ssi l'icone est une icone de lanceur defini par un fichier .desktop.
+*@param icon une icone.
+*/
 #define CAIRO_DOCK_IS_NORMAL_LAUNCHER(icon) (CAIRO_DOCK_IS_LAUNCHER (icon) && icon->acDesktopFileName != NULL)
+/**
+*TRUE ssi l'icone est une icone de lanceur representant une URI.
+*@param icon une icone.
+*/
 #define CAIRO_DOCK_IS_URI_LAUNCHER(icon) (CAIRO_DOCK_IS_LAUNCHER (icon) && icon->cBaseURI != NULL)
+/**
+*TRUE ssi l'icone est une icone d'appli correspondant a une ressource X valide.
+*@param icon une icone.
+*/
 #define CAIRO_DOCK_IS_VALID_APPLI(icon) (CAIRO_DOCK_IS_APPLI (icon) && icon->Xid != 0)
+/**
+*TRUE ssi l'icone est une icone d'applet possedant un module valide.
+*@param icon une icone.
+*/
 #define CAIRO_DOCK_IS_VALID_APPLET(icon) (CAIRO_DOCK_IS_APPLET (icon) && icon->pModule != NULL)
 
 /**
@@ -133,11 +164,40 @@ Icon *cairo_dock_get_previous_icon (GList *pIconList, Icon *pIcon);
 *@Returns l'element precedent de la liste bouclee.
 */
 #define cairo_dock_get_previous_element(ic, list) (ic->prev == NULL ? g_list_last (list) : ic->prev)
-
+/**
+*Cherche l'icone ayant une commande donnee parmi une liste d'icones.
+*@param pIconList la liste d'icones.
+*@param cCommand la chaine de commande.
+*@Returns la 1ere icone ayant le champ #acExec identique a la commande fournie, ou NULL si aucune icone ne correspond.
+*/
 Icon *cairo_dock_get_icon_with_command (GList *pIconList, gchar *cCommand);
+/**
+*Cherche l'icone ayant une URI de base donnee parmi une liste d'icones.
+*@param pIconList la liste d'icones.
+*@param cBaseURI l'URI.
+*@Returns la 1ere icone ayant le champ #cBaseURI identique a l'URI fournie, ou NULL si aucune icone ne correspond.
+*/
 Icon *cairo_dock_get_icon_with_base_uri (GList *pIconList, gchar *cBaseURI);
+/**
+*Cherche l'icone pointant sur un sous-dock donne parmi une liste d'icones.
+*@param pIconList la liste d'icones.
+*@param pSubDock le sous-dock.
+*@Returns la 1ere icone ayant le champ #pSubDock identique au sous-dock fourni, ou NULL si aucune icone ne correspond.
+*/
 Icon *cairo_dock_get_icon_with_subdock (GList *pIconList, CairoDock *pSubDock);
+/**
+*Cherche l'icone correspondante a un module donne parmi une liste d'icones.
+*@param pIconList la liste d'icones.
+*@param pModule le module.
+*@Returns la 1ere icone ayant le champ #pModule identique au module fourni, ou NULL si aucune icone ne correspond.
+*/
 Icon *cairo_dock_get_icon_with_module (GList *pIconList, CairoDockModule *pModule);
+/**
+*Cherche l'icone d'une application de la classe donnee parmi une liste d'icones.
+*@param pIconList la liste d'icones.
+*@param pModule le module.
+*@Returns la 1ere icone ayant le champ #cClass identique a la classe fournie, ou NULL si aucune icone ne correspond.
+*/
 Icon *cairo_dock_get_icon_with_class (GList *pIconList, gchar *cClass);
 
 #define cairo_dock_none_clicked(pIconList) (cairo_dock_get_bouncing_icon (pIconList) == NULL)
@@ -153,17 +213,52 @@ Icon *cairo_dock_get_icon_with_class (GList *pIconList, gchar *cClass);
 void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2);
 void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2);
 
+/**
+*Detache une icone de son dock, en enlevant les separateurs superflus si necessaires. L'icone n'est pas detruite, et peut etre re-inseree autre part telle qu'elle; elle garde son sous-dock, mais perd son dialogue.
+*@param icon l'icone a detacher.
+*@param pDock le dock contenant l'icone.
+*@param bCheckUnusedSeparator si TRUE, alors teste si des separateurs sont devenus superflus, et les enleve le cas echeant.
+*/
 void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bCheckUnusedSeparator);
+/**
+*Detache une icone de son dock, sans verifier la presence de separateurs superflus. L'icone n'est pas detruite, et garde son sous-dock, mais perd son dialogue et est fermee (son .desktop est detruit, son module est desactive, et son Xid est effacee du registre (la classe est geree aussi)).
+*@param pDock le dock contenant l'icone.
+*@param icon l'icone a detacher.
+*/
 void cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon);
+/**
+*Detache une icone de son dock, en enlevant les separateurs superflus si necessaires. L'icone n'est pas detruite, et garde son sous-dock, mais perd son dialogue et est fermee (son .desktop est detruit, son module est desactive, et son Xid est effacee du registre (la classe est geree aussi)).
+*@param pDock le dock contenant l'icone.
+*@param icon l'icone a detacher.
+*/
 void cairo_dock_remove_icon_from_dock (CairoDock *pDock, Icon *icon);
+/**
+*Enleve et detruit toutes les icones dont le type est celui fourni.
+*@param pDock le dock contenant l'icone.
+*@param iType le type d'icones a supprimer.
+*/
 void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType);
+/**
+*Enleve et detruit toutes les icones d'applications.
+*@param pDock le dock duquel supprimer les icones.
+*/
 #define cairo_dock_remove_all_applis(pDock) cairo_dock_remove_icons_of_type (pDock, CAIRO_DOCK_APPLI)
+/**
+*Enleve et detruit toutes les icones d'applets.
+*@param pDock le dock duquel supprimer les icones.
+*/
 #define cairo_dock_remove_all_applets(pDock) cairo_dock_remove_icons_of_type (pDock, CAIRO_DOCK_APPLET)
-
-void cairo_dock_remove_separator (CairoDock *pDock, CairoDockIconType iType);
-
+/**
+*Enleve et detruit toutes les icones de separateurs.
+*@param pDock le dock duquel supprimer les icones.
+*/
 void cairo_dock_remove_all_separators (CairoDock *pDock);
 
+/**
+*Rajoute un separateur entre lanceurs et applis si necessaire.
+*@param pDock le dock ou se situent les applis.
+*/
+void cairo_dock_insert_separator_between_launchers_and_applis (CairoDock *pDock);
 
 
 GList * cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, int iMinDockWidth, int iXOffset);
@@ -184,8 +279,12 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, CairoDockIconTyp
 void cairo_dock_mark_avoiding_mouse_icons_linear (CairoDock *pDock);
 void cairo_dock_stop_marking_icons (CairoDock *pDock);
 
-
-void cairo_dock_update_icon_s_container_name (Icon *icon, gchar *cNewParentDockName);
+/**
+*Met a jour le fichier .desktop d'un lanceur avec le nom de son nouveau conteneur.
+*@param icon l'icone du lanceur.
+*@param cNewParentDockName le nom de son nouveau conteneur.
+*/
+void cairo_dock_update_icon_s_container_name (Icon *icon, const gchar *cNewParentDockName);
 
 #endif
 

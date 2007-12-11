@@ -30,6 +30,7 @@ extern gboolean g_bHorizontalDock;
 
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
+extern gboolean g_bUseSeparator;
 extern gchar *g_cSeparatorImage;
 extern gboolean g_bRevolveSeparator;
 
@@ -73,9 +74,21 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 			FALSE);
 		g_free (cImagePath);
 	}
-	else if (FALSE)
+	else
 	{
+		double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
+		cairo_dock_calculate_contrainted_icon_size (fWidth,
+			fHeight,
+			g_tMinIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12],
+			g_tMinIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12],
+			g_tMaxIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12],
+			g_tMaxIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12],
+			&fIconWidthSaturationFactor, &fIconHeightSaturationFactor);
 		
+		pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+			CAIRO_CONTENT_COLOR_ALPHA,
+			ceil (*fWidth * fMaxScale),
+			ceil (*fHeight * fMaxScale));
 	}
 	
 	return pNewSurface;
@@ -86,7 +99,7 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorType, CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
-	if (g_cSeparatorImage == NULL)
+	if (g_bUseSeparator == NULL)
 		return NULL;
 	
 	Icon *icon = g_new0 (Icon, 1);

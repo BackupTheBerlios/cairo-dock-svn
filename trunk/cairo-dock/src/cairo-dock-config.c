@@ -133,6 +133,7 @@ extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 
+extern gboolean g_bUseSeparator;
 extern gchar *g_cSeparatorImage;
 extern gboolean g_bRevolveSeparator;
 extern gboolean g_bConstantSeparatorSize;
@@ -576,9 +577,6 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	
 	//\___________________ On recupere les parametres du dock en lui-meme.
-	g_free (g_cLanguage);
-	g_cLanguage = cairo_dock_get_string_key_value (pKeyFile, "Cairo Dock", "language", &bFlushConfFileNeeded, "en");
-	
 	gchar **cIconsTypesList = cairo_dock_get_string_list_key_value (pKeyFile, "Cairo Dock", "icon's type order", &bFlushConfFileNeeded, &length, NULL);
 	if (cIconsTypesList != NULL && length > 0)
 	{
@@ -816,6 +814,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_tMinIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12] = cairo_dock_get_integer_key_value (pKeyFile, "Separators", "min icon size", &bFlushConfFileNeeded, 0);
 	g_tMinIconAuthorizedSize[CAIRO_DOCK_SEPARATOR23] = g_tMinIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12];
 	
+	gboolean bUseSeparatorOld = g_bUseSeparator;
+	g_bUseSeparator = cairo_dock_get_boolean_key_value (pKeyFile, "Separators", "use separator", &bFlushConfFileNeeded, TRUE);
+	
 	g_free (g_cSeparatorImage);
 	g_cSeparatorImage = cairo_dock_get_string_key_value (pKeyFile, "Separators", "separator image", &bFlushConfFileNeeded, NULL);
 	
@@ -899,6 +900,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		pDock->icons = g_list_sort (pDock->icons, (GCompareFunc) cairo_dock_compare_icons_order);
 	}
 	
+	if (bUseSeparatorOld && ! g_bUseSeparator)
+		cairo_dock_remove_all_separators (pDock);
+	
 	g_fBackgroundImageWidth = 1e4;  // inutile de mettre a jour les decorations maintenant.
 	g_fBackgroundImageHeight = 1e4;
 	if (pDock->icons == NULL)
@@ -912,14 +916,18 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	if (! cairo_dock_application_manager_is_running () && g_bShowAppli)  // maintenant on veut voir les applis !
 	{
-		cairo_dock_start_application_manager (pDock);
+		cairo_dock_start_application_manager (pDock);  // va inserer le separateur si necessaire.
+	}
+	else if (g_bShowAppli && g_bUseSeparator && ! bUseSeparatorOld)  // il faut rajouter le separateur a la main.
+	{
+		cairo_dock_insert_separator_between_launchers_and_applis (pDock);
 	}
 	
 	
 	cairo_dock_activate_modules_from_list (cActiveModuleList, pDock);
 	g_strfreev (cActiveModuleList);
 	
-	cairo_dock_set_all_views_to_default ();  // met a jour les tailles des docks.
+	cairo_dock_set_all_views_to_default ();
 	
 	cairo_dock_reserve_space_for_dock (pDock, g_bReserveSpace);
 	///cairo_dock_update_dock_size (pDock);
@@ -973,7 +981,6 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		cairo_dock_flush_conf_file (pKeyFile, cConfFilePath, CAIRO_DOCK_SHARE_DATA_DIR);
 		
 		cairo_dock_update_conf_file_with_available_modules (cConfFilePath);
-		cairo_dock_update_conf_file_with_translations (cConfFilePath, CAIRO_DOCK_SHARE_DATA_DIR);
 	}
 	
 	cairo_dock_update_conf_file_with_renderers (cConfFilePath);
@@ -1218,16 +1225,6 @@ void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int
 	g_key_file_free (pKeyFile);
 }
 
-void cairo_dock_update_conf_file_with_translations_full (gchar *cConfFile, gchar *cTranslationsDir, gchar *cGroupName, gchar *cKeyName)
-{
-	GError *erreur = NULL;
-	GHashTable *pTranslationTable = cairo_dock_list_available_translations (cTranslationsDir, "cairo-dock-", &erreur);
-	
-	cairo_dock_update_conf_file_with_hash_table (cConfFile, pTranslationTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_name);
-	
-	g_hash_table_destroy (pTranslationTable);
-}
-
 
 
 CairoDockDesktopEnv cairo_dock_guess_environment (void)
@@ -1283,8 +1280,6 @@ void cairo_dock_copy_easy_conf_file (gchar *cEasyConfFilePath, GKeyFile *pMainKe
 	}
 	
 	//\___________________ On recupere les parametres systeme.
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "language", pMainKeyFile, "Cairo Dock", "language");
-	
 	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "screen border", pMainKeyFile, "Position", "screen border");
 	
 	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "auto-hide", pMainKeyFile, "Auto-Hide", "auto-hide");
@@ -1352,8 +1347,6 @@ void cairo_dock_copy_to_easy_conf_file (GKeyFile *pMainKeyFile, gchar *cEasyConf
 	}
 	
 	//\___________________ On ecrit les parametres systeme.
-	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Cairo Dock", "language", pKeyFile, "System", "language");
-	
 	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Position", "screen border", pKeyFile, "System", "screen border");
 	
 	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Auto-Hide", "auto-hide", pKeyFile, "System", "auto-hide");
@@ -1399,7 +1392,6 @@ void cairo_dock_copy_to_easy_conf_file (GKeyFile *pMainKeyFile, gchar *cEasyConf
 	
 	//\___________________ On complete.
 	cairo_dock_update_easy_conf_file_with_available_modules (cEasyConfFilePath);
-	cairo_dock_update_easy_conf_file_with_translations (cEasyConfFilePath, CAIRO_DOCK_SHARE_DATA_DIR);
 	
 	cairo_dock_update_easy_conf_file_with_renderers (cEasyConfFilePath);
 }

@@ -24,5 +24,7 @@ void cairo_dock_update_easy_conf_file_with_renderers (gchar *cConfFile);
 void cairo_dock_reset_all_views (void);
 void cairo_dock_set_all_views_to_default (void);
 
+int cairo_dock_get_number_of_renderers (void);
+
 
 #endif

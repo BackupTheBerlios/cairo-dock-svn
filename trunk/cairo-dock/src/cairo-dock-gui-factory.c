@@ -8,10 +8,11 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 ******************************************************************************/
 #include <string.h>
 #include <stdlib.h>
+#include <glib/gi18n.h>
 
 #include "cairo-dock-gui-factory.h"
 
-#define CAIRO_DOCK_GUI_MARGIN 3
+#define CAIRO_DOCK_GUI_MARGIN 6
 
 typedef enum
 {
@@ -530,11 +531,13 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					cUsefulComment[strlen (cUsefulComment) - 1] = '\0';
 				if (cUsefulComment[strlen (cUsefulComment) - 1] == '/')
 				{
-					bIsAligned = TRUE;
+					bIsAligned = FALSE;
 					cUsefulComment[strlen (cUsefulComment) - 1] = '\0';
 				}
 				else
-					bIsAligned = FALSE;
+				{
+					bIsAligned = TRUE;
+				}
 				//g_print ("cUsefulComment : %s\n", cUsefulComment);
 				
 				pTipString = strchr (cUsefulComment, '{');
@@ -560,7 +563,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					gtk_container_add (GTK_CONTAINER (pEventBox), pHBox);
 					gtk_tooltips_set_tip (GTK_TOOLTIPS (pToolTipsGroup),
 						pEventBox,
-						pTipString,
+						gettext (pTipString),
 						"pouet");
 				}
 				else
@@ -568,7 +571,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 				
 				if (*cUsefulComment != '\0' && strcmp (cUsefulComment, "...") != 0 && iElementType != 'F' && iElementType != 'X')
 				{
-					pLabel = gtk_label_new (cUsefulComment);
+					pLabel = gtk_label_new (gettext (cUsefulComment));
 					GtkWidget *pAlign = gtk_alignment_new (0., 0.5, 0., 0.);
 					gtk_container_add (GTK_CONTAINER (pAlign), pLabel);
 					gtk_box_pack_start ((bIsAligned ? GTK_BOX (pHBox) : (pFrameVBox == NULL ? GTK_BOX (pVBox) : GTK_BOX (pFrameVBox))),
@@ -600,11 +603,18 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							
 							pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
 							//gtk_container_add (GTK_CONTAINER (pHBox), pOneWidget);
-							gtk_box_pack_start (GTK_BOX (pHBox),
-								pOneWidget,
-								FALSE,
-								FALSE,
-								0);
+							if (bIsAligned)
+								gtk_box_pack_end (GTK_BOX (pHBox),
+									pOneWidget,
+									FALSE,
+									FALSE,
+									0);
+							else
+								gtk_box_pack_start (GTK_BOX (pHBox),
+									pOneWidget,
+									FALSE,
+									FALSE,
+									0);
 						}
 						g_free (bValueList);
 					break;
@@ -630,11 +640,18 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							gtk_spin_button_set_value (GTK_SPIN_BUTTON (pOneWidget), iValue);
 							
 							pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
-							gtk_box_pack_start (GTK_BOX (pHBox),
-								pOneWidget,
-								FALSE,
-								FALSE,
-								0);
+							if (bIsAligned)
+								gtk_box_pack_end (GTK_BOX (pHBox),
+									pOneWidget,
+									FALSE,
+									FALSE,
+									0);
+							else
+								gtk_box_pack_start(GTK_BOX (pHBox),
+									pOneWidget,
+									FALSE,
+									FALSE,
+									0);
 						}
 						g_free (iValueList);
 					break;
@@ -680,11 +697,18 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							gtk_adjustment_set_value (GTK_ADJUSTMENT (pAdjustment), fValue);
 							
 							pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
-							gtk_box_pack_start (GTK_BOX (pHBox),
-								pOneWidget,
-								FALSE,
-								FALSE,
-								0);
+							if (bIsAligned)
+								gtk_box_pack_end (GTK_BOX (pHBox),
+									pOneWidget,
+									FALSE,
+									FALSE,
+									0);
+							else
+								gtk_box_pack_start(GTK_BOX (pHBox),
+									pOneWidget,
+									FALSE,
+									FALSE,
+									0);
 						}
 						if (iElementType == 'c' && length > 2)
 						{
@@ -700,12 +724,18 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							else
 								gtk_color_button_set_use_alpha (GTK_COLOR_BUTTON (pColorButton), FALSE);
 							
-							
-							gtk_box_pack_start (GTK_BOX (pHBox),
-								pColorButton,
-								FALSE,
-								FALSE,
-								0);
+							if (bIsAligned)
+								gtk_box_pack_end (GTK_BOX (pHBox),
+									pColorButton,
+									FALSE,
+									FALSE,
+									0);
+							else
+								gtk_box_pack_start (GTK_BOX (pHBox),
+									pColorButton,
+									FALSE,
+									FALSE,
+									0);
 							 g_signal_connect (G_OBJECT (pColorButton), "color-set", G_CALLBACK(_cairo_dock_set_color), pSubWidgetList);
 							 g_signal_connect (G_OBJECT (pColorButton), "clicked", G_CALLBACK(_cairo_dock_recup_current_color), pSubWidgetList);
 							
@@ -721,7 +751,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					case 'R' :  // string, avec un label pour la description.
 					case 'P' :  // string avec un selecteur de font a cote du GtkEntry.
 					case 'r' : // string representee par son numero dans une liste de choix.
-						//g_print ("  + string\n");
+						//g_print ("  + string (%s)\n", cUsefulComment);
 						pEntry = NULL;
 						pDescriptionLabel = NULL;
 						length = 0;
@@ -795,11 +825,18 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								gtk_combo_box_set_active (GTK_COMBO_BOX (pOneWidget), iSelectedItem);
 							}
 							pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
-							gtk_box_pack_start (GTK_BOX (pHBox),
-								pOneWidget,
-								FALSE,
-								FALSE,
-								0);
+							if (bIsAligned)
+								gtk_box_pack_end (GTK_BOX (pHBox),
+									pOneWidget,
+									FALSE,
+									FALSE,
+									0);
+							else
+								gtk_box_pack_start (GTK_BOX (pHBox),
+									pOneWidget,
+									FALSE,
+									FALSE,
+									0);
 						}
 						else
 						{
@@ -823,18 +860,32 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
 							
 							pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
-							gtk_box_pack_start (GTK_BOX (pHBox),
-								pOneWidget,
-								FALSE,
-								FALSE,
-								0);
+							if (bIsAligned)
+								gtk_box_pack_end (GTK_BOX (pHBox),
+									pOneWidget,
+									FALSE,
+									FALSE,
+									0);
+							else
+								gtk_box_pack_start (GTK_BOX (pHBox),
+									pOneWidget,
+									FALSE,
+									FALSE,
+									0);
 							
 							pSmallVBox = gtk_vbox_new (FALSE, 3);
-							gtk_box_pack_start (GTK_BOX (pHBox),
-								pSmallVBox,
-								FALSE,
-								FALSE,
-								0);
+							if (bIsAligned)
+								gtk_box_pack_end (GTK_BOX (pHBox),
+									pSmallVBox,
+									FALSE,
+									FALSE,
+									0);
+							else
+								gtk_box_pack_start (GTK_BOX (pHBox),
+									pSmallVBox,
+									FALSE,
+									FALSE,
+									0);
 							
 							pButtonUp = gtk_button_new_from_stock (GTK_STOCK_GO_UP);
 							g_signal_connect (G_OBJECT (pButtonUp),
@@ -938,11 +989,18 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									}
 								}
 								pTable = gtk_table_new (2, 2, FALSE);
-								gtk_box_pack_start (GTK_BOX (pHBox),
-									pTable,
-									FALSE,
-									FALSE,
-									0);
+								if (bIsAligned)
+									gtk_box_pack_end (GTK_BOX (pHBox),
+										pTable,
+										FALSE,
+										FALSE,
+										0);
+								else
+									gtk_box_pack_start (GTK_BOX (pHBox),
+										pTable,
+										FALSE,
+										FALSE,
+										0);
 								
 								if (iNbBuffers < s_pBufferArray->len)
 								{
@@ -1022,19 +1080,33 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								"clicked",
 								G_CALLBACK (_cairo_dock_pick_a_file),
 								data);
-							gtk_box_pack_start (GTK_BOX (pHBox),
-								pButtonFileChooser,
-								FALSE,
-								FALSE,
-								0);
+							if (bIsAligned)
+								gtk_box_pack_end (GTK_BOX (pHBox),
+									pButtonFileChooser,
+									FALSE,
+									FALSE,
+									0);
+							else
+								gtk_box_pack_start (GTK_BOX (pHBox),
+									pButtonFileChooser,
+									FALSE,
+									FALSE,
+									0);
 						}
 						else if (iElementType == 'R' && pDescriptionLabel != NULL)
 						{
-							gtk_box_pack_start (GTK_BOX (pHBox),
-								pDescriptionLabel,
-								FALSE,
-								FALSE,
-								0);
+							if (bIsAligned)
+								gtk_box_pack_end (GTK_BOX (pHBox),
+									pDescriptionLabel,
+									FALSE,
+									FALSE,
+									0);
+							else
+								gtk_box_pack_start (GTK_BOX (pHBox),
+									pDescriptionLabel,
+									FALSE,
+									FALSE,
+									0);
 						}
 						else if (iElementType == 'P' && pEntry != NULL)
 						{
@@ -1045,11 +1117,18 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								"font-set",
 								G_CALLBACK (_cairo_dock_set_font),
 								pEntry);
-							gtk_box_pack_start (GTK_BOX (pHBox),
-								pFontButton,
-								FALSE,
-								FALSE,
-								0);
+							if (bIsAligned)
+								gtk_box_pack_end (GTK_BOX (pHBox),
+									pFontButton,
+									FALSE,
+									FALSE,
+									0);
+							else
+								gtk_box_pack_start (GTK_BOX (pHBox),
+									pFontButton,
+									FALSE,
+									FALSE,
+									0);
 						}
 						
 						g_strfreev (cValueList);
@@ -1073,7 +1152,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							
 							if (iElementType == 'F')
 							{
-								cFrameTitle = g_strdup_printf ("<b>%s</b>", cValue);
+								cFrameTitle = g_strdup_printf ("<b>%s</b>", gettext (cValue));
 								pLabel= gtk_label_new (NULL);
 								gtk_label_set_markup (GTK_LABEL (pLabel), cFrameTitle);
 								

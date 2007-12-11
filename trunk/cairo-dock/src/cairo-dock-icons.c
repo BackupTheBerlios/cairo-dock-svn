@@ -31,6 +31,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-dialogs.h"
 #include "cairo-dock-applications-manager.h"
+#include "cairo-dock-separator-factory.h"
 #include "cairo-dock-icons.h"
 
 
@@ -712,6 +713,41 @@ void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType)
 }
 
 
+void cairo_dock_remove_all_separators (CairoDock *pDock)
+{
+	Icon *icon;
+	GList *ic;
+	for (ic = pDock->icons->next; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		
+		if (CAIRO_DOCK_IS_SEPARATOR (icon))
+		{
+			cairo_dock_remove_one_icon_from_dock (pDock, icon);
+			cairo_dock_free_icon (icon);
+		}
+	}
+}
+
+
+void cairo_dock_insert_separator_between_launchers_and_applis (CairoDock *pDock)
+{
+	Icon *pFirstLauncher = cairo_dock_get_first_icon_of_type (pDock->icons, CAIRO_DOCK_LAUNCHER);
+	Icon *pFirstAppli = cairo_dock_get_first_icon_of_type (pDock->icons, CAIRO_DOCK_APPLI);
+	
+	if (pFirstLauncher != NULL && pFirstAppli != NULL)
+	{
+		int iSeparatorType = MIN (g_tIconTypeOrder[CAIRO_DOCK_LAUNCHER], g_tIconTypeOrder[CAIRO_DOCK_APPLI]) + 1;
+		if (cairo_dock_get_first_icon_of_type (pDock->icons, iSeparatorType) == NULL)
+		{
+			cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+			Icon *pSeparator = cairo_dock_create_separator_icon (pCairoContext, iSeparatorType, pDock);
+			cairo_destroy (pCairoContext);
+			
+			cairo_dock_insert_icon_in_dock (pSeparator, pDock, !CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+		}
+	}
+}
 
 
 GList *cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, int iFlatDockWidth, int iXOffset)
@@ -1136,7 +1172,7 @@ void cairo_dock_stop_marking_icons (CairoDock *pDock)
 
 
 
-void cairo_dock_update_icon_s_container_name (Icon *icon, gchar *cNewParentDockName)
+void cairo_dock_update_icon_s_container_name (Icon *icon, const gchar *cNewParentDockName)
 {
 	g_free (icon->cParentDockName);
 	icon->cParentDockName = g_strdup (cNewParentDockName);

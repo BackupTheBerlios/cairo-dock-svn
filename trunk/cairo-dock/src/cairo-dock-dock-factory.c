@@ -73,16 +73,6 @@ extern gboolean g_bSticky;
 extern gboolean g_bUseGlitz;
 
 
-void cairo_dock_set_colormap_for_window (GtkWidget *pWidget)
-{
-	GdkScreen* pScreen = gtk_widget_get_screen (pWidget);
-	GdkColormap* pColormap = gdk_screen_get_rgba_colormap (pScreen);
-	if (!pColormap)
-		pColormap = gdk_screen_get_rgb_colormap (pScreen);
-		
-	gtk_widget_set_colormap (pWidget, pColormap);
-}
-
 static void _cairo_dock_set_colormap (CairoDock *pDock)
 {
 	//g_print ("%s f%d)\n", __func__, g_bUseGlitz);
@@ -875,7 +865,7 @@ void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDoc
 
 
 /**
-* Augmente la reference d'un dock, c'est-a-dire le nombre d'icones pointant sur ce dock. Si le dock etait auparavant un dock principal, il devient un sous-dock, prenant du meme coup les parametres propres aux sous-docks.
+* Incremente de 1 la reference d'un dock, c'est-a-dire le nombre d'icones pointant sur ce dock. Si le dock etait auparavant un dock principal, il devient un sous-dock, prenant du meme coup les parametres propres aux sous-docks.
 * @param pDock le dock.
 */
 void cairo_dock_reference_dock (CairoDock *pDock)

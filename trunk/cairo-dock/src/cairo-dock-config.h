@@ -116,10 +116,6 @@ gboolean cairo_dock_edit_conf_file_full (GtkWidget *pWidget, gchar *cConfFilePat
 
 void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int y);
 
-void cairo_dock_update_conf_file_with_translations_full (gchar *cConfFile, gchar *cTranslationsDir, gchar *cGroupName, gchar *cKeyName);
-#define cairo_dock_update_conf_file_with_translations(cConfFile, cTranslationsDir) cairo_dock_update_conf_file_with_translations_full (cConfFile, cTranslationsDir, "Cairo Dock", "language")
-#define cairo_dock_update_easy_conf_file_with_translations(cConfFile, cTranslationsDir) cairo_dock_update_conf_file_with_translations_full (cConfFile, cTranslationsDir, "System", "language")
-
 
 CairoDockDesktopEnv cairo_dock_guess_environment (void);
 

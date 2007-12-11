@@ -68,6 +68,17 @@ extern double g_fAlbedo;
 extern gboolean g_bConstantSeparatorSize;
 
 
+void cairo_dock_set_colormap_for_window (GtkWidget *pWidget)
+{
+	GdkScreen* pScreen = gtk_widget_get_screen (pWidget);
+	GdkColormap* pColormap = gdk_screen_get_rgba_colormap (pScreen);
+	if (!pColormap)
+		pColormap = gdk_screen_get_rgb_colormap (pScreen);
+		
+	gtk_widget_set_colormap (pWidget, pColormap);
+}
+
+
 double cairo_dock_get_current_dock_width_linear (CairoDock *pDock)
 {
 	if (pDock->icons == NULL)
@@ -140,7 +151,7 @@ cairo_t * cairo_dock_create_context_from_window (CairoDock *pDock)
 	return gdk_cairo_create (pDock->pWidget->window);
 }
 
-void cairo_dock_draw_frame_horizontal (cairo_t *pCairoContext, double fRadius, double fLineWidth, double fFrameWidth, double fFrameHeight, double fDockOffsetX, double fDockOffsetY, int sens, double fInclination)  // la largeur est donnee par rapport "au fond".
+static void cairo_dock_draw_frame_horizontal (cairo_t *pCairoContext, double fRadius, double fLineWidth, double fFrameWidth, double fFrameHeight, double fDockOffsetX, double fDockOffsetY, int sens, double fInclination)  // la largeur est donnee par rapport "au fond".
 {
 	if (2*fRadius > fFrameHeight + fLineWidth)
 		fRadius = (fFrameHeight + fLineWidth) / 2 - 1;
@@ -180,7 +191,7 @@ void cairo_dock_draw_frame_horizontal (cairo_t *pCairoContext, double fRadius, d
 	if (fRadius < 1)
 		cairo_close_path (pCairoContext);
 }
-void cairo_dock_draw_frame_vertical (cairo_t *pCairoContext, double fRadius, double fLineWidth, double fFrameWidth, double fFrameHeight, double fDockOffsetX, double fDockOffsetY, int sens, double fInclination)
+static void cairo_dock_draw_frame_vertical (cairo_t *pCairoContext, double fRadius, double fLineWidth, double fFrameWidth, double fFrameHeight, double fDockOffsetX, double fDockOffsetY, int sens, double fInclination)
 {
 	if (2*fRadius > fFrameHeight + fLineWidth)
 		fRadius = (fFrameHeight + fLineWidth) / 2 - 1;
@@ -888,13 +899,13 @@ static gboolean _cairo_dock_hide_dock (gchar *cDockName, CairoDock *pDock, Cairo
 			
 			//g_print ("on cache %s par parente\n", cDockName);
 			gtk_widget_hide (pDock->pWidget);
-			cairo_dock_hide_parent_docks (pDock);
+			cairo_dock_hide_parent_dock (pDock);
 		}
 		return TRUE;
 	}
 	return FALSE;
 }
-void cairo_dock_hide_parent_docks (CairoDock *pDock)
+void cairo_dock_hide_parent_dock (CairoDock *pDock)
 {
 	 g_hash_table_find (g_hDocksTable, (GHRFunc)_cairo_dock_hide_dock, pDock);
 }

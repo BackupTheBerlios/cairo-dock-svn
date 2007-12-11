@@ -18,7 +18,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-themes-manager.h"
 
-//#define CAIRO_DOCK_REMEMBER_THEME_FILE ".cairo-dock.last"
 #define CAIRO_DOCK_MODIFIED_THEME_FILE ".cairo-dock-need-save"
 #define CAIRO_DOCK_THEME_PANEL_WIDTH 600
 #define CAIRO_DOCK_THEME_PANEL_HEIGHT 400
@@ -175,7 +174,6 @@ void cairo_dock_load_theme (gchar *cThemePath)
 	
 	//\___________________ On lit son fichier de conf et on charge tout.
 	cairo_dock_update_conf_file_with_available_modules (g_cConfFile);
-	cairo_dock_update_conf_file_with_translations (g_cConfFile, CAIRO_DOCK_SHARE_DATA_DIR);
 	
 	gboolean bNeedSave = cairo_dock_theme_need_save ();
 	cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);  // chargera des valeurs par defaut si le fichier de conf fourni est incorrect.

@@ -19,7 +19,7 @@
 **    Karl Lattimer <karl@qdh.org.uk> 
 **
 ** notes :
-**    Originally conceived as a stress-test for cairo, librsvg, and glitz. 
+**    Originally conceived as a stress-test for cairo, librsvg, and glitz.
 **
 ** notes from original author:
 **
@@ -80,6 +80,7 @@
 #include "cairo-dock-themes-manager.h"
 #include "cairo-dock-dialogs.h"
 #include "cairo-dock-notifications.h"
+#include "cairo-dock-keyfile-manager.h"
 #include "cairo-dock-renderer-manager.h"
 
 CairoDock *g_pMainDock;  // pointeur sur le dock principal.
@@ -184,6 +185,7 @@ gboolean g_bDemandsAttentionWithDialog;  // attirer l'attention avec une bulle d
 gboolean g_bDemandsAttentionWithAnimation;  // attirer l'attention avec une animation.
 gboolean g_bAnimateOnActiveWindow;  // jouer une breve animation de l'icone lorsque la fenetre correspondante devient active.
 
+gboolean g_bUseSeparator = TRUE;  // utiliser les separateurs ou pas.
 gchar *g_cSeparatorImage = NULL;
 gboolean g_bRevolveSeparator;  // faire pivoter l'image des separateurs.
 gboolean g_bConstantSeparatorSize;  // garder les separateurs de taille constante.
@@ -227,7 +229,7 @@ main (int argc, char** argv)
 	
 	//\___________________ On recupere quelques options.
 	g_iWmHint = GDK_WINDOW_TYPE_HINT_DOCK;
-	gboolean bDialogTest = FALSE;
+	gboolean bDialogTest = FALSE, bSafeMode = FALSE;
 	for (i = 0; i < argc; i++)
 	{
 		if (strcmp (argv[i], "--glitz") == 0)
@@ -279,6 +281,10 @@ main (int argc, char** argv)
 			g_print ("v%s\n", CAIRO_DOCK_VERSION);
 			return 0;
 		}
+		else if (strcmp (argv[i], "--safe-mode") == 0)
+		{
+			bSafeMode = TRUE;
+		}
 		else if (strcmp (argv[i], "--verbose") == 0)
 		{
 #ifdef CAIRO_DOCK_VERBOSE
@@ -298,9 +304,27 @@ main (int argc, char** argv)
 		}
 	}
 	
+	//\___________________ On internationalise l'appli.
 	bindtextdomain ( GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR );
 	bind_textdomain_codeset ( GETTEXT_PACKAGE, "UTF-8" );
 	textdomain ( GETTEXT_PACKAGE );
+	
+	const gchar* const *cLanguageTab = g_get_language_names ();
+	GHashTable *pTranslationTable = cairo_dock_list_available_translations (CAIRO_DOCK_SHARE_DATA_DIR, "cairo-dock-", NULL);
+	if (pTranslationTable != NULL && cLanguageTab != NULL)
+	{
+		int i = 0;
+		for (i = 0; cLanguageTab[i] != NULL; i ++)
+		{
+			if (g_hash_table_lookup (pTranslationTable, cLanguageTab[i]) != NULL)
+			{
+				g_cLanguage = g_strdup (cLanguageTab[i]);
+				break ;
+			}
+		}
+	}
+	g_hash_table_destroy (pTranslationTable);
+	g_print (" *** %s ***\n", g_cLanguage);
 	
 	
 	//\___________________ On initialise les numeros de version.
@@ -323,7 +347,8 @@ main (int argc, char** argv)
 	cairo_dock_initialize_application_manager ();
 	
 	//\___________________ On initialise le gestionnaire de modules et on pre-charge les modules existant.
-	cairo_dock_initialize_module_manager (CAIRO_DOCK_MODULES_DIR);
+	if (! bSafeMode)
+		cairo_dock_initialize_module_manager (CAIRO_DOCK_MODULES_DIR);
 	
 	//\___________________ On initialise le gestionnaire de vues.
 	cairo_dock_initialize_renderer_manager ();
@@ -391,10 +416,11 @@ main (int argc, char** argv)
 	//const gchar *cSillyMessage = "Montrer Cairo-Dock à un utilisateur de Mac est le meilleur moyen de s'en faire un ennemi;\nN'oubliez pas qu'il a payé 129$ pour avoir la même chose !";  // 7500
 	//const gchar *cSillyMessage = "Petite annonce :\n  Projet sérieux recherche secrétaire pour rédiger documentation.\n  Niveau d'étude exigé : 95C.";  // 7500
 	//const gchar *cSillyMessage = "Cairo-Dock fait même le café ! Au choix :\n cairo-dock --capuccino , cairo-dock --expresso , cairo-dock --cafe_latte";  // 8000
-	const gchar *cSillyMessage = "Veuillez rentrer un compliment élogieux à la gloire Fab pour pouvoir utiliser cairo-dock.";
+	//const gchar *cSillyMessage = "Veuillez rentrer un compliment élogieux à la gloire Fab pour pouvoir utiliser cairo-dock.";
+	const gchar *cSillyMessage = "Sondage :\n Combien cairo-dock c'est trop bien :";
 	//const gchar *cSillyMessage = "Cairo-Dock : just launch it !";  // 4000
 	//const gchar *cSillyMessage = "Cairo-Dock lave plus blanc que blanc";  // 4000
-	const gchar *cNumSilllyMessage = "7";
+	const gchar *cNumSilllyMessage = "8";
 	gboolean bWriteSillyMessage;
 	if (! g_file_test (cSillyMessageFilePath, G_FILE_TEST_EXISTS))
 	{
@@ -428,10 +454,12 @@ main (int argc, char** argv)
 		{
 			//cairo_dock_show_temporary_dialog_with_default_icon (cSillyMessage, pFirstIcon, g_pMainDock, 4000);
 			
-			gchar *cAnswer = cairo_dock_show_demand_and_wait (cSillyMessage, pFirstIcon, g_pMainDock, NULL);
-			g_print (" ==> %s\n", cAnswer);
-			if (cAnswer == NULL)
-				g_print ("mechant ! ;-)\n");
+			double fAnswer = cairo_dock_show_value_and_wait (cSillyMessage, pFirstIcon, g_pMainDock, 1.);
+			g_print (" ==> %.2f\n", fAnswer);
+			if (fAnswer == 0)
+				g_print ("Cela sera consigné et utilisé contre vous le moment venu ;-)\n");
+			else if (fAnswer == 1)
+				g_print ("je suis aussi d'accord ! ;-)\n");
 			/*cairo_t *pIconContext = cairo_dock_create_context_from_window (g_pMainDock);
 			cairo_dock_set_quick_info (pIconContext, "69°C", pFirstIcon, g_pMainDock);
 			cairo_destroy (pIconContext);*/

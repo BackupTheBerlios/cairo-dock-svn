@@ -188,7 +188,6 @@ void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath, gchar *cL
 	cairo_dock_replace_values_in_conf_file (cDesktopFilePath, pKeyFile, FALSE, 0);
 	g_key_file_free (pKeyFile);*/
 	
-	
 	cairo_dock_update_conf_file_with_hash_table (cDesktopFilePath, g_hDocksTable, "Desktop Entry", "Container", NULL, (GHFunc)cairo_dock_write_one_name);
 	cairo_dock_update_launcher_conf_file_with_renderers (cDesktopFilePath);
 }

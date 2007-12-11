@@ -270,7 +270,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 			{
 				//g_print ("on cache ce sous-dock en sortant par lui\n");
 				gtk_widget_hide (pDock->pWidget);
-				cairo_dock_hide_parent_docks (pDock);
+				cairo_dock_hide_parent_dock (pDock);
 			}
 			
 			pDock->iSidShrinkDown = 0;

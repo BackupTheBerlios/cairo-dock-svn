@@ -285,127 +285,128 @@ typedef enum {
 
 struct _Icon {
 	//\____________ renseignes lors de la creation de l'icone.
-	/// 
+	/// Nom (et non pas chemin) du fichier .desktop definissant l'icone, ou NULL si l'icone n'est pas definie pas un fichier.
 	gchar *acDesktopFileName;
-	/// 
+	/// URI.
 	gchar *cBaseURI;
-	/// 
+	/// ID d'un volume.
 	gint iVolumeID;
-	/// 
+	/// Nom (et non pas chemin) du fichier de l'image, ou NULL si son image n'est pas definie pas un fichier.
 	gchar* acFileName;
-	/// 
+	/// Nom de l'icone tel qu'il apparaitra dans son etiquette. Donne le nom au sous-dock.
 	gchar* acName;
-	/// 
+	/// Commande a executer lors d'un clique gauche clique, ou NULL si aucune.
 	gchar* acCommand;
-	/// 
+	/// Type de l'icone.
 	CairoDockIconType iType;
-	/// 
+	/// Ordre de l'icone dans son dock, parmi les icones de meme type.
 	gdouble fOrder;
-	/// 
+	/// Sous-dock sur lequel pointe l'icone, ou NULL si aucun.
 	CairoDock *pSubDock;
-	/// 
+	/// Nom du dock contenant l'icone.
 	gchar *cParentDockName;
 	//\____________ calcules lors du chargement de l'icone.
-	/// 
+	/// Largeur de l'image de l'icone.
 	gdouble fWidth;
-	/// 
+	/// Hauteur de l'image de l'icone.
 	gdouble fHeight;
-	/// 
+	/// Surface cairo de l'image.
 	cairo_surface_t* pIconBuffer;
-	/// 
+	/// Surface cairo de l'etiquette.
 	cairo_surface_t* pTextBuffer;
-	/// 
+	/// Surface cairo du reflet.
 	cairo_surface_t* pReflectionBuffer;
-	/// 
-	/// 
+	/// Surface cairo de l'image et de son reflet.
 	cairo_surface_t* pFullIconBuffer;
-	/// 
+	/// Largeur de l'etiquette.
 	int iTextWidth;
-	/// 
+	/// Hauteur de l'etiquette.
 	int iTextHeight;
-	/// 
+	/// Decalage en X de l'etiquette.
 	gdouble fTextXOffset;
-	/// 
+	/// Decalage en Y de l'etiquette.
 	gdouble fTextYOffset;
-	/// 
-	/// 
+	/// Abscisse maximale (droite) que l'icone atteindra (variable avec la vague).
 	gdouble fXMax;
-	/// 
+	/// Abscisse minimale (gauche) que l'icone atteindra (variable avec la vague).
 	gdouble fXMin;
 	//\____________ calcules a chaque scroll et insertion/suppression d'une icone.
-	/// 
+	/// Abscisse de l'icone au repos.
 	gdouble fXAtRest;
 	//\____________ calcules a chaque fois.
-	/// 
+	/// Phase de l'icone (entre -pi et pi).
 	gdouble fPhase;
-	/// 
+	/// Abscisse temporaire du bord gauche de l'image de l'icone.
 	gdouble fX;
-	/// 
+	/// Ordonnee temporaire du bord haut de l'image de l'icone.
 	gdouble fY;
-	/// 
+	/// Echelle courante de l'icone (facteur de zoom, >= 1).
 	gdouble fScale;
-	/// 
+	/// Abscisse du bord gauche de l'image de l'icone.
 	gdouble fDrawX;
-	/// 
+	/// Ordonnee du bord haut de l'image de l'icone.
 	gdouble fDrawY;
-	/// 
+	/// Facteur de zoom sur la largeur de l'icone.
 	gdouble fWidthFactor;
-	/// 
+	/// Facteur de zoom sur la hauteur de l'icone.
 	gdouble fHeightFactor;
-	/// 
+	/// Transparence (<= 1).
 	gdouble fAlpha;
-	/// 
+	/// TRUE ssi l'icone est couramment pointee.
 	gboolean bPointed;
-	/// 
+	/// Compteur de l'animation de l'icone (> 0 si une animation est en cours, 0 sinon).
 	gint iCount;
-	/// 
+	/// Type de l'animation.
 	CairoDockAnimationType iAnimationType;
-	/// 
+	/// Facteur de zoom personnel, utilise pour l'apparition et la suppression des icones.
 	gdouble fPersonnalScale;
-	/// 
+	/// Decalage en ordonnees de reflet (pour le rebond, >= 0).
 	gdouble fDeltaYReflection;
-	/// 
+	/// Orientation de l'icone (angle par rapport a la verticale).
 	gdouble fOrientation;
 	//\____________ Pour les applis.
-	/// 
+	/// PID de l'application correspondante.
 	gint iPid;
-	/// 
+	/// ID de la fenetre X de l'application correspondante.
 	Window Xid;
-	/// 
+	/// Classe de l'application correspondante (ou NULL si aucune).
 	gchar *cClass;
-	/// 
+	/// Heure de derniere verification de la presence de l'application dans la barre des taches.
 	double fLastCheckTime;
-	/// 
+	/// TRUE ssi la fenetre de l'application correspondante est minimisee.
 	gboolean bIsHidden;
 	//\____________ Pour les modules.
-	/// 
+	/// Module que represente l'icone.
 	CairoDockModule *pModule;
-	/// 
+	/// Texte de l'info rapide.
 	gchar *cQuickInfo;
-	/// 
+	/// Surface cairo de l'info rapide.
 	cairo_surface_t* pQuickInfoBuffer;
-	/// 
+	/// Largeur de l'info rapide.
 	int iQuickInfoWidth;
-	/// 
+	/// Heuteur de l'info rapide.
 	int iQuickInfoHeight;
-	/// 
+	/// Decalage en X de la surface de l'info rapide.
 	double fQuickInfoXOffset;
-	/// 
+	/// Decalage en Y de la surface de l'info rapide.
 	double fQuickInfoYOffset;
 	//\____________ Pour les bulles de dialogues.
-	/// 
+	/// Dialogue pointant sur l'icone.
 	CairoDockDialog *pDialog;
 };
 
 
-
+/// Nom du repertoire de travail de cairo-dock.
 #define CAIRO_DOCK_DATA_DIR ".cairo-dock"
+/// Nom du repertoire des themes.
 #define CAIRO_DOCK_THEMES_DIR "themes"
+/// Nom du repertoire du theme courant.
 #define CAIRO_DOCK_CURRENT_THEME_NAME "current_theme"
+/// Nom du repertoire des lanceurs et leurs icones.
 #define CAIRO_DOCK_LAUNCHERS_DIR "launchers"
-
+/// Nom du dock principal (le 1er cree).
 #define CAIRO_DOCK_MAIN_DOCK_NAME "_MainDock_"
-
+/// Nom de la vue par defaut.
 #define CAIRO_DOCK_DEFAULT_RENDERER_NAME "default"
 
 

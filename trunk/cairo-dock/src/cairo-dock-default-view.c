@@ -163,7 +163,6 @@ void cairo_dock_render_linear (CairoDock *pDock)
 	cairo_restore (pCairoContext);
 	
 	//\____________________ On dessine la ficelle qui les joint.
-	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 	if (g_iStringLineWidth > 0)
 		cairo_dock_draw_string (pCairoContext, pDock, g_iStringLineWidth, FALSE, FALSE);
 	

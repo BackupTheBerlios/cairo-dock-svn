@@ -658,7 +658,7 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 		double fFrameHeight = *iTextHeight - fLineWidth;
 		double fDockOffsetX = fRadius + fLineWidth/2;
 		double fDockOffsetY = 0.;
-		cairo_dock_draw_frame_horizontal (pCairoContext, fRadius, fLineWidth, fFrameWidth, fFrameHeight, fDockOffsetX, fDockOffsetY, 1, 0.);
+		cairo_dock_draw_frame (pCairoContext, fRadius, fLineWidth, fFrameWidth, fFrameHeight, fDockOffsetX, fDockOffsetY, 1, 0., CAIRO_DOCK_HORIZONTAL);
 		cairo_set_source_rgba (pCairoContext, 0., 0., 0., fBackgroundAlpha);
 		cairo_fill_preserve (pCairoContext);
 		cairo_restore(pCairoContext);

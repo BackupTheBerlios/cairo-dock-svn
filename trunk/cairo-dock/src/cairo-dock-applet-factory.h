@@ -139,6 +139,12 @@ void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar *cNa
 #define CD_CONFIG_GET_ANIMATION(cGroupName, cKeyName) cairo_dock_get_animation_type_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, NULL);
 
 
+#define CD_APPLET_H \
+CairoDockVisitCard *pre_init (void);\
+Icon *init (CairoDock *pDock, gchar **cConfFilePath, GError **erreur);\
+void stop (void);
+
+
 #define CD_APPLET_DEFINITION(cName, iMajorVersion, iMinorVersion, iMicroVersion) \
 CairoDockVisitCard *pre_init (void)\
 {\
@@ -151,11 +157,21 @@ CairoDockVisitCard *pre_init (void)\
 	return pVisitCard;\
 }
 
-#define CD_INIT_APPLET Icon *init (CairoDock *pDock, gchar **cConfFilePath, GError **erreur)
-#define CD_STOP_APPLET void stop (void)
-#define CD_PRE_INIT_APPLET gchar *pre_init (void)
+#define CD_APPLET_STOP_BEGIN \
+void stop (void) \
+{ \
+	myDock = NULL;\
+	myIcon = NULL;\
+	cairo_destroy (myDrawContext);
+
+#define CD_APPLET_STOP_END \
+}
+
+
 
 #define CD_APPLET_INIT_BEGIN \
+Icon *init (CairoDock *pDock, gchar **cConfFilePath, GError **erreur) \
+{ \
 	myDock = pDock; \
 	*cConfFilePath = cairo_dock_check_conf_file_exists (MY_APPLET_USER_DATA_DIR, MY_APPLET_SHARE_DATA_DIR, APPLET_CONF_FILE); \
 	int iOriginalWidth = 48, iOriginalHeight = 48; \
@@ -166,12 +182,13 @@ CairoDockVisitCard *pre_init (void)\
 
 #define CD_APPLET_INIT_END \
 	g_free (cAppletName); \
-	return myIcon;
+	return myIcon; \
+}
 
 
-#define CD_CLICK_ON_APPLET \
-gboolean action_on_click (gpointer *data)
-
+#define CD_CLICK_ON_APPLET_BEGIN \
+gboolean action_on_click (gpointer *data) \
+{ \
 #define CD_CLICK_ON_APPLET_BEGIN \
 	if (data[0] == myIcon) \
 	{
