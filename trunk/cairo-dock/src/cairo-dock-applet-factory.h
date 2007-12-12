@@ -119,33 +119,17 @@ void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cExtraInfo
 void cairo_dock_animate_icon (Icon *pIcon, CairoDock *pDock, CairoDockAnimationType iAnimationType, int iNbRounds);
 
 
-#define CD_CONFIG_APPLET \
-void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar *cName)
-
-#define CD_CONFIG_BEGIN \
-	GError *erreur = NULL; \
-	gboolean bFlushConfFileNeeded = FALSE; \
-	GKeyFile *pKeyFile = cairo_dock_read_header_applet_conf_file (cConfFilePath, iWidth, iHeight, &cName, &bFlushConfFileNeeded); \
-	g_return_if_fail (pKeyFile != NULL);
-#define CD_CONFIG_END \
-	if (bFlushConfFileNeeded) \
-		cairo_dock_write_keys_to_file (pKeyFile, cConfFilePath); \
-	g_key_file_free (pKeyFile);
-
-#define CD_CONFIG_GET_BOOLEAN(cGroupName, cKeyName) cairo_dock_get_boolean_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, TRUE)
-#define CD_CONFIG_GET_INTEGER(cGroupName, cKeyName) cairo_dock_get_integer_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, 0)
-#define CD_CONFIG_GET_DOUBLE(cGroupName, cKeyName) cairo_dock_get_double_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, 0.)
-#define CD_CONFIG_GET_STRING(cGroupName, cKeyName) cairo_dock_get_string_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, NULL)
-#define CD_CONFIG_GET_ANIMATION(cGroupName, cKeyName) cairo_dock_get_animation_type_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, NULL);
-
-
+//\___________________________ INIT
 #define CD_APPLET_H \
 CairoDockVisitCard *pre_init (void);\
 Icon *init (CairoDock *pDock, gchar **cConfFilePath, GError **erreur);\
 void stop (void);
 
-
+//\___________________ pre_init.
 #define CD_APPLET_DEFINITION(cName, iMajorVersion, iMinorVersion, iMicroVersion) \
+Icon *myIcon = NULL;\
+CairoDock *myDock = NULL;\
+cairo_t *myDrawContext = NULL;\
 CairoDockVisitCard *pre_init (void)\
 {\
 	CairoDockVisitCard *pVisitCard = g_new0 (CairoDockVisitCard, 1);\
@@ -157,45 +141,165 @@ CairoDockVisitCard *pre_init (void)\
 	return pVisitCard;\
 }
 
-#define CD_APPLET_STOP_BEGIN \
-void stop (void) \
-{ \
-	myDock = NULL;\
-	myIcon = NULL;\
-	cairo_destroy (myDrawContext);
-
-#define CD_APPLET_STOP_END \
-}
-
-
-
+//\___________________ init.
 #define CD_APPLET_INIT_BEGIN \
 Icon *init (CairoDock *pDock, gchar **cConfFilePath, GError **erreur) \
 { \
 	myDock = pDock; \
-	*cConfFilePath = cairo_dock_check_conf_file_exists (MY_APPLET_USER_DATA_DIR, MY_APPLET_SHARE_DATA_DIR, APPLET_CONF_FILE); \
-	int iOriginalWidth = 48, iOriginalHeight = 48; \
-	gchar *cAppletName = NULL; \
-	read_conf_file (*cConfFilePath, &iOriginalWidth, &iOriginalHeight, &cAppletName); \
-	myIcon = cairo_dock_create_icon_for_applet (pDock, iOriginalWidth, iOriginalHeight, conf_defaultTitle, NULL); \
-	myDrawContext = cairo_create (myIcon->pIconBuffer);
+	gchar *cAppletConfFilePath = cairo_dock_check_conf_file_exists (MY_APPLET_USER_DATA_DIR, MY_APPLET_SHARE_DATA_DIR, MY_APPLET_CONF_FILE); \
+	int iDesiredWidth = 48, iDesiredHeight = 48; \
+	gchar *cAppletName = NULL, *cIconName = NULL; \
+	read_conf_file (cAppletConfFilePath, &iDesiredWidth, &iDesiredHeight, &cAppletName, &cIconName); \
+	myIcon = cairo_dock_create_icon_for_applet (pDock, iDesiredWidth, iDesiredHeight, cAppletName, cIconName); \
+	g_return_val_if_fail (myIcon != NULL, NULL); \
+	myDrawContext = cairo_create (myIcon->pIconBuffer); \
+	g_return_val_if_fail (cairo_status (myDrawContext) == CAIRO_STATUS_SUCCESS, NULL);
 
 #define CD_APPLET_INIT_END \
+	*cConfFilePath = cAppletConfFilePath;\
 	g_free (cAppletName); \
+	g_free (cIconName); \
 	return myIcon; \
 }
 
+//\___________________ stop.
+#define CD_APPLET_STOP_BEGIN \
+void stop (void) \
+{
 
-#define CD_CLICK_ON_APPLET_BEGIN \
+#define CD_APPLET_STOP_END \
+	myDock = NULL; \
+	myIcon = NULL; \
+	cairo_destroy (myDrawContext); \
+	myDrawContext = NULL; \
+}
+
+
+//\___________________________ CONFIG
+#define CD_APPLET_CONFIG_BEGIN(cDefaultAppletName, cDefaultIconName) \
+void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cAppletName, gchar **cIconName) \
+{ \
+	GError *erreur = NULL; \
+	gboolean bFlushConfFileNeeded = FALSE; \
+	GKeyFile *pKeyFile = g_key_file_new (); \
+	g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur); \
+	if (erreur != NULL) \
+	{ \
+		g_print ("Attention : %s\n", erreur->message); \
+		g_error_free (erreur); \
+		return ; \
+	} \
+	*iWidth = cairo_dock_get_integer_key_value (pKeyFile, "ICON", "width", &bFlushConfFileNeeded, 48); \
+	*iHeight = cairo_dock_get_integer_key_value (pKeyFile, "ICON", "height", &bFlushConfFileNeeded, 48); \
+	if (cDefaultAppletName != NULL) \
+		*cAppletName = cairo_dock_get_string_key_value (pKeyFile, "ICON", "name", &bFlushConfFileNeeded, cDefaultAppletName); \
+	if (cDefaultIconName != NULL) \
+		*cIconName = cairo_dock_get_string_key_value (pKeyFile, "ICON", "icon", &bFlushConfFileNeeded, cDefaultIconName); \
+
+#define CD_APPLET_CONFIG_END \
+	if (bFlushConfFileNeeded) \
+		cairo_dock_write_keys_to_file (pKeyFile, cConfFilePath); \
+	g_key_file_free (pKeyFile); \
+}
+
+#define CD_APPLET_CONFIG_H \
+void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cAppletName, gchar **cIconName);
+
+
+#define CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT(cGroupName, cKeyName, bDefaultValue) cairo_dock_get_boolean_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, bDefaultValue)
+#define CD_CONFIG_GET_BOOLEAN(cGroupName, cKeyName) CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT (cGroupName, cKeyName, TRUE)
+
+#define CD_CONFIG_GET_INTEGER_WITH_DEFAULT(cGroupName, cKeyName, iDefaultValue) cairo_dock_get_integer_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, iDefaultValue)
+#define CD_CONFIG_GET_INTEGER(cGroupName, cKeyName)CD_CONFIG_GET_INTEGER_WITH_DEFAULT (cGroupName, cKeyName, 0)
+
+#define CD_CONFIG_GET_DOUBLE_WITH_DEFAULT(cGroupName, cKeyName, fDefaultValue) cairo_dock_get_double_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, 0.)
+#define CD_CONFIG_GET_DOUBLE(cGroupName, cKeyName) CD_CONFIG_GET_DOUBLE_WITH_DEFAULT (cGroupName, cKeyName, 0.)
+
+#define CD_CONFIG_GET_STRING_WITH_DEFAULT(cGroupName, cKeyName, cDefaultValue) cairo_dock_get_string_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, cDefaultValue)
+#define CD_CONFIG_GET_STRING(cGroupName, cKeyName) CD_CONFIG_GET_STRING_WITH_DEFAULT (cGroupName, cKeyName, NULL)
+
+#define CD_CONFIG_GET_ANIMATION(cGroupName, cKeyName) cairo_dock_get_animation_type_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, NULL);
+
+#define CD_CONFIG_GET_COLOR_WITH_DEFAULT(cGroupName, cKeyName, pColorBuffer, pDefaultColor) cairo_dock_get_double_list_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, pColorBuffer, 4, pDefaultColor);
+#define CD_CONFIG_GET_COLOR(cGroupName, cKeyName, pColorBuffer) CD_CONFIG_GET_COLOR_WITH_DEFAULT(cGroupName, cKeyName, pColorBuffer, NULL)
+
+//\___________________________ NOTIFICATIONS
+//\___________________ fonction about.
+#define CD_APPLET_ABOUT(cMessage) \
+void about (GtkMenuItem *menu_item, gpointer *data) \
+{ \
+	cairo_dock_show_temporary_dialog (cMessage, myIcon, myDock, 0); \
+}
+
+#define CD_APPLET_ABOUT_H \
+void about (GtkMenuItem *menu_item, gpointer *data);
+
+//\___________________ notification clique gauche.
+#define CD_APPLET_ON_CLICK action_on_click
+
+#define CD_APPLET_ON_CLICK_BEGIN \
 gboolean action_on_click (gpointer *data) \
 { \
-#define CD_CLICK_ON_APPLET_BEGIN \
 	if (data[0] == myIcon) \
 	{
 
-#define CD_CLICK_ON_APPLET_END \
+#define CD_APPLET_ON_CLICK_END \
+		return CAIRO_DOCK_INTERCEPT_NOTIFICATION; \
 	} \
-	return CAIRO_DOCK_LET_PASS_NOTIFICATION;
+	return CAIRO_DOCK_LET_PASS_NOTIFICATION; \
+}
 
+#define CD_APPLET_ON_CLICK_H \
+gboolean action_on_click (gpointer *data);
+
+//\___________________ notification construction menu.
+#define CD_APPLET_ON_BUILD_MENU applet_on_build_menu
+
+#define CD_APPLET_ON_BUILD_MENU_BEGIN \
+gboolean applet_on_build_menu (gpointer *data) \
+{ \
+	if (data[0] == myIcon) \
+	{ \
+		GtkWidget *pAppletMenu = data[2]; \
+		GtkWidget *pMenuItem;
+
+#define CD_APPLET_ON_BUILD_MENU_END \
+	} \
+	return CAIRO_DOCK_LET_PASS_NOTIFICATION; \
+}
+
+#define CD_APPLET_ADD_SUB_MENU(cLabel, pSubMenu, pMenu) \
+	pSubMenu = gtk_menu_new (); \
+	pMenuItem = gtk_menu_item_new_with_label (cLabel); \
+	gtk_menu_shell_append  (GTK_MENU_SHELL (pMenu), pMenuItem); \
+	gtk_menu_item_set_submenu (GTK_MENU_ITEM (pMenuItem), pSubMenu);
+
+#define CD_APPLET_ADD_IN_MENU(cLabel, pFunction, pMenu) \
+	pMenuItem = gtk_menu_item_new_with_label (cLabel); \
+	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), pMenuItem); \
+	g_signal_connect (G_OBJECT (pMenuItem), "activate", G_CALLBACK (pFunction), NULL);
+
+#define CD_APPLET_ADD_ABOUT_IN_MENU(pMenu) CD_APPLET_ADD_IN_MENU ("About", about, pMenu)
+
+#define CD_APPLET_ON_BUILD_MENU_H \
+gboolean applet_on_build_menu (gpointer *data);
+
+//\___________________ notification clique milieu.
+#define CD_APPLET_ON_MIDDLE_CLICK action_on_middle_click
+
+#define CD_APPLET_ON_MIDDLE_CLICK_BEGIN \
+gboolean action_on_middle_click (gpointer *data) \
+{ \
+	if (data[0] == myIcon) \
+	{
+
+#define CD_APPLET_ON_MIDDLE_CLICK_END \
+		return CAIRO_DOCK_INTERCEPT_NOTIFICATION; \
+	} \
+	return CAIRO_DOCK_LET_PASS_NOTIFICATION; \
+}
+
+#define CD_APPLET_ON_MIDDLE_CLICK_H \
+gboolean action_on_middle_click (gpointer *data);
 
 #endif

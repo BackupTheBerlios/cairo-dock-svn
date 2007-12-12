@@ -32,12 +32,8 @@ extern int g_iLabelSize;
 extern gchar *g_cLabelPolice;
 extern gboolean g_bTextAlwaysHorizontal;
 
-extern double g_fAlbedo;
-
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
-
-extern gboolean g_bUseGlitz;
 
 
 cairo_surface_t *cairo_dock_create_applet_surface (gchar *cIconFileName, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)

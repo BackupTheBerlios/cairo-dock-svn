@@ -26,6 +26,7 @@ static GHashTable *s_hRendererTable = NULL;  // table des modules de rendus.
 
 CairoDockRenderer *cairo_dock_get_renderer (gchar *cRendererName, gboolean bForMainDock)
 {
+	g_print ("%s (%s, %d)\n", __func__, cRendererName, bForMainDock);
 	CairoDockRenderer *pRenderer = NULL;
 	if (cRendererName != NULL)
 		pRenderer = g_hash_table_lookup (s_hRendererTable, cRendererName);
@@ -33,6 +34,7 @@ CairoDockRenderer *cairo_dock_get_renderer (gchar *cRendererName, gboolean bForM
 	if (pRenderer == NULL)
 	{
 		const gchar *cDefaultRendererName = (bForMainDock ? g_cMainDockDefaultRendererName : g_cSubDockDefaultRendererName);
+		g_print ("  cDefaultRendererName : %s\n", cDefaultRendererName);
 		if (cDefaultRendererName != NULL)
 			pRenderer = g_hash_table_lookup (s_hRendererTable, cDefaultRendererName);
 	}

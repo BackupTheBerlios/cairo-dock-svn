@@ -596,6 +596,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_free (g_cMainDockDefaultRendererName);
 	g_cMainDockDefaultRendererName = cairo_dock_get_string_key_value (pKeyFile, "Cairo Dock", "main dock view", &bFlushConfFileNeeded, CAIRO_DOCK_DEFAULT_RENDERER_NAME);
+	g_print ("g_cMainDockDefaultRendererName <- %s\n", g_cMainDockDefaultRendererName);
 	
 	double fUserValue = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "unfold factor", &bFlushConfFileNeeded, 8.);
 	g_fUnfoldAcceleration = 1 - pow (2, - fUserValue);

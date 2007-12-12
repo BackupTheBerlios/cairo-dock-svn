@@ -46,20 +46,6 @@ extern gchar *g_cEasyConfFile;
 extern gchar *g_cCurrentLaunchersPath;
 
 
-static void cairo_dock_edit_and_reload_appearance (GtkMenuItem *menu_item, gpointer *data)
-{
-	Icon *icon = data[0];
-	CairoDock *pDock = data[1];
-	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Appearance", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '+', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
-}
-static void cairo_dock_edit_and_reload_behaviour (GtkMenuItem *menu_item, gpointer *data)
-{
-	Icon *icon = data[0];
-	CairoDock *pDock = data[1];
-	
-	gboolean config_ok = cairo_dock_edit_conf_file (pDock->pWidget, g_cConfFile, "Configuration of Behaviour", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '-', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL);
-}
 static void cairo_dock_edit_and_reload_conf (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
@@ -163,7 +149,6 @@ gboolean cairo_dock_notification_remove_icon (gpointer *data)
 		gboolean bDestroyIcons = TRUE;
 		if (! CAIRO_DOCK_IS_URI_LAUNCHER (icon))  // alors on propose de repartir les icones de son sous-dock dans le dock principal.
 		{
-			///int answer = cairo_dock_ask_question (pDock, "Do you want to re-dispatch the icons contained inside this container into the dock (otherwise they will be destroyed) ?");
 			int answer = cairo_dock_ask_question_and_wait (_("Do you want to re-dispatch the icons contained inside this container into the dock ?\n (otherwise they will be destroyed)"), icon, pDock);
 			g_return_val_if_fail (answer != GTK_RESPONSE_NONE, CAIRO_DOCK_LET_PASS_NOTIFICATION);
 			if (answer == GTK_RESPONSE_YES)
@@ -388,7 +373,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 static void cairo_dock_initiate_config_module_from_module (GtkMenuItem *menu_item, CairoDockModule *pModule)
 {
 	GError *erreur = NULL;
-	cairo_dock_configure_module (pModule, g_pMainDock, &erreur);
+	cairo_dock_configure_module (GTK_WINDOW (g_pMainDock->pWidget), pModule, g_pMainDock, &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
@@ -401,7 +386,7 @@ static void cairo_dock_initiate_config_module (GtkMenuItem *menu_item, gpointer 
 	CairoDock *pDock = data[1];
 	
 	GError *erreur = NULL;
-	cairo_dock_configure_module (icon->pModule, pDock, &erreur);
+	cairo_dock_configure_module (GTK_WINDOW (pDock->pWidget), icon->pModule, pDock, &erreur);
 	if (erreur != NULL)
 	{
 		g_print ("Attention : %s\n", erreur->message);
@@ -559,7 +544,9 @@ GtkWidget *cairo_dock_build_menu (Icon *icon, CairoDock *pDock)
 	
 	GtkWidget *menu_item, *image;
 	menu_item = gtk_image_menu_item_new_with_label ("Cairo-Dock");
-	image = gtk_image_new_from_file ("/opt/cairo-dock/cairo-dock/data/cairo-dock-icon.svg");
+	gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-icon.svg", CAIRO_DOCK_SHARE_DATA_DIR);
+	image = gtk_image_new_from_file (cIconPath);
+	g_free (cIconPath);
 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 	gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 	GtkWidget *pSubMenu = gtk_menu_new ();
@@ -575,14 +562,6 @@ GtkWidget *cairo_dock_build_menu (Icon *icon, CairoDock *pDock)
 	menu_item = gtk_menu_item_new_with_label (_("All"));
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pConfSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_edit_and_reload_conf), data);
-	
-	menu_item = gtk_menu_item_new_with_label (_("Appearance"));
-	gtk_menu_shell_append  (GTK_MENU_SHELL (pConfSubMenu), menu_item);
-	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_edit_and_reload_appearance), data);
-	
-	menu_item = gtk_menu_item_new_with_label (_("Behaviour"));
-	gtk_menu_shell_append  (GTK_MENU_SHELL (pConfSubMenu), menu_item);
-	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_edit_and_reload_behaviour), data);
 	
 	menu_item = gtk_image_menu_item_new_with_label (_("Modules"));
 	image = gtk_image_new_from_stock (GTK_STOCK_CONNECT, GTK_ICON_SIZE_MENU);

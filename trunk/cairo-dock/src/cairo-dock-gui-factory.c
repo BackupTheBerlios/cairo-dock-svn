@@ -10,9 +10,12 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <stdlib.h>
 #include <glib/gi18n.h>
 
+#include "cairo-dock-modules.h"
 #include "cairo-dock-gui-factory.h"
 
 #define CAIRO_DOCK_GUI_MARGIN 6
+
+extern CairoDock *g_pMainDock;
 
 typedef enum
 {
@@ -113,6 +116,34 @@ static void _cairo_dock_go_down (GtkButton *button, GtkTreeView *pTreeView)
 	gtk_tree_model_foreach (GTK_TREE_MODEL (pModel), (GtkTreeModelForeachFunc) _cairo_dock_decrease_order, &iOrder);
 	
 	gtk_list_store_set (GTK_LIST_STORE (pModel), &iter, CAIRO_DOCK_MODEL_ORDER, iOrder, -1);
+}
+
+static void _cairo_dock_configure (GtkButton *button, gpointer *data)
+{
+	GtkTreeView *pTreeView = data[0];
+	GtkWindow *pDialog = data[1];
+	GtkTreeSelection *pSelection = gtk_tree_view_get_selection (pTreeView);
+	
+	GtkTreeModel *pModel;
+	GtkTreeIter iter;
+	if (! gtk_tree_selection_get_selected (pSelection, &pModel, &iter))
+		return ;
+	
+	gchar *cSelectedValue = NULL;
+	gtk_tree_model_get (pModel, &iter, CAIRO_DOCK_MODEL_RESULT, &cSelectedValue, -1);
+	
+	CairoDockModule *pModule = cairo_dock_find_module_from_name (cSelectedValue);
+	if (pModule != NULL)
+	{
+		GError *erreur = NULL;
+		cairo_dock_configure_module (pDialog, pModule, g_pMainDock, &erreur);
+		if (erreur != NULL)
+		{
+			g_print ("Attention : %s\n", erreur->message);
+			g_error_free (erreur);
+		}
+	}
+	g_free (cSelectedValue);
 }
 
 static void _cairo_dock_add (GtkButton *button, gpointer *data)
@@ -372,7 +403,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	GtkWidget *pEntry;
 	GtkWidget *pTable;
 	GtkWidget *pButtonAdd, *pButtonRemove;
-	GtkWidget *pButtonDown, *pButtonUp;
+	GtkWidget *pButtonDown, *pButtonUp, *pButtonConfig;
 	GtkWidget *pButtonFileChooser;
 	GtkWidget *pFrame, *pFrameVBox;
 	GtkWidget *pScrolledWindow;
@@ -751,6 +782,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					case 'R' :  // string, avec un label pour la description.
 					case 'P' :  // string avec un selecteur de font a cote du GtkEntry.
 					case 'r' : // string representee par son numero dans une liste de choix.
+					case 'M' :  // string, avec un label pour la description et un bouton configurer (specialement fait pour les modules).
 						//g_print ("  + string (%s)\n", cUsefulComment);
 						pEntry = NULL;
 						pDescriptionLabel = NULL;
@@ -790,7 +822,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									GtkTreeIter iter;
 									gtk_list_store_append (GTK_LIST_STORE (modele), &iter);
 									if (iSelectedItem == -1 && strcmp (cValue, pAuthorizedValuesList[k]) == 0)
-										iSelectedItem = (iElementType == 'R' ? k / 2 : k);
+										iSelectedItem = (iElementType == 'R' || iElementType == 'M' ? k / 2 : k);
 									
 									if (cResult != NULL)
 									{
@@ -799,10 +831,10 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									gtk_list_store_set (GTK_LIST_STORE (modele), &iter,
 										CAIRO_DOCK_MODEL_NAME, pAuthorizedValuesList[k],
 										CAIRO_DOCK_MODEL_RESULT, (cResult != NULL ? cResult : pAuthorizedValuesList[k]),
-										CAIRO_DOCK_MODEL_DESCRIPTION_FILE, (iElementType == 'R' ? pAuthorizedValuesList[k+1] : NULL),
+										CAIRO_DOCK_MODEL_DESCRIPTION_FILE, (iElementType == 'R' || iElementType == 'M' ? pAuthorizedValuesList[k+1] : NULL),
 										-1);
 									
-									if (iElementType == 'R')
+									if (iElementType == 'R' || iElementType == 'M')
 									{
 										k += 2;
 										if (pAuthorizedValuesList[k-1] == NULL)  // ne devrait pas arriver si le fichier de conf est bien rempli.
@@ -813,7 +845,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								}
 								g_free (cResult);
 								
-								if (iElementType == 'R')
+								if (iElementType == 'R' || iElementType == 'M')
 								{
 									pDescriptionLabel = gtk_label_new (NULL);
 									gtk_label_set_use_markup  (GTK_LABEL (pDescriptionLabel), TRUE);
@@ -909,6 +941,32 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								FALSE,
 								0);
 							
+							if (iElementType == 'M')
+							{
+								if (iNbBuffers < s_pBufferArray->len)
+								{
+									data = g_ptr_array_index (s_pBufferArray, iNbBuffers);
+								}
+								else
+								{
+									data = g_new (gpointer, 3);  // tous les buffers ont 3 elements.
+									g_ptr_array_add (s_pBufferArray, data);
+								}
+								iNbBuffers ++;
+								data[0] = pOneWidget;
+								data[1] = pDialog;
+								pButtonConfig = gtk_button_new_from_stock (GTK_STOCK_PREFERENCES);
+								g_signal_connect (G_OBJECT (pButtonConfig),
+									"clicked",
+									G_CALLBACK (_cairo_dock_configure),
+									data);
+								gtk_box_pack_start (GTK_BOX (pSmallVBox),
+									pButtonConfig,
+									FALSE,
+									FALSE,
+									0);
+							}
+							
 							GtkTreeIter iter;
 							if (pAuthorizedValuesList != NULL)  //  && pAuthorizedValuesList[0] != NULL
 							{
@@ -923,7 +981,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 										{
 											break;
 										}
-										k += (iElementType == 'R') + 1;
+										k += (iElementType == 'R' || iElementType == 'M') + 1;
 									}
 									
 									if (pAuthorizedValuesList[k] != NULL)  // c'etait bien une valeur autorisee.
@@ -961,10 +1019,10 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 											CAIRO_DOCK_MODEL_DESCRIPTION_FILE, pAuthorizedValuesList[k+1],
 											CAIRO_DOCK_MODEL_ORDER, iOrder ++, -1);
 									}
-									k += (iElementType == 'R') + 1;
+									k += (iElementType == 'R' || iElementType == 'M') + 1;
 								}
 								
-								if (iElementType == 'R')
+								if (iElementType == 'R' || iElementType == 'M')
 								{
 									pDescriptionLabel = gtk_label_new (NULL);
 									gtk_label_set_use_markup (GTK_LABEL (pDescriptionLabel), TRUE);
@@ -972,7 +1030,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									gtk_tree_selection_set_select_function (selection, (GtkTreeSelectionFunc) _cairo_dock_select_one_item_in_tree, pDescriptionLabel, NULL);
 								}
 							}
-							else
+							else  // pas de valeurs autorisees.
 							{
 								for (k = 0; k < iNbElements; k ++)
 								{
@@ -1093,7 +1151,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									FALSE,
 									0);
 						}
-						else if (iElementType == 'R' && pDescriptionLabel != NULL)
+						else if ((iElementType == 'R' || iElementType == 'M') && pDescriptionLabel != NULL)
 						{
 							if (bIsAligned)
 								gtk_box_pack_end (GTK_BOX (pHBox),

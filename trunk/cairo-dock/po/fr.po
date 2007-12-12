@@ -1,134 +1,219 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Copyright (C) 2007 Cairo-Dock project
+# This file is distributed under the same license as the Cairo-Dock package.
+# Fabrice Rey <fabounet@users.berlios.de>, 2007.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 1.4.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-12-05 15:40+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2007-12-11 18:15+0100\n"
+"PO-Revision-Date: 2007-12-11\n"
+"Last-Translator: FULL NAME <fabounet@users.berlios.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ASCII\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: cairo-dock-menu.c:572
+#: cairo-dock-menu.c:572 src/cairo-dock-menu.c:568 src/cairo-dock-menu.c:567
+#: src/cairo-dock-menu.c:553
 msgid "Configure"
 msgstr "Configurer"
 
-#: cairo-dock-menu.c:579
+#: cairo-dock-menu.c:579 src/cairo-dock-menu.c:575 src/cairo-dock-menu.c:574
+#: src/cairo-dock-menu.c:560
 msgid "All"
 msgstr "Tout"
 
-#: cairo-dock-menu.c:583
+#: cairo-dock-menu.c:583 src/cairo-dock-menu.c:579 src/cairo-dock-menu.c:578
 msgid "Appearance"
 msgstr "Apparence"
 
-#: cairo-dock-menu.c:587
+#: cairo-dock-menu.c:587 src/cairo-dock-menu.c:583 src/cairo-dock-menu.c:582
 msgid "Behaviour"
 msgstr "Comportement"
 
-#: cairo-dock-menu.c:591
+#: cairo-dock-menu.c:591 src/cairo-dock-menu.c:587 src/cairo-dock-menu.c:586
+#: src/cairo-dock-menu.c:564
 msgid "Modules"
 msgstr "Modules"
 
-#: cairo-dock-menu.c:601
+#: cairo-dock-menu.c:601 src/cairo-dock-menu.c:597 src/cairo-dock-menu.c:596
+#: src/cairo-dock-menu.c:574
 msgid "Manage themes"
 msgstr "Gestion des themes"
 
-#: cairo-dock-menu.c:607
+#: cairo-dock-menu.c:607 src/cairo-dock-menu.c:603 src/cairo-dock-menu.c:602
+#: src/cairo-dock-menu.c:580
 msgid "Check updates"
 msgstr "Verifier MaJ"
 
-#: cairo-dock-menu.c:613
+#: cairo-dock-menu.c:613 src/cairo-dock-menu.c:609 src/cairo-dock-menu.c:608
+#: src/cairo-dock-menu.c:586
 msgid "About"
 msgstr "A propos"
 
-#: cairo-dock-menu.c:619
+#: cairo-dock-menu.c:619 src/cairo-dock-menu.c:615 src/cairo-dock-menu.c:614
+#: src/cairo-dock-menu.c:592
 msgid "Help"
 msgstr "Aide"
 
-#: cairo-dock-menu.c:627
+#: cairo-dock-menu.c:627 src/cairo-dock-menu.c:623 src/cairo-dock-menu.c:622
+#: src/cairo-dock-menu.c:600
 msgid "Quick-Hide"
 msgstr "Cachage rapide"
 
-#: cairo-dock-menu.c:634
+#: cairo-dock-menu.c:634 src/cairo-dock-menu.c:630 src/cairo-dock-menu.c:629
+#: src/cairo-dock-menu.c:607
 msgid "Quit"
 msgstr "Quiter"
 
 #: cairo-dock-menu.c:659 cairo-dock-menu.c:669 cairo-dock-menu.c:678
+#: src/cairo-dock-menu.c:655 src/cairo-dock-menu.c:665
+#: src/cairo-dock-menu.c:674 src/cairo-dock-menu.c:654
+#: src/cairo-dock-menu.c:664 src/cairo-dock-menu.c:673
+#: src/cairo-dock-menu.c:632 src/cairo-dock-menu.c:642
+#: src/cairo-dock-menu.c:651
 msgid "Add a launcher"
 msgstr "Ajouter un lanceur"
 
-#: cairo-dock-menu.c:684
+#: cairo-dock-menu.c:684 src/cairo-dock-menu.c:680 src/cairo-dock-menu.c:679
+#: src/cairo-dock-menu.c:657
 msgid "Remove this launcher"
 msgstr "Supprimer ce lanceur"
 
-#: cairo-dock-menu.c:690
+#: cairo-dock-menu.c:690 src/cairo-dock-menu.c:321 src/cairo-dock-menu.c:686
+#: src/cairo-dock-menu.c:320 src/cairo-dock-menu.c:685
+#: src/cairo-dock-menu.c:306 src/cairo-dock-menu.c:663
 msgid "Modify this launcher"
 msgstr "Modifier ce lanceur"
 
-#: cairo-dock-menu.c:698
+#: cairo-dock-menu.c:698 src/cairo-dock-menu.c:694 src/cairo-dock-menu.c:693
+#: src/cairo-dock-menu.c:671
 msgid "Close"
 msgstr "Fermer"
 
-#: cairo-dock-menu.c:704
+#: cairo-dock-menu.c:704 src/cairo-dock-menu.c:700 src/cairo-dock-menu.c:699
+#: src/cairo-dock-menu.c:677
 msgid "Minimize"
 msgstr "Minimiser"
 
-#: cairo-dock-menu.c:711
+#: cairo-dock-menu.c:711 src/cairo-dock-menu.c:707 src/cairo-dock-menu.c:706
+#: src/cairo-dock-menu.c:684
 msgid "Unmaximize"
 msgstr "De-maximiser"
 
-#: cairo-dock-menu.c:711
+#: cairo-dock-menu.c:711 src/cairo-dock-menu.c:707 src/cairo-dock-menu.c:706
+#: src/cairo-dock-menu.c:684
 msgid "Maximize"
 msgstr "Maximiser"
 
-#: cairo-dock-menu.c:718
+#: cairo-dock-menu.c:718 src/cairo-dock-menu.c:714 src/cairo-dock-menu.c:713
+#: src/cairo-dock-menu.c:691
 msgid "Other actions"
 msgstr "Autres actions"
 
-#: cairo-dock-menu.c:724
+#: cairo-dock-menu.c:724 src/cairo-dock-menu.c:720 src/cairo-dock-menu.c:719
+#: src/cairo-dock-menu.c:697
 msgid "Not Fullscreen"
 msgstr "Pas plein ecran"
 
-#: cairo-dock-menu.c:724
+#: cairo-dock-menu.c:724 src/cairo-dock-menu.c:720 src/cairo-dock-menu.c:719
+#: src/cairo-dock-menu.c:697
 msgid "Fullscreen"
 msgstr "Plein ecran"
 
-#: cairo-dock-menu.c:728
+#: cairo-dock-menu.c:728 src/cairo-dock-menu.c:724 src/cairo-dock-menu.c:723
+#: src/cairo-dock-menu.c:701
 msgid "Move to this desktop"
 msgstr "Deplacer sur ce bureau"
 
-#: cairo-dock-menu.c:734
+#: cairo-dock-menu.c:734 src/cairo-dock-menu.c:730 src/cairo-dock-menu.c:729
+#: src/cairo-dock-menu.c:707
 msgid "Configure this module"
 msgstr "Configurer ce module"
 
-#: cairo-dock-menu.c:740
+#: cairo-dock-menu.c:740 src/cairo-dock-menu.c:736 src/cairo-dock-menu.c:735
+#: src/cairo-dock-menu.c:713
 msgid "Remove this module"
 msgstr "Enlever ce module"
 
-#: cairo-dock-menu.c:746
+#: cairo-dock-menu.c:746 src/cairo-dock-menu.c:742 src/cairo-dock-menu.c:741
+#: src/cairo-dock-menu.c:719
 msgid "Move this icon"
 msgstr "Deplacer cette icone"
 
-#: cairo-dock-menu.c:754
+#: cairo-dock-menu.c:754 src/cairo-dock-menu.c:750 src/cairo-dock-menu.c:749
+#: src/cairo-dock-menu.c:727
 msgid "To the left"
 msgstr "A gauche"
 
-#: cairo-dock-menu.c:760
+#: cairo-dock-menu.c:760 src/cairo-dock-menu.c:756 src/cairo-dock-menu.c:755
+#: src/cairo-dock-menu.c:733
 msgid "To the right"
 msgstr "A droite"
 
-#: cairo-dock-menu.c:767
+#: cairo-dock-menu.c:767 src/cairo-dock-menu.c:763 src/cairo-dock-menu.c:762
+#: src/cairo-dock-menu.c:740
 msgid "To the beginning"
 msgstr "Au debut"
 
-#: cairo-dock-menu.c:774
+#: cairo-dock-menu.c:774 src/cairo-dock-menu.c:770 src/cairo-dock-menu.c:769
+#: src/cairo-dock-menu.c:747
 msgid "To the end"
 msgstr "A la fin"
+
+#: src/cairo-dock-themes-manager.c:268
+#, c-format
+msgid "Are you sure you want to delete theme %s ?"
+msgstr "Etes-vous sûr de vouloir effacer le thème %s ?"
+
+#: src/cairo-dock-themes-manager.c:433 src/cairo-dock-themes-manager.c:414
+#, c-format
+msgid "Are you sure you want to overwrite theme %s ?"
+msgstr "Etes-vous sûr de vouloir écraser le thème %s"
+
+#: src/cairo-dock-menu.c:167 src/cairo-dock-menu.c:353
+#: src/cairo-dock-menu.c:166 src/cairo-dock-menu.c:352
+#: src/cairo-dock-menu.c:152 src/cairo-dock-menu.c:338
+msgid ""
+"Do you want to re-dispatch the icons contained inside this container into "
+"the dock ?\n"
+" (otherwise they will be destroyed)"
+msgstr ""
+"Voulez-vous répartir les icônes contenues dans ce conteneur dans un le "
+"dock ?\n"
+" (autrement elles seront détruites)"
+
+#: src/cairo-dock-menu.c:188 src/cairo-dock-menu.c:187
+#: src/cairo-dock-menu.c:173
+#, c-format
+msgid "You're about to remove this icon (%s) from the dock. Sure ?"
+msgstr "Vous êtes sur le point d'enlever cette icône du dock. Sûr ?"
+
+#: src/cairo-dock-menu.c:243 src/cairo-dock-menu.c:242
+#: src/cairo-dock-menu.c:228
+msgid "Choose or Create a launcher"
+msgstr "Choisir ou Créer un lanceur"
+
+#: src/cairo-dock-menu.c:417 src/cairo-dock-menu.c:416
+#: src/cairo-dock-menu.c:402
+#, c-format
+msgid "You're about to remove this module (%s) from the dock. Sure ?"
+msgstr "Vous êtes sur le point d'enlever ce module (%s) du dock. Sûr ?"
+
+#: src/cairo-dock-themes-manager.c:327
+msgid ""
+"You made some modifications in the current theme.\n"
+"You will loose them if you don't save before choosing a new theme. Continue "
+"anyway ?"
+msgstr ""
+"Vous avez fait des modifications dans le thème courant\n"
+"Vous les perdrez si vous ne le sauvez pas d'abord. Continuer malgré tout ?"
+
+#: src/cairo-dock-modules.c:475
+#, c-format
+msgid "Configuration of %s"
+msgstr "Configuration de %s"
 

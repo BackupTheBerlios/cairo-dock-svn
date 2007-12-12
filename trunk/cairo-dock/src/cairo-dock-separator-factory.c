@@ -60,6 +60,7 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 				fRotationAngle = -G_PI/2;
 			else
 				fRotationAngle = G_PI/2;
+		g_print ("%s (%s)\n", __func__, cImagePath);
 		pNewSurface = cairo_dock_create_surface_from_image (cImagePath,
 			pSourceContext,
 			fMaxScale,

@@ -11,6 +11,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <stdlib.h>
 #include <gtk/gtk.h>
 #include <glib/gstdio.h>
+#include <glib/gi18n.h>
 
 #include <cairo.h>
 
@@ -464,18 +465,18 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 	cairo_dock_free_icon (pOldIcon);
 }
 
-void cairo_dock_configure_module (CairoDockModule *module, CairoDock *pDock, GError **erreur)
+void cairo_dock_configure_module (GtkWindow *pParentWindow, CairoDockModule *module, CairoDock *pDock, GError **erreur)
 {
 	g_return_if_fail (module != NULL);
 	
 	if (module->cConfFilePath == NULL)
 		return;
 	
-	gchar *cTitle = g_strdup_printf ("Configuration of %s", module->cModuleName);
+	gchar *cTitle = g_strdup_printf (_("Configuration of %s"), module->cModuleName);
 	gpointer *user_data = g_new (gpointer, 2);
 	user_data[0]= module;
 	user_data[1] = pDock;
-	gboolean configuration_ok = cairo_dock_edit_conf_file (NULL, module->cConfFilePath, cTitle, CAIRO_DOCK_MODULE_PANEL_WIDTH, CAIRO_DOCK_MODULE_PANEL_HEIGHT, 0, NULL, (CairoDockConfigFunc) cairo_dock_reload_module, user_data, (GFunc) g_free);
+	gboolean configuration_ok = cairo_dock_edit_conf_file (pParentWindow, module->cConfFilePath, cTitle, CAIRO_DOCK_MODULE_PANEL_WIDTH, CAIRO_DOCK_MODULE_PANEL_HEIGHT, 0, NULL, (CairoDockConfigFunc) cairo_dock_reload_module, user_data, (GFunc) g_free);
 	g_free (cTitle);
 }
 
@@ -495,5 +496,11 @@ Icon *cairo_dock_find_icon_from_module (CairoDockModule *module, GList *pIconLis
 			return icon;
 	}
 	return NULL;
+}
+
+CairoDockModule *cairo_dock_find_module_from_name (gchar *cModuleName)
+{
+	g_return_val_if_fail (cModuleName != NULL, NULL);
+	return g_hash_table_lookup (s_hModuleTable, cModuleName);
 }
 

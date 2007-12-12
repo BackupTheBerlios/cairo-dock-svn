@@ -58,4 +58,25 @@ void cairo_dock_remove_notification_func (CairoDockNotificationType iNotifType, 
 */
 gboolean cairo_dock_notify (CairoDockNotificationType iNotifType, gpointer data);
 
+
+/**
+*Enregistre une liste de fonctions notifiees. La liste est une liste de couples (CairoDockNotificationType, CairoDockNotificationFunc), et doit etre clot par -1.
+*@param iNotifType type de la notification.
+*@param pFunction fonction notifiee.
+*/
+void cairo_dock_register_first_notifications (int iFirstNotifType, ...);
+/**
+*Enregistre une liste de fonctions notifiees. La liste est une liste de couples (CairoDockNotificationType, CairoDockNotificationFunc), et doit etre clot par -1.
+*@param iNotifType type de la notification.
+*@param pFunction fonction notifiee.
+*/
+void cairo_dock_register_last_notifications (int iFirstNotifType, ...);
+/**
+*Enleve une liste de fonctions notifiees. La liste est une liste de couples (CairoDockNotificationType, CairoDockNotificationFunc), et doit etre clot par -1.
+*@param iNotifType type de la notification.
+*@param pFunction fonction notifiee.
+*/
+void cairo_dock_remove_notification_funcs (int iFirstNotifType, ...);
+
+
 #endif

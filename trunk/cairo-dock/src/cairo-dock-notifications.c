@@ -65,3 +65,60 @@ gboolean cairo_dock_notify (CairoDockNotificationType iNotifType, gpointer data)
 		return FALSE;
 	}
 }
+
+
+static void cairo_dock_register_notifications (gboolean bRunFirst, int iFirstNotifType, va_list args)
+{
+	CairoDockNotificationType iNotifType = iFirstNotifType;
+	CairoDockNotificationFunc pFunction;
+	
+	while (iNotifType != -1)
+	{
+		g_print ("%s () : %d\n", __func__, iNotifType);
+		
+		pFunction= va_arg (args, CairoDockNotificationFunc);
+		if (pFunction == NULL)  // ne devrait pas arriver.
+			break;
+		
+		cairo_dock_register_notification (iNotifType, pFunction, bRunFirst);
+		
+		iNotifType = va_arg (args, CairoDockNotificationType);
+	}
+}
+
+void cairo_dock_register_first_notifications (int iFirstNotifType, ...)
+{
+	va_list args;
+	va_start (args, iFirstNotifType);
+	cairo_dock_register_notifications (CAIRO_DOCK_RUN_FIRST, iFirstNotifType, args);
+	va_end (args);
+}
+
+void cairo_dock_register_last_notifications (int iFirstNotifType, ...)
+{
+	va_list args;
+	va_start (args, iFirstNotifType);
+	cairo_dock_register_notifications (CAIRO_DOCK_RUN_AFTER, iFirstNotifType, args);
+	va_end (args);
+}
+
+void cairo_dock_remove_notification_funcs (int iFirstNotifType, ...)
+{
+	va_list args;
+	va_start (args, iFirstNotifType);
+	
+	CairoDockNotificationType iNotifType = iFirstNotifType;
+	CairoDockNotificationFunc pFunction;
+	while (iNotifType != -1)
+	{
+		pFunction= va_arg (args, CairoDockNotificationFunc);
+		if (pFunction == NULL)  // ne devrait pas arriver.
+			break;
+		
+		cairo_dock_remove_notification_func (iNotifType, pFunction);
+		
+		iNotifType = va_arg (args, CairoDockNotificationType);
+	}
+	
+	va_end (args);
+}

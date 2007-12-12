@@ -9,6 +9,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <string.h>
 #include <stdlib.h>
 #include <glib/gstdio.h>
+#include <glib/gi18n.h>
 
 #include "cairo-dock-applet-factory.h"
 #include "cairo-dock-config.h"
@@ -16,6 +17,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-renderer-manager.h"
+#include "cairo-dock-dialogs.h"
 #include "cairo-dock-themes-manager.h"
 
 #define CAIRO_DOCK_MODIFIED_THEME_FILE ".cairo-dock-need-save"
@@ -263,7 +265,7 @@ static void _cairo_dock_delete_one_theme (gchar *cThemeName, gchar *cThemePath, 
 	
 	if (cThemesList[i] == NULL)  // le theme ne se trouve pas dans la liste des themes desires.
 	{
-		gchar *question = g_strdup_printf ("Are you sure you want to delete theme %s ?", cThemeName);
+		gchar *question = g_strdup_printf (_("Are you sure you want to delete theme %s ?"), cThemeName);
 		GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (pWidget),
 			GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_MESSAGE_QUESTION,
@@ -322,26 +324,8 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 		{
 			if (bNeedSave)
 			{
-				GtkWidget *dialog = gtk_dialog_new_with_buttons ("Confirm discarding changes",
-					GTK_WINDOW (pWidget),
-					GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
-					GTK_STOCK_SAVE,
-					GTK_RESPONSE_NO,
-					GTK_STOCK_APPLY,  // GTK_STOCK_DISCARD pour GTK 2.12
-					GTK_RESPONSE_YES,
-					NULL);
-				
-				GtkWidget *pHBox = gtk_hbox_new (FALSE, 3);
-				gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), pHBox);
-				GtkWidget *pImage = gtk_image_new_from_stock (GTK_STOCK_DIALOG_QUESTION, GTK_ICON_SIZE_DIALOG);
-				GtkWidget *pQuestionLabel = gtk_label_new ("\nYou made some modifications in this currenttheme.\nSave it before or apply new theme ?");
-				gtk_container_add (GTK_CONTAINER (pHBox), pImage);
-				gtk_container_add (GTK_CONTAINER (pHBox), pQuestionLabel);
-				gtk_widget_show_all (GTK_DIALOG (dialog)->vbox);
-				gtk_window_move (GTK_WINDOW (dialog), 500, 500);
-				int answer = gtk_dialog_run (GTK_DIALOG (dialog));
-				gtk_widget_destroy (dialog);
-				if (answer != GTK_RESPONSE_YES)
+				int iAnswer = cairo_dock_ask_general_question_and_wait (_("You made some modifications in the current theme.\nYou will loose them if you don't save before choosing a new theme. Continue anyway ?"));
+				if (iAnswer != GTK_RESPONSE_YES)
 				{
 					g_hash_table_destroy (hThemeTable);
 					return TRUE;
@@ -427,7 +411,7 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 				}
 				else
 				{
-					gchar *question = g_strdup_printf ("Are you sure you want to overwrite theme %s ?", cNewThemeName);
+					gchar *question = g_strdup_printf (_("Are you sure you want to overwrite theme %s ?"), cNewThemeName);
 					GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (pWidget),
 						GTK_DIALOG_DESTROY_WITH_PARENT,
 						GTK_MESSAGE_QUESTION,
