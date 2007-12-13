@@ -85,6 +85,14 @@ void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, Cair
 *@param pDock le dock contenant l'icone.
 */
 void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoDock *pDock);
+/**
+*Applique une image sur le contexte d'une icone, en effacant tout au prealable et en creant les reflets correspondant.
+*@param pIconContext le contexte de dessin lie a la surface de l'icone; est modifie par la fonction.
+*@param pSurface la surface a appliquer a l'icone.
+*@param pIcon l'icone.
+*@param pDock le dock contenant l'icone.
+*/
+void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Icon *pIcon, CairoDock *pDock);
 
 /**
 *Modifie l'etiquette d'une icone.
@@ -301,5 +309,17 @@ gboolean action_on_middle_click (gpointer *data) \
 
 #define CD_APPLET_ON_MIDDLE_CLICK_H \
 gboolean action_on_middle_click (gpointer *data);
+
+//\___________________________ DESSIN
+#define CD_APPLET_SET_ICON_SURFACE(pSurface) \
+	cairo_dock_set_icon_surface_with_reflect (myDrawContext, pSurface, myIcon, myDock); \
+	cairo_dock_redraw_my_icon (myIcon, myDock);
+
+#define CD_APPLET_SET_ICON_NAME(cIconName) \
+	cairo_dock_set_icon_name (myDrawContext, cIconName, myIcon, myDock);
+
+#define CD_APPLET_ANIMATE(iAnimationType, iAnimationLength) \
+	cairo_dock_animate_icon (myIcon, myDock, iAnimationType, iAnimationLength);
+
 
 #endif

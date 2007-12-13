@@ -171,7 +171,7 @@ void cairo_dock_load_theme (gchar *cThemePath)
 	cairo_dock_free_all_docks (g_pMainDock);
 	
 	//\___________________ On cree le dock principal.
-	g_pMainDock = cairo_dock_create_new_dock (g_iWmHint, CAIRO_DOCK_MAIN_DOCK_NAME, g_cMainDockDefaultRendererName);
+	g_pMainDock = cairo_dock_create_new_dock (g_iWmHint, CAIRO_DOCK_MAIN_DOCK_NAME, NULL);  // on ne lui assigne pas de vues, puisque la vue par defaut des docks principaux sera definie plus tard.
 	g_pMainDock->bIsMainDock = TRUE;
 	
 	//\___________________ On lit son fichier de conf et on charge tout.

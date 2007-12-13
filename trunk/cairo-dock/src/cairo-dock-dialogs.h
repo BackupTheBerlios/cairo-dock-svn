@@ -30,7 +30,7 @@ void cairo_dock_free_dialog (CairoDockDialog *pDialog);
 void cairo_dock_remove_dialog_if_any (Icon *icon);
 
 
-GtkWidget *cairo_dock_build_interactive_widget_for_dialog (const gchar *cInitialAnswer, double fValueForHScale);
+GtkWidget *cairo_dock_build_common_interactive_widget_for_dialog (const gchar *cInitialAnswer, double fValueForHScale);
 
 CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, CairoDock *pDock, gchar *cImageFilePath, GtkWidget *pInteractiveWidget, GtkButtonsType iButtonsType, CairoDockActionOnAnswerFunc pActionFunc, gpointer data);
 
@@ -66,24 +66,27 @@ CairoDockDialog *cairo_dock_show_dialog_full (const gchar *cText, Icon *pIcon, C
 *@param pDock le dock contenant l'icone.
 *@param fTimeLength la duree de vie du dialogue (ou 0 pour une duree de vie illimitee).
 *@param cIconPath le chemin vers une icone.
+*@param ... les arguments a inserer dans la chaine de texte, facon printf.
 */
-void cairo_dock_show_temporary_dialog_with_icon (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength, gchar *cIconPath);
+void cairo_dock_show_temporary_dialog_with_icon (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength, gchar *cIconPath, ...);
 /**
 *Fait apparaitre un dialogue a duree de vie limitee sans icone.
 *@param cText le message du dialogue.
 *@param pIcon l'icone sur laquelle pointe le dialogue.
 *@param pDock le dock contenant l'icone.
 *@param fTimeLength la duree de vie du dialogue (ou 0 pour une duree de vie illimitee).
+*@param ... les arguments a inserer dans la chaine de texte.
 */
-void cairo_dock_show_temporary_dialog (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength);
+void cairo_dock_show_temporary_dialog (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength, ...);
 /**
 *Fait apparaitre un dialogue a duree de vie limitee et avec l'icone par defaut.
 *@param cText le message du dialogue.
 *@param pIcon l'icone sur laquelle pointe le dialogue.
 *@param pDock le dock contenant l'icone.
 *@param fTimeLength la duree de vie du dialogue (ou 0 pour une duree de vie illimitee).
+*@param ... les arguments a inserer dans la chaine de texte, facon printf.
 */
-void cairo_dock_show_temporary_dialog_with_default_icon (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength);
+void cairo_dock_show_temporary_dialog_with_default_icon (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength, ...);
 
 /**
 *Fait apparaitre un dialogue a duree de vie illimitee avec une question et 2 boutons oui/non. Lorsque l'utilisateur clique sur "oui", la fonction d'action est appelee avec "yes", et avec "no" s'il a clique sur "non".
@@ -134,7 +137,7 @@ CairoDockDialog *cairo_dock_show_dialog_with_value (const gchar *cText, Icon *pI
 *@param pInteractiveWidget un widget d'interaction avec l'utilisateur.
 @Returns La reponse sous la fome d'une chaine de caracters nouvellement allouee. Si le widget est une entree de texte, retourne le texte si oui, et "" si non. Si le widget est une echelle, retourne la valeur sous forme de chaine si "oui", et "-1" si non, et sinon, retourne "yes" si oui, et "no" si non. Si le dialogue est detruit entre-temps, NULL est retourne. Si c'est un autre widget, il faut le referencer avant, de facon a ce qu'il ne soit pas detruit avec le dialogue.
 */
-gchar *cairo_dock_show_dialog_and_wait (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength, gchar *cIconPath, GtkButtonsType iButtonsType, GtkWidget *pInteractiveWidget);
+int cairo_dock_show_dialog_and_wait (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength, gchar *cIconPath, GtkButtonsType iButtonsType, GtkWidget *pInteractiveWidget);
 /**
 *Fait apparaitre un dialogue avec une entree de texte et 2 boutons ok/annuler, et met en pause le programme jusqu'a ce que l'utilisateur ait fait son choix.
 *@param cMessage le message du dialogue.
@@ -167,6 +170,17 @@ int cairo_dock_ask_question_and_wait (const gchar *cQuestion, Icon *pIcon, Cairo
 @Returns idem que pour #cairo_dock_ask_question_and_wait .
 */
 int cairo_dock_ask_general_question_and_wait (const gchar *cQuestion);
+
+/**
+*Cache le dialogue d'une icone, sans le detruire.
+*@param pIcon l'icône possedant le dialogue.
+*/
+void cairo_dock_hide_dialog (Icon *pIcon);
+/**
+*Montre et fait prendre le focus au dialogue d'une icone, si elle en possède deja un.
+*@param pIcon l'icône possedant le dialogue.
+*/
+void cairo_dock_unhide_dialog (Icon *pIcon);
 
 
 #endif

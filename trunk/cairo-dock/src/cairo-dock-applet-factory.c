@@ -241,6 +241,19 @@ void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surf
 	cairo_dock_add_reflection_to_icon (pIconContext, pIcon, pDock);
 }
 
+void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Icon *pIcon, CairoDock *pDock)
+{
+	cairo_surface_t *pImageSurface = cairo_dock_create_surface_for_icon (cImagePath,
+		pIconContext,
+		pIcon->fWidth * (1 + g_fAmplitude),
+		pIcon->fHeight * (1 + g_fAmplitude));
+	
+	cairo_dock_set_icon_surface_with_reflect (pIconContext, pImageSurface, pIcon, pDock);
+	
+	cairo_surface_destroy (pImageSurface);
+}
+
+
 void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, Icon *pIcon, CairoDock *pDock)  // fonction proposee par Necropotame.
 {
 	g_return_if_fail (pIcon != NULL);  // le contexte sera verifie plus loin.

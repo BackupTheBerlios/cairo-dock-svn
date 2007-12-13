@@ -62,7 +62,7 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock);
 *@param fDockMagnitude la magnitude actuelle du dock.
 *@param bUseReflect TRUE pour dessiner les reflets.
 */
-void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect, int iDecorationsHeight, double fInclinationOnHorizon);
+void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect);
 void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, double fRatio);
 
 /**

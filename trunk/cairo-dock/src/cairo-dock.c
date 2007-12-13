@@ -308,7 +308,7 @@ main (int argc, char** argv)
 	bindtextdomain ( GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR );
 	bind_textdomain_codeset ( GETTEXT_PACKAGE, "UTF-8" );
 	textdomain ( GETTEXT_PACKAGE );
-	
+	g_print ("GETTEXT_PACKAGE : %s ; PACKAGE_LOCALE_DIR : %s\n", GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
 	const gchar* const *cLanguageTab = g_get_language_names ();
 	GHashTable *pTranslationTable = cairo_dock_list_available_translations (CAIRO_DOCK_SHARE_DATA_DIR, "cairo-dock-", NULL);
 	if (pTranslationTable != NULL && cLanguageTab != NULL)
