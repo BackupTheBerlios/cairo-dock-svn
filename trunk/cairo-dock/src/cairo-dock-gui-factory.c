@@ -421,6 +421,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	double fValue, fMinValue, fMaxValue, *fValueList;
 	gchar *cValue, **cValueList;
 	GdkColor gdkColor;
+	int iTextOffset;
 	
 	GtkWidget *pDialog;
 	if (bApplyButtonPresent)
@@ -510,7 +511,14 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 				
 				if (pVBox == NULL)  // maintenant qu'on a au moins un element dans ce groupe, on cree sa page dans le notebook.
 				{
-					pLabel = gtk_label_new (cGroupName);
+					if (cGroupName[0] == '_' && cGroupName[1] == '(')
+					{
+						iTextOffset = 2;
+						cGroupName[strlen (cGroupName)-1] = '\0';
+					}
+					else
+						iTextOffset = 0;
+					pLabel = gtk_label_new (gettext (cGroupName+iTextOffset));
 					pVBox = gtk_vbox_new (FALSE, CAIRO_DOCK_GUI_MARGIN);
 					
 					pScrolledWindow = gtk_scrolled_window_new (NULL, NULL);
@@ -592,9 +600,16 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					//g_print ("pTipString : '%s'\n", pTipString);
 					pEventBox = gtk_event_box_new ();
 					gtk_container_add (GTK_CONTAINER (pEventBox), pHBox);
+					if (pTipString[0] == '_' && pTipString[1] == '(')
+					{
+						iTextOffset = 2;
+						pTipString[strlen (pTipString)-1] = '\0';
+					}
+					else
+						iTextOffset = 0;
 					gtk_tooltips_set_tip (GTK_TOOLTIPS (pToolTipsGroup),
 						pEventBox,
-						gettext (pTipString),
+						gettext (pTipString + iTextOffset),
 						"pouet");
 				}
 				else
@@ -602,7 +617,14 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 				
 				if (*cUsefulComment != '\0' && strcmp (cUsefulComment, "...") != 0 && iElementType != 'F' && iElementType != 'X')
 				{
-					pLabel = gtk_label_new (gettext (cUsefulComment));
+					if (cUsefulComment[0] == '_' && cUsefulComment[1] == '(')
+					{
+						iTextOffset = 2;
+						cUsefulComment[strlen (cUsefulComment)-1] = '\0';
+					}
+					else
+						iTextOffset = 0;
+					pLabel = gtk_label_new (gettext (cUsefulComment + iTextOffset));
 					GtkWidget *pAlign = gtk_alignment_new (0., 0.5, 0., 0.);
 					gtk_container_add (GTK_CONTAINER (pAlign), pLabel);
 					gtk_box_pack_start ((bIsAligned ? GTK_BOX (pHBox) : (pFrameVBox == NULL ? GTK_BOX (pVBox) : GTK_BOX (pFrameVBox))),
@@ -1210,7 +1232,14 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							
 							if (iElementType == 'F')
 							{
-								cFrameTitle = g_strdup_printf ("<b>%s</b>", gettext (cValue));
+								if (cValue[0] == '_' && cValue[1] == '(')
+								{
+									iTextOffset = 2;
+									cValue[strlen (cValue)-1] = '\0';
+								}
+								else
+									iTextOffset = 0;
+								cFrameTitle = g_strdup_printf ("<b>%s</b>", gettext (cValue + iTextOffset));
 								pLabel= gtk_label_new (NULL);
 								gtk_label_set_markup (GTK_LABEL (pLabel), cFrameTitle);
 								

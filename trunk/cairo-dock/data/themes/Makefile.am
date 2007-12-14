@@ -6,4 +6,5 @@ SUBDIRS = \
 	_Djoole_\
 	_Cobalt_\
 	_Glattering_\
-	_TapisVert_
+	_TapisVert_\
+	_MacOSX_

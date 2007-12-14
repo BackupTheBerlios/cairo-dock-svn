@@ -1,0 +1,26 @@
+#!fr
+
+[Desktop Entry]
+#s Nom de ce lanceur :
+Name=Compiz-Fusion
+#s Commande à exécuter lors du clique :
+Exec=ccsm
+#S Nom ou chemin de l'image :
+Icon=workspaces.svg
+#f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
+Order=0.716796875
+#E[_MainDock_]  Nom du container auquel il appartient :
+Container=_MainDock_
+#b Cette icône est-elle un container ?
+Is container=false
+#R[Caroussel;/usr/share/cairo-dock/plug-in/rendering/readme-caroussel-view;3D plane;/usr/share/cairo-dock/plug-in/rendering/readme-3D-plane-view;default;/usr/share/cairo-dock/readme-basic-view]  Si oui, nom de la vue à utiliser pour son sous-dock :/
+Renderer=
+
+Base URI=
+Is mounting point=false
+Encoding=UTF-8
+Comment=Configure Compiz with CompizConfig
+Terminal=false
+Type=Application
+Categories=Compiz;Settings;DesktopSettings;
+Is URI=false

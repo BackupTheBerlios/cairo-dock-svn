@@ -130,7 +130,7 @@ void cairo_dock_animate_icon (Icon *pIcon, CairoDock *pDock, CairoDockAnimationT
 //\___________________________ INIT
 #define CD_APPLET_H \
 CairoDockVisitCard *pre_init (void);\
-Icon *init (CairoDock *pDock, gchar **cConfFilePath, GError **erreur);\
+Icon *init (CairoDock *pDock, gchar **cAppletConfFilePath, GError **erreur);\
 void stop (void);
 
 //\___________________ pre_init.
@@ -150,21 +150,21 @@ CairoDockVisitCard *pre_init (void)\
 }
 
 //\___________________ init.
-#define CD_APPLET_INIT_BEGIN \
-Icon *init (CairoDock *pDock, gchar **cConfFilePath, GError **erreur) \
+#define CD_APPLET_INIT_BEGIN(erreur) \
+Icon *init (CairoDock *pDock, gchar **cAppletConfFilePath, GError **erreur) \
 { \
 	myDock = pDock; \
-	gchar *cAppletConfFilePath = cairo_dock_check_conf_file_exists (MY_APPLET_USER_DATA_DIR, MY_APPLET_SHARE_DATA_DIR, MY_APPLET_CONF_FILE); \
+	gchar *cConfFilePath = cairo_dock_check_conf_file_exists (MY_APPLET_USER_DATA_DIR, MY_APPLET_SHARE_DATA_DIR, MY_APPLET_CONF_FILE); \
 	int iDesiredWidth = 48, iDesiredHeight = 48; \
 	gchar *cAppletName = NULL, *cIconName = NULL; \
-	read_conf_file (cAppletConfFilePath, &iDesiredWidth, &iDesiredHeight, &cAppletName, &cIconName); \
+	read_conf_file (cConfFilePath, &iDesiredWidth, &iDesiredHeight, &cAppletName, &cIconName); \
 	myIcon = cairo_dock_create_icon_for_applet (pDock, iDesiredWidth, iDesiredHeight, cAppletName, cIconName); \
 	g_return_val_if_fail (myIcon != NULL, NULL); \
 	myDrawContext = cairo_create (myIcon->pIconBuffer); \
 	g_return_val_if_fail (cairo_status (myDrawContext) == CAIRO_STATUS_SUCCESS, NULL);
 
 #define CD_APPLET_INIT_END \
-	*cConfFilePath = cAppletConfFilePath;\
+	*cAppletConfFilePath = cConfFilePath; \
 	g_free (cAppletName); \
 	g_free (cIconName); \
 	return myIcon; \
@@ -181,6 +181,8 @@ void stop (void) \
 	cairo_destroy (myDrawContext); \
 	myDrawContext = NULL; \
 }
+
+#define CD_APPLET_MY_CONF_FILE cConfFilePath
 
 
 //\___________________________ CONFIG
@@ -276,18 +278,24 @@ gboolean applet_on_build_menu (gpointer *data) \
 	return CAIRO_DOCK_LET_PASS_NOTIFICATION; \
 }
 
+#define CD_APPLET_MY_MENU pAppletMenu
+
 #define CD_APPLET_ADD_SUB_MENU(cLabel, pSubMenu, pMenu) \
-	pSubMenu = gtk_menu_new (); \
+	GtkWidget *pSubMenu = gtk_menu_new (); \
 	pMenuItem = gtk_menu_item_new_with_label (cLabel); \
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pMenu), pMenuItem); \
 	gtk_menu_item_set_submenu (GTK_MENU_ITEM (pMenuItem), pSubMenu);
 
-#define CD_APPLET_ADD_IN_MENU(cLabel, pFunction, pMenu) \
+#define CD_APPLET_ADD_IN_MENU_WITH_DATA(cLabel, pFunction, pMenu, pData) \
 	pMenuItem = gtk_menu_item_new_with_label (cLabel); \
-	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), pMenuItem); \
-	g_signal_connect (G_OBJECT (pMenuItem), "activate", G_CALLBACK (pFunction), NULL);
+	gtk_menu_shell_append  (GTK_MENU_SHELL (pMenu), pMenuItem); \
+	g_signal_connect (G_OBJECT (pMenuItem), "activate", G_CALLBACK (pFunction), pData);
+
+#define CD_APPLET_ADD_IN_MENU(cLabel, pFunction, pMenu) CD_APPLET_ADD_IN_MENU_WITH_DATA(cLabel, pFunction, pMenu, NULL)
 
 #define CD_APPLET_ADD_ABOUT_IN_MENU(pMenu) CD_APPLET_ADD_IN_MENU ("About", about, pMenu)
+
+#define CD_APPLET_LAST_ITEM_IN_MENU pMenuItem
 
 #define CD_APPLET_ON_BUILD_MENU_H \
 gboolean applet_on_build_menu (gpointer *data);
@@ -320,6 +328,12 @@ gboolean action_on_middle_click (gpointer *data);
 
 #define CD_APPLET_ANIMATE(iAnimationType, iAnimationLength) \
 	cairo_dock_animate_icon (myIcon, myDock, iAnimationType, iAnimationLength);
+
+//\___________________________ INCLUDE
+#define CD_APPLET_INCLUDE_MY_VARS \
+extern Icon *myIcon; \
+extern cairo_t *myDrawContext; \
+extern CairoDock *myDock;
 
 
 #endif

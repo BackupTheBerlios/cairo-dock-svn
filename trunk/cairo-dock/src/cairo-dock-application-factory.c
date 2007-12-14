@@ -54,6 +54,7 @@ static Atom s_aUtf8String;
 static Atom s_aWmName;
 static Atom s_aString;
 static Atom s_aWmHints;
+static Atom s_aNetWmHidden;
 
 
 void cairo_dock_initialize_application_factory (Display *pXDisplay)
@@ -71,6 +72,7 @@ void cairo_dock_initialize_application_factory (Display *pXDisplay)
 	s_aNetWmState = XInternAtom (s_XDisplay, "_NET_WM_STATE", False);
 	s_aNetWmSkipPager = XInternAtom (s_XDisplay, "_NET_WM_STATE_SKIP_PAGER", False);
 	s_aNetWmSkipTaskbar = XInternAtom (s_XDisplay, "_NET_WM_STATE_SKIP_TASKBAR", False);
+	s_aNetWmHidden = XInternAtom (s_XDisplay, "_NET_WM_STATE_HIDDEN", False);
 	
 	s_aNetWmPid = XInternAtom (s_XDisplay, "_NET_WM_PID", False);
 	
@@ -252,7 +254,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	double fWidth, fHeight;
 	
 	//\__________________ On regarde si on doit l'afficher ou la sauter.
-	gboolean bSkip = FALSE;
+	gboolean bSkip = FALSE, bIsHidden = FALSE;
 	gulong *pXStateBuffer = NULL;
 	iBufferNbElements = 0;
 	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmState, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXStateBuffer);
@@ -263,6 +265,8 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 		{
 			if (pXStateBuffer[i] == s_aNetWmSkipTaskbar)
 				bSkip = TRUE;
+			else if (pXStateBuffer[i] == s_aNetWmHidden)
+				bIsHidden = TRUE;
 			//else if (pXStateBuffer[i] == s_aNetWmSkipPager)  // contestable ...
 			//	bSkip = TRUE;
 		}
@@ -369,6 +373,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	Icon * pLastAppli = cairo_dock_get_last_appli (pDock->icons);
 	icon->fOrder = (pLastAppli != NULL ? pLastAppli->fOrder + 1 : 1);
 	icon->iType = CAIRO_DOCK_APPLI;
+	icon->bIsHidden = bIsHidden;
 	
 	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
 	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));

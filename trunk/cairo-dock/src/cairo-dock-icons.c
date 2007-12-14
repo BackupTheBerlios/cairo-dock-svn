@@ -71,8 +71,6 @@ void cairo_dock_free_icon (Icon *icon)
 	if (icon == NULL)
 		return ;
 	
-	if (icon->pSubDock != NULL)
-		g_print ("/!\\ /!\\ Attention : cette icone n'a pas ete liberee proprement !!! /!\\ /!\\\n");
 	g_print ("%s (%s)\n", __func__, icon->acName);
 	
 	cairo_dock_remove_dialog_if_any (icon);
@@ -544,6 +542,8 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 	//\___________________ On efface son eventuel dialogue, puisqu'elle n'appartiendra bientot plus a aucun dock.
 	cairo_dock_remove_dialog_if_any (icon);
 	
+	icon->iCount = 0;
+	
 	//\___________________ On l'enleve de la liste.
 	if (pDock->pFirstDrawnElement != NULL && pDock->pFirstDrawnElement->data == icon)
 	{
@@ -579,9 +579,6 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 		icon->fWidth /= g_fSubDockSizeRatio;
 		icon->fHeight /= g_fSubDockSizeRatio;
 	}
-	
-	g_free (icon->cParentDockName);
-	icon->cParentDockName = NULL;
 	
 	//\___________________ On enleve le separateur si c'est la derniere icone de son type.
 	if (bCheckUnusedSeparator)

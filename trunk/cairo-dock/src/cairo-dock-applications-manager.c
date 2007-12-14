@@ -39,6 +39,8 @@ extern int g_iScreenWidth[2], g_iScreenHeight[2];
 extern gboolean g_bUniquePid;
 extern gboolean g_bAnimateOnActiveWindow;
 extern gboolean g_bAutoHideOnFullScreen;
+extern gboolean g_bHideVisibleApplis;
+extern double g_fVisibleAppliAlpha;
 
 static GHashTable *s_hXWindowTable = NULL;  // table des fenetres X affichees dans le dock.
 static Display *s_XDisplay = NULL;
@@ -634,7 +636,6 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 					if (! g_bAutoHide && g_bAutoHideOnFullScreen && bIsFullScreen)
 					{
 						g_print (" => devient plein ecran\n");
-						
 						cairo_dock_activate_temporary_auto_hide (g_pMainDock);
 					}
 					else
@@ -649,7 +650,24 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 							if (bIsHidden != icon->bIsHidden)
 							{
 								icon->bIsHidden = bIsHidden;
-								cairo_dock_redraw_my_icon (icon, pParentDock);
+								
+								if (g_bHideVisibleApplis)
+								{
+									if (bIsHidden)
+									{
+										g_print (" => se cache\n");
+										cairo_dock_insert_icon_in_dock (icon, pParentDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+									}
+									else
+									{
+										g_print (" => re-apparait\n");
+										cairo_dock_detach_icon_from_dock (icon, pParentDock, TRUE);
+										cairo_dock_update_dock_size (pParentDock);
+									}
+									gtk_widget_queue_draw (pParentDock->pWidget);
+								}
+								else if (g_fVisibleAppliAlpha < 1)
+									cairo_dock_redraw_my_icon (icon, pParentDock);
 							}
 						}
 					}
@@ -705,14 +723,19 @@ static void _cairo_dock_remove_old_applis (Window *Xid, Icon *icon, double *fTim
 		{
 			g_print ("cette fenetre (%ld) est trop vieille\n", *Xid);
 			CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
-			g_return_if_fail (pParentDock != NULL);
-			
-			if (! pParentDock->bInside && (g_bAutoHide || pParentDock->iRefCount != 0) && pParentDock->bAtBottom)
-				icon->fPersonnalScale = 0.05;
+			if (pParentDock != NULL)
+			{
+				if (! pParentDock->bInside && (g_bAutoHide || pParentDock->iRefCount != 0) && pParentDock->bAtBottom)
+					icon->fPersonnalScale = 0.05;
+				else
+					icon->fPersonnalScale = 1.0;
+				
+				cairo_dock_start_animation (icon, pParentDock);
+			}
 			else
-				icon->fPersonnalScale = 1.0;
-			
-			cairo_dock_start_animation (icon, pParentDock);
+			{
+				cairo_dock_free_icon (icon);
+			}
 		}
 	}
 }
@@ -743,13 +766,16 @@ void cairo_dock_update_applis_list (CairoDock *pDock, double fTime)
 			{
 				g_print (" insertion de %s dans %s\n", icon->acName, icon->cParentDockName);
 				icon->fLastCheckTime = fTime;
-				CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
-				g_return_if_fail (pParentDock != NULL);
-				cairo_dock_insert_icon_in_dock (icon, pParentDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
-				if (! pParentDock->bInside && g_bAutoHide && pParentDock->bAtBottom)
-					icon->fPersonnalScale = - 0.05;
-				g_print (" insertion complete (%.2f)\n", icon->fPersonnalScale);
-				cairo_dock_start_animation (icon, pParentDock);
+				if (icon->bIsHidden || ! g_bHideVisibleApplis)
+				{
+					CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+					g_return_if_fail (pParentDock != NULL);
+					cairo_dock_insert_icon_in_dock (icon, pParentDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+					if (! pParentDock->bInside && g_bAutoHide && pParentDock->bAtBottom)
+						icon->fPersonnalScale = - 0.05;
+					g_print (" insertion complete (%.2f)\n", icon->fPersonnalScale);
+					cairo_dock_start_animation (icon, pParentDock);
+				}
 			}
 			else
 				cairo_dock_blacklist_appli (Xid);
@@ -804,7 +830,7 @@ void cairo_dock_start_application_manager (CairoDock *pDock)
 		Xid = pXWindowsList[i];
 		pIcon = cairo_dock_create_icon_from_xwindow (pCairoContext, Xid, pDock);
 		
-		if (pIcon != NULL)
+		if (pIcon != NULL && (pIcon->bIsHidden || ! g_bHideVisibleApplis))
 		{
 			CairoDock *pParentDock = cairo_dock_search_dock_from_name (pIcon->cParentDockName);
 			g_return_if_fail (pParentDock != NULL);

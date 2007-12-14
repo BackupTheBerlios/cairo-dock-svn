@@ -126,6 +126,8 @@ extern gboolean g_bAutoHideOnFullScreen;
 extern gboolean g_bDemandsAttentionWithDialog;
 extern gboolean g_bDemandsAttentionWithAnimation;
 extern gboolean g_bAnimateOnActiveWindow;
+extern double g_fVisibleAppliAlpha;
+extern gboolean g_bHideVisibleApplis;
 
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
@@ -795,6 +797,12 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_bAnimateOnActiveWindow = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "animate on active window", &bFlushConfFileNeeded, TRUE);
 	
+	gboolean bHideVisibleApplisOld = g_bHideVisibleApplis;
+	g_bHideVisibleApplis = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "hide visible", &bFlushConfFileNeeded, FALSE);
+	
+	g_fVisibleAppliAlpha = cairo_dock_get_double_key_value (pKeyFile, "Applications", "visible alpha", &bFlushConfFileNeeded, 1.);
+	if (g_bHideVisibleApplis)
+		g_fVisibleAppliAlpha = 1.;  // on inhibe ce parametre, puisqu'il ne sert alors a rien.
 	
 	//\___________________ On recupere les parametres des applets.
 	g_tMaxIconAuthorizedSize[CAIRO_DOCK_APPLET] = cairo_dock_get_integer_key_value (pKeyFile, "Applets", "max icon size", &bFlushConfFileNeeded, 0);
@@ -892,7 +900,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	cairo_dock_remove_all_applets (pDock);  // on est obliges d'arreter tous les applets (c.a.d. les modules ayant une icone dans le dock).
 	
-	if (bUniquePidOld != g_bUniquePid || bGroupAppliByClassOld != g_bGroupAppliByClass || (cairo_dock_application_manager_is_running () && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
+	if (bUniquePidOld != g_bUniquePid || bGroupAppliByClassOld != g_bGroupAppliByClass || bHideVisibleApplisOld != g_bHideVisibleApplis || (cairo_dock_application_manager_is_running () && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
 	{
 		cairo_dock_stop_application_manager (pDock);
 	}
@@ -931,7 +939,6 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	cairo_dock_set_all_views_to_default ();
 	
 	cairo_dock_reserve_space_for_dock (pDock, g_bReserveSpace);
-	///cairo_dock_update_dock_size (pDock);
 	
 	
 	cairo_dock_load_visible_zone (pDock, cVisibleZoneImageFile, g_iVisibleZoneWidth, g_iVisibleZoneHeight, g_fVisibleZoneAlpha);

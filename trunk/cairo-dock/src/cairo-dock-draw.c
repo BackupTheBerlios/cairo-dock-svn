@@ -61,6 +61,7 @@ extern gboolean g_bLabelForPointedIconOnly;
 extern double g_fLabelAlphaThreshold;
 
 extern double g_fAlphaAtRest;
+extern double g_fVisibleAppliAlpha;
 
 extern int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS];
 extern gboolean g_bDynamicReflection;
@@ -450,8 +451,8 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect)
 {
 	//\_____________________ On separe 2 cas : dessin avec le tampon complet, et dessin avec le ou les petits tampons.
-	if (icon->bIsHidden)
-		icon->fAlpha *= .5;
+	if (CAIRO_DOCK_IS_APPLI (icon) && ! icon->bIsHidden)
+		icon->fAlpha *= g_fVisibleAppliAlpha;
 	gboolean bDrawFullBuffer;
 	bDrawFullBuffer  = (bUseReflect && icon->pFullIconBuffer != NULL && (! g_bDynamicReflection || icon->fScale == 1) && (icon->iCount == 0 || icon->iAnimationType == CAIRO_DOCK_ROTATE || icon->iAnimationType == CAIRO_DOCK_BLINK));
 	int iCurrentWidth= 1;

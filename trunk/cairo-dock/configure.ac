@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([cairo-dock], [1.4.5], [Fabrice Rey (fabounet@users.berlios.de)])
+AC_INIT([cairo-dock], [1.4.5.1], [Fabrice Rey (fabounet@users.berlios.de)])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
 
@@ -65,5 +65,11 @@ AC_CONFIG_FILES([Makefile
 		data/themes/_TapisVert_/plug-ins/rendering/Makefile
 		data/themes/_TapisVert_/plug-ins/logout/Makefile
 		data/themes/_TapisVert_/plug-ins/dustbin/Makefile
+		data/themes/_MacOSX_/Makefile
+		data/themes/_MacOSX_/launchers/Makefile
+		data/themes/_MacOSX_/plug-ins/Makefile
+		data/themes/_MacOSX_/plug-ins/clock/Makefile
+		data/themes/_MacOSX_/plug-ins/dustbin/Makefile
+		data/themes/_MacOSX_/plug-ins/rendering/Makefile
 		])
 AC_OUTPUT

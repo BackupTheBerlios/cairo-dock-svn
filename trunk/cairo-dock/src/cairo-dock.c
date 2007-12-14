@@ -175,8 +175,8 @@ double g_fMoveDownSpeed = 0.33;
 double g_fRefreshInterval = .04;
 
 gboolean g_bShowAppli = FALSE;  // au debut on ne montre pas les applis, il faut que cairo-dock le sache.
-gboolean g_bUniquePid;  // une seule icone par PID.
-gboolean g_bGroupAppliByClass = TRUE;  // une seule icone par classe, les autres dans un container.
+gboolean g_bUniquePid = FALSE;  // une seule icone par PID.
+gboolean g_bGroupAppliByClass = FALSE;  // une seule icone par classe, les autres dans un container.
 int g_iAppliMaxNameLength;  // longueur max de la chaine de caractere du nom des applis.
 gboolean g_bMinimizeOnClick;  // minimiser l'appli lorsqu'on clique sur son icone si elle est deja active.
 gboolean g_bCloseAppliOnMiddleClick;  // utiliser le clique du milieu pour fermer une appli.
@@ -184,6 +184,8 @@ gboolean g_bAutoHideOnFullScreen;  // quick-hide automatique lorsqu'une fenetre 
 gboolean g_bDemandsAttentionWithDialog;  // attirer l'attention avec une bulle de dialogue.
 gboolean g_bDemandsAttentionWithAnimation;  // attirer l'attention avec une animation.
 gboolean g_bAnimateOnActiveWindow;  // jouer une breve animation de l'icone lorsque la fenetre correspondante devient active.
+double g_fVisibleAppliAlpha;  // transparence des icones des applis dont la fenetre est visible.
+gboolean g_bHideVisibleApplis;  // TRUE <=> cacher les applis dont la fenetre est visible.
 
 gboolean g_bUseSeparator = TRUE;  // utiliser les separateurs ou pas.
 gchar *g_cSeparatorImage = NULL;

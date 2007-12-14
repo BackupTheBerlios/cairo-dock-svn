@@ -411,6 +411,7 @@ const gchar *cairo_dock_search_dock_name (CairoDock *pDock)
 */
 CairoDock *cairo_dock_search_dock_from_name (gchar *cDockName)
 {
+	g_return_val_if_fail (cDockName != NULL, NULL);
 	return g_hash_table_lookup (g_hDocksTable, cDockName);
 }
 
