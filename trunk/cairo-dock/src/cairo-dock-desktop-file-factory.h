@@ -13,7 +13,7 @@ gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, const gchar *cDockName
 gchar *cairo_dock_generate_desktop_filename (gchar *cBaseName, gchar *cCairoDockDataDir);
 
 
-void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath, gchar *cLanguage);
+void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath);
 
 
 gchar *cairo_dock_get_launcher_template_conf_file (void);

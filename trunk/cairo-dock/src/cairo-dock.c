@@ -86,7 +86,6 @@
 CairoDock *g_pMainDock;  // pointeur sur le dock principal.
 GHashTable *g_hDocksTable = NULL;  // table des docks existant.
 int g_iWmHint;  // hint pour la fenetre du dock principal.
-gchar *g_cLanguage = NULL;  // langue courante.
 gboolean g_bReserveSpace;
 gchar *g_cMainDockDefaultRendererName = NULL;
 gchar *g_cSubDockDefaultRendererName = NULL;
@@ -103,8 +102,7 @@ gchar *g_cCurrentThemePath = NULL;  // le chemin vers le repertoire du theme cou
 gchar *g_cCurrentLaunchersPath = NULL;  // le chemin vers le repertoire des lanceurs/icones du theme courant.
 gchar *g_cConfFile = NULL;  // le chemin du fichier de conf.
 gchar *g_cEasyConfFile = NULL;  // le chemin du fichier de conf pour les noobs ;-)
-gchar **g_cDefaultIconDirectory = NULL;  // les repertoires ou on va chercher les icones avant d'aller chercher dans le theme d'icones.
-GtkIconTheme *g_pIconTheme = NULL;  // le theme d'icone choisi.
+gpointer *g_pDefaultIconDirectory = NULL;  // les repertoires/themes ou on va chercher les icones.
 gchar *g_cCairoDockDataDir = NULL;  // le repertoire ou on va chercher les .desktop.
 
 gboolean g_bAutoHide;
@@ -140,8 +138,8 @@ cairo_surface_t *g_pBackgroundSurfaceFull[2] = {NULL, NULL};  // surface associe
 gboolean g_bDecorationsFollowMouse;  // dis si les decorations sont asservies au curseur, ou si le delta de deplacement ne depend que de la direction de celui-ci.
 
 int g_iIconGap;  // ecart en pixels entre les icones.
-int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];  // les tailles min et max pour chaque type d'icone.
-int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
+int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];  // les tailles min et max pour chaque type d'icone.
+int g_tIconAuthorizedHeight[CAIRO_DOCK_NB_TYPES];
 int g_tAnimationType[CAIRO_DOCK_NB_TYPES];  // le type de l'animation pour chaque type d'icone.
 int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];  // le nombre de rebonds/rotation/etc lors d'un clique gauche.
 int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];  // l'ordre de chaque type dans le dock.
@@ -156,6 +154,7 @@ double g_fSubDockSizeRatio;  // ratio de la taille des icones des sous-docks par
 gboolean g_bAnimateSubDock;
 int g_iLeaveSubDockDelay;
 int g_iShowSubDockDelay;
+gboolean bShowSubDockOnClick;  // TRUE <=> ne montrer les sous-docks qu'au clique, sinon au survol.
 
 int g_iLabelSize;  // taille de la police des etiquettes.
 gchar *g_cLabelPolice = NULL;  // police de caracteres des etiquettes.
@@ -186,6 +185,7 @@ gboolean g_bDemandsAttentionWithAnimation;  // attirer l'attention avec une anim
 gboolean g_bAnimateOnActiveWindow;  // jouer une breve animation de l'icone lorsque la fenetre correspondante devient active.
 double g_fVisibleAppliAlpha;  // transparence des icones des applis dont la fenetre est visible.
 gboolean g_bHideVisibleApplis;  // TRUE <=> cacher les applis dont la fenetre est visible.
+gboolean g_bAppliOnCurrentDesktopOnly;  // TRUE <=> cacher les applis dont la fenetre n'est pas sur le bureau courant.
 
 gboolean g_bUseSeparator = TRUE;  // utiliser les separateurs ou pas.
 gchar *g_cSeparatorImage = NULL;
@@ -194,8 +194,12 @@ gboolean g_bConstantSeparatorSize;  // garder les separateurs de taille constant
 
 int g_iDialogButtonWidth;
 int g_iDialogButtonHeight;
-double g_fDialogAlpha;
+double g_fDialogColor[4];
 int g_iDialogIconSize;
+int g_iDialogMessageSize;  // taille de la police des messagez.
+gchar *g_cDialogMessagePolice = NULL;  // police de caracteres des etiquettes.
+int g_iDialogMessageWeight;  // epaisseur des traits.
+int g_iDialogMessageStyle;  // italique ou droit.
 
 gboolean g_bKeepAbove = TRUE;
 gboolean g_bSkipPager = TRUE;
@@ -311,23 +315,6 @@ main (int argc, char** argv)
 	bind_textdomain_codeset ( GETTEXT_PACKAGE, "UTF-8" );
 	textdomain ( GETTEXT_PACKAGE );
 	g_print ("GETTEXT_PACKAGE : %s ; PACKAGE_LOCALE_DIR : %s\n", GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
-	const gchar* const *cLanguageTab = g_get_language_names ();
-	GHashTable *pTranslationTable = cairo_dock_list_available_translations (CAIRO_DOCK_SHARE_DATA_DIR, "cairo-dock-", NULL);
-	if (pTranslationTable != NULL && cLanguageTab != NULL)
-	{
-		int i = 0;
-		for (i = 0; cLanguageTab[i] != NULL; i ++)
-		{
-			if (g_hash_table_lookup (pTranslationTable, cLanguageTab[i]) != NULL)
-			{
-				g_cLanguage = g_strdup (cLanguageTab[i]);
-				break ;
-			}
-		}
-	}
-	g_hash_table_destroy (pTranslationTable);
-	g_print (" *** %s ***\n", g_cLanguage);
-	
 	
 	//\___________________ On initialise les numeros de version.
 	gchar **cVersions = g_strsplit (CAIRO_DOCK_VERSION, ".", -1);
@@ -419,10 +406,10 @@ main (int argc, char** argv)
 	//const gchar *cSillyMessage = "Petite annonce :\n  Projet sérieux recherche secrétaire pour rédiger documentation.\n  Niveau d'étude exigé : 95C.";  // 7500
 	//const gchar *cSillyMessage = "Cairo-Dock fait même le café ! Au choix :\n cairo-dock --capuccino , cairo-dock --expresso , cairo-dock --cafe_latte";  // 8000
 	//const gchar *cSillyMessage = "Veuillez rentrer un compliment élogieux à la gloire Fab pour pouvoir utiliser cairo-dock.";
-	const gchar *cSillyMessage = "Sondage :\n Combien cairo-dock c'est trop bien :";
-	//const gchar *cSillyMessage = "Cairo-Dock : just launch it !";  // 4000
+	//const gchar *cSillyMessage = "Sondage :\n Combien cairo-dock c'est trop bien :";
+	const gchar *cSillyMessage = "Cairo-Dock : just launch it !";  // 4000
 	//const gchar *cSillyMessage = "Cairo-Dock lave plus blanc que blanc";  // 4000
-	const gchar *cNumSilllyMessage = "8";
+	const gchar *cNumSilllyMessage = "9";
 	gboolean bWriteSillyMessage;
 	if (! g_file_test (cSillyMessageFilePath, G_FILE_TEST_EXISTS))
 	{
@@ -454,14 +441,14 @@ main (int argc, char** argv)
 		Icon *pFirstIcon = cairo_dock_get_first_icon (g_pMainDock->icons);
 		if (pFirstIcon != NULL)
 		{
-			//cairo_dock_show_temporary_dialog_with_default_icon (cSillyMessage, pFirstIcon, g_pMainDock, 4000);
+			cairo_dock_show_temporary_dialog_with_default_icon (cSillyMessage, pFirstIcon, g_pMainDock, 4000);
 			
-			double fAnswer = cairo_dock_show_value_and_wait (cSillyMessage, pFirstIcon, g_pMainDock, 1.);
+			/*double fAnswer = cairo_dock_show_value_and_wait (cSillyMessage, pFirstIcon, g_pMainDock, 1.);
 			g_print (" ==> %.2f\n", fAnswer);
 			if (fAnswer == 0)
 				g_print ("Cela sera consigné et utilisé contre vous le moment venu ;-)\n");
 			else if (fAnswer == 1)
-				g_print ("je suis aussi d'accord ! ;-)\n");
+				g_print ("je suis aussi d'accord ! ;-)\n");*/
 			/*cairo_t *pIconContext = cairo_dock_create_context_from_window (g_pMainDock);
 			cairo_dock_set_quick_info (pIconContext, "69°C", pFirstIcon, g_pMainDock);
 			cairo_destroy (pIconContext);*/

@@ -6,7 +6,7 @@
 #include <gtk/gtk.h>
 
 
-gchar *cairo_dock_edit_themes (gchar *cLanguage, GHashTable **hThemeTable);
+gchar *cairo_dock_edit_themes (GHashTable **hThemeTable);
 
 
 gchar *cairo_dock_get_chosen_theme (gchar *cConfFile, gboolean *bUseThemeBehaviour, gboolean *bUseThemeLaunchers);

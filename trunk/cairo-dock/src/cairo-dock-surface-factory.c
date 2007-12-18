@@ -15,8 +15,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-draw.h"
 #include "cairo-dock-surface-factory.h"
 
-extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
-extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
+extern int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];
+extern int g_tIconAuthorizedHeight[CAIRO_DOCK_NB_TYPES];
 extern double g_fAmplitude;
 extern double g_fReflectSize;
 extern double g_fAlbedo;
@@ -99,10 +99,10 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 	double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
 	cairo_dock_calculate_contrainted_icon_size (fWidth,
 		fHeight,
-		g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLI],
-		g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLI],
-		g_tMaxIconAuthorizedSize[CAIRO_DOCK_APPLI],
-		g_tMaxIconAuthorizedSize[CAIRO_DOCK_APPLI],
+		g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI],
+		g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI],
+		g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI],
+		g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI],
 		&fIconWidthSaturationFactor,
 		&fIconHeightSaturationFactor);
 	

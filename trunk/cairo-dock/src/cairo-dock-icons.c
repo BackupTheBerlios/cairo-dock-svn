@@ -539,6 +539,9 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 
 void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bCheckUnusedSeparator)
 {
+	if (g_list_find (pDock->icons, icon) == NULL)  // elle est deja detachee.
+		return ;
+	
 	//\___________________ On efface son eventuel dialogue, puisqu'elle n'appartiendra bientot plus a aucun dock.
 	cairo_dock_remove_dialog_if_any (icon);
 	

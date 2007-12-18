@@ -27,7 +27,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 extern GHashTable *g_hDocksTable;
 extern gchar *g_cCurrentThemePath;
 extern gchar *g_cCurrentLaunchersPath;
-extern gchar *g_cLanguage;
 
 
 gchar *cairo_dock_add_desktop_file_from_uri (gchar *cURI, const gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur)
@@ -167,7 +166,7 @@ gchar *cairo_dock_generate_desktop_filename (gchar *cBaseName, gchar *cCairoDock
 }
 
 
-void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath, gchar *cLanguage)
+void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath)
 {
 	GError *erreur = NULL;
 	GKeyFile *pKeyFile = g_key_file_new ();
@@ -181,13 +180,7 @@ void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath, gchar *cL
 	
 	if (cairo_dock_conf_file_needs_update (pKeyFile))
 		cairo_dock_flush_conf_file_full (pKeyFile, cDesktopFilePath, CAIRO_DOCK_SHARE_DATA_DIR, FALSE, CAIRO_DOCK_LAUNCHER_CONF_FILE);
-	/**gchar *cCommand = g_strdup_printf ("/bin/cp %s/launcher-%s.conf %s\n", CAIRO_DOCK_SHARE_DATA_DIR, cLanguage, cDesktopFilePath);
-	system (cCommand);
-	g_free (cCommand);
-	
-	cairo_dock_replace_values_in_conf_file (cDesktopFilePath, pKeyFile, FALSE, 0);
-	g_key_file_free (pKeyFile);*/
-	
+
 	cairo_dock_update_conf_file_with_hash_table (cDesktopFilePath, g_hDocksTable, "Desktop Entry", "Container", NULL, (GHFunc)cairo_dock_write_one_name);
 	cairo_dock_update_launcher_conf_file_with_renderers (cDesktopFilePath);
 }

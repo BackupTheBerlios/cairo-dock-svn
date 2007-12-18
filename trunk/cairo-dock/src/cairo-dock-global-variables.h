@@ -9,7 +9,6 @@
 extern CairoDock *g_pMainDock;
 /// Table des docks existant.
 extern GHashTable *g_hDocksTable;
-extern gchar *g_cLanguage;
 /// Largeur de l'ecran en mode horizontal/vertical.
 extern gint g_iScreenWidth[2];
 /// Hauteur/largeur de l'ecran en mode horizontal/vertical.

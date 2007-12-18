@@ -32,8 +32,8 @@ extern int g_iLabelSize;
 extern gchar *g_cLabelPolice;
 extern gboolean g_bTextAlwaysHorizontal;
 
-extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
-extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
+extern int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];
+extern int g_tIconAuthorizedHeight[CAIRO_DOCK_NB_TYPES];
 
 
 cairo_surface_t *cairo_dock_create_applet_surface (gchar *cIconFileName, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
@@ -42,10 +42,10 @@ cairo_surface_t *cairo_dock_create_applet_surface (gchar *cIconFileName, cairo_t
 	double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
 	cairo_dock_calculate_contrainted_icon_size (fWidth,
 		fHeight,
-		g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLET],
-		g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLET],
-		g_tMaxIconAuthorizedSize[CAIRO_DOCK_APPLET],
-		g_tMaxIconAuthorizedSize[CAIRO_DOCK_APPLET],
+		g_tIconAuthorizedWidth[CAIRO_DOCK_APPLET],
+		g_tIconAuthorizedHeight[CAIRO_DOCK_APPLET],
+		g_tIconAuthorizedWidth[CAIRO_DOCK_APPLET],
+		g_tIconAuthorizedHeight[CAIRO_DOCK_APPLET],
 		&fIconWidthSaturationFactor, &fIconHeightSaturationFactor);
 	
 	cairo_surface_t *pNewSurface;
@@ -111,11 +111,11 @@ GKeyFile *cairo_dock_read_header_applet_conf_file (gchar *cConfFilePath, int *iW
 		return NULL;
 	}
 	
-	*iWidth = cairo_dock_get_integer_key_value (pKeyFile, "ICON", "width", bFlushConfFileNeeded, 48);
+	*iWidth = cairo_dock_get_integer_key_value (pKeyFile, "ICON", "width", bFlushConfFileNeeded, 48, NULL, NULL);
 	
-	*iHeight = cairo_dock_get_integer_key_value (pKeyFile, "ICON", "height", bFlushConfFileNeeded, 48);
+	*iHeight = cairo_dock_get_integer_key_value (pKeyFile, "ICON", "height", bFlushConfFileNeeded, 48, NULL, NULL);
 	
-	*cName = cairo_dock_get_string_key_value (pKeyFile, "ICON", "name", bFlushConfFileNeeded, NULL);
+	*cName = cairo_dock_get_string_key_value (pKeyFile, "ICON", "name", bFlushConfFileNeeded, NULL, NULL, NULL);
 	
 	return pKeyFile;
 }

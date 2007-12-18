@@ -35,7 +35,6 @@ static const gchar * s_cIconTypeNames[(CAIRO_DOCK_NB_TYPES+1)/2] = {"launchers",
 
 extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
-extern gchar *g_cLanguage;
 extern gboolean g_bReverseVisibleImage;
 extern gboolean g_bReserveSpace;
 extern gchar *g_cMainDockDefaultRendererName;
@@ -65,6 +64,7 @@ extern double g_fSubDockSizeRatio;
 extern gboolean g_bAnimateSubDock;
 extern int g_iLeaveSubDockDelay;
 extern int g_iShowSubDockDelay;
+extern gboolean bShowSubDockOnClick;
 
 extern int g_iLabelSize;
 extern gchar *g_cLabelPolice;
@@ -74,8 +74,7 @@ extern gboolean g_bLabelForPointedIconOnly;
 extern double g_fLabelAlphaThreshold;
 extern gboolean g_bTextAlwaysHorizontal;
 
-extern gchar **g_cDefaultIconDirectory;
-extern GtkIconTheme *g_pIconTheme;
+extern gpointer *g_pDefaultIconDirectory;
 static gboolean s_bUserTheme = FALSE;
 extern gchar *g_cCurrentLaunchersPath;
 extern gchar *g_cConfFile;
@@ -128,9 +127,10 @@ extern gboolean g_bDemandsAttentionWithAnimation;
 extern gboolean g_bAnimateOnActiveWindow;
 extern double g_fVisibleAppliAlpha;
 extern gboolean g_bHideVisibleApplis;
+extern gboolean g_bAppliOnCurrentDesktopOnly;
 
-extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
-extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
+extern int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];
+extern int g_tIconAuthorizedHeight[CAIRO_DOCK_NB_TYPES];
 extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
@@ -142,9 +142,12 @@ extern gboolean g_bConstantSeparatorSize;
 
 extern int g_iDialogButtonWidth;
 extern int g_iDialogButtonHeight;
-extern double g_fDialogAlpha;
+extern double g_fDialogColor[4];
 extern int g_iDialogIconSize;
-
+extern int g_iDialogMessageSize;
+extern gchar *g_cDialogMessagePolice;
+extern int g_iDialogMessageWeight;
+extern int g_iDialogMessageStyle;
 
 /**
 *Recupere une cle booleene d'un fichier de cles.
@@ -155,7 +158,7 @@ extern int g_iDialogIconSize;
 *@param bDefaultValue valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
 @Returns la valeur booleene de la cle.
 */
-gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gboolean bDefaultValue)
+gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gboolean bDefaultValue, gchar *cDefaultGroupName, gchar *cDefaultKeyName)
 {
 	GError *erreur = NULL;
 	gboolean bValue = g_key_file_get_boolean (pKeyFile, cGroupName, cKeyName, &erreur);
@@ -176,7 +179,15 @@ gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 			if (erreur != NULL)
 			{
 				g_error_free (erreur);
-				bValue = bDefaultValue;
+				erreur = NULL;
+				bValue = g_key_file_get_boolean (pKeyFile, (cDefaultGroupName != NULL ? cDefaultGroupName : cGroupName), (cDefaultKeyName != NULL ? cDefaultKeyName : cKeyName), &erreur);
+				if (erreur != NULL)
+				{
+					g_error_free (erreur);
+					bValue = bDefaultValue;
+				}
+				else
+					g_print (" (recuperee)\n");
 			}
 			else
 				g_print (" (recuperee)\n");
@@ -196,7 +207,7 @@ gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 *@param iDefaultValue valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
 @Returns la valeur entiere de la cle.
 */
-int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, int iDefaultValue)
+int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, int iDefaultValue, gchar *cDefaultGroupName, gchar *cDefaultKeyName)
 {
 	GError *erreur = NULL;
 	int iValue = g_key_file_get_integer (pKeyFile, cGroupName, cKeyName, &erreur);
@@ -216,7 +227,15 @@ int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gch
 			if (erreur != NULL)
 			{
 				g_error_free (erreur);
-				iValue = iDefaultValue;
+				erreur = NULL;
+				iValue = g_key_file_get_integer (pKeyFile, (cDefaultGroupName != NULL ? cDefaultGroupName : cGroupName), (cDefaultKeyName != NULL ? cDefaultKeyName : cKeyName), &erreur);
+				if (erreur != NULL)
+				{
+					g_error_free (erreur);
+					iValue = iDefaultValue;
+				}
+				else
+					g_print (" (recuperee)\n");
 			}
 			else
 				g_print (" (recuperee)\n");
@@ -237,7 +256,7 @@ int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gch
 *@param fDefaultValue valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
 @Returns la valeur flottante de la cle.
 */
-double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, double fDefaultValue)
+double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, double fDefaultValue, gchar *cDefaultGroupName, gchar *cDefaultKeyName)
 {
 	GError *erreur = NULL;
 	double fValue = g_key_file_get_double (pKeyFile, cGroupName, cKeyName, &erreur);
@@ -257,7 +276,15 @@ double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 			if (erreur != NULL)
 			{
 				g_error_free (erreur);
-				fValue = fDefaultValue;
+				erreur = NULL;
+				fValue = g_key_file_get_double (pKeyFile, (cDefaultGroupName != NULL ? cDefaultGroupName : cGroupName), (cDefaultKeyName != NULL ? cDefaultKeyName : cKeyName), &erreur);
+				if (erreur != NULL)
+				{
+					g_error_free (erreur);
+					fValue = fDefaultValue;
+				}
+				else
+					g_print (" (recuperee)\n");
 			}
 			else
 				g_print (" (recuperee)\n");
@@ -278,7 +305,7 @@ double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 *@param cDefaultValue valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
 @Returns la chaine de caractere nouvellement allouee correspondante a la cle.
 */
-gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, const gchar *cDefaultValue)
+gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, const gchar *cDefaultValue, gchar *cDefaultGroupName, gchar *cDefaultKeyName)
 {
 	GError *erreur = NULL;
 	gchar *cValue = g_key_file_get_string (pKeyFile, cGroupName, cKeyName, &erreur);
@@ -298,7 +325,15 @@ gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 			if (erreur != NULL)
 			{
 				g_error_free (erreur);
-				cValue = g_strdup (cDefaultValue);
+				erreur = NULL;
+				cValue = g_key_file_get_string (pKeyFile, (cDefaultGroupName != NULL ? cDefaultGroupName : cGroupName), (cDefaultKeyName != NULL ? cDefaultKeyName : cKeyName), &erreur);
+				if (erreur != NULL)
+				{
+					g_error_free (erreur);
+					cValue = g_strdup (cDefaultValue);
+				}
+				else
+					g_print (" (recuperee)\n");
 			}
 			else
 				g_print (" (recuperee)\n");
@@ -325,7 +360,7 @@ gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 *@param iNbElements nombre d'elements a recuperer; c'est le nombre d'elements du tableau passe en entree.
 *@param iDefaultValues valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
 */
-void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, int *iValueBuffer, int iNbElements, int *iDefaultValues)
+void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, int *iValueBuffer, int iNbElements, int *iDefaultValues, gchar *cDefaultGroupName, gchar *cDefaultKeyName)
 {
 	GError *erreur = NULL;
 	gsize length = 0;
@@ -349,6 +384,18 @@ void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cGroupNam
 			if (erreur != NULL)
 			{
 				g_error_free (erreur);
+				erreur = NULL;
+				iValuesList = g_key_file_get_integer_list (pKeyFile, (cDefaultGroupName != NULL ? cDefaultGroupName : cGroupName), (cDefaultKeyName != NULL ? cDefaultKeyName : cKeyName), &length, &erreur);
+				if (erreur != NULL)
+				{
+					g_error_free (erreur);
+				}
+				else
+				{
+					g_print (" (recuperee)\n");
+					if (length > 0)
+						memcpy (iValueBuffer, iValuesList, MIN (iNbElements, length) * sizeof (int));
+				}
 			}
 			else
 			{
@@ -384,7 +431,7 @@ void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cGroupNam
 *@param iNbElements nombre d'elements a recuperer; c'est le nombre d'elements du tableau passe en entree.
 *@param fDefaultValues valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
 */
-void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, double *fValueBuffer, int iNbElements, double *fDefaultValues)
+void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, double *fValueBuffer, int iNbElements, double *fDefaultValues, gchar *cDefaultGroupName, gchar *cDefaultKeyName)
 {
 	GError *erreur = NULL;
 	gsize length = 0;
@@ -408,6 +455,18 @@ void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 			if (erreur != NULL)
 			{
 				g_error_free (erreur);
+				erreur = NULL;
+				fValuesList = g_key_file_get_double_list (pKeyFile, (cDefaultGroupName != NULL ? cDefaultGroupName : cGroupName), (cDefaultKeyName != NULL ? cDefaultKeyName : cKeyName), &length, &erreur);
+				if (erreur != NULL)
+				{
+					g_error_free (erreur);
+				}
+				else
+				{
+					g_print (" (recuperee)\n");
+					if (length > 0)
+						memcpy (fValueBuffer, fValuesList, MIN (iNbElements, length) * sizeof (double));
+				}
 			}
 			else
 			{
@@ -443,7 +502,7 @@ void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 *@param cDefaultValues valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
 @Returns un tableau de chaines de caracteres; a liberer avec g_strfreev().
 */
-gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gsize *length, gchar *cDefaultValues)
+gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gsize *length, gchar *cDefaultValues, gchar *cDefaultGroupName, gchar *cDefaultKeyName)
 {
 	GError *erreur = NULL;
 	*length = 0;
@@ -459,14 +518,20 @@ gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupN
 		if (erreur != NULL)
 		{
 			g_error_free (erreur);
-			cValuesList = g_strsplit (cDefaultValues, ";", -1);  // "" -> NULL.
-			int i = 0;
-			if (cValuesList != NULL)
+			erreur = NULL;
+			cValuesList = g_key_file_get_string_list (pKeyFile, (cDefaultGroupName != NULL ? cDefaultGroupName : cGroupName), (cDefaultKeyName != NULL ? cDefaultKeyName : cKeyName), length, &erreur);
+			if (erreur != NULL)
 			{
-				while (cValuesList[i] != NULL)
-					i ++;
+				g_error_free (erreur);
+				cValuesList = g_strsplit (cDefaultValues, ";", -1);  // "" -> NULL.
+				int i = 0;
+				if (cValuesList != NULL)
+				{
+					while (cValuesList[i] != NULL)
+						i ++;
+				}
+				*length = i;
 			}
-			*length = i;
 		}
 		g_free (cGroupNameUpperCase);
 		
@@ -493,9 +558,9 @@ gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupN
 *@param iDefaultAnimation valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
 *@Returns le type de l'animation correspondante a la cle.
 */
-CairoDockAnimationType cairo_dock_get_animation_type_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, CairoDockAnimationType iDefaultAnimation)
+CairoDockAnimationType cairo_dock_get_animation_type_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, CairoDockAnimationType iDefaultAnimation, gchar *cDefaultGroupName, gchar *cDefaultKeyName)
 {
-	CairoDockAnimationType iAnimationType = cairo_dock_get_integer_key_value (pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, iDefaultAnimation);
+	CairoDockAnimationType iAnimationType = cairo_dock_get_integer_key_value (pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, iDefaultAnimation, cDefaultGroupName, cDefaultKeyName);
 	if (iAnimationType < 0 || iAnimationType >= CAIRO_DOCK_NB_ANIMATIONS)
 		iAnimationType = 0;
 	return iAnimationType;
@@ -507,7 +572,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	//g_print ("%s (%s)\n", __func__, cConfFilePath);
 	GError *erreur = NULL;
 	gsize length;
-	gboolean bFlushConfFileNeeded = FALSE;  // si un champ n'existe pas, on le rajoute au fichier de conf.
+	gboolean bFlushConfFileNeeded = FALSE, bFlushConfFileNeeded2 = FALSE;  // si un champ n'existe pas, on le rajoute au fichier de conf.
 	
 	//\___________________ On ouvre le fichier de conf.
 	GKeyFile *pKeyFile = g_key_file_new ();
@@ -520,53 +585,55 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	}
 	
 	//\___________________ On recupere la position du dock.
-	pDock->iGapX = cairo_dock_get_integer_key_value (pKeyFile, "Position", "x gap", &bFlushConfFileNeeded, 0);
-	pDock->iGapY = cairo_dock_get_integer_key_value (pKeyFile, "Position", "y gap", &bFlushConfFileNeeded, 0);
+	pDock->iGapX = cairo_dock_get_integer_key_value (pKeyFile, "Position", "x gap", &bFlushConfFileNeeded, 0, NULL, NULL);
+	pDock->iGapY = cairo_dock_get_integer_key_value (pKeyFile, "Position", "y gap", &bFlushConfFileNeeded, 0, NULL, NULL);
 	
 	///gchar *cScreenBorder = cairo_dock_get_string_key_value (pKeyFile, "Position", "screen border", &bFlushConfFileNeeded, "bottom");
-	CairoDockPositionType iScreenBorder = cairo_dock_get_integer_key_value (pKeyFile, "Position", "screen border", &bFlushConfFileNeeded, 0);
+	CairoDockPositionType iScreenBorder = cairo_dock_get_integer_key_value (pKeyFile, "Position", "screen border", &bFlushConfFileNeeded, 0, NULL, NULL);
 	if (iScreenBorder < 0 || iScreenBorder >= CAIRO_DOCK_NB_POSITIONS)
 		iScreenBorder = 0;
 	
-	pDock->fAlign = cairo_dock_get_double_key_value (pKeyFile, "Position", "alignment", &bFlushConfFileNeeded, 0.5);
+	pDock->fAlign = cairo_dock_get_double_key_value (pKeyFile, "Position", "alignment", &bFlushConfFileNeeded, 0.5, NULL, NULL);
 	
-	g_bReserveSpace = cairo_dock_get_boolean_key_value (pKeyFile, "Position", "reserve space", &bFlushConfFileNeeded, FALSE);
+	g_bReserveSpace = cairo_dock_get_boolean_key_value (pKeyFile, "Position", "reserve space", &bFlushConfFileNeeded, FALSE, NULL, NULL);
+	
+	cairo_dock_deactivate_temporary_auto_hide ();
+	g_bAutoHide = cairo_dock_get_boolean_key_value (pKeyFile, "Position", "auto-hide", &bFlushConfFileNeeded, FALSE, "Auto-Hide", "auto-hide");
 	
 	
 	//\___________________ On recupere les parametres de la zone visible.
-	gchar *cVisibleZoneImageFile = cairo_dock_get_string_key_value (pKeyFile, "Auto-Hide", "background image", &bFlushConfFileNeeded, NULL);
+	gchar *cVisibleZoneImageFile = cairo_dock_get_string_key_value (pKeyFile, "Background", "background image", &bFlushConfFileNeeded, NULL, "Auto-Hide", NULL);
 	
-	g_iVisibleZoneWidth = cairo_dock_get_integer_key_value (pKeyFile, "Auto-Hide", "zone width", &bFlushConfFileNeeded, 150);
-	g_iVisibleZoneHeight = cairo_dock_get_integer_key_value (pKeyFile, "Auto-Hide", "zone height", &bFlushConfFileNeeded, 25);
+	g_iVisibleZoneWidth = cairo_dock_get_integer_key_value (pKeyFile, "Background", "zone width", &bFlushConfFileNeeded, 150, "Auto-Hide", NULL);
+	g_iVisibleZoneHeight = cairo_dock_get_integer_key_value (pKeyFile, "Background", "zone height", &bFlushConfFileNeeded, 25, "Auto-Hide", NULL);
 	
-	g_fVisibleZoneAlpha = cairo_dock_get_double_key_value (pKeyFile, "Auto-Hide", "alpha", &bFlushConfFileNeeded, 0.5);
+	g_fVisibleZoneAlpha = cairo_dock_get_double_key_value (pKeyFile, "Background", "alpha", &bFlushConfFileNeeded, 0.5, "Auto-Hide", NULL);
 	
-	cairo_dock_deactivate_temporary_auto_hide ();
-	g_bAutoHide = cairo_dock_get_boolean_key_value (pKeyFile, "Auto-Hide", "auto-hide", &bFlushConfFileNeeded, FALSE);
-	
-	g_bReverseVisibleImage = cairo_dock_get_boolean_key_value (pKeyFile, "Auto-Hide", "reverse visible image", &bFlushConfFileNeeded, TRUE);
+	g_bReverseVisibleImage = cairo_dock_get_boolean_key_value (pKeyFile, "Background", "reverse visible image", &bFlushConfFileNeeded, TRUE, "Auto-Hide", NULL);
 	
 	
 	//\___________________ On recupere les parametres des etiquettes.
-	g_bLabelForPointedIconOnly = cairo_dock_get_boolean_key_value (pKeyFile, "Labels", "pointed icon only", &bFlushConfFileNeeded, FALSE);
+	g_bLabelForPointedIconOnly = cairo_dock_get_boolean_key_value (pKeyFile, "System", "pointed icon only", &bFlushConfFileNeeded, FALSE, "Labels", NULL);
 	
-	g_fLabelAlphaThreshold = cairo_dock_get_double_key_value (pKeyFile, "Labels", "alpha threshold", &bFlushConfFileNeeded, 10.);
+	g_fLabelAlphaThreshold = cairo_dock_get_double_key_value (pKeyFile, "System", "alpha threshold", &bFlushConfFileNeeded, 10., "Labels", NULL);
+	
+	g_bTextAlwaysHorizontal = cairo_dock_get_boolean_key_value (pKeyFile, "System", "always horizontal", &bFlushConfFileNeeded, FALSE, "Labels", NULL);
+	
 	
 	g_free (g_cLabelPolice);
-	g_cLabelPolice = cairo_dock_get_string_key_value (pKeyFile, "Labels", "police", &bFlushConfFileNeeded, "sans");
+	g_cLabelPolice = cairo_dock_get_string_key_value (pKeyFile, "Icons", "police", &bFlushConfFileNeeded, "sans", "Labels", NULL);
 	
-	g_iLabelSize = cairo_dock_get_integer_key_value (pKeyFile, "Labels", "size", &bFlushConfFileNeeded, 14);
+	g_iLabelSize = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "size", &bFlushConfFileNeeded, 14, "Labels", NULL);
 	
-	g_iLabelWeight = cairo_dock_get_integer_key_value (pKeyFile, "Labels", "weight", &bFlushConfFileNeeded, 5);
+	g_iLabelWeight = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "weight", &bFlushConfFileNeeded, 5, "Labels", NULL);
 	g_iLabelWeight = ((PANGO_WEIGHT_HEAVY - PANGO_WEIGHT_ULTRALIGHT) * g_iLabelWeight + 9 * PANGO_WEIGHT_ULTRALIGHT - PANGO_WEIGHT_HEAVY) / 8;  // on se ramene aux intervalles definit par Pango.
 	
-	gboolean bLabelStyleItalic = cairo_dock_get_boolean_key_value (pKeyFile, "Labels", "italic", &bFlushConfFileNeeded, FALSE);
+	gboolean bLabelStyleItalic = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "italic", &bFlushConfFileNeeded, FALSE, "Labels", NULL);
 	if (bLabelStyleItalic)
 		g_iLabelStyle = PANGO_STYLE_ITALIC;
 	else
 		g_iLabelStyle = PANGO_STYLE_NORMAL;
 	
-	g_bTextAlwaysHorizontal = cairo_dock_get_boolean_key_value (pKeyFile, "Labels", "always horizontal", &bFlushConfFileNeeded, FALSE);
 	
 	if (g_cLabelPolice == NULL)
 		g_iLabelSize = 0;
@@ -579,7 +646,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	
 	//\___________________ On recupere les parametres du dock en lui-meme.
-	gchar **cIconsTypesList = cairo_dock_get_string_list_key_value (pKeyFile, "Cairo Dock", "icon's type order", &bFlushConfFileNeeded, &length, NULL);
+	gchar **cIconsTypesList = cairo_dock_get_string_list_key_value (pKeyFile, "Icons", "icon's type order", &bFlushConfFileNeeded, &length, NULL, "Cairo Dock", NULL);
 	if (cIconsTypesList != NULL && length > 0)
 	{
 		unsigned int i, j;
@@ -597,68 +664,70 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_strfreev (cIconsTypesList);
 	
 	g_free (g_cMainDockDefaultRendererName);
-	g_cMainDockDefaultRendererName = cairo_dock_get_string_key_value (pKeyFile, "Cairo Dock", "main dock view", &bFlushConfFileNeeded, CAIRO_DOCK_DEFAULT_RENDERER_NAME);
+	g_cMainDockDefaultRendererName = cairo_dock_get_string_key_value (pKeyFile, "Views", "main dock view", &bFlushConfFileNeeded, CAIRO_DOCK_DEFAULT_RENDERER_NAME, "Cairo Dock", NULL);
 	g_print ("g_cMainDockDefaultRendererName <- %s\n", g_cMainDockDefaultRendererName);
 	
-	double fUserValue = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "unfold factor", &bFlushConfFileNeeded, 8.);
+	double fUserValue = cairo_dock_get_double_key_value (pKeyFile, "System", "unfold factor", &bFlushConfFileNeeded, 8., "Cairo Dock", NULL);
 	g_fUnfoldAcceleration = 1 - pow (2, - fUserValue);
 	
-	int iNbSteps = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "grow up steps", &bFlushConfFileNeeded, 8);
+	int iNbSteps = cairo_dock_get_integer_key_value (pKeyFile, "System", "grow up steps", &bFlushConfFileNeeded, 8, "Cairo Dock", NULL);
 	iNbSteps = MAX (iNbSteps, 1);
 	g_iGrowUpInterval = MAX (1, CAIRO_DOCK_NB_MAX_ITERATIONS / iNbSteps);
-	iNbSteps = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "shrink down steps", &bFlushConfFileNeeded, 10);
+	iNbSteps = cairo_dock_get_integer_key_value (pKeyFile, "System", "shrink down steps", &bFlushConfFileNeeded, 10, "Cairo Dock", NULL);
 	iNbSteps = MAX (iNbSteps, 1);
 	g_iShrinkDownInterval = MAX (1, CAIRO_DOCK_NB_MAX_ITERATIONS / iNbSteps);
-	g_fMoveUpSpeed = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "move up speed", &bFlushConfFileNeeded, 0.35);
+	g_fMoveUpSpeed = cairo_dock_get_double_key_value (pKeyFile, "System", "move up speed", &bFlushConfFileNeeded, 0.35, "Cairo Dock", NULL);
 	g_fMoveUpSpeed = MAX (0.01, MIN (g_fMoveUpSpeed, 1));
-	g_fMoveDownSpeed = cairo_dock_get_double_key_value (pKeyFile, "Cairo Dock", "move down speed", &bFlushConfFileNeeded, 0.35);
+	g_fMoveDownSpeed = cairo_dock_get_double_key_value (pKeyFile, "System", "move down speed", &bFlushConfFileNeeded, 0.35, "Cairo Dock", NULL);
 	g_fMoveDownSpeed = MAX (0.01, MIN (g_fMoveDownSpeed, 1));
 	
-	int iRefreshFrequency = cairo_dock_get_integer_key_value (pKeyFile, "Cairo Dock", "refresh frequency", &bFlushConfFileNeeded, 25);
+	int iRefreshFrequency = cairo_dock_get_integer_key_value (pKeyFile, "System", "refresh frequency", &bFlushConfFileNeeded, 25, "Cairo Dock", NULL);
 	g_fRefreshInterval = 1000. / iRefreshFrequency;
 	
 	
 	//\___________________ On recupere les parametres propres aux sous-docks.
 	g_free (g_cSubDockDefaultRendererName);
-	g_cSubDockDefaultRendererName = cairo_dock_get_string_key_value (pKeyFile, "Sub-Docks", "sub-dock view", &bFlushConfFileNeeded, CAIRO_DOCK_DEFAULT_RENDERER_NAME);
+	g_cSubDockDefaultRendererName = cairo_dock_get_string_key_value (pKeyFile, "Views", "sub-dock view", &bFlushConfFileNeeded, CAIRO_DOCK_DEFAULT_RENDERER_NAME, "Sub-Docks", NULL);
 	
-	g_bSameHorizontality = cairo_dock_get_boolean_key_value (pKeyFile, "Sub-Docks", "same horizontality", &bFlushConfFileNeeded, TRUE);
+	g_bSameHorizontality = cairo_dock_get_boolean_key_value (pKeyFile, "Views", "same horizontality", &bFlushConfFileNeeded, TRUE, "Sub-Docks", NULL);
 	
-	g_fSubDockSizeRatio = cairo_dock_get_double_key_value (pKeyFile, "Sub-Docks", "relative icon size", &bFlushConfFileNeeded, 0.8);
+	g_fSubDockSizeRatio = cairo_dock_get_double_key_value (pKeyFile, "Views", "relative icon size", &bFlushConfFileNeeded, 0.8, "Sub-Docks", NULL);
 	
-	g_bAnimateSubDock = cairo_dock_get_boolean_key_value (pKeyFile, "Sub-Docks", "animate subdocks", &bFlushConfFileNeeded, TRUE);
+	g_bAnimateSubDock = cairo_dock_get_boolean_key_value (pKeyFile, "System", "animate subdocks", &bFlushConfFileNeeded, TRUE, "Sub-Docks", NULL);
 	
-	g_iLeaveSubDockDelay = cairo_dock_get_integer_key_value (pKeyFile, "Sub-Docks", "leaving delay", &bFlushConfFileNeeded, 250);
-	g_iShowSubDockDelay = cairo_dock_get_integer_key_value (pKeyFile, "Sub-Docks", "show delay", &bFlushConfFileNeeded, 300);
+	g_iLeaveSubDockDelay = cairo_dock_get_integer_key_value (pKeyFile, "System", "leaving delay", &bFlushConfFileNeeded, 250, "Sub-Docks", NULL);
+	g_iShowSubDockDelay = cairo_dock_get_integer_key_value (pKeyFile, "System", "show delay", &bFlushConfFileNeeded, 300, "Sub-Docks", NULL);
+	
+	bShowSubDockOnClick = cairo_dock_get_boolean_key_value (pKeyFile, "System", "show on click", &bFlushConfFileNeeded, FALSE, "Sub-Docks", NULL);
 	
 	
 	//\___________________ On recupere les parametres du fond.
-	g_iDockRadius = cairo_dock_get_integer_key_value (pKeyFile, "Background", "corner radius", &bFlushConfFileNeeded, 12);
+	g_iDockRadius = cairo_dock_get_integer_key_value (pKeyFile, "Background", "corner radius", &bFlushConfFileNeeded, 12, NULL, NULL);
 
-	g_iDockLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Background", "line width", &bFlushConfFileNeeded, 2);
+	g_iDockLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Background", "line width", &bFlushConfFileNeeded, 2, NULL, NULL);
 	
-	g_iFrameMargin = cairo_dock_get_integer_key_value (pKeyFile, "Background", "frame margin", &bFlushConfFileNeeded, 2);
+	g_iFrameMargin = cairo_dock_get_integer_key_value (pKeyFile, "Background", "frame margin", &bFlushConfFileNeeded, 2, NULL, NULL);
 	
 	double couleur[4] = {0., 0., 0.6, 0.4};
-	cairo_dock_get_double_list_key_value (pKeyFile, "Background", "line color", &bFlushConfFileNeeded, g_fLineColor, 4, couleur);
+	cairo_dock_get_double_list_key_value (pKeyFile, "Background", "line color", &bFlushConfFileNeeded, g_fLineColor, 4, couleur, NULL, NULL);
 	
-	g_bRoundedBottomCorner = cairo_dock_get_boolean_key_value (pKeyFile, "Background", "rounded bottom corner", &bFlushConfFileNeeded, TRUE);
+	g_bRoundedBottomCorner = cairo_dock_get_boolean_key_value (pKeyFile, "Background", "rounded bottom corner", &bFlushConfFileNeeded, TRUE, NULL, NULL);
 	
-	g_iMaxAuthorizedWidth = cairo_dock_get_integer_key_value (pKeyFile, "Background", "max autorized width", &bFlushConfFileNeeded, 0);
+	g_iMaxAuthorizedWidth = cairo_dock_get_integer_key_value (pKeyFile, "Background", "max autorized width", &bFlushConfFileNeeded, 0, NULL, NULL);
 	
 	double couleur2[4] = {.7, .9, .7, .4};
-	cairo_dock_get_double_list_key_value (pKeyFile, "Background", "stripes color bright", &bFlushConfFileNeeded, g_fStripesColorBright, 4, couleur2);
+	cairo_dock_get_double_list_key_value (pKeyFile, "Background", "stripes color bright", &bFlushConfFileNeeded, g_fStripesColorBright, 4, couleur2, NULL, NULL);
 	
 	g_free (g_cBackgroundImageFile);
-	g_cBackgroundImageFile = cairo_dock_get_string_key_value (pKeyFile, "Background", "background image", &bFlushConfFileNeeded, NULL);
+	g_cBackgroundImageFile = cairo_dock_get_string_key_value (pKeyFile, "Background", "background image", &bFlushConfFileNeeded, NULL, NULL, NULL);
 	
-	g_fBackgroundImageAlpha = cairo_dock_get_double_key_value (pKeyFile, "Background", "image alpha", &bFlushConfFileNeeded, 0.5);
+	g_fBackgroundImageAlpha = cairo_dock_get_double_key_value (pKeyFile, "Background", "image alpha", &bFlushConfFileNeeded, 0.5, NULL, NULL);
 	
-	g_bBackgroundImageRepeat = cairo_dock_get_boolean_key_value (pKeyFile, "Background", "repeat image", &bFlushConfFileNeeded, FALSE);
+	g_bBackgroundImageRepeat = cairo_dock_get_boolean_key_value (pKeyFile, "Background", "repeat image", &bFlushConfFileNeeded, FALSE, NULL, NULL);
 	
-	g_iNbStripes = cairo_dock_get_integer_key_value (pKeyFile, "Background", "number of stripes", &bFlushConfFileNeeded, 10);
+	g_iNbStripes = cairo_dock_get_integer_key_value (pKeyFile, "Background", "number of stripes", &bFlushConfFileNeeded, 10, NULL, NULL);
 	
-	g_fStripesWidth = cairo_dock_get_double_key_value (pKeyFile, "Background", "stripes width", &bFlushConfFileNeeded, 0.02);
+	g_fStripesWidth = cairo_dock_get_double_key_value (pKeyFile, "Background", "stripes width", &bFlushConfFileNeeded, 0.02, NULL, NULL);
 	if (g_iNbStripes > 0 && g_fStripesWidth > 1. / g_iNbStripes)
 	{
 		g_print ("Attention : the stripes' width is greater than the space between them.\n");
@@ -666,184 +735,205 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	}
 	
 	double couleur3[4] = {.7, .7, 1., .7};
-	cairo_dock_get_double_list_key_value (pKeyFile, "Background", "stripes color dark", &bFlushConfFileNeeded, g_fStripesColorDark, 4, couleur3);
+	cairo_dock_get_double_list_key_value (pKeyFile, "Background", "stripes color dark", &bFlushConfFileNeeded, g_fStripesColorDark, 4, couleur3, NULL, NULL);
 	
-	g_fStripesAngle = cairo_dock_get_double_key_value (pKeyFile, "Background", "stripes angle", &bFlushConfFileNeeded, 30.);
+	g_fStripesAngle = cairo_dock_get_double_key_value (pKeyFile, "Background", "stripes angle", &bFlushConfFileNeeded, 30., NULL, NULL);
 	
-	g_fStripesSpeedFactor = cairo_dock_get_double_key_value (pKeyFile, "Background", "scroll speed factor", &bFlushConfFileNeeded, 1.0);
+	g_fStripesSpeedFactor = cairo_dock_get_double_key_value (pKeyFile, "System", "scroll speed factor", &bFlushConfFileNeeded, 1.0, "Background", NULL);
 	g_fStripesSpeedFactor = MIN (1., g_fStripesSpeedFactor);
 	
-	g_bDecorationsFollowMouse = cairo_dock_get_boolean_key_value (pKeyFile, "Background", "decorations enslaved", &bFlushConfFileNeeded, TRUE);
+	g_bDecorationsFollowMouse = cairo_dock_get_boolean_key_value (pKeyFile, "System", "decorations enslaved", &bFlushConfFileNeeded, TRUE, "Background", NULL);
 	
 	
 	//\___________________ On recupere les parametres des icones.
-	double fFieldDepth = cairo_dock_get_double_key_value (pKeyFile, "Icons", "field depth", &bFlushConfFileNeeded, 0.7);
+	double fFieldDepth = cairo_dock_get_double_key_value (pKeyFile, "Icons", "field depth", &bFlushConfFileNeeded, 0.7, NULL, NULL);
 	
-	g_bDynamicReflection = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "dynamic reflection", &bFlushConfFileNeeded, FALSE);
+	g_bDynamicReflection = cairo_dock_get_boolean_key_value (pKeyFile, "System", "dynamic reflection", &bFlushConfFileNeeded, FALSE, NULL, NULL);
 	
-	g_fAlbedo = cairo_dock_get_double_key_value (pKeyFile, "Icons", "albedo", &bFlushConfFileNeeded, .6);
+	g_fAlbedo = cairo_dock_get_double_key_value (pKeyFile, "Icons", "albedo", &bFlushConfFileNeeded, .6, NULL, NULL);
 	
-	g_fAmplitude = cairo_dock_get_double_key_value (pKeyFile, "Icons", "amplitude", &bFlushConfFileNeeded, 1.0);
+	g_fAmplitude = cairo_dock_get_double_key_value (pKeyFile, "Icons", "amplitude", &bFlushConfFileNeeded, 1.0, NULL, NULL);
 	
-	g_iSinusoidWidth = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "sinusoid width", &bFlushConfFileNeeded, 250);
+	g_iSinusoidWidth = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "sinusoid width", &bFlushConfFileNeeded, 250, NULL, NULL);
 	g_iSinusoidWidth = MAX (1, g_iSinusoidWidth);
 	
-	g_iIconGap = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "icon gap", &bFlushConfFileNeeded, 0);
+	g_iIconGap = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "icon gap", &bFlushConfFileNeeded, 0, NULL, NULL);
 	
-	g_iStringLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "string width", &bFlushConfFileNeeded, 0);
+	g_iStringLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "string width", &bFlushConfFileNeeded, 0, NULL, NULL);
 	
-	cairo_dock_get_double_list_key_value (pKeyFile, "Icons", "string color", &bFlushConfFileNeeded, g_fStringColor, 4, couleur);
+	cairo_dock_get_double_list_key_value (pKeyFile, "Icons", "string color", &bFlushConfFileNeeded, g_fStringColor, 4, couleur, NULL, NULL);
 	
-	g_fAlphaAtRest = cairo_dock_get_double_key_value (pKeyFile, "Icons", "alpha at rest", &bFlushConfFileNeeded, 1.);
+	g_fAlphaAtRest = cairo_dock_get_double_key_value (pKeyFile, "Icons", "alpha at rest", &bFlushConfFileNeeded, 1., NULL, NULL);
 	
-	g_iScrollAmount = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "scroll amount", &bFlushConfFileNeeded, FALSE);
+	g_iScrollAmount = cairo_dock_get_integer_key_value (pKeyFile, "System", "scroll amount", &bFlushConfFileNeeded, FALSE, "Icons", NULL);
 	
-	g_bResetScrollOnLeave = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "reset scroll", &bFlushConfFileNeeded, TRUE);
+	g_bResetScrollOnLeave = cairo_dock_get_boolean_key_value (pKeyFile, "System", "reset scroll", &bFlushConfFileNeeded, TRUE, "Icons", NULL);
 	
-	g_fScrollAcceleration = cairo_dock_get_double_key_value (pKeyFile, "Icons", "reset scroll acceleration", &bFlushConfFileNeeded, 0.9);
+	g_fScrollAcceleration = cairo_dock_get_double_key_value (pKeyFile, "System", "reset scroll acceleration", &bFlushConfFileNeeded, 0.9, "Icons", NULL);
 	
 	
 	//\___________________ On recupere les parametres des lanceurs.
-	gchar *cIconThemeName = cairo_dock_get_string_key_value (pKeyFile, "Launchers", "icon theme", &bFlushConfFileNeeded, NULL);
-	if (s_bUserTheme)
-		g_object_unref (g_pIconTheme);
-	
-	if (cIconThemeName != NULL)
+	if (g_pDefaultIconDirectory != NULL)  // g_strfreev (g_cDefaultIconDirectory);
 	{
-		g_pIconTheme = gtk_icon_theme_new ();
-		gtk_icon_theme_set_custom_theme (g_pIconTheme, cIconThemeName);
-		g_free (cIconThemeName);
-		s_bUserTheme = TRUE;
+		gpointer data;
+		int i;
+		for (i = 0; (g_pDefaultIconDirectory[2*i] != NULL || g_pDefaultIconDirectory[2*i+1] != NULL); i ++)
+		{
+			if (g_pDefaultIconDirectory[2*i] != NULL)
+				g_free (g_pDefaultIconDirectory[2*i]);
+			else
+				g_object_unref (g_pDefaultIconDirectory[2*i+1]);
+		}
 	}
-	else
-	{
-		g_pIconTheme = gtk_icon_theme_get_default ();
-		s_bUserTheme = FALSE;
-	}
+	gchar **directoryList = cairo_dock_get_string_list_key_value (pKeyFile, "Icons", "default icon directory", &bFlushConfFileNeeded, &length, NULL, "Launchers", NULL);
 	
-	gchar **directoryList = cairo_dock_get_string_list_key_value (pKeyFile, "Launchers", "default icon directory", &bFlushConfFileNeeded, &length, NULL);
-	g_strfreev (g_cDefaultIconDirectory);
 	
 	if (directoryList == NULL)
 	{
-		g_cDefaultIconDirectory = NULL;
+		g_pDefaultIconDirectory = NULL;
 	}
 	else
 	{
-		g_cDefaultIconDirectory = g_new0 (gchar *, length + 1);  // +1 pour le NULL final.
+		g_pDefaultIconDirectory = g_new0 (gpointer, 2 * length + 2);  // +2 pour les NULL final.
 		int i = 0, j = 0;
 		while (directoryList[i] != NULL)
 		{
 			if (directoryList[i][0] == '~')
 			{
-				g_cDefaultIconDirectory[j] = g_strdup_printf ("%s%s", getenv ("HOME"), directoryList[i]+1);
+				g_pDefaultIconDirectory[j] = g_strdup_printf ("%s%s", getenv ("HOME"), directoryList[i]+1);
 			}
 			else if (directoryList[i][0] == '/')
 			{
-				g_cDefaultIconDirectory[j] = g_strdup (directoryList[i]);
+				g_pDefaultIconDirectory[j] = g_strdup (directoryList[i]);
 			}
 			else if (strncmp (directoryList[i], "_ThemeDirectory_", 16) == 0)
 			{
-				g_cDefaultIconDirectory[j] = g_strdup_printf ("%s%s", g_cCurrentLaunchersPath, directoryList[i]+16);
+				g_pDefaultIconDirectory[j] = g_strdup_printf ("%s%s", g_cCurrentLaunchersPath, directoryList[i]+16);
 			}
 			else
 			{
-				g_print ("Attention : invalid directory name (%s), will be ignored\n", directoryList[i]);
-				j --;
+				g_print ("theme %s\n", directoryList[i]);
+				g_pDefaultIconDirectory[j+1] = gtk_icon_theme_new ();
+				gtk_icon_theme_set_custom_theme (g_pDefaultIconDirectory[j+1], directoryList[i]);
 			}
 			//g_print ("+ %s\n", g_cDefaultIconDirectory[j]);
 			i ++;
-			j ++;
+			j += 2;
 		}
 	}
 	g_strfreev (directoryList);
 	
-	g_tMaxIconAuthorizedSize[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_integer_key_value (pKeyFile, "Launchers", "max icon size", &bFlushConfFileNeeded, 0);
+	g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "launcher width", &bFlushConfFileNeeded, 48, "Launchers", "max icon size");
 	
-	g_tMinIconAuthorizedSize[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_integer_key_value (pKeyFile, "Launchers", "min icon size", &bFlushConfFileNeeded, 0);
+	g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "launcher height", &bFlushConfFileNeeded, 48, "Launchers", "max icon size");
 	
-	g_tAnimationType[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_animation_type_key_value (pKeyFile, "Launchers", "animation type", &bFlushConfFileNeeded, CAIRO_DOCK_BOUNCE);
+	g_tAnimationType[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_animation_type_key_value (pKeyFile, "Icons", "launcher animation", &bFlushConfFileNeeded, CAIRO_DOCK_BOUNCE, "Launchers", "animation type");
 	
-	g_tNbAnimationRounds[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_integer_key_value (pKeyFile, "Launchers", "number of animation rounds", &bFlushConfFileNeeded, 4);
+	g_tNbAnimationRounds[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "launcher number of rounds", &bFlushConfFileNeeded, 3, "Launchers", "number of animation rounds");
 	
 	
 	//\___________________ On recupere les parametres des aplications.
-	g_bShowAppli = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "show applications", &bFlushConfFileNeeded, TRUE);
+	g_bShowAppli = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "show applications", &bFlushConfFileNeeded, TRUE, "Applications", NULL);
 	
-	g_tMaxIconAuthorizedSize[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Applications", "max icon size", &bFlushConfFileNeeded, 0);
+	g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "appli width", &bFlushConfFileNeeded, 48, "Applications", "max icon size");
 	
-	g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Applications", "min icon size", &bFlushConfFileNeeded, 0);
+	g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "appli height", &bFlushConfFileNeeded, 48, "Applications", "max icon size");
 	
-	g_tAnimationType[CAIRO_DOCK_APPLI] = cairo_dock_get_animation_type_key_value (pKeyFile, "Applications", "animation type", &bFlushConfFileNeeded, CAIRO_DOCK_ROTATE);
+	g_tAnimationType[CAIRO_DOCK_APPLI] = cairo_dock_get_animation_type_key_value (pKeyFile, "Icons", "appli animation", &bFlushConfFileNeeded, CAIRO_DOCK_ROTATE, "Applications", "animation type");
 	
-	g_tNbAnimationRounds[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Applications", "number of animation rounds", &bFlushConfFileNeeded, 2);
+	g_tNbAnimationRounds[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "appli number of rounds", &bFlushConfFileNeeded, 2, "Applications", "number of animation rounds");
 	
 	gboolean bUniquePidOld = g_bUniquePid;
-	g_bUniquePid = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "unique PID", &bFlushConfFileNeeded, FALSE);
+	g_bUniquePid = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "unique PID", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
 	
 	gboolean bGroupAppliByClassOld = g_bGroupAppliByClass;
-	g_bGroupAppliByClass = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "group by class", &bFlushConfFileNeeded, FALSE);
+	g_bGroupAppliByClass = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "group by class", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
 	
-	g_iAppliMaxNameLength = cairo_dock_get_integer_key_value (pKeyFile, "Applications", "max name length", &bFlushConfFileNeeded, 15);
+	g_iAppliMaxNameLength = cairo_dock_get_integer_key_value (pKeyFile, "TaskBar", "max name length", &bFlushConfFileNeeded, 15, "Applications", NULL);
 	
-	g_bMinimizeOnClick = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "minimize on click", &bFlushConfFileNeeded, TRUE);
+	g_bMinimizeOnClick = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "minimize on click", &bFlushConfFileNeeded, TRUE, "Applications", NULL);
 	
-	g_bCloseAppliOnMiddleClick = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "close on middle click", &bFlushConfFileNeeded, TRUE);
+	g_bCloseAppliOnMiddleClick = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "close on middle click", &bFlushConfFileNeeded, TRUE, "Applications", NULL);
 	
-	g_bAutoHideOnFullScreen = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "auto quick hide", &bFlushConfFileNeeded, TRUE);
+	g_bAutoHideOnFullScreen = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "auto quick hide", &bFlushConfFileNeeded, TRUE, "Applications", NULL);
 	
-	g_bDemandsAttentionWithDialog = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "demands attention with dialog", &bFlushConfFileNeeded, TRUE);
-	g_bDemandsAttentionWithAnimation = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "demands attention with animation", &bFlushConfFileNeeded, FALSE);
+	g_bDemandsAttentionWithDialog = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "demands attention with dialog", &bFlushConfFileNeeded, TRUE, "Applications", NULL);
+	g_bDemandsAttentionWithAnimation = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "demands attention with animation", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
 	
-	g_bAnimateOnActiveWindow = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "animate on active window", &bFlushConfFileNeeded, TRUE);
+	g_bAnimateOnActiveWindow = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "animate on active window", &bFlushConfFileNeeded, TRUE, "Applications", NULL);
 	
 	gboolean bHideVisibleApplisOld = g_bHideVisibleApplis;
-	g_bHideVisibleApplis = cairo_dock_get_boolean_key_value (pKeyFile, "Applications", "hide visible", &bFlushConfFileNeeded, FALSE);
+	g_bHideVisibleApplis = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "hide visible", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
 	
-	g_fVisibleAppliAlpha = cairo_dock_get_double_key_value (pKeyFile, "Applications", "visible alpha", &bFlushConfFileNeeded, 1.);
+	g_fVisibleAppliAlpha = cairo_dock_get_double_key_value (pKeyFile, "TaskBar", "visible alpha", &bFlushConfFileNeeded, 1., "Applications", NULL);
 	if (g_bHideVisibleApplis)
 		g_fVisibleAppliAlpha = 1.;  // on inhibe ce parametre, puisqu'il ne sert alors a rien.
 	
+	gboolean bAppliOnCurrentDesktopOnlyOld = g_bAppliOnCurrentDesktopOnly;
+	g_bAppliOnCurrentDesktopOnly = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "current desktop only", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
+	
+	
 	//\___________________ On recupere les parametres des applets.
-	g_tMaxIconAuthorizedSize[CAIRO_DOCK_APPLET] = cairo_dock_get_integer_key_value (pKeyFile, "Applets", "max icon size", &bFlushConfFileNeeded, 0);
+	g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "applet width", &bFlushConfFileNeeded, 48, "Applets", "max icon size");
 	
-	g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLET] = cairo_dock_get_integer_key_value (pKeyFile, "Applets", "min icon size", &bFlushConfFileNeeded, 0);
+	g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "applet height", &bFlushConfFileNeeded, 48, "Applets", "max icon size");
 	
-	g_tAnimationType[CAIRO_DOCK_APPLET] = cairo_dock_get_animation_type_key_value (pKeyFile, "Applets", "animation type", &bFlushConfFileNeeded, CAIRO_DOCK_BLINK);
+	g_tAnimationType[CAIRO_DOCK_APPLI] = cairo_dock_get_animation_type_key_value (pKeyFile, "Icons", "applet animation", &bFlushConfFileNeeded, CAIRO_DOCK_ROTATE, "Applets", "animation type");
 	
-	g_tNbAnimationRounds[CAIRO_DOCK_APPLET] = cairo_dock_get_integer_key_value (pKeyFile, "Applets", "number of animation rounds", &bFlushConfFileNeeded, 1);
+	g_tNbAnimationRounds[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "applet number of rounds", &bFlushConfFileNeeded, 2, "Applets", "number of animation rounds");
 	
-	gchar **cActiveModuleList = cairo_dock_get_string_list_key_value (pKeyFile, "Applets", "active modules", &bFlushConfFileNeeded, &length, NULL);
+	gchar **cActiveModuleList = cairo_dock_get_string_list_key_value (pKeyFile, "Applets", "active modules", &bFlushConfFileNeeded, &length, NULL, NULL, NULL);
 	
 	
 	//\___________________ On recupere les parametres des separateurs.
-	g_tMaxIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12] = cairo_dock_get_integer_key_value (pKeyFile, "Separators", "max icon size", &bFlushConfFileNeeded, 0);
-	g_tMaxIconAuthorizedSize[CAIRO_DOCK_SEPARATOR23] = g_tMaxIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12];
+	g_tIconAuthorizedWidth[CAIRO_DOCK_SEPARATOR12] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "separator width", &bFlushConfFileNeeded, 48, "Separators", "max icon size");
+	g_tIconAuthorizedWidth[CAIRO_DOCK_SEPARATOR23] = g_tIconAuthorizedWidth[CAIRO_DOCK_SEPARATOR12];
 	
-	g_tMinIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12] = cairo_dock_get_integer_key_value (pKeyFile, "Separators", "min icon size", &bFlushConfFileNeeded, 0);
-	g_tMinIconAuthorizedSize[CAIRO_DOCK_SEPARATOR23] = g_tMinIconAuthorizedSize[CAIRO_DOCK_SEPARATOR12];
+	g_tIconAuthorizedHeight[CAIRO_DOCK_SEPARATOR12] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "separator height", &bFlushConfFileNeeded, 48, "Separators", "max icon size");
+	g_tIconAuthorizedHeight[CAIRO_DOCK_SEPARATOR23] = g_tIconAuthorizedHeight[CAIRO_DOCK_SEPARATOR12];
 	
 	gboolean bUseSeparatorOld = g_bUseSeparator;
-	g_bUseSeparator = cairo_dock_get_boolean_key_value (pKeyFile, "Separators", "use separator", &bFlushConfFileNeeded, TRUE);
+	g_bUseSeparator = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "use separator", &bFlushConfFileNeeded, TRUE, "Separators", NULL);
 	
 	g_free (g_cSeparatorImage);
-	g_cSeparatorImage = cairo_dock_get_string_key_value (pKeyFile, "Separators", "separator image", &bFlushConfFileNeeded, NULL);
+	g_cSeparatorImage = cairo_dock_get_string_key_value (pKeyFile, "Icons", "separator image", &bFlushConfFileNeeded, NULL, "Separators", NULL);
 	
-	g_bRevolveSeparator = cairo_dock_get_boolean_key_value (pKeyFile, "Separators", "revolve separator image", &bFlushConfFileNeeded, TRUE);
+	g_bRevolveSeparator = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "revolve separator image", &bFlushConfFileNeeded, TRUE, "Separators", NULL);
 	
-	g_bConstantSeparatorSize = cairo_dock_get_boolean_key_value (pKeyFile, "Separators", "force size", &bFlushConfFileNeeded, TRUE);
+	g_bConstantSeparatorSize = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "force size", &bFlushConfFileNeeded, TRUE, "Separators", NULL);
 	
 	
 	//\___________________ On recupere les parametres des dialogues.
-	gchar *cButtonOkImage = cairo_dock_get_string_key_value (pKeyFile, "Dialogs", "button_ok image", &bFlushConfFileNeeded, NULL);
-	gchar *cButtonCancelImage = cairo_dock_get_string_key_value (pKeyFile, "Dialogs", "button_cancel image", &bFlushConfFileNeeded, NULL);
+	gchar *cButtonOkImage = cairo_dock_get_string_key_value (pKeyFile, "Dialogs", "button_ok image", &bFlushConfFileNeeded, NULL, NULL, NULL);
+	gchar *cButtonCancelImage = cairo_dock_get_string_key_value (pKeyFile, "Dialogs", "button_cancel image", &bFlushConfFileNeeded, NULL, NULL, NULL);
 	
-	g_iDialogButtonWidth = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "button width", &bFlushConfFileNeeded, 48);
-	g_iDialogButtonHeight = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "button height", &bFlushConfFileNeeded, 32);
+	g_iDialogButtonWidth = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "button width", &bFlushConfFileNeeded, 48, NULL, NULL);
+	g_iDialogButtonHeight = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "button height", &bFlushConfFileNeeded, 32, NULL, NULL);
 	
-	g_fDialogAlpha = cairo_dock_get_double_key_value (pKeyFile, "Dialogs", "alpha", &bFlushConfFileNeeded, .6);
+	double couleur_bulle[4] = {1., 1., 1.0, 0.7};
+	cairo_dock_get_double_list_key_value (pKeyFile, "Dialogs", "background color", &bFlushConfFileNeeded, g_fDialogColor, 4, couleur_bulle, NULL, NULL);
 	
-	g_iDialogIconSize = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "icon size", &bFlushConfFileNeeded, 48);
+	g_iDialogIconSize = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "icon size", &bFlushConfFileNeeded, 48, NULL, NULL);
+	
+	g_free (g_cDialogMessagePolice);
+	if (cairo_dock_get_boolean_key_value (pKeyFile, "Dialogs", "homogeneous text", &bFlushConfFileNeeded, TRUE, NULL, NULL))
+	{
+		g_iDialogMessageSize = g_iLabelSize;
+		g_cDialogMessagePolice = g_strdup (g_cLabelPolice);
+		g_iDialogMessageWeight = g_iLabelWeight;
+		g_iDialogMessageStyle = g_iLabelStyle;
+	}
+	else
+	{
+		g_cDialogMessagePolice = cairo_dock_get_string_key_value (pKeyFile, "Dialogs", "message police", &bFlushConfFileNeeded, "sans", NULL, NULL);
+		g_iDialogMessageSize = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "message size", &bFlushConfFileNeeded, 14, NULL, NULL);
+		g_iDialogMessageWeight = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "message weight", &bFlushConfFileNeeded, 5, NULL, NULL);
+		g_iDialogMessageWeight = ((PANGO_WEIGHT_HEAVY - PANGO_WEIGHT_ULTRALIGHT) * g_iLabelWeight + 9 * PANGO_WEIGHT_ULTRALIGHT - PANGO_WEIGHT_HEAVY) / 8;  // on se ramene aux intervalles definit par Pango.
+		if (cairo_dock_get_boolean_key_value (pKeyFile, "Dialogs", "message italic", &bFlushConfFileNeeded, FALSE, NULL, NULL))
+			g_iDialogMessageStyle = PANGO_STYLE_ITALIC;
+		else
+			g_iDialogMessageStyle = PANGO_STYLE_NORMAL;
+	}
 	
 	
 	//\___________________ On (re)charge tout, car n'importe quel parametre peut avoir change.
@@ -880,15 +970,15 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	guint i;
 	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)
 	{
-		if (g_tMinIconAuthorizedSize[i] > 0)
-			g_fReflectSize = MAX (g_fReflectSize, g_tMinIconAuthorizedSize[i]);
+		if (g_tIconAuthorizedHeight[i] > 0)
+			g_fReflectSize = MAX (g_fReflectSize, g_tIconAuthorizedHeight[i]);
 	}
-	if (g_fReflectSize == 0)  // on n'a pas trouve de taille minimale, on va essayer avec la taille max.
+	if (g_fReflectSize == 0)  // on n'a pas trouve de hauteur, on va essayer avec la largeur.
 	{
 		for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)
 		{
-			if (g_tMaxIconAuthorizedSize[i] > 0)
-				g_fReflectSize = MAX (g_fReflectSize, g_tMaxIconAuthorizedSize[i]);
+			if (g_tIconAuthorizedWidth[i] > 0)
+				g_fReflectSize = MAX (g_fReflectSize, g_tIconAuthorizedWidth[i]);
 		}
 		if (g_fReflectSize > 0)
 			g_fReflectSize = MIN (48, g_fReflectSize);
@@ -900,7 +990,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	cairo_dock_remove_all_applets (pDock);  // on est obliges d'arreter tous les applets (c.a.d. les modules ayant une icone dans le dock).
 	
-	if (bUniquePidOld != g_bUniquePid || bGroupAppliByClassOld != g_bGroupAppliByClass || bHideVisibleApplisOld != g_bHideVisibleApplis || (cairo_dock_application_manager_is_running () && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
+	if (bUniquePidOld != g_bUniquePid || bGroupAppliByClassOld != g_bGroupAppliByClass || bHideVisibleApplisOld != g_bHideVisibleApplis || bAppliOnCurrentDesktopOnlyOld != g_bAppliOnCurrentDesktopOnly || (cairo_dock_application_manager_is_running () && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
 	{
 		cairo_dock_stop_application_manager (pDock);
 	}
@@ -1004,7 +1094,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 
 static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, gpointer *user_data);  // declaree en amont, car les 2 s'appellent mutuellement.
 
-static gboolean cairo_dock_edit_conf_file_core (GtkWidget *pWidget, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert)
+static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert)
 {
 	g_print ("%s (%s; %s)\n", __func__, cConfFilePath, cConfFilePath2);
 	GSList *pWidgetList = NULL;
@@ -1021,10 +1111,10 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWidget *pWidget, gchar *cConf
 	}
 	g_key_file_remove_key (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", NULL);  // salete de traducteur automatique.
 	
-	GtkWidget *pDialog = cairo_dock_generate_advanced_ihm_from_keyfile (pKeyFile, cTitle, pWidget, &pWidgetList, (pConfigFunc != NULL), iIdentifier, cPresentedGroup, (pConfigFunc2 != NULL), cButtonConvert);
+	GtkWidget *pDialog = cairo_dock_generate_advanced_ihm_from_keyfile (pKeyFile, cTitle, pWindow, &pWidgetList, (pConfigFunc != NULL), iIdentifier, cPresentedGroup, (pConfigFunc2 != NULL), cButtonConvert);
 	if (pDialog == NULL || pWidgetList == NULL)
 	{
-		pDialog = cairo_dock_generate_basic_ihm_from_keyfile (cConfFilePath, cTitle, pWidget, &pTextBuffer, (pConfigFunc != NULL), (pConfigFunc2 != NULL), cButtonConvert);
+		pDialog = cairo_dock_generate_basic_ihm_from_keyfile (cConfFilePath, cTitle, pWindow, &pTextBuffer, (pConfigFunc != NULL), (pConfigFunc2 != NULL), cButtonConvert);
 	}
 	g_return_val_if_fail (pDialog != NULL, FALSE);
 	
@@ -1055,7 +1145,7 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWidget *pWidget, gchar *cConf
 		user_data[6] = pFreeUserDataFunc;
 		user_data[7] = cConfFilePath2;
 		user_data[8] = pConfigFunc2;
-		user_data[9] = pWidget;
+		user_data[9] = pWindow;
 		user_data[10] = cTitle;
 		user_data[11] = GINT_TO_POINTER (iWindowWidth);
 		user_data[12] = GINT_TO_POINTER (iWindowHeight);
@@ -1123,7 +1213,7 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 	GFunc pFreeUserDataFunc = user_data[6];
 	gchar *cConfFilePath2 = user_data[7];
 	CairoDockConfigFunc pConfigFunc2 = user_data[8];
-	GtkWidget *pWidget = user_data[9];
+	GtkWindow *pWindow = user_data[9];
 	gchar *cTitle = user_data[10];
 	int iWindowWidth = GPOINTER_TO_INT (user_data[11]);
 	int iWindowHeight = GPOINTER_TO_INT (user_data[12]);
@@ -1183,7 +1273,7 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 		cairo_dock_free_generated_widget_list (pWidgetList);
 		g_free (user_data);
 		
-		cairo_dock_edit_conf_file_core (pWidget, cConfFilePath2, cTitle, iWindowWidth, iWindowHeight, iIdentifier, NULL, pConfigFunc2, data, pFreeUserDataFunc, pConfigFunc, cConfFilePath, cButtonRevert, cButtonConvert);
+		cairo_dock_edit_conf_file_core (pWindow, cConfFilePath2, cTitle, iWindowWidth, iWindowHeight, iIdentifier, NULL, pConfigFunc2, data, pFreeUserDataFunc, pConfigFunc, cConfFilePath, cButtonRevert, cButtonConvert);
 	}
 }
 
@@ -1206,9 +1296,9 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 *@param  cButtonRevert 
 @Returns TRUE si l'utilisateur a ferme le panneau de conf en appuyant sur OK, FALSE sinon.
 */
-gboolean cairo_dock_edit_conf_file_full (GtkWidget *pWidget, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert)
+gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert)
 {
-	return cairo_dock_edit_conf_file_core (pWidget, g_strdup (cConfFilePath), g_strdup (cTitle), iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc, pConfigFunc2, g_strdup (cConfFilePath2), g_strdup (cButtonConvert), g_strdup (cButtonRevert));
+	return cairo_dock_edit_conf_file_core (pWindow, g_strdup (cConfFilePath), g_strdup (cTitle), iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc, pConfigFunc2, g_strdup (cConfFilePath2), g_strdup (cButtonConvert), g_strdup (cButtonRevert));
 }
 
 
@@ -1290,49 +1380,49 @@ void cairo_dock_copy_easy_conf_file (gchar *cEasyConfFilePath, GKeyFile *pMainKe
 	//\___________________ On recupere les parametres systeme.
 	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "screen border", pMainKeyFile, "Position", "screen border");
 	
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "auto-hide", pMainKeyFile, "Auto-Hide", "auto-hide");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "auto-hide", pMainKeyFile, "Position", "auto-hide");
 	
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "show applications", pMainKeyFile, "Applications", "show applications");
-	
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "active modules", pMainKeyFile, "Applets", "active modules");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "show applications", pMainKeyFile, "TaskBar", "show applications");
 	
 	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "active modules", pMainKeyFile, "Applets", "active modules");
 	
 	//\___________________ On recupere les parametres de personnalisation.
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "callback image", pMainKeyFile, "Auto-Hide", "background image");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "callback image", pMainKeyFile, "Background", "callback image");
 	
 	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "background image", pMainKeyFile, "Background", "background image");
 	
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "separator image", pMainKeyFile, "Separators", "separator image");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "separator image", pMainKeyFile, "Icons", "separator image");
 	
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "main dock view", pMainKeyFile, "Cairo Dock", "main dock view");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "main dock view", pMainKeyFile, "Views", "main dock view");
 	
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "sub-dock view", pMainKeyFile, "Sub-Docks", "sub-dock view");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "sub-dock view", pMainKeyFile, "Views", "sub-dock view");
 	
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Launchers", "min icon size");
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Launchers", "max icon size");
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Applications", "min icon size");
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Applications", "max icon size");
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Applets", "max icon size");
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Launchers", "max icon size");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Icons", "launcher width");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Icons", "launcher height");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Icons", "appli width");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Icons", "appli height");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Icons", "applet width");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Icons", "applet height");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Icons", "separator width");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon size", pMainKeyFile, "Icons", "separator height");
 	
 	gboolean bFlushConfFileNeeded;
-	double fValue = cairo_dock_get_double_key_value (pKeyFile, "Personnalisation", "zoom", &bFlushConfFileNeeded, 2.0);
+	double fValue = cairo_dock_get_double_key_value (pKeyFile, "Personnalisation", "zoom", &bFlushConfFileNeeded, 2.0, NULL, NULL);
 	g_key_file_set_double (pMainKeyFile, "Icons", "amplitude", fValue - 1);
 	
 	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "icon gap", pMainKeyFile, "Icons", "icon gap");
 	
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "launcher animation", pMainKeyFile, "Launchers", "animation type");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "launcher animation", pMainKeyFile, "Icons", "launcher animation");
 	
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "appli animation", pMainKeyFile, "Applications", "animation type");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "appli animation", pMainKeyFile, "Icons", "appli animation");
 	
 	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "corner radius", pMainKeyFile, "Background", "corner radius");
 	
 	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "line color", pMainKeyFile, "Background", "line color");
 	
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "police", pMainKeyFile, "Labels", "police");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "police", pMainKeyFile, "Icons", "police");
 	
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "font size", pMainKeyFile, "Labels", "size");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "font size", pMainKeyFile, "Icons", "size");
 	
 	g_key_file_free (pKeyFile);
 }
@@ -1357,42 +1447,40 @@ void cairo_dock_copy_to_easy_conf_file (GKeyFile *pMainKeyFile, gchar *cEasyConf
 	//\___________________ On ecrit les parametres systeme.
 	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Position", "screen border", pKeyFile, "System", "screen border");
 	
-	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Auto-Hide", "auto-hide", pKeyFile, "System", "auto-hide");
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Position", "auto-hide", pKeyFile, "System", "auto-hide");
 	
-	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Applications", "show applications", pKeyFile, "System", "show applications");
-	
-	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Applets", "active modules", pKeyFile, "System", "active modules");
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "TaskBar", "show applications", pKeyFile, "System", "show applications");
 	
 	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Applets", "active modules", pKeyFile, "System", "active modules");
 	
 	//\___________________ On ecrit les parametres de personnalisation.
-	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Auto-Hide", "background image", pKeyFile, "Personnalisation", "callback image");
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Background", "background image", pKeyFile, "Personnalisation", "callback image");
 	
 	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Background", "background image", pKeyFile, "Personnalisation", "background image");
 	
-	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Separators", "separator image", pKeyFile, "Personnalisation", "separator image");
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Icons", "separator image", pKeyFile, "Personnalisation", "separator image");
 	
-	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Cairo Dock", "main dock view", pKeyFile, "Personnalisation", "main dock view");
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Views", "main dock view", pKeyFile, "Personnalisation", "main dock view");
 	
-	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Sub-Docks", "sub-dock view", pKeyFile, "Personnalisation", "sub-dock view");
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Views", "sub-dock view", pKeyFile, "Personnalisation", "sub-dock view");
 	
-	g_key_file_set_integer (pKeyFile, "Personnalisation", "icon size", MAX (g_tMaxIconAuthorizedSize[CAIRO_DOCK_LAUNCHER], g_tMaxIconAuthorizedSize[CAIRO_DOCK_APPLI]));
+	g_key_file_set_integer (pKeyFile, "Personnalisation", "icon size", MAX (g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER], g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI]));
 	
 	g_key_file_set_double (pKeyFile, "Personnalisation", "zoom", 1 + g_fAmplitude);
 	
 	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Icons", "icon gap", pKeyFile, "Personnalisation", "icon gap");
 	
-	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Launchers", "animation type", pKeyFile, "Personnalisation", "launcher animation");
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Icons", "launcher animation", pKeyFile, "Personnalisation", "launcher animation");
 	
-	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Applications", "animation type", pKeyFile, "Personnalisation", "appli animation");
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Icons", "appli animation", pKeyFile, "Personnalisation", "appli animation");
 	
 	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Background", "corner radius", pKeyFile, "Personnalisation", "corner radius");
 	
 	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Background", "line color", pKeyFile, "Personnalisation", "line color");
 	
-	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Labels", "police", pKeyFile, "Personnalisation", "police");
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Icons", "police", pKeyFile, "Personnalisation", "police");
 	
-	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Labels", "size", pKeyFile, "Personnalisation", "font size");
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Icons", "size", pKeyFile, "Personnalisation", "font size");
 	
 	//\___________________ On ecrit tout.
 	cairo_dock_write_keys_to_file (pKeyFile, cEasyConfFilePath);

@@ -379,7 +379,7 @@ static void _cairo_dock_recup_current_color (GtkColorButton *pColorButton, GSLis
 }
 
 
-GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWidget *pParentWidget, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier, gchar *cPresentedGroup, gboolean bSwitchButtonPresent, gchar *cButtonConvert)
+GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWindow *pParentWindow, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier, gchar *cPresentedGroup, gboolean bSwitchButtonPresent, gchar *cButtonConvert)
 {
 	static GPtrArray *s_pBufferArray = NULL;  // pour empecher les fuites memoires.
 	
@@ -428,7 +428,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	{
 		if (bSwitchButtonPresent)
 			pDialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
-				(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
+				(pParentWindow != NULL ? GTK_WINDOW (pParentWindow) : NULL),
 				GTK_DIALOG_DESTROY_WITH_PARENT,
 				(cButtonConvert != NULL ? cButtonConvert : GTK_STOCK_CONVERT),
 				GTK_RESPONSE_HELP,
@@ -441,7 +441,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 				NULL);
 		else
 			pDialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
-				(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
+				(pParentWindow != NULL ? GTK_WINDOW (pParentWindow) : NULL),
 				GTK_DIALOG_DESTROY_WITH_PARENT,
 				GTK_STOCK_APPLY,
 				GTK_RESPONSE_APPLY,
@@ -454,7 +454,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	else
 	{
 		pDialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
-			(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
+			(pParentWindow != NULL ? GTK_WINDOW (pParentWindow) : NULL),
 			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_OK,
 			GTK_RESPONSE_ACCEPT,
@@ -851,7 +851,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 										snprintf (cResult, 10, "%d", k);
 									}
 									gtk_list_store_set (GTK_LIST_STORE (modele), &iter,
-										CAIRO_DOCK_MODEL_NAME, pAuthorizedValuesList[k],
+										CAIRO_DOCK_MODEL_NAME, (iElementType == 'r' ? gettext (pAuthorizedValuesList[k]) : pAuthorizedValuesList[k]),
 										CAIRO_DOCK_MODEL_RESULT, (cResult != NULL ? cResult : pAuthorizedValuesList[k]),
 										CAIRO_DOCK_MODEL_DESCRIPTION_FILE, (iElementType == 'R' || iElementType == 'M' ? pAuthorizedValuesList[k+1] : NULL),
 										-1);
@@ -1230,15 +1230,16 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								cValue = pAuthorizedValuesList[0];
 							gchar *cFrameTitle;
 							
+							if (cValue[0] == '_' && cValue[1] == '(')
+							{
+								iTextOffset = 2;
+								cValue[strlen (cValue)-1] = '\0';
+							}
+							else
+								iTextOffset = 0;
+							
 							if (iElementType == 'F')
 							{
-								if (cValue[0] == '_' && cValue[1] == '(')
-								{
-									iTextOffset = 2;
-									cValue[strlen (cValue)-1] = '\0';
-								}
-								else
-									iTextOffset = 0;
 								cFrameTitle = g_strdup_printf ("<b>%s</b>", gettext (cValue + iTextOffset));
 								pLabel= gtk_label_new (NULL);
 								gtk_label_set_markup (GTK_LABEL (pLabel), cFrameTitle);
@@ -1250,7 +1251,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							}
 							else
 							{
-								cFrameTitle = g_strdup_printf ("<u><b>%s</b></u>", cValue);
+								cFrameTitle = g_strdup_printf ("<u><b>%s</b></u>", gettext (cValue + iTextOffset));
 								pFrame = gtk_expander_new (cFrameTitle);
 								gtk_expander_set_use_markup (GTK_EXPANDER (pFrame), TRUE);
 								gtk_expander_set_expanded (GTK_EXPANDER (pFrame), FALSE);
@@ -1269,6 +1270,9 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								g_free (cValue);
 						}
 					break;
+					
+					case 'v' :  // separateur.
+					break ;
 					
 					default :
 						g_print ("Attention : this conf file seems to be incorrect !\n");
@@ -1318,7 +1322,7 @@ gboolean cairo_dock_is_advanced_keyfile (GKeyFile *pKeyFile)
 }
 
 
-GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, gchar *cTitle, GtkWidget *pParentWidget, GtkTextBuffer **pTextBuffer, gboolean bApplyButtonPresent, gboolean bSwitchButtonPresent, gchar *cButtonConvert)
+GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, gchar *cTitle, GtkWindow *pParentWindow, GtkTextBuffer **pTextBuffer, gboolean bApplyButtonPresent, gboolean bSwitchButtonPresent, gchar *cButtonConvert)
 {
 	gchar *cConfiguration;
 	gboolean read_ok = g_file_get_contents (cConfFilePath, &cConfiguration, NULL, NULL);
@@ -1335,7 +1339,7 @@ GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, gch
 	{
 		if (bSwitchButtonPresent)
 			pDialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
-				(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
+				(pParentWindow != NULL ? GTK_WINDOW (pParentWindow) : NULL),
 				GTK_DIALOG_DESTROY_WITH_PARENT,
 				(cButtonConvert != NULL ? cButtonConvert : GTK_STOCK_CONVERT),
 				GTK_RESPONSE_HELP,
@@ -1348,7 +1352,7 @@ GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, gch
 				NULL);
 		else
 			pDialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
-				(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
+				(pParentWindow != NULL ? GTK_WINDOW (pParentWindow) : NULL),
 				GTK_DIALOG_DESTROY_WITH_PARENT,
 				GTK_STOCK_APPLY,
 				GTK_RESPONSE_APPLY,
@@ -1361,7 +1365,7 @@ GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, gch
 	else
 	{
 		pDialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
-			(pParentWidget != NULL ? GTK_WINDOW (pParentWidget) : NULL),
+			(pParentWindow != NULL ? GTK_WINDOW (pParentWindow) : NULL),
 			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_OK,
 			GTK_RESPONSE_ACCEPT,

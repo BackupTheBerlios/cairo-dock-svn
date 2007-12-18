@@ -45,6 +45,7 @@ extern gboolean g_bAnimateSubDock;
 extern double g_fUnfoldAcceleration;
 extern int g_iLeaveSubDockDelay;
 extern int g_iShowSubDockDelay;
+extern gboolean bShowSubDockOnClick;
 
 extern gint g_iScreenWidth[2];
 extern gint g_iScreenHeight[2];
@@ -80,6 +81,7 @@ extern gboolean g_bUseGlitz;
 
 static gboolean s_bTemporaryAutoHide = FALSE;
 static gboolean s_bEntranceAllowed = TRUE;
+static gboolean s_bAutoHideInitialValue;
 
 
 gboolean on_expose (GtkWidget *pWidget,
@@ -355,7 +357,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			//else
 			//	g_print ("pas encore visible !\n");
 		}
-		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL && pPointedIcon->pSubDock != s_pLastPointedDock)
+		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL && pPointedIcon->pSubDock != s_pLastPointedDock && ! bShowSubDockOnClick)
 		{
 			if (g_iShowSubDockDelay > 0)
 			{
@@ -387,7 +389,7 @@ gboolean _cairo_dock_emit_leave_signal (CairoDock *pDock)
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
-	//g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
+	g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
 	pDock->iAvoidingMouseIconType = -1;
 	pDock->fAvoidingMouseMargin = 0;
 	pDock->bInside = FALSE;
@@ -433,7 +435,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	CairoDock *pDock)
 {
 	//g_print ("%s (bInside:%d; bAtBottom:%d)\n", __func__, pDock->bInside, pDock->bAtBottom);
-	if (pDock->bAtBottom)  // || ! pDock->bInside
+	if (pDock->bAtBottom || ! pDock->bAtTop)  // || ! pDock->bInside
 	{
 		pDock->iSidLeaveDemand = 0;
 		return FALSE;
@@ -447,9 +449,9 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 		{
 			if (pDock->iSidLeaveDemand == 0)
 			{
-				//g_print ("  on retarde la sortie\n");
-				pDock->iSidLeaveDemand = g_timeout_add (g_iLeaveSubDockDelay, (GSourceFunc) _cairo_dock_emit_leave_signal, (gpointer) pDock);
-				return FALSE;
+				g_print ("  on retarde la sortie du dock de %dms\n", MAX (g_iLeaveSubDockDelay, 330));
+				pDock->iSidLeaveDemand = g_timeout_add (MAX (g_iLeaveSubDockDelay, 330), (GSourceFunc) _cairo_dock_emit_leave_signal, (gpointer) pDock);
+				return TRUE;
 			}
 		}
 	}
@@ -457,9 +459,9 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	{
 		if (pDock->iSidLeaveDemand == 0)
 		{
-			//g_print ("  on retarde la sortie\n");
+			g_print ("  on retarde la sortie du sous-dock de %dms\n", g_iLeaveSubDockDelay);
 			pDock->iSidLeaveDemand = g_timeout_add (g_iLeaveSubDockDelay, (GSourceFunc) _cairo_dock_emit_leave_signal, (gpointer) pDock);
-			return FALSE;
+			return TRUE;
 		}
 	}
 	pDock->iSidLeaveDemand = 0;
@@ -479,11 +481,11 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 		s_iSidShowSubDockDemand = 0;
 	}
 	if (! cairo_dock_hide_child_docks (pDock))  // on quitte si on entre dans un sous-dock, pour rester en position "haute".
-		return FALSE;
+		return TRUE;
 	
 	cairo_dock_leave_from_main_dock (pDock);
 	
-	return FALSE;
+	return TRUE;
 }
 
 
@@ -492,7 +494,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	//g_print ("%s (bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
+	g_print ("%s (bIsMainDock : %d; bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bIsMainDock, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
 	s_pLastPointedDock = NULL;  // ajoute le 04/10/07 pour permettre aux sous-docks d'apparaitre si on entre en pointant tout de suite sur l'icone.
 	
 	if (! s_bEntranceAllowed)
@@ -820,6 +822,11 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 					{
 						cairo_dock_arm_animation (icon, -1, -1);
 						
+						if (icon->pSubDock != NULL && bShowSubDockOnClick)
+						{
+							cairo_dock_show_subdock (icon, FALSE, pDock);
+						}
+						
 						gpointer data[2] = {icon, pDock};
 						cairo_dock_notify (CAIRO_DOCK_CLICK_ICON, data);
 						
@@ -1008,7 +1015,7 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 			if (GTK_WIDGET_VISIBLE (pLastPointedIcon->pSubDock->pWidget))
 				gdk_window_hide (pLastPointedIcon->pSubDock->pWidget->window);
 		}
-		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL)
+		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL && ! bShowSubDockOnClick)
 		{
 			if (g_iShowSubDockDelay > 0)
 			{
@@ -1263,10 +1270,11 @@ gboolean on_delete (GtkWidget *pWidget, GdkEvent *event, CairoDock *pDock)
 
 void cairo_dock_activate_temporary_auto_hide (CairoDock *pDock)
 {
-	if (! g_bAutoHide)
+	if (! s_bTemporaryAutoHide)
 	{
-		pDock->bAtBottom = FALSE;  // car on a deja quitte le dock lors de la fermeture du menu, donc le "leave-notify" serait ignore.
 		s_bTemporaryAutoHide = TRUE;
+		pDock->bAtBottom = FALSE;  // car on a deja quitte le dock lors de la fermeture du menu, donc le "leave-notify" serait ignore.
+		s_bAutoHideInitialValue = g_bAutoHide;
 		g_bAutoHide = TRUE;
 		s_bEntranceAllowed = FALSE;
 		_cairo_dock_emit_leave_signal (pDock);
@@ -1278,7 +1286,7 @@ void cairo_dock_deactivate_temporary_auto_hide (void)
 	if (s_bTemporaryAutoHide)
 	{
 		s_bTemporaryAutoHide = FALSE;
-		g_bAutoHide = FALSE;
+		g_bAutoHide = s_bAutoHideInitialValue;
 	}
 }
 
@@ -1297,8 +1305,13 @@ gboolean cairo_dock_entrance_is_allowed (void)
 	return s_bEntranceAllowed;
 }
 
+gboolean cairo_dock_quick_hide_is_activated (void)
+{
+	return s_bTemporaryAutoHide;
+}
 
 
+// Tests sur les selections.
 void on_selection_get (GtkWidget *pWidget, GtkSelectionData *data, guint info, guint time, gpointer user_data)
 {
 	g_print ("***%s ()\n", __func__);

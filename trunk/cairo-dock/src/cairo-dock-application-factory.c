@@ -31,8 +31,8 @@ extern int g_iLabelSize;
 extern gchar *g_cLabelPolice;
 extern gboolean g_bTextAlwaysHorizontal;
 
-extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
-extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
+extern int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];
+extern int g_tIconAuthorizedHeight[CAIRO_DOCK_NB_TYPES];
 
 extern gboolean g_bUniquePid;
 extern gboolean g_bGroupAppliByClass;
@@ -226,10 +226,10 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 				pSourceContext,
 				fMaxScale,
 				TRUE,
-				g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLI],
-				g_tMinIconAuthorizedSize[CAIRO_DOCK_APPLI],
-				g_tMaxIconAuthorizedSize[CAIRO_DOCK_APPLI],
-				g_tMaxIconAuthorizedSize[CAIRO_DOCK_APPLI],
+				g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI],
+				g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI],
+				g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI],
+				g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI],
 				fWidth,
 				fHeight);
 			

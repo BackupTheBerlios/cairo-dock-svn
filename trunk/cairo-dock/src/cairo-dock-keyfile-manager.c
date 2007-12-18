@@ -11,8 +11,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 #include "cairo-dock-keyfile-manager.h"
 
-extern gchar *g_cLanguage;
-
 
 void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file)
 {
@@ -55,30 +53,11 @@ gchar *cairo_dock_get_translated_conf_file_path (gchar *cConfFileName, gchar *cS
 		*str = '\0';
 	}
 	
-	gchar *cTranslatedConfFilePath = g_strdup_printf ("%s/%s-%s%s", cShareDataDirPath, cBaseName, g_cLanguage, (cExtension != NULL ? cExtension : ""));
+	gchar *cTranslatedConfFilePath = g_strdup_printf ("%s/%s%s", cShareDataDirPath, cBaseName, (cExtension != NULL ? cExtension : ""));
 	if (! g_file_test (cTranslatedConfFilePath, G_FILE_TEST_EXISTS))
 	{
 		g_free (cTranslatedConfFilePath);
 		cTranslatedConfFilePath = NULL;
-		if (g_cLanguage == NULL || strcmp (g_cLanguage, "en") != 0)
-		{
-			cTranslatedConfFilePath = g_strdup_printf ("%s/%s-en%s", cShareDataDirPath, cBaseName, (cExtension != NULL ? cExtension : ""));
-			if (! g_file_test (cTranslatedConfFilePath, G_FILE_TEST_EXISTS))
-			{
-				g_free (cTranslatedConfFilePath);
-				cTranslatedConfFilePath = NULL;
-			}
-		}
-		
-		if (cTranslatedConfFilePath == NULL)
-		{
-			cTranslatedConfFilePath = g_strdup_printf ("%s/%s%s", cShareDataDirPath, cBaseName, (cExtension != NULL ? cExtension : ""));
-			if (! g_file_test (cTranslatedConfFilePath, G_FILE_TEST_EXISTS))
-			{
-				g_free (cTranslatedConfFilePath);
-				cTranslatedConfFilePath = NULL;
-			}
-		}
 	}
 	
 	g_free (cBaseName);
@@ -414,48 +393,8 @@ void cairo_dock_replace_keys_by_identifier (gchar *cConfFilePath, gchar *cReplac
 
 
 
-GHashTable *cairo_dock_list_available_translations (gchar *cTranslationsDir, gchar *cFilePrefix, GError **erreur)
+void cairo_dock_get_conf_file_language_and_version (GKeyFile *pKeyFile, gchar **cConfFileVersion)
 {
-	g_return_val_if_fail (cFilePrefix != NULL, NULL);
-	GError *tmp_erreur = NULL;
-	GDir *dir = g_dir_open (cTranslationsDir, 0, &tmp_erreur);
-	if (tmp_erreur != NULL)
-	{
-		g_propagate_error (erreur, tmp_erreur);
-		return NULL;
-	}
-	
-	GHashTable *pTranslationTable = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
-	
-	int iPrefixLength = strlen (cFilePrefix);
-	const gchar* cFileName;
-	gchar *cLanguage;
-	gchar *cFilePath;
-	do
-	{
-		cFileName = g_dir_read_name (dir);
-		if (cFileName == NULL)
-			break ;
-		
-		if (g_str_has_suffix (cFileName, ".conf") && strncmp (cFileName, cFilePrefix, iPrefixLength) == 0)
-		{
-			cFilePath = g_strdup_printf ("%s/%s", cTranslationsDir, cFileName);
-			
-			cLanguage = g_strdup (cFileName + iPrefixLength);
-			cLanguage[strlen (cLanguage) - 5] = '\0';
-			
-			g_hash_table_insert (pTranslationTable, cLanguage, cFilePath);
-		}
-	}
-	while (1);
-	g_dir_close (dir);
-	
-	return pTranslationTable;
-}
-
-void cairo_dock_get_conf_file_language_and_version (GKeyFile *pKeyFile, gchar **cConfFileLanguage, gchar **cConfFileVersion)
-{
-	*cConfFileLanguage = NULL;
 	*cConfFileVersion = NULL;
 	
 	gchar *cFirstComment =  g_key_file_get_comment (pKeyFile, NULL, NULL, NULL);
@@ -481,26 +420,21 @@ void cairo_dock_get_conf_file_language_and_version (GKeyFile *pKeyFile, gchar **
 			if (cFirstComment[iStringLenght-1] == '\n')
 				cFirstComment[iStringLenght-1] = '\0';
 		}
-		if (cConfFileLanguage != NULL)
-			*cConfFileLanguage = g_strdup (cFirstComment+1);
 	}
 	g_free (cFirstComment);
 }
 
 gboolean cairo_dock_conf_file_needs_update (GKeyFile *pKeyFile)
 {
-	gchar *cPreviousLanguage = NULL, *cPreviousVersion = NULL;
-	cairo_dock_get_conf_file_language_and_version (pKeyFile, &cPreviousLanguage, &cPreviousVersion);
+	gchar *cPreviousVersion = NULL;
+	cairo_dock_get_conf_file_language_and_version (pKeyFile, &cPreviousVersion);
 	
 	gboolean bNeedsUpdate;
-	if ( (g_cLanguage != NULL && (cPreviousLanguage == NULL || strcmp (cPreviousLanguage, g_cLanguage) != 0)) ||
-		cPreviousVersion == NULL ||
-		strcmp (cPreviousVersion, CAIRO_DOCK_VERSION) != 0)
+	if (cPreviousVersion == NULL || strcmp (cPreviousVersion, CAIRO_DOCK_VERSION) != 0)
 		bNeedsUpdate = TRUE;
 	else
 		bNeedsUpdate = FALSE;
 	
-	g_free (cPreviousLanguage);
 	g_free (cPreviousVersion);
 	return bNeedsUpdate;
 }

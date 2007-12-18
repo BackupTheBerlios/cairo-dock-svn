@@ -38,8 +38,7 @@ extern gchar *g_cLabelPolice;
 
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentLaunchersPath;
-extern gchar **g_cDefaultIconDirectory;
-extern GtkIconTheme *g_pIconTheme;
+extern gpointer *g_pDefaultIconDirectory;
 
 extern gboolean g_bDirectionUp;
 extern gboolean g_bSameHorizontality;
@@ -56,6 +55,7 @@ gchar *cairo_dock_search_icon_s_path (gchar *cFileName)
 	GString *sIconPath = g_string_new ("");
 	gchar *cSuffixTab[4] = {".svg", ".png", ".xpm", NULL};
 	gboolean bAddSuffix, bFileFound;
+	GtkIconInfo* pIconInfo = NULL;
 	int i, j;
 	
 	//\_______________________ On construit le chemin de l'icone a afficher.
@@ -81,23 +81,48 @@ gchar *cairo_dock_search_icon_s_path (gchar *cFileName)
 		//\_______________________ On parcourt les repertoires disponibles, en testant tous les suffixes connus.
 		i = 0;
 		bFileFound = FALSE;
-		if (g_cDefaultIconDirectory != NULL)
+		if (g_pDefaultIconDirectory != NULL)
 		{
-			while (g_cDefaultIconDirectory[i] != NULL && ! bFileFound)
+			while ((g_pDefaultIconDirectory[2*i] != NULL || g_pDefaultIconDirectory[2*i+1] != NULL) && ! bFileFound)
 			{
-				j = 0;
-				while (! bFileFound && (cSuffixTab[j] != NULL || ! bAddSuffix))
+				if (g_pDefaultIconDirectory[2*i] != NULL)
 				{
-					g_string_printf (sIconPath, "%s/%s", g_cDefaultIconDirectory[i], cFileName);
-					if (bAddSuffix)
-						g_string_append_printf (sIconPath, "%s", cSuffixTab[j]);
-					
-					if ( g_file_test (sIconPath->str, G_FILE_TEST_EXISTS) )
-						bFileFound = TRUE;
-					
-					j ++;
+					//g_print ("on recherche %s dans le repertoire %s\n", sIconPath->str, g_pDefaultIconDirectory[2*i]);
+					j = 0;
+					while (! bFileFound && (cSuffixTab[j] != NULL || ! bAddSuffix))
+					{
+						g_string_printf (sIconPath, "%s/%s", g_pDefaultIconDirectory[2*i], cFileName);
+						if (bAddSuffix)
+							g_string_append_printf (sIconPath, "%s", cSuffixTab[j]);
+						//g_print ("  -> %s\n", sIconPath->str);
+						if ( g_file_test (sIconPath->str, G_FILE_TEST_EXISTS) )
+							bFileFound = TRUE;
+						
+						j ++;
+						if (! bAddSuffix)
+							break;
+					}
+				}
+				else if (g_pDefaultIconDirectory[2*i+1] != NULL)
+				{
+					g_string_printf (sIconPath, "%s", cFileName);
 					if (! bAddSuffix)
-						break;
+					{
+						gchar *str = strrchr (sIconPath->str, '.');
+						if (str != NULL)
+							*str = '\0';
+					}
+					//g_print ("on recherche %s dans le theme d'icones\n", sIconPath->str);
+					pIconInfo = gtk_icon_theme_lookup_icon  (GTK_ICON_THEME (g_pDefaultIconDirectory[2*i+1]),
+						sIconPath->str,
+						64,
+						GTK_ICON_LOOKUP_FORCE_SVG);
+					if (pIconInfo != NULL)
+					{
+						g_string_printf (sIconPath, "%s", gtk_icon_info_get_filename (pIconInfo));
+						bFileFound = TRUE;
+						gtk_icon_info_free (pIconInfo);
+					}
 				}
 				i ++;
 			}
@@ -112,22 +137,12 @@ gchar *cairo_dock_search_icon_s_path (gchar *cFileName)
 				if (str != NULL)
 					*str = '\0';
 			}
-			//g_print ("on recherche %s dans le theme d'icones\n", sIconPath->str);
-			GtkIconInfo* pIconInfo = gtk_icon_theme_lookup_icon  (g_pIconTheme,
+			//g_print ("on recherche %s dans le theme par defaut.\n", sIconPath->str);
+			GtkIconTheme *pDefaultIconTheme = gtk_icon_theme_get_default ();
+			pIconInfo = gtk_icon_theme_lookup_icon  (pDefaultIconTheme,
 				sIconPath->str,
 				64,
 				GTK_ICON_LOOKUP_FORCE_SVG);
-			if (pIconInfo == NULL)
-			{
-				GtkIconTheme *pDefaultIconTheme = gtk_icon_theme_get_default ();
-				if (g_pIconTheme != pDefaultIconTheme)
-				{
-					pIconInfo = gtk_icon_theme_lookup_icon  (pDefaultIconTheme,
-						sIconPath->str,
-						64,
-						GTK_ICON_LOOKUP_FORCE_SVG);
-				}
-			}
 			
 			if (pIconInfo != NULL)
 			{

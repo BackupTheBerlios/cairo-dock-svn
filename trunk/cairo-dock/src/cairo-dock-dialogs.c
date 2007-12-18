@@ -27,19 +27,19 @@ extern gboolean g_bKeepAbove;
 extern gboolean g_bAutoHide;
 extern int g_iVisibleZoneWidth, g_iVisibleZoneHeight;
 
-extern int g_iLabelSize;
-extern gchar *g_cLabelPolice;
-extern int g_iLabelStyle;
-extern int g_iLabelWeight;
-
 extern int g_iDockLineWidth;
 extern int g_iDockRadius;
 extern double g_fLineColor[4];
 
 extern int g_iDialogButtonWidth;
 extern int g_iDialogButtonHeight;
-extern double g_fDialogAlpha;
+extern double g_fDialogColor[4];
 extern int g_iDialogIconSize;
+
+extern int g_iDialogMessageSize;
+extern gchar *g_cDialogMessagePolice;
+extern int g_iDialogMessageWeight;
+extern int g_iDialogMessageStyle;
 
 static cairo_surface_t *s_pButtonOkSurface = NULL;
 static cairo_surface_t *s_pButtonCancelSurface = NULL;
@@ -70,11 +70,11 @@ static gboolean on_button_press_dialog (GtkWidget* pWidget,
 	{
 		if (pButton->type == GDK_BUTTON_PRESS)
 		{
-			if (pDialog->iButtonsType == GTK_BUTTONS_NONE)
+			if (pDialog->iButtonsType == GTK_BUTTONS_NONE && pDialog->pInteractiveWidget == NULL)  // ce n'est pas un dialogue  interactif.
 			{
 				cairo_dock_dialog_unreference (pIcon);
 			}
-			else
+			else if (pDialog->iButtonsType != GTK_BUTTONS_NONE)
 			{
 				GtkRequisition requisition = {0, 0};
 				if (pDialog->pInteractiveWidget != NULL)
@@ -226,7 +226,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 		cairo_close_path (pCairoContext);
 	
 	cairo_save (pCairoContext);
-	cairo_set_source_rgba (pCairoContext, 1., 1., 1., g_fDialogAlpha);
+	cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], g_fDialogColor[3]);
 	cairo_fill_preserve (pCairoContext);
 	cairo_restore (pCairoContext);
 	
@@ -482,7 +482,7 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 	
 	
 	//\________________ On dessine le texte dans une surface tampon.
-	int iLabelSize = (g_iLabelSize > 0 ? g_iLabelSize : 15);
+	int iLabelSize = (g_iDialogMessageSize > 0 ? g_iDialogMessageSize : 15);
 	cairo_t *pSourceContext = gdk_cairo_create (pWindow->window);
 	cairo_set_source_rgba (pSourceContext, 0., 0., 0., 0.);
 	cairo_set_operator (pSourceContext, CAIRO_OPERATOR_SOURCE);
@@ -492,9 +492,9 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 	
 	PangoFontDescription *pDesc = pango_font_description_new ();
 	pango_font_description_set_absolute_size (pDesc, iLabelSize * PANGO_SCALE);
-	pango_font_description_set_family_static (pDesc, g_cLabelPolice);
-	pango_font_description_set_weight (pDesc, g_iLabelWeight);
-	pango_font_description_set_style (pDesc, g_iLabelStyle);
+	pango_font_description_set_family_static (pDesc, g_cDialogMessagePolice);
+	pango_font_description_set_weight (pDesc, g_iDialogMessageWeight);
+	pango_font_description_set_style (pDesc, g_iDialogMessageStyle);
 	pango_layout_set_font_description (pLayout, pDesc);
 	pango_font_description_free (pDesc);
 	

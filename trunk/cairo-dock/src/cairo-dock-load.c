@@ -70,8 +70,8 @@ extern gboolean g_bDirectionUp;
 
 extern unsigned int g_iAppliMaxNameLength;
 
-extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
-extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
+extern int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];
+extern int g_tIconAuthorizedHeight[CAIRO_DOCK_NB_TYPES];
 
 extern gboolean g_bUseGlitz;
 
@@ -152,10 +152,10 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 			icon->pIconBuffer = cairo_dock_create_surface_from_image (cIconPath,
 				pSourceContext,
 				fMaxScale,
-				g_tMinIconAuthorizedSize[CAIRO_DOCK_LAUNCHER],
-				g_tMinIconAuthorizedSize[CAIRO_DOCK_LAUNCHER],
-				g_tMaxIconAuthorizedSize[CAIRO_DOCK_LAUNCHER],
-				g_tMaxIconAuthorizedSize[CAIRO_DOCK_LAUNCHER],
+				g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER],
+				g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER],
+				g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER],
+				g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER],
 				(bHorizontalDock ? &icon->fWidth : &icon->fHeight),
 				(bHorizontalDock ? &icon->fHeight : &icon->fWidth),
 				0,
@@ -184,10 +184,10 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 		icon->pIconBuffer = cairo_dock_create_surface_from_image (cIconPath,
 			pSourceContext,
 			fMaxScale,
-			g_tMinIconAuthorizedSize[icon->iType],
-			g_tMinIconAuthorizedSize[icon->iType],
-			g_tMaxIconAuthorizedSize[icon->iType],
-			g_tMaxIconAuthorizedSize[icon->iType],
+			g_tIconAuthorizedWidth[icon->iType],
+			g_tIconAuthorizedHeight[icon->iType],
+			g_tIconAuthorizedWidth[icon->iType],
+			g_tIconAuthorizedHeight[icon->iType],
 			(bHorizontalDock ? &icon->fWidth : &icon->fHeight),
 			(bHorizontalDock ? &icon->fHeight : &icon->fWidth),
 			0,

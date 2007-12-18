@@ -585,6 +585,9 @@ void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et iFlatD
 void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpdateSize, gboolean bAnimated, gboolean bApplyRatio)
 {
 	g_return_if_fail (icon != NULL);
+	if (g_list_find (pDock->icons, icon) != NULL)  // elle est deja dans ce dock.
+		return ;
+	
 	int iPreviousMinWidth = pDock->iFlatDockWidth;
 	int iPreviousMaxIconHeight = pDock->iMaxIconHeight;
 	

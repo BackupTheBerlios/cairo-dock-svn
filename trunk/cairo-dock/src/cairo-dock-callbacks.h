@@ -63,6 +63,7 @@ void cairo_dock_deactivate_temporary_auto_hide (void);
 void cairo_dock_allow_entrance (void);
 void cairo_dock_disable_entrance (void);
 gboolean cairo_dock_entrance_is_allowed (void);
+gboolean cairo_dock_quick_hide_is_activated (void);
 
 
 void on_selection_get (GtkWidget *pWidget, GtkSelectionData *data, guint info, guint time, gpointer user_data);

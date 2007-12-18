@@ -28,7 +28,6 @@ extern gchar *g_cCairoDockDataDir;
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentThemePath;
 extern gchar *g_cCurrentLaunchersPath;
-extern gchar *g_cLanguage;
 extern gchar *g_cMainDockDefaultRendererName;
 
 extern CairoDock *g_pMainDock;
@@ -39,7 +38,7 @@ static void _cairo_dock_write_one_theme_name (gchar *cThemeName, gchar *cThemePa
 {
 	g_string_append_printf (sThemeNames, "%s;", cThemeName);
 }
-gchar *cairo_dock_edit_themes (gchar *cLanguage, GHashTable **hThemeTable)
+gchar *cairo_dock_edit_themes (GHashTable **hThemeTable)
 {
 	//\___________________ On recupere la liste des themes existant (pre-installes et utilisateur).
 	GError *erreur = NULL;
@@ -218,7 +217,7 @@ int cairo_dock_ask_initial_theme (void)
 {
 	int iInitialChoiceOK = -1;
 	GHashTable *hThemeTable = NULL;
-	gchar *cInitConfFile = cairo_dock_edit_themes ("en", &hThemeTable);
+	gchar *cInitConfFile = cairo_dock_edit_themes (&hThemeTable);
 	
 	if (cInitConfFile != NULL)
 	{
@@ -286,7 +285,7 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 {
 	gchar *cCommand;
 	GHashTable *hThemeTable = NULL;
-	gchar *cInitConfFile = cairo_dock_edit_themes (g_cLanguage, &hThemeTable);
+	gchar *cInitConfFile = cairo_dock_edit_themes (&hThemeTable);
 	
 	if (cInitConfFile != NULL)
 	{

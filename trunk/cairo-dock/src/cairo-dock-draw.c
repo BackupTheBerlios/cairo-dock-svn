@@ -805,16 +805,18 @@ void cairo_dock_render_background (CairoDock *pDock)
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 	cairo_paint (pCairoContext);
 	
-	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
-	cairo_move_to (pCairoContext, 0, 0);
-	if (g_pVisibleZoneSurface != NULL)
+	if (! cairo_dock_quick_hide_is_activated ())
 	{
-		cairo_set_source_surface (pCairoContext, g_pVisibleZoneSurface, 0.0, 0.0);
-		cairo_paint_with_alpha (pCairoContext, g_fVisibleZoneAlpha);
+		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
+		cairo_move_to (pCairoContext, 0, 0);
+		if (g_pVisibleZoneSurface != NULL)
+		{
+			cairo_set_source_surface (pCairoContext, g_pVisibleZoneSurface, 0.0, 0.0);
+			cairo_paint_with_alpha (pCairoContext, g_fVisibleZoneAlpha);
+		}
 	}
 	cairo_destroy (pCairoContext);
 	
-	//cairo_dock_allow_entrance ();
 #ifdef HAVE_GLITZ
 	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
 		glitz_drawable_swap_buffers (pDock->pGlitzDrawable);
@@ -882,7 +884,7 @@ static gboolean _cairo_dock_hide_dock (gchar *cDockName, CairoDock *pDock, Cairo
 	
 	if (pPointedIcon != NULL)
 	{
-		//g_print (" il faut cacher ce dock parent\n");
+		g_print (" il faut cacher ce dock parent\n");
 		if (pDock->iRefCount == 0)  // pDock->bIsMainDock
 		{
 			cairo_dock_leave_from_main_dock (pDock);
@@ -898,7 +900,7 @@ static gboolean _cairo_dock_hide_dock (gchar *cDockName, CairoDock *pDock, Cairo
 				pDock->render (pDock);  // peut-etre qu'il faudrait faire un redraw.
 			}
 			
-			//g_print ("on cache %s par parente\n", cDockName);
+			g_print ("on cache %s par parente\n", cDockName);
 			gtk_widget_hide (pDock->pWidget);
 			cairo_dock_hide_parent_dock (pDock);
 		}
@@ -922,14 +924,14 @@ gboolean cairo_dock_hide_child_docks (CairoDock *pDock)
 		{
 			if (icon->pSubDock->bInside)
 			{
-				//g_print ("on est dans le sous-dock, donc on ne le cache pas\n");
+				g_print ("on est dans le sous-dock, donc on ne le cache pas\n");
 				pDock->bInside = FALSE;
 				pDock->bAtTop = FALSE;
 				return FALSE;
 			}
 			else  // si on sort du dock sans passer par le sous-dock, par exemple en sortant par le bas.
 			{
-				//g_print ("on cache %s par filiation\n", icon->acName);
+				g_print ("on cache %s par filiation\n", icon->acName);
 				icon->pSubDock->iScrollOffset = 0;
 				icon->pSubDock->fFoldingFactor = 0;
 				gtk_widget_hide (icon->pSubDock->pWidget);
