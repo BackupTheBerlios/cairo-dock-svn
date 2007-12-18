@@ -434,8 +434,8 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	//g_print ("%s (bInside:%d; bAtBottom:%d)\n", __func__, pDock->bInside, pDock->bAtBottom);
-	if (pDock->bAtBottom || ! pDock->bAtTop)  // || ! pDock->bInside
+	g_print ("%s (bInside:%d; bAtBottom:%d; iRefCount:%d)\n", __func__, pDock->bInside, pDock->bAtBottom, pDock->iRefCount);
+	if (pDock->bAtBottom)  // || ! pDock->bInside
 	{
 		pDock->iSidLeaveDemand = 0;
 		return FALSE;
