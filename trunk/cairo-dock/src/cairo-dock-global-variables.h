@@ -81,4 +81,13 @@ extern gboolean g_bUseSeparator;
 /// La direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.
 extern gboolean g_bDirectionUp;
 
+/// Ratio de la taille des icones des sous-docks par rapport a celles du dock principal.
+extern double g_fSubDockSizeRatio;
+
+/// Epaisseur de la ficelle.
+extern int g_iStringLineWidth;
+
+/// Taille max autorisee pour les docks.
+extern int g_iMaxAuthorizedWidth;
+
 #endif

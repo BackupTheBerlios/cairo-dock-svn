@@ -285,16 +285,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 			{
 				//g_print ("  fin\n");
 				cairo_dock_remove_icon_from_dock (pDock, pRemovingIcon);
-				if (CAIRO_DOCK_IS_APPLI (pRemovingIcon) && pRemovingIcon->cClass != NULL)
-				{
-					if (pDock == cairo_dock_search_dock_from_name (pRemovingIcon->cClass) && pDock->icons == NULL)  // il n'y a plus aucune icone de cette classe.
-					{
-						g_print ("le sous-dock de la classe %s n'a plus d'element\n", pRemovingIcon->cClass);
-						cairo_dock_destroy_dock (pDock, pRemovingIcon->cClass, NULL, NULL);
-						cairo_dock_free_icon (pRemovingIcon);
-						return FALSE;
-					}
-				}
+				
 				cairo_dock_update_dock_size (pDock);
 				cairo_dock_free_icon (pRemovingIcon);
 			}

@@ -695,7 +695,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_bAnimateSubDock = cairo_dock_get_boolean_key_value (pKeyFile, "System", "animate subdocks", &bFlushConfFileNeeded, TRUE, "Sub-Docks", NULL);
 	
-	g_iLeaveSubDockDelay = cairo_dock_get_integer_key_value (pKeyFile, "System", "leaving delay", &bFlushConfFileNeeded, 250, "Sub-Docks", NULL);
+	g_iLeaveSubDockDelay = cairo_dock_get_integer_key_value (pKeyFile, "System", "leaving delay", &bFlushConfFileNeeded, 330, "Sub-Docks", NULL);
 	g_iShowSubDockDelay = cairo_dock_get_integer_key_value (pKeyFile, "System", "show delay", &bFlushConfFileNeeded, 300, "Sub-Docks", NULL);
 	
 	bShowSubDockOnClick = cairo_dock_get_boolean_key_value (pKeyFile, "System", "show on click", &bFlushConfFileNeeded, FALSE, "Sub-Docks", NULL);

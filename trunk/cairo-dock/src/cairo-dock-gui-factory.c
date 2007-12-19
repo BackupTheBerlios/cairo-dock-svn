@@ -399,7 +399,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	GtkWidget *pOneWidget;
 	GSList * pSubWidgetList;
 	GtkWidget *pLabel;
-	GtkWidget *pVBox, *pHBox, *pSmallVBox, *pEventBox;
+	GtkWidget *pVBox, *pHBox, *pSmallVBox, *pEventBox, *pRightHBox;
 	GtkWidget *pEntry;
 	GtkWidget *pTable;
 	GtkWidget *pButtonAdd, *pButtonRemove;
@@ -640,6 +640,17 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					FALSE,
 					0);
 				
+				if (bIsAligned)
+				{
+					pRightHBox = gtk_hbox_new (FALSE, CAIRO_DOCK_GUI_MARGIN);
+					gtk_box_pack_end (GTK_BOX (pHBox),
+						pRightHBox,
+						FALSE,
+						FALSE,
+						0);
+					pHBox = pRightHBox;
+				}
+				
 				pSubWidgetList = NULL;
 				
 				switch (iElementType)
@@ -648,6 +659,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						//g_print ("  + boolean\n");
 						length = 0;
 						bValueList = g_key_file_get_boolean_list (pKeyFile, cGroupName, cKeyName, &length, NULL);
+						
 						for (k = 0; k < iNbElements; k ++)
 						{
 							bValue =  (k < length ? bValueList[k] : FALSE);
@@ -655,19 +667,11 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							gtk_toggle_button_set_active  (GTK_TOGGLE_BUTTON (pOneWidget), bValue);
 							
 							pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
-							//gtk_container_add (GTK_CONTAINER (pHBox), pOneWidget);
-							if (bIsAligned)
-								gtk_box_pack_end (GTK_BOX (pHBox),
-									pOneWidget,
-									FALSE,
-									FALSE,
-									0);
-							else
-								gtk_box_pack_start (GTK_BOX (pHBox),
-									pOneWidget,
-									FALSE,
-									FALSE,
-									0);
+							gtk_box_pack_start (GTK_BOX (pHBox),
+								pOneWidget,
+								FALSE,
+								FALSE,
+								0);
 						}
 						g_free (bValueList);
 					break;
@@ -693,18 +697,11 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							gtk_spin_button_set_value (GTK_SPIN_BUTTON (pOneWidget), iValue);
 							
 							pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
-							if (bIsAligned)
-								gtk_box_pack_end (GTK_BOX (pHBox),
-									pOneWidget,
-									FALSE,
-									FALSE,
-									0);
-							else
-								gtk_box_pack_start(GTK_BOX (pHBox),
-									pOneWidget,
-									FALSE,
-									FALSE,
-									0);
+							gtk_box_pack_start(GTK_BOX (pHBox),
+								pOneWidget,
+								FALSE,
+								FALSE,
+								0);
 						}
 						g_free (iValueList);
 					break;
@@ -750,18 +747,11 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							gtk_adjustment_set_value (GTK_ADJUSTMENT (pAdjustment), fValue);
 							
 							pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
-							if (bIsAligned)
-								gtk_box_pack_end (GTK_BOX (pHBox),
-									pOneWidget,
-									FALSE,
-									FALSE,
-									0);
-							else
-								gtk_box_pack_start(GTK_BOX (pHBox),
-									pOneWidget,
-									FALSE,
-									FALSE,
-									0);
+							gtk_box_pack_start(GTK_BOX (pHBox),
+								pOneWidget,
+								FALSE,
+								FALSE,
+								0);
 						}
 						if (iElementType == 'c' && length > 2)
 						{
@@ -777,18 +767,11 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							else
 								gtk_color_button_set_use_alpha (GTK_COLOR_BUTTON (pColorButton), FALSE);
 							
-							if (bIsAligned)
-								gtk_box_pack_end (GTK_BOX (pHBox),
-									pColorButton,
-									FALSE,
-									FALSE,
-									0);
-							else
-								gtk_box_pack_start (GTK_BOX (pHBox),
-									pColorButton,
-									FALSE,
-									FALSE,
-									0);
+							gtk_box_pack_start (GTK_BOX (pHBox),
+								pColorButton,
+								FALSE,
+								FALSE,
+								0);
 							 g_signal_connect (G_OBJECT (pColorButton), "color-set", G_CALLBACK(_cairo_dock_set_color), pSubWidgetList);
 							 g_signal_connect (G_OBJECT (pColorButton), "clicked", G_CALLBACK(_cairo_dock_recup_current_color), pSubWidgetList);
 							
@@ -879,18 +862,11 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								gtk_combo_box_set_active (GTK_COMBO_BOX (pOneWidget), iSelectedItem);
 							}
 							pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
-							if (bIsAligned)
-								gtk_box_pack_end (GTK_BOX (pHBox),
-									pOneWidget,
-									FALSE,
-									FALSE,
-									0);
-							else
-								gtk_box_pack_start (GTK_BOX (pHBox),
-									pOneWidget,
-									FALSE,
-									FALSE,
-									0);
+							gtk_box_pack_start (GTK_BOX (pHBox),
+								pOneWidget,
+								FALSE,
+								FALSE,
+								0);
 						}
 						else
 						{
@@ -914,32 +890,18 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
 							
 							pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
-							if (bIsAligned)
-								gtk_box_pack_end (GTK_BOX (pHBox),
-									pOneWidget,
-									FALSE,
-									FALSE,
-									0);
-							else
-								gtk_box_pack_start (GTK_BOX (pHBox),
-									pOneWidget,
-									FALSE,
-									FALSE,
-									0);
+							gtk_box_pack_start (GTK_BOX (pHBox),
+								pOneWidget,
+								FALSE,
+								FALSE,
+								0);
 							
 							pSmallVBox = gtk_vbox_new (FALSE, 3);
-							if (bIsAligned)
-								gtk_box_pack_end (GTK_BOX (pHBox),
-									pSmallVBox,
-									FALSE,
-									FALSE,
-									0);
-							else
-								gtk_box_pack_start (GTK_BOX (pHBox),
-									pSmallVBox,
-									FALSE,
-									FALSE,
-									0);
+							gtk_box_pack_start (GTK_BOX (pHBox),
+								pSmallVBox,
+								FALSE,
+								FALSE,
+								0);
 							
 							pButtonUp = gtk_button_new_from_stock (GTK_STOCK_GO_UP);
 							g_signal_connect (G_OBJECT (pButtonUp),
@@ -1069,18 +1031,11 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									}
 								}
 								pTable = gtk_table_new (2, 2, FALSE);
-								if (bIsAligned)
-									gtk_box_pack_end (GTK_BOX (pHBox),
-										pTable,
-										FALSE,
-										FALSE,
-										0);
-								else
-									gtk_box_pack_start (GTK_BOX (pHBox),
-										pTable,
-										FALSE,
-										FALSE,
-										0);
+								gtk_box_pack_start (GTK_BOX (pHBox),
+									pTable,
+									FALSE,
+									FALSE,
+									0);
 								
 								if (iNbBuffers < s_pBufferArray->len)
 								{
@@ -1160,33 +1115,19 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								"clicked",
 								G_CALLBACK (_cairo_dock_pick_a_file),
 								data);
-							if (bIsAligned)
-								gtk_box_pack_end (GTK_BOX (pHBox),
-									pButtonFileChooser,
-									FALSE,
-									FALSE,
-									0);
-							else
-								gtk_box_pack_start (GTK_BOX (pHBox),
-									pButtonFileChooser,
-									FALSE,
-									FALSE,
-									0);
+							gtk_box_pack_start (GTK_BOX (pHBox),
+								pButtonFileChooser,
+								FALSE,
+								FALSE,
+								0);
 						}
 						else if ((iElementType == 'R' || iElementType == 'M') && pDescriptionLabel != NULL)
 						{
-							if (bIsAligned)
-								gtk_box_pack_end (GTK_BOX (pHBox),
-									pDescriptionLabel,
-									FALSE,
-									FALSE,
-									0);
-							else
-								gtk_box_pack_start (GTK_BOX (pHBox),
-									pDescriptionLabel,
-									FALSE,
-									FALSE,
-									0);
+							gtk_box_pack_start (GTK_BOX (pHBox),
+								pDescriptionLabel,
+								FALSE,
+								FALSE,
+								0);
 						}
 						else if (iElementType == 'P' && pEntry != NULL)
 						{
@@ -1197,18 +1138,11 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								"font-set",
 								G_CALLBACK (_cairo_dock_set_font),
 								pEntry);
-							if (bIsAligned)
-								gtk_box_pack_end (GTK_BOX (pHBox),
-									pFontButton,
-									FALSE,
-									FALSE,
-									0);
-							else
-								gtk_box_pack_start (GTK_BOX (pHBox),
-									pFontButton,
-									FALSE,
-									FALSE,
-									0);
+							gtk_box_pack_start (GTK_BOX (pHBox),
+								pFontButton,
+								FALSE,
+								FALSE,
+								0);
 						}
 						
 						g_strfreev (cValueList);

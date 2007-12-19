@@ -547,6 +547,46 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 	
 	icon->iCount = 0;
 	
+	//\___________________ On gere le cas des classes d'applis.
+	if (CAIRO_DOCK_IS_APPLI (icon))
+	{
+		CairoDock *pClassSubDock = icon->pSubDock;
+		if (pClassSubDock != NULL)  // cette icone pointe sur le sous-dock de sa classe, il faut enlever la 1ere icone de ce sous-dock, la deplacer au dock parent, et lui affecter le sous-dock si il est non vide, ou sinon le detruire.
+		{
+			Icon *pSameClassIcon = cairo_dock_get_first_icon (pClassSubDock->icons);
+			if (pSameClassIcon != NULL)  // a priori toujours vrai.
+			{
+				icon->pSubDock = NULL;  // on detache le sous-dock de l'icone, il sera detruit ou rattache.
+				
+				cairo_dock_detach_icon_from_dock (pSameClassIcon, pClassSubDock, FALSE);  // inutile de verifier si un separateur est present.
+				
+				pSameClassIcon->fOrder = icon->fOrder;
+				pSameClassIcon->cParentDockName = g_strdup (cairo_dock_search_dock_name (pDock));
+				cairo_dock_insert_icon_in_dock (pSameClassIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+				
+				if (pClassSubDock->icons != NULL)
+				{
+					g_print ("  on re-attribue le sous-dock de la classe a l'icone deplacee\n");
+					pSameClassIcon->pSubDock = pClassSubDock;
+				}
+				else
+				{
+					g_print ("  plus d'icone de cette classe\n");
+					const gchar *cClassSubDockName = cairo_dock_search_dock_name (pClassSubDock);  // on aurait pu utiliser l'ancien 'cParentDockName' de pSameClassIcon mais bon ...
+					cairo_dock_destroy_dock (pClassSubDock, cClassSubDockName, NULL, NULL);
+				}
+			}
+		}
+		
+		if (pDock == cairo_dock_search_dock_from_name (icon->cClass) && g_list_length (pDock->icons) == 1)  // il n'y aura plus aucune icone de cette classe.
+		{
+			g_print ("le sous-dock de la classe %s n'a plus d'element\n", icon->cClass);
+			Icon *pPointingIcon = cairo_dock_search_icon_pointing_on_dock (pDock, NULL);
+			if (pPointingIcon != NULL)
+				pPointingIcon->pSubDock = NULL;
+		}
+	}
+	
 	//\___________________ On l'enleve de la liste.
 	if (pDock->pFirstDrawnElement != NULL && pDock->pFirstDrawnElement->data == icon)
 	{
@@ -619,33 +659,6 @@ static void _cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon,
 	else if (CAIRO_DOCK_IS_VALID_APPLI (icon))
 	{
 		cairo_dock_unregister_appli (icon);
-		CairoDock *pClassSubDock = icon->pSubDock;
-		if (pClassSubDock != NULL)  // cette icone pointe sur le sous-dock de sa classe, il faut enlever la 1ere icone de ce sous-dock, la deplacer au dock parent, et lui affecter le sous-dock si il est non vide, ou sinon le detruire.
-		{
-			Icon *pSameClassIcon = cairo_dock_get_first_icon (pClassSubDock->icons);
-			if (pSameClassIcon != NULL)  // a priori toujours vrai.
-			{
-				icon->pSubDock = NULL;  // on detache le sous-dock de l'icone, il sera detruit ou rattache.
-				
-				cairo_dock_detach_icon_from_dock (pSameClassIcon, pClassSubDock, FALSE);  // inutile de verifier si un separateur est present.
-				
-				pSameClassIcon->fOrder = icon->fOrder;
-				pSameClassIcon->cParentDockName = g_strdup (cairo_dock_search_dock_name (pDock));
-				cairo_dock_insert_icon_in_dock (pSameClassIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
-				
-				if (pClassSubDock->icons != NULL)
-				{
-					g_print ("  on re-attribue le sous-dock de la classe a l'icone deplacee\n");
-					pSameClassIcon->pSubDock = pClassSubDock;
-				}
-				else
-				{
-					g_print ("  plus d'icone de cette classe\n");
-					const gchar *cClassSubDockName = cairo_dock_search_dock_name (pClassSubDock);  // on aurait pu utiliser l'ancien 'cParentDockName' de pSameClassIcon mais bon ...
-					cairo_dock_destroy_dock (pClassSubDock, cClassSubDockName, NULL, NULL);
-				}
-			}
-		}
 	}
 	else if (CAIRO_DOCK_IS_VALID_APPLET (icon))
 	{
@@ -655,6 +668,15 @@ static void _cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon,
 	
 	//\___________________ On detache l'icone du dock.
 	cairo_dock_detach_icon_from_dock (icon, pDock, bCheckUnusedSeparator);
+	
+	if (CAIRO_DOCK_IS_APPLI (icon) && icon->cClass != NULL)
+	{
+		if (pDock == cairo_dock_search_dock_from_name (icon->cClass) && pDock->icons == NULL)  // il n'y a plus aucune icone de cette classe.
+		{
+			g_print ("le sous-dock de la classe %s n'a plus d'element et sera detruit\n", icon->cClass);
+			cairo_dock_destroy_dock (pDock, icon->cClass, NULL, NULL);
+		}
+	}
 	
 	if (pDock->bIsMainDock && g_bReserveSpace)
 		cairo_dock_reserve_space_for_dock (pDock, TRUE);  // l'espace est reserve sur la taille min, qui a deja ete mise a jour.
@@ -680,7 +702,32 @@ void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType)
 	gboolean bOneIconFound = FALSE;
 	Icon *pSeparatorIcon = NULL;
 	ic = pDock->icons;
-	for (ic = pDock->icons->next; ic != NULL; ic = ic->next)
+	do
+	{
+		if (ic->next == NULL)
+			break;
+		
+		icon = ic->next->data;  // on ne peut pas enlever l'element courant, sinon on perd 'ic'.
+		if (icon->iType == iType)
+		{
+			bOneIconFound = TRUE;
+			cairo_dock_remove_one_icon_from_dock (pDock, icon);
+			cairo_dock_free_icon (icon);
+		}
+		else
+		{
+			if (CAIRO_DOCK_IS_SEPARATOR (icon))
+			{
+				if ( (bOneIconFound && pSeparatorIcon == NULL) || (! bOneIconFound) )
+					pSeparatorIcon = icon;
+			}
+			ic = ic->next;
+		}
+	} while (! bOneIconFound || icon->iType == iType);
+	
+	icon = cairo_dock_get_first_icon_of_type (pDock->icons, iType);
+	
+	/*for (ic = pDock->icons->next; ic != NULL; ic = ic->next)
 	{
 		icon = ic->prev->data;  // on ne peut pas enlever l'element courant, sinon on perd 'ic'.
 		if (icon->iType == iType)
@@ -696,7 +743,7 @@ void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType)
 		}
 	}
 	
-	icon = cairo_dock_get_last_icon_of_type (pDock->icons, iType);
+	icon = cairo_dock_get_last_icon_of_type (pDock->icons, iType);*/
 	if (icon != NULL && icon->iType == iType)
 	{
 		bOneIconFound = TRUE;
@@ -782,7 +829,7 @@ GList *cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, in
 
 Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, int iFlatDockWidth, int iWidth, int iHeight, double fAlign, double fFoldingFactor)
 {
-	//g_print (">>>>>%s (%d/%d, %dx%d)\n", __func__, x_abs, iFlatDockWidth, iWidth, iHeight);
+	//g_print (">>>>>%s (%d/%d, %dx%d, %.2f, %.2f)\n", __func__, x_abs, iFlatDockWidth, iWidth, iHeight, fAlign, fFoldingFactor);
 	if (x_abs < 0 && iWidth > 0)  // ces cas limite sont la pour empecher les icones de retrecir trop rapidement quend on sort par les cotes.
 		x_abs = -1;
 	else if (x_abs > iFlatDockWidth && iWidth > 0)
@@ -808,24 +855,14 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 		if (icon->fPhase < 0)
 		{
 			icon->fPhase = 0;
-			/*if (ic != pointed_ic)
-				icon->fPhase = 0;
-			else
-				icon->fPhase += G_PI / 2;*/
 		}
 		else if (icon->fPhase > G_PI)
 		{
 			icon->fPhase = G_PI;
-			/*if (ic != pointed_ic)
-				icon->fPhase = G_PI;
-			else
-				icon->fPhase -= G_PI / 2;*/
 		}
 		
 		//\_______________ On en deduit l'amplitude de la sinusoide au niveau de cette icone, et donc son echelle.
 		icon->fScale = 1 + fMagnitude * g_fAmplitude * sin (icon->fPhase);
-		//if (CAIRO_DOCK_IS_SEPARATOR (icon))
-		//	icon->fScale = 1;
 		if (icon->fPersonnalScale > 0 && iWidth > 0)
 		{
 			icon->fPersonnalScale *= .85;
@@ -848,23 +885,22 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 			if (ic == pFirstDrawnElement)  // peut arriver si on est en dehors a gauche du dock.
 			{
 				icon->fX = x_cumulated - 1. * (iFlatDockWidth - iWidth) / 2;
-				//g_print ("  icon->fX = %.2f (%.2f)\n", icon->fX, x_cumulated);
+				//g_print ("  en dehors a gauche : icon->fX = %.2f (%.2f)\n", icon->fX, x_cumulated);
 			}
 			else
 			{
 				prev_icon = (ic->prev != NULL ? ic->prev->data : cairo_dock_get_last_icon (pIconList));
 				icon->fX = prev_icon->fX + (prev_icon->fWidth + g_iIconGap) * prev_icon->fScale;
 				
-				if (icon->fX + icon->fWidth * icon->fScale > icon->fXMax - g_fAmplitude * (icon->fWidth + 1.5*g_iIconGap) / 8 && iWidth != 0)  /// && icon->fPhase == G_PI
+				if (icon->fX + icon->fWidth * icon->fScale > icon->fXMax - g_fAmplitude * (icon->fWidth + 1.5*g_iIconGap) / 8 && iWidth != 0)
 				{
 					//g_print ("  on contraint %s (fXMax=%.2f , fX=%.2f\n", prev_icon->acName, prev_icon->fXMax, prev_icon->fX);
 					fDeltaExtremum = icon->fX + icon->fWidth * icon->fScale - (icon->fXMax - g_fAmplitude * (icon->fWidth + 1.5*g_iIconGap) / 16);
 					icon->fX -= fDeltaExtremum * (1 - (icon->fScale - 1) / g_fAmplitude);
-					///icon->fX = icon->fXMax - icon->fWidth * icon->fScale - g_fAmplitude * icon->fWidth / 16;
 				}
 			}
 			icon->fX = fAlign * iWidth + (icon->fX - fAlign * iWidth) * (1. - fFoldingFactor);
-			//g_print ("  icon->fX = %.2f (%.2f)\n", icon->fX, x_cumulated);
+			//g_print ("  a droite : icon->fX = %.2f (%.2f)\n", icon->fX, x_cumulated);
 		}
 		
 		//\_______________ On regarde si on pointe sur cette icone.
@@ -889,7 +925,7 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 		icon = pointed_ic->data;
 		icon->fX = x_cumulated - (iFlatDockWidth - iWidth) / 2 + (1 - icon->fScale) * (icon->fWidth + .5*g_iIconGap);
 		icon->fX = fAlign * iWidth + (icon->fX - fAlign * iWidth) * (1 - fFoldingFactor);
-		//g_print ("  icon->fX = %.2f (%.2f)\n", icon->fX, x_cumulated);
+		//g_print ("  en dehors a droite : icon->fX = %.2f (%.2f)\n", icon->fX, x_cumulated);
 	}
 	
 	ic = pointed_ic;
@@ -910,7 +946,6 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 			//g_print ("  on contraint %s (fXMin=%.2f , fX=%.2f\n", prev_icon->acName, prev_icon->fXMin, prev_icon->fX);
 			fDeltaExtremum = prev_icon->fX - (prev_icon->fXMin + g_fAmplitude * (prev_icon->fWidth + 2*g_iIconGap) / 16);
 			prev_icon->fX -= fDeltaExtremum * (1 - (prev_icon->fScale - 1) / g_fAmplitude);
-			///prev_icon->fX = prev_icon->fXMin + g_fAmplitude * prev_icon->fWidth / 16;
 		}
 		prev_icon->fX = fAlign * iWidth + (prev_icon->fX - fAlign * iWidth) * (1. - fFoldingFactor);
 		//g_print ("  prev_icon->fX : %.2f\n", prev_icon->fX);

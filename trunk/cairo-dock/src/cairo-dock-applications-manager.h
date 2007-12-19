@@ -33,14 +33,17 @@ gboolean cairo_dock_window_is_maximized (Window Xid);
 gboolean cairo_dock_window_is_fullscreen (Window Xid);
 void cairo_dock_window_is_fullscreen_or_hidden (Window Xid, gboolean *bIsFullScreen, gboolean *bIsHidden);
 Window cairo_dock_get_active_window (void);
+
 void cairo_dock_get_window_desktop_and_position (int Xid, int *iDesktopNumber, int *iGlobalPositionX, int *iGlobalPositionY);
 void cairo_dock_get_current_desktop (int *iDesktopNumber, int *iDesktopViewportX, int *iDesktopViewportY);
+gboolean cairo_dock_window_is_on_this_desktop (int Xid, int *pDesktop);
 gboolean cairo_dock_window_is_on_current_desktop (int Xid);
 
 
 gboolean cairo_dock_unstack_Xevents (CairoDock *pDock);
 void cairo_dock_set_window_mask (Window Xid, long iMask);
 Window *cairo_dock_get_windows_list (gulong *iNbWindows);
+void cairo_dock_insert_appli_in_dock (Icon *icon, CairoDock *pMainDock, gboolean bUpdateSize, gboolean bAnimate);
 void cairo_dock_update_applis_list (CairoDock *pDock, double fTime);
 void cairo_dock_start_application_manager (CairoDock *pDock);
 

@@ -285,7 +285,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 	icon->pTextBuffer = pNewSurface;
 }
 
-void cairo_dock_fill_one_extra_info_buffer (Icon *icon, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double fBackgroundAlpha)
+void cairo_dock_fill_one_quick_info_buffer (Icon *icon, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double fBackgroundAlpha)
 {
 	cairo_surface_destroy (icon->pQuickInfoBuffer);
 	icon->pQuickInfoBuffer = NULL;
@@ -305,7 +305,7 @@ void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDock *pDock)
 	
 	cairo_dock_fill_one_text_buffer (pIcon, pCairoContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 	
-	cairo_dock_fill_one_extra_info_buffer (pIcon, pCairoContext, 12, g_cLabelPolice, PANGO_WEIGHT_HEAVY, .4);
+	cairo_dock_fill_one_quick_info_buffer (pIcon, pCairoContext, 12, g_cLabelPolice, PANGO_WEIGHT_HEAVY, .4);
 	
 	cairo_destroy (pCairoContext);
 }
@@ -475,7 +475,7 @@ cairo_surface_t *cairo_dock_load_stripes (cairo_t* pSourceContext, int iStripesW
 
 void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, int iNewDecorationsWidth, int iNewDecorationsHeight)
 {
-	g_print ("%s (%dx%d)\n", __func__, iNewDecorationsWidth, iNewDecorationsHeight);
+	//g_print ("%s (%dx%d)\n", __func__, iNewDecorationsWidth, iNewDecorationsHeight);
 	if (2 * iNewDecorationsWidth > g_fBackgroundImageWidth || iNewDecorationsHeight > g_fBackgroundImageHeight)
 	{
 		g_print ("  MaJ des decorations du fond\n");

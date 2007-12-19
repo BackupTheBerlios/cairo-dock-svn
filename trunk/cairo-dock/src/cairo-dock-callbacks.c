@@ -357,7 +357,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			//else
 			//	g_print ("pas encore visible !\n");
 		}
-		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL && pPointedIcon->pSubDock != s_pLastPointedDock && ! bShowSubDockOnClick)
+		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL && pPointedIcon->pSubDock != s_pLastPointedDock && (! bShowSubDockOnClick || CAIRO_DOCK_IS_APPLI (pPointedIcon)))
 		{
 			if (g_iShowSubDockDelay > 0)
 			{
@@ -822,7 +822,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 					{
 						cairo_dock_arm_animation (icon, -1, -1);
 						
-						if (icon->pSubDock != NULL && bShowSubDockOnClick)
+						if (icon->pSubDock != NULL && bShowSubDockOnClick && ! CAIRO_DOCK_IS_APPLI (icon))
 						{
 							cairo_dock_show_subdock (icon, FALSE, pDock);
 						}
@@ -1015,7 +1015,7 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 			if (GTK_WIDGET_VISIBLE (pLastPointedIcon->pSubDock->pWidget))
 				gdk_window_hide (pLastPointedIcon->pSubDock->pWidget->window);
 		}
-		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL && ! bShowSubDockOnClick)
+		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL && (! bShowSubDockOnClick || CAIRO_DOCK_IS_APPLI (pPointedIcon)))
 		{
 			if (g_iShowSubDockDelay > 0)
 			{

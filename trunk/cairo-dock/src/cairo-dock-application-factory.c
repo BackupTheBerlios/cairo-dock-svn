@@ -241,6 +241,45 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 }
 
 
+CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
+{
+	g_print ("%s (%s)\n", __func__, icon->acName);
+	CairoDock *pParentDock = pMainDock;
+	if (CAIRO_DOCK_IS_APPLI (icon) && g_bGroupAppliByClass && icon->cClass != NULL)
+	{
+		Icon *pSameClassIcon = cairo_dock_get_icon_with_class (pMainDock->icons, icon->cClass);
+		g_free (icon->cParentDockName);
+		icon->cParentDockName = NULL;
+		if (pSameClassIcon == NULL || pSameClassIcon == icon)
+		{
+			g_print ("  classe %s encore vide\n", icon->cClass);
+			icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
+		}
+		else
+		{
+			icon->cParentDockName = g_strdup (icon->cClass);
+			
+			pParentDock = cairo_dock_search_dock_from_name (icon->cClass);
+			if (pParentDock == NULL)  // alors il faut creer le sous-dock, et on decide de l'associer a pSameClassIcon.
+			{
+				g_print ("  creation du dock pour la classe %s\n", icon->cClass);
+				pParentDock = cairo_dock_create_subdock_for_class_appli (icon->cClass);
+				pSameClassIcon->pSubDock = pParentDock;
+			}
+			else
+			{
+				g_print ("  sous-dock de la classe %s existant\n", icon->cClass);
+				if (pSameClassIcon->pSubDock == NULL)
+					pSameClassIcon->pSubDock = pParentDock;
+			}
+		}
+	}
+	else
+		icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
+	
+	return pParentDock;
+}
+
 
 Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid, CairoDock *pDock)
 {
@@ -362,9 +401,9 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 			g_hash_table_insert (s_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
 		return NULL;
 	}
-	//g_print ("recuperation de '%s'\n", pNameBuffer);
+	g_print ("recuperation de '%s' (bIsHidden : %d)\n", pNameBuffer, bIsHidden);
 	
-	//\__________________ On cree et on remplit l'icone, et on l'insere apres les autres applis.
+	//\__________________ On cree, on remplit l'icone, et on l'enregistre, par contre elle sera inseree plus tard.
 	Icon *icon = g_new0 (Icon, 1);
 	icon->acName = g_strdup ((gchar *)pNameBuffer);
 	if (g_bUniquePid)
@@ -395,31 +434,14 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	}
 	XFree (pClassHint);
 	
-	if (g_bGroupAppliByClass && icon->cClass != NULL)
-	{
-		Icon *pSameClassIcon = cairo_dock_get_icon_with_class (pDock->icons, icon->cClass);
-		if (pSameClassIcon == NULL)
-		{
-			icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
-		}
-		else
-		{
-			icon->cParentDockName = g_strdup (icon->cClass);
-			
-			if (cairo_dock_search_dock_from_name (icon->cClass) == NULL)  // alors il faut creer le sous-dock, et on decide de l'associer a pSameClassIcon.
-			{
-				g_print ("  creation du dock pour la classe %s\n", icon->cClass);
-				pSameClassIcon->pSubDock = cairo_dock_create_subdock_for_class_appli (icon->cClass);
-			}
-		}
-	}
-	else
-		icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
+	///cairo_dock_manage_appli_class (icon, pDock);
+	icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
 	
 	cairo_dock_set_window_mask (Xid, PropertyChangeMask);
 	
 	return icon;
 }
+
 
 
 void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, CairoDock *pDock)

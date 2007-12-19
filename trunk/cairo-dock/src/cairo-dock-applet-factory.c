@@ -256,7 +256,7 @@ void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Ico
 
 void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, Icon *pIcon, CairoDock *pDock)  // fonction proposee par Necropotame.
 {
-	g_return_if_fail (pIcon != NULL);  // le contexte sera verifie plus loin.
+	g_return_if_fail (pIcon != NULL && pDock != NULL);  // le contexte sera verifie plus loin.
 	
 	g_free (pIcon->acName);
 	pIcon->acName = g_strdup (cIconName);
@@ -276,7 +276,7 @@ void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo
 	g_free (pIcon->cQuickInfo);
 	pIcon->cQuickInfo = g_strdup (cQuickInfo);
 	
-	cairo_dock_fill_one_extra_info_buffer (pIcon,
+	cairo_dock_fill_one_quick_info_buffer (pIcon,
 		pSourceContext,
 		12,
 		g_cLabelPolice,

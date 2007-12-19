@@ -537,7 +537,7 @@ void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
 */
 void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et iFlatDockWidth doivent avoir ete mis a jour au prealable.
 {
-	g_print ("%s (bInside : %d ; iSidShrinkDown : %d)\n", __func__, pDock->bInside, pDock->iSidShrinkDown);
+	//g_print ("%s (bInside : %d ; iSidShrinkDown : %d)\n", __func__, pDock->bInside, pDock->iSidShrinkDown);
 	pDock->calculate_max_dock_size (pDock);
 	
 	if (! pDock->bInside && (g_bAutoHide && pDock->iRefCount == 0))
@@ -584,7 +584,7 @@ void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et iFlatD
 */
 void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpdateSize, gboolean bAnimated, gboolean bApplyRatio)
 {
-	g_return_if_fail (icon != NULL);
+	//g_return_if_fail (icon != NULL);
 	if (g_list_find (pDock->icons, icon) != NULL)  // elle est deja dans ce dock.
 		return ;
 	
