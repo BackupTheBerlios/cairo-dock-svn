@@ -3,7 +3,6 @@ launchersdir = $(pkgdatadir)/themes/_TapisVert_/launchers
 launchers_DATA = \
 	abiword.svg\
 	bitorrent.svg\
-	cairo-dock.conf\
 	download.desktop\
 	download.svg\
 	emule.desktop\
