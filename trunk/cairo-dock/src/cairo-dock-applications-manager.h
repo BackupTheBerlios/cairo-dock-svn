@@ -36,7 +36,7 @@ Window cairo_dock_get_active_window (void);
 
 void cairo_dock_get_window_desktop_and_position (int Xid, int *iDesktopNumber, int *iGlobalPositionX, int *iGlobalPositionY);
 void cairo_dock_get_current_desktop (int *iDesktopNumber, int *iDesktopViewportX, int *iDesktopViewportY);
-gboolean cairo_dock_window_is_on_this_desktop (int Xid, int *pDesktop);
+gboolean cairo_dock_window_is_on_this_desktop (int Xid, int iDesktopNumber);
 gboolean cairo_dock_window_is_on_current_desktop (int Xid);
 
 

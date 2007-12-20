@@ -146,6 +146,7 @@ CairoDockVisitCard *pre_init (void)\
 	pVisitCard->iMajorVersionNeeded = iMajorVersion;\
 	pVisitCard->iMinorVersionNeeded = iMinorVersion;\
 	pVisitCard->iMicroVersionNeeded = iMicroVersion;\
+	pVisitCard->cPreviewFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_PREVIEW_FILE);\
 	return pVisitCard;\
 }
 

@@ -602,7 +602,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	
 	//\___________________ On recupere les parametres de la zone visible.
-	gchar *cVisibleZoneImageFile = cairo_dock_get_string_key_value (pKeyFile, "Background", "background image", &bFlushConfFileNeeded, NULL, "Auto-Hide", NULL);
+	gchar *cVisibleZoneImageFile = cairo_dock_get_string_key_value (pKeyFile, "Background", "callback image", &bFlushConfFileNeeded, NULL, "Auto-Hide", "background image");
 	
 	g_iVisibleZoneWidth = cairo_dock_get_integer_key_value (pKeyFile, "Background", "zone width", &bFlushConfFileNeeded, 150, "Auto-Hide", NULL);
 	g_iVisibleZoneHeight = cairo_dock_get_integer_key_value (pKeyFile, "Background", "zone height", &bFlushConfFileNeeded, 25, "Auto-Hide", NULL);
@@ -886,10 +886,10 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	
 	//\___________________ On recupere les parametres des separateurs.
-	g_tIconAuthorizedWidth[CAIRO_DOCK_SEPARATOR12] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "separator width", &bFlushConfFileNeeded, 48, "Separators", "max icon size");
+	g_tIconAuthorizedWidth[CAIRO_DOCK_SEPARATOR12] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "separator width", &bFlushConfFileNeeded, 48, "Separators", "min icon size");
 	g_tIconAuthorizedWidth[CAIRO_DOCK_SEPARATOR23] = g_tIconAuthorizedWidth[CAIRO_DOCK_SEPARATOR12];
 	
-	g_tIconAuthorizedHeight[CAIRO_DOCK_SEPARATOR12] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "separator height", &bFlushConfFileNeeded, 48, "Separators", "max icon size");
+	g_tIconAuthorizedHeight[CAIRO_DOCK_SEPARATOR12] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "separator height", &bFlushConfFileNeeded, 48, "Separators", "min icon size");
 	g_tIconAuthorizedHeight[CAIRO_DOCK_SEPARATOR23] = g_tIconAuthorizedHeight[CAIRO_DOCK_SEPARATOR12];
 	
 	gboolean bUseSeparatorOld = g_bUseSeparator;
@@ -1454,7 +1454,7 @@ void cairo_dock_copy_to_easy_conf_file (GKeyFile *pMainKeyFile, gchar *cEasyConf
 	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Applets", "active modules", pKeyFile, "System", "active modules");
 	
 	//\___________________ On ecrit les parametres de personnalisation.
-	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Background", "background image", pKeyFile, "Personnalisation", "callback image");
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Background", "callback image", pKeyFile, "Personnalisation", "callback image");
 	
 	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Background", "background image", pKeyFile, "Personnalisation", "background image");
 	

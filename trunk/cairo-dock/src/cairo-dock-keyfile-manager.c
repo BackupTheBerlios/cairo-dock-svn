@@ -214,6 +214,55 @@ void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pRepla
 }
 
 
+int _cairo_dock_compare_key_names (gpointer *data1, gpointer *data2)
+{
+	if (data1[0] == NULL)
+	{
+		if (data2[0] == NULL)
+			return 0;
+		else
+			return -1;
+	}
+	else if (data2[0] == NULL)
+		return 1;
+	else
+		return strcmp ((gchar *) data1[0], (gchar *) data2[0]);
+}
+void _cairo_dock_extract_sorted_table_content (gchar *cName, gpointer value, GList **pList)
+{
+	gpointer *data = g_new (gpointer, 2);
+	data[0] = cName;
+	data[1] = value;
+	*pList = g_list_insert_sorted (*pList, data, (GCompareFunc) _cairo_dock_compare_key_names);
+}
+gchar *cairo_dock_write_table_content (GHashTable *pHashTable, GHFunc pWritingFunc, gboolean bSortByKey)
+{
+	GString *pString = g_string_new ("");
+	
+	if (! bSortByKey)
+		g_hash_table_foreach (pHashTable, pWritingFunc, pString);
+	else
+	{
+		GList *pList = NULL;
+		g_hash_table_foreach (pHashTable, (GHFunc) _cairo_dock_extract_sorted_table_content, &pList);
+		
+		GList *ic;
+		gpointer *data;
+		for (ic = pList; ic != NULL; ic = ic->next)
+		{
+			data = ic->data;
+			pWritingFunc (data[0], data[1], pString);
+			g_free (data);
+		}
+		g_list_free (pList);
+	}
+	if (pString->len > 0 && pString->str[pString->len-1] == ';')  // peut etre faux si aucune valeur n'a ete ecrite.
+		pString->str[pString->len-1] = '\0';
+	
+	gchar *cContent = pString->str;
+	g_string_free (pString, FALSE);
+	return cContent;
+}
 
 void cairo_dock_write_one_name (gchar *cName, gpointer value, GString *pString)
 {
@@ -225,19 +274,19 @@ void cairo_dock_write_one_name_description (gchar *cName, gchar *cDescriptionFil
 }
 void cairo_dock_write_one_module_name (gchar *cName, CairoDockModule *pModule, GString *pString)
 {
-	g_string_append_printf (pString, "%s;%s;", cName, (pModule->cReadmeFilePath != NULL ? pModule->cReadmeFilePath : "none"));
+	g_string_append_printf (pString, "%s;%s;%s;", cName, (pModule->cReadmeFilePath != NULL ? pModule->cReadmeFilePath : "none"), (pModule->cPreviewFilePath != NULL ? pModule->cPreviewFilePath : "none"));
 }
 void cairo_dock_write_one_theme_name (gchar *cName, gchar *cThemePath, GString *pString)
 {
-	g_string_append_printf (pString, "%s;%s/readme;", cName, cThemePath);
+	g_string_append_printf (pString, "%s;%s/readme;%s/preview.png;", cName, cThemePath, cThemePath);
 }
 void cairo_dock_write_one_renderer_name (gchar *cName, CairoDockRenderer *pRenderer, GString *pString)
 {
 	//g_print ("%s (%s)\n", __func__, cName);
-	g_string_append_printf (pString, "%s;%s;", cName, (pRenderer->cReadmeFilePath != NULL ? pRenderer->cReadmeFilePath : "none"));
+	g_string_append_printf (pString, "%s;%s;%s;", cName, (pRenderer->cReadmeFilePath != NULL ? pRenderer->cReadmeFilePath : "none"), (pRenderer->cPreviewFilePath != NULL ? pRenderer->cPreviewFilePath : "none"));
 }
 
-void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, gchar *cNewUsefullComment, GHFunc pWritingFunc)
+void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, gchar *cNewUsefullComment, GHFunc pWritingFunc, gboolean bSortByKey)
 {
 	//g_print ("%s (%s)\n", __func__, cConfFile);
 	GError *erreur = NULL;
@@ -303,11 +352,12 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 	//\___________________ On ecrit la liste des possibilites.
 	GString *sComment = g_string_new (cPrefix);
 	g_free (cPrefix);
-	g_hash_table_foreach (pModuleTable, (pWritingFunc != NULL ? pWritingFunc : (GHFunc) cairo_dock_write_one_name), sComment);
+	gchar *cTableContent = cairo_dock_write_table_content (pModuleTable, (pWritingFunc != NULL ? pWritingFunc : (GHFunc) cairo_dock_write_one_name), bSortByKey);
+	/*g_hash_table_foreach (pModuleTable, (pWritingFunc != NULL ? pWritingFunc : (GHFunc) cairo_dock_write_one_name), sComment);
 	if (sComment->str[sComment->len-1] == ';')  // peut etre faux si aucune valeur n'a ete ecrite.
-		sComment->len --;
-	g_string_append_printf (sComment, "] %s", (cUsefullComment != NULL ? cUsefullComment : ""));
-	
+		sComment->len --;*/
+	g_string_append_printf (sComment, "%s] %s", cTableContent, (cUsefullComment != NULL ? cUsefullComment : ""));
+	g_free (cTableContent);
 	g_key_file_set_comment (pKeyFile, cGroupName, cKeyName, sComment->str, &erreur);
 	if (erreur != NULL)
 	{
@@ -393,14 +443,14 @@ void cairo_dock_replace_keys_by_identifier (gchar *cConfFilePath, gchar *cReplac
 
 
 
-void cairo_dock_get_conf_file_language_and_version (GKeyFile *pKeyFile, gchar **cConfFileVersion)
+void cairo_dock_get_conf_file_version (GKeyFile *pKeyFile, gchar **cConfFileVersion)
 {
 	*cConfFileVersion = NULL;
 	
 	gchar *cFirstComment =  g_key_file_get_comment (pKeyFile, NULL, NULL, NULL);
 	if (cFirstComment != NULL && *cFirstComment == '!')
 	{
-		gchar *str = strchr (cFirstComment, ';');
+		gchar *str = strchr (cFirstComment, ';');  // le 1er est pour la langue (obsolete).
 		if (str != NULL)
 		{
 			*str = '\0';
@@ -427,7 +477,7 @@ void cairo_dock_get_conf_file_language_and_version (GKeyFile *pKeyFile, gchar **
 gboolean cairo_dock_conf_file_needs_update (GKeyFile *pKeyFile)
 {
 	gchar *cPreviousVersion = NULL;
-	cairo_dock_get_conf_file_language_and_version (pKeyFile, &cPreviousVersion);
+	cairo_dock_get_conf_file_version (pKeyFile, &cPreviousVersion);
 	
 	gboolean bNeedsUpdate;
 	if (cPreviousVersion == NULL || strcmp (cPreviousVersion, CAIRO_DOCK_VERSION) != 0)

@@ -42,13 +42,22 @@ typedef void (*CairoDockRenderOptimizedFunc) (CairoDock *pDock, GdkRectangle *pA
 typedef void (*CairoDockSetSubDockPositionFunc) (Icon *pPointedIcon, CairoDock *pParentDock);
 
 typedef struct _CairoDockRenderer {
+	/// chemin d'un fichier readme destine a presenter de maniere succinte le module.
 	gchar *cReadmeFilePath;
+	/// fonction calculant la taille max d'un dock.
 	CairoDockCalculateMaxDockSizeFunc calculate_max_dock_size;
+	/// fonction calculant l'ensemble des parametres des icones.
 	CairoDockCalculateIconsFunc calculate_icons;
+	/// fonction de rendu.
 	CairoDockRenderFunc render;
+	/// fonction de rendu optimise, ne dessinant qu'une seule icone.
 	CairoDockRenderOptimizedFunc render_optimized;
+	/// fonction calculant la position d'un sous-dock.
 	CairoDockSetSubDockPositionFunc set_subdock_position;
+	/// TRUE ssi cette vue utilise les reflets.
 	gboolean bUseReflect;
+	/// chemin d'une image de previsualisation.
+	gchar *cPreviewFilePath;
 	} CairoDockRenderer;
 
 
@@ -174,6 +183,8 @@ struct _CairoDockVisitCard {
 	short iMinorVersionNeeded;
 	/// numero de version micro de cairo-dock necessaire au bon fonctionnement du module.
 	short iMicroVersionNeeded;
+	/// chemin d'une image de previsualisation.
+	gchar *cPreviewFilePath;
 };
 
 typedef CairoDockVisitCard * (* CairoDockModulePreInit) (void);
@@ -199,6 +210,8 @@ struct _CairoDockModule {
 	gchar *cReadmeFilePath;
 	/// TRUE si le module est actif (c'est-a-dire utilise).
 	gboolean bActive;
+	/// chemin d'une image de previsualisation.
+	gchar *cPreviewFilePath;
 };
 
 
@@ -258,6 +271,8 @@ struct _CairoDockDialog
 	gpointer pUserData;
 	/// fonction appelee pour liberer les donnees.
 	GFreeFunc pFreeUserDataFunc;
+	/// icone sur laquelle pointe le dialogue.
+	Icon *pIcon;
 	};
 
 
@@ -390,9 +405,6 @@ struct _Icon {
 	double fQuickInfoXOffset;
 	/// Decalage en Y de la surface de l'info rapide.
 	double fQuickInfoYOffset;
-	//\____________ Pour les bulles de dialogues.
-	/// Dialogue pointant sur l'icone.
-	CairoDockDialog *pDialog;
 };
 
 

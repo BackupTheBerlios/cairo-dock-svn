@@ -264,7 +264,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 
 void cairo_dock_update_conf_file_with_available_modules_full (gchar *cConfFile, gchar *cGroupName, gchar *cKeyName)
 {
-	cairo_dock_update_conf_file_with_hash_table (cConfFile, s_hModuleTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_module_name);
+	cairo_dock_update_conf_file_with_hash_table (cConfFile, s_hModuleTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_module_name, FALSE);  // ils sont classes par ordre dans le dock.
 }
 
 

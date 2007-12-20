@@ -181,7 +181,7 @@ void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath)
 	if (cairo_dock_conf_file_needs_update (pKeyFile))
 		cairo_dock_flush_conf_file_full (pKeyFile, cDesktopFilePath, CAIRO_DOCK_SHARE_DATA_DIR, FALSE, CAIRO_DOCK_LAUNCHER_CONF_FILE);
 
-	cairo_dock_update_conf_file_with_hash_table (cDesktopFilePath, g_hDocksTable, "Desktop Entry", "Container", NULL, (GHFunc)cairo_dock_write_one_name);
+	cairo_dock_update_conf_file_with_hash_table (cDesktopFilePath, g_hDocksTable, "Desktop Entry", "Container", NULL, (GHFunc)cairo_dock_write_one_name, FALSE);
 	cairo_dock_update_launcher_conf_file_with_renderers (cDesktopFilePath);
 }
 

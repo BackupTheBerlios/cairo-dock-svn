@@ -407,9 +407,10 @@ main (int argc, char** argv)
 	//const gchar *cSillyMessage = "Cairo-Dock fait même le café ! Au choix :\n cairo-dock --capuccino , cairo-dock --expresso , cairo-dock --cafe_latte";  // 8000
 	//const gchar *cSillyMessage = "Veuillez rentrer un compliment élogieux à la gloire Fab pour pouvoir utiliser cairo-dock.";
 	//const gchar *cSillyMessage = "Sondage :\n Combien cairo-dock c'est trop bien :";
-	const gchar *cSillyMessage = "Cairo-Dock : just launch it !";  // 4000
-	//const gchar *cSillyMessage = "Cairo-Dock lave plus blanc que blanc";  // 4000
-	const gchar *cNumSilllyMessage = "9";
+	//const gchar *cSillyMessage = "Cairo-Dock : just launch it !";  // 4000
+	const gchar *cSillyMessage = "Cairo-Dock lave plus blanc que blanc.";  // 4000
+	//const gchar *cSillyMessage = "Etes-vous pour la création d'un thème Playboy par Vilraleur ?.";
+	const gchar *cNumSilllyMessage = "10";
 	gboolean bWriteSillyMessage;
 	if (! g_file_test (cSillyMessageFilePath, G_FILE_TEST_EXISTS))
 	{
