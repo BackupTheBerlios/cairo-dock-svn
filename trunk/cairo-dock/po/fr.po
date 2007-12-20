@@ -3,6 +3,8 @@
 # This file is distributed under the same license as the Cairo-Dock package.
 # Fabrice Rey <fabounet@users.berlios.de>, 2007.
 #
+#: po/fr.po:7 po/fr.po:8 po/fr.po:182 po/fr.po:186 po/fr.po:209 po/fr.po:213
+#: po/fr.po:233 po/fr.po:236 po/fr.po:239 po/fr.po:242 po/fr.po:245
 #, fuzzy
 msgid ""
 msgstr ""
@@ -17,55 +19,57 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: cairo-dock-menu.c:572 src/cairo-dock-menu.c:568 src/cairo-dock-menu.c:567
-#: src/cairo-dock-menu.c:553
+#: src/cairo-dock-menu.c:553 src/cairo-dock-menu.c:555 po/fr.po:21
 msgid "Configure"
 msgstr "Configurer"
 
 #: cairo-dock-menu.c:579 src/cairo-dock-menu.c:575 src/cairo-dock-menu.c:574
-#: src/cairo-dock-menu.c:560
+#: src/cairo-dock-menu.c:560 src/cairo-dock-menu.c:562 po/fr.po:26
 msgid "All"
 msgstr "Tout"
 
 #: cairo-dock-menu.c:583 src/cairo-dock-menu.c:579 src/cairo-dock-menu.c:578
+#: po/fr.po:30
 msgid "Appearance"
 msgstr "Apparence"
 
 #: cairo-dock-menu.c:587 src/cairo-dock-menu.c:583 src/cairo-dock-menu.c:582
+#: po/fr.po:34
 msgid "Behaviour"
 msgstr "Comportement"
 
 #: cairo-dock-menu.c:591 src/cairo-dock-menu.c:587 src/cairo-dock-menu.c:586
-#: src/cairo-dock-menu.c:564
+#: src/cairo-dock-menu.c:564 src/cairo-dock-menu.c:566 po/fr.po:39 po/fr.po:40
 msgid "Modules"
 msgstr "Modules"
 
 #: cairo-dock-menu.c:601 src/cairo-dock-menu.c:597 src/cairo-dock-menu.c:596
-#: src/cairo-dock-menu.c:574
+#: src/cairo-dock-menu.c:574 src/cairo-dock-menu.c:576 po/fr.po:44
 msgid "Manage themes"
 msgstr "Gestion des themes"
 
 #: cairo-dock-menu.c:607 src/cairo-dock-menu.c:603 src/cairo-dock-menu.c:602
-#: src/cairo-dock-menu.c:580
+#: src/cairo-dock-menu.c:580 src/cairo-dock-menu.c:582 po/fr.po:49
 msgid "Check updates"
 msgstr "Verifier MaJ"
 
 #: cairo-dock-menu.c:613 src/cairo-dock-menu.c:609 src/cairo-dock-menu.c:608
-#: src/cairo-dock-menu.c:586
+#: src/cairo-dock-menu.c:586 src/cairo-dock-menu.c:588 po/fr.po:54
 msgid "About"
 msgstr "A propos"
 
 #: cairo-dock-menu.c:619 src/cairo-dock-menu.c:615 src/cairo-dock-menu.c:614
-#: src/cairo-dock-menu.c:592
+#: src/cairo-dock-menu.c:592 src/cairo-dock-menu.c:594 po/fr.po:59
 msgid "Help"
 msgstr "Aide"
 
 #: cairo-dock-menu.c:627 src/cairo-dock-menu.c:623 src/cairo-dock-menu.c:622
-#: src/cairo-dock-menu.c:600
+#: src/cairo-dock-menu.c:600 src/cairo-dock-menu.c:602 po/fr.po:64
 msgid "Quick-Hide"
 msgstr "Cachage rapide"
 
 #: cairo-dock-menu.c:634 src/cairo-dock-menu.c:630 src/cairo-dock-menu.c:629
-#: src/cairo-dock-menu.c:607
+#: src/cairo-dock-menu.c:607 src/cairo-dock-menu.c:609 po/fr.po:69
 msgid "Quit"
 msgstr "Quiter"
 
@@ -74,102 +78,105 @@ msgstr "Quiter"
 #: src/cairo-dock-menu.c:674 src/cairo-dock-menu.c:654
 #: src/cairo-dock-menu.c:664 src/cairo-dock-menu.c:673
 #: src/cairo-dock-menu.c:632 src/cairo-dock-menu.c:642
-#: src/cairo-dock-menu.c:651
+#: src/cairo-dock-menu.c:651 src/cairo-dock-menu.c:634
+#: src/cairo-dock-menu.c:644 src/cairo-dock-menu.c:653 po/fr.po:79
 msgid "Add a launcher"
 msgstr "Ajouter un lanceur"
 
 #: cairo-dock-menu.c:684 src/cairo-dock-menu.c:680 src/cairo-dock-menu.c:679
-#: src/cairo-dock-menu.c:657
+#: src/cairo-dock-menu.c:657 src/cairo-dock-menu.c:659 po/fr.po:84
 msgid "Remove this launcher"
 msgstr "Supprimer ce lanceur"
 
 #: cairo-dock-menu.c:690 src/cairo-dock-menu.c:321 src/cairo-dock-menu.c:686
 #: src/cairo-dock-menu.c:320 src/cairo-dock-menu.c:685
 #: src/cairo-dock-menu.c:306 src/cairo-dock-menu.c:663
+#: src/cairo-dock-menu.c:665 po/fr.po:91
 msgid "Modify this launcher"
 msgstr "Modifier ce lanceur"
 
 #: cairo-dock-menu.c:698 src/cairo-dock-menu.c:694 src/cairo-dock-menu.c:693
-#: src/cairo-dock-menu.c:671
+#: src/cairo-dock-menu.c:671 src/cairo-dock-menu.c:673 po/fr.po:96
 msgid "Close"
 msgstr "Fermer"
 
 #: cairo-dock-menu.c:704 src/cairo-dock-menu.c:700 src/cairo-dock-menu.c:699
-#: src/cairo-dock-menu.c:677
+#: src/cairo-dock-menu.c:677 src/cairo-dock-menu.c:679 po/fr.po:101
 msgid "Minimize"
 msgstr "Minimiser"
 
 #: cairo-dock-menu.c:711 src/cairo-dock-menu.c:707 src/cairo-dock-menu.c:706
-#: src/cairo-dock-menu.c:684
+#: src/cairo-dock-menu.c:684 src/cairo-dock-menu.c:686 po/fr.po:106
 msgid "Unmaximize"
 msgstr "De-maximiser"
 
 #: cairo-dock-menu.c:711 src/cairo-dock-menu.c:707 src/cairo-dock-menu.c:706
-#: src/cairo-dock-menu.c:684
+#: src/cairo-dock-menu.c:684 src/cairo-dock-menu.c:686 po/fr.po:111
 msgid "Maximize"
 msgstr "Maximiser"
 
 #: cairo-dock-menu.c:718 src/cairo-dock-menu.c:714 src/cairo-dock-menu.c:713
-#: src/cairo-dock-menu.c:691
+#: src/cairo-dock-menu.c:691 src/cairo-dock-menu.c:693 po/fr.po:116
 msgid "Other actions"
 msgstr "Autres actions"
 
 #: cairo-dock-menu.c:724 src/cairo-dock-menu.c:720 src/cairo-dock-menu.c:719
-#: src/cairo-dock-menu.c:697
+#: src/cairo-dock-menu.c:697 src/cairo-dock-menu.c:699 po/fr.po:121
 msgid "Not Fullscreen"
 msgstr "Pas plein ecran"
 
 #: cairo-dock-menu.c:724 src/cairo-dock-menu.c:720 src/cairo-dock-menu.c:719
-#: src/cairo-dock-menu.c:697
+#: src/cairo-dock-menu.c:697 src/cairo-dock-menu.c:699 po/fr.po:126
 msgid "Fullscreen"
 msgstr "Plein ecran"
 
 #: cairo-dock-menu.c:728 src/cairo-dock-menu.c:724 src/cairo-dock-menu.c:723
-#: src/cairo-dock-menu.c:701
+#: src/cairo-dock-menu.c:701 src/cairo-dock-menu.c:703 po/fr.po:131
 msgid "Move to this desktop"
 msgstr "Deplacer sur ce bureau"
 
 #: cairo-dock-menu.c:734 src/cairo-dock-menu.c:730 src/cairo-dock-menu.c:729
-#: src/cairo-dock-menu.c:707
+#: src/cairo-dock-menu.c:707 src/cairo-dock-menu.c:709 po/fr.po:136
 msgid "Configure this module"
 msgstr "Configurer ce module"
 
 #: cairo-dock-menu.c:740 src/cairo-dock-menu.c:736 src/cairo-dock-menu.c:735
-#: src/cairo-dock-menu.c:713
+#: src/cairo-dock-menu.c:713 src/cairo-dock-menu.c:715 po/fr.po:141
 msgid "Remove this module"
 msgstr "Enlever ce module"
 
 #: cairo-dock-menu.c:746 src/cairo-dock-menu.c:742 src/cairo-dock-menu.c:741
-#: src/cairo-dock-menu.c:719
+#: src/cairo-dock-menu.c:719 src/cairo-dock-menu.c:721 po/fr.po:146
 msgid "Move this icon"
 msgstr "Deplacer cette icone"
 
 #: cairo-dock-menu.c:754 src/cairo-dock-menu.c:750 src/cairo-dock-menu.c:749
-#: src/cairo-dock-menu.c:727
+#: src/cairo-dock-menu.c:727 src/cairo-dock-menu.c:729 po/fr.po:151
 msgid "To the left"
 msgstr "A gauche"
 
 #: cairo-dock-menu.c:760 src/cairo-dock-menu.c:756 src/cairo-dock-menu.c:755
-#: src/cairo-dock-menu.c:733
+#: src/cairo-dock-menu.c:733 src/cairo-dock-menu.c:735 po/fr.po:156
 msgid "To the right"
 msgstr "A droite"
 
 #: cairo-dock-menu.c:767 src/cairo-dock-menu.c:763 src/cairo-dock-menu.c:762
-#: src/cairo-dock-menu.c:740
+#: src/cairo-dock-menu.c:740 src/cairo-dock-menu.c:742 po/fr.po:161
 msgid "To the beginning"
 msgstr "Au debut"
 
 #: cairo-dock-menu.c:774 src/cairo-dock-menu.c:770 src/cairo-dock-menu.c:769
-#: src/cairo-dock-menu.c:747
+#: src/cairo-dock-menu.c:747 src/cairo-dock-menu.c:749 po/fr.po:166
 msgid "To the end"
 msgstr "A la fin"
 
-#: src/cairo-dock-themes-manager.c:268
+#: src/cairo-dock-themes-manager.c:268 po/fr.po:171
 #, c-format
 msgid "Are you sure you want to delete theme %s ?"
 msgstr "Etes-vous sûr de vouloir effacer le thème %s ?"
 
 #: src/cairo-dock-themes-manager.c:433 src/cairo-dock-themes-manager.c:414
+#: po/fr.po:176
 #, c-format
 msgid "Are you sure you want to overwrite theme %s ?"
 msgstr "Etes-vous sûr de vouloir écraser le thème %s"
@@ -187,18 +194,18 @@ msgstr ""
 " (autrement elles seront détruites)"
 
 #: src/cairo-dock-menu.c:188 src/cairo-dock-menu.c:187
-#: src/cairo-dock-menu.c:173
+#: src/cairo-dock-menu.c:173 po/fr.po:194
 #, c-format
 msgid "You're about to remove this icon (%s) from the dock. Sure ?"
 msgstr "Vous êtes sur le point d'enlever cette icône du dock. Sûr ?"
 
 #: src/cairo-dock-menu.c:243 src/cairo-dock-menu.c:242
-#: src/cairo-dock-menu.c:228
+#: src/cairo-dock-menu.c:228 po/fr.po:199
 msgid "Choose or Create a launcher"
 msgstr "Choisir ou Créer un lanceur"
 
 #: src/cairo-dock-menu.c:417 src/cairo-dock-menu.c:416
-#: src/cairo-dock-menu.c:402
+#: src/cairo-dock-menu.c:402 po/fr.po:205
 #, c-format
 msgid "You're about to remove this module (%s) from the dock. Sure ?"
 msgstr "Vous êtes sur le point d'enlever ce module (%s) du dock. Sûr ?"
@@ -212,8 +219,700 @@ msgstr ""
 "Vous avez fait des modifications dans le thème courant\n"
 "Vous les perdrez si vous ne le sauvez pas d'abord. Continuer malgré tout ?"
 
-#: src/cairo-dock-modules.c:475
+#: src/cairo-dock-modules.c:475 po/fr.po:219
 #, c-format
 msgid "Configuration of %s"
 msgstr "Configuration de %s"
 
+##################################
+############ launcher.conf #############
+##################################
+
+#: po/fr.po:223
+msgid "Launcher's name :"
+msgstr "Nom du lanceur :"
+
+#: po/fr.po:226
+msgid "Command to launch on click :"
+msgstr "Commande à exécuter au clic :"
+
+#: po/fr.po:229
+msgid "Image's name or path :"
+msgstr "Chemin ou nom de l'image :"
+
+#: po/fr.po:232
+msgid "Extra parameters"
+msgstr "Autres paramètres"
+
+#: po/fr.po:235
+msgid "Order you want for this launcher among the others:"
+msgstr "Ordre de ce lanceur parmi les autres :"
+
+#: po/fr.po:238
+msgid "Name of the container it belongs to:"
+msgstr "Nom du conteneur auquel il appartient :"
+
+#: po/fr.po:241
+msgid "Is this icon a container ?"
+msgstr "Cette icône est-elle un conteneur ?"
+
+#: po/fr.po:244
+msgid "If so, name of the view used for the sub-dock :"
+msgstr "Si oui, nom de la vue utilisée pour le sous-dock :"
+
+
+##################################
+############ themes.conf #############
+##################################
+
+msgid "Themes"
+msgstr "Thèmes"
+
+msgid "Choose a theme"
+msgstr "Choisissez un thème"
+
+msgid "List of themes :"
+msgstr "Liste des thèmes :"
+
+msgid "Overwrite the current theme's behaviour with the new one's ?"
+msgstr "Ecraser le comportement du thème courant par celui du nouveau ?"
+
+msgid "Otherwise the current behaviour will be used. It's all about the dock's position, behaviour parameters such as auto-hide, using taskbar or not, etc."
+msgstr "Sinon le comportement actuel sera utilisé. C'est tout ce qui concerne la position du dock, les paramètres de comportement tels que l'auto-hide, l'utilisation de la barre des tâches, etc"
+
+msgid "Overwrite the current theme's launchers with the new one's ?"
+msgstr "Ecraser les lanceurs du thème courant par ceux du nouveau ?"
+
+msgid "So if you check this box, your launchers and their icons will be deleted and replaced by the ones provided in the new theme. Otherwise the current launchers will be used."
+msgstr "Donc si vous cochez cette case, vos lanceurs et leurs icônes seront effacés et remplacés par ceux fournis par le nouveau thème. Sinon les lanceurs actuels seront utilisés."
+
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "Save current theme"
+msgstr "Enregistrez le thème actuel"
+
+msgid "Save as :"
+msgstr "Enregistrez sous :"
+
+msgid "You will then be able to re-open it at any time."
+msgstr "Vous pourrez ainsi le rouvrir à tout moment."
+
+msgid "Save current behaviour too ?"
+msgstr "Enregistrer aussi le comportement actuel ?"
+
+msgid "Save current launchers too ?"
+msgstr "Enregistrer aussi les lanceurs actuels ?"
+
+msgid "Delete"
+msgstr "Effacer"
+
+msgid "List of your personnal themes"
+msgstr "Liste de vos thèmes perso"
+
+msgid "Uncheck from the list themes you don't want anymore :"
+msgstr "Décochez de la liste les thèmes indésirables :"
+
+
+##################################
+############ cairo-dock-easy.conf #############
+##################################
+
+msgid "Personnalisation"
+msgstr "Personnalisation"
+
+msgid "Images"
+msgstr "Images"
+
+msgid "Icons' size"
+msgstr "Taille des icônes"
+
+msgid "Size of the icons at rest :"
+msgstr "Taille que les icônes ont au repos :"
+
+msgid "or 0 if you don't want to constraint them."
+msgstr "ou 0 si vous ne voulez pas les contraindre"
+
+msgid "Maximum zoom :"
+msgstr "Zoom maximum :"
+
+msgid "Space between icons (in pixels) :"
+msgstr "Espace entre les icônes (en pixels) :"
+
+msgid "Animations"
+msgstr "Animations"
+
+msgid "Animation type for launchers :"
+msgstr "Type d'animation pour les lanceurs :"
+
+msgid "Animation type for applis :"
+msgstr "Type d'animation pour les applis :"
+
+msgid "Extern frame"
+msgstr "Cadre extérieur"
+
+msgid "Corner radius, in pixels:"
+msgstr "Rayon des coins, en pixels :"
+
+msgid "Color of the extern line (red, blue, green, alpha):"
+msgstr "Couleur du cadre (rouge, vert, bleu, alpha):"
+
+msgid "Etiquettes"
+msgstr "Etiquettes"
+
+##################################
+############ cairo-dock.conf #############
+##################################
+
+msgid "Position"
+msgstr "Positionnement"
+
+msgid "Position on the screen"
+msgstr "Positionnement sur l'écran"
+
+msgid "bottom"
+msgstr "bas"
+
+msgid "top"
+msgstr "haut"
+
+msgid "left"
+msgstr "gauche"
+
+msgid "right"
+msgstr "droit"
+
+msgid "Choose the screen border regarding to which the dock will place itself :"
+msgstr "Choisissez par rapport à quel bord de l'écran le dock doit se placer :"
+
+msgid "The icons will scroll according to the chosen placement type. Of course the dock can be placed anywhere on the screen, here we specify regarding to what."
+msgstr "Les icônes se dérouleront en accord avec le type de placement choisi. Le dock peut bien sûr se placer n'importe où sur l'écran, ici il s'agit de préciser par rapport à quoi"
+
+msgid "Relative alignment :"
+msgstr "Alignement relatif :"
+
+msgid "At 0, the dock will place itself regarding the left corner if horizontal and the top corner if vertical, at 1 regarding the right corner if horizontal and the bottom corner if vertical, and at 0.5, regarding the middle of the screen's edge."
+msgstr "A 0, le dock se placera relativement au coin gauche à l'horizontal (coin haut à la verticale), à 1 relativement au coin droit à l'horizontal (coin bas à la verticale), et à 0.5 relativement au milieu du bord de l'écran."
+
+msgid "Position regarding the chosen screen's edge"
+msgstr "Positionnement par rapport au bord de l'écran choisi"
+
+msgid "Lateral gap :"
+msgstr "Ecart latéral :"
+
+msgid "Gap from the absolute position on the screen's edge, in pixels."
+msgstr "Ecart par rapport à la position absolue précédemment définie le long du bord de l'écran, en pixels."
+
+msgid "Distance to the screen's edge :"
+msgstr "Distance au bord de l'écran :"
+
+msgid "in pixels."
+msgstr "en pixels."
+
+msgid "Reserve space at the edge of the screen for the dock ?"
+msgstr "Reserver l'espace au bord de l'écran pour le dock ?"
+
+msgid "This will prevent other windows from overlapping the dock."
+msgstr "Cela empêchera les autres fenêtres de recouvrir le dock."
+
+msgid "Auto-Hide"
+msgstr "Masquage automatique"
+
+msgid "Activate auto-hide ?"
+msgstr "Activer le masquage automatique"
+
+msgid "The dock will automatically hide itself outside of the scren when the mouse leaves it and will show a callback zone instead. Place the mouse into this zone will make the dock re-appear."
+msgstr "Le dock se cachera automatiquement hors de l'écran quand la souris le quittera, et montrera une zone de rappel à sa place. Placer la souris dans cette zone fera ré-apparaître le dock."
+
+msgid "TaskBar"
+msgstr "Barre des tâches"
+
+msgid "Show the current applications in the dock ?"
+msgstr "Montrer les applications actuellement ouvertes dans le dock ?"
+
+msgid "Cairo-Dock will then replace your taskbar. It is recommanded to remove any other taskbar, and to not force the dock's type to normal."
+msgstr "Cairo-Dock remplace alors votre barre des tâches. Il est recommandé de supprimer toute autre barre des tâches, et de ne pas forcer le type du dock à normal"
+
+msgid "Should the applications with same PID be displayed only once ?"
+msgstr "Les applications avec le même PID ne devraient être affichées qu'une seule fois ?"
+
+msgid "Should the applications with same class be grouped in a sub-dock ?"
+msgstr "Les applications avec la même classe doivent-elles être groupées dans un sous-dock ?"
+
+msgid "This allows to group windows in some soft like Gimp, and to have only 1 icon in the main dock.The 1st window will appear in the main dock, and the others will be placed in a container associated with this 1st icon."
+msgstr "Cela permet de grouper les fenêtres de logiciels tels que Gimp, et de n'avoir qu'une seule icône dans le dock principal. La 1ère fenêtre sera dans le dock principal, et les autres seront dans un container associé à cette 1ère icône."
+
+msgid "Only show icons whose window is minimized ?"
+msgstr "Ne montrer que les icônes dont la fenêtre est minimisée ?"
+
+msgid "Only show applis on current desktop ?"
+msgstr "Ne montrer que les applis du bureau courant ?"
+
+msgid "Interaction"
+msgstr "Interaction"
+
+msgid "Minimize the window when its icon is clicked, if it was already the active window ?"
+msgstr "Minimiser la fenêtre lors d'un clique sur son icône, si elle était déjà la fenêtre active ? "
+
+msgid "It is the default behaviour of most of taskbars."
+msgstr "C'est le comportement par défaut de la plupart des barres de tâches."
+
+msgid "Middle click on an icon closes its relative application ?"
+msgstr "Clique du milieu sur une icône ferme l'application correspondante ?"
+
+msgid "In a Firefox's tabs manner."
+msgstr "A la manière des onglets sous Firefox."
+
+msgid "Automatically quick-hide the dock when a window becomes fullscreen ?"
+msgstr "Activer le masquage-rapide automatiquement quand une fenêtre passe en plein écran ?"
+
+msgid "This is only usefull if don't already use the auto-hide, and if your WM let the dock in front of fullscreen windows."
+msgstr "Cela n'est utile que si vous n'avez pas déjà l'auto-hide, et que votre WM laisse le dock devant les fenêtres plein écran."
+
+msgid "Signal the applications demanding your attention with a dialog tip ?"
+msgstr "Signaler les fenêtres demandant votre attention par une bulle de dialogue ?"
+
+msgid "Signal the applications demanding your attention with an animation ?"
+msgstr "Signaler les fenêtres demandant votre attention par une animation ?"
+
+msgid "Play a short animation of the icon when its window becomes active ?"
+msgstr "Jouer une breve animation de l'icône lorsque la fenêtre correspondante devient active ?"
+
+msgid "Representation"
+msgstr "Représentation"
+
+msgid "Maximum number of caracters in application's name :"
+msgstr "Nombre maximum de caractères dans le nom des applications :"
+
+msgid "\"...\" will be added at the end if the name is too long."
+msgstr "\"...\" seront ajoutés si le nom est trop long."
+
+msgid "Transparency of icons whose window is not minimized :"
+msgstr "Transparence des icônes dont la fenêtre n'est pas minimisée :"
+
+msgid "Allow to highlight hidden windows regarding to windows that ca be accessed without the dock."
+msgstr "Permet de mettre en relief les fenêtres cachées par rapport aux fenêtres visibles et donc accessibles sans le dock."
+
+msgid "System"
+msgstr "Système"
+
+msgid "Movement parameters"
+msgstr "Caractéristiques du mouvement"
+
+msgid "Icons' lateral unfolding acceleration, regarding the alignement point :"
+msgstr "Acceleration de depliage latéral des icônes :"
+
+msgid "The icons will appear folded on themselves, regarding the alignement point, then will unfold untill they fill the whole dock. Use 0 to not use unfolding, the more it's close to 0, the faster it will be"
+msgstr "Les icônes apparaîtront repliées sur elles-mêmes, par rapport au point d'alignement, puis se déplieront jusqu'à remplir tout le dock. Mettre 0 pour ne pas utiliser le dépliage, plus c'est proche de 0, plus c'est rapide."
+
+msgid "Number of steps for icons' resizing (grow up/shrink down) :"
+msgstr "Nombre d'étapes dans le redimensionnement des icônes (grossissement/rétrécissement) :"
+
+msgid "The more there are, the slower it will be"
+msgstr "Plus il y'en a, plus celui-ci sera lent"
+
+msgid "Window's move acceleration (move up/move down) :"
+msgstr "Acceleration du mouvement de la fenêtre lors de l'auto-hide :"
+
+msgid "in percentage of the distance it can move at each step . After n steps, the remaining distance will be reduced by (1-s)^n."
+msgstr "en pourcentage de la distance pouvant être parcourue à chaque étape (montée, descente). Après n étapes, la distance restante sera réduite par (1-a)^n"
+
+msgid "Mouse"
+msgstr "Souris"
+
+msgid "Scroll speed factor for background decorations :"
+msgstr "Facteur de vitesse de défilement pour les décorations du fond :"
+
+msgid "The smaller, the lower the decorations will move along with the cursor. At 0 they will be static."
+msgstr "Plus c'est proche de 0, plus les décorations se déplaceront lentement avec le curseur. A 0 elles seront immobiles."
+
+msgid "Should the decorations be enslaved to the cursor ?"
+msgstr "Les décorations doivent-elles être asservies au curseur ?"
+
+msgid "Otherwise the amount of movement of the decorations will only depend on the direction of the cursor's movement, as if the decorations were \"gliding\"."
+msgstr "sinon le delta de deplacement des décorations ne dépendra que de la direction du mouvement du curseur, un peu comme si les décorations \"glissaient\"."
+
+msgid "Amount of pixels the icons will scroll at each wheel scroll :"
+msgstr "De combien de pixels les icônes vont défiler à chaque coup de molette :"
+
+msgid "If you put 0, this will make them scroll of exactly one icon each time."
+msgstr "Si vous mettez 0, cela les fera défiler d'une icône exactement à chaque fois."
+
+msgid "Re-center the dock on leaving if it has been scrolled ?"
+msgstr "Recentrer le dock en quittant ?"
+
+msgid "If so, you can specify the scrolling acceleration :"
+msgstr "Si oui, vous pouvez spécifier l'accélération du défilement :"
+
+msgid "The more it's close to 0, the faster the scroll will be."
+msgstr "Plus c'est proche de 0, plus le défilement sera rapide."
+
+msgid "Sub-docks"
+msgstr "Sous-Docks"
+
+msgid "Delay before you effectively leave from a sub-dock or to a sub-dock :"
+msgstr "Délai avant de sortir effectivement d'un sous-dock :"
+
+msgid "in ms."
+msgstr "en ms."
+
+msgid "Delay before displaying a sub-dock :"
+msgstr "Délai avant l'affichage d'un sous-dock :"
+
+msgid "in ms. Unused if you set up to click to show sub-docks."
+msgstr "en ms. Inutile si vous devez cliquer pour montrer les sous-docks."
+
+msgid "Click to show sub-docks ?"
+msgstr "Cliquer pour montrer les sous-docks ?"
+
+msgid "Otherwise they will appear when you linger over the icon pointing on it."
+msgstr "Sinon ils apparaîtront quand vous survolez l'icône pointant dessus."
+
+msgid "Animate sub-docks when they appear ?"
+msgstr "Animer les sous-docks lors de leur apparition ?"
+
+msgid "Always true if sub-docks appear with mouse click."
+msgstr "Toujours vrai si les sous-docks apparaissent au clic."
+
+msgid "CPU"
+msgstr "CPU"
+
+msgid "Refresh frequency when mouving cursor into the dock :"
+msgstr "Fréquence de rafraîchissement lorsqu'on bouge le curseur dans le dock :"
+
+msgid "in Hz. This is to adjust regarding your CPU power."
+msgstr "en Hz. Ceci est à ajuster en fonction de la puissance du processeur."
+
+msgid "Reflections should be calculated in real-time ?"
+msgstr "Les reflets doivent-ils être recalculés en temps réel ?"
+
+msgid "The transparency gradation pattern will then be re-calculated in real time. May needs more CPU power."
+msgstr "Le motif de dégradé en transparence sera alors recalculé en temps réel. Cela peut consommer plus de CPU."
+
+msgid "Labels"
+msgstr "Etiquettes"
+
+msgid "Show label of the currently pointed icon only ?"
+msgstr "Ne montrer que l'étiquette de l'icône pointée ?"
+
+msgid "Should the labels be always horizontal, even when dock is vertical ?"
+msgstr "Les etiquettes doivent être toujours horizontales, même quand le dock est vertical ?"
+
+msgid "label's visibility threshold :"
+msgstr "Seuil de visibilité des étiquettes :"
+
+msgid "the bigger, the more the labels next to the pointed icon will be transparent."
+msgstr "plus la valeur est élevée, plus les étiquettes à côté de l'icône pointée sont transparentes."
+
+msgid "Applets"
+msgstr "Applets"
+
+msgid "Add fonctionnalities to your dock !"
+msgstr "Ajoutez des fonctionnalités à votre dock !"
+
+msgid "Activate a plug-in to use it and configure it."
+msgstr "Activez un plug-in pour l'utiliser et le configurer."
+
+msgid "List of active plug-ins (applets and others) :"
+msgstr "Liste des plug-ins actifs (applets et autres) :"
+
+msgid "Background"
+msgstr "Arrière-plan"
+
+msgid "Callback zone"
+msgstr "Zone de rappel"
+
+msgid "Size of the callback zone (width x height) :"
+msgstr "Taille de la zone de rappel (largeur x hauteur) :"
+
+msgid "Place the mouse into this zone will make the dock re-appear."
+msgstr "Placer la souris dans cette zone fera ré-apparaître le dock"
+
+msgid "Filename of an image to put on the callback zone :"
+msgstr "Nom de fichier d'une image pour la zone de rappel :"
+
+msgid "Any format allowed; let this field empty to have an invisible callback zone. The callback zone is what you see when the dock hides itselfs."
+msgstr "Tous formats acceptés; laisser ce champ vide si vous voulez une zone de rappel invisible. La zone de rappel est ce que vous voyez quand le dock se cache."
+
+msgid "Transparency of the callback zone :"
+msgstr "Transparence de la zone de rappel :"
+
+msgid "Rotate the callback zone's image when the dock is on top/left/right ?"
+msgstr "faire pivoter l'image de la zone de rappel avec le dock ?"
+
+msgid "Use it when the image is an arrow pointing to the center of the screen for exemple."
+msgstr "Utilisez-le lorsque l'image est une flèche pointant vers le centre de l'écran par exemple."
+
+msgid "Extern Frame"
+msgstr "Cadre extérieur"
+
+msgid "Corner radius :"
+msgstr "Rayon des coins :"
+
+msgid "Linewidth of the extern line :"
+msgstr "Epaisseur de la ligne externe :"
+
+msgid "Margin between the frame and the icons or their reflects :"
+msgstr "marge entre le cadre et les icônes ou leurs reflets :"
+
+msgid "Color of the extern line (r,v,b,a) :"
+msgstr "Couleur de la ligne externe (r,v,b,a) :"
+
+msgid "Are the bottom left and right corners rounded ?"
+msgstr "Les coins du bas sont-ils aussi arrondis ?"
+
+msgid "Maximum width that can have the dock :"
+msgstr "Largeur maximale que peut avoir le dock :"
+
+msgid "You can scroll with the mouse's wheel to make the icons scroll, like a carousel. If you put 0, the dock will automatically adapt itself to the desktop's size."
+msgstr "Vous pourrez faire défiler les icônes avec la molette. Mettez 0 pour laisser le dock s'adapter à la taille de l'écran."
+
+msgid "Background image..."
+msgstr "Image de fond..."
+
+msgid "Image's filename to use as a background :"
+msgstr "Nom du fichier d'une image à mettre en fond du dock :"
+
+msgid "Any format allowed; let this field empty if you don't want to use an image as background."
+msgstr "Tous formats acceptés; laisser ce champ vide si vous ne voulez pas utiliser une image en fond"
+
+msgid "Image's transparency :"
+msgstr "Transparence de l'image :"
+
+msgid "Repeat image as a pattern to fill background ?"
+msgstr "Répéter l'image comme un motif pour remplir le fond ?"
+
+msgid "...or Gradation"
+msgstr "...ou Dégradé"
+
+msgid "Bright color (red, green, blue, alpha) :"
+msgstr "Couleur claire (rouge, vert, bleu, alpha):"
+
+msgid "Dark color (red, green, blue, alpha) :"
+msgstr "Couleur foncée (rouge, vert, bleu, alpha):"
+
+msgid "Angle of the stripes / gradation, in relation to the vertical (in degree) :"
+msgstr "Angle d'inclinaison du dégradé / des rayures, par rapport à la verticale (en degrés) :"
+
+msgid "Number of stripes, in each pattern, to draw in the background :"
+msgstr "Nombre de rayures, dans chaque motif, à dessiner dans le fond :"
+
+msgid "The bigger, the more the stripes are close to each other; with 0 stripes, the background will be filled with a single gradation."
+msgstr "Plus c'est élevé, plus les rayures seront proches les unes des autres. Avec 0 rayures, un dégradé unique remplira tout le fond."
+
+msgid "Width of the stripes, in percentage of the pattern size :"
+msgstr "Largeur des rayures, en pourcentage de la taille d'un motif :"
+
+msgid "1 pattern contains N stripes, so the width can be less or equal than 1/N."
+msgstr "1 motif contient N rayures, donc la largeur peut être inférieure ou égale à 1/N."
+
+msgid "Icons"
+msgstr "Icônes"
+
+msgid "Wave's shape"
+msgstr "Forme de la vague"
+
+msgid "Crest of the wave :"
+msgstr "Crête de la vague :"
+
+msgid "the maximum zoom will be 1+C."
+msgstr "le zoom maximal sera de 1+C."
+
+msgid "Width of the interval in which the wave will be effective :"
+msgstr "Largeur de l'intervalle dans lequel la vague sera effective :"
+
+msgid "in pixels. Outside of this interval (centered on the mouse), the wave is flat."
+msgstr "en pixels. En dehors de cet intervalle (centré sur le curseur), la vague sera plate"
+
+msgid "Space between icons :"
+msgstr "Espace entre les icônes :"
+
+msgid "Icons' transparency at rest :"
+msgstr "Transparence des icônes au repos :"
+
+msgid "It is their transparency when the wave is flat; they will \"materialize\" progressively as the dock grows up. The closer to 0, the more transparent they will be."
+msgstr "C'est leur transparence lorsque la vague est plate; elles se \"matérialiseront\" progressivement au fur et à mesure que le dock grandit. Plus c'est proche de 0, plus elles seront transparentes."
+
+msgid "Reflections"
+msgstr "Réflections"
+
+msgid "Reflecting power of the plane :"
+msgstr "Pouvoir réflechissant du plan incliné :"
+
+msgid "It is its albedo; at 1 the icons reflect to the maximum, at 0 reflects are not used."
+msgstr "est son albédo; à 1 les icônes se reflètent au maximum, à 0 il n'y a pas de reflet (ils sont alors désactivés)."
+
+msgid "Field depth of the view:"
+msgstr "Profondeur de champ de la vue :"
+
+msgid "More precisely, it is the fraction of the max icon height that will be used to draw reflect. So setting it to 0.33 will mean that 33% of the icons will reflect on the ground, and the icons will be placed at the right distance from the front border of the frame so that the reflect is fully visible."
+msgstr "Plus précisement, c'est la fraction de la hauteur max des icônes qui sera utilisée pour dessiner le reflet. Donc mettre 0.33 signifie que 33% des icônes se reflèteront sur le sol, et les icônes se placeront à la bonne distance du bord inférieur du cadre afin que le reflet soit entièrement visible."
+
+msgid "Style of the icons' labels"
+msgstr "Style des étiquettes"
+
+
+msgid "Family of the font used for labels :"
+msgstr "Police de caractères utilisée pour les étiquettes :"
+
+msgid "for exemple Monospace, Purisa, ... Just write the font name wihtout any number or so."
+msgstr "par exemple Monospace, Purisa, ... Ecrivez juste le nom de la police, sans aucun chiffre ou autre"
+
+msgid "Size of the font :"
+msgstr "Taille de la police :"
+
+msgid "approximately size in pixels, put 0 to not display labels"
+msgstr "approximativement la taille en pixels, mettre 0 pour ne pas afficher les étiquettes"
+
+msgid "Weight (between 1 and 9, the bigger, the heavier):"
+msgstr "Poids (entre 1 et 9, plus c'est élevé, plus les traits sont épais):"
+
+msgid "Should be italic ?"
+msgstr "Le texte est-il en italique ?"
+
+msgid "Link the icons with a string"
+msgstr "Relier les icônes avec une ficelle"
+
+msgid "Linewidth of the string, in pixels (0 to not use string) :"
+msgstr "Epaisseur de la ficelle, en pixels (0 pour ne pas avoir de ficelle) :"
+
+msgid "Color of the string (red, blue, green, alpha) :"
+msgstr "Couleur de la ficelle (rouge, vert, bleu, alpha):"
+
+msgid "Icons' themes"
+msgstr "Thèmes d'icônes"
+
+msgid "List of icons themes or directories :"
+msgstr "Liste de thèmes d'icônes et de répertoires :"
+
+msgid "Directories or themes where to search icons. Put some directories where you have icons you wish to see in the dock, or put some theme's name you've installed on your system. (the order is taken into account during the research). The key word _ThemeDirectory_ represents the directory ~/.cairo-dock/current_theme/launchers"
+msgstr ""
+
+msgid "Launchers"
+msgstr "Lanceurs"
+
+msgid "Icon size at rest (width x height) :"
+msgstr "Taille des icônes au repos (largeur x hauteur) :"
+
+msgid "Put 0 if you don't want to restrain them"
+msgstr "Mettez 0 si vous ne voulez pas les contraindre."
+
+msgid "Animation type when clicked :"
+msgstr "Type d'animation lors du clic :"
+
+msgid "bounce"
+msgstr "rebond"
+
+msgid "rotate"
+msgstr "rotation"
+
+msgid "blink"
+msgstr "clignotement"
+
+msgid "pulse"
+msgstr "pulsation"
+
+msgid "upside-down"
+msgstr "sens dessus-dessous"
+
+msgid "wobbly"
+msgstr "élastique"
+
+msgid "random"
+msgstr "aléatoire"
+
+msgid "Number of times the icon will bounce/rotate/blink/etc when clicked :"
+msgstr "Nombre de fois où l'icône va rebondir/tourner/clignoter/etc :"
+
+msgid "Applications"
+msgstr "Applications"
+
+msgid "Separators"
+msgstr "Séparateurs"
+
+msgid "Use separators ?"
+msgstr "Utiliser les séparateurs ?"
+
+msgid "Separators are icons used to make a separation between different types of icons."
+msgstr "Les séparateurs sont des icônes utilisées pour faire une séparation entre les différents types d'icônes."
+
+msgid "Filename of an image to use for separators :"
+msgstr "Nom de fichier d'une image à utiliser pour les séparateurs :"
+
+msgid "If you don't provide one, blanks will be used."
+msgstr "Tous formats acceptés; Si vous n'en spécifiez pas, des blancs seront utilisés"
+
+msgid "Make the separator's image revolve when dock is on top/on the left/on the right ?"
+msgstr "Faire pivoter l'image du séparateur lorsque le dock est en haut/à droite/à gauche ?"
+
+msgid "Force separator's image size to stay constant ?"
+msgstr "Forcer l'image du séparateur à rester de taille constante ?"
+
+msgid "Order of the different types of icons :"
+msgstr "Ordre des differents types d'icônes :"
+
+msgid "Views"
+msgstr "Vues"
+
+msgid "Main Dock"
+msgstr "Dock Principal"
+
+msgid "Choose the default view for main dock :"
+msgstr "Choisissez la vue par défaut à utiliser pour le dock principal :"
+
+msgid "Sub-Docks"
+msgstr "Sous-Docks"
+
+msgid "Choose the default view for sub-docks :"
+msgstr "Choisissez la vue par défaut à utiliser pour les sous-docks :"
+
+msgid "Are the sub-docks parallel to main docks ?"
+msgstr "Les sous-docks sont-ils parallèles aux docks principaux ?"
+
+msgid "otherwise they will be perpendicular"
+msgstr "sinon ils seront perpendiculaires"
+
+msgid "Ratio for the size of the sub-docks' icons :"
+msgstr "Ratio de la taille des icônes des sous-docks :"
+
+msgid "You can specify a ratio for the size of the sub-docks' icons, regarding the main docks' icons size"
+msgstr "Vous pouvez spécifier un ratio de la taille des icônes des sous-docks par rapport à celles des docks principaux :"
+
+msgid "Dialogs"
+msgstr "Dialogues"
+
+msgid "Buttons"
+msgstr "Boutons"
+
+msgid "Size of buttons in the info-bubbles (width x height) :"
+msgstr "Taille des boutons dans les info-bulles (largeur x hauteur) :"
+
+msgid "Name of an image to use for the yes/ok button :"
+msgstr "Nom de fichier d'une image à utiliser pour le bouton oui/ok :"
+
+msgid "If you don't provide any, a default image will be used."
+msgstr "Si vous ne spécifiez rien, une image par défaut sera utilisée."
+
+msgid "Name of an image to use for the no/cancel button :"
+msgstr "Nom de fichier d'une image à utiliser pour le bouton non/annuler :"
+
+msgid "Bubble"
+msgstr "Bulle"
+
+msgid "Background color of the bubble (r,v,b,a) :"
+msgstr "Couleur du fond de la bulle (r,v,b,a):"
+
+msgid "Size of the icon displayed next to the text :"
+msgstr "Taille de l'icône affichée à côté du texte :"
+
+msgid "Put 0 to let the size adapt itself to the text."
+msgstr "Mettez 0 pour que sa taille s'adapte à celle du texte."
+
+msgid "Text"
+msgstr "Texte"
+
+msgid "Homogeneous with icons' label ?"
+msgstr "Homogène avec les étiquettes des icônes ?"
+
+msgid "The messages will have the same style as the icons' labels. The beneath parameters are then unused."
+msgstr "Les messages auront le même style que les étiquettes des icônes. Les paramètres ci-dessous seront donc inutilisés."
