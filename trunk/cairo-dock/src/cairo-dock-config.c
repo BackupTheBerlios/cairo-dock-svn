@@ -874,13 +874,13 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	
 	//\___________________ On recupere les parametres des applets.
-	g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "applet width", &bFlushConfFileNeeded, 48, "Applets", "max icon size");
+	g_tIconAuthorizedWidth[CAIRO_DOCK_APPLET] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "applet width", &bFlushConfFileNeeded, 48, "Applets", "max icon size");
 	
-	g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "applet height", &bFlushConfFileNeeded, 48, "Applets", "max icon size");
+	g_tIconAuthorizedHeight[CAIRO_DOCK_APPLET] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "applet height", &bFlushConfFileNeeded, 48, "Applets", "max icon size");
 	
-	g_tAnimationType[CAIRO_DOCK_APPLI] = cairo_dock_get_animation_type_key_value (pKeyFile, "Icons", "applet animation", &bFlushConfFileNeeded, CAIRO_DOCK_ROTATE, "Applets", "animation type");
+	g_tAnimationType[CAIRO_DOCK_APPLET] = cairo_dock_get_animation_type_key_value (pKeyFile, "Icons", "applet animation", &bFlushConfFileNeeded, CAIRO_DOCK_ROTATE, "Applets", "animation type");
 	
-	g_tNbAnimationRounds[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "applet number of rounds", &bFlushConfFileNeeded, 2, "Applets", "number of animation rounds");
+	g_tNbAnimationRounds[CAIRO_DOCK_APPLET] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "applet number of rounds", &bFlushConfFileNeeded, 2, "Applets", "number of animation rounds");
 	
 	gchar **cActiveModuleList = cairo_dock_get_string_list_key_value (pKeyFile, "Applets", "active modules", &bFlushConfFileNeeded, &length, NULL, NULL, NULL);
 	
