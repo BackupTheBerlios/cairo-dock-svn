@@ -401,9 +401,9 @@ void cairo_dock_remove_dialog_if_any (Icon *icon)
 	CairoDockDialog *pDialog;
 	GSList *ic;
 	
-	g_static_rw_lock_writer_lock (&s_mDialogsMutex);
 	if (s_pDialogList == NULL)
 		return ;
+	g_static_rw_lock_writer_lock (&s_mDialogsMutex);
 	
 	ic = s_pDialogList;
 	do
@@ -830,9 +830,9 @@ void cairo_dock_replace_all_dialogs (void)
 	CairoDock *pDock;
 	Icon *pIcon;
 	
-	g_static_rw_lock_reader_lock (&s_mDialogsMutex);
 	if (s_pDialogList == NULL)
 		return ;
+	g_static_rw_lock_reader_lock (&s_mDialogsMutex);
 	
 	for (ic = s_pDialogList; ic != NULL; ic = ic->next)
 	{

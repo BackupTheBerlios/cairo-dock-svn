@@ -84,6 +84,7 @@ static gchar *cairo_dock_extract_default_module_name_from_path (gchar *cSoFilePa
 void cairo_dock_free_visit_card (CairoDockVisitCard *pVisitCard)
 {
 	g_free (pVisitCard->cReadmeFilePath);
+	g_free (pVisitCard->cPreviewFilePath);
 	g_free (pVisitCard->cModuleName);
 	g_free (pVisitCard);
 }
@@ -115,6 +116,7 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 			return ;
 		}
 		pCairoDockModule->cReadmeFilePath = g_strdup (pVisitCard->cReadmeFilePath);
+		pCairoDockModule->cPreviewFilePath = g_strdup (pVisitCard->cPreviewFilePath);
 		if (pVisitCard->cModuleName == NULL)
 			pCairoDockModule->cModuleName = cairo_dock_extract_default_module_name_from_path (pCairoDockModule->cSoFilePath);
 		else
@@ -183,7 +185,7 @@ CairoDockModule * cairo_dock_load_module (gchar *cSoFilePath, GHashTable *pModul
 	}
 	
 	
-	if (pModuleTable != NULL)
+	if (pModuleTable != NULL && pCairoDockModule->initModule != NULL)
 		g_hash_table_insert (pModuleTable, pCairoDockModule->cModuleName, pCairoDockModule);
 	
 	return pCairoDockModule;

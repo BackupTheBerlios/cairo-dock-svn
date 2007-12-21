@@ -201,7 +201,7 @@ gchar *g_cDialogMessagePolice = NULL;  // police de caracteres des etiquettes.
 int g_iDialogMessageWeight;  // epaisseur des traits.
 int g_iDialogMessageStyle;  // italique ou droit.
 
-gboolean g_bKeepAbove = TRUE;
+gboolean g_bKeepAbove = FALSE;
 gboolean g_bSkipPager = TRUE;
 gboolean g_bSkipTaskbar = TRUE;
 gboolean g_bSticky = TRUE;
@@ -251,8 +251,8 @@ main (int argc, char** argv)
 		{
 			g_print ("Attention : this option is useless, glitz being not activated by default\n");
 		}
-		else if (strcmp (argv[i], "--no-keep-above") == 0)
-			g_bKeepAbove = FALSE;
+		else if (strcmp (argv[i], "--keep-above") == 0)
+			g_bKeepAbove = TRUE;
 		else if (strcmp (argv[i], "--no-skip-pager") == 0)
 			g_bSkipPager = FALSE;
 		else if (strcmp (argv[i], "--no-skip-taskbar") == 0)
@@ -269,7 +269,7 @@ main (int argc, char** argv)
 			bDialogTest = TRUE;
 		else if (strcmp (argv[i], "--capuccino") == 0)
 		{
-			g_print ("Veuillez Insérer 1 euro dans la fente de votre ordinateur.\n");
+			g_print ("Veuillez insérer 1 euro dans la fente de votre ordinateur.\n");
 			return 0;
 		}
 		else if (strcmp (argv[i], "--cafe_latte") == 0)
@@ -279,7 +279,7 @@ main (int argc, char** argv)
 		}
 		else if (strcmp (argv[i], "--expresso") == 0)
 		{
-			g_print ("Franchement, vous faites confiance à un gars qui met des options pareilles dans son programme ?\n");
+			g_print ("Franchement, vous faites confiance à quelqu'un qui met des options pareilles dans son programme ?\n");
 			return 0;
 		}
 		else if (strcmp (argv[i], "--version") == 0)
@@ -302,9 +302,9 @@ main (int argc, char** argv)
 		}
 		else if (argv[i][0] == '-')
 		{
-			gboolean help = (strcmp (argv[i], "--help") == 0);
+			gboolean help = (strcmp (argv[i], "--help") == 0 || strcmp (argv[i], "--usage") == 0);
 			fprintf (help ? stdout : stderr,
-				 "Usage:\n%s\n  [--glitz] (use hardware acceleration (needs a glitz-enabled libcairo))\n  [--no-keep-above] (don't keep the dock above other windows)\n  [--no-skip-pager] (show the dock in the pager)\n  [--no-skip-taskbar] (show the dock in taskbar)\n  [--no-sticky] (don't show the dock on all desktops)\n  [--normal-hint] (force the window manager to consider cairo-dock as a normal appli instead of a dock)\n  [--toolbar-hint] (force the window manager to consider cairo-dock as a toolbar instead of a dock)\n  [--help] (print this help and quit)\n",
+				 "Usage:\n%s\n  [--glitz] (use hardware acceleration (needs a glitz-enabled libcairo))\n  [--keep-above] (keep the dock above other windows whatever)\n  [--no-skip-pager] (show the dock in the pager)\n  [--no-skip-taskbar] (show the dock in taskbar)\n  [--no-sticky] (don't show the dock on all desktops)\n  [--normal-hint] (force the window manager to consider cairo-dock as a normal appli instead of a dock - not recommended)\n  [--toolbar-hint] (force the window manager to consider cairo-dock as a toolbar instead of a dock)\n  [--version] (print version and exit)\n  [--safe-mode] (don't load any plug-ins)\n  [--expresso] (cairo-dock makes anything, including coffee !)\n  [--capuccino] (cairo-dock makes anything, including coffee !)\n  [--cafe_latte] (cairo-dock makes anything, including coffee !)\n  [--help/usage] (print this help and quit)\n",
 				 argv[0]);
 			return help ? 0 : 1;
 		}
@@ -395,9 +395,69 @@ main (int argc, char** argv)
 	
 	cairo_dock_load_theme (g_cCurrentThemePath);
 	
+	
+	//\___________________ On affiche le changelog en cas de nouvelle version.
+	gchar *cLastVersionFilePath = g_strdup_printf ("%s/.cairo-dock-last-version", g_cCairoDockDataDir);
+	gboolean bWriteChangeLog;
+	if (! g_file_test (cLastVersionFilePath, G_FILE_TEST_EXISTS))
+	{
+		bWriteChangeLog = TRUE;
+	}
+	else
+	{
+		gsize length = 0;
+		gchar *cContent = NULL;
+		g_file_get_contents (cLastVersionFilePath,
+			&cContent,
+			&length,
+			NULL);
+		if (length > 0 && strcmp (cContent, CAIRO_DOCK_VERSION) == 0)
+			bWriteChangeLog = FALSE;
+		else
+			bWriteChangeLog = TRUE;
+		g_free (cContent);
+	}
+	
+	g_file_set_contents (cLastVersionFilePath,
+		CAIRO_DOCK_VERSION,
+		-1,
+		NULL);
+	g_free (cLastVersionFilePath);
+	
+	if (bWriteChangeLog)
+	{
+		gchar *cChangeLogFilePath = g_strdup_printf ("%s/ChangeLog.txt", CAIRO_DOCK_SHARE_DATA_DIR);
+		GKeyFile *pKeyFile = g_key_file_new ();
+		GError *erreur = NULL;
+		g_key_file_load_from_file (pKeyFile, cChangeLogFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+		if (erreur != NULL)
+		{
+			g_print ("Attention : %s\n", erreur->message);
+			g_error_free (erreur);
+			erreur = NULL;
+		}
+		else
+		{
+			gchar *cChangeLogMessage = g_key_file_get_string (pKeyFile, "ChangeLog", CAIRO_DOCK_VERSION, &erreur);
+			if (erreur != NULL)
+			{
+				g_error_free (erreur);
+				erreur = NULL;
+			}
+			else
+			{
+				Icon *pFirstIcon = cairo_dock_get_first_icon (g_pMainDock->icons);
+				cairo_dock_show_temporary_dialog_with_default_icon (gettext (cChangeLogMessage), pFirstIcon, g_pMainDock, 0);
+			}
+			g_free (cChangeLogMessage);
+		}
+	}
+	
+	
 	if (bDialogTest)
 		g_timeout_add (2000, (GSourceFunc) random_dialog, NULL);  // pour tests seulement.
 	
+	//\___________________ Message a caractere informatif (ou pas).
 	gchar *cSillyMessageFilePath = g_strdup_printf ("%s/.cairo-dock-silly-question", g_cCairoDockDataDir);
 	//const gchar *cSillyMessage = "Le saviez-vous ?\nUtiliser cairo-dock vous rendra beau et intelligent !";
 	//const gchar *cSillyMessage = "Le saviez-vous ?\nUtiliser cairo-dock augmentera votre popularité auprès de la gente féminine !";
@@ -443,7 +503,6 @@ main (int argc, char** argv)
 		if (pFirstIcon != NULL)
 		{
 			cairo_dock_show_temporary_dialog_with_default_icon (cSillyMessage, pFirstIcon, g_pMainDock, 4000);
-			
 			/*double fAnswer = cairo_dock_show_value_and_wait (cSillyMessage, pFirstIcon, g_pMainDock, 1.);
 			g_print (" ==> %.2f\n", fAnswer);
 			if (fAnswer == 0)
@@ -455,7 +514,6 @@ main (int argc, char** argv)
 			cairo_destroy (pIconContext);*/
 		}
 	}
-	
 	
 	gtk_main ();
 	

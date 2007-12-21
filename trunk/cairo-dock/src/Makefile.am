@@ -24,6 +24,7 @@ cairo_dock_CFLAGS = \
 	-DCAIRO_DOCK_CONF_FILE=\""cairo-dock.conf"\"\
 	-DCAIRO_DOCK_EASY_CONF_FILE=\""cairo-dock_easy.conf"\"\
 	-DCAIRO_DOCK_LAUNCHER_CONF_FILE=\""launcher.conf"\"\
+	-DCAIRO_DOCK_CONTAINER_CONF_FILE=\""container.conf"\"\
 	-DCAIRO_DOCK_THEME_CONF_FILE=\""themes.conf"\"\
 	-DCAIRO_DOCK_DEFAULT_ICON_NAME=\""default-icon.svg"\"\
 	-DCAIRO_DOCK_VERSION=\""$(VERSION)"\"\

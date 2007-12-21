@@ -54,7 +54,7 @@ void cairo_dock_remove_notification_func (CairoDockNotificationType iNotifType, 
 *Enleve une fonction de la liste des fonctions appelees par une notification donnee.
 *@param iNotifType type de la notification.
 *@param data donnees passees a la fonction notifiee.
-@Returns TRUE si la notification a ete utilisee par quelqu'un, FALSE si aucune fonction n'est enregistree pour elle.
+@return TRUE si la notification a ete utilisee par quelqu'un, FALSE si aucune fonction n'est enregistree pour elle.
 */
 gboolean cairo_dock_notify (CairoDockNotificationType iNotifType, gpointer data);
 

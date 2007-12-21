@@ -11,33 +11,33 @@
 * @param iWmHint indicateur du type de fenetre pour le WM.
 * @param cDockName nom du dock, qui pourra etre utilise pour retrouver celui-ci rapidement.
 * @param cRendererName nom de la fonction de rendu a applisuer au dock. si NULL, le rendu par defaut sera applique.
-* @Returns le dock nouvellement alloué, a detruire avec <cairo_dock_destroy_dock>
+* @return le dock nouvellement alloué, a detruire avec <cairo_dock_destroy_dock>
 */
 CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockName, gchar *cRendererName);
 
 /**
 * Cherche le nom d'un dock, en parcourant la table des docks jusqu'a trouver celui passe en entree.
 * @param pDock le dock.
-* @Returns le nom du dock, ou NULL si ce dock n'existe pas. Ne _pas_ desallouer la chaine.
+* @return le nom du dock, ou NULL si ce dock n'existe pas. Ne _pas_ desallouer la chaine.
 */
 const gchar *cairo_dock_search_dock_name (CairoDock *pDock);
 /**
 * Cherche un dock etant donne son nom.
 * @param cDockName le nom du dock.
-* @Returns le dock qui a ete enregistre sous ce nom, ou NULL si aucun ne correspond.
+* @return le dock qui a ete enregistre sous ce nom, ou NULL si aucun ne correspond.
 */
 CairoDock *cairo_dock_search_dock_from_name (gchar *cDockName);
 /**
 * Cherche l'icone pointant sur un dock. Si plusieurs icones pointent sur ce dock, la premiere sera renvoyee.
 * @param pDock le dock.
 * @param pParentDock si non NULL, sera renseigne avec le dock contenant l'icone.
-* @Returns l'icone pointant sur le dock.
+* @return l'icone pointant sur le dock.
 */
 Icon *cairo_dock_search_icon_pointing_on_dock (CairoDock *pDock, CairoDock **pParentDock);
 /**
 * Cherche le dock contenant l'icone donnee, en parcourant la liste des icones de tous les docks jusqu'a trouver celle passee en entree.
 * @param icon l'icone.
-* @Returns le dock contenant cette icone, ou NULL si aucun n'a ete trouve.
+* @return le dock contenant cette icone, ou NULL si aucun n'a ete trouve.
 */
 CairoDock *cairo_dock_search_container_from_icon (Icon *icon);
 
@@ -103,7 +103,7 @@ void cairo_dock_reference_dock (CairoDock *pChildDock);
 * @param pIconList une liste d'icones qui seront entierement chargees et inserees dans le dock.
 * @param cDockName le nom desire pour le dock.
 * @param iWindowTypeHint indicateur du type de fenetre pour le WM.
-* @Returns le dock nouvellement alloue.
+* @return le dock nouvellement alloue.
 */
 CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, gchar *cDockName, GdkWindowTypeHint iWindowTypeHint);
 #define cairo_dock_create_subdock_from_scratch(pIconList, cDockName) cairo_dock_create_subdock_from_scratch_with_type (pIconList, cDockName, GDK_WINDOW_TYPE_HINT_MENU)

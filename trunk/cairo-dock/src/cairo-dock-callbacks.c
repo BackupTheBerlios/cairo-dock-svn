@@ -273,7 +273,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		if (s_pIconClicked != NULL && pDock->iAvoidingMouseIconType == -1)
 		{
 			s_pIconClicked->iAnimationType = CAIRO_DOCK_FOLLOW_MOUSE;
-			pDock->iAvoidingMouseIconType = s_pIconClicked->iType;  // on pourrait le faire lors du 'motion' aussi.
+			pDock->iAvoidingMouseIconType = s_pIconClicked->iType;  // on pourrait le faire lors du clic aussi.
 			pDock->fAvoidingMouseMargin = .5;
 		}
 		
@@ -379,7 +379,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	return FALSE;
 }
 
-gboolean _cairo_dock_emit_leave_signal (CairoDock *pDock)
+gboolean cairo_dock_emit_leave_signal (CairoDock *pDock)
 {
 	static gboolean bReturn;
 	//g_print ("demande de quitter\n");
@@ -423,7 +423,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 		//g_print ("on force bAtBottom\n");
 	}
 	
-	pDock->fDecorationsOffsetX = 0;
+	///pDock->fDecorationsOffsetX = 0;
 	if (pDock->iSidShrinkDown == 0)  // on commence a faire diminuer la taille des icones.
 		pDock->iSidShrinkDown = g_timeout_add (40, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 	
@@ -450,7 +450,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 			if (pDock->iSidLeaveDemand == 0)
 			{
 				g_print ("  on retarde la sortie du dock de %dms\n", MAX (g_iLeaveSubDockDelay, 330));
-				pDock->iSidLeaveDemand = g_timeout_add (MAX (g_iLeaveSubDockDelay, 330), (GSourceFunc) _cairo_dock_emit_leave_signal, (gpointer) pDock);
+				pDock->iSidLeaveDemand = g_timeout_add (MAX (g_iLeaveSubDockDelay, 330), (GSourceFunc) cairo_dock_emit_leave_signal, (gpointer) pDock);
 				return TRUE;
 			}
 		}
@@ -460,7 +460,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 		if (pDock->iSidLeaveDemand == 0)
 		{
 			g_print ("  on retarde la sortie du sous-dock de %dms\n", g_iLeaveSubDockDelay);
-			pDock->iSidLeaveDemand = g_timeout_add (g_iLeaveSubDockDelay, (GSourceFunc) _cairo_dock_emit_leave_signal, (gpointer) pDock);
+			pDock->iSidLeaveDemand = g_timeout_add (g_iLeaveSubDockDelay, (GSourceFunc) cairo_dock_emit_leave_signal, (gpointer) pDock);
 			return TRUE;
 		}
 	}
@@ -1277,7 +1277,7 @@ void cairo_dock_activate_temporary_auto_hide (CairoDock *pDock)
 		s_bAutoHideInitialValue = g_bAutoHide;
 		g_bAutoHide = TRUE;
 		s_bEntranceAllowed = FALSE;
-		_cairo_dock_emit_leave_signal (pDock);
+		cairo_dock_emit_leave_signal (pDock);
 	}
 }
 

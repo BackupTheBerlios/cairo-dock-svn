@@ -19,7 +19,7 @@ double cairo_dock_get_current_dock_width_linear (CairoDock *pDock);
 /**
 *Cree un contexte de dessin pour la libcairo. Si glitz est active, le contexte sera lie a une surface glitz (et donc on dessinera directement sur la carte graphique), sinon a une surface X representant la fenetre du dock.
 *@param pDock le dock sur lequel on veut dessiner.
-*@Returns le contexte sur lequel dessiner. N'est jamais nul; tester sa coherence avec #cairo_status avant de l'utiliser, et le detruire avec #cairo_destroy apres en avoir fini avec lui.
+*@return le contexte sur lequel dessiner. N'est jamais nul; tester sa coherence avec #cairo_status avant de l'utiliser, et le detruire avec #cairo_destroy apres en avoir fini avec lui.
 */
 cairo_t * cairo_dock_create_context_from_window (CairoDock *pDock);
 

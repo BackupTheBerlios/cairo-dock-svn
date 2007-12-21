@@ -223,7 +223,11 @@ static void _cairo_dock_selection_changed (GtkTreeModel *model, GtkTreeIter iter
 	
 	if (cPreviewFilePath != NULL)
 	{
-		GdkPixbuf *pPreviewPixbuf = gdk_pixbuf_new_from_file_at_size (cPreviewFilePath, CAIRO_DOCK_PREVIEW_WIDTH, CAIRO_DOCK_PREVIEW_HEIGHT, NULL);
+		int iPreviewWidth, iPreviewHeight;
+		gdk_pixbuf_get_file_info   (cPreviewFilePath, &iPreviewWidth, &iPreviewHeight);
+		iPreviewWidth = MIN (iPreviewWidth, CAIRO_DOCK_PREVIEW_WIDTH);
+		iPreviewHeight = MIN (iPreviewHeight, CAIRO_DOCK_PREVIEW_HEIGHT);
+		GdkPixbuf *pPreviewPixbuf = gdk_pixbuf_new_from_file_at_size (cPreviewFilePath, iPreviewWidth, iPreviewHeight, NULL);
 		if (pPreviewPixbuf == NULL)
 		pPreviewPixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB,
 			TRUE,
@@ -1132,14 +1136,20 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						}
 						else if (iElementType == 'R' || iElementType == 'M')
 						{
+							GtkWidget *pPreviewBox = gtk_vbox_new (FALSE, CAIRO_DOCK_GUI_MARGIN);
+							gtk_box_pack_start (GTK_BOX (pHBox),
+									pPreviewBox,
+									FALSE,
+									FALSE,
+									0);
 							if (pDescriptionLabel != NULL)
-								gtk_box_pack_start (GTK_BOX (pHBox),
+								gtk_box_pack_start (GTK_BOX (pPreviewBox),
 									pDescriptionLabel,
 									FALSE,
 									FALSE,
 									0);
 							if (pPreviewImage != NULL)
-								gtk_box_pack_start (GTK_BOX (pHBox),
+								gtk_box_pack_start (GTK_BOX (pPreviewBox),
 									pPreviewImage,
 									FALSE,
 									FALSE,

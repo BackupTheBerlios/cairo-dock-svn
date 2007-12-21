@@ -174,7 +174,8 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	
 	if (g_bSticky)
 		gtk_window_stick (GTK_WINDOW (pWindow));
-	gtk_window_set_keep_above (GTK_WINDOW (pWindow), g_bKeepAbove);
+	if (g_pMainDock == NULL)  // puisque c'est lui qu'on cree en premier.
+		gtk_window_set_keep_above (GTK_WINDOW (pWindow), g_bKeepAbove);
 	gtk_window_set_skip_pager_hint (GTK_WINDOW (pWindow), g_bSkipPager);
 	gtk_window_set_skip_taskbar_hint (GTK_WINDOW (pWindow), g_bSkipTaskbar);
 	gtk_window_set_gravity (GTK_WINDOW (pWindow), GDK_GRAVITY_STATIC);
@@ -783,9 +784,11 @@ static gboolean _cairo_dock_free_one_dock (gchar *cDockName, CairoDock *pDock, g
 {
 	_cairo_dock_deactivate_one_dock (pDock);
 	
-	g_list_foreach (pDock->icons, (GFunc) cairo_dock_free_icon, NULL);
-	g_list_free (pDock->icons);
+	GList *pIconsList = pDock->icons;
 	pDock->icons = NULL;
+	
+	g_list_foreach (pIconsList, (GFunc) cairo_dock_free_icon, NULL);
+	g_list_free (pIconsList);
 	
 	g_free (pDock);
 	return TRUE;
@@ -803,6 +806,7 @@ void cairo_dock_free_all_docks (CairoDock *pMainDock)
 	///cairo_dock_pause_application_manager ();  // sera fait lors de la liberation du dock.
 	
 	g_hash_table_foreach_remove (g_hDocksTable, (GHRFunc) _cairo_dock_free_one_dock, NULL);
+	g_pMainDock = NULL;
 }
 
 /**
@@ -821,10 +825,12 @@ void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDoc
 	
 	_cairo_dock_deactivate_one_dock (pDock);
 	
+	GList *pIconsList = pDock->icons;
+	pDock->icons = NULL;
 	Icon *icon;
 	GList *ic;
 	gchar *cDesktopFilePath;
-	for (ic = pDock->icons; ic != NULL; ic = ic->next)
+	for (ic = pIconsList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
 		
@@ -859,8 +865,7 @@ void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDoc
 	if (ReceivingDock != NULL)
 		cairo_dock_update_dock_size (ReceivingDock);
 	
-	g_list_free (pDock->icons);
-	pDock->icons = NULL;
+	g_list_free (pIconsList);
 	
 	g_hash_table_remove (g_hDocksTable, cDockName);
 	

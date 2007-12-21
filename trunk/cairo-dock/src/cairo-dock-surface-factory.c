@@ -688,8 +688,8 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 					 log.width / 2. - ink.x,
 					 log.height     - ink.y);*/
 	*fTextXOffset = (log.width / 2. - ink.x) / fMaxScale;
-	*fTextYOffset = (log.height     - ink.y) / fMaxScale;
-	//*fTextYOffset = iLabelSize - (log.height + 1) + ink.y ;  // en tenant compte de l'ecart du bas du texte.
+	*fTextYOffset = - (iLabelSize - (log.height - ink.y)) / fMaxScale ;  // en tenant compte de l'ecart du bas du texte.
+	//*fTextYOffset = - (ink.y) / fMaxScale;  // pour tenir compte de l'ecart du bas du texte.
 	//g_print ("%s -> %.2f (%d;%d)\n", icon->acName, icon->fTextYOffset, log.height, ink.y);
 	
 	*iTextWidth = *iTextWidth / fMaxScale;

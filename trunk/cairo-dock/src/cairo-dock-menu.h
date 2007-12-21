@@ -16,7 +16,4 @@ GtkWidget *cairo_dock_build_menu (Icon *icon, CairoDock *pDock);
 gboolean cairo_dock_notification_build_menu (gpointer *data);
 
 
-//int cairo_dock_ask_question (CairoDock *pDock, const gchar *cQuestion);
-
-
 #endif

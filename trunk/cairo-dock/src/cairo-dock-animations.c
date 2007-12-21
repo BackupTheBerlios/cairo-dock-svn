@@ -206,6 +206,8 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 		if (pDock->fFoldingFactor > g_fUnfoldAcceleration)
 			pDock->fFoldingFactor = g_fUnfoldAcceleration;
 	}
+	pDock->fDecorationsOffsetX *= .8;
+	//g_print ("fDecorationsOffsetX <- %.2f\n", pDock->fDecorationsOffsetX);
 	
 	if (pDock->bHorizontalDock)  // ce n'est pas le motion_notify qui va nous donner des coordonnees en dehors du dock, et donc le fait d'etre dedans va nous faire interrompre le shrink_down et re-grossir, du coup il faut le faire ici. L'inconvenient, c'est que quand on sort par les cotes, il n'y a soudain plus d'icone pointee, et donc le dock devient tout plat subitement au lieu de le faire doucement. Heureusement j'ai trouve une astuce. ^_^
 		gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
@@ -236,7 +238,6 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 	
 	if (pDock->iMagnitudeIndex == 0)
 	{
-		pDock->iMagnitudeIndex = 0;
 		Icon *pBouncingIcon = cairo_dock_get_bouncing_icon (pDock->icons);
 		Icon *pRemovingIcon = cairo_dock_get_removing_or_inserting_icon (pDock->icons);
 		
@@ -286,8 +287,19 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 				//g_print ("  fin\n");
 				cairo_dock_remove_icon_from_dock (pDock, pRemovingIcon);
 				
-				cairo_dock_update_dock_size (pDock);
-				cairo_dock_free_icon (pRemovingIcon);
+				if (CAIRO_DOCK_IS_APPLI (pRemovingIcon) && pRemovingIcon->cClass != NULL)
+				{
+					if (pDock == cairo_dock_search_dock_from_name (pRemovingIcon->cClass) && pDock->icons == NULL)  // il n'y a plus aucune icone de cette classe.
+					{
+						g_print ("le sous-dock de la classe %s n'a plus d'element et sera detruit\n", pRemovingIcon->cClass);
+						cairo_dock_destroy_dock (pDock, pRemovingIcon->cClass, NULL, NULL);
+					}
+				}
+				else
+				{
+					cairo_dock_update_dock_size (pDock);
+					cairo_dock_free_icon (pRemovingIcon);
+				}
 			}
 			else if (pRemovingIcon->fPersonnalScale == -0.05)
 			{

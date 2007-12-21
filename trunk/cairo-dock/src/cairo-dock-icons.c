@@ -38,6 +38,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 extern gint g_iScreenWidth;
 extern gint g_iScreenHeight;
 extern gboolean g_bReserveSpace;
+extern int g_iLeaveSubDockDelay;
 
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
@@ -669,15 +670,6 @@ static void _cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon,
 	//\___________________ On detache l'icone du dock.
 	cairo_dock_detach_icon_from_dock (icon, pDock, bCheckUnusedSeparator);
 	
-	if (CAIRO_DOCK_IS_APPLI (icon) && icon->cClass != NULL)
-	{
-		if (pDock == cairo_dock_search_dock_from_name (icon->cClass) && pDock->icons == NULL)  // il n'y a plus aucune icone de cette classe.
-		{
-			g_print ("le sous-dock de la classe %s n'a plus d'element et sera detruit\n", icon->cClass);
-			cairo_dock_destroy_dock (pDock, icon->cClass, NULL, NULL);
-		}
-	}
-	
 	if (pDock->bIsMainDock && g_bReserveSpace)
 		cairo_dock_reserve_space_for_dock (pDock, TRUE);  // l'espace est reserve sur la taille min, qui a deja ete mise a jour.
 }
@@ -711,6 +703,8 @@ void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType)
 		if (icon->iType == iType)
 		{
 			bOneIconFound = TRUE;
+			if (CAIRO_DOCK_IS_APPLI (icon) && icon->pSubDock != NULL && cairo_dock_search_dock_from_name (icon->cClass) == icon->pSubDock)
+				cairo_dock_destroy_dock (icon->pSubDock, icon->cClass, NULL, NULL);
 			cairo_dock_remove_one_icon_from_dock (pDock, icon);
 			cairo_dock_free_icon (icon);
 		}
@@ -1032,7 +1026,7 @@ void cairo_dock_manage_mouse_position (CairoDock *pDock, CairoDockMousePositionT
 		break ;
 		
 		case CAIRO_DOCK_MOUSE_ON_THE_EDGE :
-			pDock->fDecorationsOffsetX = - pDock->iCurrentWidth / 2;  // on fixe les decorations.
+			///pDock->fDecorationsOffsetX = - pDock->iCurrentWidth / 2;  // on fixe les decorations.
 			if (pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0 && pDock->iMagnitudeIndex > 0)  // pDock->iMagnitudeIndex == CAIRO_DOCK_NB_MAX_ITERATIONS
 			{
 				//g_print ("on dezoome le dock\n");
@@ -1041,11 +1035,14 @@ void cairo_dock_manage_mouse_position (CairoDock *pDock, CairoDockMousePositionT
 		break ;
 		
 		case CAIRO_DOCK_MOUSE_OUTSIDE :
-			pDock->fDecorationsOffsetX = - pDock->iCurrentWidth / 2;  // on fixe les decorations.
+			///pDock->fDecorationsOffsetX = - pDock->iCurrentWidth / 2;  // on fixe les decorations.
 			if (pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0 && pDock->iMagnitudeIndex > 0 && pDock->iSidLeaveDemand == 0)  // pDock->iMagnitudeIndex == CAIRO_DOCK_NB_MAX_ITERATIONS
 			{
 				g_print ("on force a quitter\n");
-				g_signal_emit_by_name (pDock->pWidget, "leave-notify-event", NULL, &bReturn);
+				if (pDock->iRefCount > 0 && g_iLeaveSubDockDelay > 0)
+					pDock->iSidLeaveDemand = g_timeout_add (g_iLeaveSubDockDelay, (GSourceFunc) cairo_dock_emit_leave_signal, (gpointer) pDock);
+				else
+					cairo_dock_emit_leave_signal (pDock);
 			}
 		break ;
 	}
