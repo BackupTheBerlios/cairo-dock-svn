@@ -6,4 +6,5 @@ theme_DATA = \
 	cairo-dock.conf\
 	readme\
 	minidock.svg\
-	separateur.svg
+	separateur.svg\
+	preview.png
