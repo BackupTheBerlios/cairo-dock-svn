@@ -204,6 +204,9 @@ msgstr "Vous êtes sur le point d'enlever cette icône du dock. Sûr ?"
 msgid "Choose or Create a launcher"
 msgstr "Choisir ou Créer un lanceur"
 
+msgid "Fill this launcher"
+msgstr "Remplissez ce lanceur"
+
 #: src/cairo-dock-menu.c:417 src/cairo-dock-menu.c:416
 #: src/cairo-dock-menu.c:402 po/fr.po:205
 #, c-format
@@ -257,8 +260,8 @@ msgid "Is this icon a container ?"
 msgstr "Cette icône est-elle un conteneur ?"
 
 #: po/fr.po:244
-msgid "If so, name of the view used for the sub-dock :"
-msgstr "Si oui, nom de la vue utilisée pour le sous-dock :"
+msgid "Name of the view used for the sub-dock :"
+msgstr "Nom de la vue utilisée pour le sous-dock :"
 
 
 ##################################
@@ -274,14 +277,14 @@ msgstr "Choisissez un thème"
 msgid "List of themes :"
 msgstr "Liste des thèmes :"
 
-msgid "Overwrite the current theme's behaviour with the new one's ?"
-msgstr "Ecraser le comportement du thème courant par celui du nouveau ?"
+msgid "Use the new theme's behaviour ?"
+msgstr "Utiliser le comportement du nouveau thème ?"
 
-msgid "Otherwise the current behaviour will be used. It's all about the dock's position, behaviour parameters such as auto-hide, using taskbar or not, etc."
-msgstr "Sinon le comportement actuel sera utilisé. C'est tout ce qui concerne la position du dock, les paramètres de comportement tels que l'auto-hide, l'utilisation de la barre des tâches, etc"
+msgid "Otherwise the current behaviour will be kept. It's all about the dock's position, behaviour parameters such as auto-hide, using taskbar or not, etc."
+msgstr "Sinon le comportement actuel sera conservé. C'est tout ce qui concerne la position du dock, les paramètres de comportement tels que l'auto-hide, l'utilisation de la barre des tâches, etc"
 
-msgid "Overwrite the current theme's launchers with the new one's ?"
-msgstr "Ecraser les lanceurs du thème courant par ceux du nouveau ?"
+msgid "Use the new theme's launchers ?"
+msgstr "Utiliser les lanceurs du nouveau thème ?"
 
 msgid "So if you check this box, your launchers and their icons will be deleted and replaced by the ones provided in the new theme. Otherwise the current launchers will be used."
 msgstr "Donc si vous cochez cette case, vos lanceurs et leurs icônes seront effacés et remplacés par ceux fournis par le nouveau thème. Sinon les lanceurs actuels seront utilisés."
@@ -916,3 +919,18 @@ msgstr "Homogène avec les étiquettes des icônes ?"
 
 msgid "The messages will have the same style as the icons' labels. The beneath parameters are then unused."
 msgstr "Les messages auront le même style que les étiquettes des icônes. Les paramètres ci-dessous seront donc inutilisés."
+
+
+##################################
+############ ChangeLog #############
+##################################
+
+msgid "pouet"
+msgstr "pouet fr"
+
+msgid "pouic pouic"
+msgstr "pouic pouic fr"
+
+msgid "new version 1.4.6\nit rocks !"
+msgstr "nouvelle version 1.4.6\nelle dechire tout !"
+
