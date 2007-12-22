@@ -10,9 +10,9 @@
 void cairo_dock_load_dialog_buttons (CairoDock *pDock, gchar *cButtonOkImage, gchar *cButtonCancelImage);
 
 /**
-*Incremente le compteur de reference de 1 de maniere atomique, de maniere a empecher toute destruction du dialogue pendant son utilisation. Utiliser <cairo_dock_dialog_reference> apres en avoir termine.
+*Incremente le compteur de reference de 1 de maniere atomique, de maniere a empecher toute destruction du dialogue pendant son utilisation. Utiliser #cairo_dock_dialog_unreference apres en avoir termine.
 *@param pDialog le dialogue.
-@return TRUE ssi la reference sur le dialogue n'etait pas deja nulle et a pu etre incrementee, FALSE sinon, auquel cas il ne faut pas l'utiliser.
+*@return TRUE ssi la reference sur le dialogue n'etait pas deja nulle et a pu etre incrementee, FALSE sinon, auquel cas il ne faut pas l'utiliser.
 */
 gboolean cairo_dock_dialog_reference (CairoDockDialog *pDialog);
 /**
@@ -29,7 +29,7 @@ gboolean cairo_dock_dialog_unreference (CairoDockDialog *pDialog);
 */
 void cairo_dock_isolate_dialog (CairoDockDialog *pDialog, gboolean bHasBeenLocked);
 /**
-*Detruit un dialogue et libere les ressources allouees. Ne devrait pas etre utilise tel quel, utiliser <cairo_dock_dialog_unreference>.
+*Detruit un dialogue et libere les ressources allouees. Ne devrait pas etre utilise tel quel, utiliser #cairo_dock_dialog_unreference.
 *@param pDialog le dialogue.
 */
 void cairo_dock_free_dialog (CairoDockDialog *pDialog);
@@ -61,6 +61,7 @@ void cairo_dock_replace_all_dialogs (void);
 *@param cText le message du dialogue.
 *@param pIcon l'icone sur laquelle pointe le dialogue.
 *@param pDock le dock contenant l'icone.
+*@param fTimeLength duree de vie du dialogue, ou 0 pour une duree de vie illimitee.
 *@param cIconPath le chemin vers une icone a afficher dans la marge.
 *@param iButtonsType type des boutons (GTK_BUTTONS_OK_CANCEL ou GTK_BUTTONS_YES_NO).
 *@param pInteractiveWidget un widget d'interaction avec l'utilisateur.
@@ -144,6 +145,7 @@ CairoDockDialog *cairo_dock_show_dialog_with_value (const gchar *cText, Icon *pI
 *@param cText le message du dialogue.
 *@param pIcon l'icone sur laquelle pointe le dialogue.
 *@param pDock le dock contenant l'icone.
+*@param fTimeLength duree de vie du dialogue, ou 0 pour une duree de vie illimitee.
 *@param cIconPath le chemin vers une icone a afficher dans la marge.
 *@param iButtonsType type des boutons (GTK_BUTTONS_OK_CANCEL ou GTK_BUTTONS_YES_NO).
 *@param pInteractiveWidget un widget d'interaction avec l'utilisateur.
@@ -179,7 +181,7 @@ int cairo_dock_ask_question_and_wait (const gchar *cQuestion, Icon *pIcon, Cairo
 /**
 *Fait apparaitre un dialogue de question bloquant, et pointant sur une icone de separateur si possible, ou sinon sur l'icone pointee du dock principal (ou la 1ere icone sans dialogue si aucune n'est pointee). Cela permet a cairo-dock de poser une question d'ordre general.
 *@param cQuestion la question a poser.
-*@return idem que pour <cairo_dock_ask_question_and_wait>.
+*@return idem que pour #cairo_dock_ask_question_and_wait.
 */
 int cairo_dock_ask_general_question_and_wait (const gchar *cQuestion);
 

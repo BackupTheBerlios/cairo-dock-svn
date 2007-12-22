@@ -134,7 +134,7 @@ Icon *init (CairoDock *pDock, gchar **cAppletConfFilePath, GError **erreur);\
 void stop (void);
 
 //\___________________ pre_init.
-#define CD_APPLET_DEFINITION(cName, iMajorVersion, iMinorVersion, iMicroVersion) \
+#define CD_APPLET_PRE_INIT_BEGIN(cName, iMajorVersion, iMinorVersion, iMicroVersion) \
 Icon *myIcon = NULL;\
 CairoDock *myDock = NULL;\
 cairo_t *myDrawContext = NULL;\
@@ -146,9 +146,15 @@ CairoDockVisitCard *pre_init (void)\
 	pVisitCard->iMajorVersionNeeded = iMajorVersion;\
 	pVisitCard->iMinorVersionNeeded = iMinorVersion;\
 	pVisitCard->iMicroVersionNeeded = iMicroVersion;\
-	pVisitCard->cPreviewFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_PREVIEW_FILE);\
+	pVisitCard->cPreviewFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_PREVIEW_FILE);
+
+#define CD_APPLET_PRE_INIT_END \
 	return pVisitCard;\
 }
+
+#define CD_APPLET_DEFINITION(cName, iMajorVersion, iMinorVersion, iMicroVersion) \
+CD_APPLET_PRE_INIT_BEGIN (cName, iMajorVersion, iMinorVersion, iMicroVersion) \
+CD_APPLET_PRE_INIT_END
 
 //\___________________ init.
 #define CD_APPLET_INIT_BEGIN(erreur) \
@@ -232,7 +238,8 @@ void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cA
 #define CD_CONFIG_GET_STRING_LIST_WITH_DEFAULT(cGroupName, cKeyName, length, cDefaultValues) cairo_dock_get_string_list_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, length, cDefaultValues, NULL, NULL)
 #define CD_CONFIG_GET_STRING_LIST(cGroupName, cKeyName, length) CD_CONFIG_GET_STRING_LIST_WITH_DEFAULT(cGroupName, cKeyName, length, NULL)
 
-#define CD_CONFIG_GET_ANIMATION(cGroupName, cKeyName) cairo_dock_get_animation_type_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, NULL, NULL, NULL);
+#define CD_CONFIG_GET_ANIMATION_WITH_DEFAULT(cGroupName, cKeyName, iDefaultAnimation) cairo_dock_get_animation_type_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, iDefaultAnimation, NULL, NULL);
+#define CD_CONFIG_GET_ANIMATION(cGroupName, cKeyName) CD_CONFIG_GET_ANIMATION_WITH_DEFAULT(cGroupName, cKeyName, CAIRO_DOCK_BOUNCE)
 
 #define CD_CONFIG_GET_COLOR_WITH_DEFAULT(cGroupName, cKeyName, pColorBuffer, pDefaultColor) cairo_dock_get_double_list_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, pColorBuffer, 4, pDefaultColor, NULL, NULL);
 #define CD_CONFIG_GET_COLOR(cGroupName, cKeyName, pColorBuffer) CD_CONFIG_GET_COLOR_WITH_DEFAULT(cGroupName, cKeyName, pColorBuffer, NULL)
@@ -250,9 +257,11 @@ void about (GtkMenuItem *menu_item, gpointer *data);
 
 //\___________________ notification clique gauche.
 #define CD_APPLET_ON_CLICK action_on_click
+#define CD_APPLET_REGISTER_FOR_CLICK_EVENT cairo_dock_register_notification (CAIRO_DOCK_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_CLICK, CAIRO_DOCK_RUN_FIRST);
+#define CD_APPLET_UNREGISTER_FOR_CLICK_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_CLICK);
 
 #define CD_APPLET_ON_CLICK_BEGIN \
-gboolean action_on_click (gpointer *data) \
+gboolean CD_APPLET_ON_CLICK (gpointer *data) \
 { \
 	if (data[0] == myIcon) \
 	{
@@ -264,13 +273,15 @@ gboolean action_on_click (gpointer *data) \
 }
 
 #define CD_APPLET_ON_CLICK_H \
-gboolean action_on_click (gpointer *data);
+gboolean CD_APPLET_ON_CLICK (gpointer *data);
 
 //\___________________ notification construction menu.
 #define CD_APPLET_ON_BUILD_MENU applet_on_build_menu
+#define CD_APPLET_REGISTER_FOR_BUILD_MENU_EVENT cairo_dock_register_notification (CAIRO_DOCK_BUILD_MENU, (CairoDockNotificationFunc) CD_APPLET_ON_BUILD_MENU, CAIRO_DOCK_RUN_FIRST);
+#define CD_APPLET_UNREGISTER_FOR_BUILD_MENU_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_BUILD_MENU, (CairoDockNotificationFunc) CD_APPLET_ON_BUILD_MENU);
 
 #define CD_APPLET_ON_BUILD_MENU_BEGIN \
-gboolean applet_on_build_menu (gpointer *data) \
+gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data) \
 { \
 	if (data[0] == myIcon) \
 	{ \
@@ -302,13 +313,15 @@ gboolean applet_on_build_menu (gpointer *data) \
 #define CD_APPLET_LAST_ITEM_IN_MENU pMenuItem
 
 #define CD_APPLET_ON_BUILD_MENU_H \
-gboolean applet_on_build_menu (gpointer *data);
+gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 
 //\___________________ notification clique milieu.
 #define CD_APPLET_ON_MIDDLE_CLICK action_on_middle_click
+#define CD_APPLET_REGISTER_FOR_MIDDLE_CLICK_EVENT cairo_dock_register_notification (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_MIDDLE_CLICK, CAIRO_DOCK_RUN_FIRST);
+#define CD_APPLET_UNREGISTER_FOR_MIDDLE_CLICK_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_MIDDLE_CLICK);
 
 #define CD_APPLET_ON_MIDDLE_CLICK_BEGIN \
-gboolean action_on_middle_click (gpointer *data) \
+gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data) \
 { \
 	if (data[0] == myIcon) \
 	{
@@ -320,18 +333,26 @@ gboolean action_on_middle_click (gpointer *data) \
 }
 
 #define CD_APPLET_ON_MIDDLE_CLICK_H \
-gboolean action_on_middle_click (gpointer *data);
+gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data);
 
 //\___________________________ DESSIN
-#define CD_APPLET_SET_ICON_SURFACE(pSurface) \
+#define CD_APPLET_SET_SURFACE_ON_MY_ICON(pSurface) \
 	cairo_dock_set_icon_surface_with_reflect (myDrawContext, pSurface, myIcon, myDock); \
 	cairo_dock_redraw_my_icon (myIcon, myDock);
 
-#define CD_APPLET_SET_ICON_NAME(cIconName) \
+#define CD_APPLET_SET_IMAGE_ON_MY_ICON(cImagePath) \
+	cairo_dock_set_image_on_icon (myDrawContext, cImagePath, myIcon, myDock);
+
+#define CD_APPLET_SET_NAME_FOR_MY_ICON(cIconName) \
 	cairo_dock_set_icon_name (myDrawContext, cIconName, myIcon, myDock);
 
-#define CD_APPLET_ANIMATE(iAnimationType, iAnimationLength) \
+#define CD_APPLET_SET_QUICK_INFO_ON_MY_ICON(cQuickInfo) \
+	cairo_dock_set_quick_info (myDrawContext, cQuickInfo, myIcon);
+
+#define CD_APPLET_ANIMATE_MY_ICON(iAnimationType, iAnimationLength) \
 	cairo_dock_animate_icon (myIcon, myDock, iAnimationType, iAnimationLength);
+
+#define CD_APPLET_LOAD_SURFACE_FOR_MY_APPLET(cImagePath) cairo_dock_create_surface_for_icon (cImagePath, myDrawContext, myIcon->fWidth * (1 + g_fAmplitude), myIcon->fHeight* (1 + g_fAmplitude));
 
 //\___________________________ INCLUDE
 #define CD_APPLET_INCLUDE_MY_VARS \

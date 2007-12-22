@@ -88,14 +88,14 @@ Icon *cairo_dock_get_first_icon (GList *pIconList);
 */
 Icon *cairo_dock_get_last_icon (GList *pIconList);
 /**
-*Renvoie la 1ere icone a etre dessinee d'une liste d'icones (qui n'est pas forcement la 1ere icone de la liste, si l'utilisateur a scrolle).
-*@param pIconList la liste d'icones.
+*Renvoie la 1ere icone a etre dessinee dans un dock (qui n'est pas forcement la 1ere icone de la liste, si l'utilisateur a scrolle).
+*@param pDock le dock.
 *@return la 1ere icone a etre dessinee, ou NULL si la liste est vide.
 */
 Icon *cairo_dock_get_first_drawn_icon (CairoDock *pDock);
 /**
-*Renvoie la derniere icone a etre dessinee d'une liste d'icones (qui n'est pas forcement la derniere icone de la liste, si l'utilisateur a scrolle).
-*@param pIconList la liste d'icones.
+*Renvoie la derniere icone a etre dessinee dans un dock (qui n'est pas forcement la derniere icone de la liste, si l'utilisateur a scrolle).
+*@param pDock le dock.
 *@return la derniere icone a etre dessinee, ou NULL si la liste est vide.
 */
 Icon *cairo_dock_get_last_drawn_icon (CairoDock *pDock);
@@ -140,12 +140,14 @@ Icon *cairo_dock_get_animated_icon (GList *pIconList);
 /**
 *Renvoie l'icone suivante dans la liste d'icones. Cout en O(n).
 *@param pIconList la liste d'icones.
+*@param pIcon l'icone dont on veut le voisin.
 *@return l'icone dont le voisin de gauche est pIcon, ou NULL si pIcon est la derniere icone de la liste.
 */
 Icon *cairo_dock_get_next_icon (GList *pIconList, Icon *pIcon);
 /**
 *Renvoie l'icone precedente dans la liste d'icones. Cout en O(n).
 *@param pIconList la liste d'icones.
+*@param pIcon l'icone dont on veut le voisin.
 *@return l'icone dont le voisin de droite est pIcon, ou NULL si pIcon est la 1ere icone de la liste.
 */
 Icon *cairo_dock_get_previous_icon (GList *pIconList, Icon *pIcon);
@@ -167,35 +169,35 @@ Icon *cairo_dock_get_previous_icon (GList *pIconList, Icon *pIcon);
 *Cherche l'icone ayant une commande donnee parmi une liste d'icones.
 *@param pIconList la liste d'icones.
 *@param cCommand la chaine de commande.
-*@return la 1ere icone ayant le champ #acExec identique a la commande fournie, ou NULL si aucune icone ne correspond.
+*@return la 1ere icone ayant le champ 'acExec' identique a la commande fournie, ou NULL si aucune icone ne correspond.
 */
 Icon *cairo_dock_get_icon_with_command (GList *pIconList, gchar *cCommand);
 /**
 *Cherche l'icone ayant une URI de base donnee parmi une liste d'icones.
 *@param pIconList la liste d'icones.
 *@param cBaseURI l'URI.
-*@return la 1ere icone ayant le champ #cBaseURI identique a l'URI fournie, ou NULL si aucune icone ne correspond.
+*@return la 1ere icone ayant le champ 'cBaseURI' identique a l'URI fournie, ou NULL si aucune icone ne correspond.
 */
 Icon *cairo_dock_get_icon_with_base_uri (GList *pIconList, gchar *cBaseURI);
 /**
 *Cherche l'icone pointant sur un sous-dock donne parmi une liste d'icones.
 *@param pIconList la liste d'icones.
 *@param pSubDock le sous-dock.
-*@return la 1ere icone ayant le champ #pSubDock identique au sous-dock fourni, ou NULL si aucune icone ne correspond.
+*@return la 1ere icone ayant le champ 'pSubDock' identique au sous-dock fourni, ou NULL si aucune icone ne correspond.
 */
 Icon *cairo_dock_get_icon_with_subdock (GList *pIconList, CairoDock *pSubDock);
 /**
 *Cherche l'icone correspondante a un module donne parmi une liste d'icones.
 *@param pIconList la liste d'icones.
 *@param pModule le module.
-*@return la 1ere icone ayant le champ #pModule identique au module fourni, ou NULL si aucune icone ne correspond.
+*@return la 1ere icone ayant le champ 'pModule' identique au module fourni, ou NULL si aucune icone ne correspond.
 */
 Icon *cairo_dock_get_icon_with_module (GList *pIconList, CairoDockModule *pModule);
 /**
-*Cherche l'icone d'une application de la classe donnee parmi une liste d'icones.
+*Cherche l'icone d'une application de classe donnee parmi une liste d'icones.
 *@param pIconList la liste d'icones.
-*@param pModule le module.
-*@return la 1ere icone ayant le champ #cClass identique a la classe fournie, ou NULL si aucune icone ne correspond.
+*@param cClass la classe d'application.
+*@return la 1ere icone ayant le champ 'cClass' identique a la classe fournie, ou NULL si aucune icone ne correspond.
 */
 Icon *cairo_dock_get_icon_with_class (GList *pIconList, gchar *cClass);
 

@@ -19,7 +19,7 @@ double cairo_dock_get_current_dock_width_linear (CairoDock *pDock);
 /**
 *Cree un contexte de dessin pour la libcairo. Si glitz est active, le contexte sera lie a une surface glitz (et donc on dessinera directement sur la carte graphique), sinon a une surface X representant la fenetre du dock.
 *@param pDock le dock sur lequel on veut dessiner.
-*@return le contexte sur lequel dessiner. N'est jamais nul; tester sa coherence avec #cairo_status avant de l'utiliser, et le detruire avec #cairo_destroy apres en avoir fini avec lui.
+*@return le contexte sur lequel dessiner. N'est jamais nul; tester sa coherence avec cairo_status() avant de l'utiliser, et le detruire avec cairo_destroy() apres en avoir fini avec lui.
 */
 cairo_t * cairo_dock_create_context_from_window (CairoDock *pDock);
 
@@ -49,7 +49,8 @@ void cairo_dock_render_decorations_in_frame (cairo_t *pCairoContext, CairoDock *
 
 /**
 *Dessine entierement une icone, dont toutes les caracteristiques ont ete prealablement calculees. Gere sa position, sa transparence (modulee par la transparence du dock au repos), son reflet, son placement de profil, son etiquette, et son info-rapide.
-*@param 
+*@param icon l'icone a dessiner.
+*@param pDock le dock auquel elle appartient.
 */
 void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock);
 
@@ -71,6 +72,7 @@ void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, d
 *@param pDock le dock contenant les icônes a relier.
 *@param fStringLineWidth epaisseur de la ligne.
 *@param bIsLoop TRUE si on veut boucler (relier la derniere icone a la 1ere).
+*@param bForceConstantSeparator TRUE pour forcer les separateurs a etre consideres comme de taille constante.
 */
 void cairo_dock_draw_string (cairo_t *pCairoContext, CairoDock *pDock, double fStringLineWidth, gboolean bIsLoop, gboolean bForceConstantSeparator);
 

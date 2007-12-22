@@ -15,7 +15,7 @@
 *@param bDefaultValue valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
 *@param cDefaultGroupName nom de groupe alternatif, ou NULL si aucun autre.
 *@param cDefaultKeyName nom de cle alternative, ou NULL si aucune autre.
-@return la valeur booleene de la cle.
+*@return la valeur booleene de la cle.
 */
 gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gboolean bDefaultValue, gchar *cDefaultGroupName, gchar *cDefaultKeyName);
 /**
@@ -39,7 +39,7 @@ int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gch
 *@param fDefaultValue valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
 *@param cDefaultGroupName nom de groupe alternatif, ou NULL si aucun autre.
 *@param cDefaultKeyName nom de cle alternative, ou NULL si aucune autre.
-@return la valeur flottante de la cle.
+*@return la valeur flottante de la cle.
 */
 double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, double fDefaultValue, gchar *cDefaultGroupName, gchar *cDefaultKeyName);
 /**
@@ -51,7 +51,7 @@ double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 *@param cDefaultValue valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
 *@param cDefaultGroupName nom de groupe alternatif, ou NULL si aucun autre.
 *@param cDefaultKeyName nom de cle alternative, ou NULL si aucune autre.
-@return la chaine de caractere nouvellement allouee correspondante a la cle.
+*@return la chaine de caractere nouvellement allouee correspondante a la cle.
 */
 gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, const gchar *cDefaultValue, gchar *cDefaultGroupName, gchar *cDefaultKeyName);
 /**
@@ -90,7 +90,7 @@ void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 *@param cDefaultValues valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
 *@param cDefaultGroupName nom de groupe alternatif, ou NULL si aucun autre.
 *@param cDefaultKeyName nom de cle alternative, ou NULL si aucune autre.
-@return un tableau de chaines de caracteres; a liberer avec g_strfreev().
+*@return un tableau de chaines de caracteres; a liberer avec g_strfreev().
 */
 gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gsize *length, gchar *cDefaultValues, gchar *cDefaultGroupName, gchar *cDefaultKeyName);
 /**
@@ -110,21 +110,21 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock);
 
 /**
 *Lis un fichier de conf, construit l'IHM appropriee, et la presente a l'utilisateur.
-*@param pWindow 
-*@param cConfFilePath 
-*@param cTitle 
-*@param iWindowWidth 
-*@param iWindowHeight 
-*@param iIdentifier 
-*@param cPresentedGroup 
-*@param pConfigFunc 
-*@param data 
-*@param pFreeUserDataFunc 
-*@param pConfigFunc2 
-*@param cConfFilePath2 
-*@param cButtonConvert 
-*@param  cButtonRevert 
-@return TRUE si l'utilisateur a ferme le panneau de conf en appuyant sur OK, FALSE sinon.
+*@param pWindow fenetre pour laquelle le panneau de conf sera modal.
+*@param cConfFilePath chemin du fichier de conf.
+*@param cTitle titre du panneau de conf.
+*@param iWindowWidth largeur du panneau de conf.
+*@param iWindowHeight hauteur du panneau de conf.
+*@param iIdentifier identifiant des cles, ou 0 pour aucun.
+*@param cPresentedGroup onglet devant etre selectionne initialement.
+*@param pConfigFunc fonction appelee a l'appui sur le bouton "valider"
+*@param data donnees passees a la fonction.
+*@param pFreeUserDataFunc fonction liberant les donnees, ou NULL.
+*@param pConfigFunc2 2eme fonction dans le cas d'une config s'affichant sous 2 formes.
+*@param cConfFilePath2 2eme fichier de conf dans le cas d'une config s'affichant sous 2 formes.
+*@param cButtonConvert chaine a afficher dans le bouton permettant de passer d'une forme a l'autre.
+*@param  cButtonRevert chaine a afficher dans le bouton permettant de passer d'une forme a l'autre dans l'autre sens.
+*@return TRUE si l'utilisateur a ferme le panneau de conf en appuyant sur OK, FALSE sinon.
 */
 gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert);
 #define cairo_dock_edit_conf_file(pWindow, cConfFilePath, cTitle, iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc) cairo_dock_edit_conf_file_full (pWindow, cConfFilePath, cTitle, iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc, NULL, NULL, NULL, NULL)
@@ -132,7 +132,10 @@ gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePat
 
 void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int y);
 
-
+/**
+*Essaye de determiner l'environnement de bureau dela session courante.
+*@return l'environnement de bureau (couramment Gnome et KDE son detectes).
+*/
 CairoDockDesktopEnv cairo_dock_guess_environment (void);
 
 
