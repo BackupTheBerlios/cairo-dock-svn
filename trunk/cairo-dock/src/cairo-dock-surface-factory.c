@@ -74,7 +74,7 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 	*fHeight = (double) pXIconBuffer[iBestIndex+1];
 	
 	int i;
-	gulong alpha, red, green, blue;
+	gint alpha, red, green, blue;
 	float fAlphaFactor;
 	for (i = 0; i < (int) (*fHeight) * (*fWidth); i ++)
 	{

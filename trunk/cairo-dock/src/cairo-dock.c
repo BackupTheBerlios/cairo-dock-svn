@@ -497,7 +497,7 @@ main (int argc, char** argv)
 		NULL);
 	g_free (cSillyMessageFilePath);
 	
- 	if (bWriteSillyMessage)
+ 	if (bWriteSillyMessage && ! bWriteChangeLog)
 	{
 		Icon *pFirstIcon = cairo_dock_get_first_icon (g_pMainDock->icons);
 		if (pFirstIcon != NULL)
