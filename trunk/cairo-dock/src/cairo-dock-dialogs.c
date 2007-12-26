@@ -786,7 +786,7 @@ void cairo_dock_place_dialog (CairoDockDialog *pDialog, CairoDock *pDock)
 {
 	g_return_if_fail (pDock != NULL && pDialog->pIcon != NULL);
 	cairo_dock_dialog_calculate_aimed_point (pDialog->pIcon, pDock, &pDialog->iAimedX, &pDialog->iAimedY, &pDialog->bRight, &pDialog->bIsPerpendicular, &pDialog->bDirectionUp);
-	g_print (" Aim (%d;%d)\n", pDialog->iAimedX, pDialog->iAimedY);
+	//g_print (" Aim (%d;%d)\n", pDialog->iAimedX, pDialog->iAimedY);
 	
 	double fLineWidth = g_iDockLineWidth;
 	if (pDialog->bIsPerpendicular)
@@ -817,13 +817,13 @@ void cairo_dock_place_dialog (CairoDockDialog *pDialog, CairoDock *pDock)
 		pDialog->iPositionY,
 		pDialog->iWidth,
 		pDialog->iHeight);
-	g_print (" => (%d;%d) %dx%d\n", pDialog->iPositionX, pDialog->iPositionY, pDialog->iWidth, pDialog->iHeight);
+	//g_print (" => (%d;%d) %dx%d\n", pDialog->iPositionX, pDialog->iPositionY, pDialog->iWidth, pDialog->iHeight);
 }
 
 
 void cairo_dock_replace_all_dialogs (void)
 {
-	g_print ("%s ()\n", __func__);
+	//g_print ("%s ()\n", __func__);
 	
 	GSList *ic;
 	CairoDockDialog *pDialog;
