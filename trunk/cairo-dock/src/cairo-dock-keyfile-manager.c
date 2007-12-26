@@ -42,34 +42,13 @@ void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file)
 	}
 }
 
-gchar *cairo_dock_get_translated_conf_file_path (gchar *cConfFileName, gchar *cShareDataDirPath)
-{
-	gchar *cBaseName = g_strdup (cConfFileName);
-	gchar *cExtension = NULL;
-	gchar *str = strrchr (cBaseName, '.');
-	if (str != NULL)
-	{
-		cExtension = g_strdup (str);
-		*str = '\0';
-	}
-	
-	gchar *cTranslatedConfFilePath = g_strdup_printf ("%s/%s%s", cShareDataDirPath, cBaseName, (cExtension != NULL ? cExtension : ""));
-	if (! g_file_test (cTranslatedConfFilePath, G_FILE_TEST_EXISTS))
-	{
-		g_free (cTranslatedConfFilePath);
-		cTranslatedConfFilePath = NULL;
-	}
-	
-	g_free (cBaseName);
-	g_free (cExtension);
-	return cTranslatedConfFilePath;
-}
 
 void cairo_dock_flush_conf_file_full (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath, gboolean bUseFileKeys, gchar *cTemplateFileName)
 {
-	gchar *cTranslatedConfFilePath = cairo_dock_get_translated_conf_file_path (cTemplateFileName, cShareDataDirPath);
+	gchar *cTranslatedConfFilePath = g_strdup_printf ("%s/%s", cShareDataDirPath, cTemplateFileName);
+	g_print ("%s (%s)\n", __func__, cTranslatedConfFilePath);
 	
-	if (cTranslatedConfFilePath == NULL)
+	if (! g_file_test (cTranslatedConfFilePath, G_FILE_TEST_EXISTS))
 	{
 		g_print ("Attention : couldn't find any installed conf file\n");
 	}
@@ -474,13 +453,13 @@ void cairo_dock_get_conf_file_version (GKeyFile *pKeyFile, gchar **cConfFileVers
 	g_free (cFirstComment);
 }
 
-gboolean cairo_dock_conf_file_needs_update (GKeyFile *pKeyFile)
+gboolean cairo_dock_conf_file_needs_update (GKeyFile *pKeyFile, gchar *cVersion)
 {
 	gchar *cPreviousVersion = NULL;
 	cairo_dock_get_conf_file_version (pKeyFile, &cPreviousVersion);
 	
 	gboolean bNeedsUpdate;
-	if (cPreviousVersion == NULL || strcmp (cPreviousVersion, CAIRO_DOCK_VERSION) != 0)
+	if (cPreviousVersion == NULL || strcmp (cPreviousVersion, cVersion) != 0)
 		bNeedsUpdate = TRUE;
 	else
 		bNeedsUpdate = FALSE;

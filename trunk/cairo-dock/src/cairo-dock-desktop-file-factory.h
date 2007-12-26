@@ -18,8 +18,5 @@ gchar *cairo_dock_generate_desktop_filename (gchar *cBaseName, gchar *cCairoDock
 void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath, gboolean bIsContainer);
 
 
-gchar *cairo_dock_get_launcher_template_conf_file (void);
-
-
 #endif
 

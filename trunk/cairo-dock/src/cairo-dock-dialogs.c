@@ -183,6 +183,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	if (pDialog->bRight)
 	{
 		fDeltaMargin = pDialog->iAimedX - pDialog->iPositionX - fRadius - fLineWidth / 2;  // >= 0
+		g_print ("fDeltaMargin : %.2f\n", fDeltaMargin);
 		cairo_rel_line_to (pCairoContext, -iWidth + fDeltaMargin + fLineWidth + 2. * fRadius + CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE + CAIRO_DOCK_DIALOG_TIP_ROUNDING_MARGIN , 0);
 		cairo_rel_curve_to (pCairoContext,
 			0, 0,
@@ -197,6 +198,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	else
 	{
 		fDeltaMargin = pDialog->iPositionX + pDialog->iWidth - fRadius - fLineWidth / 2 - pDialog->iAimedX;  // >= 0.
+		g_print ("fDeltaMargin : %.2f\n", fDeltaMargin);
 		cairo_rel_line_to (pCairoContext, - (CAIRO_DOCK_DIALOG_TIP_MARGIN + fDeltaMargin) + CAIRO_DOCK_DIALOG_TIP_ROUNDING_MARGIN, 0);
 		cairo_rel_curve_to (pCairoContext,
 			0, 0,
@@ -340,7 +342,12 @@ gboolean cairo_dock_dialog_unreference (CairoDockDialog *pDialog)
 	{
 		if (g_atomic_int_dec_and_test (&pDialog->iRefCount))  // devient nul.
 		{
-			cairo_dock_free_dialog (pDialog);
+			cairo_dock_isolate_dialog (pDialog);
+			if (g_static_rw_lock_writer_trylock (&s_mDialogsMutex))
+			{
+				cairo_dock_free_dialog (pDialog);
+				g_static_rw_lock_writer_unlock (&s_mDialogsMutex);
+			}
 			return TRUE;
 		}
 		else
@@ -349,16 +356,10 @@ gboolean cairo_dock_dialog_unreference (CairoDockDialog *pDialog)
 	return TRUE;
 }
 
-void cairo_dock_isolate_dialog (CairoDockDialog *pDialog, gboolean bHasBeenLocked)
+void cairo_dock_isolate_dialog (CairoDockDialog *pDialog)
 {
 	if (pDialog == NULL)
 		return ;
-	
-	if (! bHasBeenLocked)
-		g_static_rw_lock_writer_lock (&s_mDialogsMutex);
-	s_pDialogList = g_slist_remove (s_pDialogList, pDialog);
-	if (! bHasBeenLocked)
-		g_static_rw_lock_writer_unlock (&s_mDialogsMutex);
 	
 	if (pDialog->iSidTimer > 0)
 	{
@@ -379,9 +380,9 @@ void cairo_dock_isolate_dialog (CairoDockDialog *pDialog, gboolean bHasBeenLocke
 void cairo_dock_free_dialog (CairoDockDialog *pDialog)
 {
 	if (pDialog == NULL)
-		return;
+		return ;
 	
-	cairo_dock_isolate_dialog (pDialog, FALSE);
+	s_pDialogList = g_slist_remove (s_pDialogList, pDialog);
 	
 	cairo_surface_destroy (pDialog->pTextBuffer);
 	pDialog->pTextBuffer = NULL;
@@ -414,8 +415,8 @@ void cairo_dock_remove_dialog_if_any (Icon *icon)
 		pDialog = ic->next->data;  // on ne peut pas enlever l'element courant, sinon on perd 'ic'.
 		if (pDialog->pIcon == icon)
 		{
-			if (! cairo_dock_dialog_unreference (pDialog))  // il resiste le bougre !
-				cairo_dock_isolate_dialog (pDialog, TRUE);  // l'isole et l'enleve de la liste.
+			if (cairo_dock_dialog_unreference (pDialog))
+				cairo_dock_free_dialog (pDialog);  // la liberation n'a pas pu se faire a cause du lock.
 		}
 		else
 		{
@@ -426,13 +427,47 @@ void cairo_dock_remove_dialog_if_any (Icon *icon)
 	pDialog = s_pDialogList->data;
 	if (pDialog != NULL && pDialog->pIcon == icon)
 	{
-		if (! cairo_dock_dialog_unreference (pDialog))  // il resiste le bougre !
-			cairo_dock_isolate_dialog (pDialog, TRUE);  // l'isole et l'enleve de la liste.
+		if (cairo_dock_dialog_unreference (pDialog))
+			cairo_dock_free_dialog (pDialog);  // la liberation n'a pas pu se faire a cause du lock.
 	}
 	
 	g_static_rw_lock_writer_unlock (&s_mDialogsMutex);
 }
 
+void cairo_dock_remove_orphelans (void)
+{
+	CairoDockDialog *pDialog;
+	GSList *ic;
+	
+	if (s_pDialogList == NULL)
+		return ;
+	g_static_rw_lock_writer_lock (&s_mDialogsMutex);
+	
+	ic = s_pDialogList;
+	do
+	{
+		if (ic->next == NULL)
+			break;
+		
+		pDialog = ic->next->data;  // on ne peut pas enlever l'element courant, sinon on perd 'ic'.
+		if (pDialog->iRefCount == 0 && pDialog->pIcon == NULL)  // plus utilise, meme pas en cours d'isolation.
+		{
+			cairo_dock_free_dialog (pDialog);
+		}
+		else
+		{
+			ic = ic->next;
+		}
+	} while (TRUE);
+	
+	pDialog = s_pDialogList->data;
+	if (pDialog != NULL && pDialog->iRefCount == 0 && pDialog->pIcon == NULL)
+	{
+		cairo_dock_free_dialog (pDialog);  // la liberation n'a pas pu se faire a cause du lock.
+	}
+	
+	g_static_rw_lock_writer_unlock (&s_mDialogsMutex);
+}
 
 
 GtkWidget *cairo_dock_build_common_interactive_widget_for_dialog (const gchar *cInitialAnswer, double fValueForHScale)
@@ -636,6 +671,7 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 		G_CALLBACK (on_button_press_dialog),
 		pDialog);
 	cairo_dock_place_dialog (pDialog, pDock);  // renseigne aussi bDirectionUp et bIsPerpendicular.
+	cairo_dock_remove_orphelans ();  // la liste a ete verouillee par la fonction precedente pendant longtemps, empechant les dialogues d'etre detruits.
 	
 	if (pInteractiveWidget != NULL)  // on ne peut placer le widget qu'apres avoir determine 'bDirectionUp'.
 	{
@@ -657,7 +693,8 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 
 void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int *iX, int *iY, gboolean *bRight, gboolean *bIsPerpendicular, gboolean *bDirectionUp)
 {
-	//g_print ("%s (%.2f)\n", __func__, pIcon->fXAtRest);
+	g_return_if_fail (pIcon != NULL && pDock != NULL);
+	//g_print ("%s (%.2f, %.2f)\n", __func__, pIcon->fXAtRest, pIcon->fDrawX);
 	if (pDock->iRefCount == 0 && pDock->bAtBottom)  // un dock principal au repos.
 	{
 		*bIsPerpendicular = (pDock->bHorizontalDock == CAIRO_DOCK_VERTICAL);
@@ -711,7 +748,7 @@ void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int
 
 void cairo_dock_dialog_find_optimal_placement  (CairoDockDialog *pDialog, CairoDock *pDock)
 {
-	g_print ("%s (Ybulle:%d; width:%d)\n", __func__, pDialog->iPositionY, pDialog->iWidth);
+	//g_print ("%s (Ybulle:%d; width:%d)\n", __func__, pDialog->iPositionY, pDialog->iWidth);
 	g_return_if_fail (pDialog->iPositionY > 0);
 	
 	double fRadius = pDialog->fRadius;
@@ -739,24 +776,22 @@ void cairo_dock_dialog_find_optimal_placement  (CairoDockDialog *pDialog, CairoD
 		pDialogOnOurWay = ic->data;
 		if (pDialogOnOurWay != pDialog)
 		{
-			if (! cairo_dock_dialog_reference (pDialogOnOurWay))
+			if (cairo_dock_dialog_reference (pDialogOnOurWay) && pDialogOnOurWay->pIcon != NULL)
 			{
+				iYInf = (pDialog->bDirectionUp ? pDialogOnOurWay->iPositionY : pDialogOnOurWay->iPositionY + pDialogOnOurWay->iHeight - (pDialogOnOurWay->iTextHeight + 2 * g_iDockLineWidth));
+				iYSup = (pDialog->bDirectionUp ? pDialogOnOurWay->iPositionY + pDialogOnOurWay->iTextHeight + 2 * g_iDockLineWidth : pDialogOnOurWay->iPositionY + pDialogOnOurWay->iHeight);
+				if (iYInf < pDialog->iPositionY + pDialog->iTextHeight + 2 * g_iDockLineWidth && iYSup > pDialog->iPositionY)
+				{
+					g_print ("pDialogOnOurWay : %d - %d ; pDialog : %d - %d\n", iYInf, iYSup, pDialog->iPositionY, pDialog->iPositionY + (pDialog->iTextHeight + 2 * g_iDockLineWidth));
+					if (pDialogOnOurWay->iAimedX < pDialog->iAimedX)
+						fXLeft = MAX (fXLeft, pDialogOnOurWay->iPositionX + pDialogOnOurWay->iWidth);
+					else
+						fXRight = MIN (fXRight, pDialogOnOurWay->iPositionX);
+					bCollision = TRUE;
+					fNextYStep = (pDialog->bDirectionUp ? MAX (fNextYStep, iYInf) : MIN (fNextYStep, iYSup));
+				}
 				cairo_dock_dialog_unreference (pDialogOnOurWay);
-				continue;
 			}
-			iYInf = (pDialog->bDirectionUp ? pDialogOnOurWay->iPositionY : pDialogOnOurWay->iPositionY + pDialogOnOurWay->iHeight - (pDialogOnOurWay->iTextHeight + 2 * g_iDockLineWidth));
-			iYSup = (pDialog->bDirectionUp ? pDialogOnOurWay->iPositionY + pDialogOnOurWay->iTextHeight + 2 * g_iDockLineWidth : pDialogOnOurWay->iPositionY + pDialogOnOurWay->iHeight);
-			if (iYInf < pDialog->iPositionY + pDialog->iTextHeight + 2 * g_iDockLineWidth && iYSup > pDialog->iPositionY)
-			{
-				g_print ("pDialogOnOurWay : %d - %d ; pDialog : %d - %d\n", iYInf, iYSup, pDialog->iPositionY, pDialog->iPositionY + (pDialog->iTextHeight + 2 * g_iDockLineWidth));
-				if (pDialogOnOurWay->iAimedX < pDialog->iAimedX)
-					fXLeft = MAX (fXLeft, pDialogOnOurWay->iPositionX + pDialogOnOurWay->iWidth);
-				else
-					fXRight = MIN (fXRight, pDialogOnOurWay->iPositionX);
-				bCollision = TRUE;
-				fNextYStep = (pDialog->bDirectionUp ? MAX (fNextYStep, iYInf) : MIN (fNextYStep, iYSup));
-			}
-			cairo_dock_dialog_unreference (pDialogOnOurWay);
 		}
 	}
 	g_static_rw_lock_reader_unlock (&s_mDialogsMutex);
@@ -776,9 +811,9 @@ void cairo_dock_dialog_find_optimal_placement  (CairoDockDialog *pDialog, CairoD
 	}
 	else
 	{
-		//g_print ("Aim : (%d ; %d) ; Width : %d\n", pDialog->iAimedX, pDialog->iAimedY, pDialog->iWidth);
+		//g_print (" * Aim : (%d ; %d) ; Width : %d\n", pDialog->iAimedX, pDialog->iAimedY, pDialog->iWidth);
 		pDialog->iPositionY = fNextYStep - (pDialog->bDirectionUp ? pDialog->iTextHeight + 2*g_iDockLineWidth : 0);
-		cairo_dock_dialog_find_optimal_placement  (pDialog, pDock);
+		cairo_dock_dialog_find_optimal_placement (pDialog, pDock);
 	}
 }
 
@@ -842,11 +877,18 @@ void cairo_dock_replace_all_dialogs (void)
 		{
 			pIcon = pDialog->pIcon;
 			pDock = cairo_dock_search_container_from_icon (pIcon);
+			int iPreviousX = pDialog->iPositionX, iPreviousY = pDialog->iPositionY;
 			cairo_dock_place_dialog (pDialog, pDock);
+			if (iPreviousX == pDialog->iPositionX && iPreviousY == pDialog->iPositionY)  // on force le redessin.
+			{
+				gtk_widget_queue_draw (pDialog->pWidget);
+			}
 			cairo_dock_dialog_unreference (pDialog);
 		}
 	}
 	g_static_rw_lock_reader_unlock (&s_mDialogsMutex);
+	
+	cairo_dock_remove_orphelans ();  // la liste a ete verouillee pendant longtemps, empechant les dialogues d'etre detruits.
 }
 
 

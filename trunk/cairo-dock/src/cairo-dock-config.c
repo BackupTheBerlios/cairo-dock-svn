@@ -855,7 +855,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_bCloseAppliOnMiddleClick = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "close on middle click", &bFlushConfFileNeeded, TRUE, "Applications", NULL);
 	
-	g_bAutoHideOnFullScreen = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "auto quick hide", &bFlushConfFileNeeded, TRUE, "Applications", NULL);
+	g_bAutoHideOnFullScreen = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "auto quick hide", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
 	
 	g_bDemandsAttentionWithDialog = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "demands attention with dialog", &bFlushConfFileNeeded, TRUE, "Applications", NULL);
 	g_bDemandsAttentionWithAnimation = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "demands attention with animation", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
@@ -1073,7 +1073,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	//\___________________ On ecrit si necessaire.
 	if (! bFlushConfFileNeeded)
-		bFlushConfFileNeeded = cairo_dock_conf_file_needs_update (pKeyFile);
+		bFlushConfFileNeeded = cairo_dock_conf_file_needs_update (pKeyFile, CAIRO_DOCK_VERSION);
 	if (bFlushConfFileNeeded)
 	{
 		cairo_dock_flush_conf_file (pKeyFile, cConfFilePath, CAIRO_DOCK_SHARE_DATA_DIR);
@@ -1094,7 +1094,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 
 static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, gpointer *user_data);  // declaree en amont, car les 2 s'appellent mutuellement.
 
-static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert)
+static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert, gchar *cGettextDomain)
 {
 	g_print ("%s (%s; %s)\n", __func__, cConfFilePath, cConfFilePath2);
 	GSList *pWidgetList = NULL;
@@ -1111,10 +1111,10 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConf
 	}
 	g_key_file_remove_key (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", NULL);  // salete de traducteur automatique.
 	
-	GtkWidget *pDialog = cairo_dock_generate_advanced_ihm_from_keyfile (pKeyFile, cTitle, pWindow, &pWidgetList, (pConfigFunc != NULL), iIdentifier, cPresentedGroup, (pConfigFunc2 != NULL), cButtonConvert);
+	GtkWidget *pDialog = cairo_dock_generate_advanced_ihm_from_keyfile (pKeyFile, cTitle, pWindow, &pWidgetList, (pConfigFunc != NULL), iIdentifier, cPresentedGroup, (pConfigFunc2 != NULL), cButtonConvert, cGettextDomain);
 	if (pDialog == NULL || pWidgetList == NULL)
 	{
-		pDialog = cairo_dock_generate_basic_ihm_from_keyfile (cConfFilePath, cTitle, pWindow, &pTextBuffer, (pConfigFunc != NULL), (pConfigFunc2 != NULL), cButtonConvert);
+		pDialog = cairo_dock_generate_basic_ihm_from_keyfile (cConfFilePath, cTitle, pWindow, &pTextBuffer, (pConfigFunc != NULL), (pConfigFunc2 != NULL), cButtonConvert, NULL);
 	}
 	g_return_val_if_fail (pDialog != NULL, FALSE);
 	
@@ -1266,14 +1266,14 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 			pFreeUserDataFunc (data, NULL);
 		g_free (user_data);
 	}
-	else if (action == GTK_RESPONSE_HELP)
+	else if (action == GTK_RESPONSE_HELP)  // demande de bascule d'un fichier de conf a un autre.
 	{
 		gtk_widget_destroy (GTK_WIDGET (pDialog));
 		g_key_file_free (pKeyFile);
 		cairo_dock_free_generated_widget_list (pWidgetList);
 		g_free (user_data);
 		
-		cairo_dock_edit_conf_file_core (pWindow, cConfFilePath2, cTitle, iWindowWidth, iWindowHeight, iIdentifier, NULL, pConfigFunc2, data, pFreeUserDataFunc, pConfigFunc, cConfFilePath, cButtonRevert, cButtonConvert);
+		cairo_dock_edit_conf_file_core (pWindow, cConfFilePath2, cTitle, iWindowWidth, iWindowHeight, iIdentifier, NULL, pConfigFunc2, data, pFreeUserDataFunc, pConfigFunc, cConfFilePath, cButtonRevert, cButtonConvert, NULL);
 	}
 }
 
@@ -1296,9 +1296,9 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 *@param  cButtonRevert 
 @Returns TRUE si l'utilisateur a ferme le panneau de conf en appuyant sur OK, FALSE sinon.
 */
-gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert)
+gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert, gchar *cGettextDomain)
 {
-	return cairo_dock_edit_conf_file_core (pWindow, g_strdup (cConfFilePath), g_strdup (cTitle), iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc, pConfigFunc2, g_strdup (cConfFilePath2), g_strdup (cButtonConvert), g_strdup (cButtonRevert));
+	return cairo_dock_edit_conf_file_core (pWindow, g_strdup (cConfFilePath), g_strdup (cTitle), iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc, pConfigFunc2, g_strdup (cConfFilePath2), g_strdup (cButtonConvert), g_strdup (cButtonRevert), cGettextDomain);
 }
 
 
@@ -1430,7 +1430,7 @@ void cairo_dock_copy_easy_conf_file (gchar *cEasyConfFilePath, GKeyFile *pMainKe
 void cairo_dock_copy_to_easy_conf_file (GKeyFile *pMainKeyFile, gchar *cEasyConfFilePath)
 {
 	//\___________________ On recupere le patron.
-	gchar *cEasyConfTemplate = cairo_dock_get_translated_conf_file_path (CAIRO_DOCK_EASY_CONF_FILE, CAIRO_DOCK_SHARE_DATA_DIR);
+	gchar *cEasyConfTemplate = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_EASY_CONF_FILE);
 	
 	//\___________________ On ouvre le fichier de conf.
 	GKeyFile *pKeyFile = g_key_file_new ();

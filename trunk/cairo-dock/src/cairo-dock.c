@@ -311,10 +311,9 @@ main (int argc, char** argv)
 	}
 	
 	//\___________________ On internationalise l'appli.
-	bindtextdomain ( GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR );
-	bind_textdomain_codeset ( GETTEXT_PACKAGE, "UTF-8" );
-	textdomain ( GETTEXT_PACKAGE );
-	g_print ("GETTEXT_PACKAGE : %s ; PACKAGE_LOCALE_DIR : %s\n", GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
+	bindtextdomain (CAIRO_DOCK_GETTEXT_PACKAGE, CAIRO_DOCK_LOCALE_DIR);
+	bind_textdomain_codeset (CAIRO_DOCK_GETTEXT_PACKAGE, "UTF-8");
+	textdomain (CAIRO_DOCK_GETTEXT_PACKAGE);
 	
 	//\___________________ On initialise les numeros de version.
 	gchar **cVersions = g_strsplit (CAIRO_DOCK_VERSION, ".", -1);

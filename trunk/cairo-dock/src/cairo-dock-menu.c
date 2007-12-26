@@ -53,9 +53,9 @@ static void cairo_dock_edit_and_reload_conf (GtkMenuItem *menu_item, gpointer *d
 	cairo_dock_build_easy_conf_file (g_cConfFile, g_cEasyConfFile);
 	
 	if (cairo_dock_use_full_conf_file ())
-		cairo_dock_edit_conf_file_full (GTK_WINDOW (pDock->pWidget), g_cConfFile, "Configuration of Cairo-Dock", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL, cairo_dock_read_easy_conf_file, g_cEasyConfFile, "Well, maybe not ...", "I want more !");
+		cairo_dock_edit_conf_file_full (GTK_WINDOW (pDock->pWidget), g_cConfFile, "Configuration of Cairo-Dock", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL, cairo_dock_read_easy_conf_file, g_cEasyConfFile, _("Well, maybe not ..."), _("Do you want to know more ?"), NULL);
 	else
-		cairo_dock_edit_conf_file_full (GTK_WINDOW (pDock->pWidget), g_cEasyConfFile, "Configuration of Cairo-Dock", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_easy_conf_file, g_pMainDock, NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_cConfFile, "I want more !", "Well, maybe not ...");
+		cairo_dock_edit_conf_file_full (GTK_WINDOW (pDock->pWidget), g_cEasyConfFile, "Configuration of Cairo-Dock", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_easy_conf_file, g_pMainDock, NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_cConfFile, _("Do you want to know more ?"), _("Well, maybe not ..."), NULL);
 	
 }
 
@@ -221,7 +221,7 @@ static void _cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data,
 	gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, cNewDesktopFileName);
 	cairo_dock_update_launcher_desktop_file (cNewDesktopFilePath, bIsContainer);
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (GTK_WINDOW (pDock->pWidget), cNewDesktopFilePath, _("Fill this launcher"), CAIRO_DOCK_LAUNCHER_PANEL_WIDTH, CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT, 0, NULL, NULL, NULL, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (GTK_WINDOW (pDock->pWidget), cNewDesktopFilePath, _("Fill this launcher"), CAIRO_DOCK_LAUNCHER_PANEL_WIDTH, CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT, 0, NULL, NULL, NULL, NULL, NULL);
 	if (config_ok)
 	{
 		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
@@ -334,7 +334,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	
 	cairo_dock_update_launcher_desktop_file (cDesktopFilePath, icon->pSubDock != NULL);
 	
-	gboolean config_ok = cairo_dock_edit_conf_file (GTK_WINDOW (pDock->pWidget), cDesktopFilePath, _("Modify this launcher"), CAIRO_DOCK_LAUNCHER_PANEL_WIDTH, CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT, 0, NULL, NULL, NULL, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (GTK_WINDOW (pDock->pWidget), cDesktopFilePath, _("Modify this launcher"), CAIRO_DOCK_LAUNCHER_PANEL_WIDTH, CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT, 0, NULL, NULL, NULL, NULL, NULL);
 	g_free (cDesktopFilePath);
 	
 	if (! pDock->bInside)

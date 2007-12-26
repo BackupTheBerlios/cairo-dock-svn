@@ -185,6 +185,8 @@ struct _CairoDockVisitCard {
 	short iMicroVersionNeeded;
 	/// chemin d'une image de previsualisation.
 	gchar *cPreviewFilePath;
+	/// Nom du domaine pour la traduction du module par 'gettext'.
+	gchar *cGettextDomain;
 };
 
 typedef CairoDockVisitCard * (* CairoDockModulePreInit) (void);
@@ -212,6 +214,8 @@ struct _CairoDockModule {
 	gboolean bActive;
 	/// chemin d'une image de previsualisation.
 	gchar *cPreviewFilePath;
+	/// Nom du domaine pour la traduction du module par 'gettext'.
+	gchar *cGettextDomain;
 };
 
 

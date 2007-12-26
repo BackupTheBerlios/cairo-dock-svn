@@ -717,7 +717,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 				{
 					gboolean bIsFullScreen, bIsHidden;
 					cairo_dock_window_is_fullscreen_or_hidden (Xid, &bIsFullScreen, &bIsHidden);
-					g_print ("changement d'etat de %d => {%d ; %d}\n", Xid, bIsFullScreen, bIsHidden);
+					//g_print ("changement d'etat de %d => {%d ; %d}\n", Xid, bIsFullScreen, bIsHidden);
 					if (g_bAutoHideOnFullScreen && bIsFullScreen && ! cairo_dock_quick_hide_is_activated ())
 					{
 						g_print (" => devient plein ecran\n");

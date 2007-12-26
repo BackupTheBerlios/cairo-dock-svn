@@ -146,7 +146,8 @@ CairoDockVisitCard *pre_init (void)\
 	pVisitCard->iMajorVersionNeeded = iMajorVersion;\
 	pVisitCard->iMinorVersionNeeded = iMinorVersion;\
 	pVisitCard->iMicroVersionNeeded = iMicroVersion;\
-	pVisitCard->cPreviewFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_PREVIEW_FILE);
+	pVisitCard->cPreviewFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_PREVIEW_FILE);\
+	pVisitCard->cGettextDomain = g_strdup (MY_APPLET_GETTEXT_DOMAIN);
 
 #define CD_APPLET_PRE_INIT_END \
 	return pVisitCard;\
@@ -214,8 +215,10 @@ void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cA
 		*cIconName = cairo_dock_get_string_key_value (pKeyFile, "ICON", "icon", &bFlushConfFileNeeded, cDefaultIconName, NULL, NULL); \
 
 #define CD_APPLET_CONFIG_END \
+	if (! bFlushConfFileNeeded) \
+		bFlushConfFileNeeded = cairo_dock_conf_file_needs_update (pKeyFile, MY_APPLET_VERSION); \
 	if (bFlushConfFileNeeded) \
-		cairo_dock_write_keys_to_file (pKeyFile, cConfFilePath); \
+		cairo_dock_flush_conf_file (pKeyFile, cConfFilePath, MY_APPLET_SHARE_DATA_DIR);\
 	g_key_file_free (pKeyFile); \
 }
 
@@ -347,7 +350,8 @@ gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data);
 	cairo_dock_set_icon_name (myDrawContext, cIconName, myIcon, myDock);
 
 #define CD_APPLET_SET_QUICK_INFO_ON_MY_ICON(cQuickInfo) \
-	cairo_dock_set_quick_info (myDrawContext, cQuickInfo, myIcon);
+	cairo_dock_set_quick_info (myDrawContext, cQuickInfo, myIcon);\
+	cairo_dock_redraw_my_icon (myIcon, myDock);
 
 #define CD_APPLET_ANIMATE_MY_ICON(iAnimationType, iAnimationLength) \
 	cairo_dock_animate_icon (myIcon, myDock, iAnimationType, iAnimationLength);

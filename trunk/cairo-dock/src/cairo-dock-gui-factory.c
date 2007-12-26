@@ -224,16 +224,21 @@ static void _cairo_dock_selection_changed (GtkTreeModel *model, GtkTreeIter iter
 	if (cPreviewFilePath != NULL)
 	{
 		int iPreviewWidth, iPreviewHeight;
-		gdk_pixbuf_get_file_info   (cPreviewFilePath, &iPreviewWidth, &iPreviewHeight);
-		iPreviewWidth = MIN (iPreviewWidth, CAIRO_DOCK_PREVIEW_WIDTH);
-		iPreviewHeight = MIN (iPreviewHeight, CAIRO_DOCK_PREVIEW_HEIGHT);
-		GdkPixbuf *pPreviewPixbuf = gdk_pixbuf_new_from_file_at_size (cPreviewFilePath, iPreviewWidth, iPreviewHeight, NULL);
+		GdkPixbuf *pPreviewPixbuf = NULL;
+		if (gdk_pixbuf_get_file_info (cPreviewFilePath, &iPreviewWidth, &iPreviewHeight) != NULL)
+		{
+			iPreviewWidth = MIN (iPreviewWidth, CAIRO_DOCK_PREVIEW_WIDTH);
+			iPreviewHeight = MIN (iPreviewHeight, CAIRO_DOCK_PREVIEW_HEIGHT);
+			pPreviewPixbuf = gdk_pixbuf_new_from_file_at_size (cPreviewFilePath, iPreviewWidth, iPreviewHeight, NULL);
+		}
 		if (pPreviewPixbuf == NULL)
-		pPreviewPixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB,
-			TRUE,
-			8,
-			1,
-			1);
+		{
+			pPreviewPixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB,
+				TRUE,
+				8,
+				1,
+				1);
+		}
 		gtk_image_set_from_pixbuf (pPreviewImage, pPreviewPixbuf);
 		gdk_pixbuf_unref (pPreviewPixbuf);
 	}
@@ -400,7 +405,7 @@ static void _cairo_dock_recup_current_color (GtkColorButton *pColorButton, GSLis
 		g_ptr_array_add (s_pBufferArray, data); \
 	} \
 	iNbBuffers ++;
-GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWindow *pParentWindow, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier, gchar *cPresentedGroup, gboolean bSwitchButtonPresent, gchar *cButtonConvert)
+GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWindow *pParentWindow, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier, gchar *cPresentedGroup, gboolean bSwitchButtonPresent, gchar *cButtonConvert, gchar *cGettextDomain)
 {
 	static GPtrArray *s_pBufferArray = NULL;  // pour empecher les fuites memoires.
 	
@@ -443,7 +448,6 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	double fValue, fMinValue, fMaxValue, *fValueList;
 	gchar *cValue, **cValueList;
 	GdkColor gdkColor;
-	int iTextOffset;
 	
 	GtkWidget *pDialog;
 	if (bApplyButtonPresent)
@@ -533,14 +537,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 				
 				if (pVBox == NULL)  // maintenant qu'on a au moins un element dans ce groupe, on cree sa page dans le notebook.
 				{
-					if (cGroupName[0] == '_' && cGroupName[1] == '(')
-					{
-						iTextOffset = 2;
-						cGroupName[strlen (cGroupName)-1] = '\0';
-					}
-					else
-						iTextOffset = 0;
-					pLabel = gtk_label_new (gettext (cGroupName+iTextOffset));
+					pLabel = gtk_label_new (dgettext (cGettextDomain, cGroupName));
 					pVBox = gtk_vbox_new (FALSE, CAIRO_DOCK_GUI_MARGIN);
 					
 					pScrolledWindow = gtk_scrolled_window_new (NULL, NULL);
@@ -622,16 +619,9 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					//g_print ("pTipString : '%s'\n", pTipString);
 					pEventBox = gtk_event_box_new ();
 					gtk_container_add (GTK_CONTAINER (pEventBox), pHBox);
-					if (pTipString[0] == '_' && pTipString[1] == '(')
-					{
-						iTextOffset = 2;
-						pTipString[strlen (pTipString)-1] = '\0';
-					}
-					else
-						iTextOffset = 0;
 					gtk_tooltips_set_tip (GTK_TOOLTIPS (pToolTipsGroup),
 						pEventBox,
-						gettext (pTipString + iTextOffset),
+						dgettext (cGettextDomain, pTipString),
 						"pouet");
 				}
 				else
@@ -639,14 +629,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 				
 				if (*cUsefulComment != '\0' && strcmp (cUsefulComment, "...") != 0 && iElementType != 'F' && iElementType != 'X')
 				{
-					if (cUsefulComment[0] == '_' && cUsefulComment[1] == '(')
-					{
-						iTextOffset = 2;
-						cUsefulComment[strlen (cUsefulComment)-1] = '\0';
-					}
-					else
-						iTextOffset = 0;
-					pLabel = gtk_label_new (gettext (cUsefulComment + iTextOffset));
+					pLabel = gtk_label_new (dgettext (cGettextDomain, cUsefulComment));
 					GtkWidget *pAlign = gtk_alignment_new (0., 0.5, 0., 0.);
 					gtk_container_add (GTK_CONTAINER (pAlign), pLabel);
 					gtk_box_pack_start ((bIsAligned ? GTK_BOX (pHBox) : (pFrameVBox == NULL ? GTK_BOX (pVBox) : GTK_BOX (pFrameVBox))),
@@ -858,7 +841,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 										snprintf (cResult, 10, "%d", k);
 									}
 									gtk_list_store_set (GTK_LIST_STORE (modele), &iter,
-										CAIRO_DOCK_MODEL_NAME, (iElementType == 'r' ? gettext (pAuthorizedValuesList[k]) : pAuthorizedValuesList[k]),
+										CAIRO_DOCK_MODEL_NAME, (iElementType == 'r' ? dgettext (cGettextDomain, pAuthorizedValuesList[k]) : pAuthorizedValuesList[k]),
 										CAIRO_DOCK_MODEL_RESULT, (cResult != NULL ? cResult : pAuthorizedValuesList[k]),
 										CAIRO_DOCK_MODEL_DESCRIPTION_FILE, (iElementType == 'R' || iElementType == 'M' ? pAuthorizedValuesList[k+1] : NULL),
 										CAIRO_DOCK_MODEL_IMAGE,
@@ -1190,17 +1173,9 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								cValue = pAuthorizedValuesList[0];
 							gchar *cFrameTitle;
 							
-							if (cValue[0] == '_' && cValue[1] == '(')
-							{
-								iTextOffset = 2;
-								cValue[strlen (cValue)-1] = '\0';
-							}
-							else
-								iTextOffset = 0;
-							
 							if (iElementType == 'F')
 							{
-								cFrameTitle = g_strdup_printf ("<b>%s</b>", gettext (cValue + iTextOffset));
+								cFrameTitle = g_strdup_printf ("<b>%s</b>", dgettext (cGettextDomain, cValue));
 								pLabel= gtk_label_new (NULL);
 								gtk_label_set_markup (GTK_LABEL (pLabel), cFrameTitle);
 								
@@ -1211,7 +1186,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							}
 							else
 							{
-								cFrameTitle = g_strdup_printf ("<u><b>%s</b></u>", gettext (cValue + iTextOffset));
+								cFrameTitle = g_strdup_printf ("<u><b>%s</b></u>", dgettext (cGettextDomain, cValue));
 								pFrame = gtk_expander_new (cFrameTitle);
 								gtk_expander_set_use_markup (GTK_EXPANDER (pFrame), TRUE);
 								gtk_expander_set_expanded (GTK_EXPANDER (pFrame), FALSE);
@@ -1282,7 +1257,7 @@ gboolean cairo_dock_is_advanced_keyfile (GKeyFile *pKeyFile)
 }
 
 
-GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, gchar *cTitle, GtkWindow *pParentWindow, GtkTextBuffer **pTextBuffer, gboolean bApplyButtonPresent, gboolean bSwitchButtonPresent, gchar *cButtonConvert)
+GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, gchar *cTitle, GtkWindow *pParentWindow, GtkTextBuffer **pTextBuffer, gboolean bApplyButtonPresent, gboolean bSwitchButtonPresent, gchar *cButtonConvert, gchar *cGettextDomain)
 {
 	gchar *cConfiguration;
 	gboolean read_ok = g_file_get_contents (cConfFilePath, &cConfiguration, NULL, NULL);

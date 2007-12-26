@@ -7,7 +7,6 @@
 
 
 void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file);
-gchar *cairo_dock_get_translated_conf_file_path (gchar *cConfFileName, gchar *cShareDataDirPath);
 void cairo_dock_flush_conf_file_full (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath, gboolean bUseFileKeys, gchar *cTemplateFileName);
 void cairo_dock_flush_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath);
 
@@ -27,7 +26,7 @@ void cairo_dock_replace_values_in_conf_file (gchar *cConfFilePath, GKeyFile *pVa
 void cairo_dock_replace_keys_by_identifier (gchar *cConfFilePath, gchar *cReplacementConfFilePath, gchar iIdentifier);
 
 void cairo_dock_get_conf_file_version (GKeyFile *pKeyFile, gchar **cConfFileVersion);
-gboolean cairo_dock_conf_file_needs_update (GKeyFile *pKeyFile);
+gboolean cairo_dock_conf_file_needs_update (GKeyFile *pKeyFile, gchar *cVersion);
 
 
 #endif

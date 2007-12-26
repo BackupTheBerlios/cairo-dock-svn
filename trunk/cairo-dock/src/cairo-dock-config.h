@@ -126,8 +126,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock);
 *@param  cButtonRevert chaine a afficher dans le bouton permettant de passer d'une forme a l'autre dans l'autre sens.
 *@return TRUE si l'utilisateur a ferme le panneau de conf en appuyant sur OK, FALSE sinon.
 */
-gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert);
-#define cairo_dock_edit_conf_file(pWindow, cConfFilePath, cTitle, iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc) cairo_dock_edit_conf_file_full (pWindow, cConfFilePath, cTitle, iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc, NULL, NULL, NULL, NULL)
+gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert, gchar *cGettextDomain);
+#define cairo_dock_edit_conf_file(pWindow, cConfFilePath, cTitle, iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc, cGettextDomain) cairo_dock_edit_conf_file_full (pWindow, cConfFilePath, cTitle, iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc, NULL, NULL, NULL, NULL, cGettextDomain)
 
 
 void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int y);

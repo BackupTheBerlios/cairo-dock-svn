@@ -85,6 +85,7 @@ void cairo_dock_free_visit_card (CairoDockVisitCard *pVisitCard)
 {
 	g_free (pVisitCard->cReadmeFilePath);
 	g_free (pVisitCard->cPreviewFilePath);
+	g_free (pVisitCard->cGettextDomain);
 	g_free (pVisitCard->cModuleName);
 	g_free (pVisitCard);
 }
@@ -117,6 +118,7 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 		}
 		pCairoDockModule->cReadmeFilePath = g_strdup (pVisitCard->cReadmeFilePath);
 		pCairoDockModule->cPreviewFilePath = g_strdup (pVisitCard->cPreviewFilePath);
+		pCairoDockModule->cGettextDomain = g_strdup (pVisitCard->cGettextDomain);
 		if (pVisitCard->cModuleName == NULL)
 			pCairoDockModule->cModuleName = cairo_dock_extract_default_module_name_from_path (pCairoDockModule->cSoFilePath);
 		else
@@ -405,6 +407,12 @@ void cairo_dock_deactivate_module (CairoDockModule *module)
 	module->bActive = FALSE;
 	g_free (module->cConfFilePath);
 	module->cConfFilePath = NULL;
+	g_free (module->cReadmeFilePath);
+	module->cReadmeFilePath = NULL;
+	g_free (module->cPreviewFilePath);
+	module->cPreviewFilePath = NULL;
+	g_free (module->cGettextDomain);
+	module->cGettextDomain = NULL;
 }
 
 
@@ -478,7 +486,7 @@ void cairo_dock_configure_module (GtkWindow *pParentWindow, CairoDockModule *mod
 	gpointer *user_data = g_new (gpointer, 2);
 	user_data[0]= module;
 	user_data[1] = pDock;
-	gboolean configuration_ok = cairo_dock_edit_conf_file (pParentWindow, module->cConfFilePath, cTitle, CAIRO_DOCK_MODULE_PANEL_WIDTH, CAIRO_DOCK_MODULE_PANEL_HEIGHT, 0, NULL, (CairoDockConfigFunc) cairo_dock_reload_module, user_data, (GFunc) g_free);
+	gboolean configuration_ok = cairo_dock_edit_conf_file (pParentWindow, module->cConfFilePath, cTitle, CAIRO_DOCK_MODULE_PANEL_WIDTH, CAIRO_DOCK_MODULE_PANEL_HEIGHT, 0, NULL, (CairoDockConfigFunc) cairo_dock_reload_module, user_data, (GFunc) g_free, module->cGettextDomain);
 	g_free (cTitle);
 }
 

@@ -69,7 +69,7 @@ gchar *cairo_dock_edit_themes (GHashTable **hThemeTable)
 	const gchar *cTmpDir = g_get_tmp_dir ();
 	gchar *cTmpConfFile = g_strdup_printf ("%s/cairo-dock-init", cTmpDir);
 	
-	gchar *cDesktopFileTemplate = cairo_dock_get_translated_conf_file_path (CAIRO_DOCK_THEME_CONF_FILE, CAIRO_DOCK_SHARE_DATA_DIR);
+	gchar *cDesktopFileTemplate = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_THEME_CONF_FILE);
 	gchar *cCommand = g_strdup_printf ("cp %s %s", cDesktopFileTemplate, cTmpConfFile);
 	g_free (cDesktopFileTemplate);
 	system (cCommand);
@@ -100,7 +100,7 @@ gchar *cairo_dock_edit_themes (GHashTable **hThemeTable)
 	
 	//\___________________ On laisse l'utilisateur l'editer.
 	gchar *cPresentedGroup = (cairo_dock_theme_need_save () ? "Save" : NULL);
-	gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTmpConfFile, "Manage themes", CAIRO_DOCK_THEME_PANEL_WIDTH, CAIRO_DOCK_THEME_PANEL_HEIGHT, 0, cPresentedGroup, NULL, NULL, NULL);
+	gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTmpConfFile, "Manage themes", CAIRO_DOCK_THEME_PANEL_WIDTH, CAIRO_DOCK_THEME_PANEL_HEIGHT, 0, cPresentedGroup, NULL, NULL, NULL, NULL);
 	if (! bChoiceOK)
 	{
 		g_remove (cTmpConfFile);

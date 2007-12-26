@@ -210,6 +210,7 @@ void cairo_dock_set_icon_surface (cairo_t *pIconContext, cairo_surface_t *pSurfa
 
 void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, CairoDock *pDock)
 {
+	g_return_if_fail (pIcon != NULL && pDock != NULL);
 	if (pIcon->pReflectionBuffer != NULL)
 	{
 		cairo_surface_destroy (pIcon->pReflectionBuffer);

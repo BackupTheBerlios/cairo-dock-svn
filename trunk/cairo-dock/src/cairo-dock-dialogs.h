@@ -16,28 +16,31 @@ void cairo_dock_load_dialog_buttons (CairoDock *pDock, gchar *cButtonOkImage, gc
 */
 gboolean cairo_dock_dialog_reference (CairoDockDialog *pDialog);
 /**
-*Decremente le compteur de reference de 1 de maniere atomique, et detruit le dialogue si la refernce est tombee a 0.
+*Decremente le compteur de reference de 1 de maniere atomique. Si la reference est tombee a 0, tente de detruire le dialogue si la liste des dialogues n'est pas verouillee, et sinon l'isole (il sera alors detruit plus tard).
 *@param pDialog le dialogue.
 *@return TRUE ssi la reference sur le dialogue est tombee a zero, auquel cas il ne faut plus l'utiliser.
 */
 gboolean cairo_dock_dialog_unreference (CairoDockDialog *pDialog);
 
 /**
-*Isole un dialogue, de maniere a ce qu'il ne puisse plus etre utilise par une nouvelle personne. N'a aucun effet sur un dialogue deja isole. Ne devrait pas etre utilise tel quel.
+*Isole un dialogue, de maniere a ce qu'il ne soit pas utilise par une nouvelle personne. Les utilisations courantes ne sont pas affectees. N'a aucun effet sur un dialogue deja isole. Ne devrait pas etre utilise tel quel.
 *@param pDialog le dialogue.
-*@param bHasBeenLocked TRUE ssi la liste des dialogues a deja ete verouillee.
 */
-void cairo_dock_isolate_dialog (CairoDockDialog *pDialog, gboolean bHasBeenLocked);
+void cairo_dock_isolate_dialog (CairoDockDialog *pDialog);
 /**
-*Detruit un dialogue et libere les ressources allouees. Ne devrait pas etre utilise tel quel, utiliser #cairo_dock_dialog_unreference.
+*Detruit un dialogue, libere les ressources allouees, et l'enleve de la liste des dialogues. Ne devrait pas etre utilise tel quel, utiliser #cairo_dock_dialog_unreference.
 *@param pDialog le dialogue.
 */
 void cairo_dock_free_dialog (CairoDockDialog *pDialog);
 /**
-*Tente de detruire les dialogues associes a une icone; si les dialogues sont utilises par quelqu'un d'autre, il seront detruits plus tard, mais seront au moins isoles, et ne pourront donc plus etre utilises par une nouvelle personne.
+*Dereference tous les dialogues pointant sur une icone; si les dialogues sont utilises par quelqu'un d'autre, il seront detruits plus tard, mais seront au moins isoles, et ne pourront donc plus etre utilises par une nouvelle personne.
 *@param icon l'icone dont on veut supprimer les dialogues.
 */
 void cairo_dock_remove_dialog_if_any (Icon *icon);
+/**
+*Detruit et enleve de la liste tous les dialogues dont la reference est a 0, et qui n'ont pas ete enleves de la liste.
+*/
+void cairo_dock_remove_orphelans (void);
 
 
 GtkWidget *cairo_dock_build_common_interactive_widget_for_dialog (const gchar *cInitialAnswer, double fValueForHScale);

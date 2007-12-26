@@ -281,10 +281,10 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 		//\______________ Au moins une icone est en cours d'animation suite a un clique, on continue le 'shrink_down'.
 		if (pRemovingIcon != NULL)
 		{
-			g_print ("au moins 1 icone en cours d'insertion/suppression (%f)\n", pRemovingIcon->fPersonnalScale);
+			//g_print ("au moins 1 icone en cours d'insertion/suppression (%f)\n", pRemovingIcon->fPersonnalScale);
 			if (pRemovingIcon->fPersonnalScale == 0.05)
 			{
-				g_print ("  fin\n");
+				//g_print ("  fin\n");
 				cairo_dock_remove_icon_from_dock (pDock, pRemovingIcon);
 				
 				if (CAIRO_DOCK_IS_APPLI (pRemovingIcon) && pRemovingIcon->cClass != NULL && pDock == cairo_dock_search_dock_from_name (pRemovingIcon->cClass) && pDock->icons == NULL)  // il n'y a plus aucune icone de cette classe.
