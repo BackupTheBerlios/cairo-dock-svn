@@ -311,7 +311,7 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data) \
 
 #define CD_APPLET_ADD_IN_MENU(cLabel, pFunction, pMenu) CD_APPLET_ADD_IN_MENU_WITH_DATA(cLabel, pFunction, pMenu, NULL)
 
-#define CD_APPLET_ADD_ABOUT_IN_MENU(pMenu) CD_APPLET_ADD_IN_MENU ("About", about, pMenu)
+#define CD_APPLET_ADD_ABOUT_IN_MENU(pMenu) CD_APPLET_ADD_IN_MENU (_("About"), about, pMenu)
 
 #define CD_APPLET_LAST_ITEM_IN_MENU pMenuItem
 
@@ -364,5 +364,8 @@ extern Icon *myIcon; \
 extern cairo_t *myDrawContext; \
 extern CairoDock *myDock;
 
+//\___________________________ INTERNATIONNALISATION
+/// Macro pour gettext, similaire à _() et _N(), mais avec le nom de domaine en parametre.
+#define _D(message) dgettext (MY_APPLET_GETTEXT_DOMAIN, message)
 
 #endif

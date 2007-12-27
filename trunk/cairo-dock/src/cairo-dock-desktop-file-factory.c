@@ -51,7 +51,7 @@ gchar *cairo_dock_add_desktop_file_from_uri_full (gchar *cURI, const gchar *cDoc
 	if (cURI == NULL)
 	{
 		//\___________________ On ouvre le patron.
-		gchar *cDesktopFileTemplate = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, (bIsContainer ? CAIRO_DOCK_CONTAINER_CONF_FILE : CAIRO_DOCK_LAUNCHER_CONF_FILE));
+		gchar *cDesktopFileTemplate = cairo_dock_get_launcher_template_conf_file (bIsContainer);
 		
 		GKeyFile *pKeyFile = g_key_file_new ();
 		g_key_file_load_from_file (pKeyFile, cDesktopFileTemplate, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &tmp_erreur);
@@ -136,7 +136,7 @@ gchar *cairo_dock_add_desktop_file_from_uri_full (gchar *cURI, const gchar *cDoc
 		gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, cNewDesktopFileName);
 		cairo_dock_write_keys_to_file (pKeyFile, cNewDesktopFilePath);
 		
-		gchar *cDesktopFileTemplate = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_LAUNCHER_CONF_FILE);
+		gchar *cDesktopFileTemplate = cairo_dock_get_launcher_template_conf_file (FALSE);
 		cairo_dock_apply_translation_on_conf_file (cNewDesktopFilePath, cDesktopFileTemplate);  // ecrit tous les commentaires utiles.
 		g_free (cDesktopFileTemplate);
 		g_free (cNewDesktopFilePath);
@@ -184,4 +184,10 @@ void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath, gboolean 
 	cairo_dock_update_conf_file_with_hash_table (cDesktopFilePath, g_hDocksTable, "Desktop Entry", "Container", NULL, (GHFunc)cairo_dock_write_one_name, FALSE);
 	if (bIsContainer)
 		cairo_dock_update_launcher_conf_file_with_renderers (cDesktopFilePath);
+}
+
+
+gchar *cairo_dock_get_launcher_template_conf_file (gboolean bIsContainer)
+{
+	return g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, (bIsContainer ? CAIRO_DOCK_CONTAINER_CONF_FILE : CAIRO_DOCK_LAUNCHER_CONF_FILE));
 }

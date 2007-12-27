@@ -580,6 +580,7 @@ GtkWidget *cairo_dock_build_menu (Icon *icon, CairoDock *pDock)
 	g_free (cIconPath);
 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 	gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
+	
 	GtkWidget *pSubMenu = gtk_menu_new ();
 	gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), pSubMenu);
 	
@@ -587,17 +588,12 @@ GtkWidget *cairo_dock_build_menu (Icon *icon, CairoDock *pDock)
 	image = gtk_image_new_from_stock (GTK_STOCK_PREFERENCES, GTK_ICON_SIZE_MENU);
 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
-	GtkWidget *pConfSubMenu = gtk_menu_new ();
-	gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), pConfSubMenu);
-	
-	menu_item = gtk_menu_item_new_with_label (_("All"));
-	gtk_menu_shell_append  (GTK_MENU_SHELL (pConfSubMenu), menu_item);
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_edit_and_reload_conf), data);
 	
 	menu_item = gtk_image_menu_item_new_with_label (_("Modules"));
 	image = gtk_image_new_from_stock (GTK_STOCK_CONNECT, GTK_ICON_SIZE_MENU);
 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
-	gtk_menu_shell_append  (GTK_MENU_SHELL (pConfSubMenu), menu_item);
+	gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
 	GtkWidget *pModuleSubMenu = gtk_menu_new ();
 	gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), pModuleSubMenu);
 	

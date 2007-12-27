@@ -23,7 +23,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-keyfile-manager.h"
 #include "cairo-dock-modules.h"
 
-#define CAIRO_DOCK_MODULE_PANEL_WIDTH 650
+#define CAIRO_DOCK_MODULE_PANEL_WIDTH 700
 #define CAIRO_DOCK_MODULE_PANEL_HEIGHT 450
 
 extern gchar *g_cConfFile;
@@ -220,7 +220,7 @@ void cairo_dock_preload_module_from_directory (gchar *cModuleDirPath, GHashTable
 			pModule = cairo_dock_load_module (cFilePath, pModuleTable, &tmp_erreur);
 			if (tmp_erreur != NULL)
 			{
-				g_print ("Attention : %s", tmp_erreur->message);
+				g_print ("Attention : %s\n", tmp_erreur->message);
 				g_error_free (tmp_erreur);
 				tmp_erreur = NULL;
 			}

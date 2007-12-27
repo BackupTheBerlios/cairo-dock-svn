@@ -34,7 +34,7 @@ cairo_dock_CFLAGS = \
 	-O3\
 	-g -ggdb\
 	-Wno-unused-parameter
-#	-Wall -Wunreachable-code -Wstrict-prototypes -Wextra -Wwrite-strings -Wuninitialized 
+#	-Wall -Wunreachable-code -Wstrict-prototypes -Wextra -Wwrite-strings -Wuninitialized -Werror-implicit-function-declaration
 
 cairo_dock_LDFLAGS = \
 	-Wl,--export-dynamic

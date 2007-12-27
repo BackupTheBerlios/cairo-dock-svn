@@ -462,7 +462,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 				GTK_RESPONSE_APPLY,
 				GTK_STOCK_OK,
 				GTK_RESPONSE_ACCEPT,
-				GTK_STOCK_CANCEL,
+				GTK_STOCK_QUIT,
 				GTK_RESPONSE_REJECT,
 				NULL);
 		else
@@ -473,7 +473,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 				GTK_RESPONSE_APPLY,
 				GTK_STOCK_OK,
 				GTK_RESPONSE_ACCEPT,
-				GTK_STOCK_CANCEL,
+				GTK_STOCK_QUIT,
 				GTK_RESPONSE_REJECT,
 				NULL);
 	}
@@ -484,7 +484,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_OK,
 			GTK_RESPONSE_ACCEPT,
-			GTK_STOCK_CANCEL,
+			GTK_STOCK_QUIT,
 			GTK_RESPONSE_REJECT,
 			NULL);
 	}
@@ -1282,7 +1282,7 @@ GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, gch
 				GTK_RESPONSE_APPLY,
 				GTK_STOCK_OK,
 				GTK_RESPONSE_ACCEPT,
-				GTK_STOCK_CANCEL,
+				GTK_STOCK_QUIT,
 				GTK_RESPONSE_REJECT,
 				NULL);
 		else
@@ -1293,7 +1293,7 @@ GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, gch
 				GTK_RESPONSE_APPLY,
 				GTK_STOCK_OK,
 				GTK_RESPONSE_ACCEPT,
-				GTK_STOCK_CANCEL,
+				GTK_STOCK_QUIT,
 				GTK_RESPONSE_REJECT,
 				NULL);
 	}
@@ -1304,7 +1304,7 @@ GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, gch
 			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_OK,
 			GTK_RESPONSE_ACCEPT,
-			GTK_STOCK_CANCEL,
+			GTK_STOCK_QUIT,
 			GTK_RESPONSE_REJECT,
 			NULL);
 	}
