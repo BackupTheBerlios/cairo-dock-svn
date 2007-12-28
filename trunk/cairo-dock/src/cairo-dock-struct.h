@@ -16,6 +16,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <cairo.h>
 #include <librsvg/rsvg.h>
 #include <librsvg/rsvg-cairo.h>
+#include <glib/gi18n.h>
 
 #ifdef HAVE_GLITZ
 #include <gdk/gdkx.h>
@@ -177,7 +178,7 @@ struct _CairoDockVisitCard {
 	gchar *cModuleName;
 	/// chemin d'un fichier readme destine a presenter de maniere succinte le module.
 	gchar *cReadmeFilePath;
-	/// numero de version majeur de cairo-dock necessaire au bon fonctionnement du module.
+	/// numero de version majeure de cairo-dock necessaire au bon fonctionnement du module.
 	short iMajorVersionNeeded;
 	/// numero de version mineure de cairo-dock necessaire au bon fonctionnement du module.
 	short iMinorVersionNeeded;
@@ -187,6 +188,10 @@ struct _CairoDockVisitCard {
 	gchar *cPreviewFilePath;
 	/// Nom du domaine pour la traduction du module par 'gettext'.
 	gchar *cGettextDomain;
+	/// Version du dock pour laquelle a ete compilee le module.
+	gchar *cDockVersionOnCompilation;
+	/// 64 octets reserves pour preserver la compatibilite binaire lors de futurs ajouts sur l'interface entre plug-ins et dock.
+	char reserved[64];
 };
 
 typedef CairoDockVisitCard * (* CairoDockModulePreInit) (void);
@@ -252,7 +257,7 @@ struct _CairoDockDialog
 	/// hauteur de la zone de texte globale (widgets et boutons compris).
 	int iTextHeight;
 	/// hauteur du message + double marge en haut et en bas.
-	int iMessageHeight; 
+	int iMessageHeight;
 	/// decalage pour l'effet de clique sur le bouton Ok.
 	int iButtonOkOffset;
 	/// decalage pour l'effet de clique sur le bouton Annuler.

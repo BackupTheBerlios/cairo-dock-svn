@@ -134,7 +134,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	GdkEventExpose *pExpose,
 	CairoDockDialog *pDialog)
 {
-	//g_print ("%s ()\n", __func__);
+	g_print ("%s ()\n", __func__);
 	if (! cairo_dock_dialog_reference (pDialog))
 		return FALSE;
 	
@@ -183,7 +183,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	if (pDialog->bRight)
 	{
 		fDeltaMargin = pDialog->iAimedX - pDialog->iPositionX - fRadius - fLineWidth / 2;  // >= 0
-		g_print ("fDeltaMargin : %.2f\n", fDeltaMargin);
+		//g_print ("fDeltaMargin : %.2f\n", fDeltaMargin);
 		cairo_rel_line_to (pCairoContext, -iWidth + fDeltaMargin + fLineWidth + 2. * fRadius + CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE + CAIRO_DOCK_DIALOG_TIP_ROUNDING_MARGIN , 0);
 		cairo_rel_curve_to (pCairoContext,
 			0, 0,
@@ -198,7 +198,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	else
 	{
 		fDeltaMargin = pDialog->iPositionX + pDialog->iWidth - fRadius - fLineWidth / 2 - pDialog->iAimedX;  // >= 0.
-		g_print ("fDeltaMargin : %.2f\n", fDeltaMargin);
+		//g_print ("fDeltaMargin : %.2f\n", fDeltaMargin);
 		cairo_rel_line_to (pCairoContext, - (CAIRO_DOCK_DIALOG_TIP_MARGIN + fDeltaMargin) + CAIRO_DOCK_DIALOG_TIP_ROUNDING_MARGIN, 0);
 		cairo_rel_curve_to (pCairoContext,
 			0, 0,
@@ -266,11 +266,11 @@ static gboolean on_configure_dialog (GtkWidget* pWidget,
 	GdkEventConfigure* pEvent,
 	CairoDockDialog *pDialog)
 {
-	//g_print ("%s (%dx%d)\n", __func__, pEvent->width, pEvent->height);
+	g_print ("%s (%dx%d)\n", __func__, pEvent->width, pEvent->height);
 	if (! cairo_dock_dialog_reference (pDialog))
 		return FALSE;
 	
-	pDialog->bBuildComplete = (pDialog->iWidth == pEvent->width && pDialog->iHeight == pEvent->height);  // pour empecher un clignotement intempsetif lors de la creation de la fenetre, on la dessine en transparent lorsqu'elle n'est pas encore completement finie.
+	pDialog->bBuildComplete = (pDialog->iWidth == pEvent->width && pDialog->iHeight == pEvent->height);  // pour empecher un clignotement intempestif lors de la creation de la fenetre, on la dessine en transparent lorsqu'elle n'est pas encore completement finie.
 	
 	cairo_dock_dialog_unreference (pDialog);
 	return FALSE;
@@ -325,11 +325,12 @@ gboolean cairo_dock_dialog_reference (CairoDockDialog *pDialog)
 	if (pDialog != NULL)
 	{
 		//g_atomic_int_inc (&pIcon->pDialog->iRefCount);
-		if (g_atomic_int_exchange_and_add (&pDialog->iRefCount, 1) > 0)  // il etait > 0 avant l'incrementation.
+		if (g_atomic_int_exchange_and_add (&pDialog->iRefCount, 1) > 0 && pDialog->pIcon != NULL)  // il etait > 0 avant l'incrementation.
 			return TRUE;  // on peut l'utiliser.
 		else
 		{
-			g_atomic_int_add (&pDialog->iRefCount, -1);
+			//g_atomic_int_add (&pDialog->iRefCount, -1);
+			cairo_dock_dialog_unreference (pDialog);
 			return FALSE;  // il etait deja en sursis, on en profite pour lui balancer quelques coups de pieds, puis on s'en va :-)
 		}
 	}
@@ -382,6 +383,7 @@ void cairo_dock_free_dialog (CairoDockDialog *pDialog)
 	if (pDialog == NULL)
 		return ;
 	
+	g_print ("%s ()\n", __func__);
 	s_pDialogList = g_slist_remove (s_pDialogList, pDialog);
 	
 	cairo_surface_destroy (pDialog->pTextBuffer);
@@ -714,6 +716,7 @@ void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int
 		if (g_bAutoHide)
 		{
 			*iX = pDock->iWindowPositionX + (pIcon->fXAtRest + pIcon->fWidth * (*bRight ? .7 : .3)) / pDock->iFlatDockWidth * g_iVisibleZoneWidth;
+			g_print ("placement sur un dock cache -> %d\n", *iX);
 		}
 		else
 		{
@@ -776,19 +779,22 @@ void cairo_dock_dialog_find_optimal_placement  (CairoDockDialog *pDialog, CairoD
 		pDialogOnOurWay = ic->data;
 		if (pDialogOnOurWay != pDialog)
 		{
-			if (cairo_dock_dialog_reference (pDialogOnOurWay) && pDialogOnOurWay->pIcon != NULL)
+			if (cairo_dock_dialog_reference (pDialogOnOurWay))
 			{
-				iYInf = (pDialog->bDirectionUp ? pDialogOnOurWay->iPositionY : pDialogOnOurWay->iPositionY + pDialogOnOurWay->iHeight - (pDialogOnOurWay->iTextHeight + 2 * g_iDockLineWidth));
-				iYSup = (pDialog->bDirectionUp ? pDialogOnOurWay->iPositionY + pDialogOnOurWay->iTextHeight + 2 * g_iDockLineWidth : pDialogOnOurWay->iPositionY + pDialogOnOurWay->iHeight);
-				if (iYInf < pDialog->iPositionY + pDialog->iTextHeight + 2 * g_iDockLineWidth && iYSup > pDialog->iPositionY)
+				if (GTK_WIDGET_VISIBLE (pDialogOnOurWay->pWidget) && pDialogOnOurWay->pIcon != NULL)
 				{
-					g_print ("pDialogOnOurWay : %d - %d ; pDialog : %d - %d\n", iYInf, iYSup, pDialog->iPositionY, pDialog->iPositionY + (pDialog->iTextHeight + 2 * g_iDockLineWidth));
-					if (pDialogOnOurWay->iAimedX < pDialog->iAimedX)
-						fXLeft = MAX (fXLeft, pDialogOnOurWay->iPositionX + pDialogOnOurWay->iWidth);
-					else
-						fXRight = MIN (fXRight, pDialogOnOurWay->iPositionX);
-					bCollision = TRUE;
-					fNextYStep = (pDialog->bDirectionUp ? MAX (fNextYStep, iYInf) : MIN (fNextYStep, iYSup));
+					iYInf = (pDialog->bDirectionUp ? pDialogOnOurWay->iPositionY : pDialogOnOurWay->iPositionY + pDialogOnOurWay->iHeight - (pDialogOnOurWay->iTextHeight + 2 * g_iDockLineWidth));
+					iYSup = (pDialog->bDirectionUp ? pDialogOnOurWay->iPositionY + pDialogOnOurWay->iTextHeight + 2 * g_iDockLineWidth : pDialogOnOurWay->iPositionY + pDialogOnOurWay->iHeight);
+					if (iYInf < pDialog->iPositionY + pDialog->iTextHeight + 2 * g_iDockLineWidth && iYSup > pDialog->iPositionY)
+					{
+						g_print ("pDialogOnOurWay : %d - %d ; pDialog : %d - %d\n", iYInf, iYSup, pDialog->iPositionY, pDialog->iPositionY + (pDialog->iTextHeight + 2 * g_iDockLineWidth));
+						if (pDialogOnOurWay->iAimedX < pDialog->iAimedX)
+							fXLeft = MAX (fXLeft, pDialogOnOurWay->iPositionX + pDialogOnOurWay->iWidth);
+						else
+							fXRight = MIN (fXRight, pDialogOnOurWay->iPositionX);
+						bCollision = TRUE;
+						fNextYStep = (pDialog->bDirectionUp ? MAX (fNextYStep, iYInf) : MIN (fNextYStep, iYSup));
+					}
 				}
 				cairo_dock_dialog_unreference (pDialogOnOurWay);
 			}
@@ -876,12 +882,15 @@ void cairo_dock_replace_all_dialogs (void)
 		if (cairo_dock_dialog_reference (pDialog))
 		{
 			pIcon = pDialog->pIcon;
-			pDock = cairo_dock_search_container_from_icon (pIcon);
-			int iPreviousX = pDialog->iPositionX, iPreviousY = pDialog->iPositionY;
-			cairo_dock_place_dialog (pDialog, pDock);
-			if (iPreviousX == pDialog->iPositionX && iPreviousY == pDialog->iPositionY)  // on force le redessin.
+			if (pIcon != NULL && GTK_WIDGET_VISIBLE (pDialog->pWidget)) // on ne replace pas les dialogues en cours de destruction ou caches.
 			{
-				gtk_widget_queue_draw (pDialog->pWidget);
+				pDock = cairo_dock_search_container_from_icon (pIcon);
+				int iPreviousX = pDialog->iPositionX, iPreviousY = pDialog->iPositionY;
+				cairo_dock_place_dialog (pDialog, pDock);
+				//if (iPreviousX == pDialog->iPositionX && iPreviousY == pDialog->iPositionY)  // on force le redessin pour la pointe.
+				{
+					gtk_widget_queue_draw (pDialog->pWidget);
+				}
 			}
 			cairo_dock_dialog_unreference (pDialog);
 		}
@@ -985,7 +994,7 @@ static void _cairo_dock_get_answer_from_dialog (int iAnswer, GtkWidget *pInterac
 	GMainLoop *pBlockingLoop = data[1];
 	GtkWidget *pWidgetCatcher = data[2];
 	if (pInteractiveWidget != NULL)
-		gtk_widget_reparent (pInteractiveWidget, pWidgetCatcher);  // j'ai rien trouve de mieux pour empecher que le 'pInteractiveWidget' ne soit pas detruit avec le dialogue, apres l'appel de la callback (g_objcet_ref ne marche pas).
+		gtk_widget_reparent (pInteractiveWidget, pWidgetCatcher);  // j'ai rien trouve de mieux pour empecher que le 'pInteractiveWidget' ne soit pas detruit avec le dialogue apres l'appel de la callback (g_object_ref ne marche pas).
 	
 	*iAnswerBuffer = iAnswer;
 	
@@ -1139,7 +1148,14 @@ void cairo_dock_unhide_dialog (CairoDockDialog *pDialog)
 	if (! cairo_dock_dialog_reference (pDialog))
 		return ;
 	
-	gtk_window_present (GTK_WINDOW (pDialog->pWidget));
+	Icon *pIcon = pDialog->pIcon;
+	if (pIcon != NULL)
+	{
+		CairoDock *pDock = cairo_dock_search_container_from_icon (pIcon);
+		cairo_dock_place_dialog (pDialog, pDock);
+		
+		gtk_window_present (GTK_WINDOW (pDialog->pWidget));
+	}
 	
 	cairo_dock_dialog_unreference (pDialog);
 }

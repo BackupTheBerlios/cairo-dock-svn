@@ -214,9 +214,12 @@ void _cairo_dock_extract_sorted_table_content (gchar *cName, gpointer value, GLi
 	data[1] = value;
 	*pList = g_list_insert_sorted (*pList, data, (GCompareFunc) _cairo_dock_compare_key_names);
 }
-gchar *cairo_dock_write_table_content (GHashTable *pHashTable, GHFunc pWritingFunc, gboolean bSortByKey)
+gchar *cairo_dock_write_table_content (GHashTable *pHashTable, GHFunc pWritingFunc, gboolean bSortByKey, gboolean bAddEmptyEntry)
 {
 	GString *pString = g_string_new ("");
+	
+	if (bAddEmptyEntry)
+		pWritingFunc ("", NULL, pString);
 	
 	if (! bSortByKey)
 		g_hash_table_foreach (pHashTable, pWritingFunc, pString);
@@ -253,7 +256,7 @@ void cairo_dock_write_one_name_description (gchar *cName, gchar *cDescriptionFil
 }
 void cairo_dock_write_one_module_name (gchar *cName, CairoDockModule *pModule, GString *pString)
 {
-	g_string_append_printf (pString, "%s;%s;%s;", cName, (pModule->cReadmeFilePath != NULL ? pModule->cReadmeFilePath : "none"), (pModule->cPreviewFilePath != NULL ? pModule->cPreviewFilePath : "none"));
+	g_string_append_printf (pString, "%s;%s;%s;", cName, (pModule != NULL && pModule->cReadmeFilePath != NULL ? pModule->cReadmeFilePath : "none"), (pModule != NULL && pModule->cPreviewFilePath != NULL ? pModule->cPreviewFilePath : "none"));
 }
 void cairo_dock_write_one_theme_name (gchar *cName, gchar *cThemePath, GString *pString)
 {
@@ -261,11 +264,11 @@ void cairo_dock_write_one_theme_name (gchar *cName, gchar *cThemePath, GString *
 }
 void cairo_dock_write_one_renderer_name (gchar *cName, CairoDockRenderer *pRenderer, GString *pString)
 {
-	//g_print ("%s (%s)\n", __func__, cName);
-	g_string_append_printf (pString, "%s;%s;%s;", cName, (pRenderer->cReadmeFilePath != NULL ? pRenderer->cReadmeFilePath : "none"), (pRenderer->cPreviewFilePath != NULL ? pRenderer->cPreviewFilePath : "none"));
+	g_print ("%s (%s)\n", __func__, cName);
+	g_string_append_printf (pString, "%s;%s;%s;", cName, (pRenderer != NULL && pRenderer->cReadmeFilePath != NULL ? pRenderer->cReadmeFilePath : "none"), (pRenderer != NULL && pRenderer->cPreviewFilePath != NULL ? pRenderer->cPreviewFilePath : "none"));
 }
 
-void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, gchar *cNewUsefullComment, GHFunc pWritingFunc, gboolean bSortByKey)
+void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, gchar *cNewUsefullComment, GHFunc pWritingFunc, gboolean bSortByKey, gboolean bAddEmptyEntry)
 {
 	//g_print ("%s (%s)\n", __func__, cConfFile);
 	GError *erreur = NULL;
@@ -331,7 +334,7 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 	//\___________________ On ecrit la liste des possibilites.
 	GString *sComment = g_string_new (cPrefix);
 	g_free (cPrefix);
-	gchar *cTableContent = cairo_dock_write_table_content (pModuleTable, (pWritingFunc != NULL ? pWritingFunc : (GHFunc) cairo_dock_write_one_name), bSortByKey);
+	gchar *cTableContent = cairo_dock_write_table_content (pModuleTable, (pWritingFunc != NULL ? pWritingFunc : (GHFunc) cairo_dock_write_one_name), bSortByKey, bAddEmptyEntry);
 	/*g_hash_table_foreach (pModuleTable, (pWritingFunc != NULL ? pWritingFunc : (GHFunc) cairo_dock_write_one_name), sComment);
 	if (sComment->str[sComment->len-1] == ';')  // peut etre faux si aucune valeur n'a ete ecrite.
 		sComment->len --;*/

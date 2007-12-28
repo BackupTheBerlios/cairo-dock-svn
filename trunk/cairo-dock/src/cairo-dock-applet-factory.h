@@ -147,7 +147,8 @@ CairoDockVisitCard *pre_init (void)\
 	pVisitCard->iMinorVersionNeeded = iMinorVersion;\
 	pVisitCard->iMicroVersionNeeded = iMicroVersion;\
 	pVisitCard->cPreviewFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_PREVIEW_FILE);\
-	pVisitCard->cGettextDomain = g_strdup (MY_APPLET_GETTEXT_DOMAIN);
+	pVisitCard->cGettextDomain = g_strdup (MY_APPLET_GETTEXT_DOMAIN);\
+	pVisitCard->cDockVersionOnCompilation = g_strdup (MY_APPLET_DOCK_VERSION);
 
 #define CD_APPLET_PRE_INIT_END \
 	return pVisitCard;\

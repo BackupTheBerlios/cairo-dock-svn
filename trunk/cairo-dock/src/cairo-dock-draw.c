@@ -473,7 +473,9 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		else
 			cairo_scale (pCairoContext, fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude));
 		if (icon->fOrientation != 0)
+		{
 			cairo_rotate (pCairoContext, icon->fOrientation);
+		}
 	}
 	else
 	{

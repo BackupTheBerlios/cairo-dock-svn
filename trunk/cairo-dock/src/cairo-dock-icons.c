@@ -975,7 +975,7 @@ CairoDockMousePositionType cairo_dock_check_if_mouse_inside_linear (CairoDock *p
 		else
 			iMousePositionType = CAIRO_DOCK_MOUSE_ON_THE_EDGE;
 	}
-	else if ( (g_bDirectionUp && iMouseY >= 0 && iMouseY <= iHeight) || (! g_bDirectionUp && iMouseY <= iHeight && iMouseY >= 0) )  // et en plus on est dedans en y.  //  && pPointedIcon != NULL
+	else if (iMouseY >= 0 && iMouseY <= iHeight)  // et en plus on est dedans en y.  //  && pPointedIcon != NULL
 	{
 		//g_print ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone ne soit animee (iMouseX=%d => x_abs=%d)\n", iMouseX, x_abs);
 		//pDock->bInside = TRUE;

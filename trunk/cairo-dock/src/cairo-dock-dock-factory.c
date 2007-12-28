@@ -460,6 +460,7 @@ static gboolean _cairo_dock_search_icon_in_a_dock (gchar *cDockName, CairoDock *
 */
 CairoDock *cairo_dock_search_container_from_icon (Icon *icon)
 {
+	g_return_val_if_fail (icon != NULL, NULL);
 	if (icon->cParentDockName != NULL)
 		return g_hash_table_lookup (g_hDocksTable, icon->cParentDockName);
 	else

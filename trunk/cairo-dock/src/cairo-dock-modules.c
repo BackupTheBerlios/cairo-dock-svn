@@ -86,6 +86,7 @@ void cairo_dock_free_visit_card (CairoDockVisitCard *pVisitCard)
 	g_free (pVisitCard->cReadmeFilePath);
 	g_free (pVisitCard->cPreviewFilePath);
 	g_free (pVisitCard->cGettextDomain);
+	g_free (pVisitCard->cDockVersionOnCompilation);
 	g_free (pVisitCard->cModuleName);
 	g_free (pVisitCard);
 }
@@ -116,6 +117,13 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 			cairo_dock_free_visit_card (pVisitCard);
 			return ;
 		}
+		g_print ("pVisitCard->cDockVersionOnCompilation : %s\n", pVisitCard->cDockVersionOnCompilation);
+		if (pVisitCard->cDockVersionOnCompilation != NULL && strcmp (pVisitCard->cDockVersionOnCompilation, CAIRO_DOCK_VERSION) != 0)
+		{
+			g_set_error (erreur, 1, 1, "Attention : this module ('%s') was compiled with Cairo-Dock v%s, but Cairo-Dock is in v%s\n  It will be ignored", pCairoDockModule->cSoFilePath, pVisitCard->cDockVersionOnCompilation, CAIRO_DOCK_VERSION);
+			cairo_dock_free_visit_card (pVisitCard);
+			return ;
+		}
 		pCairoDockModule->cReadmeFilePath = g_strdup (pVisitCard->cReadmeFilePath);
 		pCairoDockModule->cPreviewFilePath = g_strdup (pVisitCard->cPreviewFilePath);
 		pCairoDockModule->cGettextDomain = g_strdup (pVisitCard->cGettextDomain);
@@ -127,8 +135,9 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 	}
 	else
 	{
-		g_print ("Attention : this module does not have any visit card, it may be broken or icompatible with cairo-dock\n");
-		pCairoDockModule->cModuleName = cairo_dock_extract_default_module_name_from_path (pCairoDockModule->cSoFilePath);
+		g_set_error (erreur, 1, 1, "Attention : this module ('%s') does not have any visit card, it may be broken or icompatible with cairo-dock\n", pCairoDockModule->cSoFilePath);
+		cairo_dock_free_visit_card (pVisitCard);
+		return ;
 	}
 	
 	
@@ -268,7 +277,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 
 void cairo_dock_update_conf_file_with_available_modules_full (gchar *cConfFile, gchar *cGroupName, gchar *cKeyName)
 {
-	cairo_dock_update_conf_file_with_hash_table (cConfFile, s_hModuleTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_module_name, FALSE);  // ils sont classes par ordre dans le dock.
+	cairo_dock_update_conf_file_with_hash_table (cConfFile, s_hModuleTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_module_name, FALSE, FALSE);  // ils sont classes par ordre dans le dock.
 }
 
 

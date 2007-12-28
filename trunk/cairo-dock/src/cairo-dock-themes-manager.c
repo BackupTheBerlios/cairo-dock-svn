@@ -60,7 +60,7 @@ gchar *cairo_dock_edit_themes (GHashTable **hThemeTable)
 	GHashTable *hUserThemeTable = cairo_dock_list_themes (cThemesDir, NULL, NULL);
 	g_free (cThemesDir);
 	
-	gchar *cUserThemeNames = cairo_dock_write_table_content (hUserThemeTable, (GHFunc) cairo_dock_write_one_name, TRUE);
+	gchar *cUserThemeNames = cairo_dock_write_table_content (hUserThemeTable, (GHFunc) cairo_dock_write_one_name, TRUE, FALSE);
 	/*GString *sThemeNames = g_string_new ("");
 	g_hash_table_foreach (hUserThemeTable, (GHFunc) cairo_dock_write_one_name, sThemeNames);
 	sThemeNames->str[sThemeNames->len-1] = '\0';*/
@@ -76,10 +76,10 @@ gchar *cairo_dock_edit_themes (GHashTable **hThemeTable)
 	g_free (cCommand);
 	
 	//\___________________ On met a jour ce fichier de conf.
-	cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, *hThemeTable, "Themes", "chosen theme", NULL, (GHFunc) cairo_dock_write_one_theme_name, TRUE);
-	cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, hUserThemeTable, "Delete", "wanted themes", NULL, (GHFunc) cairo_dock_write_one_name, TRUE);
+	cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, *hThemeTable, "Themes", "chosen theme", NULL, (GHFunc) cairo_dock_write_one_theme_name, TRUE, FALSE);
+	cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, hUserThemeTable, "Delete", "wanted themes", NULL, (GHFunc) cairo_dock_write_one_name, TRUE, FALSE);
 	//g_hash_table_insert (hUserThemeTable, g_strdup (""), g_strdup (""));
-	cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, hUserThemeTable, "Save", "theme name", NULL, (GHFunc) cairo_dock_write_one_name, TRUE);
+	cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, hUserThemeTable, "Save", "theme name", NULL, (GHFunc) cairo_dock_write_one_name, TRUE, FALSE);
 	g_hash_table_destroy (hUserThemeTable);
 	
 	GKeyFile *pKeyFile = g_key_file_new ();
