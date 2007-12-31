@@ -14,4 +14,4 @@ launchers_DATA = \
 	firefox.svg\
 	terminal.svg\
 	gaim.svg\
-	synaptic.png
+	synaptic.svg

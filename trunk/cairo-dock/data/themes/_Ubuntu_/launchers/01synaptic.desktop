@@ -41,7 +41,7 @@ Name[zh_TW]=Synaptic 套件管理程式
 #s Exec command :
 Exec=gksu /usr/sbin/synaptic
 #s Image's name or path :
-Icon=synaptic.png
+Icon=synaptic.svg
 #f Order you want for this launcher among the other launchers :
 Order=7
 #s Name of the container it belongs to:
