@@ -123,7 +123,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock);
 *@param pConfigFunc2 2eme fonction dans le cas d'une config s'affichant sous 2 formes.
 *@param cConfFilePath2 2eme fichier de conf dans le cas d'une config s'affichant sous 2 formes.
 *@param cButtonConvert chaine a afficher dans le bouton permettant de passer d'une forme a l'autre.
-*@param  cButtonRevert chaine a afficher dans le bouton permettant de passer d'une forme a l'autre dans l'autre sens.
+*@param cButtonRevert chaine a afficher dans le bouton permettant de passer d'une forme a l'autre dans l'autre sens.
+*@param cGettextDomain nom du domainde de traduction a utiliser, ou NULL pour utiliser celui du dock.
 *@return TRUE si l'utilisateur a ferme le panneau de conf en appuyant sur OK, FALSE sinon.
 */
 gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert, gchar *cGettextDomain);

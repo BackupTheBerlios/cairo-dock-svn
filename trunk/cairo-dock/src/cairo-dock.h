@@ -26,5 +26,6 @@
 #include "cairo-dock-surface-factory.h"
 #include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-default-view.h"
+#include "cairo-dock-applet-facility.h"
 
 #endif

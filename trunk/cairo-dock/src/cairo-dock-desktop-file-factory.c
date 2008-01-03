@@ -79,6 +79,22 @@ gchar *cairo_dock_add_desktop_file_from_uri_full (gchar *cURI, const gchar *cDoc
 	else if (g_str_has_suffix (cURI, ".desktop") && (strncmp (cURI, "file://", 7) == 0 || *cURI == '/'))
 	{
 		gchar *cFilePath = (*cURI == '/' ? cURI : cURI + 7);  // on saute le "file://".
+		
+		//\___________________ On supprime a la main les '%20' qui foutent le boxon.
+		//g_print ("cFilePath : %s\n", cFilePath);
+		gchar *str = cFilePath;
+		do
+		{
+			str = g_strstr_len (str, -1, "%20");
+			if (str == NULL)
+				break ;
+			*str = ' ';
+			str ++;
+			strcpy (str, str+2);
+		}
+		while (TRUE);
+		//g_print ("cFilePath : %s\n", cFilePath);
+		
 		gchar *cBaseName = g_path_get_basename (cFilePath);
 		cNewDesktopFileName = cairo_dock_generate_desktop_filename (cBaseName, g_cCurrentLaunchersPath);
 		g_free (cBaseName);
@@ -108,7 +124,7 @@ gchar *cairo_dock_add_desktop_file_from_uri_full (gchar *cURI, const gchar *cDoc
 			g_free (cNewDesktopFileName);
 			return NULL;
 		}
-		gchar *str = strchr (cCommand, '%');
+		str = strchr (cCommand, '%');
 		if (str != NULL)
 		{
 			*str = '\0';

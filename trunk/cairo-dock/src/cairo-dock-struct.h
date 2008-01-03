@@ -78,9 +78,9 @@ struct _CairoDock {
 	/// decalage de la fenetre par rapport au point d'alignement sur le bord de l'ecran.
 	gint iGapY;
 	/// alignement, entre 0 et 1, du dock sur le bord de l'ecran.
-	gdouble fAlign;  
+	gdouble fAlign;
 	/// dit si le dock est horizontal ou vertical.
-	CairoDockTypeHorizontality bHorizontalDock;  
+	CairoDockTypeHorizontality bHorizontalDock;
 	
 	/// max des hauteurs des icones.
 	gint iMaxIconHeight;
@@ -106,6 +106,10 @@ struct _CairoDock {
 	gint iCurrentWidth;
 	/// hauteur de la fenetre, _apres_ le redimensionnement par GTK.
 	gint iCurrentHeight;
+	
+	gint iMaxLabelWidth;
+	gint iRightMargin;
+	gint iTopMargin;
 	
 	//\_______________ Les parametres lies a une animation du dock.
 	/// pour faire defiler les icones avec la molette.
