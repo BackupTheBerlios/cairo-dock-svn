@@ -467,9 +467,9 @@ main (int argc, char** argv)
 	//const gchar *cSillyMessage = "Veuillez rentrer un compliment élogieux à la gloire Fab pour pouvoir utiliser cairo-dock.";
 	//const gchar *cSillyMessage = "Sondage :\n Combien cairo-dock c'est trop bien :";
 	//const gchar *cSillyMessage = "Cairo-Dock : just launch it !";  // 4000
-	const gchar *cSillyMessage = "Cairo-Dock lave plus blanc que blanc.";  // 4000
-	//const gchar *cSillyMessage = "Etes-vous pour la création d'un thème Playboy par Vilraleur ?.";
-	const gchar *cNumSilllyMessage = "10";
+	//const gchar *cSillyMessage = "Cairo-Dock lave plus blanc que blanc.";  // 4000
+	const gchar *cSillyMessage = "Sondage :\nVoulez-vous voir plus de filles nues dans Cairo-Dock ?";
+	const gchar *cNumSilllyMessage = "12";
 	gboolean bWriteSillyMessage;
 	if (! g_file_test (cSillyMessageFilePath, G_FILE_TEST_EXISTS))
 	{
@@ -501,16 +501,19 @@ main (int argc, char** argv)
 		Icon *pFirstIcon = cairo_dock_get_first_icon (g_pMainDock->icons);
 		if (pFirstIcon != NULL)
 		{
-			cairo_dock_show_temporary_dialog_with_default_icon (cSillyMessage, pFirstIcon, g_pMainDock, 4000);
+			//cairo_dock_show_temporary_dialog_with_default_icon (cSillyMessage, pFirstIcon, g_pMainDock, 4000);
 			/*double fAnswer = cairo_dock_show_value_and_wait (cSillyMessage, pFirstIcon, g_pMainDock, 1.);
 			g_print (" ==> %.2f\n", fAnswer);
 			if (fAnswer == 0)
 				g_print ("Cela sera consigné et utilisé contre vous le moment venu ;-)\n");
 			else if (fAnswer == 1)
 				g_print ("je suis aussi d'accord ! ;-)\n");*/
-			/*cairo_t *pIconContext = cairo_dock_create_context_from_window (g_pMainDock);
-			cairo_dock_set_quick_info (pIconContext, "69°C", pFirstIcon, g_pMainDock);
-			cairo_destroy (pIconContext);*/
+			
+			int iAnswer = cairo_dock_ask_question_and_wait (cSillyMessage, pFirstIcon, g_pMainDock);
+			if (iAnswer == GTK_RESPONSE_YES)
+				g_print ("c'est bien ce que je pensais ;-)\n");
+			else
+				g_print ("allez on ne me la fais pas ! ;-)\n");
 		}
 	}
 	
