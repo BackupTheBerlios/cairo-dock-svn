@@ -1,0 +1,154 @@
+\section{R\'{e}f\'{e}rence du fichier src/cairo-dock-themes-manager.c}
+\label{cairo-dock-themes-manager_8c}\index{src/cairo-dock-themes-manager.c@{src/cairo-dock-themes-manager.c}}
+\subsection*{Macros}
+\begin{CompactItemize}
+\item 
+\#define {\bf CAIRO\_\-DOCK\_\-MODIFIED\_\-THEME\_\-FILE}~\char`\"{}.cairo-dock-need-save\char`\"{}
+\item 
+\#define {\bf CAIRO\_\-DOCK\_\-THEME\_\-PANEL\_\-WIDTH}~600
+\item 
+\#define {\bf CAIRO\_\-DOCK\_\-THEME\_\-PANEL\_\-HEIGHT}~400
+\end{CompactItemize}
+\subsection*{Fonctions}
+\begin{CompactItemize}
+\item 
+gchar $\ast$ {\bf cairo\_\-dock\_\-edit\_\-themes} (gchar $\ast$c\-Language, GHash\-Table $\ast$$\ast$h\-Theme\-Table)
+\item 
+gchar $\ast$ {\bf cairo\_\-dock\_\-get\_\-chosen\_\-theme} (gchar $\ast$c\-Conf\-File, gboolean $\ast$b\-Use\-Theme\-Behaviour, gboolean $\ast$b\-Use\-Theme\-Launchers)
+\item 
+void {\bf cairo\_\-dock\_\-load\_\-theme} (gchar $\ast$c\-Theme\-Path)
+\item 
+void {\bf cairo\_\-dock\_\-mark\_\-theme\_\-as\_\-modified} (gboolean b\-Modified)
+\item 
+gboolean {\bf cairo\_\-dock\_\-theme\_\-need\_\-save} (void)
+\item 
+int {\bf cairo\_\-dock\_\-ask\_\-initial\_\-theme} (void)
+\item 
+gboolean {\bf cairo\_\-dock\_\-manage\_\-themes} (Gtk\-Widget $\ast$p\-Widget)
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+gchar $\ast$ {\bf g\_\-c\-Cairo\-Dock\-Data\-Dir}
+\begin{CompactList}\small\item\em le repertoire ou on va chercher les .desktop. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Conf\-File}
+\item 
+gchar $\ast$ {\bf g\_\-c\-Current\-Theme\-Path}
+\begin{CompactList}\small\item\em le chemin vers le repertoire du theme courant. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Current\-Launchers\-Path}
+\begin{CompactList}\small\item\em le chemin vers le repertoire des lanceurs/icones du theme courant. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Language}
+\item 
+gchar $\ast$ {\bf g\_\-c\-Main\-Dock\-Default\-Renderer\-Name}
+\item 
+{\bf Cairo\-Dock} $\ast$ {\bf g\_\-p\-Main\-Dock}
+\begin{CompactList}\small\item\em pointeur sur le dock principal. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Wm\-Hint}
+\end{CompactItemize}
+
+
+\subsection{Documentation des macros}
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!CAIRO_DOCK_MODIFIED_THEME_FILE@{CAIRO\_\-DOCK\_\-MODIFIED\_\-THEME\_\-FILE}}
+\index{CAIRO_DOCK_MODIFIED_THEME_FILE@{CAIRO\_\-DOCK\_\-MODIFIED\_\-THEME\_\-FILE}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CAIRO\_\-DOCK\_\-MODIFIED\_\-THEME\_\-FILE~\char`\"{}.cairo-dock-need-save\char`\"{}}\label{cairo-dock-themes-manager_8c_50cd89aa9618599768d18b90f0b04bbb}
+
+
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!CAIRO_DOCK_THEME_PANEL_WIDTH@{CAIRO\_\-DOCK\_\-THEME\_\-PANEL\_\-WIDTH}}
+\index{CAIRO_DOCK_THEME_PANEL_WIDTH@{CAIRO\_\-DOCK\_\-THEME\_\-PANEL\_\-WIDTH}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CAIRO\_\-DOCK\_\-THEME\_\-PANEL\_\-WIDTH~600}\label{cairo-dock-themes-manager_8c_f7db424e4222ab2ab382dec131bc1d06}
+
+
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!CAIRO_DOCK_THEME_PANEL_HEIGHT@{CAIRO\_\-DOCK\_\-THEME\_\-PANEL\_\-HEIGHT}}
+\index{CAIRO_DOCK_THEME_PANEL_HEIGHT@{CAIRO\_\-DOCK\_\-THEME\_\-PANEL\_\-HEIGHT}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CAIRO\_\-DOCK\_\-THEME\_\-PANEL\_\-HEIGHT~400}\label{cairo-dock-themes-manager_8c_e1f2d149f540024554b8167ce4eb48d0}
+
+
+
+
+\subsection{Documentation des fonctions}
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!cairo_dock_edit_themes@{cairo\_\-dock\_\-edit\_\-themes}}
+\index{cairo_dock_edit_themes@{cairo\_\-dock\_\-edit\_\-themes}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ cairo\_\-dock\_\-edit\_\-themes (gchar $\ast$ {\em c\-Language}, GHash\-Table $\ast$$\ast$ {\em h\-Theme\-Table})}\label{cairo-dock-themes-manager_8c_033a37ed1275891560cbcef5d89d7a12}
+
+
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!cairo_dock_get_chosen_theme@{cairo\_\-dock\_\-get\_\-chosen\_\-theme}}
+\index{cairo_dock_get_chosen_theme@{cairo\_\-dock\_\-get\_\-chosen\_\-theme}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ cairo\_\-dock\_\-get\_\-chosen\_\-theme (gchar $\ast$ {\em c\-Conf\-File}, gboolean $\ast$ {\em b\-Use\-Theme\-Behaviour}, gboolean $\ast$ {\em b\-Use\-Theme\-Launchers})}\label{cairo-dock-themes-manager_8c_45bfce739852d43b48219926540d6769}
+
+
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!cairo_dock_load_theme@{cairo\_\-dock\_\-load\_\-theme}}
+\index{cairo_dock_load_theme@{cairo\_\-dock\_\-load\_\-theme}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-load\_\-theme (gchar $\ast$ {\em c\-Theme\-Path})}\label{cairo-dock-themes-manager_8c_addcb28e2da1100a291c744cb56fe47f}
+
+
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!cairo_dock_mark_theme_as_modified@{cairo\_\-dock\_\-mark\_\-theme\_\-as\_\-modified}}
+\index{cairo_dock_mark_theme_as_modified@{cairo\_\-dock\_\-mark\_\-theme\_\-as\_\-modified}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-mark\_\-theme\_\-as\_\-modified (gboolean {\em b\-Modified})}\label{cairo-dock-themes-manager_8c_973b61d0f4c31abe529402ec059f5750}
+
+
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!cairo_dock_theme_need_save@{cairo\_\-dock\_\-theme\_\-need\_\-save}}
+\index{cairo_dock_theme_need_save@{cairo\_\-dock\_\-theme\_\-need\_\-save}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean cairo\_\-dock\_\-theme\_\-need\_\-save (void)}\label{cairo-dock-themes-manager_8c_0432fda9c86ccd9027768c7e7b5d53a4}
+
+
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!cairo_dock_ask_initial_theme@{cairo\_\-dock\_\-ask\_\-initial\_\-theme}}
+\index{cairo_dock_ask_initial_theme@{cairo\_\-dock\_\-ask\_\-initial\_\-theme}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int cairo\_\-dock\_\-ask\_\-initial\_\-theme (void)}\label{cairo-dock-themes-manager_8c_90446f0d410e290d6c18d790d12dad3a}
+
+
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!cairo_dock_manage_themes@{cairo\_\-dock\_\-manage\_\-themes}}
+\index{cairo_dock_manage_themes@{cairo\_\-dock\_\-manage\_\-themes}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean cairo\_\-dock\_\-manage\_\-themes (Gtk\-Widget $\ast$ {\em p\-Widget})}\label{cairo-dock-themes-manager_8c_4ac8cb0010b84c3f6ce48f1a103ac736}
+
+
+
+
+\subsection{Documentation des variables}
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!g_cCairoDockDataDir@{g\_\-cCairoDockDataDir}}
+\index{g_cCairoDockDataDir@{g\_\-cCairoDockDataDir}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Cairo\-Dock\-Data\-Dir}}\label{cairo-dock-themes-manager_8c_e8ab56da998f5b0784d5e09cdddd929b}
+
+
+le repertoire ou on va chercher les .desktop. 
+
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!g_cConfFile@{g\_\-cConfFile}}
+\index{g_cConfFile@{g\_\-cConfFile}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Conf\-File}}\label{cairo-dock-themes-manager_8c_2173efce4550991bad33a89cf25b6243}
+
+
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!g_cCurrentThemePath@{g\_\-cCurrentThemePath}}
+\index{g_cCurrentThemePath@{g\_\-cCurrentThemePath}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Current\-Theme\-Path}}\label{cairo-dock-themes-manager_8c_c9102142a8dd6330299f9340c9d2b704}
+
+
+le chemin vers le repertoire du theme courant. 
+
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!g_cCurrentLaunchersPath@{g\_\-cCurrentLaunchersPath}}
+\index{g_cCurrentLaunchersPath@{g\_\-cCurrentLaunchersPath}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Current\-Launchers\-Path}}\label{cairo-dock-themes-manager_8c_540e05d87e90a39620d6d15e03dc808b}
+
+
+le chemin vers le repertoire des lanceurs/icones du theme courant. 
+
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!g_cLanguage@{g\_\-cLanguage}}
+\index{g_cLanguage@{g\_\-cLanguage}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Language}}\label{cairo-dock-themes-manager_8c_fb26c14d874eba876836b1ba28f1eb58}
+
+
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!g_cMainDockDefaultRendererName@{g\_\-cMainDockDefaultRendererName}}
+\index{g_cMainDockDefaultRendererName@{g\_\-cMainDockDefaultRendererName}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Main\-Dock\-Default\-Renderer\-Name}}\label{cairo-dock-themes-manager_8c_d58fb04683fb946b0fb7679743506c80}
+
+
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!g_pMainDock@{g\_\-pMainDock}}
+\index{g_pMainDock@{g\_\-pMainDock}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf Cairo\-Dock}$\ast$ {\bf g\_\-p\-Main\-Dock}}\label{cairo-dock-themes-manager_8c_a24af9062f9cc975eb0b9422eb6587e6}
+
+
+pointeur sur le dock principal. 
+
+\index{cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}!g_iWmHint@{g\_\-iWmHint}}
+\index{g_iWmHint@{g\_\-iWmHint}!cairo-dock-themes-manager.c@{cairo-dock-themes-manager.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Wm\-Hint}}\label{cairo-dock-themes-manager_8c_bc80d722fa6c2e0711ebd9d9e720551c}
+
+

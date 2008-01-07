@@ -1,0 +1,1997 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Cairo-Dock: Référence du fichier src/cairo-dock-icons.c</title>
+<link href="doxygen.css" rel="stylesheet" type="text/css">
+<link href="tabs.css" rel="stylesheet" type="text/css">
+</head><body>
+<!-- Généré par Doxygen 1.4.6 -->
+<div class="tabs">
+  <ul>
+    <li><a href="index.html"><span>Page&nbsp;principale</span></a></li>
+    <li><a href="annotated.html"><span>Structures&nbsp;de&nbsp;données</span></a></li>
+    <li id="current"><a href="files.html"><span>Fichiers</span></a></li>
+  </ul></div>
+<div class="tabs">
+  <ul>
+    <li><a href="files.html"><span>Liste&nbsp;des&nbsp;fichiers</span></a></li>
+    <li><a href="globals.html"><span>Portée&nbsp;globale</span></a></li>
+  </ul></div>
+<h1>Référence du fichier src/cairo-dock-icons.c</h1><table border="0" cellpadding="0" cellspacing="0">
+<tr><td></td></tr>
+<tr><td colspan="2"><br><h2>Fonctions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#f54199a4215a71f8b017ceb6512366f9">cairo_dock_free_icon</a> (<a class="el" href="struct__Icon.html">Icon</a> *icon)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#a4e008f173bb3255251da119e4173c3b">cairo_dock_compare_icons_order</a> (<a class="el" href="struct__Icon.html">Icon</a> *icon1, <a class="el" href="struct__Icon.html">Icon</a> *icon2)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">GList *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#f1bef19a6b85b6a6e27feb40cefd400b">cairo_dock_sort_icons_by_order</a> (GList *pIconList)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">GList *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#a78c3612a56f84f0e0765bd26c7510a4">cairo_dock_sort_icons_by_name</a> (GList *pIconList)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#a33afd0fe00295cedadd9f7ef73d8b1e">cairo_dock_get_first_icon</a> (GList *pIconList)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#dbfc665a5e83340a487626894db56333">cairo_dock_get_last_icon</a> (GList *pIconList)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#6c95bef22b883b260f1ff3537c7fdc44">cairo_dock_get_first_drawn_icon</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#1b554df6ac772507962a71409d457ea5">cairo_dock_get_last_drawn_icon</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#9a7036812e508856128697b1c8b39c32">cairo_dock_get_first_icon_of_type</a> (GList *pIconList, <a class="el" href="cairo-dock-struct_8h.html#bab3fe5b912f0abef3f1e2b0b4b44e4e">CairoDockIconType</a> iType)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#93932d590d2ac32c52a2726f5c497334">cairo_dock_get_last_icon_of_type</a> (GList *pIconList, <a class="el" href="cairo-dock-struct_8h.html#bab3fe5b912f0abef3f1e2b0b4b44e4e">CairoDockIconType</a> iType)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#4e8cf7b6a3e5f061e6e18010ba9da590">cairo_dock_get_pointed_icon</a> (GList *pIconList)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#532844978ed82d7672e33e81a3fcf6a4">cairo_dock_get_bouncing_icon</a> (GList *pIconList)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#189d2744f7e2343c1ad465a3322bbd2e">cairo_dock_get_removing_or_inserting_icon</a> (GList *pIconList)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#a06250cef09ef759aa1ad5d6cd857ab1">cairo_dock_get_animated_icon</a> (GList *pIconList)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#9175d5e7c32d59cf31f7f70d6530f815">cairo_dock_get_next_icon</a> (GList *pIconList, <a class="el" href="struct__Icon.html">Icon</a> *pIcon)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#da24c66ec41597d0fa95a0b6a2ac1c2f">cairo_dock_get_previous_icon</a> (GList *pIconList, <a class="el" href="struct__Icon.html">Icon</a> *pIcon)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#f472e108228239776b9074576813cf9e">cairo_dock_get_icon_with_command</a> (GList *pIconList, gchar *cCommand)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#b2ba28fe9c6626243086a80a12cfd97f">cairo_dock_get_icon_with_base_uri</a> (GList *pIconList, gchar *cBaseURI)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#87b911e3bc92d45896c945589290d586">cairo_dock_get_icon_with_subdock</a> (GList *pIconList, <a class="el" href="struct__CairoDock.html">CairoDock</a> *pSubDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#4d6bf4d25995b5e7afb89b5b47180494">cairo_dock_get_icon_with_module</a> (GList *pIconList, <a class="el" href="struct__CairoDockModule.html">CairoDockModule</a> *pModule)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#03e5049b05266883f78ceea9622e5a98">cairo_dock_get_icon_with_class</a> (GList *pIconList, gchar *cClass)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#c02977792baa2a21b716d1787ddb3d66">cairo_dock_swap_icons</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock, <a class="el" href="struct__Icon.html">Icon</a> *icon1, <a class="el" href="struct__Icon.html">Icon</a> *icon2)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#b74f1ffc9f9fa74089e88fc6650632db">cairo_dock_move_icon_after_icon</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock, <a class="el" href="struct__Icon.html">Icon</a> *icon1, <a class="el" href="struct__Icon.html">Icon</a> *icon2)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#d935bcfab81e0f2435e6eb59e870801c">cairo_dock_detach_icon_from_dock</a> (<a class="el" href="struct__Icon.html">Icon</a> *icon, <a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock, gboolean bCheckUnusedSeparator)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#d66a0e6a2a1922353b51d07c8f07423e">cairo_dock_remove_one_icon_from_dock</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock, <a class="el" href="struct__Icon.html">Icon</a> *icon)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#7a43c7c13c5d65eca70bb4dd5161520f">cairo_dock_remove_icon_from_dock</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock, <a class="el" href="struct__Icon.html">Icon</a> *icon)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#b27435756459370bf38b0edb0ac912e8">cairo_dock_remove_icons_of_type</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock, <a class="el" href="cairo-dock-struct_8h.html#bab3fe5b912f0abef3f1e2b0b4b44e4e">CairoDockIconType</a> iType)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">GList *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#c1f07e94b422708cf1c85695ae78ebc5">cairo_dock_calculate_icons_positions_at_rest_linear</a> (GList *pIconList, int iFlatDockWidth, int iXOffset)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#8d2dd5716c12c0255c77da0fee1d4821">cairo_dock_calculate_wave_with_position_linear</a> (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, int iFlatDockWidth, int iWidth, int iHeight, double fAlign, double fFoldingFactor)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#3754e21213c6d9c5e9a8e096f0f65cbe">cairo_dock_apply_wave_effect</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="cairo-dock-struct_8h.html#8381e20c54bf015162ac9a0e38dbbf51">CairoDockMousePositionType</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#2ec7a7123586aa8cb88600e491d300ec">cairo_dock_check_if_mouse_inside_linear</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#4e6a111da5db5afd996af79e910d2da9">cairo_dock_manage_mouse_position</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock, <a class="el" href="cairo-dock-struct_8h.html#8381e20c54bf015162ac9a0e38dbbf51">CairoDockMousePositionType</a> iMousePositionType)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#fd2087e9dcd589c343b4c753331fab92">cairo_dock_calculate_max_dock_width</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock, GList *pFirstDrawnElementGiven, int iFlatDockWidth, double fWidthConstraintFactor, double fExtraWidth)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#d9ad4d443f515bf41830a4fc6a399389">cairo_dock_mark_icons_as_avoiding_mouse</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock, <a class="el" href="cairo-dock-struct_8h.html#bab3fe5b912f0abef3f1e2b0b4b44e4e">CairoDockIconType</a> iType, double fMargin)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#5ec554e58fcd78bec57719d61e58f36f">cairo_dock_mark_avoiding_mouse_icons_linear</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#dbc8afc5e49eb94aac6da82ce5b192c0">cairo_dock_stop_marking_icons</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#939bc4f8d63860f0c3e5c2899ec43db7">cairo_dock_update_icon_s_container_name</a> (<a class="el" href="struct__Icon.html">Icon</a> *icon, gchar *cNewParentDockName)</td></tr>
+
+<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gint&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#0a64a806782434c9930f85b6fbf906d6">g_iScreenWidth</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">dimensions de l'ecran.  <a href="#0a64a806782434c9930f85b6fbf906d6"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gint&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#de51da4658bcdb61f36639e0585fcbc7">g_iScreenHeight</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#db969b7c9d9280df9b787bf0e04f8e13">g_bReserveSpace</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gint&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#e5d97f4f9a4f7e546af6ebe7b7d5399b">g_iDockLineWidth</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">epaisseur du cadre (en pixels).  <a href="#e5d97f4f9a4f7e546af6ebe7b7d5399b"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gint&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#c5768ebc340b36dd210f7b4dea884697">g_iDockRadius</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">rayon des coins du cadre.  <a href="#c5768ebc340b36dd210f7b4dea884697"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gint&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#a16b32df9350a49829c9d153db02cabd">g_iFrameMargin</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">marge entre le cadre et les icones.  <a href="#a16b32df9350a49829c9d153db02cabd"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#386538e26258de4d50feb84fecc45dd6">g_iLabelSize</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">taille de la police des etiquettes.  <a href="#386538e26258de4d50feb84fecc45dd6"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#32a45bc8bdc1899cbe8bbc034a3815fe">g_iIconGap</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">ecart en pixels entre les icones.  <a href="#32a45bc8bdc1899cbe8bbc034a3815fe"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#e6ee377f5c409b71e3f7e87694f60556">g_fSubDockSizeRatio</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">ratio de la taille des icones des sous-docks par rapport a celles du dock principal.  <a href="#e6ee377f5c409b71e3f7e87694f60556"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#43a8f6facdf04f7534a1792a4004a7fc">g_iMaxAuthorizedWidth</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gchar *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#540e05d87e90a39620d6d15e03dc808b">g_cCurrentLaunchersPath</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">le chemin vers le repertoire des lanceurs/icones du theme courant.  <a href="#540e05d87e90a39620d6d15e03dc808b"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#71125a40fdc7b421002f176b9b82ac79">g_fAmplitude</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">amplitude de la siunsoide.  <a href="#71125a40fdc7b421002f176b9b82ac79"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#7ed10b4674d07794421af544ea9f2ad8">g_iSinusoidWidth</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">largeur de la sinusoide en pixels. On va de 0 a pi en la parcourant, en etant a pi/2 au niveau du curseur; en dehors de cet intervalle, la sinusoide est plate.  <a href="#7ed10b4674d07794421af544ea9f2ad8"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#321302a26af19930e4796a30e248a416">g_fUnfoldAcceleration</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#263de39492b5e16c81c98792f183edcf">g_bAutoHide</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">TRUE si l'auto-hide est active.  <a href="#263de39492b5e16c81c98792f183edcf"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#080e0cb494374269a17c7ebd078e855d">g_bDirectionUp</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.  <a href="#080e0cb494374269a17c7ebd078e855d"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#479142bd03646b25b45d1dcd8f02dc43">g_bUniquePid</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#92a992add0770c0af1108b58f8a02154">g_tIconTypeOrder</a> [CAIRO_DOCK_NB_TYPES]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gchar *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-icons_8c.html#2173efce4550991bad33a89cf25b6243">g_cConfFile</a></td></tr>
+
+</table>
+<hr><h2>Documentation des fonctions</h2>
+<a class="anchor" name="f54199a4215a71f8b017ceb6512366f9"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_free_icon" ref="f54199a4215a71f8b017ceb6512366f9" args="(Icon *icon)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_free_icon           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>icon</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+Libere toutes les ressources liees a une icone, ainsi que cette derniere. Le sous-dock pointee par elle n'est pas dereferencee, cela doit etre fait au prealable. <dl compact><dt><b>Paramètres:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>icon</em>&nbsp;</td><td>l'icone a liberer. </td></tr>
+  </table>
+</dl>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="a4e008f173bb3255251da119e4173c3b"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_compare_icons_order" ref="a4e008f173bb3255251da119e4173c3b" args="(Icon *icon1, Icon *icon2)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int cairo_dock_compare_icons_order           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>icon1</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>icon2</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+Compare 2 icones grace a la relation d'ordre sur le couple (position du type , ordre). <dl compact><dt><b>Paramètres:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>icon1</em>&nbsp;</td><td>une icone. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>icon2</em>&nbsp;</td><td>une autre icone. </td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Renvoie:</b></dt><dd>-1 si icone1 &lt; icone2, 1 si icone1 &gt; icone2, 0 si icone1 = icone2 (au sens de la relation d'ordre). </dd></dl>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="f1bef19a6b85b6a6e27feb40cefd400b"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_sort_icons_by_order" ref="f1bef19a6b85b6a6e27feb40cefd400b" args="(GList *pIconList)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">GList* cairo_dock_sort_icons_by_order           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pIconList</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+Trie une liste en se basant sur la relation d'ordre sur le couple (position du type , ordre). <dl compact><dt><b>Paramètres:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>pIconList</em>&nbsp;</td><td>la liste d'icones. </td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Renvoie:</b></dt><dd>la liste triee. Les elements sont les memes que ceux de la liste initiale, seul leur ordre a change. </dd></dl>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="a78c3612a56f84f0e0765bd26c7510a4"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_sort_icons_by_name" ref="a78c3612a56f84f0e0765bd26c7510a4" args="(GList *pIconList)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">GList* cairo_dock_sort_icons_by_name           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pIconList</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+Trie une liste en se basant sur la relation d'ordre alphanumerique sur le nom des icones. <dl compact><dt><b>Paramètres:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>pIconList</em>&nbsp;</td><td>la liste d'icones. </td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Renvoie:</b></dt><dd>la liste triee. Les elements sont les memes que ceux de la liste initiale, seul leur ordre a change. Les ordres des icones sont mis a jour pour refleter le nouvel ordre global. </dd></dl>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="a33afd0fe00295cedadd9f7ef73d8b1e"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_get_first_icon" ref="a33afd0fe00295cedadd9f7ef73d8b1e" args="(GList *pIconList)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_get_first_icon           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pIconList</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+Renvoie la 1ere icone d'une liste d'icones. <dl compact><dt><b>Paramètres:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>pIconList</em>&nbsp;</td><td>la liste d'icones. </td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Renvoie:</b></dt><dd>la 1ere icone, ou NULL si la liste est vide. </dd></dl>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="dbfc665a5e83340a487626894db56333"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_get_last_icon" ref="dbfc665a5e83340a487626894db56333" args="(GList *pIconList)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_get_last_icon           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pIconList</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+Renvoie la derniere icone d'une liste d'icones. <dl compact><dt><b>Paramètres:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>pIconList</em>&nbsp;</td><td>la liste d'icones. </td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Renvoie:</b></dt><dd>la derniere icone, ou NULL si la liste est vide. </dd></dl>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="6c95bef22b883b260f1ff3537c7fdc44"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_get_first_drawn_icon" ref="6c95bef22b883b260f1ff3537c7fdc44" args="(CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_get_first_drawn_icon           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pDock</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+Renvoie la 1ere icone a etre dessinee d'une liste d'icones (qui n'est pas forcement la 1ere icone de la liste, si l'utilisateur a scrolle). <dl compact><dt><b>Paramètres:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>pIconList</em>&nbsp;</td><td>la liste d'icones. </td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Renvoie:</b></dt><dd>la 1ere icone a etre dessinee, ou NULL si la liste est vide. </dd></dl>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="1b554df6ac772507962a71409d457ea5"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_get_last_drawn_icon" ref="1b554df6ac772507962a71409d457ea5" args="(CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_get_last_drawn_icon           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pDock</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+Renvoie la derniere icone a etre dessinee d'une liste d'icones (qui n'est pas forcement la derniere icone de la liste, si l'utilisateur a scrolle). <dl compact><dt><b>Paramètres:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>pIconList</em>&nbsp;</td><td>la liste d'icones. </td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Renvoie:</b></dt><dd>la derniere icone a etre dessinee, ou NULL si la liste est vide. </dd></dl>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="9a7036812e508856128697b1c8b39c32"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_get_first_icon_of_type" ref="9a7036812e508856128697b1c8b39c32" args="(GList *pIconList, CairoDockIconType iType)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_get_first_icon_of_type           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pIconList</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="cairo-dock-struct_8h.html#bab3fe5b912f0abef3f1e2b0b4b44e4e">CairoDockIconType</a>&nbsp;</td>
+          <td class="mdname" nowrap> <em>iType</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+Renvoie la 1ere icone du type donne. <dl compact><dt><b>Paramètres:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>pIconList</em>&nbsp;</td><td>la liste d'icones. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>iType</em>&nbsp;</td><td>le type d'icone recherche. </td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Renvoie:</b></dt><dd>la 1ere icone trouvee ayant ce type, ou NULL si aucune icone n'est trouvee. </dd></dl>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="93932d590d2ac32c52a2726f5c497334"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_get_last_icon_of_type" ref="93932d590d2ac32c52a2726f5c497334" args="(GList *pIconList, CairoDockIconType iType)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_get_last_icon_of_type           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pIconList</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="cairo-dock-struct_8h.html#bab3fe5b912f0abef3f1e2b0b4b44e4e">CairoDockIconType</a>&nbsp;</td>
+          <td class="mdname" nowrap> <em>iType</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="4e8cf7b6a3e5f061e6e18010ba9da590"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_get_pointed_icon" ref="4e8cf7b6a3e5f061e6e18010ba9da590" args="(GList *pIconList)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_get_pointed_icon           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pIconList</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="532844978ed82d7672e33e81a3fcf6a4"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_get_bouncing_icon" ref="532844978ed82d7672e33e81a3fcf6a4" args="(GList *pIconList)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_get_bouncing_icon           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pIconList</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="189d2744f7e2343c1ad465a3322bbd2e"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_get_removing_or_inserting_icon" ref="189d2744f7e2343c1ad465a3322bbd2e" args="(GList *pIconList)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_get_removing_or_inserting_icon           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pIconList</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="a06250cef09ef759aa1ad5d6cd857ab1"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_get_animated_icon" ref="a06250cef09ef759aa1ad5d6cd857ab1" args="(GList *pIconList)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_get_animated_icon           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pIconList</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="9175d5e7c32d59cf31f7f70d6530f815"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_get_next_icon" ref="9175d5e7c32d59cf31f7f70d6530f815" args="(GList *pIconList, Icon *pIcon)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_get_next_icon           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pIconList</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pIcon</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="da24c66ec41597d0fa95a0b6a2ac1c2f"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_get_previous_icon" ref="da24c66ec41597d0fa95a0b6a2ac1c2f" args="(GList *pIconList, Icon *pIcon)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_get_previous_icon           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pIconList</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pIcon</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="f472e108228239776b9074576813cf9e"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_get_icon_with_command" ref="f472e108228239776b9074576813cf9e" args="(GList *pIconList, gchar *cCommand)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_get_icon_with_command           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pIconList</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gchar *&nbsp;</td>
+          <td class="mdname" nowrap> <em>cCommand</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="b2ba28fe9c6626243086a80a12cfd97f"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_get_icon_with_base_uri" ref="b2ba28fe9c6626243086a80a12cfd97f" args="(GList *pIconList, gchar *cBaseURI)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_get_icon_with_base_uri           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pIconList</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gchar *&nbsp;</td>
+          <td class="mdname" nowrap> <em>cBaseURI</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="87b911e3bc92d45896c945589290d586"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_get_icon_with_subdock" ref="87b911e3bc92d45896c945589290d586" args="(GList *pIconList, CairoDock *pSubDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_get_icon_with_subdock           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pIconList</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pSubDock</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="4d6bf4d25995b5e7afb89b5b47180494"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_get_icon_with_module" ref="4d6bf4d25995b5e7afb89b5b47180494" args="(GList *pIconList, CairoDockModule *pModule)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_get_icon_with_module           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pIconList</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__CairoDockModule.html">CairoDockModule</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pModule</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="03e5049b05266883f78ceea9622e5a98"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_get_icon_with_class" ref="03e5049b05266883f78ceea9622e5a98" args="(GList *pIconList, gchar *cClass)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_get_icon_with_class           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pIconList</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gchar *&nbsp;</td>
+          <td class="mdname" nowrap> <em>cClass</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="c02977792baa2a21b716d1787ddb3d66"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_swap_icons" ref="c02977792baa2a21b716d1787ddb3d66" args="(CairoDock *pDock, Icon *icon1, Icon *icon2)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_swap_icons           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pDock</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>icon1</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>icon2</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="b74f1ffc9f9fa74089e88fc6650632db"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_move_icon_after_icon" ref="b74f1ffc9f9fa74089e88fc6650632db" args="(CairoDock *pDock, Icon *icon1, Icon *icon2)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_move_icon_after_icon           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pDock</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>icon1</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>icon2</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="d935bcfab81e0f2435e6eb59e870801c"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_detach_icon_from_dock" ref="d935bcfab81e0f2435e6eb59e870801c" args="(Icon *icon, CairoDock *pDock, gboolean bCheckUnusedSeparator)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_detach_icon_from_dock           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>icon</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pDock</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gboolean&nbsp;</td>
+          <td class="mdname" nowrap> <em>bCheckUnusedSeparator</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="d66a0e6a2a1922353b51d07c8f07423e"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_remove_one_icon_from_dock" ref="d66a0e6a2a1922353b51d07c8f07423e" args="(CairoDock *pDock, Icon *icon)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_remove_one_icon_from_dock           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pDock</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>icon</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="7a43c7c13c5d65eca70bb4dd5161520f"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_remove_icon_from_dock" ref="7a43c7c13c5d65eca70bb4dd5161520f" args="(CairoDock *pDock, Icon *icon)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_remove_icon_from_dock           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pDock</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>icon</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="b27435756459370bf38b0edb0ac912e8"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_remove_icons_of_type" ref="b27435756459370bf38b0edb0ac912e8" args="(CairoDock *pDock, CairoDockIconType iType)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_remove_icons_of_type           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pDock</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="cairo-dock-struct_8h.html#bab3fe5b912f0abef3f1e2b0b4b44e4e">CairoDockIconType</a>&nbsp;</td>
+          <td class="mdname" nowrap> <em>iType</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="c1f07e94b422708cf1c85695ae78ebc5"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_calculate_icons_positions_at_rest_linear" ref="c1f07e94b422708cf1c85695ae78ebc5" args="(GList *pIconList, int iFlatDockWidth, int iXOffset)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">GList* cairo_dock_calculate_icons_positions_at_rest_linear           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pIconList</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iFlatDockWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iXOffset</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="8d2dd5716c12c0255c77da0fee1d4821"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_calculate_wave_with_position_linear" ref="8d2dd5716c12c0255c77da0fee1d4821" args="(GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, int iFlatDockWidth, int iWidth, int iHeight, double fAlign, double fFoldingFactor)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_calculate_wave_with_position_linear           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GList *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pIconList</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>GList *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pFirstDrawnElementGiven</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>x_abs</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gdouble&nbsp;</td>
+          <td class="mdname" nowrap> <em>fMagnitude</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iFlatDockWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iHeight</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fAlign</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fFoldingFactor</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+&amp;&amp; icon-&gt;fPhase == G_PI<p>
+icon-&gt;fX = icon-&gt;fXMax - icon-&gt;fWidth * icon-&gt;fScale - g_fAmplitude * icon-&gt;fWidth / 16;<p>
+&amp;&amp; prev_icon-&gt;fPhase == 0 // on rajoute 'fMagnitude &gt; 0' sinon il y'a un leger "saut" du aux contraintes a gauche de l'icone pointee.<p>
+prev_icon-&gt;fX = prev_icon-&gt;fXMin + g_fAmplitude * prev_icon-&gt;fWidth / 16;     </td>
+  </tr>
+</table>
+<a class="anchor" name="3754e21213c6d9c5e9a8e096f0f65cbe"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_apply_wave_effect" ref="3754e21213c6d9c5e9a8e096f0f65cbe" args="(CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_apply_wave_effect           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pDock</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="2ec7a7123586aa8cb88600e491d300ec"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_check_if_mouse_inside_linear" ref="2ec7a7123586aa8cb88600e491d300ec" args="(CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="cairo-dock-struct_8h.html#8381e20c54bf015162ac9a0e38dbbf51">CairoDockMousePositionType</a> cairo_dock_check_if_mouse_inside_linear           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pDock</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="4e6a111da5db5afd996af79e910d2da9"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_manage_mouse_position" ref="4e6a111da5db5afd996af79e910d2da9" args="(CairoDock *pDock, CairoDockMousePositionType iMousePositionType)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_manage_mouse_position           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pDock</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="cairo-dock-struct_8h.html#8381e20c54bf015162ac9a0e38dbbf51">CairoDockMousePositionType</a>&nbsp;</td>
+          <td class="mdname" nowrap> <em>iMousePositionType</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+cairo_dock_render_blank (pDock); // utile ?     </td>
+  </tr>
+</table>
+<a class="anchor" name="fd2087e9dcd589c343b4c753331fab92"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_calculate_max_dock_width" ref="fd2087e9dcd589c343b4c753331fab92" args="(CairoDock *pDock, GList *pFirstDrawnElementGiven, int iFlatDockWidth, double fWidthConstraintFactor, double fExtraWidth)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">double cairo_dock_calculate_max_dock_width           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pDock</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>GList *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pFirstDrawnElementGiven</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iFlatDockWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fWidthConstraintFactor</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fExtraWidth</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+fMaxDockWidth = (icon-&gt;fXMax - ((Icon *) pFirstDrawnElement-&gt;data)-&gt;fXMin + 2 * g_iDockRadius + 2 * g_iFrameMargin + g_iDockLineWidth) * fWidthConstraintFactor;     </td>
+  </tr>
+</table>
+<a class="anchor" name="d9ad4d443f515bf41830a4fc6a399389"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_mark_icons_as_avoiding_mouse" ref="d9ad4d443f515bf41830a4fc6a399389" args="(CairoDock *pDock, CairoDockIconType iType, double fMargin)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_mark_icons_as_avoiding_mouse           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pDock</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="cairo-dock-struct_8h.html#bab3fe5b912f0abef3f1e2b0b4b44e4e">CairoDockIconType</a>&nbsp;</td>
+          <td class="mdname" nowrap> <em>iType</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fMargin</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="5ec554e58fcd78bec57719d61e58f36f"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_mark_avoiding_mouse_icons_linear" ref="5ec554e58fcd78bec57719d61e58f36f" args="(CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_mark_avoiding_mouse_icons_linear           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pDock</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="dbc8afc5e49eb94aac6da82ce5b192c0"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_stop_marking_icons" ref="dbc8afc5e49eb94aac6da82ce5b192c0" args="(CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_stop_marking_icons           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pDock</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="939bc4f8d63860f0c3e5c2899ec43db7"></a><!-- doxytag: member="cairo-dock-icons.c::cairo_dock_update_icon_s_container_name" ref="939bc4f8d63860f0c3e5c2899ec43db7" args="(Icon *icon, gchar *cNewParentDockName)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_update_icon_s_container_name           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>icon</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gchar *&nbsp;</td>
+          <td class="mdname" nowrap> <em>cNewParentDockName</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<hr><h2>Documentation des variables</h2>
+<a class="anchor" name="0a64a806782434c9930f85b6fbf906d6"></a><!-- doxytag: member="cairo-dock-icons.c::g_iScreenWidth" ref="0a64a806782434c9930f85b6fbf906d6" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gint <a class="el" href="cairo-dock_8c.html#d832291d167ff78b5ae1b76dfb288ac8">g_iScreenWidth</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+dimensions de l'ecran. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="de51da4658bcdb61f36639e0585fcbc7"></a><!-- doxytag: member="cairo-dock-icons.c::g_iScreenHeight" ref="de51da4658bcdb61f36639e0585fcbc7" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gint <a class="el" href="cairo-dock_8c.html#70dbb6c14cb143c826e85759b205f201">g_iScreenHeight</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="db969b7c9d9280df9b787bf0e04f8e13"></a><!-- doxytag: member="cairo-dock-icons.c::g_bReserveSpace" ref="db969b7c9d9280df9b787bf0e04f8e13" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#db969b7c9d9280df9b787bf0e04f8e13">g_bReserveSpace</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="e5d97f4f9a4f7e546af6ebe7b7d5399b"></a><!-- doxytag: member="cairo-dock-icons.c::g_iDockLineWidth" ref="e5d97f4f9a4f7e546af6ebe7b7d5399b" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gint <a class="el" href="cairo-dock_8c.html#e5d97f4f9a4f7e546af6ebe7b7d5399b">g_iDockLineWidth</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+epaisseur du cadre (en pixels). 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="c5768ebc340b36dd210f7b4dea884697"></a><!-- doxytag: member="cairo-dock-icons.c::g_iDockRadius" ref="c5768ebc340b36dd210f7b4dea884697" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gint <a class="el" href="cairo-dock_8c.html#c5768ebc340b36dd210f7b4dea884697">g_iDockRadius</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+rayon des coins du cadre. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="a16b32df9350a49829c9d153db02cabd"></a><!-- doxytag: member="cairo-dock-icons.c::g_iFrameMargin" ref="a16b32df9350a49829c9d153db02cabd" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gint <a class="el" href="cairo-dock_8c.html#a16b32df9350a49829c9d153db02cabd">g_iFrameMargin</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+marge entre le cadre et les icones. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="386538e26258de4d50feb84fecc45dd6"></a><!-- doxytag: member="cairo-dock-icons.c::g_iLabelSize" ref="386538e26258de4d50feb84fecc45dd6" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#386538e26258de4d50feb84fecc45dd6">g_iLabelSize</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+taille de la police des etiquettes. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="32a45bc8bdc1899cbe8bbc034a3815fe"></a><!-- doxytag: member="cairo-dock-icons.c::g_iIconGap" ref="32a45bc8bdc1899cbe8bbc034a3815fe" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#32a45bc8bdc1899cbe8bbc034a3815fe">g_iIconGap</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+ecart en pixels entre les icones. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="e6ee377f5c409b71e3f7e87694f60556"></a><!-- doxytag: member="cairo-dock-icons.c::g_fSubDockSizeRatio" ref="e6ee377f5c409b71e3f7e87694f60556" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">double <a class="el" href="cairo-dock_8c.html#e6ee377f5c409b71e3f7e87694f60556">g_fSubDockSizeRatio</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+ratio de la taille des icones des sous-docks par rapport a celles du dock principal. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="43a8f6facdf04f7534a1792a4004a7fc"></a><!-- doxytag: member="cairo-dock-icons.c::g_iMaxAuthorizedWidth" ref="43a8f6facdf04f7534a1792a4004a7fc" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#43a8f6facdf04f7534a1792a4004a7fc">g_iMaxAuthorizedWidth</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="540e05d87e90a39620d6d15e03dc808b"></a><!-- doxytag: member="cairo-dock-icons.c::g_cCurrentLaunchersPath" ref="540e05d87e90a39620d6d15e03dc808b" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gchar* <a class="el" href="cairo-dock_8c.html#540e05d87e90a39620d6d15e03dc808b">g_cCurrentLaunchersPath</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+le chemin vers le repertoire des lanceurs/icones du theme courant. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="71125a40fdc7b421002f176b9b82ac79"></a><!-- doxytag: member="cairo-dock-icons.c::g_fAmplitude" ref="71125a40fdc7b421002f176b9b82ac79" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">double <a class="el" href="cairo-dock_8c.html#71125a40fdc7b421002f176b9b82ac79">g_fAmplitude</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+amplitude de la siunsoide. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="7ed10b4674d07794421af544ea9f2ad8"></a><!-- doxytag: member="cairo-dock-icons.c::g_iSinusoidWidth" ref="7ed10b4674d07794421af544ea9f2ad8" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#7ed10b4674d07794421af544ea9f2ad8">g_iSinusoidWidth</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+largeur de la sinusoide en pixels. On va de 0 a pi en la parcourant, en etant a pi/2 au niveau du curseur; en dehors de cet intervalle, la sinusoide est plate. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="321302a26af19930e4796a30e248a416"></a><!-- doxytag: member="cairo-dock-icons.c::g_fUnfoldAcceleration" ref="321302a26af19930e4796a30e248a416" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">double <a class="el" href="cairo-dock_8c.html#321302a26af19930e4796a30e248a416">g_fUnfoldAcceleration</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="263de39492b5e16c81c98792f183edcf"></a><!-- doxytag: member="cairo-dock-icons.c::g_bAutoHide" ref="263de39492b5e16c81c98792f183edcf" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#263de39492b5e16c81c98792f183edcf">g_bAutoHide</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+TRUE si l'auto-hide est active. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="080e0cb494374269a17c7ebd078e855d"></a><!-- doxytag: member="cairo-dock-icons.c::g_bDirectionUp" ref="080e0cb494374269a17c7ebd078e855d" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#080e0cb494374269a17c7ebd078e855d">g_bDirectionUp</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="479142bd03646b25b45d1dcd8f02dc43"></a><!-- doxytag: member="cairo-dock-icons.c::g_bUniquePid" ref="479142bd03646b25b45d1dcd8f02dc43" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#479142bd03646b25b45d1dcd8f02dc43">g_bUniquePid</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="92a992add0770c0af1108b58f8a02154"></a><!-- doxytag: member="cairo-dock-icons.c::g_tIconTypeOrder" ref="92a992add0770c0af1108b58f8a02154" args="[CAIRO_DOCK_NB_TYPES]" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#92a992add0770c0af1108b58f8a02154">g_tIconTypeOrder</a>[CAIRO_DOCK_NB_TYPES]          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="2173efce4550991bad33a89cf25b6243"></a><!-- doxytag: member="cairo-dock-icons.c::g_cConfFile" ref="2173efce4550991bad33a89cf25b6243" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gchar* <a class="el" href="cairo-dock_8c.html#2173efce4550991bad33a89cf25b6243">g_cConfFile</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<hr size="1"><address style="align: right;"><small>Généré le Fri Dec 7 13:11:02 2007 pour Cairo-Dock par&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.4.6 </small></address>
+</body>
+</html>

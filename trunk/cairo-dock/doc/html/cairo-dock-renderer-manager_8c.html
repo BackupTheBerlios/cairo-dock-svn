@@ -1,0 +1,503 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Cairo-Dock: Référence du fichier src/cairo-dock-renderer-manager.c</title>
+<link href="doxygen.css" rel="stylesheet" type="text/css">
+<link href="tabs.css" rel="stylesheet" type="text/css">
+</head><body>
+<!-- Généré par Doxygen 1.4.6 -->
+<div class="tabs">
+  <ul>
+    <li><a href="index.html"><span>Page&nbsp;principale</span></a></li>
+    <li><a href="annotated.html"><span>Structures&nbsp;de&nbsp;données</span></a></li>
+    <li id="current"><a href="files.html"><span>Fichiers</span></a></li>
+  </ul></div>
+<div class="tabs">
+  <ul>
+    <li><a href="files.html"><span>Liste&nbsp;des&nbsp;fichiers</span></a></li>
+    <li><a href="globals.html"><span>Portée&nbsp;globale</span></a></li>
+  </ul></div>
+<h1>Référence du fichier src/cairo-dock-renderer-manager.c</h1><table border="0" cellpadding="0" cellspacing="0">
+<tr><td></td></tr>
+<tr><td colspan="2"><br><h2>Macros</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-renderer-manager_8c.html#99ac7de16128dee139441641f7c75635">_cairo_dock_update_conf_file_with_renderers</a>(cConfFile, cGroupName, cKeyName)&nbsp;&nbsp;&nbsp;cairo_dock_update_conf_file_with_hash_table (cConfFile, s_hRendererTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_renderer_name)</td></tr>
+
+<tr><td colspan="2"><br><h2>Fonctions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__CairoDockRenderer.html">CairoDockRenderer</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-renderer-manager_8c.html#a73c48c0b9ecc34645d09d3d80185c1e">cairo_dock_get_renderer</a> (gchar *cRendererName, gboolean bForMainDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-renderer-manager_8c.html#d8bda3c1da807d8b3cf5d7564bc4d215">cairo_dock_register_renderer</a> (gchar *cRendererName, <a class="el" href="struct__CairoDockRenderer.html">CairoDockRenderer</a> *pRenderer)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-renderer-manager_8c.html#ce3fd14c4035c66d68eaaf7767c541aa">cairo_dock_remove_renderer</a> (gchar *cRendererName)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-renderer-manager_8c.html#b14521c7d0570b30f4eaa2690eb72644">cairo_dock_initialize_renderer_manager</a> (void)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-renderer-manager_8c.html#294a36bea221e1f38fee85c567589aaa">cairo_dock_set_renderer</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock, gchar *cRendererName)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-renderer-manager_8c.html#4a2369a5806de2dc8c2a2c5f2ef77767">cairo_dock_set_default_renderer</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-renderer-manager_8c.html#c838dff5794de206725cc8de01e5806b">cairo_dock_update_conf_file_with_renderers</a> (gchar *cConfFile)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-renderer-manager_8c.html#2be54ab92dc1a187483aa6be019cdb82">cairo_dock_update_launcher_conf_file_with_renderers</a> (gchar *cConfFile)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-renderer-manager_8c.html#471a50a6dc4bfe5e0ecceb91ecb9513a">cairo_dock_update_easy_conf_file_with_renderers</a> (gchar *cConfFile)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-renderer-manager_8c.html#1d16b5cb3e1c382cfe573b541da5ad85">cairo_dock_reset_all_views</a> (void)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-renderer-manager_8c.html#734dac3576b37663ec1519bf1f4fae14">cairo_dock_set_all_views_to_default</a> (void)</td></tr>
+
+<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">GHashTable *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-renderer-manager_8c.html#0651cfb551572c8fc57a25044f9dd016">g_hDocksTable</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">table des docks existant.  <a href="#0651cfb551572c8fc57a25044f9dd016"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gchar *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-renderer-manager_8c.html#d58fb04683fb946b0fb7679743506c80">g_cMainDockDefaultRendererName</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gchar *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-renderer-manager_8c.html#d32ec627add3ffb884c06ed22927114a">g_cSubDockDefaultRendererName</a></td></tr>
+
+</table>
+<hr><h2>Documentation des macros</h2>
+<a class="anchor" name="99ac7de16128dee139441641f7c75635"></a><!-- doxytag: member="cairo-dock-renderer-manager.c::_cairo_dock_update_conf_file_with_renderers" ref="99ac7de16128dee139441641f7c75635" args="(cConfFile, cGroupName, cKeyName)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">#define _cairo_dock_update_conf_file_with_renderers          </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">cConfFile,         <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>cGroupName,         <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>cKeyName&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap>&nbsp;&nbsp;&nbsp;cairo_dock_update_conf_file_with_hash_table (cConfFile, s_hRendererTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_renderer_name)</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<hr><h2>Documentation des fonctions</h2>
+<a class="anchor" name="a73c48c0b9ecc34645d09d3d80185c1e"></a><!-- doxytag: member="cairo-dock-renderer-manager.c::cairo_dock_get_renderer" ref="a73c48c0b9ecc34645d09d3d80185c1e" args="(gchar *cRendererName, gboolean bForMainDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDockRenderer.html">CairoDockRenderer</a>* cairo_dock_get_renderer           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">gchar *&nbsp;</td>
+          <td class="mdname" nowrap> <em>cRendererName</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gboolean&nbsp;</td>
+          <td class="mdname" nowrap> <em>bForMainDock</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="d8bda3c1da807d8b3cf5d7564bc4d215"></a><!-- doxytag: member="cairo-dock-renderer-manager.c::cairo_dock_register_renderer" ref="d8bda3c1da807d8b3cf5d7564bc4d215" args="(gchar *cRendererName, CairoDockRenderer *pRenderer)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_register_renderer           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">gchar *&nbsp;</td>
+          <td class="mdname" nowrap> <em>cRendererName</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__CairoDockRenderer.html">CairoDockRenderer</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pRenderer</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="ce3fd14c4035c66d68eaaf7767c541aa"></a><!-- doxytag: member="cairo-dock-renderer-manager.c::cairo_dock_remove_renderer" ref="ce3fd14c4035c66d68eaaf7767c541aa" args="(gchar *cRendererName)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_remove_renderer           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">gchar *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>cRendererName</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="b14521c7d0570b30f4eaa2690eb72644"></a><!-- doxytag: member="cairo-dock-renderer-manager.c::cairo_dock_initialize_renderer_manager" ref="b14521c7d0570b30f4eaa2690eb72644" args="(void)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_initialize_renderer_manager           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">void&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="294a36bea221e1f38fee85c567589aaa"></a><!-- doxytag: member="cairo-dock-renderer-manager.c::cairo_dock_set_renderer" ref="294a36bea221e1f38fee85c567589aaa" args="(CairoDock *pDock, gchar *cRendererName)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_set_renderer           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pDock</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gchar *&nbsp;</td>
+          <td class="mdname" nowrap> <em>cRendererName</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="4a2369a5806de2dc8c2a2c5f2ef77767"></a><!-- doxytag: member="cairo-dock-renderer-manager.c::cairo_dock_set_default_renderer" ref="4a2369a5806de2dc8c2a2c5f2ef77767" args="(CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_set_default_renderer           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pDock</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="c838dff5794de206725cc8de01e5806b"></a><!-- doxytag: member="cairo-dock-renderer-manager.c::cairo_dock_update_conf_file_with_renderers" ref="c838dff5794de206725cc8de01e5806b" args="(gchar *cConfFile)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_update_conf_file_with_renderers           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">gchar *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>cConfFile</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="2be54ab92dc1a187483aa6be019cdb82"></a><!-- doxytag: member="cairo-dock-renderer-manager.c::cairo_dock_update_launcher_conf_file_with_renderers" ref="2be54ab92dc1a187483aa6be019cdb82" args="(gchar *cConfFile)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_update_launcher_conf_file_with_renderers           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">gchar *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>cConfFile</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="471a50a6dc4bfe5e0ecceb91ecb9513a"></a><!-- doxytag: member="cairo-dock-renderer-manager.c::cairo_dock_update_easy_conf_file_with_renderers" ref="471a50a6dc4bfe5e0ecceb91ecb9513a" args="(gchar *cConfFile)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_update_easy_conf_file_with_renderers           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">gchar *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>cConfFile</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="1d16b5cb3e1c382cfe573b541da5ad85"></a><!-- doxytag: member="cairo-dock-renderer-manager.c::cairo_dock_reset_all_views" ref="1d16b5cb3e1c382cfe573b541da5ad85" args="(void)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_reset_all_views           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">void&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="734dac3576b37663ec1519bf1f4fae14"></a><!-- doxytag: member="cairo-dock-renderer-manager.c::cairo_dock_set_all_views_to_default" ref="734dac3576b37663ec1519bf1f4fae14" args="(void)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_set_all_views_to_default           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">void&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<hr><h2>Documentation des variables</h2>
+<a class="anchor" name="0651cfb551572c8fc57a25044f9dd016"></a><!-- doxytag: member="cairo-dock-renderer-manager.c::g_hDocksTable" ref="0651cfb551572c8fc57a25044f9dd016" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">GHashTable* <a class="el" href="cairo-dock_8c.html#0651cfb551572c8fc57a25044f9dd016">g_hDocksTable</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+table des docks existant. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="d58fb04683fb946b0fb7679743506c80"></a><!-- doxytag: member="cairo-dock-renderer-manager.c::g_cMainDockDefaultRendererName" ref="d58fb04683fb946b0fb7679743506c80" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gchar* <a class="el" href="cairo-dock_8c.html#d58fb04683fb946b0fb7679743506c80">g_cMainDockDefaultRendererName</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="d32ec627add3ffb884c06ed22927114a"></a><!-- doxytag: member="cairo-dock-renderer-manager.c::g_cSubDockDefaultRendererName" ref="d32ec627add3ffb884c06ed22927114a" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gchar* <a class="el" href="cairo-dock_8c.html#d32ec627add3ffb884c06ed22927114a">g_cSubDockDefaultRendererName</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<hr size="1"><address style="align: right;"><small>Généré le Fri Dec 7 13:11:02 2007 pour Cairo-Dock par&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.4.6 </small></address>
+</body>
+</html>

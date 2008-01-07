@@ -1,0 +1,78 @@
+\section{R\'{e}f\'{e}rence du fichier src/cairo-dock-desktop-file-factory.c}
+\label{cairo-dock-desktop-file-factory_8c}\index{src/cairo-dock-desktop-file-factory.c@{src/cairo-dock-desktop-file-factory.c}}
+\subsection*{Fonctions}
+\begin{CompactItemize}
+\item 
+gchar $\ast$ {\bf cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-from\_\-uri} (gchar $\ast$c\-URI, const gchar $\ast$c\-Dock\-Name, double f\-Order, {\bf Cairo\-Dock} $\ast$p\-Dock, GError $\ast$$\ast$erreur)
+\item 
+gchar $\ast$ {\bf cairo\_\-dock\_\-generate\_\-desktop\_\-filename} (gchar $\ast$c\-Base\-Name, gchar $\ast$c\-Cairo\-Dock\-Data\-Dir)
+\item 
+void {\bf cairo\_\-dock\_\-update\_\-launcher\_\-desktop\_\-file} (gchar $\ast$c\-Desktop\-File\-Path, gchar $\ast$c\-Language)
+\item 
+gchar $\ast$ {\bf cairo\_\-dock\_\-get\_\-launcher\_\-template\_\-conf\_\-file} (void)
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+GHash\-Table $\ast$ {\bf g\_\-h\-Docks\-Table}
+\begin{CompactList}\small\item\em table des docks existant. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Current\-Theme\-Path}
+\begin{CompactList}\small\item\em le chemin vers le repertoire du theme courant. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Current\-Launchers\-Path}
+\begin{CompactList}\small\item\em le chemin vers le repertoire des lanceurs/icones du theme courant. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Language}
+\end{CompactItemize}
+
+
+\subsection{Documentation des fonctions}
+\index{cairo-dock-desktop-file-factory.c@{cairo-dock-desktop-file-factory.c}!cairo_dock_add_desktop_file_from_uri@{cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-from\_\-uri}}
+\index{cairo_dock_add_desktop_file_from_uri@{cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-from\_\-uri}!cairo-dock-desktop-file-factory.c@{cairo-dock-desktop-file-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-from\_\-uri (gchar $\ast$ {\em c\-URI}, const gchar $\ast$ {\em c\-Dock\-Name}, double {\em f\-Order}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock}, GError $\ast$$\ast$ {\em erreur})}\label{cairo-dock-desktop-file-factory_8c_11094fb6262a838b12612848bd63438e}
+
+
+\index{cairo-dock-desktop-file-factory.c@{cairo-dock-desktop-file-factory.c}!cairo_dock_generate_desktop_filename@{cairo\_\-dock\_\-generate\_\-desktop\_\-filename}}
+\index{cairo_dock_generate_desktop_filename@{cairo\_\-dock\_\-generate\_\-desktop\_\-filename}!cairo-dock-desktop-file-factory.c@{cairo-dock-desktop-file-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ cairo\_\-dock\_\-generate\_\-desktop\_\-filename (gchar $\ast$ {\em c\-Base\-Name}, gchar $\ast$ {\em c\-Cairo\-Dock\-Data\-Dir})}\label{cairo-dock-desktop-file-factory_8c_df8738f894709bd3404df3fe96fe68af}
+
+
+\index{cairo-dock-desktop-file-factory.c@{cairo-dock-desktop-file-factory.c}!cairo_dock_update_launcher_desktop_file@{cairo\_\-dock\_\-update\_\-launcher\_\-desktop\_\-file}}
+\index{cairo_dock_update_launcher_desktop_file@{cairo\_\-dock\_\-update\_\-launcher\_\-desktop\_\-file}!cairo-dock-desktop-file-factory.c@{cairo-dock-desktop-file-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-update\_\-launcher\_\-desktop\_\-file (gchar $\ast$ {\em c\-Desktop\-File\-Path}, gchar $\ast$ {\em c\-Language})}\label{cairo-dock-desktop-file-factory_8c_d51426a177620e5774676a6d28eb7fed}
+
+
+gchar $\ast$c\-Command = g\_\-strdup\_\-printf (\char`\"{}/bin/cp \%s/launcher-\%s.conf \%s$\backslash$n\char`\"{}, CAIRO\_\-DOCK\_\-SHARE\_\-DATA\_\-DIR, c\-Language, c\-Desktop\-File\-Path); system (c\-Command); g\_\-free (c\-Command);
+
+cairo\_\-dock\_\-replace\_\-values\_\-in\_\-conf\_\-file (c\-Desktop\-File\-Path, p\-Key\-File, FALSE, 0); g\_\-key\_\-file\_\-free (p\-Key\-File); \index{cairo-dock-desktop-file-factory.c@{cairo-dock-desktop-file-factory.c}!cairo_dock_get_launcher_template_conf_file@{cairo\_\-dock\_\-get\_\-launcher\_\-template\_\-conf\_\-file}}
+\index{cairo_dock_get_launcher_template_conf_file@{cairo\_\-dock\_\-get\_\-launcher\_\-template\_\-conf\_\-file}!cairo-dock-desktop-file-factory.c@{cairo-dock-desktop-file-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ cairo\_\-dock\_\-get\_\-launcher\_\-template\_\-conf\_\-file (void)}\label{cairo-dock-desktop-file-factory_8c_0d962a281ed17c5636d49a0445ab4253}
+
+
+
+
+\subsection{Documentation des variables}
+\index{cairo-dock-desktop-file-factory.c@{cairo-dock-desktop-file-factory.c}!g_hDocksTable@{g\_\-hDocksTable}}
+\index{g_hDocksTable@{g\_\-hDocksTable}!cairo-dock-desktop-file-factory.c@{cairo-dock-desktop-file-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}GHash\-Table$\ast$ {\bf g\_\-h\-Docks\-Table}}\label{cairo-dock-desktop-file-factory_8c_0651cfb551572c8fc57a25044f9dd016}
+
+
+table des docks existant. 
+
+\index{cairo-dock-desktop-file-factory.c@{cairo-dock-desktop-file-factory.c}!g_cCurrentThemePath@{g\_\-cCurrentThemePath}}
+\index{g_cCurrentThemePath@{g\_\-cCurrentThemePath}!cairo-dock-desktop-file-factory.c@{cairo-dock-desktop-file-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Current\-Theme\-Path}}\label{cairo-dock-desktop-file-factory_8c_c9102142a8dd6330299f9340c9d2b704}
+
+
+le chemin vers le repertoire du theme courant. 
+
+\index{cairo-dock-desktop-file-factory.c@{cairo-dock-desktop-file-factory.c}!g_cCurrentLaunchersPath@{g\_\-cCurrentLaunchersPath}}
+\index{g_cCurrentLaunchersPath@{g\_\-cCurrentLaunchersPath}!cairo-dock-desktop-file-factory.c@{cairo-dock-desktop-file-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Current\-Launchers\-Path}}\label{cairo-dock-desktop-file-factory_8c_540e05d87e90a39620d6d15e03dc808b}
+
+
+le chemin vers le repertoire des lanceurs/icones du theme courant. 
+
+\index{cairo-dock-desktop-file-factory.c@{cairo-dock-desktop-file-factory.c}!g_cLanguage@{g\_\-cLanguage}}
+\index{g_cLanguage@{g\_\-cLanguage}!cairo-dock-desktop-file-factory.c@{cairo-dock-desktop-file-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Language}}\label{cairo-dock-desktop-file-factory_8c_fb26c14d874eba876836b1ba28f1eb58}
+
+

@@ -1,0 +1,938 @@
+\section{R\'{e}f\'{e}rence du fichier src/cairo-dock-config.c}
+\label{cairo-dock-config_8c}\index{src/cairo-dock-config.c@{src/cairo-dock-config.c}}
+\subsection*{Macros}
+\begin{CompactItemize}
+\item 
+\#define {\bf CAIRO\_\-DOCK\_\-TYPE\_\-CONF\_\-FILE\_\-FILE}~\char`\"{}.cairo-dock-conf-file\char`\"{}
+\end{CompactItemize}
+\subsection*{Fonctions}
+\begin{CompactItemize}
+\item 
+gboolean {\bf cairo\_\-dock\_\-get\_\-boolean\_\-key\_\-value} (GKey\-File $\ast$p\-Key\-File, gchar $\ast$c\-Group\-Name, gchar $\ast$c\-Key\-Name, gboolean $\ast$b\-Flush\-Conf\-File\-Needed, gboolean b\-Default\-Value)
+\item 
+int {\bf cairo\_\-dock\_\-get\_\-integer\_\-key\_\-value} (GKey\-File $\ast$p\-Key\-File, gchar $\ast$c\-Group\-Name, gchar $\ast$c\-Key\-Name, gboolean $\ast$b\-Flush\-Conf\-File\-Needed, int i\-Default\-Value)
+\item 
+double {\bf cairo\_\-dock\_\-get\_\-double\_\-key\_\-value} (GKey\-File $\ast$p\-Key\-File, gchar $\ast$c\-Group\-Name, gchar $\ast$c\-Key\-Name, gboolean $\ast$b\-Flush\-Conf\-File\-Needed, double f\-Default\-Value)
+\item 
+gchar $\ast$ {\bf cairo\_\-dock\_\-get\_\-string\_\-key\_\-value} (GKey\-File $\ast$p\-Key\-File, gchar $\ast$c\-Group\-Name, gchar $\ast$c\-Key\-Name, gboolean $\ast$b\-Flush\-Conf\-File\-Needed, const gchar $\ast$c\-Default\-Value)
+\item 
+void {\bf cairo\_\-dock\_\-get\_\-integer\_\-list\_\-key\_\-value} (GKey\-File $\ast$p\-Key\-File, gchar $\ast$c\-Group\-Name, gchar $\ast$c\-Key\-Name, gboolean $\ast$b\-Flush\-Conf\-File\-Needed, int $\ast$i\-Value\-Buffer, int i\-Nb\-Elements, int $\ast$i\-Default\-Values)
+\item 
+void {\bf cairo\_\-dock\_\-get\_\-double\_\-list\_\-key\_\-value} (GKey\-File $\ast$p\-Key\-File, gchar $\ast$c\-Group\-Name, gchar $\ast$c\-Key\-Name, gboolean $\ast$b\-Flush\-Conf\-File\-Needed, double $\ast$f\-Value\-Buffer, int i\-Nb\-Elements, double $\ast$f\-Default\-Values)
+\item 
+gchar $\ast$$\ast$ {\bf cairo\_\-dock\_\-get\_\-string\_\-list\_\-key\_\-value} (GKey\-File $\ast$p\-Key\-File, gchar $\ast$c\-Group\-Name, gchar $\ast$c\-Key\-Name, gboolean $\ast$b\-Flush\-Conf\-File\-Needed, gsize $\ast$length, gchar $\ast$c\-Default\-Values)
+\item 
+{\bf Cairo\-Dock\-Animation\-Type} {\bf cairo\_\-dock\_\-get\_\-animation\_\-type\_\-key\_\-value} (GKey\-File $\ast$p\-Key\-File, gchar $\ast$c\-Group\-Name, gchar $\ast$c\-Key\-Name, gboolean $\ast$b\-Flush\-Conf\-File\-Needed, {\bf Cairo\-Dock\-Animation\-Type} i\-Default\-Animation)
+\item 
+void {\bf cairo\_\-dock\_\-read\_\-conf\_\-file} (gchar $\ast$c\-Conf\-File\-Path, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+gboolean {\bf cairo\_\-dock\_\-edit\_\-conf\_\-file\_\-full} (Gtk\-Widget $\ast$p\-Widget, gchar $\ast$c\-Conf\-File\-Path, gchar $\ast$c\-Title, int i\-Window\-Width, int i\-Window\-Height, gchar i\-Identifier, gchar $\ast$c\-Presented\-Group, {\bf Cairo\-Dock\-Config\-Func} p\-Config\-Func, gpointer data, GFunc p\-Free\-User\-Data\-Func, {\bf Cairo\-Dock\-Config\-Func} p\-Config\-Func2, gchar $\ast$c\-Conf\-File\-Path2, gchar $\ast$c\-Button\-Convert, gchar $\ast$c\-Button\-Revert)
+\item 
+void {\bf cairo\_\-dock\_\-update\_\-conf\_\-file\_\-with\_\-position} (gchar $\ast$c\-Conf\-File\-Path, int x, int y)
+\item 
+void {\bf cairo\_\-dock\_\-update\_\-conf\_\-file\_\-with\_\-translations\_\-full} (gchar $\ast$c\-Conf\-File, gchar $\ast$c\-Translations\-Dir, gchar $\ast$c\-Group\-Name, gchar $\ast$c\-Key\-Name)
+\item 
+{\bf Cairo\-Dock\-Desktop\-Env} {\bf cairo\_\-dock\_\-guess\_\-environment} (void)
+\item 
+void {\bf cairo\_\-dock\_\-copy\_\-easy\_\-conf\_\-file} (gchar $\ast$c\-Easy\-Conf\-File\-Path, GKey\-File $\ast$p\-Main\-Key\-File)
+\item 
+void {\bf cairo\_\-dock\_\-copy\_\-to\_\-easy\_\-conf\_\-file} (GKey\-File $\ast$p\-Main\-Key\-File, gchar $\ast$c\-Easy\-Conf\-File\-Path)
+\item 
+void {\bf cairo\_\-dock\_\-build\_\-easy\_\-conf\_\-file} (gchar $\ast$c\-Main\-Conf\-File\-Path, gchar $\ast$c\-Easy\-Conf\-File\-Path)
+\item 
+void {\bf cairo\_\-dock\_\-read\_\-easy\_\-conf\_\-file} (gchar $\ast$c\-Easy\-Conf\-File\-Path, gpointer data)
+\item 
+gboolean {\bf cairo\_\-dock\_\-use\_\-full\_\-conf\_\-file} (void)
+\item 
+void {\bf cairo\_\-dock\_\-mark\_\-prefered\_\-conf\_\-file} (gchar $\ast$c\-Conf\-File\-Path)
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+{\bf Cairo\-Dock} $\ast$ {\bf g\_\-p\-Main\-Dock}
+\begin{CompactList}\small\item\em pointeur sur le dock principal. \item\end{CompactList}\item 
+GHash\-Table $\ast$ {\bf g\_\-h\-Docks\-Table}
+\begin{CompactList}\small\item\em table des docks existant. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Language}
+\item 
+gboolean {\bf g\_\-b\-Reverse\-Visible\-Image}
+\item 
+gboolean {\bf g\_\-b\-Reserve\-Space}
+\item 
+gchar $\ast$ {\bf g\_\-c\-Main\-Dock\-Default\-Renderer\-Name}
+\item 
+gchar $\ast$ {\bf g\_\-c\-Sub\-Dock\-Default\-Renderer\-Name}
+\item 
+gchar $\ast$ {\bf g\_\-c\-Current\-Theme\-Path}
+\begin{CompactList}\small\item\em le chemin vers le repertoire du theme courant. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Easy\-Conf\-File}
+\item 
+gchar $\ast$ {\bf g\_\-c\-Cairo\-Dock\-Data\-Dir}
+\begin{CompactList}\small\item\em le repertoire ou on va chercher les .desktop. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Max\-Authorized\-Width}
+\item 
+int {\bf g\_\-i\-Scroll\-Amount}
+\item 
+gboolean {\bf g\_\-b\-Reset\-Scroll\-On\-Leave}
+\item 
+double {\bf g\_\-f\-Scroll\-Acceleration}
+\item 
+int {\bf g\_\-i\-Sinusoid\-Width}
+\begin{CompactList}\small\item\em largeur de la sinusoide en pixels. On va de 0 a pi en la parcourant, en etant a pi/2 au niveau du curseur; en dehors de cet intervalle, la sinusoide est plate. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Amplitude}
+\begin{CompactList}\small\item\em amplitude de la siunsoide. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Icon\-Gap}
+\begin{CompactList}\small\item\em ecart en pixels entre les icones. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Reflect\-Size}
+\begin{CompactList}\small\item\em taille des reflets, en pixels, calcules par rapport a la hauteur max des icones. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Albedo}
+\begin{CompactList}\small\item\em pouvoir reflechissant du plan. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Dynamic\-Reflection}
+\begin{CompactList}\small\item\em dis s'il faut recalculer en temps reel le degrade en transparence des reflets. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Alpha\-At\-Rest}
+\item 
+gboolean {\bf g\_\-b\-Auto\-Hide}
+\begin{CompactList}\small\item\em TRUE si l'auto-hide est active. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Visible\-Zone\-Alpha}
+\begin{CompactList}\small\item\em transparence de la zone de rappel. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Direction\-Up}
+\begin{CompactList}\small\item\em la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Same\-Horizontality}
+\begin{CompactList}\small\item\em dit si les sous-docks ont la meme horizontalite que les docks racines. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Sub\-Dock\-Size\-Ratio}
+\begin{CompactList}\small\item\em ratio de la taille des icones des sous-docks par rapport a celles du dock principal. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Animate\-Sub\-Dock}
+\begin{CompactList}\small\item\em TRUE s'il faut animer les sous-docks des leur apparition. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Leave\-Sub\-Dock\-Delay}
+\item 
+int {\bf g\_\-i\-Show\-Sub\-Dock\-Delay}
+\item 
+int {\bf g\_\-i\-Label\-Size}
+\begin{CompactList}\small\item\em taille de la police des etiquettes. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Label\-Police}
+\begin{CompactList}\small\item\em police de caracteres des etiquettes. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Label\-Weight}
+\begin{CompactList}\small\item\em epaisseur des traits. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Label\-Style}
+\begin{CompactList}\small\item\em italique ou droit. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Label\-For\-Pointed\-Icon\-Only}
+\item 
+double {\bf g\_\-f\-Label\-Alpha\-Threshold}
+\item 
+gboolean {\bf g\_\-b\-Text\-Always\-Horizontal}
+\begin{CompactList}\small\item\em TRUE $<$=$>$ etiquettes horizontales meme pour les docks verticaux. \item\end{CompactList}\item 
+gchar $\ast$$\ast$ {\bf g\_\-c\-Default\-Icon\-Directory}
+\item 
+Gtk\-Icon\-Theme $\ast$ {\bf g\_\-p\-Icon\-Theme}
+\begin{CompactList}\small\item\em le theme d'icone choisi. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Current\-Launchers\-Path}
+\begin{CompactList}\small\item\em le chemin vers le repertoire des lanceurs/icones du theme courant. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Conf\-File}
+\item 
+int {\bf g\_\-i\-Visible\-Zone\-Width}
+\begin{CompactList}\small\item\em dimensions de la zone ou on place le curseur pour faire apparaitre le dock. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Visible\-Zone\-Height}
+\item 
+int {\bf g\_\-f\-Background\-Image\-Width}
+\begin{CompactList}\small\item\em sa taille reelle. \item\end{CompactList}\item 
+int {\bf g\_\-f\-Background\-Image\-Height}
+\item 
+int {\bf g\_\-i\-Dock\-Radius}
+\begin{CompactList}\small\item\em rayon des coins du cadre. \item\end{CompactList}\item 
+gint {\bf g\_\-i\-Frame\-Margin}
+\begin{CompactList}\small\item\em marge entre le cadre et les icones. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Dock\-Line\-Width}
+\begin{CompactList}\small\item\em epaisseur du cadre (en pixels). \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Rounded\-Bottom\-Corner}
+\begin{CompactList}\small\item\em vrai ssi les coins du bas sont arrondis. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Line\-Color} [4]
+\begin{CompactList}\small\item\em la couleur du cadre. \item\end{CompactList}\item 
+gint {\bf g\_\-i\-String\-Line\-Width}
+\begin{CompactList}\small\item\em epaisseur de la ficelle. \item\end{CompactList}\item 
+double {\bf g\_\-f\-String\-Color} [4]
+\begin{CompactList}\small\item\em la couleur de la ficelle. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Background\-Image\-Repeat}
+\begin{CompactList}\small\item\em repeter l'image du fond comme un motif. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Background\-Image\-Alpha}
+\begin{CompactList}\small\item\em transparence de l'image de fond. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Background\-Image\-File}
+\begin{CompactList}\small\item\em nom du fichier image a mettre en fond. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Decorations\-Follow\-Mouse}
+\item 
+double {\bf g\_\-f\-Stripes\-Color\-Bright} [4]
+\item 
+double {\bf g\_\-f\-Stripes\-Color\-Dark} [4]
+\item 
+cairo\_\-surface\_\-t $\ast$ {\bf g\_\-p\-Stripes\-Buffer}
+\item 
+int {\bf g\_\-i\-Nb\-Stripes}
+\item 
+double {\bf g\_\-f\-Stripes\-Speed\-Factor}
+\item 
+double {\bf g\_\-f\-Stripes\-Width}
+\item 
+double {\bf g\_\-f\-Stripes\-Angle}
+\item 
+int {\bf g\_\-i\-Screen\-Width} [2]
+\begin{CompactList}\small\item\em dimensions de l'ecran. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Screen\-Height} [2]
+\item 
+double {\bf g\_\-f\-Unfold\-Acceleration}
+\item 
+int {\bf g\_\-i\-Grow\-Up\-Interval}
+\item 
+int {\bf g\_\-i\-Shrink\-Down\-Interval}
+\item 
+double {\bf g\_\-f\-Move\-Up\-Speed}
+\item 
+double {\bf g\_\-f\-Move\-Down\-Speed}
+\item 
+double {\bf g\_\-f\-Refresh\-Interval}
+\item 
+gboolean {\bf g\_\-b\-Show\-Appli}
+\item 
+gboolean {\bf g\_\-b\-Unique\-Pid}
+\item 
+gboolean {\bf g\_\-b\-Group\-Appli\-By\-Class}
+\item 
+int {\bf g\_\-i\-Appli\-Max\-Name\-Length}
+\item 
+gboolean {\bf g\_\-b\-Minimize\-On\-Click}
+\item 
+gboolean {\bf g\_\-b\-Close\-Appli\-On\-Middle\-Click}
+\item 
+gboolean {\bf g\_\-b\-Demands\-Attention\-With\-Dialog}
+\item 
+gboolean {\bf g\_\-b\-Demands\-Attention\-With\-Animation}
+\item 
+gboolean {\bf g\_\-b\-Animate\-On\-Active\-Window}
+\item 
+int {\bf g\_\-t\-Max\-Icon\-Authorized\-Size} [CAIRO\_\-DOCK\_\-NB\_\-TYPES]
+\item 
+int {\bf g\_\-t\-Min\-Icon\-Authorized\-Size} [CAIRO\_\-DOCK\_\-NB\_\-TYPES]
+\begin{CompactList}\small\item\em les tailles min et max pour chaque type d'icone. \item\end{CompactList}\item 
+int {\bf g\_\-t\-Animation\-Type} [CAIRO\_\-DOCK\_\-NB\_\-TYPES]
+\item 
+int {\bf g\_\-t\-Nb\-Animation\-Rounds} [CAIRO\_\-DOCK\_\-NB\_\-TYPES]
+\item 
+int {\bf g\_\-t\-Icon\-Type\-Order} [CAIRO\_\-DOCK\_\-NB\_\-TYPES]
+\item 
+gchar $\ast$ {\bf g\_\-c\-Separator\-Image}
+\begin{CompactList}\small\item\em nom d'une image a afficher en tant que separateur. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Revolve\-Separator}
+\begin{CompactList}\small\item\em faire pivoter l'image des separateurs. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Constant\-Separator\-Size}
+\begin{CompactList}\small\item\em garder les separateurs de taille constante. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Dialog\-Button\-Width}
+\item 
+int {\bf g\_\-i\-Dialog\-Button\-Height}
+\item 
+double {\bf g\_\-f\-Dialog\-Alpha}
+\item 
+int {\bf g\_\-i\-Dialog\-Icon\-Size}
+\end{CompactItemize}
+
+
+\subsection{Documentation des macros}
+\index{cairo-dock-config.c@{cairo-dock-config.c}!CAIRO_DOCK_TYPE_CONF_FILE_FILE@{CAIRO\_\-DOCK\_\-TYPE\_\-CONF\_\-FILE\_\-FILE}}
+\index{CAIRO_DOCK_TYPE_CONF_FILE_FILE@{CAIRO\_\-DOCK\_\-TYPE\_\-CONF\_\-FILE\_\-FILE}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CAIRO\_\-DOCK\_\-TYPE\_\-CONF\_\-FILE\_\-FILE~\char`\"{}.cairo-dock-conf-file\char`\"{}}\label{cairo-dock-config_8c_188502d7a7cf14a71adb7060000f14ed}
+
+
+
+
+\subsection{Documentation des fonctions}
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_get_boolean_key_value@{cairo\_\-dock\_\-get\_\-boolean\_\-key\_\-value}}
+\index{cairo_dock_get_boolean_key_value@{cairo\_\-dock\_\-get\_\-boolean\_\-key\_\-value}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean cairo\_\-dock\_\-get\_\-boolean\_\-key\_\-value (GKey\-File $\ast$ {\em p\-Key\-File}, gchar $\ast$ {\em c\-Group\-Name}, gchar $\ast$ {\em c\-Key\-Name}, gboolean $\ast$ {\em b\-Flush\-Conf\-File\-Needed}, gboolean {\em b\-Default\-Value})}\label{cairo-dock-config_8c_c5270550536ee2b141bb837ed3109f7b}
+
+
+Recupere une cle booleene d'un fichier de cles. \begin{Desc}
+\item[Param\`{e}tres:]
+\begin{description}
+\item[{\em p\-Key\-File}]le fichier de cles. \item[{\em c\-Group\-Name}]le com du groupe. \item[{\em c\-Key\-Name}]le nom de la cle. \item[{\em b\-Flush\-Conf\-File\-Needed}]est mis a TRUE si la cle est manquante. \item[{\em b\-Default\-Value}]valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]la valeur booleene de la cle. \end{Desc}
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_get_integer_key_value@{cairo\_\-dock\_\-get\_\-integer\_\-key\_\-value}}
+\index{cairo_dock_get_integer_key_value@{cairo\_\-dock\_\-get\_\-integer\_\-key\_\-value}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int cairo\_\-dock\_\-get\_\-integer\_\-key\_\-value (GKey\-File $\ast$ {\em p\-Key\-File}, gchar $\ast$ {\em c\-Group\-Name}, gchar $\ast$ {\em c\-Key\-Name}, gboolean $\ast$ {\em b\-Flush\-Conf\-File\-Needed}, int {\em i\-Default\-Value})}\label{cairo-dock-config_8c_5ed21435bb2a71a53413df26e0efe77e}
+
+
+Recupere une cle entiere d'un fichier de cles. \begin{Desc}
+\item[Param\`{e}tres:]
+\begin{description}
+\item[{\em p\-Key\-File}]le fichier de cles. \item[{\em c\-Group\-Name}]le com du groupe. \item[{\em c\-Key\-Name}]le nom de la cle. \item[{\em b\-Flush\-Conf\-File\-Needed}]est mis a TRUE si la cle est manquante. \item[{\em i\-Default\-Value}]valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]la valeur entiere de la cle. \end{Desc}
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_get_double_key_value@{cairo\_\-dock\_\-get\_\-double\_\-key\_\-value}}
+\index{cairo_dock_get_double_key_value@{cairo\_\-dock\_\-get\_\-double\_\-key\_\-value}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double cairo\_\-dock\_\-get\_\-double\_\-key\_\-value (GKey\-File $\ast$ {\em p\-Key\-File}, gchar $\ast$ {\em c\-Group\-Name}, gchar $\ast$ {\em c\-Key\-Name}, gboolean $\ast$ {\em b\-Flush\-Conf\-File\-Needed}, double {\em f\-Default\-Value})}\label{cairo-dock-config_8c_db8d7432ccf93682ccc4b20f7f40c25c}
+
+
+Recupere une cle flottante d'un fichier de cles. \begin{Desc}
+\item[Param\`{e}tres:]
+\begin{description}
+\item[{\em p\-Key\-File}]le fichier de cles. \item[{\em c\-Group\-Name}]le com du groupe. \item[{\em c\-Key\-Name}]le nom de la cle. \item[{\em b\-Flush\-Conf\-File\-Needed}]est mis a TRUE si la cle est manquante. \item[{\em f\-Default\-Value}]valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]la valeur flottante de la cle. \end{Desc}
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_get_string_key_value@{cairo\_\-dock\_\-get\_\-string\_\-key\_\-value}}
+\index{cairo_dock_get_string_key_value@{cairo\_\-dock\_\-get\_\-string\_\-key\_\-value}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ cairo\_\-dock\_\-get\_\-string\_\-key\_\-value (GKey\-File $\ast$ {\em p\-Key\-File}, gchar $\ast$ {\em c\-Group\-Name}, gchar $\ast$ {\em c\-Key\-Name}, gboolean $\ast$ {\em b\-Flush\-Conf\-File\-Needed}, const gchar $\ast$ {\em c\-Default\-Value})}\label{cairo-dock-config_8c_f95ee7aa52a85f3f38ecc289f55b7c32}
+
+
+Recupere une cle d'un fichier de cles sous la forme d'une chaine de caractere. \begin{Desc}
+\item[Param\`{e}tres:]
+\begin{description}
+\item[{\em p\-Key\-File}]le fichier de cles. \item[{\em c\-Group\-Name}]le com du groupe. \item[{\em c\-Key\-Name}]le nom de la cle. \item[{\em b\-Flush\-Conf\-File\-Needed}]est mis a TRUE si la cle est manquante. \item[{\em c\-Default\-Value}]valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]la chaine de caractere nouvellement allouee correspondante a la cle. \end{Desc}
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_get_integer_list_key_value@{cairo\_\-dock\_\-get\_\-integer\_\-list\_\-key\_\-value}}
+\index{cairo_dock_get_integer_list_key_value@{cairo\_\-dock\_\-get\_\-integer\_\-list\_\-key\_\-value}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-get\_\-integer\_\-list\_\-key\_\-value (GKey\-File $\ast$ {\em p\-Key\-File}, gchar $\ast$ {\em c\-Group\-Name}, gchar $\ast$ {\em c\-Key\-Name}, gboolean $\ast$ {\em b\-Flush\-Conf\-File\-Needed}, int $\ast$ {\em i\-Value\-Buffer}, int {\em i\-Nb\-Elements}, int $\ast$ {\em i\-Default\-Values})}\label{cairo-dock-config_8c_b12b7c7f51c703b3c16c90b00b83acbd}
+
+
+Recupere une cle d'un fichier de cles sous la forme d'un tableau d'entiers. \begin{Desc}
+\item[Param\`{e}tres:]
+\begin{description}
+\item[{\em p\-Key\-File}]le fichier de cles. \item[{\em c\-Group\-Name}]le com du groupe. \item[{\em c\-Key\-Name}]le nom de la cle. \item[{\em b\-Flush\-Conf\-File\-Needed}]est mis a TRUE si la cle est manquante. \item[{\em i\-Value\-Buffer}]tableau qui sera rempli. \item[{\em i\-Nb\-Elements}]nombre d'elements a recuperer; c'est le nombre d'elements du tableau passe en entree. \item[{\em i\-Default\-Values}]valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante. \end{description}
+\end{Desc}
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_get_double_list_key_value@{cairo\_\-dock\_\-get\_\-double\_\-list\_\-key\_\-value}}
+\index{cairo_dock_get_double_list_key_value@{cairo\_\-dock\_\-get\_\-double\_\-list\_\-key\_\-value}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-get\_\-double\_\-list\_\-key\_\-value (GKey\-File $\ast$ {\em p\-Key\-File}, gchar $\ast$ {\em c\-Group\-Name}, gchar $\ast$ {\em c\-Key\-Name}, gboolean $\ast$ {\em b\-Flush\-Conf\-File\-Needed}, double $\ast$ {\em f\-Value\-Buffer}, int {\em i\-Nb\-Elements}, double $\ast$ {\em f\-Default\-Values})}\label{cairo-dock-config_8c_1cc7cb88d1fb657678fe728e648db8be}
+
+
+Recupere une cle d'un fichier de cles sous la forme d'un tableau de doubles. \begin{Desc}
+\item[Param\`{e}tres:]
+\begin{description}
+\item[{\em p\-Key\-File}]le fichier de cles. \item[{\em c\-Group\-Name}]le com du groupe. \item[{\em c\-Key\-Name}]le nom de la cle. \item[{\em b\-Flush\-Conf\-File\-Needed}]est mis a TRUE si la cle est manquante. \item[{\em f\-Value\-Buffer}]tableau qui sera rempli. \item[{\em i\-Nb\-Elements}]nombre d'elements a recuperer; c'est le nombre d'elements du tableau passe en entree. \item[{\em f\-Default\-Values}]valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante. \end{description}
+\end{Desc}
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_get_string_list_key_value@{cairo\_\-dock\_\-get\_\-string\_\-list\_\-key\_\-value}}
+\index{cairo_dock_get_string_list_key_value@{cairo\_\-dock\_\-get\_\-string\_\-list\_\-key\_\-value}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$$\ast$ cairo\_\-dock\_\-get\_\-string\_\-list\_\-key\_\-value (GKey\-File $\ast$ {\em p\-Key\-File}, gchar $\ast$ {\em c\-Group\-Name}, gchar $\ast$ {\em c\-Key\-Name}, gboolean $\ast$ {\em b\-Flush\-Conf\-File\-Needed}, gsize $\ast$ {\em length}, gchar $\ast$ {\em c\-Default\-Values})}\label{cairo-dock-config_8c_44da4d7a6a3acc79178ac1b1153f11d5}
+
+
+Recupere une cle d'un fichier de cles sous la forme d'un tableau de chaines de caracteres. \begin{Desc}
+\item[Param\`{e}tres:]
+\begin{description}
+\item[{\em p\-Key\-File}]le fichier de cles. \item[{\em c\-Group\-Name}]le com du groupe. \item[{\em c\-Key\-Name}]le nom de la cle. \item[{\em b\-Flush\-Conf\-File\-Needed}]est mis a TRUE si la cle est manquante. \item[{\em length}]nombre de chaines de caracteres recuperees. \item[{\em c\-Default\-Values}]valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]un tableau de chaines de caracteres; a liberer avec g\_\-strfreev(). \end{Desc}
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_get_animation_type_key_value@{cairo\_\-dock\_\-get\_\-animation\_\-type\_\-key\_\-value}}
+\index{cairo_dock_get_animation_type_key_value@{cairo\_\-dock\_\-get\_\-animation\_\-type\_\-key\_\-value}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf Cairo\-Dock\-Animation\-Type} cairo\_\-dock\_\-get\_\-animation\_\-type\_\-key\_\-value (GKey\-File $\ast$ {\em p\-Key\-File}, gchar $\ast$ {\em c\-Group\-Name}, gchar $\ast$ {\em c\-Key\-Name}, gboolean $\ast$ {\em b\-Flush\-Conf\-File\-Needed}, {\bf Cairo\-Dock\-Animation\-Type} {\em i\-Default\-Animation})}\label{cairo-dock-config_8c_1399e889ecff5ac390552c643c01ea43}
+
+
+Recupere une cle d'un fichier de cles sous la forme d'un tableau de chaines de caracteres. \begin{Desc}
+\item[Param\`{e}tres:]
+\begin{description}
+\item[{\em p\-Key\-File}]le fichier de cles. \item[{\em c\-Group\-Name}]le com du groupe. \item[{\em c\-Key\-Name}]le nom de la cle. \item[{\em b\-Flush\-Conf\-File\-Needed}]est mis a TRUE si la cle est manquante. \item[{\em i\-Default\-Animation}]valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]le type de l'animation correspondante a la cle. \end{Desc}
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_read_conf_file@{cairo\_\-dock\_\-read\_\-conf\_\-file}}
+\index{cairo_dock_read_conf_file@{cairo\_\-dock\_\-read\_\-conf\_\-file}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-read\_\-conf\_\-file (gchar $\ast$ {\em c\-Conf\-File\-Path}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-config_8c_c64f3ee3060851d08a10b674983ceef6}
+
+
+gchar $\ast$c\-Screen\-Border = cairo\_\-dock\_\-get\_\-string\_\-key\_\-value (p\-Key\-File, \char`\"{}Position\char`\"{}, \char`\"{}screen border\char`\"{}, \&b\-Flush\-Conf\-File\-Needed, \char`\"{}bottom\char`\"{});
+
+cairo\_\-dock\_\-update\_\-dock\_\-size (p\-Dock); \index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_edit_conf_file_full@{cairo\_\-dock\_\-edit\_\-conf\_\-file\_\-full}}
+\index{cairo_dock_edit_conf_file_full@{cairo\_\-dock\_\-edit\_\-conf\_\-file\_\-full}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean cairo\_\-dock\_\-edit\_\-conf\_\-file\_\-full (Gtk\-Widget $\ast$ {\em p\-Widget}, gchar $\ast$ {\em c\-Conf\-File\-Path}, gchar $\ast$ {\em c\-Title}, int {\em i\-Window\-Width}, int {\em i\-Window\-Height}, gchar {\em i\-Identifier}, gchar $\ast$ {\em c\-Presented\-Group}, {\bf Cairo\-Dock\-Config\-Func} {\em p\-Config\-Func}, gpointer {\em data}, GFunc {\em p\-Free\-User\-Data\-Func}, {\bf Cairo\-Dock\-Config\-Func} {\em p\-Config\-Func2}, gchar $\ast$ {\em c\-Conf\-File\-Path2}, gchar $\ast$ {\em c\-Button\-Convert}, gchar $\ast$ {\em c\-Button\-Revert})}\label{cairo-dock-config_8c_4a1db70ca82116e654ad3de0a2b40791}
+
+
+Lis un fichier de conf, construit l'IHM appropriee, et la presente a l'utilisateur. \begin{Desc}
+\item[Param\`{e}tres:]
+\begin{description}
+\item[{\em p\-Widget}]\item[{\em c\-Conf\-File\-Path}]\item[{\em c\-Title}]\item[{\em i\-Window\-Width}]\item[{\em i\-Window\-Height}]\item[{\em i\-Identifier}]\item[{\em c\-Presented\-Group}]\item[{\em p\-Config\-Func}]\item[{\em data}]\item[{\em p\-Free\-User\-Data\-Func}]\item[{\em p\-Config\-Func2}]\item[{\em c\-Conf\-File\-Path2}]\item[{\em c\-Button\-Convert}]\item[{\em c\-Button\-Revert}]\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]TRUE si l'utilisateur a ferme le panneau de conf en appuyant sur OK, FALSE sinon. \end{Desc}
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_update_conf_file_with_position@{cairo\_\-dock\_\-update\_\-conf\_\-file\_\-with\_\-position}}
+\index{cairo_dock_update_conf_file_with_position@{cairo\_\-dock\_\-update\_\-conf\_\-file\_\-with\_\-position}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-update\_\-conf\_\-file\_\-with\_\-position (gchar $\ast$ {\em c\-Conf\-File\-Path}, int {\em x}, int {\em y})}\label{cairo-dock-config_8c_4fbe55818645f3a7eababc1023ccb205}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_update_conf_file_with_translations_full@{cairo\_\-dock\_\-update\_\-conf\_\-file\_\-with\_\-translations\_\-full}}
+\index{cairo_dock_update_conf_file_with_translations_full@{cairo\_\-dock\_\-update\_\-conf\_\-file\_\-with\_\-translations\_\-full}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-update\_\-conf\_\-file\_\-with\_\-translations\_\-full (gchar $\ast$ {\em c\-Conf\-File}, gchar $\ast$ {\em c\-Translations\-Dir}, gchar $\ast$ {\em c\-Group\-Name}, gchar $\ast$ {\em c\-Key\-Name})}\label{cairo-dock-config_8c_a2c3c5b3ad3280220a4f919be33b9ea4}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_guess_environment@{cairo\_\-dock\_\-guess\_\-environment}}
+\index{cairo_dock_guess_environment@{cairo\_\-dock\_\-guess\_\-environment}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf Cairo\-Dock\-Desktop\-Env} cairo\_\-dock\_\-guess\_\-environment (void)}\label{cairo-dock-config_8c_e4f8b1a235338cc84135c147972d7ca1}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_copy_easy_conf_file@{cairo\_\-dock\_\-copy\_\-easy\_\-conf\_\-file}}
+\index{cairo_dock_copy_easy_conf_file@{cairo\_\-dock\_\-copy\_\-easy\_\-conf\_\-file}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-copy\_\-easy\_\-conf\_\-file (gchar $\ast$ {\em c\-Easy\-Conf\-File\-Path}, GKey\-File $\ast$ {\em p\-Main\-Key\-File})}\label{cairo-dock-config_8c_99b1a5ec61008af612dd93c43a711d0e}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_copy_to_easy_conf_file@{cairo\_\-dock\_\-copy\_\-to\_\-easy\_\-conf\_\-file}}
+\index{cairo_dock_copy_to_easy_conf_file@{cairo\_\-dock\_\-copy\_\-to\_\-easy\_\-conf\_\-file}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-copy\_\-to\_\-easy\_\-conf\_\-file (GKey\-File $\ast$ {\em p\-Main\-Key\-File}, gchar $\ast$ {\em c\-Easy\-Conf\-File\-Path})}\label{cairo-dock-config_8c_39c75b5dca429d1ce0f043e4ba94a3ac}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_build_easy_conf_file@{cairo\_\-dock\_\-build\_\-easy\_\-conf\_\-file}}
+\index{cairo_dock_build_easy_conf_file@{cairo\_\-dock\_\-build\_\-easy\_\-conf\_\-file}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-build\_\-easy\_\-conf\_\-file (gchar $\ast$ {\em c\-Main\-Conf\-File\-Path}, gchar $\ast$ {\em c\-Easy\-Conf\-File\-Path})}\label{cairo-dock-config_8c_33f275343b1af7c5fccc9a66eb87967b}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_read_easy_conf_file@{cairo\_\-dock\_\-read\_\-easy\_\-conf\_\-file}}
+\index{cairo_dock_read_easy_conf_file@{cairo\_\-dock\_\-read\_\-easy\_\-conf\_\-file}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-read\_\-easy\_\-conf\_\-file (gchar $\ast$ {\em c\-Easy\-Conf\-File\-Path}, gpointer {\em data})}\label{cairo-dock-config_8c_3c83e742ee7d6a6d9d4781dbf82a1dc8}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_use_full_conf_file@{cairo\_\-dock\_\-use\_\-full\_\-conf\_\-file}}
+\index{cairo_dock_use_full_conf_file@{cairo\_\-dock\_\-use\_\-full\_\-conf\_\-file}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean cairo\_\-dock\_\-use\_\-full\_\-conf\_\-file (void)}\label{cairo-dock-config_8c_a114a97808acd1212d04cc424186d2f5}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!cairo_dock_mark_prefered_conf_file@{cairo\_\-dock\_\-mark\_\-prefered\_\-conf\_\-file}}
+\index{cairo_dock_mark_prefered_conf_file@{cairo\_\-dock\_\-mark\_\-prefered\_\-conf\_\-file}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-mark\_\-prefered\_\-conf\_\-file (gchar $\ast$ {\em c\-Conf\-File\-Path})}\label{cairo-dock-config_8c_8aab139403895e5d792e02de7e3d899c}
+
+
+
+
+\subsection{Documentation des variables}
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_pMainDock@{g\_\-pMainDock}}
+\index{g_pMainDock@{g\_\-pMainDock}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf Cairo\-Dock}$\ast$ {\bf g\_\-p\-Main\-Dock}}\label{cairo-dock-config_8c_a24af9062f9cc975eb0b9422eb6587e6}
+
+
+pointeur sur le dock principal. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_hDocksTable@{g\_\-hDocksTable}}
+\index{g_hDocksTable@{g\_\-hDocksTable}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}GHash\-Table$\ast$ {\bf g\_\-h\-Docks\-Table}}\label{cairo-dock-config_8c_0651cfb551572c8fc57a25044f9dd016}
+
+
+table des docks existant. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_cLanguage@{g\_\-cLanguage}}
+\index{g_cLanguage@{g\_\-cLanguage}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Language}}\label{cairo-dock-config_8c_fb26c14d874eba876836b1ba28f1eb58}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bReverseVisibleImage@{g\_\-bReverseVisibleImage}}
+\index{g_bReverseVisibleImage@{g\_\-bReverseVisibleImage}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Reverse\-Visible\-Image}}\label{cairo-dock-config_8c_720b918c7fc3ffd5f45d08f0c245ad4e}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bReserveSpace@{g\_\-bReserveSpace}}
+\index{g_bReserveSpace@{g\_\-bReserveSpace}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Reserve\-Space}}\label{cairo-dock-config_8c_db969b7c9d9280df9b787bf0e04f8e13}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_cMainDockDefaultRendererName@{g\_\-cMainDockDefaultRendererName}}
+\index{g_cMainDockDefaultRendererName@{g\_\-cMainDockDefaultRendererName}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Main\-Dock\-Default\-Renderer\-Name}}\label{cairo-dock-config_8c_d58fb04683fb946b0fb7679743506c80}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_cSubDockDefaultRendererName@{g\_\-cSubDockDefaultRendererName}}
+\index{g_cSubDockDefaultRendererName@{g\_\-cSubDockDefaultRendererName}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Sub\-Dock\-Default\-Renderer\-Name}}\label{cairo-dock-config_8c_d32ec627add3ffb884c06ed22927114a}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_cCurrentThemePath@{g\_\-cCurrentThemePath}}
+\index{g_cCurrentThemePath@{g\_\-cCurrentThemePath}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Current\-Theme\-Path}}\label{cairo-dock-config_8c_c9102142a8dd6330299f9340c9d2b704}
+
+
+le chemin vers le repertoire du theme courant. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_cEasyConfFile@{g\_\-cEasyConfFile}}
+\index{g_cEasyConfFile@{g\_\-cEasyConfFile}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Easy\-Conf\-File}}\label{cairo-dock-config_8c_516cee7fd8c65742fa35c0269b544eda}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_cCairoDockDataDir@{g\_\-cCairoDockDataDir}}
+\index{g_cCairoDockDataDir@{g\_\-cCairoDockDataDir}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Cairo\-Dock\-Data\-Dir}}\label{cairo-dock-config_8c_e8ab56da998f5b0784d5e09cdddd929b}
+
+
+le repertoire ou on va chercher les .desktop. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iMaxAuthorizedWidth@{g\_\-iMaxAuthorizedWidth}}
+\index{g_iMaxAuthorizedWidth@{g\_\-iMaxAuthorizedWidth}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Max\-Authorized\-Width}}\label{cairo-dock-config_8c_43a8f6facdf04f7534a1792a4004a7fc}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iScrollAmount@{g\_\-iScrollAmount}}
+\index{g_iScrollAmount@{g\_\-iScrollAmount}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Scroll\-Amount}}\label{cairo-dock-config_8c_362cbedfe9ef0779ecf4100f9f42519c}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bResetScrollOnLeave@{g\_\-bResetScrollOnLeave}}
+\index{g_bResetScrollOnLeave@{g\_\-bResetScrollOnLeave}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Reset\-Scroll\-On\-Leave}}\label{cairo-dock-config_8c_6f702198c2a73a5413af054e40731b63}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fScrollAcceleration@{g\_\-fScrollAcceleration}}
+\index{g_fScrollAcceleration@{g\_\-fScrollAcceleration}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Scroll\-Acceleration}}\label{cairo-dock-config_8c_993ffc03885e9dd565ea353efb16a730}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iSinusoidWidth@{g\_\-iSinusoidWidth}}
+\index{g_iSinusoidWidth@{g\_\-iSinusoidWidth}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Sinusoid\-Width}}\label{cairo-dock-config_8c_7ed10b4674d07794421af544ea9f2ad8}
+
+
+largeur de la sinusoide en pixels. On va de 0 a pi en la parcourant, en etant a pi/2 au niveau du curseur; en dehors de cet intervalle, la sinusoide est plate. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fAmplitude@{g\_\-fAmplitude}}
+\index{g_fAmplitude@{g\_\-fAmplitude}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Amplitude}}\label{cairo-dock-config_8c_71125a40fdc7b421002f176b9b82ac79}
+
+
+amplitude de la siunsoide. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iIconGap@{g\_\-iIconGap}}
+\index{g_iIconGap@{g\_\-iIconGap}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Icon\-Gap}}\label{cairo-dock-config_8c_32a45bc8bdc1899cbe8bbc034a3815fe}
+
+
+ecart en pixels entre les icones. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fReflectSize@{g\_\-fReflectSize}}
+\index{g_fReflectSize@{g\_\-fReflectSize}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Reflect\-Size}}\label{cairo-dock-config_8c_815cf11f5b3bd8f701b0e1083921ebbd}
+
+
+taille des reflets, en pixels, calcules par rapport a la hauteur max des icones. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fAlbedo@{g\_\-fAlbedo}}
+\index{g_fAlbedo@{g\_\-fAlbedo}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Albedo}}\label{cairo-dock-config_8c_1301d24e576a57001c9ddf296d170655}
+
+
+pouvoir reflechissant du plan. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bDynamicReflection@{g\_\-bDynamicReflection}}
+\index{g_bDynamicReflection@{g\_\-bDynamicReflection}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Dynamic\-Reflection}}\label{cairo-dock-config_8c_d5827704b49bf830fcec995cd1f13263}
+
+
+dis s'il faut recalculer en temps reel le degrade en transparence des reflets. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fAlphaAtRest@{g\_\-fAlphaAtRest}}
+\index{g_fAlphaAtRest@{g\_\-fAlphaAtRest}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Alpha\-At\-Rest}}\label{cairo-dock-config_8c_e1099181d41b6745044fd824d68baa45}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bAutoHide@{g\_\-bAutoHide}}
+\index{g_bAutoHide@{g\_\-bAutoHide}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Auto\-Hide}}\label{cairo-dock-config_8c_263de39492b5e16c81c98792f183edcf}
+
+
+TRUE si l'auto-hide est active. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fVisibleZoneAlpha@{g\_\-fVisibleZoneAlpha}}
+\index{g_fVisibleZoneAlpha@{g\_\-fVisibleZoneAlpha}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Visible\-Zone\-Alpha}}\label{cairo-dock-config_8c_5ba5413d17795f22f4d5aa4cbe9a364e}
+
+
+transparence de la zone de rappel. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bDirectionUp@{g\_\-bDirectionUp}}
+\index{g_bDirectionUp@{g\_\-bDirectionUp}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Direction\-Up}}\label{cairo-dock-config_8c_080e0cb494374269a17c7ebd078e855d}
+
+
+la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bSameHorizontality@{g\_\-bSameHorizontality}}
+\index{g_bSameHorizontality@{g\_\-bSameHorizontality}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Same\-Horizontality}}\label{cairo-dock-config_8c_ebf5cd7f2cea410e4d3811a5dc3405b9}
+
+
+dit si les sous-docks ont la meme horizontalite que les docks racines. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fSubDockSizeRatio@{g\_\-fSubDockSizeRatio}}
+\index{g_fSubDockSizeRatio@{g\_\-fSubDockSizeRatio}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Sub\-Dock\-Size\-Ratio}}\label{cairo-dock-config_8c_e6ee377f5c409b71e3f7e87694f60556}
+
+
+ratio de la taille des icones des sous-docks par rapport a celles du dock principal. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bAnimateSubDock@{g\_\-bAnimateSubDock}}
+\index{g_bAnimateSubDock@{g\_\-bAnimateSubDock}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Animate\-Sub\-Dock}}\label{cairo-dock-config_8c_2af171e71561da2dfda3c5f207677f27}
+
+
+TRUE s'il faut animer les sous-docks des leur apparition. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iLeaveSubDockDelay@{g\_\-iLeaveSubDockDelay}}
+\index{g_iLeaveSubDockDelay@{g\_\-iLeaveSubDockDelay}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Leave\-Sub\-Dock\-Delay}}\label{cairo-dock-config_8c_e3ccd18397864a60a1bf19806a0b07ff}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iShowSubDockDelay@{g\_\-iShowSubDockDelay}}
+\index{g_iShowSubDockDelay@{g\_\-iShowSubDockDelay}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Show\-Sub\-Dock\-Delay}}\label{cairo-dock-config_8c_c39cdbf48f4c71bd9357ef70e569c448}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iLabelSize@{g\_\-iLabelSize}}
+\index{g_iLabelSize@{g\_\-iLabelSize}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Label\-Size}}\label{cairo-dock-config_8c_386538e26258de4d50feb84fecc45dd6}
+
+
+taille de la police des etiquettes. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_cLabelPolice@{g\_\-cLabelPolice}}
+\index{g_cLabelPolice@{g\_\-cLabelPolice}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Label\-Police}}\label{cairo-dock-config_8c_1dd252a8514e5074187d0c12a311f158}
+
+
+police de caracteres des etiquettes. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iLabelWeight@{g\_\-iLabelWeight}}
+\index{g_iLabelWeight@{g\_\-iLabelWeight}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Label\-Weight}}\label{cairo-dock-config_8c_709f8c9af486980298862ded5b3edfa5}
+
+
+epaisseur des traits. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iLabelStyle@{g\_\-iLabelStyle}}
+\index{g_iLabelStyle@{g\_\-iLabelStyle}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Label\-Style}}\label{cairo-dock-config_8c_673e7ae2a36a56170ff492d17b46030b}
+
+
+italique ou droit. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bLabelForPointedIconOnly@{g\_\-bLabelForPointedIconOnly}}
+\index{g_bLabelForPointedIconOnly@{g\_\-bLabelForPointedIconOnly}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Label\-For\-Pointed\-Icon\-Only}}\label{cairo-dock-config_8c_57a991233be710d18740f1ce21647c58}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fLabelAlphaThreshold@{g\_\-fLabelAlphaThreshold}}
+\index{g_fLabelAlphaThreshold@{g\_\-fLabelAlphaThreshold}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Label\-Alpha\-Threshold}}\label{cairo-dock-config_8c_edfb545352a3033876f0cdfb4e7f0893}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bTextAlwaysHorizontal@{g\_\-bTextAlwaysHorizontal}}
+\index{g_bTextAlwaysHorizontal@{g\_\-bTextAlwaysHorizontal}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Text\-Always\-Horizontal}}\label{cairo-dock-config_8c_9656ee040199018fa599316b38e2f231}
+
+
+TRUE $<$=$>$ etiquettes horizontales meme pour les docks verticaux. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_cDefaultIconDirectory@{g\_\-cDefaultIconDirectory}}
+\index{g_cDefaultIconDirectory@{g\_\-cDefaultIconDirectory}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$$\ast$ {\bf g\_\-c\-Default\-Icon\-Directory}}\label{cairo-dock-config_8c_41126bcd8eca05e7c4898de8202e7375}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_pIconTheme@{g\_\-pIconTheme}}
+\index{g_pIconTheme@{g\_\-pIconTheme}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Gtk\-Icon\-Theme$\ast$ {\bf g\_\-p\-Icon\-Theme}}\label{cairo-dock-config_8c_ecfdd070a6e5e7dd7ef53cb73b68add8}
+
+
+le theme d'icone choisi. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_cCurrentLaunchersPath@{g\_\-cCurrentLaunchersPath}}
+\index{g_cCurrentLaunchersPath@{g\_\-cCurrentLaunchersPath}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Current\-Launchers\-Path}}\label{cairo-dock-config_8c_540e05d87e90a39620d6d15e03dc808b}
+
+
+le chemin vers le repertoire des lanceurs/icones du theme courant. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_cConfFile@{g\_\-cConfFile}}
+\index{g_cConfFile@{g\_\-cConfFile}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Conf\-File}}\label{cairo-dock-config_8c_2173efce4550991bad33a89cf25b6243}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iVisibleZoneWidth@{g\_\-iVisibleZoneWidth}}
+\index{g_iVisibleZoneWidth@{g\_\-iVisibleZoneWidth}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Visible\-Zone\-Width}}\label{cairo-dock-config_8c_e5fa6397c672cb778cb4637dfa5983d0}
+
+
+dimensions de la zone ou on place le curseur pour faire apparaitre le dock. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iVisibleZoneHeight@{g\_\-iVisibleZoneHeight}}
+\index{g_iVisibleZoneHeight@{g\_\-iVisibleZoneHeight}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Visible\-Zone\-Height}}\label{cairo-dock-config_8c_b032d5fe2acfb6b93dcbc85ad1962730}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fBackgroundImageWidth@{g\_\-fBackgroundImageWidth}}
+\index{g_fBackgroundImageWidth@{g\_\-fBackgroundImageWidth}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-f\-Background\-Image\-Width}}\label{cairo-dock-config_8c_62d9678ec1ab18763d277117d75b3f1f}
+
+
+sa taille reelle. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fBackgroundImageHeight@{g\_\-fBackgroundImageHeight}}
+\index{g_fBackgroundImageHeight@{g\_\-fBackgroundImageHeight}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-f\-Background\-Image\-Height}}\label{cairo-dock-config_8c_164378e6b67dd6caa165edb41d53079d}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iDockRadius@{g\_\-iDockRadius}}
+\index{g_iDockRadius@{g\_\-iDockRadius}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Dock\-Radius}}\label{cairo-dock-config_8c_ecf9278fca418109e169d4514d022541}
+
+
+rayon des coins du cadre. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iFrameMargin@{g\_\-iFrameMargin}}
+\index{g_iFrameMargin@{g\_\-iFrameMargin}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-Frame\-Margin}}\label{cairo-dock-config_8c_a16b32df9350a49829c9d153db02cabd}
+
+
+marge entre le cadre et les icones. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iDockLineWidth@{g\_\-iDockLineWidth}}
+\index{g_iDockLineWidth@{g\_\-iDockLineWidth}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Dock\-Line\-Width}}\label{cairo-dock-config_8c_8ff61d8910b08e05a1cc800f5a5dd81b}
+
+
+epaisseur du cadre (en pixels). 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bRoundedBottomCorner@{g\_\-bRoundedBottomCorner}}
+\index{g_bRoundedBottomCorner@{g\_\-bRoundedBottomCorner}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Rounded\-Bottom\-Corner}}\label{cairo-dock-config_8c_eff7098546eeea81c9c29a272527cbdb}
+
+
+vrai ssi les coins du bas sont arrondis. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fLineColor@{g\_\-fLineColor}}
+\index{g_fLineColor@{g\_\-fLineColor}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Line\-Color}[4]}\label{cairo-dock-config_8c_692342aa8466267ea13fc290bdbecd96}
+
+
+la couleur du cadre. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iStringLineWidth@{g\_\-iStringLineWidth}}
+\index{g_iStringLineWidth@{g\_\-iStringLineWidth}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-String\-Line\-Width}}\label{cairo-dock-config_8c_0db95b23d504f175f413a97ffebf90e6}
+
+
+epaisseur de la ficelle. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fStringColor@{g\_\-fStringColor}}
+\index{g_fStringColor@{g\_\-fStringColor}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-String\-Color}[4]}\label{cairo-dock-config_8c_f88d55afe2a1e788f20f0ba72b74366f}
+
+
+la couleur de la ficelle. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bBackgroundImageRepeat@{g\_\-bBackgroundImageRepeat}}
+\index{g_bBackgroundImageRepeat@{g\_\-bBackgroundImageRepeat}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Background\-Image\-Repeat}}\label{cairo-dock-config_8c_240e5572251596a2e43df0d2531a4060}
+
+
+repeter l'image du fond comme un motif. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fBackgroundImageAlpha@{g\_\-fBackgroundImageAlpha}}
+\index{g_fBackgroundImageAlpha@{g\_\-fBackgroundImageAlpha}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Background\-Image\-Alpha}}\label{cairo-dock-config_8c_6b34bbd116215d631a2c54b2ea9cb51c}
+
+
+transparence de l'image de fond. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_cBackgroundImageFile@{g\_\-cBackgroundImageFile}}
+\index{g_cBackgroundImageFile@{g\_\-cBackgroundImageFile}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Background\-Image\-File}}\label{cairo-dock-config_8c_c6f0f579ae572aa31d29a32fbe82ef46}
+
+
+nom du fichier image a mettre en fond. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bDecorationsFollowMouse@{g\_\-bDecorationsFollowMouse}}
+\index{g_bDecorationsFollowMouse@{g\_\-bDecorationsFollowMouse}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Decorations\-Follow\-Mouse}}\label{cairo-dock-config_8c_bac296da240c508f185ee1a660f28c50}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fStripesColorBright@{g\_\-fStripesColorBright}}
+\index{g_fStripesColorBright@{g\_\-fStripesColorBright}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Stripes\-Color\-Bright}[4]}\label{cairo-dock-config_8c_4be8b55ef7fe012b34b5fa867c2740de}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fStripesColorDark@{g\_\-fStripesColorDark}}
+\index{g_fStripesColorDark@{g\_\-fStripesColorDark}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Stripes\-Color\-Dark}[4]}\label{cairo-dock-config_8c_37f48317d776c16c80ae657ef5951fed}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_pStripesBuffer@{g\_\-pStripesBuffer}}
+\index{g_pStripesBuffer@{g\_\-pStripesBuffer}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}cairo\_\-surface\_\-t$\ast$ {\bf g\_\-p\-Stripes\-Buffer}}\label{cairo-dock-config_8c_96237667ccb745607923bf6b27f0cd0d}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iNbStripes@{g\_\-iNbStripes}}
+\index{g_iNbStripes@{g\_\-iNbStripes}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Nb\-Stripes}}\label{cairo-dock-config_8c_47bab2fd035032c04b67f7f9a4629cd2}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fStripesSpeedFactor@{g\_\-fStripesSpeedFactor}}
+\index{g_fStripesSpeedFactor@{g\_\-fStripesSpeedFactor}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Stripes\-Speed\-Factor}}\label{cairo-dock-config_8c_8b62dc99da9d5e64301059825355784f}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fStripesWidth@{g\_\-fStripesWidth}}
+\index{g_fStripesWidth@{g\_\-fStripesWidth}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Stripes\-Width}}\label{cairo-dock-config_8c_f3413a4da4c875c92eb8eb9329e4e627}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fStripesAngle@{g\_\-fStripesAngle}}
+\index{g_fStripesAngle@{g\_\-fStripesAngle}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Stripes\-Angle}}\label{cairo-dock-config_8c_66816d8aedce074096d9f03da7c7b522}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iScreenWidth@{g\_\-iScreenWidth}}
+\index{g_iScreenWidth@{g\_\-iScreenWidth}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Screen\-Width}[2]}\label{cairo-dock-config_8c_f5b78259c07d46a4b659e075884fe728}
+
+
+dimensions de l'ecran. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iScreenHeight@{g\_\-iScreenHeight}}
+\index{g_iScreenHeight@{g\_\-iScreenHeight}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Screen\-Height}[2]}\label{cairo-dock-config_8c_07391901b88403fa54f99e3c24b796ad}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fUnfoldAcceleration@{g\_\-fUnfoldAcceleration}}
+\index{g_fUnfoldAcceleration@{g\_\-fUnfoldAcceleration}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Unfold\-Acceleration}}\label{cairo-dock-config_8c_321302a26af19930e4796a30e248a416}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iGrowUpInterval@{g\_\-iGrowUpInterval}}
+\index{g_iGrowUpInterval@{g\_\-iGrowUpInterval}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Grow\-Up\-Interval}}\label{cairo-dock-config_8c_5fe51da6d176c32c91aa15496bde0e85}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iShrinkDownInterval@{g\_\-iShrinkDownInterval}}
+\index{g_iShrinkDownInterval@{g\_\-iShrinkDownInterval}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Shrink\-Down\-Interval}}\label{cairo-dock-config_8c_1c1098834228f93d28178a3681c55f4f}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fMoveUpSpeed@{g\_\-fMoveUpSpeed}}
+\index{g_fMoveUpSpeed@{g\_\-fMoveUpSpeed}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Move\-Up\-Speed}}\label{cairo-dock-config_8c_86ac4f286478a585e3615ea9f619e2e1}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fMoveDownSpeed@{g\_\-fMoveDownSpeed}}
+\index{g_fMoveDownSpeed@{g\_\-fMoveDownSpeed}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Move\-Down\-Speed}}\label{cairo-dock-config_8c_3cd78b794e0ae231fdfc3b33688ed4f9}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fRefreshInterval@{g\_\-fRefreshInterval}}
+\index{g_fRefreshInterval@{g\_\-fRefreshInterval}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Refresh\-Interval}}\label{cairo-dock-config_8c_05629fe9cd7eb206ddac78e3ac886677}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bShowAppli@{g\_\-bShowAppli}}
+\index{g_bShowAppli@{g\_\-bShowAppli}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Show\-Appli}}\label{cairo-dock-config_8c_c4289f0f258df8c5f790a03fa30f70ba}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bUniquePid@{g\_\-bUniquePid}}
+\index{g_bUniquePid@{g\_\-bUniquePid}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Unique\-Pid}}\label{cairo-dock-config_8c_479142bd03646b25b45d1dcd8f02dc43}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bGroupAppliByClass@{g\_\-bGroupAppliByClass}}
+\index{g_bGroupAppliByClass@{g\_\-bGroupAppliByClass}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Group\-Appli\-By\-Class}}\label{cairo-dock-config_8c_94b6ebfa41f246e7dbeff8f6a24eeba0}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iAppliMaxNameLength@{g\_\-iAppliMaxNameLength}}
+\index{g_iAppliMaxNameLength@{g\_\-iAppliMaxNameLength}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Appli\-Max\-Name\-Length}}\label{cairo-dock-config_8c_fd18ef7acf8c7e1866db0d4c65d60cc4}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bMinimizeOnClick@{g\_\-bMinimizeOnClick}}
+\index{g_bMinimizeOnClick@{g\_\-bMinimizeOnClick}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Minimize\-On\-Click}}\label{cairo-dock-config_8c_ed64f177296778b2d0fceceee0f9bca8}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bCloseAppliOnMiddleClick@{g\_\-bCloseAppliOnMiddleClick}}
+\index{g_bCloseAppliOnMiddleClick@{g\_\-bCloseAppliOnMiddleClick}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Close\-Appli\-On\-Middle\-Click}}\label{cairo-dock-config_8c_22d03e60e566b1c7a288afcf9a09e83d}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bDemandsAttentionWithDialog@{g\_\-bDemandsAttentionWithDialog}}
+\index{g_bDemandsAttentionWithDialog@{g\_\-bDemandsAttentionWithDialog}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Demands\-Attention\-With\-Dialog}}\label{cairo-dock-config_8c_1105bd4dbea07d18907623cc7111df9b}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bDemandsAttentionWithAnimation@{g\_\-bDemandsAttentionWithAnimation}}
+\index{g_bDemandsAttentionWithAnimation@{g\_\-bDemandsAttentionWithAnimation}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Demands\-Attention\-With\-Animation}}\label{cairo-dock-config_8c_5c3fb3d0d5b957d82a5d2a64545198b1}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bAnimateOnActiveWindow@{g\_\-bAnimateOnActiveWindow}}
+\index{g_bAnimateOnActiveWindow@{g\_\-bAnimateOnActiveWindow}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Animate\-On\-Active\-Window}}\label{cairo-dock-config_8c_55244d4b1cc34be78f48d7beba5714ad}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_tMaxIconAuthorizedSize@{g\_\-tMaxIconAuthorizedSize}}
+\index{g_tMaxIconAuthorizedSize@{g\_\-tMaxIconAuthorizedSize}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-t\-Max\-Icon\-Authorized\-Size}[CAIRO\_\-DOCK\_\-NB\_\-TYPES]}\label{cairo-dock-config_8c_93e9653fa15a07997f49709814aad739}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_tMinIconAuthorizedSize@{g\_\-tMinIconAuthorizedSize}}
+\index{g_tMinIconAuthorizedSize@{g\_\-tMinIconAuthorizedSize}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-t\-Min\-Icon\-Authorized\-Size}[CAIRO\_\-DOCK\_\-NB\_\-TYPES]}\label{cairo-dock-config_8c_7f137381241bb9dc494d796d01baf72b}
+
+
+les tailles min et max pour chaque type d'icone. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_tAnimationType@{g\_\-tAnimationType}}
+\index{g_tAnimationType@{g\_\-tAnimationType}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-t\-Animation\-Type}[CAIRO\_\-DOCK\_\-NB\_\-TYPES]}\label{cairo-dock-config_8c_d032f581fee0aa87c72f18d59537e435}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_tNbAnimationRounds@{g\_\-tNbAnimationRounds}}
+\index{g_tNbAnimationRounds@{g\_\-tNbAnimationRounds}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-t\-Nb\-Animation\-Rounds}[CAIRO\_\-DOCK\_\-NB\_\-TYPES]}\label{cairo-dock-config_8c_1b48a416cde2ed547878e8e86e1a8841}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_tIconTypeOrder@{g\_\-tIconTypeOrder}}
+\index{g_tIconTypeOrder@{g\_\-tIconTypeOrder}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-t\-Icon\-Type\-Order}[CAIRO\_\-DOCK\_\-NB\_\-TYPES]}\label{cairo-dock-config_8c_92a992add0770c0af1108b58f8a02154}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_cSeparatorImage@{g\_\-cSeparatorImage}}
+\index{g_cSeparatorImage@{g\_\-cSeparatorImage}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Separator\-Image}}\label{cairo-dock-config_8c_12f4d4e5812c3c51d7ad0dbc9885026c}
+
+
+nom d'une image a afficher en tant que separateur. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bRevolveSeparator@{g\_\-bRevolveSeparator}}
+\index{g_bRevolveSeparator@{g\_\-bRevolveSeparator}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Revolve\-Separator}}\label{cairo-dock-config_8c_4b4ce0d984901ab8ae5a1338947e9eed}
+
+
+faire pivoter l'image des separateurs. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_bConstantSeparatorSize@{g\_\-bConstantSeparatorSize}}
+\index{g_bConstantSeparatorSize@{g\_\-bConstantSeparatorSize}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Constant\-Separator\-Size}}\label{cairo-dock-config_8c_9a6d6b5c9c8ccf78a92927b9419e479c}
+
+
+garder les separateurs de taille constante. 
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iDialogButtonWidth@{g\_\-iDialogButtonWidth}}
+\index{g_iDialogButtonWidth@{g\_\-iDialogButtonWidth}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Dialog\-Button\-Width}}\label{cairo-dock-config_8c_4b5eb498332aa29167565f0455eedee1}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iDialogButtonHeight@{g\_\-iDialogButtonHeight}}
+\index{g_iDialogButtonHeight@{g\_\-iDialogButtonHeight}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Dialog\-Button\-Height}}\label{cairo-dock-config_8c_6207be19096c1960c50dc9b9f3cf318b}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_fDialogAlpha@{g\_\-fDialogAlpha}}
+\index{g_fDialogAlpha@{g\_\-fDialogAlpha}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Dialog\-Alpha}}\label{cairo-dock-config_8c_7041b8657730703d62a807526312eafb}
+
+
+\index{cairo-dock-config.c@{cairo-dock-config.c}!g_iDialogIconSize@{g\_\-iDialogIconSize}}
+\index{g_iDialogIconSize@{g\_\-iDialogIconSize}!cairo-dock-config.c@{cairo-dock-config.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Dialog\-Icon\-Size}}\label{cairo-dock-config_8c_8b6895cd8dafd085cf20ca52ec10a7ce}
+
+

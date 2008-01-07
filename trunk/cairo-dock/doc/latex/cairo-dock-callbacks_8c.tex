@@ -1,0 +1,457 @@
+\section{R\'{e}f\'{e}rence du fichier src/cairo-dock-callbacks.c}
+\label{cairo-dock-callbacks_8c}\index{src/cairo-dock-callbacks.c@{src/cairo-dock-callbacks.c}}
+\subsection*{Fonctions}
+\begin{CompactItemize}
+\item 
+gboolean {\bf on\_\-expose} (Gtk\-Widget $\ast$p\-Widget, Gdk\-Event\-Expose $\ast$p\-Expose, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+gboolean {\bf \_\-cairo\_\-dock\_\-show\_\-sub\_\-dock\_\-delayed} ({\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+gboolean {\bf on\_\-motion\_\-notify2} (Gtk\-Widget $\ast$p\-Widget, Gdk\-Event\-Motion $\ast$p\-Motion, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+gboolean {\bf \_\-cairo\_\-dock\_\-emit\_\-leave\_\-signal} ({\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+void {\bf cairo\_\-dock\_\-leave\_\-from\_\-main\_\-dock} ({\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+gboolean {\bf on\_\-leave\_\-notify2} (Gtk\-Widget $\ast$p\-Widget, Gdk\-Event\-Crossing $\ast$p\-Event, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+gboolean {\bf on\_\-enter\_\-notify2} (Gtk\-Widget $\ast$p\-Widget, Gdk\-Event\-Crossing $\ast$p\-Event, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+void {\bf cairo\_\-dock\_\-update\_\-gaps\_\-with\_\-window\_\-position} ({\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+gboolean {\bf on\_\-key\_\-release} (Gtk\-Widget $\ast$p\-Widget, Gdk\-Event\-Key $\ast$p\-Key, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+gboolean {\bf on\_\-key\_\-press} (Gtk\-Widget $\ast$p\-Widget, Gdk\-Event\-Key $\ast$p\-Key, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+gboolean {\bf cairo\_\-dock\_\-notification\_\-click\_\-icon} (gpointer $\ast$data)
+\item 
+gboolean {\bf cairo\_\-dock\_\-notification\_\-middle\_\-click\_\-icon} (gpointer $\ast$data)
+\item 
+gboolean {\bf on\_\-button\_\-press2} (Gtk\-Widget $\ast$p\-Widget, Gdk\-Event\-Button $\ast$p\-Button, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+gboolean {\bf on\_\-scroll} (Gtk\-Widget $\ast$p\-Widget, Gdk\-Event\-Scroll $\ast$p\-Scroll, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+gboolean {\bf on\_\-configure} (Gtk\-Widget $\ast$p\-Widget, Gdk\-Event\-Configure $\ast$p\-Event, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+void {\bf on\_\-drag\_\-data\_\-received} (Gtk\-Widget $\ast$p\-Widget, Gdk\-Drag\-Context $\ast$dc, gint x, gint y, Gtk\-Selection\-Data $\ast$selection\_\-data, guint info, guint t, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+gboolean {\bf cairo\_\-dock\_\-notification\_\-drop\_\-data} (gpointer $\ast$data)
+\item 
+void {\bf on\_\-drag\_\-motion} (Gtk\-Widget $\ast$p\-Widget, Gdk\-Drag\-Context $\ast$dc, gint x, gint y, guint t, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+gboolean {\bf on\_\-delete} (Gtk\-Widget $\ast$p\-Widget, Gdk\-Event $\ast$event, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+void {\bf cairo\_\-dock\_\-activate\_\-temporary\_\-auto\_\-hide} ({\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+void {\bf cairo\_\-dock\_\-deactivate\_\-temporary\_\-auto\_\-hide} (void)
+\item 
+void {\bf cairo\_\-dock\_\-allow\_\-entrance} (void)
+\item 
+void {\bf cairo\_\-dock\_\-disable\_\-entrance} (void)
+\item 
+gboolean {\bf cairo\_\-dock\_\-entrance\_\-is\_\-allowed} (void)
+\item 
+void {\bf on\_\-selection\_\-get} (Gtk\-Widget $\ast$p\-Widget, Gtk\-Selection\-Data $\ast$data, guint info, guint time, gpointer user\_\-data)
+\item 
+void {\bf on\_\-selection\_\-received} (Gtk\-Widget $\ast$p\-Widget, Gtk\-Selection\-Data $\ast$data, guint time, gpointer user\_\-data)
+\item 
+gboolean {\bf on\_\-selection\_\-clear\_\-event} (Gtk\-Widget $\ast$p\-Widget, Gdk\-Event\-Selection $\ast$event, gpointer user\_\-data)
+\item 
+gboolean {\bf on\_\-selection\_\-request\_\-event} (Gtk\-Widget $\ast$p\-Widget, Gdk\-Event\-Selection $\ast$event, gpointer user\_\-data)
+\item 
+gboolean {\bf on\_\-selection\_\-notify\_\-event} (Gtk\-Widget $\ast$p\-Widget, Gdk\-Event\-Selection $\ast$event, gpointer user\_\-data)
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+{\bf Cairo\-Dock} $\ast$ {\bf g\_\-p\-Main\-Dock}
+\begin{CompactList}\small\item\em pointeur sur le dock principal. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Sub\-Dock\-Size\-Ratio}
+\begin{CompactList}\small\item\em ratio de la taille des icones des sous-docks par rapport a celles du dock principal. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Animate\-Sub\-Dock}
+\begin{CompactList}\small\item\em TRUE s'il faut animer les sous-docks des leur apparition. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Unfold\-Acceleration}
+\item 
+int {\bf g\_\-i\-Leave\-Sub\-Dock\-Delay}
+\item 
+int {\bf g\_\-i\-Show\-Sub\-Dock\-Delay}
+\item 
+gint {\bf g\_\-i\-Screen\-Width} [2]
+\begin{CompactList}\small\item\em dimensions de l'ecran. \item\end{CompactList}\item 
+gint {\bf g\_\-i\-Screen\-Height} [2]
+\item 
+int {\bf g\_\-i\-Scroll\-Amount}
+\item 
+gboolean {\bf g\_\-b\-Reset\-Scroll\-On\-Leave}
+\item 
+gboolean {\bf g\_\-b\-Decorations\-Follow\-Mouse}
+\item 
+cairo\_\-surface\_\-t $\ast$ {\bf g\_\-p\-Background\-Surface\-Full} [2]
+\begin{CompactList}\small\item\em surface associee aux decorations, de 2 fois la taille de la fenetre. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Same\-Horizontality}
+\begin{CompactList}\small\item\em dit si les sous-docks ont la meme horizontalite que les docks racines. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Label\-Size}
+\begin{CompactList}\small\item\em taille de la police des etiquettes. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Label\-Police}
+\begin{CompactList}\small\item\em police de caracteres des etiquettes. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Text\-Always\-Horizontal}
+\begin{CompactList}\small\item\em TRUE $<$=$>$ etiquettes horizontales meme pour les docks verticaux. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Dock\-Radius}
+\begin{CompactList}\small\item\em rayon des coins du cadre. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Dock\-Line\-Width}
+\begin{CompactList}\small\item\em epaisseur du cadre (en pixels). \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Auto\-Hide}
+\begin{CompactList}\small\item\em TRUE si l'auto-hide est active. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Conf\-File}
+\item 
+int {\bf g\_\-i\-Visible\-Zone\-Height}
+\item 
+int {\bf g\_\-i\-Visible\-Zone\-Width}
+\begin{CompactList}\small\item\em dimensions de la zone ou on place le curseur pour faire apparaitre le dock. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Direction\-Up}
+\begin{CompactList}\small\item\em la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Refresh\-Interval}
+\item 
+gboolean {\bf g\_\-b\-Minimize\-On\-Click}
+\item 
+gboolean {\bf g\_\-b\-Close\-Appli\-On\-Middle\-Click}
+\item 
+int {\bf g\_\-t\-Animation\-Type} [CAIRO\_\-DOCK\_\-NB\_\-TYPES]
+\item 
+int {\bf g\_\-t\-Nb\-Animation\-Rounds} [CAIRO\_\-DOCK\_\-NB\_\-TYPES]
+\item 
+int {\bf g\_\-t\-Nb\-Iter\-In\-One\-Round} [CAIRO\_\-DOCK\_\-NB\_\-ANIMATIONS]
+\item 
+gboolean {\bf g\_\-b\-Use\-Glitz}
+\end{CompactItemize}
+
+
+\subsection{Documentation des fonctions}
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!on_expose@{on\_\-expose}}
+\index{on_expose@{on\_\-expose}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean on\_\-expose (Gtk\-Widget $\ast$ {\em p\-Widget}, Gdk\-Event\-Expose $\ast$ {\em p\-Expose}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-callbacks_8c_edbc97fc4750f7b2ebe5f038b27e8fe0}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!_cairo_dock_show_sub_dock_delayed@{\_\-cairo\_\-dock\_\-show\_\-sub\_\-dock\_\-delayed}}
+\index{_cairo_dock_show_sub_dock_delayed@{\_\-cairo\_\-dock\_\-show\_\-sub\_\-dock\_\-delayed}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean \_\-cairo\_\-dock\_\-show\_\-sub\_\-dock\_\-delayed ({\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-callbacks_8c_324668e8db6a440e17f4f3e690f73c38}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!on_motion_notify2@{on\_\-motion\_\-notify2}}
+\index{on_motion_notify2@{on\_\-motion\_\-notify2}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean on\_\-motion\_\-notify2 (Gtk\-Widget $\ast$ {\em p\-Widget}, Gdk\-Event\-Motion $\ast$ {\em p\-Motion}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-callbacks_8c_87c81f77583280d3ed478bf85485c144}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!_cairo_dock_emit_leave_signal@{\_\-cairo\_\-dock\_\-emit\_\-leave\_\-signal}}
+\index{_cairo_dock_emit_leave_signal@{\_\-cairo\_\-dock\_\-emit\_\-leave\_\-signal}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean \_\-cairo\_\-dock\_\-emit\_\-leave\_\-signal ({\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-callbacks_8c_5183de6cfe1fe4c2f969373cae187263}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!cairo_dock_leave_from_main_dock@{cairo\_\-dock\_\-leave\_\-from\_\-main\_\-dock}}
+\index{cairo_dock_leave_from_main_dock@{cairo\_\-dock\_\-leave\_\-from\_\-main\_\-dock}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-leave\_\-from\_\-main\_\-dock ({\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-callbacks_8c_79d1076bf5d597fee7d4b3ba4edd97e9}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!on_leave_notify2@{on\_\-leave\_\-notify2}}
+\index{on_leave_notify2@{on\_\-leave\_\-notify2}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean on\_\-leave\_\-notify2 (Gtk\-Widget $\ast$ {\em p\-Widget}, Gdk\-Event\-Crossing $\ast$ {\em p\-Event}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-callbacks_8c_67ddef53a87c9160a5b7a3799e1f62a0}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!on_enter_notify2@{on\_\-enter\_\-notify2}}
+\index{on_enter_notify2@{on\_\-enter\_\-notify2}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean on\_\-enter\_\-notify2 (Gtk\-Widget $\ast$ {\em p\-Widget}, Gdk\-Event\-Crossing $\ast$ {\em p\-Event}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-callbacks_8c_6de200eaa20569294e690c13578b0681}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!cairo_dock_update_gaps_with_window_position@{cairo\_\-dock\_\-update\_\-gaps\_\-with\_\-window\_\-position}}
+\index{cairo_dock_update_gaps_with_window_position@{cairo\_\-dock\_\-update\_\-gaps\_\-with\_\-window\_\-position}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-update\_\-gaps\_\-with\_\-window\_\-position ({\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-callbacks_8c_17baa12b0d27a3fba0a3fe222ba2fcf2}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!on_key_release@{on\_\-key\_\-release}}
+\index{on_key_release@{on\_\-key\_\-release}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean on\_\-key\_\-release (Gtk\-Widget $\ast$ {\em p\-Widget}, Gdk\-Event\-Key $\ast$ {\em p\-Key}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-callbacks_8c_823c8cb438da21dfc7353461d8ce3874}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!on_key_press@{on\_\-key\_\-press}}
+\index{on_key_press@{on\_\-key\_\-press}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean on\_\-key\_\-press (Gtk\-Widget $\ast$ {\em p\-Widget}, Gdk\-Event\-Key $\ast$ {\em p\-Key}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-callbacks_8c_d8a6d4041a78724d9f5de8276b2d3f85}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!cairo_dock_notification_click_icon@{cairo\_\-dock\_\-notification\_\-click\_\-icon}}
+\index{cairo_dock_notification_click_icon@{cairo\_\-dock\_\-notification\_\-click\_\-icon}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean cairo\_\-dock\_\-notification\_\-click\_\-icon (gpointer $\ast$ {\em data})}\label{cairo-dock-callbacks_8c_c076ae37a74c4d491ef86d3aa976af15}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!cairo_dock_notification_middle_click_icon@{cairo\_\-dock\_\-notification\_\-middle\_\-click\_\-icon}}
+\index{cairo_dock_notification_middle_click_icon@{cairo\_\-dock\_\-notification\_\-middle\_\-click\_\-icon}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean cairo\_\-dock\_\-notification\_\-middle\_\-click\_\-icon (gpointer $\ast$ {\em data})}\label{cairo-dock-callbacks_8c_5061b4bd3821dd31dad195b009391876}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!on_button_press2@{on\_\-button\_\-press2}}
+\index{on_button_press2@{on\_\-button\_\-press2}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean on\_\-button\_\-press2 (Gtk\-Widget $\ast$ {\em p\-Widget}, Gdk\-Event\-Button $\ast$ {\em p\-Button}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-callbacks_8c_5a2d76eb791db17ee894325707a24490}
+
+
+cairo\_\-dock\_\-remove\_\-icon\_\-from\_\-dock (p\-Origin\-Dock, s\_\-p\-Icon\-Clicked);
+
+s\_\-p\-Icon\-Clicked-$>$f\-Width /= (p\-Origin\-Dock-$>$i\-Ref\-Count == 0 ? 1. : g\_\-f\-Sub\-Dock\-Size\-Ratio); s\_\-p\-Icon\-Clicked-$>$f\-Height /= (p\-Origin\-Dock-$>$i\-Ref\-Count == 0 ? 1. : g\_\-f\-Sub\-Dock\-Size\-Ratio); \index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!on_scroll@{on\_\-scroll}}
+\index{on_scroll@{on\_\-scroll}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean on\_\-scroll (Gtk\-Widget $\ast$ {\em p\-Widget}, Gdk\-Event\-Scroll $\ast$ {\em p\-Scroll}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-callbacks_8c_7f4d45c0a09a7fb9c25a42f1f05d61df}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!on_configure@{on\_\-configure}}
+\index{on_configure@{on\_\-configure}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean on\_\-configure (Gtk\-Widget $\ast$ {\em p\-Widget}, Gdk\-Event\-Configure $\ast$ {\em p\-Event}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-callbacks_8c_2830e75acc33032f4025b4bffd88bc74}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!on_drag_data_received@{on\_\-drag\_\-data\_\-received}}
+\index{on_drag_data_received@{on\_\-drag\_\-data\_\-received}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void on\_\-drag\_\-data\_\-received (Gtk\-Widget $\ast$ {\em p\-Widget}, Gdk\-Drag\-Context $\ast$ {\em dc}, gint {\em x}, gint {\em y}, Gtk\-Selection\-Data $\ast$ {\em selection\_\-data}, guint {\em info}, guint {\em t}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-callbacks_8c_23c9fad74a2cc2107743574ddde78d12}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!cairo_dock_notification_drop_data@{cairo\_\-dock\_\-notification\_\-drop\_\-data}}
+\index{cairo_dock_notification_drop_data@{cairo\_\-dock\_\-notification\_\-drop\_\-data}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean cairo\_\-dock\_\-notification\_\-drop\_\-data (gpointer $\ast$ {\em data})}\label{cairo-dock-callbacks_8c_7e84e4bdb08b1d835025cbd7c27347d6}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!on_drag_motion@{on\_\-drag\_\-motion}}
+\index{on_drag_motion@{on\_\-drag\_\-motion}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void on\_\-drag\_\-motion (Gtk\-Widget $\ast$ {\em p\-Widget}, Gdk\-Drag\-Context $\ast$ {\em dc}, gint {\em x}, gint {\em y}, guint {\em t}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-callbacks_8c_bf1959ee54920864d3ac3ff4e24d87cf}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!on_delete@{on\_\-delete}}
+\index{on_delete@{on\_\-delete}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean on\_\-delete (Gtk\-Widget $\ast$ {\em p\-Widget}, Gdk\-Event $\ast$ {\em event}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-callbacks_8c_c66fac4fea851d5b7d668a60b5d1c596}
+
+
+int answer = cairo\_\-dock\_\-ask\_\-question (p\-Dock, \char`\"{}Quit Cairo-Dock ?\char`\"{}); \index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!cairo_dock_activate_temporary_auto_hide@{cairo\_\-dock\_\-activate\_\-temporary\_\-auto\_\-hide}}
+\index{cairo_dock_activate_temporary_auto_hide@{cairo\_\-dock\_\-activate\_\-temporary\_\-auto\_\-hide}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-activate\_\-temporary\_\-auto\_\-hide ({\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-callbacks_8c_5939f9e63cc7bfbb9ccc65a09cd4bbb2}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!cairo_dock_deactivate_temporary_auto_hide@{cairo\_\-dock\_\-deactivate\_\-temporary\_\-auto\_\-hide}}
+\index{cairo_dock_deactivate_temporary_auto_hide@{cairo\_\-dock\_\-deactivate\_\-temporary\_\-auto\_\-hide}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-deactivate\_\-temporary\_\-auto\_\-hide (void)}\label{cairo-dock-callbacks_8c_5d532e290f7744c4a94af89fb4d8077b}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!cairo_dock_allow_entrance@{cairo\_\-dock\_\-allow\_\-entrance}}
+\index{cairo_dock_allow_entrance@{cairo\_\-dock\_\-allow\_\-entrance}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-allow\_\-entrance (void)}\label{cairo-dock-callbacks_8c_170f13e08d97bb60ae982f312bd393b0}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!cairo_dock_disable_entrance@{cairo\_\-dock\_\-disable\_\-entrance}}
+\index{cairo_dock_disable_entrance@{cairo\_\-dock\_\-disable\_\-entrance}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-disable\_\-entrance (void)}\label{cairo-dock-callbacks_8c_e30c5f6a40557e3d7f49843af7fda3fc}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!cairo_dock_entrance_is_allowed@{cairo\_\-dock\_\-entrance\_\-is\_\-allowed}}
+\index{cairo_dock_entrance_is_allowed@{cairo\_\-dock\_\-entrance\_\-is\_\-allowed}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean cairo\_\-dock\_\-entrance\_\-is\_\-allowed (void)}\label{cairo-dock-callbacks_8c_06b8d2ca28a23fecc1559b51cc3b28fc}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!on_selection_get@{on\_\-selection\_\-get}}
+\index{on_selection_get@{on\_\-selection\_\-get}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void on\_\-selection\_\-get (Gtk\-Widget $\ast$ {\em p\-Widget}, Gtk\-Selection\-Data $\ast$ {\em data}, guint {\em info}, guint {\em time}, gpointer {\em user\_\-data})}\label{cairo-dock-callbacks_8c_8715fde59c81ddf21588168fb60e2770}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!on_selection_received@{on\_\-selection\_\-received}}
+\index{on_selection_received@{on\_\-selection\_\-received}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void on\_\-selection\_\-received (Gtk\-Widget $\ast$ {\em p\-Widget}, Gtk\-Selection\-Data $\ast$ {\em data}, guint {\em time}, gpointer {\em user\_\-data})}\label{cairo-dock-callbacks_8c_acdcbacab79323c508921b7e518ffa2a}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!on_selection_clear_event@{on\_\-selection\_\-clear\_\-event}}
+\index{on_selection_clear_event@{on\_\-selection\_\-clear\_\-event}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean on\_\-selection\_\-clear\_\-event (Gtk\-Widget $\ast$ {\em p\-Widget}, Gdk\-Event\-Selection $\ast$ {\em event}, gpointer {\em user\_\-data})}\label{cairo-dock-callbacks_8c_93ff657805fb15298eefe79b9b1f288a}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!on_selection_request_event@{on\_\-selection\_\-request\_\-event}}
+\index{on_selection_request_event@{on\_\-selection\_\-request\_\-event}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean on\_\-selection\_\-request\_\-event (Gtk\-Widget $\ast$ {\em p\-Widget}, Gdk\-Event\-Selection $\ast$ {\em event}, gpointer {\em user\_\-data})}\label{cairo-dock-callbacks_8c_02dc9f237cebac602543f30ad123d7e6}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!on_selection_notify_event@{on\_\-selection\_\-notify\_\-event}}
+\index{on_selection_notify_event@{on\_\-selection\_\-notify\_\-event}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean on\_\-selection\_\-notify\_\-event (Gtk\-Widget $\ast$ {\em p\-Widget}, Gdk\-Event\-Selection $\ast$ {\em event}, gpointer {\em user\_\-data})}\label{cairo-dock-callbacks_8c_f5ffabf713bd96b8b8166c43b99739b6}
+
+
+
+
+\subsection{Documentation des variables}
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_pMainDock@{g\_\-pMainDock}}
+\index{g_pMainDock@{g\_\-pMainDock}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf Cairo\-Dock}$\ast$ {\bf g\_\-p\-Main\-Dock}}\label{cairo-dock-callbacks_8c_a24af9062f9cc975eb0b9422eb6587e6}
+
+
+pointeur sur le dock principal. 
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_fSubDockSizeRatio@{g\_\-fSubDockSizeRatio}}
+\index{g_fSubDockSizeRatio@{g\_\-fSubDockSizeRatio}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Sub\-Dock\-Size\-Ratio}}\label{cairo-dock-callbacks_8c_e6ee377f5c409b71e3f7e87694f60556}
+
+
+ratio de la taille des icones des sous-docks par rapport a celles du dock principal. 
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_bAnimateSubDock@{g\_\-bAnimateSubDock}}
+\index{g_bAnimateSubDock@{g\_\-bAnimateSubDock}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Animate\-Sub\-Dock}}\label{cairo-dock-callbacks_8c_2af171e71561da2dfda3c5f207677f27}
+
+
+TRUE s'il faut animer les sous-docks des leur apparition. 
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_fUnfoldAcceleration@{g\_\-fUnfoldAcceleration}}
+\index{g_fUnfoldAcceleration@{g\_\-fUnfoldAcceleration}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Unfold\-Acceleration}}\label{cairo-dock-callbacks_8c_321302a26af19930e4796a30e248a416}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_iLeaveSubDockDelay@{g\_\-iLeaveSubDockDelay}}
+\index{g_iLeaveSubDockDelay@{g\_\-iLeaveSubDockDelay}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Leave\-Sub\-Dock\-Delay}}\label{cairo-dock-callbacks_8c_e3ccd18397864a60a1bf19806a0b07ff}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_iShowSubDockDelay@{g\_\-iShowSubDockDelay}}
+\index{g_iShowSubDockDelay@{g\_\-iShowSubDockDelay}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Show\-Sub\-Dock\-Delay}}\label{cairo-dock-callbacks_8c_c39cdbf48f4c71bd9357ef70e569c448}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_iScreenWidth@{g\_\-iScreenWidth}}
+\index{g_iScreenWidth@{g\_\-iScreenWidth}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-Screen\-Width}[2]}\label{cairo-dock-callbacks_8c_d832291d167ff78b5ae1b76dfb288ac8}
+
+
+dimensions de l'ecran. 
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_iScreenHeight@{g\_\-iScreenHeight}}
+\index{g_iScreenHeight@{g\_\-iScreenHeight}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-Screen\-Height}[2]}\label{cairo-dock-callbacks_8c_70dbb6c14cb143c826e85759b205f201}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_iScrollAmount@{g\_\-iScrollAmount}}
+\index{g_iScrollAmount@{g\_\-iScrollAmount}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Scroll\-Amount}}\label{cairo-dock-callbacks_8c_362cbedfe9ef0779ecf4100f9f42519c}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_bResetScrollOnLeave@{g\_\-bResetScrollOnLeave}}
+\index{g_bResetScrollOnLeave@{g\_\-bResetScrollOnLeave}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Reset\-Scroll\-On\-Leave}}\label{cairo-dock-callbacks_8c_6f702198c2a73a5413af054e40731b63}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_bDecorationsFollowMouse@{g\_\-bDecorationsFollowMouse}}
+\index{g_bDecorationsFollowMouse@{g\_\-bDecorationsFollowMouse}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Decorations\-Follow\-Mouse}}\label{cairo-dock-callbacks_8c_bac296da240c508f185ee1a660f28c50}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_pBackgroundSurfaceFull@{g\_\-pBackgroundSurfaceFull}}
+\index{g_pBackgroundSurfaceFull@{g\_\-pBackgroundSurfaceFull}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}cairo\_\-surface\_\-t$\ast$ {\bf g\_\-p\-Background\-Surface\-Full}[2]}\label{cairo-dock-callbacks_8c_c620ddb584a16b76ed80471bc61e9ac9}
+
+
+surface associee aux decorations, de 2 fois la taille de la fenetre. 
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_bSameHorizontality@{g\_\-bSameHorizontality}}
+\index{g_bSameHorizontality@{g\_\-bSameHorizontality}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Same\-Horizontality}}\label{cairo-dock-callbacks_8c_ebf5cd7f2cea410e4d3811a5dc3405b9}
+
+
+dit si les sous-docks ont la meme horizontalite que les docks racines. 
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_iLabelSize@{g\_\-iLabelSize}}
+\index{g_iLabelSize@{g\_\-iLabelSize}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Label\-Size}}\label{cairo-dock-callbacks_8c_386538e26258de4d50feb84fecc45dd6}
+
+
+taille de la police des etiquettes. 
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_cLabelPolice@{g\_\-cLabelPolice}}
+\index{g_cLabelPolice@{g\_\-cLabelPolice}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Label\-Police}}\label{cairo-dock-callbacks_8c_1dd252a8514e5074187d0c12a311f158}
+
+
+police de caracteres des etiquettes. 
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_bTextAlwaysHorizontal@{g\_\-bTextAlwaysHorizontal}}
+\index{g_bTextAlwaysHorizontal@{g\_\-bTextAlwaysHorizontal}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Text\-Always\-Horizontal}}\label{cairo-dock-callbacks_8c_9656ee040199018fa599316b38e2f231}
+
+
+TRUE $<$=$>$ etiquettes horizontales meme pour les docks verticaux. 
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_iDockRadius@{g\_\-iDockRadius}}
+\index{g_iDockRadius@{g\_\-iDockRadius}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Dock\-Radius}}\label{cairo-dock-callbacks_8c_ecf9278fca418109e169d4514d022541}
+
+
+rayon des coins du cadre. 
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_iDockLineWidth@{g\_\-iDockLineWidth}}
+\index{g_iDockLineWidth@{g\_\-iDockLineWidth}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Dock\-Line\-Width}}\label{cairo-dock-callbacks_8c_8ff61d8910b08e05a1cc800f5a5dd81b}
+
+
+epaisseur du cadre (en pixels). 
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_bAutoHide@{g\_\-bAutoHide}}
+\index{g_bAutoHide@{g\_\-bAutoHide}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Auto\-Hide}}\label{cairo-dock-callbacks_8c_263de39492b5e16c81c98792f183edcf}
+
+
+TRUE si l'auto-hide est active. 
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_cConfFile@{g\_\-cConfFile}}
+\index{g_cConfFile@{g\_\-cConfFile}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Conf\-File}}\label{cairo-dock-callbacks_8c_2173efce4550991bad33a89cf25b6243}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_iVisibleZoneHeight@{g\_\-iVisibleZoneHeight}}
+\index{g_iVisibleZoneHeight@{g\_\-iVisibleZoneHeight}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Visible\-Zone\-Height}}\label{cairo-dock-callbacks_8c_b032d5fe2acfb6b93dcbc85ad1962730}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_iVisibleZoneWidth@{g\_\-iVisibleZoneWidth}}
+\index{g_iVisibleZoneWidth@{g\_\-iVisibleZoneWidth}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Visible\-Zone\-Width}}\label{cairo-dock-callbacks_8c_e5fa6397c672cb778cb4637dfa5983d0}
+
+
+dimensions de la zone ou on place le curseur pour faire apparaitre le dock. 
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_bDirectionUp@{g\_\-bDirectionUp}}
+\index{g_bDirectionUp@{g\_\-bDirectionUp}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Direction\-Up}}\label{cairo-dock-callbacks_8c_080e0cb494374269a17c7ebd078e855d}
+
+
+la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas. 
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_fRefreshInterval@{g\_\-fRefreshInterval}}
+\index{g_fRefreshInterval@{g\_\-fRefreshInterval}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Refresh\-Interval}}\label{cairo-dock-callbacks_8c_05629fe9cd7eb206ddac78e3ac886677}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_bMinimizeOnClick@{g\_\-bMinimizeOnClick}}
+\index{g_bMinimizeOnClick@{g\_\-bMinimizeOnClick}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Minimize\-On\-Click}}\label{cairo-dock-callbacks_8c_ed64f177296778b2d0fceceee0f9bca8}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_bCloseAppliOnMiddleClick@{g\_\-bCloseAppliOnMiddleClick}}
+\index{g_bCloseAppliOnMiddleClick@{g\_\-bCloseAppliOnMiddleClick}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Close\-Appli\-On\-Middle\-Click}}\label{cairo-dock-callbacks_8c_22d03e60e566b1c7a288afcf9a09e83d}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_tAnimationType@{g\_\-tAnimationType}}
+\index{g_tAnimationType@{g\_\-tAnimationType}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-t\-Animation\-Type}[CAIRO\_\-DOCK\_\-NB\_\-TYPES]}\label{cairo-dock-callbacks_8c_d032f581fee0aa87c72f18d59537e435}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_tNbAnimationRounds@{g\_\-tNbAnimationRounds}}
+\index{g_tNbAnimationRounds@{g\_\-tNbAnimationRounds}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-t\-Nb\-Animation\-Rounds}[CAIRO\_\-DOCK\_\-NB\_\-TYPES]}\label{cairo-dock-callbacks_8c_1b48a416cde2ed547878e8e86e1a8841}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_tNbIterInOneRound@{g\_\-tNbIterInOneRound}}
+\index{g_tNbIterInOneRound@{g\_\-tNbIterInOneRound}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-t\-Nb\-Iter\-In\-One\-Round}[CAIRO\_\-DOCK\_\-NB\_\-ANIMATIONS]}\label{cairo-dock-callbacks_8c_57cbfb0ead563d0d0f16e94bedfbd568}
+
+
+\index{cairo-dock-callbacks.c@{cairo-dock-callbacks.c}!g_bUseGlitz@{g\_\-bUseGlitz}}
+\index{g_bUseGlitz@{g\_\-bUseGlitz}!cairo-dock-callbacks.c@{cairo-dock-callbacks.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Use\-Glitz}}\label{cairo-dock-callbacks_8c_16a0df3aa6645b9f4437809d3bbd3865}
+
+

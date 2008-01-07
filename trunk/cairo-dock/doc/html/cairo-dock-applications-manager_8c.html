@@ -1,0 +1,1447 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Cairo-Dock: Référence du fichier src/cairo-dock-applications-manager.c</title>
+<link href="doxygen.css" rel="stylesheet" type="text/css">
+<link href="tabs.css" rel="stylesheet" type="text/css">
+</head><body>
+<!-- Généré par Doxygen 1.4.6 -->
+<div class="tabs">
+  <ul>
+    <li><a href="index.html"><span>Page&nbsp;principale</span></a></li>
+    <li><a href="annotated.html"><span>Structures&nbsp;de&nbsp;données</span></a></li>
+    <li id="current"><a href="files.html"><span>Fichiers</span></a></li>
+  </ul></div>
+<div class="tabs">
+  <ul>
+    <li><a href="files.html"><span>Liste&nbsp;des&nbsp;fichiers</span></a></li>
+    <li><a href="globals.html"><span>Portée&nbsp;globale</span></a></li>
+  </ul></div>
+<h1>Référence du fichier src/cairo-dock-applications-manager.c</h1><table border="0" cellpadding="0" cellspacing="0">
+<tr><td></td></tr>
+<tr><td colspan="2"><br><h2>Macros</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#2eca6cb91e1d8de16029f465005ada36">CAIRO_DOCK_TASKBAR_CHECK_INTERVAL</a>&nbsp;&nbsp;&nbsp;250</td></tr>
+
+<tr><td colspan="2"><br><h2>Fonctions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#9b43a61286dce635cfc3de9a95476d69">cairo_dock_xerror_handler</a> (Display *pDisplay, XErrorEvent *pXError)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#9be1f3c893173d869591061769319167">cairo_dock_initialize_application_manager</a> (void)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">const Display *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#ce413c152ce63e62da7ca1ced9162f76">cairo_dock_get_Xdisplay</a> (void)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#a3ed958743c3d92ab3605ed4522e4684">cairo_dock_register_appli</a> (<a class="el" href="struct__Icon.html">Icon</a> *icon)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#23a7ad90233e1c3ec8a09b0f533f229d">cairo_dock_blacklist_appli</a> (Window Xid)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#65f3f3b215d1bca2d818a039f6139978">cairo_dock_unregister_appli</a> (<a class="el" href="struct__Icon.html">Icon</a> *icon)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gulong&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#3755d5076e48084064ea0e64c2504f32">cairo_dock_get_xwindow_timestamp</a> (Window Xid)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#17dfe6c5b94d793cf0d669b156c3edc0">cairo_dock_set_xwindow_timestamp</a> (Window Xid, gulong iTimeStamp)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#e683af570c65020752a4c8bc9f572450">cairo_dock_close_xwindow</a> (Window Xid)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#55d1ad8f30198f61a73a9e2a2e8bb2a7">cairo_dock_show_appli</a> (Window Xid)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#b53c222978e2ff55bb218524e8785675">cairo_dock_minimize_xwindow</a> (Window Xid)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#35e5a7e8b01d4407db1b6ff356e0f378">cairo_dock_maximize_xwindow</a> (Window Xid, gboolean bMaximize)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#2902625deca3f96d18213722a1c0abcc">cairo_dock_set_xwindow_fullscreen</a> (Window Xid, gboolean bFullScreen)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#56433a2fc51ac1b156bb0d4449015bfa">cairo_dock_move_xwindow_to_nth_desktop</a> (Window Xid, int iDesktopNumber, int iDesktopViewportX, int iDesktopViewportY)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#893d0d3fe02503ec48a29331a066a0a6">cairo_dock_window_is_maximized</a> (Window Xid)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#ce9c9717a43029f7578777bb86f7b430">cairo_dock_window_is_fullscreen</a> (Window Xid)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">Window&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#b15bf8e379479a94a148adbd7fe10ccb">cairo_dock_get_active_window</a> (void)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#7f6627386c8a6f3318333e52d8c83792">cairo_dock_get_current_desktop</a> (int *iDesktopNumber, int *iDesktopViewportX, int *iDesktopViewportY)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#fc4e3c71945c8204e6f07cf137cd4151">cairo_dock_unstack_Xevents</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#febdb458e4507c609dfd363c236fbe0c">cairo_dock_set_window_mask</a> (Window Xid, long iMask)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">Window *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#6854d1a079a4139ba4035940c5630f51">cairo_dock_get_windows_list</a> (gulong *iNbWindows)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#e50105367094357c54c6ebc5d688fc8d">cairo_dock_update_applis_list</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock, double fTime)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">GdkFilterReturn&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#e9152482284991281f2f96caed32f49b">filter</a> (GdkXEvent *gdkxevent, GdkEvent *event, gpointer data)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">GdkFilterReturn&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#62a50bc07e2b0201000f26439ea25bc7">filter2</a> (GdkXEvent *gdkxevent, GdkEvent *event, gpointer data)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#7c1241b133a5e587d8e14f6e836ea115">cairo_dock_start_application_manager</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#5784935cb0080105fce8a0f64c35dc30">cairo_dock_pause_application_manager</a> (void)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#dcd5a8de71ba0ea3f18ff026fc46395a">cairo_dock_stop_application_manager</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#7ec3bcd76eadc8a7b0f42e98815c9196">cairo_dock_application_manager_is_running</a> (void)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#4aba8529da340f73ce1e3c80f9f10bca">cairo_dock_set_strut_partial</a> (int Xid, int left, int right, int top, int bottom, int left_start_y, int left_end_y, int right_start_y, int right_end_y, int top_start_x, int top_end_x, int bottom_start_x, int bottom_end_x)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#0d4e6e3237c4abd52577259efe8eaad4">cairo_dock_set_xwindow_type_hint</a> (int Xid, gchar *cWindowTypeName)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#1ab4ef5ca197ea250821485ad8abe424">cairo_dock_set_one_icon_geometry_for_window_manager</a> (<a class="el" href="struct__Icon.html">Icon</a> *icon, <a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#a2ca8f52eeac2632b14d922b79cfbc5d">cairo_dock_set_icons_geometry_for_window_manager</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#a92bcc61a7d49ae823d3b6d50f25ea33">cairo_dock_update_screen_geometry</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#a24af9062f9cc975eb0b9422eb6587e6">g_pMainDock</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">pointeur sur le dock principal.  <a href="#a24af9062f9cc975eb0b9422eb6587e6"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#263de39492b5e16c81c98792f183edcf">g_bAutoHide</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">TRUE si l'auto-hide est active.  <a href="#263de39492b5e16c81c98792f183edcf"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#71125a40fdc7b421002f176b9b82ac79">g_fAmplitude</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">amplitude de la siunsoide.  <a href="#71125a40fdc7b421002f176b9b82ac79"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#f5b78259c07d46a4b659e075884fe728">g_iScreenWidth</a> [2]</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">dimensions de l'ecran.  <a href="#f5b78259c07d46a4b659e075884fe728"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#07391901b88403fa54f99e3c24b796ad">g_iScreenHeight</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#479142bd03646b25b45d1dcd8f02dc43">g_bUniquePid</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-applications-manager_8c.html#55244d4b1cc34be78f48d7beba5714ad">g_bAnimateOnActiveWindow</a></td></tr>
+
+</table>
+<hr><h2>Documentation des macros</h2>
+<a class="anchor" name="2eca6cb91e1d8de16029f465005ada36"></a><!-- doxytag: member="cairo-dock-applications-manager.c::CAIRO_DOCK_TASKBAR_CHECK_INTERVAL" ref="2eca6cb91e1d8de16029f465005ada36" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">#define CAIRO_DOCK_TASKBAR_CHECK_INTERVAL&nbsp;&nbsp;&nbsp;250          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<hr><h2>Documentation des fonctions</h2>
+<a class="anchor" name="9b43a61286dce635cfc3de9a95476d69"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_xerror_handler" ref="9b43a61286dce635cfc3de9a95476d69" args="(Display *pDisplay, XErrorEvent *pXError)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int cairo_dock_xerror_handler           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">Display *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pDisplay</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>XErrorEvent *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pXError</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="9be1f3c893173d869591061769319167"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_initialize_application_manager" ref="9be1f3c893173d869591061769319167" args="(void)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_initialize_application_manager           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">void&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="ce413c152ce63e62da7ca1ced9162f76"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_get_Xdisplay" ref="ce413c152ce63e62da7ca1ced9162f76" args="(void)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">const Display* cairo_dock_get_Xdisplay           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">void&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="a3ed958743c3d92ab3605ed4522e4684"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_register_appli" ref="a3ed958743c3d92ab3605ed4522e4684" args="(Icon *icon)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_register_appli           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>icon</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="23a7ad90233e1c3ec8a09b0f533f229d"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_blacklist_appli" ref="23a7ad90233e1c3ec8a09b0f533f229d" args="(Window Xid)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_blacklist_appli           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">Window&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>Xid</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="65f3f3b215d1bca2d818a039f6139978"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_unregister_appli" ref="65f3f3b215d1bca2d818a039f6139978" args="(Icon *icon)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_unregister_appli           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>icon</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+g_free (icon-&gt;cClass); icon-&gt;cClass = NULL;     </td>
+  </tr>
+</table>
+<a class="anchor" name="3755d5076e48084064ea0e64c2504f32"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_get_xwindow_timestamp" ref="3755d5076e48084064ea0e64c2504f32" args="(Window Xid)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gulong cairo_dock_get_xwindow_timestamp           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">Window&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>Xid</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="17dfe6c5b94d793cf0d669b156c3edc0"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_set_xwindow_timestamp" ref="17dfe6c5b94d793cf0d669b156c3edc0" args="(Window Xid, gulong iTimeStamp)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_set_xwindow_timestamp           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">Window&nbsp;</td>
+          <td class="mdname" nowrap> <em>Xid</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gulong&nbsp;</td>
+          <td class="mdname" nowrap> <em>iTimeStamp</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="e683af570c65020752a4c8bc9f572450"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_close_xwindow" ref="e683af570c65020752a4c8bc9f572450" args="(Window Xid)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_close_xwindow           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">Window&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>Xid</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="55d1ad8f30198f61a73a9e2a2e8bb2a7"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_show_appli" ref="55d1ad8f30198f61a73a9e2a2e8bb2a7" args="(Window Xid)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_show_appli           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">Window&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>Xid</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="b53c222978e2ff55bb218524e8785675"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_minimize_xwindow" ref="b53c222978e2ff55bb218524e8785675" args="(Window Xid)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_minimize_xwindow           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">Window&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>Xid</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="35e5a7e8b01d4407db1b6ff356e0f378"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_maximize_xwindow" ref="35e5a7e8b01d4407db1b6ff356e0f378" args="(Window Xid, gboolean bMaximize)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_maximize_xwindow           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">Window&nbsp;</td>
+          <td class="mdname" nowrap> <em>Xid</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gboolean&nbsp;</td>
+          <td class="mdname" nowrap> <em>bMaximize</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="2902625deca3f96d18213722a1c0abcc"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_set_xwindow_fullscreen" ref="2902625deca3f96d18213722a1c0abcc" args="(Window Xid, gboolean bFullScreen)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_set_xwindow_fullscreen           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">Window&nbsp;</td>
+          <td class="mdname" nowrap> <em>Xid</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gboolean&nbsp;</td>
+          <td class="mdname" nowrap> <em>bFullScreen</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="56433a2fc51ac1b156bb0d4449015bfa"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_move_xwindow_to_nth_desktop" ref="56433a2fc51ac1b156bb0d4449015bfa" args="(Window Xid, int iDesktopNumber, int iDesktopViewportX, int iDesktopViewportY)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_move_xwindow_to_nth_desktop           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">Window&nbsp;</td>
+          <td class="mdname" nowrap> <em>Xid</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iDesktopNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iDesktopViewportX</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iDesktopViewportY</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="893d0d3fe02503ec48a29331a066a0a6"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_window_is_maximized" ref="893d0d3fe02503ec48a29331a066a0a6" args="(Window Xid)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean cairo_dock_window_is_maximized           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">Window&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>Xid</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="ce9c9717a43029f7578777bb86f7b430"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_window_is_fullscreen" ref="ce9c9717a43029f7578777bb86f7b430" args="(Window Xid)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean cairo_dock_window_is_fullscreen           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">Window&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>Xid</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="b15bf8e379479a94a148adbd7fe10ccb"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_get_active_window" ref="b15bf8e379479a94a148adbd7fe10ccb" args="(void)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">Window cairo_dock_get_active_window           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">void&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="7f6627386c8a6f3318333e52d8c83792"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_get_current_desktop" ref="7f6627386c8a6f3318333e52d8c83792" args="(int *iDesktopNumber, int *iDesktopViewportX, int *iDesktopViewportY)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_get_current_desktop           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">int *&nbsp;</td>
+          <td class="mdname" nowrap> <em>iDesktopNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int *&nbsp;</td>
+          <td class="mdname" nowrap> <em>iDesktopViewportX</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int *&nbsp;</td>
+          <td class="mdname" nowrap> <em>iDesktopViewportY</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="fc4e3c71945c8204e6f07cf137cd4151"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_unstack_Xevents" ref="fc4e3c71945c8204e6f07cf137cd4151" args="(CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean cairo_dock_unstack_Xevents           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pDock</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="febdb458e4507c609dfd363c236fbe0c"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_set_window_mask" ref="febdb458e4507c609dfd363c236fbe0c" args="(Window Xid, long iMask)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_set_window_mask           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">Window&nbsp;</td>
+          <td class="mdname" nowrap> <em>Xid</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>long&nbsp;</td>
+          <td class="mdname" nowrap> <em>iMask</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="6854d1a079a4139ba4035940c5630f51"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_get_windows_list" ref="6854d1a079a4139ba4035940c5630f51" args="(gulong *iNbWindows)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">Window* cairo_dock_get_windows_list           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">gulong *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>iNbWindows</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="e50105367094357c54c6ebc5d688fc8d"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_update_applis_list" ref="e50105367094357c54c6ebc5d688fc8d" args="(CairoDock *pDock, double fTime)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_update_applis_list           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pDock</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fTime</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="e9152482284991281f2f96caed32f49b"></a><!-- doxytag: member="cairo-dock-applications-manager.c::filter" ref="e9152482284991281f2f96caed32f49b" args="(GdkXEvent *gdkxevent, GdkEvent *event, gpointer data)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">GdkFilterReturn filter           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GdkXEvent *&nbsp;</td>
+          <td class="mdname" nowrap> <em>gdkxevent</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>GdkEvent *&nbsp;</td>
+          <td class="mdname" nowrap> <em>event</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gpointer&nbsp;</td>
+          <td class="mdname" nowrap> <em>data</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="62a50bc07e2b0201000f26439ea25bc7"></a><!-- doxytag: member="cairo-dock-applications-manager.c::filter2" ref="62a50bc07e2b0201000f26439ea25bc7" args="(GdkXEvent *gdkxevent, GdkEvent *event, gpointer data)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">GdkFilterReturn filter2           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GdkXEvent *&nbsp;</td>
+          <td class="mdname" nowrap> <em>gdkxevent</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>GdkEvent *&nbsp;</td>
+          <td class="mdname" nowrap> <em>event</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gpointer&nbsp;</td>
+          <td class="mdname" nowrap> <em>data</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="7c1241b133a5e587d8e14f6e836ea115"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_start_application_manager" ref="7c1241b133a5e587d8e14f6e836ea115" args="(CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_start_application_manager           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pDock</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="5784935cb0080105fce8a0f64c35dc30"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_pause_application_manager" ref="5784935cb0080105fce8a0f64c35dc30" args="(void)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_pause_application_manager           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">void&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="dcd5a8de71ba0ea3f18ff026fc46395a"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_stop_application_manager" ref="dcd5a8de71ba0ea3f18ff026fc46395a" args="(CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_stop_application_manager           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pDock</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="7ec3bcd76eadc8a7b0f42e98815c9196"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_application_manager_is_running" ref="7ec3bcd76eadc8a7b0f42e98815c9196" args="(void)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean cairo_dock_application_manager_is_running           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">void&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="4aba8529da340f73ce1e3c80f9f10bca"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_set_strut_partial" ref="4aba8529da340f73ce1e3c80f9f10bca" args="(int Xid, int left, int right, int top, int bottom, int left_start_y, int left_end_y, int right_start_y, int right_end_y, int top_start_x, int top_end_x, int bottom_start_x, int bottom_end_x)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_set_strut_partial           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">int&nbsp;</td>
+          <td class="mdname" nowrap> <em>Xid</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>left</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>right</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>top</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>bottom</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>left_start_y</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>left_end_y</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>right_start_y</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>right_end_y</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>top_start_x</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>top_end_x</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>bottom_start_x</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>bottom_end_x</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="0d4e6e3237c4abd52577259efe8eaad4"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_set_xwindow_type_hint" ref="0d4e6e3237c4abd52577259efe8eaad4" args="(int Xid, gchar *cWindowTypeName)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_set_xwindow_type_hint           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">int&nbsp;</td>
+          <td class="mdname" nowrap> <em>Xid</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gchar *&nbsp;</td>
+          <td class="mdname" nowrap> <em>cWindowTypeName</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="1ab4ef5ca197ea250821485ad8abe424"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_set_one_icon_geometry_for_window_manager" ref="1ab4ef5ca197ea250821485ad8abe424" args="(Icon *icon, CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_set_one_icon_geometry_for_window_manager           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>icon</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pDock</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="a2ca8f52eeac2632b14d922b79cfbc5d"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_set_icons_geometry_for_window_manager" ref="a2ca8f52eeac2632b14d922b79cfbc5d" args="(CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_set_icons_geometry_for_window_manager           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pDock</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="a92bcc61a7d49ae823d3b6d50f25ea33"></a><!-- doxytag: member="cairo-dock-applications-manager.c::cairo_dock_update_screen_geometry" ref="a92bcc61a7d49ae823d3b6d50f25ea33" args="(CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean cairo_dock_update_screen_geometry           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pDock</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<hr><h2>Documentation des variables</h2>
+<a class="anchor" name="a24af9062f9cc975eb0b9422eb6587e6"></a><!-- doxytag: member="cairo-dock-applications-manager.c::g_pMainDock" ref="a24af9062f9cc975eb0b9422eb6587e6" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a>* <a class="el" href="cairo-dock_8c.html#a24af9062f9cc975eb0b9422eb6587e6">g_pMainDock</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+pointeur sur le dock principal. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="263de39492b5e16c81c98792f183edcf"></a><!-- doxytag: member="cairo-dock-applications-manager.c::g_bAutoHide" ref="263de39492b5e16c81c98792f183edcf" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#263de39492b5e16c81c98792f183edcf">g_bAutoHide</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+TRUE si l'auto-hide est active. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="71125a40fdc7b421002f176b9b82ac79"></a><!-- doxytag: member="cairo-dock-applications-manager.c::g_fAmplitude" ref="71125a40fdc7b421002f176b9b82ac79" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">double <a class="el" href="cairo-dock_8c.html#71125a40fdc7b421002f176b9b82ac79">g_fAmplitude</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+amplitude de la siunsoide. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="f5b78259c07d46a4b659e075884fe728"></a><!-- doxytag: member="cairo-dock-applications-manager.c::g_iScreenWidth" ref="f5b78259c07d46a4b659e075884fe728" args="[2]" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#d832291d167ff78b5ae1b76dfb288ac8">g_iScreenWidth</a>[2]          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+dimensions de l'ecran. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="07391901b88403fa54f99e3c24b796ad"></a><!-- doxytag: member="cairo-dock-applications-manager.c::g_iScreenHeight" ref="07391901b88403fa54f99e3c24b796ad" args="[2]" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#70dbb6c14cb143c826e85759b205f201">g_iScreenHeight</a>[2]          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="479142bd03646b25b45d1dcd8f02dc43"></a><!-- doxytag: member="cairo-dock-applications-manager.c::g_bUniquePid" ref="479142bd03646b25b45d1dcd8f02dc43" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#479142bd03646b25b45d1dcd8f02dc43">g_bUniquePid</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="55244d4b1cc34be78f48d7beba5714ad"></a><!-- doxytag: member="cairo-dock-applications-manager.c::g_bAnimateOnActiveWindow" ref="55244d4b1cc34be78f48d7beba5714ad" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#55244d4b1cc34be78f48d7beba5714ad">g_bAnimateOnActiveWindow</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<hr size="1"><address style="align: right;"><small>Généré le Fri Dec 7 13:11:02 2007 pour Cairo-Dock par&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.4.6 </small></address>
+</body>
+</html>

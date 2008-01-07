@@ -1,0 +1,95 @@
+\section{R\'{e}f\'{e}rence du fichier src/cairo-dock-gui-factory.c}
+\label{cairo-dock-gui-factory_8c}\index{src/cairo-dock-gui-factory.c@{src/cairo-dock-gui-factory.c}}
+\subsection*{Macros}
+\begin{CompactItemize}
+\item 
+\#define {\bf CAIRO\_\-DOCK\_\-GUI\_\-MARGIN}~3
+\end{CompactItemize}
+\subsection*{\'{E}num\'{e}rations}
+\begin{CompactItemize}
+\item 
+enum {\bf \_\-Cairo\-Dock\-Model\-Columns} \{ \par
+{\bf CAIRO\_\-DOCK\_\-MODEL\_\-NAME} =  0, 
+{\bf CAIRO\_\-DOCK\_\-MODEL\_\-RESULT}, 
+{\bf CAIRO\_\-DOCK\_\-MODEL\_\-DESCRIPTION\_\-FILE}, 
+{\bf CAIRO\_\-DOCK\_\-MODEL\_\-ACTIVE}, 
+\par
+{\bf CAIRO\_\-DOCK\_\-MODEL\_\-ORDER}, 
+{\bf CAIRO\_\-DOCK\_\-MODEL\_\-NB\_\-COLUMNS}
+ \}
+\end{CompactItemize}
+\subsection*{Fonctions}
+\begin{CompactItemize}
+\item 
+Gtk\-Widget $\ast$ {\bf cairo\_\-dock\_\-generate\_\-advanced\_\-ihm\_\-from\_\-keyfile} (GKey\-File $\ast$p\-Key\-File, gchar $\ast$c\-Title, Gtk\-Widget $\ast$p\-Parent\-Widget, GSList $\ast$$\ast$p\-Widget\-List, gboolean b\-Apply\-Button\-Present, gchar i\-Identifier, gchar $\ast$c\-Presented\-Group, gboolean b\-Switch\-Button\-Present, gchar $\ast$c\-Button\-Convert)
+\item 
+gboolean {\bf cairo\_\-dock\_\-is\_\-advanced\_\-keyfile} (GKey\-File $\ast$p\-Key\-File)
+\item 
+Gtk\-Widget $\ast$ {\bf cairo\_\-dock\_\-generate\_\-basic\_\-ihm\_\-from\_\-keyfile} (gchar $\ast$c\-Conf\-File\-Path, gchar $\ast$c\-Title, Gtk\-Widget $\ast$p\-Parent\-Widget, Gtk\-Text\-Buffer $\ast$$\ast$p\-Text\-Buffer, gboolean b\-Apply\-Button\-Present, gboolean b\-Switch\-Button\-Present, gchar $\ast$c\-Button\-Convert)
+\item 
+void {\bf cairo\_\-dock\_\-update\_\-keyfile\_\-from\_\-widget\_\-list} (GKey\-File $\ast$p\-Key\-File, GSList $\ast$p\-Widget\-List)
+\item 
+void {\bf cairo\_\-dock\_\-free\_\-generated\_\-widget\_\-list} (GSList $\ast$p\-Widget\-List)
+\end{CompactItemize}
+
+
+\subsection{Documentation des macros}
+\index{cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}!CAIRO_DOCK_GUI_MARGIN@{CAIRO\_\-DOCK\_\-GUI\_\-MARGIN}}
+\index{CAIRO_DOCK_GUI_MARGIN@{CAIRO\_\-DOCK\_\-GUI\_\-MARGIN}!cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CAIRO\_\-DOCK\_\-GUI\_\-MARGIN~3}\label{cairo-dock-gui-factory_8c_6baaf705c3808a4966f67490af5f1950}
+
+
+
+
+\subsection{Documentation du type de l'\'{e}num\'{e}ration}
+\index{cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}!_CairoDockModelColumns@{\_\-CairoDockModelColumns}}
+\index{_CairoDockModelColumns@{\_\-CairoDockModelColumns}!cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}enum {\bf \_\-Cairo\-Dock\-Model\-Columns}}\label{cairo-dock-gui-factory_8c_2095d964f12bb5bb3797e9fda2791692}
+
+
+\begin{Desc}
+\item[Valeurs \'{e}num\'{e}r\'{e}es: ]\par
+\begin{description}
+\index{CAIRO_DOCK_MODEL_NAME@{CAIRO\_\-DOCK\_\-MODEL\_\-NAME}!cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}}\index{cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}!CAIRO_DOCK_MODEL_NAME@{CAIRO\_\-DOCK\_\-MODEL\_\-NAME}}\item[{\em 
+CAIRO\_\-DOCK\_\-MODEL\_\-NAME\label{cairo-dock-gui-factory_8c_2095d964f12bb5bb3797e9fda27916923610796dafdcd6f5f6b02dbc9247de1a}
+}]\index{CAIRO_DOCK_MODEL_RESULT@{CAIRO\_\-DOCK\_\-MODEL\_\-RESULT}!cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}}\index{cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}!CAIRO_DOCK_MODEL_RESULT@{CAIRO\_\-DOCK\_\-MODEL\_\-RESULT}}\item[{\em 
+CAIRO\_\-DOCK\_\-MODEL\_\-RESULT\label{cairo-dock-gui-factory_8c_2095d964f12bb5bb3797e9fda2791692b40f82957a9d3191a78bc484ebbd670a}
+}]\index{CAIRO_DOCK_MODEL_DESCRIPTION_FILE@{CAIRO\_\-DOCK\_\-MODEL\_\-DESCRIPTION\_\-FILE}!cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}}\index{cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}!CAIRO_DOCK_MODEL_DESCRIPTION_FILE@{CAIRO\_\-DOCK\_\-MODEL\_\-DESCRIPTION\_\-FILE}}\item[{\em 
+CAIRO\_\-DOCK\_\-MODEL\_\-DESCRIPTION\_\-FILE\label{cairo-dock-gui-factory_8c_2095d964f12bb5bb3797e9fda279169283951d62cfa490affbfeff1a35d1d507}
+}]\index{CAIRO_DOCK_MODEL_ACTIVE@{CAIRO\_\-DOCK\_\-MODEL\_\-ACTIVE}!cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}}\index{cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}!CAIRO_DOCK_MODEL_ACTIVE@{CAIRO\_\-DOCK\_\-MODEL\_\-ACTIVE}}\item[{\em 
+CAIRO\_\-DOCK\_\-MODEL\_\-ACTIVE\label{cairo-dock-gui-factory_8c_2095d964f12bb5bb3797e9fda2791692da3e8cbf6c023c478880535fa1c9b912}
+}]\index{CAIRO_DOCK_MODEL_ORDER@{CAIRO\_\-DOCK\_\-MODEL\_\-ORDER}!cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}}\index{cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}!CAIRO_DOCK_MODEL_ORDER@{CAIRO\_\-DOCK\_\-MODEL\_\-ORDER}}\item[{\em 
+CAIRO\_\-DOCK\_\-MODEL\_\-ORDER\label{cairo-dock-gui-factory_8c_2095d964f12bb5bb3797e9fda27916926ed72bd3c38d901f0b68763927206f50}
+}]\index{CAIRO_DOCK_MODEL_NB_COLUMNS@{CAIRO\_\-DOCK\_\-MODEL\_\-NB\_\-COLUMNS}!cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}}\index{cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}!CAIRO_DOCK_MODEL_NB_COLUMNS@{CAIRO\_\-DOCK\_\-MODEL\_\-NB\_\-COLUMNS}}\item[{\em 
+CAIRO\_\-DOCK\_\-MODEL\_\-NB\_\-COLUMNS\label{cairo-dock-gui-factory_8c_2095d964f12bb5bb3797e9fda27916920f91c537ad4f87f2c5be67a389bc4609}
+}]\end{description}
+\end{Desc}
+
+
+
+\subsection{Documentation des fonctions}
+\index{cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}!cairo_dock_generate_advanced_ihm_from_keyfile@{cairo\_\-dock\_\-generate\_\-advanced\_\-ihm\_\-from\_\-keyfile}}
+\index{cairo_dock_generate_advanced_ihm_from_keyfile@{cairo\_\-dock\_\-generate\_\-advanced\_\-ihm\_\-from\_\-keyfile}!cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Gtk\-Widget$\ast$ cairo\_\-dock\_\-generate\_\-advanced\_\-ihm\_\-from\_\-keyfile (GKey\-File $\ast$ {\em p\-Key\-File}, gchar $\ast$ {\em c\-Title}, Gtk\-Widget $\ast$ {\em p\-Parent\-Widget}, GSList $\ast$$\ast$ {\em p\-Widget\-List}, gboolean {\em b\-Apply\-Button\-Present}, gchar {\em i\-Identifier}, gchar $\ast$ {\em c\-Presented\-Group}, gboolean {\em b\-Switch\-Button\-Present}, gchar $\ast$ {\em c\-Button\-Convert})}\label{cairo-dock-gui-factory_8c_e932540c836103d2131b9c4cb6775187}
+
+
+\index{cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}!cairo_dock_is_advanced_keyfile@{cairo\_\-dock\_\-is\_\-advanced\_\-keyfile}}
+\index{cairo_dock_is_advanced_keyfile@{cairo\_\-dock\_\-is\_\-advanced\_\-keyfile}!cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean cairo\_\-dock\_\-is\_\-advanced\_\-keyfile (GKey\-File $\ast$ {\em p\-Key\-File})}\label{cairo-dock-gui-factory_8c_b73ac9120d9c0467c1d44f93488c3469}
+
+
+\index{cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}!cairo_dock_generate_basic_ihm_from_keyfile@{cairo\_\-dock\_\-generate\_\-basic\_\-ihm\_\-from\_\-keyfile}}
+\index{cairo_dock_generate_basic_ihm_from_keyfile@{cairo\_\-dock\_\-generate\_\-basic\_\-ihm\_\-from\_\-keyfile}!cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Gtk\-Widget$\ast$ cairo\_\-dock\_\-generate\_\-basic\_\-ihm\_\-from\_\-keyfile (gchar $\ast$ {\em c\-Conf\-File\-Path}, gchar $\ast$ {\em c\-Title}, Gtk\-Widget $\ast$ {\em p\-Parent\-Widget}, Gtk\-Text\-Buffer $\ast$$\ast$ {\em p\-Text\-Buffer}, gboolean {\em b\-Apply\-Button\-Present}, gboolean {\em b\-Switch\-Button\-Present}, gchar $\ast$ {\em c\-Button\-Convert})}\label{cairo-dock-gui-factory_8c_a199dc6beb014f48145fa89151df8d4f}
+
+
+\index{cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}!cairo_dock_update_keyfile_from_widget_list@{cairo\_\-dock\_\-update\_\-keyfile\_\-from\_\-widget\_\-list}}
+\index{cairo_dock_update_keyfile_from_widget_list@{cairo\_\-dock\_\-update\_\-keyfile\_\-from\_\-widget\_\-list}!cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-update\_\-keyfile\_\-from\_\-widget\_\-list (GKey\-File $\ast$ {\em p\-Key\-File}, GSList $\ast$ {\em p\-Widget\-List})}\label{cairo-dock-gui-factory_8c_b247cff92f05bad671971a7435ace512}
+
+
+\index{cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}!cairo_dock_free_generated_widget_list@{cairo\_\-dock\_\-free\_\-generated\_\-widget\_\-list}}
+\index{cairo_dock_free_generated_widget_list@{cairo\_\-dock\_\-free\_\-generated\_\-widget\_\-list}!cairo-dock-gui-factory.c@{cairo-dock-gui-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-free\_\-generated\_\-widget\_\-list (GSList $\ast$ {\em p\-Widget\-List})}\label{cairo-dock-gui-factory_8c_32eda439a65f9d52b3bb2c6c3f886d51}
+
+

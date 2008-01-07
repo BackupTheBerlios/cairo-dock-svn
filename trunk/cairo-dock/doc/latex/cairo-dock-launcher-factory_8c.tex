@@ -1,0 +1,171 @@
+\section{R\'{e}f\'{e}rence du fichier src/cairo-dock-launcher-factory.c}
+\label{cairo-dock-launcher-factory_8c}\index{src/cairo-dock-launcher-factory.c@{src/cairo-dock-launcher-factory.c}}
+\subsection*{Fonctions}
+\begin{CompactItemize}
+\item 
+gchar $\ast$ {\bf cairo\_\-dock\_\-search\_\-icon\_\-s\_\-path} (gchar $\ast$c\-File\-Name)
+\item 
+void {\bf cairo\_\-dock\_\-load\_\-icon\_\-info\_\-from\_\-desktop\_\-file} (const gchar $\ast$c\-Desktop\-File\-Name, {\bf Icon} $\ast$icon)
+\item 
+{\bf Icon} $\ast$ {\bf cairo\_\-dock\_\-create\_\-icon\_\-from\_\-desktop\_\-file} (const gchar $\ast$c\-Desktop\-File\-Name, cairo\_\-t $\ast$p\-Source\-Context)
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+{\bf Cairo\-Dock} $\ast$ {\bf g\_\-p\-Main\-Dock}
+\begin{CompactList}\small\item\em pointeur sur le dock principal. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Sub\-Dock\-Size\-Ratio}
+\begin{CompactList}\small\item\em ratio de la taille des icones des sous-docks par rapport a celles du dock principal. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Amplitude}
+\begin{CompactList}\small\item\em amplitude de la siunsoide. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Icon\-Gap}
+\begin{CompactList}\small\item\em ecart en pixels entre les icones. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Label\-Size}
+\begin{CompactList}\small\item\em taille de la police des etiquettes. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Text\-Always\-Horizontal}
+\begin{CompactList}\small\item\em TRUE $<$=$>$ etiquettes horizontales meme pour les docks verticaux. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Label\-Police}
+\begin{CompactList}\small\item\em police de caracteres des etiquettes. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Conf\-File}
+\item 
+gchar $\ast$ {\bf g\_\-c\-Current\-Launchers\-Path}
+\begin{CompactList}\small\item\em le chemin vers le repertoire des lanceurs/icones du theme courant. \item\end{CompactList}\item 
+gchar $\ast$$\ast$ {\bf g\_\-c\-Default\-Icon\-Directory}
+\item 
+Gtk\-Icon\-Theme $\ast$ {\bf g\_\-p\-Icon\-Theme}
+\begin{CompactList}\small\item\em le theme d'icone choisi. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Direction\-Up}
+\begin{CompactList}\small\item\em la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Same\-Horizontality}
+\begin{CompactList}\small\item\em dit si les sous-docks ont la meme horizontalite que les docks racines. \item\end{CompactList}\item 
+int {\bf g\_\-t\-Min\-Icon\-Authorized\-Size} [CAIRO\_\-DOCK\_\-NB\_\-TYPES]
+\begin{CompactList}\small\item\em les tailles min et max pour chaque type d'icone. \item\end{CompactList}\item 
+int {\bf g\_\-t\-Max\-Icon\-Authorized\-Size} [CAIRO\_\-DOCK\_\-NB\_\-TYPES]
+\item 
+gboolean {\bf g\_\-b\-Use\-Glitz}
+\end{CompactItemize}
+
+
+\subsection{Documentation des fonctions}
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!cairo_dock_search_icon_s_path@{cairo\_\-dock\_\-search\_\-icon\_\-s\_\-path}}
+\index{cairo_dock_search_icon_s_path@{cairo\_\-dock\_\-search\_\-icon\_\-s\_\-path}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ cairo\_\-dock\_\-search\_\-icon\_\-s\_\-path (gchar $\ast$ {\em c\-File\-Name})}\label{cairo-dock-launcher-factory_8c_78eed06457876a9d7ed2d3f106446cbd}
+
+
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!cairo_dock_load_icon_info_from_desktop_file@{cairo\_\-dock\_\-load\_\-icon\_\-info\_\-from\_\-desktop\_\-file}}
+\index{cairo_dock_load_icon_info_from_desktop_file@{cairo\_\-dock\_\-load\_\-icon\_\-info\_\-from\_\-desktop\_\-file}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-load\_\-icon\_\-info\_\-from\_\-desktop\_\-file (const gchar $\ast$ {\em c\-Desktop\-File\-Name}, {\bf Icon} $\ast$ {\em icon})}\label{cairo-dock-launcher-factory_8c_153268a1483980e1451c07a78234e7e0}
+
+
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!cairo_dock_create_icon_from_desktop_file@{cairo\_\-dock\_\-create\_\-icon\_\-from\_\-desktop\_\-file}}
+\index{cairo_dock_create_icon_from_desktop_file@{cairo\_\-dock\_\-create\_\-icon\_\-from\_\-desktop\_\-file}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf Icon}$\ast$ cairo\_\-dock\_\-create\_\-icon\_\-from\_\-desktop\_\-file (const gchar $\ast$ {\em c\-Desktop\-File\-Name}, cairo\_\-t $\ast$ {\em p\-Source\-Context})}\label{cairo-dock-launcher-factory_8c_14479202384b12f7f532120e69af2b96}
+
+
+
+
+\subsection{Documentation des variables}
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!g_pMainDock@{g\_\-pMainDock}}
+\index{g_pMainDock@{g\_\-pMainDock}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf Cairo\-Dock}$\ast$ {\bf g\_\-p\-Main\-Dock}}\label{cairo-dock-launcher-factory_8c_a24af9062f9cc975eb0b9422eb6587e6}
+
+
+pointeur sur le dock principal. 
+
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!g_fSubDockSizeRatio@{g\_\-fSubDockSizeRatio}}
+\index{g_fSubDockSizeRatio@{g\_\-fSubDockSizeRatio}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Sub\-Dock\-Size\-Ratio}}\label{cairo-dock-launcher-factory_8c_e6ee377f5c409b71e3f7e87694f60556}
+
+
+ratio de la taille des icones des sous-docks par rapport a celles du dock principal. 
+
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!g_fAmplitude@{g\_\-fAmplitude}}
+\index{g_fAmplitude@{g\_\-fAmplitude}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Amplitude}}\label{cairo-dock-launcher-factory_8c_71125a40fdc7b421002f176b9b82ac79}
+
+
+amplitude de la siunsoide. 
+
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!g_iIconGap@{g\_\-iIconGap}}
+\index{g_iIconGap@{g\_\-iIconGap}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Icon\-Gap}}\label{cairo-dock-launcher-factory_8c_32a45bc8bdc1899cbe8bbc034a3815fe}
+
+
+ecart en pixels entre les icones. 
+
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!g_iLabelSize@{g\_\-iLabelSize}}
+\index{g_iLabelSize@{g\_\-iLabelSize}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Label\-Size}}\label{cairo-dock-launcher-factory_8c_386538e26258de4d50feb84fecc45dd6}
+
+
+taille de la police des etiquettes. 
+
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!g_bTextAlwaysHorizontal@{g\_\-bTextAlwaysHorizontal}}
+\index{g_bTextAlwaysHorizontal@{g\_\-bTextAlwaysHorizontal}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Text\-Always\-Horizontal}}\label{cairo-dock-launcher-factory_8c_9656ee040199018fa599316b38e2f231}
+
+
+TRUE $<$=$>$ etiquettes horizontales meme pour les docks verticaux. 
+
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!g_cLabelPolice@{g\_\-cLabelPolice}}
+\index{g_cLabelPolice@{g\_\-cLabelPolice}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Label\-Police}}\label{cairo-dock-launcher-factory_8c_1dd252a8514e5074187d0c12a311f158}
+
+
+police de caracteres des etiquettes. 
+
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!g_cConfFile@{g\_\-cConfFile}}
+\index{g_cConfFile@{g\_\-cConfFile}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Conf\-File}}\label{cairo-dock-launcher-factory_8c_2173efce4550991bad33a89cf25b6243}
+
+
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!g_cCurrentLaunchersPath@{g\_\-cCurrentLaunchersPath}}
+\index{g_cCurrentLaunchersPath@{g\_\-cCurrentLaunchersPath}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Current\-Launchers\-Path}}\label{cairo-dock-launcher-factory_8c_540e05d87e90a39620d6d15e03dc808b}
+
+
+le chemin vers le repertoire des lanceurs/icones du theme courant. 
+
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!g_cDefaultIconDirectory@{g\_\-cDefaultIconDirectory}}
+\index{g_cDefaultIconDirectory@{g\_\-cDefaultIconDirectory}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$$\ast$ {\bf g\_\-c\-Default\-Icon\-Directory}}\label{cairo-dock-launcher-factory_8c_41126bcd8eca05e7c4898de8202e7375}
+
+
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!g_pIconTheme@{g\_\-pIconTheme}}
+\index{g_pIconTheme@{g\_\-pIconTheme}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Gtk\-Icon\-Theme$\ast$ {\bf g\_\-p\-Icon\-Theme}}\label{cairo-dock-launcher-factory_8c_ecfdd070a6e5e7dd7ef53cb73b68add8}
+
+
+le theme d'icone choisi. 
+
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!g_bDirectionUp@{g\_\-bDirectionUp}}
+\index{g_bDirectionUp@{g\_\-bDirectionUp}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Direction\-Up}}\label{cairo-dock-launcher-factory_8c_080e0cb494374269a17c7ebd078e855d}
+
+
+la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas. 
+
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!g_bSameHorizontality@{g\_\-bSameHorizontality}}
+\index{g_bSameHorizontality@{g\_\-bSameHorizontality}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Same\-Horizontality}}\label{cairo-dock-launcher-factory_8c_ebf5cd7f2cea410e4d3811a5dc3405b9}
+
+
+dit si les sous-docks ont la meme horizontalite que les docks racines. 
+
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!g_tMinIconAuthorizedSize@{g\_\-tMinIconAuthorizedSize}}
+\index{g_tMinIconAuthorizedSize@{g\_\-tMinIconAuthorizedSize}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-t\-Min\-Icon\-Authorized\-Size}[CAIRO\_\-DOCK\_\-NB\_\-TYPES]}\label{cairo-dock-launcher-factory_8c_7f137381241bb9dc494d796d01baf72b}
+
+
+les tailles min et max pour chaque type d'icone. 
+
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!g_tMaxIconAuthorizedSize@{g\_\-tMaxIconAuthorizedSize}}
+\index{g_tMaxIconAuthorizedSize@{g\_\-tMaxIconAuthorizedSize}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-t\-Max\-Icon\-Authorized\-Size}[CAIRO\_\-DOCK\_\-NB\_\-TYPES]}\label{cairo-dock-launcher-factory_8c_93e9653fa15a07997f49709814aad739}
+
+
+\index{cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}!g_bUseGlitz@{g\_\-bUseGlitz}}
+\index{g_bUseGlitz@{g\_\-bUseGlitz}!cairo-dock-launcher-factory.c@{cairo-dock-launcher-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Use\-Glitz}}\label{cairo-dock-launcher-factory_8c_16a0df3aa6645b9f4437809d3bbd3865}
+
+

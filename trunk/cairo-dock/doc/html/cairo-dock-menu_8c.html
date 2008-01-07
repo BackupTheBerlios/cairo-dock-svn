@@ -1,0 +1,418 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Cairo-Dock: Référence du fichier src/cairo-dock-menu.c</title>
+<link href="doxygen.css" rel="stylesheet" type="text/css">
+<link href="tabs.css" rel="stylesheet" type="text/css">
+</head><body>
+<!-- Généré par Doxygen 1.4.6 -->
+<div class="tabs">
+  <ul>
+    <li><a href="index.html"><span>Page&nbsp;principale</span></a></li>
+    <li><a href="annotated.html"><span>Structures&nbsp;de&nbsp;données</span></a></li>
+    <li id="current"><a href="files.html"><span>Fichiers</span></a></li>
+  </ul></div>
+<div class="tabs">
+  <ul>
+    <li><a href="files.html"><span>Liste&nbsp;des&nbsp;fichiers</span></a></li>
+    <li><a href="globals.html"><span>Portée&nbsp;globale</span></a></li>
+  </ul></div>
+<h1>Référence du fichier src/cairo-dock-menu.c</h1><table border="0" cellpadding="0" cellspacing="0">
+<tr><td></td></tr>
+<tr><td colspan="2"><br><h2>Macros</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-menu_8c.html#4b102c79eee6723861b950368875b10f">CAIRO_DOCK_CONF_PANEL_WIDTH</a>&nbsp;&nbsp;&nbsp;800</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-menu_8c.html#b95cc6a842893ab6665c4dd89f820d80">CAIRO_DOCK_CONF_PANEL_HEIGHT</a>&nbsp;&nbsp;&nbsp;600</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-menu_8c.html#c8479fcacbd45c2a551891e7b6a806a0">CAIRO_DOCK_LAUNCHER_PANEL_WIDTH</a>&nbsp;&nbsp;&nbsp;550</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-menu_8c.html#c628c6e122c28657f382268655f232a0">CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT</a>&nbsp;&nbsp;&nbsp;350</td></tr>
+
+<tr><td colspan="2"><br><h2>Fonctions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-menu_8c.html#613b3a0561c8323bbf7537b4c97c369e">cairo_dock_notification_remove_icon</a> (gpointer *data)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">GtkWidget *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-menu_8c.html#6f8b8ef737a942bc8a624f66c0d9b51f">cairo_dock_build_menu</a> (<a class="el" href="struct__Icon.html">Icon</a> *icon, <a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-menu_8c.html#e75d5444afb0de3d95d5217509ac1fa7">cairo_dock_notification_build_menu</a> (gpointer *data)</td></tr>
+
+<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-menu_8c.html#a24af9062f9cc975eb0b9422eb6587e6">g_pMainDock</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">pointeur sur le dock principal.  <a href="#a24af9062f9cc975eb0b9422eb6587e6"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-menu_8c.html#e6ee377f5c409b71e3f7e87694f60556">g_fSubDockSizeRatio</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">ratio de la taille des icones des sous-docks par rapport a celles du dock principal.  <a href="#e6ee377f5c409b71e3f7e87694f60556"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gchar *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-menu_8c.html#fb26c14d874eba876836b1ba28f1eb58">g_cLanguage</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-menu_8c.html#263de39492b5e16c81c98792f183edcf">g_bAutoHide</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">TRUE si l'auto-hide est active.  <a href="#263de39492b5e16c81c98792f183edcf"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gchar *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-menu_8c.html#2173efce4550991bad33a89cf25b6243">g_cConfFile</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gchar *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-menu_8c.html#516cee7fd8c65742fa35c0269b544eda">g_cEasyConfFile</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gchar *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-menu_8c.html#540e05d87e90a39620d6d15e03dc808b">g_cCurrentLaunchersPath</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">le chemin vers le repertoire des lanceurs/icones du theme courant.  <a href="#540e05d87e90a39620d6d15e03dc808b"></a><br></td></tr>
+</table>
+<hr><h2>Documentation des macros</h2>
+<a class="anchor" name="4b102c79eee6723861b950368875b10f"></a><!-- doxytag: member="cairo-dock-menu.c::CAIRO_DOCK_CONF_PANEL_WIDTH" ref="4b102c79eee6723861b950368875b10f" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">#define CAIRO_DOCK_CONF_PANEL_WIDTH&nbsp;&nbsp;&nbsp;800          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="b95cc6a842893ab6665c4dd89f820d80"></a><!-- doxytag: member="cairo-dock-menu.c::CAIRO_DOCK_CONF_PANEL_HEIGHT" ref="b95cc6a842893ab6665c4dd89f820d80" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">#define CAIRO_DOCK_CONF_PANEL_HEIGHT&nbsp;&nbsp;&nbsp;600          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="c8479fcacbd45c2a551891e7b6a806a0"></a><!-- doxytag: member="cairo-dock-menu.c::CAIRO_DOCK_LAUNCHER_PANEL_WIDTH" ref="c8479fcacbd45c2a551891e7b6a806a0" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">#define CAIRO_DOCK_LAUNCHER_PANEL_WIDTH&nbsp;&nbsp;&nbsp;550          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="c628c6e122c28657f382268655f232a0"></a><!-- doxytag: member="cairo-dock-menu.c::CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT" ref="c628c6e122c28657f382268655f232a0" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">#define CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT&nbsp;&nbsp;&nbsp;350          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<hr><h2>Documentation des fonctions</h2>
+<a class="anchor" name="613b3a0561c8323bbf7537b4c97c369e"></a><!-- doxytag: member="cairo-dock-menu.c::cairo_dock_notification_remove_icon" ref="613b3a0561c8323bbf7537b4c97c369e" args="(gpointer *data)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean cairo_dock_notification_remove_icon           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">gpointer *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>data</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+int answer = cairo_dock_ask_question (pDock, "Do you want to re-dispatch the icons contained inside this container into the dock (otherwise they will be destroyed) ?");     </td>
+  </tr>
+</table>
+<a class="anchor" name="6f8b8ef737a942bc8a624f66c0d9b51f"></a><!-- doxytag: member="cairo-dock-menu.c::cairo_dock_build_menu" ref="6f8b8ef737a942bc8a624f66c0d9b51f" args="(Icon *icon, CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">GtkWidget* cairo_dock_build_menu           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>icon</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pDock</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="e75d5444afb0de3d95d5217509ac1fa7"></a><!-- doxytag: member="cairo-dock-menu.c::cairo_dock_notification_build_menu" ref="e75d5444afb0de3d95d5217509ac1fa7" args="(gpointer *data)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean cairo_dock_notification_build_menu           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">gpointer *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>data</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<hr><h2>Documentation des variables</h2>
+<a class="anchor" name="a24af9062f9cc975eb0b9422eb6587e6"></a><!-- doxytag: member="cairo-dock-menu.c::g_pMainDock" ref="a24af9062f9cc975eb0b9422eb6587e6" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a>* <a class="el" href="cairo-dock_8c.html#a24af9062f9cc975eb0b9422eb6587e6">g_pMainDock</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+pointeur sur le dock principal. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="e6ee377f5c409b71e3f7e87694f60556"></a><!-- doxytag: member="cairo-dock-menu.c::g_fSubDockSizeRatio" ref="e6ee377f5c409b71e3f7e87694f60556" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">double <a class="el" href="cairo-dock_8c.html#e6ee377f5c409b71e3f7e87694f60556">g_fSubDockSizeRatio</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+ratio de la taille des icones des sous-docks par rapport a celles du dock principal. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="fb26c14d874eba876836b1ba28f1eb58"></a><!-- doxytag: member="cairo-dock-menu.c::g_cLanguage" ref="fb26c14d874eba876836b1ba28f1eb58" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gchar* <a class="el" href="cairo-dock_8c.html#fb26c14d874eba876836b1ba28f1eb58">g_cLanguage</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="263de39492b5e16c81c98792f183edcf"></a><!-- doxytag: member="cairo-dock-menu.c::g_bAutoHide" ref="263de39492b5e16c81c98792f183edcf" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#263de39492b5e16c81c98792f183edcf">g_bAutoHide</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+TRUE si l'auto-hide est active. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="2173efce4550991bad33a89cf25b6243"></a><!-- doxytag: member="cairo-dock-menu.c::g_cConfFile" ref="2173efce4550991bad33a89cf25b6243" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gchar* <a class="el" href="cairo-dock_8c.html#2173efce4550991bad33a89cf25b6243">g_cConfFile</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="516cee7fd8c65742fa35c0269b544eda"></a><!-- doxytag: member="cairo-dock-menu.c::g_cEasyConfFile" ref="516cee7fd8c65742fa35c0269b544eda" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gchar* <a class="el" href="cairo-dock_8c.html#516cee7fd8c65742fa35c0269b544eda">g_cEasyConfFile</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="540e05d87e90a39620d6d15e03dc808b"></a><!-- doxytag: member="cairo-dock-menu.c::g_cCurrentLaunchersPath" ref="540e05d87e90a39620d6d15e03dc808b" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gchar* <a class="el" href="cairo-dock_8c.html#540e05d87e90a39620d6d15e03dc808b">g_cCurrentLaunchersPath</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+le chemin vers le repertoire des lanceurs/icones du theme courant. 
+<p>
+    </td>
+  </tr>
+</table>
+<hr size="1"><address style="align: right;"><small>Généré le Fri Dec 7 13:11:02 2007 pour Cairo-Dock par&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.4.6 </small></address>
+</body>
+</html>

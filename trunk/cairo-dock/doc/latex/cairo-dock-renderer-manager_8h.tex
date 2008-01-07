@@ -1,0 +1,92 @@
+\section{Référence du fichier src/cairo-dock-renderer-manager.h}
+\label{cairo-dock-renderer-manager_8h}\index{src/cairo-dock-renderer-manager.h@{src/cairo-dock-renderer-manager.h}}
+\subsection*{Fonctions}
+\begin{CompactItemize}
+\item 
+{\bf CairoDockRenderer} $\ast$ {\bf cairo\_\-dock\_\-get\_\-renderer} (gchar $\ast$cRendererName, gboolean bForMainDock)
+\item 
+void {\bf cairo\_\-dock\_\-register\_\-renderer} (gchar $\ast$cRendererName, {\bf CairoDockRenderer} $\ast$pRenderer)
+\item 
+void {\bf cairo\_\-dock\_\-remove\_\-renderer} (gchar $\ast$cRendererName)
+\item 
+void {\bf cairo\_\-dock\_\-initialize\_\-renderer\_\-manager} (void)
+\item 
+void {\bf cairo\_\-dock\_\-set\_\-renderer} ({\bf CairoDock} $\ast$pDock, gchar $\ast$cRendererName)
+\item 
+void {\bf cairo\_\-dock\_\-set\_\-default\_\-renderer} ({\bf CairoDock} $\ast$pDock)
+\item 
+void {\bf cairo\_\-dock\_\-update\_\-conf\_\-file\_\-with\_\-renderers} (gchar $\ast$cConfFile)
+\item 
+void {\bf cairo\_\-dock\_\-update\_\-launcher\_\-conf\_\-file\_\-with\_\-renderers} (gchar $\ast$cConfFile)
+\item 
+void {\bf cairo\_\-dock\_\-update\_\-easy\_\-conf\_\-file\_\-with\_\-renderers} (gchar $\ast$cConfFile)
+\item 
+void {\bf cairo\_\-dock\_\-reset\_\-all\_\-views} (void)
+\item 
+void {\bf cairo\_\-dock\_\-set\_\-all\_\-views\_\-to\_\-default} (void)
+\item 
+int {\bf cairo\_\-dock\_\-get\_\-number\_\-of\_\-renderers} (void)
+\end{CompactItemize}
+
+
+\subsection{Documentation des fonctions}
+\index{cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}!cairo_dock_get_renderer@{cairo\_\-dock\_\-get\_\-renderer}}
+\index{cairo_dock_get_renderer@{cairo\_\-dock\_\-get\_\-renderer}!cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf CairoDockRenderer}$\ast$ cairo\_\-dock\_\-get\_\-renderer (gchar $\ast$ {\em cRendererName}, gboolean {\em bForMainDock})}\label{cairo-dock-renderer-manager_8h_a73c48c0b9ecc34645d09d3d80185c1e}
+
+
+\index{cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}!cairo_dock_register_renderer@{cairo\_\-dock\_\-register\_\-renderer}}
+\index{cairo_dock_register_renderer@{cairo\_\-dock\_\-register\_\-renderer}!cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-register\_\-renderer (gchar $\ast$ {\em cRendererName}, {\bf CairoDockRenderer} $\ast$ {\em pRenderer})}\label{cairo-dock-renderer-manager_8h_d8bda3c1da807d8b3cf5d7564bc4d215}
+
+
+\index{cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}!cairo_dock_remove_renderer@{cairo\_\-dock\_\-remove\_\-renderer}}
+\index{cairo_dock_remove_renderer@{cairo\_\-dock\_\-remove\_\-renderer}!cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-remove\_\-renderer (gchar $\ast$ {\em cRendererName})}\label{cairo-dock-renderer-manager_8h_ce3fd14c4035c66d68eaaf7767c541aa}
+
+
+\index{cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}!cairo_dock_initialize_renderer_manager@{cairo\_\-dock\_\-initialize\_\-renderer\_\-manager}}
+\index{cairo_dock_initialize_renderer_manager@{cairo\_\-dock\_\-initialize\_\-renderer\_\-manager}!cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-initialize\_\-renderer\_\-manager (void)}\label{cairo-dock-renderer-manager_8h_b14521c7d0570b30f4eaa2690eb72644}
+
+
+\index{cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}!cairo_dock_set_renderer@{cairo\_\-dock\_\-set\_\-renderer}}
+\index{cairo_dock_set_renderer@{cairo\_\-dock\_\-set\_\-renderer}!cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-set\_\-renderer ({\bf CairoDock} $\ast$ {\em pDock}, gchar $\ast$ {\em cRendererName})}\label{cairo-dock-renderer-manager_8h_294a36bea221e1f38fee85c567589aaa}
+
+
+\index{cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}!cairo_dock_set_default_renderer@{cairo\_\-dock\_\-set\_\-default\_\-renderer}}
+\index{cairo_dock_set_default_renderer@{cairo\_\-dock\_\-set\_\-default\_\-renderer}!cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-set\_\-default\_\-renderer ({\bf CairoDock} $\ast$ {\em pDock})}\label{cairo-dock-renderer-manager_8h_4a2369a5806de2dc8c2a2c5f2ef77767}
+
+
+\index{cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}!cairo_dock_update_conf_file_with_renderers@{cairo\_\-dock\_\-update\_\-conf\_\-file\_\-with\_\-renderers}}
+\index{cairo_dock_update_conf_file_with_renderers@{cairo\_\-dock\_\-update\_\-conf\_\-file\_\-with\_\-renderers}!cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-update\_\-conf\_\-file\_\-with\_\-renderers (gchar $\ast$ {\em cConfFile})}\label{cairo-dock-renderer-manager_8h_c838dff5794de206725cc8de01e5806b}
+
+
+\index{cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}!cairo_dock_update_launcher_conf_file_with_renderers@{cairo\_\-dock\_\-update\_\-launcher\_\-conf\_\-file\_\-with\_\-renderers}}
+\index{cairo_dock_update_launcher_conf_file_with_renderers@{cairo\_\-dock\_\-update\_\-launcher\_\-conf\_\-file\_\-with\_\-renderers}!cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-update\_\-launcher\_\-conf\_\-file\_\-with\_\-renderers (gchar $\ast$ {\em cConfFile})}\label{cairo-dock-renderer-manager_8h_2be54ab92dc1a187483aa6be019cdb82}
+
+
+\index{cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}!cairo_dock_update_easy_conf_file_with_renderers@{cairo\_\-dock\_\-update\_\-easy\_\-conf\_\-file\_\-with\_\-renderers}}
+\index{cairo_dock_update_easy_conf_file_with_renderers@{cairo\_\-dock\_\-update\_\-easy\_\-conf\_\-file\_\-with\_\-renderers}!cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-update\_\-easy\_\-conf\_\-file\_\-with\_\-renderers (gchar $\ast$ {\em cConfFile})}\label{cairo-dock-renderer-manager_8h_471a50a6dc4bfe5e0ecceb91ecb9513a}
+
+
+\index{cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}!cairo_dock_reset_all_views@{cairo\_\-dock\_\-reset\_\-all\_\-views}}
+\index{cairo_dock_reset_all_views@{cairo\_\-dock\_\-reset\_\-all\_\-views}!cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-reset\_\-all\_\-views (void)}\label{cairo-dock-renderer-manager_8h_1d16b5cb3e1c382cfe573b541da5ad85}
+
+
+\index{cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}!cairo_dock_set_all_views_to_default@{cairo\_\-dock\_\-set\_\-all\_\-views\_\-to\_\-default}}
+\index{cairo_dock_set_all_views_to_default@{cairo\_\-dock\_\-set\_\-all\_\-views\_\-to\_\-default}!cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-set\_\-all\_\-views\_\-to\_\-default (void)}\label{cairo-dock-renderer-manager_8h_734dac3576b37663ec1519bf1f4fae14}
+
+
+\index{cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}!cairo_dock_get_number_of_renderers@{cairo\_\-dock\_\-get\_\-number\_\-of\_\-renderers}}
+\index{cairo_dock_get_number_of_renderers@{cairo\_\-dock\_\-get\_\-number\_\-of\_\-renderers}!cairo-dock-renderer-manager.h@{cairo-dock-renderer-manager.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int cairo\_\-dock\_\-get\_\-number\_\-of\_\-renderers (void)}\label{cairo-dock-renderer-manager_8h_3e6cb9db8c0160e101c07875e5406d19}
+
+

@@ -1,0 +1,474 @@
+\section{R\'{e}f\'{e}rence du fichier src/cairo-dock-draw.c}
+\label{cairo-dock-draw_8c}\index{src/cairo-dock-draw.c@{src/cairo-dock-draw.c}}
+\subsection*{Fonctions}
+\begin{CompactItemize}
+\item 
+double {\bf cairo\_\-dock\_\-get\_\-current\_\-dock\_\-width\_\-linear} ({\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+cairo\_\-t $\ast$ {\bf cairo\_\-dock\_\-create\_\-context\_\-from\_\-window} ({\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+void {\bf cairo\_\-dock\_\-draw\_\-frame\_\-horizontal} (cairo\_\-t $\ast$p\-Cairo\-Context, double f\-Radius, double f\-Line\-Width, double f\-Frame\-Width, double f\-Frame\-Height, double f\-Dock\-Offset\-X, double f\-Dock\-Offset\-Y, int sens, double f\-Inclination)
+\item 
+void {\bf cairo\_\-dock\_\-draw\_\-frame\_\-vertical} (cairo\_\-t $\ast$p\-Cairo\-Context, double f\-Radius, double f\-Line\-Width, double f\-Frame\-Width, double f\-Frame\-Height, double f\-Dock\-Offset\-X, double f\-Dock\-Offset\-Y, int sens, double f\-Inclination)
+\item 
+void {\bf cairo\_\-dock\_\-draw\_\-frame} (cairo\_\-t $\ast$p\-Cairo\-Context, double f\-Radius, double f\-Line\-Width, double f\-Frame\-Width, double f\-Frame\-Height, double f\-Dock\-Offset\-X, double f\-Dock\-Offset\-Y, int sens, double f\-Inclination, gboolean b\-Horizontal)
+\item 
+void {\bf cairo\_\-dock\_\-render\_\-decorations\_\-in\_\-frame} (cairo\_\-t $\ast$p\-Cairo\-Context, {\bf Cairo\-Dock} $\ast$p\-Dock, double f\-Offset\-Y)
+\item 
+void {\bf cairo\_\-dock\_\-manage\_\-animations} ({\bf Icon} $\ast$icon, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+void {\bf cairo\_\-dock\_\-render\_\-one\_\-icon} ({\bf Icon} $\ast$icon, cairo\_\-t $\ast$p\-Cairo\-Context, gboolean b\-Horizontal\-Dock, double f\-Ratio, double f\-Dock\-Magnitude, gboolean b\-Use\-Reflect, int i\-Decorations\-Height, double f\-Inclination\-On\-Horizon)
+\item 
+void {\bf cairo\_\-dock\_\-draw\_\-string} (cairo\_\-t $\ast$p\-Cairo\-Context, {\bf Cairo\-Dock} $\ast$p\-Dock, double f\-String\-Line\-Width, gboolean b\-Is\-Loop, gboolean b\-Force\-Constant\-Separator)
+\item 
+void {\bf cairo\_\-dock\_\-render\_\-icons\_\-linear} (cairo\_\-t $\ast$p\-Cairo\-Context, {\bf Cairo\-Dock} $\ast$p\-Dock, double f\-Ratio)
+\item 
+void {\bf cairo\_\-dock\_\-render\_\-background} ({\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+void {\bf cairo\_\-dock\_\-render\_\-blank} ({\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+void {\bf cairo\_\-dock\_\-redraw\_\-my\_\-icon} ({\bf Icon} $\ast$icon, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+void {\bf cairo\_\-dock\_\-hide\_\-parent\_\-docks} ({\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+gboolean {\bf cairo\_\-dock\_\-hide\_\-child\_\-docks} ({\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+void {\bf cairo\_\-dock\_\-set\_\-window\_\-position\_\-at\_\-balance} ({\bf Cairo\-Dock} $\ast$p\-Dock, int i\-New\-Width, int i\-New\-Height)
+\item 
+void {\bf cairo\_\-dock\_\-get\_\-window\_\-position\_\-and\_\-geometry\_\-at\_\-balance} ({\bf Cairo\-Dock} $\ast$p\-Dock, {\bf Cairo\-Dock\-Size\-Type} i\-Size\-Type, int $\ast$i\-New\-Width, int $\ast$i\-New\-Height)
+\item 
+double {\bf cairo\_\-dock\_\-calculate\_\-extra\_\-width\_\-for\_\-trapeze} (double f\-Frame\-Height, double f\-Inclination, double f\-Radius, double f\-Line\-Width)
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+{\bf Cairo\-Dock} $\ast$ {\bf g\_\-p\-Main\-Dock}
+\begin{CompactList}\small\item\em pointeur sur le dock principal. \item\end{CompactList}\item 
+GHash\-Table $\ast$ {\bf g\_\-h\-Docks\-Table}
+\begin{CompactList}\small\item\em table des docks existant. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Sub\-Dock\-Size\-Ratio}
+\begin{CompactList}\small\item\em ratio de la taille des icones des sous-docks par rapport a celles du dock principal. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Auto\-Hide}
+\begin{CompactList}\small\item\em TRUE si l'auto-hide est active. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Text\-Always\-Horizontal}
+\begin{CompactList}\small\item\em TRUE $<$=$>$ etiquettes horizontales meme pour les docks verticaux. \item\end{CompactList}\item 
+gint {\bf g\_\-i\-Screen\-Width} [2]
+\begin{CompactList}\small\item\em dimensions de l'ecran. \item\end{CompactList}\item 
+gint {\bf g\_\-i\-Screen\-Height} [2]
+\item 
+gint {\bf g\_\-i\-Max\-Authorized\-Width}
+\item 
+gint {\bf g\_\-i\-Dock\-Line\-Width}
+\begin{CompactList}\small\item\em epaisseur du cadre (en pixels). \item\end{CompactList}\item 
+gint {\bf g\_\-i\-Dock\-Radius}
+\begin{CompactList}\small\item\em rayon des coins du cadre. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Line\-Color} [4]
+\begin{CompactList}\small\item\em la couleur du cadre. \item\end{CompactList}\item 
+gint {\bf g\_\-i\-Frame\-Margin}
+\begin{CompactList}\small\item\em marge entre le cadre et les icones. \item\end{CompactList}\item 
+gint {\bf g\_\-i\-String\-Line\-Width}
+\begin{CompactList}\small\item\em epaisseur de la ficelle. \item\end{CompactList}\item 
+double {\bf g\_\-f\-String\-Color} [4]
+\begin{CompactList}\small\item\em la couleur de la ficelle. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Reflect\-Size}
+\begin{CompactList}\small\item\em taille des reflets, en pixels, calcules par rapport a la hauteur max des icones. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Rounded\-Bottom\-Corner}
+\begin{CompactList}\small\item\em vrai ssi les coins du bas sont arrondis. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Direction\-Up}
+\begin{CompactList}\small\item\em la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Stripes\-Speed\-Factor}
+\item 
+double {\bf g\_\-f\-Background\-Image\-Width}
+\begin{CompactList}\small\item\em sa taille reelle. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Background\-Image\-Height}
+\item 
+cairo\_\-surface\_\-t $\ast$ {\bf g\_\-p\-Background\-Surface} [2]
+\begin{CompactList}\small\item\em surface associee a l'image du fond, de la taille de l'image du fond. \item\end{CompactList}\item 
+cairo\_\-surface\_\-t $\ast$ {\bf g\_\-p\-Background\-Surface\-Full} [2]
+\begin{CompactList}\small\item\em surface associee aux decorations, de 2 fois la taille de la fenetre. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Visible\-Zone\-Width}
+\begin{CompactList}\small\item\em dimensions de la zone ou on place le curseur pour faire apparaitre le dock. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Visible\-Zone\-Height}
+\item 
+cairo\_\-surface\_\-t $\ast$ {\bf g\_\-p\-Visible\-Zone\-Surface}
+\begin{CompactList}\small\item\em surface de la zone de rappel. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Visible\-Zone\-Alpha}
+\begin{CompactList}\small\item\em transparence de la zone de rappel. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Amplitude}
+\begin{CompactList}\small\item\em amplitude de la siunsoide. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Label\-Size}
+\begin{CompactList}\small\item\em taille de la police des etiquettes. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Label\-For\-Pointed\-Icon\-Only}
+\item 
+double {\bf g\_\-f\-Label\-Alpha\-Threshold}
+\item 
+double {\bf g\_\-f\-Alpha\-At\-Rest}
+\item 
+int {\bf g\_\-t\-Nb\-Iter\-In\-One\-Round} [CAIRO\_\-DOCK\_\-NB\_\-ANIMATIONS]
+\item 
+gboolean {\bf g\_\-b\-Dynamic\-Reflection}
+\begin{CompactList}\small\item\em dis s'il faut recalculer en temps reel le degrade en transparence des reflets. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Albedo}
+\begin{CompactList}\small\item\em pouvoir reflechissant du plan. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Constant\-Separator\-Size}
+\begin{CompactList}\small\item\em garder les separateurs de taille constante. \item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Documentation des fonctions}
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_get_current_dock_width_linear@{cairo\_\-dock\_\-get\_\-current\_\-dock\_\-width\_\-linear}}
+\index{cairo_dock_get_current_dock_width_linear@{cairo\_\-dock\_\-get\_\-current\_\-dock\_\-width\_\-linear}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double cairo\_\-dock\_\-get\_\-current\_\-dock\_\-width\_\-linear ({\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-draw_8c_ea372b03ccfb1e8a769c817f9b750f37}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_create_context_from_window@{cairo\_\-dock\_\-create\_\-context\_\-from\_\-window}}
+\index{cairo_dock_create_context_from_window@{cairo\_\-dock\_\-create\_\-context\_\-from\_\-window}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}cairo\_\-t$\ast$ cairo\_\-dock\_\-create\_\-context\_\-from\_\-window ({\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-draw_8c_50f5a04dababbd88ddb1e4c9428238ea}
+
+
+Cree un contexte de dessin pour la libcairo. Si glitz est active, le contexte sera lie a une surface glitz (et donc on dessinera directement sur la carte graphique), sinon a une surface X representant la fenetre du dock. \begin{Desc}
+\item[Param\`{e}tres:]
+\begin{description}
+\item[{\em p\-Dock}]le dock sur lequel on veut dessiner. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]le contexte sur lequel dessiner. N'est jamais nul; tester sa coherence avec cairo\_\-status avant de l'utiliser, et le detruire avec cairo\_\-destroy apres en avoir fini avec lui. \end{Desc}
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_draw_frame_horizontal@{cairo\_\-dock\_\-draw\_\-frame\_\-horizontal}}
+\index{cairo_dock_draw_frame_horizontal@{cairo\_\-dock\_\-draw\_\-frame\_\-horizontal}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-draw\_\-frame\_\-horizontal (cairo\_\-t $\ast$ {\em p\-Cairo\-Context}, double {\em f\-Radius}, double {\em f\-Line\-Width}, double {\em f\-Frame\-Width}, double {\em f\-Frame\-Height}, double {\em f\-Dock\-Offset\-X}, double {\em f\-Dock\-Offset\-Y}, int {\em sens}, double {\em f\-Inclination})}\label{cairo-dock-draw_8c_8da10394deab3c6ab4369005a0933bce}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_draw_frame_vertical@{cairo\_\-dock\_\-draw\_\-frame\_\-vertical}}
+\index{cairo_dock_draw_frame_vertical@{cairo\_\-dock\_\-draw\_\-frame\_\-vertical}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-draw\_\-frame\_\-vertical (cairo\_\-t $\ast$ {\em p\-Cairo\-Context}, double {\em f\-Radius}, double {\em f\-Line\-Width}, double {\em f\-Frame\-Width}, double {\em f\-Frame\-Height}, double {\em f\-Dock\-Offset\-X}, double {\em f\-Dock\-Offset\-Y}, int {\em sens}, double {\em f\-Inclination})}\label{cairo-dock-draw_8c_02192ca051bd6b5b10b77bb0075c1c9a}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_draw_frame@{cairo\_\-dock\_\-draw\_\-frame}}
+\index{cairo_dock_draw_frame@{cairo\_\-dock\_\-draw\_\-frame}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-draw\_\-frame (cairo\_\-t $\ast$ {\em p\-Cairo\-Context}, double {\em f\-Radius}, double {\em f\-Line\-Width}, double {\em f\-Frame\-Width}, double {\em f\-Frame\-Height}, double {\em f\-Dock\-Offset\-X}, double {\em f\-Dock\-Offset\-Y}, int {\em sens}, double {\em f\-Inclination}, gboolean {\em b\-Horizontal})}\label{cairo-dock-draw_8c_4c114b58259893749f206d02ba419da9}
+
+
+Trace sur le contexte un contour trapezoidale aux coins arrondis. Le contour n'est pas dessine, mais peut l'etre a posteriori, et peut servir de cadre pour y dessiner des choses dedans. \begin{Desc}
+\item[Param\`{e}tres:]
+\begin{description}
+\item[{\em p\-Cairo\-Context}]le contexte du dessin, contenant le cadre a la fin de la fonction. \item[{\em f\-Radius}]le rayon en pixels des coins. \item[{\em f\-Line\-Width}]l'epaisseur en pixels du contour. \item[{\em f\-Frame\-Width}]la largeur de la plus petite base du trapeze. \item[{\em f\-Frame\-Height}]la hauteur du trapeze. \item[{\em f\-Dock\-Offset\-X}]un decalage, dans le sens de la largeur du dock, a partir duquel commencer a tracer la plus petite base du trapeze. \item[{\em f\-Dock\-Offset\-Y}]un decalage, dans le sens de la hauteur du dock, a partir duquel commencer a tracer la plus petite base du trapeze. \item[{\em sens}]1 pour un tracer dans le sens des aiguilles d'une montre (indirect), -1 sinon. \item[{\em f\-Inclination}]tangente de l'angle d'inclinaison des cotes du trapeze par rapport a la vertical. 0 pour tracer un rectangle. \item[{\em b\-Horizontal}]CAIRO\_\-DOCK\_\-HORIZONTAL ou CAIRO\_\-DOCK\_\-VERTICAL suivant l'horizontalit\~{A}© du dock. \end{description}
+\end{Desc}
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_render_decorations_in_frame@{cairo\_\-dock\_\-render\_\-decorations\_\-in\_\-frame}}
+\index{cairo_dock_render_decorations_in_frame@{cairo\_\-dock\_\-render\_\-decorations\_\-in\_\-frame}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-render\_\-decorations\_\-in\_\-frame (cairo\_\-t $\ast$ {\em p\-Cairo\-Context}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock}, double {\em f\-Offset\-Y})}\label{cairo-dock-draw_8c_27647a57f25f521ea768affbb88fa0f8}
+
+
+Dessine les decorations d'un dock a l'interieur d'un cadre prealablement trace sur le contexte. \begin{Desc}
+\item[Param\`{e}tres:]
+\begin{description}
+\item[{\em p\-Cairo\-Context}]le contexte du dessin, est laisse intact par la fonction. \item[{\em p\-Dock}]le dock sur lequel appliquer les decorations. \item[{\em f\-Offset\-Y}]un decalage, dans le sens de la hauteur du dock, a partir duquel appliquer les decorations. \end{description}
+\end{Desc}
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_manage_animations@{cairo\_\-dock\_\-manage\_\-animations}}
+\index{cairo_dock_manage_animations@{cairo\_\-dock\_\-manage\_\-animations}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-manage\_\-animations ({\bf Icon} $\ast$ {\em icon}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-draw_8c_c461010c8336cbe94f13a3d945eb3181}
+
+
+Dessine entierement une icone, dont toutes les caracteristiques ont ete prealablement calculees. Gere sa position, sa transparence (modulee par la transparence du dock au repos), son reflet, son placement de profil, son etiquette, et son info-rapide. \begin{Desc}
+\item[Param\`{e}tres:]
+\begin{description}
+\item[{\em }]\end{description}
+\end{Desc}
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_render_one_icon@{cairo\_\-dock\_\-render\_\-one\_\-icon}}
+\index{cairo_dock_render_one_icon@{cairo\_\-dock\_\-render\_\-one\_\-icon}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-render\_\-one\_\-icon ({\bf Icon} $\ast$ {\em icon}, cairo\_\-t $\ast$ {\em p\-Cairo\-Context}, gboolean {\em b\-Horizontal\-Dock}, double {\em f\-Ratio}, double {\em f\-Dock\-Magnitude}, gboolean {\em b\-Use\-Reflect}, int {\em i\-Decorations\-Height}, double {\em f\-Inclination\-On\-Horizon})}\label{cairo-dock-draw_8c_260bc868258558ecf65b52339236cf0e}
+
+
+Dessine entierement une icone, dont toutes les caracteristiques ont ete prealablement calculees. Gere sa position, sa transparence (modulee par la transparence du dock au repos), son reflet, son placement de profil, son etiquette, et son info-rapide. \begin{Desc}
+\item[Param\`{e}tres:]
+\begin{description}
+\item[{\em icon}]l'icone a dessiner. \item[{\em p\-Cairo\-Context}]le contexte du dessin, est altere pendant le dessin. \item[{\em b\-Horizontal\-Dock}]l'horizontalite du dock contenant l'icone. \item[{\em f\-Ratio}]le ratio de taille des icones dans ce dock. \item[{\em f\-Dock\-Magnitude}]la magnitude actuelle du dock. \item[{\em b\-Use\-Reflect}]TRUE pour dessiner les reflets. \end{description}
+\end{Desc}
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_draw_string@{cairo\_\-dock\_\-draw\_\-string}}
+\index{cairo_dock_draw_string@{cairo\_\-dock\_\-draw\_\-string}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-draw\_\-string (cairo\_\-t $\ast$ {\em p\-Cairo\-Context}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock}, double {\em f\-String\-Line\-Width}, gboolean {\em b\-Is\-Loop}, gboolean {\em b\-Force\-Constant\-Separator})}\label{cairo-dock-draw_8c_2b8ce54b5b1ce5b64cba73aa8f2431b6}
+
+
+Dessine une ficelle reliant le centre de toutes les icones, en commencant par la 1ere dessinee. \begin{Desc}
+\item[Param\`{e}tres:]
+\begin{description}
+\item[{\em p\-Cairo\-Context}]le contexte du dessin, n'est pas altere par la fonction. \item[{\em p\-Dock}]le dock contenant les ic\~{A}´nes a relier. \item[{\em f\-String\-Line\-Width}]epaisseur de la ligne. \item[{\em b\-Is\-Loop}]TRUE si on veut boucler (relier la derniere icone a la 1ere). \end{description}
+\end{Desc}
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_render_icons_linear@{cairo\_\-dock\_\-render\_\-icons\_\-linear}}
+\index{cairo_dock_render_icons_linear@{cairo\_\-dock\_\-render\_\-icons\_\-linear}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-render\_\-icons\_\-linear (cairo\_\-t $\ast$ {\em p\-Cairo\-Context}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock}, double {\em f\-Ratio})}\label{cairo-dock-draw_8c_4360118a269b12c5acfdbf2d294db3ed}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_render_background@{cairo\_\-dock\_\-render\_\-background}}
+\index{cairo_dock_render_background@{cairo\_\-dock\_\-render\_\-background}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-render\_\-background ({\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-draw_8c_cbf4ddecfb07100464b88c9188351346}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_render_blank@{cairo\_\-dock\_\-render\_\-blank}}
+\index{cairo_dock_render_blank@{cairo\_\-dock\_\-render\_\-blank}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-render\_\-blank ({\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-draw_8c_0082ff87537c9b2dcdfc76eb3a51c76f}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_redraw_my_icon@{cairo\_\-dock\_\-redraw\_\-my\_\-icon}}
+\index{cairo_dock_redraw_my_icon@{cairo\_\-dock\_\-redraw\_\-my\_\-icon}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-redraw\_\-my\_\-icon ({\bf Icon} $\ast$ {\em icon}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-draw_8c_cee4212ab3b9a1a4dc5128c825f2e8e4}
+
+
+Efface et redessine entierement une seule icone. Appelle la fonction de trace optimise de la vue courante; si cette derniere ne fournit pas de trace optimise, retrace tout le dock (ce qui peut etre penalisant). \begin{Desc}
+\item[Param\`{e}tres:]
+\begin{description}
+\item[{\em icon}]l'icone a retracer. \item[{\em p\-Dock}]le dock contenant l' icone. \end{description}
+\end{Desc}
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_hide_parent_docks@{cairo\_\-dock\_\-hide\_\-parent\_\-docks}}
+\index{cairo_dock_hide_parent_docks@{cairo\_\-dock\_\-hide\_\-parent\_\-docks}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-hide\_\-parent\_\-docks ({\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-draw_8c_06517c8d9135e242d36fcf0218c52330}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_hide_child_docks@{cairo\_\-dock\_\-hide\_\-child\_\-docks}}
+\index{cairo_dock_hide_child_docks@{cairo\_\-dock\_\-hide\_\-child\_\-docks}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean cairo\_\-dock\_\-hide\_\-child\_\-docks ({\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-draw_8c_5f3268886844cf7c952d229c6d9b3782}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_set_window_position_at_balance@{cairo\_\-dock\_\-set\_\-window\_\-position\_\-at\_\-balance}}
+\index{cairo_dock_set_window_position_at_balance@{cairo\_\-dock\_\-set\_\-window\_\-position\_\-at\_\-balance}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-set\_\-window\_\-position\_\-at\_\-balance ({\bf Cairo\-Dock} $\ast$ {\em p\-Dock}, int {\em i\-New\-Width}, int {\em i\-New\-Height})}\label{cairo-dock-draw_8c_45370f7a3ab981c49eb9869aed1deed8}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_get_window_position_and_geometry_at_balance@{cairo\_\-dock\_\-get\_\-window\_\-position\_\-and\_\-geometry\_\-at\_\-balance}}
+\index{cairo_dock_get_window_position_and_geometry_at_balance@{cairo\_\-dock\_\-get\_\-window\_\-position\_\-and\_\-geometry\_\-at\_\-balance}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-get\_\-window\_\-position\_\-and\_\-geometry\_\-at\_\-balance ({\bf Cairo\-Dock} $\ast$ {\em p\-Dock}, {\bf Cairo\-Dock\-Size\-Type} {\em i\-Size\-Type}, int $\ast$ {\em i\-New\-Width}, int $\ast$ {\em i\-New\-Height})}\label{cairo-dock-draw_8c_6a0dfd93297f61be5bbda3fcdc13138a}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!cairo_dock_calculate_extra_width_for_trapeze@{cairo\_\-dock\_\-calculate\_\-extra\_\-width\_\-for\_\-trapeze}}
+\index{cairo_dock_calculate_extra_width_for_trapeze@{cairo\_\-dock\_\-calculate\_\-extra\_\-width\_\-for\_\-trapeze}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double cairo\_\-dock\_\-calculate\_\-extra\_\-width\_\-for\_\-trapeze (double {\em f\-Frame\-Height}, double {\em f\-Inclination}, double {\em f\-Radius}, double {\em f\-Line\-Width})}\label{cairo-dock-draw_8c_7482115ade781220cb4c9afbd56c618c}
+
+
+
+
+\subsection{Documentation des variables}
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_pMainDock@{g\_\-pMainDock}}
+\index{g_pMainDock@{g\_\-pMainDock}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf Cairo\-Dock}$\ast$ {\bf g\_\-p\-Main\-Dock}}\label{cairo-dock-draw_8c_a24af9062f9cc975eb0b9422eb6587e6}
+
+
+pointeur sur le dock principal. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_hDocksTable@{g\_\-hDocksTable}}
+\index{g_hDocksTable@{g\_\-hDocksTable}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}GHash\-Table$\ast$ {\bf g\_\-h\-Docks\-Table}}\label{cairo-dock-draw_8c_0651cfb551572c8fc57a25044f9dd016}
+
+
+table des docks existant. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_fSubDockSizeRatio@{g\_\-fSubDockSizeRatio}}
+\index{g_fSubDockSizeRatio@{g\_\-fSubDockSizeRatio}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Sub\-Dock\-Size\-Ratio}}\label{cairo-dock-draw_8c_e6ee377f5c409b71e3f7e87694f60556}
+
+
+ratio de la taille des icones des sous-docks par rapport a celles du dock principal. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_bAutoHide@{g\_\-bAutoHide}}
+\index{g_bAutoHide@{g\_\-bAutoHide}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Auto\-Hide}}\label{cairo-dock-draw_8c_263de39492b5e16c81c98792f183edcf}
+
+
+TRUE si l'auto-hide est active. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_bTextAlwaysHorizontal@{g\_\-bTextAlwaysHorizontal}}
+\index{g_bTextAlwaysHorizontal@{g\_\-bTextAlwaysHorizontal}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Text\-Always\-Horizontal}}\label{cairo-dock-draw_8c_9656ee040199018fa599316b38e2f231}
+
+
+TRUE $<$=$>$ etiquettes horizontales meme pour les docks verticaux. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_iScreenWidth@{g\_\-iScreenWidth}}
+\index{g_iScreenWidth@{g\_\-iScreenWidth}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-Screen\-Width}[2]}\label{cairo-dock-draw_8c_d832291d167ff78b5ae1b76dfb288ac8}
+
+
+dimensions de l'ecran. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_iScreenHeight@{g\_\-iScreenHeight}}
+\index{g_iScreenHeight@{g\_\-iScreenHeight}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-Screen\-Height}[2]}\label{cairo-dock-draw_8c_70dbb6c14cb143c826e85759b205f201}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_iMaxAuthorizedWidth@{g\_\-iMaxAuthorizedWidth}}
+\index{g_iMaxAuthorizedWidth@{g\_\-iMaxAuthorizedWidth}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-Max\-Authorized\-Width}}\label{cairo-dock-draw_8c_bc428aa410f7f4c2376ee65c3286eff4}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_iDockLineWidth@{g\_\-iDockLineWidth}}
+\index{g_iDockLineWidth@{g\_\-iDockLineWidth}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-Dock\-Line\-Width}}\label{cairo-dock-draw_8c_e5d97f4f9a4f7e546af6ebe7b7d5399b}
+
+
+epaisseur du cadre (en pixels). 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_iDockRadius@{g\_\-iDockRadius}}
+\index{g_iDockRadius@{g\_\-iDockRadius}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-Dock\-Radius}}\label{cairo-dock-draw_8c_c5768ebc340b36dd210f7b4dea884697}
+
+
+rayon des coins du cadre. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_fLineColor@{g\_\-fLineColor}}
+\index{g_fLineColor@{g\_\-fLineColor}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Line\-Color}[4]}\label{cairo-dock-draw_8c_692342aa8466267ea13fc290bdbecd96}
+
+
+la couleur du cadre. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_iFrameMargin@{g\_\-iFrameMargin}}
+\index{g_iFrameMargin@{g\_\-iFrameMargin}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-Frame\-Margin}}\label{cairo-dock-draw_8c_a16b32df9350a49829c9d153db02cabd}
+
+
+marge entre le cadre et les icones. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_iStringLineWidth@{g\_\-iStringLineWidth}}
+\index{g_iStringLineWidth@{g\_\-iStringLineWidth}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-String\-Line\-Width}}\label{cairo-dock-draw_8c_0db95b23d504f175f413a97ffebf90e6}
+
+
+epaisseur de la ficelle. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_fStringColor@{g\_\-fStringColor}}
+\index{g_fStringColor@{g\_\-fStringColor}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-String\-Color}[4]}\label{cairo-dock-draw_8c_f88d55afe2a1e788f20f0ba72b74366f}
+
+
+la couleur de la ficelle. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_fReflectSize@{g\_\-fReflectSize}}
+\index{g_fReflectSize@{g\_\-fReflectSize}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Reflect\-Size}}\label{cairo-dock-draw_8c_815cf11f5b3bd8f701b0e1083921ebbd}
+
+
+taille des reflets, en pixels, calcules par rapport a la hauteur max des icones. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_bRoundedBottomCorner@{g\_\-bRoundedBottomCorner}}
+\index{g_bRoundedBottomCorner@{g\_\-bRoundedBottomCorner}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Rounded\-Bottom\-Corner}}\label{cairo-dock-draw_8c_eff7098546eeea81c9c29a272527cbdb}
+
+
+vrai ssi les coins du bas sont arrondis. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_bDirectionUp@{g\_\-bDirectionUp}}
+\index{g_bDirectionUp@{g\_\-bDirectionUp}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Direction\-Up}}\label{cairo-dock-draw_8c_080e0cb494374269a17c7ebd078e855d}
+
+
+la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_fStripesSpeedFactor@{g\_\-fStripesSpeedFactor}}
+\index{g_fStripesSpeedFactor@{g\_\-fStripesSpeedFactor}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Stripes\-Speed\-Factor}}\label{cairo-dock-draw_8c_8b62dc99da9d5e64301059825355784f}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_fBackgroundImageWidth@{g\_\-fBackgroundImageWidth}}
+\index{g_fBackgroundImageWidth@{g\_\-fBackgroundImageWidth}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Background\-Image\-Width}}\label{cairo-dock-draw_8c_2bb10b8df97b252287d28db1462247a0}
+
+
+sa taille reelle. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_fBackgroundImageHeight@{g\_\-fBackgroundImageHeight}}
+\index{g_fBackgroundImageHeight@{g\_\-fBackgroundImageHeight}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Background\-Image\-Height}}\label{cairo-dock-draw_8c_7ca303e56227ededdffc96547fb87f03}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_pBackgroundSurface@{g\_\-pBackgroundSurface}}
+\index{g_pBackgroundSurface@{g\_\-pBackgroundSurface}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}cairo\_\-surface\_\-t$\ast$ {\bf g\_\-p\-Background\-Surface}[2]}\label{cairo-dock-draw_8c_3f4e8f62a39cc5703bed11b03539a6d6}
+
+
+surface associee a l'image du fond, de la taille de l'image du fond. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_pBackgroundSurfaceFull@{g\_\-pBackgroundSurfaceFull}}
+\index{g_pBackgroundSurfaceFull@{g\_\-pBackgroundSurfaceFull}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}cairo\_\-surface\_\-t$\ast$ {\bf g\_\-p\-Background\-Surface\-Full}[2]}\label{cairo-dock-draw_8c_c620ddb584a16b76ed80471bc61e9ac9}
+
+
+surface associee aux decorations, de 2 fois la taille de la fenetre. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_iVisibleZoneWidth@{g\_\-iVisibleZoneWidth}}
+\index{g_iVisibleZoneWidth@{g\_\-iVisibleZoneWidth}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Visible\-Zone\-Width}}\label{cairo-dock-draw_8c_e5fa6397c672cb778cb4637dfa5983d0}
+
+
+dimensions de la zone ou on place le curseur pour faire apparaitre le dock. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_iVisibleZoneHeight@{g\_\-iVisibleZoneHeight}}
+\index{g_iVisibleZoneHeight@{g\_\-iVisibleZoneHeight}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Visible\-Zone\-Height}}\label{cairo-dock-draw_8c_b032d5fe2acfb6b93dcbc85ad1962730}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_pVisibleZoneSurface@{g\_\-pVisibleZoneSurface}}
+\index{g_pVisibleZoneSurface@{g\_\-pVisibleZoneSurface}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}cairo\_\-surface\_\-t$\ast$ {\bf g\_\-p\-Visible\-Zone\-Surface}}\label{cairo-dock-draw_8c_dd5e4b71a08cefb33405fc437cf81437}
+
+
+surface de la zone de rappel. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_fVisibleZoneAlpha@{g\_\-fVisibleZoneAlpha}}
+\index{g_fVisibleZoneAlpha@{g\_\-fVisibleZoneAlpha}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Visible\-Zone\-Alpha}}\label{cairo-dock-draw_8c_5ba5413d17795f22f4d5aa4cbe9a364e}
+
+
+transparence de la zone de rappel. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_fAmplitude@{g\_\-fAmplitude}}
+\index{g_fAmplitude@{g\_\-fAmplitude}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Amplitude}}\label{cairo-dock-draw_8c_71125a40fdc7b421002f176b9b82ac79}
+
+
+amplitude de la siunsoide. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_iLabelSize@{g\_\-iLabelSize}}
+\index{g_iLabelSize@{g\_\-iLabelSize}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Label\-Size}}\label{cairo-dock-draw_8c_386538e26258de4d50feb84fecc45dd6}
+
+
+taille de la police des etiquettes. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_bLabelForPointedIconOnly@{g\_\-bLabelForPointedIconOnly}}
+\index{g_bLabelForPointedIconOnly@{g\_\-bLabelForPointedIconOnly}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Label\-For\-Pointed\-Icon\-Only}}\label{cairo-dock-draw_8c_57a991233be710d18740f1ce21647c58}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_fLabelAlphaThreshold@{g\_\-fLabelAlphaThreshold}}
+\index{g_fLabelAlphaThreshold@{g\_\-fLabelAlphaThreshold}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Label\-Alpha\-Threshold}}\label{cairo-dock-draw_8c_edfb545352a3033876f0cdfb4e7f0893}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_fAlphaAtRest@{g\_\-fAlphaAtRest}}
+\index{g_fAlphaAtRest@{g\_\-fAlphaAtRest}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Alpha\-At\-Rest}}\label{cairo-dock-draw_8c_e1099181d41b6745044fd824d68baa45}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_tNbIterInOneRound@{g\_\-tNbIterInOneRound}}
+\index{g_tNbIterInOneRound@{g\_\-tNbIterInOneRound}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-t\-Nb\-Iter\-In\-One\-Round}[CAIRO\_\-DOCK\_\-NB\_\-ANIMATIONS]}\label{cairo-dock-draw_8c_57cbfb0ead563d0d0f16e94bedfbd568}
+
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_bDynamicReflection@{g\_\-bDynamicReflection}}
+\index{g_bDynamicReflection@{g\_\-bDynamicReflection}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Dynamic\-Reflection}}\label{cairo-dock-draw_8c_d5827704b49bf830fcec995cd1f13263}
+
+
+dis s'il faut recalculer en temps reel le degrade en transparence des reflets. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_fAlbedo@{g\_\-fAlbedo}}
+\index{g_fAlbedo@{g\_\-fAlbedo}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Albedo}}\label{cairo-dock-draw_8c_1301d24e576a57001c9ddf296d170655}
+
+
+pouvoir reflechissant du plan. 
+
+\index{cairo-dock-draw.c@{cairo-dock-draw.c}!g_bConstantSeparatorSize@{g\_\-bConstantSeparatorSize}}
+\index{g_bConstantSeparatorSize@{g\_\-bConstantSeparatorSize}!cairo-dock-draw.c@{cairo-dock-draw.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Constant\-Separator\-Size}}\label{cairo-dock-draw_8c_9a6d6b5c9c8ccf78a92927b9419e479c}
+
+
+garder les separateurs de taille constante. 
+

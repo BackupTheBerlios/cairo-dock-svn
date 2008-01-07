@@ -1,0 +1,176 @@
+\section{R\'{e}f\'{e}rence du fichier src/cairo-dock-default-view.c}
+\label{cairo-dock-default-view_8c}\index{src/cairo-dock-default-view.c@{src/cairo-dock-default-view.c}}
+\subsection*{Fonctions}
+\begin{CompactItemize}
+\item 
+void {\bf cairo\_\-dock\_\-set\_\-subdock\_\-position\_\-linear} ({\bf Icon} $\ast$p\-Pointed\-Icon, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+void {\bf cairo\_\-dock\_\-calculate\_\-max\_\-dock\_\-size\_\-linear} ({\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+void {\bf cairo\_\-dock\_\-calculate\_\-construction\_\-parameters\_\-generic} ({\bf Icon} $\ast$icon, int i\-Current\-Width, int i\-Current\-Height, int i\-Max\-Dock\-Width)
+\item 
+void {\bf cairo\_\-dock\_\-render\_\-linear} ({\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+void {\bf cairo\_\-dock\_\-render\_\-optimized\_\-linear} ({\bf Cairo\-Dock} $\ast$p\-Dock, Gdk\-Rectangle $\ast$p\-Area)
+\item 
+{\bf Icon} $\ast$ {\bf cairo\_\-dock\_\-calculate\_\-icons\_\-linear} ({\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+void {\bf cairo\_\-dock\_\-register\_\-default\_\-renderer} (void)
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+double {\bf g\_\-f\-Sub\-Dock\-Size\-Ratio}
+\begin{CompactList}\small\item\em ratio de la taille des icones des sous-docks par rapport a celles du dock principal. \item\end{CompactList}\item 
+gint {\bf g\_\-i\-Screen\-Width} [2]
+\begin{CompactList}\small\item\em dimensions de l'ecran. \item\end{CompactList}\item 
+gint {\bf g\_\-i\-Screen\-Height} [2]
+\item 
+gint {\bf g\_\-i\-Max\-Authorized\-Width}
+\item 
+gint {\bf g\_\-i\-Dock\-Line\-Width}
+\begin{CompactList}\small\item\em epaisseur du cadre (en pixels). \item\end{CompactList}\item 
+gint {\bf g\_\-i\-Dock\-Radius}
+\begin{CompactList}\small\item\em rayon des coins du cadre. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Line\-Color} [4]
+\begin{CompactList}\small\item\em la couleur du cadre. \item\end{CompactList}\item 
+gint {\bf g\_\-i\-Frame\-Margin}
+\begin{CompactList}\small\item\em marge entre le cadre et les icones. \item\end{CompactList}\item 
+gint {\bf g\_\-i\-String\-Line\-Width}
+\begin{CompactList}\small\item\em epaisseur de la ficelle. \item\end{CompactList}\item 
+double {\bf g\_\-f\-String\-Color} [4]
+\begin{CompactList}\small\item\em la couleur de la ficelle. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Direction\-Up}
+\begin{CompactList}\small\item\em la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Amplitude}
+\begin{CompactList}\small\item\em amplitude de la siunsoide. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Label\-Size}
+\begin{CompactList}\small\item\em taille de la police des etiquettes. \item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Documentation des fonctions}
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!cairo_dock_set_subdock_position_linear@{cairo\_\-dock\_\-set\_\-subdock\_\-position\_\-linear}}
+\index{cairo_dock_set_subdock_position_linear@{cairo\_\-dock\_\-set\_\-subdock\_\-position\_\-linear}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-set\_\-subdock\_\-position\_\-linear ({\bf Icon} $\ast$ {\em p\-Pointed\-Icon}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-default-view_8c_09127be8247fe7ae1228c1b7699b0fca}
+
+
+int i\-X = i\-Mouse\-X + (-i\-Mouse\-X + (p\-Pointed\-Icon-$>$f\-Draw\-X + p\-Pointed\-Icon-$>$f\-Width $\ast$ p\-Pointed\-Icon-$>$f\-Scale / 2)) / 2; \index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!cairo_dock_calculate_max_dock_size_linear@{cairo\_\-dock\_\-calculate\_\-max\_\-dock\_\-size\_\-linear}}
+\index{cairo_dock_calculate_max_dock_size_linear@{cairo\_\-dock\_\-calculate\_\-max\_\-dock\_\-size\_\-linear}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-calculate\_\-max\_\-dock\_\-size\_\-linear ({\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-default-view_8c_e5d42aa467c924093dadb5702c077aff}
+
+
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!cairo_dock_calculate_construction_parameters_generic@{cairo\_\-dock\_\-calculate\_\-construction\_\-parameters\_\-generic}}
+\index{cairo_dock_calculate_construction_parameters_generic@{cairo\_\-dock\_\-calculate\_\-construction\_\-parameters\_\-generic}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-calculate\_\-construction\_\-parameters\_\-generic ({\bf Icon} $\ast$ {\em icon}, int {\em i\-Current\-Width}, int {\em i\-Current\-Height}, int {\em i\-Max\-Dock\-Width})}\label{cairo-dock-default-view_8c_9969f949d755073f4c676bede10b6f66}
+
+
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!cairo_dock_render_linear@{cairo\_\-dock\_\-render\_\-linear}}
+\index{cairo_dock_render_linear@{cairo\_\-dock\_\-render\_\-linear}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-render\_\-linear ({\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-default-view_8c_39d946349d2e3099c3ac34a28c264dbe}
+
+
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!cairo_dock_render_optimized_linear@{cairo\_\-dock\_\-render\_\-optimized\_\-linear}}
+\index{cairo_dock_render_optimized_linear@{cairo\_\-dock\_\-render\_\-optimized\_\-linear}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-render\_\-optimized\_\-linear ({\bf Cairo\-Dock} $\ast$ {\em p\-Dock}, Gdk\-Rectangle $\ast$ {\em p\-Area})}\label{cairo-dock-default-view_8c_36f88f2f4c9e62b7f73e9186930650ce}
+
+
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!cairo_dock_calculate_icons_linear@{cairo\_\-dock\_\-calculate\_\-icons\_\-linear}}
+\index{cairo_dock_calculate_icons_linear@{cairo\_\-dock\_\-calculate\_\-icons\_\-linear}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf Icon}$\ast$ cairo\_\-dock\_\-calculate\_\-icons\_\-linear ({\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-default-view_8c_46f5bcadf3ac8d72ddbcbec195fce653}
+
+
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!cairo_dock_register_default_renderer@{cairo\_\-dock\_\-register\_\-default\_\-renderer}}
+\index{cairo_dock_register_default_renderer@{cairo\_\-dock\_\-register\_\-default\_\-renderer}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-register\_\-default\_\-renderer (void)}\label{cairo-dock-default-view_8c_71a119097ac54e653af1c75332e7d199}
+
+
+
+
+\subsection{Documentation des variables}
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!g_fSubDockSizeRatio@{g\_\-fSubDockSizeRatio}}
+\index{g_fSubDockSizeRatio@{g\_\-fSubDockSizeRatio}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Sub\-Dock\-Size\-Ratio}}\label{cairo-dock-default-view_8c_e6ee377f5c409b71e3f7e87694f60556}
+
+
+ratio de la taille des icones des sous-docks par rapport a celles du dock principal. 
+
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!g_iScreenWidth@{g\_\-iScreenWidth}}
+\index{g_iScreenWidth@{g\_\-iScreenWidth}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-Screen\-Width}[2]}\label{cairo-dock-default-view_8c_d832291d167ff78b5ae1b76dfb288ac8}
+
+
+dimensions de l'ecran. 
+
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!g_iScreenHeight@{g\_\-iScreenHeight}}
+\index{g_iScreenHeight@{g\_\-iScreenHeight}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-Screen\-Height}[2]}\label{cairo-dock-default-view_8c_70dbb6c14cb143c826e85759b205f201}
+
+
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!g_iMaxAuthorizedWidth@{g\_\-iMaxAuthorizedWidth}}
+\index{g_iMaxAuthorizedWidth@{g\_\-iMaxAuthorizedWidth}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-Max\-Authorized\-Width}}\label{cairo-dock-default-view_8c_bc428aa410f7f4c2376ee65c3286eff4}
+
+
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!g_iDockLineWidth@{g\_\-iDockLineWidth}}
+\index{g_iDockLineWidth@{g\_\-iDockLineWidth}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-Dock\-Line\-Width}}\label{cairo-dock-default-view_8c_e5d97f4f9a4f7e546af6ebe7b7d5399b}
+
+
+epaisseur du cadre (en pixels). 
+
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!g_iDockRadius@{g\_\-iDockRadius}}
+\index{g_iDockRadius@{g\_\-iDockRadius}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-Dock\-Radius}}\label{cairo-dock-default-view_8c_c5768ebc340b36dd210f7b4dea884697}
+
+
+rayon des coins du cadre. 
+
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!g_fLineColor@{g\_\-fLineColor}}
+\index{g_fLineColor@{g\_\-fLineColor}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Line\-Color}[4]}\label{cairo-dock-default-view_8c_692342aa8466267ea13fc290bdbecd96}
+
+
+la couleur du cadre. 
+
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!g_iFrameMargin@{g\_\-iFrameMargin}}
+\index{g_iFrameMargin@{g\_\-iFrameMargin}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-Frame\-Margin}}\label{cairo-dock-default-view_8c_a16b32df9350a49829c9d153db02cabd}
+
+
+marge entre le cadre et les icones. 
+
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!g_iStringLineWidth@{g\_\-iStringLineWidth}}
+\index{g_iStringLineWidth@{g\_\-iStringLineWidth}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gint {\bf g\_\-i\-String\-Line\-Width}}\label{cairo-dock-default-view_8c_0db95b23d504f175f413a97ffebf90e6}
+
+
+epaisseur de la ficelle. 
+
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!g_fStringColor@{g\_\-fStringColor}}
+\index{g_fStringColor@{g\_\-fStringColor}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-String\-Color}[4]}\label{cairo-dock-default-view_8c_f88d55afe2a1e788f20f0ba72b74366f}
+
+
+la couleur de la ficelle. 
+
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!g_bDirectionUp@{g\_\-bDirectionUp}}
+\index{g_bDirectionUp@{g\_\-bDirectionUp}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Direction\-Up}}\label{cairo-dock-default-view_8c_080e0cb494374269a17c7ebd078e855d}
+
+
+la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas. 
+
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!g_fAmplitude@{g\_\-fAmplitude}}
+\index{g_fAmplitude@{g\_\-fAmplitude}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Amplitude}}\label{cairo-dock-default-view_8c_71125a40fdc7b421002f176b9b82ac79}
+
+
+amplitude de la siunsoide. 
+
+\index{cairo-dock-default-view.c@{cairo-dock-default-view.c}!g_iLabelSize@{g\_\-iLabelSize}}
+\index{g_iLabelSize@{g\_\-iLabelSize}!cairo-dock-default-view.c@{cairo-dock-default-view.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Label\-Size}}\label{cairo-dock-default-view_8c_386538e26258de4d50feb84fecc45dd6}
+
+
+taille de la police des etiquettes. 
+

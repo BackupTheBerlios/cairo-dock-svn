@@ -1,0 +1,972 @@
+\section{Référence du fichier src/cairo-dock-applet-facility.h}
+\label{cairo-dock-applet-facility_8h}\index{src/cairo-dock-applet-facility.h@{src/cairo-dock-applet-facility.h}}
+\subsection*{Macros}
+\begin{CompactItemize}
+\item 
+\#define {\bf cairo\_\-dock\_\-remove\_\-quick\_\-info}(pIcon)~cairo\_\-dock\_\-set\_\-quick\_\-info (NULL, NULL, pIcon)
+\item 
+\#define {\bf CD\_\-APPLET\_\-H}
+\item 
+\#define {\bf CD\_\-APPLET\_\-PRE\_\-INIT\_\-BEGIN}(cName, iMajorVersion, iMinorVersion, iMicroVersion)
+\item 
+\#define {\bf CD\_\-APPLET\_\-PRE\_\-INIT\_\-END}
+\item 
+\#define {\bf CD\_\-APPLET\_\-DEFINITION}(cName, iMajorVersion, iMinorVersion, iMicroVersion)
+\item 
+\#define {\bf CD\_\-APPLET\_\-INIT\_\-BEGIN}(erreur)
+\item 
+\#define {\bf CD\_\-APPLET\_\-INIT\_\-END}
+\item 
+\#define {\bf CD\_\-APPLET\_\-STOP\_\-BEGIN}
+\item 
+\#define {\bf CD\_\-APPLET\_\-STOP\_\-END}
+\item 
+\#define {\bf CD\_\-APPLET\_\-MY\_\-CONF\_\-FILE}~cConfFilePath
+\item 
+\#define {\bf CD\_\-APPLET\_\-CONFIG\_\-BEGIN}(cDefaultAppletName, cDefaultIconName)
+\item 
+\#define {\bf CD\_\-APPLET\_\-CONFIG\_\-END}
+\item 
+\#define {\bf CD\_\-APPLET\_\-CONFIG\_\-H}~void read\_\-conf\_\-file (gchar $\ast$cConfFilePath, int $\ast$iWidth, int $\ast$iHeight, gchar $\ast$$\ast$cAppletName, gchar $\ast$$\ast$cIconName);
+\item 
+\#define {\bf CD\_\-CONFIG\_\-GET\_\-BOOLEAN\_\-WITH\_\-DEFAULT}(cGroupName, cKeyName, bDefaultValue)~cairo\_\-dock\_\-get\_\-boolean\_\-key\_\-value (pKeyFile, cGroupName, cKeyName, \&bFlushConfFileNeeded, bDefaultValue, NULL, NULL)
+\item 
+\#define {\bf CD\_\-CONFIG\_\-GET\_\-BOOLEAN}(cGroupName, cKeyName)~CD\_\-CONFIG\_\-GET\_\-BOOLEAN\_\-WITH\_\-DEFAULT (cGroupName, cKeyName, TRUE)
+\item 
+\#define {\bf CD\_\-CONFIG\_\-GET\_\-INTEGER\_\-WITH\_\-DEFAULT}(cGroupName, cKeyName, iDefaultValue)~cairo\_\-dock\_\-get\_\-integer\_\-key\_\-value (pKeyFile, cGroupName, cKeyName, \&bFlushConfFileNeeded, iDefaultValue, NULL, NULL)
+\item 
+\#define {\bf CD\_\-CONFIG\_\-GET\_\-INTEGER}(cGroupName, cKeyName)~CD\_\-CONFIG\_\-GET\_\-INTEGER\_\-WITH\_\-DEFAULT (cGroupName, cKeyName, 0)
+\item 
+\#define {\bf CD\_\-CONFIG\_\-GET\_\-DOUBLE\_\-WITH\_\-DEFAULT}(cGroupName, cKeyName, fDefaultValue)~cairo\_\-dock\_\-get\_\-double\_\-key\_\-value (pKeyFile, cGroupName, cKeyName, \&bFlushConfFileNeeded, 0., NULL, NULL)
+\item 
+\#define {\bf CD\_\-CONFIG\_\-GET\_\-DOUBLE}(cGroupName, cKeyName)~CD\_\-CONFIG\_\-GET\_\-DOUBLE\_\-WITH\_\-DEFAULT (cGroupName, cKeyName, 0.)
+\item 
+\#define {\bf CD\_\-CONFIG\_\-GET\_\-STRING\_\-WITH\_\-DEFAULT}(cGroupName, cKeyName, cDefaultValue)~cairo\_\-dock\_\-get\_\-string\_\-key\_\-value (pKeyFile, cGroupName, cKeyName, \&bFlushConfFileNeeded, cDefaultValue, NULL, NULL)
+\item 
+\#define {\bf CD\_\-CONFIG\_\-GET\_\-STRING}(cGroupName, cKeyName)~CD\_\-CONFIG\_\-GET\_\-STRING\_\-WITH\_\-DEFAULT (cGroupName, cKeyName, NULL)
+\item 
+\#define {\bf CD\_\-CONFIG\_\-GET\_\-STRING\_\-LIST\_\-WITH\_\-DEFAULT}(cGroupName, cKeyName, length, cDefaultValues)~cairo\_\-dock\_\-get\_\-string\_\-list\_\-key\_\-value (pKeyFile, cGroupName, cKeyName, \&bFlushConfFileNeeded, length, cDefaultValues, NULL, NULL)
+\item 
+\#define {\bf CD\_\-CONFIG\_\-GET\_\-STRING\_\-LIST}(cGroupName, cKeyName, length)~CD\_\-CONFIG\_\-GET\_\-STRING\_\-LIST\_\-WITH\_\-DEFAULT(cGroupName, cKeyName, length, NULL)
+\item 
+\#define {\bf CD\_\-CONFIG\_\-GET\_\-ANIMATION\_\-WITH\_\-DEFAULT}(cGroupName, cKeyName, iDefaultAnimation)~cairo\_\-dock\_\-get\_\-animation\_\-type\_\-key\_\-value (pKeyFile, cGroupName, cKeyName, \&bFlushConfFileNeeded, iDefaultAnimation, NULL, NULL);
+\item 
+\#define {\bf CD\_\-CONFIG\_\-GET\_\-ANIMATION}(cGroupName, cKeyName)~CD\_\-CONFIG\_\-GET\_\-ANIMATION\_\-WITH\_\-DEFAULT(cGroupName, cKeyName, CAIRO\_\-DOCK\_\-BOUNCE)
+\item 
+\#define {\bf CD\_\-CONFIG\_\-GET\_\-COLOR\_\-WITH\_\-DEFAULT}(cGroupName, cKeyName, pColorBuffer, pDefaultColor)~cairo\_\-dock\_\-get\_\-double\_\-list\_\-key\_\-value (pKeyFile, cGroupName, cKeyName, \&bFlushConfFileNeeded, pColorBuffer, 4, pDefaultColor, NULL, NULL);
+\item 
+\#define {\bf CD\_\-CONFIG\_\-GET\_\-COLOR}(cGroupName, cKeyName, pColorBuffer)~CD\_\-CONFIG\_\-GET\_\-COLOR\_\-WITH\_\-DEFAULT(cGroupName, cKeyName, pColorBuffer, NULL)
+\item 
+\#define {\bf CD\_\-CONFIG\_\-GET\_\-THEME\_\-PATH}(cGroupName, cKeyName, cThemesDirName, cDefaultThemeName)~cairo\_\-dock\_\-manage\_\-themes\_\-for\_\-applet (MY\_\-APPLET\_\-SHARE\_\-DATA\_\-DIR, cThemesDirName, CD\_\-APPLET\_\-MY\_\-CONF\_\-FILE, pKeyFile, cGroupName, cKeyName, \&bFlushConfFileNeeded, cDefaultThemeName)
+\item 
+\#define {\bf CD\_\-APPLET\_\-ABOUT}(cMessage)
+\item 
+\#define {\bf CD\_\-APPLET\_\-ABOUT\_\-H}~void about (GtkMenuItem $\ast$menu\_\-item, gpointer $\ast$data);
+\item 
+\#define {\bf CD\_\-APPLET\_\-ON\_\-CLICK}~action\_\-on\_\-click
+\item 
+\#define {\bf CD\_\-APPLET\_\-REGISTER\_\-FOR\_\-CLICK\_\-EVENT}~cairo\_\-dock\_\-register\_\-notification (CAIRO\_\-DOCK\_\-CLICK\_\-ICON, ({\bf CairoDockNotificationFunc}) CD\_\-APPLET\_\-ON\_\-CLICK, CAIRO\_\-DOCK\_\-RUN\_\-FIRST);
+\item 
+\#define {\bf CD\_\-APPLET\_\-UNREGISTER\_\-FOR\_\-CLICK\_\-EVENT}~cairo\_\-dock\_\-remove\_\-notification\_\-func (CAIRO\_\-DOCK\_\-CLICK\_\-ICON, ({\bf CairoDockNotificationFunc}) CD\_\-APPLET\_\-ON\_\-CLICK);
+\item 
+\#define {\bf CD\_\-APPLET\_\-ON\_\-CLICK\_\-BEGIN}
+\item 
+\#define {\bf CD\_\-APPLET\_\-ON\_\-CLICK\_\-END}
+\item 
+\#define {\bf CD\_\-APPLET\_\-ON\_\-CLICK\_\-H}~gboolean CD\_\-APPLET\_\-ON\_\-CLICK (gpointer $\ast$data);
+\item 
+\#define {\bf CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU}~applet\_\-on\_\-build\_\-menu
+\item 
+\#define {\bf CD\_\-APPLET\_\-REGISTER\_\-FOR\_\-BUILD\_\-MENU\_\-EVENT}~cairo\_\-dock\_\-register\_\-notification (CAIRO\_\-DOCK\_\-BUILD\_\-MENU, ({\bf CairoDockNotificationFunc}) CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU, CAIRO\_\-DOCK\_\-RUN\_\-FIRST);
+\item 
+\#define {\bf CD\_\-APPLET\_\-UNREGISTER\_\-FOR\_\-BUILD\_\-MENU\_\-EVENT}~cairo\_\-dock\_\-remove\_\-notification\_\-func (CAIRO\_\-DOCK\_\-BUILD\_\-MENU, ({\bf CairoDockNotificationFunc}) CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU);
+\item 
+\#define {\bf CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU\_\-BEGIN}
+\item 
+\#define {\bf CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU\_\-END}
+\item 
+\#define {\bf CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU\_\-H}~gboolean CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU (gpointer $\ast$data);
+\item 
+\#define {\bf CD\_\-APPLET\_\-MY\_\-MENU}~pAppletMenu
+\item 
+\#define {\bf CD\_\-APPLET\_\-ADD\_\-SUB\_\-MENU}(cLabel, pSubMenu, pMenu)
+\item 
+\#define {\bf CD\_\-APPLET\_\-CREATE\_\-AND\_\-ADD\_\-SUB\_\-MENU}(cLabel, pMenu)~cairo\_\-dock\_\-create\_\-sub\_\-menu (cLabel, pMenu);
+\item 
+\#define {\bf CD\_\-APPLET\_\-ADD\_\-IN\_\-MENU\_\-WITH\_\-DATA}(cLabel, pFunction, pMenu, pData)
+\item 
+\#define {\bf CD\_\-APPLET\_\-ADD\_\-IN\_\-MENU}(cLabel, pFunction, pMenu)~CD\_\-APPLET\_\-ADD\_\-IN\_\-MENU\_\-WITH\_\-DATA(cLabel, pFunction, pMenu, NULL)
+\item 
+\#define {\bf CD\_\-APPLET\_\-ADD\_\-ABOUT\_\-IN\_\-MENU}(pMenu)~CD\_\-APPLET\_\-ADD\_\-IN\_\-MENU (\_\-(\char`\"{}About\char`\"{}), about, pMenu)
+\item 
+\#define {\bf CD\_\-APPLET\_\-LAST\_\-ITEM\_\-IN\_\-MENU}~pMenuItem
+\item 
+\#define {\bf CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK}~action\_\-on\_\-middle\_\-click
+\item 
+\#define {\bf CD\_\-APPLET\_\-REGISTER\_\-FOR\_\-MIDDLE\_\-CLICK\_\-EVENT}~cairo\_\-dock\_\-register\_\-notification (CAIRO\_\-DOCK\_\-MIDDLE\_\-CLICK\_\-ICON, ({\bf CairoDockNotificationFunc}) CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK, CAIRO\_\-DOCK\_\-RUN\_\-FIRST);
+\item 
+\#define {\bf CD\_\-APPLET\_\-UNREGISTER\_\-FOR\_\-MIDDLE\_\-CLICK\_\-EVENT}~cairo\_\-dock\_\-remove\_\-notification\_\-func (CAIRO\_\-DOCK\_\-MIDDLE\_\-CLICK\_\-ICON, ({\bf CairoDockNotificationFunc}) CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK);
+\item 
+\#define {\bf CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK\_\-BEGIN}
+\item 
+\#define {\bf CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK\_\-END}
+\item 
+\#define {\bf CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK\_\-H}~gboolean CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK (gpointer $\ast$data);
+\item 
+\#define {\bf CD\_\-APPLET\_\-SET\_\-SURFACE\_\-ON\_\-MY\_\-ICON}(pSurface)
+\item 
+\#define {\bf CD\_\-APPLET\_\-SET\_\-IMAGE\_\-ON\_\-MY\_\-ICON}(cImagePath)~cairo\_\-dock\_\-set\_\-image\_\-on\_\-icon (myDrawContext, cImagePath, myIcon, myDock);
+\item 
+\#define {\bf CD\_\-APPLET\_\-SET\_\-NAME\_\-FOR\_\-MY\_\-ICON}(cIconName)~cairo\_\-dock\_\-set\_\-icon\_\-name (myDrawContext, cIconName, myIcon, myDock);
+\item 
+\#define {\bf CD\_\-APPLET\_\-SET\_\-QUICK\_\-INFO\_\-ON\_\-MY\_\-ICON}(cQuickInfo)
+\item 
+\#define {\bf CD\_\-APPLET\_\-ANIMATE\_\-MY\_\-ICON}(iAnimationType, iAnimationLength)~cairo\_\-dock\_\-animate\_\-icon (myIcon, myDock, iAnimationType, iAnimationLength);
+\item 
+\#define {\bf CD\_\-APPLET\_\-LOAD\_\-SURFACE\_\-FOR\_\-MY\_\-APPLET}(cImagePath)~cairo\_\-dock\_\-create\_\-surface\_\-for\_\-icon (cImagePath, myDrawContext, myIcon $\rightarrow$ fWidth $\ast$ (1 + {\bf g\_\-fAmplitude}), myIcon $\rightarrow$ fHeight$\ast$ (1 + {\bf g\_\-fAmplitude}));
+\item 
+\#define {\bf CD\_\-APPLET\_\-INCLUDE\_\-MY\_\-VARS}
+\item 
+\#define {\bf \_\-D}(message)~dgettext (MY\_\-APPLET\_\-GETTEXT\_\-DOMAIN, message)
+\end{CompactItemize}
+\subsection*{Fonctions}
+\begin{CompactItemize}
+\item 
+gchar $\ast$ {\bf cairo\_\-dock\_\-check\_\-conf\_\-file\_\-exists} (gchar $\ast$cUserDataDirName, gchar $\ast$cShareDataDir, gchar $\ast$cConfFileName)
+\item 
+void {\bf cairo\_\-dock\_\-set\_\-icon\_\-surface} (cairo\_\-t $\ast$pIconContext, cairo\_\-surface\_\-t $\ast$pSurface)
+\item 
+void {\bf cairo\_\-dock\_\-add\_\-reflection\_\-to\_\-icon} (cairo\_\-t $\ast$pIconContext, {\bf Icon} $\ast$pIcon, {\bf CairoDock} $\ast$pDock)
+\item 
+void {\bf cairo\_\-dock\_\-set\_\-icon\_\-surface\_\-with\_\-reflect} (cairo\_\-t $\ast$pIconContext, cairo\_\-surface\_\-t $\ast$pSurface, {\bf Icon} $\ast$pIcon, {\bf CairoDock} $\ast$pDock)
+\item 
+void {\bf cairo\_\-dock\_\-set\_\-image\_\-on\_\-icon} (cairo\_\-t $\ast$pIconContext, gchar $\ast$cImagePath, {\bf Icon} $\ast$pIcon, {\bf CairoDock} $\ast$pDock)
+\item 
+void {\bf cairo\_\-dock\_\-set\_\-icon\_\-name} (cairo\_\-t $\ast$pSourceContext, const gchar $\ast$cIconName, {\bf Icon} $\ast$pIcon, {\bf CairoDock} $\ast$pDock)
+\item 
+void {\bf cairo\_\-dock\_\-set\_\-quick\_\-info} (cairo\_\-t $\ast$pSourceContext, const gchar $\ast$cQuickInfo, {\bf Icon} $\ast$pIcon)
+\item 
+void {\bf cairo\_\-dock\_\-animate\_\-icon} ({\bf Icon} $\ast$pIcon, {\bf CairoDock} $\ast$pDock, {\bf CairoDockAnimationType} iAnimationType, int iNbRounds)
+\item 
+gchar $\ast$ {\bf cairo\_\-dock\_\-manage\_\-themes\_\-for\_\-applet} (gchar $\ast$cAppletShareDataDir, gchar $\ast$cThemeDirName, gchar $\ast$cAppletConfFilePath, GKeyFile $\ast$pKeyFile, gchar $\ast$cGroupName, gchar $\ast$cKeyName, gboolean $\ast$bFlushConfFileNeeded, gchar $\ast$cDefaultThemeName)
+\item 
+GtkWidget $\ast$ {\bf cairo\_\-dock\_\-create\_\-sub\_\-menu} (gchar $\ast$cLabel, GtkWidget $\ast$pMenu)
+\end{CompactItemize}
+
+
+\subsection{Description détaillée}
+Les macros forment un canevas dedie aux applets. Elles permettent un developpement rapide et normalise d'une applet pour Cairo-Dock.
+
+Pour un exemple tres simple, consultez les sources de l'applet 'logout'. 
+
+\subsection{Documentation des macros}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!cairo_dock_remove_quick_info@{cairo\_\-dock\_\-remove\_\-quick\_\-info}}
+\index{cairo_dock_remove_quick_info@{cairo\_\-dock\_\-remove\_\-quick\_\-info}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define cairo\_\-dock\_\-remove\_\-quick\_\-info(pIcon)~cairo\_\-dock\_\-set\_\-quick\_\-info (NULL, NULL, pIcon)}\label{cairo-dock-applet-facility_8h_a018ebb8327854b22c4cd42dbfbe9d9b}
+
+
+Efface l'info-rapide d'une icone. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pIcon}]l'icone. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_H@{CD\_\-APPLET\_\-H}}
+\index{CD_APPLET_H@{CD\_\-APPLET\_\-H}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-H}\label{cairo-dock-applet-facility_8h_a0982c52cc4acbf02d0d37a64bba21c5}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}CairoDockVisitCard *pre_init (void);\
+Icon *init (CairoDock *pDock, gchar **cAppletConfFilePath, GError **erreur);\
+void stop (void);
+\end{verbatim}
+\end{Code}
+Definition des fonctions d'initialisation de l'applet; a inclure dans le .h du fichier d'init de l'applet. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_PRE_INIT_BEGIN@{CD\_\-APPLET\_\-PRE\_\-INIT\_\-BEGIN}}
+\index{CD_APPLET_PRE_INIT_BEGIN@{CD\_\-APPLET\_\-PRE\_\-INIT\_\-BEGIN}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-PRE\_\-INIT\_\-BEGIN(cName, iMajorVersion, iMinorVersion, iMicroVersion)}\label{cairo-dock-applet-facility_8h_fabe5696ffe3d81893124d929981ba04}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}Icon *myIcon = NULL;\
+CairoDock *myDock = NULL;\
+cairo_t *myDrawContext = NULL;\
+CairoDockVisitCard *pre_init (void)\
+{\
+        CairoDockVisitCard *pVisitCard = g_new0 (CairoDockVisitCard, 1);\
+        pVisitCard->cModuleName = g_strdup (cName);\
+        pVisitCard->cReadmeFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_README_FILE);\
+        pVisitCard->iMajorVersionNeeded = iMajorVersion;\
+        pVisitCard->iMinorVersionNeeded = iMinorVersion;\
+        pVisitCard->iMicroVersionNeeded = iMicroVersion;\
+        pVisitCard->cPreviewFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_PREVIEW_FILE);\
+        pVisitCard->cGettextDomain = g_strdup (MY_APPLET_GETTEXT_DOMAIN);\
+        pVisitCard->cDockVersionOnCompilation = g_strdup (MY_APPLET_DOCK_VERSION);
+\end{verbatim}
+\end{Code}
+Debut de la fonction de pre-initialisation de l'applet (celle qui est appele a l'enregistrement de tous les plug-ins). Defini egalement les variables globales suivantes : myIcon, myDock, et myDrawContext. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cName}]nom de sous lequel l'applet sera enregistree par Cairo-Dock. \item[{\em iMajorVersion}]version majeure du dock necessaire au bon fonctionnement de l'applet. \item[{\em iMinorVersion}]version mineure du dock necessaire au bon fonctionnement de l'applet. \item[{\em iMicroVersion}]version micro du dock necessaire au bon fonctionnement de l'applet. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_PRE_INIT_END@{CD\_\-APPLET\_\-PRE\_\-INIT\_\-END}}
+\index{CD_APPLET_PRE_INIT_END@{CD\_\-APPLET\_\-PRE\_\-INIT\_\-END}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-PRE\_\-INIT\_\-END}\label{cairo-dock-applet-facility_8h_902888776403f24d855b5074f836e76a}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}return pVisitCard;\
+}
+\end{verbatim}
+\end{Code}
+Fin de la fonction de pre-initialisation de l'applet. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_DEFINITION@{CD\_\-APPLET\_\-DEFINITION}}
+\index{CD_APPLET_DEFINITION@{CD\_\-APPLET\_\-DEFINITION}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-DEFINITION(cName, iMajorVersion, iMinorVersion, iMicroVersion)}\label{cairo-dock-applet-facility_8h_55daad39007731967dda0f91266df39a}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}CD_APPLET_PRE_INIT_BEGIN (cName, iMajorVersion, iMinorVersion, iMicroVersion) \
+CD_APPLET_PRE_INIT_END
+\end{verbatim}
+\end{Code}
+Fonction de pre-initialisation generique. Ne fais que definir l'applet (en appelant les 2 macros precedentes), la plupart du temps cela est suffisant. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_INIT_BEGIN@{CD\_\-APPLET\_\-INIT\_\-BEGIN}}
+\index{CD_APPLET_INIT_BEGIN@{CD\_\-APPLET\_\-INIT\_\-BEGIN}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-INIT\_\-BEGIN(erreur)}\label{cairo-dock-applet-facility_8h_d9e04e23f2e7d2a77e37583fb5f39685}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}Icon *init (CairoDock *pDock, gchar **cAppletConfFilePath, GError **erreur) \
+{ \
+        myDock = pDock; \
+        gchar *cConfFilePath = cairo_dock_check_conf_file_exists (MY_APPLET_USER_DATA_DIR, MY_APPLET_SHARE_DATA_DIR, MY_APPLET_CONF_FILE); \
+        int iDesiredWidth = 48, iDesiredHeight = 48; \
+        gchar *cAppletName = NULL, *cIconName = NULL; \
+        read_conf_file (cConfFilePath, &iDesiredWidth, &iDesiredHeight, &cAppletName, &cIconName); \
+        myIcon = cairo_dock_create_icon_for_applet (pDock, iDesiredWidth, iDesiredHeight, cAppletName, cIconName); \
+        g_return_val_if_fail (myIcon != NULL, NULL); \
+        myDrawContext = cairo_create (myIcon->pIconBuffer); \
+        g_return_val_if_fail (cairo_status (myDrawContext) == CAIRO_STATUS_SUCCESS, NULL);
+\end{verbatim}
+\end{Code}
+Debut de la fonction d'initialisation de l'applet (celle qui est appelee a chaque chargement de l'applet). Lis le fichier de conf de l'applet, et cree son icone ainsi que son contexte de dessin. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em erreur}]une GError, utilisable pour reporter une erreur ayant lieu durant l'initialisation. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_INIT_END@{CD\_\-APPLET\_\-INIT\_\-END}}
+\index{CD_APPLET_INIT_END@{CD\_\-APPLET\_\-INIT\_\-END}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-INIT\_\-END}\label{cairo-dock-applet-facility_8h_cd56d5f4dc1ffae3f9930c9bb0260aad}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}*cAppletConfFilePath = cConfFilePath; \
+        g_free (cAppletName); \
+        g_free (cIconName); \
+        return myIcon; \
+}
+\end{verbatim}
+\end{Code}
+Fin de la fonction d'initialisation de l'applet. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_STOP_BEGIN@{CD\_\-APPLET\_\-STOP\_\-BEGIN}}
+\index{CD_APPLET_STOP_BEGIN@{CD\_\-APPLET\_\-STOP\_\-BEGIN}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-STOP\_\-BEGIN}\label{cairo-dock-applet-facility_8h_3bb602a8fee1cd45f5a7dc77b039579b}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}void stop (void) \
+{
+\end{verbatim}
+\end{Code}
+Debut de la fonction d'arret de l'applet. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_STOP_END@{CD\_\-APPLET\_\-STOP\_\-END}}
+\index{CD_APPLET_STOP_END@{CD\_\-APPLET\_\-STOP\_\-END}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-STOP\_\-END}\label{cairo-dock-applet-facility_8h_29752d1b78577068d344e6f01252bb57}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}myDock = NULL; \
+        myIcon = NULL; \
+        cairo_destroy (myDrawContext); \
+        myDrawContext = NULL; \
+}
+\end{verbatim}
+\end{Code}
+Fin de la fonction d'arret de l'applet. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_MY_CONF_FILE@{CD\_\-APPLET\_\-MY\_\-CONF\_\-FILE}}
+\index{CD_APPLET_MY_CONF_FILE@{CD\_\-APPLET\_\-MY\_\-CONF\_\-FILE}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-MY\_\-CONF\_\-FILE~cConfFilePath}\label{cairo-dock-applet-facility_8h_43deb68912fbcf2ee76baacbf64c44a7}
+
+
+Chemin du fichier de conf de l'applet, appelable durant les fonctions d'init et de config. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_CONFIG_BEGIN@{CD\_\-APPLET\_\-CONFIG\_\-BEGIN}}
+\index{CD_APPLET_CONFIG_BEGIN@{CD\_\-APPLET\_\-CONFIG\_\-BEGIN}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-CONFIG\_\-BEGIN(cDefaultAppletName, cDefaultIconName)}\label{cairo-dock-applet-facility_8h_3e8589350f2beff44c92e3baae15c7b4}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cAppletName, gchar **cIconName) \
+{ \
+        GError *erreur = NULL; \
+        gboolean bFlushConfFileNeeded = FALSE; \
+        GKeyFile *pKeyFile = g_key_file_new (); \
+        g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur); \
+        if (erreur != NULL) \
+        { \
+                g_print ("Attention : %s\n", erreur->message); \
+                g_error_free (erreur); \
+                return ; \
+        } \
+        *iWidth = cairo_dock_get_integer_key_value (pKeyFile, "ICON", "width", &bFlushConfFileNeeded, 48, NULL, NULL); \
+        *iHeight = cairo_dock_get_integer_key_value (pKeyFile, "ICON", "height", &bFlushConfFileNeeded, 48, NULL, NULL); \
+        if (cDefaultAppletName != NULL) \
+                *cAppletName = cairo_dock_get_string_key_value (pKeyFile, "ICON", "name", &bFlushConfFileNeeded, cDefaultAppletName, NULL, NULL); \
+        if (cDefaultIconName != NULL) \
+                *cIconName = cairo_dock_get_string_key_value (pKeyFile, "ICON", "icon", &bFlushConfFileNeeded, cDefaultIconName, NULL, NULL);
+\end{verbatim}
+\end{Code}
+Debut de la fonction de configuration de l'applet (celle qui est appelee au debt de l'init). Ouvre le fichier de conf de l'applet, et charge les parametres generiques suivant (groupe \char`\"{}ICON\char`\"{}) : largeur (\char`\"{}width\char`\"{}), hauteur (\char`\"{}height), nom (\char`\"{}name\char`\"{}, optionnel), et icone (\char`\"{}icon\char`\"{}, optionnel). \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cDefaultAppletName}]nom par defaut de l'applet dans le dock (son etiquette), ou NULL si aucun nom ne doit etre lu dans la conf (habituellement l'etiquette reprend simplement le nom de l'applet). \item[{\em cDefaultIconName}]nom de l'icone a appliquer par defaut a l'applet, ou NULL si aucune icone ne doit etre lue dans la conf (auquel cas la surface de l'icone sera juste transparente). \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_CONFIG_END@{CD\_\-APPLET\_\-CONFIG\_\-END}}
+\index{CD_APPLET_CONFIG_END@{CD\_\-APPLET\_\-CONFIG\_\-END}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-CONFIG\_\-END}\label{cairo-dock-applet-facility_8h_757f9a0ca963a2e1a572673a4b63b823}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}if (! bFlushConfFileNeeded) \
+                bFlushConfFileNeeded = cairo_dock_conf_file_needs_update (pKeyFile, MY_APPLET_VERSION); \
+        if (bFlushConfFileNeeded) \
+                cairo_dock_flush_conf_file (pKeyFile, cConfFilePath, MY_APPLET_SHARE_DATA_DIR);\
+        g_key_file_free (pKeyFile); \
+}
+\end{verbatim}
+\end{Code}
+Fin de la fonction de configuration de l'applet. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_CONFIG_H@{CD\_\-APPLET\_\-CONFIG\_\-H}}
+\index{CD_APPLET_CONFIG_H@{CD\_\-APPLET\_\-CONFIG\_\-H}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-CONFIG\_\-H~void read\_\-conf\_\-file (gchar $\ast$cConfFilePath, int $\ast$iWidth, int $\ast$iHeight, gchar $\ast$$\ast$cAppletName, gchar $\ast$$\ast$cIconName);}\label{cairo-dock-applet-facility_8h_574b5f070d39b7b69297a9d7ad4afe1d}
+
+
+Definition de la fonction de configuration, a inclure dans le .h correspondant. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT@{CD\_\-CONFIG\_\-GET\_\-BOOLEAN\_\-WITH\_\-DEFAULT}}
+\index{CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT@{CD\_\-CONFIG\_\-GET\_\-BOOLEAN\_\-WITH\_\-DEFAULT}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-CONFIG\_\-GET\_\-BOOLEAN\_\-WITH\_\-DEFAULT(cGroupName, cKeyName, bDefaultValue)~cairo\_\-dock\_\-get\_\-boolean\_\-key\_\-value (pKeyFile, cGroupName, cKeyName, \&bFlushConfFileNeeded, bDefaultValue, NULL, NULL)}\label{cairo-dock-applet-facility_8h_95c375ab4085afa56c98f76e1a2177cd}
+
+
+Recupere la valeur d'un parametre 'booleen' du fichier de conf. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cGroupName}]nom du groupe dans le fichier de conf. \item[{\em cKeyName}]nom de la cle dans le fichier de conf. \item[{\em bDefaultValue}]valeur par defaut si la cle et/ou le groupe n'est pas trouve (typiquement si cette cle est nouvelle). \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]un gboolean. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_CONFIG_GET_BOOLEAN@{CD\_\-CONFIG\_\-GET\_\-BOOLEAN}}
+\index{CD_CONFIG_GET_BOOLEAN@{CD\_\-CONFIG\_\-GET\_\-BOOLEAN}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-CONFIG\_\-GET\_\-BOOLEAN(cGroupName, cKeyName)~CD\_\-CONFIG\_\-GET\_\-BOOLEAN\_\-WITH\_\-DEFAULT (cGroupName, cKeyName, TRUE)}\label{cairo-dock-applet-facility_8h_6b8a301a18e1732b94738e3a2d6f34e5}
+
+
+Recupere la valeur d'un parametre 'booleen' du fichier de conf, avec TRUE comme valeur par defaut. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cGroupName}]nom du groupe dans le fichier de conf. \item[{\em cKeyName}]nom de la cle dans le fichier de conf. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]un gboolean. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_CONFIG_GET_INTEGER_WITH_DEFAULT@{CD\_\-CONFIG\_\-GET\_\-INTEGER\_\-WITH\_\-DEFAULT}}
+\index{CD_CONFIG_GET_INTEGER_WITH_DEFAULT@{CD\_\-CONFIG\_\-GET\_\-INTEGER\_\-WITH\_\-DEFAULT}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-CONFIG\_\-GET\_\-INTEGER\_\-WITH\_\-DEFAULT(cGroupName, cKeyName, iDefaultValue)~cairo\_\-dock\_\-get\_\-integer\_\-key\_\-value (pKeyFile, cGroupName, cKeyName, \&bFlushConfFileNeeded, iDefaultValue, NULL, NULL)}\label{cairo-dock-applet-facility_8h_bb390d5fc6bfa9c4cf01ae3f689b2d9b}
+
+
+Recupere la valeur d'un parametre 'entier' du fichier de conf. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cGroupName}]nom du groupe dans le fichier de conf. \item[{\em cKeyName}]nom de la cle dans le fichier de conf. \item[{\em iDefaultValue}]valeur par defaut si la cle et/ou le groupe n'est pas trouve (typiquement si cette cle est nouvelle). \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]un entier. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_CONFIG_GET_INTEGER@{CD\_\-CONFIG\_\-GET\_\-INTEGER}}
+\index{CD_CONFIG_GET_INTEGER@{CD\_\-CONFIG\_\-GET\_\-INTEGER}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-CONFIG\_\-GET\_\-INTEGER(cGroupName, cKeyName)~CD\_\-CONFIG\_\-GET\_\-INTEGER\_\-WITH\_\-DEFAULT (cGroupName, cKeyName, 0)}\label{cairo-dock-applet-facility_8h_2e965a54c8fb32344f983b8ee6fb8762}
+
+
+Recupere la valeur d'un parametre 'entier' du fichier de conf, avec 0 comme valeur par defaut. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cGroupName}]nom du groupe dans le fichier de conf. \item[{\em cKeyName}]nom de la cle dans le fichier de conf. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]un entier. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_CONFIG_GET_DOUBLE_WITH_DEFAULT@{CD\_\-CONFIG\_\-GET\_\-DOUBLE\_\-WITH\_\-DEFAULT}}
+\index{CD_CONFIG_GET_DOUBLE_WITH_DEFAULT@{CD\_\-CONFIG\_\-GET\_\-DOUBLE\_\-WITH\_\-DEFAULT}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-CONFIG\_\-GET\_\-DOUBLE\_\-WITH\_\-DEFAULT(cGroupName, cKeyName, fDefaultValue)~cairo\_\-dock\_\-get\_\-double\_\-key\_\-value (pKeyFile, cGroupName, cKeyName, \&bFlushConfFileNeeded, 0., NULL, NULL)}\label{cairo-dock-applet-facility_8h_4695f5ea7a22882b73b5205cdfdf2e29}
+
+
+Recupere la valeur d'un parametre 'double' du fichier de conf. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cGroupName}]nom du groupe dans le fichier de conf. \item[{\em cKeyName}]nom de la cle dans le fichier de conf. \item[{\em fDefaultValue}]valeur par defaut si la cle et/ou le groupe n'est pas trouve (typiquement si cette cle est nouvelle). \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]un double. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_CONFIG_GET_DOUBLE@{CD\_\-CONFIG\_\-GET\_\-DOUBLE}}
+\index{CD_CONFIG_GET_DOUBLE@{CD\_\-CONFIG\_\-GET\_\-DOUBLE}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-CONFIG\_\-GET\_\-DOUBLE(cGroupName, cKeyName)~CD\_\-CONFIG\_\-GET\_\-DOUBLE\_\-WITH\_\-DEFAULT (cGroupName, cKeyName, 0.)}\label{cairo-dock-applet-facility_8h_243a6fc7b950aafaf578049db5dc4e65}
+
+
+Recupere la valeur d'un parametre 'double' du fichier de conf, avec 0. comme valeur par defaut. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cGroupName}]nom du groupe dans le fichier de conf. \item[{\em cKeyName}]nom de la cle dans le fichier de conf. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]un double. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_CONFIG_GET_STRING_WITH_DEFAULT@{CD\_\-CONFIG\_\-GET\_\-STRING\_\-WITH\_\-DEFAULT}}
+\index{CD_CONFIG_GET_STRING_WITH_DEFAULT@{CD\_\-CONFIG\_\-GET\_\-STRING\_\-WITH\_\-DEFAULT}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-CONFIG\_\-GET\_\-STRING\_\-WITH\_\-DEFAULT(cGroupName, cKeyName, cDefaultValue)~cairo\_\-dock\_\-get\_\-string\_\-key\_\-value (pKeyFile, cGroupName, cKeyName, \&bFlushConfFileNeeded, cDefaultValue, NULL, NULL)}\label{cairo-dock-applet-facility_8h_7857724f089eefd0ab85a5a676417a35}
+
+
+Recupere la valeur d'un parametre 'chaine de caracteres' du fichier de conf. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cGroupName}]nom du groupe dans le fichier de conf. \item[{\em cKeyName}]nom de la cle dans le fichier de conf. \item[{\em cDefaultValue}]valeur par defaut si la cle et/ou le groupe n'est pas trouve (typiquement si cette cle est nouvelle). NULL accepte. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]une chaine de caracteres nouvellement allouee. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_CONFIG_GET_STRING@{CD\_\-CONFIG\_\-GET\_\-STRING}}
+\index{CD_CONFIG_GET_STRING@{CD\_\-CONFIG\_\-GET\_\-STRING}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-CONFIG\_\-GET\_\-STRING(cGroupName, cKeyName)~CD\_\-CONFIG\_\-GET\_\-STRING\_\-WITH\_\-DEFAULT (cGroupName, cKeyName, NULL)}\label{cairo-dock-applet-facility_8h_31acb378f798104e855a44797fdfbea8}
+
+
+Recupere la valeur d'un parametre 'chaine de caracteres' du fichier de conf, avec NULL comme valeur par defaut. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cGroupName}]nom du groupe dans le fichier de conf. \item[{\em cKeyName}]nom de la cle dans le fichier de conf. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]une chaine de caracteres nouvellement allouee. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_CONFIG_GET_STRING_LIST_WITH_DEFAULT@{CD\_\-CONFIG\_\-GET\_\-STRING\_\-LIST\_\-WITH\_\-DEFAULT}}
+\index{CD_CONFIG_GET_STRING_LIST_WITH_DEFAULT@{CD\_\-CONFIG\_\-GET\_\-STRING\_\-LIST\_\-WITH\_\-DEFAULT}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-CONFIG\_\-GET\_\-STRING\_\-LIST\_\-WITH\_\-DEFAULT(cGroupName, cKeyName, length, cDefaultValues)~cairo\_\-dock\_\-get\_\-string\_\-list\_\-key\_\-value (pKeyFile, cGroupName, cKeyName, \&bFlushConfFileNeeded, length, cDefaultValues, NULL, NULL)}\label{cairo-dock-applet-facility_8h_42fc7314fe53430bdf0e766f634a185e}
+
+
+Recupere la valeur d'un parametre 'liste de chaines de caracteres' du fichier de conf. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cGroupName}]nom du groupe dans le fichier de conf. \item[{\em cKeyName}]nom de la cle dans le fichier de conf. \item[{\em length}]pointeur sur un entier, rempli avec le nombre de chaines recuperees. \item[{\em cDefaultValues}]valeur par defaut si la cle et/ou le groupe n'est pas trouve (typiquement si cette cle est nouvelle). C'est une chaine de caractere contenant les mots separes par des ';', ou NULL. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]un tableau de chaine de caracteres, a liberer avec 'g\_\-strfreev'. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_CONFIG_GET_STRING_LIST@{CD\_\-CONFIG\_\-GET\_\-STRING\_\-LIST}}
+\index{CD_CONFIG_GET_STRING_LIST@{CD\_\-CONFIG\_\-GET\_\-STRING\_\-LIST}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-CONFIG\_\-GET\_\-STRING\_\-LIST(cGroupName, cKeyName, length)~CD\_\-CONFIG\_\-GET\_\-STRING\_\-LIST\_\-WITH\_\-DEFAULT(cGroupName, cKeyName, length, NULL)}\label{cairo-dock-applet-facility_8h_75d95869a2430ba771874f7950f7770d}
+
+
+Recupere la valeur d'un parametre 'liste de chaines de caracteres' du fichier de conf, avec NULL comme valeur par defaut. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cGroupName}]nom du groupe dans le fichier de conf. \item[{\em cKeyName}]nom de la cle dans le fichier de conf. \item[{\em length}]pointeur sur un entier, rempli avec le nombre de chaines recuperees. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]un tableau de chaine de caracteres, a liberer avec 'g\_\-strfreev'. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_CONFIG_GET_ANIMATION_WITH_DEFAULT@{CD\_\-CONFIG\_\-GET\_\-ANIMATION\_\-WITH\_\-DEFAULT}}
+\index{CD_CONFIG_GET_ANIMATION_WITH_DEFAULT@{CD\_\-CONFIG\_\-GET\_\-ANIMATION\_\-WITH\_\-DEFAULT}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-CONFIG\_\-GET\_\-ANIMATION\_\-WITH\_\-DEFAULT(cGroupName, cKeyName, iDefaultAnimation)~cairo\_\-dock\_\-get\_\-animation\_\-type\_\-key\_\-value (pKeyFile, cGroupName, cKeyName, \&bFlushConfFileNeeded, iDefaultAnimation, NULL, NULL);}\label{cairo-dock-applet-facility_8h_0d7676c29cbefba6155a2198b19d94a6}
+
+
+Recupere la valeur d'un parametre 'type d'animation' du fichier de conf. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cGroupName}]nom du groupe dans le fichier de conf. \item[{\em cKeyName}]nom de la cle dans le fichier de conf. \item[{\em iDefaultAnimation}]valeur par defaut si la cle et/ou le groupe n'est pas trouve (typiquement si cette cle est nouvelle). \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]le type de l'animation, un \doxyref{CairoDockAnimationType}{p.}{cairo-dock-struct_8h_72c6f286d96c028feb8d4516820b74d9}. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_CONFIG_GET_ANIMATION@{CD\_\-CONFIG\_\-GET\_\-ANIMATION}}
+\index{CD_CONFIG_GET_ANIMATION@{CD\_\-CONFIG\_\-GET\_\-ANIMATION}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-CONFIG\_\-GET\_\-ANIMATION(cGroupName, cKeyName)~CD\_\-CONFIG\_\-GET\_\-ANIMATION\_\-WITH\_\-DEFAULT(cGroupName, cKeyName, CAIRO\_\-DOCK\_\-BOUNCE)}\label{cairo-dock-applet-facility_8h_47051bfe4ada4041bc5967bad2265050}
+
+
+Recupere la valeur d'un parametre 'type d'animation' du fichier de conf, avec \doxyref{CAIRO\_\-DOCK\_\-BOUNCE}{p.}{cairo-dock-struct_8h_72c6f286d96c028feb8d4516820b74d93a1697de8c770147e72ec3749645c360} comme valeur par defaut. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cGroupName}]nom du groupe dans le fichier de conf. \item[{\em cKeyName}]nom de la cle dans le fichier de conf. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]le type de l'animation, un \doxyref{CairoDockAnimationType}{p.}{cairo-dock-struct_8h_72c6f286d96c028feb8d4516820b74d9}. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_CONFIG_GET_COLOR_WITH_DEFAULT@{CD\_\-CONFIG\_\-GET\_\-COLOR\_\-WITH\_\-DEFAULT}}
+\index{CD_CONFIG_GET_COLOR_WITH_DEFAULT@{CD\_\-CONFIG\_\-GET\_\-COLOR\_\-WITH\_\-DEFAULT}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-CONFIG\_\-GET\_\-COLOR\_\-WITH\_\-DEFAULT(cGroupName, cKeyName, pColorBuffer, pDefaultColor)~cairo\_\-dock\_\-get\_\-double\_\-list\_\-key\_\-value (pKeyFile, cGroupName, cKeyName, \&bFlushConfFileNeeded, pColorBuffer, 4, pDefaultColor, NULL, NULL);}\label{cairo-dock-applet-facility_8h_36db893eed656ef167f47ab43a2285d1}
+
+
+Recupere la valeur d'un parametre 'couleur' du fichier de conf. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cGroupName}]nom du groupe dans le fichier de conf. \item[{\em cKeyName}]nom de la cle dans le fichier de conf. \item[{\em pColorBuffer}]tableau de 4 double deja alloue, et qui sera rempli avec les 4 composantes de la couleur. \item[{\em pDefaultColor}]valeur par defaut si la cle et/ou le groupe n'est pas trouve (typiquement si cette cle est nouvelle). C'est un tableau de 4 double, ou NULL. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_CONFIG_GET_COLOR@{CD\_\-CONFIG\_\-GET\_\-COLOR}}
+\index{CD_CONFIG_GET_COLOR@{CD\_\-CONFIG\_\-GET\_\-COLOR}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-CONFIG\_\-GET\_\-COLOR(cGroupName, cKeyName, pColorBuffer)~CD\_\-CONFIG\_\-GET\_\-COLOR\_\-WITH\_\-DEFAULT(cGroupName, cKeyName, pColorBuffer, NULL)}\label{cairo-dock-applet-facility_8h_483d0330c1c8768ba433780b81fca204}
+
+
+Recupere la valeur d'un parametre 'couleur' du fichier de conf, avec NULL comme valeur par defaut. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cGroupName}]nom du groupe dans le fichier de conf. \item[{\em cKeyName}]nom de la cle dans le fichier de conf. \item[{\em pColorBuffer}]tableau de 4 double deja alloue, et qui sera rempli avec les 4 composantes de la couleur. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_CONFIG_GET_THEME_PATH@{CD\_\-CONFIG\_\-GET\_\-THEME\_\-PATH}}
+\index{CD_CONFIG_GET_THEME_PATH@{CD\_\-CONFIG\_\-GET\_\-THEME\_\-PATH}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-CONFIG\_\-GET\_\-THEME\_\-PATH(cGroupName, cKeyName, cThemesDirName, cDefaultThemeName)~cairo\_\-dock\_\-manage\_\-themes\_\-for\_\-applet (MY\_\-APPLET\_\-SHARE\_\-DATA\_\-DIR, cThemesDirName, CD\_\-APPLET\_\-MY\_\-CONF\_\-FILE, pKeyFile, cGroupName, cKeyName, \&bFlushConfFileNeeded, cDefaultThemeName)}\label{cairo-dock-applet-facility_8h_0a4da143164434e0da5f414b4f32e820}
+
+
+Liste les themes contenu dans un repertoire, met a jour le fichier de conf avec, et renvoie le chemin correspondant au theme choisi. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cGroupName}]nom du groupe (dans le fichier de conf) du parametre correspondant au theme. \item[{\em cKeyName}]nom de la cle (dans le fichier de conf) du parametre correspondant au theme. \item[{\em cThemesDirName}]nom du sous-repertoire regroupant tous les themes. \item[{\em cDefaultThemeName}]valeur par defaut si la cle et/ou le groupe et/ou le theme n'existe(nt) pas. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]Le chemin vers le repertoire du theme, dans une chaine nouvellement allouee. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ABOUT@{CD\_\-APPLET\_\-ABOUT}}
+\index{CD_APPLET_ABOUT@{CD\_\-APPLET\_\-ABOUT}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ABOUT(cMessage)}\label{cairo-dock-applet-facility_8h_91dc25bf8fcc3ea429f93bf16a734bbf}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}void about (GtkMenuItem *menu_item, gpointer *data) \
+{ \
+        cairo_dock_show_temporary_dialog (cMessage, myIcon, myDock, 0); \
+}
+\end{verbatim}
+\end{Code}
+Fonction 'A propos' toute faite, qui affiche un message dans une info-bulle. A inclure dans le .c. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cMessage}]message a afficher dans l'info-bulle. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ABOUT_H@{CD\_\-APPLET\_\-ABOUT\_\-H}}
+\index{CD_APPLET_ABOUT_H@{CD\_\-APPLET\_\-ABOUT\_\-H}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ABOUT\_\-H~void about (GtkMenuItem $\ast$menu\_\-item, gpointer $\ast$data);}\label{cairo-dock-applet-facility_8h_9ecdbd793978883dbc2cc90954a6c15c}
+
+
+Definition de la fonction precedente; a inclure dans le .h correspondant. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ON_CLICK@{CD\_\-APPLET\_\-ON\_\-CLICK}}
+\index{CD_APPLET_ON_CLICK@{CD\_\-APPLET\_\-ON\_\-CLICK}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ON\_\-CLICK~action\_\-on\_\-click}\label{cairo-dock-applet-facility_8h_9c7eb1af8133468449966a63fd0d3beb}
+
+
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_REGISTER_FOR_CLICK_EVENT@{CD\_\-APPLET\_\-REGISTER\_\-FOR\_\-CLICK\_\-EVENT}}
+\index{CD_APPLET_REGISTER_FOR_CLICK_EVENT@{CD\_\-APPLET\_\-REGISTER\_\-FOR\_\-CLICK\_\-EVENT}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-REGISTER\_\-FOR\_\-CLICK\_\-EVENT~cairo\_\-dock\_\-register\_\-notification (CAIRO\_\-DOCK\_\-CLICK\_\-ICON, ({\bf CairoDockNotificationFunc}) CD\_\-APPLET\_\-ON\_\-CLICK, CAIRO\_\-DOCK\_\-RUN\_\-FIRST);}\label{cairo-dock-applet-facility_8h_9af4f412c90f432476994e97b7a6869c}
+
+
+Abonne l'applet aux notifications du clic gauche. A effectuer lors de l'init de l'applet. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_UNREGISTER_FOR_CLICK_EVENT@{CD\_\-APPLET\_\-UNREGISTER\_\-FOR\_\-CLICK\_\-EVENT}}
+\index{CD_APPLET_UNREGISTER_FOR_CLICK_EVENT@{CD\_\-APPLET\_\-UNREGISTER\_\-FOR\_\-CLICK\_\-EVENT}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-UNREGISTER\_\-FOR\_\-CLICK\_\-EVENT~cairo\_\-dock\_\-remove\_\-notification\_\-func (CAIRO\_\-DOCK\_\-CLICK\_\-ICON, ({\bf CairoDockNotificationFunc}) CD\_\-APPLET\_\-ON\_\-CLICK);}\label{cairo-dock-applet-facility_8h_36334807d26aedafc981900a6fa02e92}
+
+
+Desabonne l'applet aux notifications du clic gauche. A effectuer lors de l'arret de l'applet. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ON_CLICK_BEGIN@{CD\_\-APPLET\_\-ON\_\-CLICK\_\-BEGIN}}
+\index{CD_APPLET_ON_CLICK_BEGIN@{CD\_\-APPLET\_\-ON\_\-CLICK\_\-BEGIN}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ON\_\-CLICK\_\-BEGIN}\label{cairo-dock-applet-facility_8h_2eb08b1e3af8ab407081b9e49bb03773}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}gboolean CD_APPLET_ON_CLICK (gpointer *data) \
+{ \
+        if (data[0] == myIcon) \
+        {
+\end{verbatim}
+\end{Code}
+Debut de la fonction de notification au clic gauche. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ON_CLICK_END@{CD\_\-APPLET\_\-ON\_\-CLICK\_\-END}}
+\index{CD_APPLET_ON_CLICK_END@{CD\_\-APPLET\_\-ON\_\-CLICK\_\-END}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ON\_\-CLICK\_\-END}\label{cairo-dock-applet-facility_8h_c2663e8afce516ba24298335fd8d9e9f}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}return CAIRO_DOCK_INTERCEPT_NOTIFICATION; \
+        } \
+        return CAIRO_DOCK_LET_PASS_NOTIFICATION; \
+}
+\end{verbatim}
+\end{Code}
+Fin de la fonction de notification au clic gauche. Par defaut elle intercepte la notification si elle l'a recue. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ON_CLICK_H@{CD\_\-APPLET\_\-ON\_\-CLICK\_\-H}}
+\index{CD_APPLET_ON_CLICK_H@{CD\_\-APPLET\_\-ON\_\-CLICK\_\-H}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ON\_\-CLICK\_\-H~gboolean CD\_\-APPLET\_\-ON\_\-CLICK (gpointer $\ast$data);}\label{cairo-dock-applet-facility_8h_19996a83c4fcc1d371cacca30a920adb}
+
+
+Definition de la fonction precedente; a inclure dans le .h correspondant. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ON_BUILD_MENU@{CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU}}
+\index{CD_APPLET_ON_BUILD_MENU@{CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU~applet\_\-on\_\-build\_\-menu}\label{cairo-dock-applet-facility_8h_30942d93b6a087bdf61d47ebcb6da382}
+
+
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_REGISTER_FOR_BUILD_MENU_EVENT@{CD\_\-APPLET\_\-REGISTER\_\-FOR\_\-BUILD\_\-MENU\_\-EVENT}}
+\index{CD_APPLET_REGISTER_FOR_BUILD_MENU_EVENT@{CD\_\-APPLET\_\-REGISTER\_\-FOR\_\-BUILD\_\-MENU\_\-EVENT}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-REGISTER\_\-FOR\_\-BUILD\_\-MENU\_\-EVENT~cairo\_\-dock\_\-register\_\-notification (CAIRO\_\-DOCK\_\-BUILD\_\-MENU, ({\bf CairoDockNotificationFunc}) CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU, CAIRO\_\-DOCK\_\-RUN\_\-FIRST);}\label{cairo-dock-applet-facility_8h_f1834e58d8a9ba1d50ae3417bcd51d5e}
+
+
+Abonne l'applet aux notifications de construction du menu. A effectuer lors de l'init de l'applet. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_UNREGISTER_FOR_BUILD_MENU_EVENT@{CD\_\-APPLET\_\-UNREGISTER\_\-FOR\_\-BUILD\_\-MENU\_\-EVENT}}
+\index{CD_APPLET_UNREGISTER_FOR_BUILD_MENU_EVENT@{CD\_\-APPLET\_\-UNREGISTER\_\-FOR\_\-BUILD\_\-MENU\_\-EVENT}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-UNREGISTER\_\-FOR\_\-BUILD\_\-MENU\_\-EVENT~cairo\_\-dock\_\-remove\_\-notification\_\-func (CAIRO\_\-DOCK\_\-BUILD\_\-MENU, ({\bf CairoDockNotificationFunc}) CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU);}\label{cairo-dock-applet-facility_8h_94ab7b0c147a901a15965dec8afb1271}
+
+
+Desabonne l'applet aux notifications de construction du menu. A effectuer lors de l'arret de l'applet. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ON_BUILD_MENU_BEGIN@{CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU\_\-BEGIN}}
+\index{CD_APPLET_ON_BUILD_MENU_BEGIN@{CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU\_\-BEGIN}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU\_\-BEGIN}\label{cairo-dock-applet-facility_8h_8e443df867d9bd2f31fa2c7d6e838366}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data) \
+{ \
+        if (data[0] == myIcon) \
+        { \
+                GtkWidget *pAppletMenu = data[2]; \
+                GtkWidget *pMenuItem;
+\end{verbatim}
+\end{Code}
+Debut de la fonction de notification de construction du menu. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ON_BUILD_MENU_END@{CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU\_\-END}}
+\index{CD_APPLET_ON_BUILD_MENU_END@{CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU\_\-END}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU\_\-END}\label{cairo-dock-applet-facility_8h_63c9821be62eb58904c2fd836a3570d1}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}} \
+        return CAIRO_DOCK_LET_PASS_NOTIFICATION; \
+}
+\end{verbatim}
+\end{Code}
+Fin de la fonction de notification de construction du menu. Par defaut elle intercepte la notification si elle l'a recue. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ON_BUILD_MENU_H@{CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU\_\-H}}
+\index{CD_APPLET_ON_BUILD_MENU_H@{CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU\_\-H}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU\_\-H~gboolean CD\_\-APPLET\_\-ON\_\-BUILD\_\-MENU (gpointer $\ast$data);}\label{cairo-dock-applet-facility_8h_4a3a795531ece3caa4afc0479e3fced2}
+
+
+Definition de la fonction precedente; a inclure dans le .h correspondant. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_MY_MENU@{CD\_\-APPLET\_\-MY\_\-MENU}}
+\index{CD_APPLET_MY_MENU@{CD\_\-APPLET\_\-MY\_\-MENU}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-MY\_\-MENU~pAppletMenu}\label{cairo-dock-applet-facility_8h_4f2ba1855e4b676071edc59d620745e9}
+
+
+Menu principal de l'applet. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ADD_SUB_MENU@{CD\_\-APPLET\_\-ADD\_\-SUB\_\-MENU}}
+\index{CD_APPLET_ADD_SUB_MENU@{CD\_\-APPLET\_\-ADD\_\-SUB\_\-MENU}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ADD\_\-SUB\_\-MENU(cLabel, pSubMenu, pMenu)}\label{cairo-dock-applet-facility_8h_e91a84a943cabe89554980dad37ecec6}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}GtkWidget *pSubMenu = gtk_menu_new (); \
+        pMenuItem = gtk_menu_item_new_with_label (cLabel); \
+        gtk_menu_shell_append  (GTK_MENU_SHELL (pMenu), pMenuItem); \
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (pMenuItem), pSubMenu);
+\end{verbatim}
+\end{Code}
+Cree et ajoute un sous-menu a un menu. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cLabel}]nom du sous-menu, tel qu'il apparaitra dans le menu. \item[{\em pSubMenu}]GtkWidget du sous-menu; il doit juste avoir ete declare, il sera cree par la macro. \item[{\em pMenu}]GtkWidget du menu auquel on rajoutera le sous-menu. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_CREATE_AND_ADD_SUB_MENU@{CD\_\-APPLET\_\-CREATE\_\-AND\_\-ADD\_\-SUB\_\-MENU}}
+\index{CD_APPLET_CREATE_AND_ADD_SUB_MENU@{CD\_\-APPLET\_\-CREATE\_\-AND\_\-ADD\_\-SUB\_\-MENU}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-CREATE\_\-AND\_\-ADD\_\-SUB\_\-MENU(cLabel, pMenu)~cairo\_\-dock\_\-create\_\-sub\_\-menu (cLabel, pMenu);}\label{cairo-dock-applet-facility_8h_1ffb7b201e9530cd055ce60c5fb1240c}
+
+
+Cree et ajoute un sous-menu a un menu deja existant. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cLabel}]nom du sous-menu, tel qu'il apparaitra dans le menu. \item[{\em pMenu}]GtkWidget du menu auquel on rajoutera le sous-menu. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]le GtkWidget du sous-menu. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ADD_IN_MENU_WITH_DATA@{CD\_\-APPLET\_\-ADD\_\-IN\_\-MENU\_\-WITH\_\-DATA}}
+\index{CD_APPLET_ADD_IN_MENU_WITH_DATA@{CD\_\-APPLET\_\-ADD\_\-IN\_\-MENU\_\-WITH\_\-DATA}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ADD\_\-IN\_\-MENU\_\-WITH\_\-DATA(cLabel, pFunction, pMenu, pData)}\label{cairo-dock-applet-facility_8h_cd7a761ad1f57c8462bdd44a6d25cc0f}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}pMenuItem = gtk_menu_item_new_with_label (cLabel); \
+        gtk_menu_shell_append  (GTK_MENU_SHELL (pMenu), pMenuItem); \
+        g_signal_connect (G_OBJECT (pMenuItem), "activate", G_CALLBACK (pFunction), pData);
+\end{verbatim}
+\end{Code}
+Cree et ajoute un sous-menu a un menu. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cLabel}]nom du sous-menu, tel qu'il apparaitra dans le menu. \item[{\em pFunction}]fonction appelee lors de la selection de cette entree. \item[{\em pMenu}]GtkWidget du menu auquel on rajoutera le sous-menu. \item[{\em pData}]donnees passees en parametre de la fonction. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ADD_IN_MENU@{CD\_\-APPLET\_\-ADD\_\-IN\_\-MENU}}
+\index{CD_APPLET_ADD_IN_MENU@{CD\_\-APPLET\_\-ADD\_\-IN\_\-MENU}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ADD\_\-IN\_\-MENU(cLabel, pFunction, pMenu)~CD\_\-APPLET\_\-ADD\_\-IN\_\-MENU\_\-WITH\_\-DATA(cLabel, pFunction, pMenu, NULL)}\label{cairo-dock-applet-facility_8h_94e4e5dcb6b22218816bf0591be6ecf7}
+
+
+Ajoute une entree a un menu deja existant. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cLabel}]nom de l'entree, tel qu'il apparaitra dans le menu. \item[{\em pFunction}]fonction appelee lors de la selection de cette entree. \item[{\em pMenu}]GtkWidget du menu auquel on rajoutera l'entree. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ADD_ABOUT_IN_MENU@{CD\_\-APPLET\_\-ADD\_\-ABOUT\_\-IN\_\-MENU}}
+\index{CD_APPLET_ADD_ABOUT_IN_MENU@{CD\_\-APPLET\_\-ADD\_\-ABOUT\_\-IN\_\-MENU}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ADD\_\-ABOUT\_\-IN\_\-MENU(pMenu)~CD\_\-APPLET\_\-ADD\_\-IN\_\-MENU (\_\-(\char`\"{}About\char`\"{}), about, pMenu)}\label{cairo-dock-applet-facility_8h_fa27706cd0b1a11837c7ea0b5118b546}
+
+
+Ajoute une entree pour la fonction 'A propos'. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pMenu}]GtkWidget du menu auquel sera ajoutee l'entree. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_LAST_ITEM_IN_MENU@{CD\_\-APPLET\_\-LAST\_\-ITEM\_\-IN\_\-MENU}}
+\index{CD_APPLET_LAST_ITEM_IN_MENU@{CD\_\-APPLET\_\-LAST\_\-ITEM\_\-IN\_\-MENU}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-LAST\_\-ITEM\_\-IN\_\-MENU~pMenuItem}\label{cairo-dock-applet-facility_8h_06ac357be5e2d95a15f417c185383ec2}
+
+
+Recupere la derniere entree ajoutee dans la fonction. \begin{Desc}
+\item[Renvoie:]le GtkWidget de la derniere entree. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ON_MIDDLE_CLICK@{CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK}}
+\index{CD_APPLET_ON_MIDDLE_CLICK@{CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK~action\_\-on\_\-middle\_\-click}\label{cairo-dock-applet-facility_8h_efd535bf7b831118204cd656d6877e6b}
+
+
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_REGISTER_FOR_MIDDLE_CLICK_EVENT@{CD\_\-APPLET\_\-REGISTER\_\-FOR\_\-MIDDLE\_\-CLICK\_\-EVENT}}
+\index{CD_APPLET_REGISTER_FOR_MIDDLE_CLICK_EVENT@{CD\_\-APPLET\_\-REGISTER\_\-FOR\_\-MIDDLE\_\-CLICK\_\-EVENT}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-REGISTER\_\-FOR\_\-MIDDLE\_\-CLICK\_\-EVENT~cairo\_\-dock\_\-register\_\-notification (CAIRO\_\-DOCK\_\-MIDDLE\_\-CLICK\_\-ICON, ({\bf CairoDockNotificationFunc}) CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK, CAIRO\_\-DOCK\_\-RUN\_\-FIRST);}\label{cairo-dock-applet-facility_8h_ba2fd37338b6b37e1f216fccc81d8a3a}
+
+
+Abonne l'applet aux notifications du clic du milieu. A effectuer lors de l'init de l'applet. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_UNREGISTER_FOR_MIDDLE_CLICK_EVENT@{CD\_\-APPLET\_\-UNREGISTER\_\-FOR\_\-MIDDLE\_\-CLICK\_\-EVENT}}
+\index{CD_APPLET_UNREGISTER_FOR_MIDDLE_CLICK_EVENT@{CD\_\-APPLET\_\-UNREGISTER\_\-FOR\_\-MIDDLE\_\-CLICK\_\-EVENT}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-UNREGISTER\_\-FOR\_\-MIDDLE\_\-CLICK\_\-EVENT~cairo\_\-dock\_\-remove\_\-notification\_\-func (CAIRO\_\-DOCK\_\-MIDDLE\_\-CLICK\_\-ICON, ({\bf CairoDockNotificationFunc}) CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK);}\label{cairo-dock-applet-facility_8h_1ff10307b589b0d35818e7968453ed86}
+
+
+Desabonne l'applet aux notifications du clic du milieu. A effectuer lors de l'arret de l'applet. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ON_MIDDLE_CLICK_BEGIN@{CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK\_\-BEGIN}}
+\index{CD_APPLET_ON_MIDDLE_CLICK_BEGIN@{CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK\_\-BEGIN}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK\_\-BEGIN}\label{cairo-dock-applet-facility_8h_7a07d8ba50630038278f0ce0c59c3e98}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data) \
+{ \
+        if (data[0] == myIcon) \
+        {
+\end{verbatim}
+\end{Code}
+Debut de la fonction de notification du clic du milieu. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ON_MIDDLE_CLICK_END@{CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK\_\-END}}
+\index{CD_APPLET_ON_MIDDLE_CLICK_END@{CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK\_\-END}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK\_\-END}\label{cairo-dock-applet-facility_8h_d0d650fcb60c1ed1454013d2de00469b}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}return CAIRO_DOCK_INTERCEPT_NOTIFICATION; \
+        } \
+        return CAIRO_DOCK_LET_PASS_NOTIFICATION; \
+}
+\end{verbatim}
+\end{Code}
+Fin de la fonction de notification du clic du milieu. Par defaut elle intercepte la notification si elle l'a recue. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ON_MIDDLE_CLICK_H@{CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK\_\-H}}
+\index{CD_APPLET_ON_MIDDLE_CLICK_H@{CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK\_\-H}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK\_\-H~gboolean CD\_\-APPLET\_\-ON\_\-MIDDLE\_\-CLICK (gpointer $\ast$data);}\label{cairo-dock-applet-facility_8h_a1542215d48f4c5e1bf38db968b20b28}
+
+
+Definition de la fonction precedente; a inclure dans le .h correspondant. \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_SET_SURFACE_ON_MY_ICON@{CD\_\-APPLET\_\-SET\_\-SURFACE\_\-ON\_\-MY\_\-ICON}}
+\index{CD_APPLET_SET_SURFACE_ON_MY_ICON@{CD\_\-APPLET\_\-SET\_\-SURFACE\_\-ON\_\-MY\_\-ICON}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-SET\_\-SURFACE\_\-ON\_\-MY\_\-ICON(pSurface)}\label{cairo-dock-applet-facility_8h_10a311556476929ac354cc45923fc9b2}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}cairo_dock_set_icon_surface_with_reflect (myDrawContext, pSurface, myIcon, myDock); \
+        cairo_dock_redraw_my_icon (myIcon, myDock);
+\end{verbatim}
+\end{Code}
+Applique une surface existante sur le contexte de dessin de l'applet, et la redessine. La surface est redimensionnee aux dimensions de l'icone. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pSurface}]\end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_SET_IMAGE_ON_MY_ICON@{CD\_\-APPLET\_\-SET\_\-IMAGE\_\-ON\_\-MY\_\-ICON}}
+\index{CD_APPLET_SET_IMAGE_ON_MY_ICON@{CD\_\-APPLET\_\-SET\_\-IMAGE\_\-ON\_\-MY\_\-ICON}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-SET\_\-IMAGE\_\-ON\_\-MY\_\-ICON(cImagePath)~cairo\_\-dock\_\-set\_\-image\_\-on\_\-icon (myDrawContext, cImagePath, myIcon, myDock);}\label{cairo-dock-applet-facility_8h_057c6cc5e55a0f84a8117492237f7a20}
+
+
+Applique une image definie par son chemin sur le contexte de dessin de l'applet, et la redessine. L'image est redimensionnee aux dimensions de l'icone. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cImagePath}]chemin du fichier de l'image. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_SET_NAME_FOR_MY_ICON@{CD\_\-APPLET\_\-SET\_\-NAME\_\-FOR\_\-MY\_\-ICON}}
+\index{CD_APPLET_SET_NAME_FOR_MY_ICON@{CD\_\-APPLET\_\-SET\_\-NAME\_\-FOR\_\-MY\_\-ICON}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-SET\_\-NAME\_\-FOR\_\-MY\_\-ICON(cIconName)~cairo\_\-dock\_\-set\_\-icon\_\-name (myDrawContext, cIconName, myIcon, myDock);}\label{cairo-dock-applet-facility_8h_fef845209619728708968e3ca885c320}
+
+
+Remplace l'etiquette de l'icone de l'applet par une nouvelle. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cIconName}]la nouvelle etiquette. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_SET_QUICK_INFO_ON_MY_ICON@{CD\_\-APPLET\_\-SET\_\-QUICK\_\-INFO\_\-ON\_\-MY\_\-ICON}}
+\index{CD_APPLET_SET_QUICK_INFO_ON_MY_ICON@{CD\_\-APPLET\_\-SET\_\-QUICK\_\-INFO\_\-ON\_\-MY\_\-ICON}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-SET\_\-QUICK\_\-INFO\_\-ON\_\-MY\_\-ICON(cQuickInfo)}\label{cairo-dock-applet-facility_8h_cee7aad8315a5ba345d7a3dbf3bff6d4}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}cairo_dock_set_quick_info (myDrawContext, cQuickInfo, myIcon);\
+        cairo_dock_redraw_my_icon (myIcon, myDock);
+\end{verbatim}
+\end{Code}
+Ecris une info-rapide sur l'icone de l'applet et la redessine. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cQuickInfo}]l'info-rapide. Ce doit etre une chaine de caracteres particulièrement petite, representant une info concise, puisque ecrite directement sur l'icone. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_ANIMATE_MY_ICON@{CD\_\-APPLET\_\-ANIMATE\_\-MY\_\-ICON}}
+\index{CD_APPLET_ANIMATE_MY_ICON@{CD\_\-APPLET\_\-ANIMATE\_\-MY\_\-ICON}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-ANIMATE\_\-MY\_\-ICON(iAnimationType, iAnimationLength)~cairo\_\-dock\_\-animate\_\-icon (myIcon, myDock, iAnimationType, iAnimationLength);}\label{cairo-dock-applet-facility_8h_77297cbfe3802d03468009730d41baab}
+
+
+Lance l'animation de l'icone de l'applet. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em iAnimationType}]type de l'animation (un \doxyref{CairoDockAnimationType}{p.}{cairo-dock-struct_8h_72c6f286d96c028feb8d4516820b74d9}). \item[{\em iAnimationLength}]duree de l'animation, en nombre de tours. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_LOAD_SURFACE_FOR_MY_APPLET@{CD\_\-APPLET\_\-LOAD\_\-SURFACE\_\-FOR\_\-MY\_\-APPLET}}
+\index{CD_APPLET_LOAD_SURFACE_FOR_MY_APPLET@{CD\_\-APPLET\_\-LOAD\_\-SURFACE\_\-FOR\_\-MY\_\-APPLET}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-LOAD\_\-SURFACE\_\-FOR\_\-MY\_\-APPLET(cImagePath)~cairo\_\-dock\_\-create\_\-surface\_\-for\_\-icon (cImagePath, myDrawContext, myIcon $\rightarrow$ fWidth $\ast$ (1 + {\bf g\_\-fAmplitude}), myIcon $\rightarrow$ fHeight$\ast$ (1 + {\bf g\_\-fAmplitude}));}\label{cairo-dock-applet-facility_8h_dd457f2634017f0dc47ca9552658315d}
+
+
+Charge une image dans une surface, aux dimensions de l'icone de l'applet. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cImagePath}]chemin du fichier de l'image. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]la surface nouvellement creee. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!CD_APPLET_INCLUDE_MY_VARS@{CD\_\-APPLET\_\-INCLUDE\_\-MY\_\-VARS}}
+\index{CD_APPLET_INCLUDE_MY_VARS@{CD\_\-APPLET\_\-INCLUDE\_\-MY\_\-VARS}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CD\_\-APPLET\_\-INCLUDE\_\-MY\_\-VARS}\label{cairo-dock-applet-facility_8h_54bf4c3900274a7d9bc31c0bddec0e82}
+
+
+\textbf{Valeur :}
+
+\begin{Code}\begin{verbatim}extern Icon *myIcon; \
+extern cairo_t *myDrawContext; \
+extern CairoDock *myDock;
+\end{verbatim}
+\end{Code}
+Exportation des variables globales de l'applet. A inclure dans chaque .c ou elles sont utilisees (directement ou via les macros). \index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!_D@{\_\-D}}
+\index{_D@{\_\-D}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define \_\-D(message)~dgettext (MY\_\-APPLET\_\-GETTEXT\_\-DOMAIN, message)}\label{cairo-dock-applet-facility_8h_853da7a2be9f4ed76a59d825c56456b3}
+
+
+Macro pour gettext, similaire a \_\-() et \_\-N(), mais avec le nom de domaine en parametre. Encadrez toutes vos chaines de caracteres statiques avec ca, de maniere a ce que l'utilitaire 'xgettext' puisse les trouver et les inclure autimatiquement dans les fichiers de traduction. 
+
+\subsection{Documentation des fonctions}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!cairo_dock_check_conf_file_exists@{cairo\_\-dock\_\-check\_\-conf\_\-file\_\-exists}}
+\index{cairo_dock_check_conf_file_exists@{cairo\_\-dock\_\-check\_\-conf\_\-file\_\-exists}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ cairo\_\-dock\_\-check\_\-conf\_\-file\_\-exists (gchar $\ast$ {\em cUserDataDirName}, gchar $\ast$ {\em cShareDataDir}, gchar $\ast$ {\em cConfFileName})}\label{cairo-dock-applet-facility_8h_55073690cc61234d715457132a54026e}
+
+
+Verifie que le fichier de conf d'un plug-in est bien present dans le repertoire utilisateur du plug-in, sinon le copie a partir du fichier de conf fournit lors de l'installation. Cree au besoin le repertoire utilisateur du plug-in. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cUserDataDirName}]le nom du repertoire utilisateur du plug-in. \item[{\em cShareDataDir}]le chemin du repertoire d'installation du plug-in. \item[{\em cConfFileName}]: le nom du fichier de conf fournit a l'installation. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]Le chemin du fichier de conf en espace utilisateur, ou NULL si le fichier n'a pu etre ni trouve, ni cree. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!cairo_dock_set_icon_surface@{cairo\_\-dock\_\-set\_\-icon\_\-surface}}
+\index{cairo_dock_set_icon_surface@{cairo\_\-dock\_\-set\_\-icon\_\-surface}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-set\_\-icon\_\-surface (cairo\_\-t $\ast$ {\em pIconContext}, cairo\_\-surface\_\-t $\ast$ {\em pSurface})}\label{cairo-dock-applet-facility_8h_f298aaa4399caa2ce52f2e775eeb1c97}
+
+
+Applique une surface sur un contexte, en effacant tout au prealable. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pIconContext}]le contexte du dessin; est modifie par la fonction. \item[{\em pSurface}]la surface a appliquer \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!cairo_dock_add_reflection_to_icon@{cairo\_\-dock\_\-add\_\-reflection\_\-to\_\-icon}}
+\index{cairo_dock_add_reflection_to_icon@{cairo\_\-dock\_\-add\_\-reflection\_\-to\_\-icon}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-add\_\-reflection\_\-to\_\-icon (cairo\_\-t $\ast$ {\em pIconContext}, {\bf Icon} $\ast$ {\em pIcon}, {\bf CairoDock} $\ast$ {\em pDock})}\label{cairo-dock-applet-facility_8h_620ff5ba88d39637f6de466867424edd}
+
+
+Cree les surfaces de reflection d'une icone. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pIconContext}]le contexte de dessin lie a la surface de l'icone; est modifie par la fonction. \item[{\em pIcon}]l'icone. \item[{\em pDock}]le dock contenant l'icone. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!cairo_dock_set_icon_surface_with_reflect@{cairo\_\-dock\_\-set\_\-icon\_\-surface\_\-with\_\-reflect}}
+\index{cairo_dock_set_icon_surface_with_reflect@{cairo\_\-dock\_\-set\_\-icon\_\-surface\_\-with\_\-reflect}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-set\_\-icon\_\-surface\_\-with\_\-reflect (cairo\_\-t $\ast$ {\em pIconContext}, cairo\_\-surface\_\-t $\ast$ {\em pSurface}, {\bf Icon} $\ast$ {\em pIcon}, {\bf CairoDock} $\ast$ {\em pDock})}\label{cairo-dock-applet-facility_8h_27d7e4bfd22731afc1b86dea90d283a1}
+
+
+Applique une surface sur le contexte d'une icone, en effacant tout au prealable et en creant les reflets correspondant. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pIconContext}]le contexte de dessin lie a la surface de l'icone; est modifie par la fonction. \item[{\em pSurface}]la surface a appliquer a l'icone. \item[{\em pIcon}]l'icone. \item[{\em pDock}]le dock contenant l'icone. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!cairo_dock_set_image_on_icon@{cairo\_\-dock\_\-set\_\-image\_\-on\_\-icon}}
+\index{cairo_dock_set_image_on_icon@{cairo\_\-dock\_\-set\_\-image\_\-on\_\-icon}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-set\_\-image\_\-on\_\-icon (cairo\_\-t $\ast$ {\em pIconContext}, gchar $\ast$ {\em cImagePath}, {\bf Icon} $\ast$ {\em pIcon}, {\bf CairoDock} $\ast$ {\em pDock})}\label{cairo-dock-applet-facility_8h_bd79e6d36309e19bc5d9680236fb0cf3}
+
+
+Applique une image sur le contexte d'une icone, en effacant tout au prealable et en creant les reflets correspondant. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pIconContext}]le contexte de dessin lie a la surface de l'icone; est modifie par la fonction. \item[{\em cImagePath}]chemin de l'image a appliquer a l'icone. \item[{\em pIcon}]l'icone. \item[{\em pDock}]le dock contenant l'icone. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!cairo_dock_set_icon_name@{cairo\_\-dock\_\-set\_\-icon\_\-name}}
+\index{cairo_dock_set_icon_name@{cairo\_\-dock\_\-set\_\-icon\_\-name}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-set\_\-icon\_\-name (cairo\_\-t $\ast$ {\em pSourceContext}, const gchar $\ast$ {\em cIconName}, {\bf Icon} $\ast$ {\em pIcon}, {\bf CairoDock} $\ast$ {\em pDock})}\label{cairo-dock-applet-facility_8h_e43c71f687d8b0042dfe38830fe4f15e}
+
+
+Modifie l'etiquette d'une icone. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pSourceContext}]un contexte de dessin; n'est pas altere par la fonction. \item[{\em cIconName}]la nouvelle etiquette de l'icone. \item[{\em pIcon}]l'icone. \item[{\em pDock}]le dock contenant l'icone. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!cairo_dock_set_quick_info@{cairo\_\-dock\_\-set\_\-quick\_\-info}}
+\index{cairo_dock_set_quick_info@{cairo\_\-dock\_\-set\_\-quick\_\-info}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-set\_\-quick\_\-info (cairo\_\-t $\ast$ {\em pSourceContext}, const gchar $\ast$ {\em cQuickInfo}, {\bf Icon} $\ast$ {\em pIcon})}\label{cairo-dock-applet-facility_8h_08c39505bfe2941f34391c1c8614b6bc}
+
+
+Ecris une info-rapide sur l'icone. C'est un petit texte (quelques caracteres) qui vient se superposer sur l'icone, avec un fond fonce. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pSourceContext}]un contexte de dessin; n'est pas altere par la fonction. \item[{\em cQuickInfo}]le texte de l'info-rapide. \item[{\em pIcon}]l'icone. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!cairo_dock_animate_icon@{cairo\_\-dock\_\-animate\_\-icon}}
+\index{cairo_dock_animate_icon@{cairo\_\-dock\_\-animate\_\-icon}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-animate\_\-icon ({\bf Icon} $\ast$ {\em pIcon}, {\bf CairoDock} $\ast$ {\em pDock}, {\bf CairoDockAnimationType} {\em iAnimationType}, int {\em iNbRounds})}\label{cairo-dock-applet-facility_8h_bdb9b030d1be18daf86caa31464fb955}
+
+
+Prepare l'animation d'une icone, et la lance immediatement. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pIcon}]l'icone a animer. \item[{\em pDock}]le dock contenant l'icone. \item[{\em iAnimationType}]le type d'animation voulu, ou -1 pour utiliser l'animtion correspondante au type de l'icone. \item[{\em iNbRounds}]le nombre de fois ou l'animation sera jouee, ou -1 pour utiliser la valeur correspondante au type de l'icone. \end{description}
+\end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!cairo_dock_manage_themes_for_applet@{cairo\_\-dock\_\-manage\_\-themes\_\-for\_\-applet}}
+\index{cairo_dock_manage_themes_for_applet@{cairo\_\-dock\_\-manage\_\-themes\_\-for\_\-applet}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ cairo\_\-dock\_\-manage\_\-themes\_\-for\_\-applet (gchar $\ast$ {\em cAppletShareDataDir}, gchar $\ast$ {\em cThemeDirName}, gchar $\ast$ {\em cAppletConfFilePath}, GKeyFile $\ast$ {\em pKeyFile}, gchar $\ast$ {\em cGroupName}, gchar $\ast$ {\em cKeyName}, gboolean $\ast$ {\em bFlushConfFileNeeded}, gchar $\ast$ {\em cDefaultThemeName})}\label{cairo-dock-applet-facility_8h_76d8cf8894ee2260ef0b0af7fe7fcd16}
+
+
+Liste les themes contenu dans un repertoire, met a jour le fichier de conf avec, et renvoie le chemin correspondant au theme choisi. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cAppletShareDataDir}]chemin du repertoire contenant les donnees de l'applet. \item[{\em cThemeDirName}]nom du sous-repertoire regroupant tous les themes. \item[{\em cAppletConfFilePath}]chemin du fichier de conf. \item[{\em pKeyFile}]le fichier de conf ouvert. \item[{\em cGroupName}]nom du groupe (dans le fichier de conf) du parametre correspondant au theme. \item[{\em cKeyName}]nom de la cle (dans le fichier de conf) du parametre correspondant au theme. \item[{\em bFlushConfFileNeeded}]pointeur sur un booleen mis a TRUE si la cle n'existe pas. \item[{\em cDefaultThemeName}]nom du theme par defaut au cas ou le precedent n'existerait pas. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]Le chemin du repertoire du theme choisi, dans une chaine nouvellement allouee. \end{Desc}
+\index{cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}!cairo_dock_create_sub_menu@{cairo\_\-dock\_\-create\_\-sub\_\-menu}}
+\index{cairo_dock_create_sub_menu@{cairo\_\-dock\_\-create\_\-sub\_\-menu}!cairo-dock-applet-facility.h@{cairo-dock-applet-facility.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}GtkWidget$\ast$ cairo\_\-dock\_\-create\_\-sub\_\-menu (gchar $\ast$ {\em cLabel}, GtkWidget $\ast$ {\em pMenu})}\label{cairo-dock-applet-facility_8h_769f0ed2faa57c75c3c264771647b64d}
+
+
+Cree un sous-menu, et l'ajoute a un menu deja existant. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cLabel}]nom du sous-menu, tel qu'il apparaitra dans le menu. \item[{\em pMenu}]menu auquel on rajoutera le sous-menu. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]le sous-menu cree et ajoute au menu. \end{Desc}

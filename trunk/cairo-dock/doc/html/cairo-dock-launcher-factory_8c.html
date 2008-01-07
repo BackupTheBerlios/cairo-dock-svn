@@ -1,0 +1,574 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Cairo-Dock: Référence du fichier src/cairo-dock-launcher-factory.c</title>
+<link href="doxygen.css" rel="stylesheet" type="text/css">
+<link href="tabs.css" rel="stylesheet" type="text/css">
+</head><body>
+<!-- Généré par Doxygen 1.4.6 -->
+<div class="tabs">
+  <ul>
+    <li><a href="index.html"><span>Page&nbsp;principale</span></a></li>
+    <li><a href="annotated.html"><span>Structures&nbsp;de&nbsp;données</span></a></li>
+    <li id="current"><a href="files.html"><span>Fichiers</span></a></li>
+  </ul></div>
+<div class="tabs">
+  <ul>
+    <li><a href="files.html"><span>Liste&nbsp;des&nbsp;fichiers</span></a></li>
+    <li><a href="globals.html"><span>Portée&nbsp;globale</span></a></li>
+  </ul></div>
+<h1>Référence du fichier src/cairo-dock-launcher-factory.c</h1><table border="0" cellpadding="0" cellspacing="0">
+<tr><td></td></tr>
+<tr><td colspan="2"><br><h2>Fonctions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gchar *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#78eed06457876a9d7ed2d3f106446cbd">cairo_dock_search_icon_s_path</a> (gchar *cFileName)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#153268a1483980e1451c07a78234e7e0">cairo_dock_load_icon_info_from_desktop_file</a> (const gchar *cDesktopFileName, <a class="el" href="struct__Icon.html">Icon</a> *icon)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#14479202384b12f7f532120e69af2b96">cairo_dock_create_icon_from_desktop_file</a> (const gchar *cDesktopFileName, cairo_t *pSourceContext)</td></tr>
+
+<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#a24af9062f9cc975eb0b9422eb6587e6">g_pMainDock</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">pointeur sur le dock principal.  <a href="#a24af9062f9cc975eb0b9422eb6587e6"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#e6ee377f5c409b71e3f7e87694f60556">g_fSubDockSizeRatio</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">ratio de la taille des icones des sous-docks par rapport a celles du dock principal.  <a href="#e6ee377f5c409b71e3f7e87694f60556"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#71125a40fdc7b421002f176b9b82ac79">g_fAmplitude</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">amplitude de la siunsoide.  <a href="#71125a40fdc7b421002f176b9b82ac79"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#32a45bc8bdc1899cbe8bbc034a3815fe">g_iIconGap</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">ecart en pixels entre les icones.  <a href="#32a45bc8bdc1899cbe8bbc034a3815fe"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#386538e26258de4d50feb84fecc45dd6">g_iLabelSize</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">taille de la police des etiquettes.  <a href="#386538e26258de4d50feb84fecc45dd6"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#9656ee040199018fa599316b38e2f231">g_bTextAlwaysHorizontal</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">TRUE &lt;=&gt; etiquettes horizontales meme pour les docks verticaux.  <a href="#9656ee040199018fa599316b38e2f231"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gchar *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#1dd252a8514e5074187d0c12a311f158">g_cLabelPolice</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">police de caracteres des etiquettes.  <a href="#1dd252a8514e5074187d0c12a311f158"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gchar *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#2173efce4550991bad33a89cf25b6243">g_cConfFile</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gchar *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#540e05d87e90a39620d6d15e03dc808b">g_cCurrentLaunchersPath</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">le chemin vers le repertoire des lanceurs/icones du theme courant.  <a href="#540e05d87e90a39620d6d15e03dc808b"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gchar **&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#41126bcd8eca05e7c4898de8202e7375">g_cDefaultIconDirectory</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">GtkIconTheme *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#ecfdd070a6e5e7dd7ef53cb73b68add8">g_pIconTheme</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">le theme d'icone choisi.  <a href="#ecfdd070a6e5e7dd7ef53cb73b68add8"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#080e0cb494374269a17c7ebd078e855d">g_bDirectionUp</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.  <a href="#080e0cb494374269a17c7ebd078e855d"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#ebf5cd7f2cea410e4d3811a5dc3405b9">g_bSameHorizontality</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">dit si les sous-docks ont la meme horizontalite que les docks racines.  <a href="#ebf5cd7f2cea410e4d3811a5dc3405b9"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#7f137381241bb9dc494d796d01baf72b">g_tMinIconAuthorizedSize</a> [CAIRO_DOCK_NB_TYPES]</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">les tailles min et max pour chaque type d'icone.  <a href="#7f137381241bb9dc494d796d01baf72b"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#93e9653fa15a07997f49709814aad739">g_tMaxIconAuthorizedSize</a> [CAIRO_DOCK_NB_TYPES]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-launcher-factory_8c.html#16a0df3aa6645b9f4437809d3bbd3865">g_bUseGlitz</a></td></tr>
+
+</table>
+<hr><h2>Documentation des fonctions</h2>
+<a class="anchor" name="78eed06457876a9d7ed2d3f106446cbd"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::cairo_dock_search_icon_s_path" ref="78eed06457876a9d7ed2d3f106446cbd" args="(gchar *cFileName)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gchar* cairo_dock_search_icon_s_path           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">gchar *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>cFileName</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="153268a1483980e1451c07a78234e7e0"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::cairo_dock_load_icon_info_from_desktop_file" ref="153268a1483980e1451c07a78234e7e0" args="(const gchar *cDesktopFileName, Icon *icon)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_load_icon_info_from_desktop_file           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">const gchar *&nbsp;</td>
+          <td class="mdname" nowrap> <em>cDesktopFileName</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>icon</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="14479202384b12f7f532120e69af2b96"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::cairo_dock_create_icon_from_desktop_file" ref="14479202384b12f7f532120e69af2b96" args="(const gchar *cDesktopFileName, cairo_t *pSourceContext)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_create_icon_from_desktop_file           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">const gchar *&nbsp;</td>
+          <td class="mdname" nowrap> <em>cDesktopFileName</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>cairo_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pSourceContext</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<hr><h2>Documentation des variables</h2>
+<a class="anchor" name="a24af9062f9cc975eb0b9422eb6587e6"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::g_pMainDock" ref="a24af9062f9cc975eb0b9422eb6587e6" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a>* <a class="el" href="cairo-dock_8c.html#a24af9062f9cc975eb0b9422eb6587e6">g_pMainDock</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+pointeur sur le dock principal. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="e6ee377f5c409b71e3f7e87694f60556"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::g_fSubDockSizeRatio" ref="e6ee377f5c409b71e3f7e87694f60556" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">double <a class="el" href="cairo-dock_8c.html#e6ee377f5c409b71e3f7e87694f60556">g_fSubDockSizeRatio</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+ratio de la taille des icones des sous-docks par rapport a celles du dock principal. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="71125a40fdc7b421002f176b9b82ac79"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::g_fAmplitude" ref="71125a40fdc7b421002f176b9b82ac79" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">double <a class="el" href="cairo-dock_8c.html#71125a40fdc7b421002f176b9b82ac79">g_fAmplitude</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+amplitude de la siunsoide. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="32a45bc8bdc1899cbe8bbc034a3815fe"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::g_iIconGap" ref="32a45bc8bdc1899cbe8bbc034a3815fe" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#32a45bc8bdc1899cbe8bbc034a3815fe">g_iIconGap</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+ecart en pixels entre les icones. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="386538e26258de4d50feb84fecc45dd6"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::g_iLabelSize" ref="386538e26258de4d50feb84fecc45dd6" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#386538e26258de4d50feb84fecc45dd6">g_iLabelSize</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+taille de la police des etiquettes. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="9656ee040199018fa599316b38e2f231"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::g_bTextAlwaysHorizontal" ref="9656ee040199018fa599316b38e2f231" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#9656ee040199018fa599316b38e2f231">g_bTextAlwaysHorizontal</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+TRUE &lt;=&gt; etiquettes horizontales meme pour les docks verticaux. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="1dd252a8514e5074187d0c12a311f158"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::g_cLabelPolice" ref="1dd252a8514e5074187d0c12a311f158" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gchar* <a class="el" href="cairo-dock_8c.html#1dd252a8514e5074187d0c12a311f158">g_cLabelPolice</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+police de caracteres des etiquettes. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="2173efce4550991bad33a89cf25b6243"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::g_cConfFile" ref="2173efce4550991bad33a89cf25b6243" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gchar* <a class="el" href="cairo-dock_8c.html#2173efce4550991bad33a89cf25b6243">g_cConfFile</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="540e05d87e90a39620d6d15e03dc808b"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::g_cCurrentLaunchersPath" ref="540e05d87e90a39620d6d15e03dc808b" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gchar* <a class="el" href="cairo-dock_8c.html#540e05d87e90a39620d6d15e03dc808b">g_cCurrentLaunchersPath</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+le chemin vers le repertoire des lanceurs/icones du theme courant. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="41126bcd8eca05e7c4898de8202e7375"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::g_cDefaultIconDirectory" ref="41126bcd8eca05e7c4898de8202e7375" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gchar** <a class="el" href="cairo-dock_8c.html#41126bcd8eca05e7c4898de8202e7375">g_cDefaultIconDirectory</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="ecfdd070a6e5e7dd7ef53cb73b68add8"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::g_pIconTheme" ref="ecfdd070a6e5e7dd7ef53cb73b68add8" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">GtkIconTheme* <a class="el" href="cairo-dock_8c.html#ecfdd070a6e5e7dd7ef53cb73b68add8">g_pIconTheme</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+le theme d'icone choisi. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="080e0cb494374269a17c7ebd078e855d"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::g_bDirectionUp" ref="080e0cb494374269a17c7ebd078e855d" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#080e0cb494374269a17c7ebd078e855d">g_bDirectionUp</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="ebf5cd7f2cea410e4d3811a5dc3405b9"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::g_bSameHorizontality" ref="ebf5cd7f2cea410e4d3811a5dc3405b9" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#ebf5cd7f2cea410e4d3811a5dc3405b9">g_bSameHorizontality</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+dit si les sous-docks ont la meme horizontalite que les docks racines. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="7f137381241bb9dc494d796d01baf72b"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::g_tMinIconAuthorizedSize" ref="7f137381241bb9dc494d796d01baf72b" args="[CAIRO_DOCK_NB_TYPES]" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#7f137381241bb9dc494d796d01baf72b">g_tMinIconAuthorizedSize</a>[CAIRO_DOCK_NB_TYPES]          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+les tailles min et max pour chaque type d'icone. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="93e9653fa15a07997f49709814aad739"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::g_tMaxIconAuthorizedSize" ref="93e9653fa15a07997f49709814aad739" args="[CAIRO_DOCK_NB_TYPES]" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#93e9653fa15a07997f49709814aad739">g_tMaxIconAuthorizedSize</a>[CAIRO_DOCK_NB_TYPES]          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="16a0df3aa6645b9f4437809d3bbd3865"></a><!-- doxytag: member="cairo-dock-launcher-factory.c::g_bUseGlitz" ref="16a0df3aa6645b9f4437809d3bbd3865" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#16a0df3aa6645b9f4437809d3bbd3865">g_bUseGlitz</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<hr size="1"><address style="align: right;"><small>Généré le Fri Dec 7 13:11:02 2007 pour Cairo-Dock par&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.4.6 </small></address>
+</body>
+</html>

@@ -1,0 +1,196 @@
+\section{Référence du fichier src/cairo-dock-dock-factory.h}
+\label{cairo-dock-dock-factory_8h}\index{src/cairo-dock-dock-factory.h@{src/cairo-dock-dock-factory.h}}
+\subsection*{Macros}
+\begin{CompactItemize}
+\item 
+\#define {\bf cairo\_\-dock\_\-create\_\-subdock\_\-from\_\-scratch}(pIconList, cDockName)~cairo\_\-dock\_\-create\_\-subdock\_\-from\_\-scratch\_\-with\_\-type (pIconList, cDockName, GDK\_\-WINDOW\_\-TYPE\_\-HINT\_\-MENU)
+\item 
+\#define {\bf cairo\_\-dock\_\-create\_\-subdock\_\-for\_\-class\_\-appli}(cClassName)~cairo\_\-dock\_\-create\_\-subdock\_\-from\_\-scratch\_\-with\_\-type (NULL, cClassName, GDK\_\-WINDOW\_\-TYPE\_\-HINT\_\-DOCK)
+\end{CompactItemize}
+\subsection*{Fonctions}
+\begin{CompactItemize}
+\item 
+{\bf CairoDock} $\ast$ {\bf cairo\_\-dock\_\-create\_\-new\_\-dock} (GdkWindowTypeHint iWmHint, gchar $\ast$cDockName, gchar $\ast$cRendererName)
+\item 
+const gchar $\ast$ {\bf cairo\_\-dock\_\-search\_\-dock\_\-name} ({\bf CairoDock} $\ast$pDock)
+\item 
+{\bf CairoDock} $\ast$ {\bf cairo\_\-dock\_\-search\_\-dock\_\-from\_\-name} (gchar $\ast$cDockName)
+\item 
+{\bf Icon} $\ast$ {\bf cairo\_\-dock\_\-search\_\-icon\_\-pointing\_\-on\_\-dock} ({\bf CairoDock} $\ast$pDock, {\bf CairoDock} $\ast$$\ast$pParentDock)
+\item 
+{\bf CairoDock} $\ast$ {\bf cairo\_\-dock\_\-search\_\-container\_\-from\_\-icon} ({\bf Icon} $\ast$icon)
+\item 
+void {\bf cairo\_\-dock\_\-reserve\_\-space\_\-for\_\-dock} ({\bf CairoDock} $\ast$pDock, gboolean bReserve)
+\item 
+void {\bf cairo\_\-dock\_\-update\_\-dock\_\-size} ({\bf CairoDock} $\ast$pDock)
+\item 
+void {\bf cairo\_\-dock\_\-insert\_\-icon\_\-in\_\-dock} ({\bf Icon} $\ast$icon, {\bf CairoDock} $\ast$pDock, gboolean bUpdateSize, gboolean bAnimated, gboolean bApplyRatio)
+\item 
+void {\bf cairo\_\-dock\_\-build\_\-docks\_\-tree\_\-with\_\-desktop\_\-files} ({\bf CairoDock} $\ast$pMainDock, gchar $\ast$cDirectory)
+\item 
+void {\bf cairo\_\-dock\_\-free\_\-all\_\-docks} ({\bf CairoDock} $\ast$pMainDock)
+\item 
+void {\bf cairo\_\-dock\_\-destroy\_\-dock} ({\bf CairoDock} $\ast$pDock, const gchar $\ast$cDockName, {\bf CairoDock} $\ast$ReceivingDock, gchar $\ast$cReceivingDockName)
+\item 
+void {\bf cairo\_\-dock\_\-reference\_\-dock} ({\bf CairoDock} $\ast$pDock)
+\item 
+{\bf CairoDock} $\ast$ {\bf cairo\_\-dock\_\-create\_\-subdock\_\-from\_\-scratch\_\-with\_\-type} (GList $\ast$pIconList, gchar $\ast$cDockName, GdkWindowTypeHint iWindowTypeHint)
+\end{CompactItemize}
+
+
+\subsection{Documentation des macros}
+\index{cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}!cairo_dock_create_subdock_from_scratch@{cairo\_\-dock\_\-create\_\-subdock\_\-from\_\-scratch}}
+\index{cairo_dock_create_subdock_from_scratch@{cairo\_\-dock\_\-create\_\-subdock\_\-from\_\-scratch}!cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define cairo\_\-dock\_\-create\_\-subdock\_\-from\_\-scratch(pIconList, cDockName)~cairo\_\-dock\_\-create\_\-subdock\_\-from\_\-scratch\_\-with\_\-type (pIconList, cDockName, GDK\_\-WINDOW\_\-TYPE\_\-HINT\_\-MENU)}\label{cairo-dock-dock-factory_8h_baa51f1389568edc833bb7029a1f2374}
+
+
+\index{cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}!cairo_dock_create_subdock_for_class_appli@{cairo\_\-dock\_\-create\_\-subdock\_\-for\_\-class\_\-appli}}
+\index{cairo_dock_create_subdock_for_class_appli@{cairo\_\-dock\_\-create\_\-subdock\_\-for\_\-class\_\-appli}!cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define cairo\_\-dock\_\-create\_\-subdock\_\-for\_\-class\_\-appli(cClassName)~cairo\_\-dock\_\-create\_\-subdock\_\-from\_\-scratch\_\-with\_\-type (NULL, cClassName, GDK\_\-WINDOW\_\-TYPE\_\-HINT\_\-DOCK)}\label{cairo-dock-dock-factory_8h_48f675f813296c74f102ff555bd38e09}
+
+
+
+
+\subsection{Documentation des fonctions}
+\index{cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}!cairo_dock_create_new_dock@{cairo\_\-dock\_\-create\_\-new\_\-dock}}
+\index{cairo_dock_create_new_dock@{cairo\_\-dock\_\-create\_\-new\_\-dock}!cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf CairoDock}$\ast$ cairo\_\-dock\_\-create\_\-new\_\-dock (GdkWindowTypeHint {\em iWmHint}, gchar $\ast$ {\em cDockName}, gchar $\ast$ {\em cRendererName})}\label{cairo-dock-dock-factory_8h_78d3f78cb0fc9d32154f2282eefa3023}
+
+
+Cree un nouveau dock principal. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em iWmHint}]indicateur du type de fenetre pour le WM. \item[{\em cDockName}]nom du dock, qui pourra etre utilise pour retrouver celui-ci rapidement. \item[{\em cRendererName}]nom de la fonction de rendu a applisuer au dock. si NULL, le rendu par defaut sera applique. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]le dock nouvellement alloué, a detruire avec \doxyref{cairo\_\-dock\_\-destroy\_\-dock}{p.}{cairo-dock-dock-factory_8h_96c2324a71cd648e8ba0e4421c9e2886} \end{Desc}
+\index{cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}!cairo_dock_search_dock_name@{cairo\_\-dock\_\-search\_\-dock\_\-name}}
+\index{cairo_dock_search_dock_name@{cairo\_\-dock\_\-search\_\-dock\_\-name}!cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}const gchar$\ast$ cairo\_\-dock\_\-search\_\-dock\_\-name ({\bf CairoDock} $\ast$ {\em pDock})}\label{cairo-dock-dock-factory_8h_9989be0544735933310a229cae3c1f9a}
+
+
+Cherche le nom d'un dock, en parcourant la table des docks jusqu'a trouver celui passe en entree. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pDock}]le dock. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]le nom du dock, ou NULL si ce dock n'existe pas. Ne \_\-pas\_\- desallouer la chaine. \end{Desc}
+\index{cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}!cairo_dock_search_dock_from_name@{cairo\_\-dock\_\-search\_\-dock\_\-from\_\-name}}
+\index{cairo_dock_search_dock_from_name@{cairo\_\-dock\_\-search\_\-dock\_\-from\_\-name}!cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf CairoDock}$\ast$ cairo\_\-dock\_\-search\_\-dock\_\-from\_\-name (gchar $\ast$ {\em cDockName})}\label{cairo-dock-dock-factory_8h_3795e0e64608190b65ada5bf63118c41}
+
+
+Cherche un dock etant donne son nom. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em cDockName}]le nom du dock. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]le dock qui a ete enregistre sous ce nom, ou NULL si aucun ne correspond. \end{Desc}
+\index{cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}!cairo_dock_search_icon_pointing_on_dock@{cairo\_\-dock\_\-search\_\-icon\_\-pointing\_\-on\_\-dock}}
+\index{cairo_dock_search_icon_pointing_on_dock@{cairo\_\-dock\_\-search\_\-icon\_\-pointing\_\-on\_\-dock}!cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf Icon}$\ast$ cairo\_\-dock\_\-search\_\-icon\_\-pointing\_\-on\_\-dock ({\bf CairoDock} $\ast$ {\em pDock}, {\bf CairoDock} $\ast$$\ast$ {\em pParentDock})}\label{cairo-dock-dock-factory_8h_0e45ba62e4c156427a36c43d01001797}
+
+
+Cherche l'icone pointant sur un dock. Si plusieurs icones pointent sur ce dock, la premiere sera renvoyee. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pDock}]le dock. \item[{\em pParentDock}]si non NULL, sera renseigne avec le dock contenant l'icone. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]l'icone pointant sur le dock. \end{Desc}
+\index{cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}!cairo_dock_search_container_from_icon@{cairo\_\-dock\_\-search\_\-container\_\-from\_\-icon}}
+\index{cairo_dock_search_container_from_icon@{cairo\_\-dock\_\-search\_\-container\_\-from\_\-icon}!cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf CairoDock}$\ast$ cairo\_\-dock\_\-search\_\-container\_\-from\_\-icon ({\bf Icon} $\ast$ {\em icon})}\label{cairo-dock-dock-factory_8h_c7f906bf33a23b71b238fd724549ad66}
+
+
+Cherche le dock contenant l'icone donnee, en parcourant la liste des icones de tous les docks jusqu'a trouver celle passee en entree. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em icon}]l'icone. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]le dock contenant cette icone, ou NULL si aucun n'a ete trouve. \end{Desc}
+\index{cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}!cairo_dock_reserve_space_for_dock@{cairo\_\-dock\_\-reserve\_\-space\_\-for\_\-dock}}
+\index{cairo_dock_reserve_space_for_dock@{cairo\_\-dock\_\-reserve\_\-space\_\-for\_\-dock}!cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-reserve\_\-space\_\-for\_\-dock ({\bf CairoDock} $\ast$ {\em pDock}, gboolean {\em bReserve})}\label{cairo-dock-dock-factory_8h_343e005ccbc53eb36062aa98b35476a7}
+
+
+Demande au WM d'empecher les autres fenetres d'empieter sur l'espace du dock. L'espace reserve est pris sur la taille minimale du dock, c'est-a-dire la taille de la zone de rappel si l'auto-hide est active, ou la taille du dock au repos sinon. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pDock}]le dock. \item[{\em bReserve}]TRUE pour reserver l'espace, FALSE pour annuler la reservation. \end{description}
+\end{Desc}
+\index{cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}!cairo_dock_update_dock_size@{cairo\_\-dock\_\-update\_\-dock\_\-size}}
+\index{cairo_dock_update_dock_size@{cairo\_\-dock\_\-update\_\-dock\_\-size}!cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-update\_\-dock\_\-size ({\bf CairoDock} $\ast$ {\em pDock})}\label{cairo-dock-dock-factory_8h_9dde58fc3ae35123ba5802cdafa0048c}
+
+
+Recalcule la taille maximale du dock, si par exemple une icone a ete enlevee/rajoutee. Met a jour la taille des decorations si necessaire. Le dock est deplace de maniere a rester centre sur la meme position, et les coordonnees des icones des applis sont recalculees et renvoyees au WM. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pDock}]le dock. \end{description}
+\end{Desc}
+\index{cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}!cairo_dock_insert_icon_in_dock@{cairo\_\-dock\_\-insert\_\-icon\_\-in\_\-dock}}
+\index{cairo_dock_insert_icon_in_dock@{cairo\_\-dock\_\-insert\_\-icon\_\-in\_\-dock}!cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-insert\_\-icon\_\-in\_\-dock ({\bf Icon} $\ast$ {\em icon}, {\bf CairoDock} $\ast$ {\em pDock}, gboolean {\em bUpdateSize}, gboolean {\em bAnimated}, gboolean {\em bApplyRatio})}\label{cairo-dock-dock-factory_8h_e80a3b0826d54897fdb9dee4afe7882b}
+
+
+Insere une icone dans le dock, a la position indiquee par le champ /a fOrder. Insere un separateur si necessaire, et reserve l'espace correspondant aux nouvelles dimensions du dock si necessaire. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em icon}]l'icone a inserer. \item[{\em pDock}]le dock dans lequel l'inserer. \item[{\em bUpdateSize}]TRUE pour recalculer la taille du dock apres insertion. \item[{\em bAnimated}]TRUE pour regler la taille de l'icone au minimum de facon a la faire grossir apres. \item[{\em bApplyRatio}]TRUE pour appliquer le facteur de taille propre au sous-dock. \end{description}
+\end{Desc}
+\index{cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}!cairo_dock_build_docks_tree_with_desktop_files@{cairo\_\-dock\_\-build\_\-docks\_\-tree\_\-with\_\-desktop\_\-files}}
+\index{cairo_dock_build_docks_tree_with_desktop_files@{cairo\_\-dock\_\-build\_\-docks\_\-tree\_\-with\_\-desktop\_\-files}!cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-build\_\-docks\_\-tree\_\-with\_\-desktop\_\-files ({\bf CairoDock} $\ast$ {\em pMainDock}, gchar $\ast$ {\em cDirectory})}\label{cairo-dock-dock-factory_8h_93532a96d0bc2b65dabcf442fd706278}
+
+
+Charge un ensemble de fichiers .desktop definissant des icones, et construit l'arborescence des docks. Toutes les icones sont creees et placees dans leur conteneur repectif, qui est cree si necessaire. Cette fonction peut tres bien s'utiliser pour A la fin du processus, chaque dock est calcule, et place a la position qui lui est assignee. Il faut fournir un dock pour avoir ujn contexte de dessin, car les icones sont crees avant leur conteneur. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pMainDock}]un dock quelconque. \item[{\em cDirectory}]le repertoire contenant les fichiers .desktop. \end{description}
+\end{Desc}
+\index{cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}!cairo_dock_free_all_docks@{cairo\_\-dock\_\-free\_\-all\_\-docks}}
+\index{cairo_dock_free_all_docks@{cairo\_\-dock\_\-free\_\-all\_\-docks}!cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-free\_\-all\_\-docks ({\bf CairoDock} $\ast$ {\em pMainDock})}\label{cairo-dock-dock-factory_8h_743126b5b9682b4f6e67719d415b68c1}
+
+
+Detruit tous les docks et toutes les icones contenues dedans, et libere la memoire qui leur etait allouee. Les applets sont stoppees au prealable, ainsi que la barre des taches. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pMainDock}]le dock principal contenant les applets. \end{description}
+\end{Desc}
+\index{cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}!cairo_dock_destroy_dock@{cairo\_\-dock\_\-destroy\_\-dock}}
+\index{cairo_dock_destroy_dock@{cairo\_\-dock\_\-destroy\_\-dock}!cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-destroy\_\-dock ({\bf CairoDock} $\ast$ {\em pDock}, const gchar $\ast$ {\em cDockName}, {\bf CairoDock} $\ast$ {\em ReceivingDock}, gchar $\ast$ {\em cReceivingDockName})}\label{cairo-dock-dock-factory_8h_96c2324a71cd648e8ba0e4421c9e2886}
+
+
+Diminue le nombre d'icones pointant sur un dock de 1. Si aucune icone ne pointe plus sur lui apres ca, le detruit et libere la memoire qui lui etait allouee. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pDock}]le dock a detruire. \item[{\em cDockName}]son nom. \item[{\em ReceivingDock}]un dock qui recuperera les icones, ou NULL pour detruire toutes les icones contenues dans le dock. \item[{\em cReceivingDockName}]le nom du dock qui recuperera les icones, ou NULL si aucun n'est fourni. \end{description}
+\end{Desc}
+\index{cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}!cairo_dock_reference_dock@{cairo\_\-dock\_\-reference\_\-dock}}
+\index{cairo_dock_reference_dock@{cairo\_\-dock\_\-reference\_\-dock}!cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-reference\_\-dock ({\bf CairoDock} $\ast$ {\em pDock})}\label{cairo-dock-dock-factory_8h_3724a68583cf130b44051bec3e22797e}
+
+
+Incremente de 1 la reference d'un dock, c'est-a-dire le nombre d'icones pointant sur ce dock. Si le dock etait auparavant un dock principal, il devient un sous-dock, prenant du meme coup les parametres propres aux sous-docks. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pDock}]un dock. \end{description}
+\end{Desc}
+\index{cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}!cairo_dock_create_subdock_from_scratch_with_type@{cairo\_\-dock\_\-create\_\-subdock\_\-from\_\-scratch\_\-with\_\-type}}
+\index{cairo_dock_create_subdock_from_scratch_with_type@{cairo\_\-dock\_\-create\_\-subdock\_\-from\_\-scratch\_\-with\_\-type}!cairo-dock-dock-factory.h@{cairo-dock-dock-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf CairoDock}$\ast$ cairo\_\-dock\_\-create\_\-subdock\_\-from\_\-scratch\_\-with\_\-type (GList $\ast$ {\em pIconList}, gchar $\ast$ {\em cDockName}, GdkWindowTypeHint {\em iWindowTypeHint})}\label{cairo-dock-dock-factory_8h_61acf06fa512907b849016e4f66e7f78}
+
+
+Cree un nouveau dock de type \char`\"{}sous-dock\char`\"{}, et y insere la liste des icones fournie. La liste est appropriee par le dock, et ne doit donc \_\-pas\_\- etre liberee apres cela. Chaque icone est chargee, et a donc juste besoin d'avoir un nom et un fichier d'image. \begin{Desc}
+\item[Paramètres:]
+\begin{description}
+\item[{\em pIconList}]une liste d'icones qui seront entierement chargees et inserees dans le dock. \item[{\em cDockName}]le nom desire pour le dock. \item[{\em iWindowTypeHint}]indicateur du type de fenetre pour le WM. \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Renvoie:]le dock nouvellement alloue. \end{Desc}

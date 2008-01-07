@@ -1,0 +1,126 @@
+\section{R\'{e}f\'{e}rence du fichier src/cairo-dock-menu.c}
+\label{cairo-dock-menu_8c}\index{src/cairo-dock-menu.c@{src/cairo-dock-menu.c}}
+\subsection*{Macros}
+\begin{CompactItemize}
+\item 
+\#define {\bf CAIRO\_\-DOCK\_\-CONF\_\-PANEL\_\-WIDTH}~800
+\item 
+\#define {\bf CAIRO\_\-DOCK\_\-CONF\_\-PANEL\_\-HEIGHT}~600
+\item 
+\#define {\bf CAIRO\_\-DOCK\_\-LAUNCHER\_\-PANEL\_\-WIDTH}~550
+\item 
+\#define {\bf CAIRO\_\-DOCK\_\-LAUNCHER\_\-PANEL\_\-HEIGHT}~350
+\end{CompactItemize}
+\subsection*{Fonctions}
+\begin{CompactItemize}
+\item 
+gboolean {\bf cairo\_\-dock\_\-notification\_\-remove\_\-icon} (gpointer $\ast$data)
+\item 
+Gtk\-Widget $\ast$ {\bf cairo\_\-dock\_\-build\_\-menu} ({\bf Icon} $\ast$icon, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+gboolean {\bf cairo\_\-dock\_\-notification\_\-build\_\-menu} (gpointer $\ast$data)
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+{\bf Cairo\-Dock} $\ast$ {\bf g\_\-p\-Main\-Dock}
+\begin{CompactList}\small\item\em pointeur sur le dock principal. \item\end{CompactList}\item 
+double {\bf g\_\-f\-Sub\-Dock\-Size\-Ratio}
+\begin{CompactList}\small\item\em ratio de la taille des icones des sous-docks par rapport a celles du dock principal. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Language}
+\item 
+gboolean {\bf g\_\-b\-Auto\-Hide}
+\begin{CompactList}\small\item\em TRUE si l'auto-hide est active. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Conf\-File}
+\item 
+gchar $\ast$ {\bf g\_\-c\-Easy\-Conf\-File}
+\item 
+gchar $\ast$ {\bf g\_\-c\-Current\-Launchers\-Path}
+\begin{CompactList}\small\item\em le chemin vers le repertoire des lanceurs/icones du theme courant. \item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Documentation des macros}
+\index{cairo-dock-menu.c@{cairo-dock-menu.c}!CAIRO_DOCK_CONF_PANEL_WIDTH@{CAIRO\_\-DOCK\_\-CONF\_\-PANEL\_\-WIDTH}}
+\index{CAIRO_DOCK_CONF_PANEL_WIDTH@{CAIRO\_\-DOCK\_\-CONF\_\-PANEL\_\-WIDTH}!cairo-dock-menu.c@{cairo-dock-menu.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CAIRO\_\-DOCK\_\-CONF\_\-PANEL\_\-WIDTH~800}\label{cairo-dock-menu_8c_4b102c79eee6723861b950368875b10f}
+
+
+\index{cairo-dock-menu.c@{cairo-dock-menu.c}!CAIRO_DOCK_CONF_PANEL_HEIGHT@{CAIRO\_\-DOCK\_\-CONF\_\-PANEL\_\-HEIGHT}}
+\index{CAIRO_DOCK_CONF_PANEL_HEIGHT@{CAIRO\_\-DOCK\_\-CONF\_\-PANEL\_\-HEIGHT}!cairo-dock-menu.c@{cairo-dock-menu.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CAIRO\_\-DOCK\_\-CONF\_\-PANEL\_\-HEIGHT~600}\label{cairo-dock-menu_8c_b95cc6a842893ab6665c4dd89f820d80}
+
+
+\index{cairo-dock-menu.c@{cairo-dock-menu.c}!CAIRO_DOCK_LAUNCHER_PANEL_WIDTH@{CAIRO\_\-DOCK\_\-LAUNCHER\_\-PANEL\_\-WIDTH}}
+\index{CAIRO_DOCK_LAUNCHER_PANEL_WIDTH@{CAIRO\_\-DOCK\_\-LAUNCHER\_\-PANEL\_\-WIDTH}!cairo-dock-menu.c@{cairo-dock-menu.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CAIRO\_\-DOCK\_\-LAUNCHER\_\-PANEL\_\-WIDTH~550}\label{cairo-dock-menu_8c_c8479fcacbd45c2a551891e7b6a806a0}
+
+
+\index{cairo-dock-menu.c@{cairo-dock-menu.c}!CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT@{CAIRO\_\-DOCK\_\-LAUNCHER\_\-PANEL\_\-HEIGHT}}
+\index{CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT@{CAIRO\_\-DOCK\_\-LAUNCHER\_\-PANEL\_\-HEIGHT}!cairo-dock-menu.c@{cairo-dock-menu.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CAIRO\_\-DOCK\_\-LAUNCHER\_\-PANEL\_\-HEIGHT~350}\label{cairo-dock-menu_8c_c628c6e122c28657f382268655f232a0}
+
+
+
+
+\subsection{Documentation des fonctions}
+\index{cairo-dock-menu.c@{cairo-dock-menu.c}!cairo_dock_notification_remove_icon@{cairo\_\-dock\_\-notification\_\-remove\_\-icon}}
+\index{cairo_dock_notification_remove_icon@{cairo\_\-dock\_\-notification\_\-remove\_\-icon}!cairo-dock-menu.c@{cairo-dock-menu.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean cairo\_\-dock\_\-notification\_\-remove\_\-icon (gpointer $\ast$ {\em data})}\label{cairo-dock-menu_8c_613b3a0561c8323bbf7537b4c97c369e}
+
+
+int answer = cairo\_\-dock\_\-ask\_\-question (p\-Dock, \char`\"{}Do you want to re-dispatch the icons contained inside this container into the dock (otherwise they will be destroyed) ?\char`\"{}); \index{cairo-dock-menu.c@{cairo-dock-menu.c}!cairo_dock_build_menu@{cairo\_\-dock\_\-build\_\-menu}}
+\index{cairo_dock_build_menu@{cairo\_\-dock\_\-build\_\-menu}!cairo-dock-menu.c@{cairo-dock-menu.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Gtk\-Widget$\ast$ cairo\_\-dock\_\-build\_\-menu ({\bf Icon} $\ast$ {\em icon}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-menu_8c_6f8b8ef737a942bc8a624f66c0d9b51f}
+
+
+\index{cairo-dock-menu.c@{cairo-dock-menu.c}!cairo_dock_notification_build_menu@{cairo\_\-dock\_\-notification\_\-build\_\-menu}}
+\index{cairo_dock_notification_build_menu@{cairo\_\-dock\_\-notification\_\-build\_\-menu}!cairo-dock-menu.c@{cairo-dock-menu.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean cairo\_\-dock\_\-notification\_\-build\_\-menu (gpointer $\ast$ {\em data})}\label{cairo-dock-menu_8c_e75d5444afb0de3d95d5217509ac1fa7}
+
+
+
+
+\subsection{Documentation des variables}
+\index{cairo-dock-menu.c@{cairo-dock-menu.c}!g_pMainDock@{g\_\-pMainDock}}
+\index{g_pMainDock@{g\_\-pMainDock}!cairo-dock-menu.c@{cairo-dock-menu.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf Cairo\-Dock}$\ast$ {\bf g\_\-p\-Main\-Dock}}\label{cairo-dock-menu_8c_a24af9062f9cc975eb0b9422eb6587e6}
+
+
+pointeur sur le dock principal. 
+
+\index{cairo-dock-menu.c@{cairo-dock-menu.c}!g_fSubDockSizeRatio@{g\_\-fSubDockSizeRatio}}
+\index{g_fSubDockSizeRatio@{g\_\-fSubDockSizeRatio}!cairo-dock-menu.c@{cairo-dock-menu.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Sub\-Dock\-Size\-Ratio}}\label{cairo-dock-menu_8c_e6ee377f5c409b71e3f7e87694f60556}
+
+
+ratio de la taille des icones des sous-docks par rapport a celles du dock principal. 
+
+\index{cairo-dock-menu.c@{cairo-dock-menu.c}!g_cLanguage@{g\_\-cLanguage}}
+\index{g_cLanguage@{g\_\-cLanguage}!cairo-dock-menu.c@{cairo-dock-menu.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Language}}\label{cairo-dock-menu_8c_fb26c14d874eba876836b1ba28f1eb58}
+
+
+\index{cairo-dock-menu.c@{cairo-dock-menu.c}!g_bAutoHide@{g\_\-bAutoHide}}
+\index{g_bAutoHide@{g\_\-bAutoHide}!cairo-dock-menu.c@{cairo-dock-menu.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Auto\-Hide}}\label{cairo-dock-menu_8c_263de39492b5e16c81c98792f183edcf}
+
+
+TRUE si l'auto-hide est active. 
+
+\index{cairo-dock-menu.c@{cairo-dock-menu.c}!g_cConfFile@{g\_\-cConfFile}}
+\index{g_cConfFile@{g\_\-cConfFile}!cairo-dock-menu.c@{cairo-dock-menu.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Conf\-File}}\label{cairo-dock-menu_8c_2173efce4550991bad33a89cf25b6243}
+
+
+\index{cairo-dock-menu.c@{cairo-dock-menu.c}!g_cEasyConfFile@{g\_\-cEasyConfFile}}
+\index{g_cEasyConfFile@{g\_\-cEasyConfFile}!cairo-dock-menu.c@{cairo-dock-menu.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Easy\-Conf\-File}}\label{cairo-dock-menu_8c_516cee7fd8c65742fa35c0269b544eda}
+
+
+\index{cairo-dock-menu.c@{cairo-dock-menu.c}!g_cCurrentLaunchersPath@{g\_\-cCurrentLaunchersPath}}
+\index{g_cCurrentLaunchersPath@{g\_\-cCurrentLaunchersPath}!cairo-dock-menu.c@{cairo-dock-menu.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Current\-Launchers\-Path}}\label{cairo-dock-menu_8c_540e05d87e90a39620d6d15e03dc808b}
+
+
+le chemin vers le repertoire des lanceurs/icones du theme courant. 
+

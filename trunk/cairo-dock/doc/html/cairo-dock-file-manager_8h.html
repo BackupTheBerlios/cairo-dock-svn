@@ -1,0 +1,374 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<title>Cairo-Dock: Référence du fichier src/cairo-dock-file-manager.h</title>
+<link href="doxygen.css" rel="stylesheet" type="text/css">
+<link href="tabs.css" rel="stylesheet" type="text/css">
+</head><body>
+<!-- Généré par Doxygen 1.5.3 -->
+<div class="tabs">
+  <ul>
+    <li><a href="index.html"><span>Page&nbsp;principale</span></a></li>
+    <li><a href="annotated.html"><span>Structures&nbsp;de&nbsp;données</span></a></li>
+    <li class="current"><a href="files.html"><span>Fichiers</span></a></li>
+  </ul>
+</div>
+<h1>Référence du fichier src/cairo-dock-file-manager.h</h1>
+<p>
+<a href="cairo-dock-file-manager_8h-source.html">Aller au code source de ce fichier.</a><table border="0" cellpadding="0" cellspacing="0">
+<tr><td></td></tr>
+<tr><td colspan="2"><br><h2>Macros</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#6be33121da500fa2af7d41abba6a88a1">CAIRO_DOCK_FM_VFS_ROOT</a>&nbsp;&nbsp;&nbsp;&quot;_vfsroot_&quot;</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#8b49d19ec28c1278343f64a85a1c3bf2">CAIRO_DOCK_FM_NETWORK</a>&nbsp;&nbsp;&nbsp;&quot;_network_&quot;</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#02585e5837f941bf3eb2934ed8620fd9">CAIRO_DOCK_FM_VFS_ROOT_NETWORK</a>&nbsp;&nbsp;&nbsp;&quot;_vfsroot+network_&quot;</td></tr>
+
+<tr><td colspan="2"><br><h2>Définition de type</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#95ea694838c301e495a6c3f9d91181f8">CairoDockFMGetFileInfoFunc</a> )(gchar *cBaseURI, gchar **cName, gchar **cURI, gchar **cIconName, gboolean *bIsDirectory, int *iVolumeID, double *fOrder, <a class="el" href="cairo-dock-file-manager_8h.html#44bc0366369fedba4ea97ed4c5dbc5ee">CairoDockFMSortType</a> iSortType)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#3c0d31a846f93a603413f0d2c2e76aa8">CairoDockFMFilePropertiesFunc</a> )(gchar *cURI, guint64 *iSize, time_t *iLastModificationTime, gchar **cMimeType, int *iUID, int *iGID, int *iPermissionsMask)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef GList *(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#4901f5e53c1514142096a9b78ad952b8">CairoDockFMListDirectoryFunc</a> )(gchar *cURI, <a class="el" href="cairo-dock-file-manager_8h.html#44bc0366369fedba4ea97ed4c5dbc5ee">CairoDockFMSortType</a> g_fm_iSortType, gchar **cFullURI)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#ee2023acc5ae22f35effd7982fd2c1f5">CairoDockFMLaunchUriFunc</a> )(gchar *cURI)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#ae7c4c71a366f181217befd18c019bac">CairoDockFMMountCallback</a> )(<a class="el" href="struct__Icon.html">Icon</a> *icon, <a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock, gboolean bMounting, gboolean bSuccess)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef gchar *(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#6cf75827d517c6c5c9e03c95b170599e">CairoDockFMIsMountingPointFunc</a> )(gchar *cURI, gboolean *bIsMounted)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#f29514a34346f3f0a0006db321f7232d">CairoDockFMMountFunc</a> )(int iVolumeID, <a class="el" href="cairo-dock-file-manager_8h.html#ae7c4c71a366f181217befd18c019bac">CairoDockFMMountCallback</a> pCallback, gpointer *data)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#78f0fac23979265c3439951abecfb1ee">CairoDockFMUnmountFunc</a> )(gchar *cURI, <a class="el" href="cairo-dock-file-manager_8h.html#ae7c4c71a366f181217befd18c019bac">CairoDockFMMountCallback</a> pCallback, gpointer *data)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#1656e9a640413082e294cdc57e25c398">CairoDockFMOnEventFunc</a> )(<a class="el" href="cairo-dock-file-manager_8h.html#87d5bf15e6a33b9ac3f56f5c3e568970">CairoDockFMEventType</a> iEventType, const gchar *cURI, <a class="el" href="struct__Icon.html">Icon</a> *pIcon)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#590672cb3ff3fa1a91f390ff125179fd">CairoDockFMAddMonitorFunc</a> )(<a class="el" href="struct__Icon.html">Icon</a> *pIcon)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef gboolean(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#d81b50e788a0f442819cb3ef0cf5c360">CairoDockFMDeleteFileFunc</a> )(gchar *cURI)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef gboolean(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#4c1153971b1bb2781277dce5449fea93">CairoDockFMRenameFileFunc</a> )(gchar *cOldURI, const gchar *cNewName)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef gboolean(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#9fc02878a613013ca28d7f74865d6780">CairoDockFMMoveFileFunc</a> )(gchar *cURI, gchar *cDirectoryURI)</td></tr>
+
+<tr><td colspan="2"><br><h2>Énumérations</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#87d5bf15e6a33b9ac3f56f5c3e568970">CairoDockFMEventType</a> { <a class="el" href="cairo-dock-file-manager_8h.html#87d5bf15e6a33b9ac3f56f5c3e56897017185ee54047c6fa680ebbea85bae133">CAIRO_DOCK_FILE_MODIFIED</a> = 0, 
+<a class="el" href="cairo-dock-file-manager_8h.html#87d5bf15e6a33b9ac3f56f5c3e5689705c1b41c7184a556b2fed5f443066383b">CAIRO_DOCK_FILE_DELETED</a>, 
+<a class="el" href="cairo-dock-file-manager_8h.html#87d5bf15e6a33b9ac3f56f5c3e5689701a616fa9706e71fcf7c8d7a83e83ae1d">CAIRO_DOCK_FILE_CREATED</a>, 
+<a class="el" href="cairo-dock-file-manager_8h.html#87d5bf15e6a33b9ac3f56f5c3e568970b95201e6db5b40c8f273458c834191dc">CAIRO_DOCK_NB_EVENT_ON_FILES</a>
+ }</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-file-manager_8h.html#44bc0366369fedba4ea97ed4c5dbc5ee">CairoDockFMSortType</a> { <br>
+&nbsp;&nbsp;<a class="el" href="cairo-dock-file-manager_8h.html#44bc0366369fedba4ea97ed4c5dbc5eea2ac2474e14605816890661f8f220f42">CAIRO_DOCK_FM_SORT_BY_NAME</a> = 0, 
+<a class="el" href="cairo-dock-file-manager_8h.html#44bc0366369fedba4ea97ed4c5dbc5ee8cb76c9fe1b89849b92cec105f513816">CAIRO_DOCK_FM_SORT_BY_DATE</a>, 
+<a class="el" href="cairo-dock-file-manager_8h.html#44bc0366369fedba4ea97ed4c5dbc5eed3f7e3a10d8979bf9a9d3b5ad2eb355f">CAIRO_DOCK_FM_SORT_BY_SIZE</a>, 
+<a class="el" href="cairo-dock-file-manager_8h.html#44bc0366369fedba4ea97ed4c5dbc5ee108e6b6306fd10b3e0f4ebfe4cd57d68">CAIRO_DOCK_FM_SORT_BY_TYPE</a>, 
+<br>
+&nbsp;&nbsp;<a class="el" href="cairo-dock-file-manager_8h.html#44bc0366369fedba4ea97ed4c5dbc5ee90186a6793315ca69952942eec3b25b3">CAIRO_DOCK_NB_SORT_ON_FILE</a>
+<br>
+ }</td></tr>
+
+</table>
+<hr><h2>Documentation des macros</h2>
+<a class="anchor" name="6be33121da500fa2af7d41abba6a88a1"></a><!-- doxytag: member="cairo-dock-file-manager.h::CAIRO_DOCK_FM_VFS_ROOT" ref="6be33121da500fa2af7d41abba6a88a1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CAIRO_DOCK_FM_VFS_ROOT&nbsp;&nbsp;&nbsp;&quot;_vfsroot_&quot;          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8b49d19ec28c1278343f64a85a1c3bf2"></a><!-- doxytag: member="cairo-dock-file-manager.h::CAIRO_DOCK_FM_NETWORK" ref="8b49d19ec28c1278343f64a85a1c3bf2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CAIRO_DOCK_FM_NETWORK&nbsp;&nbsp;&nbsp;&quot;_network_&quot;          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="02585e5837f941bf3eb2934ed8620fd9"></a><!-- doxytag: member="cairo-dock-file-manager.h::CAIRO_DOCK_FM_VFS_ROOT_NETWORK" ref="02585e5837f941bf3eb2934ed8620fd9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CAIRO_DOCK_FM_VFS_ROOT_NETWORK&nbsp;&nbsp;&nbsp;&quot;_vfsroot+network_&quot;          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<hr><h2>Documentation des définition de type</h2>
+<a class="anchor" name="95ea694838c301e495a6c3f9d91181f8"></a><!-- doxytag: member="cairo-dock-file-manager.h::CairoDockFMGetFileInfoFunc" ref="95ea694838c301e495a6c3f9d91181f8" args=")(gchar *cBaseURI, gchar **cName, gchar **cURI, gchar **cIconName, gboolean *bIsDirectory, int *iVolumeID, double *fOrder, CairoDockFMSortType iSortType)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void(* <a class="el" href="cairo-dock-file-manager_8h.html#95ea694838c301e495a6c3f9d91181f8">CairoDockFMGetFileInfoFunc</a>)(gchar *cBaseURI, gchar **cName, gchar **cURI, gchar **cIconName, gboolean *bIsDirectory, int *iVolumeID, double *fOrder, <a class="el" href="cairo-dock-file-manager_8h.html#44bc0366369fedba4ea97ed4c5dbc5ee">CairoDockFMSortType</a> iSortType)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="3c0d31a846f93a603413f0d2c2e76aa8"></a><!-- doxytag: member="cairo-dock-file-manager.h::CairoDockFMFilePropertiesFunc" ref="3c0d31a846f93a603413f0d2c2e76aa8" args=")(gchar *cURI, guint64 *iSize, time_t *iLastModificationTime, gchar **cMimeType, int *iUID, int *iGID, int *iPermissionsMask)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void(* <a class="el" href="cairo-dock-file-manager_8h.html#3c0d31a846f93a603413f0d2c2e76aa8">CairoDockFMFilePropertiesFunc</a>)(gchar *cURI, guint64 *iSize, time_t *iLastModificationTime, gchar **cMimeType, int *iUID, int *iGID, int *iPermissionsMask)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="4901f5e53c1514142096a9b78ad952b8"></a><!-- doxytag: member="cairo-dock-file-manager.h::CairoDockFMListDirectoryFunc" ref="4901f5e53c1514142096a9b78ad952b8" args=")(gchar *cURI, CairoDockFMSortType g_fm_iSortType, gchar **cFullURI)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef GList*(* <a class="el" href="cairo-dock-file-manager_8h.html#4901f5e53c1514142096a9b78ad952b8">CairoDockFMListDirectoryFunc</a>)(gchar *cURI, <a class="el" href="cairo-dock-file-manager_8h.html#44bc0366369fedba4ea97ed4c5dbc5ee">CairoDockFMSortType</a> g_fm_iSortType, gchar **cFullURI)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ee2023acc5ae22f35effd7982fd2c1f5"></a><!-- doxytag: member="cairo-dock-file-manager.h::CairoDockFMLaunchUriFunc" ref="ee2023acc5ae22f35effd7982fd2c1f5" args=")(gchar *cURI)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void(* <a class="el" href="cairo-dock-file-manager_8h.html#ee2023acc5ae22f35effd7982fd2c1f5">CairoDockFMLaunchUriFunc</a>)(gchar *cURI)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ae7c4c71a366f181217befd18c019bac"></a><!-- doxytag: member="cairo-dock-file-manager.h::CairoDockFMMountCallback" ref="ae7c4c71a366f181217befd18c019bac" args=")(Icon *icon, CairoDock *pDock, gboolean bMounting, gboolean bSuccess)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void(* <a class="el" href="cairo-dock-file-manager_8h.html#ae7c4c71a366f181217befd18c019bac">CairoDockFMMountCallback</a>)(<a class="el" href="struct__Icon.html">Icon</a> *icon, <a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock, gboolean bMounting, gboolean bSuccess)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="6cf75827d517c6c5c9e03c95b170599e"></a><!-- doxytag: member="cairo-dock-file-manager.h::CairoDockFMIsMountingPointFunc" ref="6cf75827d517c6c5c9e03c95b170599e" args=")(gchar *cURI, gboolean *bIsMounted)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef gchar*(* <a class="el" href="cairo-dock-file-manager_8h.html#6cf75827d517c6c5c9e03c95b170599e">CairoDockFMIsMountingPointFunc</a>)(gchar *cURI, gboolean *bIsMounted)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="f29514a34346f3f0a0006db321f7232d"></a><!-- doxytag: member="cairo-dock-file-manager.h::CairoDockFMMountFunc" ref="f29514a34346f3f0a0006db321f7232d" args=")(int iVolumeID, CairoDockFMMountCallback pCallback, gpointer *data)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void(* <a class="el" href="cairo-dock-file-manager_8h.html#f29514a34346f3f0a0006db321f7232d">CairoDockFMMountFunc</a>)(int iVolumeID, <a class="el" href="cairo-dock-file-manager_8h.html#ae7c4c71a366f181217befd18c019bac">CairoDockFMMountCallback</a> pCallback, gpointer *data)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="78f0fac23979265c3439951abecfb1ee"></a><!-- doxytag: member="cairo-dock-file-manager.h::CairoDockFMUnmountFunc" ref="78f0fac23979265c3439951abecfb1ee" args=")(gchar *cURI, CairoDockFMMountCallback pCallback, gpointer *data)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void(* <a class="el" href="cairo-dock-file-manager_8h.html#78f0fac23979265c3439951abecfb1ee">CairoDockFMUnmountFunc</a>)(gchar *cURI, <a class="el" href="cairo-dock-file-manager_8h.html#ae7c4c71a366f181217befd18c019bac">CairoDockFMMountCallback</a> pCallback, gpointer *data)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1656e9a640413082e294cdc57e25c398"></a><!-- doxytag: member="cairo-dock-file-manager.h::CairoDockFMOnEventFunc" ref="1656e9a640413082e294cdc57e25c398" args=")(CairoDockFMEventType iEventType, const gchar *cURI, Icon *pIcon)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void(* <a class="el" href="cairo-dock-file-manager_8h.html#1656e9a640413082e294cdc57e25c398">CairoDockFMOnEventFunc</a>)(<a class="el" href="cairo-dock-file-manager_8h.html#87d5bf15e6a33b9ac3f56f5c3e568970">CairoDockFMEventType</a> iEventType, const gchar *cURI, <a class="el" href="struct__Icon.html">Icon</a> *pIcon)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="590672cb3ff3fa1a91f390ff125179fd"></a><!-- doxytag: member="cairo-dock-file-manager.h::CairoDockFMAddMonitorFunc" ref="590672cb3ff3fa1a91f390ff125179fd" args=")(Icon *pIcon)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void(* <a class="el" href="cairo-dock-file-manager_8h.html#590672cb3ff3fa1a91f390ff125179fd">CairoDockFMAddMonitorFunc</a>)(<a class="el" href="struct__Icon.html">Icon</a> *pIcon)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d81b50e788a0f442819cb3ef0cf5c360"></a><!-- doxytag: member="cairo-dock-file-manager.h::CairoDockFMDeleteFileFunc" ref="d81b50e788a0f442819cb3ef0cf5c360" args=")(gchar *cURI)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef gboolean(* <a class="el" href="cairo-dock-file-manager_8h.html#d81b50e788a0f442819cb3ef0cf5c360">CairoDockFMDeleteFileFunc</a>)(gchar *cURI)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="4c1153971b1bb2781277dce5449fea93"></a><!-- doxytag: member="cairo-dock-file-manager.h::CairoDockFMRenameFileFunc" ref="4c1153971b1bb2781277dce5449fea93" args=")(gchar *cOldURI, const gchar *cNewName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef gboolean(* <a class="el" href="cairo-dock-file-manager_8h.html#4c1153971b1bb2781277dce5449fea93">CairoDockFMRenameFileFunc</a>)(gchar *cOldURI, const gchar *cNewName)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="9fc02878a613013ca28d7f74865d6780"></a><!-- doxytag: member="cairo-dock-file-manager.h::CairoDockFMMoveFileFunc" ref="9fc02878a613013ca28d7f74865d6780" args=")(gchar *cURI, gchar *cDirectoryURI)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef gboolean(* <a class="el" href="cairo-dock-file-manager_8h.html#9fc02878a613013ca28d7f74865d6780">CairoDockFMMoveFileFunc</a>)(gchar *cURI, gchar *cDirectoryURI)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<hr><h2>Documentation du type de l'énumération</h2>
+<a class="anchor" name="87d5bf15e6a33b9ac3f56f5c3e568970"></a><!-- doxytag: member="cairo-dock-file-manager.h::CairoDockFMEventType" ref="87d5bf15e6a33b9ac3f56f5c3e568970" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="cairo-dock-file-manager_8h.html#87d5bf15e6a33b9ac3f56f5c3e568970">CairoDockFMEventType</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+<dl compact><dt><b>Valeurs énumérées: </b></dt><dd>
+<table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" name="87d5bf15e6a33b9ac3f56f5c3e56897017185ee54047c6fa680ebbea85bae133"></a><!-- doxytag: member="CAIRO_DOCK_FILE_MODIFIED" ref="87d5bf15e6a33b9ac3f56f5c3e56897017185ee54047c6fa680ebbea85bae133" args="" -->CAIRO_DOCK_FILE_MODIFIED</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="87d5bf15e6a33b9ac3f56f5c3e5689705c1b41c7184a556b2fed5f443066383b"></a><!-- doxytag: member="CAIRO_DOCK_FILE_DELETED" ref="87d5bf15e6a33b9ac3f56f5c3e5689705c1b41c7184a556b2fed5f443066383b" args="" -->CAIRO_DOCK_FILE_DELETED</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="87d5bf15e6a33b9ac3f56f5c3e5689701a616fa9706e71fcf7c8d7a83e83ae1d"></a><!-- doxytag: member="CAIRO_DOCK_FILE_CREATED" ref="87d5bf15e6a33b9ac3f56f5c3e5689701a616fa9706e71fcf7c8d7a83e83ae1d" args="" -->CAIRO_DOCK_FILE_CREATED</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="87d5bf15e6a33b9ac3f56f5c3e568970b95201e6db5b40c8f273458c834191dc"></a><!-- doxytag: member="CAIRO_DOCK_NB_EVENT_ON_FILES" ref="87d5bf15e6a33b9ac3f56f5c3e568970b95201e6db5b40c8f273458c834191dc" args="" -->CAIRO_DOCK_NB_EVENT_ON_FILES</em>&nbsp;</td><td>
+</td></tr>
+</table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="44bc0366369fedba4ea97ed4c5dbc5ee"></a><!-- doxytag: member="cairo-dock-file-manager.h::CairoDockFMSortType" ref="44bc0366369fedba4ea97ed4c5dbc5ee" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="cairo-dock-file-manager_8h.html#44bc0366369fedba4ea97ed4c5dbc5ee">CairoDockFMSortType</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+<dl compact><dt><b>Valeurs énumérées: </b></dt><dd>
+<table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" name="44bc0366369fedba4ea97ed4c5dbc5eea2ac2474e14605816890661f8f220f42"></a><!-- doxytag: member="CAIRO_DOCK_FM_SORT_BY_NAME" ref="44bc0366369fedba4ea97ed4c5dbc5eea2ac2474e14605816890661f8f220f42" args="" -->CAIRO_DOCK_FM_SORT_BY_NAME</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="44bc0366369fedba4ea97ed4c5dbc5ee8cb76c9fe1b89849b92cec105f513816"></a><!-- doxytag: member="CAIRO_DOCK_FM_SORT_BY_DATE" ref="44bc0366369fedba4ea97ed4c5dbc5ee8cb76c9fe1b89849b92cec105f513816" args="" -->CAIRO_DOCK_FM_SORT_BY_DATE</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="44bc0366369fedba4ea97ed4c5dbc5eed3f7e3a10d8979bf9a9d3b5ad2eb355f"></a><!-- doxytag: member="CAIRO_DOCK_FM_SORT_BY_SIZE" ref="44bc0366369fedba4ea97ed4c5dbc5eed3f7e3a10d8979bf9a9d3b5ad2eb355f" args="" -->CAIRO_DOCK_FM_SORT_BY_SIZE</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="44bc0366369fedba4ea97ed4c5dbc5ee108e6b6306fd10b3e0f4ebfe4cd57d68"></a><!-- doxytag: member="CAIRO_DOCK_FM_SORT_BY_TYPE" ref="44bc0366369fedba4ea97ed4c5dbc5ee108e6b6306fd10b3e0f4ebfe4cd57d68" args="" -->CAIRO_DOCK_FM_SORT_BY_TYPE</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="44bc0366369fedba4ea97ed4c5dbc5ee90186a6793315ca69952942eec3b25b3"></a><!-- doxytag: member="CAIRO_DOCK_NB_SORT_ON_FILE" ref="44bc0366369fedba4ea97ed4c5dbc5ee90186a6793315ca69952942eec3b25b3" args="" -->CAIRO_DOCK_NB_SORT_ON_FILE</em>&nbsp;</td><td>
+</td></tr>
+</table>
+</dl>
+
+</div>
+</div><p>
+<hr size="1"><address style="text-align: right;"><small>Généré le Fri Jan 4 20:22:14 2008 pour Cairo-Dock par&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.3 </small></address>
+</body>
+</html>

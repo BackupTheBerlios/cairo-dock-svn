@@ -1,0 +1,103 @@
+\section{R\'{e}f\'{e}rence du fichier src/cairo-dock-separator-factory.c}
+\label{cairo-dock-separator-factory_8c}\index{src/cairo-dock-separator-factory.c@{src/cairo-dock-separator-factory.c}}
+\subsection*{Fonctions}
+\begin{CompactItemize}
+\item 
+cairo\_\-surface\_\-t $\ast$ {\bf cairo\_\-dock\_\-create\_\-separator\_\-surface} (cairo\_\-t $\ast$p\-Source\-Context, double f\-Max\-Scale, gboolean b\-Horizontal\-Dock, double $\ast$f\-Width, double $\ast$f\-Height)
+\item 
+{\bf Icon} $\ast$ {\bf cairo\_\-dock\_\-create\_\-separator\_\-icon} (cairo\_\-t $\ast$p\-Source\-Context, int i\-Separator\-Type, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+double {\bf g\_\-f\-Amplitude}
+\begin{CompactList}\small\item\em amplitude de la siunsoide. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Dock\-Line\-Width}
+\begin{CompactList}\small\item\em epaisseur du cadre (en pixels). \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Direction\-Up}
+\begin{CompactList}\small\item\em la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Horizontal\-Dock}
+\item 
+int {\bf g\_\-t\-Min\-Icon\-Authorized\-Size} [CAIRO\_\-DOCK\_\-NB\_\-TYPES]
+\begin{CompactList}\small\item\em les tailles min et max pour chaque type d'icone. \item\end{CompactList}\item 
+int {\bf g\_\-t\-Max\-Icon\-Authorized\-Size} [CAIRO\_\-DOCK\_\-NB\_\-TYPES]
+\item 
+gchar $\ast$ {\bf g\_\-c\-Separator\-Image}
+\begin{CompactList}\small\item\em nom d'une image a afficher en tant que separateur. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Revolve\-Separator}
+\begin{CompactList}\small\item\em faire pivoter l'image des separateurs. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Use\-Glitz}
+\end{CompactItemize}
+
+
+\subsection{Documentation des fonctions}
+\index{cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}!cairo_dock_create_separator_surface@{cairo\_\-dock\_\-create\_\-separator\_\-surface}}
+\index{cairo_dock_create_separator_surface@{cairo\_\-dock\_\-create\_\-separator\_\-surface}!cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}cairo\_\-surface\_\-t$\ast$ cairo\_\-dock\_\-create\_\-separator\_\-surface (cairo\_\-t $\ast$ {\em p\-Source\-Context}, double {\em f\-Max\-Scale}, gboolean {\em b\-Horizontal\-Dock}, double $\ast$ {\em f\-Width}, double $\ast$ {\em f\-Height})}\label{cairo-dock-separator-factory_8c_a62ef285e32a79de3efc5be781079ab4}
+
+
+\index{cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}!cairo_dock_create_separator_icon@{cairo\_\-dock\_\-create\_\-separator\_\-icon}}
+\index{cairo_dock_create_separator_icon@{cairo\_\-dock\_\-create\_\-separator\_\-icon}!cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf Icon}$\ast$ cairo\_\-dock\_\-create\_\-separator\_\-icon (cairo\_\-t $\ast$ {\em p\-Source\-Context}, int {\em i\-Separator\-Type}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-separator-factory_8c_3fd6483ad1688ab96a758fa4aef9905a}
+
+
+
+
+\subsection{Documentation des variables}
+\index{cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}!g_fAmplitude@{g\_\-fAmplitude}}
+\index{g_fAmplitude@{g\_\-fAmplitude}!cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Amplitude}}\label{cairo-dock-separator-factory_8c_71125a40fdc7b421002f176b9b82ac79}
+
+
+amplitude de la siunsoide. 
+
+\index{cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}!g_iDockLineWidth@{g\_\-iDockLineWidth}}
+\index{g_iDockLineWidth@{g\_\-iDockLineWidth}!cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Dock\-Line\-Width}}\label{cairo-dock-separator-factory_8c_8ff61d8910b08e05a1cc800f5a5dd81b}
+
+
+epaisseur du cadre (en pixels). 
+
+\index{cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}!g_bDirectionUp@{g\_\-bDirectionUp}}
+\index{g_bDirectionUp@{g\_\-bDirectionUp}!cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Direction\-Up}}\label{cairo-dock-separator-factory_8c_080e0cb494374269a17c7ebd078e855d}
+
+
+la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas. 
+
+\index{cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}!g_bHorizontalDock@{g\_\-bHorizontalDock}}
+\index{g_bHorizontalDock@{g\_\-bHorizontalDock}!cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Horizontal\-Dock}}\label{cairo-dock-separator-factory_8c_94d3b861b3f8044136fec65dd9e5f1d9}
+
+
+\index{cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}!g_tMinIconAuthorizedSize@{g\_\-tMinIconAuthorizedSize}}
+\index{g_tMinIconAuthorizedSize@{g\_\-tMinIconAuthorizedSize}!cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-t\-Min\-Icon\-Authorized\-Size}[CAIRO\_\-DOCK\_\-NB\_\-TYPES]}\label{cairo-dock-separator-factory_8c_7f137381241bb9dc494d796d01baf72b}
+
+
+les tailles min et max pour chaque type d'icone. 
+
+\index{cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}!g_tMaxIconAuthorizedSize@{g\_\-tMaxIconAuthorizedSize}}
+\index{g_tMaxIconAuthorizedSize@{g\_\-tMaxIconAuthorizedSize}!cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-t\-Max\-Icon\-Authorized\-Size}[CAIRO\_\-DOCK\_\-NB\_\-TYPES]}\label{cairo-dock-separator-factory_8c_93e9653fa15a07997f49709814aad739}
+
+
+\index{cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}!g_cSeparatorImage@{g\_\-cSeparatorImage}}
+\index{g_cSeparatorImage@{g\_\-cSeparatorImage}!cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Separator\-Image}}\label{cairo-dock-separator-factory_8c_12f4d4e5812c3c51d7ad0dbc9885026c}
+
+
+nom d'une image a afficher en tant que separateur. 
+
+\index{cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}!g_bRevolveSeparator@{g\_\-bRevolveSeparator}}
+\index{g_bRevolveSeparator@{g\_\-bRevolveSeparator}!cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Revolve\-Separator}}\label{cairo-dock-separator-factory_8c_4b4ce0d984901ab8ae5a1338947e9eed}
+
+
+faire pivoter l'image des separateurs. 
+
+\index{cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}!g_bUseGlitz@{g\_\-bUseGlitz}}
+\index{g_bUseGlitz@{g\_\-bUseGlitz}!cairo-dock-separator-factory.c@{cairo-dock-separator-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Use\-Glitz}}\label{cairo-dock-separator-factory_8c_16a0df3aa6645b9f4437809d3bbd3865}
+
+

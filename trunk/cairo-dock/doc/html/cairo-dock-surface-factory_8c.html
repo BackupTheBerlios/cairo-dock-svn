@@ -1,0 +1,1038 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Cairo-Dock: Référence du fichier src/cairo-dock-surface-factory.c</title>
+<link href="doxygen.css" rel="stylesheet" type="text/css">
+<link href="tabs.css" rel="stylesheet" type="text/css">
+</head><body>
+<!-- Généré par Doxygen 1.4.6 -->
+<div class="tabs">
+  <ul>
+    <li><a href="index.html"><span>Page&nbsp;principale</span></a></li>
+    <li><a href="annotated.html"><span>Structures&nbsp;de&nbsp;données</span></a></li>
+    <li id="current"><a href="files.html"><span>Fichiers</span></a></li>
+  </ul></div>
+<div class="tabs">
+  <ul>
+    <li><a href="files.html"><span>Liste&nbsp;des&nbsp;fichiers</span></a></li>
+    <li><a href="globals.html"><span>Portée&nbsp;globale</span></a></li>
+  </ul></div>
+<h1>Référence du fichier src/cairo-dock-surface-factory.c</h1><table border="0" cellpadding="0" cellspacing="0">
+<tr><td></td></tr>
+<tr><td colspan="2"><br><h2>Fonctions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#4c7687cc4b5a7ff06680a60d493193d9">cairo_dock_calculate_contrainted_icon_size</a> (double *fImageWidth, double *fImageHeight, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fIconWidthSaturationFactor, double *fIconHeightSaturationFactor)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">cairo_surface_t *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#8b6a3e0b8a54450c1a667e558bfd7943">cairo_dock_create_surface_from_xicon_buffer</a> (gulong *pXIconBuffer, int iBufferNbElements, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">cairo_surface_t *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#407975a48fc32a8ce923f215083b16f7">cairo_dock_create_surface_from_pixbuf</a> (GdkPixbuf *pixbuf, cairo_t *pSourceContext, double fMaxScale, gboolean bConstraintSize, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fImageWidth, double *fImageHeight)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">cairo_surface_t *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#61e4d4ae332553013a6cd11f93540d90">cairo_dock_create_surface_from_image</a> (gchar *cImagePath, cairo_t *pSourceContext, double fMaxScale, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">cairo_surface_t *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#a9a2ef8f9a86b8fe1de100679fcd13f6">cairo_dock_create_surface_for_icon</a> (gchar *cImagePath, cairo_t *pSourceContext, double fImageWidth, double fImageHeight)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">cairo_surface_t *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#bb4e67760f9d84c7867bd7598a55406a">cairo_dock_rotate_surface</a> (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fRotationAngle)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">cairo_surface_t *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#2039d1782b569ee28727f63feddbef07">cairo_dock_create_reflection_surface</a> (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, gboolean bHorizontalDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">cairo_surface_t *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#008734e6b5aebf071ba2f9f32ad69750">cairo_dock_create_icon_surface_with_reflection_horizontal</a> (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">cairo_surface_t *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#b8d47b5d639540b608ef825c6c6e1c7a">cairo_dock_create_icon_surface_with_reflection_vertical</a> (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">cairo_surface_t *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#f291ea9a737e4c9f735517bedefbd6c2">cairo_dock_create_icon_surface_with_reflection</a> (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, gboolean bHorizontalDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">cairo_surface_t *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#0dc49419d75c95644061ec7c90c570e4">cairo_dock_create_surface_from_text</a> (gchar *cText, cairo_t *pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double fBackgroundAlpha, double fMaxScale, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset)</td></tr>
+
+<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#93e9653fa15a07997f49709814aad739">g_tMaxIconAuthorizedSize</a> [CAIRO_DOCK_NB_TYPES]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#7f137381241bb9dc494d796d01baf72b">g_tMinIconAuthorizedSize</a> [CAIRO_DOCK_NB_TYPES]</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">les tailles min et max pour chaque type d'icone.  <a href="#7f137381241bb9dc494d796d01baf72b"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#71125a40fdc7b421002f176b9b82ac79">g_fAmplitude</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">amplitude de la siunsoide.  <a href="#71125a40fdc7b421002f176b9b82ac79"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#815cf11f5b3bd8f701b0e1083921ebbd">g_fReflectSize</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">taille des reflets, en pixels, calcules par rapport a la hauteur max des icones.  <a href="#815cf11f5b3bd8f701b0e1083921ebbd"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#1301d24e576a57001c9ddf296d170655">g_fAlbedo</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">pouvoir reflechissant du plan.  <a href="#1301d24e576a57001c9ddf296d170655"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#080e0cb494374269a17c7ebd078e855d">g_bDirectionUp</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.  <a href="#080e0cb494374269a17c7ebd078e855d"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#709f8c9af486980298862ded5b3edfa5">g_iLabelWeight</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">epaisseur des traits.  <a href="#709f8c9af486980298862ded5b3edfa5"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#673e7ae2a36a56170ff492d17b46030b">g_iLabelStyle</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">italique ou droit.  <a href="#673e7ae2a36a56170ff492d17b46030b"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-surface-factory_8c.html#ecf9278fca418109e169d4514d022541">g_iDockRadius</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">rayon des coins du cadre.  <a href="#ecf9278fca418109e169d4514d022541"></a><br></td></tr>
+</table>
+<hr><h2>Documentation des fonctions</h2>
+<a class="anchor" name="4c7687cc4b5a7ff06680a60d493193d9"></a><!-- doxytag: member="cairo-dock-surface-factory.c::cairo_dock_calculate_contrainted_icon_size" ref="4c7687cc4b5a7ff06680a60d493193d9" args="(double *fImageWidth, double *fImageHeight, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fIconWidthSaturationFactor, double *fIconHeightSaturationFactor)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_calculate_contrainted_icon_size           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">double *&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double *&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageHeight</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iMinIconAuthorizedWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iMinIconAuthorizedHeight</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iMaxIconAuthorizedWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iMaxIconAuthorizedHeight</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double *&nbsp;</td>
+          <td class="mdname" nowrap> <em>fIconWidthSaturationFactor</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double *&nbsp;</td>
+          <td class="mdname" nowrap> <em>fIconHeightSaturationFactor</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="8b6a3e0b8a54450c1a667e558bfd7943"></a><!-- doxytag: member="cairo-dock-surface-factory.c::cairo_dock_create_surface_from_xicon_buffer" ref="8b6a3e0b8a54450c1a667e558bfd7943" args="(gulong *pXIconBuffer, int iBufferNbElements, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">cairo_surface_t* cairo_dock_create_surface_from_xicon_buffer           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">gulong *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pXIconBuffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iBufferNbElements</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>cairo_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pSourceContext</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fMaxScale</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double *&nbsp;</td>
+          <td class="mdname" nowrap> <em>fWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double *&nbsp;</td>
+          <td class="mdname" nowrap> <em>fHeight</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="407975a48fc32a8ce923f215083b16f7"></a><!-- doxytag: member="cairo-dock-surface-factory.c::cairo_dock_create_surface_from_pixbuf" ref="407975a48fc32a8ce923f215083b16f7" args="(GdkPixbuf *pixbuf, cairo_t *pSourceContext, double fMaxScale, gboolean bConstraintSize, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fImageWidth, double *fImageHeight)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">cairo_surface_t* cairo_dock_create_surface_from_pixbuf           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">GdkPixbuf *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pixbuf</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>cairo_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pSourceContext</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fMaxScale</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gboolean&nbsp;</td>
+          <td class="mdname" nowrap> <em>bConstraintSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iMinIconAuthorizedWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iMinIconAuthorizedHeight</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iMaxIconAuthorizedWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iMaxIconAuthorizedHeight</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double *&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double *&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageHeight</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="61e4d4ae332553013a6cd11f93540d90"></a><!-- doxytag: member="cairo-dock-surface-factory.c::cairo_dock_create_surface_from_image" ref="61e4d4ae332553013a6cd11f93540d90" args="(gchar *cImagePath, cairo_t *pSourceContext, double fMaxScale, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">cairo_surface_t* cairo_dock_create_surface_from_image           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">gchar *&nbsp;</td>
+          <td class="mdname" nowrap> <em>cImagePath</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>cairo_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pSourceContext</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fMaxScale</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iMinIconAuthorizedWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iMinIconAuthorizedHeight</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iMaxIconAuthorizedWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iMaxIconAuthorizedHeight</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double *&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double *&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageHeight</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fRotationAngle</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fAlpha</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gboolean&nbsp;</td>
+          <td class="mdname" nowrap> <em>bReapeatAsPattern</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="a9a2ef8f9a86b8fe1de100679fcd13f6"></a><!-- doxytag: member="cairo-dock-surface-factory.c::cairo_dock_create_surface_for_icon" ref="a9a2ef8f9a86b8fe1de100679fcd13f6" args="(gchar *cImagePath, cairo_t *pSourceContext, double fImageWidth, double fImageHeight)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">cairo_surface_t* cairo_dock_create_surface_for_icon           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">gchar *&nbsp;</td>
+          <td class="mdname" nowrap> <em>cImagePath</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>cairo_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pSourceContext</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageHeight</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="bb4e67760f9d84c7867bd7598a55406a"></a><!-- doxytag: member="cairo-dock-surface-factory.c::cairo_dock_rotate_surface" ref="bb4e67760f9d84c7867bd7598a55406a" args="(cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fRotationAngle)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">cairo_surface_t* cairo_dock_rotate_surface           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">cairo_surface_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pSurface</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>cairo_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pSourceContext</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageHeight</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fRotationAngle</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="2039d1782b569ee28727f63feddbef07"></a><!-- doxytag: member="cairo-dock-surface-factory.c::cairo_dock_create_reflection_surface" ref="2039d1782b569ee28727f63feddbef07" args="(cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, gboolean bHorizontalDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">cairo_surface_t* cairo_dock_create_reflection_surface           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">cairo_surface_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pSurface</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>cairo_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pSourceContext</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageHeight</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gboolean&nbsp;</td>
+          <td class="mdname" nowrap> <em>bHorizontalDock</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="008734e6b5aebf071ba2f9f32ad69750"></a><!-- doxytag: member="cairo-dock-surface-factory.c::cairo_dock_create_icon_surface_with_reflection_horizontal" ref="008734e6b5aebf071ba2f9f32ad69750" args="(cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">cairo_surface_t* cairo_dock_create_icon_surface_with_reflection_horizontal           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">cairo_surface_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pIconSurface</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>cairo_surface_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pReflectionSurface</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>cairo_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pSourceContext</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageHeight</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="b8d47b5d639540b608ef825c6c6e1c7a"></a><!-- doxytag: member="cairo-dock-surface-factory.c::cairo_dock_create_icon_surface_with_reflection_vertical" ref="b8d47b5d639540b608ef825c6c6e1c7a" args="(cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">cairo_surface_t* cairo_dock_create_icon_surface_with_reflection_vertical           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">cairo_surface_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pIconSurface</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>cairo_surface_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pReflectionSurface</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>cairo_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pSourceContext</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageHeight</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="f291ea9a737e4c9f735517bedefbd6c2"></a><!-- doxytag: member="cairo-dock-surface-factory.c::cairo_dock_create_icon_surface_with_reflection" ref="f291ea9a737e4c9f735517bedefbd6c2" args="(cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, gboolean bHorizontalDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">cairo_surface_t* cairo_dock_create_icon_surface_with_reflection           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">cairo_surface_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pIconSurface</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>cairo_surface_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pReflectionSurface</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>cairo_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pSourceContext</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fImageHeight</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gboolean&nbsp;</td>
+          <td class="mdname" nowrap> <em>bHorizontalDock</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="0dc49419d75c95644061ec7c90c570e4"></a><!-- doxytag: member="cairo-dock-surface-factory.c::cairo_dock_create_surface_from_text" ref="0dc49419d75c95644061ec7c90c570e4" args="(gchar *cText, cairo_t *pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double fBackgroundAlpha, double fMaxScale, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">cairo_surface_t* cairo_dock_create_surface_from_text           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">gchar *&nbsp;</td>
+          <td class="mdname" nowrap> <em>cText</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>cairo_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pSourceContext</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iLabelSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gchar *&nbsp;</td>
+          <td class="mdname" nowrap> <em>cLabelPolice</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iLabelWeight</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fBackgroundAlpha</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fMaxScale</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int *&nbsp;</td>
+          <td class="mdname" nowrap> <em>iTextWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int *&nbsp;</td>
+          <td class="mdname" nowrap> <em>iTextHeight</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double *&nbsp;</td>
+          <td class="mdname" nowrap> <em>fTextXOffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double *&nbsp;</td>
+          <td class="mdname" nowrap> <em>fTextYOffset</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<hr><h2>Documentation des variables</h2>
+<a class="anchor" name="93e9653fa15a07997f49709814aad739"></a><!-- doxytag: member="cairo-dock-surface-factory.c::g_tMaxIconAuthorizedSize" ref="93e9653fa15a07997f49709814aad739" args="[CAIRO_DOCK_NB_TYPES]" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#93e9653fa15a07997f49709814aad739">g_tMaxIconAuthorizedSize</a>[CAIRO_DOCK_NB_TYPES]          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="7f137381241bb9dc494d796d01baf72b"></a><!-- doxytag: member="cairo-dock-surface-factory.c::g_tMinIconAuthorizedSize" ref="7f137381241bb9dc494d796d01baf72b" args="[CAIRO_DOCK_NB_TYPES]" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#7f137381241bb9dc494d796d01baf72b">g_tMinIconAuthorizedSize</a>[CAIRO_DOCK_NB_TYPES]          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+les tailles min et max pour chaque type d'icone. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="71125a40fdc7b421002f176b9b82ac79"></a><!-- doxytag: member="cairo-dock-surface-factory.c::g_fAmplitude" ref="71125a40fdc7b421002f176b9b82ac79" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">double <a class="el" href="cairo-dock_8c.html#71125a40fdc7b421002f176b9b82ac79">g_fAmplitude</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+amplitude de la siunsoide. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="815cf11f5b3bd8f701b0e1083921ebbd"></a><!-- doxytag: member="cairo-dock-surface-factory.c::g_fReflectSize" ref="815cf11f5b3bd8f701b0e1083921ebbd" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">double <a class="el" href="cairo-dock_8c.html#815cf11f5b3bd8f701b0e1083921ebbd">g_fReflectSize</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+taille des reflets, en pixels, calcules par rapport a la hauteur max des icones. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="1301d24e576a57001c9ddf296d170655"></a><!-- doxytag: member="cairo-dock-surface-factory.c::g_fAlbedo" ref="1301d24e576a57001c9ddf296d170655" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">double <a class="el" href="cairo-dock_8c.html#1301d24e576a57001c9ddf296d170655">g_fAlbedo</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+pouvoir reflechissant du plan. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="080e0cb494374269a17c7ebd078e855d"></a><!-- doxytag: member="cairo-dock-surface-factory.c::g_bDirectionUp" ref="080e0cb494374269a17c7ebd078e855d" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#080e0cb494374269a17c7ebd078e855d">g_bDirectionUp</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="709f8c9af486980298862ded5b3edfa5"></a><!-- doxytag: member="cairo-dock-surface-factory.c::g_iLabelWeight" ref="709f8c9af486980298862ded5b3edfa5" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#709f8c9af486980298862ded5b3edfa5">g_iLabelWeight</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+epaisseur des traits. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="673e7ae2a36a56170ff492d17b46030b"></a><!-- doxytag: member="cairo-dock-surface-factory.c::g_iLabelStyle" ref="673e7ae2a36a56170ff492d17b46030b" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#673e7ae2a36a56170ff492d17b46030b">g_iLabelStyle</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+italique ou droit. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="ecf9278fca418109e169d4514d022541"></a><!-- doxytag: member="cairo-dock-surface-factory.c::g_iDockRadius" ref="ecf9278fca418109e169d4514d022541" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#c5768ebc340b36dd210f7b4dea884697">g_iDockRadius</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+rayon des coins du cadre. 
+<p>
+    </td>
+  </tr>
+</table>
+<hr size="1"><address style="align: right;"><small>Généré le Fri Dec 7 13:11:02 2007 pour Cairo-Dock par&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.4.6 </small></address>
+</body>
+</html>

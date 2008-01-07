@@ -1,0 +1,129 @@
+\section{R\'{e}f\'{e}rence du fichier src/cairo-dock-application-factory.c}
+\label{cairo-dock-application-factory_8c}\index{src/cairo-dock-application-factory.c@{src/cairo-dock-application-factory.c}}
+\subsection*{Fonctions}
+\begin{CompactItemize}
+\item 
+void {\bf cairo\_\-dock\_\-initialize\_\-application\_\-factory} (Display $\ast$p\-XDisplay)
+\item 
+void {\bf cairo\_\-dock\_\-unregister\_\-pid} ({\bf Icon} $\ast$icon)
+\item 
+cairo\_\-surface\_\-t $\ast$ {\bf cairo\_\-dock\_\-create\_\-surface\_\-from\_\-xwindow} (Window Xid, cairo\_\-t $\ast$p\-Source\-Context, double f\-Max\-Scale, double $\ast$f\-Width, double $\ast$f\-Height)
+\item 
+{\bf Icon} $\ast$ {\bf cairo\_\-dock\_\-create\_\-icon\_\-from\_\-xwindow} (cairo\_\-t $\ast$p\-Source\-Context, Window Xid, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\item 
+void {\bf cairo\_\-dock\_\-Xproperty\_\-changed} ({\bf Icon} $\ast$icon, Atom a\-Property, int i\-State, {\bf Cairo\-Dock} $\ast$p\-Dock)
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+double {\bf g\_\-f\-Amplitude}
+\begin{CompactList}\small\item\em amplitude de la siunsoide. \item\end{CompactList}\item 
+int {\bf g\_\-i\-Label\-Size}
+\begin{CompactList}\small\item\em taille de la police des etiquettes. \item\end{CompactList}\item 
+gchar $\ast$ {\bf g\_\-c\-Label\-Police}
+\begin{CompactList}\small\item\em police de caracteres des etiquettes. \item\end{CompactList}\item 
+gboolean {\bf g\_\-b\-Text\-Always\-Horizontal}
+\begin{CompactList}\small\item\em TRUE $<$=$>$ etiquettes horizontales meme pour les docks verticaux. \item\end{CompactList}\item 
+int {\bf g\_\-t\-Min\-Icon\-Authorized\-Size} [CAIRO\_\-DOCK\_\-NB\_\-TYPES]
+\begin{CompactList}\small\item\em les tailles min et max pour chaque type d'icone. \item\end{CompactList}\item 
+int {\bf g\_\-t\-Max\-Icon\-Authorized\-Size} [CAIRO\_\-DOCK\_\-NB\_\-TYPES]
+\item 
+gboolean {\bf g\_\-b\-Unique\-Pid}
+\item 
+gboolean {\bf g\_\-b\-Group\-Appli\-By\-Class}
+\item 
+gboolean {\bf g\_\-b\-Demands\-Attention\-With\-Dialog}
+\item 
+gboolean {\bf g\_\-b\-Demands\-Attention\-With\-Animation}
+\end{CompactItemize}
+
+
+\subsection{Documentation des fonctions}
+\index{cairo-dock-application-factory.c@{cairo-dock-application-factory.c}!cairo_dock_initialize_application_factory@{cairo\_\-dock\_\-initialize\_\-application\_\-factory}}
+\index{cairo_dock_initialize_application_factory@{cairo\_\-dock\_\-initialize\_\-application\_\-factory}!cairo-dock-application-factory.c@{cairo-dock-application-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-initialize\_\-application\_\-factory (Display $\ast$ {\em p\-XDisplay})}\label{cairo-dock-application-factory_8c_678ef395cc28e3a8fa07ba22577f6bf7}
+
+
+\index{cairo-dock-application-factory.c@{cairo-dock-application-factory.c}!cairo_dock_unregister_pid@{cairo\_\-dock\_\-unregister\_\-pid}}
+\index{cairo_dock_unregister_pid@{cairo\_\-dock\_\-unregister\_\-pid}!cairo-dock-application-factory.c@{cairo-dock-application-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-unregister\_\-pid ({\bf Icon} $\ast$ {\em icon})}\label{cairo-dock-application-factory_8c_42e39f7b5ad59fb32467a1e6c033c3f7}
+
+
+\index{cairo-dock-application-factory.c@{cairo-dock-application-factory.c}!cairo_dock_create_surface_from_xwindow@{cairo\_\-dock\_\-create\_\-surface\_\-from\_\-xwindow}}
+\index{cairo_dock_create_surface_from_xwindow@{cairo\_\-dock\_\-create\_\-surface\_\-from\_\-xwindow}!cairo-dock-application-factory.c@{cairo-dock-application-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}cairo\_\-surface\_\-t$\ast$ cairo\_\-dock\_\-create\_\-surface\_\-from\_\-xwindow (Window {\em Xid}, cairo\_\-t $\ast$ {\em p\-Source\-Context}, double {\em f\-Max\-Scale}, double $\ast$ {\em f\-Width}, double $\ast$ {\em f\-Height})}\label{cairo-dock-application-factory_8c_6c118c96f01f32634ecdb3c4e2f2a826}
+
+
+\index{cairo-dock-application-factory.c@{cairo-dock-application-factory.c}!cairo_dock_create_icon_from_xwindow@{cairo\_\-dock\_\-create\_\-icon\_\-from\_\-xwindow}}
+\index{cairo_dock_create_icon_from_xwindow@{cairo\_\-dock\_\-create\_\-icon\_\-from\_\-xwindow}!cairo-dock-application-factory.c@{cairo-dock-application-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf Icon}$\ast$ cairo\_\-dock\_\-create\_\-icon\_\-from\_\-xwindow (cairo\_\-t $\ast$ {\em p\-Source\-Context}, Window {\em Xid}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-application-factory_8c_e28b5fa69e1fb9cf38fccc6ba95e0efc}
+
+
+\index{cairo-dock-application-factory.c@{cairo-dock-application-factory.c}!cairo_dock_Xproperty_changed@{cairo\_\-dock\_\-Xproperty\_\-changed}}
+\index{cairo_dock_Xproperty_changed@{cairo\_\-dock\_\-Xproperty\_\-changed}!cairo-dock-application-factory.c@{cairo-dock-application-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-Xproperty\_\-changed ({\bf Icon} $\ast$ {\em icon}, Atom {\em a\-Property}, int {\em i\-State}, {\bf Cairo\-Dock} $\ast$ {\em p\-Dock})}\label{cairo-dock-application-factory_8c_ad3e753de8bc7fc717a7f81f87d7b8fa}
+
+
+
+
+\subsection{Documentation des variables}
+\index{cairo-dock-application-factory.c@{cairo-dock-application-factory.c}!g_fAmplitude@{g\_\-fAmplitude}}
+\index{g_fAmplitude@{g\_\-fAmplitude}!cairo-dock-application-factory.c@{cairo-dock-application-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double {\bf g\_\-f\-Amplitude}}\label{cairo-dock-application-factory_8c_71125a40fdc7b421002f176b9b82ac79}
+
+
+amplitude de la siunsoide. 
+
+\index{cairo-dock-application-factory.c@{cairo-dock-application-factory.c}!g_iLabelSize@{g\_\-iLabelSize}}
+\index{g_iLabelSize@{g\_\-iLabelSize}!cairo-dock-application-factory.c@{cairo-dock-application-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-i\-Label\-Size}}\label{cairo-dock-application-factory_8c_386538e26258de4d50feb84fecc45dd6}
+
+
+taille de la police des etiquettes. 
+
+\index{cairo-dock-application-factory.c@{cairo-dock-application-factory.c}!g_cLabelPolice@{g\_\-cLabelPolice}}
+\index{g_cLabelPolice@{g\_\-cLabelPolice}!cairo-dock-application-factory.c@{cairo-dock-application-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ {\bf g\_\-c\-Label\-Police}}\label{cairo-dock-application-factory_8c_1dd252a8514e5074187d0c12a311f158}
+
+
+police de caracteres des etiquettes. 
+
+\index{cairo-dock-application-factory.c@{cairo-dock-application-factory.c}!g_bTextAlwaysHorizontal@{g\_\-bTextAlwaysHorizontal}}
+\index{g_bTextAlwaysHorizontal@{g\_\-bTextAlwaysHorizontal}!cairo-dock-application-factory.c@{cairo-dock-application-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Text\-Always\-Horizontal}}\label{cairo-dock-application-factory_8c_9656ee040199018fa599316b38e2f231}
+
+
+TRUE $<$=$>$ etiquettes horizontales meme pour les docks verticaux. 
+
+\index{cairo-dock-application-factory.c@{cairo-dock-application-factory.c}!g_tMinIconAuthorizedSize@{g\_\-tMinIconAuthorizedSize}}
+\index{g_tMinIconAuthorizedSize@{g\_\-tMinIconAuthorizedSize}!cairo-dock-application-factory.c@{cairo-dock-application-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-t\-Min\-Icon\-Authorized\-Size}[CAIRO\_\-DOCK\_\-NB\_\-TYPES]}\label{cairo-dock-application-factory_8c_7f137381241bb9dc494d796d01baf72b}
+
+
+les tailles min et max pour chaque type d'icone. 
+
+\index{cairo-dock-application-factory.c@{cairo-dock-application-factory.c}!g_tMaxIconAuthorizedSize@{g\_\-tMaxIconAuthorizedSize}}
+\index{g_tMaxIconAuthorizedSize@{g\_\-tMaxIconAuthorizedSize}!cairo-dock-application-factory.c@{cairo-dock-application-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int {\bf g\_\-t\-Max\-Icon\-Authorized\-Size}[CAIRO\_\-DOCK\_\-NB\_\-TYPES]}\label{cairo-dock-application-factory_8c_93e9653fa15a07997f49709814aad739}
+
+
+\index{cairo-dock-application-factory.c@{cairo-dock-application-factory.c}!g_bUniquePid@{g\_\-bUniquePid}}
+\index{g_bUniquePid@{g\_\-bUniquePid}!cairo-dock-application-factory.c@{cairo-dock-application-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Unique\-Pid}}\label{cairo-dock-application-factory_8c_479142bd03646b25b45d1dcd8f02dc43}
+
+
+\index{cairo-dock-application-factory.c@{cairo-dock-application-factory.c}!g_bGroupAppliByClass@{g\_\-bGroupAppliByClass}}
+\index{g_bGroupAppliByClass@{g\_\-bGroupAppliByClass}!cairo-dock-application-factory.c@{cairo-dock-application-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Group\-Appli\-By\-Class}}\label{cairo-dock-application-factory_8c_94b6ebfa41f246e7dbeff8f6a24eeba0}
+
+
+\index{cairo-dock-application-factory.c@{cairo-dock-application-factory.c}!g_bDemandsAttentionWithDialog@{g\_\-bDemandsAttentionWithDialog}}
+\index{g_bDemandsAttentionWithDialog@{g\_\-bDemandsAttentionWithDialog}!cairo-dock-application-factory.c@{cairo-dock-application-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Demands\-Attention\-With\-Dialog}}\label{cairo-dock-application-factory_8c_1105bd4dbea07d18907623cc7111df9b}
+
+
+\index{cairo-dock-application-factory.c@{cairo-dock-application-factory.c}!g_bDemandsAttentionWithAnimation@{g\_\-bDemandsAttentionWithAnimation}}
+\index{g_bDemandsAttentionWithAnimation@{g\_\-bDemandsAttentionWithAnimation}!cairo-dock-application-factory.c@{cairo-dock-application-factory.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gboolean {\bf g\_\-b\-Demands\-Attention\-With\-Animation}}\label{cairo-dock-application-factory_8c_5c3fb3d0d5b957d82a5d2a64545198b1}
+
+

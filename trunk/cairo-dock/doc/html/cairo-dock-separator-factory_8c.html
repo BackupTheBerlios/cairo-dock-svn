@@ -1,0 +1,375 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Cairo-Dock: Référence du fichier src/cairo-dock-separator-factory.c</title>
+<link href="doxygen.css" rel="stylesheet" type="text/css">
+<link href="tabs.css" rel="stylesheet" type="text/css">
+</head><body>
+<!-- Généré par Doxygen 1.4.6 -->
+<div class="tabs">
+  <ul>
+    <li><a href="index.html"><span>Page&nbsp;principale</span></a></li>
+    <li><a href="annotated.html"><span>Structures&nbsp;de&nbsp;données</span></a></li>
+    <li id="current"><a href="files.html"><span>Fichiers</span></a></li>
+  </ul></div>
+<div class="tabs">
+  <ul>
+    <li><a href="files.html"><span>Liste&nbsp;des&nbsp;fichiers</span></a></li>
+    <li><a href="globals.html"><span>Portée&nbsp;globale</span></a></li>
+  </ul></div>
+<h1>Référence du fichier src/cairo-dock-separator-factory.c</h1><table border="0" cellpadding="0" cellspacing="0">
+<tr><td></td></tr>
+<tr><td colspan="2"><br><h2>Fonctions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">cairo_surface_t *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-separator-factory_8c.html#a62ef285e32a79de3efc5be781079ab4">cairo_dock_create_separator_surface</a> (cairo_t *pSourceContext, double fMaxScale, gboolean bHorizontalDock, double *fWidth, double *fHeight)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-separator-factory_8c.html#3fd6483ad1688ab96a758fa4aef9905a">cairo_dock_create_separator_icon</a> (cairo_t *pSourceContext, int iSeparatorType, <a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-separator-factory_8c.html#71125a40fdc7b421002f176b9b82ac79">g_fAmplitude</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">amplitude de la siunsoide.  <a href="#71125a40fdc7b421002f176b9b82ac79"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-separator-factory_8c.html#8ff61d8910b08e05a1cc800f5a5dd81b">g_iDockLineWidth</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">epaisseur du cadre (en pixels).  <a href="#8ff61d8910b08e05a1cc800f5a5dd81b"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-separator-factory_8c.html#080e0cb494374269a17c7ebd078e855d">g_bDirectionUp</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.  <a href="#080e0cb494374269a17c7ebd078e855d"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-separator-factory_8c.html#94d3b861b3f8044136fec65dd9e5f1d9">g_bHorizontalDock</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-separator-factory_8c.html#7f137381241bb9dc494d796d01baf72b">g_tMinIconAuthorizedSize</a> [CAIRO_DOCK_NB_TYPES]</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">les tailles min et max pour chaque type d'icone.  <a href="#7f137381241bb9dc494d796d01baf72b"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-separator-factory_8c.html#93e9653fa15a07997f49709814aad739">g_tMaxIconAuthorizedSize</a> [CAIRO_DOCK_NB_TYPES]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gchar *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-separator-factory_8c.html#12f4d4e5812c3c51d7ad0dbc9885026c">g_cSeparatorImage</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">nom d'une image a afficher en tant que separateur.  <a href="#12f4d4e5812c3c51d7ad0dbc9885026c"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-separator-factory_8c.html#4b4ce0d984901ab8ae5a1338947e9eed">g_bRevolveSeparator</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">faire pivoter l'image des separateurs.  <a href="#4b4ce0d984901ab8ae5a1338947e9eed"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-separator-factory_8c.html#16a0df3aa6645b9f4437809d3bbd3865">g_bUseGlitz</a></td></tr>
+
+</table>
+<hr><h2>Documentation des fonctions</h2>
+<a class="anchor" name="a62ef285e32a79de3efc5be781079ab4"></a><!-- doxytag: member="cairo-dock-separator-factory.c::cairo_dock_create_separator_surface" ref="a62ef285e32a79de3efc5be781079ab4" args="(cairo_t *pSourceContext, double fMaxScale, gboolean bHorizontalDock, double *fWidth, double *fHeight)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">cairo_surface_t* cairo_dock_create_separator_surface           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">cairo_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pSourceContext</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double&nbsp;</td>
+          <td class="mdname" nowrap> <em>fMaxScale</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>gboolean&nbsp;</td>
+          <td class="mdname" nowrap> <em>bHorizontalDock</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double *&nbsp;</td>
+          <td class="mdname" nowrap> <em>fWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>double *&nbsp;</td>
+          <td class="mdname" nowrap> <em>fHeight</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="3fd6483ad1688ab96a758fa4aef9905a"></a><!-- doxytag: member="cairo-dock-separator-factory.c::cairo_dock_create_separator_icon" ref="3fd6483ad1688ab96a758fa4aef9905a" args="(cairo_t *pSourceContext, int iSeparatorType, CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a>* cairo_dock_create_separator_icon           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">cairo_t *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pSourceContext</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iSeparatorType</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pDock</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<hr><h2>Documentation des variables</h2>
+<a class="anchor" name="71125a40fdc7b421002f176b9b82ac79"></a><!-- doxytag: member="cairo-dock-separator-factory.c::g_fAmplitude" ref="71125a40fdc7b421002f176b9b82ac79" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">double <a class="el" href="cairo-dock_8c.html#71125a40fdc7b421002f176b9b82ac79">g_fAmplitude</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+amplitude de la siunsoide. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="8ff61d8910b08e05a1cc800f5a5dd81b"></a><!-- doxytag: member="cairo-dock-separator-factory.c::g_iDockLineWidth" ref="8ff61d8910b08e05a1cc800f5a5dd81b" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#e5d97f4f9a4f7e546af6ebe7b7d5399b">g_iDockLineWidth</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+epaisseur du cadre (en pixels). 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="080e0cb494374269a17c7ebd078e855d"></a><!-- doxytag: member="cairo-dock-separator-factory.c::g_bDirectionUp" ref="080e0cb494374269a17c7ebd078e855d" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#080e0cb494374269a17c7ebd078e855d">g_bDirectionUp</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="94d3b861b3f8044136fec65dd9e5f1d9"></a><!-- doxytag: member="cairo-dock-separator-factory.c::g_bHorizontalDock" ref="94d3b861b3f8044136fec65dd9e5f1d9" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock-separator-factory_8c.html#94d3b861b3f8044136fec65dd9e5f1d9">g_bHorizontalDock</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="7f137381241bb9dc494d796d01baf72b"></a><!-- doxytag: member="cairo-dock-separator-factory.c::g_tMinIconAuthorizedSize" ref="7f137381241bb9dc494d796d01baf72b" args="[CAIRO_DOCK_NB_TYPES]" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#7f137381241bb9dc494d796d01baf72b">g_tMinIconAuthorizedSize</a>[CAIRO_DOCK_NB_TYPES]          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+les tailles min et max pour chaque type d'icone. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="93e9653fa15a07997f49709814aad739"></a><!-- doxytag: member="cairo-dock-separator-factory.c::g_tMaxIconAuthorizedSize" ref="93e9653fa15a07997f49709814aad739" args="[CAIRO_DOCK_NB_TYPES]" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#93e9653fa15a07997f49709814aad739">g_tMaxIconAuthorizedSize</a>[CAIRO_DOCK_NB_TYPES]          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="12f4d4e5812c3c51d7ad0dbc9885026c"></a><!-- doxytag: member="cairo-dock-separator-factory.c::g_cSeparatorImage" ref="12f4d4e5812c3c51d7ad0dbc9885026c" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gchar* <a class="el" href="cairo-dock_8c.html#12f4d4e5812c3c51d7ad0dbc9885026c">g_cSeparatorImage</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+nom d'une image a afficher en tant que separateur. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="4b4ce0d984901ab8ae5a1338947e9eed"></a><!-- doxytag: member="cairo-dock-separator-factory.c::g_bRevolveSeparator" ref="4b4ce0d984901ab8ae5a1338947e9eed" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#4b4ce0d984901ab8ae5a1338947e9eed">g_bRevolveSeparator</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+faire pivoter l'image des separateurs. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="16a0df3aa6645b9f4437809d3bbd3865"></a><!-- doxytag: member="cairo-dock-separator-factory.c::g_bUseGlitz" ref="16a0df3aa6645b9f4437809d3bbd3865" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#16a0df3aa6645b9f4437809d3bbd3865">g_bUseGlitz</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<hr size="1"><address style="align: right;"><small>Généré le Fri Dec 7 13:11:02 2007 pour Cairo-Dock par&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.4.6 </small></address>
+</body>
+</html>

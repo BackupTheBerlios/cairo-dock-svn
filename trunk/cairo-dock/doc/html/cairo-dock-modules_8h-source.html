@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<title>Cairo-Dock:  Fichier source de src/cairo-dock-modules.h</title>
+<link href="doxygen.css" rel="stylesheet" type="text/css">
+<link href="tabs.css" rel="stylesheet" type="text/css">
+</head><body>
+<!-- Généré par Doxygen 1.5.3 -->
+<div class="tabs">
+  <ul>
+    <li><a href="index.html"><span>Page&nbsp;principale</span></a></li>
+    <li><a href="annotated.html"><span>Structures&nbsp;de&nbsp;données</span></a></li>
+    <li class="current"><a href="files.html"><span>Fichiers</span></a></li>
+  </ul>
+</div>
+<h1>src/cairo-dock-modules.h</h1><a href="cairo-dock-modules_8h.html">Aller à la documentation de ce fichier.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 
+<a name="l00002"></a>00002 <span class="preprocessor">#ifndef __CAIRO_DOCK_MODULES__</span>
+<a name="l00003"></a>00003 <span class="preprocessor"></span><span class="preprocessor">#define  __CAIRO_DOCK_MODULES__</span>
+<a name="l00004"></a>00004 <span class="preprocessor"></span>
+<a name="l00005"></a>00005 <span class="preprocessor">#include &lt;glib.h&gt;</span>
+<a name="l00006"></a>00006 
+<a name="l00007"></a>00007 <span class="preprocessor">#include "<a class="code" href="cairo-dock-struct_8h.html">cairo-dock-struct.h</a>"</span>
+<a name="l00008"></a>00008 
+<a name="l00009"></a>00009 
+<a name="l00010"></a>00010 <span class="keywordtype">void</span> <a class="code" href="cairo-dock-modules_8h.html#1340f2d554ab9a7eb635385fc3cd1b3b">cairo_dock_initialize_module_manager</a> (gchar *cModuleDirPath);
+<a name="l00011"></a>00011 
+<a name="l00012"></a>00012 <span class="keywordtype">void</span> <a class="code" href="cairo-dock-modules_8h.html#dce0dd50bfcd266f4bfe19442aa5866b">cairo_dock_free_visit_card</a> (<a class="code" href="struct__CairoDockVisitCard.html">CairoDockVisitCard</a> *pVisitCard);
+<a name="l00013"></a>00013 
+<a name="l00014"></a>00014 <a class="code" href="struct__CairoDockModule.html">CairoDockModule</a> * <a class="code" href="cairo-dock-modules_8h.html#b813976c4ae825f539b5b1aa9dc5a242">cairo_dock_load_module</a> (gchar *cSoFilePath, GHashTable *pModuleTable, GError **erreur);
+<a name="l00015"></a>00015 
+<a name="l00016"></a>00016 <span class="keywordtype">void</span> <a class="code" href="cairo-dock-modules_8h.html#ff31d986bb19e13dd2a0fdd8d9d4ca87">cairo_dock_preload_module_from_directory</a> (gchar *cModuleDirPath, GHashTable *pModuleTable, GError **erreur);
+<a name="l00017"></a>00017 
+<a name="l00018"></a>00018 
+<a name="l00019"></a>00019 
+<a name="l00020"></a>00020 <span class="keywordtype">void</span> <a class="code" href="cairo-dock-modules_8h.html#23f1df1de21099aea23d7f00eb078440">cairo_dock_activate_modules_from_list</a> (gchar **cActiveModuleList, <a class="code" href="struct__CairoDock.html">CairoDock</a> *pDock);
+<a name="l00021"></a>00021 
+<a name="l00022"></a>00022 <span class="keywordtype">void</span> <a class="code" href="cairo-dock-modules_8h.html#0246efa71f9254d983f55e127850f062">cairo_dock_update_conf_file_with_available_modules_full</a> (gchar *cConfFile, gchar *cGroupName, gchar *cKeyName);
+<a name="l00023"></a><a class="code" href="cairo-dock-modules_8h.html#c7d625d3eaa6a4e6950bb5ebb80d3b8f">00023</a> <span class="preprocessor">#define cairo_dock_update_conf_file_with_available_modules(cConfFile) cairo_dock_update_conf_file_with_available_modules_full (cConfFile, "Applets", "active modules")</span>
+<a name="l00024"></a><a class="code" href="cairo-dock-modules_8h.html#0dcdc58cbdf5e51eaf979bc364468404">00024</a> <span class="preprocessor"></span><span class="preprocessor">#define cairo_dock_update_easy_conf_file_with_available_modules(cConfFile) cairo_dock_update_conf_file_with_available_modules_full (cConfFile, "System", "active modules")</span>
+<a name="l00025"></a>00025 <span class="preprocessor"></span>
+<a name="l00026"></a>00026 <span class="keywordtype">void</span> <a class="code" href="cairo-dock-modules_8h.html#7c78d4001bbaf6e43c7f46202e80dc2f">cairo_dock_update_conf_file_with_active_modules</a> (gchar *cConfFile, GList *pIconList);
+<a name="l00027"></a>00027 
+<a name="l00028"></a>00028 <span class="keywordtype">void</span> <a class="code" href="cairo-dock-modules_8h.html#8a64844e7786277a1a7ea375815c7d93">cairo_dock_foreach_module</a> (GHFunc pFunction, gpointer data);
+<a name="l00029"></a>00029 
+<a name="l00030"></a>00030 
+<a name="l00031"></a>00031 
+<a name="l00032"></a>00032 <span class="keywordtype">void</span> <a class="code" href="cairo-dock-modules_8h.html#a30d8f12c4b2960f885f65214f500e8f">cairo_dock_free_module</a> (<a class="code" href="struct__CairoDockModule.html">CairoDockModule</a> *module);
+<a name="l00033"></a>00033 
+<a name="l00034"></a>00034 <a class="code" href="struct__Icon.html">Icon</a> * <a class="code" href="cairo-dock-modules_8h.html#acfcaabda81a50f7711e0247dcd892a4">cairo_dock_activate_module</a> (<a class="code" href="struct__CairoDockModule.html">CairoDockModule</a> *module, <a class="code" href="struct__CairoDock.html">CairoDock</a> *pDock, GError **erreur);
+<a name="l00035"></a>00035 
+<a name="l00036"></a>00036 <span class="keywordtype">void</span> <a class="code" href="cairo-dock-modules_8h.html#b3bc5aeab21bc70a81b0120ceeb60ac5">cairo_dock_deactivate_module</a> (<a class="code" href="struct__CairoDockModule.html">CairoDockModule</a> *module);
+<a name="l00037"></a>00037 
+<a name="l00038"></a>00038 <span class="keywordtype">void</span> <a class="code" href="cairo-dock-modules_8h.html#96c60c656ddd2fb99901b6c5efdd7d58">cairo_dock_reload_module</a> (gchar *cConfFile, gpointer *data);
+<a name="l00039"></a>00039 <span class="keywordtype">void</span> <a class="code" href="cairo-dock-modules_8h.html#0d5d011f72e200331ce429c8039840c3">cairo_dock_configure_module</a> (GtkWindow *pParentWindow, <a class="code" href="struct__CairoDockModule.html">CairoDockModule</a> *module, <a class="code" href="struct__CairoDock.html">CairoDock</a> *pDock, GError **erreur);
+<a name="l00040"></a>00040 
+<a name="l00041"></a>00041 
+<a name="l00042"></a>00042 <a class="code" href="struct__Icon.html">Icon</a> *<a class="code" href="cairo-dock-modules_8h.html#d301a84567acc58d428f081d8280aac4">cairo_dock_find_icon_from_module</a> (<a class="code" href="struct__CairoDockModule.html">CairoDockModule</a> *module, GList *pIconList);
+<a name="l00043"></a>00043 
+<a name="l00044"></a>00044 <a class="code" href="struct__CairoDockModule.html">CairoDockModule</a> *<a class="code" href="cairo-dock-modules_8h.html#4b8a7e9daa3f83e0f4d05f79797fac70">cairo_dock_find_module_from_name</a> (gchar *cModuleName);
+<a name="l00045"></a>00045 
+<a name="l00046"></a>00046 
+<a name="l00047"></a>00047 <span class="preprocessor">#endif</span>
+</pre></div><hr size="1"><address style="text-align: right;"><small>Généré le Fri Jan 4 20:22:13 2008 pour Cairo-Dock par&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.3 </small></address>
+</body>
+</html>

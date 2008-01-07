@@ -1,0 +1,634 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Cairo-Dock: Référence du fichier src/cairo-dock-animations.c</title>
+<link href="doxygen.css" rel="stylesheet" type="text/css">
+<link href="tabs.css" rel="stylesheet" type="text/css">
+</head><body>
+<!-- Généré par Doxygen 1.4.6 -->
+<div class="tabs">
+  <ul>
+    <li><a href="index.html"><span>Page&nbsp;principale</span></a></li>
+    <li><a href="annotated.html"><span>Structures&nbsp;de&nbsp;données</span></a></li>
+    <li id="current"><a href="files.html"><span>Fichiers</span></a></li>
+  </ul></div>
+<div class="tabs">
+  <ul>
+    <li><a href="files.html"><span>Liste&nbsp;des&nbsp;fichiers</span></a></li>
+    <li><a href="globals.html"><span>Portée&nbsp;globale</span></a></li>
+  </ul></div>
+<h1>Référence du fichier src/cairo-dock-animations.c</h1><table border="0" cellpadding="0" cellspacing="0">
+<tr><td></td></tr>
+<tr><td colspan="2"><br><h2>Fonctions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#dbdf2df4bca3c8693babeda5fba8b110">cairo_dock_move_up</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#0ceefbf48eaf88fbcde2fc204f91c82d">cairo_dock_move_down</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gfloat&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#9e998350ee650b466b278b892f8e6d98">cairo_dock_calculate_magnitude</a> (gint iMagnitudeIndex)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#5f6835106b72e260624d5f09db86a6bf">cairo_dock_grow_up</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#9c19b3db8ce61a2e377cbd66aff22ee3">cairo_dock_shrink_down</a> (<a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#2341802d978d04a570615adb01e1046f">cairo_dock_arm_animation</a> (<a class="el" href="struct__Icon.html">Icon</a> *icon, <a class="el" href="cairo-dock-struct_8h.html#72c6f286d96c028feb8d4516820b74d9">CairoDockAnimationType</a> iAnimationType, int iNbRounds)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#551472639c25a63d7d996c7efea4960c">cairo_dock_start_animation</a> (<a class="el" href="struct__Icon.html">Icon</a> *icon, <a class="el" href="struct__CairoDock.html">CairoDock</a> *pDock)</td></tr>
+
+<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#993ffc03885e9dd565ea353efb16a730">g_fScrollAcceleration</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#6f702198c2a73a5413af054e40731b63">g_bResetScrollOnLeave</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#07391901b88403fa54f99e3c24b796ad">g_iScreenHeight</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#263de39492b5e16c81c98792f183edcf">g_bAutoHide</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">TRUE si l'auto-hide est active.  <a href="#263de39492b5e16c81c98792f183edcf"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">gboolean&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#080e0cb494374269a17c7ebd078e855d">g_bDirectionUp</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.  <a href="#080e0cb494374269a17c7ebd078e855d"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#b032d5fe2acfb6b93dcbc85ad1962730">g_iVisibleZoneHeight</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#321302a26af19930e4796a30e248a416">g_fUnfoldAcceleration</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#5fe51da6d176c32c91aa15496bde0e85">g_iGrowUpInterval</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#1c1098834228f93d28178a3681c55f4f">g_iShrinkDownInterval</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#86ac4f286478a585e3615ea9f619e2e1">g_fMoveUpSpeed</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#3cd78b794e0ae231fdfc3b33688ed4f9">g_fMoveDownSpeed</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#d032f581fee0aa87c72f18d59537e435">g_tAnimationType</a> [CAIRO_DOCK_NB_TYPES]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#1b48a416cde2ed547878e8e86e1a8841">g_tNbAnimationRounds</a> [CAIRO_DOCK_NB_TYPES]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="cairo-dock-animations_8c.html#57cbfb0ead563d0d0f16e94bedfbd568">g_tNbIterInOneRound</a> [CAIRO_DOCK_NB_ANIMATIONS]</td></tr>
+
+</table>
+<hr><h2>Documentation des fonctions</h2>
+<a class="anchor" name="dbdf2df4bca3c8693babeda5fba8b110"></a><!-- doxytag: member="cairo-dock-animations.c::cairo_dock_move_up" ref="dbdf2df4bca3c8693babeda5fba8b110" args="(CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean cairo_dock_move_up           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pDock</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="0ceefbf48eaf88fbcde2fc204f91c82d"></a><!-- doxytag: member="cairo-dock-animations.c::cairo_dock_move_down" ref="0ceefbf48eaf88fbcde2fc204f91c82d" args="(CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean cairo_dock_move_down           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pDock</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="9e998350ee650b466b278b892f8e6d98"></a><!-- doxytag: member="cairo-dock-animations.c::cairo_dock_calculate_magnitude" ref="9e998350ee650b466b278b892f8e6d98" args="(gint iMagnitudeIndex)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gfloat cairo_dock_calculate_magnitude           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top">gint&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>iMagnitudeIndex</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="5f6835106b72e260624d5f09db86a6bf"></a><!-- doxytag: member="cairo-dock-animations.c::cairo_dock_grow_up" ref="5f6835106b72e260624d5f09db86a6bf" args="(CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean cairo_dock_grow_up           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pDock</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+pDock-&gt;fFoldingFactor = (pDock-&gt;fFoldingFactor != 0 ? pow (1.5, - 1. / pDock-&gt;fFoldingFactor) : 0); // f(x)-x &lt; 0 pour a &gt; exp(exp(-1)) ~ 1.445.     </td>
+  </tr>
+</table>
+<a class="anchor" name="9c19b3db8ce61a2e377cbd66aff22ee3"></a><!-- doxytag: member="cairo-dock-animations.c::cairo_dock_shrink_down" ref="9c19b3db8ce61a2e377cbd66aff22ee3" args="(CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean cairo_dock_shrink_down           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname1" valign="top" nowrap> <em>pDock</em>          </td>
+          <td class="md" valign="top">&nbsp;)&nbsp;</td>
+          <td class="md" nowrap></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+if (pDock-&gt;bHorizontalDock) gdk_window_get_pointer (pDock-&gt;pWidget-&gt;window, &amp;pDock-&gt;iMouseX, &amp;pDock-&gt;iMouseY, NULL); else gdk_window_get_pointer (pDock-&gt;pWidget-&gt;window, &amp;pDock-&gt;iMouseY, &amp;pDock-&gt;iMouseX, NULL);<p>
+pDock-&gt;fMagnitude = 0.001; // on garde la magnitude &gt; 0 de facon a ce qu'un motion_notify ne commence pas un 'grow_up'.     </td>
+  </tr>
+</table>
+<a class="anchor" name="2341802d978d04a570615adb01e1046f"></a><!-- doxytag: member="cairo-dock-animations.c::cairo_dock_arm_animation" ref="2341802d978d04a570615adb01e1046f" args="(Icon *icon, CairoDockAnimationType iAnimationType, int iNbRounds)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_arm_animation           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>icon</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="cairo-dock-struct_8h.html#72c6f286d96c028feb8d4516820b74d9">CairoDockAnimationType</a>&nbsp;</td>
+          <td class="mdname" nowrap> <em>iAnimationType</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap>int&nbsp;</td>
+          <td class="mdname" nowrap> <em>iNbRounds</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+Arme l'animation d'une icone <dl compact><dt><b>Paramètres:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>icon</em>&nbsp;</td><td>l'icone dont on veut preparer l'animation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>iAnimationType</em>&nbsp;</td><td>le type d'animation voulu, ou -1 pour utiliser l'animtion correspondante au type de l'icone. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>iNbRounds</em>&nbsp;</td><td>le nombre de fois ou l'animation sera jouee, ou -1 pour utiliser la valeur correspondante au type de l'icone. </td></tr>
+  </table>
+</dl>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="551472639c25a63d7d996c7efea4960c"></a><!-- doxytag: member="cairo-dock-animations.c::cairo_dock_start_animation" ref="551472639c25a63d7d996c7efea4960c" args="(Icon *icon, CairoDock *pDock)" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">void cairo_dock_start_animation           </td>
+          <td class="md" valign="top">(&nbsp;</td>
+          <td class="md" nowrap valign="top"><a class="el" href="struct__Icon.html">Icon</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>icon</em>, </td>
+        </tr>
+        <tr>
+          <td class="md" nowrap align="right"></td>
+          <td class="md"></td>
+          <td class="md" nowrap><a class="el" href="struct__CairoDock.html">CairoDock</a> *&nbsp;</td>
+          <td class="mdname" nowrap> <em>pDock</em></td>
+        </tr>
+        <tr>
+          <td class="md"></td>
+          <td class="md">)&nbsp;</td>
+          <td class="md" colspan="2"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+Lance l'animation de l'icone. Ne fait rien si l'icone ne sera pas animee. <dl compact><dt><b>Paramètres:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>icon</em>&nbsp;</td><td>l'icone a animer. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>pDock</em>&nbsp;</td><td>le dock contenant l'icone. </td></tr>
+  </table>
+</dl>
+    </td>
+  </tr>
+</table>
+<hr><h2>Documentation des variables</h2>
+<a class="anchor" name="993ffc03885e9dd565ea353efb16a730"></a><!-- doxytag: member="cairo-dock-animations.c::g_fScrollAcceleration" ref="993ffc03885e9dd565ea353efb16a730" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">double <a class="el" href="cairo-dock_8c.html#993ffc03885e9dd565ea353efb16a730">g_fScrollAcceleration</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="6f702198c2a73a5413af054e40731b63"></a><!-- doxytag: member="cairo-dock-animations.c::g_bResetScrollOnLeave" ref="6f702198c2a73a5413af054e40731b63" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#6f702198c2a73a5413af054e40731b63">g_bResetScrollOnLeave</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="07391901b88403fa54f99e3c24b796ad"></a><!-- doxytag: member="cairo-dock-animations.c::g_iScreenHeight" ref="07391901b88403fa54f99e3c24b796ad" args="[2]" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#70dbb6c14cb143c826e85759b205f201">g_iScreenHeight</a>[2]          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="263de39492b5e16c81c98792f183edcf"></a><!-- doxytag: member="cairo-dock-animations.c::g_bAutoHide" ref="263de39492b5e16c81c98792f183edcf" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#263de39492b5e16c81c98792f183edcf">g_bAutoHide</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+TRUE si l'auto-hide est active. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="080e0cb494374269a17c7ebd078e855d"></a><!-- doxytag: member="cairo-dock-animations.c::g_bDirectionUp" ref="080e0cb494374269a17c7ebd078e855d" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">gboolean <a class="el" href="cairo-dock_8c.html#080e0cb494374269a17c7ebd078e855d">g_bDirectionUp</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas. 
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="b032d5fe2acfb6b93dcbc85ad1962730"></a><!-- doxytag: member="cairo-dock-animations.c::g_iVisibleZoneHeight" ref="b032d5fe2acfb6b93dcbc85ad1962730" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#b032d5fe2acfb6b93dcbc85ad1962730">g_iVisibleZoneHeight</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="321302a26af19930e4796a30e248a416"></a><!-- doxytag: member="cairo-dock-animations.c::g_fUnfoldAcceleration" ref="321302a26af19930e4796a30e248a416" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">double <a class="el" href="cairo-dock_8c.html#321302a26af19930e4796a30e248a416">g_fUnfoldAcceleration</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="5fe51da6d176c32c91aa15496bde0e85"></a><!-- doxytag: member="cairo-dock-animations.c::g_iGrowUpInterval" ref="5fe51da6d176c32c91aa15496bde0e85" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#5fe51da6d176c32c91aa15496bde0e85">g_iGrowUpInterval</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="1c1098834228f93d28178a3681c55f4f"></a><!-- doxytag: member="cairo-dock-animations.c::g_iShrinkDownInterval" ref="1c1098834228f93d28178a3681c55f4f" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#1c1098834228f93d28178a3681c55f4f">g_iShrinkDownInterval</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="86ac4f286478a585e3615ea9f619e2e1"></a><!-- doxytag: member="cairo-dock-animations.c::g_fMoveUpSpeed" ref="86ac4f286478a585e3615ea9f619e2e1" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">double <a class="el" href="cairo-dock_8c.html#86ac4f286478a585e3615ea9f619e2e1">g_fMoveUpSpeed</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="3cd78b794e0ae231fdfc3b33688ed4f9"></a><!-- doxytag: member="cairo-dock-animations.c::g_fMoveDownSpeed" ref="3cd78b794e0ae231fdfc3b33688ed4f9" args="" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">double <a class="el" href="cairo-dock_8c.html#3cd78b794e0ae231fdfc3b33688ed4f9">g_fMoveDownSpeed</a>          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="d032f581fee0aa87c72f18d59537e435"></a><!-- doxytag: member="cairo-dock-animations.c::g_tAnimationType" ref="d032f581fee0aa87c72f18d59537e435" args="[CAIRO_DOCK_NB_TYPES]" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#d032f581fee0aa87c72f18d59537e435">g_tAnimationType</a>[CAIRO_DOCK_NB_TYPES]          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="1b48a416cde2ed547878e8e86e1a8841"></a><!-- doxytag: member="cairo-dock-animations.c::g_tNbAnimationRounds" ref="1b48a416cde2ed547878e8e86e1a8841" args="[CAIRO_DOCK_NB_TYPES]" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#1b48a416cde2ed547878e8e86e1a8841">g_tNbAnimationRounds</a>[CAIRO_DOCK_NB_TYPES]          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<a class="anchor" name="57cbfb0ead563d0d0f16e94bedfbd568"></a><!-- doxytag: member="cairo-dock-animations.c::g_tNbIterInOneRound" ref="57cbfb0ead563d0d0f16e94bedfbd568" args="[CAIRO_DOCK_NB_ANIMATIONS]" --><p>
+<table class="mdTable" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="mdRow">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="md" nowrap valign="top">int <a class="el" href="cairo-dock_8c.html#57cbfb0ead563d0d0f16e94bedfbd568">g_tNbIterInOneRound</a>[CAIRO_DOCK_NB_ANIMATIONS]          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table cellspacing="5" cellpadding="0" border="0">
+  <tr>
+    <td>
+      &nbsp;
+    </td>
+    <td>
+
+<p>
+    </td>
+  </tr>
+</table>
+<hr size="1"><address style="align: right;"><small>Généré le Fri Dec 7 13:11:02 2007 pour Cairo-Dock par&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.4.6 </small></address>
+</body>
+</html>

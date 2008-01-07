@@ -1,0 +1,56 @@
+\section{Référence du fichier src/cairo-dock-desktop-file-factory.h}
+\label{cairo-dock-desktop-file-factory_8h}\index{src/cairo-dock-desktop-file-factory.h@{src/cairo-dock-desktop-file-factory.h}}
+\subsection*{Macros}
+\begin{CompactItemize}
+\item 
+\#define {\bf cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-from\_\-uri}(cURI, cDockName, fOrder, pDock, erreur)~cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-from\_\-uri\_\-full (cURI, cDockName, fOrder, pDock, FALSE, erreur)
+\item 
+\#define {\bf cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-for\_\-container}(cDockName, fOrder, pDock, erreur)~cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-from\_\-uri\_\-full (NULL, cDockName, fOrder, pDock, TRUE, erreur)
+\end{CompactItemize}
+\subsection*{Fonctions}
+\begin{CompactItemize}
+\item 
+gchar $\ast$ {\bf cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-from\_\-uri\_\-full} (gchar $\ast$cURI, const gchar $\ast$cDockName, double fOrder, {\bf CairoDock} $\ast$pDock, gboolean bIsContainer, GError $\ast$$\ast$erreur)
+\item 
+gchar $\ast$ {\bf cairo\_\-dock\_\-generate\_\-desktop\_\-filename} (gchar $\ast$cBaseName, gchar $\ast$cCairoDockDataDir)
+\item 
+void {\bf cairo\_\-dock\_\-update\_\-launcher\_\-desktop\_\-file} (gchar $\ast$cDesktopFilePath, gboolean bIsContainer)
+\item 
+gchar $\ast$ {\bf cairo\_\-dock\_\-get\_\-launcher\_\-template\_\-conf\_\-file} (gboolean bIsContainer)
+\end{CompactItemize}
+
+
+\subsection{Documentation des macros}
+\index{cairo-dock-desktop-file-factory.h@{cairo-dock-desktop-file-factory.h}!cairo_dock_add_desktop_file_from_uri@{cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-from\_\-uri}}
+\index{cairo_dock_add_desktop_file_from_uri@{cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-from\_\-uri}!cairo-dock-desktop-file-factory.h@{cairo-dock-desktop-file-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-from\_\-uri(cURI, cDockName, fOrder, pDock, erreur)~cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-from\_\-uri\_\-full (cURI, cDockName, fOrder, pDock, FALSE, erreur)}\label{cairo-dock-desktop-file-factory_8h_4bebaf86198cc20a54e674e865c077f9}
+
+
+\index{cairo-dock-desktop-file-factory.h@{cairo-dock-desktop-file-factory.h}!cairo_dock_add_desktop_file_for_container@{cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-for\_\-container}}
+\index{cairo_dock_add_desktop_file_for_container@{cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-for\_\-container}!cairo-dock-desktop-file-factory.h@{cairo-dock-desktop-file-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-for\_\-container(cDockName, fOrder, pDock, erreur)~cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-from\_\-uri\_\-full (NULL, cDockName, fOrder, pDock, TRUE, erreur)}\label{cairo-dock-desktop-file-factory_8h_2001a580c2287b91127e224ae8e66f89}
+
+
+
+
+\subsection{Documentation des fonctions}
+\index{cairo-dock-desktop-file-factory.h@{cairo-dock-desktop-file-factory.h}!cairo_dock_add_desktop_file_from_uri_full@{cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-from\_\-uri\_\-full}}
+\index{cairo_dock_add_desktop_file_from_uri_full@{cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-from\_\-uri\_\-full}!cairo-dock-desktop-file-factory.h@{cairo-dock-desktop-file-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ cairo\_\-dock\_\-add\_\-desktop\_\-file\_\-from\_\-uri\_\-full (gchar $\ast$ {\em cURI}, const gchar $\ast$ {\em cDockName}, double {\em fOrder}, {\bf CairoDock} $\ast$ {\em pDock}, gboolean {\em bIsContainer}, GError $\ast$$\ast$ {\em erreur})}\label{cairo-dock-desktop-file-factory_8h_6703ff5ccc8fc9f2ce3eaaaa5edde0b1}
+
+
+\index{cairo-dock-desktop-file-factory.h@{cairo-dock-desktop-file-factory.h}!cairo_dock_generate_desktop_filename@{cairo\_\-dock\_\-generate\_\-desktop\_\-filename}}
+\index{cairo_dock_generate_desktop_filename@{cairo\_\-dock\_\-generate\_\-desktop\_\-filename}!cairo-dock-desktop-file-factory.h@{cairo-dock-desktop-file-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ cairo\_\-dock\_\-generate\_\-desktop\_\-filename (gchar $\ast$ {\em cBaseName}, gchar $\ast$ {\em cCairoDockDataDir})}\label{cairo-dock-desktop-file-factory_8h_df8738f894709bd3404df3fe96fe68af}
+
+
+\index{cairo-dock-desktop-file-factory.h@{cairo-dock-desktop-file-factory.h}!cairo_dock_update_launcher_desktop_file@{cairo\_\-dock\_\-update\_\-launcher\_\-desktop\_\-file}}
+\index{cairo_dock_update_launcher_desktop_file@{cairo\_\-dock\_\-update\_\-launcher\_\-desktop\_\-file}!cairo-dock-desktop-file-factory.h@{cairo-dock-desktop-file-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void cairo\_\-dock\_\-update\_\-launcher\_\-desktop\_\-file (gchar $\ast$ {\em cDesktopFilePath}, gboolean {\em bIsContainer})}\label{cairo-dock-desktop-file-factory_8h_9c769d8d527da9ab5e9ff24dd1fa17a5}
+
+
+\index{cairo-dock-desktop-file-factory.h@{cairo-dock-desktop-file-factory.h}!cairo_dock_get_launcher_template_conf_file@{cairo\_\-dock\_\-get\_\-launcher\_\-template\_\-conf\_\-file}}
+\index{cairo_dock_get_launcher_template_conf_file@{cairo\_\-dock\_\-get\_\-launcher\_\-template\_\-conf\_\-file}!cairo-dock-desktop-file-factory.h@{cairo-dock-desktop-file-factory.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}gchar$\ast$ cairo\_\-dock\_\-get\_\-launcher\_\-template\_\-conf\_\-file (gboolean {\em bIsContainer})}\label{cairo-dock-desktop-file-factory_8h_6e56ee50a125da0d1ef4117b2bdde9a9}
+
+
