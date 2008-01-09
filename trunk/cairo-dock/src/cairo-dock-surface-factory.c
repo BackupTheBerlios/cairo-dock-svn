@@ -58,7 +58,6 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 {
 	//g_print ("%s (%d)\n", __func__, iBufferNbElements);
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
-	int iNbChannels = 4;
 	
 	//\____________________ On recupere la plus grosse des icones presentes dans le tampon (meilleur rendu).
 	int iIndex = 0, iBestIndex = 0;
@@ -90,11 +89,12 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 	}
 	
 	//\____________________ On cree la surface a partir du tampon.
+	int iStride = pXIconBuffer[iBestIndex+1] * sizeof (int);  // nbre d'octets entre le debut de 2 lignes. cela prend en compte le 64bits, merci a Hannemann pour sa precieuse indication ! :-)
 	cairo_surface_t *surface_ini = cairo_image_surface_create_for_data ((guchar *)&pXIconBuffer[iBestIndex+2],
 		CAIRO_FORMAT_ARGB32,
 		(int) pXIconBuffer[iBestIndex],
 		(int) pXIconBuffer[iBestIndex+1],
-		(int) pXIconBuffer[iBestIndex] * iNbChannels);
+		(int) iStride);
 	
 	double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
 	cairo_dock_calculate_contrainted_icon_size (fWidth,
