@@ -29,6 +29,7 @@ typedef struct _CairoDockModule CairoDockModule;
 typedef struct _CairoDockDialog CairoDockDialog;
 typedef struct _Icon Icon;
 typedef struct _CairoDockVisitCard CairoDockVisitCard;
+typedef struct _CairoDockVFSBackend CairoDockVFSBackend;
 
 typedef enum {
 	CAIRO_DOCK_VERTICAL = 0,
@@ -421,6 +422,65 @@ struct _Icon {
 };
 
 
+typedef enum {
+	CAIRO_DOCK_FILE_MODIFIED=0,
+	CAIRO_DOCK_FILE_DELETED,
+	CAIRO_DOCK_FILE_CREATED,
+	CAIRO_DOCK_NB_EVENT_ON_FILES
+	} CairoDockFMEventType;
+
+typedef enum {
+	CAIRO_DOCK_FM_SORT_BY_NAME=0,
+	CAIRO_DOCK_FM_SORT_BY_DATE,
+	CAIRO_DOCK_FM_SORT_BY_SIZE,
+	CAIRO_DOCK_FM_SORT_BY_TYPE,
+	CAIRO_DOCK_NB_SORT_ON_FILE
+	} CairoDockFMSortType;
+
+typedef void (*CairoDockFMGetFileInfoFunc) (const gchar *cBaseURI, gchar **cName, gchar **cURI, gchar **cIconName, gboolean *bIsDirectory, int *iVolumeID, double *fOrder, CairoDockFMSortType iSortType);
+typedef void (*CairoDockFMFilePropertiesFunc) (const gchar *cURI, guint64 *iSize, time_t *iLastModificationTime, gchar **cMimeType, int *iUID, int *iGID, int *iPermissionsMask);
+typedef GList * (*CairoDockFMListDirectoryFunc) (const gchar *cURI, CairoDockFMSortType g_fm_iSortType, gchar **cFullURI);
+typedef void (*CairoDockFMLaunchUriFunc) (const gchar *cURI);
+
+typedef gchar * (*CairoDockFMIsMountedFunc) (const gchar *cURI, gboolean *bIsMounted);
+typedef void (*CairoDockFMMountCallback) (gboolean bMounting, gboolean bSuccess, const gchar *cName, Icon *icon, CairoDock *pDock);
+typedef void (*CairoDockFMMountFunc) (const gchar *cURI, int iVolumeID, CairoDockFMMountCallback pCallback, Icon *icon, CairoDock *pDock);
+typedef void (*CairoDockFMUnmountFunc) (const gchar *cURI, int iVolumeID, CairoDockFMMountCallback pCallback, Icon *icon, CairoDock *pDockCairoDock);
+
+typedef void (*CairoDockFMMonitorCallback) (CairoDockFMEventType iEventType, const gchar *cURI, Icon *pIcon);
+typedef void (*CairoDockFMAddMonitorFunc) (const gchar *cURI, gboolean bDirectory, CairoDockFMMonitorCallback pCallback, Icon *icon);
+typedef void (*CairoDockFMRemoveMonitorFunc) (const gchar *cURI);
+
+typedef gboolean (*CairoDockFMDeleteFileFunc) (const gchar *cURI);
+typedef gboolean (*CairoDockFMRenameFileFunc) (const gchar *cOldURI, const gchar *cNewName);
+typedef gboolean (*CairoDockFMMoveFileFunc) (const gchar *cURI, const gchar *cDirectoryURI);
+
+typedef gchar * (*CairoDockFMGetTrashFunc) (const gchar *cNearURI);
+typedef gchar * (*CairoDockFMGetDesktopFunc) (void);
+
+struct _CairoDockVFSBackend {
+	CairoDockFMGetFileInfoFunc 		get_file_info;
+	CairoDockFMFilePropertiesFunc 	get_file_properties;
+	CairoDockFMListDirectoryFunc 	list_directory;
+	CairoDockFMLaunchUriFunc 		launch_uri;
+	CairoDockFMIsMountedFunc 		is_mounted;
+	CairoDockFMMountFunc 			mount;
+	CairoDockFMUnmountFunc 		unmount;
+	CairoDockFMAddMonitorFunc 		add_monitor;
+	CairoDockFMRemoveMonitorFunc 	remove_monitor;
+	CairoDockFMDeleteFileFunc 		delete;
+	CairoDockFMRenameFileFunc 		rename;
+	CairoDockFMMoveFileFunc 		move;
+	CairoDockFMGetTrashFunc 		get_trash_path;
+	CairoDockFMGetDesktopFunc 	get_desktop_path;
+};
+
+
+#define CAIRO_DOCK_FM_VFS_ROOT "_vfsroot_"
+#define CAIRO_DOCK_FM_NETWORK "_network_"
+#define CAIRO_DOCK_FM_VFS_ROOT_NETWORK "_vfsroot+network_"
+
+
 /// Nom du repertoire de travail de cairo-dock.
 #define CAIRO_DOCK_DATA_DIR ".cairo-dock"
 /// Nom du repertoire des themes.
@@ -466,7 +526,8 @@ typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
 typedef enum {
 	CAIRO_DOCK_UNKNOWN_ENV=0,
 	CAIRO_DOCK_GNOME,
-	CAIRO_DOCK_KDE
+	CAIRO_DOCK_KDE,
+	CAIRO_DOCK_XFCE
 	} CairoDockDesktopEnv;
 
 typedef enum

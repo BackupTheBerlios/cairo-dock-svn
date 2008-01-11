@@ -24,6 +24,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-surface-factory.h"
 #include "cairo-dock-renderer-manager.h"
+#include "cairo-dock-file-manager.h"
 #include "cairo-dock-launcher-factory.h"
 
 extern CairoDock *g_pMainDock;
@@ -47,6 +48,7 @@ extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
 
 extern gboolean g_bUseGlitz;
+extern CairoDockFMSortType g_iFileSortType;
 
 
 gchar *cairo_dock_search_icon_s_path (gchar *cFileName)
@@ -163,6 +165,7 @@ gchar *cairo_dock_search_icon_s_path (gchar *cFileName)
 void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName, Icon *icon)
 {
 	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, cDesktopFileName);
+	g_print ("%s (%s)\n", __func__, cDesktopFilePath);
 	
 	GError *erreur = NULL;
 	GKeyFile* keyfile = g_key_file_new();
@@ -174,10 +177,11 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		return ;
 	}
 	
-	g_free(icon->acDesktopFileName);
+	icon->iType = CAIRO_DOCK_LAUNCHER;
+	g_free (icon->acDesktopFileName);
 	icon->acDesktopFileName = g_strdup (cDesktopFileName);
 	
-	g_free(icon->acFileName);
+	g_free (icon->acFileName);
 	icon->acFileName = g_key_file_get_string (keyfile, "Desktop Entry", "Icon", &erreur);
 	if (erreur != NULL)
 	{
@@ -186,23 +190,13 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		erreur = NULL;
 	}
 	
-	g_free(icon->acName);
-	icon->acName = g_key_file_get_locale_string (keyfile, "Desktop Entry", "Name", NULL, NULL);
-	if (icon->acName != NULL && strcmp (icon->acName, "") == 0)
+	g_free (icon->acName);
+	icon->acName = g_key_file_get_string (keyfile, "Desktop Entry", "Name", &erreur);
+	if (erreur != NULL)
 	{
-		g_free (icon->acName);
-		icon->acName = NULL;
-	}
-	
-	if (icon->acName == NULL)
-	{
-		icon->acName = g_key_file_get_string (keyfile, "Desktop Entry", "Name", &erreur);
-		if (erreur != NULL)
-		{
-			g_print ("Attention : while trying to load %s : %s\n", cDesktopFileName, erreur->message);
-			g_error_free (erreur);
-			erreur = NULL;
-		}
+		g_print ("Attention : while trying to load %s : %s\n", cDesktopFileName, erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
 	}
 	if (icon->acName != NULL && strcmp (icon->acName, "") == 0)
 	{
@@ -210,7 +204,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		icon->acName = NULL;
 	}
 	
-	g_free(icon->acCommand);
+	g_free (icon->acCommand);
 	icon->acCommand = g_key_file_get_string (keyfile, "Desktop Entry", "Exec", &erreur);
 	if (erreur != NULL)
 	{
@@ -252,6 +246,18 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		g_error_free (erreur);
 		erreur = NULL;
 	}
+	if (icon->iVolumeID)  // les infos dans le .desktop ne sont pas a jour.
+	{
+		g_free (icon->acName);
+		icon->acName = NULL;
+		g_free (icon->acCommand);
+		icon->acCommand = NULL;
+		g_free (icon->acFileName);
+		icon->acFileName = NULL;
+		
+		gboolean bIsDirectory;  // on n'ecrase pas le fait que ce soit un container ou pas, car c'est l'utilisateur qui l'a decide.
+		cairo_dock_fm_get_file_info (icon->cBaseURI, &icon->acName, &icon->acCommand, &icon->acFileName, &bIsDirectory, &icon->iVolumeID, &icon->fOrder, g_iFileSortType);
+	}
 	
 	gboolean bIsContainer = g_key_file_get_boolean (keyfile, "Desktop Entry", "Is container", &erreur);
 	if (erreur != NULL)
@@ -268,15 +274,23 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		if (pChildDock == NULL)
 		{
 			g_print ("le dock fils (%s) n'existe pas, on le cree avec la vue %s\n", icon->acName, cRendererName);
-			pChildDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->acName, cRendererName);
+			if (icon->cBaseURI == NULL)
+				icon->pSubDock = cairo_dock_create_subdock_from_scratch (NULL, icon->acName);
+			else
+				cairo_dock_fm_create_dock_from_directory (icon);
 		}
-		else if (cRendererName != NULL)
-			cairo_dock_set_renderer (pChildDock, cRendererName);
-		cairo_dock_reference_dock (pChildDock);
-		icon->pSubDock = pChildDock;
+		else
+		{
+			cairo_dock_reference_dock (pChildDock);
+			icon->pSubDock = pChildDock;
+		}
+		if (cRendererName != NULL && icon->pSubDock != NULL)
+			cairo_dock_set_renderer (icon->pSubDock, cRendererName);
+		
 		g_free (cRendererName);
 	}
 	
+	g_free (icon->cParentDockName);
 	icon->cParentDockName = g_key_file_get_string (keyfile, "Desktop Entry", "Container", &erreur);
 	if (erreur != NULL)
 	{
@@ -291,17 +305,17 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
 	}
 	
-	icon->iType = CAIRO_DOCK_LAUNCHER;
-	
 	g_free (cDesktopFilePath);
+	g_key_file_free (keyfile);
 }
 
 
 
 Icon * cairo_dock_create_icon_from_desktop_file (const gchar *cDesktopFileName, cairo_t *pSourceContext)
 {
-	Icon *icon = g_new0 (Icon, 1);
+	g_print ("%s (%s)\n", __func__, cDesktopFileName);
 	
+	Icon *icon = g_new0 (Icon, 1);
 	cairo_dock_load_icon_info_from_desktop_file (cDesktopFileName, icon);
 	g_return_val_if_fail (icon->acDesktopFileName != NULL, NULL);
 	
@@ -317,7 +331,7 @@ Icon * cairo_dock_create_icon_from_desktop_file (const gchar *cDesktopFileName, 
 	if (pParentDock == NULL)
 	{
 		g_print ("le dock parent (%s) n'existe pas, on le cree\n", icon->cParentDockName);
-		pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_MENU, icon->cParentDockName, NULL);
+		pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_DOCK, icon->cParentDockName, NULL);
 	}
 	
 	return icon;

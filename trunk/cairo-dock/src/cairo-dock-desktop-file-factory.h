@@ -7,7 +7,12 @@
 #include "cairo-dock-struct.h"
 
 
-gchar *cairo_dock_add_desktop_file_from_uri_full (gchar *cURI, const gchar *cDockName, double fOrder, CairoDock *pDock, gboolean bIsContainer, GError **erreur);
+
+gchar *cairo_dock_generate_desktop_file_for_launcher (const gchar *cDesktopURI, const gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur);
+gchar *cairo_dock_generate_desktop_file_for_edition (gboolean bIsContainer, const gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur);
+gchar *cairo_dock_generate_desktop_file_for_file (const gchar *cURI, const gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur);
+
+gchar *cairo_dock_add_desktop_file_from_uri_full (const gchar *cURI, const gchar *cDockName, double fOrder, CairoDock *pDock, gboolean bIsContainer, GError **erreur);
 #define cairo_dock_add_desktop_file_from_uri(cURI, cDockName, fOrder, pDock, erreur) cairo_dock_add_desktop_file_from_uri_full (cURI, cDockName, fOrder, pDock, FALSE, erreur)
 #define cairo_dock_add_desktop_file_for_container(cDockName, fOrder, pDock, erreur) cairo_dock_add_desktop_file_from_uri_full (NULL, cDockName, fOrder, pDock, TRUE, erreur)
 

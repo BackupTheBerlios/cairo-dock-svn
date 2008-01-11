@@ -81,6 +81,8 @@
 #include "cairo-dock-dialogs.h"
 #include "cairo-dock-notifications.h"
 #include "cairo-dock-keyfile-manager.h"
+#include "cairo-dock-config.h"
+#include "cairo-dock-file-manager.h"
 #include "cairo-dock-renderer-manager.h"
 
 CairoDock *g_pMainDock;  // pointeur sur le dock principal.
@@ -163,6 +165,7 @@ int g_iLabelStyle;  // italique ou droit.
 gboolean g_bLabelForPointedIconOnly;  // n'afficher les etiquettes que pour l'icone pointee.
 double g_fLabelAlphaThreshold;  // seuil de visibilité de etiquettes.
 gboolean g_bTextAlwaysHorizontal;  // true <=> etiquettes horizontales meme pour les docks verticaux.
+double g_fLabelBackgroundAlpha;  // alpha des etiquettes, 0 pour utiliser des contours epais.
 
 double g_fAlphaAtRest;
 
@@ -210,6 +213,9 @@ gboolean g_bUseGlitz = FALSE;
 gboolean g_bVerbose = FALSE;
 
 short g_iMajorVersion, g_iMinorVersion, g_iMicroVersion;
+CairoDockDesktopEnv g_iDesktopEnv = CAIRO_DOCK_UNKNOWN_ENV;
+CairoDockFMSortType g_iFileSortType;
+
 
 static gboolean random_dialog (gpointer user_data)
 {
@@ -265,6 +271,12 @@ main (int argc, char** argv)
 			g_iWmHint = GDK_WINDOW_TYPE_HINT_NORMAL;
 		else if (strcmp (argv[i], "--dock-hint") == 0)  // le dock restera devant quoiqu'il arrive, mais ne recuperera plus les touches clavier.
 			g_print ("Attention : the '--dock-hint' option is deprecated since v1.3.7\n  It is now the default behaviour.");
+		else if (strcmp (argv[i], "--force-gnome") == 0)
+			g_iDesktopEnv = CAIRO_DOCK_GNOME;
+		else if (strcmp (argv[i], "--force-kde") == 0)
+			g_iDesktopEnv = CAIRO_DOCK_KDE;
+		else if (strcmp (argv[i], "--safe-mode") == 0)
+			bSafeMode = TRUE;
 		else if (strcmp (argv[i], "--dialog") == 0)
 			bDialogTest = TRUE;
 		else if (strcmp (argv[i], "--capuccino") == 0)
@@ -286,10 +298,6 @@ main (int argc, char** argv)
 		{
 			g_print ("v%s\n", CAIRO_DOCK_VERSION);
 			return 0;
-		}
-		else if (strcmp (argv[i], "--safe-mode") == 0)
-		{
-			bSafeMode = TRUE;
 		}
 		else if (strcmp (argv[i], "--verbose") == 0)
 		{
@@ -325,6 +333,11 @@ main (int argc, char** argv)
 		g_iMicroVersion = atoi (cVersions[2]);
 	g_strfreev (cVersions);
 	
+	//\___________________ On detecte l'environnement de bureau.
+	if (g_iDesktopEnv == CAIRO_DOCK_UNKNOWN_ENV)
+		g_iDesktopEnv = cairo_dock_guess_environment ();
+	g_print ("environnement de bureau : %d\n", g_iDesktopEnv);
+	
 	//\___________________ On initialise la table des docks.
 	g_hDocksTable = g_hash_table_new_full (g_str_hash,
 		g_str_equal,
@@ -335,7 +348,7 @@ main (int argc, char** argv)
 	cairo_dock_initialize_application_manager ();
 	
 	//\___________________ On initialise le gestionnaire de modules et on pre-charge les modules existant.
-	if (! bSafeMode)
+	if (! bSafeMode && g_module_supported ())
 		cairo_dock_initialize_module_manager (CAIRO_DOCK_MODULES_DIR);
 	
 	//\___________________ On initialise le gestionnaire de vues.

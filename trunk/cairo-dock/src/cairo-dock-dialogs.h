@@ -181,12 +181,6 @@ double cairo_dock_show_value_and_wait (const gchar *cMessage, Icon *pIcon, Cairo
 *@return GTK_RESPONSE_YES ou GTK_RESPONSE_NO suivant le choix de l'utilisateur, ou GTK_RESPONSE_NONE si le dialogue s'est fait detruire avant.
 */
 int cairo_dock_ask_question_and_wait (const gchar *cQuestion, Icon *pIcon, CairoDock *pDock);
-/**
-*Fait apparaitre un dialogue de question bloquant, et pointant sur une icone de separateur si possible, ou sinon sur l'icone pointee du dock principal (ou la 1ere icone sans dialogue si aucune n'est pointee). Cela permet a cairo-dock de poser une question d'ordre general.
-*@param cQuestion la question a poser.
-*@return idem que pour #cairo_dock_ask_question_and_wait.
-*/
-int cairo_dock_ask_general_question_and_wait (const gchar *cQuestion);
 
 
 /**
@@ -195,6 +189,27 @@ int cairo_dock_ask_general_question_and_wait (const gchar *cQuestion);
 *@return TRUE ssi l'icone possede au moins un dialogue.
 */
 gboolean cairo_dock_icon_has_dialog (Icon *pIcon);
+/**
+*Cherche une icone propice pour montrer un dialogue d'ordre general, dans le dock principal.
+*@return une icone, ou NULL si le dock est vide.
+*/
+Icon *cairo_dock_get_dialogless_icon (void);
+
+
+/**
+*Fait apparaitre un dialogue de question bloquant, et pointant sur une icone de separateur si possible, ou sinon sur l'icone pointee du dock principal (ou la 1ere icone sans dialogue si aucune n'est pointee). Cela permet a cairo-dock de poser une question d'ordre general.
+*@param cMessage le message.
+*@param fTimeLength la duree de vie du dialogue.
+*/
+void cairo_dock_show_general_message (const gchar *cMessage, double fTimeLength);
+/**
+*Fait apparaitre un dialogue de question bloquant, et pointant sur une icone de separateur si possible, ou sinon sur l'icone pointee du dock principal (ou la 1ere icone sans dialogue si aucune n'est pointee). Cela permet a cairo-dock de poser une question d'ordre general.
+*@param cQuestion la question a poser.
+*@return idem que pour #cairo_dock_ask_question_and_wait.
+*/
+int cairo_dock_ask_general_question_and_wait (const gchar *cQuestion);
+
+
 /**
 *Cache un dialogue, sans le detruire.
 *@param pDialog le dialogue.

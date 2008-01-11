@@ -73,24 +73,26 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 	*fHeight = (double) pXIconBuffer[iBestIndex+1];
 	
 	int i;
-	gint alpha, red, green, blue;
+	gint pixel, alpha, red, green, blue;
 	float fAlphaFactor;
+	gint *pPixelBuffer = (gint *) &pXIconBuffer[iBestIndex+2];  // on va ecrire le resultat du filtre directement dans le tableau fourni en entree. C'est ok car sizeof(gulong) >= sizeof(gint), donc le tableau de pixels est plus petit que le buffer fourni en entree. merci a Hannemann pour ses tests et ses screenshots ! :-)
 	for (i = 0; i < (int) (*fHeight) * (*fWidth); i ++)
 	{
-		alpha = (pXIconBuffer[iBestIndex+2+i] & 0xFF000000) >> 24;
-		red = (pXIconBuffer[iBestIndex+2+i] & 0x00FF0000) >> 16;
-		green = (pXIconBuffer[iBestIndex+2+i] & 0x0000FF00) >> 8;
-		blue = pXIconBuffer[iBestIndex+2+i] & 0x000000FF;
+		pixel = (gint) pXIconBuffer[iBestIndex+2+i];
+		alpha = (pixel & 0xFF000000) >> 24;
+		red   = (pixel & 0x00FF0000) >> 16;
+		green = (pixel & 0x0000FF00) >> 8;
+		blue  = (pixel & 0x000000FF);
 		fAlphaFactor = (float) alpha / 255;
 		red *= fAlphaFactor;
 		green *= fAlphaFactor;
 		blue *= fAlphaFactor;
-		pXIconBuffer[iBestIndex+2+i] = (pXIconBuffer[iBestIndex+2+i] & 0xFF000000) + (red << 16) + (green << 8) + blue;
+		pPixelBuffer[i] = (pixel & 0xFF000000) + (red << 16) + (green << 8) + blue;
 	}
 	
 	//\____________________ On cree la surface a partir du tampon.
-	int iStride = pXIconBuffer[iBestIndex+1] * sizeof (int);  // nbre d'octets entre le debut de 2 lignes. cela prend en compte le 64bits, merci a Hannemann pour sa precieuse indication ! :-)
-	cairo_surface_t *surface_ini = cairo_image_surface_create_for_data ((guchar *)&pXIconBuffer[iBestIndex+2],
+	int iStride = (int) (*fWidth) * sizeof (gint);  // nbre d'octets entre le debut de 2 lignes.
+	cairo_surface_t *surface_ini = cairo_image_surface_create_for_data ((guchar *)pPixelBuffer,
 		CAIRO_FORMAT_ARGB32,
 		(int) pXIconBuffer[iBestIndex],
 		(int) pXIconBuffer[iBestIndex+1],

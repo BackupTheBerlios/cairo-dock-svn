@@ -1087,10 +1087,29 @@ int cairo_dock_ask_question_and_wait (const gchar *cQuestion, Icon *pIcon, Cairo
 	return (iAnswer == GTK_RESPONSE_OK ? GTK_RESPONSE_YES : GTK_RESPONSE_NO);
 }
 
-int cairo_dock_ask_general_question_and_wait (const gchar *cQuestion)
+
+
+gboolean cairo_dock_icon_has_dialog (Icon *pIcon)
+{
+	g_static_rw_lock_reader_lock (&s_mDialogsMutex);
+	
+	GSList *ic;
+	CairoDockDialog *pDialog;
+	for (ic = s_pDialogList; ic != NULL; ic = ic->next)
+	{
+		pDialog = ic->data;
+		if (pDialog->pIcon == pIcon)
+			break ;
+	}
+	
+	g_static_rw_lock_reader_unlock (&s_mDialogsMutex);
+	return (ic != NULL);
+}
+
+Icon *cairo_dock_get_dialogless_icon (void)
 {
 	if (g_pMainDock->icons == NULL)
-		return GTK_RESPONSE_NONE;
+		return NULL;
 	
 	Icon *pIcon = cairo_dock_get_first_icon_of_type (g_pMainDock->icons, CAIRO_DOCK_SEPARATOR12);
 	if (pIcon == NULL)
@@ -1111,27 +1130,26 @@ int cairo_dock_ask_general_question_and_wait (const gchar *cQuestion)
 			}
 		}
 	}
-	return cairo_dock_ask_question_and_wait (cQuestion, pIcon, g_pMainDock);
+	return pIcon;
 }
 
-
-
-gboolean cairo_dock_icon_has_dialog (Icon *pIcon)
+void cairo_dock_show_general_message (const gchar *cMessage, double fTimeLength)
 {
-	g_static_rw_lock_reader_lock (&s_mDialogsMutex);
-	
-	GSList *ic;
-	CairoDockDialog *pDialog;
-	for (ic = s_pDialogList; ic != NULL; ic = ic->next)
-	{
-		pDialog = ic->data;
-		if (pDialog->pIcon == pIcon)
-			break ;
-	}
-	
-	g_static_rw_lock_reader_unlock (&s_mDialogsMutex);
-	return (ic != NULL);
+	Icon *pIcon = cairo_dock_get_dialogless_icon ();
+	if (pIcon != NULL)
+		cairo_dock_show_temporary_dialog (cMessage, pIcon, g_pMainDock, fTimeLength);
 }
+
+int cairo_dock_ask_general_question_and_wait (const gchar *cQuestion)
+{
+	Icon *pIcon = cairo_dock_get_dialogless_icon ();
+	if (pIcon == NULL)
+		return GTK_RESPONSE_NONE;
+	else
+		return cairo_dock_ask_question_and_wait (cQuestion, pIcon, g_pMainDock);
+}
+
+
 
 void cairo_dock_hide_dialog (CairoDockDialog *pDialog)
 {

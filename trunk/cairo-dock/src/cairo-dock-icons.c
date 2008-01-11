@@ -32,6 +32,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dialogs.h"
 #include "cairo-dock-applications-manager.h"
 #include "cairo-dock-separator-factory.h"
+#include "cairo-dock-file-manager.h"
 #include "cairo-dock-icons.h"
 
 
@@ -345,7 +346,7 @@ Icon *cairo_dock_get_icon_with_command (GList *pIconList, gchar *cCommand)
 	return NULL;
 }
 
-Icon *cairo_dock_get_icon_with_base_uri (GList *pIconList, gchar *cBaseURI)
+Icon *cairo_dock_get_icon_with_base_uri (GList *pIconList, const gchar *cBaseURI)
 {
 	g_return_val_if_fail (cBaseURI != NULL, NULL);
 	GList* ic;
@@ -651,11 +652,19 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 static void _cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon, gboolean bCheckUnusedSeparator)
 {
 	//\___________________ On effectue les taches de fermeture de l'icone suivant son type.
-	if (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon))
+	if (CAIRO_DOCK_IS_LAUNCHER (icon))
 	{
-		gchar *icon_path = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
-		g_remove (icon_path);
-		g_free (icon_path);
+		if (icon->acDesktopFileName != NULL)
+		{
+			gchar *icon_path = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
+			g_remove (icon_path);
+			g_free (icon_path);
+			
+			if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
+			{
+				cairo_dock_fm_remove_monitor (icon);
+			}
+		}
 	}
 	else if (CAIRO_DOCK_IS_VALID_APPLI (icon))
 	{

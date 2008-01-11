@@ -16,17 +16,14 @@ typedef enum {
 	CAIRO_DOCK_DOUBLE_CLICK_ICON,
 	/// data : Icon
 	CAIRO_DOCK_MIDDLE_CLICK_ICON,
-	/// data : {Icon, CairoDock}
-	CAIRO_DOCK_ADD_ICON,
-	/// data : {Icon, CairoDock}
-	CAIRO_DOCK_MODIFY_ICON,
 	/// data : {Icon, CairoDock, GtkMenu}
 	CAIRO_DOCK_BUILD_MENU,
 	/// data : {gchar, Icon, double, CairoDock}
 	CAIRO_DOCK_DROP_DATA,
-	/// data : NULL
+	/// notification appellee lors d'un changement de bureau ou de viewport. data : NULL
 	CAIRO_DOCK_DESKTOP_CHANGED,
-	///
+	/// notification appellee lorsqu'une fenetre est redimensionnee ou deplacee. data : XConfigureEvent.
+	CAIRO_DOCK_WINDOW_CONFIGURED,
 	CAIRO_DOCK_NB_NOTIFICATIONS
 	} CairoDockNotificationType;
 

@@ -29,6 +29,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-themes-manager.h"
 #include "cairo-dock-notifications.h"
 #include "cairo-dock-dialogs.h"
+#include "cairo-dock-file-manager.h"
 #include "cairo-dock-menu.h"
 
 #define CAIRO_DOCK_CONF_PANEL_WIDTH 800
@@ -400,6 +401,174 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	}
 }
 
+static void _cairo_dock_show_file_properties (GtkMenuItem *menu_item, gpointer *data)
+{
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
+	//g_print ("%s (%s)\n", __func__, icon->acName);
+	
+	guint64 iSize = 0;
+	time_t iLastModificationTime = 0;
+	gchar *cMimeType = NULL;
+	int iUID=0, iGID=0, iPermissionsMask=0;
+	if (cairo_dock_fm_get_file_properties (icon->acCommand, &iSize, &iLastModificationTime, &cMimeType, &iUID, &iGID, &iPermissionsMask))
+	{
+		GtkWidget *pDialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
+			GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_MESSAGE_INFO,
+			GTK_BUTTONS_OK,
+			"Properties :");
+		
+		GString *sInfo = g_string_new ("");
+		g_string_printf (sInfo, "<b>%s</b>", icon->acName);
+		
+		GtkWidget *pLabel= gtk_label_new (NULL);
+		gtk_label_set_use_markup (GTK_LABEL (pLabel), TRUE);
+		gtk_label_set_markup (GTK_LABEL (pLabel), sInfo->str);
+		
+		GtkWidget *pFrame = gtk_frame_new (NULL);
+		gtk_container_set_border_width (GTK_CONTAINER (pFrame), 3);
+		gtk_frame_set_label_widget (GTK_FRAME (pFrame), pLabel);
+		gtk_frame_set_shadow_type (GTK_FRAME (pFrame), GTK_SHADOW_OUT);
+		gtk_container_add (GTK_CONTAINER (GTK_DIALOG (pDialog)->vbox), pFrame);
+		
+		GtkWidget *pVBox = gtk_vbox_new (FALSE, 3);
+		gtk_container_add (GTK_CONTAINER (pFrame), pVBox);
+		
+		pLabel = gtk_label_new (NULL);
+		gtk_label_set_use_markup (GTK_LABEL (pLabel), TRUE);
+		g_string_printf (sInfo, "<u>Size</u> : %d bytes", iSize);
+		if (iSize > 1024*1024)
+			g_string_append_printf (sInfo, " (%.1f Mo)", 1. * iSize / 1024 / 1024);
+		else if (iSize > 1024)
+			g_string_append_printf (sInfo, " (%.1f Ko)", 1. * iSize / 1024);
+		gtk_label_set_markup (GTK_LABEL (pLabel), sInfo->str);
+		gtk_container_add (GTK_CONTAINER (pVBox), pLabel);
+		
+		pLabel = gtk_label_new (NULL);
+		gtk_label_set_use_markup (GTK_LABEL (pLabel), TRUE);
+		struct tm epoch_tm;
+		localtime_r (&iLastModificationTime, &epoch_tm);  // et non pas gmtime_r.
+		gchar *cTimeChain = g_new0 (gchar, 100);
+		strftime (cTimeChain, 100, "%F, %T", &epoch_tm);
+		g_string_printf (sInfo, "<u>Last Modification</u> : %s", cTimeChain);
+		g_free (cTimeChain);
+		gtk_label_set_markup (GTK_LABEL (pLabel), sInfo->str);
+		gtk_container_add (GTK_CONTAINER (pVBox), pLabel);
+		
+		if (cMimeType != NULL)
+		{
+			pLabel = gtk_label_new (NULL);
+			gtk_label_set_use_markup (GTK_LABEL (pLabel), TRUE);
+			g_string_printf (sInfo, "<u>Mime Type</u> : %s", cMimeType);
+			gtk_label_set_markup (GTK_LABEL (pLabel), sInfo->str);
+			gtk_container_add (GTK_CONTAINER (pVBox), pLabel);
+		}
+		
+		GtkWidget *pSeparator = gtk_hseparator_new ();
+		gtk_container_add (GTK_CONTAINER (pVBox), pSeparator);
+		
+		pLabel = gtk_label_new (NULL);
+		gtk_label_set_use_markup (GTK_LABEL (pLabel), TRUE);
+		g_string_printf (sInfo, "<u>User ID</u> : %d / <u>Group ID</u> : %d", iUID, iGID);
+		gtk_label_set_markup (GTK_LABEL (pLabel), sInfo->str);
+		gtk_container_add (GTK_CONTAINER (pVBox), pLabel);
+		
+		pLabel = gtk_label_new (NULL);
+		gtk_label_set_use_markup (GTK_LABEL (pLabel), TRUE);
+		int iOwnerPermissions = iPermissionsMask >> 6;  // 8*8.
+		int iGroupPermissions = (iPermissionsMask - (iOwnerPermissions << 6)) >> 3;
+		int iOthersPermissions = (iPermissionsMask % 8);
+		g_string_printf (sInfo, "<u>Permissions</u> : %d / %d / %d", iOwnerPermissions, iGroupPermissions, iOthersPermissions);
+		gtk_label_set_markup (GTK_LABEL (pLabel), sInfo->str);
+		gtk_container_add (GTK_CONTAINER (pVBox), pLabel);
+		
+		gtk_widget_show_all (GTK_DIALOG (pDialog)->vbox);
+		gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER_ALWAYS);
+		int answer = gtk_dialog_run (GTK_DIALOG (pDialog));
+		gtk_widget_destroy (pDialog);
+		
+		g_string_free (sInfo, TRUE);
+		g_free (cMimeType);
+	}
+}
+
+static void _cairo_dock_mount_unmount (GtkMenuItem *menu_item, gpointer *data)
+{
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
+	g_print ("%s (%s)\n", __func__, icon->acName);
+	
+	gboolean bIsMounted = FALSE;
+	gchar *cActivationURI = cairo_dock_fm_is_mounted (icon->acCommand, &bIsMounted);
+	g_print ("  cActivationURI : %s; bIsMounted : %d\n", cActivationURI, bIsMounted);
+	g_free (cActivationURI);
+	
+	if (! bIsMounted)
+	{
+		cairo_dock_fm_mount (icon, pDock);
+	}
+	else
+		cairo_dock_fm_unmount (icon, pDock);
+}
+
+static void _cairo_dock_delete_file (GtkMenuItem *menu_item, gpointer *data)
+{
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
+	g_print ("%s (%s)\n", __func__, icon->acName);
+	
+	gchar *question = g_strdup_printf (_("You're about to delete this file\n  (%s)\nfrom your hard-disk. Sure ?"), icon->acCommand);
+	int answer = cairo_dock_ask_question_and_wait (question, icon, pDock);
+	g_free (question);
+	if (answer == GTK_RESPONSE_YES)
+	{
+		gboolean bSuccess = cairo_dock_fm_delete_file (icon->acCommand);
+		if (! bSuccess)
+		{
+			g_print ("Attention : couldn't delete this file.\nCheck that you have writing rights on this file.\n");
+			gchar *cMessage = g_strdup_printf (_("Attention : couldn't delete this file.\nCheck that you have writing rights on it."));
+			cairo_dock_show_temporary_dialog_with_default_icon (cMessage, icon, pDock, 4000);
+			g_free (cMessage);
+		}
+		cairo_dock_remove_icon_from_dock (pDock, icon);
+		cairo_dock_update_dock_size (pDock);
+		
+		if (icon->acDesktopFileName != NULL)
+		{
+			gchar *icon_path = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
+			g_remove (icon_path);
+			g_free (icon_path);
+		}
+		
+		cairo_dock_free_icon (icon);
+	}
+}
+
+static void _cairo_dock_rename_file (GtkMenuItem *menu_item, gpointer *data)
+{
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
+	g_print ("%s (%s)\n", __func__, icon->acName);
+	
+	gchar *cNewName = cairo_dock_show_demand_and_wait (_("Rename to :"), icon, pDock, icon->acName);
+	if (cNewName != NULL && *cNewName != '\0')
+	{
+		gboolean bSuccess = cairo_dock_fm_rename_file (icon->acCommand, cNewName);
+		if (! bSuccess)
+		{
+			g_print ("Attention : couldn't rename this file.\nCheck that you have writing rights, and that the new name does not already exist.\n");
+			gchar *cMessage = g_strdup_printf (_("Attention : couldn't rename %s.\nCheck that you have writing rights,\n and that the new name does not already exist."), icon->acCommand);
+			cairo_dock_show_temporary_dialog (cMessage, icon, pDock, 5000);
+			g_free (cMessage);
+		}
+	}
+	g_free (cNewName);
+	//gtk_widget_destroy (pDialog);  // il faut le faire ici et pas avant, pour garder la GtkEntry.
+}
+
+
+
 
 static void cairo_dock_initiate_config_module_from_module (GtkMenuItem *menu_item, CairoDockModule *pModule)
 {
@@ -691,6 +860,36 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	{
 		if (CAIRO_DOCK_IS_LAUNCHER (icon))
 		{
+			if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
+			{
+				if (icon->iVolumeID > 0)
+				{
+					gboolean bIsMounted = FALSE;
+					gchar *cActivationURI = cairo_dock_fm_is_mounted  (icon->acCommand, &bIsMounted);
+					g_print ("  cActivationURI : %s; bIsMounted : %d\n", cActivationURI, bIsMounted);
+					g_free (cActivationURI);
+					
+					menu_item = gtk_menu_item_new_with_label (bIsMounted ? "Unmount" : "Mount");
+					gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
+					g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(_cairo_dock_mount_unmount), data);
+				}
+				else
+				{
+					menu_item = gtk_menu_item_new_with_label ("Delete this file");
+					gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
+					g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(_cairo_dock_delete_file), data);
+					
+					menu_item = gtk_menu_item_new_with_label ("Rename this file");
+					gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
+					g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(_cairo_dock_rename_file), data);
+					
+					menu_item = gtk_menu_item_new_with_label ("Properties");
+					gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
+					g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(_cairo_dock_show_file_properties), data);
+				}
+				if (icon->acDesktopFileName == NULL)
+					return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
+			}
 			menu_item = gtk_image_menu_item_new_with_label (_("Add a launcher"));
 			image = gtk_image_new_from_stock (GTK_STOCK_ADD, GTK_ICON_SIZE_MENU);
 			gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);

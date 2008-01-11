@@ -71,6 +71,7 @@ void cairo_dock_initialize_renderer_manager (void)
 
 void cairo_dock_set_renderer (CairoDock *pDock, gchar *cRendererName)
 {
+	g_return_if_fail (pDock != NULL);
 	g_print ("%s (%s)\n", __func__, cRendererName);
 	CairoDockRenderer *pRenderer = cairo_dock_get_renderer (cRendererName, (pDock->iRefCount == 0));
 	

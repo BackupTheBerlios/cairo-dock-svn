@@ -35,7 +35,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-separator-factory.h"
 #include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-renderer-manager.h"
-#include "cairo-dock-dock-factory.h"
+#include "cairo-dock-file-manager.h"
 #include "cairo-dock-dock-factory.h"
 
 extern int g_iWmHint;
@@ -144,7 +144,7 @@ static void _cairo_dock_set_colormap (CairoDock *pDock)
 * @param iWmHint indicateur du type de fenetre pour le WM.
 * @param cDockName nom du dock, qui pourra etre utilise pour retrouver celui-ci rapidement.
 * @param cRendererName nom de la fonction de rendu a applisuer au dock. si NULL, le rendu par defaut sera applique.
-* @Returns le dock nouvellement alloué, a detruire avec <cairo_dock_destroy_dock>
+* @Returns le dock nouvellement alloué, a detruire avec #cairo_dock_destroy_dock
 */
 CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockName, gchar *cRendererName)
 {
@@ -174,8 +174,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	
 	if (g_bSticky)
 		gtk_window_stick (GTK_WINDOW (pWindow));
-	if (g_pMainDock == NULL)  // puisque c'est lui qu'on cree en premier.
-		gtk_window_set_keep_above (GTK_WINDOW (pWindow), g_bKeepAbove);
+	gtk_window_set_keep_above (GTK_WINDOW (pWindow), g_bKeepAbove);
 	gtk_window_set_skip_pager_hint (GTK_WINDOW (pWindow), g_bSkipPager);
 	gtk_window_set_skip_taskbar_hint (GTK_WINDOW (pWindow), g_bSkipTaskbar);
 	gtk_window_set_gravity (GTK_WINDOW (pWindow), GDK_GRAVITY_STATIC);
@@ -259,15 +258,21 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 		G_CALLBACK (on_selection_notify_event),
 		pDock);*/
 	
-	GtkTargetEntry *pTargetEntry = g_new0 (GtkTargetEntry, 1);
-	pTargetEntry[0].target = g_strdup ("text/uri-list");
+	GtkTargetEntry *pTargetEntry = g_new0 (GtkTargetEntry, 6);
+	pTargetEntry[0].target = "text/*";
 	pTargetEntry[0].flags = (GtkTargetFlags) 0;
 	pTargetEntry[0].info = 0;
+	pTargetEntry[1].target = "text/uri-list";
+	pTargetEntry[2].target = "text/plain";
+	pTargetEntry[3].target = "text/plain;charset=UTF-8";
+	pTargetEntry[4].target = "text/directory";
+	pTargetEntry[5].target = "text/html";
 	gtk_drag_dest_set (pWindow,
 		GTK_DEST_DEFAULT_DROP | GTK_DEST_DEFAULT_MOTION,  // GTK_DEST_DEFAULT_HIGHLIGHT ne rend pas joli je trouve.
 		pTargetEntry,
-		1,
+		6,
 		GDK_ACTION_COPY);
+	g_free (pTargetEntry);
 	
 	g_hash_table_insert (g_hDocksTable, g_strdup (cDockName), pDock);
 	gtk_window_get_size (GTK_WINDOW (pWindow), &pDock->iCurrentWidth, &pDock->iCurrentHeight);  // ca n'est que la taille initiale allouee par GTK.
@@ -752,6 +757,11 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 	//g_hash_table_foreach (g_hDocksTable, (GHFunc) _cairo_dock_update_child_dock_size, NULL);  // on mettra a jour la taille du dock principal apres y avoir insere les applis/applets, car pour l'instant les docks fils n'en ont pas.
 }
 
+static void _cairo_dock_fm_remove_monitor_on_one_icon (Icon *icon, gpointer data)
+{
+	if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
+		cairo_dock_fm_remove_monitor (icon);
+}
 static void _cairo_dock_deactivate_one_dock (CairoDock *pDock)
 {
 	if (pDock->iSidMoveDown != 0)
@@ -766,8 +776,10 @@ static void _cairo_dock_deactivate_one_dock (CairoDock *pDock)
 		g_source_remove (pDock->iSidLeaveDemand);
 	if (pDock->bIsMainDock && cairo_dock_application_manager_is_running ())
 	{
-		cairo_dock_pause_application_manager ();  // inutile d'enlever les icones des applis, ce sera fait de toute maniere.
+		cairo_dock_pause_application_manager ();  // precaution au cas ou.
 	}
+	
+	g_list_foreach (pDock->icons, (GFunc) _cairo_dock_fm_remove_monitor_on_one_icon, NULL);
 	
 	Icon *pPointedIcon;
 	while ((pPointedIcon = cairo_dock_search_icon_pointing_on_dock (pDock, NULL)) != NULL)
@@ -802,17 +814,18 @@ void cairo_dock_free_all_docks (CairoDock *pMainDock)
 {
 	if (pMainDock == NULL)
 		return ;
-	cairo_dock_remove_all_applets (pMainDock);  // pour arreter les applets; on pourrait se contenter de faire un stop() sur chacun ...
 	
-	///cairo_dock_pause_application_manager ();  // sera fait lors de la liberation du dock.
+	cairo_dock_stop_deactivate_all_modules ();  // pas seulement les modules qui ont une icone.
+	
+	cairo_dock_pause_application_manager ();
 	
 	g_hash_table_foreach_remove (g_hDocksTable, (GHRFunc) _cairo_dock_free_one_dock, NULL);
 	g_pMainDock = NULL;
 }
 
 /**
-* Diminue le nombre d'icones pointant sur un dock de 1. Si aucune icone ne pointe plus sur lui apres ca, le detruit et libere la memoire qui lui etait allouee.
-* @param pMainDock le dock a detruire.
+* Diminue le nombre d'icones pointant sur un dock de 1. Si aucune icone ne pointe plus sur lui apres ca, le detruit ainsi que tous ses sous-docks, et libere la memoire qui lui etait allouee. Ne fais rien pour le dock principal, utiliser #cairo_dock_free_all_docks pour cela.
+* @param pDock le dock a detruire.
 * @param cDockName son nom.
 * @param ReceivingDock un dock qui recuperera les icones, ou NULL pour detruire toutes les icones contenues dans le dock.
 * @param cReceivingDockName le nom du dock qui recuperera les icones, ou NULL si aucun n'est fourni.
@@ -820,6 +833,8 @@ void cairo_dock_free_all_docks (CairoDock *pMainDock)
 void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDock *ReceivingDock, gchar *cReceivingDockName)
 {
 	//g_print ("%s (%s, %d)\n", __func__, cDockName, pDock->iRefCount);
+	if (pDock->bIsMainDock)  // utiliser cairo_dock_free_all_docks ().
+		return;
 	pDock->iRefCount --;  // peut-etre qu'il faudrait en faire une operation atomique...
 	if (pDock->iRefCount > 0)
 		return ;

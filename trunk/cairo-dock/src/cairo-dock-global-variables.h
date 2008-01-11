@@ -90,4 +90,7 @@ extern int g_iStringLineWidth;
 /// Taille max autorisee pour les docks.
 extern int g_iMaxAuthorizedWidth;
 
+/// Environnement de bureau detecte.
+extern CairoDockDesktopEnv g_iDesktopEnv;
+
 #endif

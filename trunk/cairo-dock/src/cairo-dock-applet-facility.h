@@ -2,10 +2,13 @@
 #ifndef __CAIRO_DOCK_APPLET_FACILITY__
 #define  __CAIRO_DOCK_APPLET_FACILITY__
 
-#include <glib.h>
-
 #include "cairo-dock-struct.h"
 
+/**
+*@file cairo-dock-applet-facility.h Les macros forment un canevas dedie aux applets. Elles permettent un developpement rapide et normalise d'une applet pour Cairo-Dock.
+*
+* Pour un exemple tres simple, consultez les sources de l'applet 'logout'.
+*/
 
 /**
 *Verifie que le fichier de conf d'un plug-in est bien present dans le repertoire utilisateur du plug-in, sinon le copie a partir du fichier de conf fournit lors de l'installation. Cree au besoin le repertoire utilisateur du plug-in.
@@ -250,13 +253,15 @@ void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cA
 *@return un gboolean.
 */
 #define CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT(cGroupName, cKeyName, bDefaultValue) cairo_dock_get_boolean_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, bDefaultValue, NULL, NULL)
+
 /**
 *Recupere la valeur d'un parametre 'booleen' du fichier de conf, avec TRUE comme valeur par defaut.
 *@param cGroupName nom du groupe dans le fichier de conf.
 *@param cKeyName nom de la cle dans le fichier de conf.
 *@return un gboolean.
 */
-#define CD_CONFIG_GET_BOOLEAN(cGroupName, cKeyName) CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT (cGroupName, cKeyName, TRUE)
+#define CD_CONFIG_GET_BOOLEAN(cGroupName, cKeyName) \
+CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT (cGroupName, cKeyName, TRUE)
 
 /**
 *Recupere la valeur d'un parametre 'entier' du fichier de conf.
@@ -543,6 +548,47 @@ gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data) \
 #define CD_APPLET_ON_MIDDLE_CLICK_H \
 gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data);
 
+//\______________________ notification drag'n'drop.
+#define CD_APPLET_ON_DROP_DATA action_on_drop_data
+/**
+*Abonne l'applet aux notifications du glisse-depose. A effectuer lors de l'init de l'applet.
+*/
+#define CD_APPLET_REGISTER_FOR_DROP_DATA_EVENT cairo_dock_register_notification (CAIRO_DOCK_DROP_DATA, (CairoDockNotificationFunc) CD_APPLET_ON_DROP_DATA, CAIRO_DOCK_RUN_FIRST);
+/**
+*Desabonne l'applet aux notifications du glisse-depose. A effectuer lors de l'arret de l'applet.
+*/
+#define CD_APPLET_UNREGISTER_FOR_DROP_DATA_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_DROP_DATA, (CairoDockNotificationFunc) CD_APPLET_ON_DROP_DATA);
+
+/**
+*Debut de la fonction de notification du glisse-depose.
+*/
+#define CD_APPLET_ON_DROP_DATA_BEGIN \
+gboolean CD_APPLET_ON_DROP_DATA (gpointer *data) \
+{ \
+	if (data[1] == myIcon) \
+	{ \
+		const gchar *cReceivedData = data[0];
+
+/**
+*Donnees recues (chaine de caracteres).
+*/
+#define CD_APPLET_RECEIVED_DATA cReceivedData
+
+/**
+*Fin de la fonction de notification du glisse-depose. Par defaut elle intercepte la notification si elle l'a recue.
+*/
+#define CD_APPLET_ON_DROP_DATA_END \
+		return CAIRO_DOCK_INTERCEPT_NOTIFICATION; \
+	} \
+	return CAIRO_DOCK_LET_PASS_NOTIFICATION; \
+}
+/**
+*Definition de la fonction precedente; a inclure dans le .h correspondant.
+*/
+#define CD_APPLET_ON_DROP_DATA_H \
+gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
+
+
 //\_________________________________ DESSIN
 /**
 *Applique une surface existante sur le contexte de dessin de l'applet, et la redessine. La surface est redimensionnee aux dimensions de l'icone.
@@ -599,7 +645,9 @@ extern cairo_t *myDrawContext; \
 extern CairoDock *myDock;
 
 //\_________________________________ INTERNATIONNALISATION
-/// Macro pour gettext, similaire a _() et _N(), mais avec le nom de domaine en parametre. Encadrez toutes vos chaines de caracteres statiques avec ca, de maniere a ce que l'utilitaire 'xgettext' puisse les trouver et les inclure autimatiquement dans les fichiers de traduction.
+/**
+*Macro pour gettext, similaire a _() et _N(), mais avec le nom de domaine en parametre. Encadrez toutes vos chaines de caracteres statiques avec ca, de maniere a ce que l'utilitaire 'xgettext' puisse les trouver et les inclure autimatiquement dans les fichiers de traduction.
+*/
 #define _D(message) dgettext (MY_APPLET_GETTEXT_DOMAIN, message)
 
 #endif

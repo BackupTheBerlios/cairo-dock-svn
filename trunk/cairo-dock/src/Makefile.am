@@ -94,7 +94,9 @@ cairo_dock_SOURCES = \
 	cairo-dock-default-view.c\
 	cairo-dock-default-view.h\
 	cairo-dock-applet-facility.c\
-	cairo-dock-applet-facility.h
+	cairo-dock-applet-facility.h\
+	cairo-dock-file-manager.c\
+	cairo-dock-file-manager.h
 	
 
 cairo_dockincludedir =\
@@ -132,4 +134,5 @@ cairo_docksubinclude_HEADERS =\
 	cairo-dock-surface-factory.h\
 	cairo-dock-renderer-manager.h\
 	cairo-dock-default-view.h\
-	cairo-dock-applet-facility.h
+	cairo-dock-applet-facility.h\
+	cairo-dock-file-manager.h

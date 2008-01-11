@@ -2,4 +2,12 @@
 
 1.4.5.1 = pouet
 
-1.4.6 = new version 1.4.6\nit rocks !
+1.4.6 = Welcome to new 1.4.6 version !\n - New conf panel, clearly separating apparence and behavior.\n - complete internationnalisation (except plug-ins).\n - applis on current desktop only.\n - minimized applis only.\n - better accessibility of sub-docks and show on clic.\n - Themes and applets preview.\n - Distinction launcher/sub-dock in the menu.\n - And ... merry Xmas ! :-)
+
+1.4.6.1 = It's Mr Jack who made the presents and he hid some bugs into them ^_^\nv1.4.6.1 :\n - Prevent Rhythmbox applet from interfering when we don't want.\n - Correct a bug that made dialogs freeze the dock.\n - Better version management for applet.
+
+1.4.6.2 = v1.4.6.2 :\nThis time is the good one !\n - correct a bug that crashed the dock when adding files\n - make dustbin delete trash when we choose to\n - internationnalization of most applets
+
+1.4.6.3 = v1.4.6.3 :\nJust to say :\n*** Happy new Year 2008 ! ***\n  the Cairo-Dock's team.
+
+v1.4.7 = v1.4.7 :\n - A new view has appeared : the parabolic view !\n  Perfect for sub-docks with a dozen of icons.\n - Don't use any terminal window anymore,\n use the 'terminal' applet ! thanks to Cedric Gestes for it !\n - A new plug-in for integration in GNOME\n  Wanted : a KDE user who could do the same for KDE !\n - Dustbin can now handle drag'n'drops.\n - Applet API is now fully documented,\n  why not try to make an applet for Cairo-Dock ? ;-)

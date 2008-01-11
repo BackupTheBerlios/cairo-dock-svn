@@ -74,7 +74,7 @@ static void cairo_dock_register_notifications (gboolean bRunFirst, int iFirstNot
 	
 	while (iNotifType != -1)
 	{
-		g_print ("%s () : %d\n", __func__, iNotifType);
+		//g_print ("%s () : %d\n", __func__, iNotifType);
 		
 		pFunction= va_arg (args, CairoDockNotificationFunc);
 		if (pFunction == NULL)  // ne devrait pas arriver.

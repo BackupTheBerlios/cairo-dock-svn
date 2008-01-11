@@ -73,6 +73,7 @@ extern int g_iLabelStyle;
 extern gboolean g_bLabelForPointedIconOnly;
 extern double g_fLabelAlphaThreshold;
 extern gboolean g_bTextAlwaysHorizontal;
+extern double g_fLabelBackgroundAlpha;
 
 extern gpointer *g_pDefaultIconDirectory;
 static gboolean s_bUserTheme = FALSE;
@@ -643,6 +644,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		g_free (g_cLabelPolice);
 		g_cLabelPolice = NULL;
 	}
+	
+	g_fLabelBackgroundAlpha = cairo_dock_get_double_key_value (pKeyFile, "Icons", "label background alpha", &bFlushConfFileNeeded, 0., NULL, NULL);
 	
 	
 	//\___________________ On recupere les parametres du dock en lui-meme.

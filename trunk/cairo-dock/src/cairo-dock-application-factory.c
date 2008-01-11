@@ -354,7 +354,6 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 			{
 				Window XMainAppliWindow = 0;
 				XGetTransientForHint (s_XDisplay, Xid, &XMainAppliWindow);
-				
 				if (XMainAppliWindow != 0)
 				{
 					//g_print ("dialogue 'transient for' => on ignore\n");
@@ -376,9 +375,8 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	}
 	else
 	{
-		Window XMainAppliWindow;
-		if (XGetTransientForHint (s_XDisplay, Xid, &XMainAppliWindow) != 0)
-			XMainAppliWindow = 0;
+		Window XMainAppliWindow = 0;
+		XGetTransientForHint (s_XDisplay, Xid, &XMainAppliWindow);
 		if (XMainAppliWindow != 0)
 		{
 			//g_print ("fenetre modale => on saute.\n");
@@ -437,7 +435,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	///cairo_dock_manage_appli_class (icon, pDock);
 	icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
 	
-	cairo_dock_set_window_mask (Xid, PropertyChangeMask);
+	cairo_dock_set_window_mask (Xid, PropertyChangeMask | StructureNotifyMask);
 	
 	return icon;
 }

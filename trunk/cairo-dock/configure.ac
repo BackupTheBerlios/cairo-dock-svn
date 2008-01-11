@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([cairo-dock], [1.4.7], [Fabrice Rey (fabounet@users.berlios.de)])
+AC_INIT([cairo-dock], [1.4.7-alpha2], [Fabrice Rey (fabounet@users.berlios.de)])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
 
@@ -43,6 +43,7 @@ AC_CONFIG_FILES([Makefile
 		src/Makefile
 		po/Makefile.in
 		data/Makefile
+		data/cairo-dock.conf
 		data/themes/Makefile
 		data/themes/_default_/Makefile
 		data/themes/_default_/launchers/Makefile

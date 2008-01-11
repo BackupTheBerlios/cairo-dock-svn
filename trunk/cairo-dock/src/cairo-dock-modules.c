@@ -117,7 +117,6 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 			cairo_dock_free_visit_card (pVisitCard);
 			return ;
 		}
-		g_print ("pVisitCard->cDockVersionOnCompilation : %s\n", pVisitCard->cDockVersionOnCompilation);
 		if (pVisitCard->cDockVersionOnCompilation != NULL && strcmp (pVisitCard->cDockVersionOnCompilation, CAIRO_DOCK_VERSION) != 0)
 		{
 			g_set_error (erreur, 1, 1, "Attention : this module ('%s') was compiled with Cairo-Dock v%s, but Cairo-Dock is in v%s\n  It will be ignored", pCairoDockModule->cSoFilePath, pVisitCard->cDockVersionOnCompilation, CAIRO_DOCK_VERSION);
@@ -408,20 +407,33 @@ void cairo_dock_deactivate_module (CairoDockModule *module)
 {
 	g_return_if_fail (module != NULL);
 	
-	if (module->stopModule != NULL && module->bActive)
+	if (module->bActive)
 	{
-		module->stopModule ();
+		if (module->stopModule != NULL)
+		{
+			module->stopModule ();
+		}
+		
+		module->bActive = FALSE;
+		g_free (module->cConfFilePath);
+		module->cConfFilePath = NULL;
+		g_free (module->cReadmeFilePath);
+		module->cReadmeFilePath = NULL;
+		g_free (module->cPreviewFilePath);
+		module->cPreviewFilePath = NULL;
+		g_free (module->cGettextDomain);
+		module->cGettextDomain = NULL;
 	}
-	
-	module->bActive = FALSE;
-	g_free (module->cConfFilePath);
-	module->cConfFilePath = NULL;
-	g_free (module->cReadmeFilePath);
-	module->cReadmeFilePath = NULL;
-	g_free (module->cPreviewFilePath);
-	module->cPreviewFilePath = NULL;
-	g_free (module->cGettextDomain);
-	module->cGettextDomain = NULL;
+}
+
+
+static void _cairo_dock_deactivate_one_module (gchar *cModuleName, CairoDockModule *pModule, gpointer data)
+{
+	cairo_dock_deactivate_module (pModule);
+}
+void cairo_dock_stop_deactivate_all_modules (void)
+{
+	g_hash_table_foreach (s_hModuleTable, (GHFunc) _cairo_dock_deactivate_one_module, NULL);
 }
 
 
