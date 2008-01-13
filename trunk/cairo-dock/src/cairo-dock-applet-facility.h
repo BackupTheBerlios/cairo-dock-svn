@@ -67,6 +67,15 @@ void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, 
 */
 void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo, Icon *pIcon);
 /**
+*Ecris une info-rapide sur l'icone, en prenant une chaine au format 'printf'.
+*@param pSourceContext un contexte de dessin; n'est pas altere par la fonction.
+*@param pIcon l'icone.
+*@param pDock le dock contenant l'icone.
+*@param cQuickInfoFormat le texte de l'info-rapide, au format 'printf' (%s, %d, etc)
+*@param ... les donnees a inserer dans la chaine de caracteres.
+*/
+void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, CairoDock *pDock, const gchar *cQuickInfoFormat, ...);
+/**
 *Efface l'info-rapide d'une icone.
 *@param pIcon l'icone.
 */
@@ -567,7 +576,8 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data) \
 { \
 	if (data[1] == myIcon) \
 	{ \
-		const gchar *cReceivedData = data[0];
+		const gchar *cReceivedData = data[0]; \
+		g_return_val_if_fail (cReceivedData != NULL, CAIRO_DOCK_LET_PASS_NOTIFICATION);
 
 /**
 *Donnees recues (chaine de caracteres).
@@ -613,12 +623,24 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 	cairo_dock_set_icon_name (myDrawContext, cIconName, myIcon, myDock);
 
 /**
-*Ecris une info-rapide sur l'icone de l'applet et la redessine.
-*@param cQuickInfo l'info-rapide. Ce doit etre une chaine de caracteres particulièrement petite, representant une info concise, puisque ecrite directement sur l'icone.
+*Ecris une info-rapide sur l'icone de l'applet.
+*@param cQuickInfoFormat l'info-rapide, au format 'printf'. Ce doit etre une chaine de caracteres particulièrement petite, representant une info concise, puisque ecrite directement sur l'icone.
 */
-#define CD_APPLET_SET_QUICK_INFO_ON_MY_ICON(cQuickInfo) \
-	cairo_dock_set_quick_info (myDrawContext, cQuickInfo, myIcon);\
+#define CD_APPLET_SET_QUICK_INFO_ON_MY_ICON(cQuickInfoFormat, ...) \
+	cairo_dock_set_quick_info_full (myDrawContext, myIcon, myDock, cQuickInfoFormat, ##__VA_ARGS__);
+/**
+*Ecris une info-rapide sur l'icone de l'applet et la redessine.
+*@param cQuickInfoFormat l'info-rapide, au format 'printf'. Ce doit etre une chaine de caracteres particulièrement petite, representant une info concise, puisque ecrite directement sur l'icone.
+*/
+#define CD_APPLET_SET_QUICK_INFO_ON_MY_ICON_AND_REDRAW(cQuickInfoFormat, ...) \
+	cairo_dock_set_quick_info_full (myDrawContext, myIcon, myDock, cQuickInfoFormat, ##__VA_ARGS__); \
 	cairo_dock_redraw_my_icon (myIcon, myDock);
+
+/**
+*Ecris une info-rapide sur l'icone de l'applet et la redessine.
+*@param cQuickInfoFormat l'info-rapide, au format 'printf'. Ce doit etre une chaine de caracteres particulièrement petite, representant une info concise, puisque ecrite directement sur l'icone.
+*/
+
 
 /**
 *Lance l'animation de l'icone de l'applet.

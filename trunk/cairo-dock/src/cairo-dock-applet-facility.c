@@ -161,6 +161,17 @@ void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo
 		.4);
 }
 
+void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, CairoDock *pDock, const gchar *cQuickInfoFormat, ...)
+{
+	va_list args;
+	va_start (args, cQuickInfoFormat);
+	gchar *cFullText = g_strdup_vprintf (cQuickInfoFormat, args);
+	cairo_dock_set_quick_info (pSourceContext, cFullText, pIcon);
+	g_free (cFullText);
+	va_end (args);
+}
+
+
 void cairo_dock_animate_icon (Icon *pIcon, CairoDock *pDock, CairoDockAnimationType iAnimationType, int iNbRounds)
 {
 	cairo_dock_arm_animation (pIcon, iAnimationType, iNbRounds);
