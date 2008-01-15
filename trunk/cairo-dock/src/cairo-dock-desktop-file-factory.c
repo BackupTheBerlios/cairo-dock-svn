@@ -35,8 +35,9 @@ extern CairoDockFMSortType g_iFileSortType;
 
 gchar *cairo_dock_generate_desktop_file_for_launcher (const gchar *cDesktopURI, const gchar *cDockName, double fOrder, CairoDock *pDock, GError **erreur)
 {
+	g_return_val_if_fail (cDesktopURI != NULL, NULL);
 	GError *tmp_erreur = NULL;
-	gchar *cFilePath = g_filename_from_uri (cDesktopURI, NULL, &tmp_erreur);
+	gchar *cFilePath = (*cDesktopURI == '/' ? g_strdup (cDesktopURI) : g_filename_from_uri (cDesktopURI, NULL, &tmp_erreur));
 	if (tmp_erreur != NULL)
 	{
 		g_propagate_error (erreur, tmp_erreur);
