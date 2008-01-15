@@ -790,6 +790,7 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 	return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 }
 
+
 gboolean cairo_dock_notification_middle_click_icon (gpointer *data)
 {
 	Icon *icon = data[0];

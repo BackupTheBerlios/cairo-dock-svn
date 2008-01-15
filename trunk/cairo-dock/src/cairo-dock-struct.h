@@ -455,7 +455,7 @@ typedef gboolean (*CairoDockFMDeleteFileFunc) (const gchar *cURI);
 typedef gboolean (*CairoDockFMRenameFileFunc) (const gchar *cOldURI, const gchar *cNewName);
 typedef gboolean (*CairoDockFMMoveFileFunc) (const gchar *cURI, const gchar *cDirectoryURI);
 
-typedef gchar * (*CairoDockFMGetTrashFunc) (const gchar *cNearURI);
+typedef gchar * (*CairoDockFMGetTrashFunc) (const gchar *cNearURI, gboolean bCreateIfNecessary);
 typedef gchar * (*CairoDockFMGetDesktopFunc) (void);
 
 struct _CairoDockVFSBackend {

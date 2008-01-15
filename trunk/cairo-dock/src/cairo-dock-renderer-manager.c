@@ -26,7 +26,7 @@ static GHashTable *s_hRendererTable = NULL;  // table des modules de rendus.
 
 CairoDockRenderer *cairo_dock_get_renderer (gchar *cRendererName, gboolean bForMainDock)
 {
-	g_print ("%s (%s, %d)\n", __func__, cRendererName, bForMainDock);
+	//g_print ("%s (%s, %d)\n", __func__, cRendererName, bForMainDock);
 	CairoDockRenderer *pRenderer = NULL;
 	if (cRendererName != NULL)
 		pRenderer = g_hash_table_lookup (s_hRendererTable, cRendererName);
@@ -34,7 +34,7 @@ CairoDockRenderer *cairo_dock_get_renderer (gchar *cRendererName, gboolean bForM
 	if (pRenderer == NULL)
 	{
 		const gchar *cDefaultRendererName = (bForMainDock ? g_cMainDockDefaultRendererName : g_cSubDockDefaultRendererName);
-		g_print ("  cDefaultRendererName : %s\n", cDefaultRendererName);
+		//g_print ("  cDefaultRendererName : %s\n", cDefaultRendererName);
 		if (cDefaultRendererName != NULL)
 			pRenderer = g_hash_table_lookup (s_hRendererTable, cDefaultRendererName);
 	}
@@ -72,7 +72,7 @@ void cairo_dock_initialize_renderer_manager (void)
 void cairo_dock_set_renderer (CairoDock *pDock, gchar *cRendererName)
 {
 	g_return_if_fail (pDock != NULL);
-	g_print ("%s (%s)\n", __func__, cRendererName);
+	//g_print ("%s (%s)\n", __func__, cRendererName);
 	CairoDockRenderer *pRenderer = cairo_dock_get_renderer (cRendererName, (pDock->iRefCount == 0));
 	
 	pDock->calculate_max_dock_size = pRenderer->calculate_max_dock_size;
@@ -106,7 +106,7 @@ void cairo_dock_update_launcher_conf_file_with_renderers (gchar *cConfFile)
 
 void cairo_dock_update_easy_conf_file_with_renderers (gchar *cConfFile)
 {
-	g_print ("%s (%s)\n", __func__, cConfFile);
+	//g_print ("%s (%s)\n", __func__, cConfFile);
 	_cairo_dock_update_conf_file_with_renderers (cConfFile, "Personnalisation", "main dock view", FALSE);
 	_cairo_dock_update_conf_file_with_renderers (cConfFile, "Personnalisation", "sub-dock view", FALSE);
 }
@@ -117,19 +117,19 @@ static void _cairo_dock_reset_one_dock_view (gchar *cDockName, CairoDock *pDock,
 }
 void cairo_dock_reset_all_views (void)
 {
-	g_print ("%s ()\n", __func__);
+	//g_print ("%s ()\n", __func__);
 	g_hash_table_foreach (g_hDocksTable, (GHFunc) _cairo_dock_reset_one_dock_view, NULL);
 }
 
 static void _cairo_dock_set_one_dock_view_to_default (gchar *cDockName, CairoDock *pDock, gpointer data)
 {
-	g_print ("%s (%s)\n", __func__, cDockName);
+	//g_print ("%s (%s)\n", __func__, cDockName);
 	cairo_dock_set_default_renderer (pDock);
 	cairo_dock_update_dock_size (pDock);
 }
 void cairo_dock_set_all_views_to_default (void)
 {
-	g_print ("%s ()\n", __func__);
+	//g_print ("%s ()\n", __func__);
 	g_hash_table_foreach (g_hDocksTable, (GHFunc) _cairo_dock_set_one_dock_view_to_default, NULL);
 }
 

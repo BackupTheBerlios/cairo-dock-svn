@@ -165,7 +165,8 @@ int g_iLabelStyle;  // italique ou droit.
 gboolean g_bLabelForPointedIconOnly;  // n'afficher les etiquettes que pour l'icone pointee.
 double g_fLabelAlphaThreshold;  // seuil de visibilité de etiquettes.
 gboolean g_bTextAlwaysHorizontal;  // true <=> etiquettes horizontales meme pour les docks verticaux.
-double g_fLabelBackgroundAlpha;  // alpha des etiquettes, 0 pour utiliser des contours epais.
+double g_fLabelBackgroundColor[4];  // couleur des etiquettes, alpha=0 pour utiliser des contours epais.
+gboolean g_bUseBackgroundForLabel;
 
 double g_fAlphaAtRest;
 
@@ -203,6 +204,7 @@ int g_iDialogMessageSize;  // taille de la police des messagez.
 gchar *g_cDialogMessagePolice = NULL;  // police de caracteres des etiquettes.
 int g_iDialogMessageWeight;  // epaisseur des traits.
 int g_iDialogMessageStyle;  // italique ou droit.
+double g_fDialogTextColor[4];
 
 gboolean g_bKeepAbove = FALSE;
 gboolean g_bSkipPager = TRUE;
@@ -481,8 +483,9 @@ main (int argc, char** argv)
 	//const gchar *cSillyMessage = "Sondage :\n Combien cairo-dock c'est trop bien :";
 	//const gchar *cSillyMessage = "Cairo-Dock : just launch it !";  // 4000
 	//const gchar *cSillyMessage = "Cairo-Dock lave plus blanc que blanc.";  // 4000
-	const gchar *cSillyMessage = "Sondage :\nVoulez-vous voir plus de filles nues dans Cairo-Dock ?";
-	const gchar *cNumSilllyMessage = "12";
+	//const gchar *cSillyMessage = "Sondage :\nVoulez-vous voir plus de filles nues dans Cairo-Dock ?";
+	const gchar *cSillyMessage = "C'est les soldes !\n Pour tout sous-dock acheté, un sous-dock offert !";
+	const gchar *cNumSilllyMessage = "13";
 	gboolean bWriteSillyMessage;
 	if (! g_file_test (cSillyMessageFilePath, G_FILE_TEST_EXISTS))
 	{
@@ -511,23 +514,19 @@ main (int argc, char** argv)
 	
  	if (bWriteSillyMessage && ! bWriteChangeLog)
 	{
-		Icon *pFirstIcon = cairo_dock_get_first_icon (g_pMainDock->icons);
-		if (pFirstIcon != NULL)
-		{
-			//cairo_dock_show_temporary_dialog_with_default_icon (cSillyMessage, pFirstIcon, g_pMainDock, 4000);
-			/*double fAnswer = cairo_dock_show_value_and_wait (cSillyMessage, pFirstIcon, g_pMainDock, 1.);
-			g_print (" ==> %.2f\n", fAnswer);
-			if (fAnswer == 0)
-				g_print ("Cela sera consigné et utilisé contre vous le moment venu ;-)\n");
-			else if (fAnswer == 1)
-				g_print ("je suis aussi d'accord ! ;-)\n");*/
-			
-			int iAnswer = cairo_dock_ask_question_and_wait (cSillyMessage, pFirstIcon, g_pMainDock);
-			if (iAnswer == GTK_RESPONSE_YES)
-				g_print ("c'est bien ce que je pensais ;-)\n");
-			else
-				g_print ("allez on ne me la fais pas ! ;-)\n");
-		}
+		cairo_dock_show_general_message (cSillyMessage, 4000);
+		/*double fAnswer = cairo_dock_show_value_and_wait (cSillyMessage, pFirstIcon, g_pMainDock, 1.);
+		g_print (" ==> %.2f\n", fAnswer);
+		if (fAnswer == 0)
+			g_print ("Cela sera consigné et utilisé contre vous le moment venu ;-)\n");
+		else if (fAnswer == 1)
+			g_print ("je suis aussi d'accord ! ;-)\n");*/
+		
+		/*int iAnswer = cairo_dock_ask_question_and_wait (cSillyMessage, pFirstIcon, g_pMainDock);
+		if (iAnswer == GTK_RESPONSE_YES)
+			g_print ("c'est bien ce que je pensais ;-)\n");
+		else
+			g_print ("allez on ne me la fais pas ! ;-)\n");*/
 	}
 	
 	gtk_main ();

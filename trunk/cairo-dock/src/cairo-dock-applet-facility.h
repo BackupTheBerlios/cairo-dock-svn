@@ -600,6 +600,13 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 
 
 //\_________________________________ DESSIN
+
+/**
+*Redessine immediatement l'icone de l'applet.
+*/
+#define CD_APPLET_REDRAW_MY_ICON \
+	cairo_dock_redraw_my_icon (myIcon, myDock);
+
 /**
 *Applique une surface existante sur le contexte de dessin de l'applet, et la redessine. La surface est redimensionnee aux dimensions de l'icone.
 *@param pSurface

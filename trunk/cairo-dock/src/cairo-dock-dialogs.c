@@ -35,6 +35,7 @@ extern int g_iDialogButtonWidth;
 extern int g_iDialogButtonHeight;
 extern double g_fDialogColor[4];
 extern int g_iDialogIconSize;
+extern double g_fDialogTextColor[4];
 
 extern int g_iDialogMessageSize;
 extern gchar *g_cDialogMessagePolice;
@@ -601,7 +602,7 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 	
 	cairo_save (pSurfaceContext);
 	cairo_translate (pSurfaceContext, -ink.x + (pIconSurface != NULL ? fImageSize + CAIRO_DOCK_DIALOG_TEXT_MARGIN : 0), -ink.y + (pIconSurface != NULL && fImageSize > ink.height ? (fImageSize - ink.height) / 2: 0));
-	cairo_set_source_rgb (pSurfaceContext, 0., 0., 0.);
+	cairo_set_source_rgba (pSurfaceContext, g_fDialogTextColor[0], g_fDialogTextColor[1], g_fDialogTextColor[2], g_fDialogTextColor[3]);
 	pango_cairo_show_layout (pSurfaceContext, pLayout);
 	
 	if (pIconSurface != NULL)

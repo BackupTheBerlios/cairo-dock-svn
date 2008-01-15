@@ -952,6 +952,12 @@ msgstr "Poids (entre 1 et 9, plus c'est élevé, plus les traits sont épais):"
 msgid "Should be italic ?"
 msgstr "Le texte est-il en italique ?"
 
+msgid "Color of the label's background :"
+msgstr "Couleur de fond des étiquettes :"
+
+msgid "If you set it to fully transparent, there will be no background for the text, but the letters' outline will be thicker."
+msgstr "Si vous le rendez complètement transparent, il n'y aura pas de fond pour le texte, mais les contours des lettres seront plus épaisses."
+
 msgid "Link the icons with a string"
 msgstr "Relier les icônes avec une ficelle"
 
@@ -1110,6 +1116,9 @@ msgstr "Mettez 0 pour que sa taille s'adapte à celle du texte."
 
 msgid "Text"
 msgstr "Texte"
+
+msgid "Text color (r,v,b,a) :"
+msgstr "Couleur du texte (r,v,b,a) :"
 
 msgid "Homogeneous with icons' label ?"
 msgstr "Homogène avec les étiquettes des icônes ?"

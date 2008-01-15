@@ -621,7 +621,7 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection (cairo_surface_
 }
 
 
-cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double fBackgroundAlpha, double fMaxScale, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset)
+cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double *fBackgroundColor, double fMaxScale, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset)
 {
 	g_return_val_if_fail (cText != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	
@@ -651,7 +651,7 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 		*iTextWidth, *iTextHeight);
 	cairo_t* pCairoContext = cairo_create (pNewSurface);
 	
-	if (fBackgroundAlpha > 0)
+	if (fBackgroundColor != NULL && fBackgroundColor[3] > 0)  // non transparent.
 	{
 		cairo_save (pCairoContext);
 		double fRadius = fMaxScale * MIN (.5 * g_iDockRadius, 5.);  // bon compromis.
@@ -661,7 +661,7 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 		double fDockOffsetX = fRadius + fLineWidth/2;
 		double fDockOffsetY = 0.;
 		cairo_dock_draw_frame (pCairoContext, fRadius, fLineWidth, fFrameWidth, fFrameHeight, fDockOffsetX, fDockOffsetY, 1, 0., CAIRO_DOCK_HORIZONTAL);
-		cairo_set_source_rgba (pCairoContext, 0., 0., 0., fBackgroundAlpha);
+		cairo_set_source_rgba (pCairoContext, fBackgroundColor[0], fBackgroundColor[1], fBackgroundColor[2], fBackgroundColor[3]);
 		cairo_fill_preserve (pCairoContext);
 		cairo_restore(pCairoContext);
 	}

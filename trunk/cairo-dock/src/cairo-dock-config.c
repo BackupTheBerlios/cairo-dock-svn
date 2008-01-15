@@ -73,7 +73,8 @@ extern int g_iLabelStyle;
 extern gboolean g_bLabelForPointedIconOnly;
 extern double g_fLabelAlphaThreshold;
 extern gboolean g_bTextAlwaysHorizontal;
-extern double g_fLabelBackgroundAlpha;
+extern double g_fLabelBackgroundColor[4];
+extern gboolean g_bUseBackgroundForLabel;
 
 extern gpointer *g_pDefaultIconDirectory;
 static gboolean s_bUserTheme = FALSE;
@@ -149,6 +150,7 @@ extern int g_iDialogMessageSize;
 extern gchar *g_cDialogMessagePolice;
 extern int g_iDialogMessageWeight;
 extern int g_iDialogMessageStyle;
+extern double g_fDialogTextColor[4];
 
 /**
 *Recupere une cle booleene d'un fichier de cles.
@@ -645,7 +647,10 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		g_cLabelPolice = NULL;
 	}
 	
-	g_fLabelBackgroundAlpha = cairo_dock_get_double_key_value (pKeyFile, "Icons", "label background alpha", &bFlushConfFileNeeded, 0., NULL, NULL);
+	double couleur_label[4] = {0., 0., 0., 0.5};
+	cairo_dock_get_double_list_key_value (pKeyFile, "Icons", "text background color", &bFlushConfFileNeeded, g_fLabelBackgroundColor, 4, couleur_label, NULL, NULL);
+	
+	g_bUseBackgroundForLabel = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "background for label", &bFlushConfFileNeeded, FALSE, NULL, NULL);
 	
 	
 	//\___________________ On recupere les parametres du dock en lui-meme.
@@ -937,6 +942,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		else
 			g_iDialogMessageStyle = PANGO_STYLE_NORMAL;
 	}
+	
+	double couleur_dtext[4] = {0., 0., 0., 1.};
+	cairo_dock_get_double_list_key_value (pKeyFile, "Dialogs", "text color", &bFlushConfFileNeeded, g_fDialogTextColor, 4, couleur_dtext, NULL, NULL);
 	
 	
 	//\___________________ On (re)charge tout, car n'importe quel parametre peut avoir change.
