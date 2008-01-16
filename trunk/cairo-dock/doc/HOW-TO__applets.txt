@@ -1,6 +1,6 @@
 
 Cairo-Dock met à votre disposition un canevas dédié à une écriture rapide et normalisée de ses applets.
-Mettons qu'on veuille écrire une applet (appelons-la 'truc'); faites une copie du répertoire de l'applet 'logout' et changez toutes les occurrences de 'logout' en 'truc' dans les sources et les fichiers de compil., et mettez votre nom dans le 'readme' et le 'about'. Voilà, vous avez une applet fonctionnelle ! :-)
+Mettons qu'on veuille écrire une applet (appelons-la 'truc'); utilisez le script generate-new-applet.sh pour la creer. Voila vous avez une applet fonctionnelle ! :-)
 Pour aller plus loin, regardons les 3 points importants :
 
 1) La structure de votre applet :

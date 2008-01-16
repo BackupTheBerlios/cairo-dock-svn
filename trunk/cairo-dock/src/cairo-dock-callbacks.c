@@ -834,7 +834,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				{
 					if (s_pIconClicked != NULL)
 					{
-						//g_print ("release sur %s\n", s_pIconClicked->acName);
+						g_print ("release de %s (inside:%d)\n", s_pIconClicked->acName, pDock->bInside);
 						s_pIconClicked->iAnimationType = 0;  // stoppe les animations de suivi du curseur.
 						s_pIconClicked->iCount = 0;  // precaution.
 						cairo_dock_stop_marking_icons (pDock);

@@ -854,6 +854,7 @@ void cairo_dock_render_blank (CairoDock *pDock)
 */
 void cairo_dock_redraw_my_icon (Icon *icon, CairoDock *pDock)
 {
+	g_return_if_fail (icon != NULL && pDock != NULL);
 	if (pDock->bAtBottom && (pDock->iRefCount > 0 || g_bAutoHide))
 		return ;
 	GdkRectangle rect = {(int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor)),
@@ -867,7 +868,7 @@ void cairo_dock_redraw_my_icon (Icon *icon, CairoDock *pDock)
 		rect.width = (int) icon->fHeight * icon->fScale + (pDock->bUseReflect ? g_fReflectSize : 0);
 		rect.height = (int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)) - 1;
 	}
-	//g_print ("rect (%d;%d) (%dx%d)\n", rect.x, rect.y, rect.width, rect.height);
+	g_print ("rect (%d;%d) (%dx%d)\n", rect.x, rect.y, rect.width, rect.height);
 #ifdef HAVE_GLITZ
 	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
 		gtk_widget_queue_draw (pDock->pWidget);

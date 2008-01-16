@@ -76,19 +76,19 @@ gboolean cairo_dock_fm_launch_uri (const gchar *cURI)
 		return FALSE;
 }
 
-gboolean cairo_dock_fm_add_monitor_full (const gchar *cURI, gboolean bDirectory, const gchar *cMountedURI, CairoDockFMMonitorCallback pCallback, Icon *pIcon)
+gboolean cairo_dock_fm_add_monitor_full (const gchar *cURI, gboolean bDirectory, const gchar *cMountedURI, CairoDockFMMonitorCallback pCallback, gpointer data)
 {
 	if (s_pVFSBackend != NULL && s_pVFSBackend->add_monitor != NULL)
 	{
 		if (cMountedURI != NULL && strcmp (cMountedURI, cURI) != 0)
 		{
-			s_pVFSBackend->add_monitor (cURI, FALSE, pCallback, pIcon);
+			s_pVFSBackend->add_monitor (cURI, FALSE, pCallback, data);
 			if (bDirectory)
-				s_pVFSBackend->add_monitor (cMountedURI, TRUE, pCallback, pIcon);
+				s_pVFSBackend->add_monitor (cMountedURI, TRUE, pCallback, data);
 		}
 		else
 		{
-			s_pVFSBackend->add_monitor (cURI, bDirectory, pCallback, pIcon);
+			s_pVFSBackend->add_monitor (cURI, bDirectory, pCallback, data);
 		}
 		return TRUE;
 	}

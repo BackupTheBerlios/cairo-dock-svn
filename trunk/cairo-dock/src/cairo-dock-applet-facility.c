@@ -152,6 +152,7 @@ void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo
 	
 	g_free (pIcon->cQuickInfo);
 	pIcon->cQuickInfo = g_strdup (cQuickInfo);
+	g_print ("cQuickInfo <- %s\n", pIcon->cQuickInfo);
 	
 	cairo_dock_fill_one_quick_info_buffer (pIcon,
 		pSourceContext,

@@ -447,8 +447,8 @@ typedef void (*CairoDockFMMountCallback) (gboolean bMounting, gboolean bSuccess,
 typedef void (*CairoDockFMMountFunc) (const gchar *cURI, int iVolumeID, CairoDockFMMountCallback pCallback, Icon *icon, CairoDock *pDock);
 typedef void (*CairoDockFMUnmountFunc) (const gchar *cURI, int iVolumeID, CairoDockFMMountCallback pCallback, Icon *icon, CairoDock *pDockCairoDock);
 
-typedef void (*CairoDockFMMonitorCallback) (CairoDockFMEventType iEventType, const gchar *cURI, Icon *pIcon);
-typedef void (*CairoDockFMAddMonitorFunc) (const gchar *cURI, gboolean bDirectory, CairoDockFMMonitorCallback pCallback, Icon *icon);
+typedef void (*CairoDockFMMonitorCallback) (CairoDockFMEventType iEventType, const gchar *cURI, gpointer data);
+typedef void (*CairoDockFMAddMonitorFunc) (const gchar *cURI, gboolean bDirectory, CairoDockFMMonitorCallback pCallback, gpointer data);
 typedef void (*CairoDockFMRemoveMonitorFunc) (const gchar *cURI);
 
 typedef gboolean (*CairoDockFMDeleteFileFunc) (const gchar *cURI);

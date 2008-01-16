@@ -676,7 +676,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 						icon = g_hash_table_lookup (s_hXWindowTable, &XActiveWindow);
 						if (icon != NULL)
 						{
-							g_print ("%s devient active\n", icon->acName);
+							//g_print ("%s devient active\n", icon->acName);
 							if (icon->iCount == 0 && icon->fPersonnalScale == 0)  // sinon on laisse l'animation actuelle.
 							{
 								CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
