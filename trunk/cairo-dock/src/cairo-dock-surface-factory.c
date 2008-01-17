@@ -56,7 +56,6 @@ void cairo_dock_calculate_contrainted_icon_size (double *fImageWidth, double *fI
 
 cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuffer, int iBufferNbElements, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
 {
-	g_print ("%s (%d)\n  Allez quoi, dites-moi que ça marche en 64bits !\n", __func__, iBufferNbElements);
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	
 	//\____________________ On recupere la plus grosse des icones presentes dans le tampon (meilleur rendu).

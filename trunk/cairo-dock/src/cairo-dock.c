@@ -528,7 +528,6 @@ main (int argc, char** argv)
 		else
 			g_print ("allez on ne me la fais pas ! ;-)\n");*/
 	}
-	
 	gtk_main ();
 	
 	rsvg_term ();

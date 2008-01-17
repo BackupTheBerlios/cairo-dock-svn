@@ -397,6 +397,32 @@ void cairo_dock_move_xwindow_to_nth_desktop (Window Xid, int iDesktopNumber, int
 	//cairo_dock_set_xwindow_timestamp (Xid, cairo_dock_get_xwindow_timestamp (root));
 }
 
+void cairo_dock_show_hide_desktop (gboolean bShow)
+{
+	XEvent xClientMessage;
+	Window root = DefaultRootWindow (s_XDisplay);
+	
+	xClientMessage.xclient.type = ClientMessage;
+	xClientMessage.xclient.serial = 0;
+	xClientMessage.xclient.send_event = True;
+	xClientMessage.xclient.display = s_XDisplay;
+	xClientMessage.xclient.window = root;
+	xClientMessage.xclient.message_type = XInternAtom (s_XDisplay, "_NET_SHOWING_DESKTOP", False);
+	xClientMessage.xclient.format = 32;
+	xClientMessage.xclient.data.l[0] = bShow;
+	xClientMessage.xclient.data.l[1] = 0;
+	xClientMessage.xclient.data.l[2] = 0;
+	xClientMessage.xclient.data.l[3] = 2;
+	xClientMessage.xclient.data.l[4] = 0;
+
+	XSendEvent (s_XDisplay,
+		root,
+		False,
+		SubstructureRedirectMask | SubstructureNotifyMask,
+		&xClientMessage);
+}
+
+
 
 gboolean cairo_dock_window_is_maximized (Window Xid)
 {
@@ -485,6 +511,21 @@ void cairo_dock_window_is_fullscreen_or_hidden (Window Xid, gboolean *bIsFullScr
 	}
 	
 	XFree (pXStateBuffer);
+}
+
+gboolean cairo_dock_desktop_is_visible (void)
+{
+	Atom aNetShowingDesktop = XInternAtom (s_XDisplay, "_NET_SHOWING_DESKTOP", False);
+	gulong iLeftBytes, iBufferNbElements = 0;
+	Atom aReturnedType = 0;
+	int aReturnedFormat = 0;
+	gulong *pXBuffer = NULL;
+	Window root = DefaultRootWindow (s_XDisplay);
+	XGetWindowProperty (s_XDisplay, root, aNetShowingDesktop, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXBuffer);
+	
+	gboolean bDesktopIsShown = (iBufferNbElements > 0 && pXBuffer != NULL ? *pXBuffer : FALSE);
+	XFree (pXBuffer);
+	return bDesktopIsShown;
 }
 
 

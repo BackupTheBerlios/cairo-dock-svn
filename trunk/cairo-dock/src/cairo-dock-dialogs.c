@@ -936,7 +936,7 @@ void cairo_dock_show_temporary_dialog_with_icon (const gchar *cText, Icon *pIcon
 	va_list args;
 	va_start (args, cIconPath);
 	gchar *cFullText = g_strdup_vprintf (cText, args);
-	cairo_dock_show_dialog_full (cText, pIcon, pDock, fTimeLength, cIconPath, GTK_BUTTONS_NONE, NULL, NULL, NULL, NULL);
+	cairo_dock_show_dialog_full (cFullText, pIcon, pDock, fTimeLength, cIconPath, GTK_BUTTONS_NONE, NULL, NULL, NULL, NULL);
 	g_free (cFullText);
 	va_end (args);
 }
@@ -946,7 +946,7 @@ void cairo_dock_show_temporary_dialog (const gchar *cText, Icon *pIcon, CairoDoc
 	va_list args;
 	va_start (args, fTimeLength);
 	gchar *cFullText = g_strdup_vprintf (cText, args);
-	cairo_dock_show_dialog_full (cText, pIcon, pDock, fTimeLength, NULL, GTK_BUTTONS_NONE, NULL, NULL, NULL, NULL);
+	cairo_dock_show_dialog_full (cFullText, pIcon, pDock, fTimeLength, NULL, GTK_BUTTONS_NONE, NULL, NULL, NULL, NULL);
 	g_free (cFullText);
 	va_end (args);
 }
@@ -957,7 +957,7 @@ void cairo_dock_show_temporary_dialog_with_default_icon (const gchar *cText, Ico
 	va_start (args, fTimeLength);
 	gchar *cFullText = g_strdup_vprintf (cText, args);
 	gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-icon.svg", CAIRO_DOCK_SHARE_DATA_DIR);
-	cairo_dock_show_dialog_full (cText, pIcon, pDock, fTimeLength, cIconPath, GTK_BUTTONS_NONE, NULL, NULL, NULL, NULL);
+	cairo_dock_show_dialog_full (cFullText, pIcon, pDock, fTimeLength, cIconPath, GTK_BUTTONS_NONE, NULL, NULL, NULL, NULL);
 	g_free (cIconPath);
 	g_free (cFullText);
 	va_end (args);

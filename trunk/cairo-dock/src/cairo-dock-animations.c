@@ -236,6 +236,9 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 	pDock->calculate_icons (pDock);
 	gtk_widget_queue_draw (pDock->pWidget);
 	
+	if (! pDock->bInside)
+		cairo_dock_replace_all_dialogs ();
+	
 	if (pDock->iMagnitudeIndex == 0)
 	{
 		Icon *pBouncingIcon = cairo_dock_get_bouncing_icon (pDock->icons);
