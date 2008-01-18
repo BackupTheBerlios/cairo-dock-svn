@@ -215,7 +215,7 @@ void stop (void) \
 //\_________________________________ CONFIG
 /**
 *Debut de la fonction de configuration de l'applet (celle qui est appelee au debt de l'init).
-*Ouvre le fichier de conf de l'applet, et charge les parametres generiques suivant (groupe "ICON") : largeur ("width"), hauteur ("height), nom ("name", optionnel), et icone ("icon", optionnel).
+*Ouvre le fichier de conf de l'applet, et charge les parametres generiques suivant (groupe "Icon") : largeur ("width"), hauteur ("height), nom ("name", optionnel), et icone ("icon", optionnel).
 *@param cDefaultAppletName nom par defaut de l'applet dans le dock (son etiquette), ou NULL si aucun nom ne doit etre lu dans la conf (habituellement l'etiquette reprend simplement le nom de l'applet).
 *@param cDefaultIconName nom de l'icone a appliquer par defaut a l'applet, ou NULL si aucune icone ne doit etre lue dans la conf (auquel cas la surface de l'icone sera juste transparente).
 */
@@ -232,12 +232,12 @@ void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cA
 		g_error_free (erreur); \
 		return ; \
 	} \
-	*iWidth = cairo_dock_get_integer_key_value (pKeyFile, "ICON", "width", &bFlushConfFileNeeded, 48, NULL, NULL); \
-	*iHeight = cairo_dock_get_integer_key_value (pKeyFile, "ICON", "height", &bFlushConfFileNeeded, 48, NULL, NULL); \
+	*iWidth = cairo_dock_get_integer_key_value (pKeyFile, "Icon", "width", &bFlushConfFileNeeded, 48, NULL, NULL); \
+	*iHeight = cairo_dock_get_integer_key_value (pKeyFile, "Icon", "height", &bFlushConfFileNeeded, 48, NULL, NULL); \
 	if (cDefaultAppletName != NULL) \
-		*cAppletName = cairo_dock_get_string_key_value (pKeyFile, "ICON", "name", &bFlushConfFileNeeded, cDefaultAppletName, NULL, NULL); \
+		*cAppletName = cairo_dock_get_string_key_value (pKeyFile, "Icon", "name", &bFlushConfFileNeeded, cDefaultAppletName, NULL, NULL); \
 	if (cDefaultIconName != NULL) \
-		*cIconName = cairo_dock_get_string_key_value (pKeyFile, "ICON", "icon", &bFlushConfFileNeeded, cDefaultIconName, NULL, NULL);
+		*cIconName = cairo_dock_get_string_key_value (pKeyFile, "Icon", "icon", &bFlushConfFileNeeded, cDefaultIconName, NULL, NULL);
 /**
 *Fin de la fonction de configuration de l'applet.
 */

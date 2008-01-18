@@ -110,7 +110,7 @@ double cairo_dock_get_current_dock_width_linear (CairoDock *pDock)
 }*/
 
 /**
-*Cree un contexte de dessin pour la libcairo. Si glitz est active, le contexte sera lie a une surface glitz (et donc on dessinera directement sur la carte graphique), sinon a une surface X representant la fenetre du dock.
+*Cree un contexte de dessin pour la libcairo. Si glitz est active, le contexte sera lie a une surface glitz (et donc on dessinera directement sur la carte graphique via OpenGL), sinon a une surface X representant la fenetre du dock.
 *@param pDock le dock sur lequel on veut dessiner.
 *@Returns le contexte sur lequel dessiner. N'est jamais nul; tester sa coherence avec #cairo_status avant de l'utiliser, et le detruire avec #cairo_destroy apres en avoir fini avec lui.
 */
@@ -855,7 +855,7 @@ void cairo_dock_render_blank (CairoDock *pDock)
 void cairo_dock_redraw_my_icon (Icon *icon, CairoDock *pDock)
 {
 	g_return_if_fail (icon != NULL && pDock != NULL);
-	if (pDock->bAtBottom && (pDock->iRefCount > 0 || g_bAutoHide))
+	if (pDock->bAtBottom && (pDock->iRefCount > 0 || g_bAutoHide))  // inutile de redessiner.
 		return ;
 	GdkRectangle rect = {(int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor)),
 		(int) icon->fDrawY - (pDock->bUseReflect && ! g_bDirectionUp ? g_fReflectSize : 0),
@@ -868,13 +868,16 @@ void cairo_dock_redraw_my_icon (Icon *icon, CairoDock *pDock)
 		rect.width = (int) icon->fHeight * icon->fScale + (pDock->bUseReflect ? g_fReflectSize : 0);
 		rect.height = (int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)) - 1;
 	}
-	g_print ("rect (%d;%d) (%dx%d)\n", rect.x, rect.y, rect.width, rect.height);
+	//g_print ("rect (%d;%d) (%dx%d)\n", rect.x, rect.y, rect.width, rect.height);
+	if (rect.width > 0 && rect.height > 0)
+	{
 #ifdef HAVE_GLITZ
-	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
-		gtk_widget_queue_draw (pDock->pWidget);
-	else
+		if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
+			gtk_widget_queue_draw (pDock->pWidget);
+		else
 #endif
-	gdk_window_invalidate_rect (pDock->pWidget->window, &rect, FALSE);
+		gdk_window_invalidate_rect (pDock->pWidget->window, &rect, FALSE);
+	}
 }
 
 
