@@ -166,7 +166,6 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 		pDock->iMagnitudeIndex = CAIRO_DOCK_NB_MAX_ITERATIONS;
 	
 	pDock->fFoldingFactor *= sqrt (pDock->fFoldingFactor);
-	///pDock->fFoldingFactor = (pDock->fFoldingFactor != 0 ? pow (1.5, - 1. / pDock->fFoldingFactor) : 0);  // f(x)-x < 0 pour a > exp(exp(-1)) ~ 1.445.
 	if (pDock->fFoldingFactor < 0.03)
 		pDock->fFoldingFactor = 0;
 	
@@ -264,11 +263,6 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 						iNewWidth);
 			}
 			
-			/**if (pDock->bHorizontalDock)
-				gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
-			else
-				gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);*/
-			
 			pDock->calculate_icons (pDock);  // relance le grossissement si on est dedans.
 			if (! pDock->bInside && pDock->iRefCount > 0)
 			{
@@ -284,10 +278,10 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 		//\______________ Au moins une icone est en cours d'animation suite a un clique, on continue le 'shrink_down'.
 		if (pRemovingIcon != NULL)
 		{
-			//g_print ("au moins 1 icone en cours d'insertion/suppression (%f)\n", pRemovingIcon->fPersonnalScale);
+			g_print ("au moins 1 icone en cours d'insertion/suppression (%f)\n", pRemovingIcon->fPersonnalScale);
 			if (pRemovingIcon->fPersonnalScale == 0.05)
 			{
-				//g_print ("  fin\n");
+				g_print ("  fin\n");
 				cairo_dock_remove_icon_from_dock (pDock, pRemovingIcon);
 				
 				if (CAIRO_DOCK_IS_APPLI (pRemovingIcon) && pRemovingIcon->cClass != NULL && pDock == cairo_dock_search_dock_from_name (pRemovingIcon->cClass) && pDock->icons == NULL)  // il n'y a plus aucune icone de cette classe.
@@ -309,7 +303,6 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 			}
 		}
 		
-		///pDock->fMagnitude = 0.001;  // on garde la magnitude > 0 de facon a ce qu'un motion_notify ne commence pas un 'grow_up'.
 		return TRUE;
 	}
 	else

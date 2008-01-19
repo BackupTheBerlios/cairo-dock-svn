@@ -629,7 +629,7 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 	if (bCheckUnusedSeparator)
 	{
 		Icon * pSeparatorIcon = NULL;
-		if (! CAIRO_DOCK_IS_SEPARATOR (icon))
+		if (! CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon))
 		{
 			Icon *pSameTypeIcon = cairo_dock_get_first_icon_of_type (pDock->icons, icon->iType);
 			if (pSameTypeIcon == NULL)
@@ -652,7 +652,7 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 static void _cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon, gboolean bCheckUnusedSeparator)
 {
 	//\___________________ On effectue les taches de fermeture de l'icone suivant son type.
-	if (CAIRO_DOCK_IS_LAUNCHER (icon))
+	if (CAIRO_DOCK_IS_LAUNCHER (icon) || CAIRO_DOCK_IS_USER_SEPARATOR (icon))
 	{
 		if (icon->acDesktopFileName != NULL)
 		{
@@ -719,7 +719,7 @@ void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType)
 		}
 		else
 		{
-			if (CAIRO_DOCK_IS_SEPARATOR (icon))
+			if (CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon))
 			{
 				if ( (bOneIconFound && pSeparatorIcon == NULL) || (! bOneIconFound) )
 					pSeparatorIcon = icon;
@@ -761,7 +761,7 @@ void cairo_dock_remove_all_separators (CairoDock *pDock)
 			break;
 		
 		icon = ic->next->data;  // on ne peut pas enlever l'element courant, sinon on perd 'ic'.
-		if (CAIRO_DOCK_IS_SEPARATOR (icon))
+		if (CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon))
 		{
 			cairo_dock_remove_one_icon_from_dock (pDock, icon);
 			cairo_dock_free_icon (icon);

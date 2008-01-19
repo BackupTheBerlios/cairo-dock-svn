@@ -252,6 +252,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 		{
 			*fImageWidth = (double) cairo_image_surface_get_width (surface_ini);
 			*fImageHeight = (double) cairo_image_surface_get_height (surface_ini);
+			g_print ("%.2f x %.2f\n", *fImageWidth, *fImageHeight);
 			
 			if (! bReapeatAsPattern)
 				cairo_dock_calculate_contrainted_icon_size (fImageWidth,

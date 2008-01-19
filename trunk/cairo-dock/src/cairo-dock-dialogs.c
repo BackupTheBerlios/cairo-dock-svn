@@ -58,6 +58,19 @@ static cairo_surface_t *s_pButtonCancelSurface = NULL;
 #define CAIRO_DOCK_DIALOG_VGAP 4
 #define CAIRO_DOCK_DIALOG_BUTTON_GAP 16
 
+gboolean on_enter_dialog (GtkWidget* pWidget,
+	GdkEventCrossing* pEvent,
+	CairoDockDialog *pDialog)
+{
+	pDialog->bInside = TRUE;
+}
+
+static gboolean on_leave_dialog (GtkWidget* pWidget,
+	GdkEventCrossing* pEvent,
+	CairoDockDialog *pDialog)
+{
+	pDialog->bInside = FALSE;
+}
 
 static gboolean on_button_press_dialog (GtkWidget* pWidget,
 	GdkEventButton* pButton,
@@ -373,6 +386,8 @@ void cairo_dock_isolate_dialog (CairoDockDialog *pDialog)
 	g_signal_handlers_disconnect_by_func (pDialog->pWidget, on_expose_dialog, NULL);
 	g_signal_handlers_disconnect_by_func (pDialog->pWidget, on_button_press_dialog, NULL);
 	g_signal_handlers_disconnect_by_func (pDialog->pWidget, on_configure_dialog, NULL);
+	g_signal_handlers_disconnect_by_func (pDialog->pWidget, on_enter_dialog, NULL);
+	g_signal_handlers_disconnect_by_func (pDialog->pWidget, on_leave_dialog, NULL);
 	
 	pDialog->iButtonsType = GTK_BUTTONS_NONE;
 	pDialog->action_on_answer = NULL;
@@ -674,6 +689,14 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 		"button-release-event",
 		G_CALLBACK (on_button_press_dialog),
 		pDialog);
+	g_signal_connect (G_OBJECT (pWindow),
+		"enter-notify-event",
+		G_CALLBACK (on_enter_dialog),
+		pDialog);
+	g_signal_connect (G_OBJECT (pWindow),
+		"leave-notify-event",
+		G_CALLBACK (on_leave_dialog),
+		pDialog);
 	cairo_dock_place_dialog (pDialog, pDock);  // renseigne aussi bDirectionUp et bIsPerpendicular.
 	cairo_dock_remove_orphelans ();  // la liste a ete verouillee par la fonction precedente pendant longtemps, empechant les dialogues d'etre detruits.
 	
@@ -884,7 +907,7 @@ void cairo_dock_replace_all_dialogs (void)
 		if (cairo_dock_dialog_reference (pDialog))
 		{
 			pIcon = pDialog->pIcon;
-			if (pIcon != NULL && GTK_WIDGET_VISIBLE (pDialog->pWidget)) // on ne replace pas les dialogues en cours de destruction ou caches.
+			if (pIcon != NULL && GTK_WIDGET_VISIBLE (pDialog->pWidget) && ! pDialog->bInside) // on ne replace pas les dialogues en cours de destruction ou caches.
 			{
 				pDock = cairo_dock_search_container_from_icon (pIcon);
 				int iPreviousX = pDialog->iPositionX, iPreviousY = pDialog->iPositionY;

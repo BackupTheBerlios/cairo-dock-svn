@@ -84,7 +84,7 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 */
 void cairo_dock_free_all_docks (CairoDock *pMainDock);
 /**
-* Diminue le nombre d'icones pointant sur un dock de 1. Si aucune icone ne pointe plus sur lui apres ca, le detruit et libere la memoire qui lui etait allouee.
+* Diminue le nombre d'icones pointant sur un dock de 1. Si aucune icone ne pointe plus sur lui apres ca, le detruit ainsi que tous ses sous-docks, et libere la memoire qui lui etait allouee. Ne fais rien pour le dock principal, utiliser #cairo_dock_free_all_docks pour cela.
 * @param pDock le dock a detruire.
 * @param cDockName son nom.
 * @param ReceivingDock un dock qui recuperera les icones, ou NULL pour detruire toutes les icones contenues dans le dock.

@@ -287,6 +287,8 @@ struct _CairoDockDialog
 	GFreeFunc pFreeUserDataFunc;
 	/// icone sur laquelle pointe le dialogue.
 	Icon *pIcon;
+	/// vrai ssi la souris est dans le dialogue, auquel cas on le garde immobile.
+	gboolean bInside;
 	};
 
 
@@ -538,5 +540,13 @@ typedef enum
 	CAIRO_DOCK_RIGHT,
 	CAIRO_DOCK_NB_POSITIONS
 	} CairoDockPositionType;
+
+typedef enum
+{
+	CAIRO_DOCK_LAUNCHER_FROM_DESKTOP_FILE = 0,
+	CAIRO_DOCK_LAUNCHER_FOR_CONTAINER,
+	CAIRO_DOCK_LAUNCHER_FOR_SEPARATOR,
+	CAIRO_DOCK_NB_NEW_LAUNCHER_TYPE
+	} CairoDockNewLauncherType;
 
 #endif

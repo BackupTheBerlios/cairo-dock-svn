@@ -93,4 +93,7 @@ extern int g_iMaxAuthorizedWidth;
 /// Environnement de bureau detecte.
 extern CairoDockDesktopEnv g_iDesktopEnv;
 
+/// Type de tri des fichiers (par nom, taille, date, ...).
+extern CairoDockFMSortType g_iFileSortType;
+
 #endif

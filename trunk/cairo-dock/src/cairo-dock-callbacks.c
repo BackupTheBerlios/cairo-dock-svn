@@ -604,6 +604,15 @@ void cairo_dock_update_gaps_with_window_position (CairoDock *pDock)
 	pDock->iGapX = x - g_iScreenWidth[pDock->bHorizontalDock] * pDock->fAlign;
 	pDock->iGapY = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - y : y);
 	
+	if (pDock->iGapX < 0)
+		pDock->iGapX = 0;
+	if (pDock->iGapY < 0)
+		pDock->iGapY = 0;
+	if (pDock->iGapX > g_iScreenWidth[pDock->bHorizontalDock])
+		pDock->iGapX = g_iScreenWidth[pDock->bHorizontalDock];
+	if (pDock->iGapY > g_iScreenHeight[pDock->bHorizontalDock])
+		pDock->iGapY = g_iScreenHeight[pDock->bHorizontalDock];
+	
 	if (pDock->bIsMainDock)
 		cairo_dock_update_conf_file_with_position (g_cConfFile, pDock->iGapX, pDock->iGapY);
 }

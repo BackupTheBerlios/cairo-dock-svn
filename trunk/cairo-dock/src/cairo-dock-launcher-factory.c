@@ -189,6 +189,12 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		g_error_free (erreur);
 		erreur = NULL;
 	}
+	if (icon->acFileName != NULL && *icon->acFileName == '\0')
+	{
+		g_free (icon->acFileName);
+		icon->acFileName = NULL;
+	}
+	
 	
 	g_free (icon->acName);
 	icon->acName = g_key_file_get_string (keyfile, "Desktop Entry", "Name", &erreur);
@@ -198,7 +204,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		g_error_free (erreur);
 		erreur = NULL;
 	}
-	if (icon->acName != NULL && strcmp (icon->acName, "") == 0)
+	if (icon->acName != NULL && *icon->acName == '\0')
 	{
 		g_free (icon->acName);
 		icon->acName = NULL;
@@ -212,7 +218,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		g_error_free (erreur);
 		erreur = NULL;
 	}
-	if (icon->acCommand != NULL && strcmp (icon->acCommand, "") == 0)
+	if (icon->acCommand != NULL && *icon->acCommand == '\0')
 	{
 		g_free (icon->acCommand);
 		icon->acCommand = NULL;
@@ -233,7 +239,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		g_error_free (erreur);
 		erreur = NULL;
 	}
-	if (icon->cBaseURI != NULL && strcmp (icon->cBaseURI, "") == 0)
+	if (icon->cBaseURI != NULL && *icon->cBaseURI == '\0')
 	{
 		g_free (icon->cBaseURI);
 		icon->cBaseURI = NULL;
@@ -299,7 +305,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		erreur = NULL;
 		icon->cParentDockName = NULL;
 	}
-	if (icon->cParentDockName == NULL || strcmp (icon->cParentDockName, "") == 0)
+	if (icon->cParentDockName == NULL || *icon->cParentDockName == '\0')
 	{
 		g_free (icon->cParentDockName);
 		icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
