@@ -93,7 +93,13 @@ void cairo_dock_set_default_renderer (CairoDock *pDock)
 
 
 #define _cairo_dock_update_conf_file_with_renderers(cConfFile, cGroupName, cKeyName, bAddEmptyRenderer) cairo_dock_update_conf_file_with_hash_table (cConfFile, s_hRendererTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_renderer_name, FALSE, bAddEmptyRenderer)
-void cairo_dock_update_conf_file_with_renderers (gchar *cConfFile)
+
+void cairo_dock_update_conf_file_with_renderers (gchar *cConfFile, gchar *cGroupName, gchar *cKeyName)
+{
+	_cairo_dock_update_conf_file_with_renderers(cConfFile, cGroupName, cKeyName, TRUE);
+}
+
+void cairo_dock_update_main_conf_file_with_renderers (gchar *cConfFile)
 {
 	_cairo_dock_update_conf_file_with_renderers (cConfFile, "Views", "main dock view", FALSE);
 	_cairo_dock_update_conf_file_with_renderers (cConfFile, "Views", "sub-dock view", FALSE);

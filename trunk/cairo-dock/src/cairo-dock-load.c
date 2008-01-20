@@ -343,13 +343,10 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 		pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, icon->fHeight);
 		
 		cairo_dock_fill_one_text_buffer (icon, pCairoContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
+		
+		cairo_dock_fill_one_quick_info_buffer (icon, pCairoContext, 12, g_cLabelPolice, PANGO_WEIGHT_HEAVY, .4);
 	}
 	cairo_destroy (pCairoContext);
-	
-	if (! pDock->bIsMainDock)  // on le fait pas pour le dock principal, ce sera fait a la fin de la fonction 'read_conf'.
-	{
-		///cairo_dock_update_dock_size (pDock);
-	}
 }
 void cairo_dock_reload_buffers_in_all_docks (GHashTable *hDocksTable)
 {

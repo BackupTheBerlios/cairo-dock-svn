@@ -1092,7 +1092,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		cairo_dock_update_conf_file_with_available_modules (cConfFilePath);
 	}
 	
-	cairo_dock_update_conf_file_with_renderers (cConfFilePath);
+	cairo_dock_update_main_conf_file_with_renderers (cConfFilePath);
 	
 	//\___________________ On applique les modifs au fichier de conf easy.
 	cairo_dock_copy_to_easy_conf_file (pKeyFile, g_cEasyConfFile);

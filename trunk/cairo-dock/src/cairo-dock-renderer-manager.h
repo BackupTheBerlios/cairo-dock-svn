@@ -16,7 +16,8 @@ void cairo_dock_initialize_renderer_manager (void);
 void cairo_dock_set_renderer (CairoDock *pDock, gchar *cRendererName);
 void cairo_dock_set_default_renderer (CairoDock *pDock);
 
-void cairo_dock_update_conf_file_with_renderers (gchar *cConfFile);
+void cairo_dock_update_conf_file_with_renderers (gchar *cConfFile, gchar *cGroupName, gchar *cKeyName);
+void cairo_dock_update_main_conf_file_with_renderers (gchar *cConfFile);
 void cairo_dock_update_launcher_conf_file_with_renderers (gchar *cConfFile);
 void cairo_dock_update_easy_conf_file_with_renderers (gchar *cConfFile);
 
