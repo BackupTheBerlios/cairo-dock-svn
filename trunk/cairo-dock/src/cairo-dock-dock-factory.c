@@ -559,7 +559,10 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 	{
 		Icon *pSameTypeIcon = cairo_dock_get_first_icon_of_type (pDock->icons, icon->iType);
 		if (pSameTypeIcon == NULL && pDock->icons != NULL)
+		{
 			bSeparatorNeeded = TRUE;
+			g_print ("separateur necessaire\n");
+		}
 	}
 	
 	//\______________ On insere l'icone a sa place dans la liste.
@@ -606,7 +609,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 				g_print ("insertion de %s -> iSeparatorType : %d\n", icon->acName, iSeparatorType);
 				
 				cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock);
-				Icon *pSeparatorIcon = cairo_dock_create_separator_icon (pSourceContext, iSeparatorType, pDock);
+				Icon *pSeparatorIcon = cairo_dock_create_separator_icon (pSourceContext, iSeparatorType, pDock, bApplyRatio);
 				if (pSeparatorIcon != NULL)
 				{
 					pDock->icons = g_list_insert_sorted (pDock->icons,
@@ -624,10 +627,10 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 			if (pPrevIcon != NULL && ((pPrevIcon->iType - icon->iType) % 2 == 0))
 			{
 				int iSeparatorType = iOrder - 1;
-				//g_print ("insertion de %s -> iSeparatorType : %d\n", icon->acName, iSeparatorType);
+				g_print ("insertion de %s -> iSeparatorType : %d\n", icon->acName, iSeparatorType);
 				
 				cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock);
-				Icon *pSeparatorIcon = cairo_dock_create_separator_icon (pSourceContext, iSeparatorType, pDock);
+				Icon *pSeparatorIcon = cairo_dock_create_separator_icon (pSourceContext, iSeparatorType, pDock, bApplyRatio);
 				if (pSeparatorIcon != NULL)
 				{
 					pDock->icons = g_list_insert_sorted (pDock->icons,

@@ -866,7 +866,7 @@ void cairo_dock_insert_separator_between_launchers_and_applis (CairoDock *pDock)
 		if (cairo_dock_get_first_icon_of_type (pDock->icons, iSeparatorType) == NULL)
 		{
 			cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
-			Icon *pSeparator = cairo_dock_create_separator_icon (pCairoContext, iSeparatorType, pDock);
+			Icon *pSeparator = cairo_dock_create_separator_icon (pCairoContext, iSeparatorType, pDock, CAIRO_DOCK_APPLY_RATIO);
 			cairo_destroy (pCairoContext);
 			
 			cairo_dock_insert_icon_in_dock (pSeparator, pDock, !CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
@@ -897,7 +897,7 @@ GList *cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, in
 			fXMin = icon->fXAtRest;
 			pFirstDrawnElement = ic;
 		}
-		//g_print ("%s : fXAtRest = %.2f\n", icon->acName, icon->fXAtRest);
+		g_print ("%s : fXAtRest = %.2f\n", icon->acName, icon->fXAtRest);
 		
 		x_cumulated += icon->fWidth + g_iIconGap;
 	}
@@ -972,7 +972,7 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 				
 				if (icon->fX + icon->fWidth * icon->fScale > icon->fXMax - g_fAmplitude * (icon->fWidth + 1.5*g_iIconGap) / 8 && iWidth != 0)
 				{
-					//g_print ("  on contraint %s (fXMax=%.2f , fX=%.2f\n", prev_icon->acName, prev_icon->fXMax, prev_icon->fX);
+					g_print ("  on contraint %s (fXMax=%.2f , fX=%.2f\n", prev_icon->acName, prev_icon->fXMax, prev_icon->fX);
 					fDeltaExtremum = icon->fX + icon->fWidth * icon->fScale - (icon->fXMax - g_fAmplitude * (icon->fWidth + 1.5*g_iIconGap) / 16);
 					icon->fX -= fDeltaExtremum * (1 - (icon->fScale - 1) / g_fAmplitude);
 				}
@@ -1021,7 +1021,7 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 		//g_print ("fX <- %.2f; fXMin : %.2f\n", prev_icon->fX, prev_icon->fXMin);
 		if (prev_icon->fX < prev_icon->fXMin + g_fAmplitude * (prev_icon->fWidth + 1.5*g_iIconGap) / 8 && iWidth != 0 && x_abs < iWidth && fMagnitude > 0)  /// && prev_icon->fPhase == 0   // on rajoute 'fMagnitude > 0' sinon il y'a un leger "saut" du aux contraintes a gauche de l'icone pointee.
 		{
-			//g_print ("  on contraint %s (fXMin=%.2f , fX=%.2f\n", prev_icon->acName, prev_icon->fXMin, prev_icon->fX);
+			g_print ("  on contraint %s (fXMin=%.2f , fX=%.2f\n", prev_icon->acName, prev_icon->fXMin, prev_icon->fX);
 			fDeltaExtremum = prev_icon->fX - (prev_icon->fXMin + g_fAmplitude * (prev_icon->fWidth + 2*g_iIconGap) / 16);
 			prev_icon->fX -= fDeltaExtremum * (1 - (prev_icon->fScale - 1) / g_fAmplitude);
 		}

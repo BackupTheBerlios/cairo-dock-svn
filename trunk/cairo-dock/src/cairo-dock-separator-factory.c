@@ -24,6 +24,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 extern double g_fAmplitude;
 extern int g_iDockLineWidth;
+extern double g_fSubDockSizeRatio;
 
 extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
@@ -97,7 +98,7 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 
 
 
-Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorType, CairoDock *pDock)
+Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorType, CairoDock *pDock, gboolean bApplyRatio)
 {
 	//g_print ("%s ()\n", __func__);
 	if ((iSeparatorType & 1) && ! g_bUseSeparator)
@@ -107,6 +108,11 @@ Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorT
 	icon->iType = iSeparatorType;
 	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
 	
+	if (bApplyRatio && pDock->iRefCount > 0)
+	{
+		icon->fWidth *= g_fSubDockSizeRatio;
+		icon->fHeight *= g_fSubDockSizeRatio;
+	}
+	
 	return icon;
 }
-
