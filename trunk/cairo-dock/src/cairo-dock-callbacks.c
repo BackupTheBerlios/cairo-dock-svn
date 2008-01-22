@@ -392,7 +392,7 @@ gboolean cairo_dock_emit_leave_signal (CairoDock *pDock)
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
-	g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
+	//g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
 	pDock->iAvoidingMouseIconType = -1;
 	pDock->fAvoidingMouseMargin = 0;
 	pDock->bInside = FALSE;
@@ -437,7 +437,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	g_print ("%s (bInside:%d; bAtBottom:%d; iRefCount:%d)\n", __func__, pDock->bInside, pDock->bAtBottom, pDock->iRefCount);
+	//g_print ("%s (bInside:%d; bAtBottom:%d; iRefCount:%d)\n", __func__, pDock->bInside, pDock->bAtBottom, pDock->iRefCount);
 	if (pDock->bAtBottom)  // || ! pDock->bInside
 	{
 		pDock->iSidLeaveDemand = 0;
@@ -452,7 +452,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 		{
 			if (pDock->iSidLeaveDemand == 0)
 			{
-				g_print ("  on retarde la sortie du dock de %dms\n", MAX (g_iLeaveSubDockDelay, 330));
+				//g_print ("  on retarde la sortie du dock de %dms\n", MAX (g_iLeaveSubDockDelay, 330));
 				pDock->iSidLeaveDemand = g_timeout_add (MAX (g_iLeaveSubDockDelay, 330), (GSourceFunc) cairo_dock_emit_leave_signal, (gpointer) pDock);
 				return TRUE;
 			}
@@ -462,7 +462,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	{
 		if (pDock->iSidLeaveDemand == 0)
 		{
-			g_print ("  on retarde la sortie du sous-dock de %dms\n", g_iLeaveSubDockDelay);
+			//g_print ("  on retarde la sortie du sous-dock de %dms\n", g_iLeaveSubDockDelay);
 			pDock->iSidLeaveDemand = g_timeout_add (g_iLeaveSubDockDelay, (GSourceFunc) cairo_dock_emit_leave_signal, (gpointer) pDock);
 			return TRUE;
 		}
@@ -600,12 +600,14 @@ void cairo_dock_update_gaps_with_window_position (CairoDock *pDock)
 	int x, y;  // position du point invariant du dock.
 	x = pDock->iWindowPositionX + iWidth * pDock->fAlign;
 	y = (g_bDirectionUp ? pDock->iWindowPositionY + iHeight : pDock->iWindowPositionY);
+	g_print ("%s (%d;%d)\n", __func__, x, y);
 	
 	pDock->iGapX = x - g_iScreenWidth[pDock->bHorizontalDock] * pDock->fAlign;
 	pDock->iGapY = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - y : y);
+	g_print (" -> (%d;%d)\n", pDock->iGapX, pDock->iGapY);
 	
-	if (pDock->iGapX < 0)
-		pDock->iGapX = 0;
+	if (pDock->iGapX < - g_iScreenWidth[pDock->bHorizontalDock])
+		pDock->iGapX = - g_iScreenWidth[pDock->bHorizontalDock];
 	if (pDock->iGapY < 0)
 		pDock->iGapY = 0;
 	if (pDock->iGapX > g_iScreenWidth[pDock->bHorizontalDock])
@@ -1227,112 +1229,101 @@ gboolean cairo_dock_notification_drop_data (gpointer *data)
 	double fOrder = *((double *) data[2]);
 	CairoDock *pDock = data[3];
 	
-	CairoDock *pReceivingDock = pDock;
-	if (g_str_has_suffix (cReceivedData, ".desktop"))  // c'est un fichier .desktop, on choisit de l'ajouter quoiqu'il arrive.
+	if (icon == NULL || CAIRO_DOCK_IS_LAUNCHER (icon) || CAIRO_DOCK_IS_SEPARATOR (icon))
 	{
-		if (fOrder == CAIRO_DOCK_LAST_ORDER)  // on a lache dessus.
+		CairoDock *pReceivingDock = pDock;
+		if (g_str_has_suffix (cReceivedData, ".desktop"))  // c'est un fichier .desktop, on choisit de l'ajouter quoiqu'il arrive.
 		{
-			if (icon->pSubDock != NULL)  // on l'ajoutera au sous-dock.
+			if (fOrder == CAIRO_DOCK_LAST_ORDER)  // on a lache dessus.
 			{
-				pReceivingDock = icon->pSubDock;
-			}
-		}
-	}
-	else  // c'est un fichier.
-	{
-		if (fOrder == CAIRO_DOCK_LAST_ORDER)  // on a lache dessus.
-		{
-			if (CAIRO_DOCK_IS_LAUNCHER (icon))
-			{
-				if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
-				{
-					if (icon->pSubDock != NULL || icon->iVolumeID != 0)  // on le lache sur un repertoire ou un point de montage.
-					{
-						cairo_dock_fm_move_into_directory (cReceivedData, icon, pDock);
-						return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
-					}
-					else  // on le lache sur un fichier.
-					{
-						return CAIRO_DOCK_LET_PASS_NOTIFICATION;
-					}
-				}
-				else if (icon->pSubDock != NULL)  // on le lache sur un sous-dock de lanceurs.
+				if (icon->pSubDock != NULL)  // on l'ajoutera au sous-dock.
 				{
 					pReceivingDock = icon->pSubDock;
 				}
-				else  // on le lache sur un lanceur.
+			}
+		}
+		else  // c'est un fichier.
+		{
+			if (fOrder == CAIRO_DOCK_LAST_ORDER)  // on a lache dessus.
+			{
+				if (CAIRO_DOCK_IS_LAUNCHER (icon))
 				{
-					gchar *cCommand = g_strdup_printf ("%s '%s'", icon->acCommand, cReceivedData);
-					g_spawn_command_line_async (cCommand, NULL);
-					g_free (cCommand);
-					cairo_dock_arm_animation (icon, CAIRO_DOCK_BLINK, 2);  // 2 clignotements.
-					cairo_dock_start_animation (icon, pDock);
+					if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
+					{
+						if (icon->pSubDock != NULL || icon->iVolumeID != 0)  // on le lache sur un repertoire ou un point de montage.
+						{
+							cairo_dock_fm_move_into_directory (cReceivedData, icon, pDock);
+							return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
+						}
+						else  // on le lache sur un fichier.
+						{
+							return CAIRO_DOCK_LET_PASS_NOTIFICATION;
+						}
+					}
+					else if (icon->pSubDock != NULL)  // on le lache sur un sous-dock de lanceurs.
+					{
+						pReceivingDock = icon->pSubDock;
+					}
+					else  // on le lache sur un lanceur.
+					{
+						gchar *cCommand = g_strdup_printf ("%s '%s'", icon->acCommand, cReceivedData);
+						g_spawn_command_line_async (cCommand, NULL);
+						g_free (cCommand);
+						cairo_dock_arm_animation (icon, CAIRO_DOCK_BLINK, 2);  // 2 clignotements.
+						cairo_dock_start_animation (icon, pDock);
+						return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
+					}
+				}
+				else  // on le lache sur autre chose qu'un lanceur.
+				{
+					return CAIRO_DOCK_LET_PASS_NOTIFICATION;
+				}
+			}
+			else  // on a lache a cote.
+			{
+				Icon *pPointingIcon = cairo_dock_search_icon_pointing_on_dock (pDock, NULL);
+				if (CAIRO_DOCK_IS_URI_LAUNCHER (pPointingIcon))  // on a lache dans un dock qui est un repertoire, on copie donc le fichier dedans.
+				{
+					cairo_dock_fm_move_into_directory (cReceivedData, icon, pDock);
 					return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
 				}
 			}
-			else  // on le lache sur autre chose qu'un lanceur.
-			{
-				return CAIRO_DOCK_LET_PASS_NOTIFICATION;
-			}
 		}
-		else  // on a lache a cote.
+		
+		
+		//\_________________ On l'ajoute dans le repertoire des lanceurs du theme courant.
+		GError *erreur = NULL;
+		const gchar *cDockName = cairo_dock_search_dock_name (pReceivingDock);
+		gchar *cNewDesktopFileName = cairo_dock_add_desktop_file_from_uri (cReceivedData, cDockName, fOrder, pDock, &erreur);
+		if (erreur != NULL)
 		{
-			Icon *pPointingIcon = cairo_dock_search_icon_pointing_on_dock (pDock, NULL);
-			if (CAIRO_DOCK_IS_URI_LAUNCHER (pPointingIcon))  // on a lache dans un dock qui est un repertoire, on copie donc le fichier dedans.
-			{
-				cairo_dock_fm_move_into_directory (cReceivedData, icon, pDock);
-				return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
-			}
+			g_print ("Attention : %s\n", erreur->message);
+			g_error_free (erreur);
+			return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 		}
-	}
-	
-	
-	//\_________________ On l'ajoute dans le repertoire des lanceurs du theme courant.
-	GError *erreur = NULL;
-	const gchar *cDockName = cairo_dock_search_dock_name (pReceivingDock);
-	gchar *cNewDesktopFileName = cairo_dock_add_desktop_file_from_uri (cReceivedData, cDockName, fOrder, pDock, &erreur);
-	if (erreur != NULL)
-	{
-		g_print ("Attention : %s\n", erreur->message);
-		g_error_free (erreur);
-		return CAIRO_DOCK_LET_PASS_NOTIFICATION;
-	}
-	
-	//\_________________ On charge ce nouveau lanceur.
-	if (cNewDesktopFileName != NULL)
-	{
-		cairo_dock_mark_theme_as_modified (TRUE);
 		
-		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pReceivingDock);
-		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cNewDesktopFileName, pCairoContext);
-		g_free (cNewDesktopFileName);
-		cairo_destroy (pCairoContext);
-		
-		if (pNewIcon != NULL)
+		//\_________________ On charge ce nouveau lanceur.
+		if (cNewDesktopFileName != NULL)
 		{
-			cairo_dock_insert_icon_in_dock (pNewIcon, pReceivingDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+			cairo_dock_mark_theme_as_modified (TRUE);
 			
-			if (CAIRO_DOCK_IS_URI_LAUNCHER (pNewIcon))
+			cairo_t* pCairoContext = cairo_dock_create_context_from_window (pReceivingDock);
+			Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cNewDesktopFileName, pCairoContext);
+			g_free (cNewDesktopFileName);
+			cairo_destroy (pCairoContext);
+			
+			if (pNewIcon != NULL)
 			{
-				/*if (pNewIcon->pSubDock != NULL)  // c'est un repertoire.
-				{
-					if (pNewIcon->pSubDock->icons == NULL)
-					{
-						g_free (pNewIcon->acCommand);
-						pNewIcon->pSubDock->icons = cairo_dock_fm_list_directory (pNewIcon->cBaseURI, g_iFileSortType, &pNewIcon->acCommand);
-						cairo_dock_load_buffers_in_one_dock (pNewIcon->pSubDock);
-					}
-					else
-					{
-						g_print ("attention : a subdock with this name (s) seems to exist already !\n", pNewIcon->acName);
-					}
-				}*/
+				cairo_dock_insert_icon_in_dock (pNewIcon, pReceivingDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
 				
-				cairo_dock_fm_add_monitor (pNewIcon);  // n'est-ce pas trop lourd de rajouter un moniteur sur les fichiers simples ?
+				if (CAIRO_DOCK_IS_URI_LAUNCHER (pNewIcon))
+				{
+					cairo_dock_fm_add_monitor (pNewIcon);  // n'est-ce pas trop lourd de rajouter un moniteur sur les fichiers simples ?
+				}
+				
+				if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
+					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 			}
-			
-			if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
-				pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
 		}
 	}
 	return CAIRO_DOCK_LET_PASS_NOTIFICATION;

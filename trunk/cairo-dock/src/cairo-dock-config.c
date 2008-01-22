@@ -1316,6 +1316,7 @@ gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePat
 
 void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int y)
 {
+	//g_print ("%s (%d;%d)\n", __func__, x, y);
 	GKeyFile *pKeyFile = g_key_file_new ();
 	
 	GError *erreur = NULL;

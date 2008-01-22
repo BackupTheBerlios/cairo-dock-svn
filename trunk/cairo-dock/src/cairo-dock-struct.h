@@ -201,7 +201,7 @@ struct _CairoDockVisitCard {
 
 typedef CairoDockVisitCard * (* CairoDockModulePreInit) (void);
 
-typedef gpointer (*CairoDockModuleInit) (CairoDock *pDock, gchar **cConfFilePath, GError **erreur);  // renvoie son icone si il en a.
+typedef gpointer (*CairoDockModuleInit) (CairoDock *pDock, CairoDockModule *pModule, GError **erreur);  // renvoie son icone si il en a.
 
 typedef void (*CairoDockModuleStop) (void);
 
@@ -441,7 +441,7 @@ typedef enum {
 
 typedef void (*CairoDockFMGetFileInfoFunc) (const gchar *cBaseURI, gchar **cName, gchar **cURI, gchar **cIconName, gboolean *bIsDirectory, int *iVolumeID, double *fOrder, CairoDockFMSortType iSortType);
 typedef void (*CairoDockFMFilePropertiesFunc) (const gchar *cURI, guint64 *iSize, time_t *iLastModificationTime, gchar **cMimeType, int *iUID, int *iGID, int *iPermissionsMask);
-typedef GList * (*CairoDockFMListDirectoryFunc) (const gchar *cURI, CairoDockFMSortType g_fm_iSortType, gchar **cFullURI);
+typedef GList * (*CairoDockFMListDirectoryFunc) (const gchar *cURI, CairoDockFMSortType g_fm_iSortType, int iNewIconsType, gchar **cFullURI);
 typedef void (*CairoDockFMLaunchUriFunc) (const gchar *cURI);
 
 typedef gchar * (*CairoDockFMIsMountedFunc) (const gchar *cURI, gboolean *bIsMounted);
@@ -483,6 +483,11 @@ struct _CairoDockVFSBackend {
 #define CAIRO_DOCK_FM_VFS_ROOT_NETWORK "_vfsroot+network_"
 
 
+typedef void (*CairoDockForeachIconFunc) (Icon *icon, CairoDock *pDock, gpointer data);
+
+typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
+
+
 /// Nom du repertoire de travail de cairo-dock.
 #define CAIRO_DOCK_DATA_DIR ".cairo-dock"
 /// Nom du repertoire des themes.
@@ -522,8 +527,6 @@ typedef enum {
 	CAIRO_DOCK_MOUSE_ON_THE_EDGE,
 	CAIRO_DOCK_MOUSE_OUTSIDE
 	} CairoDockMousePositionType;
-
-typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
 
 typedef enum {
 	CAIRO_DOCK_UNKNOWN_ENV=0,

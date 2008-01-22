@@ -30,11 +30,11 @@ void cairo_dock_fm_register_vfs_backend (CairoDockVFSBackend *pVFSBackend)
 
 
 
-GList * cairo_dock_fm_list_directory (const gchar *cURI, CairoDockFMSortType g_fm_iSortType, gchar **cFullURI)
+GList * cairo_dock_fm_list_directory (const gchar *cURI, CairoDockFMSortType g_fm_iSortType, int iNewIconsType, gchar **cFullURI)
 {
 	if (s_pVFSBackend != NULL && s_pVFSBackend->list_directory != NULL)
 	{
-		return s_pVFSBackend->list_directory (cURI, g_fm_iSortType, cFullURI);
+		return s_pVFSBackend->list_directory (cURI, g_fm_iSortType, iNewIconsType, cFullURI);
 	}
 	else
 	{
@@ -250,7 +250,7 @@ void cairo_dock_fm_create_dock_from_directory (Icon *pIcon)
 		return;
 	g_print ("%s ()\n", __func__);
 	g_free (pIcon->acCommand);
-	GList *pIconList = cairo_dock_fm_list_directory (pIcon->cBaseURI, g_iFileSortType, &pIcon->acCommand);
+	GList *pIconList = cairo_dock_fm_list_directory (pIcon->cBaseURI, g_iFileSortType, CAIRO_DOCK_LAUNCHER, &pIcon->acCommand);
 	pIcon->pSubDock = cairo_dock_create_subdock_from_scratch (pIconList, pIcon->acName);
 	
 	cairo_dock_update_dock_size (pIcon->pSubDock);  // le 'load_buffer' ne le fait pas.
@@ -307,7 +307,7 @@ static Icon *cairo_dock_fm_alter_icon_if_necessary (Icon *pIcon, CairoDock *pDoc
 		return pIcon;
 	}
 }
-void cairo_dock_fm_action_on_file_event (CairoDockFMEventType iEventType, const gchar *cURI, Icon *pIcon)
+void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const gchar *cURI, Icon *pIcon, CairoDockIconType iTypeOnCreation)
 {
 	g_return_if_fail (cURI != NULL && pIcon != NULL);
 	g_print ("%s (%d sur %s)\n", __func__, iEventType, cURI);
@@ -350,9 +350,10 @@ void cairo_dock_fm_action_on_file_event (CairoDockFMEventType iEventType, const 
 			{
 				Icon *pNewIcon = cairo_dock_fm_create_icon_from_URI (cURI, pIcon->pSubDock);
 				g_return_if_fail (pNewIcon != NULL);
+				pNewIcon->iType = iTypeOnCreation;
 				
 				cairo_dock_insert_icon_in_dock (pNewIcon, pIcon->pSubDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
-				g_print ("  %s a ete insere(e)\n", (pNewIcon != NULL ? pNewIcon->acName : "aucune icone"));
+				g_print ("  %s a ete insere(e)\n", (pNewIcon != NULL ? pNewIcon->acName : "aucune icone n'"));
 			}
 		}
 		break ;
@@ -393,6 +394,11 @@ void cairo_dock_fm_action_on_file_event (CairoDockFMEventType iEventType, const 
 		}
 		break ;
 	}
+}
+
+void cairo_dock_fm_action_on_file_event (CairoDockFMEventType iEventType, const gchar *cURI, Icon *pIcon)
+{
+	cairo_dock_fm_manage_event_on_file (iEventType, cURI, pIcon, CAIRO_DOCK_LAUNCHER);
 }
 
 void cairo_dock_fm_action_after_mounting (gboolean bMounting, gboolean bSuccess, const gchar *cName, Icon *icon, CairoDock *pDock)  // FileManagerMountCallback.

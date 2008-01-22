@@ -117,7 +117,6 @@ void cairo_dock_unregister_appli (Icon *icon)
 	if (CAIRO_DOCK_IS_VALID_APPLI (icon))
 	{
 		g_hash_table_remove (s_hXWindowTable, &icon->Xid);
-		icon->Xid = 0;
 		
 		cairo_dock_unregister_pid (icon);
 		///g_free (icon->cClass);

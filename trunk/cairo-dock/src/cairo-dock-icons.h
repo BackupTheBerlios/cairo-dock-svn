@@ -10,22 +10,22 @@
 *TRUE ssi l'icone est une icone de lanceur.
 *@param icon une icone.
 */
-#define CAIRO_DOCK_IS_APPLI(icon) (icon != NULL && icon->iType == CAIRO_DOCK_APPLI)
+#define CAIRO_DOCK_IS_LAUNCHER(icon) (icon != NULL && (icon->acCommand != NULL || (icon->pSubDock != NULL && icon->pModule == NULL && icon->Xid == 0)))
 /**
 *TRUE ssi l'icone est une icone d'appli.
 *@param icon une icone.
 */
-#define CAIRO_DOCK_IS_LAUNCHER(icon) (icon != NULL && icon->iType == CAIRO_DOCK_LAUNCHER && icon->acName != NULL)
-/**
-*TRUE ssi l'icone est une icone de separateur.
-*@param icon une icone.
-*/
-#define CAIRO_DOCK_IS_SEPARATOR(icon) (icon != NULL && ((icon->iType & 1) || (icon->iType != CAIRO_DOCK_APPLET && icon->acName == NULL)))
+#define CAIRO_DOCK_IS_APPLI(icon) (icon != NULL && icon->Xid != 0)
 /**
 *TRUE ssi l'icone est une icone d'applet.
 *@param icon une icone.
 */
-#define CAIRO_DOCK_IS_APPLET(icon) (icon != NULL && icon->iType  == CAIRO_DOCK_APPLET)
+#define CAIRO_DOCK_IS_APPLET(icon) (icon != NULL && icon->pModule != NULL)
+/**
+*TRUE ssi l'icone est une icone de separateur.
+*@param icon une icone.
+*/
+#define CAIRO_DOCK_IS_SEPARATOR(icon) (icon != NULL && ((icon->iType & 1) || (icon->pModule == NULL && icon->Xid == 0 && icon->acName == NULL)))
 
 /**
 *TRUE ssi l'icone est une icone de lanceur defini par un fichier .desktop.
@@ -64,13 +64,20 @@
 *@param icon l'icone a liberer.
 */
 void cairo_dock_free_icon (Icon *icon);
+
+#define cairo_dock_get_group_order(icon) (icon->iType < CAIRO_DOCK_NB_TYPES ? g_tIconTypeOrder[icon->iType] : icon->iType)
+
+/**
+*Donne le type d'une icone relativement a son contenu.
+*@param icon l'icone.
+*/
+CairoDockIconType cairo_dock_get_icon_type (Icon *icon);
 /**
 *Compare 2 icones grace a la relation d'ordre sur le couple (position du type , ordre).
 *@param icon1 une icone.
 *@param icon2 une autre icone.
 *@return -1 si icone1 < icone2, 1 si icone1 > icone2, 0 si icone1 = icone2 (au sens de la relation d'ordre).
 */
-
 int cairo_dock_compare_icons_order (Icon *icon1, Icon *icon2);
 /**
 *Trie une liste en se basant sur la relation d'ordre sur le couple (position du type , ordre).
@@ -260,6 +267,15 @@ void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType)
 *@param pDock le dock duquel supprimer les icones.
 */
 #define cairo_dock_remove_all_applets(pDock) cairo_dock_remove_icons_of_type (pDock, CAIRO_DOCK_APPLET)
+/**
+*Effectue une action sur toutes les icones d'un type donne. L'action peut meme detruire et enlever de la liste l'icone courante.
+*@param pDock le dock duquel supprimer les icones.
+*@param iType le type d'icone.
+*@param pFuntion l'action a effectuer sur chaque icone.
+*@param data un pointeur qui sera passe en entree de l'action.
+*@return le separateur avec le type a gauche si il y'en a, NULL sinon.
+*/
+Icon *cairo_dock_foreach_icons_of_type (CairoDock *pDock, CairoDockIconType iType, CairoDockForeachIconFunc pFuntion, gpointer data);
 /**
 *Enleve et detruit toutes les icones de separateurs.
 *@param pDock le dock duquel supprimer les icones.

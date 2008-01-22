@@ -136,7 +136,7 @@ cairo_surface_t *cairo_dock_load_image_for_icon (cairo_t *pSourceContext, gchar 
 
 void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdouble fMaxScale, gboolean bHorizontalDock)
 {
-	g_print ("%s (%d, %.2f, %s)\n", __func__, icon->iType, fMaxScale, icon->acFileName);
+	//g_print ("%s (%d, %.2f, %s)\n", __func__, icon->iType, fMaxScale, icon->acFileName);
 	cairo_surface_destroy (icon->pIconBuffer);
 	icon->pIconBuffer = NULL;
 	cairo_surface_destroy (icon->pReflectionBuffer);
@@ -148,7 +148,7 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	{
 		//\_______________________ On recherche une icone.
 		gchar *cIconPath = cairo_dock_search_icon_s_path (icon->acFileName);
-		g_print (" -> %s\n", cIconPath);
+		//g_print (" -> %s\n", cIconPath);
 		
 		//\_______________________ On cree la surface cairo a afficher.
 		if (cIconPath != NULL && strlen (cIconPath) > 0)
@@ -339,6 +339,7 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 		cairo_dock_fill_one_icon_buffer (icon, pCairoContext, fMaxScale, pDock->bHorizontalDock);
 		icon->fWidth *= fRatio;
 		icon->fHeight *= fRatio;
+		g_print (" =size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
 		pDock->iFlatDockWidth += g_iIconGap + icon->fWidth;
 		pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, icon->fHeight);
 		

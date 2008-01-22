@@ -98,6 +98,21 @@ void cairo_dock_free_icon (Icon *icon)
 	g_free (icon);
 }
 
+CairoDockIconType cairo_dock_get_icon_type (Icon *icon)
+{
+	if (icon == NULL)
+		return CAIRO_DOCK_LAUNCHER;
+	
+	if (icon->Xid != 0)
+		return CAIRO_DOCK_APPLI;
+	else if (icon->pModule != NULL)
+		return CAIRO_DOCK_APPLET;
+	else if (icon->acName == NULL)
+		return CAIRO_DOCK_SEPARATOR12;
+	else
+		return CAIRO_DOCK_LAUNCHER;
+}
+
 /**
 *Compare 2 icones grace a la relation d'ordre sur le couple (position du type , ordre).
 *@param icon1 une icone.
@@ -106,9 +121,11 @@ void cairo_dock_free_icon (Icon *icon)
 */
 int cairo_dock_compare_icons_order (Icon *icon1, Icon *icon2)
 {
-	if (g_tIconTypeOrder[icon1->iType] < g_tIconTypeOrder[icon2->iType])
+	int iOrder1 = cairo_dock_get_group_order (icon1);
+	int iOrder2 = cairo_dock_get_group_order (icon2);
+	if (iOrder1 < iOrder2)
 		return -1;
-	else if (g_tIconTypeOrder[icon1->iType] > g_tIconTypeOrder[icon2->iType])
+	else if (iOrder1 > iOrder2)
 		return 1;
 	else
 	{
@@ -624,6 +641,7 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 		icon->fWidth /= g_fSubDockSizeRatio;
 		icon->fHeight /= g_fSubDockSizeRatio;
 	}
+	g_print (" -size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
 	
 	//\___________________ On enleve le separateur si c'est la derniere icone de son type.
 	if (bCheckUnusedSeparator)
@@ -634,10 +652,11 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 			Icon *pSameTypeIcon = cairo_dock_get_first_icon_of_type (pDock->icons, icon->iType);
 			if (pSameTypeIcon == NULL)
 			{
-				if (g_tIconTypeOrder[icon->iType] > 1)  // attention : iType - 1 > 0 si iType = 0, car c'est un unsigned int !
-					pSeparatorIcon = cairo_dock_get_first_icon_of_type (pDock->icons, g_tIconTypeOrder[icon->iType] - 1);
-				else if (g_tIconTypeOrder[icon->iType] + 1 < CAIRO_DOCK_NB_TYPES)
-					pSeparatorIcon = cairo_dock_get_first_icon_of_type (pDock->icons, g_tIconTypeOrder[icon->iType] + 1);
+				int iOrder = cairo_dock_get_group_order (icon);
+				if (iOrder > 1)  // attention : iType - 1 > 0 si iType = 0, car c'est un unsigned int !
+					pSeparatorIcon = cairo_dock_get_first_icon_of_type (pDock->icons, iOrder - 1);
+				else if (iOrder + 1 < CAIRO_DOCK_NB_TYPES)
+					pSeparatorIcon = cairo_dock_get_first_icon_of_type (pDock->icons, iOrder + 1);
 				
 				if (pSeparatorIcon != NULL)
 				{
@@ -692,10 +711,17 @@ void cairo_dock_remove_icon_from_dock (CairoDock *pDock, Icon *icon)
 	_cairo_dock_remove_one_icon_from_dock (pDock, icon, TRUE);
 }
 
+static void _cairo_dock_remove_one_icon (Icon *icon, CairoDock *pDock, gpointer data)
+{
+	if (CAIRO_DOCK_IS_APPLI (icon) && icon->pSubDock != NULL && cairo_dock_search_dock_from_name (icon->cClass) == icon->pSubDock)
+		cairo_dock_destroy_dock (icon->pSubDock, icon->cClass, NULL, NULL);
+	cairo_dock_remove_one_icon_from_dock (pDock, icon);
+	cairo_dock_free_icon (icon);
+}
 void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType)
 {
 	//g_print ("%s (%d)\n", __func__, iType);
-	Icon *icon;
+	/*Icon *icon;
 	GList *ic;
 	if (pDock->icons == NULL)
 		return ;
@@ -743,8 +769,63 @@ void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType)
 		//g_print ("  on enleve un separateur\n");
 		cairo_dock_remove_one_icon_from_dock (pDock, pSeparatorIcon);
 		cairo_dock_free_icon (pSeparatorIcon);
+	}*/
+	Icon *pSeparatorIcon = cairo_dock_foreach_icons_of_type (pDock, iType, _cairo_dock_remove_one_icon, NULL);
+	if (pSeparatorIcon != NULL)
+	{
+		//g_print ("  on enleve un separateur\n");
+		cairo_dock_remove_one_icon_from_dock (pDock, pSeparatorIcon);
+		cairo_dock_free_icon (pSeparatorIcon);
 	}
 }
+
+Icon *cairo_dock_foreach_icons_of_type (CairoDock *pDock, CairoDockIconType iType, CairoDockForeachIconFunc pFuntion, gpointer data)
+{
+	//g_print ("%s (%d)\n", __func__, iType);
+	if (pDock->icons == NULL)
+		return NULL;
+	
+	Icon *icon;
+	GList *ic;
+	gboolean bOneIconFound = FALSE;
+	Icon *pSeparatorIcon = NULL;
+	ic = pDock->icons;
+	do
+	{
+		if (ic->next == NULL)
+			break;
+		
+		icon = ic->next->data;  // on ne peut pas enlever l'element courant, sinon on perd 'ic'.
+		if (icon->iType == iType)
+		{
+			bOneIconFound = TRUE;
+			pFuntion (icon, pDock, data);
+		}
+		else
+		{
+			if (CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon))
+			{
+				if ( (bOneIconFound && pSeparatorIcon == NULL) || (! bOneIconFound) )
+					pSeparatorIcon = icon;
+			}
+			ic = ic->next;
+		}
+	} while (TRUE);  // on parcourt tout, inutile de complexifier la chose pour gagner 3ns.
+	
+	icon = cairo_dock_get_first_icon_of_type (pDock->icons, iType);
+	if (icon != NULL && icon->iType == iType)
+	{
+		bOneIconFound = TRUE;
+		pFuntion (icon, pDock, data);
+	}
+	
+	if (bOneIconFound)
+		return pSeparatorIcon;
+	else
+		return NULL;
+}
+
+
 
 
 void cairo_dock_remove_all_separators (CairoDock *pDock)

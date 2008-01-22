@@ -8,7 +8,7 @@
 void cairo_dock_fm_register_vfs_backend (CairoDockVFSBackend *pVFSBackend);
 
 
-GList * cairo_dock_fm_list_directory (const gchar *cURI, CairoDockFMSortType g_fm_iSortType, gchar **cFullURI);
+GList * cairo_dock_fm_list_directory (const gchar *cURI, CairoDockFMSortType g_fm_iSortType, int iNewIconsType, gchar **cFullURI);
 
 gboolean cairo_dock_fm_get_file_info (const gchar *cBaseURI, gchar **cName, gchar **cURI, gchar **cIconName, gboolean *bIsDirectory, int *iVolumeID, double *fOrder, CairoDockFMSortType iSortType);
 
@@ -48,6 +48,7 @@ Icon *cairo_dock_fm_create_icon_from_URI (const gchar *cURI, CairoDock *pDock);
 void cairo_dock_fm_create_dock_from_directory (Icon *pIcon);
 
 
+void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const gchar *cURI, Icon *pIcon, CairoDockIconType iTypeOnCreation);
 void cairo_dock_fm_action_on_file_event (CairoDockFMEventType iEventType, const gchar *cURI, Icon *pIcon);
 
 void cairo_dock_fm_action_after_mounting (gboolean bMounting, gboolean bSuccess, const gchar *cName, Icon *icon, CairoDock *pDock);

@@ -264,7 +264,7 @@ void cairo_dock_write_one_theme_name (gchar *cName, gchar *cThemePath, GString *
 }
 void cairo_dock_write_one_renderer_name (gchar *cName, CairoDockRenderer *pRenderer, GString *pString)
 {
-	g_print ("%s (%s)\n", __func__, cName);
+	//g_print ("%s (%s)\n", __func__, cName);
 	g_string_append_printf (pString, "%s;%s;%s;", cName, (pRenderer != NULL && pRenderer->cReadmeFilePath != NULL ? pRenderer->cReadmeFilePath : "none"), (pRenderer != NULL && pRenderer->cPreviewFilePath != NULL ? pRenderer->cPreviewFilePath : "none"));
 }
 

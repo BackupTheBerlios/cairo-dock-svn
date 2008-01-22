@@ -318,8 +318,9 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 */
 void cairo_dock_arm_animation (Icon *icon, CairoDockAnimationType iAnimationType, int iNbRounds)
 {
+	CairoDockIconType iType = cairo_dock_get_icon_type (icon);
 	if (iAnimationType == -1)
-		icon->iAnimationType = g_tAnimationType[icon->iType];
+		icon->iAnimationType = g_tAnimationType[iType];
 	else
 		icon->iAnimationType = iAnimationType;
 	
@@ -328,7 +329,7 @@ void cairo_dock_arm_animation (Icon *icon, CairoDockAnimationType iAnimationType
 	
 	
 	if (iNbRounds == -1)
-		iNbRounds = g_tNbAnimationRounds[icon->iType];
+		iNbRounds = g_tNbAnimationRounds[iType];
 	icon->iCount = MAX (0, g_tNbIterInOneRound[icon->iAnimationType] * iNbRounds - 1);
 }
 

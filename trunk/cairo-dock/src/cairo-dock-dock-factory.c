@@ -581,6 +581,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 		icon->fWidth *= g_fSubDockSizeRatio;
 		icon->fHeight *= g_fSubDockSizeRatio;
 	}
+	g_print (" +size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
 	
 	if (! g_bSameHorizontality)
 	{
@@ -595,13 +596,14 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 	//\______________ On insere un separateur si necessaire.
 	if (bSeparatorNeeded)
 	{
-		if (g_tIconTypeOrder[icon->iType] + 1 < CAIRO_DOCK_NB_TYPES)
+		int iOrder = cairo_dock_get_group_order (icon);
+		if (iOrder + 1 < CAIRO_DOCK_NB_TYPES)
 		{
 			Icon *pNextIcon = cairo_dock_get_next_icon (pDock->icons, icon);
 			if (pNextIcon != NULL && ((pNextIcon->iType - icon->iType) % 2 == 0))
 			{
-				int iSeparatorType = g_tIconTypeOrder[icon->iType] + 1;
-				//g_print ("insertion de %s -> iSeparatorType : %d\n", icon->acName, iSeparatorType);
+				int iSeparatorType = iOrder + 1;
+				g_print ("insertion de %s -> iSeparatorType : %d\n", icon->acName, iSeparatorType);
 				
 				cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock);
 				Icon *pSeparatorIcon = cairo_dock_create_separator_icon (pSourceContext, iSeparatorType, pDock);
@@ -616,12 +618,12 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 				cairo_destroy (pSourceContext);
 			}
 		}
-		if (g_tIconTypeOrder[icon->iType] - 1 > 0)
+		if (iOrder > 1)
 		{
 			Icon *pPrevIcon = cairo_dock_get_previous_icon (pDock->icons, icon);
 			if (pPrevIcon != NULL && ((pPrevIcon->iType - icon->iType) % 2 == 0))
 			{
-				int iSeparatorType = g_tIconTypeOrder[icon->iType] - 1;
+				int iSeparatorType = iOrder - 1;
 				//g_print ("insertion de %s -> iSeparatorType : %d\n", icon->acName, iSeparatorType);
 				
 				cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock);

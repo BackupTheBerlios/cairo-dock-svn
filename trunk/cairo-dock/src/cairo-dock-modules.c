@@ -386,7 +386,7 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 	
 	g_free (module->cConfFilePath);
 	module->cConfFilePath = NULL;
-	Icon *icon = module->initModule (pDock, &module->cConfFilePath, &tmp_erreur);
+	Icon *icon = module->initModule (pDock, module, &tmp_erreur);
 	if (tmp_erreur != NULL)
 	{
 		g_propagate_error (erreur, tmp_erreur);

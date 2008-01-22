@@ -120,7 +120,7 @@ GtkWidget *cairo_dock_create_sub_menu (gchar *cLabel, GtkWidget *pMenu);
 */
 #define CD_APPLET_H \
 CairoDockVisitCard *pre_init (void);\
-Icon *init (CairoDock *pDock, gchar **cAppletConfFilePath, GError **erreur);\
+Icon *init (CairoDock *pDock, CairoDockModule *pModule, GError **erreur);\
 void stop (void);
 
 //\______________________ pre_init.
@@ -169,14 +169,14 @@ CD_APPLET_PRE_INIT_END
 *@param erreur une GError, utilisable pour reporter une erreur ayant lieu durant l'initialisation.
 */
 #define CD_APPLET_INIT_BEGIN(erreur) \
-Icon *init (CairoDock *pDock, gchar **cAppletConfFilePath, GError **erreur) \
+Icon *init (CairoDock *pDock, CairoDockModule *pModule, GError **erreur) \
 { \
 	myDock = pDock; \
 	gchar *cConfFilePath = cairo_dock_check_conf_file_exists (MY_APPLET_USER_DATA_DIR, MY_APPLET_SHARE_DATA_DIR, MY_APPLET_CONF_FILE); \
 	int iDesiredWidth = 48, iDesiredHeight = 48; \
 	gchar *cAppletName = NULL, *cIconName = NULL; \
 	read_conf_file (cConfFilePath, &iDesiredWidth, &iDesiredHeight, &cAppletName, &cIconName); \
-	myIcon = cairo_dock_create_icon_for_applet (pDock, iDesiredWidth, iDesiredHeight, cAppletName, cIconName); \
+	myIcon = cairo_dock_create_icon_for_applet (pDock, iDesiredWidth, iDesiredHeight, cAppletName, cIconName, pModule); \
 	g_return_val_if_fail (myIcon != NULL, NULL); \
 	myDrawContext = cairo_create (myIcon->pIconBuffer); \
 	g_return_val_if_fail (cairo_status (myDrawContext) == CAIRO_STATUS_SUCCESS, NULL);
@@ -184,7 +184,7 @@ Icon *init (CairoDock *pDock, gchar **cAppletConfFilePath, GError **erreur) \
 *Fin de la fonction d'initialisation de l'applet.
 */
 #define CD_APPLET_INIT_END \
-	*cAppletConfFilePath = cConfFilePath; \
+	pModule->cConfFilePath = cConfFilePath; \
 	g_free (cAppletName); \
 	g_free (cIconName); \
 	return myIcon; \
@@ -416,7 +416,9 @@ void about (GtkMenuItem *menu_item, gpointer *data);
 #define CD_APPLET_ON_CLICK_BEGIN \
 gboolean CD_APPLET_ON_CLICK (gpointer *data) \
 { \
-	if (data[0] == myIcon) \
+	Icon *pClickedIcon = data[0]; \
+	CairoDock *pClickedDock = data[1]; \
+	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock)) \
 	{
 /**
 *Fin de la fonction de notification au clic gauche. Par defaut elle intercepte la notification si elle l'a recue.
@@ -449,7 +451,9 @@ gboolean CD_APPLET_ON_CLICK (gpointer *data);
 #define CD_APPLET_ON_BUILD_MENU_BEGIN \
 gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data) \
 { \
-	if (data[0] == myIcon) \
+	Icon *pClickedIcon = data[0]; \
+	CairoDock *pClickedDock = data[1]; \
+	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock)) \
 	{ \
 		GtkWidget *pAppletMenu = data[2]; \
 		GtkWidget *pMenuItem;
@@ -470,6 +474,10 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 *Menu principal de l'applet.
 */
 #define CD_APPLET_MY_MENU pAppletMenu
+/**
+*Icone cliquee droit.
+*/
+#define CD_APPLET_CLICKED_ICON pClickedIcon
 
 /**
 *Cree et ajoute un sous-menu a un menu.
@@ -541,7 +549,9 @@ cairo_dock_create_sub_menu (cLabel, pMenu);
 #define CD_APPLET_ON_MIDDLE_CLICK_BEGIN \
 gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data) \
 { \
-	if (data[0] == myIcon) \
+	Icon *pClickedIcon = data[0]; \
+	CairoDock *pClickedDock = data[1]; \
+	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock)) \
 	{
 /**
 *Fin de la fonction de notification du clic du milieu. Par defaut elle intercepte la notification si elle l'a recue.

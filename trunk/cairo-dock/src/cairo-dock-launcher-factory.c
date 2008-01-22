@@ -165,7 +165,7 @@ gchar *cairo_dock_search_icon_s_path (gchar *cFileName)
 void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName, Icon *icon)
 {
 	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, cDesktopFileName);
-	g_print ("%s (%s)\n", __func__, cDesktopFilePath);
+	//g_print ("%s (%s)\n", __func__, cDesktopFilePath);
 	
 	GError *erreur = NULL;
 	GKeyFile* keyfile = g_key_file_new();
@@ -319,7 +319,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 
 Icon * cairo_dock_create_icon_from_desktop_file (const gchar *cDesktopFileName, cairo_t *pSourceContext)
 {
-	g_print ("%s (%s)\n", __func__, cDesktopFileName);
+	//g_print ("%s (%s)\n", __func__, cDesktopFileName);
 	
 	Icon *icon = g_new0 (Icon, 1);
 	cairo_dock_load_icon_info_from_desktop_file (cDesktopFileName, icon);
