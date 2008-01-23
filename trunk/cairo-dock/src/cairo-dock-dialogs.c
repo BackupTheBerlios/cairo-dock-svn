@@ -1207,14 +1207,17 @@ void cairo_dock_unhide_dialog (CairoDockDialog *pDialog)
 	if (! cairo_dock_dialog_reference (pDialog))
 		return ;
 	
-	Icon *pIcon = pDialog->pIcon;
-	if (pIcon != NULL)
+	if (! GTK_WIDGET_VISIBLE (pDialog->pWidget))
 	{
-		CairoDock *pDock = cairo_dock_search_container_from_icon (pIcon);
-		cairo_dock_place_dialog (pDialog, pDock);
-		
-		gtk_window_present (GTK_WINDOW (pDialog->pWidget));
+		Icon *pIcon = pDialog->pIcon;
+		if (pIcon != NULL)
+		{
+			CairoDock *pDock = cairo_dock_search_container_from_icon (pIcon);
+			cairo_dock_place_dialog (pDialog, pDock);
+		}
 	}
+	
+	gtk_window_present (GTK_WINDOW (pDialog->pWidget));
 	
 	cairo_dock_dialog_unreference (pDialog);
 }

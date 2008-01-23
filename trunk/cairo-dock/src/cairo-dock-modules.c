@@ -414,8 +414,8 @@ void cairo_dock_deactivate_module (CairoDockModule *module)
 		{
 			module->stopModule ();
 		}
-		
 		module->bActive = FALSE;
+		
 		g_free (module->cConfFilePath);
 		module->cConfFilePath = NULL;
 		g_free (module->cReadmeFilePath);

@@ -110,4 +110,11 @@ CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, g
 #define cairo_dock_create_subdock_from_scratch(pIconList, cDockName) cairo_dock_create_subdock_from_scratch_with_type (pIconList, cDockName, GDK_WINDOW_TYPE_HINT_DOCK)
 #define cairo_dock_create_subdock_for_class_appli(cClassName) cairo_dock_create_subdock_from_scratch_with_type (NULL, cClassName, GDK_WINDOW_TYPE_HINT_DOCK)
 
+/**
+* Autorise un widget a accepter les glisse-deposes.
+* @param pWidget un widget.
+* @param pCallBack la fonction qui sera appelee lors d'une reception de donnee.
+*/
+void cairo_dock_allow_widget_to_receive_data (GtkWidget *pWidget, GCallback pCallBack);
+
 #endif

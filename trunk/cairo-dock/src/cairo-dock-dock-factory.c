@@ -880,3 +880,29 @@ CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, g
 	
 	return pSubDock;
 }
+
+
+
+void cairo_dock_allow_widget_to_receive_data (GtkWidget *pWidget, GCallback pCallBack)
+{
+	GtkTargetEntry *pTargetEntry = g_new0 (GtkTargetEntry, 6);
+	pTargetEntry[0].target = "text/*";
+	pTargetEntry[0].flags = (GtkTargetFlags) 0;
+	pTargetEntry[0].info = 0;
+	pTargetEntry[1].target = "text/uri-list";
+	pTargetEntry[2].target = "text/plain";
+	pTargetEntry[3].target = "text/plain;charset=UTF-8";
+	pTargetEntry[4].target = "text/directory";
+	pTargetEntry[5].target = "text/html";
+	gtk_drag_dest_set (pWidget,
+		GTK_DEST_DEFAULT_DROP | GTK_DEST_DEFAULT_MOTION,  // GTK_DEST_DEFAULT_HIGHLIGHT ne rend pas joli je trouve.
+		pTargetEntry,
+		6,
+		GDK_ACTION_COPY);
+	g_free (pTargetEntry);
+	
+	g_signal_connect (G_OBJECT (pWidget),
+		"drag_data_received",
+		pCallBack,
+		NULL);
+}

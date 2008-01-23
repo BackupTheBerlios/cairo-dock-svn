@@ -355,7 +355,7 @@ CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT (cGroupName, cKeyName, TRUE)
 #define CD_CONFIG_GET_ANIMATION(cGroupName, cKeyName) CD_CONFIG_GET_ANIMATION_WITH_DEFAULT(cGroupName, cKeyName, CAIRO_DOCK_BOUNCE)
 
 /**
-*Recupere la valeur d'un parametre 'couleur' du fichier de conf.
+*Recupere la valeur d'un parametre 'couleur' au format RVBA. du fichier de conf.
 *@param cGroupName nom du groupe dans le fichier de conf.
 *@param cKeyName nom de la cle dans le fichier de conf.
 *@param pColorBuffer tableau de 4 double deja alloue, et qui sera rempli avec les 4 composantes de la couleur.
@@ -363,12 +363,30 @@ CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT (cGroupName, cKeyName, TRUE)
 */
 #define CD_CONFIG_GET_COLOR_WITH_DEFAULT(cGroupName, cKeyName, pColorBuffer, pDefaultColor) cairo_dock_get_double_list_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, pColorBuffer, 4, pDefaultColor, NULL, NULL);
 /**
-*Recupere la valeur d'un parametre 'couleur' du fichier de conf, avec NULL comme valeur par defaut.
+*Recupere la valeur d'un parametre 'couleur' au format RVBA. du fichier de conf, avec NULL comme valeur par defaut.
 *@param cGroupName nom du groupe dans le fichier de conf.
 *@param cKeyName nom de la cle dans le fichier de conf.
 *@param pColorBuffer tableau de 4 double deja alloue, et qui sera rempli avec les 4 composantes de la couleur.
 */
 #define CD_CONFIG_GET_COLOR(cGroupName, cKeyName, pColorBuffer) CD_CONFIG_GET_COLOR_WITH_DEFAULT(cGroupName, cKeyName, pColorBuffer, NULL)
+/**
+*Recupere la valeur d'un parametre 'couleur' au format RVB. du fichier de conf.
+*@param cGroupName nom du groupe dans le fichier de conf.
+*@param cKeyName nom de la cle dans le fichier de conf.
+*@param pColorBuffer tableau de 3 double deja alloue, et qui sera rempli avec les 3 composantes de la couleur.
+*@param pDefaultColor valeur par defaut si la cle et/ou le groupe n'est pas trouve (typiquement si cette cle est nouvelle). C'est un tableau de 3 double, ou NULL.
+*/
+#define CD_CONFIG_GET_COLOR_RVB_WITH_DEFAULT(cGroupName, cKeyName, pColorBuffer, pDefaultColor) cairo_dock_get_double_list_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, pColorBuffer, 3, pDefaultColor, NULL, NULL);
+/**
+*Recupere la valeur d'un parametre 'couleur' au format RVB. du fichier de conf, avec NULL comme valeur par defaut.
+*@param cGroupName nom du groupe dans le fichier de conf.
+*@param cKeyName nom de la cle dans le fichier de conf.
+*@param pColorBuffer tableau de 3 double deja alloue, et qui sera rempli avec les 3 composantes de la couleur.
+*/
+#define CD_CONFIG_GET_COLOR_RVB(cGroupName, cKeyName, pColorBuffer) CD_CONFIG_GET_COLOR_RVB_WITH_DEFAULT(cGroupName, cKeyName, pColorBuffer, NULL)
+
+
+
 
 /**
 *Liste les themes contenu dans un repertoire, met a jour le fichier de conf avec, et renvoie le chemin correspondant au theme choisi.
