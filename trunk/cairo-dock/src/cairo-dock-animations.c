@@ -216,7 +216,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 	if (pDock->iScrollOffset != 0 && g_bResetScrollOnLeave)
 	{
 		//g_print ("iScrollOffset : %d\n", pDock->iScrollOffset);
-		if (pDock->iScrollOffset < pDock->iFlatDockWidth / 2)
+		if (pDock->iScrollOffset < pDock->fFlatDockWidth / 2)
 		{
 			//pDock->iScrollOffset = pDock->iScrollOffset * g_fScrollAcceleration;
 			pDock->iScrollOffset -= MAX (2, ceil (pDock->iScrollOffset * (1 - g_fScrollAcceleration)));
@@ -225,8 +225,8 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 		}
 		else
 		{
-			pDock->iScrollOffset += MAX (2, ceil ((pDock->iFlatDockWidth - pDock->iScrollOffset) * (1 - g_fScrollAcceleration)));
-			if (pDock->iScrollOffset > pDock->iFlatDockWidth)
+			pDock->iScrollOffset += MAX (2, ceil ((pDock->fFlatDockWidth - pDock->iScrollOffset) * (1 - g_fScrollAcceleration)));
+			if (pDock->iScrollOffset > pDock->fFlatDockWidth)
 				pDock->iScrollOffset = 0;
 		}
 		pDock->calculate_max_dock_size (pDock);

@@ -23,6 +23,8 @@ fi
 
 
 cd $CAIRO_DOCK_DIR
+find . -name linguas -execdir mv linguas LINGUAS \;
+find . -name potfiles.in -execdir mv potfiles.in POTFILES.in \;
 
 cd cairo-dock
 if test "$CAIRO_DOCK_AUTORECONF" = "1"; then

@@ -136,7 +136,7 @@ cairo_surface_t *cairo_dock_load_image_for_icon (cairo_t *pSourceContext, gchar 
 
 void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdouble fMaxScale, gboolean bHorizontalDock)
 {
-	//g_print ("%s (%d, %.2f, %s)\n", __func__, icon->iType, fMaxScale, icon->acFileName);
+	g_print ("%s (%d, %.2f, %s)\n", __func__, icon->iType, fMaxScale, icon->acFileName);
 	cairo_surface_destroy (icon->pIconBuffer);
 	icon->pIconBuffer = NULL;
 	cairo_surface_destroy (icon->pReflectionBuffer);
@@ -323,7 +323,7 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 	else
 		pDock->bHorizontalDock = g_pMainDock->bHorizontalDock;
 	
-	pDock->iFlatDockWidth = - g_iIconGap;
+	double fFlatDockWidth = - g_iIconGap;
 	pDock->iMaxIconHeight = 0;
 	
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
@@ -339,14 +339,15 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 		cairo_dock_fill_one_icon_buffer (icon, pCairoContext, fMaxScale, pDock->bHorizontalDock);
 		icon->fWidth *= fRatio;
 		icon->fHeight *= fRatio;
-		g_print (" =size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
-		pDock->iFlatDockWidth += g_iIconGap + icon->fWidth;
+		//g_print (" =size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
+		fFlatDockWidth += g_iIconGap + icon->fWidth;
 		pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, icon->fHeight);
 		
 		cairo_dock_fill_one_text_buffer (icon, pCairoContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 		
 		cairo_dock_fill_one_quick_info_buffer (icon, pCairoContext, 12, g_cLabelPolice, PANGO_WEIGHT_HEAVY, .4);
 	}
+	pDock->fFlatDockWidth = (int) fFlatDockWidth;
 	cairo_destroy (pCairoContext);
 }
 void cairo_dock_reload_buffers_in_all_docks (GHashTable *hDocksTable)

@@ -27,6 +27,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #define CAIRO_DOCK_MODULE_PANEL_HEIGHT 450
 
 extern gchar *g_cConfFile;
+extern gboolean g_bUseSeparator;
 extern short g_iMajorVersion, g_iMinorVersion, g_iMicroVersion;
 static GHashTable *s_hModuleTable = NULL;
 
@@ -267,7 +268,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 			if (pIcon != NULL)
 			{
 				pIcon->fOrder = iOrder ++;
-				cairo_dock_insert_icon_in_dock (pIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+				cairo_dock_insert_icon_in_dock (pIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
 			}
 		}
 		i ++;
@@ -484,7 +485,7 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 		}
 		
 		g_print ("pNewIcon->fOrder <- %.1f\n", pNewIcon->fOrder);
-		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
 		
 		cairo_dock_redraw_my_icon (pNewIcon, pDock);
 	}

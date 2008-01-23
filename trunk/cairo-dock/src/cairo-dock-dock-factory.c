@@ -56,6 +56,7 @@ extern int g_iLabelSize;
 extern gchar *g_cLabelPolice;
 extern gboolean g_bTextAlwaysHorizontal;
 
+extern gboolean g_bUseSeparator;
 extern gboolean g_bAutoHide;
 
 extern gchar *g_cCurrentLaunchersPath;
@@ -153,7 +154,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	pDock->bAtBottom = TRUE;
 	pDock->iRefCount = 0;  // c'est un dock racine par defaut.
 	pDock->iAvoidingMouseIconType = -1;
-	pDock->iFlatDockWidth = - g_iIconGap;
+	pDock->fFlatDockWidth = - g_iIconGap;
 	if (g_pMainDock != NULL)
 	{
 		pDock->bHorizontalDock = g_pMainDock->bHorizontalDock;
@@ -505,7 +506,7 @@ void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
 }
 
 
-void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et iFlatDockWidth doivent avoir ete mis a jour au prealable.
+void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et fFlatDockWidth doivent avoir ete mis a jour au prealable.
 {
 	//g_print ("%s (bInside : %d ; iSidShrinkDown : %d)\n", __func__, pDock->bInside, pDock->iSidShrinkDown);
 	pDock->calculate_max_dock_size (pDock);
@@ -544,18 +545,18 @@ void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et iFlatD
 
 
 
-void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpdateSize, gboolean bAnimated, gboolean bApplyRatio)
+void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpdateSize, gboolean bAnimated, gboolean bApplyRatio, gboolean bInsertSeparator)
 {
 	g_return_if_fail (icon != NULL);
 	if (g_list_find (pDock->icons, icon) != NULL)  // elle est deja dans ce dock.
 		return ;
 	
-	int iPreviousMinWidth = pDock->iFlatDockWidth;
+	int iPreviousMinWidth = pDock->fFlatDockWidth;
 	int iPreviousMaxIconHeight = pDock->iMaxIconHeight;
 	
 	//\______________ On regarde si on doit inserer un separateur.
 	gboolean bSeparatorNeeded = FALSE;
-	if (! CAIRO_DOCK_IS_SEPARATOR (icon))
+	if (bInsertSeparator && ! CAIRO_DOCK_IS_SEPARATOR (icon))
 	{
 		Icon *pSameTypeIcon = cairo_dock_get_first_icon_of_type (pDock->icons, icon->iType);
 		if (pSameTypeIcon == NULL && pDock->icons != NULL)
@@ -568,7 +569,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 	//\______________ On insere l'icone a sa place dans la liste.
 	if (icon->fOrder == CAIRO_DOCK_LAST_ORDER)
 	{
-		Icon *pLastIcon = cairo_dock_get_last_launcher (pDock->icons);
+		Icon *pLastIcon = cairo_dock_get_last_icon_of_type (pDock->icons, icon->iType);
 		if (pLastIcon != NULL)
 			icon->fOrder = pLastIcon->fOrder + 1;
 		else
@@ -584,7 +585,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 		icon->fWidth *= g_fSubDockSizeRatio;
 		icon->fHeight *= g_fSubDockSizeRatio;
 	}
-	g_print (" +size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
+	//g_print (" +size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
 	
 	if (! g_bSameHorizontality)
 	{
@@ -593,7 +594,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 		cairo_destroy (pSourceContext);
 	}
 	
-	pDock->iFlatDockWidth += g_iIconGap + icon->fWidth;
+	pDock->fFlatDockWidth += g_iIconGap + icon->fWidth;
 	pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, icon->fHeight);
 	
 	//\______________ On insere un separateur si necessaire.
@@ -615,7 +616,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 					pDock->icons = g_list_insert_sorted (pDock->icons,
 						pSeparatorIcon,
 						(GCompareFunc) cairo_dock_compare_icons_order);
-					pDock->iFlatDockWidth += g_iIconGap + pSeparatorIcon->fWidth;
+					pDock->fFlatDockWidth += g_iIconGap + pSeparatorIcon->fWidth;
 					pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, pSeparatorIcon->fHeight);
 				}
 				cairo_destroy (pSourceContext);
@@ -636,7 +637,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 					pDock->icons = g_list_insert_sorted (pDock->icons,
 						pSeparatorIcon,
 						(GCompareFunc) cairo_dock_compare_icons_order);
-					pDock->iFlatDockWidth += g_iIconGap + pSeparatorIcon->fWidth;
+					pDock->fFlatDockWidth += g_iIconGap + pSeparatorIcon->fWidth;
 					pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, pSeparatorIcon->fHeight);
 				}
 				cairo_destroy (pSourceContext);
@@ -651,7 +652,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 	if (bUpdateSize)
 		cairo_dock_update_dock_size (pDock);
 	
-	if (pDock->bIsMainDock && g_bReserveSpace && ! g_bAutoHide && ! pDock->bInside && (pDock->iFlatDockWidth != iPreviousMinWidth || pDock->iMaxIconHeight != iPreviousMaxIconHeight))
+	if (pDock->bIsMainDock && g_bReserveSpace && ! g_bAutoHide && ! pDock->bInside && (pDock->fFlatDockWidth != iPreviousMinWidth || pDock->iMaxIconHeight != iPreviousMaxIconHeight))
 		cairo_dock_reserve_space_for_dock (pDock, TRUE);
 }
 
@@ -699,7 +700,7 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 			pParentDock = g_hash_table_lookup (g_hDocksTable, icon->cParentDockName);
 			
 			if (pParentDock != NULL)  // a priori toujours vrai.
-				cairo_dock_insert_icon_in_dock (icon, pParentDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+				cairo_dock_insert_icon_in_dock (icon, pParentDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, ! CAIRO_DOCK_INSERT_SEPARATOR);
 		}
 	} while (1);
 	g_dir_close (dir);
@@ -817,7 +818,7 @@ void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDoc
 				icon->fWidth /= g_fSubDockSizeRatio;
 				icon->fHeight /= g_fSubDockSizeRatio;
 			}
-			cairo_dock_insert_icon_in_dock (icon, ReceivingDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+			cairo_dock_insert_icon_in_dock (icon, ReceivingDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
 		}
 	}
 	if (ReceivingDock != NULL)
@@ -840,13 +841,13 @@ void cairo_dock_reference_dock (CairoDock *pDock)
 		
 		Icon *icon;
 		GList *ic;
-		pDock->iFlatDockWidth = -g_iIconGap;
+		pDock->fFlatDockWidth = -g_iIconGap;
 		for (ic = pDock->icons; ic != NULL; ic = ic->next)
 		{
 			icon = ic->data;
 			icon->fWidth *= g_fSubDockSizeRatio;
 			icon->fHeight *= g_fSubDockSizeRatio;
-			pDock->iFlatDockWidth += icon->fWidth + g_iIconGap;
+			pDock->fFlatDockWidth += icon->fWidth + g_iIconGap;
 			
 			if (! g_bSameHorizontality)
 			{

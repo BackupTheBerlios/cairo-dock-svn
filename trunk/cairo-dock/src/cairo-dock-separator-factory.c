@@ -113,6 +113,7 @@ Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorT
 		icon->fWidth *= g_fSubDockSizeRatio;
 		icon->fHeight *= g_fSubDockSizeRatio;
 	}
+	//g_print ("1 separateur : %.2fx%.2f\n", icon->fWidth, icon->fHeight);
 	
 	return icon;
 }

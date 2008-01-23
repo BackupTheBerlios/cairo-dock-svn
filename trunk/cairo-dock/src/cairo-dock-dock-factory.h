@@ -65,8 +65,9 @@ void cairo_dock_update_dock_size (CairoDock *pDock);
 * @param bUpdateSize TRUE pour recalculer la taille du dock apres insertion.
 * @param bAnimated TRUE pour regler la taille de l'icone au minimum de facon a la faire grossir apres.
 * @param bApplyRatio TRUE pour appliquer le facteur de taille propre au sous-dock.
+* @param bInsertSeparator TRUE pour inserer un separateur si necessaire.
 */
-void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpdateSize, gboolean bAnimated, gboolean bApplyRatio);
+void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpdateSize, gboolean bAnimated, gboolean bApplyRatio, gboolean bInsertSeparator);
 
 /**
 * Charge un ensemble de fichiers .desktop definissant des icones, et construit l'arborescence des docks.

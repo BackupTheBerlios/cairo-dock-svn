@@ -40,6 +40,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
 
+extern gboolean g_bUseSeparator;
 extern gboolean g_bAutoHide;
 extern gchar *g_cConfFile;
 extern gchar *g_cEasyConfFile;
@@ -240,7 +241,7 @@ static void _cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data,
 			pNewIcon->iType = icon->iType;  // pour une futur insertion de separateurs dans les applis ou les applets.
 		
 		CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
-		cairo_dock_insert_icon_in_dock (pNewIcon, pParentDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+		cairo_dock_insert_icon_in_dock (pNewIcon, pParentDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
 		
 		if (pDock->iSidShrinkDown == 0)
 			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
@@ -302,7 +303,7 @@ static void cairo_dock_add_launcher (GtkMenuItem *menu_item, gpointer *data)
 			pNewIcon = cairo_dock_create_icon_from_desktop_file (cDesktopFileName, pCairoContext);
 			g_free (cDesktopFileName);
 			
-			cairo_dock_insert_icon_in_dock (pNewIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+			cairo_dock_insert_icon_in_dock (pNewIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
 			
 			cairo_dock_mark_theme_as_modified (TRUE);
 			g_free (cFilePath);
@@ -406,7 +407,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 		if (pDock != pNewContainer && pNewIcon->fOrder > g_list_length (pNewContainer->icons) + 1)
 			pNewIcon->fOrder = CAIRO_DOCK_LAST_ORDER;
 		
-		cairo_dock_insert_icon_in_dock (pNewIcon, pNewContainer, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);  // on n'empeche pas les bouclages.
+		cairo_dock_insert_icon_in_dock (pNewIcon, pNewContainer, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);  // on n'empeche pas les bouclages.
 		
 		if (pDock != pNewContainer)
 			cairo_dock_update_dock_size (pDock);

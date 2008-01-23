@@ -33,6 +33,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 extern CairoDock *g_pMainDock;
 extern gboolean g_bAutoHide;
 extern double g_fAmplitude;
+extern gboolean g_bUseSeparator;
 
 extern int g_iScreenWidth[2], g_iScreenHeight[2];
 
@@ -910,7 +911,7 @@ CairoDock *cairo_dock_insert_appli_in_dock (Icon *icon, CairoDock *pMainDock, gb
 	g_return_val_if_fail (pParentDock != NULL, NULL);
 	
 	//\_________________ On l'insere dans son dock parent en animant ce dernier eventuellement.
-	cairo_dock_insert_icon_in_dock (icon, pParentDock, bUpdateSize, bAnimate, CAIRO_DOCK_APPLY_RATIO);
+	cairo_dock_insert_icon_in_dock (icon, pParentDock, bUpdateSize, bAnimate, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
 	g_print (" insertion de %s complete (%.2f)\n", icon->acName, icon->fPersonnalScale);
 	
 	if (bAnimate && cairo_dock_animation_will_be_visible (pParentDock))
@@ -977,13 +978,6 @@ void cairo_dock_update_applis_list (CairoDock *pDock, double fTime)
 				if ((icon->bIsHidden || ! g_bHideVisibleApplis) && (! g_bAppliOnCurrentDesktopOnly || cairo_dock_window_is_on_current_desktop (Xid)))
 				{
 					g_print (" insertion de %s dans %s\n", icon->acName, icon->cParentDockName);
-					/*CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
-					g_return_if_fail (pParentDock != NULL);
-					cairo_dock_insert_icon_in_dock (icon, pParentDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
-					if (! pParentDock->bInside && g_bAutoHide && pParentDock->bAtBottom)
-						icon->fPersonnalScale = - 0.05;
-					g_print (" insertion complete (%.2f)\n", icon->fPersonnalScale);
-					cairo_dock_start_animation (icon, pParentDock);*/
 					cairo_dock_insert_appli_in_dock (icon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON);
 				}
 			}
@@ -1044,9 +1038,6 @@ void cairo_dock_start_application_manager (CairoDock *pDock)
 		{
 			if ((pIcon->bIsHidden || ! g_bHideVisibleApplis) && (! g_bAppliOnCurrentDesktopOnly || cairo_dock_window_is_on_current_desktop (Xid)))
 			{
-				/*CairoDock *pParentDock = cairo_dock_search_dock_from_name (pIcon->cParentDockName);
-				g_return_if_fail (pParentDock != NULL);
-				cairo_dock_insert_icon_in_dock (pIcon, pParentDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);*/
 				cairo_dock_insert_appli_in_dock (pIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON);
 				//g_print (">>>>>>>>>>>> Xid : %d\n", Xid);
 			}
@@ -1146,7 +1137,7 @@ void cairo_dock_set_one_icon_geometry_for_window_manager (Icon *icon, CairoDock 
 	if (CAIRO_DOCK_IS_VALID_APPLI (icon))
 	{
 		int iX, iY, iWidth, iHeight;
-		iX = pDock->iWindowPositionX + icon->fXAtRest + (pDock->iCurrentWidth - pDock->iFlatDockWidth) / 2;
+		iX = pDock->iWindowPositionX + icon->fXAtRest + (pDock->iCurrentWidth - pDock->fFlatDockWidth) / 2;
 		iY = pDock->iWindowPositionY + icon->fDrawY - icon->fHeight * g_fAmplitude;  // il faudrait un fYAtRest ...
 		iWidth = icon->fWidth;
 		iHeight = icon->fHeight * (1. + 2. * g_fAmplitude);  // on elargit en haut et en bas, pour gerer les cas ou l'icone grossirait vers le haut ou vers le bas.

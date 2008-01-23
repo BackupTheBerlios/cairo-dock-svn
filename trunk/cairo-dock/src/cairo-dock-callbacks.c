@@ -47,6 +47,7 @@ extern double g_fUnfoldAcceleration;
 extern int g_iLeaveSubDockDelay;
 extern int g_iShowSubDockDelay;
 extern gboolean bShowSubDockOnClick;
+extern gboolean g_bUseSeparator;
 
 extern gint g_iScreenWidth[2];
 extern gint g_iScreenHeight[2];
@@ -885,7 +886,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 								cairo_destroy (pSourceContext);
 							}
 							
-							cairo_dock_insert_icon_in_dock (s_pIconClicked, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+							cairo_dock_insert_icon_in_dock (s_pIconClicked, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
 						}
 						
 						Icon *prev_icon, *next_icon;
@@ -1001,10 +1002,10 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 		return FALSE;
 	}
 	
-	if (pDock->iScrollOffset >= pDock->iFlatDockWidth)
-		pDock->iScrollOffset -= pDock->iFlatDockWidth;
+	if (pDock->iScrollOffset >= pDock->fFlatDockWidth)
+		pDock->iScrollOffset -= pDock->fFlatDockWidth;
 	if (pDock->iScrollOffset < 0)
-		pDock->iScrollOffset += pDock->iFlatDockWidth;
+		pDock->iScrollOffset += pDock->fFlatDockWidth;
 	//g_print ("iScrollOffset <- %d, (%d;%d) (%x)\n", pDock->iScrollOffset, (int) pScroll->x, (int) pScroll->y, pDock->icons);
 	
 	///cairo_dock_update_dock_size (pDock);  // gourmand en ressources a cause de X.
@@ -1314,7 +1315,7 @@ gboolean cairo_dock_notification_drop_data (gpointer *data)
 			
 			if (pNewIcon != NULL)
 			{
-				cairo_dock_insert_icon_in_dock (pNewIcon, pReceivingDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO);
+				cairo_dock_insert_icon_in_dock (pNewIcon, pReceivingDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
 				
 				if (CAIRO_DOCK_IS_URI_LAUNCHER (pNewIcon))
 				{

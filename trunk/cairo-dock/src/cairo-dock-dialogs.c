@@ -62,14 +62,30 @@ gboolean on_enter_dialog (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDockDialog *pDialog)
 {
+	if (! cairo_dock_dialog_reference (pDialog))
+		return FALSE;
 	pDialog->bInside = TRUE;
+	cairo_dock_dialog_unreference (pDialog);
+	return FALSE;
 }
 
 static gboolean on_leave_dialog (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDockDialog *pDialog)
 {
+	if (! cairo_dock_dialog_reference (pDialog))
+		return FALSE;
+	
 	pDialog->bInside = FALSE;
+	Icon *pIcon = pDialog->pIcon;
+	if (pIcon != NULL)
+	{
+		CairoDock *pDock = cairo_dock_search_container_from_icon (pIcon);
+		cairo_dock_place_dialog (pDialog, pDock);
+	}
+	
+	cairo_dock_dialog_unreference (pDialog);
+	return FALSE;
 }
 
 static gboolean on_button_press_dialog (GtkWidget* pWidget,
@@ -727,20 +743,20 @@ void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int
 		*bIsPerpendicular = (pDock->bHorizontalDock == CAIRO_DOCK_VERTICAL);
 		if (pDock->bHorizontalDock)
 		{
-			*bRight = (pIcon->fXAtRest > pDock->iFlatDockWidth / 2);
+			*bRight = (pIcon->fXAtRest > pDock->fFlatDockWidth / 2);
 			*bDirectionUp = (pDock->iWindowPositionY > g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] / 2);
 			*iY = (*bDirectionUp ? pDock->iWindowPositionY : pDock->iWindowPositionY + pDock->iCurrentHeight);
 		}
 		else
 		{
 			*bRight = (pDock->iWindowPositionY < g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] / 2);
-			*bDirectionUp = (pIcon->fXAtRest > pDock->iFlatDockWidth / 2);
+			*bDirectionUp = (pIcon->fXAtRest > pDock->fFlatDockWidth / 2);
 			*iY = (! (*bRight) ? pDock->iWindowPositionY : pDock->iWindowPositionY + pDock->iCurrentHeight);
 		}
 		
 		if (g_bAutoHide)
 		{
-			*iX = pDock->iWindowPositionX + (pIcon->fXAtRest + pIcon->fWidth * (*bRight ? .7 : .3)) / pDock->iFlatDockWidth * g_iVisibleZoneWidth;
+			*iX = pDock->iWindowPositionX + (pIcon->fXAtRest + pIcon->fWidth * (*bRight ? .7 : .3)) / pDock->fFlatDockWidth * g_iVisibleZoneWidth;
 			g_print ("placement sur un dock cache -> %d\n", *iX);
 		}
 		else
@@ -759,14 +775,14 @@ void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int
 		*bIsPerpendicular = (pDock->bHorizontalDock == CAIRO_DOCK_VERTICAL);
 		if (pDock->bHorizontalDock)
 		{
-			*bRight = (pIcon->fXAtRest > pDock->iFlatDockWidth / 2);
+			*bRight = (pIcon->fXAtRest > pDock->fFlatDockWidth / 2);
 			*bDirectionUp = (pDock->iWindowPositionY > g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] / 2);
 			*iY = (*bDirectionUp ? pDock->iWindowPositionY : pDock->iWindowPositionY + pDock->iCurrentHeight);
 		}
 		else
 		{
 			*bRight = (pDock->iWindowPositionY < g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] / 2);
-			*bDirectionUp = (pIcon->fXAtRest > pDock->iFlatDockWidth / 2);
+			*bDirectionUp = (pIcon->fXAtRest > pDock->fFlatDockWidth / 2);
 			*iY = (! (*bRight) ? pDock->iWindowPositionY : pDock->iWindowPositionY + pDock->iCurrentHeight);
 		}
 		*iX = pDock->iWindowPositionX + pIcon->fDrawX + pIcon->fWidth * pIcon->fScale * (*bRight ? .7 : .3);

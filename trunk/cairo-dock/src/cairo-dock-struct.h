@@ -86,7 +86,7 @@ struct _CairoDock {
 	/// max des hauteurs des icones.
 	gint iMaxIconHeight;
 	/// largeur du dock a plat, avec juste les icones.
-	gint iFlatDockWidth;
+	gdouble fFlatDockWidth;
 	/// largeur du dock au repos.
 	gint iMinDockWidth;
 	/// hauteur du dock au repos.
@@ -201,7 +201,7 @@ struct _CairoDockVisitCard {
 
 typedef CairoDockVisitCard * (* CairoDockModulePreInit) (void);
 
-typedef gpointer (*CairoDockModuleInit) (CairoDock *pDock, CairoDockModule *pModule, GError **erreur);  // renvoie son icone si il en a.
+typedef Icon * (*CairoDockModuleInit) (CairoDock *pDock, CairoDockModule *pModule, GError **erreur);  // renvoie son icone si il en a.
 
 typedef void (*CairoDockModuleStop) (void);
 
@@ -483,7 +483,7 @@ struct _CairoDockVFSBackend {
 #define CAIRO_DOCK_FM_VFS_ROOT_NETWORK "_vfsroot+network_"
 
 
-typedef void (*CairoDockForeachIconFunc) (Icon *icon, CairoDock *pDock, gpointer data);
+typedef void (* CairoDockForeachIconFunc) (Icon *icon, CairoDock *pDock, gpointer data);
 
 typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
 
@@ -508,6 +508,7 @@ typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
 #define CAIRO_DOCK_UPDATE_DOCK_SIZE TRUE
 #define CAIRO_DOCK_ANIMATE_ICON TRUE
 #define CAIRO_DOCK_APPLY_RATIO TRUE
+#define CAIRO_DOCK_INSERT_SEPARATOR TRUE
 
 #ifdef CAIRO_DOCK_VERBOSE
 #define CAIRO_DOCK_MESSAGE if (g_bVerbose) g_message

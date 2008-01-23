@@ -289,9 +289,9 @@ void cairo_dock_remove_all_separators (CairoDock *pDock);
 void cairo_dock_insert_separator_between_launchers_and_applis (CairoDock *pDock);
 
 
-GList * cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, int iMinDockWidth, int iXOffset);
+GList * cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, double fFlatDockWidth, int iXOffset);
 
-Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElement, int x_abs, gdouble fMagnitude, int iMinDockWidth, int iWidth, int iHeight, double fAlign, double fLateralFactor);
+Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElement, int x_abs, gdouble fMagnitude, double fFlatDockWidth, int iWidth, int iHeight, double fAlign, double fLateralFactor);
 
 Icon *cairo_dock_apply_wave_effect (CairoDock *pDock);
 
@@ -300,7 +300,7 @@ CairoDockMousePositionType cairo_dock_check_if_mouse_inside_linear (CairoDock *p
 void cairo_dock_manage_mouse_position (CairoDock *pDock, CairoDockMousePositionType iMousePositionType);
 
 
-double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawnElement, int iFlatDockWidth, double fWidthConstraintFactor, double fExtraWidth);
+double cairo_dock_calculate_max_dock_width (CairoDock *pDock, GList *pFirstDrawnElement, double fFlatDockWidth, double fWidthConstraintFactor, double fExtraWidth);
 
 
 void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, CairoDockIconType iType, double fMargin);
