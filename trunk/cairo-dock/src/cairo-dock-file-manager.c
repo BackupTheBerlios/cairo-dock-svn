@@ -362,7 +362,7 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 		{
 			Icon *pConcernedIcon;
 			CairoDock *pParentDock;
-			if (strcmp (pIcon->cBaseURI, cURI) == 0)  // c'est l'icone elle-meme.
+			if (pIcon->cBaseURI != NULL && strcmp (pIcon->cBaseURI, cURI) == 0)  // c'est l'icone elle-meme.
 			{
 				pConcernedIcon = pIcon;
 				pParentDock = cairo_dock_search_container_from_icon (pIcon);
@@ -373,6 +373,11 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 				pConcernedIcon = cairo_dock_get_icon_with_base_uri (pIcon->pSubDock->icons, cURI);
 				g_return_if_fail (pConcernedIcon != NULL);
 				pParentDock = pIcon->pSubDock;
+			}
+			else
+			{
+				g_print ("  on n'aurait pas du arriver la !\n");
+				return ;
 			}
 			g_print ("  %s est modifiee (iRefCount:%d)\n", pConcernedIcon->acName, pParentDock->iRefCount);
 			
