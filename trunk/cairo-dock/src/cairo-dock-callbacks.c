@@ -1179,9 +1179,12 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 	
 	//\_________________ On recupere l'URI.
 	gchar *cReceivedData = (gchar *) selection_data->data;
-	gchar *str = strrchr (cReceivedData, '\n');
-	if (str != NULL)
-		*(str-1) = '\0';  // on vire les retrours chariot.
+	g_return_if_fail (cReceivedData != NULL);
+	int length = strlen (cReceivedData);
+	if (cReceivedData[length-1] == '\n')
+		cReceivedData[--length] = '\0';  // on vire le retour chariot final.
+	if (cReceivedData[length-1] == '\r')
+		cReceivedData[--length] = '\0';  // on vire ce ... c'est quoi ce truc ??!
 	g_print (">>> cReceivedData : %s\n", cReceivedData);
 	
 	//\_________________ On calcule la position a laquelle on l'a lache.

@@ -83,6 +83,8 @@ struct _CairoDock {
 	/// dit si le dock est horizontal ou vertical.
 	CairoDockTypeHorizontality bHorizontalDock;
 	
+	/// amplitude de la vague.
+	gdouble fAmplitude;
 	/// max des hauteurs des icones.
 	gint iMaxIconHeight;
 	/// largeur du dock a plat, avec juste les icones.

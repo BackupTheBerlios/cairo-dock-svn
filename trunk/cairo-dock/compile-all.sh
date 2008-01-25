@@ -32,6 +32,8 @@ if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
 fi
 if test "$CAIRO_DOCK_CLEAN" = "1" -a -e Makefile; then
 	make clean
+	rm -f config.* configure configure.lineno intltool-extract intltool-merge intltool-update libtool ltmain.sh Makefile.in Makefile aclocal.m4
+	rm -rf autom4te.cache src/.deps src/.libs src/Makefile src/Makefile.in po/Makefile po/Makefile.in po/*.gmo
 fi
 if test "$CAIRO_DOCK_COMPIL" = "1"; then
 	make
@@ -60,6 +62,8 @@ do
 			fi
 			if test "$CAIRO_DOCK_CLEAN" = "1" -a -e Makefile; then
 				make clean
+				rm -f config.* configure configure.lineno intltool-extract intltool-merge intltool-update libtool ltmain.sh Makefile.in Makefile aclocal.m4
+			        rm -rf autom4te.cache src/.deps src/.libs src/Makefile src/Makefile.in po/Makefile po/Makefile.in po/*.gmo
 			fi
 			if test "$CAIRO_DOCK_COMPIL" = "1"; then
 				make

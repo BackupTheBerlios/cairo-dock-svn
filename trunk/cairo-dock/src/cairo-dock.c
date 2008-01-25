@@ -512,9 +512,9 @@ main (int argc, char** argv)
 		NULL);
 	g_free (cSillyMessageFilePath);
 	
- 	if (bWriteSillyMessage && ! bWriteChangeLog)
+ 	///if (bWriteSillyMessage && ! bWriteChangeLog)
 	{
-		cairo_dock_show_general_message (cSillyMessage, 4000);
+		///cairo_dock_show_general_message (cSillyMessage, 4000);
 		/*double fAnswer = cairo_dock_show_value_and_wait (cSillyMessage, pFirstIcon, g_pMainDock, 1.);
 		g_print (" ==> %.2f\n", fAnswer);
 		if (fAnswer == 0)
@@ -527,6 +527,11 @@ main (int argc, char** argv)
 			g_print ("c'est bien ce que je pensais ;-)\n");
 		else
 			g_print ("allez on ne me la fais pas ! ;-)\n");*/
+		
+		/*gchar *cAnswer = cairo_dock_show_demand_and_wait ("Test :", NULL, g_pMainDock, "pouet");
+		g_print (" -> %s\n", cAnswer);*/
+		/*double fAnswer = cairo_dock_show_value_and_wait ("Test :", cairo_dock_get_first_appli (g_pMainDock->icons), g_pMainDock, .7);
+		g_print (" ==> %.2f\n", fAnswer);*/
 	}
 	gtk_main ();
 	

@@ -182,7 +182,7 @@ void cairo_dock_render_linear (CairoDock *pDock)
 
 void cairo_dock_render_optimized_linear (CairoDock *pDock, GdkRectangle *pArea)
 {
-	g_print ("%s ((%d;%d) x (%d;%d) / (%dx%d))\n", __func__, pArea->x, pArea->y, pArea->width, pArea->height, pDock->iCurrentWidth, pDock->iCurrentHeight);
+	//g_print ("%s ((%d;%d) x (%d;%d) / (%dx%d))\n", __func__, pArea->x, pArea->y, pArea->width, pArea->height, pDock->iCurrentWidth, pDock->iCurrentHeight);
 	double fLineWidth = g_iDockLineWidth;
 	double fMargin = g_iFrameMargin;
 	int iWidth = pDock->iCurrentWidth;
@@ -280,8 +280,8 @@ void cairo_dock_render_optimized_linear (CairoDock *pDock, GdkRectangle *pArea)
 			if (fXLeft <= fXMax && floor (fXRight) > fXMin)
 			{
 				cairo_save (pCairoContext);
-				g_print ("dessin optimise de %s\n", icon->acName);
-				cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect);
+				//g_print ("dessin optimise de %s\n", icon->acName);
+				cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect, TRUE);
 				cairo_restore (pCairoContext);
 			}
 			

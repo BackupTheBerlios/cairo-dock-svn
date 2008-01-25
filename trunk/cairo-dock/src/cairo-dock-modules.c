@@ -500,6 +500,7 @@ void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
 void cairo_dock_configure_module (GtkWindow *pParentWindow, CairoDockModule *module, CairoDock *pDock, GError **erreur)
 {
 	g_return_if_fail (module != NULL);
+	//g_print ("%s (%s)\n", __func__, module->cConfFilePath);
 	
 	if (module->cConfFilePath == NULL)
 		return;
@@ -532,6 +533,7 @@ Icon *cairo_dock_find_icon_from_module (CairoDockModule *module, GList *pIconLis
 
 CairoDockModule *cairo_dock_find_module_from_name (gchar *cModuleName)
 {
+	//g_print ("%s (%s)\n", __func__, cModuleName);
 	g_return_val_if_fail (cModuleName != NULL, NULL);
 	return g_hash_table_lookup (s_hModuleTable, cModuleName);
 }

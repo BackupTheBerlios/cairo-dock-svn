@@ -136,7 +136,7 @@ cairo_surface_t *cairo_dock_load_image_for_icon (cairo_t *pSourceContext, gchar 
 
 void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdouble fMaxScale, gboolean bHorizontalDock)
 {
-	g_print ("%s (%d, %.2f, %s)\n", __func__, icon->iType, fMaxScale, icon->acFileName);
+	//g_print ("%s (%d, %.2f, %s)\n", __func__, icon->iType, fMaxScale, icon->acFileName);
 	cairo_surface_destroy (icon->pIconBuffer);
 	icon->pIconBuffer = NULL;
 	cairo_surface_destroy (icon->pReflectionBuffer);
