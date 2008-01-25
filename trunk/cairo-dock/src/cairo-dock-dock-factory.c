@@ -162,7 +162,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	}
 	pDock->iMouseX = -1; // utile ?
 	pDock->iMouseY = -1;
-	pDock->fAmplitude = g_fAmplitude;
+	pDock->fMagnitudeMax = 1.;
 	
 	//\__________________ On cree la fenetre GTK.
 	GtkWidget* pWindow = gtk_window_new (GTK_WINDOW_TOPLEVEL);

@@ -389,20 +389,6 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 		icon->iCount --;
 	}
 	
-	if (icon->fWidthFactor >= 0 && icon->fWidthFactor < 0.05)
-		icon->fWidthFactor = 0.05;
-	else if (icon->fWidthFactor < 0 && icon->fWidthFactor > -0.05)
-		icon->fWidthFactor = -0.05;
-	
-	icon->fDrawX += (1 - icon->fWidthFactor) / 2 * icon->fWidth * icon->fScale;
-	
-	if (icon->fHeightFactor >= 0 && icon->fHeightFactor < 0.05)
-		icon->fHeightFactor = 0.05;
-	else if (icon->fHeightFactor < 0 && icon->fHeightFactor > -0.05)
-		icon->fHeightFactor = -0.05;
-	
-	icon->fDrawY += (1 - icon->fHeightFactor) / 2 * icon->fHeight * icon->fScale;
-	
 	//\_____________________ On gere l'animation de l'icone qui suit ou evite le curseur.
 	if (icon->iAnimationType == CAIRO_DOCK_FOLLOW_MOUSE)
 	{
@@ -436,6 +422,21 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 		icon->fAlpha *= icon->fAlpha;  // pour accentuer.
 		icon->iCount --;
 	}
+	
+	
+	if (icon->fWidthFactor >= 0 && icon->fWidthFactor < 0.05)
+		icon->fWidthFactor = 0.05;
+	else if (icon->fWidthFactor < 0 && icon->fWidthFactor > -0.05)
+		icon->fWidthFactor = -0.05;
+	
+	icon->fDrawX += (1 - icon->fWidthFactor) / 2 * icon->fWidth * icon->fScale;
+	
+	if (icon->fHeightFactor >= 0 && icon->fHeightFactor < 0.05)
+		icon->fHeightFactor = 0.05;
+	else if (icon->fHeightFactor < 0 && icon->fHeightFactor > -0.05)
+		icon->fHeightFactor = -0.05;
+	
+	icon->fDrawY += (1 - icon->fHeightFactor) / 2 * icon->fHeight * icon->fScale;
 }
 
 
@@ -502,9 +503,9 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			cairo_save (pCairoContext);
 			double fScaleFactor = 1 + (1 - icon->fAlpha);
 			if (bHorizontalDock)
-				cairo_translate (pCairoContext, icon->fWidth * (1 - fScaleFactor) * (1 + g_fAmplitude) / 2, icon->fHeight * (1 - fScaleFactor) * (1 + g_fAmplitude) / 2);
+				cairo_translate (pCairoContext, icon->fWidth / fRatio * (1 - fScaleFactor) * (1 + g_fAmplitude) / 2, icon->fHeight / fRatio * (1 - fScaleFactor) * (1 + g_fAmplitude) / 2);
 			else
-				cairo_translate (pCairoContext, icon->fHeight * (1 - fScaleFactor) * (1 + g_fAmplitude) / 2, icon->fWidth * (1 - fScaleFactor) * (1 + g_fAmplitude) / 2);
+				cairo_translate (pCairoContext, icon->fHeight / fRatio * (1 - fScaleFactor) * (1 + g_fAmplitude) / 2, icon->fWidth / fRatio * (1 - fScaleFactor) * (1 + g_fAmplitude) / 2);
 			cairo_scale (pCairoContext, fScaleFactor, fScaleFactor);
 			if (icon->pIconBuffer != NULL)
 				cairo_set_source_surface (pCairoContext, icon->pIconBuffer, 0.0, 0.0);
@@ -784,7 +785,7 @@ void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, d
 	if (pFirstDrawnElement == NULL)
 		return;
 	
-	double fDockMagnitude = cairo_dock_calculate_magnitude (pDock->iMagnitudeIndex);
+	double fDockMagnitude = cairo_dock_calculate_magnitude (pDock->iMagnitudeIndex) * pDock->fMagnitudeMax;
 	Icon *icon;
 	GList *ic = pFirstDrawnElement;
 	do

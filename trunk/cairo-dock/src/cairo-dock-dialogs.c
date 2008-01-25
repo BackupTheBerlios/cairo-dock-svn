@@ -81,9 +81,10 @@ static gboolean on_leave_dialog (GtkWidget* pWidget,
 	if (! cairo_dock_dialog_reference (pDialog))
 		return FALSE;
 	
+	//g_print ("%s (%d/%d)\n", __func__, pDialog->iButtonOkOffset, pDialog->iButtonCancelOffset);
 	pDialog->bInside = FALSE;
 	Icon *pIcon = pDialog->pIcon;
-	if (pIcon != NULL)
+	if (pIcon != NULL && (pEvent->state & GDK_BUTTON1_MASK) == 0)
 	{
 		CairoDock *pDock = cairo_dock_search_container_from_icon (pIcon);
 		cairo_dock_place_dialog (pDialog, pDock);
