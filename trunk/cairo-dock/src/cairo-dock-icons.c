@@ -1129,7 +1129,7 @@ void cairo_dock_manage_mouse_position (CairoDock *pDock, CairoDockMousePositionT
 			///pDock->fDecorationsOffsetX = - pDock->iCurrentWidth / 2;  // on fixe les decorations.
 			if (pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0 && pDock->iMagnitudeIndex > 0 && pDock->iSidLeaveDemand == 0)  // pDock->iMagnitudeIndex == CAIRO_DOCK_NB_MAX_ITERATIONS
 			{
-				g_print ("on force a quitter\n");
+				g_print ("on force a quitter (iRefCount:%d)\n", pDock->iRefCount);
 				if (pDock->iRefCount > 0 && g_iLeaveSubDockDelay > 0)
 					pDock->iSidLeaveDemand = g_timeout_add (g_iLeaveSubDockDelay, (GSourceFunc) cairo_dock_emit_leave_signal, (gpointer) pDock);
 				else

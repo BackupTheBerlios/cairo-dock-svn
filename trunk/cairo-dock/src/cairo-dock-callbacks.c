@@ -343,8 +343,8 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			CairoDock *pSubDock = pLastPointedIcon->pSubDock;
 			if (GTK_WIDGET_VISIBLE (pSubDock->pWidget))
 			{
-				//g_print ("on cache %s en changeant d'icône\n", pLastPointedIcon->acName);
-				if (pSubDock->iSidGrowUp != 0)
+				g_print ("on cache %s en changeant d'icône\n", pLastPointedIcon->acName);
+				/*if (pSubDock->iSidGrowUp != 0)
 				{
 					g_source_remove (pSubDock->iSidGrowUp);
 					pSubDock->iSidGrowUp = 0;
@@ -356,13 +356,23 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 				}
 				pSubDock->iScrollOffset = 0;
 				pSubDock->fFoldingFactor = 0;
-				gtk_widget_hide (pSubDock->pWidget);
+				gtk_widget_hide (pSubDock->pWidget);*/
+				if (pLastPointedIcon->pSubDock->iSidLeaveDemand == 0)
+				{
+					g_print ("  on retarde le cachage du dock de %dms\n", MAX (g_iLeaveSubDockDelay, 330));
+					pLastPointedIcon->pSubDock->iSidLeaveDemand = g_timeout_add (MAX (g_iLeaveSubDockDelay, 330), (GSourceFunc) cairo_dock_emit_leave_signal, (gpointer) pLastPointedIcon->pSubDock);
+				}
 			}
 			//else
 			//	g_print ("pas encore visible !\n");
 		}
 		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL && pPointedIcon->pSubDock != s_pLastPointedDock && (! bShowSubDockOnClick || CAIRO_DOCK_IS_APPLI (pPointedIcon)))
 		{
+			if (pPointedIcon->pSubDock->iSidLeaveDemand != 0)
+			{
+				g_source_remove (pPointedIcon->pSubDock->iSidLeaveDemand);
+				pPointedIcon->pSubDock->iSidLeaveDemand = 0;
+			}
 			if (g_iShowSubDockDelay > 0)
 			{
 				//pDock->iMouseX = iX;
@@ -422,7 +432,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	}
 	else
 	{
-		pDock->fFoldingFactor = 0.0;
+		pDock->fFoldingFactor = 0.03;
 		pDock->bAtBottom = TRUE;  // mis en commentaire le 12/11/07 pour permettre le quick-hide.
 		//g_print ("on force bAtBottom\n");
 	}
@@ -498,7 +508,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	//g_print ("%s (bIsMainDock : %d; bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bIsMainDock, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
+	g_print ("%s (bIsMainDock : %d; bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bIsMainDock, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
 	s_pLastPointedDock = NULL;  // ajoute le 04/10/07 pour permettre aux sous-docks d'apparaitre si on entre en pointant tout de suite sur l'icone.
 	
 	if (! s_bEntranceAllowed)
@@ -1043,14 +1053,26 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 	//\_______________ On montre les sous-docks.
 	if (pPointedIcon != pLastPointedIcon || s_pLastPointedDock == NULL)
 	{
-		//g_print ("on change d'icone\n");
+		g_print ("on change d'icone\n");
 		if (pDock == s_pLastPointedDock && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
 		{
 			if (GTK_WIDGET_VISIBLE (pLastPointedIcon->pSubDock->pWidget))
-				gdk_window_hide (pLastPointedIcon->pSubDock->pWidget->window);
+			{
+				///gdk_window_hide (pLastPointedIcon->pSubDock->pWidget->window);
+				if (pLastPointedIcon->pSubDock->iSidLeaveDemand == 0)
+				{
+					g_print ("  on retarde le cachage du dock de %dms\n", MAX (g_iLeaveSubDockDelay, 330));
+					pLastPointedIcon->pSubDock->iSidLeaveDemand = g_timeout_add (MAX (g_iLeaveSubDockDelay, 330), (GSourceFunc) cairo_dock_emit_leave_signal, (gpointer) pLastPointedIcon->pSubDock);
+				}
+			}
 		}
 		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL && (! bShowSubDockOnClick || CAIRO_DOCK_IS_APPLI (pPointedIcon)))
 		{
+			if (pPointedIcon->pSubDock->iSidLeaveDemand != 0)
+			{
+				g_source_remove (pPointedIcon->pSubDock->iSidLeaveDemand);
+				pPointedIcon->pSubDock->iSidLeaveDemand = 0;
+			}
 			if (g_iShowSubDockDelay > 0)
 			{
 				//pDock->iMouseX = iX;
