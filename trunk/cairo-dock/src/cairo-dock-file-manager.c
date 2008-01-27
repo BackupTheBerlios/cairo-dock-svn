@@ -318,7 +318,7 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 		{
 			Icon *pConcernedIcon;
 			CairoDock *pParentDock;
-			if (strcmp (cURI, pIcon->cBaseURI) == 0)
+			if (pIcon->cBaseURI != NULL && strcmp (cURI, pIcon->cBaseURI) == 0)
 			{
 				pConcernedIcon = pIcon;
 				pParentDock = cairo_dock_search_container_from_icon (pIcon);
@@ -346,7 +346,7 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 		
 		case CAIRO_DOCK_FILE_CREATED :
 		{
-			if (strcmp (cURI, pIcon->cBaseURI) != 0 && pIcon->pSubDock != NULL)  // dans des cas foirreux, il se peut que le fichier soit cree alors qu'il existait deja dans le dock.
+			if ((pIcon->cBaseURI == NULL || strcmp (cURI, pIcon->cBaseURI) != 0) && pIcon->pSubDock != NULL)  // dans des cas foirreux, il se peut que le fichier soit cree alors qu'il existait deja dans le dock.
 			{
 				Icon *pNewIcon = cairo_dock_fm_create_icon_from_URI (cURI, pIcon->pSubDock);
 				g_return_if_fail (pNewIcon != NULL);
