@@ -344,7 +344,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			if (GTK_WIDGET_VISIBLE (pSubDock->pWidget))
 			{
 				g_print ("on cache %s en changeant d'icône\n", pLastPointedIcon->acName);
-				/*if (pSubDock->iSidGrowUp != 0)
+				/**if (pSubDock->iSidGrowUp != 0)
 				{
 					g_source_remove (pSubDock->iSidGrowUp);
 					pSubDock->iSidGrowUp = 0;
@@ -430,7 +430,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 		if (pDock->iSidMoveDown == 0)  // on commence a descendre.
 			pDock->iSidMoveDown = g_timeout_add (40, (GSourceFunc) cairo_dock_move_down, (gpointer) pDock);
 	}
-	else
+	else if (pDock->iRefCount != 0)
 	{
 		pDock->fFoldingFactor = 0.03;
 		pDock->bAtBottom = TRUE;  // mis en commentaire le 12/11/07 pour permettre le quick-hide.
