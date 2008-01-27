@@ -422,7 +422,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	}
 	else
 	{
-		pDock->fFoldingFactor = 0;
+		pDock->fFoldingFactor = 0.0;
 		pDock->bAtBottom = TRUE;  // mis en commentaire le 12/11/07 pour permettre le quick-hide.
 		//g_print ("on force bAtBottom\n");
 	}

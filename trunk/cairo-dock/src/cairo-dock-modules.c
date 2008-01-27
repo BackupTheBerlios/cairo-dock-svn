@@ -350,6 +350,7 @@ void cairo_dock_free_module (CairoDockModule *module)
 {
 	if (module == NULL)
 		return ;
+	g_print ("%s (%s)\n", __func__, module->cModuleName);
 	
 	cairo_dock_deactivate_module (module);
 	
@@ -406,9 +407,7 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 
 void cairo_dock_deactivate_module (CairoDockModule *module)
 {
-	g_return_if_fail (module != NULL);
-	
-	if (module->bActive)
+	if (module != NULL && module->bActive)
 	{
 		if (module->stopModule != NULL)
 		{

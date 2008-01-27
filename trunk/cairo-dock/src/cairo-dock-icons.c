@@ -93,7 +93,7 @@ void cairo_dock_free_icon (Icon *icon)
 	cairo_surface_destroy (icon->pTextBuffer);
 	cairo_surface_destroy (icon->pQuickInfoBuffer);
 	
-	cairo_dock_free_module (icon->pModule);
+	cairo_dock_deactivate_module (icon->pModule);
 	
 	g_free (icon);
 }

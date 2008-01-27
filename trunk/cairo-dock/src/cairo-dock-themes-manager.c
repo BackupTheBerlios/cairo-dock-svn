@@ -209,10 +209,8 @@ void cairo_dock_load_theme (gchar *cThemePath)
 	//\___________________ On lit son fichier de conf et on charge tout.
 	cairo_dock_update_conf_file_with_available_modules (g_cConfFile);
 	
-	gboolean bNeedSave = cairo_dock_theme_need_save ();
 	cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);  // chargera des valeurs par defaut si le fichier de conf fourni est incorrect.
-	if (! bNeedSave)  // le chargement du fichier de conf le marque a 'TRUE'.
-		cairo_dock_mark_theme_as_modified (bNeedSave);
+	cairo_dock_mark_theme_as_modified (FALSE);  // le chargement du fichier de conf le marque a 'TRUE'.
 }
 
 
