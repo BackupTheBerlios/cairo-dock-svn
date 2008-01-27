@@ -34,6 +34,7 @@ void cairo_dock_free_module (CairoDockModule *module);
 Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GError **erreur);
 
 void cairo_dock_deactivate_module (CairoDockModule *module);
+void cairo_dock_call_configure_module (CairoDockModule *module);
 
 void cairo_dock_stop_deactivate_all_modules (void);
 

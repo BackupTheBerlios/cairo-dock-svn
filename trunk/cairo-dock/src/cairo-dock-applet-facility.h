@@ -121,7 +121,8 @@ GtkWidget *cairo_dock_create_sub_menu (gchar *cLabel, GtkWidget *pMenu);
 #define CD_APPLET_H \
 CairoDockVisitCard *pre_init (void);\
 Icon *init (CairoDock *pDock, CairoDockModule *pModule, GError **erreur);\
-void stop (void);
+void stop (void);\
+ void configure();
 
 //\______________________ pre_init.
 /**
@@ -248,11 +249,25 @@ void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cA
 		cairo_dock_flush_conf_file (pKeyFile, cConfFilePath, MY_APPLET_SHARE_DATA_DIR);\
 	g_key_file_free (pKeyFile); \
 }
+
+#define CD_APPLET_CONFIGURE_BEGIN \
+  void configure() {\
+    gchar *cConfFilePath = cairo_dock_check_conf_file_exists (MY_APPLET_USER_DATA_DIR, MY_APPLET_SHARE_DATA_DIR, MY_APPLET_CONF_FILE); \
+    int iDesiredWidth = 48, iDesiredHeight = 48;                        \
+    gchar *cAppletName = NULL, *cIconName = NULL;                       \
+    read_conf_file (cConfFilePath, &iDesiredWidth, &iDesiredHeight, &cAppletName, &cIconName); \
+
+
+#define CD_APPLET_CONFIGURE_END \
+  ; }
 /**
 *Definition de la fonction de configuration, a inclure dans le .h correspondant.
 */
 #define CD_APPLET_CONFIG_H \
 void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cAppletName, gchar **cIconName);
+
+/* #define CD_APPLET_CONFIGURE_H \ */
+/* void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cAppletName, gchar **cIconName); */
 
 /**
 *Recupere la valeur d'un parametre 'booleen' du fichier de conf.

@@ -1,6 +1,6 @@
 /******************************************************************************
 
-This file is a part of the cairo-dock program, 
+This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
 Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
@@ -72,7 +72,7 @@ struct _CairoDock {
 	gboolean bIsMainDock;
 	/// le nombre d'icones pointant sur lui.
 	gint iRefCount;
-	
+
 	//\_______________ Les parametres de position et de geometrie de la fenetre du dock.
 	/// ecart de la fenetre par rapport au bord de l'ecran.
 	gint iGapX;
@@ -82,7 +82,7 @@ struct _CairoDock {
 	gdouble fAlign;
 	/// dit si le dock est horizontal ou vertical.
 	CairoDockTypeHorizontality bHorizontalDock;
-	
+
 	/// magnitude maximale de la vague.
 	gdouble fMagnitudeMax;
 	/// max des hauteurs des icones.
@@ -109,11 +109,11 @@ struct _CairoDock {
 	gint iCurrentWidth;
 	/// hauteur de la fenetre, _apres_ le redimensionnement par GTK.
 	gint iCurrentHeight;
-	
+
 	gint iMaxLabelWidth;
 	gint iRightMargin;
 	gint iTopMargin;
-	
+
 	//\_______________ Les parametres lies a une animation du dock.
 	/// pour faire defiler les icones avec la molette.
 	gint iScrollOffset;
@@ -127,14 +127,14 @@ struct _CairoDock {
 	gint iMouseY;
 	/// type d'icone devant eviter la souris, -1 si aucun.
 	gint iAvoidingMouseIconType;
-	/// marge d'evitement de la souris, en fraction de la largeur d'une icone (entre 0 et 0.5) 
+	/// marge d'evitement de la souris, en fraction de la largeur d'une icone (entre 0 et 0.5)
 	gdouble fAvoidingMouseMargin;
-	
+
 	/// pointeur sur le 1er element de la liste des icones a etre dessine, en partant de la gauche.
 	GList *pFirstDrawnElement;
 	/// decalage des decorations pour les faire suivre la souris.
 	gdouble fDecorationsOffsetX;
-	
+
 	/// le dock est en bas au repos.
 	gboolean bAtBottom;
 	/// le dock est en haut pret a etre utilise.
@@ -143,7 +143,7 @@ struct _CairoDock {
 	gboolean bInside;
 	/// lorsque le menu du clique droit est visible.
 	gboolean bMenuVisible;
-	
+
 	//\_______________ Les ID des threads en cours sur le dock.
 	/// serial ID du thread de descente de la fenetre.
 	gint iSidMoveDown;
@@ -155,7 +155,7 @@ struct _CairoDock {
 	gint iSidShrinkDown;
 	/// serial ID du thread qui enverra le signal de sortie retarde.
 	gint iSidLeaveDemand;
-	
+
 	//\_______________ Les fonctions de dessin du dock.
 	/// nom de la vue, utile pour charger les fonctions de rendu posterieurement a la creation du dock.
 	gchar *cRendererName;
@@ -171,7 +171,7 @@ struct _CairoDock {
 	CairoDockSetSubDockPositionFunc set_subdock_position;
 	/// dit si la vue courante utilise les reflets ou pas (utile pour les plug-ins).
 	gboolean bUseReflect;
-	
+
 #ifdef HAVE_GLITZ
 	glitz_drawable_format_t *pDrawFormat;
 	glitz_drawable_t* pGlitzDrawable;
@@ -206,6 +206,7 @@ typedef CairoDockVisitCard * (* CairoDockModulePreInit) (void);
 typedef Icon * (*CairoDockModuleInit) (CairoDock *pDock, CairoDockModule *pModule, GError **erreur);  // renvoie son icone si il en a.
 
 typedef void (*CairoDockModuleStop) (void);
+typedef void (*CairoDockModuleConfigure) (void);
 
 struct _CairoDockModule {
 	/// nom du module qui sert a l'identifier.
@@ -214,10 +215,12 @@ struct _CairoDockModule {
 	gchar *cSoFilePath;
 	/// structure du module, contenant les pointeurs vers les fonctions du module.
 	GModule *pModule;
-	/// fonction d'initialisation du module. Appelee a chaque reconfiguration du module.
+	/// fonction d'initialisation du module.
 	CairoDockModuleInit initModule;
-	/// fonction d'arret du module. Appelee a chaque reconfiguration du module.
+	/// fonction d'arret du module.
 	CairoDockModuleStop stopModule;
+	/// fonction de configuration du module. Appelee a chaque reconfiguration du module.
+	CairoDockModuleConfigure configureModule;
 	/// chemin du fichier de conf du module.
 	gchar *cConfFilePath;
 	/// chemin du fichier readme destine a presenter de maniere succinte le module.
