@@ -197,16 +197,23 @@ struct _CairoDockVisitCard {
 	gchar *cGettextDomain;
 	/// Version du dock pour laquelle a ete compilee le module.
 	gchar *cDockVersionOnCompilation;
-	/// 64 octets reserves pour preserver la compatibilite binaire lors de futurs ajouts sur l'interface entre plug-ins et dock.
-	char reserved[64];
+	/// chemin du fichier de conf du module.
+	gchar *cConfFilePath;
+	/// octets reserves pour preserver la compatibilite binaire lors de futurs ajouts sur l'interface entre plug-ins et dock.
+	char reserved[60];
 };
 
+/// Construit et renvoie la carte de visite du module.
 typedef CairoDockVisitCard * (* CairoDockModulePreInit) (void);
 
-typedef Icon * (*CairoDockModuleInit) (CairoDock *pDock, CairoDockModule *pModule, GError **erreur);  // renvoie son icone si il en a.
+/// Initialise le module, et renvoie son icone si il en a.
+typedef Icon * (*CairoDockModuleInit) (CairoDock *pDock, gchar *cConfFilePath, GError **erreur);
 
+/// Stoppe le module et libere toutes les ressources allouees par lui.
 typedef void (*CairoDockModuleStop) (void);
-typedef void (*CairoDockModuleConfigure) (void);
+
+/// Recharge le module (optionnel).
+typedef gboolean (*CairoDockModuleReload) (gchar *cConfFileToReload);
 
 struct _CairoDockModule {
 	/// nom du module qui sert a l'identifier.
@@ -220,7 +227,7 @@ struct _CairoDockModule {
 	/// fonction d'arret du module.
 	CairoDockModuleStop stopModule;
 	/// fonction de configuration du module. Appelee a chaque reconfiguration du module.
-	CairoDockModuleConfigure configureModule;
+	CairoDockModuleReload reloadModule;
 	/// chemin du fichier de conf du module.
 	gchar *cConfFilePath;
 	/// chemin du fichier readme destine a presenter de maniere succinte le module.

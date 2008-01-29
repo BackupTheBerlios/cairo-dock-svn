@@ -98,6 +98,8 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 <b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole\n  Glattering\n  Vilraleur\n  Lord Northam\n\
 <b>Patchs :</b>\n  Robrob\n  Tshirtman\n\
 <b>Translations :</b>\n  Fabounet\n  Ppmt\n\
+<b>Installation scripts and repository :</b>\n  Mav\n\
+<b>Site (cairo-dock.org) :</b>\n  DegSeb\n\
 <b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Mav\n  Necropotame\n  Ppmt\n  Sombrero\n  Vilraleur");  // Djoole <=> (Julien Barrau)
 	gtk_label_set_markup (GTK_LABEL (pLabel), cAboutText);
 	g_free (cAboutText);

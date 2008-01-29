@@ -277,16 +277,16 @@ void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType)
 */
 Icon *cairo_dock_foreach_icons_of_type (CairoDock *pDock, CairoDockIconType iType, CairoDockForeachIconFunc pFuntion, gpointer data);
 /**
-*Enleve et detruit toutes les icones de separateurs.
+*Enleve et detruit toutes les icones de separateurs automatiques.
 *@param pDock le dock duquel supprimer les icones.
 */
 void cairo_dock_remove_all_separators (CairoDock *pDock);
 
 /**
-*Rajoute un separateur entre lanceurs et applis si necessaire.
-*@param pDock le dock ou se situent les applis.
+*Ajoute des separateurs automatiques entre les differents types d'icones.
+*@param pDock le dock auquel rajouter les separateurs.
 */
-void cairo_dock_insert_separator_between_launchers_and_applis (CairoDock *pDock);
+void cairo_dock_insert_separators_in_dock (CairoDock *pDock);
 
 
 GList * cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, double fFlatDockWidth, int iXOffset);

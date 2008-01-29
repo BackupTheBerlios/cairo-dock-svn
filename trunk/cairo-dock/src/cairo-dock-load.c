@@ -3,7 +3,7 @@
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
 ******************************************************************************/
 #include <math.h>
@@ -26,6 +26,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-separator-factory.h"
 #include "cairo-dock-applet-factory.h"
 #include "cairo-dock-dock-factory.h"
+#include "cairo-dock-modules.h"
 #include "cairo-dock-load.h"
 
 extern CairoDock *g_pMainDock;
@@ -301,16 +302,22 @@ void cairo_dock_fill_one_quick_info_buffer (Icon *icon, cairo_t* pSourceContext,
 }
 
 
+
+void cairo_dock_fill_icon_buffers (Icon *icon, cairo_t *pSourceContext, double fMaxScale, gboolean bHorizontalDock)
+{
+	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, fMaxScale, bHorizontalDock);
+	
+	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : bHorizontalDock));
+	
+	cairo_dock_fill_one_quick_info_buffer (icon, pSourceContext, 12, g_cLabelPolice, PANGO_WEIGHT_HEAVY, .4);
+}
+
 void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDock *pDock)
 {
 	g_return_if_fail (pIcon != NULL);
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 	
-	cairo_dock_fill_one_icon_buffer (pIcon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
-	
-	cairo_dock_fill_one_text_buffer (pIcon, pCairoContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
-	
-	cairo_dock_fill_one_quick_info_buffer (pIcon, pCairoContext, 12, g_cLabelPolice, PANGO_WEIGHT_HEAVY, .4);
+	cairo_dock_fill_icon_buffers (pIcon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
 	
 	cairo_destroy (pCairoContext);
 }
@@ -335,17 +342,16 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
+		if (CAIRO_DOCK_IS_APPLET (icon))
+			cairo_dock_reload_module (icon->pModule, pDock, FALSE);
+		else
+			cairo_dock_fill_icon_buffers (icon, pCairoContext, fMaxScale, pDock->bHorizontalDock);
 		
-		cairo_dock_fill_one_icon_buffer (icon, pCairoContext, fMaxScale, pDock->bHorizontalDock);
 		icon->fWidth *= fRatio;
 		icon->fHeight *= fRatio;
 		//g_print (" =size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
 		fFlatDockWidth += g_iIconGap + icon->fWidth;
 		pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, icon->fHeight);
-		
-		cairo_dock_fill_one_text_buffer (icon, pCairoContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
-		
-		cairo_dock_fill_one_quick_info_buffer (icon, pCairoContext, 12, g_cLabelPolice, PANGO_WEIGHT_HEAVY, .4);
 	}
 	pDock->fFlatDockWidth = (int) fFlatDockWidth;
 	cairo_destroy (pCairoContext);

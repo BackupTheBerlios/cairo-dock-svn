@@ -3,7 +3,7 @@
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
 ******************************************************************************/
 #include <math.h>
@@ -764,7 +764,7 @@ void cairo_dock_free_all_docks (CairoDock *pMainDock)
 	if (pMainDock == NULL)
 		return ;
 	
-	cairo_dock_stop_deactivate_all_modules ();  // pas seulement les modules qui ont une icone.
+	cairo_dock_deactivate_all_modules ();  // y compris les modules qui n'ont pas d'icone.
 	
 	cairo_dock_pause_application_manager ();
 	

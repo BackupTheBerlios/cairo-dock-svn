@@ -325,6 +325,33 @@ main (int argc, char** argv)
 	bind_textdomain_codeset (CAIRO_DOCK_GETTEXT_PACKAGE, "UTF-8");
 	textdomain (CAIRO_DOCK_GETTEXT_PACKAGE);
 	
+	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
+	g_cCairoDockDataDir = g_strdup_printf ("%s/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR);
+	if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_IS_DIR))
+	{
+		if (g_mkdir (g_cCairoDockDataDir, 7*8*8+7*8+5) != 0)
+			g_print ("Attention : couldn't create directory %s\n", g_cCairoDockDataDir);
+	}
+	gchar *cThemesDir = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_THEMES_DIR);
+	if (! g_file_test (cThemesDir, G_FILE_TEST_IS_DIR))
+	{
+		if (g_mkdir (cThemesDir, 7*8*8+7*8+5) != 0)
+			g_print ("Attention : couldn't create directory %s\n", cThemesDir);
+	}
+	g_free (cThemesDir);
+	g_cCurrentThemePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_CURRENT_THEME_NAME);
+	if (! g_file_test (g_cCurrentThemePath, G_FILE_TEST_IS_DIR))
+	{
+		if (g_mkdir (g_cCurrentThemePath, 7*8*8+7*8+5) != 0)
+			g_print ("Attention : couldn't create directory %s\n", g_cCurrentThemePath);
+	}
+	g_cCurrentLaunchersPath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_LAUNCHERS_DIR);
+	if (! g_file_test (g_cCurrentLaunchersPath, G_FILE_TEST_IS_DIR))
+	{
+		if (g_mkdir (g_cCurrentLaunchersPath, 7*8*8+7*8+5) != 0)
+			g_print ("Attention : couldn't create directory %s\n", g_cCurrentLaunchersPath);
+	}
+	
 	//\___________________ On initialise les numeros de version.
 	gchar **cVersions = g_strsplit (CAIRO_DOCK_VERSION, ".", -1);
 	if (cVersions[0] != NULL)
@@ -355,34 +382,6 @@ main (int argc, char** argv)
 	
 	//\___________________ On initialise le gestionnaire de vues.
 	cairo_dock_initialize_renderer_manager ();
-	
-	
-	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
-	g_cCairoDockDataDir = g_strdup_printf ("%s/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR);
-	if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_IS_DIR))
-	{
-		if (g_mkdir (g_cCairoDockDataDir, 7*8*8+7*8+5) != 0)
-			g_print ("Attention : couldn't create directory %s\n", g_cCairoDockDataDir);
-	}
-	gchar *cThemesDir = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_THEMES_DIR);
-	if (! g_file_test (cThemesDir, G_FILE_TEST_IS_DIR))
-	{
-		if (g_mkdir (cThemesDir, 7*8*8+7*8+5) != 0)
-			g_print ("Attention : couldn't create directory %s\n", cThemesDir);
-	}
-	g_free (cThemesDir);
-	g_cCurrentThemePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_CURRENT_THEME_NAME);
-	if (! g_file_test (g_cCurrentThemePath, G_FILE_TEST_IS_DIR))
-	{
-		if (g_mkdir (g_cCurrentThemePath, 7*8*8+7*8+5) != 0)
-			g_print ("Attention : couldn't create directory %s\n", g_cCurrentThemePath);
-	}
-	g_cCurrentLaunchersPath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_LAUNCHERS_DIR);
-	if (! g_file_test (g_cCurrentLaunchersPath, G_FILE_TEST_IS_DIR))
-	{
-		if (g_mkdir (g_cCurrentLaunchersPath, 7*8*8+7*8+5) != 0)
-			g_print ("Attention : couldn't create directory %s\n", g_cCurrentLaunchersPath);
-	}
 	
 	
 	//\___________________ On enregistre nos notifications.

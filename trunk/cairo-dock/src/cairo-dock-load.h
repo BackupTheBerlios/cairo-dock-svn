@@ -20,6 +20,8 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 void cairo_dock_fill_one_quick_info_buffer (Icon *icon, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double fBackgroundAlpha);
 
 
+void cairo_dock_fill_icon_buffers (Icon *icon, cairo_t *pSourceContext, double fMaxScale, gboolean bHorizontalDock);
+
 void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDock *pDock);
 
 void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpointer data);

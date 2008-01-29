@@ -3,7 +3,7 @@
 This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
 ******************************************************************************/
 #include <math.h>
@@ -89,6 +89,7 @@ void cairo_dock_free_visit_card (CairoDockVisitCard *pVisitCard)
 	g_free (pVisitCard->cGettextDomain);
 	g_free (pVisitCard->cDockVersionOnCompilation);
 	g_free (pVisitCard->cModuleName);
+	g_free (pVisitCard->cConfFilePath);
 	g_free (pVisitCard);
 }
 
@@ -112,7 +113,7 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 	}
 	if (pVisitCard != NULL)
 	{
-		if (pVisitCard->iMajorVersionNeeded > g_iMajorVersion || pVisitCard->iMinorVersionNeeded > g_iMinorVersion || pVisitCard->iMicroVersionNeeded > g_iMicroVersion)
+		if (pVisitCard->iMajorVersionNeeded > g_iMajorVersion || (pVisitCard->iMajorVersionNeeded == g_iMajorVersion && pVisitCard->iMinorVersionNeeded > g_iMinorVersion) || (pVisitCard->iMajorVersionNeeded == g_iMajorVersion && pVisitCard->iMinorVersionNeeded == g_iMinorVersion && pVisitCard->iMicroVersionNeeded > g_iMicroVersion))
 		{
 			g_set_error (erreur, 1, 1, "Attention : this module ('%s') needs at least Cairo-Dock v%d.%d.%d, but Cairo-Dock is in v%s\n  It will be ignored", pCairoDockModule->cSoFilePath, pVisitCard->iMajorVersionNeeded, pVisitCard->iMinorVersionNeeded, pVisitCard->iMicroVersionNeeded, CAIRO_DOCK_VERSION);
 			cairo_dock_free_visit_card (pVisitCard);
@@ -127,6 +128,7 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 		pCairoDockModule->cReadmeFilePath = g_strdup (pVisitCard->cReadmeFilePath);
 		pCairoDockModule->cPreviewFilePath = g_strdup (pVisitCard->cPreviewFilePath);
 		pCairoDockModule->cGettextDomain = g_strdup (pVisitCard->cGettextDomain);
+		pCairoDockModule->cConfFilePath = g_strdup (pVisitCard->cConfFilePath);
 		if (pVisitCard->cModuleName == NULL)
 			pCairoDockModule->cModuleName = cairo_dock_extract_default_module_name_from_path (pCairoDockModule->cSoFilePath);
 		else
@@ -136,7 +138,6 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 	else
 	{
 		g_set_error (erreur, 1, 1, "Attention : this module ('%s') does not have any visit card, it may be broken or icompatible with cairo-dock\n", pCairoDockModule->cSoFilePath);
-		cairo_dock_free_visit_card (pVisitCard);
 		return ;
 	}
 
@@ -159,18 +160,18 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 		function_stop = NULL;
 	}
 
-	CairoDockModuleConfigure function_configure;
-	bSymbolFound = g_module_symbol (module, "configure", (gpointer) &function_configure);
+	CairoDockModuleReload function_reload;
+	bSymbolFound = g_module_symbol (module, "reload", (gpointer) &function_reload);
 	if (! bSymbolFound)
 	{
-		function_configure = NULL;
+		function_reload = NULL;
 	}
 
 
 	pCairoDockModule->pModule = module;
 	pCairoDockModule->initModule = function_init;
 	pCairoDockModule->stopModule = function_stop;
-	pCairoDockModule->configureModule = function_configure;
+	pCairoDockModule->reloadModule = function_reload;
 }
 
 static void cairo_dock_close_module (CairoDockModule *pCairoDockModule)
@@ -179,7 +180,7 @@ static void cairo_dock_close_module (CairoDockModule *pCairoDockModule)
 	pCairoDockModule->pModule = NULL;
 	pCairoDockModule->initModule = NULL;
 	pCairoDockModule->stopModule = NULL;
-	pCairoDockModule->configureModule = NULL;
+	pCairoDockModule->reloadModule = NULL;
 }
 
 
@@ -192,10 +193,10 @@ CairoDockModule * cairo_dock_load_module (gchar *cSoFilePath, GHashTable *pModul
 		g_set_error (erreur, 1, 1, "%s () : no such module", __func__);
 		return NULL;
 	}
-
+	
 	CairoDockModule *pCairoDockModule = g_new0 (CairoDockModule, 1);
 	pCairoDockModule->cSoFilePath = g_strdup (cSoFilePath);
-
+	
 	GError *tmp_erreur = NULL;
 	cairo_dock_open_module (pCairoDockModule, &tmp_erreur);
 	if (tmp_erreur != NULL)
@@ -203,11 +204,11 @@ CairoDockModule * cairo_dock_load_module (gchar *cSoFilePath, GHashTable *pModul
 		g_propagate_error (erreur, tmp_erreur);
 		return NULL;
 	}
-
-
+	
+	
 	if (pModuleTable != NULL && pCairoDockModule->initModule != NULL)
 		g_hash_table_insert (pModuleTable, pCairoDockModule->cModuleName, pCairoDockModule);
-
+	
 	return pCairoDockModule;
 }
 
@@ -222,7 +223,7 @@ void cairo_dock_preload_module_from_directory (gchar *cModuleDirPath, GHashTable
 		g_propagate_error (erreur, tmp_erreur);
 		return ;
 	}
-
+	
 	const gchar *cFileName;
 	gchar *cFilePath;
 	CairoDockModule *pModule;
@@ -231,7 +232,7 @@ void cairo_dock_preload_module_from_directory (gchar *cModuleDirPath, GHashTable
 		cFileName = g_dir_read_name (dir);
 		if (cFileName == NULL)
 			break ;
-
+		
 		cFilePath = g_strdup_printf ("%s/%s", cModuleDirPath, cFileName);
 		if (g_str_has_suffix (cFilePath, ".so"))
 		{
@@ -255,7 +256,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 {
 	if (cActiveModuleList == NULL)
 		return ;
-
+	
 	GError *erreur = NULL;
 	gchar *cModuleName;
 	CairoDockModule *pModule;
@@ -265,21 +266,27 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 		cModuleName = cActiveModuleList[i];
 		//g_print (" + %s\n", cModuleName);
 		pModule = g_hash_table_lookup (s_hModuleTable, cModuleName);
-		if (pModule != NULL && ! pModule->bActive)  // les modules qui n'ont pas d'icones ne sont pas desactives lors de la configuration du dock, et donc peuvent etre deja actifs.
+		if (pModule != NULL)
 		{
-			Icon *pIcon = cairo_dock_activate_module (pModule, pDock, &erreur);
-			if (erreur != NULL)
+			if (! pModule->bActive)
 			{
-				g_print ("Attention : %s\n", erreur->message);
-				g_error_free (erreur);
-				erreur = NULL;
+				Icon *pIcon = cairo_dock_activate_module (pModule, pDock, &erreur);
+				if (erreur != NULL)
+				{
+					g_print ("Attention : %s\n", erreur->message);
+					g_error_free (erreur);
+					erreur = NULL;
+				}
+				if (pIcon != NULL)
+				{
+					pIcon->fOrder = iOrder ++;
+					cairo_dock_insert_icon_in_dock (pIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
+				}
 			}
-			if (pIcon != NULL)
+			else
 			{
-				pIcon->fOrder = iOrder ++;
-				cairo_dock_insert_icon_in_dock (pIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
+				cairo_dock_reload_module (pModule, pDock, FALSE);
 			}
-                        cairo_dock_call_configure_module(pModule);
 		}
 		i ++;
 	}
@@ -304,7 +311,7 @@ void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *p
 {
 	g_print ("%s ()\n", __func__);
 	GError *erreur = NULL;
-
+	
 	//\___________________ On ouvre le fichier de conf.
 	GKeyFile *pKeyFile = g_key_file_new ();
 	g_key_file_load_from_file (pKeyFile, cConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
@@ -314,7 +321,7 @@ void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *p
 		g_error_free (erreur);
 		return ;
 	}
-
+	
 	//\___________________ On dresse la liste des modules actifs, en conservant leur ordre dans le dock.
 	GSList *pListeModule = NULL;
 	Icon *icon;
@@ -332,7 +339,7 @@ void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *p
 			break ;
 	}
 	g_hash_table_foreach (s_hModuleTable, (GHFunc) _cairo_dock_add_one_module_name_if_active, &pListeModule);  // on complete.
-
+	
 	//\___________________ On ecrit tout ca dans le fichier de conf.
 	GSList *pSList;
 	GString *cActiveModules = g_string_new ("");
@@ -340,10 +347,10 @@ void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *p
 	{
 		g_string_append_printf (cActiveModules, "%s;", (gchar *) pSList->data);
 	}
-
+	
 	g_key_file_set_string (pKeyFile, "Applets", "active modules", cActiveModules->str);
 	cairo_dock_write_keys_to_file (pKeyFile, cConfFile);
-
+	
 	g_slist_free (pListeModule);
 	g_string_free (cActiveModules, TRUE);
 	g_key_file_free (pKeyFile);
@@ -361,11 +368,11 @@ void cairo_dock_free_module (CairoDockModule *module)
 	if (module == NULL)
 		return ;
 	g_print ("%s (%s)\n", __func__, module->cModuleName);
-
+	
 	cairo_dock_deactivate_module (module);
-
+	
 	cairo_dock_close_module (module);
-
+	
 	g_free (module->cModuleName);
 	g_free (module->cSoFilePath);
 	g_free (module);
@@ -378,13 +385,13 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 		g_set_error (erreur, 1, 1, "%s () : empty module !", __func__);
 		return NULL;
 	}
-
+	
 	if (module->bActive)
 	{
 		g_set_error (erreur, 1, 1, "%s () : module %s is already active !", __func__, module->cModuleName);
 		return NULL;
 	}
-
+	
 	GError *tmp_erreur = NULL;
 	if (module->pModule == NULL)  // normalement impossible.
 	{
@@ -395,16 +402,14 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 			return NULL;
 		}
 	}
-
-	g_free (module->cConfFilePath);
-	module->cConfFilePath = NULL;
+	
 	Icon *icon = module->initModule (pDock, module, &tmp_erreur);
 	if (tmp_erreur != NULL)
 	{
 		g_propagate_error (erreur, tmp_erreur);
 		return NULL;
 	}
-
+	
 	if (icon != NULL)
 	{
 		icon->pModule = module;
@@ -415,14 +420,6 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 	return icon;
 }
 
-void cairo_dock_call_configure_module (CairoDockModule *module)
-{
-        g_return_if_fail(module != 0);
-        g_return_if_fail(module->pModule != 0);
-        g_return_if_fail(module->configureModule != 0);
-        //TODO should we reload the conf?
-        module->configureModule();
-}
 
 void cairo_dock_deactivate_module (CairoDockModule *module)
 {
@@ -433,7 +430,7 @@ void cairo_dock_deactivate_module (CairoDockModule *module)
 			module->stopModule ();
 		}
 		module->bActive = FALSE;
-
+		
 		g_free (module->cConfFilePath);
 		module->cConfFilePath = NULL;
 		g_free (module->cReadmeFilePath);
@@ -446,81 +443,89 @@ void cairo_dock_deactivate_module (CairoDockModule *module)
 }
 
 
+void cairo_dock_reload_module (CairoDockModule *module, CairoDock *pDock, gboolean bReloadAppletConf)
+{
+	GError *erreur = NULL;
+	
+	//\______________ On tente de recharger le module.
+	gboolean bModuleReloaded = FALSE;
+	if (module->bActive && module->reloadModule != NULL)
+	{
+		bModuleReloaded = module->reloadModule (bReloadAppletConf ? module->cConfFilePath : NULL);
+	}
+	
+	//\______________ Si cela n'a pas marche, on applique la sequence stop + init.
+	if (! bModuleReloaded)
+	{
+		//\______________ On recupere l'eventuelle icone du module.
+		Icon *pOldIcon = cairo_dock_find_icon_from_module (module, pDock->icons);
+		
+		//\______________ On desactive le module et on retire son eventuelle icone du dock.
+		cairo_dock_deactivate_module (module);
+		if (pOldIcon != NULL)
+		{
+			g_print ("  enlevement de l'ancienne icone (%.1f)\n", pOldIcon->fOrder);
+			pOldIcon->pModule = NULL;
+			cairo_dock_remove_icon_from_dock (pDock, pOldIcon);
+		}
+		
+		//\______________ On le reactive.
+		Icon *pNewIcon = cairo_dock_activate_module (module, pDock, &erreur);
+		if (erreur != NULL)
+		{
+			module->bActive = FALSE;
+			cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons);
+			g_print ("Attention : %s\n", erreur->message);
+			g_error_free (erreur);
+		}
+		
+		//\______________ On insere sa nouvelle eventuelle icone en reprenant quelques parametres de l'ancienne.
+		if (pNewIcon != NULL)
+		{
+			if (pOldIcon != NULL)
+			{
+				pNewIcon->fOrder = pOldIcon->fOrder;
+				pNewIcon->fX = pOldIcon->fX;
+				pNewIcon->fY = pOldIcon->fY;
+				pNewIcon->fScale = pOldIcon->fScale;
+				pNewIcon->fDrawX = pOldIcon->fDrawX;
+				pNewIcon->fDrawY = pOldIcon->fDrawY;
+				pNewIcon->fWidthFactor = pOldIcon->fWidthFactor;
+				pNewIcon->fAlpha = pOldIcon->fAlpha;
+			}
+	
+			g_print ("pNewIcon->fOrder <- %.1f\n", pNewIcon->fOrder);
+			cairo_dock_insert_icon_in_dock (pNewIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
+	
+			cairo_dock_redraw_my_icon (pNewIcon, pDock);
+		}
+		else if (pOldIcon != NULL)
+		{
+			cairo_dock_update_dock_size (pDock);
+			gtk_widget_queue_draw (pDock->pWidget);
+		}
+		cairo_dock_free_icon (pOldIcon);
+	}
+}
+
 static void _cairo_dock_deactivate_one_module (gchar *cModuleName, CairoDockModule *pModule, gpointer data)
 {
 	cairo_dock_deactivate_module (pModule);
 }
-void cairo_dock_stop_deactivate_all_modules (void)
+void cairo_dock_deactivate_all_modules (void)
 {
 	g_hash_table_foreach (s_hModuleTable, (GHFunc) _cairo_dock_deactivate_one_module, NULL);
 }
 
 
-void cairo_dock_reload_module (gchar *cConfFile, gpointer *data)
+static void _cairo_dock_configure_module_callback (gchar *cConfFile, gpointer *data)
 {
-        g_return_if_fail (data != NULL);
-        CairoDockModule *module = data[0];
-        CairoDock *pDock = data[1];
-
-
-        //FIXME TO BE REMOVED
-        //###################################################
-	GError *erreur = NULL;
-	if (! module->bActive)
-		return;
-
-	//\______________ On recupere l'eventuelle icone du module.
-	Icon *pOldIcon = cairo_dock_find_icon_from_module (module, pDock->icons);
-
-	//\______________ On desactive le module et on retire son eventuelle icone du dock.
-	cairo_dock_deactivate_module (module);
-	if (pOldIcon != NULL)
-	{
-		g_print ("  enlevement de l'ancienne icone (%.1f)\n", pOldIcon->fOrder);
-		pOldIcon->pModule = NULL;
-		cairo_dock_remove_icon_from_dock (pDock, pOldIcon);
-	}
-
-	//\______________ On le reactive.
-	Icon *pNewIcon = cairo_dock_activate_module (module, pDock, &erreur);
-	if (erreur != NULL)
- 	{
-		module->bActive = FALSE;
-		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons);
-		g_print ("Attention : %s\n", erreur->message);
-		g_error_free (erreur);
-	}
-
-	//\______________ On insere sa nouvelle eventuelle icone en reprenant quelques parametres de l'ancienne.
-	if (pNewIcon != NULL)
-	{
-		if (pOldIcon != NULL)
-		{
-			pNewIcon->fOrder = pOldIcon->fOrder;
-			pNewIcon->fX = pOldIcon->fX;
-			pNewIcon->fY = pOldIcon->fY;
-			pNewIcon->fScale = pOldIcon->fScale;
-			pNewIcon->fDrawX = pOldIcon->fDrawX;
-			pNewIcon->fDrawY = pOldIcon->fDrawY;
-			pNewIcon->fWidthFactor = pOldIcon->fWidthFactor;
-			pNewIcon->fAlpha = pOldIcon->fAlpha;
-		}
-
-		g_print ("pNewIcon->fOrder <- %.1f\n", pNewIcon->fOrder);
-		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
-
-		cairo_dock_redraw_my_icon (pNewIcon, pDock);
-	}
-	else if (pOldIcon != NULL)
-	{
-		cairo_dock_update_dock_size (pDock);
-		gtk_widget_queue_draw (pDock->pWidget);
-	}
-	cairo_dock_free_icon (pOldIcon);
-        //###################################################
-        cairo_dock_call_configure_module(module);
+	g_return_if_fail (data != NULL);
+	CairoDockModule *module = data[0];
+	CairoDock *pDock = data[1];
+	gboolean bReloadAppletConf = GPOINTER_TO_INT (data[2]);
+	cairo_dock_reload_module (module, pDock, bReloadAppletConf);
 }
-
 void cairo_dock_configure_module (GtkWindow *pParentWindow, CairoDockModule *module, CairoDock *pDock, GError **erreur)
 {
 	g_return_if_fail (module != NULL);
@@ -530,10 +535,11 @@ void cairo_dock_configure_module (GtkWindow *pParentWindow, CairoDockModule *mod
 		return;
 
 	gchar *cTitle = g_strdup_printf (_("Configuration of %s"), module->cModuleName);
-	gpointer *user_data = g_new (gpointer, 2);
-	user_data[0]= module;
-	user_data[1] = pDock;
-	gboolean configuration_ok = cairo_dock_edit_conf_file (pParentWindow, module->cConfFilePath, cTitle, CAIRO_DOCK_MODULE_PANEL_WIDTH, CAIRO_DOCK_MODULE_PANEL_HEIGHT, 0, NULL, (CairoDockConfigFunc) cairo_dock_reload_module, user_data, (GFunc) g_free, module->cGettextDomain);
+	gpointer *data = g_new (gpointer, 3);
+	data[0]= module;
+	data[1] = pDock;
+	data[2] = GINT_TO_POINTER (TRUE);  // reload applet conf file.
+	gboolean configuration_ok = cairo_dock_edit_conf_file (pParentWindow, module->cConfFilePath, cTitle, CAIRO_DOCK_MODULE_PANEL_WIDTH, CAIRO_DOCK_MODULE_PANEL_HEIGHT, 0, NULL, (CairoDockConfigFunc) _cairo_dock_configure_module_callback, data, (GFunc) g_free, module->cGettextDomain);
 	g_free (cTitle);
 }
 

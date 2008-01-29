@@ -396,14 +396,14 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 gboolean cairo_dock_emit_leave_signal (CairoDock *pDock)
 {
 	static gboolean bReturn;
-	//g_print ("demande de quitter\n");
+	g_print ("demande de quitter\n");
 	g_signal_emit_by_name (pDock->pWidget, "leave-notify-event", NULL, &bReturn);
 	return FALSE;
 }
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
-	//g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
+	g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
 	pDock->iAvoidingMouseIconType = -1;
 	pDock->fAvoidingMouseMargin = 0;
 	pDock->bInside = FALSE;
@@ -448,13 +448,13 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	//g_print ("%s (bInside:%d; bAtBottom:%d; iRefCount:%d)\n", __func__, pDock->bInside, pDock->bAtBottom, pDock->iRefCount);
+	g_print ("%s (bInside:%d; bAtBottom:%d; iRefCount:%d)\n", __func__, pDock->bInside, pDock->bAtBottom, pDock->iRefCount);
 	if (pDock->bAtBottom)  // || ! pDock->bInside
 	{
 		pDock->iSidLeaveDemand = 0;
 		return FALSE;
 	}
-	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
 	if (pDock->iRefCount == 0)
 	{
@@ -463,7 +463,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 		{
 			if (pDock->iSidLeaveDemand == 0)
 			{
-				//g_print ("  on retarde la sortie du dock de %dms\n", MAX (g_iLeaveSubDockDelay, 330));
+				g_print ("  on retarde la sortie du dock de %dms\n", MAX (g_iLeaveSubDockDelay, 330));
 				pDock->iSidLeaveDemand = g_timeout_add (MAX (g_iLeaveSubDockDelay, 330), (GSourceFunc) cairo_dock_emit_leave_signal, (gpointer) pDock);
 				return TRUE;
 			}
@@ -473,7 +473,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	{
 		if (pDock->iSidLeaveDemand == 0)
 		{
-			//g_print ("  on retarde la sortie du sous-dock de %dms\n", g_iLeaveSubDockDelay);
+			g_print ("  on retarde la sortie du sous-dock de %dms\n", g_iLeaveSubDockDelay);
 			pDock->iSidLeaveDemand = g_timeout_add (g_iLeaveSubDockDelay, (GSourceFunc) cairo_dock_emit_leave_signal, (gpointer) pDock);
 			return TRUE;
 		}
@@ -486,8 +486,8 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 		s_iSidNonStopScrolling = 0;
 	}
 	
-	while (gtk_events_pending ())  // on laisse le temps au signal d'entree dans le sous-dock d'etre traite.
-		gtk_main_iteration ();
+	///while (gtk_events_pending ())  // on laisse le temps au signal d'entree dans le sous-dock d'etre traite.
+	///	gtk_main_iteration ();
 	
 	if (s_iSidShowSubDockDemand != 0)
 	{
@@ -528,7 +528,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	{
 		return FALSE;
 	}
-	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
 	pDock->fDecorationsOffsetX = 0;
 	if (! pDock->bIsMainDock)

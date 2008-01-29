@@ -3,7 +3,7 @@
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
 ******************************************************************************/
 #include <math.h>
@@ -852,6 +852,33 @@ void cairo_dock_remove_all_separators (CairoDock *pDock)
 			ic = ic->next;
 		}
 	} while (TRUE);
+}
+
+
+void cairo_dock_insert_separators_in_dock (CairoDock *pDock)
+{
+	Icon *icon, *next_icon;
+	GList *ic;
+	for (ic = pDock->icons; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (! CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon))
+		{
+			if (ic->next != NULL)
+			{
+				next_icon = ic->next->data;
+				if (! CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon) && icon->iType != next_icon->iType)
+				{
+					int iSeparatorType = g_tIconTypeOrder[next_icon->iType] - 1;
+					cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+					Icon *pSeparator = cairo_dock_create_separator_icon (pCairoContext, iSeparatorType, pDock, CAIRO_DOCK_APPLY_RATIO);
+					cairo_destroy (pCairoContext);
+					
+					cairo_dock_insert_icon_in_dock (pSeparator, pDock, !CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, ! CAIRO_DOCK_INSERT_SEPARATOR);
+				}
+			}
+		}
+	}
 }
 
 

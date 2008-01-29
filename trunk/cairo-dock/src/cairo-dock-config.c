@@ -3,7 +3,7 @@
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
 ******************************************************************************/
 #include <math.h>
@@ -999,16 +999,14 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_fReflectSize *= fFieldDepth;
 	g_print ("  g_fReflectSize : %.2f pixels\n", g_fReflectSize);
 	
-	cairo_dock_remove_all_applets (pDock);  // on est obliges d'arreter tous les applets (c.a.d. les modules ayant une icone dans le dock).
+	///cairo_dock_remove_all_applets (pDock);  // on est obliges d'arreter tous les applets (c.a.d. les modules ayant une icone dans le dock).
 	
 	if (bUniquePidOld != g_bUniquePid || bGroupAppliByClassOld != g_bGroupAppliByClass || bHideVisibleApplisOld != g_bHideVisibleApplis || bAppliOnCurrentDesktopOnlyOld != g_bAppliOnCurrentDesktopOnly || (cairo_dock_application_manager_is_running () && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
 	{
 		cairo_dock_stop_application_manager (pDock);
 	}
-	else  // il reste 2 types distincts dans la liste, on reordonne car l'ordre des types a pu changer.
-	{
-		pDock->icons = g_list_sort (pDock->icons, (GCompareFunc) cairo_dock_compare_icons_order);
-	}
+	
+	pDock->icons = g_list_sort (pDock->icons, (GCompareFunc) cairo_dock_compare_icons_order);  // on reordonne car l'ordre des types a pu changer.
 	
 	if (bUseSeparatorOld && ! g_bUseSeparator)
 		cairo_dock_remove_all_separators (pDock);
@@ -1028,11 +1026,11 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	{
 		cairo_dock_start_application_manager (pDock);  // va inserer le separateur si necessaire.
 	}
-	else if (g_bShowAppli && g_bUseSeparator && ! bUseSeparatorOld)  // il faut rajouter le separateur a la main.
-	{
-		cairo_dock_insert_separator_between_launchers_and_applis (pDock);
-	}
 	
+	if (g_bUseSeparator && ! bUseSeparatorOld)
+	{
+		cairo_dock_insert_separators_in_dock (pDock);
+	}
 	
 	cairo_dock_activate_modules_from_list (cActiveModuleList, pDock);
 	g_strfreev (cActiveModuleList);

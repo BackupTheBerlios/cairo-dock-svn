@@ -122,7 +122,7 @@ GtkWidget *cairo_dock_create_sub_menu (gchar *cLabel, GtkWidget *pMenu);
 CairoDockVisitCard *pre_init (void);\
 Icon *init (CairoDock *pDock, CairoDockModule *pModule, GError **erreur);\
 void stop (void);\
- void configure();
+gboolean reload (gchar *cConfFilePath);
 
 //\______________________ pre_init.
 /**
@@ -147,7 +147,8 @@ CairoDockVisitCard *pre_init (void)\
 	pVisitCard->iMicroVersionNeeded = iMicroVersion;\
 	pVisitCard->cPreviewFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_PREVIEW_FILE);\
 	pVisitCard->cGettextDomain = g_strdup (MY_APPLET_GETTEXT_DOMAIN);\
-	pVisitCard->cDockVersionOnCompilation = g_strdup (MY_APPLET_DOCK_VERSION);
+	pVisitCard->cDockVersionOnCompilation = g_strdup (MY_APPLET_DOCK_VERSION);\
+	pVisitCard->cConfFilePath = cairo_dock_check_conf_file_exists (MY_APPLET_USER_DATA_DIR, MY_APPLET_SHARE_DATA_DIR, MY_APPLET_CONF_FILE);
 /**
 *Fin de la fonction de pre-initialisation de l'applet.
 */
@@ -173,10 +174,9 @@ CD_APPLET_PRE_INIT_END
 Icon *init (CairoDock *pDock, CairoDockModule *pModule, GError **erreur) \
 { \
 	myDock = pDock; \
-	gchar *cConfFilePath = cairo_dock_check_conf_file_exists (MY_APPLET_USER_DATA_DIR, MY_APPLET_SHARE_DATA_DIR, MY_APPLET_CONF_FILE); \
 	int iDesiredWidth = 48, iDesiredHeight = 48; \
 	gchar *cAppletName = NULL, *cIconName = NULL; \
-	read_conf_file (cConfFilePath, &iDesiredWidth, &iDesiredHeight, &cAppletName, &cIconName); \
+	read_conf_file (pModule->cConfFilePath, &iDesiredWidth, &iDesiredHeight, &cAppletName, &cIconName); \
 	myIcon = cairo_dock_create_icon_for_applet (pDock, iDesiredWidth, iDesiredHeight, cAppletName, cIconName, pModule); \
 	g_return_val_if_fail (myIcon != NULL, NULL); \
 	myDrawContext = cairo_create (myIcon->pIconBuffer); \
@@ -185,7 +185,6 @@ Icon *init (CairoDock *pDock, CairoDockModule *pModule, GError **erreur) \
 *Fin de la fonction d'initialisation de l'applet.
 */
 #define CD_APPLET_INIT_END \
-	pModule->cConfFilePath = cConfFilePath; \
 	g_free (cAppletName); \
 	g_free (cIconName); \
 	return myIcon; \
@@ -202,18 +201,57 @@ void stop (void) \
 *Fin de la fonction d'arret de l'applet.
 */
 #define CD_APPLET_STOP_END \
+	reset_config (); \
 	myDock = NULL; \
 	myIcon = NULL; \
 	cairo_destroy (myDrawContext); \
 	myDrawContext = NULL; \
 }
+
+//\______________________ reload.
 /**
-*Chemin du fichier de conf de l'applet, appelable durant les fonctions d'init et de config.
+*Debut de la fonction de rechargement de l'applet.
+*/
+#define CD_APPLET_RELOAD_BEGIN \
+gboolean reload (gchar *cConfFilePath) \
+{\
+	g_print ("%s (%s, %d)\n", __func__, cConfFilePath, (cConfFilePath != NULL)); \
+	if (cConfFilePath != NULL)\
+	{\
+		g_print ("On recharge notre config\n");\
+		int iDesiredWidth = 48, iDesiredHeight = 48;\
+		gchar *cAppletName = NULL, *cIconName = NULL;\
+		read_conf_file (cConfFilePath, &iDesiredWidth, &iDesiredHeight, &cAppletName, &cIconName);\
+		g_free (myIcon->acName);\
+		myIcon->acName = cAppletName;\
+		g_free (myIcon->acFileName);\
+		myIcon->acFileName = cIconName;\
+	}\
+	cairo_dock_load_one_icon_from_scratch (myIcon, myDock);\
+	cairo_destroy (myDrawContext);\
+	myDrawContext = cairo_create (myIcon->pIconBuffer);\
+	g_return_val_if_fail (cairo_status (myDrawContext) == CAIRO_STATUS_SUCCESS, FALSE);
+
+/**
+*Fin de la fonction de rechargement de l'applet.
+*/
+#define CD_APPLET_RELOAD_END \
+	return TRUE; \
+}
+
+/**
+*Chemin du fichier de conf de l'applet, appelable durant les fonctions d'init, de config, et de reload.
+*/
+#define CD_APPLET_MY_CONFIG_CHANGED (cConfFilePath != NULL)
+
+/**
+*Chemin du fichier de conf de l'applet, appelable durant les fonctions d'init, de config, et de reload.
 */
 #define CD_APPLET_MY_CONF_FILE cConfFilePath
 
 
 //\_________________________________ CONFIG
+//\______________________ read_conf_file.
 /**
 *Debut de la fonction de configuration de l'applet (celle qui est appelee au debt de l'init).
 *Ouvre le fichier de conf de l'applet, et charge les parametres generiques suivant (groupe "Icon") : largeur ("width"), hauteur ("height), nom ("name", optionnel), et icone ("icon", optionnel).
@@ -223,6 +261,7 @@ void stop (void) \
 #define CD_APPLET_CONFIG_BEGIN(cDefaultAppletName, cDefaultIconName) \
 void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cAppletName, gchar **cIconName) \
 { \
+	g_print ("%s (%s)\n", __func__, cConfFilePath); \
 	GError *erreur = NULL; \
 	gboolean bFlushConfFileNeeded = FALSE; \
 	GKeyFile *pKeyFile = g_key_file_new (); \
@@ -231,7 +270,6 @@ void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cA
 	{ \
 		g_print ("Attention : %s\n", erreur->message); \
 		g_error_free (erreur); \
-		return ; \
 	} \
 	*iWidth = cairo_dock_get_integer_key_value (pKeyFile, "Icon", "width", &bFlushConfFileNeeded, 48, NULL, NULL); \
 	*iHeight = cairo_dock_get_integer_key_value (pKeyFile, "Icon", "height", &bFlushConfFileNeeded, 48, NULL, NULL); \
@@ -250,24 +288,11 @@ void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cA
 	g_key_file_free (pKeyFile); \
 }
 
-#define CD_APPLET_CONFIGURE_BEGIN \
-  void configure() {\
-    gchar *cConfFilePath = cairo_dock_check_conf_file_exists (MY_APPLET_USER_DATA_DIR, MY_APPLET_SHARE_DATA_DIR, MY_APPLET_CONF_FILE); \
-    int iDesiredWidth = 48, iDesiredHeight = 48;                        \
-    gchar *cAppletName = NULL, *cIconName = NULL;                       \
-    read_conf_file (cConfFilePath, &iDesiredWidth, &iDesiredHeight, &cAppletName, &cIconName); \
-
-
-#define CD_APPLET_CONFIGURE_END \
-  ; }
 /**
 *Definition de la fonction de configuration, a inclure dans le .h correspondant.
 */
 #define CD_APPLET_CONFIG_H \
 void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cAppletName, gchar **cIconName);
-
-/* #define CD_APPLET_CONFIGURE_H \ */
-/* void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cAppletName, gchar **cIconName); */
 
 /**
 *Recupere la valeur d'un parametre 'booleen' du fichier de conf.
