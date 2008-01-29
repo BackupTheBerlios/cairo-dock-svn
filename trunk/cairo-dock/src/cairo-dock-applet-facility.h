@@ -201,7 +201,6 @@ void stop (void) \
 *Fin de la fonction d'arret de l'applet.
 */
 #define CD_APPLET_STOP_END \
-	reset_config (); \
 	myDock = NULL; \
 	myIcon = NULL; \
 	cairo_destroy (myDrawContext); \

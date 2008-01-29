@@ -28,8 +28,8 @@ find . -name potfiles.in -execdir mv potfiles.in POTFILES.in \;
 
 cd cairo-dock
 if test "$CAIRO_DOCK_CLEAN" = "1"; then
-	rm -f config.* configure configure.lineno intltool-extract intltool-merge intltool-update libtool ltmain.sh Makefile.in Makefile aclocal.m4
-	rm -rf autom4te.cache src/.deps src/.libs src/Makefile src/Makefile.in po/Makefile po/Makefile.in po/*.gmo
+	rm -f config.* configure configure.lineno intltool-extract intltool-merge intltool-update libtool ltmain.sh Makefile.in Makefile aclocal.m4 install-sh install depcomp missing compile cairo-dock.pc stamp-h1 cairo-dock.conf 
+	rm -rf autom4te.cache src/.deps src/.libs src/Makefile src/Makefile.in po/Makefile po/Makefile.in po/*.gmo src/*.o src/*.lo src/*.la
 fi
 if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
 	autoreconf -isvf && ./configure --prefix=$CAIRO_DOCK_PREFIX --enable-glitz
@@ -60,8 +60,8 @@ do
 			echo "* Compilation du module $plugin ... *"
 			echo "********************************"
 			if test "$CAIRO_DOCK_CLEAN" = "1"; then
-				rm -f config.* configure configure.lineno intltool-extract intltool-merge intltool-update libtool ltmain.sh Makefile.in Makefile aclocal.m4
-			        rm -rf autom4te.cache src/.deps src/.libs src/Makefile src/Makefile.in po/Makefile po/Makefile.in po/*.gmo
+				rm -f config.* configure configure.lineno intltool-extract intltool-merge intltool-update libtool ltmain.sh Makefile.in Makefile aclocal.m4 missing stamp-h1 depcomp compile
+			        rm -rf autom4te.cache src/.deps src/.libs src/Makefile src/Makefile.in po/Makefile po/Makefile.in po/*.gmo src/*.o src/*.lo src/*.la
 			fi
 			if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
 				autoreconf -isvf && ./configure --prefix=$CAIRO_DOCK_PREFIX --enable-glitz

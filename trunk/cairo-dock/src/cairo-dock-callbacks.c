@@ -486,8 +486,14 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 		s_iSidNonStopScrolling = 0;
 	}
 	
-	///while (gtk_events_pending ())  // on laisse le temps au signal d'entree dans le sous-dock d'etre traite.
-	///	gtk_main_iteration ();
+	pDock->bInside = FALSE;
+	g_print (" on attend...\n");
+	while (gtk_events_pending ())  // on laisse le temps au signal d'entree dans le sous-dock d'etre traite.
+		gtk_main_iteration ();
+	g_print (" ==> pDock->bInside : %d\n", pDock->bInside);
+	
+	if (pDock->bInside)  // on est re-rentre dedans entre-temps.
+		return TRUE;
 	
 	if (s_iSidShowSubDockDemand != 0)
 	{
@@ -526,6 +532,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	
 	if (pDock->bAtTop || pDock->bInside || (pDock->iSidMoveDown != 0))  // le 'iSidMoveDown != 0' est la pour empecher le dock de "vibrer" si l'utilisateur sort par en bas avec l'auto-hide active.
 	{
+		g_print ("  %d;%d;%d\n", pDock->bAtTop,  pDock->bInside, pDock->iSidMoveDown);
 		return FALSE;
 	}
 	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
@@ -581,7 +588,8 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	}
 	else
 	{
-		pDock->bAtTop = TRUE;
+		if (pDock->iRefCount > 0)
+			pDock->bAtTop = TRUE;
 		pDock->bAtBottom = FALSE;
 	}
 	if (pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0)  // on commence a faire grossir les icones, sinon on laisse l'animation se finir.

@@ -940,7 +940,7 @@ gboolean cairo_dock_hide_child_docks (CairoDock *pDock)
 				pDock->bAtTop = FALSE;
 				return FALSE;
 			}
-			else  // si on sort du dock sans passer par le sous-dock, par exemple en sortant par le bas.
+			else if (icon->pSubDock->iSidLeaveDemand == 0)  // si on sort du dock sans passer par le sous-dock, par exemple en sortant par le bas.
 			{
 				g_print ("on cache %s par filiation\n", icon->acName);
 				icon->pSubDock->iScrollOffset = 0;
