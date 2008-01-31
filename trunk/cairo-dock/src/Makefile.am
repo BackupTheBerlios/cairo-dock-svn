@@ -97,8 +97,12 @@ cairo_dock_SOURCES = \
 	cairo-dock-applet-facility.c\
 	cairo-dock-applet-facility.h\
 	cairo-dock-file-manager.c\
-	cairo-dock-file-manager.h
-	
+	cairo-dock-file-manager.h\
+	eggaccelerators.h\
+	eggaccelerators.c\
+	cairo-dock-keybinder.c\
+	cairo-dock-keybinder.h
+
 
 cairo_dockincludedir =\
 	$(includedir)/cairo-dock
@@ -136,4 +140,5 @@ cairo_docksubinclude_HEADERS =\
 	cairo-dock-renderer-manager.h\
 	cairo-dock-default-view.h\
 	cairo-dock-applet-facility.h\
-	cairo-dock-file-manager.h
+	cairo-dock-file-manager.h\
+	cairo-dock-keybinder.h
