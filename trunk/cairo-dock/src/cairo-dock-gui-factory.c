@@ -365,7 +365,7 @@ static void _cairo_dock_key_grab_clicked (GtkButton *button, gpointer *data)
   gtk_widget_set_sensitive (GTK_WIDGET(pEntry), FALSE);
   //  gtk_widget_set_sensitive (wizard_notebook, FALSE);
 
-  g_signal_connect (GTK_OBJECT(pParentWindow), "key_press_event", GTK_SIGNAL_FUNC(_cairo_dock_key_grab_cb), data);
+  g_signal_connect (GTK_OBJECT(pParentWindow), "key-press-event", GTK_SIGNAL_FUNC(_cairo_dock_key_grab_cb), data);
 
 }
 

@@ -578,6 +578,13 @@ cairo_dock_create_sub_menu (cLabel, pMenu);
 #define CD_APPLET_ADD_IN_MENU(cLabel, pFunction, pMenu) CD_APPLET_ADD_IN_MENU_WITH_DATA(cLabel, pFunction, pMenu, NULL)
 
 /**
+ * Ajoute un separateur dans un menu deja existant
+ */
+#define CD_APPLET_ADD_SEPARATOR()                               \
+  pMenuItem = gtk_separator_menu_item_new ();                   \
+  gtk_menu_shell_append(GTK_MENU_SHELL (pSubMenu), pMenuItem);
+
+/**
 *Ajoute une entree pour la fonction 'A propos'.
 *@param pMenu GtkWidget du menu auquel sera ajoutee l'entree.
 */
