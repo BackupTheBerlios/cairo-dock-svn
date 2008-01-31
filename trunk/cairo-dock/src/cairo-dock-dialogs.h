@@ -43,7 +43,7 @@ void cairo_dock_remove_dialog_if_any (Icon *icon);
 void cairo_dock_remove_orphelans (void);
 
 
-GtkWidget *cairo_dock_build_common_interactive_widget_for_dialog (const gchar *cInitialAnswer, double fValueForHScale);
+GtkWidget *cairo_dock_build_common_interactive_widget_for_dialog (const gchar *cInitialAnswer, double fValueForHScale, double fMaxValueForHScale);
 
 CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, CairoDock *pDock, gchar *cImageFilePath, GtkWidget *pInteractiveWidget, GtkButtonsType iButtonsType, CairoDockActionOnAnswerFunc pActionFunc, gpointer data);
 
@@ -172,7 +172,7 @@ gchar *cairo_dock_show_demand_and_wait (const gchar *cMessage, Icon *pIcon, Cair
 *@param fInitialValue la valeur initiale de l'echelle, entre 0 et 1.
 *@return la valeur choisie par l'utilisateur, ou -1 s'il a annule ou si le dialogue s'est fait detruire avant.
 */
-double cairo_dock_show_value_and_wait (const gchar *cMessage, Icon *pIcon, CairoDock *pDock, double fInitialValue);
+double cairo_dock_show_value_and_wait (const gchar *cMessage, Icon *pIcon, CairoDock *pDock, double fInitialValue, double fMaxValue);
 /**
 *Fait apparaitre un dialogue de question pointant sur l'icone pointee (ou la 1ere si aucune n'est pointee) avec une question et 2 boutons oui/non, et met en pause le programme jusqu'a ce que l'utilisateur ait fait son choix.
 *@param cQuestion la question a poser.

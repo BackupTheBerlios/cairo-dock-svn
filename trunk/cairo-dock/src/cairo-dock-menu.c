@@ -94,13 +94,13 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 	gtk_label_set_use_markup (GTK_LABEL (pLabel), TRUE);
 	gchar *cAboutText = g_strdup_printf ("<b>Original idea/first development :</b>\n  Mac Slow\n\
 <b>Main developer :</b>\n  Fabounet (Fabrice Rey)\n\
-<b>Applets :</b>\n  Fabounet\n  Necropotame\n\
+<b>Applets :</b>\n  Fabounet\n  Necropotame\n  Ctaf\n\
 <b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole\n  Glattering\n  Vilraleur\n  Lord Northam\n\
 <b>Patchs :</b>\n  Robrob\n  Tshirtman\n\
 <b>Translations :</b>\n  Fabounet\n  Ppmt\n\
 <b>Installation scripts and repository :</b>\n  Mav\n\
 <b>Site (cairo-dock.org) :</b>\n  DegSeb\n\
-<b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Mav\n  Necropotame\n  Ppmt\n  Sombrero\n  Vilraleur");  // Djoole <=> (Julien Barrau)
+<b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Mav\n  Necropotame\n  Ppmt\n  Sombrero\n  Vilraleur");
 	gtk_label_set_markup (GTK_LABEL (pLabel), cAboutText);
 	g_free (cAboutText);
 	gtk_container_add (GTK_CONTAINER (GTK_DIALOG (pDialog)->vbox), pLabel);

@@ -343,7 +343,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			CairoDock *pSubDock = pLastPointedIcon->pSubDock;
 			if (GTK_WIDGET_VISIBLE (pSubDock->pWidget))
 			{
-				g_print ("on cache %s en changeant d'icône\n", pLastPointedIcon->acName);
+				//g_print ("on cache %s en changeant d'icône\n", pLastPointedIcon->acName);
 				/**if (pSubDock->iSidGrowUp != 0)
 				{
 					g_source_remove (pSubDock->iSidGrowUp);
@@ -359,7 +359,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 				gtk_widget_hide (pSubDock->pWidget);*/
 				if (pLastPointedIcon->pSubDock->iSidLeaveDemand == 0)
 				{
-					g_print ("  on retarde le cachage du dock de %dms\n", MAX (g_iLeaveSubDockDelay, 330));
+					//g_print ("  on retarde le cachage du dock de %dms\n", MAX (g_iLeaveSubDockDelay, 330));
 					pLastPointedIcon->pSubDock->iSidLeaveDemand = g_timeout_add (MAX (g_iLeaveSubDockDelay, 330), (GSourceFunc) cairo_dock_emit_leave_signal, (gpointer) pLastPointedIcon->pSubDock);
 				}
 			}
@@ -396,14 +396,14 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 gboolean cairo_dock_emit_leave_signal (CairoDock *pDock)
 {
 	static gboolean bReturn;
-	g_print ("demande de quitter\n");
+	//g_print ("demande de quitter\n");
 	g_signal_emit_by_name (pDock->pWidget, "leave-notify-event", NULL, &bReturn);
 	return FALSE;
 }
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
-	g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
+	//g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
 	pDock->iAvoidingMouseIconType = -1;
 	pDock->fAvoidingMouseMargin = 0;
 	pDock->bInside = FALSE;
@@ -448,13 +448,13 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	g_print ("%s (bInside:%d; bAtBottom:%d; iRefCount:%d)\n", __func__, pDock->bInside, pDock->bAtBottom, pDock->iRefCount);
+	//g_print ("%s (bInside:%d; bAtBottom:%d; iRefCount:%d)\n", __func__, pDock->bInside, pDock->bAtBottom, pDock->iRefCount);
 	if (pDock->bAtBottom)  // || ! pDock->bInside
 	{
 		pDock->iSidLeaveDemand = 0;
 		return FALSE;
 	}
-	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
 	if (pDock->iRefCount == 0)
 	{
@@ -463,7 +463,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 		{
 			if (pDock->iSidLeaveDemand == 0)
 			{
-				g_print ("  on retarde la sortie du dock de %dms\n", MAX (g_iLeaveSubDockDelay, 330));
+				//g_print ("  on retarde la sortie du dock de %dms\n", MAX (g_iLeaveSubDockDelay, 330));
 				pDock->iSidLeaveDemand = g_timeout_add (MAX (g_iLeaveSubDockDelay, 330), (GSourceFunc) cairo_dock_emit_leave_signal, (gpointer) pDock);
 				return TRUE;
 			}
@@ -471,9 +471,9 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	}
 	else  // pEvent != NULL
 	{
-		if (pDock->iSidLeaveDemand == 0)
+		if (pDock->iSidLeaveDemand == 0 && g_iLeaveSubDockDelay != 0)
 		{
-			g_print ("  on retarde la sortie du sous-dock de %dms\n", g_iLeaveSubDockDelay);
+			//g_print ("  on retarde la sortie du sous-dock de %dms\n", g_iLeaveSubDockDelay);
 			pDock->iSidLeaveDemand = g_timeout_add (g_iLeaveSubDockDelay, (GSourceFunc) cairo_dock_emit_leave_signal, (gpointer) pDock);
 			return TRUE;
 		}
@@ -514,7 +514,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	g_print ("%s (bIsMainDock : %d; bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bIsMainDock, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
+	//g_print ("%s (bIsMainDock : %d; bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bIsMainDock, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
 	s_pLastPointedDock = NULL;  // ajoute le 04/10/07 pour permettre aux sous-docks d'apparaitre si on entre en pointant tout de suite sur l'icone.
 	
 	if (! s_bEntranceAllowed)
@@ -532,10 +532,10 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	
 	if (pDock->bAtTop || pDock->bInside || (pDock->iSidMoveDown != 0))  // le 'iSidMoveDown != 0' est la pour empecher le dock de "vibrer" si l'utilisateur sort par en bas avec l'auto-hide active.
 	{
-		g_print ("  %d;%d;%d\n", pDock->bAtTop,  pDock->bInside, pDock->iSidMoveDown);
+		//g_print ("  %d;%d;%d\n", pDock->bAtTop,  pDock->bInside, pDock->iSidMoveDown);
 		return FALSE;
 	}
-	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
 	pDock->fDecorationsOffsetX = 0;
 	if (! pDock->bIsMainDock)

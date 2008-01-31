@@ -69,6 +69,7 @@ gboolean on_enter_dialog (GtkWidget* pWidget,
 {
 	if (! cairo_dock_dialog_reference (pDialog))
 		return FALSE;
+	g_print ("%s ()\n", __func__);
 	pDialog->bInside = TRUE;
 	cairo_dock_dialog_unreference (pDialog);
 	return FALSE;
@@ -81,8 +82,13 @@ static gboolean on_leave_dialog (GtkWidget* pWidget,
 	if (! cairo_dock_dialog_reference (pDialog))
 		return FALSE;
 	
-	//g_print ("%s (%d/%d)\n", __func__, pDialog->iButtonOkOffset, pDialog->iButtonCancelOffset);
+	g_print ("%s (%d/%d)\n", __func__, pDialog->iButtonOkOffset, pDialog->iButtonCancelOffset);
 	pDialog->bInside = FALSE;
+	while (gtk_events_pending ())
+		gtk_main_iteration ();
+	
+	if (pDialog->bInside)
+		return FALSE;
 	Icon *pIcon = pDialog->pIcon;
 	if (pIcon != NULL && (pEvent->state & GDK_BUTTON1_MASK) == 0)
 	{
@@ -560,7 +566,7 @@ void cairo_dock_remove_orphelans (void)
 }
 
 
-GtkWidget *cairo_dock_build_common_interactive_widget_for_dialog (const gchar *cInitialAnswer, double fValueForHScale)
+GtkWidget *cairo_dock_build_common_interactive_widget_for_dialog (const gchar *cInitialAnswer, double fValueForHScale, double fMaxValueForHScale)
 {
 	int iBoxWidth = 0, iBoxHeight = 0;
 	GtkWidget *pWidget = NULL;
@@ -584,9 +590,9 @@ GtkWidget *cairo_dock_build_common_interactive_widget_for_dialog (const gchar *c
 		
 		gtk_entry_set_text (GTK_ENTRY (pWidget), cInitialAnswer);
 	}
-	else if (fValueForHScale >= 0 && fValueForHScale <= 1)
+	else if (fMaxValueForHScale > 0 && fValueForHScale >= 0 && fValueForHScale <= fMaxValueForHScale)
 	{
-		pWidget = gtk_hscale_new_with_range (0, 1, .01);
+		pWidget = gtk_hscale_new_with_range (0, fMaxValueForHScale, fMaxValueForHScale / 100);
 		gtk_scale_set_digits (GTK_SCALE (pWidget), 2);
 		gtk_range_set_value (GTK_RANGE (pWidget), fValueForHScale);
 		
@@ -778,6 +784,13 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 			"leave-notify-event",
 			G_CALLBACK (on_leave_dialog),
 			pDialog);
+		if (pInteractiveWidget != NULL)
+		{
+			g_signal_connect (G_OBJECT (pInteractiveWidget),
+				"enter-notify-event",
+				G_CALLBACK (on_enter_dialog),
+				pDialog);
+		}
 	}
 	
 	cairo_dock_place_dialog (pDialog, pDock);  // renseigne aussi bDirectionUp, bIsPerpendicular, et iHeight.
@@ -1100,7 +1113,7 @@ CairoDockDialog *cairo_dock_show_dialog_with_question (const gchar *cText, Icon 
 
 CairoDockDialog *cairo_dock_show_dialog_with_entry (const gchar *cText, Icon *pIcon, CairoDock *pDock, gchar *cIconPath, const gchar  *cTextForEntry, CairoDockActionOnAnswerFunc pActionFunc, gpointer data, GFreeFunc pFreeDataFunc)
 {
-	GtkWidget *pWidget = cairo_dock_build_common_interactive_widget_for_dialog (cTextForEntry, -1);
+	GtkWidget *pWidget = cairo_dock_build_common_interactive_widget_for_dialog (cTextForEntry, -1, -1);
 	
 	return cairo_dock_show_dialog_full (cText, pIcon, pDock, 0, cIconPath, GTK_BUTTONS_OK_CANCEL, pWidget, pActionFunc, data, pFreeDataFunc);
 }
@@ -1109,7 +1122,7 @@ CairoDockDialog *cairo_dock_show_dialog_with_value (const gchar *cText, Icon *pI
 {
 	fValue = MAX (0, fValue);
 	fValue = MIN (1, fValue);
-	GtkWidget *pWidget = cairo_dock_build_common_interactive_widget_for_dialog (NULL, fValue);
+	GtkWidget *pWidget = cairo_dock_build_common_interactive_widget_for_dialog (NULL, fValue, 1.);
 	
 	return cairo_dock_show_dialog_full (cText, pIcon, pDock, 0, cIconPath, GTK_BUTTONS_OK_CANCEL, pWidget, pActionFunc, data, pFreeDataFunc);
 }
@@ -1180,7 +1193,7 @@ int cairo_dock_show_dialog_and_wait (const gchar *cText, Icon *pIcon, CairoDock 
 
 gchar *cairo_dock_show_demand_and_wait (const gchar *cMessage, Icon *pIcon, CairoDock *pDock, const gchar *cInitialAnswer)
 {
-	GtkWidget *pWidget = cairo_dock_build_common_interactive_widget_for_dialog ((cInitialAnswer != NULL ? cInitialAnswer : ""), -1);
+	GtkWidget *pWidget = cairo_dock_build_common_interactive_widget_for_dialog ((cInitialAnswer != NULL ? cInitialAnswer : ""), -1, -1);
 	gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-icon.svg", CAIRO_DOCK_SHARE_DATA_DIR);
 	
 	int iAnswer = cairo_dock_show_dialog_and_wait (cMessage, pIcon, pDock, 0, cIconPath, GTK_BUTTONS_OK_CANCEL, pWidget);
@@ -1192,11 +1205,11 @@ gchar *cairo_dock_show_demand_and_wait (const gchar *cMessage, Icon *pIcon, Cair
 	return cAnswer;
 }
 
-double cairo_dock_show_value_and_wait (const gchar *cMessage, Icon *pIcon, CairoDock *pDock, double fInitialValue)
+double cairo_dock_show_value_and_wait (const gchar *cMessage, Icon *pIcon, CairoDock *pDock, double fInitialValue, double fMaxValue)
 {
 	fInitialValue = MAX (0, fInitialValue);
-	fInitialValue = MIN (1, fInitialValue);
-	GtkWidget *pWidget = cairo_dock_build_common_interactive_widget_for_dialog (NULL, fInitialValue);
+	fInitialValue = MIN (fMaxValue, fInitialValue);
+	GtkWidget *pWidget = cairo_dock_build_common_interactive_widget_for_dialog (NULL, fInitialValue, fMaxValue);
 	gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-icon.svg", CAIRO_DOCK_SHARE_DATA_DIR);
 	
 	int iAnswer = cairo_dock_show_dialog_and_wait (cMessage, pIcon, pDock, 0, cIconPath, GTK_BUTTONS_OK_CANCEL, pWidget);
