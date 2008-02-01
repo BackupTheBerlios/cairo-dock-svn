@@ -391,7 +391,7 @@ appli height = 0
 #r+[bounce;rotate;blink;pulse;upside-down;wobbly;random] Animation type when clicked :
 appli animation = bounce
 
-#i+ Number of times the icon will bounce/rotate/blink/etc when clicked:
+#i+ Number of times the icon will bounce/rotate/blink/etc when clicked :
 appli number of rounds = 4
 
 #X+[Applets]
@@ -406,7 +406,7 @@ applet height = 0
 #r+[bounce;rotate;blink;pulse;upside-down;wobbly;random] Animation type when clicked :
 applet animation = bounce
 
-#i+ Number of times the icon will bounce/rotate/blink/etc when clicked:
+#i+ Number of times the icon will bounce/rotate/blink/etc when clicked :
 applet number of rounds = 4
 
 #X+[Separators]
@@ -456,7 +456,8 @@ main dock view = default
 #F[Sub-Docks]
 frame_sub =
 
-#R+1[default] Choose the default view for sub-docks :/
+#R+1[default] Choose the default view for sub-docks :
+#{You can overwrite this parameter for each sub-dock.}/
 sub-dock view = default
 
 #b+ Are the sub-docks parallel to main docks ?

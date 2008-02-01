@@ -381,7 +381,7 @@ main (int argc, char** argv)
 	cairo_dock_initialize_application_manager ();
 
 	//\___________________ On initialise le gestionnaire de modules et on pre-charge les modules existant.
-	if (! bSafeMode && g_module_supported ())
+	if (g_module_supported () && ! bSafeMode)
 		cairo_dock_initialize_module_manager (CAIRO_DOCK_MODULES_DIR);
 
 	//\___________________ On initialise le gestionnaire de vues.
@@ -398,7 +398,7 @@ main (int argc, char** argv)
 	//\___________________ On charge le dernier theme ou on demande a l'utilisateur d'en choisir un.
 	g_cConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
 	g_cEasyConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_EASY_CONF_FILE);
-	if (! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS))
+	if (! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS) || bSafeMode)
 	{
 		cairo_dock_mark_theme_as_modified (FALSE);
 		int r;

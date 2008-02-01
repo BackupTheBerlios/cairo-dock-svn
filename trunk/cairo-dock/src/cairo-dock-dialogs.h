@@ -45,7 +45,7 @@ void cairo_dock_remove_orphelans (void);
 
 GtkWidget *cairo_dock_build_common_interactive_widget_for_dialog (const gchar *cInitialAnswer, double fValueForHScale, double fMaxValueForHScale);
 
-CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, CairoDock *pDock, gchar *cImageFilePath, GtkWidget *pInteractiveWidget, GtkButtonsType iButtonsType, CairoDockActionOnAnswerFunc pActionFunc, gpointer data);
+CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, CairoDock *pDock, gchar *cImageFilePath, GtkWidget *pInteractiveWidget, GtkButtonsType iButtonsType, CairoDockActionOnAnswerFunc pActionFunc, gpointer data, GFreeFunc pFreeDataFunc);
 
 
 void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int *iX, int *iY, gboolean *bRight, gboolean *bIsPerpendicular, gboolean *bDirectionUp);
@@ -60,18 +60,18 @@ void cairo_dock_replace_all_dialogs (void);
 
 
 /**
-*Fait apparaitre un dialogue avec un widget et 2 boutons.
+*Fait apparaitre un dialogue avec un message, un widget et 2 boutons, tous optionnels.
 *@param cText le message du dialogue.
 *@param pIcon l'icone sur laquelle pointe le dialogue.
 *@param pDock le dock contenant l'icone.
 *@param fTimeLength duree de vie du dialogue, ou 0 pour une duree de vie illimitee.
 *@param cIconPath le chemin vers une icone a afficher dans la marge.
-*@param iButtonsType type des boutons (GTK_BUTTONS_OK_CANCEL ou GTK_BUTTONS_YES_NO).
-*@param pInteractiveWidget un widget d'interaction avec l'utilisateur.
-*@param pActionFunc la fonction d'action appelee lorsque l'utilisateur valide son choix.
-*@param data 
-*@param pFreeDataFunc 
-*@return Si le widget est une entree de texte, retourne le texte si oui, et "" si non. Si le widget est une echelle, retourne la valeur sous forme de chaine si "oui", et "-1" si non, et sinon, retourne "yes" si oui, et "no" si non. Si besoin est, le widget est accessible via le dialogue, lui-meme accessible via l'icone.
+*@param iButtonsType type des boutons (GTK_BUTTONS_OK_CANCEL, GTK_BUTTONS_YES_NO, ou GTK_BUTTONS_NONE).
+*@param pInteractiveWidget un widget d'interaction avec l'utilisateur; il est rattache au dialogue, donc sera detruit avec lui. Faire un 'gtk_widget_reparent()' avant de detruire le dialogue pour eviter cela, ou bien utilisez #cairo_dock_show_dialog_and_wait.
+*@param pActionFunc la fonction d'action appelee lorsque l'utilisateur valide son choix. NULL revient a avoir des boutons du type GTK_BUTTONS_NONE.
+*@param data donnees transmises a la fonction ci-dessus.
+*@param pFreeDataFunc fonction de liberation des donnees ci-dessus, appelee lors de la destruction du dialogue, ou NULL si non necessaire.
+*@return Le dialogue nouvellement cree et visible, avec une reference a 1.
 */
 CairoDockDialog *cairo_dock_show_dialog_full (const gchar *cText, Icon *pIcon, CairoDock *pDock, double fTimeLength, gchar *cIconPath, GtkButtonsType iButtonsType, GtkWidget *pInteractiveWidget, CairoDockActionOnAnswerFunc pActionFunc, gpointer data, GFreeFunc pFreeDataFunc);
 

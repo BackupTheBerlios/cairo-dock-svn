@@ -334,6 +334,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		//g_print ("on change d'icone (-> %s)\n", (pPointedIcon != NULL ? pPointedIcon->acName : "rien"));
 		if (s_iSidShowSubDockDemand != 0)
 		{
+			g_print ("on annule la demande de motrage de sous-dock\n");
 			g_source_remove (s_iSidShowSubDockDemand);
 			s_iSidShowSubDockDemand = 0;
 		}
@@ -396,14 +397,14 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 gboolean cairo_dock_emit_leave_signal (CairoDock *pDock)
 {
 	static gboolean bReturn;
-	//g_print ("demande de quitter\n");
+	g_print ("demande de quitter\n");
 	g_signal_emit_by_name (pDock->pWidget, "leave-notify-event", NULL, &bReturn);
 	return FALSE;
 }
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
-	//g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
+	g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
 	pDock->iAvoidingMouseIconType = -1;
 	pDock->fAvoidingMouseMargin = 0;
 	pDock->bInside = FALSE;
@@ -434,7 +435,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	{
 		pDock->fFoldingFactor = 0.03;
 		pDock->bAtBottom = TRUE;  // mis en commentaire le 12/11/07 pour permettre le quick-hide.
-		//g_print ("on force bAtBottom\n");
+		g_print ("on force bAtBottom\n");
 	}
 	
 	///pDock->fDecorationsOffsetX = 0;
@@ -448,13 +449,13 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	//g_print ("%s (bInside:%d; bAtBottom:%d; iRefCount:%d)\n", __func__, pDock->bInside, pDock->bAtBottom, pDock->iRefCount);
+	g_print ("%s (bInside:%d; bAtBottom:%d; iRefCount:%d)\n", __func__, pDock->bInside, pDock->bAtBottom, pDock->iRefCount);
 	if (pDock->bAtBottom)  // || ! pDock->bInside
 	{
 		pDock->iSidLeaveDemand = 0;
 		return FALSE;
 	}
-	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
 	if (pDock->iRefCount == 0)
 	{
@@ -497,6 +498,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	
 	if (s_iSidShowSubDockDemand != 0)
 	{
+		g_print ("on annule la demande de motrage de sous-dock\n");
 		g_source_remove (s_iSidShowSubDockDemand);
 		s_iSidShowSubDockDemand = 0;
 	}
@@ -514,7 +516,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	//g_print ("%s (bIsMainDock : %d; bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bIsMainDock, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
+	g_print ("%s (bIsMainDock : %d; bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bIsMainDock, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
 	s_pLastPointedDock = NULL;  // ajoute le 04/10/07 pour permettre aux sous-docks d'apparaitre si on entre en pointant tout de suite sur l'icone.
 	
 	if (! s_bEntranceAllowed)
@@ -625,12 +627,12 @@ void cairo_dock_update_gaps_with_window_position (CairoDock *pDock)
 	pDock->iGapY = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - y : y);
 	g_print (" -> (%d;%d)\n", pDock->iGapX, pDock->iGapY);
 	
-	if (pDock->iGapX < - g_iScreenWidth[pDock->bHorizontalDock])
-		pDock->iGapX = - g_iScreenWidth[pDock->bHorizontalDock];
+	if (pDock->iGapX < - g_iScreenWidth[pDock->bHorizontalDock]/2)
+		pDock->iGapX = - g_iScreenWidth[pDock->bHorizontalDock]/2;
+	if (pDock->iGapX > g_iScreenWidth[pDock->bHorizontalDock]/2)
+		pDock->iGapX = g_iScreenWidth[pDock->bHorizontalDock]/2;
 	if (pDock->iGapY < 0)
 		pDock->iGapY = 0;
-	if (pDock->iGapX > g_iScreenWidth[pDock->bHorizontalDock])
-		pDock->iGapX = g_iScreenWidth[pDock->bHorizontalDock];
 	if (pDock->iGapY > g_iScreenHeight[pDock->bHorizontalDock])
 		pDock->iGapY = g_iScreenHeight[pDock->bHorizontalDock];
 	
@@ -703,7 +705,7 @@ gboolean on_key_press (GtkWidget *pWidget,
 			GdkEventKey *pKey,
 			CairoDock *pDock)
 {
-	//g_print ("%s ()\n", __func__);
+	g_print ("%s ()\n", __func__);
 	if (pKey->type == GDK_KEY_PRESS)
 	{
 		GdkEventScroll dummyScroll;
