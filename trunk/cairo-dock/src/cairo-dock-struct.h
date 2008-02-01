@@ -269,18 +269,30 @@ struct _CairoDockDialog
 	double fTipHeight;
 	/// surface representant le message + l'icone dans la marge a gauche du texte.
 	cairo_surface_t* pTextBuffer;
-	/// largeur de la zone de texte globale (widgets et boutons compris).
-	int iTextWidth;
-	/// hauteur de la zone de texte globale (widgets et boutons compris).
-	int iTextHeight;
-	/// hauteur du message + double marge en haut et en bas.
-	int iMessageHeight;
+	/// dimensions de la bulle (message + widget utilisateur + boutons).
+	int iBubbleWidth, iBubbleHeight;
+	/// dimensions du message en comptant la marge du texte + vgap en bas si necessaire.
+	int iMessageWidth, iMessageHeight;
+	/// dimensions des boutons + vgap en haut.
+	int iButtonsWidth, iButtonsHeight;
+	/// dimensions du widget interactif.
+	int iInteractiveWidth, iInteractiveHeight;
+	/// distance de la bulle au dock, donc hauteur totale de la pointe.
+	int iDistanceToDock;
+	/// Marge due au rayon.
+	int iMargin;
 	/// decalage pour l'effet de clique sur le bouton Ok.
 	int iButtonOkOffset;
 	/// decalage pour l'effet de clique sur le bouton Annuler.
 	int iButtonCancelOffset;
 	/// la fenetre GTK du dialogue.
 	GtkWidget *pWidget;
+	/// le widget de remplissage ou l'on dessine le message.
+	GtkWidget *pMessageWidget;
+	/// le widget de remplissage ou l'on dessine les boutons.
+	GtkWidget *pButtonsWidget;
+	/// le widget de remplissage ou l'on dessine la pointe.
+	GtkWidget *pTipWidget;
 	/// le timer pour la destruction automatique du dialogue.
 	int iSidTimer;
 	/// reference atomique.

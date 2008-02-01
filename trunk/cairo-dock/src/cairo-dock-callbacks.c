@@ -827,10 +827,7 @@ gboolean cairo_dock_notification_middle_click_icon (gpointer *data)
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
-	/*pDock->iScrollOffset = 0;
-	cairo_dock_update_dock_size (pDock);
-	pDock->calculate_icons (pDock);
-	gtk_widget_queue_draw (pDock->pWidget);*/
+	
 	if (CAIRO_DOCK_IS_VALID_APPLI (icon) && g_bCloseAppliOnMiddleClick)
 	{
 		cairo_dock_close_xwindow (icon->Xid);
@@ -1179,7 +1176,7 @@ gboolean on_configure (GtkWidget* pWidget,
 			pDock->iMouseX = 0;
 		
 		pDock->calculate_icons (pDock);
-		gtk_widget_queue_draw (pWidget);
+		///gtk_widget_queue_draw (pWidget);  // il semble qu'il soit inutile d'en rajouter un ici.
 #ifdef HAVE_GLITZ
 		if (pDock->pGlitzDrawable)
 		{
