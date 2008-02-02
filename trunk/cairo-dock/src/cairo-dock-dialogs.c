@@ -226,6 +226,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	cairo_paint (pCairoContext);
 	if (! pDialog->bBuildComplete)
 	{
+		g_print ("dialogue incomplet\n");
 		cairo_destroy (pCairoContext);
 		cairo_dock_dialog_unreference (pDialog);
 		return FALSE;
@@ -353,7 +354,6 @@ static gboolean on_configure_dialog (GtkWidget* pWidget,
 	
 	///if (! pDialog->bBuildComplete)
 	///	pDialog->bBuildComplete = (pDialog->iWidth == pEvent->width && pDialog->iHeight == pEvent->height);  // pour empecher un clignotement intempestif lors de la creation de la fenetre, on la dessine en transparent lorsqu'elle n'est pas encore completement finie.
-	pDialog->bBuildComplete = TRUE;
 	
 	if (pDialog->pInteractiveWidget != NULL)
 	{
@@ -370,6 +370,13 @@ static gboolean on_configure_dialog (GtkWidget* pWidget,
 	
 	pDialog->iWidth = pEvent->width;
 	pDialog->iHeight = pEvent->height;
+	
+	if (! pDialog->bBuildComplete)
+	{
+		pDialog->bBuildComplete = TRUE;
+		//gtk_widget_queue_draw (pDialog->pWidget);
+	}
+	gtk_widget_queue_draw (pDialog->pWidget);  // bizarre, il faut forcer le redessin.
 	
 	cairo_dock_dialog_unreference (pDialog);
 	return FALSE;
@@ -1032,7 +1039,7 @@ void cairo_dock_place_dialog (CairoDockDialog *pDialog, CairoDock *pDock)
 			if (iOldDistance == 0 || pDialog->iDistanceToDock < iOldDistance)
 			{
 				g_print ("  cela reduit la fenetre a %dx%d\n", pDialog->iBubbleWidth + 2 * pDialog->iMargin, pDialog->iMessageHeight + pDialog->iInteractiveHeight +pDialog->iButtonsHeight +  pDialog->iDistanceToDock);
-				gtk_window_resize (pDialog->pWidget,
+				gtk_window_resize (GTK_WINDOW (pDialog->pWidget),
 					pDialog->iBubbleWidth + 2 * pDialog->iMargin,
 					pDialog->iMessageHeight + pDialog->iInteractiveHeight +pDialog->iButtonsHeight + pDialog->iDistanceToDock);
 			}

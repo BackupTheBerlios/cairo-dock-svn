@@ -316,12 +316,8 @@ static void _cairo_dock_pick_a_file (GtkButton *button, gpointer *data)
 	gtk_widget_destroy (pFileChooserDialog);
 }
 
-static void _cairo_dock_key_grab_cb (GtkWidget *wizard_window, GdkEventKey *event, gpointer *data)
+static void _cairo_dock_key_grab_cb (GtkWidget *wizard_window, GdkEventKey *event, GtkEntry *pEntry)
 {
-	GtkEntry *pEntry = data[0];
-	gchar *prev_value = data[1];
-	GtkWindow *pParentWindow = data[2];
-	
 	gchar *key;
 	printf("key press event\n");
 	if (gtk_accelerator_valid (event->keyval, event->state))
@@ -335,18 +331,18 @@ static void _cairo_dock_key_grab_cb (GtkWidget *wizard_window, GdkEventKey *even
 	
 		/* Generate the correct name for this key */
 		key = gtk_accelerator_name (event->keyval, event->state);
-	
+		
 		g_printerr ("KEY GRABBED: %s\n", key);
-	
+		
 		/* Re-enable widgets */
 		gtk_widget_set_sensitive (GTK_WIDGET(pEntry), TRUE);
-	
+		
 		/* Disconnect the key grabber */
-		g_signal_handlers_disconnect_by_func (GTK_OBJECT(wizard_window), GTK_SIGNAL_FUNC(_cairo_dock_key_grab_cb), data);
-	
+		g_signal_handlers_disconnect_by_func (GTK_OBJECT(wizard_window), GTK_SIGNAL_FUNC(_cairo_dock_key_grab_cb), pEntry);
+		
 		/* Copy the pressed key to the text entry */
 		gtk_entry_set_text (GTK_ENTRY(pEntry), key);
-	
+		
 		/* Free the string */
 		g_free (key);
 	}
@@ -355,15 +351,14 @@ static void _cairo_dock_key_grab_cb (GtkWidget *wizard_window, GdkEventKey *even
 static void _cairo_dock_key_grab_clicked (GtkButton *button, gpointer *data)
 {
 	GtkEntry *pEntry = data[0];
-	gchar *prev_value = data[1];
-	GtkWindow *pParentWindow = data[2];
+	GtkWindow *pParentWindow = data[1];
 	
 	printf("clicked\n");
 	//set widget insensitive
 	gtk_widget_set_sensitive (GTK_WIDGET(pEntry), FALSE);
 	//  gtk_widget_set_sensitive (wizard_notebook, FALSE);
 	
-	g_signal_connect (GTK_OBJECT(pParentWindow), "key-press-event", GTK_SIGNAL_FUNC(_cairo_dock_key_grab_cb), data);
+	g_signal_connect (GTK_OBJECT(pParentWindow), "key-press-event", GTK_SIGNAL_FUNC(_cairo_dock_key_grab_cb), pEntry);
 }
 
 static void _cairo_dock_set_font (GtkFontButton *widget, GtkEntry *pEntry)
@@ -838,8 +833,9 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					case 'E' :  // string, mais avec un GtkComboBoxEntry pour le choix unique.
 					case 'R' :  // string, avec un label pour la description.
 					case 'P' :  // string avec un selecteur de font a cote du GtkEntry.
-					case 'r' : // string representee par son numero dans une liste de choix.
+					case 'r' :  // string representee par son numero dans une liste de choix.
 					case 'M' :  // string, avec un label pour la description et un bouton configurer (specialement fait pour les modules).
+					case 'K' :  // string avec un selecteur de touche clavier (Merci Ctaf !)
 						//g_print ("  + string (%s)\n", cUsefulComment);
 						pEntry = NULL;
 						pDescriptionLabel = NULL;
@@ -1094,9 +1090,9 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									FALSE,
 									FALSE,
 									0);
-				
+								
 								_allocate_new_buffer;
-				
+								
 								pButtonAdd = gtk_button_new_from_stock (GTK_STOCK_ADD);
 								g_signal_connect (G_OBJECT (pButtonAdd),
 									"clicked",
@@ -1200,7 +1196,26 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								FALSE,
 								0);
 						}
-						
+						else if (iElementType == 'K' && pEntry != NULL)
+						{
+							GtkWidget *pGrabKeyButton = gtk_button_new_with_label(_("grab"));
+							
+							_allocate_new_buffer;
+							data[0] = pOneWidget;
+							data[1] = pDialog;
+							gtk_widget_add_events(pDialog, GDK_KEY_PRESS_MASK);
+				
+							g_signal_connect (G_OBJECT (pGrabKeyButton),
+								"clicked",
+								G_CALLBACK (_cairo_dock_key_grab_clicked),
+								data);
+							
+							gtk_box_pack_start (GTK_BOX (pHBox),
+								pGrabKeyButton,
+								FALSE,
+								FALSE,
+								0);
+						}
 						g_strfreev (cValueList);
 					break;
 						
