@@ -96,7 +96,7 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 <b>Main developer :</b>\n  Fabounet (Fabrice Rey)\n\
 <b>Applets :</b>\n  Fabounet\n  Necropotame\n  Ctaf\n\
 <b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole\n  Glattering\n  Vilraleur\n  Lord Northam\n\
-<b>Patchs :</b>\n  Robrob\n  Tshirtman\n\
+<b>Patchs :</b>\n  Robrob\n  Tshirtman\n  Ctaf\n\
 <b>Translations :</b>\n  Fabounet\n  Ppmt\n\
 <b>Installation scripts and repository :</b>\n  Mav\n\
 <b>Site (cairo-dock.org) :</b>\n  DegSeb\n  Necropotame\n\

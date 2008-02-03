@@ -488,8 +488,9 @@ main (int argc, char** argv)
 	//const gchar *cSillyMessage = "Cairo-Dock : just launch it !";  // 4000
 	//const gchar *cSillyMessage = "Cairo-Dock lave plus blanc que blanc.";  // 4000
 	//const gchar *cSillyMessage = "Sondage :\nVoulez-vous voir plus de filles nues dans Cairo-Dock ?";
-	const gchar *cSillyMessage = "C'est les soldes !\n Pour tout sous-dock acheté, un sous-dock offert !";
-	const gchar *cNumSilllyMessage = "13";
+	//const gchar *cSillyMessage = "C'est les soldes !\n Pour tout sous-dock acheté, un sous-dock offert !";
+	const gchar *cSillyMessage = "J-2 avant la 1.5, la tension monte !";
+	const gchar *cNumSilllyMessage = "14";
 	gboolean bWriteSillyMessage;
 	if (! g_file_test (cSillyMessageFilePath, G_FILE_TEST_EXISTS))
 	{
