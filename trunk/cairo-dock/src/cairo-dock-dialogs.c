@@ -98,8 +98,10 @@ static gboolean on_leave_dialog (GtkWidget* pWidget,
 	
 	pDialog->bInside = FALSE;
 	Icon *pIcon = pDialog->pIcon;
-	if (pIcon != NULL && (pEvent->state & GDK_BUTTON1_MASK) == 0)
+	if (pIcon != NULL /*&& (pEvent->state & GDK_BUTTON1_MASK) == 0*/)
 	{
+		pDialog->iPositionX = pEvent->x_root;
+		pDialog->iPositionY = pEvent->y_root;
 		CairoDock *pDock = cairo_dock_search_container_from_icon (pIcon);
 		cairo_dock_place_dialog (pDialog, pDock);
 		gtk_widget_queue_draw (pDialog->pWidget);
@@ -224,7 +226,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	cairo_set_source_rgba (pCairoContext, 0., 0., 0., 0.);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 	cairo_paint (pCairoContext);
-	//if (! pDialog->bBuildComplete)
+	
 	if (pDialog->iWidth == 20 && pDialog->iHeight == 20)
 	{
 		g_print ("dialogue incomplet\n");
@@ -342,6 +344,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	
 	cairo_destroy (pCairoContext);
 	cairo_dock_dialog_unreference (pDialog);
+	g_print ("fin du dessin\n");
 	return FALSE;
 }
 
@@ -352,9 +355,6 @@ static gboolean on_configure_dialog (GtkWidget* pWidget,
 	g_print ("%s (%dx%d)\n", __func__, pEvent->width, pEvent->height);
 	if (! cairo_dock_dialog_reference (pDialog))
 		return FALSE;
-	
-	///if (! pDialog->bBuildComplete)
-	///	pDialog->bBuildComplete = (pDialog->iWidth == pEvent->width && pDialog->iHeight == pEvent->height);  // pour empecher un clignotement intempestif lors de la creation de la fenetre, on la dessine en transparent lorsqu'elle n'est pas encore completement finie.
 	
 	//\____________ On recupere la taille du widget interactif qui a pu avoir change.
 	if (pDialog->pInteractiveWidget != NULL)
@@ -368,12 +368,6 @@ static gboolean on_configure_dialog (GtkWidget* pWidget,
 		pDialog->iBubbleWidth = MAX (pDialog->iMessageWidth, MAX (pDialog->iInteractiveWidth, pDialog->iBubbleWidth));
 		pDialog->iBubbleHeight = pDialog->iMessageHeight + pDialog->iInteractiveHeight + pDialog->iButtonsHeight;
 		//g_print (" -> iBubbleWidth: %d , iBubbleHeight : %d\n", pDialog->iBubbleWidth, pDialog->iBubbleHeight);
-	}
-	
-	if (! pDialog->bBuildComplete)
-	{
-		pDialog->bBuildComplete = TRUE;
-		//gtk_widget_queue_draw (pDialog->pWidget);
 	}
 	
 	if ((pDialog->iWidth != pEvent->width || pDialog->iHeight != pEvent->height) && pDialog->pIcon != NULL)
@@ -778,11 +772,19 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 		pDialog->iBubbleHeight += CAIRO_DOCK_DIALOG_VGAP + pDialog->iInteractiveHeight;
 		g_print ("  3) iBubbleWidth: %d , iBubbleHeight : %d\n", pDialog->iBubbleWidth, pDialog->iBubbleHeight);
 		
+		if (gtk_widget_get_parent (pInteractiveWidget) != NULL)
+		{
+			gtk_object_ref (pInteractiveWidget);
+			gtk_widget_unparent (pInteractiveWidget);
+		}
+		else
+			gtk_object_ref (pInteractiveWidget);
 		gtk_box_pack_start (GTK_BOX (pWidgetLayout),
 			pInteractiveWidget,
 			TRUE,
 			TRUE,
 			0);
+		gtk_object_unref (pInteractiveWidget);
 	}
 	
 	//\________________ On ajoute les boutons.
@@ -1063,15 +1065,18 @@ void cairo_dock_place_dialog (CairoDockDialog *pDialog, CairoDock *pDock)
 	}
 	
 	if (iPrevPositionX != pDialog->iPositionX || iPrevPositionY != pDialog->iPositionY)
-		gtk_window_move (pDialog->pWidget,
+	{
+		g_print (" => (%d;%d) %dx%d\n", pDialog->iPositionX, pDialog->iPositionY, pDialog->iWidth, pDialog->iHeight);
+		gtk_window_move (GTK_WINDOW (pDialog->pWidget),
 			pDialog->iPositionX,
 			pDialog->iPositionY);
+	}
 	/*gdk_window_move_resize (pDialog->pWidget->window,
 		pDialog->iPositionX,
 		pDialog->iPositionY,
 		pDialog->iWidth,
 		pDialog->iHeight);*/
-	g_print (" => (%d;%d) %dx%d\n", pDialog->iPositionX, pDialog->iPositionY, pDialog->iWidth, pDialog->iHeight);
+	
 }
 
 
@@ -1098,8 +1103,14 @@ void cairo_dock_replace_all_dialogs (void)
 			if (pIcon != NULL && GTK_WIDGET_VISIBLE (pDialog->pWidget)) // on ne replace pas les dialogues en cours de destruction ou caches.
 			{
 				pDock = cairo_dock_search_container_from_icon (pIcon);
+				int iPositionX = pDialog->iPositionX;
+				int iPositionY = pDialog->iPositionY;
+				int iAimedX = pDialog->iAimedX;
+				int iAimedY = pDialog->iAimedY;
 				cairo_dock_place_dialog (pDialog, pDock);
-				gtk_widget_queue_draw (pDialog->pWidget);  // on redessine meme si la position n'a pas changee, car la pointe, elle, change.
+				
+				if (iPositionX != pDialog->iPositionX || iPositionY != pDialog->iPositionY || iAimedX != pDialog->iAimedX || iAimedY != pDialog->iAimedY)
+					gtk_widget_queue_draw (pDialog->pWidget);  // on redessine meme si la position n'a pas changee, car la pointe, elle, change.
 			}
 			cairo_dock_dialog_unreference (pDialog);
 		}
@@ -1391,4 +1402,23 @@ void cairo_dock_unhide_dialog (CairoDockDialog *pDialog)
 	gtk_window_present (GTK_WINDOW (pDialog->pWidget));
 	
 	cairo_dock_dialog_unreference (pDialog);
+}
+
+GtkWidget *cairo_dock_steal_widget_from_dialog (CairoDockDialog *pDialog)
+{
+	static GtkWidget *pWidgetCatcher = NULL;
+	if (pWidgetCatcher == NULL)
+		pWidgetCatcher = gtk_hbox_new (0, FALSE);
+	
+	if (! cairo_dock_dialog_reference (pDialog))
+		return NULL;
+	
+	GtkWidget *pInteractiveWidget = pDialog->pInteractiveWidget;
+	if (pInteractiveWidget != NULL)
+	{
+		gtk_widget_reparent (pInteractiveWidget, pWidgetCatcher);  // j'ai rien trouve de mieux pour empecher que le 'pInteractiveWidget' ne soit pas detruit avec le dialogue apres l'appel de la callback (g_object_ref ne marche pas).
+		pDialog->pInteractiveWidget = NULL;
+	}
+	cairo_dock_dialog_unreference (pDialog);
+	return pInteractiveWidget;
 }

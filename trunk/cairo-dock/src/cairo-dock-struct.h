@@ -297,8 +297,6 @@ struct _CairoDockDialog
 	int iSidTimer;
 	/// reference atomique.
 	int iRefCount;
-	/// TRUE quand la fenetre GTK a atteint sa dimension definitive.
-	gboolean bBuildComplete;
 	/// le widget d'interaction utilisateur (GtkEntry, GtkHScale, etc).
 	GtkWidget *pInteractiveWidget;
 	/// le type des boutons (GTK_BUTTONS_NONE, GTK_BUTTONS_OK_CANCEL ou GTK_BUTTONS_YES_NO).

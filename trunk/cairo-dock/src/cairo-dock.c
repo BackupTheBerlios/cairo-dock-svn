@@ -223,9 +223,9 @@ CairoDockFMSortType g_iFileSortType;
 static gboolean random_dialog (gpointer user_data)
 {
 	g_return_val_if_fail (g_pMainDock != NULL && g_pMainDock->icons != NULL, TRUE);
-
+	
 	int num_icone = g_random_int_range (0, g_list_length (g_pMainDock->icons));
-
+	
 	Icon *icon = g_list_nth_data (g_pMainDock->icons, num_icone);
 	if (CAIRO_DOCK_IS_SEPARATOR (icon))
 		return random_dialog (user_data);
@@ -239,9 +239,9 @@ main (int argc, char** argv)
 	gint i;
 	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)
 		g_tIconTypeOrder[i] = i;
-
+	
 	gtk_init (&argc, &argv);
-
+	
 	//\___________________ On recupere quelques options.
 	g_iWmHint = GDK_WINDOW_TYPE_HINT_DOCK;
 	gboolean bDialogTest = FALSE, bSafeMode = FALSE;
@@ -320,12 +320,12 @@ main (int argc, char** argv)
 			return help ? 0 : 1;
 		}
 	}
-
+	
 	//\___________________ On internationalise l'appli.
 	bindtextdomain (CAIRO_DOCK_GETTEXT_PACKAGE, CAIRO_DOCK_LOCALE_DIR);
 	bind_textdomain_codeset (CAIRO_DOCK_GETTEXT_PACKAGE, "UTF-8");
 	textdomain (CAIRO_DOCK_GETTEXT_PACKAGE);
-
+	
 	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
 	g_cCairoDockDataDir = g_strdup_printf ("%s/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR);
 	if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_IS_DIR))
@@ -352,7 +352,7 @@ main (int argc, char** argv)
 		if (g_mkdir (g_cCurrentLaunchersPath, 7*8*8+7*8+5) != 0)
 			g_print ("Attention : couldn't create directory %s\n", g_cCurrentLaunchersPath);
 	}
-
+	
 	//\___________________ On initialise les numeros de version.
 	gchar **cVersions = g_strsplit (CAIRO_DOCK_VERSION, ".", -1);
 	if (cVersions[0] != NULL)
@@ -362,7 +362,7 @@ main (int argc, char** argv)
 	if (cVersions[2] != NULL)
 		g_iMicroVersion = atoi (cVersions[2]);
 	g_strfreev (cVersions);
-
+	
 	//\___________________ On detecte l'environnement de bureau.
 	if (g_iDesktopEnv == CAIRO_DOCK_UNKNOWN_ENV)
 		g_iDesktopEnv = cairo_dock_guess_environment ();
@@ -373,28 +373,28 @@ main (int argc, char** argv)
 		g_str_equal,
 		g_free,
 		NULL);
-
-        //\___________________ initialise the keybinder
-        cd_keybinder_init();
-
+	
+	//\___________________ initialise the keybinder
+	cd_keybinder_init();
+	
 	//\___________________ On initialise le gestionnaire des applications ouvertes.
 	cairo_dock_initialize_application_manager ();
 
 	//\___________________ On initialise le gestionnaire de modules et on pre-charge les modules existant.
 	if (g_module_supported () && ! bSafeMode)
 		cairo_dock_initialize_module_manager (CAIRO_DOCK_MODULES_DIR);
-
+	
 	//\___________________ On initialise le gestionnaire de vues.
 	cairo_dock_initialize_renderer_manager ();
-
-
+	
+	
 	//\___________________ On enregistre nos notifications.
 	cairo_dock_register_notification (CAIRO_DOCK_BUILD_MENU, (CairoDockNotificationFunc) cairo_dock_notification_build_menu, CAIRO_DOCK_RUN_AFTER);
 	cairo_dock_register_notification (CAIRO_DOCK_DROP_DATA, (CairoDockNotificationFunc) cairo_dock_notification_drop_data, CAIRO_DOCK_RUN_AFTER);
 	cairo_dock_register_notification (CAIRO_DOCK_CLICK_ICON, (CairoDockNotificationFunc) cairo_dock_notification_click_icon, CAIRO_DOCK_RUN_FIRST);
 	cairo_dock_register_notification (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) cairo_dock_notification_middle_click_icon, CAIRO_DOCK_RUN_FIRST);
 	cairo_dock_register_notification (CAIRO_DOCK_REMOVE_ICON, (CairoDockNotificationFunc) cairo_dock_notification_remove_icon, CAIRO_DOCK_RUN_FIRST);
-
+	
 	//\___________________ On charge le dernier theme ou on demande a l'utilisateur d'en choisir un.
 	g_cConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
 	g_cEasyConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_EASY_CONF_FILE);
@@ -409,10 +409,10 @@ main (int argc, char** argv)
 			exit (0);
 		}
 	}
-
+	
 	cairo_dock_load_theme (g_cCurrentThemePath);
-
-
+	
+	
 	//\___________________ On affiche le changelog en cas de nouvelle version.
 	gchar *cLastVersionFilePath = g_strdup_printf ("%s/.cairo-dock-last-version", g_cCairoDockDataDir);
 	gboolean bWriteChangeLog;
@@ -434,13 +434,13 @@ main (int argc, char** argv)
 			bWriteChangeLog = TRUE;
 		g_free (cContent);
 	}
-
+	
 	g_file_set_contents (cLastVersionFilePath,
 		CAIRO_DOCK_VERSION,
 		-1,
 		NULL);
 	g_free (cLastVersionFilePath);
-
+	
 	if (bWriteChangeLog)
 	{
 		gchar *cChangeLogFilePath = g_strdup_printf ("%s/ChangeLog.txt", CAIRO_DOCK_SHARE_DATA_DIR);
@@ -469,12 +469,12 @@ main (int argc, char** argv)
 			g_free (cChangeLogMessage);
 		}
 	}
-
-
+	
+	
 	if (bDialogTest)
 		g_timeout_add (2000, (GSourceFunc) random_dialog, NULL);  // pour tests seulement.
-
-
+	
+	
 	//\___________________ Message a caractere informatif (ou pas).
 	gchar *cSillyMessageFilePath = g_strdup_printf ("%s/.cairo-dock-silly-question", g_cCairoDockDataDir);
 	//const gchar *cSillyMessage = "Le saviez-vous ?\nUtiliser cairo-dock vous rendra beau et intelligent !";
@@ -489,7 +489,8 @@ main (int argc, char** argv)
 	//const gchar *cSillyMessage = "Cairo-Dock lave plus blanc que blanc.";  // 4000
 	//const gchar *cSillyMessage = "Sondage :\nVoulez-vous voir plus de filles nues dans Cairo-Dock ?";
 	//const gchar *cSillyMessage = "C'est les soldes !\n Pour tout sous-dock acheté, un sous-dock offert !";
-	const gchar *cSillyMessage = "J-2 avant la 1.5, la tension monte !";
+	//const gchar *cSillyMessage = "J-2 avant la 1.5, la tension monte !";
+	const gchar *cSillyMessage = NULL;
 	const gchar *cNumSilllyMessage = "14";
 	gboolean bWriteSillyMessage;
 	if (! g_file_test (cSillyMessageFilePath, G_FILE_TEST_EXISTS))
@@ -510,14 +511,14 @@ main (int argc, char** argv)
 			bWriteSillyMessage = TRUE;
 		g_free (cContent);
 	}
-
+	
 	g_file_set_contents (cSillyMessageFilePath,
 		cNumSilllyMessage,
 		-1,
 		NULL);
 	g_free (cSillyMessageFilePath);
-
- 	///if (bWriteSillyMessage && ! bWriteChangeLog)
+	
+	if (bWriteSillyMessage && ! bWriteChangeLog && cSillyMessage != NULL)
 	{
 		///cairo_dock_show_general_message (cSillyMessage, 4000);
 		/*double fAnswer = cairo_dock_show_value_and_wait (cSillyMessage, pFirstIcon, g_pMainDock, 1.);
@@ -526,24 +527,24 @@ main (int argc, char** argv)
 			g_print ("Cela sera consigné et utilisé contre vous le moment venu ;-)\n");
 		else if (fAnswer == 1)
 			g_print ("je suis aussi d'accord ! ;-)\n");*/
-
+		
 		/*int iAnswer = cairo_dock_ask_question_and_wait (cSillyMessage, pFirstIcon, g_pMainDock);
 		if (iAnswer == GTK_RESPONSE_YES)
 			g_print ("c'est bien ce que je pensais ;-)\n");
 		else
 			g_print ("allez on ne me la fais pas ! ;-)\n");*/
-
+		
 		/*gchar *cAnswer = cairo_dock_show_demand_and_wait ("Test :", NULL, g_pMainDock, "pouet");
 		g_print (" -> %s\n", cAnswer);*/
 		/*double fAnswer = cairo_dock_show_value_and_wait ("Test :", cairo_dock_get_first_appli (g_pMainDock->icons), g_pMainDock, .7);
 		g_print (" ==> %.2f\n", fAnswer);*/
 	}
 	gtk_main ();
-
+	
 	rsvg_term ();
-
+	
 	g_print ("Bye bye !\n");
-
+	
 	return 0;
 }
 

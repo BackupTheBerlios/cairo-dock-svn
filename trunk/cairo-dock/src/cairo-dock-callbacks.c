@@ -228,20 +228,20 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	{
 		if ((pMotion->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK)) && (pMotion->state & GDK_BUTTON1_MASK))
 		{
-			//g_print ("mouse : (%d;%d); pointeur : (%d;%d)\n", pDock->iMouseX, pDock->iMouseY, (int) pMotion->x, (int) pMotion->y);
+			//g_print ("mouse : (%d;%d); pointeur : (%d;%d)\n", pDock->iMouseX, pDock->iMouseY, (int) pMotion->x_root, (int) pMotion->y_root);
 			if (pDock->bHorizontalDock)
 			{
 				//gtk_window_get_position (GTK_WINDOW (pDock->pWidget), &pDock->iWindowPositionX, &pDock->iWindowPositionY);
-				pDock->iWindowPositionX -= pDock->iMouseX - (int) pMotion->x;
-				pDock->iWindowPositionY -= pDock->iMouseY - (int) pMotion->y;
+				pDock->iWindowPositionX = pMotion->x_root - pDock->iMouseX;
+				pDock->iWindowPositionY = pMotion->y_root - pDock->iMouseY;
 				gtk_window_move (GTK_WINDOW (pWidget),
 					pDock->iWindowPositionX,
 					pDock->iWindowPositionY);
 			}
 			else
 			{
-				pDock->iWindowPositionX -= pDock->iMouseY - (int) pMotion->y;
-				pDock->iWindowPositionY -= pDock->iMouseX - (int) pMotion->x;
+				pDock->iWindowPositionX = pMotion->y_root - pDock->iMouseY;
+				pDock->iWindowPositionY = pMotion->x_root - pDock->iMouseX;
 				gtk_window_move (GTK_WINDOW (pWidget),
 					pDock->iWindowPositionY,
 					pDock->iWindowPositionX);
@@ -260,7 +260,6 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			pDock->iMouseX = (int) pMotion->y;
 			pDock->iMouseY = (int) pMotion->x;
 		}
-		
 		
 		if (pDock->iSidShrinkDown > 0 || pMotion->time - fLastTime < g_fRefreshInterval)  // si les icones sont en train de diminuer de taille (suite a un clic) on on laisse l'animation se finir, sinon elle va trop vite.  // || ! pDock->bInside || pDock->bAtBottom
 		{
@@ -290,6 +289,13 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			gdk_window_get_pointer (pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
 		else
 			gdk_window_get_pointer (pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);
+		
+		if (pDock->iSidShrinkDown > 0 || pMotion->time - fLastTime < g_fRefreshInterval)  // si les icones sont en train de diminuer de taille (suite a un clic) on on laisse l'animation se finir, sinon elle va trop vite.  // || ! pDock->bInside || pDock->bAtBottom
+		{
+			gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);
+			return FALSE;
+		}
+		
 		pPointedIcon = pDock->calculate_icons (pDock);
 		pDock->iAvoidingMouseIconType = CAIRO_DOCK_LAUNCHER;
 		pDock->fAvoidingMouseMargin = .25;
@@ -326,7 +332,6 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 					pDock->fDecorationsOffsetX = - pDock->iCurrentWidth / 2;
 			}
 		}
-		//pDock->iMouseX = iX;
 	}
 	
 	if (pPointedIcon != pLastPointedIcon || s_pLastPointedDock == NULL)
@@ -453,6 +458,10 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	if (pDock->bAtBottom)  // || ! pDock->bInside
 	{
 		pDock->iSidLeaveDemand = 0;
+		return FALSE;
+	}
+	if (pEvent != NULL && (pEvent->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK)) && (pEvent->state & GDK_BUTTON1_MASK))
+	{
 		return FALSE;
 	}
 	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);

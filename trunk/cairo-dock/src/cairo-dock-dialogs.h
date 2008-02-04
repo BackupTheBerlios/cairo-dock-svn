@@ -221,5 +221,6 @@ void cairo_dock_hide_dialog (CairoDockDialog *pDialog);
 */
 void cairo_dock_unhide_dialog (CairoDockDialog *pDialog);
 
+GtkWidget *cairo_dock_steal_widget_from_dialog (CairoDockDialog *pDialog);
 
 #endif
