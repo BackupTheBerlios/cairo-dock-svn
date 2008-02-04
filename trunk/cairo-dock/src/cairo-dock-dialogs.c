@@ -224,7 +224,8 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	cairo_set_source_rgba (pCairoContext, 0., 0., 0., 0.);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 	cairo_paint (pCairoContext);
-	if (! pDialog->bBuildComplete)
+	//if (! pDialog->bBuildComplete)
+	if (pDialog->iWidth == 20 && pDialog->iHeight == 20)
 	{
 		g_print ("dialogue incomplet\n");
 		cairo_destroy (pCairoContext);
@@ -377,13 +378,13 @@ static gboolean on_configure_dialog (GtkWidget* pWidget,
 	
 	if ((pDialog->iWidth != pEvent->width || pDialog->iHeight != pEvent->height) && pDialog->pIcon != NULL)
 	{
+		pDialog->iWidth = pEvent->width;
+		pDialog->iHeight = pEvent->height;
+		
 		CairoDock *pDock = cairo_dock_search_container_from_icon (pDialog->pIcon);
 		cairo_dock_place_dialog (pDialog, pDock);
-		//gtk_widget_queue_draw (pDialog->pWidget);  // bizarre, il faut forcer le redessin.
+		gtk_widget_queue_draw (pDialog->pWidget);
 	}
-	
-	pDialog->iWidth = pEvent->width;
-	pDialog->iHeight = pEvent->height;
 	
 	cairo_dock_dialog_unreference (pDialog);
 	return FALSE;
@@ -826,14 +827,6 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 		TRUE,
 		0);
 	
-	gtk_widget_show_all (pWidgetLayout);
-	
-	while (gtk_events_pending ())
-		gtk_main_iteration ();
-	
-	///cairo_dock_place_dialog (pDialog, pDock);  // renseigne aussi bDirectionUp, bIsPerpendicular, et iHeight.
-	cairo_dock_remove_orphelans ();  // la liste a ete verouillee par la fonction precedente pendant longtemps, empechant les dialogues d'etre detruits.
-	
 	//\________________ On connecte les signaux utiles.
 	g_signal_connect (G_OBJECT (pWindow),
 		"expose-event",
@@ -862,6 +855,11 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 			G_CALLBACK (on_leave_dialog),
 			pDialog);
 	}
+	
+	gtk_widget_show_all (pWidgetLayout);
+	
+	///cairo_dock_place_dialog (pDialog, pDock);  // renseigne aussi bDirectionUp, bIsPerpendicular, et iHeight.
+	cairo_dock_remove_orphelans ();  // la liste a ete verouillee par la fonction precedente pendant longtemps, empechant les dialogues d'etre detruits.
 	
 	cairo_dock_dialog_unreference (pDialog);
 	return pDialog;
@@ -1000,6 +998,7 @@ void cairo_dock_dialog_find_optimal_placement  (CairoDockDialog *pDialog, CairoD
 
 void cairo_dock_place_dialog (CairoDockDialog *pDialog, CairoDock *pDock)
 {
+	g_print ("%s ()\n", __func__);
 	//g_return_if_fail (pDock != NULL && pDialog->pIcon != NULL);
 	double fLineWidth = g_iDockLineWidth;
 	int iPrevPositionX = pDialog->iPositionX, iPrevPositionY = pDialog->iPositionY;
@@ -1099,19 +1098,8 @@ void cairo_dock_replace_all_dialogs (void)
 			if (pIcon != NULL && GTK_WIDGET_VISIBLE (pDialog->pWidget)) // on ne replace pas les dialogues en cours de destruction ou caches.
 			{
 				pDock = cairo_dock_search_container_from_icon (pIcon);
-				//int iPreviousX = pDialog->iPositionX, iPreviousY = pDialog->iPositionY;
-				/*if (! pDialog->bInside)
-				{*/
-					cairo_dock_place_dialog (pDialog, pDock);
-				/*}
-				else  // on le laisse a sa place.
-				{
-					cairo_dock_dialog_calculate_aimed_point (pDialog->pIcon, pDock, &pDialog->iAimedX, &pDialog->iAimedY, &pDialog->bRight, &pDialog->bIsPerpendicular, &pDialog->bDirectionUp);
-				}*/
-				//if (iPreviousX == pDialog->iPositionX && iPreviousY == pDialog->iPositionY)  // on force le redessin pour la pointe.
-				{
-					gtk_widget_queue_draw (pDialog->pWidget);  // on redessine meme si la position n'a pas changee, car la pointe, elle, change.
-				}
+				cairo_dock_place_dialog (pDialog, pDock);
+				gtk_widget_queue_draw (pDialog->pWidget);  // on redessine meme si la position n'a pas changee, car la pointe, elle, change.
 			}
 			cairo_dock_dialog_unreference (pDialog);
 		}
