@@ -267,6 +267,8 @@ cd_keybinder_bind (const char           *keystring,
 	Binding *binding;
 	gboolean success;
 
+        if (!keystring)
+          return FALSE;
 	binding = g_new0 (Binding, 1);
 	binding->keystring = g_strdup (keystring);
 	binding->handler = handler;
@@ -291,6 +293,8 @@ cd_keybinder_unbind (const char           *keystring,
 {
 	GSList *iter;
 
+        if (!keystring)
+          return;
 	for (iter = bindings; iter != NULL; iter = iter->next) {
 		Binding *binding = (Binding *) iter->data;
 
