@@ -176,7 +176,9 @@ Icon *init (CairoDock *pDock, CairoDockModule *pModule, GError **erreur) \
 	myDock = pDock; \
 	int iDesiredWidth = 48, iDesiredHeight = 48; \
 	gchar *cAppletName = NULL, *cIconName = NULL; \
-	read_conf_file (pModule->cConfFilePath, &iDesiredWidth, &iDesiredHeight, &cAppletName, &cIconName); \
+	gchar *cConfFilePath = cairo_dock_check_conf_file_exists (MY_APPLET_USER_DATA_DIR, MY_APPLET_SHARE_DATA_DIR, MY_APPLET_CONF_FILE); \
+	read_conf_file (cConfFilePath, &iDesiredWidth, &iDesiredHeight, &cAppletName, &cIconName); \
+	g_free (cConfFilePath); \
 	myIcon = cairo_dock_create_icon_for_applet (pDock, iDesiredWidth, iDesiredHeight, cAppletName, cIconName, pModule); \
 	g_return_val_if_fail (myIcon != NULL, NULL); \
 	myDrawContext = cairo_create (myIcon->pIconBuffer); \
