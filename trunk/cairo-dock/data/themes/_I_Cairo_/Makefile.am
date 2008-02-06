@@ -1,6 +1,6 @@
 SUBDIRS = . launchers plug-ins
 
-themedir = $(pkgdatadir)/themes/_I,Cairo_
+themedir = $(pkgdatadir)/themes/_I_Cairo_
 
 theme_DATA = \
 	cairo-dock.conf\

@@ -1,4 +1,4 @@
-launchersdir = $(pkgdatadir)/themes/_I,Cairo_/launchers
+launchersdir = $(pkgdatadir)/themes/_I_Cairo_/launchers
 
 launchers_DATA = \
 	01amule.desktop\

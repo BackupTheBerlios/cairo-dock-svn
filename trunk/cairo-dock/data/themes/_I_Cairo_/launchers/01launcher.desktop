@@ -6,7 +6,7 @@ Name=home
 #s Command to launch on click :
 Exec=nautilus --no-desktop
 #S Image's name or path :
-Icon=nautilus --no-desktop
+Icon=nautilus
 
 #X[Extra parameters]
 frame1=

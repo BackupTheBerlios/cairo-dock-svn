@@ -8,4 +8,4 @@ SUBDIRS = \
 	_Glattering_\
 	_TapisVert_\
 	_MacOSX_\
-	_I,Cairo_
+	_I_Cairo_
