@@ -29,5 +29,6 @@
 #include "cairo-dock-applet-facility.h"
 #include "cairo-dock-file-manager.h"
 #include "cairo-dock-keybinder.h"
+#include "cairo-dock-desklet.h"
 
 #endif
