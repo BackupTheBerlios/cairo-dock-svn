@@ -1311,11 +1311,63 @@ gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePat
 }
 
 
+void cairo_dock_update_conf_file (gchar *cConfFilePath, GType iFirstDataType, ...)  // type, valeur par pointeur, groupe, nom, etc. finir par G_TYPE_INVALID.
+{
+	va_list args;
+	va_start (args, iFirstDataType);
+	
+	GKeyFile *pKeyFile = g_key_file_new ();
+	GError *erreur = NULL;
+	g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		return ;
+	}
+	
+	GType iType = iFirstDataType;
+	gpointer pValue;
+	gchar *cGroupName, *cGroupKey;
+	while (iType != G_TYPE_INVALID)
+	{
+		pValue = va_arg (args, gpointer);
+		cGroupName = va_arg (args, gchar *);
+		cGroupKey = va_arg (args, gchar *);
+		
+		switch (iType)
+		{
+			case G_TYPE_BOOLEAN :
+				g_key_file_set_boolean (pKeyFile, cGroupName, cGroupKey, *((gboolean *) pValue));
+			break ;
+			case G_TYPE_INT :
+				g_key_file_set_integer (pKeyFile, cGroupName, cGroupKey, *((gint *) pValue));
+			break ;
+			case G_TYPE_DOUBLE :
+				g_key_file_set_double (pKeyFile, cGroupName, cGroupKey, *((gdouble *) pValue));
+			break ;
+			case G_TYPE_STRING :
+				g_key_file_set_string (pKeyFile, cGroupName, cGroupKey, (gchar *) pValue);
+			break ;
+			default :
+			break ;
+		}
+		
+		iType = va_arg (args, GType);
+	}
+	
+	cairo_dock_write_keys_to_file (pKeyFile, g_cConfFile);
+	g_key_file_free (pKeyFile);
+	
+	va_end (args);
+}
+
 
 void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int y)
 {
 	//g_print ("%s (%d;%d)\n", __func__, x, y);
-	GKeyFile *pKeyFile = g_key_file_new ();
+	cairo_dock_update_conf_file (cConfFilePath, G_TYPE_INT, &x, "Position", "x gap", G_TYPE_INT, &y, "Position", "y gap", G_TYPE_INVALID);
+	/*GKeyFile *pKeyFile = g_key_file_new ();
 	
 	GError *erreur = NULL;
 	g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
@@ -1330,7 +1382,7 @@ void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int
 	g_key_file_set_integer (pKeyFile, "Position", "y gap", y);
 	
 	cairo_dock_write_keys_to_file (pKeyFile, g_cConfFile);
-	g_key_file_free (pKeyFile);
+	g_key_file_free (pKeyFile);*/
 }
 
 

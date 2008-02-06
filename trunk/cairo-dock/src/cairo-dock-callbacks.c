@@ -402,14 +402,14 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 gboolean cairo_dock_emit_leave_signal (CairoDock *pDock)
 {
 	static gboolean bReturn;
-	g_print ("demande de quitter\n");
+	//g_print ("demande de quitter\n");
 	g_signal_emit_by_name (pDock->pWidget, "leave-notify-event", NULL, &bReturn);
 	return FALSE;
 }
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
-	g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
+	//g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
 	pDock->iAvoidingMouseIconType = -1;
 	pDock->fAvoidingMouseMargin = 0;
 	pDock->bInside = FALSE;
@@ -440,7 +440,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	{
 		pDock->fFoldingFactor = 0.03;
 		pDock->bAtBottom = TRUE;  // mis en commentaire le 12/11/07 pour permettre le quick-hide.
-		g_print ("on force bAtBottom\n");
+		//g_print ("on force bAtBottom\n");
 	}
 	
 	///pDock->fDecorationsOffsetX = 0;
@@ -454,7 +454,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	g_print ("%s (bInside:%d; bAtBottom:%d; iRefCount:%d)\n", __func__, pDock->bInside, pDock->bAtBottom, pDock->iRefCount);
+	//g_print ("%s (bInside:%d; bAtBottom:%d; iRefCount:%d)\n", __func__, pDock->bInside, pDock->bAtBottom, pDock->iRefCount);
 	if (pDock->bAtBottom)  // || ! pDock->bInside
 	{
 		pDock->iSidLeaveDemand = 0;
@@ -464,7 +464,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	{
 		return FALSE;
 	}
-	g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
 	
 	if (pDock->iRefCount == 0)
 	{
@@ -497,17 +497,17 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	}
 	
 	pDock->bInside = FALSE;
-	g_print (" on attend...\n");
+	//g_print (" on attend...\n");
 	while (gtk_events_pending ())  // on laisse le temps au signal d'entree dans le sous-dock d'etre traite.
 		gtk_main_iteration ();
-	g_print (" ==> pDock->bInside : %d\n", pDock->bInside);
+	//g_print (" ==> pDock->bInside : %d\n", pDock->bInside);
 	
 	if (pDock->bInside)  // on est re-rentre dedans entre-temps.
 		return TRUE;
 	
 	if (s_iSidShowSubDockDemand != 0)
 	{
-		g_print ("on annule la demande de motrage de sous-dock\n");
+		g_print ("on annule la demande de montrage de sous-dock\n");
 		g_source_remove (s_iSidShowSubDockDemand);
 		s_iSidShowSubDockDemand = 0;
 	}
@@ -525,7 +525,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	g_print ("%s (bIsMainDock : %d; bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bIsMainDock, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
+	//g_print ("%s (bIsMainDock : %d; bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bIsMainDock, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
 	s_pLastPointedDock = NULL;  // ajoute le 04/10/07 pour permettre aux sous-docks d'apparaitre si on entre en pointant tout de suite sur l'icone.
 	
 	if (! s_bEntranceAllowed)

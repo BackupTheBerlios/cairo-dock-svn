@@ -1,16 +1,15 @@
-/******************************************************************************
+/*********************************************************************************
 
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
-******************************************************************************/
+*********************************************************************************/
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#include "cairo-dock-struct.h"
 #include "cairo-dock-icons.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-load.h"
@@ -226,6 +225,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	cairo_set_source_rgba (pCairoContext, 0., 0., 0., 0.);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 	cairo_paint (pCairoContext);
+	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 	
 	if (pDialog->iWidth == 20 && pDialog->iHeight == 20)
 	{
@@ -261,7 +261,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	if (pDialog->bRight)
 	{
 		fDeltaMargin = MAX (0, pDialog->iAimedX - pDialog->iPositionX - fRadius - fLineWidth / 2);
-		g_print ("fDeltaMargin : %.2f\n", fDeltaMargin);
+		//g_print ("fDeltaMargin : %.2f\n", fDeltaMargin);
 		cairo_rel_line_to (pCairoContext, -iWidth + fDeltaMargin + fLineWidth + 2. * fRadius + CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE + CAIRO_DOCK_DIALOG_TIP_ROUNDING_MARGIN , 0);
 		cairo_rel_curve_to (pCairoContext,
 			0, 0,
@@ -276,7 +276,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	else
 	{
 		fDeltaMargin = MAX (0, pDialog->iPositionX + pDialog->iWidth - fRadius - fLineWidth / 2 - pDialog->iAimedX);
-		g_print ("fDeltaMargin : %.2f\n", fDeltaMargin);
+		//g_print ("fDeltaMargin : %.2f\n", fDeltaMargin);
 		cairo_rel_line_to (pCairoContext, - (CAIRO_DOCK_DIALOG_TIP_MARGIN + fDeltaMargin) + CAIRO_DOCK_DIALOG_TIP_ROUNDING_MARGIN, 0);
 		cairo_rel_curve_to (pCairoContext,
 			0, 0,
@@ -303,17 +303,17 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	if (fRadius < 1)
 		cairo_close_path (pCairoContext);
 	
-	cairo_save (pCairoContext);
+	///cairo_save (pCairoContext);
 	cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], g_fDialogColor[3]);
 	cairo_fill_preserve (pCairoContext);
-	cairo_restore (pCairoContext);
+	///cairo_restore (pCairoContext);
 	
 	cairo_set_line_width (pCairoContext, fLineWidth);
 	cairo_set_source_rgba (pCairoContext, g_fLineColor[0], g_fLineColor[1], g_fLineColor[2], g_fLineColor[3]);
 	cairo_stroke (pCairoContext);
 	cairo_restore (pCairoContext);  // retour au contexte initial.
 	
-	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
+	///cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 	fOffsetX = pDialog->iMargin;
 	fOffsetY = (pDialog->bDirectionUp ? pDialog->iMargin : pDialog->iHeight - pDialog->iMargin - pDialog->iBubbleHeight);
 	cairo_move_to (pCairoContext, fOffsetX, fOffsetY);
@@ -772,6 +772,7 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 		pDialog->iBubbleHeight += CAIRO_DOCK_DIALOG_VGAP + pDialog->iInteractiveHeight;
 		g_print ("  3) iBubbleWidth: %d , iBubbleHeight : %d\n", pDialog->iBubbleWidth, pDialog->iBubbleHeight);
 		
+		g_print ("ref = %d\n", pInteractiveWidget->object.parent_instance.ref_count);
 		if (gtk_widget_get_parent (pInteractiveWidget) != NULL)
 		{
 			gtk_object_ref (pInteractiveWidget);
@@ -785,6 +786,7 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 			TRUE,
 			0);
 		gtk_object_unref (pInteractiveWidget);
+		g_print ("pack -> ref = %d\n", pInteractiveWidget->object.parent_instance.ref_count);
 	}
 	
 	//\________________ On ajoute les boutons.
@@ -962,7 +964,7 @@ void cairo_dock_dialog_find_optimal_placement  (CairoDockDialog *pDialog, CairoD
 					iYSup = (pDialog->bDirectionUp ? pDialogOnOurWay->iPositionY + pDialogOnOurWay->iBubbleHeight + 2 * g_iDockLineWidth : pDialogOnOurWay->iPositionY + pDialogOnOurWay->iHeight);
 					if (iYInf < pDialog->iPositionY + pDialog->iBubbleHeight + 2 * g_iDockLineWidth && iYSup > pDialog->iPositionY)
 					{
-						g_print ("pDialogOnOurWay : %d - %d ; pDialog : %d - %d\n", iYInf, iYSup, pDialog->iPositionY, pDialog->iPositionY + (pDialog->iBubbleHeight + 2 * g_iDockLineWidth));
+						//g_print ("pDialogOnOurWay : %d - %d ; pDialog : %d - %d\n", iYInf, iYSup, pDialog->iPositionY, pDialog->iPositionY + (pDialog->iBubbleHeight + 2 * g_iDockLineWidth));
 						if (pDialogOnOurWay->iAimedX < pDialog->iAimedX)
 							fXLeft = MAX (fXLeft, pDialogOnOurWay->iPositionX + pDialogOnOurWay->iWidth);
 						else
@@ -1000,14 +1002,14 @@ void cairo_dock_dialog_find_optimal_placement  (CairoDockDialog *pDialog, CairoD
 
 void cairo_dock_place_dialog (CairoDockDialog *pDialog, CairoDock *pDock)
 {
-	g_print ("%s ()\n", __func__);
+	//g_print ("%s ()\n", __func__);
 	//g_return_if_fail (pDock != NULL && pDialog->pIcon != NULL);
 	double fLineWidth = g_iDockLineWidth;
 	int iPrevPositionX = pDialog->iPositionX, iPrevPositionY = pDialog->iPositionY;
 	if (pDock != NULL && pDialog->pIcon != NULL)
 	{
 		cairo_dock_dialog_calculate_aimed_point (pDialog->pIcon, pDock, &pDialog->iAimedX, &pDialog->iAimedY, &pDialog->bRight, &pDialog->bIsPerpendicular, &pDialog->bDirectionUp);
-		g_print (" Aim (%d;%d) / %d\n", pDialog->iAimedX, pDialog->iAimedY, pDialog->bInside);
+		//g_print (" Aim (%d;%d) / %d\n", pDialog->iAimedX, pDialog->iAimedY, pDialog->bInside);
 		
 		if (pDialog->bIsPerpendicular)
 		{
@@ -1044,12 +1046,12 @@ void cairo_dock_place_dialog (CairoDockDialog *pDialog, CairoDock *pDock)
 		//if ((int) fGapFromDock != pDialog->iDistanceToDock)
 		if (pDialog->iDistanceToDock != iOldDistance)
 		{
-			g_print ("  On change la taille de la pointe a : %d pixels ( -> %d)\n", pDialog->iDistanceToDock, pDialog->iMessageHeight + pDialog->iInteractiveHeight +pDialog->iButtonsHeight + pDialog->iDistanceToDock);
+			//g_print ("  On change la taille de la pointe a : %d pixels ( -> %d)\n", pDialog->iDistanceToDock, pDialog->iMessageHeight + pDialog->iInteractiveHeight +pDialog->iButtonsHeight + pDialog->iDistanceToDock);
 			gtk_widget_set (pDialog->pTipWidget, "height-request", pDialog->iDistanceToDock, NULL);
 			
 			if (iOldDistance == 0 || pDialog->iDistanceToDock < iOldDistance)
 			{
-				g_print ("    cela reduit la fenetre a %dx%d\n", pDialog->iBubbleWidth + 2 * pDialog->iMargin, pDialog->iMessageHeight + pDialog->iInteractiveHeight +pDialog->iButtonsHeight +  pDialog->iDistanceToDock);
+				//g_print ("    cela reduit la fenetre a %dx%d\n", pDialog->iBubbleWidth + 2 * pDialog->iMargin, pDialog->iMessageHeight + pDialog->iInteractiveHeight +pDialog->iButtonsHeight +  pDialog->iDistanceToDock);
 				gtk_window_resize (GTK_WINDOW (pDialog->pWidget),
 					pDialog->iBubbleWidth + 2 * pDialog->iMargin,
 					pDialog->iMessageHeight + pDialog->iInteractiveHeight +pDialog->iButtonsHeight + pDialog->iDistanceToDock);
@@ -1066,7 +1068,7 @@ void cairo_dock_place_dialog (CairoDockDialog *pDialog, CairoDock *pDock)
 	
 	if (iPrevPositionX != pDialog->iPositionX || iPrevPositionY != pDialog->iPositionY)
 	{
-		g_print (" => (%d;%d) %dx%d\n", pDialog->iPositionX, pDialog->iPositionY, pDialog->iWidth, pDialog->iHeight);
+		//g_print (" => (%d;%d) %dx%d\n", pDialog->iPositionX, pDialog->iPositionY, pDialog->iWidth, pDialog->iHeight);
 		gtk_window_move (GTK_WINDOW (pDialog->pWidget),
 			pDialog->iPositionX,
 			pDialog->iPositionY);
@@ -1404,6 +1406,24 @@ void cairo_dock_unhide_dialog (CairoDockDialog *pDialog)
 	cairo_dock_dialog_unreference (pDialog);
 }
 
+
+GtkWidget *cairo_dock_steal_widget_from_its_container (GtkWidget *pWidget)
+{
+	static GtkWidget *pWidgetCatcher = NULL;
+	if (pWidgetCatcher == NULL)
+		pWidgetCatcher = gtk_hbox_new (0, FALSE);
+	
+	if (pWidget != NULL && gtk_widget_get_parent (pWidget) != NULL)
+	{
+		gtk_widget_reparent (pWidget, pWidgetCatcher);
+		
+		gtk_object_ref (pWidget);
+		gtk_widget_unparent (pWidget);
+		gtk_object_unref (pWidget);
+	}
+	return pWidget;
+}
+
 GtkWidget *cairo_dock_steal_widget_from_dialog (CairoDockDialog *pDialog)
 {
 	static GtkWidget *pWidgetCatcher = NULL;
@@ -1417,6 +1437,12 @@ GtkWidget *cairo_dock_steal_widget_from_dialog (CairoDockDialog *pDialog)
 	if (pInteractiveWidget != NULL)
 	{
 		gtk_widget_reparent (pInteractiveWidget, pWidgetCatcher);  // j'ai rien trouve de mieux pour empecher que le 'pInteractiveWidget' ne soit pas detruit avec le dialogue apres l'appel de la callback (g_object_ref ne marche pas).
+		
+		g_print ("reparent -> ref = %d\n", pInteractiveWidget->object.parent_instance.ref_count);
+		gtk_object_ref (pInteractiveWidget);
+		gtk_widget_unparent (pInteractiveWidget);
+		g_print ("ref+unparent -> ref = %d\n", pInteractiveWidget->object.parent_instance.ref_count);
+		
 		pDialog->pInteractiveWidget = NULL;
 	}
 	cairo_dock_dialog_unreference (pDialog);

@@ -182,7 +182,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	gtk_widget_set_app_paintable (pWindow, TRUE);
 	gtk_window_set_decorated (GTK_WINDOW (pWindow), FALSE);
 	gtk_window_set_resizable (GTK_WINDOW (pWindow), TRUE);
-	gtk_window_set_title (GTK_WINDOW (pWindow), "cairo-dock");
+	gtk_window_set_title (GTK_WINDOW (pWindow), "cairo-dock");  // GTK renseigne la classe avec la meme valeur.
 	
 	cairo_dock_set_renderer (pDock, cRendererName);
 	
@@ -665,8 +665,8 @@ static void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDo
 	{
 		g_print ("  %s (%s)\n", __func__, cDockName);
 		cairo_dock_update_dock_size (pDock);
-		pDock->iMouseX = -1; // utile ?
-		pDock->iMouseY = -1;
+		///pDock->iMouseX = -1; // utile ?
+		///pDock->iMouseY = -1;
 		pDock->calculate_icons (pDock);
 		gtk_window_present (GTK_WINDOW (pDock->pWidget));
 		while (gtk_events_pending ())

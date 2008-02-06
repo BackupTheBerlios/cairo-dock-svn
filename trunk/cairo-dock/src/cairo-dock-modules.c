@@ -174,13 +174,22 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 	pCairoDockModule->reloadModule = function_reload;
 }
 
-static void cairo_dock_close_module (CairoDockModule *pCairoDockModule)
+static void cairo_dock_close_module (CairoDockModule *module)
 {
-	g_module_close (pCairoDockModule->pModule);
-	pCairoDockModule->pModule = NULL;
-	pCairoDockModule->initModule = NULL;
-	pCairoDockModule->stopModule = NULL;
-	pCairoDockModule->reloadModule = NULL;
+	g_module_close (module->pModule);
+	module->pModule = NULL;
+	module->initModule = NULL;
+	module->stopModule = NULL;
+	module->reloadModule = NULL;
+	
+	g_free (module->cConfFilePath);
+	module->cConfFilePath = NULL;
+	g_free (module->cReadmeFilePath);
+	module->cReadmeFilePath = NULL;
+	g_free (module->cPreviewFilePath);
+	module->cPreviewFilePath = NULL;
+	g_free (module->cGettextDomain);
+	module->cGettextDomain = NULL;
 }
 
 
@@ -430,15 +439,6 @@ void cairo_dock_deactivate_module (CairoDockModule *module)
 			module->stopModule ();
 		}
 		module->bActive = FALSE;
-		
-		g_free (module->cConfFilePath);
-		module->cConfFilePath = NULL;
-		g_free (module->cReadmeFilePath);
-		module->cReadmeFilePath = NULL;
-		g_free (module->cPreviewFilePath);
-		module->cPreviewFilePath = NULL;
-		g_free (module->cGettextDomain);
-		module->cGettextDomain = NULL;
 	}
 }
 
@@ -568,3 +568,18 @@ CairoDockModule *cairo_dock_find_module_from_name (gchar *cModuleName)
 	return g_hash_table_lookup (s_hModuleTable, cModuleName);
 }
 
+
+
+/*
+detach ()
+{
+	create_desklet
+	
+	
+	detach_icon
+	
+	reload_module (conf=NULL, desklet, dock=NULL);
+	
+	insert_callback_icon_if_needed
+}
+*/

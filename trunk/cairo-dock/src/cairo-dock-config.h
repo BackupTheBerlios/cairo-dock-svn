@@ -130,6 +130,12 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock);
 gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert, gchar *cGettextDomain);
 #define cairo_dock_edit_conf_file(pWindow, cConfFilePath, cTitle, iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc, cGettextDomain) cairo_dock_edit_conf_file_full (pWindow, cConfFilePath, cTitle, iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc, NULL, NULL, NULL, NULL, cGettextDomain)
 
+/**
+*Met a jour un fichier de conf avec une liste de valeurs de la forme : type, pointeur sur la valeur, nom du groupe, nom de la cle.
+*@param cConfFilePath chemin du fichier de conf.
+*@param iFirstDataType type de la 1ere donnee.
+*/
+void cairo_dock_update_conf_file (gchar *cConfFilePath, GType iFirstDataType, ...);
 
 void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int y);
 
