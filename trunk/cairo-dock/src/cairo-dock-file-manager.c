@@ -1,6 +1,6 @@
 /******************************************************************************
 
-This file is a part of the cairo-dock program, 
+This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
 Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
@@ -14,6 +14,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-draw.h"
 #include "cairo-dock-dialogs.h"
 #include "cairo-dock-file-manager.h"
+#include "cairo-dock-log.h"
 
 extern CairoDockDesktopEnv g_iDesktopEnv;
 extern CairoDockFMSortType g_iFileSortType;
@@ -209,12 +210,12 @@ Icon *cairo_dock_fm_create_icon_from_URI (const gchar *cURI, CairoDock *pDock)
 		cairo_dock_free_icon (pNewIcon);
 		return NULL;
 	}
-	
+
 	if (bIsDirectory)
 	{
-		g_print ("  c'est un sous-repertoire\n");
+		cd_message ("  c'est un sous-repertoire\n");
 	}
-	
+
 	if (g_iFileSortType == CAIRO_DOCK_FM_SORT_BY_NAME)
 	{
 		GList *ic;
@@ -240,7 +241,7 @@ Icon *cairo_dock_fm_create_icon_from_URI (const gchar *cURI, CairoDock *pDock)
 		}
 	}
 	cairo_dock_load_one_icon_from_scratch (pNewIcon, pDock, NULL);
-	
+
 	return pNewIcon;
 }
 
@@ -248,13 +249,13 @@ void cairo_dock_fm_create_dock_from_directory (Icon *pIcon)
 {
 	if (s_pVFSBackend == NULL)
 		return;
-	g_print ("%s ()\n", __func__);
+	cd_message ("%s ()\n", __func__);
 	g_free (pIcon->acCommand);
 	GList *pIconList = cairo_dock_fm_list_directory (pIcon->cBaseURI, g_iFileSortType, CAIRO_DOCK_LAUNCHER, &pIcon->acCommand);
 	pIcon->pSubDock = cairo_dock_create_subdock_from_scratch (pIconList, pIcon->acName);
-	
+
 	cairo_dock_update_dock_size (pIcon->pSubDock);  // le 'load_buffer' ne le fait pas.
-	
+
 	cairo_dock_fm_add_monitor (pIcon);
 }
 
@@ -266,21 +267,21 @@ static Icon *cairo_dock_fm_alter_icon_if_necessary (Icon *pIcon, CairoDock *pDoc
 		return NULL;
 	Icon *pNewIcon = cairo_dock_fm_create_icon_from_URI (pIcon->cBaseURI, pDock);
 	g_return_val_if_fail (pNewIcon != NULL && pNewIcon->acName != NULL, NULL);
-	
+
 	if (strcmp (pIcon->acName, pNewIcon->acName) != 0 || strcmp (pIcon->acFileName, pNewIcon->acFileName) != 0 || pIcon->fOrder != pNewIcon->fOrder)
 	{
-		g_print ("  on remplace %s\n", pIcon->acName);
+		cd_message ("  on remplace %s\n", pIcon->acName);
 		cairo_dock_remove_one_icon_from_dock (pDock, pIcon);
 		if (pIcon->acDesktopFileName != NULL)
 			cairo_dock_fm_remove_monitor (pIcon);
-		
+
 		pNewIcon->acDesktopFileName = g_strdup (pIcon->acDesktopFileName);
 		pNewIcon->cParentDockName = g_strdup (pIcon->cParentDockName);
 		if (pIcon->pSubDock != NULL)
 		{
 			pNewIcon->pSubDock == pIcon->pSubDock;
 			pIcon->pSubDock = NULL;
-			
+
 			if (pNewIcon->acName != NULL && strcmp (pIcon->acName, pNewIcon->acName) != 0)
 			{
 				g_hash_table_steal (g_hDocksTable, pIcon->acName);
@@ -290,14 +291,14 @@ static Icon *cairo_dock_fm_alter_icon_if_necessary (Icon *pIcon, CairoDock *pDoc
 		pNewIcon->fX = pIcon->fX;
 		pNewIcon->fXAtRest = pIcon->fXAtRest;
 		pNewIcon->fDrawX = pIcon->fDrawX;
-		
+
 		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, ! CAIRO_DOCK_INSERT_SEPARATOR);  // on met a jour la taille du dock pour le fXMin/fXMax, et eventuellement la taille de l'icone peut aussi avoir change.
-		
+
 		cairo_dock_redraw_my_icon (pNewIcon, pDock);
-		
+
 		if (pNewIcon->acDesktopFileName != NULL)
 			cairo_dock_fm_add_monitor (pNewIcon);
-		
+
 		cairo_dock_free_icon (pIcon);
 		return pNewIcon;
 	}
@@ -310,8 +311,8 @@ static Icon *cairo_dock_fm_alter_icon_if_necessary (Icon *pIcon, CairoDock *pDoc
 void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const gchar *cURI, Icon *pIcon, CairoDockIconType iTypeOnCreation)
 {
 	g_return_if_fail (cURI != NULL && pIcon != NULL);
-	g_print ("%s (%d sur %s)\n", __func__, iEventType, cURI);
-	
+	cd_message ("%s (%d sur %s)\n", __func__, iEventType, cURI);
+
 	switch (iEventType)
 	{
 		case CAIRO_DOCK_FILE_DELETED :
@@ -331,11 +332,11 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 			}
 			else
 			{
-				g_print ("  on n'aurait pas du recevoir cet evenement !\n");
+				cd_message ("  on n'aurait pas du recevoir cet evenement !\n");
 				return ;
 			}
-			g_print ("  %s sera supprimee\n", pConcernedIcon->acName);
-			
+			cd_message ("  %s sera supprimee\n", pConcernedIcon->acName);
+
 			cairo_dock_remove_one_icon_from_dock (pParentDock, pConcernedIcon);
 			if (pConcernedIcon->acDesktopFileName != NULL)  // alors elle a un moniteur.
 				cairo_dock_fm_remove_monitor (pConcernedIcon);
@@ -343,7 +344,7 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 			cairo_dock_free_icon (pConcernedIcon);
 		}
 		break ;
-		
+
 		case CAIRO_DOCK_FILE_CREATED :
 		{
 			if ((pIcon->cBaseURI == NULL || strcmp (cURI, pIcon->cBaseURI) != 0) && pIcon->pSubDock != NULL)  // dans des cas foirreux, il se peut que le fichier soit cree alors qu'il existait deja dans le dock.
@@ -351,13 +352,13 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 				Icon *pNewIcon = cairo_dock_fm_create_icon_from_URI (cURI, pIcon->pSubDock);
 				g_return_if_fail (pNewIcon != NULL);
 				pNewIcon->iType = iTypeOnCreation;
-				
+
 				cairo_dock_insert_icon_in_dock (pNewIcon, pIcon->pSubDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, ! CAIRO_DOCK_INSERT_SEPARATOR);
-				g_print ("  %s a ete insere(e)\n", (pNewIcon != NULL ? pNewIcon->acName : "aucune icone n'"));
+				cd_message ("  %s a ete insere(e)\n", (pNewIcon != NULL ? pNewIcon->acName : "aucune icone n'"));
 			}
 		}
 		break ;
-		
+
 		case CAIRO_DOCK_FILE_MODIFIED :
 		{
 			Icon *pConcernedIcon;
@@ -376,13 +377,13 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 			}
 			else
 			{
-				g_print ("  on n'aurait pas du arriver la !\n");
+				cd_message ("  on n'aurait pas du arriver la !\n");
 				return ;
 			}
-			g_print ("  %s est modifiee (iRefCount:%d)\n", pConcernedIcon->acName, pParentDock->iRefCount);
-			
+			cd_message ("  %s est modifiee (iRefCount:%d)\n", pConcernedIcon->acName, pParentDock->iRefCount);
+
 			Icon *pNewIcon = cairo_dock_fm_alter_icon_if_necessary (pConcernedIcon, pParentDock);
-			
+
 			if (pNewIcon != NULL && pNewIcon != pConcernedIcon && pNewIcon->iVolumeID > 0)
 			{
 				gboolean bIsMounted = FALSE;
@@ -392,7 +393,7 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 					g_free (cActivationURI);
 				}
 				gchar *cMessage = g_strdup_printf (_("%s is now %s"), pNewIcon->acName, (bIsMounted ? _("mounted") : _("unmounted")));
-				
+
 				cairo_dock_show_temporary_dialog (cMessage, pNewIcon, pParentDock, 4000);
 				g_free (cMessage);
 			}
@@ -408,8 +409,8 @@ void cairo_dock_fm_action_on_file_event (CairoDockFMEventType iEventType, const 
 
 void cairo_dock_fm_action_after_mounting (gboolean bMounting, gboolean bSuccess, const gchar *cName, Icon *icon, CairoDock *pDock)
 {
-	g_print ("%s (%s) : %d\n", __func__, (bMounting ? "mount" : "unmount"), bSuccess);  // en cas de demontage effectif, l'icone n'est plus valide !
-	
+	cd_message ("%s (%s) : %d\n", __func__, (bMounting ? "mount" : "unmount"), bSuccess);  // en cas de demontage effectif, l'icone n'est plus valide !
+
 	gchar *cMessage;
 	if (! bSuccess && pDock != NULL)  // dans l'autre cas (succes), l'icone peut ne plus etre valide ! mais on s'en fout, puisqu'en cas de succes, il y'aura rechargement de l'icone, et donc on pourra balancer le message a ce moment-la.
 	{
@@ -420,7 +421,7 @@ void cairo_dock_fm_action_after_mounting (gboolean bMounting, gboolean bSuccess,
 		{
 			cairo_dock_show_general_message (cMessage, 4000);
 		}
-		
+
 		g_free (cMessage);
 	}
 	else if (icon == NULL)
@@ -436,11 +437,11 @@ void cairo_dock_fm_action_after_mounting (gboolean bMounting, gboolean bSuccess,
 gboolean cairo_dock_fm_move_into_directory (const gchar *cURI, Icon *icon, CairoDock *pDock)
 {
 	g_return_val_if_fail (cURI != NULL && icon != NULL, FALSE);
-	g_print (" -> copie de %s dans %s\n", cURI, icon->cBaseURI);
+	cd_message (" -> copie de %s dans %s\n", cURI, icon->cBaseURI);
 	gboolean bSuccess = cairo_dock_fm_move_file (cURI, icon->cBaseURI);
 	if (! bSuccess)
 	{
-		g_print ("Attention : couldn't copy this file.\nCheck that you have writing rights, and that the new does not already exist.\n");
+		cd_message ("Attention : couldn't copy this file.\nCheck that you have writing rights, and that the new does not already exist.\n");
 		gchar *cMessage = g_strdup_printf ("Attention : couldn't copy %s into %s.\nCheck that you have writing rights, and that the name does not already exist.", cURI, icon->cBaseURI);
 		cairo_dock_show_temporary_dialog (cMessage, icon, pDock, 4000);
 		g_free (cMessage);

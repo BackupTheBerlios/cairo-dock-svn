@@ -1,6 +1,6 @@
 /******************************************************************************
 
-This file is a part of the cairo-dock program, 
+This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
 Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
@@ -21,6 +21,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-load.h"
 #include "cairo-dock-surface-factory.h"
 #include "cairo-dock-separator-factory.h"
+#include "cairo-dock-log.h"
 
 extern double g_fAmplitude;
 extern int g_iDockLineWidth;
@@ -42,7 +43,7 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 {
 	*fWidth = 10;
 	*fHeight = 48;
-	
+
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	cairo_surface_t *pNewSurface = NULL;
 	if (g_cSeparatorImage != NULL)
@@ -61,7 +62,7 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 				fRotationAngle = -G_PI/2;
 			else
 				fRotationAngle = G_PI/2;
-		g_print ("%s (%s)\n", __func__, cImagePath);
+		cd_message ("%s (%s)\n", __func__, cImagePath);
 		pNewSurface = cairo_dock_create_surface_from_image (cImagePath,
 			pSourceContext,
 			fMaxScale,
@@ -86,13 +87,13 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 			g_tIconAuthorizedWidth[CAIRO_DOCK_SEPARATOR12],
 			g_tIconAuthorizedHeight[CAIRO_DOCK_SEPARATOR12],
 			&fIconWidthSaturationFactor, &fIconHeightSaturationFactor);
-		
+
 		pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 			CAIRO_CONTENT_COLOR_ALPHA,
 			ceil (*fWidth * fMaxScale),
 			ceil (*fHeight * fMaxScale));
 	}
-	
+
 	return pNewSurface;
 }
 
@@ -103,17 +104,17 @@ Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorT
 	//g_print ("%s ()\n", __func__);
 	if ((iSeparatorType & 1) && ! g_bUseSeparator)
 		return NULL;
-	
+
 	Icon *icon = g_new0 (Icon, 1);
 	icon->iType = iSeparatorType;
 	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
-	
+
 	if (bApplyRatio && pDock->iRefCount > 0)
 	{
 		icon->fWidth *= g_fSubDockSizeRatio;
 		icon->fHeight *= g_fSubDockSizeRatio;
 	}
 	//g_print ("1 separateur : %.2fx%.2f\n", icon->fWidth, icon->fHeight);
-	
+
 	return icon;
 }

@@ -4,6 +4,11 @@
 ** Started on  Thu Jan 31 03:57:17 2008 Cedric GESTES
 ** $Id$
 **
+** Author(s)
+**  - Cedric GESTES <ctaf42@gmail.com>
+**  - Havoc Pennington
+**  - Tim Janik
+**
 ** Copyright (C) 2008 Cedric GESTES
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by

@@ -4,6 +4,9 @@
 ** Started on  Sat Feb  9 16:11:48 2008 Cedric GESTES
 ** $Id$
 **
+** Author(s)
+**  - Cedric GESTES
+**
 ** Copyright (C) 2008 Cedric GESTES
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +26,8 @@
 #ifndef   	CAIRO_DOCK_LOG_H_
 # define   	CAIRO_DOCK_LOG_H_
 
+# include <gtk/gtk.h>
+
 # ifndef _INSIDE_CAIRO_DOCK_LOG_C_
   extern GLogLevelFlags gLogLevel;
 # endif
@@ -30,7 +35,12 @@
 /*
  * internal function
  */
-void cd_log_location(const char *file, const char *func, const int line);
+void cd_log_location(const GLogLevelFlags loglevel,
+                     const char *file,
+                     const char *func,
+                     const int line,
+                     const char *format,
+                     ...);
 
 /**
  * initialise the log system
@@ -42,11 +52,19 @@ void cd_log_init();
  */
 void cd_log_set_level(GLogLevelFlags loglevel);
 
-#define cd_error(str, ...) cd_log_location(__FILE__, __PRETTY_FUNCTION__, __LINE__); g_error(str, __VA_ARGS__)
-#define cd_critical(str, ...) cd_log_location(__FILE__, __PRETTY_FUNCTION__, __LINE__); g_critical(str, __VA_ARGS__)
-#define cd_warning(str, ...) cd_log_location(__FILE__, __PRETTY_FUNCTION__, __LINE__); g_warning(str, __VA_ARGS__)
-#define cd_message(str, ...) cd_log_location(__FILE__, __PRETTY_FUNCTION__, __LINE__); g_message(str, __VA_ARGS__)
-#define cd_info(str, ...) cd_log_location(__FILE__, __PRETTY_FUNCTION__, __LINE__); g_info(str, __VA_ARGS__)
-#define cd_debug(str, ...) cd_log_location(__FILE__, __PRETTY_FUNCTION__, __LINE__); g_debug(str, __VA_ARGS__)
+#define cd_error(...)                                                  \
+  cd_log_location(G_LOG_LEVEL_ERROR, __FILE__, __PRETTY_FUNCTION__, __LINE__,__VA_ARGS__)
+
+#define cd_critical(...)                                               \
+  cd_log_location(G_LOG_LEVEL_CRITICAL, __FILE__, __PRETTY_FUNCTION__, __LINE__,__VA_ARGS__)
+
+#define cd_warning(...)                                                \
+  cd_log_location(G_LOG_LEVEL_WARNING, __FILE__, __PRETTY_FUNCTION__, __LINE__,__VA_ARGS__)
+
+#define cd_message(...)                                                \
+  cd_log_location(G_LOG_LEVEL_MESSAGE, __FILE__, __PRETTY_FUNCTION__, __LINE__,__VA_ARGS__)
+
+#define cd_debug(...)                                                  \
+  cd_log_location(G_LOG_LEVEL_DEBUG, __FILE__, __PRETTY_FUNCTION__, __LINE__,__VA_ARGS__)
 
 #endif 	    /* !CAIRO_DOCK_LOG_H_ */

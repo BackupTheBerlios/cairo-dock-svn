@@ -22,6 +22,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-keyfile-manager.h"
 #include "cairo-dock-modules.h"
+#include "cairo-dock-log.h"
 
 #define CAIRO_DOCK_MODULE_PANEL_WIDTH 700
 #define CAIRO_DOCK_MODULE_PANEL_HEIGHT 450
@@ -47,7 +48,7 @@ void cairo_dock_initialize_module_manager (gchar *cModuleDirPath)
 		cairo_dock_preload_module_from_directory (cModuleDirPath, s_hModuleTable, &erreur);
 		if (erreur != NULL)
 		{
-			g_print ("Attention : %s\n  no module will be available\n", erreur->message);
+			cd_message ("Attention : %s\n  no module will be available\n", erreur->message);
 			g_error_free (erreur);
 		}
 	}
@@ -181,7 +182,7 @@ static void cairo_dock_close_module (CairoDockModule *module)
 	module->initModule = NULL;
 	module->stopModule = NULL;
 	module->reloadModule = NULL;
-	
+
 	g_free (module->cConfFilePath);
 	module->cConfFilePath = NULL;
 	g_free (module->cReadmeFilePath);
@@ -202,10 +203,10 @@ CairoDockModule * cairo_dock_load_module (gchar *cSoFilePath, GHashTable *pModul
 		g_set_error (erreur, 1, 1, "%s () : no such module", __func__);
 		return NULL;
 	}
-	
+
 	CairoDockModule *pCairoDockModule = g_new0 (CairoDockModule, 1);
 	pCairoDockModule->cSoFilePath = g_strdup (cSoFilePath);
-	
+
 	GError *tmp_erreur = NULL;
 	cairo_dock_open_module (pCairoDockModule, &tmp_erreur);
 	if (tmp_erreur != NULL)
@@ -213,11 +214,11 @@ CairoDockModule * cairo_dock_load_module (gchar *cSoFilePath, GHashTable *pModul
 		g_propagate_error (erreur, tmp_erreur);
 		return NULL;
 	}
-	
-	
+
+
 	if (pModuleTable != NULL && pCairoDockModule->initModule != NULL)
 		g_hash_table_insert (pModuleTable, pCairoDockModule->cModuleName, pCairoDockModule);
-	
+
 	return pCairoDockModule;
 }
 
@@ -232,7 +233,7 @@ void cairo_dock_preload_module_from_directory (gchar *cModuleDirPath, GHashTable
 		g_propagate_error (erreur, tmp_erreur);
 		return ;
 	}
-	
+
 	const gchar *cFileName;
 	gchar *cFilePath;
 	CairoDockModule *pModule;
@@ -241,14 +242,14 @@ void cairo_dock_preload_module_from_directory (gchar *cModuleDirPath, GHashTable
 		cFileName = g_dir_read_name (dir);
 		if (cFileName == NULL)
 			break ;
-		
+
 		cFilePath = g_strdup_printf ("%s/%s", cModuleDirPath, cFileName);
 		if (g_str_has_suffix (cFilePath, ".so"))
 		{
 			pModule = cairo_dock_load_module (cFilePath, pModuleTable, &tmp_erreur);
 			if (tmp_erreur != NULL)
 			{
-				g_print ("Attention : %s\n", tmp_erreur->message);
+				cd_message ("Attention : %s\n", tmp_erreur->message);
 				g_error_free (tmp_erreur);
 				tmp_erreur = NULL;
 			}
@@ -265,7 +266,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 {
 	if (cActiveModuleList == NULL)
 		return ;
-	
+
 	GError *erreur = NULL;
 	gchar *cModuleName;
 	CairoDockModule *pModule;
@@ -282,7 +283,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 				Icon *pIcon = cairo_dock_activate_module (pModule, pDock, &erreur);
 				if (erreur != NULL)
 				{
-					g_print ("Attention : %s\n", erreur->message);
+					cd_message ("Attention : %s\n", erreur->message);
 					g_error_free (erreur);
 					erreur = NULL;
 				}
@@ -318,19 +319,19 @@ static void _cairo_dock_add_one_module_name_if_active (gchar *cModuleName, Cairo
 }
 void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *pIconList)  // garde l'ordre des icones.
 {
-	g_print ("%s ()\n", __func__);
+	cd_message ("%s ()\n", __func__);
 	GError *erreur = NULL;
-	
+
 	//\___________________ On ouvre le fichier de conf.
 	GKeyFile *pKeyFile = g_key_file_new ();
 	g_key_file_load_from_file (pKeyFile, cConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		g_print ("Attention : %s\n", erreur->message);
+		cd_message ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
-	
+
 	//\___________________ On dresse la liste des modules actifs, en conservant leur ordre dans le dock.
 	GSList *pListeModule = NULL;
 	Icon *icon;
@@ -348,7 +349,7 @@ void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *p
 			break ;
 	}
 	g_hash_table_foreach (s_hModuleTable, (GHFunc) _cairo_dock_add_one_module_name_if_active, &pListeModule);  // on complete.
-	
+
 	//\___________________ On ecrit tout ca dans le fichier de conf.
 	GSList *pSList;
 	GString *cActiveModules = g_string_new ("");
@@ -356,10 +357,10 @@ void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *p
 	{
 		g_string_append_printf (cActiveModules, "%s;", (gchar *) pSList->data);
 	}
-	
+
 	g_key_file_set_string (pKeyFile, "Applets", "active modules", cActiveModules->str);
 	cairo_dock_write_keys_to_file (pKeyFile, cConfFile);
-	
+
 	g_slist_free (pListeModule);
 	g_string_free (cActiveModules, TRUE);
 	g_key_file_free (pKeyFile);
@@ -376,12 +377,12 @@ void cairo_dock_free_module (CairoDockModule *module)
 {
 	if (module == NULL)
 		return ;
-	g_print ("%s (%s)\n", __func__, module->cModuleName);
-	
+	cd_message ("%s (%s)\n", __func__, module->cModuleName);
+
 	cairo_dock_deactivate_module (module);
-	
+
 	cairo_dock_close_module (module);
-	
+
 	g_free (module->cModuleName);
 	g_free (module->cSoFilePath);
 	g_free (module);
@@ -394,13 +395,13 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 		g_set_error (erreur, 1, 1, "%s () : empty module !", __func__);
 		return NULL;
 	}
-	
+
 	if (module->bActive)
 	{
 		g_set_error (erreur, 1, 1, "%s () : module %s is already active !", __func__, module->cModuleName);
 		return NULL;
 	}
-	
+
 	GError *tmp_erreur = NULL;
 	if (module->pModule == NULL)  // normalement impossible.
 	{
@@ -411,14 +412,14 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 			return NULL;
 		}
 	}
-	
+
 	Icon *icon = module->initModule (pDock, module, &tmp_erreur);
 	if (tmp_erreur != NULL)
 	{
 		g_propagate_error (erreur, tmp_erreur);
 		return NULL;
 	}
-	
+
 	if (icon != NULL)
 	{
 		icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
@@ -444,39 +445,39 @@ void cairo_dock_deactivate_module (CairoDockModule *module)
 void cairo_dock_reload_module (CairoDockModule *module, CairoDock *pDock, gboolean bReloadAppletConf)
 {
 	GError *erreur = NULL;
-	
+
 	//\______________ On tente de recharger le module.
 	gboolean bModuleReloaded = FALSE;
 	if (module->bActive && module->reloadModule != NULL)
 	{
 		bModuleReloaded = module->reloadModule (bReloadAppletConf ? module->cConfFilePath : NULL);
 	}
-	
+
 	//\______________ Si cela n'a pas marche, on applique la sequence stop + init.
 	if (! bModuleReloaded && pDock != NULL)
 	{
 		//\______________ On recupere l'eventuelle icone du module.
 		Icon *pOldIcon = cairo_dock_find_icon_from_module (module, pDock->icons);
-		
+
 		//\______________ On desactive le module et on retire son eventuelle icone du dock.
 		cairo_dock_deactivate_module (module);
 		if (pOldIcon != NULL)
 		{
-			g_print ("  enlevement de l'ancienne icone (%.1f)\n", pOldIcon->fOrder);
+			cd_message ("  enlevement de l'ancienne icone (%.1f)\n", pOldIcon->fOrder);
 			pOldIcon->pModule = NULL;
 			cairo_dock_remove_icon_from_dock (pDock, pOldIcon);
 		}
-		
+
 		//\______________ On le reactive.
 		Icon *pNewIcon = cairo_dock_activate_module (module, pDock, &erreur);
 		if (erreur != NULL)
 		{
 			module->bActive = FALSE;
 			cairo_dock_update_conf_file_with_active_modules (g_cConfFile, pDock->icons);
-			g_print ("Attention : %s\n", erreur->message);
+			cd_message ("Attention : %s\n", erreur->message);
 			g_error_free (erreur);
 		}
-		
+
 		//\______________ On insere sa nouvelle eventuelle icone en reprenant quelques parametres de l'ancienne.
 		if (pNewIcon != NULL)
 		{
@@ -491,10 +492,10 @@ void cairo_dock_reload_module (CairoDockModule *module, CairoDock *pDock, gboole
 				pNewIcon->fWidthFactor = pOldIcon->fWidthFactor;
 				pNewIcon->fAlpha = pOldIcon->fAlpha;
 			}
-	
-			g_print ("pNewIcon->fOrder <- %.1f\n", pNewIcon->fOrder);
+
+			cd_message ("pNewIcon->fOrder <- %.1f\n", pNewIcon->fOrder);
 			cairo_dock_insert_icon_in_dock (pNewIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
-	
+
 			cairo_dock_redraw_my_icon (pNewIcon, pDock);
 		}
 		/**else if (pOldIcon != NULL)
@@ -504,7 +505,7 @@ void cairo_dock_reload_module (CairoDockModule *module, CairoDock *pDock, gboole
 		}*/
 		cairo_dock_free_icon (pOldIcon);
 	}
-	
+
 	if (bReloadAppletConf)
 		cairo_dock_update_dock_size (pDock);
 }
@@ -575,12 +576,12 @@ CairoDockModule *cairo_dock_find_module_from_name (gchar *cModuleName)
 detach ()
 {
 	create_desklet
-	
-	
+
+
 	detach_icon
-	
+
 	reload_module (conf=NULL, desklet, dock=NULL);
-	
+
 	insert_callback_icon_if_needed
 }
 */

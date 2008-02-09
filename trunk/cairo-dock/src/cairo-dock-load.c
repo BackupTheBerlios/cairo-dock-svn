@@ -1,6 +1,6 @@
 /******************************************************************************
 
-This file is a part of the cairo-dock program, 
+This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
 Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
@@ -28,6 +28,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-load.h"
+#include "cairo-dock-log.h"
 
 extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
@@ -104,11 +105,11 @@ cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFi
 	//g_print ("%s (%dx%d)\n", __func__, image_width, image_height);
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	cairo_surface_t *pNewSurface = NULL;
-	
+
 	if (cImageFile != NULL)
 	{
 		gchar *cImagePath = cairo_dock_generate_file_path (cImageFile);
-		
+
 		pNewSurface = cairo_dock_create_surface_from_image (cImagePath,
 			pSourceContext,
 			1.,
@@ -121,10 +122,10 @@ cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFi
 			fRotationAngle,
 			fAlpha,
 			bReapeatAsPattern);
-		
+
 		g_free (cImagePath);
 	}
-	
+
 	return pNewSurface;
 }
 
@@ -144,13 +145,13 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	icon->pReflectionBuffer = NULL;
 	cairo_surface_destroy (icon->pFullIconBuffer);
 	icon->pFullIconBuffer = NULL;
-	
+
 	if (CAIRO_DOCK_IS_LAUNCHER (icon) || (CAIRO_DOCK_IS_USER_SEPARATOR (icon) && icon->acFileName != NULL))
 	{
 		//\_______________________ On recherche une icone.
 		gchar *cIconPath = cairo_dock_search_icon_s_path (icon->acFileName);
 		//g_print (" -> %s\n", cIconPath);
-		
+
 		//\_______________________ On cree la surface cairo a afficher.
 		if (cIconPath != NULL && strlen (cIconPath) > 0)
 		{
@@ -174,15 +175,15 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 				w,
 				h,
 				w * 4);
-			g_print (" + (%dx%d)\n", w, h);
-			
+			cd_message (" + (%dx%d)\n", w, h);
+
 			cairo_t* pCairoContext = cairo_create (icon->pIconBuffer);
 			cairo_set_source_surface (pCairoContext, pSurface, 0.0, 0.0);
 			cairo_paint (pCairoContext);
 			cairo_destroy (pCairoContext);
 			cairo_surface_destroy (pSurface);*/
 		}
-		
+
 		g_free (cIconPath);
 	}
 	else if (CAIRO_DOCK_IS_VALID_APPLI (icon))  // c'est l'icône d'une appli valide.
@@ -197,7 +198,7 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	{
 		icon->pIconBuffer = cairo_dock_create_separator_surface (pSourceContext, fMaxScale, bHorizontalDock, &icon->fWidth, &icon->fHeight);
 	}
-	
+
 	if (icon->pIconBuffer == NULL)
 	{
 		gchar *cIconPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_DEFAULT_ICON_NAME);
@@ -215,8 +216,8 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 			FALSE);
 		g_free (cIconPath);
 	}
-	g_print ("%s () -> %.2fx%.2f\n", __func__, icon->fWidth, icon->fHeight);
-	
+	cd_message ("%s () -> %.2fx%.2f\n", __func__, icon->fWidth, icon->fHeight);
+
 	if (g_fAlbedo > 0 && icon->pIconBuffer != NULL && ! (CAIRO_DOCK_IS_APPLET (icon) && icon->acFileName == NULL))
 	{
 		icon->pReflectionBuffer = cairo_dock_create_reflection_surface (icon->pIconBuffer,
@@ -224,7 +225,7 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 			(bHorizontalDock ? icon->fWidth : icon->fHeight) * fMaxScale,
 			(bHorizontalDock ? icon->fHeight : icon->fWidth) * fMaxScale,
 			bHorizontalDock);
-		
+
 		icon->pFullIconBuffer = cairo_dock_create_icon_surface_with_reflection (icon->pIconBuffer,
 			icon->pReflectionBuffer,
 			pSourceContext,
@@ -241,7 +242,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 	icon->pTextBuffer = NULL;
 	if (icon->acName == NULL || (iLabelSize == 0))
 		return ;
-	
+
 	gchar *cTruncatedName = NULL;
 	if (CAIRO_DOCK_IS_APPLI (icon) && g_iAppliMaxNameLength > 0)
 	{
@@ -255,13 +256,13 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 			&erreur);  // inutile sur Ubuntu, qui est nativement UTF8, mais sur les autres on ne sait pas.
 		if (erreur != NULL)
 		{
-			g_print ("Attention : %s\n", erreur->message);
+			cd_message ("Attention : %s\n", erreur->message);
 			g_error_free (erreur);
 			erreur = NULL;
 		}
 		if (cUtf8Name == NULL)  // une erreur s'est produite, on tente avec la chaine brute.
 			cUtf8Name = g_strdup (icon->acName);
-		
+
 		const gchar *cEndValidChain = NULL;
 		if (g_utf8_validate (cUtf8Name, -1, &cEndValidChain))
 		{
@@ -269,7 +270,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 			{
 				cTruncatedName = g_new0 (gchar, 8 * (g_iAppliMaxNameLength + 4));  // 8 octets par caractere.
 				g_utf8_strncpy (cTruncatedName, cUtf8Name, g_iAppliMaxNameLength);
-				
+
 				gchar *cTruncature = g_utf8_offset_to_pointer (cTruncatedName, g_iAppliMaxNameLength);
 				*cTruncature = '.';
 				*(cTruncature+1) = '.';
@@ -282,7 +283,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 			{
 				cTruncatedName = g_new0 (gchar, g_iAppliMaxNameLength + 4);
 				strncpy (cTruncatedName, icon->acName, g_iAppliMaxNameLength);
-				
+
 				cTruncatedName[g_iAppliMaxNameLength] = '.';
 				cTruncatedName[g_iAppliMaxNameLength+1] = '.';
 				cTruncatedName[g_iAppliMaxNameLength+2] = '.';
@@ -291,11 +292,11 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 		g_free (cUtf8Name);
 		//g_print (" -> etiquette : %s\n", cTruncatedName);
 	}
-	
+
 	cairo_surface_t* pNewSurface = cairo_dock_create_surface_from_text ((cTruncatedName != NULL ? cTruncatedName : icon->acName), pSourceContext, iLabelSize, cLabelPolice, g_iLabelWeight, (g_bUseBackgroundForLabel ? g_fLabelBackgroundColor : NULL), 1., &icon->iTextWidth, &icon->iTextHeight, &icon->fTextXOffset, &icon->fTextYOffset);
 	g_free (cTruncatedName);
 	//g_print (" -> %s : (%.2f;%.2f) %dx%d\n", icon->acName, icon->fTextXOffset, icon->fTextYOffset, icon->iTextWidth, icon->iTextHeight);
-	
+
 	double fRotationAngle = (bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2));
 	cairo_surface_t *pNewSurfaceRotated = cairo_dock_rotate_surface (pNewSurface, pSourceContext, icon->iTextWidth, icon->iTextHeight, fRotationAngle);
 	if (pNewSurfaceRotated != NULL)
@@ -303,7 +304,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 		cairo_surface_destroy (pNewSurface);
 		pNewSurface = pNewSurfaceRotated;
 	}
-	
+
 	icon->pTextBuffer = pNewSurface;
 }
 
@@ -313,7 +314,7 @@ void cairo_dock_fill_one_quick_info_buffer (Icon *icon, cairo_t* pSourceContext,
 	icon->pQuickInfoBuffer = NULL;
 	if (icon->cQuickInfo == NULL)
 		return ;
-	
+
 	icon->pQuickInfoBuffer = cairo_dock_create_surface_from_text (icon->cQuickInfo, pSourceContext, iLabelSize, cLabelPolice, iLabelWeight, g_fLabelBackgroundColor, fMaxScale, &icon->iQuickInfoWidth, &icon->iQuickInfoHeight, &icon->fQuickInfoXOffset, &icon->fQuickInfoYOffset);
 }
 
@@ -322,9 +323,9 @@ void cairo_dock_fill_one_quick_info_buffer (Icon *icon, cairo_t* pSourceContext,
 void cairo_dock_fill_icon_buffers (Icon *icon, cairo_t *pSourceContext, double fMaxScale, gboolean bHorizontalDock, gboolean bApplySizeRestriction)
 {
 	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, fMaxScale, bHorizontalDock, bApplySizeRestriction);
-	
+
 	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : bHorizontalDock));
-	
+
 	cairo_dock_fill_one_quick_info_buffer (icon, pSourceContext, 12, g_cLabelPolice, PANGO_WEIGHT_HEAVY, fMaxScale);
 }
 
@@ -332,29 +333,29 @@ void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDock *pDock, Cairo
 {
 	g_return_if_fail (pIcon != NULL);
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock != NULL ? pDock : pDesklet);
-	
+
 	if (pDock != NULL)
 		cairo_dock_fill_icon_buffers (pIcon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
 	else
 		cairo_dock_fill_icon_buffers (pIcon, pCairoContext, 1, CAIRO_DOCK_HORIZONTAL, FALSE);
-	
+
 	cairo_destroy (pCairoContext);
 }
 
 void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpointer data)
 {
-	g_print ("%s (%s)\n", __func__, cDockName);
+	cd_message ("%s (%s)\n", __func__, cDockName);
 	if (pDock->iRefCount > 0)
 		pDock->bHorizontalDock = (g_bSameHorizontality ? g_pMainDock->bHorizontalDock : ! g_pMainDock->bHorizontalDock);
 	else
 		pDock->bHorizontalDock = g_pMainDock->bHorizontalDock;
-	
+
 	double fFlatDockWidth = - g_iIconGap;
 	pDock->iMaxIconHeight = 0;
-	
+
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
 	double fMaxScale = 1 + g_fAmplitude;
-	
+
 	Icon* icon;
 	GList* ic;
 	double fRatio = (pDock->iRefCount == 0 ? 1 : g_fSubDockSizeRatio);
@@ -365,7 +366,7 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 			cairo_dock_reload_module (icon->pModule, pDock, FALSE);
 		else
 			cairo_dock_fill_icon_buffers (icon, pCairoContext, fMaxScale, pDock->bHorizontalDock, TRUE);
-		
+
 		icon->fWidth *= fRatio;
 		icon->fHeight *= fRatio;
 		//g_print (" =size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
@@ -413,9 +414,9 @@ cairo_surface_t *cairo_dock_load_stripes (cairo_t* pSourceContext, int iStripesW
 			0.,
 			(g_fStripesAngle == 90) ? iStripesHeight : - iStripesHeight);
 	g_return_val_if_fail (cairo_pattern_status (pStripesPattern) == CAIRO_STATUS_SUCCESS, NULL);
-	
+
 	cairo_pattern_set_extend (pStripesPattern, CAIRO_EXTEND_REPEAT);
-	
+
 	if (g_iNbStripes > 0)
 	{
 		gdouble fStep;
@@ -457,7 +458,7 @@ cairo_surface_t *cairo_dock_load_stripes (cairo_t* pSourceContext, int iStripesW
 			g_fStripesColorBright[2],
 			g_fStripesColorBright[3]);
 	}
-	
+
 	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 		CAIRO_CONTENT_COLOR_ALPHA,
 		iStripesWidth,
@@ -465,10 +466,10 @@ cairo_surface_t *cairo_dock_load_stripes (cairo_t* pSourceContext, int iStripesW
 	cairo_t *pImageContext = cairo_create (pNewSurface);
 	cairo_set_source (pImageContext, pStripesPattern);
 	cairo_paint (pImageContext);
-	
+
 	cairo_pattern_destroy (pStripesPattern);
 	cairo_destroy (pImageContext);
-	
+
 	if (fRotationAngle != 0)
 	{
 		cairo_surface_t *pNewSurfaceRotated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
@@ -476,7 +477,7 @@ cairo_surface_t *cairo_dock_load_stripes (cairo_t* pSourceContext, int iStripesW
 			iStripesHeight,
 			iStripesWidth);
 		pImageContext = cairo_create (pNewSurfaceRotated);
-		
+
 		if (fRotationAngle < 0)
 		{
 			cairo_move_to (pImageContext, iStripesWidth, 0);
@@ -490,13 +491,13 @@ cairo_surface_t *cairo_dock_load_stripes (cairo_t* pSourceContext, int iStripesW
 			cairo_translate (pImageContext, 0, - iStripesHeight);
 		}
 		cairo_set_source_surface (pImageContext, pNewSurface, 0, 0);
-		
+
 		cairo_paint (pImageContext);
 		cairo_surface_destroy (pNewSurface);
 		cairo_destroy (pImageContext);
 		pNewSurface = pNewSurfaceRotated;
 	}
-	
+
 	return pNewSurface;
 }
 
@@ -507,7 +508,7 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 	//g_print ("%s (%dx%d)\n", __func__, iNewDecorationsWidth, iNewDecorationsHeight);
 	if (2 * iNewDecorationsWidth > g_fBackgroundImageWidth || iNewDecorationsHeight > g_fBackgroundImageHeight)
 	{
-		g_print ("  MaJ des decorations du fond\n");
+		cd_message ("  MaJ des decorations du fond\n");
 		cairo_surface_destroy (g_pBackgroundSurface[0]);
 		g_pBackgroundSurface[0] = NULL;
 		cairo_surface_destroy (g_pBackgroundSurface[1]);
@@ -517,7 +518,7 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 		cairo_surface_destroy (g_pBackgroundSurfaceFull[1]);
 		g_pBackgroundSurfaceFull[1] = NULL;
 		cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
-		
+
 		if (g_cBackgroundImageFile != NULL)
 		{
 			if (g_bBackgroundImageRepeat)
@@ -531,7 +532,7 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 					0,  // (pDock->bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)),
 					g_fBackgroundImageAlpha,
 					g_bBackgroundImageRepeat);
-				
+
 				g_pBackgroundSurfaceFull[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL], pCairoContext, g_fBackgroundImageWidth, g_fBackgroundImageHeight, (g_bDirectionUp ? -G_PI/2 : G_PI/2));
 			}
 			else if (g_fBackgroundImageWidth == 0 || g_fBackgroundImageHeight == 0)
@@ -545,7 +546,7 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 					0,  // (pDock->bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2)),
 					g_fBackgroundImageAlpha,
 					g_bBackgroundImageRepeat);
-				
+
 				g_pBackgroundSurface[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (g_pBackgroundSurface[CAIRO_DOCK_HORIZONTAL], pCairoContext, g_fBackgroundImageWidth, g_fBackgroundImageHeight, (g_bDirectionUp ? -G_PI/2 : G_PI/2));
 			}
 		}
@@ -554,10 +555,10 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 			g_fBackgroundImageWidth = 2 * iNewDecorationsWidth;
 			g_fBackgroundImageHeight = iNewDecorationsHeight;
 			g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL] = cairo_dock_load_stripes (pCairoContext, g_fBackgroundImageWidth, g_fBackgroundImageHeight, 0);  // (pDock->bHorizontalDock ? 0 : (g_bDirectionUp ? -G_PI/2 : G_PI/2))
-			
+
 			g_pBackgroundSurfaceFull[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL], pCairoContext, g_fBackgroundImageWidth, g_fBackgroundImageHeight, (g_bDirectionUp ? -G_PI/2 : G_PI/2));
 		}
-		
+
 		cairo_destroy (pCairoContext);
 	}
 }
@@ -573,7 +574,7 @@ void cairo_dock_load_background_decorations (CairoDock *pDock)
 {
 	int data[2] = {0, 0};
 	g_hash_table_foreach (g_hDocksTable, (GHFunc) _cairo_dock_search_max_decorations_size, &data);
-	
+
 	g_fBackgroundImageWidth = 0;
 	g_fBackgroundImageHeight = 0;
 	cairo_dock_update_background_decorations_if_necessary (pDock, data[0], data[1]);

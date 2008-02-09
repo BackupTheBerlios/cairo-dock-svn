@@ -12,6 +12,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 #include "cairo-dock-modules.h"
 #include "cairo-dock-gui-factory.h"
+#include "cairo-dock-log.h"
 
 #define CAIRO_DOCK_GUI_MARGIN 6
 #define CAIRO_DOCK_PREVIEW_WIDTH 250
@@ -141,7 +142,7 @@ static void _cairo_dock_configure (GtkButton *button, gpointer *data)
 		cairo_dock_configure_module (pDialog, pModule, g_pMainDock, &erreur);
 		if (erreur != NULL)
 		{
-			g_print ("Attention : %s\n", erreur->message);
+			cd_message ("Attention : %s\n", erreur->message);
 			g_error_free (erreur);
 		}
 	}
@@ -319,7 +320,7 @@ static void _cairo_dock_pick_a_file (GtkButton *button, gpointer *data)
 static void _cairo_dock_key_grab_cb (GtkWidget *wizard_window, GdkEventKey *event, GtkEntry *pEntry)
 {
 	gchar *key;
-	printf("key press event\n");
+	cd_message ("key press event\n");
 	if (gtk_accelerator_valid (event->keyval, event->state))
 	{
 		/* This lets us ignore all ignorable modifier keys, including
@@ -353,7 +354,7 @@ static void _cairo_dock_key_grab_clicked (GtkButton *button, gpointer *data)
 	GtkEntry *pEntry = data[0];
 	GtkWindow *pParentWindow = data[1];
 
-	printf("clicked\n");
+	cd_message ("clicked\n");
 	//set widget insensitive
 	gtk_widget_set_sensitive (GTK_WIDGET(pEntry), FALSE);
 	//  gtk_widget_set_sensitive (wizard_notebook, FALSE);
@@ -364,7 +365,7 @@ static void _cairo_dock_key_grab_clicked (GtkButton *button, gpointer *data)
 static void _cairo_dock_set_font (GtkFontButton *widget, GtkEntry *pEntry)
 {
 	const gchar *cFontName = gtk_font_button_get_font_name (GTK_FONT_BUTTON (widget));
-	g_print (" -> %s\n", cFontName);
+	cd_message (" -> %s\n", cFontName);
 	if (cFontName != NULL)
 		gtk_entry_set_text (pEntry, cFontName);
 }
@@ -605,15 +606,15 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					iNbElements = 1;
 				}
 				//g_print ("%d element(s)\n", iNbElements);
-				
+
 				while (*cUsefulComment == ' ')  // on saute les espaces.
 					cUsefulComment ++;
-				
+
 				if (*cUsefulComment == '[')
 				{
 					cUsefulComment ++;
 					cAuthorizedValuesChain = cUsefulComment;
-					
+
 					while (*cUsefulComment != '\0' && *cUsefulComment != ']')
 						cUsefulComment ++;
 					g_return_val_if_fail (*cUsefulComment != '\0', NULL);
@@ -640,7 +641,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					bIsAligned = TRUE;
 				}
 				//g_print ("cUsefulComment : %s\n", cUsefulComment);
-				
+
 				pTipString = strchr (cUsefulComment, '{');
 				if (pTipString != NULL)
 				{
@@ -648,14 +649,14 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						*(pTipString-1) ='\0';
 					else
 						*pTipString = '\0';
-					
+
 					pTipString ++;
-					
+
 					gchar *pTipEnd = strrchr (pTipString, '}');
 					if (pTipEnd != NULL)
 						*pTipEnd = '\0';
 				}
-				
+
 				pHBox = gtk_hbox_new (FALSE, CAIRO_DOCK_GUI_MARGIN);
 				if (pTipString != NULL)
 				{
@@ -669,7 +670,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 				}
 				else
 					pEventBox = NULL;
-				
+
 				if (*cUsefulComment != '\0' && strcmp (cUsefulComment, "...") != 0 && iElementType != 'F' && iElementType != 'X')
 				{
 					pLabel = gtk_label_new (dgettext (cGettextDomain, cUsefulComment));
@@ -681,13 +682,13 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						FALSE,
 						0);
 				}
-				
+
 				gtk_box_pack_start (pFrameVBox == NULL ? GTK_BOX (pVBox) : GTK_BOX (pFrameVBox),
 					(pEventBox != NULL ? pEventBox : pHBox),
 					FALSE,
 					FALSE,
 					0);
-				
+
 				if (bIsAligned)
 				{
 					pRightHBox = gtk_hbox_new (FALSE, CAIRO_DOCK_GUI_MARGIN);
@@ -698,22 +699,22 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						0);
 					pHBox = pRightHBox;
 				}
-				
+
 				pSubWidgetList = NULL;
-				
+
 				switch (iElementType)
 				{
 					case 'b' :  // boolean
 						//g_print ("  + boolean\n");
 						length = 0;
 						bValueList = g_key_file_get_boolean_list (pKeyFile, cGroupName, cKeyName, &length, NULL);
-						
+
 						for (k = 0; k < iNbElements; k ++)
 						{
 							bValue =  (k < length ? bValueList[k] : FALSE);
 							pOneWidget = gtk_check_button_new ();
 							gtk_toggle_button_set_active  (GTK_TOGGLE_BUTTON (pOneWidget), bValue);
-							
+
 							pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
 							gtk_box_pack_start (GTK_BOX (pHBox),
 								pOneWidget,
@@ -723,7 +724,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						}
 						g_free (bValueList);
 					break;
-					
+
 					case 'i' :  // integer
 					case 'I' :  // integer dans un HScale
 						//g_print ("  + integer\n");
@@ -753,7 +754,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						}
 						g_free (iValueList);
 						break;
-					
+
 					case 'f' :  // float.
 					case 'c' :  // float avec un bouton de choix de couleur.
 					case 'e' :  // float dans un HScale.
@@ -771,14 +772,14 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								fMaxValue = g_ascii_strtod (pAuthorizedValuesList[1], NULL);
 							else
 								fMaxValue = 9999;
-							
+
 							GtkObject *pAdjustment = gtk_adjustment_new (fValue,
 								0,
 								1,
 								(fMaxValue - fMinValue) / 20.,
 								(fMaxValue - fMinValue) / 10.,
 								0);
-							
+
 							if (iElementType == 'e')
 							{
 								pOneWidget = gtk_hscale_new (GTK_ADJUSTMENT (pAdjustment));
@@ -825,7 +826,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						}
 						g_free (fValueList);
 					break;
-					
+
 					case 's' :  // string
 					case 'S' :  // string avec un selecteur de fichier a cote du GtkEntry.
 					case 'D' :  // string avec un selecteur de repertoire a cote du GtkEntry.
@@ -865,7 +866,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (pOneWidget), rend, FALSE);
 									gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (pOneWidget), rend, "text", CAIRO_DOCK_MODEL_NAME, NULL);
 								}
-								
+
 								k = 0;
 								int iSelectedItem = -1;
 								if (iElementType == 'r')
@@ -878,7 +879,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									gtk_list_store_append (GTK_LIST_STORE (modele), &iter);
 									if (iSelectedItem == -1 && strcmp (cValue, pAuthorizedValuesList[k]) == 0)
 										iSelectedItem = (iElementType == 'R' || iElementType == 'M' ? k / 3 : k);
-										
+
 									if (cResult != NULL)
 									{
 										snprintf (cResult, 10, "%d", k);
@@ -889,7 +890,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 										CAIRO_DOCK_MODEL_DESCRIPTION_FILE, (iElementType == 'R' || iElementType == 'M' ? pAuthorizedValuesList[k+1] : NULL),
 										CAIRO_DOCK_MODEL_IMAGE,
 										(iElementType == 'R' || iElementType == 'M' ? pAuthorizedValuesList[k+2] : NULL), -1);
-										
+
 									if (iElementType == 'R' || iElementType == 'M')
 									{
 										k += 3;
@@ -900,7 +901,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									k ++;
 								}
 								g_free (cResult);
-								
+
 								if (iElementType == 'R' || iElementType == 'M')
 								{
 									pDescriptionLabel = gtk_label_new (NULL);
@@ -911,7 +912,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									data[1] = pPreviewImage;
 									g_signal_connect (G_OBJECT (pOneWidget), "changed", G_CALLBACK (_cairo_dock_select_one_item_in_combo), data);
 								}
-								
+
 								if (iElementType != 'E' && iSelectedItem == -1)
 									iSelectedItem = 0;
 								gtk_combo_box_set_active (GTK_COMBO_BOX (pOneWidget), iSelectedItem);
@@ -957,7 +958,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								FALSE,
 								FALSE,
 								0);
-								
+
 							pButtonUp = gtk_button_new_from_stock (GTK_STOCK_GO_UP);
 							g_signal_connect (G_OBJECT (pButtonUp),
 								"clicked",
@@ -968,7 +969,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								FALSE,
 								FALSE,
 								0);
-								
+
 							pButtonDown = gtk_button_new_from_stock (GTK_STOCK_GO_DOWN);
 							g_signal_connect (G_OBJECT (pButtonDown),
 								"clicked",
@@ -979,7 +980,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								FALSE,
 								FALSE,
 								0);
-								
+
 							if (iElementType == 'M')
 							{
 								_allocate_new_buffer;
@@ -996,7 +997,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									FALSE,
 									0);
 							}
-							
+
 							GtkTreeIter iter;
 							if (pAuthorizedValuesList != NULL)  //  && pAuthorizedValuesList[0] != NULL
 							{
@@ -1013,7 +1014,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 										}
 										k += (iElementType == 'R' || iElementType == 'M' ? 3 : 1);
 									}
-									
+
 									if (pAuthorizedValuesList[k] != NULL)  // c'etait bien une valeur autorisee.
 									{
 									memset (&iter, 0, sizeof (GtkTreeIter));
@@ -1039,7 +1040,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 											break;
 										}
 									}
-									
+
 									if (l == length)  // elle n'a pas encore ete inseree.
 									{
 										memset (&iter, 0, sizeof (GtkTreeIter));
@@ -1090,9 +1091,9 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									FALSE,
 									FALSE,
 									0);
-									
+
 								_allocate_new_buffer;
-								
+
 								pButtonAdd = gtk_button_new_from_stock (GTK_STOCK_ADD);
 								g_signal_connect (G_OBJECT (pButtonAdd),
 									"clicked",
@@ -1134,12 +1135,12 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									GTK_SHRINK,
 									0,
 									0);
-									
+
 								data[0] = pOneWidget;
 								data[1] = pEntry;
 							}
 						}
-						
+
 						if (iElementType == 'S' || iElementType == 'D')
 						{
 							if (pEntry != NULL)
@@ -1199,7 +1200,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						else if (iElementType == 'K' && pEntry != NULL)
 						{
 							GtkWidget *pGrabKeyButton = gtk_button_new_with_label(_("grab"));
-							
+
 							_allocate_new_buffer;
 							data[0] = pOneWidget;
 							data[1] = pDialog;
@@ -1209,7 +1210,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								"clicked",
 								G_CALLBACK (_cairo_dock_key_grab_clicked),
 								data);
-								
+
 							gtk_box_pack_start (GTK_BOX (pHBox),
 								pGrabKeyButton,
 								FALSE,
@@ -1234,13 +1235,13 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							else
 								cValue = pAuthorizedValuesList[0];
 							gchar *cFrameTitle;
-							
+
 							if (iElementType == 'F')
 							{
 								cFrameTitle = g_strdup_printf ("<b>%s</b>", dgettext (cGettextDomain, cValue));
 								pLabel= gtk_label_new (NULL);
 								gtk_label_set_markup (GTK_LABEL (pLabel), cFrameTitle);
-								
+
 								pFrame = gtk_frame_new (NULL);
 								gtk_container_set_border_width (GTK_CONTAINER (pFrame), CAIRO_DOCK_GUI_MARGIN);
 								gtk_frame_set_label_widget (GTK_FRAME (pFrame), pLabel);
@@ -1301,7 +1302,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					break;
 
 					default :
-						g_print ("Attention : this conf file seems to be incorrect !\n");
+						cd_message ("Attention : this conf file seems to be incorrect !\n");
 					break ;
 				}
 
@@ -1354,7 +1355,7 @@ GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, gch
 	gboolean read_ok = g_file_get_contents (cConfFilePath, &cConfiguration, NULL, NULL);
 	if (! read_ok)
 	{
-		g_print ("file %s does not exist or is not readble\n", cConfFilePath);
+		cd_message ("file %s does not exist or is not readble\n", cConfFilePath);
 		return NULL;
 	}
 

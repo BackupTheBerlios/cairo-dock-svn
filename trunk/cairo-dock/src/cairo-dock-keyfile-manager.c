@@ -1,6 +1,6 @@
 /******************************************************************************
 
-This file is a part of the cairo-dock program, 
+This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
 Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
@@ -10,34 +10,35 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <stdlib.h>
 
 #include "cairo-dock-keyfile-manager.h"
+#include "cairo-dock-log.h"
 
 
 void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file)
 {
-	g_print ("%s (%s)\n", __func__, conf_file);
+	cd_message ("%s (%s)\n", __func__, conf_file);
 	GError *erreur = NULL;
-	
+
 	gchar *cDirectory = g_path_get_dirname (conf_file);
 	if (! g_file_test (cDirectory, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_EXECUTABLE))
 	{
 		g_mkdir_with_parents (cDirectory, 7*8*8+7*8+5);
 	}
 	g_free (cDirectory);
-	
-	
+
+
 	gsize length;
 	gchar *new_conf_file = g_key_file_to_data (key_file, &length, &erreur);
 	if (erreur != NULL)
 	{
-		g_print ("Error while fetching data : %s\n", erreur->message);
+		cd_message ("Error while fetching data : %s\n", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
-	
+
 	g_file_set_contents (conf_file, new_conf_file, length, &erreur);
 	if (erreur != NULL)
 	{
-		g_print ("Error while writing data : %s\n", erreur->message);
+		cd_message ("Error while writing data : %s\n", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
@@ -47,11 +48,11 @@ void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file)
 void cairo_dock_flush_conf_file_full (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath, gboolean bUseFileKeys, gchar *cTemplateFileName)
 {
 	gchar *cTranslatedConfFilePath = g_strdup_printf ("%s/%s", cShareDataDirPath, cTemplateFileName);
-	g_print ("%s (%s)\n", __func__, cTranslatedConfFilePath);
-	
+	cd_message ("%s (%s)\n", __func__, cTranslatedConfFilePath);
+
 	if (! g_file_test (cTranslatedConfFilePath, G_FILE_TEST_EXISTS))
 	{
-		g_print ("Attention : couldn't find any installed conf file\n");
+		cd_message ("Attention : couldn't find any installed conf file\n");
 	}
 	else
 	{
@@ -59,7 +60,7 @@ void cairo_dock_flush_conf_file_full (GKeyFile *pKeyFile, gchar *cConfFilePath, 
 		system (cCommand);
 		g_free (cCommand);
 		g_free (cTranslatedConfFilePath);
-		
+
 		cairo_dock_replace_values_in_conf_file (cConfFilePath, pKeyFile, bUseFileKeys, 0);
 	}
 }
@@ -79,37 +80,37 @@ void cairo_dock_replace_comments (GKeyFile *pOriginalKeyFile, GKeyFile *pReplace
 	gchar **pGroupList = g_key_file_get_groups (pReplacementKeyFile, &length);
 	gchar *cGroupName, *cKeyName, *cKeyComment;
 	int i, j;
-	
+
 	cKeyComment =  g_key_file_get_comment (pReplacementKeyFile, NULL, NULL, NULL);
 	if (cKeyComment != NULL && *cKeyComment != '\0')
 	{
 		g_key_file_set_comment (pOriginalKeyFile, NULL, NULL, cKeyComment, &erreur);
 		if (erreur != NULL)
 		{
-			g_print ("Attention : %s\n", erreur->message);
+			cd_message ("Attention : %s\n", erreur->message);
 			g_error_free (erreur);
 			erreur = NULL;
 		}
 	}
 	g_free (cKeyComment);
-	
+
 	i = 0;
 	while (pGroupList[i] != NULL)
 	{
 		cGroupName = pGroupList[i];
-		
+
 		length = 0;
 		pKeyList = g_key_file_get_keys (pReplacementKeyFile, cGroupName, NULL, NULL);
-		
+
 		j = 0;
 		while (pKeyList[j] != NULL)
 		{
 			cKeyName = pKeyList[j];
-			
+
 			cKeyComment =  g_key_file_get_comment (pReplacementKeyFile, cGroupName, cKeyName, &erreur);
 			if (erreur != NULL)
 			{
-				g_print ("Attention : %s\n", erreur->message);
+				cd_message ("Attention : %s\n", erreur->message);
 				g_error_free (erreur);
 				erreur = NULL;
 			}
@@ -120,7 +121,7 @@ void cairo_dock_replace_comments (GKeyFile *pOriginalKeyFile, GKeyFile *pReplace
 				g_key_file_set_comment (pOriginalKeyFile, cGroupName, cKeyName, cKeyComment, &erreur);
 				if (erreur != NULL)
 				{
-					g_print ("Attention : %s\n", erreur->message);
+					cd_message ("Attention : %s\n", erreur->message);
 					g_error_free (erreur);
 					erreur = NULL;
 				}
@@ -135,31 +136,31 @@ void cairo_dock_replace_comments (GKeyFile *pOriginalKeyFile, GKeyFile *pReplace
 
 void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile, gboolean bUseOriginalKeys, gchar iIdentifier)
 {
-	g_print ("%s (%d)\n", __func__, iIdentifier);
+	cd_message ("%s (%d)\n", __func__, iIdentifier);
 	GError *erreur = NULL;
 	gsize length = 0;
 	gchar **pKeyList;
 	gchar **pGroupList = g_key_file_get_groups ((bUseOriginalKeys ? pOriginalKeyFile : pReplacementKeyFile), &length);
 	gchar *cGroupName, *cKeyName, *cKeyValue, *cComment;
 	int i, j;
-	
+
 	i = 0;
 	while (pGroupList[i] != NULL)
 	{
 		cGroupName = pGroupList[i];
-		
+
 		length = 0;
 		pKeyList = g_key_file_get_keys ((bUseOriginalKeys ? pOriginalKeyFile : pReplacementKeyFile), cGroupName, NULL, NULL);
-		
+
 		j = 0;
 		while (pKeyList[j] != NULL)
 		{
 			cKeyName = pKeyList[j];
-			
+
 			if (iIdentifier != 0)
 			{
 				cComment = g_key_file_get_comment (pReplacementKeyFile, cGroupName, cKeyName, NULL);
-				
+
 				if (cComment == NULL || strlen (cComment) < 2 || cComment[1] != iIdentifier)
 				{
 					//g_print ("  on saute %s;%s (%s)\n", cGroupName, cKeyName, cComment);
@@ -169,11 +170,11 @@ void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pRepla
 				}
 				g_free (cComment);
 			}
-			
+
 			cKeyValue =  g_key_file_get_string (pReplacementKeyFile, cGroupName, cKeyName, &erreur);
 			if (erreur != NULL)
 			{
-				g_print ("Attention : %s\n", erreur->message);
+				cd_message ("Attention : %s\n", erreur->message);
 				g_error_free (erreur);
 				erreur = NULL;
 			}
@@ -186,7 +187,7 @@ void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pRepla
 			g_free (cKeyValue);
 			j ++;
 		}
-		
+
 		g_strfreev (pKeyList);
 		i ++;
 	}
@@ -218,17 +219,17 @@ void _cairo_dock_extract_sorted_table_content (gchar *cName, gpointer value, GLi
 gchar *cairo_dock_write_table_content (GHashTable *pHashTable, GHFunc pWritingFunc, gboolean bSortByKey, gboolean bAddEmptyEntry)
 {
 	GString *pString = g_string_new ("");
-	
+
 	if (bAddEmptyEntry)
 		pWritingFunc ("", NULL, pString);
-	
+
 	if (! bSortByKey)
 		g_hash_table_foreach (pHashTable, pWritingFunc, pString);
 	else
 	{
 		GList *pList = NULL;
 		g_hash_table_foreach (pHashTable, (GHFunc) _cairo_dock_extract_sorted_table_content, &pList);
-		
+
 		GList *ic;
 		gpointer *data;
 		for (ic = pList; ic != NULL; ic = ic->next)
@@ -241,7 +242,7 @@ gchar *cairo_dock_write_table_content (GHashTable *pHashTable, GHFunc pWritingFu
 	}
 	if (pString->len > 0 && pString->str[pString->len-1] == ';')  // peut etre faux si aucune valeur n'a ete ecrite.
 		pString->str[pString->len-1] = '\0';
-	
+
 	gchar *cContent = pString->str;
 	g_string_free (pString, FALSE);
 	return cContent;
@@ -273,29 +274,29 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 {
 	//g_print ("%s (%s)\n", __func__, cConfFile);
 	GError *erreur = NULL;
-	
+
 	//\___________________ On ouvre le fichier de conf.
 	GKeyFile *pKeyFile = g_key_file_new ();
-	
+
 	g_key_file_load_from_file (pKeyFile, cConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		g_print ("Attention : %s\n", erreur->message);
+		cd_message ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
-	
+
 	gchar *cUsefullComment;
 	gchar *cOldComment = g_key_file_get_comment (pKeyFile, cGroupName, cKeyName, &erreur);
 	if (erreur != NULL)
 	{
-		g_print ("Attention : %s\n", erreur->message);
+		cd_message ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
 	g_return_if_fail (cOldComment != NULL);
 	cOldComment[strlen (cOldComment) - 1] = '\0';
-	
+
 	gchar *cPrefix= cOldComment;
 	while (*cPrefix == ' ')
 		cPrefix ++;
@@ -308,7 +309,7 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 	{
 		cPrefix = g_strdup ("s99[");  // par defaut.
 	}
-	
+
 	//\___________________ On recupere le commentaire explicatif.
 	if (cNewUsefullComment == NULL)
 	{
@@ -331,7 +332,7 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 		cUsefullComment = g_strdup (cNewUsefullComment);
 	}
 	g_free (cOldComment);
-	
+
 	//\___________________ On ecrit la liste des possibilites.
 	GString *sComment = g_string_new (cPrefix);
 	g_free (cPrefix);
@@ -344,12 +345,12 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 	g_key_file_set_comment (pKeyFile, cGroupName, cKeyName, sComment->str, &erreur);
 	if (erreur != NULL)
 	{
-		g_print ("Attention : %s\n", erreur->message);
+		cd_message ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
 	g_string_free (sComment, TRUE);
-	
+
 	cairo_dock_write_keys_to_file (pKeyFile, cConfFile);
 	g_key_file_free (pKeyFile);
 	g_free (cUsefullComment);
@@ -358,30 +359,30 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 void cairo_dock_apply_translation_on_conf_file (gchar *cConfFilePath, gchar *cTranslatedConfFilePath)
 {
 	GError *erreur = NULL;
-	
+
 	GKeyFile *pConfKeyFile = g_key_file_new ();
 	g_key_file_load_from_file (pConfKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		g_print ("Attention : %s\n", erreur->message);
+		cd_message ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
-	
+
 	GKeyFile *pTranslatedKeyFile = g_key_file_new ();
 	g_key_file_load_from_file (pTranslatedKeyFile, cTranslatedConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		g_print ("Attention : %s\n", erreur->message);
+		cd_message ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		g_key_file_free (pConfKeyFile);
 		return ;
 	}
-	
+
 	cairo_dock_replace_comments (pConfKeyFile, pTranslatedKeyFile);
-	
+
 	cairo_dock_write_keys_to_file (pConfKeyFile, cConfFilePath);
-	
+
 	g_key_file_free (pConfKeyFile);
 	g_key_file_free (pTranslatedKeyFile);
 }
@@ -389,20 +390,20 @@ void cairo_dock_apply_translation_on_conf_file (gchar *cConfFilePath, gchar *cTr
 void cairo_dock_replace_values_in_conf_file (gchar *cConfFilePath, GKeyFile *pValidKeyFile, gboolean bUseFileKeys, gchar iIdentifier)
 {
 	GKeyFile *pConfKeyFile = g_key_file_new ();
-	
+
 	GError *erreur = NULL;
 	g_key_file_load_from_file (pConfKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		g_print ("Attention : %s\n", erreur->message);
+		cd_message ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
-	
+
 	cairo_dock_replace_key_values (pConfKeyFile, pValidKeyFile, bUseFileKeys, iIdentifier);
-	
+
 	cairo_dock_write_keys_to_file (pConfKeyFile, cConfFilePath);
-	
+
 	g_key_file_free (pConfKeyFile);
 }
 
@@ -414,13 +415,13 @@ void cairo_dock_replace_keys_by_identifier (gchar *cConfFilePath, gchar *cReplac
 	g_key_file_load_from_file (pReplacementKeyFile, cReplacementConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		g_print ("Attention : %s\n", erreur->message);
+		cd_message ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
-	
+
 	cairo_dock_replace_values_in_conf_file (cConfFilePath, pReplacementKeyFile, TRUE, iIdentifier);
-	
+
 	g_key_file_free (pReplacementKeyFile);
 }
 
@@ -429,7 +430,7 @@ void cairo_dock_replace_keys_by_identifier (gchar *cConfFilePath, gchar *cReplac
 void cairo_dock_get_conf_file_version (GKeyFile *pKeyFile, gchar **cConfFileVersion)
 {
 	*cConfFileVersion = NULL;
-	
+
 	gchar *cFirstComment =  g_key_file_get_comment (pKeyFile, NULL, NULL, NULL);
 	if (cFirstComment != NULL && *cFirstComment == '!')
 	{
@@ -461,13 +462,13 @@ gboolean cairo_dock_conf_file_needs_update (GKeyFile *pKeyFile, gchar *cVersion)
 {
 	gchar *cPreviousVersion = NULL;
 	cairo_dock_get_conf_file_version (pKeyFile, &cPreviousVersion);
-	
+
 	gboolean bNeedsUpdate;
 	if (cPreviousVersion == NULL || strcmp (cPreviousVersion, cVersion) != 0)
 		bNeedsUpdate = TRUE;
 	else
 		bNeedsUpdate = FALSE;
-	
+
 	g_free (cPreviousVersion);
 	return bNeedsUpdate;
 }

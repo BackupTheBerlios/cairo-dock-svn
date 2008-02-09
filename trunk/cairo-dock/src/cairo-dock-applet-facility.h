@@ -237,12 +237,12 @@ void stop (void) \
 #define CD_APPLET_RELOAD_BEGIN \
 gboolean reload (gchar *cConfFilePath) \
 {\
-	g_print ("%s (%s, %d)\n", __func__, cConfFilePath, (cConfFilePath != NULL)); \
+	cd_message ("%s (%s, %d)\n", __func__, cConfFilePath, (cConfFilePath != NULL)); \
 	CairoDockMinimalAppletConfig *pMinimalConfig  = NULL;\
 	gboolean bToBeInserted = FALSE;\
 	if (cConfFilePath != NULL)\
 	{\
-		g_print ("On recharge notre config\n");\
+		cd_message ("On recharge notre config\n");\
 		gchar *cAppletName = NULL, *cIconName = NULL;\
 		pMinimalConfig = read_conf_file (cConfFilePath);\
 		g_free (myIcon->acName);\
@@ -319,14 +319,14 @@ gboolean reload (gchar *cConfFilePath) \
 #define CD_APPLET_CONFIG_BEGIN(cDefaultAppletName, cDefaultIconName) \
 CairoDockMinimalAppletConfig *read_conf_file (gchar *cConfFilePath) \
 { \
-	g_print ("%s (%s)\n", __func__, cConfFilePath); \
+	cd_message ("%s (%s)\n", __func__, cConfFilePath); \
 	GError *erreur = NULL; \
 	gboolean bFlushConfFileNeeded = FALSE, bNewKeysPresent = FALSE; \
 	GKeyFile *pKeyFile = g_key_file_new (); \
 	g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur); \
 	if (erreur != NULL) \
 	{ \
-		g_print ("Attention : %s\n", erreur->message); \
+		cd_message ("Attention : %s\n", erreur->message); \
 		g_error_free (erreur); \
 		return NULL; \
 	} \

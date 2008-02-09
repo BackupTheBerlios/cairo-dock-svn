@@ -4,6 +4,9 @@
 ** Started on  Sat Feb  9 15:54:57 2008 Cedric GESTES
 ** $Id$
 **
+** Author(s)
+**  - Cedric GESTES
+**
 ** Copyright (C) 2008 Cedric GESTES
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,9 +34,20 @@
 
 static GLogLevelFlags gLogLevel = 0;
 
-void cd_log_location(const char *file, const char *func, const int line)
+void cd_log_location(const GLogLevelFlags loglevel,
+                     const char *file,
+                     const char *func,
+                     const int line,
+                     const char *format,
+                     ...)
 {
-  printf("%s:%s:%d", file, func, line);
+  va_list args;
+  if (loglevel > gLogLevel)
+    return;
+  g_print("(%s:%s:%d) ", file, func, line);
+  va_start(args, format);
+  g_logv(G_LOG_DOMAIN, loglevel, format, args);
+  va_end(args);
 }
 
 const char*_cd_log_level_to_string(const GLogLevelFlags loglevel)
@@ -61,8 +75,9 @@ static void cairo_dock_log_handler(const gchar *log_domain,
                                    const gchar *message,
                                    gpointer user_data)
 {
-  if (log_level < gLogLevel)
-    printf("%s%s", _cd_log_level_to_string(log_level), message);
+  if (log_level > gLogLevel)
+    return;
+  g_print("%s%s", _cd_log_level_to_string(log_level), message);
 }
 
 void cd_log_init()

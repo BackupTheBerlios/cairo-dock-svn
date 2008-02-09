@@ -1,6 +1,6 @@
 /******************************************************************************
 
-This file is a part of the cairo-dock program, 
+This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
 Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
@@ -25,6 +25,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-dialogs.h"
 #include "cairo-dock-applications-manager.h"
 #include "cairo-dock-animations.h"
+#include "cairo-dock-log.h"
 
 extern double g_fScrollAcceleration;
 extern gboolean g_bResetScrollOnLeave;
@@ -108,7 +109,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 				pDock->iWindowPositionX,
 				iNewHeight,
 				iNewWidth);
-		
+
 		if (g_bAutoHide && pDock->iRefCount == 0)
 		{
 			//g_print ("on arrete les animations\n");
@@ -123,15 +124,15 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 				pRemovingIcon->fPersonnalScale = 0.001;
 			}
 			pDock->iScrollOffset = 0;
-			
+
 			pDock->calculate_max_dock_size (pDock);
 			pDock->fFoldingFactor = g_fUnfoldAcceleration;
-			
+
 			cairo_dock_allow_entrance ();
 		}
-		
+
 		gtk_widget_queue_draw (pDock->pWidget);
-		
+
 		return FALSE;
 	}
 }
@@ -140,18 +141,18 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 gfloat cairo_dock_calculate_magnitude (gint iMagnitudeIndex)  // merci a Robrob pour le patch !
 {
 	gfloat tmp= ((gfloat)iMagnitudeIndex)/CAIRO_DOCK_NB_MAX_ITERATIONS;
-	
+
 	if (tmp>0.5f)
 		tmp=1.0f-(1.0f-tmp)*(1.0f-tmp)*(1.0f-tmp)*4.0f;
 	else
 		tmp=tmp*tmp*tmp*4.0f;
-	
+
 	if (tmp<0.0f)
 		tmp=0.0f;
-	
+
 	if (tmp>1.0f)
 		tmp=1.0f;
-	
+
 	return  tmp;
 }
 
@@ -160,23 +161,23 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 	//g_print ("%s (%d ; %f ; %d)\n", __func__, pDock->iMagnitudeIndex, pDock->fFoldingFactor, pDock->bInside);
 	if (pDock->iSidShrinkDown != 0)
 		return TRUE;  // on se met en attente de fin d'animation.
-	
+
 	pDock->iMagnitudeIndex += g_iGrowUpInterval;
 	if (pDock->iMagnitudeIndex > CAIRO_DOCK_NB_MAX_ITERATIONS)
 		pDock->iMagnitudeIndex = CAIRO_DOCK_NB_MAX_ITERATIONS;
-	
+
 	pDock->fFoldingFactor *= sqrt (pDock->fFoldingFactor);
 	if (pDock->fFoldingFactor < 0.03)
 		pDock->fFoldingFactor = 0;
-	
+
 	if (pDock->bHorizontalDock)
 		gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
 	else
 		gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);
-	
+
 	pDock->calculate_icons (pDock);
 	gtk_widget_queue_draw (pDock->pWidget);
-	
+
 	if (pDock->iMagnitudeIndex == CAIRO_DOCK_NB_MAX_ITERATIONS && pDock->fFoldingFactor == 0)
 	{
 		pDock->iMagnitudeIndex = CAIRO_DOCK_NB_MAX_ITERATIONS;
@@ -207,12 +208,12 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 	}
 	pDock->fDecorationsOffsetX *= .8;
 	//g_print ("fDecorationsOffsetX <- %.2f\n", pDock->fDecorationsOffsetX);
-	
+
 	if (pDock->bHorizontalDock)  // ce n'est pas le motion_notify qui va nous donner des coordonnees en dehors du dock, et donc le fait d'etre dedans va nous faire interrompre le shrink_down et re-grossir, du coup il faut le faire ici. L'inconvenient, c'est que quand on sort par les cotes, il n'y a soudain plus d'icone pointee, et donc le dock devient tout plat subitement au lieu de le faire doucement. Heureusement j'ai trouve une astuce. ^_^
 		gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
 	else
 		gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);
-	
+
 	if (pDock->iScrollOffset != 0 && g_bResetScrollOnLeave)
 	{
 		//g_print ("iScrollOffset : %d\n", pDock->iScrollOffset);
@@ -231,18 +232,18 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 		}
 		pDock->calculate_max_dock_size (pDock);
 	}
-	
+
 	pDock->calculate_icons (pDock);
 	gtk_widget_queue_draw (pDock->pWidget);
-	
+
 	if (! pDock->bInside)
 		cairo_dock_replace_all_dialogs ();
-	
+
 	if (pDock->iMagnitudeIndex == 0)
 	{
 		Icon *pBouncingIcon = cairo_dock_get_bouncing_icon (pDock->icons);
 		Icon *pRemovingIcon = cairo_dock_get_removing_or_inserting_icon (pDock->icons);
-		
+
 		if (pBouncingIcon == NULL && pRemovingIcon == NULL && (! g_bResetScrollOnLeave || pDock->iScrollOffset == 0))  // plus aucune animation en cours.
 		{
 			if (! (g_bAutoHide && pDock->iRefCount == 0) && ! pDock->bInside)
@@ -262,7 +263,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 						iNewHeight,
 						iNewWidth);
 			}
-			
+
 			pDock->calculate_icons (pDock);  // relance le grossissement si on est dedans.
 			if (! pDock->bInside && pDock->iRefCount > 0)
 			{
@@ -270,29 +271,29 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 				gtk_widget_hide (pDock->pWidget);
 				cairo_dock_hide_parent_dock (pDock);
 			}
-			
+
 			pDock->iSidShrinkDown = 0;
 			return FALSE;
 		}
-		
+
 		//\______________ Au moins une icone est en cours d'animation suite a un clique, on continue le 'shrink_down'.
 		if (pRemovingIcon != NULL)
 		{
-			g_print ("au moins 1 icone en cours d'insertion/suppression (%f)\n", pRemovingIcon->fPersonnalScale);
+			cd_message ("au moins 1 icone en cours d'insertion/suppression (%f)\n", pRemovingIcon->fPersonnalScale);
 			if (pRemovingIcon->fPersonnalScale == 0.05)
 			{
-				g_print ("  fin\n");
+				cd_message ("  fin\n");
 				cairo_dock_remove_icon_from_dock (pDock, pRemovingIcon);
-				
+
 				if (CAIRO_DOCK_IS_APPLI (pRemovingIcon) && pRemovingIcon->cClass != NULL && pDock == cairo_dock_search_dock_from_name (pRemovingIcon->cClass) && pDock->icons == NULL)  // il n'y a plus aucune icone de cette classe.
 				{
-					g_print ("le sous-dock de la classe %s n'a plus d'element et sera detruit\n", pRemovingIcon->cClass);
+					cd_message ("le sous-dock de la classe %s n'a plus d'element et sera detruit\n", pRemovingIcon->cClass);
 					cairo_dock_destroy_dock (pDock, pRemovingIcon->cClass, NULL, NULL);
 				}
 				else
 				{
 					cairo_dock_update_dock_size (pDock);
-					g_print ("destruction de %s\n", pRemovingIcon->acName);
+					cd_message ("destruction de %s\n", pRemovingIcon->acName);
 					cairo_dock_free_icon (pRemovingIcon);
 				}
 			}
@@ -302,7 +303,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 				pRemovingIcon->fPersonnalScale = 0;
 			}
 		}
-		
+
 		return TRUE;
 	}
 	else
@@ -311,7 +312,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 
 
 /**
-*Arme l'animation d'une icone 
+*Arme l'animation d'une icone
 *@param icon l'icone dont on veut preparer l'animation.
 *@param iAnimationType le type d'animation voulu, ou -1 pour utiliser l'animtion correspondante au type de l'icone.
 *@param iNbRounds le nombre de fois ou l'animation sera jouee, ou -1 pour utiliser la valeur correspondante au type de l'icone.
@@ -323,11 +324,11 @@ void cairo_dock_arm_animation (Icon *icon, CairoDockAnimationType iAnimationType
 		icon->iAnimationType = g_tAnimationType[iType];
 	else
 		icon->iAnimationType = iAnimationType;
-	
+
 	if (icon->iAnimationType == CAIRO_DOCK_RANDOM)
 		icon->iAnimationType = g_random_int_range (0, CAIRO_DOCK_NB_ANIMATIONS-1);  // [a;b[
-	
-	
+
+
 	if (iNbRounds == -1)
 		iNbRounds = g_tNbAnimationRounds[iType];
 	icon->iCount = MAX (0, g_tNbIterInOneRound[icon->iAnimationType] * iNbRounds - 1);
@@ -340,7 +341,7 @@ void cairo_dock_arm_animation (Icon *icon, CairoDockAnimationType iAnimationType
 */
 void cairo_dock_start_animation (Icon *icon, CairoDock *pDock)
 {
-	g_print ("%s (%s, %d)\n", __func__, icon->acName, icon->iAnimationType);
+	cd_message ("%s (%s, %d)\n", __func__, icon->acName, icon->iAnimationType);
 	if ((icon->iCount > 0 && icon->iAnimationType < CAIRO_DOCK_RANDOM) || icon->fPersonnalScale != 0)
 	{
 		if (pDock->iSidGrowUp != 0)

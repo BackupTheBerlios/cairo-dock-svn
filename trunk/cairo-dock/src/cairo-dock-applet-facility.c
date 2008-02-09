@@ -1,6 +1,6 @@
 /******************************************************************************
 
-This file is a part of the cairo-dock program, 
+This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
 Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
@@ -21,6 +21,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-keyfile-manager.h"
 #include "cairo-dock-applet-factory.h"
 #include "cairo-dock-applet-facility.h"
+#include "cairo-dock-log.h"
 
 extern gchar *g_cCurrentThemePath;
 
@@ -33,17 +34,17 @@ gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShare
 {
 	if (cConfFileName == NULL)
 		return NULL;
-	
+
 	gchar *cUserDataDirPath = g_strdup_printf ("%s/plug-ins/%s", g_cCurrentThemePath, cUserDataDirName);
 	if (! g_file_test (cUserDataDirPath, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
 	{
-		g_print ("directory %s doesn't exist, it will be added.\n", cUserDataDirPath);
-		
+		cd_message ("directory %s doesn't exist, it will be added.\n", cUserDataDirPath);
+
 		gchar *command = g_strdup_printf ("mkdir -p %s", cUserDataDirPath);
 		system (command);
 		g_free (command);
 	}
-	
+
 	gchar *cConfFilePath = g_strdup_printf ("%s/%s", cUserDataDirPath, cConfFileName);
 	if (! g_file_test (cConfFilePath, G_FILE_TEST_EXISTS))
 	{
@@ -51,15 +52,15 @@ gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShare
 		system (command);
 		g_free (command);
 	}
-	
+
 	if (! g_file_test (cConfFilePath, G_FILE_TEST_EXISTS))  // la copie ne s'est pas bien passee.
 	{
-		g_print ("Attention : couldn't copy %s/%s in %s; check permissions and file's existence\n", cShareDataDir, cConfFileName, cUserDataDirPath);
+		cd_message ("Attention : couldn't copy %s/%s in %s; check permissions and file's existence\n", cShareDataDir, cConfFileName, cUserDataDirPath);
 		g_free (cUserDataDirPath);
 		g_free (cConfFilePath);
 		return NULL;
 	}
-	
+
 	g_free (cUserDataDirPath);
 	return cConfFilePath;
 }
@@ -77,13 +78,13 @@ void cairo_dock_free_minimal_config (CairoDockMinimalAppletConfig *pMinimalConfi
 void cairo_dock_set_icon_surface (cairo_t *pIconContext, cairo_surface_t *pSurface)  // fonction proposee par Necropotame.
 {
 	g_return_if_fail (cairo_status (pIconContext) == CAIRO_STATUS_SUCCESS);
-	
+
 	//\________________ On efface l'ancienne image.
 	cairo_set_source_rgba (pIconContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pIconContext, CAIRO_OPERATOR_SOURCE);
 	cairo_paint (pIconContext);
 	cairo_set_operator (pIconContext, CAIRO_OPERATOR_OVER);
-	
+
 	//\________________ On applique la nouvelle image.
 	if (pSurface != NULL)
 	{
@@ -109,7 +110,7 @@ void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, Cair
 		(pDock->bHorizontalDock ? pIcon->fWidth : pIcon->fHeight) * (1 + g_fAmplitude),
 		(pDock->bHorizontalDock ? pIcon->fHeight : pIcon->fWidth) * (1 + g_fAmplitude),
 		pDock->bHorizontalDock);
-	
+
 	if (pIcon->pFullIconBuffer != NULL)
 	{
 		cairo_surface_destroy (pIcon->pFullIconBuffer);
@@ -126,7 +127,7 @@ void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, Cair
 void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoDock *pDock)
 {
 	cairo_dock_set_icon_surface (pIconContext, pSurface);
-	
+
 	cairo_dock_add_reflection_to_icon (pIconContext, pIcon, pDock);
 }
 
@@ -136,9 +137,9 @@ void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Ico
 		pIconContext,
 		pIcon->fWidth * (1 + g_fAmplitude),
 		pIcon->fHeight * (1 + g_fAmplitude));
-	
+
 	cairo_dock_set_icon_surface_with_reflect (pIconContext, pImageSurface, pIcon, pDock);
-	
+
 	cairo_surface_destroy (pImageSurface);
 }
 
@@ -146,10 +147,10 @@ void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Ico
 void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, Icon *pIcon, CairoDock *pDock)  // fonction proposee par Necropotame.
 {
 	g_return_if_fail (pIcon != NULL && pDock != NULL);  // le contexte sera verifie plus loin.
-	
+
 	g_free (pIcon->acName);
 	pIcon->acName = g_strdup (cIconName);
-	
+
 	cairo_dock_fill_one_text_buffer(
 		pIcon,
 		pSourceContext,
@@ -161,11 +162,11 @@ void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, 
 void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo, Icon *pIcon, double fMaxScale)
 {
 	g_return_if_fail (pIcon != NULL);  // le contexte sera verifie plus loin.
-	
+
 	g_free (pIcon->cQuickInfo);
 	pIcon->cQuickInfo = g_strdup (cQuickInfo);
-	g_print ("cQuickInfo <- %s\n", pIcon->cQuickInfo);
-	
+	cd_message ("cQuickInfo <- %s\n", pIcon->cQuickInfo);
+
 	cairo_dock_fill_one_quick_info_buffer (pIcon,
 		pSourceContext,
 		12,
@@ -199,25 +200,25 @@ gchar* cairo_dock_manage_themes_for_applet (gchar *cAppletShareDataDir, gchar *c
 	GHashTable *pThemeTable = cairo_dock_list_themes (cThemesDirPath, NULL, &erreur);
 	if (erreur != NULL)
 	{
-		g_print ("Attention : %s\n", erreur->message);
+		cd_message ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
 	g_free (cThemesDirPath);
-	
+
 	gchar *cThemePath = NULL;
 	if (pThemeTable != NULL)
 	{
 		cairo_dock_update_conf_file_with_hash_table (cAppletConfFilePath, pThemeTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_theme_name, TRUE, FALSE);
-		
+
 		gchar *cChosenThemeName = cairo_dock_get_string_key_value (pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, cDefaultThemeName, NULL, NULL);
 		if (cChosenThemeName != NULL)
 			cThemePath = g_strdup (g_hash_table_lookup (pThemeTable, cChosenThemeName));
 		g_free (cChosenThemeName);
-		
+
 		if (cThemePath == NULL && cDefaultThemeName != NULL)
 			cThemePath = g_strdup (g_hash_table_lookup (pThemeTable, cDefaultThemeName));
-		
+
 		g_hash_table_destroy (pThemeTable);
 	}
 	return cThemePath;

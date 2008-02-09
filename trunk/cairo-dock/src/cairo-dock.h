@@ -30,5 +30,6 @@
 #include "cairo-dock-file-manager.h"
 #include "cairo-dock-keybinder.h"
 #include "cairo-dock-desklet.h"
+#include "cairo-dock-log.h"
 
 #endif
