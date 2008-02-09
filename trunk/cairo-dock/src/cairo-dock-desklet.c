@@ -99,7 +99,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 	{
 		cairo_restore (pCairoContext);
 		Icon *pIcon = pDesklet->pIcon;
-		
+
 		if (pIcon->pIconBuffer != NULL)
 		{
 			g_print ("  dessin de l'icone (%.2fx%.2f)\n", pIcon->fWidth, pIcon->fHeight);
@@ -114,7 +114,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 				//icon->fHeight - icon->fQuickInfoYOffset);
 				(- pIcon->iQuickInfoWidth + pIcon->fWidth) / 2 * pIcon->fScale,
 				(pIcon->fHeight - pIcon->iQuickInfoHeight) * pIcon->fScale);
-			
+
 			cairo_set_source_surface (pCairoContext,
 				pIcon->pQuickInfoBuffer,
 				0,
@@ -123,7 +123,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 		}
 		cairo_destroy (pCairoContext);
 	}
-	
+
 	return FALSE;
 }
 
@@ -159,31 +159,31 @@ static gboolean on_configure_desklet (GtkWidget* pWidget,
 			g_source_remove (pDesklet->iSidWriteConfig);
 			pDesklet->iSidWriteConfig = 0;
 		}
-		
+
 		pDesklet->iSidWriteConfig = g_timeout_add (100, (GSourceFunc) _cairo_dock_write_desklet_config, (gpointer) pDesklet);
 		/*if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
 			cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
 				G_TYPE_INT, "Desklet", "width", pDesklet->iWidth,
 				G_TYPE_INT, "Desklet", "height", pDesklet->iHeight,
 				G_TYPE_INVALID);
-		
+
 		if (pDesklet->pIcon != NULL)
 		{
 			cairo_dock_reload_module (pDesklet->pIcon->pModule, g_pMainDock, TRUE);
 		}*/
 	}
-	
+
 	if (pDesklet->iWindowPositionX != pEvent->x || pDesklet->iWindowPositionY != pEvent->y)
 	{
 		pDesklet->iWindowPositionX = pEvent->x;
 		pDesklet->iWindowPositionY = pEvent->y;
-		
+
 		if (pDesklet->iSidWriteConfig != 0)
 		{
 			g_source_remove (pDesklet->iSidWriteConfig);
 			pDesklet->iSidWriteConfig = 0;
 		}
-		
+
 		pDesklet->iSidWriteConfig = g_timeout_add (100, (GSourceFunc) _cairo_dock_write_desklet_config, (gpointer) pDesklet);
 		/*if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
 			cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
@@ -191,7 +191,7 @@ static gboolean on_configure_desklet (GtkWidget* pWidget,
 				G_TYPE_INT, "Desklet", "y position", pDesklet->iWindowPositionY,
 				G_TYPE_INVALID);*/
 	}
-	
+
 	return FALSE;
 }
 
@@ -221,7 +221,7 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 					G_TYPE_INT, "Desklet", "height", pDesklet->iHeight,
 					G_TYPE_INVALID);
 		}
-		
+
 		return TRUE;
 	}
 	else if (pButton->button == 3 && pButton->type == GDK_BUTTON_PRESS)  // clique droit.
@@ -258,7 +258,7 @@ static void _cd_desklet_return_to_dock (GtkMenuItem *menu_item, CairoDockDesklet
 		cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
 			G_TYPE_BOOLEAN, "Desklet", "initially detached", FALSE,
 			G_TYPE_INVALID);
-		
+
 		cairo_dock_reload_module (pDesklet->pIcon->pModule, g_pMainDock, TRUE);
 	}
 }
@@ -273,7 +273,7 @@ static void _cd_desklet_remove_applet (GtkMenuItem *menu_item, CairoDockDesklet 
 		{
 			cairo_dock_deactivate_module (pDesklet->pIcon->pModule);  // desactive le module mais ne le ferme pas.
 			pDesklet->pIcon->pModule = NULL;  // pour ne pas le liberer lors du free_icon.
-			
+
 			cairo_dock_update_conf_file_with_active_modules (g_cConfFile, g_pMainDock->icons);
 			cairo_dock_free_icon (pDesklet->pIcon);
 			pDesklet->pIcon = NULL;
@@ -340,7 +340,7 @@ static void _cd_desklet_keep_on_widget_layer(GtkMenuItem *menu_item, CairoDockDe
 	else
 		gtk_window_set_type_hint(GTK_WINDOW(pDesklet->pWidget), GDK_WINDOW_TYPE_HINT_NORMAL);
 	cairo_dock_show_desklet (pDesklet);
-	
+
 	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
 		cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
 			G_TYPE_INT, "Desklet", "on widget layer", bOnCompizWidgetLayer,
@@ -358,13 +358,13 @@ static GtkWidget *cd_desklet_build_menu(CairoDockDesklet *pDesklet)
 	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), image);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
 	g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(_cd_desklet_return_to_dock), pDesklet);
-	
+
 	menu_item = gtk_image_menu_item_new_with_label(_("Configure this applet"));
 	image = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
 	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), image);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
 	g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(_cd_desklet_configure_applet), pDesklet);
-	
+
 	menu_item = gtk_image_menu_item_new_with_label(_("Remove this applet"));
 	image = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
 	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), image);
@@ -437,7 +437,7 @@ static gboolean on_leave_desklet (GtkWidget* pWidget,
 	{
 		return FALSE;
 	}
-	
+
 	pDesklet->bInside = FALSE;
 	gtk_widget_queue_draw (pWidget);
 	return FALSE;
@@ -467,7 +467,6 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
   //the border is were cairo paint
   gtk_container_set_border_width(GTK_CONTAINER(pWindow), 2*g_iDockRadius);  /// 10
   gtk_window_set_default_size(GTK_WINDOW(pWindow), 4*g_iDockRadius+1, 4*g_iDockRadius+1);
-
   hbox = gtk_hbox_new(0, 0);
   gtk_container_add(GTK_CONTAINER(pWindow), hbox);
 
@@ -515,7 +514,7 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
 		"leave-notify-event",
 		G_CALLBACK (on_leave_desklet),
 		pDesklet);
-	
+
   pDesklet->pConfigMenu = cd_desklet_build_menu(pDesklet);
   gtk_widget_show_all(pDesklet->pConfigMenu);
 
@@ -536,7 +535,7 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
   }
 
   gtk_widget_show_all(pWindow);
-  
+
   return pDesklet;
 }
 
@@ -549,10 +548,10 @@ void cairo_dock_place_desklet (CairoDockDesklet *pDesklet, int iWidth, int iHeig
 		iPositionY,
 		iWidth,
 		iHeight);
-	
+
 	gtk_window_set_keep_below (GTK_WINDOW (pDesklet->pWidget), bKeepBelow);
 	gtk_window_set_keep_above( GTK_WINDOW (pDesklet->pWidget), bKeepAbove);
-	
+
 	Window Xid = GDK_WINDOW_XID (pDesklet->pWidget->window);
 	/*if (bOnWidgetLayer)
 		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_UTILITY");  // le hide-show le fait deconner completement, il perd son skip_task_bar ! au moins sous KDE.
@@ -564,10 +563,10 @@ void cairo_dock_free_desklet (CairoDockDesklet *pDesklet)
 {
 	if (pDesklet == NULL)
 		return;
-	
+
 	gtk_widget_destroy (pDesklet->pWidget);  // detruit aussi l'eventuel widget interactif.
 	pDesklet->pWidget = NULL;
-	
+
 	g_free(pDesklet);
 }
 
