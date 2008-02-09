@@ -34,6 +34,7 @@
 #include "cairo-dock-icons.h"
 #include "cairo-dock-config.h"
 #include "cairo-dock-applications-manager.h"
+#include "cairo-dock-notifications.h"
 #include "cairo-dock-desklet.h"
 #include "cairo-dock-log.h"
 
@@ -41,7 +42,176 @@ extern CairoDock *g_pMainDock;
 extern gchar *g_cConfFile;
 extern int g_iDockRadius;
 extern double g_fDialogColor[4];
+extern gboolean g_bSticky;
 
+
+
+static void _cd_desklet_return_to_dock (GtkMenuItem *menu_item, CairoDockDesklet *pDesklet)
+{
+	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
+	{
+		cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
+			G_TYPE_BOOLEAN, "Desklet", "initially detached", FALSE,
+			G_TYPE_INVALID);
+		
+		cairo_dock_reload_module (pDesklet->pIcon->pModule, g_pMainDock, TRUE);
+	}
+}
+
+static void _cd_desklet_remove_applet (GtkMenuItem *menu_item, CairoDockDesklet *pDesklet)
+{
+	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
+	{
+		gchar *question = g_strdup_printf (_("You're about to remove this module (%s) from the dock. Sure ?"), pDesklet->pIcon->acName);
+		int answer = cairo_dock_ask_question_and_wait (question, pDesklet->pIcon, g_pMainDock);
+		if (answer == GTK_RESPONSE_YES)
+		{
+			cairo_dock_deactivate_module (pDesklet->pIcon->pModule);  // desactive le module mais ne le ferme pas.
+			pDesklet->pIcon->pModule = NULL;  // pour ne pas le liberer lors du free_icon.
+			
+			cairo_dock_update_conf_file_with_active_modules (g_cConfFile, g_pMainDock->icons);
+			cairo_dock_free_icon (pDesklet->pIcon);
+			pDesklet->pIcon = NULL;
+			cairo_dock_free_desklet (pDesklet);
+		}
+	}
+}
+
+static void _cd_desklet_configure_applet (GtkMenuItem *menu_item, CairoDockDesklet *pDesklet)
+{
+	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
+	{
+		GError *erreur = NULL;
+		cairo_dock_configure_module (GTK_WINDOW (pDesklet->pWidget), pDesklet->pIcon->pModule, g_pMainDock, &erreur);
+		if (erreur != NULL)
+		{
+			g_print ("Attention : %s\n", erreur->message);
+			g_error_free (erreur);
+		}
+	}
+}
+
+static void _cd_desklet_keep_above(GtkMenuItem *menu_item, CairoDockDesklet *pDesklet)
+{
+	gtk_window_set_keep_below(GTK_WINDOW(pDesklet->pWidget), FALSE);
+	gtk_window_set_keep_above(GTK_WINDOW(pDesklet->pWidget), TRUE);
+	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
+		cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
+			G_TYPE_INT, "Desklet", "keep below", FALSE,
+			G_TYPE_INT, "Desklet", "keep above", TRUE,
+			G_TYPE_INVALID);
+}
+
+static void _cd_desklet_keep_normal(GtkMenuItem *menu_item, CairoDockDesklet *pDesklet)
+{
+	gtk_window_set_keep_below(GTK_WINDOW(pDesklet->pWidget), FALSE);
+	gtk_window_set_keep_above(GTK_WINDOW(pDesklet->pWidget), FALSE);
+	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
+		cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
+			G_TYPE_INT, "Desklet", "keep below", FALSE,
+			G_TYPE_INT, "Desklet", "keep above", FALSE,
+			G_TYPE_INVALID);
+}
+
+static void _cd_desklet_keep_below(GtkMenuItem *menu_item, CairoDockDesklet *pDesklet)
+{
+	gtk_window_set_keep_below(GTK_WINDOW(pDesklet->pWidget), TRUE);
+	gtk_window_set_keep_above(GTK_WINDOW(pDesklet->pWidget), FALSE);
+	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
+		cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
+			G_TYPE_INT, "Desklet", "keep below", TRUE,
+			G_TYPE_INT, "Desklet", "keep above", FALSE,
+			G_TYPE_INVALID);
+}
+
+//for compiz fusion "widget layer"
+//set behaviour in compiz to: (name=cairo-dock-desklet & type=utility)
+static void _cd_desklet_keep_on_widget_layer(GtkMenuItem *menu_item, CairoDockDesklet *pDesklet)
+{
+	cairo_dock_hide_desklet (pDesklet);
+	gboolean bOnCompizWidgetLayer = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menu_item));
+	if (bOnCompizWidgetLayer)
+		gtk_window_set_type_hint(GTK_WINDOW(pDesklet->pWidget), GDK_WINDOW_TYPE_HINT_UTILITY);
+	else
+		gtk_window_set_type_hint(GTK_WINDOW(pDesklet->pWidget), GDK_WINDOW_TYPE_HINT_NORMAL);
+	cairo_dock_show_desklet (pDesklet);
+	
+	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
+		cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
+			G_TYPE_INT, "Desklet", "on widget layer", bOnCompizWidgetLayer,
+			G_TYPE_INVALID);
+}
+
+static GtkWidget *cd_desklet_build_menu(CairoDockDesklet *pDesklet)
+{
+	static gpointer *data = NULL;
+	
+	GtkWidget *menu = gtk_menu_new ();
+	
+	if (data == NULL)
+		data = g_new (gpointer, 3);
+	data[0] = pDesklet->pIcon;
+	data[1] = pDesklet;
+	data[2] = menu;
+	
+	GtkWidget *menu_item, *image;
+	GSList *group = NULL;
+	
+	menu_item = gtk_image_menu_item_new_with_label(_("Attach to dock"));
+	image = gtk_image_new_from_stock(GTK_STOCK_CONNECT, GTK_ICON_SIZE_MENU);
+	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), image);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+	g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(_cd_desklet_return_to_dock), pDesklet);
+	
+	menu_item = gtk_image_menu_item_new_with_label(_("Configure this module"));
+	image = gtk_image_new_from_stock(GTK_STOCK_PROPERTIES, GTK_ICON_SIZE_MENU);
+	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), image);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+	g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(_cd_desklet_configure_applet), pDesklet);
+	
+	menu_item = gtk_image_menu_item_new_with_label(_("Remove this module"));
+	image = gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU);
+	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), image);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+	g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(_cd_desklet_remove_applet), pDesklet);
+	
+	menu_item = gtk_separator_menu_item_new ();
+	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+	
+	GdkWindowState iState = gdk_window_get_state (pDesklet->pWidget->window);
+	
+	menu_item = gtk_radio_menu_item_new_with_label(group, _("Always on top"));
+	gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(menu_item));
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+	if (iState & GDK_WINDOW_STATE_ABOVE)
+	  gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
+	g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(_cd_desklet_keep_above), pDesklet);
+	
+	menu_item = gtk_radio_menu_item_new_with_label(group, _("Normal"));
+	group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(menu_item));
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+	if ( ! (iState & (GDK_WINDOW_STATE_ABOVE | GDK_WINDOW_STATE_BELOW)) )
+	  gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
+	g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(_cd_desklet_keep_normal), pDesklet);
+	
+	menu_item = gtk_radio_menu_item_new_with_label(group, _("Always below"));
+	group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(menu_item));
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+	if (iState & GDK_WINDOW_STATE_BELOW)
+	  gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
+	g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(_cd_desklet_keep_below), pDesklet);
+	
+	menu_item = gtk_separator_menu_item_new ();
+	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+	
+	menu_item = gtk_check_menu_item_new_with_label(_("Compiz Fusion Widget"));
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+	g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(_cd_desklet_keep_on_widget_layer), pDesklet);
+	
+	cairo_dock_notify (CAIRO_DOCK_BUILD_MENU, data);
+	
+	return menu;
+}
 
 static gboolean on_expose_desklet(GtkWidget *pWidget,
                                      GdkEventExpose *pExpose,
@@ -231,7 +401,15 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 	}
 	else if (pButton->button == 3 && pButton->type == GDK_BUTTON_PRESS)  // clique droit.
 	{
-		gtk_menu_popup(GTK_MENU(pDesklet->pConfigMenu), NULL, NULL, NULL, NULL, 1, gtk_get_current_event_time());
+		GtkWidget *menu = cd_desklet_build_menu (pDesklet);  // genere un CAIRO_DOCK_BUILD_MENU.
+		gtk_widget_show_all (menu);
+		gtk_menu_popup (GTK_MENU (menu),
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			1,
+			gtk_get_current_event_time ());
 	}
 	return FALSE;
 }
@@ -254,159 +432,17 @@ static gboolean on_motion_notify_desklet(GtkWidget *pWidget,
 }
 
 
-
-
-static void _cd_desklet_return_to_dock (GtkMenuItem *menu_item, CairoDockDesklet *pDesklet)
-{
-	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
-	{
-		cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
-			G_TYPE_BOOLEAN, "Desklet", "initially detached", FALSE,
-			G_TYPE_INVALID);
-
-		cairo_dock_reload_module (pDesklet->pIcon->pModule, g_pMainDock, TRUE);
-	}
-}
-
-static void _cd_desklet_remove_applet (GtkMenuItem *menu_item, CairoDockDesklet *pDesklet)
-{
-	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
-	{
-		gchar *question = g_strdup_printf (_("You're about to remove this module (%s) from the dock. Sure ?"), pDesklet->pIcon->acName);
-		int answer = cairo_dock_ask_question_and_wait (question, pDesklet->pIcon, g_pMainDock);
-		if (answer == GTK_RESPONSE_YES)
-		{
-			cairo_dock_deactivate_module (pDesklet->pIcon->pModule);  // desactive le module mais ne le ferme pas.
-			pDesklet->pIcon->pModule = NULL;  // pour ne pas le liberer lors du free_icon.
-
-			cairo_dock_update_conf_file_with_active_modules (g_cConfFile, g_pMainDock->icons);
-			cairo_dock_free_icon (pDesklet->pIcon);
-			pDesklet->pIcon = NULL;
-			cairo_dock_free_desklet (pDesklet);
-		}
-	}
-}
-
-static void _cd_desklet_configure_applet (GtkMenuItem *menu_item, CairoDockDesklet *pDesklet)
-{
-	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
-	{
-		GError *erreur = NULL;
-		cairo_dock_configure_module (GTK_WINDOW (pDesklet->pWidget), pDesklet->pIcon->pModule, g_pMainDock, &erreur);
-		if (erreur != NULL)
-		{
-			cd_message ("Attention : %s\n", erreur->message);
-			g_error_free (erreur);
-		}
-	}
-}
-
-static void _cd_desklet_keep_above(GtkMenuItem *menu_item, CairoDockDesklet *pDesklet)
-{
-	gtk_window_set_keep_below(GTK_WINDOW(pDesklet->pWidget), FALSE);
-	gtk_window_set_keep_above(GTK_WINDOW(pDesklet->pWidget), TRUE);
-	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
-		cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
-			G_TYPE_INT, "Desklet", "keep below", FALSE,
-			G_TYPE_INT, "Desklet", "keep above", TRUE,
-			G_TYPE_INVALID);
-}
-
-static void _cd_desklet_keep_normal(GtkMenuItem *menu_item, CairoDockDesklet *pDesklet)
-{
-	gtk_window_set_keep_below(GTK_WINDOW(pDesklet->pWidget), FALSE);
-	gtk_window_set_keep_above(GTK_WINDOW(pDesklet->pWidget), FALSE);
-	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
-		cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
-			G_TYPE_INT, "Desklet", "keep below", FALSE,
-			G_TYPE_INT, "Desklet", "keep above", FALSE,
-			G_TYPE_INVALID);
-}
-
-static void _cd_desklet_keep_below(GtkMenuItem *menu_item, CairoDockDesklet *pDesklet)
-{
-	gtk_window_set_keep_below(GTK_WINDOW(pDesklet->pWidget), TRUE);
-	gtk_window_set_keep_above(GTK_WINDOW(pDesklet->pWidget), FALSE);
-	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
-		cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
-			G_TYPE_INT, "Desklet", "keep below", TRUE,
-			G_TYPE_INT, "Desklet", "keep above", FALSE,
-			G_TYPE_INVALID);
-}
-
-//for compiz fusion "widget layer"
-//set behaviour in compiz to: (name=cairo-dock-desklet & type=utility)
-static void _cd_desklet_keep_on_widget_layer(GtkMenuItem *menu_item, CairoDockDesklet *pDesklet)
-{
-	cairo_dock_hide_desklet (pDesklet);
-	gboolean bOnCompizWidgetLayer = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menu_item));
-	if (bOnCompizWidgetLayer)
-		gtk_window_set_type_hint(GTK_WINDOW(pDesklet->pWidget), GDK_WINDOW_TYPE_HINT_UTILITY);
-	else
-		gtk_window_set_type_hint(GTK_WINDOW(pDesklet->pWidget), GDK_WINDOW_TYPE_HINT_NORMAL);
-	cairo_dock_show_desklet (pDesklet);
-
-	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
-		cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
-			G_TYPE_INT, "Desklet", "on widget layer", bOnCompizWidgetLayer,
-			G_TYPE_INVALID);
-}
-
-static GtkWidget *cd_desklet_build_menu(CairoDockDesklet *pDesklet)
-{
-  GtkWidget *menu = gtk_menu_new ();
-  GtkWidget *menu_item, *image;
-  GSList *group = NULL;
-
-	menu_item = gtk_image_menu_item_new_with_label(_("Attach to dock"));
-	image = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
-	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), image);
-	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-	g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(_cd_desklet_return_to_dock), pDesklet);
-
-	menu_item = gtk_image_menu_item_new_with_label(_("Configure this applet"));
-	image = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
-	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), image);
-	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-	g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(_cd_desklet_configure_applet), pDesklet);
-
-	menu_item = gtk_image_menu_item_new_with_label(_("Remove this applet"));
-	image = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
-	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), image);
-	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-	g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(_cd_desklet_remove_applet), pDesklet);
-
-  menu_item = gtk_separator_menu_item_new ();
-  gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
-
-  menu_item = gtk_radio_menu_item_new_with_label(group, _("Always on top"));
-  group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(menu_item));
-  gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-  gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
-  g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(_cd_desklet_keep_above), pDesklet);
-
-  menu_item = gtk_radio_menu_item_new_with_label(group, _("Normal"));
-  group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(menu_item));
-  gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-  g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(_cd_desklet_keep_normal), pDesklet);
-
-  menu_item = gtk_radio_menu_item_new_with_label(group, _("Always below"));
-  group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(menu_item));
-  gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-  g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(_cd_desklet_keep_below), pDesklet);
-
-  menu_item = gtk_separator_menu_item_new ();
-  gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
-
-  menu_item = gtk_check_menu_item_new_with_label(_("Compiz Fusion Widget"));
-  gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-  g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(_cd_desklet_keep_on_widget_layer), pDesklet);
-  return menu;
-}
-
 static void on_button_press_desklet_nbt(GtkButton *button, CairoDockDesklet *pDesklet)
 {
-  gtk_menu_popup(GTK_MENU(pDesklet->pConfigMenu), NULL, NULL, NULL, NULL, 1, gtk_get_current_event_time());
+	GtkWidget *menu = cd_desklet_build_menu (pDesklet);  // genere un CAIRO_DOCK_BUILD_MENU.
+	gtk_widget_show_all (menu);
+	gtk_menu_popup (GTK_MENU (menu),
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		1,
+		gtk_get_current_event_time ());
 }
 
 
@@ -460,7 +496,8 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
 
   pDesklet->pWidget = pWindow;
 
-  gtk_window_stick(GTK_WINDOW(pWindow));
+  if (g_bSticky)
+	  gtk_window_stick(GTK_WINDOW(pWindow));
   gtk_window_set_skip_pager_hint(GTK_WINDOW(pWindow), TRUE);
   gtk_window_set_skip_taskbar_hint(GTK_WINDOW(pWindow), TRUE);
   cairo_dock_set_colormap_for_window(pWindow);
@@ -476,10 +513,10 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
   gtk_container_add(GTK_CONTAINER(pWindow), hbox);
 
   vbox = gtk_vbox_new(0, 0);
-  gtk_box_pack_start(GTK_BOX(hbox), vbox, 0, 0, 0);
+  gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
 
   btn = gtk_button_new_with_label("-");
-  gtk_box_pack_start(GTK_BOX(vbox), btn, 0, 0, 0);
+  gtk_box_pack_start(GTK_BOX(vbox), btn, FALSE, FALSE, 0);
   g_signal_connect (G_OBJECT (btn), "clicked",
                     G_CALLBACK (on_button_press_desklet_nbt), pDesklet);  // Nuclear, Bacteriologic, Thermic ? :-)
 
@@ -520,9 +557,6 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
 		G_CALLBACK (on_leave_desklet),
 		pDesklet);
 
-  pDesklet->pConfigMenu = cd_desklet_build_menu(pDesklet);
-  gtk_widget_show_all(pDesklet->pConfigMenu);
-
   //user widget
   if (pInteractiveWidget != NULL)
   {
@@ -534,7 +568,7 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
       }
     else
       gtk_object_ref((gpointer)pInteractiveWidget);
-    gtk_box_pack_start(GTK_BOX(hbox), pInteractiveWidget, 1, 1, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), pInteractiveWidget, TRUE, TRUE, 0);
     gtk_object_unref((gpointer)pInteractiveWidget);
     cd_message ("pack -> ref = %d\n", pInteractiveWidget->object.parent_instance.ref_count);
   }
@@ -558,10 +592,10 @@ void cairo_dock_place_desklet (CairoDockDesklet *pDesklet, int iWidth, int iHeig
 	gtk_window_set_keep_above( GTK_WINDOW (pDesklet->pWidget), bKeepAbove);
 
 	Window Xid = GDK_WINDOW_XID (pDesklet->pWidget->window);
-	/*if (bOnWidgetLayer)
+	if (bOnWidgetLayer)
 		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_UTILITY");  // le hide-show le fait deconner completement, il perd son skip_task_bar ! au moins sous KDE.
 	else
-		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");*/
+		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");
 }
 
 void cairo_dock_free_desklet (CairoDockDesklet *pDesklet)

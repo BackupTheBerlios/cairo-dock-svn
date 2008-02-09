@@ -590,8 +590,6 @@ struct _CairoDockDesklet {
 	/// pour le deplacement manuel de la fenetre.
 	gint diff_x, diff_y;
 	gboolean moving;
-	/// Le menu de config.
-	GtkWidget *pConfigMenu;
 	/// L'icone de l'applet.
 	Icon *pIcon;
 	/// La fonction de rendu. NULL pour utiliser celle par defaut qui dessine l'icone comme si elle etait dans un dock. Est appelee par la callback liee a l'expose-event de la fenetre.
