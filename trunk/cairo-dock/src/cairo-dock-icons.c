@@ -1,11 +1,11 @@
-/******************************************************************************
+/*********************************************************************************
 
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
 Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
-******************************************************************************/
+*********************************************************************************/
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
@@ -1155,7 +1155,7 @@ void cairo_dock_manage_mouse_position (CairoDock *pDock, CairoDockMousePositionT
 		case CAIRO_DOCK_MOUSE_OUTSIDE :
 			//g_print ("en dehors du dock (%d;%d;%d;%d)\n", pDock->iSidGrowUp, pDock->iSidShrinkDown, pDock->iMagnitudeIndex, pDock->iSidLeaveDemand);
 			///pDock->fDecorationsOffsetX = - pDock->iCurrentWidth / 2;  // on fixe les decorations.
-			if (pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0 && pDock->iMagnitudeIndex > 0 && pDock->iSidLeaveDemand == 0)  // pDock->iMagnitudeIndex == CAIRO_DOCK_NB_MAX_ITERATIONS
+			if (pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0 && pDock->iSidLeaveDemand == 0)  //  && pDock->iMagnitudeIndex > 0
 			{
 				//g_print ("on force a quitter (iRefCount:%d)\n", pDock->iRefCount);
 				if (pDock->iRefCount > 0 && g_iLeaveSubDockDelay > 0)

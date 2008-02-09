@@ -1,11 +1,11 @@
-/******************************************************************************
+/*********************************************************************************
 
 This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
-******************************************************************************/
+*********************************************************************************/
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
@@ -289,10 +289,10 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			gdk_window_get_pointer (pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
 		else
 			gdk_window_get_pointer (pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);
-
-		if (pDock->iSidShrinkDown > 0 || (pMotion && (pMotion->time - fLastTime < g_fRefreshInterval)))  // si les icones sont en train de diminuer de taille (suite a un clic) on on laisse l'animation se finir, sinon elle va trop vite.  // || ! pDock->bInside || pDock->bAtBottom
+		
+		if (pDock->iSidShrinkDown > 0)  // si les icones sont en train de diminuer de taille (suite a un clic) on on laisse l'animation se finir, sinon elle va trop vite.  // || ! pDock->bInside || pDock->bAtBottom
 		{
-			gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);
+			//gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);
 			return FALSE;
 		}
 
@@ -615,7 +615,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 void cairo_dock_update_gaps_with_window_position (CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
-	int iWidth, iHeight;  // mieux que iCurrentWidth.
+	/*int iWidth, iHeight;  // mieux que iCurrentWidth.
 	if (pDock->bHorizontalDock)
 	{
 		gtk_window_get_size (GTK_WINDOW (pDock->pWidget), &iWidth, &iHeight);
@@ -625,11 +625,11 @@ void cairo_dock_update_gaps_with_window_position (CairoDock *pDock)
 	{
 		gtk_window_get_size (GTK_WINDOW (pDock->pWidget),  &iHeight, &iWidth);
 		gtk_window_get_position (GTK_WINDOW (pDock->pWidget), &pDock->iWindowPositionY, &pDock->iWindowPositionX);
-	}
+	}*/
 
 	int x, y;  // position du point invariant du dock.
-	x = pDock->iWindowPositionX + iWidth * pDock->fAlign;
-	y = (g_bDirectionUp ? pDock->iWindowPositionY + iHeight : pDock->iWindowPositionY);
+	x = pDock->iWindowPositionX +  pDock->iCurrentWidth * pDock->fAlign;
+	y = (g_bDirectionUp ? pDock->iWindowPositionY + pDock->iCurrentHeight : pDock->iWindowPositionY);
 	g_print ("%s (%d;%d)\n", __func__, x, y);
 
 	pDock->iGapX = x - g_iScreenWidth[pDock->bHorizontalDock] * pDock->fAlign;
@@ -863,7 +863,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 	}
 
 	Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
-	if (pButton->button == 1)  // clique gauche.
+	if (pButton->button == 1)  // clic gauche.
 	{
 		switch (pButton->type)
 		{
@@ -1374,7 +1374,7 @@ gboolean cairo_dock_notification_drop_data (gpointer *data)
 
 void on_drag_motion (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, guint t, CairoDock *pDock)
 {
-	//g_print ("%s (%dx%d)\n", __func__, x, y);
+	//g_print ("%s (%dx%d, %d)\n", __func__, x, y, t);
 	//\_________________ On simule les evenements souris habituels.
 	on_enter_notify2 (pWidget, NULL, pDock);  // ne sera effectif que la 1ere fois a chaque entree dans un dock.
 	on_motion_notify2 (pWidget, NULL, pDock);

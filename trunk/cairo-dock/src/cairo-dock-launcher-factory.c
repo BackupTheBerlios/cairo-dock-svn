@@ -325,20 +325,20 @@ Icon * cairo_dock_create_icon_from_desktop_file (const gchar *cDesktopFileName, 
 	cairo_dock_load_icon_info_from_desktop_file (cDesktopFileName, icon);
 	g_return_val_if_fail (icon->acDesktopFileName != NULL, NULL);
 	
-	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, g_pMainDock->bHorizontalDock);
-	
-	cairo_dock_fill_one_text_buffer (icon,
-		pSourceContext,
-		g_iLabelSize,
-		g_cLabelPolice,
-		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : g_pMainDock->bHorizontalDock));
-	
 	CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 	if (pParentDock == NULL)
 	{
 		g_print ("le dock parent (%s) n'existe pas, on le cree\n", icon->cParentDockName);
 		pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_DOCK, icon->cParentDockName, NULL);
 	}
+	
+	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pParentDock->bHorizontalDock, TRUE);
+	
+	cairo_dock_fill_one_text_buffer (icon,
+		pSourceContext,
+		g_iLabelSize,
+		g_cLabelPolice,
+		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pParentDock->bHorizontalDock));
 	
 	return icon;
 }

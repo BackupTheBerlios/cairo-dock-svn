@@ -131,7 +131,7 @@ gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePat
 #define cairo_dock_edit_conf_file(pWindow, cConfFilePath, cTitle, iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc, cGettextDomain) cairo_dock_edit_conf_file_full (pWindow, cConfFilePath, cTitle, iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc, NULL, NULL, NULL, NULL, cGettextDomain)
 
 /**
-*Met a jour un fichier de conf avec une liste de valeurs de la forme : type, pointeur sur la valeur, nom du groupe, nom de la cle.
+*Met a jour un fichier de conf avec une liste de valeurs de la forme : type, nom du groupe, nom de la cle, valeur. Finir par G_TYPE_INVALID.
 *@param cConfFilePath chemin du fichier de conf.
 *@param iFirstDataType type de la 1ere donnee.
 */

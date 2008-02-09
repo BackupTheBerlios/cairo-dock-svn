@@ -622,6 +622,21 @@ static void cairo_dock_initiate_config_module (GtkMenuItem *menu_item, gpointer 
 	}
 }
 
+static void cairo_dock_detach_module (GtkMenuItem *menu_item, gpointer *data)
+{
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
+	
+	if (icon->pModule != NULL)
+	{
+		cairo_dock_update_conf_file (icon->pModule->cConfFilePath,
+			G_TYPE_BOOLEAN, "Desklet", "initially detached", TRUE,
+			G_TYPE_INVALID);
+		
+		cairo_dock_reload_module (icon->pModule, pDock, TRUE);
+	}
+}
+
 static void cairo_dock_remove_module (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
@@ -980,6 +995,15 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_initiate_config_module), data);
+		
+		if (icon->pModule->bCanDetach)
+		{
+			menu_item = gtk_image_menu_item_new_with_label (_("Detach this module"));
+			image = gtk_image_new_from_stock (GTK_STOCK_DISCONNECT, GTK_ICON_SIZE_MENU);
+			gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
+			gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
+			g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_detach_module), data);
+		}
 		
 		menu_item = gtk_image_menu_item_new_with_label (_("Remove this module"));
 		image = gtk_image_new_from_stock (GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU);

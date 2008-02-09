@@ -454,6 +454,38 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	//\_____________________ On separe 2 cas : dessin avec le tampon complet, et dessin avec le ou les petits tampons.
 	if (CAIRO_DOCK_IS_APPLI (icon) && ! icon->bIsHidden)
 		icon->fAlpha *= g_fVisibleAppliAlpha;
+	
+	/*int w = round (icon->fWidth / fRatio * (1 + g_fAmplitude));
+	int h = round (icon->fHeight / fRatio * (1 + g_fAmplitude));
+	int x, y;
+	int alpha, red, green, blue;
+	float fAlphaFactor;
+	guchar *p, *pSurfaceData = cairo_image_surface_get_data (icon->pIconBuffer), *pSurfaceDataIni = NULL;
+	int iNbChannels = 4, iRowstride =  w * sizeof (gint);
+	int delta_lum = sin (icon->fPhase) * 75;
+	if (pSurfaceData != NULL && delta_lum)  //  && icon->bPointed
+	{
+		pSurfaceDataIni = g_memdup (pSurfaceData, iRowstride * h);
+		p = pSurfaceData;
+		g_print (" %dx%d (%d)\n", w, h, delta_lum);
+		for (y = 0; y < h; y ++)
+		{
+			for (x = 0; x < w; x ++)
+			{
+				if (p[3])
+				{
+					blue = MIN (p[0] + delta_lum, 255);
+					green = MIN (p[1] + delta_lum, 255);
+					red = MIN (p[2] + delta_lum, 255);
+					p[0] = blue;
+					p[1] = green;
+					p[2] = red;
+				}
+				p += 4;
+			}
+		}
+	}*/
+	
 	gboolean bDrawFullBuffer;
 	bDrawFullBuffer  = (bUseReflect && icon->pFullIconBuffer != NULL && (! g_bDynamicReflection || icon->fScale == 1) && (icon->iCount == 0 || icon->iAnimationType == CAIRO_DOCK_ROTATE || icon->iAnimationType == CAIRO_DOCK_BLINK));
 	int iCurrentWidth= 1;
@@ -678,6 +710,11 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			0);
 		cairo_paint (pCairoContext);
 	}
+	/*if (pSurfaceDataIni != NULL)
+	{
+		memcpy (pSurfaceData, pSurfaceDataIni, iRowstride * h);
+		g_free (pSurfaceDataIni);
+	}*/
 }
 
 
@@ -856,7 +893,9 @@ void cairo_dock_render_blank (CairoDock *pDock)
 void cairo_dock_redraw_my_icon (Icon *icon, CairoDock *pDock)
 {
 	g_return_if_fail (icon != NULL && pDock != NULL);
-	if (pDock->bAtBottom && (pDock->iRefCount > 0 || g_bAutoHide))  // inutile de redessiner.
+	if (pDock->iType == CAIRO_DOCK_DOCK && pDock->bAtBottom && (pDock->iRefCount > 0 || g_bAutoHide))  // inutile de redessiner.
+		return ;
+	if (pDock->iType == CAIRO_DOCK_DESKLET && ! GTK_WIDGET_VISIBLE (pDock->pWidget))
 		return ;
 	GdkRectangle rect = {(int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor)),
 		(int) icon->fDrawY - (pDock->bUseReflect && ! g_bDirectionUp ? g_fReflectSize : 0),
@@ -872,11 +911,11 @@ void cairo_dock_redraw_my_icon (Icon *icon, CairoDock *pDock)
 	//g_print ("rect (%d;%d) (%dx%d)\n", rect.x, rect.y, rect.width, rect.height);
 	if (rect.width > 0 && rect.height > 0)
 	{
-#ifdef HAVE_GLITZ
+/**#ifdef HAVE_GLITZ
 		if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
 			gtk_widget_queue_draw (pDock->pWidget);
 		else
-#endif
+#endif*/
 		gdk_window_invalidate_rect (pDock->pWidget->window, &rect, FALSE);
 	}
 }

@@ -64,6 +64,15 @@ gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShare
 	return cConfFilePath;
 }
 
+void cairo_dock_free_minimal_config (CairoDockMinimalAppletConfig *pMinimalConfig)
+{
+	if (pMinimalConfig == NULL)
+		return;
+	g_free (pMinimalConfig->cLabel);
+	g_free (pMinimalConfig->cIconFileName);
+	g_free (pMinimalConfig);
+}
+
 
 void cairo_dock_set_icon_surface (cairo_t *pIconContext, cairo_surface_t *pSurface)  // fonction proposee par Necropotame.
 {
@@ -149,7 +158,7 @@ void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, 
 		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 }
 
-void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo, Icon *pIcon)
+void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo, Icon *pIcon, double fMaxScale)
 {
 	g_return_if_fail (pIcon != NULL);  // le contexte sera verifie plus loin.
 	
@@ -162,7 +171,7 @@ void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo
 		12,
 		g_cLabelPolice,
 		PANGO_WEIGHT_HEAVY,
-		.4);
+		fMaxScale);
 }
 
 void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, CairoDock *pDock, const gchar *cQuickInfoFormat, ...)
@@ -170,7 +179,7 @@ void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, Cairo
 	va_list args;
 	va_start (args, cQuickInfoFormat);
 	gchar *cFullText = g_strdup_vprintf (cQuickInfoFormat, args);
-	cairo_dock_set_quick_info (pSourceContext, cFullText, pIcon);
+	cairo_dock_set_quick_info (pSourceContext, cFullText, pIcon, (pDock->iType == CAIRO_DOCK_DOCK ? 1 + g_fAmplitude : 1));
 	g_free (cFullText);
 	va_end (args);
 }

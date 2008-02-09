@@ -1,11 +1,11 @@
-/******************************************************************************
+/*********************************************************************************
 
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
 Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
-******************************************************************************/
+*********************************************************************************/
 #include <math.h>
 #include <string.h>
 
@@ -197,7 +197,8 @@ gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 		}
 		
 		g_key_file_set_boolean (pKeyFile, cGroupName, cKeyName, bValue);
-		*bFlushConfFileNeeded = TRUE;
+		if (bFlushConfFileNeeded != NULL)
+			*bFlushConfFileNeeded = TRUE;
 	}
 	return bValue;
 }
@@ -246,7 +247,8 @@ int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gch
 		g_free (cGroupNameUpperCase);
 		
 		g_key_file_set_integer (pKeyFile, cGroupName, cKeyName, iValue);
-		*bFlushConfFileNeeded = TRUE;
+		if (bFlushConfFileNeeded != NULL)
+			*bFlushConfFileNeeded = TRUE;
 	}
 	return iValue;
 }
@@ -295,7 +297,8 @@ double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 		g_free (cGroupNameUpperCase);
 		
 		g_key_file_set_double (pKeyFile, cGroupName, cKeyName, fValue);
-		*bFlushConfFileNeeded = TRUE;
+		if (bFlushConfFileNeeded != NULL)
+			*bFlushConfFileNeeded = TRUE;
 	}
 	return fValue;
 }
@@ -344,7 +347,8 @@ gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 		g_free (cGroupNameUpperCase);
 		
 		g_key_file_set_string (pKeyFile, cGroupName, cKeyName, (cValue != NULL ? cValue : ""));
-		*bFlushConfFileNeeded = TRUE;
+		if (bFlushConfFileNeeded != NULL)
+			*bFlushConfFileNeeded = TRUE;
 	}
 	if (cValue != NULL && *cValue == '\0')
 	{
@@ -415,7 +419,8 @@ void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cGroupNam
 		g_free (cGroupNameUpperCase);
 		
 		g_key_file_set_integer_list (pKeyFile, cGroupName, cKeyName, iValueBuffer, iNbElements);
-		*bFlushConfFileNeeded = TRUE;
+		if (bFlushConfFileNeeded != NULL)
+			*bFlushConfFileNeeded = TRUE;
 	}
 	else
 	{
@@ -486,7 +491,8 @@ void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 		g_free (cGroupNameUpperCase);
 		
 		g_key_file_set_double_list (pKeyFile, cGroupName, cKeyName, fValueBuffer, iNbElements);
-		*bFlushConfFileNeeded = TRUE;
+		if (bFlushConfFileNeeded != NULL)
+			*bFlushConfFileNeeded = TRUE;
 	}
 	else
 	{
@@ -542,7 +548,8 @@ gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupN
 			g_key_file_set_string_list (pKeyFile, cGroupName, cKeyName, (const gchar **)cValuesList, *length);
 		else
 			g_key_file_set_string (pKeyFile, cGroupName, cKeyName, "");
-		*bFlushConfFileNeeded = TRUE;
+		if (bFlushConfFileNeeded != NULL)
+			*bFlushConfFileNeeded = TRUE;
 	}
 	if (cValuesList != NULL && (cValuesList[0] == NULL || (*(cValuesList[0]) == '\0' && *length == 1)))
 	{
@@ -1311,8 +1318,9 @@ gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePat
 }
 
 
-void cairo_dock_update_conf_file (gchar *cConfFilePath, GType iFirstDataType, ...)  // type, valeur par pointeur, groupe, nom, etc. finir par G_TYPE_INVALID.
+void cairo_dock_update_conf_file (gchar *cConfFilePath, GType iFirstDataType, ...)  // type, groupe, nom, valeur, etc. finir par G_TYPE_INVALID.
 {
+	g_print ("%s (%s)\n", __func__, cConfFilePath);
 	va_list args;
 	va_start (args, iFirstDataType);
 	
@@ -1323,31 +1331,38 @@ void cairo_dock_update_conf_file (gchar *cConfFilePath, GType iFirstDataType, ..
 	{
 		g_print ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
+		va_end (args);
 		return ;
 	}
 	
 	GType iType = iFirstDataType;
-	gpointer pValue;
+	gboolean bValue;
+	gint iValue;
+	double fValue;
+	gchar *cValue;
 	gchar *cGroupName, *cGroupKey;
 	while (iType != G_TYPE_INVALID)
 	{
-		pValue = va_arg (args, gpointer);
 		cGroupName = va_arg (args, gchar *);
 		cGroupKey = va_arg (args, gchar *);
 		
 		switch (iType)
 		{
 			case G_TYPE_BOOLEAN :
-				g_key_file_set_boolean (pKeyFile, cGroupName, cGroupKey, *((gboolean *) pValue));
+				bValue = va_arg (args, gboolean);
+				g_key_file_set_boolean (pKeyFile, cGroupName, cGroupKey, bValue);
 			break ;
 			case G_TYPE_INT :
-				g_key_file_set_integer (pKeyFile, cGroupName, cGroupKey, *((gint *) pValue));
+				iValue = va_arg (args, gint);
+				g_key_file_set_integer (pKeyFile, cGroupName, cGroupKey, iValue);
 			break ;
 			case G_TYPE_DOUBLE :
-				g_key_file_set_double (pKeyFile, cGroupName, cGroupKey, *((gdouble *) pValue));
+				fValue = va_arg (args, gdouble);
+				g_key_file_set_double (pKeyFile, cGroupName, cGroupKey, fValue);
 			break ;
 			case G_TYPE_STRING :
-				g_key_file_set_string (pKeyFile, cGroupName, cGroupKey, (gchar *) pValue);
+				cValue = va_arg (args, gchar *);
+				g_key_file_set_string (pKeyFile, cGroupName, cGroupKey, cValue);
 			break ;
 			default :
 			break ;
@@ -1356,7 +1371,7 @@ void cairo_dock_update_conf_file (gchar *cConfFilePath, GType iFirstDataType, ..
 		iType = va_arg (args, GType);
 	}
 	
-	cairo_dock_write_keys_to_file (pKeyFile, g_cConfFile);
+	cairo_dock_write_keys_to_file (pKeyFile, cConfFilePath);
 	g_key_file_free (pKeyFile);
 	
 	va_end (args);
@@ -1366,7 +1381,10 @@ void cairo_dock_update_conf_file (gchar *cConfFilePath, GType iFirstDataType, ..
 void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int y)
 {
 	//g_print ("%s (%d;%d)\n", __func__, x, y);
-	cairo_dock_update_conf_file (cConfFilePath, G_TYPE_INT, &x, "Position", "x gap", G_TYPE_INT, &y, "Position", "y gap", G_TYPE_INVALID);
+	cairo_dock_update_conf_file (cConfFilePath,
+		G_TYPE_INT, "Position", "x gap", x,
+		G_TYPE_INT, "Position", "y gap", y,
+		G_TYPE_INVALID);
 	/*GKeyFile *pKeyFile = g_key_file_new ();
 	
 	GError *erreur = NULL;

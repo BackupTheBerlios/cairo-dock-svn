@@ -14,6 +14,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file)
 {
+	g_print ("%s (%s)\n", __func__, conf_file);
 	GError *erreur = NULL;
 	
 	gchar *cDirectory = g_path_get_dirname (conf_file);

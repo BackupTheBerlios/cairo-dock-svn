@@ -2,8 +2,6 @@
 #ifndef __CAIRO_DOCK_DIALOGS__
 #define  __CAIRO_DOCK_DIALOGS__
 
-#include <glib.h>
-
 #include "cairo-dock-struct.h"
 
 
@@ -221,9 +219,10 @@ void cairo_dock_hide_dialog (CairoDockDialog *pDialog);
 */
 void cairo_dock_unhide_dialog (CairoDockDialog *pDialog);
 
-
+/**
+*Retire un widget de son container sans le detruire Le widget peut alors etre replace ailleurs ulterieurement.
+*@param pDialog le dialogue.
+*/
 GtkWidget *cairo_dock_steal_widget_from_its_container (GtkWidget *pWidget);
-
-GtkWidget *cairo_dock_steal_widget_from_dialog (CairoDockDialog *pDialog);
 
 #endif

@@ -106,7 +106,7 @@ Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorT
 	
 	Icon *icon = g_new0 (Icon, 1);
 	icon->iType = iSeparatorType;
-	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
+	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
 	
 	if (bApplyRatio && pDock->iRefCount > 0)
 	{

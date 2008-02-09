@@ -98,8 +98,8 @@ cairo_dock_SOURCES = \
 	cairo-dock-applet-facility.h\
 	cairo-dock-file-manager.c\
 	cairo-dock-file-manager.h\
-	eggaccelerators.h\
 	eggaccelerators.c\
+	eggaccelerators.h\
 	cairo-dock-keybinder.c\
 	cairo-dock-keybinder.h\
 	cairo-dock-desklet.c\

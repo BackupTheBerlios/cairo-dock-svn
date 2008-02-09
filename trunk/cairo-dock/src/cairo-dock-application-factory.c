@@ -316,7 +316,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	//	g_print ("pas d'etat defini, donc on continue\n");
 	if (bSkip)
 	{
-		//g_print ("  cette fenetre est /de\n");
+		//g_print ("  cette fenetre est timide\n");
 		return NULL;
 	}
 	
@@ -412,7 +412,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	icon->iType = CAIRO_DOCK_APPLI;
 	icon->bIsHidden = bIsHidden;
 	
-	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
+	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
 	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 	
 	if (g_bUniquePid)
@@ -476,7 +476,7 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 	{
 		//g_print ("%s change son icone\n", icon->acName);
 		pCairoContext = cairo_dock_create_context_from_window (pDock);
-		cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
+		cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
 		cairo_destroy (pCairoContext);
 		cairo_dock_redraw_my_icon (icon, pDock);
 	}
@@ -513,7 +513,7 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 			{
 				//g_print ("%s change son icone\n", icon->acName);
 				pCairoContext = cairo_dock_create_context_from_window (pDock);
-				cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
+				cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
 				cairo_destroy (pCairoContext);
 				cairo_dock_redraw_my_icon (icon, pDock);
 			}

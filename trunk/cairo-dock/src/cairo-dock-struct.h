@@ -1,11 +1,11 @@
-/******************************************************************************
+/*********************************************************************************
 
 This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
-******************************************************************************/
+*********************************************************************************/
 #ifndef __CAIRO_DOCK_STRUCT__
 #define  __CAIRO_DOCK_STRUCT__
 
@@ -30,12 +30,9 @@ typedef struct _CairoDockDialog CairoDockDialog;
 typedef struct _Icon Icon;
 typedef struct _CairoDockVisitCard CairoDockVisitCard;
 typedef struct _CairoDockVFSBackend CairoDockVFSBackend;
-//typedef struct _CairoDockDesklet CairoDockDesklet;
-
-typedef enum {
-	CAIRO_DOCK_VERTICAL = 0,
-	CAIRO_DOCK_HORIZONTAL
-	} CairoDockTypeHorizontality;
+typedef struct _CairoDockDesklet CairoDockDesklet;
+typedef struct _CairoDockMinimalAppletConfig CairoDockMinimalAppletConfig;
+typedef struct _CairoDockContainer CairoDockContainer;
 
 
 typedef void (*CairoDockCalculateMaxDockSizeFunc) (CairoDock *pDock);
@@ -45,7 +42,7 @@ typedef void (*CairoDockRenderOptimizedFunc) (CairoDock *pDock, GdkRectangle *pA
 typedef void (*CairoDockSetSubDockPositionFunc) (Icon *pPointedIcon, CairoDock *pParentDock);
 
 typedef struct _CairoDockRenderer {
-	/// chemin d'un fichier readme destine a presenter de maniere succinte le module.
+	/// chemin d'un fichier readme destine a presenter de maniere succinte la vue.
 	gchar *cReadmeFilePath;
 	/// fonction calculant la taille max d'un dock.
 	CairoDockCalculateMaxDockSizeFunc calculate_max_dock_size;
@@ -64,11 +61,64 @@ typedef struct _CairoDockRenderer {
 	} CairoDockRenderer;
 
 
+
+typedef enum {
+	CAIRO_DOCK_VERTICAL = 0,
+	CAIRO_DOCK_HORIZONTAL
+	} CairoDockTypeHorizontality;
+
+typedef enum {
+	CAIRO_DOCK_DOCK = 0,
+	CAIRO_DOCK_DESKLET,
+	CAIRO_DOCK_DIALOG
+	} CairoDockTypeContainer;
+
+struct _CairoDockContainer {
+	/// type de container.
+	CairoDockTypeContainer iType;
+	/// La fenetre du widget.
+	GtkWidget *pWidget;
+	/// Taille de la fenetre. La surface allouee a l'applet s'en deduit.
+	gint iWidth, iHeight;
+	/// Position de la fenetre.
+	int iWindowPositionX, iWindowPositionY;
+	/// Vrai ssi le pointeur est dans le desklet (widgets fils inclus).
+	gboolean bInside;
+#ifdef HAVE_GLITZ
+	glitz_drawable_format_t *pDrawFormat;
+	glitz_drawable_t* pGlitzDrawable;
+	glitz_format_t* pGlitzFormat;
+#else
+	gpointer padding[3];
+#endif // HAVE_GLITZ
+};
+
+
 struct _CairoDock {
-	/// la liste de ses icones.
-	GList* icons;
+	/// type "dock".
+	CairoDockTypeContainer iType;
 	/// sa fenetre de dessin.
 	GtkWidget *pWidget;
+	/// largeur de la fenetre, _apres_ le redimensionnement par GTK.
+	gint iCurrentWidth;
+	/// hauteur de la fenetre, _apres_ le redimensionnement par GTK.
+	gint iCurrentHeight;
+	/// position courante en X du coin haut gauche de la fenetre sur l'ecran.
+	gint iWindowPositionX;
+	/// position courante en Y du coin haut gauche de la fenetre sur l'ecran.
+	gint iWindowPositionY;
+	/// lorsque la souris est dans le dock.
+	gboolean bInside;
+#ifdef HAVE_GLITZ
+	glitz_drawable_format_t *pDrawFormat;
+	glitz_drawable_t* pGlitzDrawable;
+	glitz_format_t* pGlitzFormat;
+#else
+	gpointer padding[3];
+#endif // HAVE_GLITZ
+	
+	/// la liste de ses icones.
+	GList* icons;
 	/// si le dock est le dock racine.
 	gboolean bIsMainDock;
 	/// le nombre d'icones pointant sur lui.
@@ -102,14 +152,6 @@ struct _CairoDock {
 	gint iDecorationsWidth;
 	/// hauteur des decorations.
 	gint iDecorationsHeight;
-	/// position courante en X du coin haut gauche de la fenetre sur l'ecran.
-	gint iWindowPositionX;
-	/// position courante en Y du coin haut gauche de la fenetre sur l'ecran.
-	gint iWindowPositionY;
-	/// largeur de la fenetre, _apres_ le redimensionnement par GTK.
-	gint iCurrentWidth;
-	/// hauteur de la fenetre, _apres_ le redimensionnement par GTK.
-	gint iCurrentHeight;
 	
 	gint iMaxLabelWidth;
 	gint iRightMargin;
@@ -140,8 +182,6 @@ struct _CairoDock {
 	gboolean bAtBottom;
 	/// le dock est en haut pret a etre utilise.
 	gboolean bAtTop;
-	/// lorsque la souris est dans le dock.
-	gboolean bInside;
 	/// lorsque le menu du clique droit est visible.
 	gboolean bMenuVisible;
 	
@@ -172,11 +212,6 @@ struct _CairoDock {
 	CairoDockSetSubDockPositionFunc set_subdock_position;
 	/// dit si la vue courante utilise les reflets ou pas (utile pour les plug-ins).
 	gboolean bUseReflect;
-#ifdef HAVE_GLITZ
-	glitz_drawable_format_t *pDrawFormat;
-	glitz_drawable_t* pGlitzDrawable;
-	glitz_format_t* pGlitzFormat;
-#endif // HAVE_GLITZ
 };
 
 
@@ -199,8 +234,14 @@ struct _CairoDockVisitCard {
 	gchar *cDockVersionOnCompilation;
 	/// chemin du fichier de conf du module.
 	gchar *cConfFilePath;
+	/// repertoire du plug-in cote utilisateur.
+	gchar *cUserDataDir;
+	/// repertoire d'installation du plug-in.
+	gchar *cShareDataDir;
+	/// nom de son fichier de conf.
+	gchar *cConfFileName;
 	/// octets reserves pour preserver la compatibilite binaire lors de futurs ajouts sur l'interface entre plug-ins et dock.
-	char reserved[60];
+	char reserved[48];
 };
 
 /// Construit et renvoie la carte de visite du module.
@@ -238,12 +279,33 @@ struct _CairoDockModule {
 	gchar *cPreviewFilePath;
 	/// Nom du domaine pour la traduction du module par 'gettext'.
 	gchar *cGettextDomain;
+	/// VRAI ssi l'appet est prevue pour pouvoir se detacher.
+	gboolean bCanDetach;
+};
+
+struct _CairoDockMinimalAppletConfig {
+	gint iDesiredIconWidth;
+	gint iDesiredIconHeight;
+	gchar *cLabel;
+	gchar *cIconFileName;
+	gint iDeskletWidth;
+	gint iDeskletHeight;
+	gint iDeskletPositionX;
+	gint iDeskletPositionY;
+	gboolean bIsDetached;
+	gboolean bKeepBelow;
+	gboolean bKeepAbove;
+	gboolean bOnWidgetLayer;
 };
 
 
 typedef void (* CairoDockActionOnAnswerFunc) (int iAnswer, GtkWidget *pWidget, gpointer data);
 
 struct _CairoDockDialog {
+	/// type de container.
+	CairoDockTypeContainer iType;
+	/// la fenetre GTK du dialogue.
+	GtkWidget *pWidget;
 	/// largeur de la fenetre GTK du dialogue (pointe comprise).
 	int iWidth;
 	/// hauteur de la fenetre GTK du dialogue (pointe comprise).
@@ -252,6 +314,15 @@ struct _CairoDockDialog {
 	int iPositionX;
 	/// position en Y du coin haut gauche de la fenetre GTK du dialogue.
 	int iPositionY;
+	/// vrai ssi la souris est dans le dialogue, auquel cas on le garde immobile.
+	gboolean bInside;
+#ifdef HAVE_GLITZ
+	glitz_drawable_format_t *pDrawFormat;
+	glitz_drawable_t* pGlitzDrawable;
+	glitz_format_t* pGlitzFormat;
+#else
+	gpointer padding[3];
+#endif // HAVE_GLITZ
 	/// position en X visee par la pointe dans le référentiel de l'écran.
 	int iAimedX;
 	/// position en Y visee par la pointe dans le référentiel de l'écran.
@@ -284,8 +355,6 @@ struct _CairoDockDialog {
 	int iButtonOkOffset;
 	/// decalage pour l'effet de clique sur le bouton Annuler.
 	int iButtonCancelOffset;
-	/// la fenetre GTK du dialogue.
-	GtkWidget *pWidget;
 	/// le widget de remplissage ou l'on dessine le message.
 	GtkWidget *pMessageWidget;
 	/// le widget de remplissage ou l'on dessine les boutons.
@@ -308,8 +377,6 @@ struct _CairoDockDialog {
 	GFreeFunc pFreeUserDataFunc;
 	/// icone sur laquelle pointe le dialogue.
 	Icon *pIcon;
-	/// vrai ssi la souris est dans le dialogue, auquel cas on le garde immobile.
-	gboolean bInside;
 };
 
 
@@ -499,24 +566,38 @@ struct _CairoDockVFSBackend {
 };
 
 
-/*typedef void (* CairoDockDeskletRenderer) (CairoDockDesklet *pDesklet);
+typedef void (* CairoDockDeskletRenderer) (CairoDockDesklet *pDesklet);
 
 struct _CairoDockDesklet {
+	/// type "desklet".
+	CairoDockTypeContainer iType;
 	/// La fenetre du widget.
 	GtkWidget *pWidget;
-	/// Position de la fenetre sur l'ecran.
-	gint iWindowPositionX, iWindowPositionY;
 	/// Taille de la fenetre. La surface allouee a l'applet s'en deduit.
 	gint iWidth, iHeight;
-	/// Vrai ssi la fenetre est tout le temps visible.
-	gboolean bInForeground;
-	/// Vrai ssi la fenetre est sur la couche de widget de Compiz, ou toujours derriere les autres fenetres.
-	gboolean bInBackground;
-	/// L'icone de l'applet. pas forcement utile, on pourrait la passer en argument du on_expose()...
+	/// Position de la fenetre.
+	int iWindowPositionX, iWindowPositionY;
+	/// Vrai ssi le pointeur est dans le desklet (widgets fils inclus). Desole Ctaf, mais je vois pas comment faire sans ^_^
+	gboolean bInside;
+#ifdef HAVE_GLITZ
+	glitz_drawable_format_t *pDrawFormat;
+	glitz_drawable_t* pGlitzDrawable;
+	glitz_format_t* pGlitzFormat;
+#else
+	gpointer padding[3];
+#endif // HAVE_GLITZ
+	/// pour le deplacement manuel de la fenetre.
+	gint diff_x, diff_y;
+	gboolean moving;
+	/// Le menu de config.
+	GtkWidget *pConfigMenu;
+	/// L'icone de l'applet.
 	Icon *pIcon;
 	/// La fonction de rendu. NULL pour utiliser celle par defaut qui dessine l'icone comme si elle etait dans un dock. Est appelee par la callback liee a l'expose-event de la fenetre.
 	CairoDockDeskletRenderer renderer;
-};*/
+	/// un timer pour retarde l'ecriture dans le fichier lors des deplacements/redimensionnements.
+	gint iSidWriteConfig;
+};
 
 
 #define CAIRO_DOCK_FM_VFS_ROOT "_vfsroot_"

@@ -1,11 +1,11 @@
-/******************************************************************************
+/*********************************************************************************
 
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
 Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
-******************************************************************************/
+*********************************************************************************/
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
@@ -452,7 +452,7 @@ CairoDock *cairo_dock_search_container_from_icon (Icon *icon)
 
 void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
 {
-	int Xid = GDK_WINDOW_XID (pDock->pWidget->window);
+	Window Xid = GDK_WINDOW_XID (pDock->pWidget->window);
 	int left=0, right=0, top=0, bottom=0;
 	int left_start_y=0, left_end_y=0, right_start_y=0, right_end_y=0, top_start_x=0, top_end_x=0, bottom_start_x=0, bottom_end_x=0;
 	int iHeight, iWidth;

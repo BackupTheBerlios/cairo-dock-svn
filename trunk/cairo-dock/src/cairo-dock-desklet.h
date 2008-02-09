@@ -22,52 +22,21 @@
 #ifndef __CAIRO_DOCK_DESKLET_H__
 #define  __CAIRO_DOCK_DESKLET_H__
 
-#include <glib.h>
-
-#include <cairo-dock.h>
+#include <cairo-dock-struct.h>
 
 
+CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiveWidget);
 
-typedef struct _CairoDockDesklet
-{
-  /// la fenetre GTK du dialogue.
-  GtkWidget *pWidget;
-  /// icone sur laquelle pointe le dialogue.
-  Icon *pIcon;
-  /// le widget d'interaction utilisateur (GtkEntry, GtkHScale, etc).
-  GtkWidget *pInteractiveWidget;
-  ///the menu
-  GtkWidget *pMenu;
-
-  //window position
-  gint x;
-  gint y;
-
-  //move
-  gboolean moving;
-  gint diff_x;
-  gint diff_y;
+void cairo_dock_place_desklet (CairoDockDesklet *pDesklet, int iWidth, int iHeight, int iPositionX, int iPositionY, gboolean bKeepBelow, gboolean bKeepAbove, gboolean bOnWidgetLayer);
 
 
-  /// donnees transmises a la fonction.
-  gpointer pUserData;
-  /// fonction appelee pour liberer les donnees.
-  GFreeFunc pFreeUserDataFunc;
-} CairoDockDesklet;
+void cairo_dock_free_desklet (CairoDockDesklet *pDesklet);
 
 
-CairoDockDesklet *cd_desklet_new(Icon *pIcon,
-                                 GtkWidget *pInteractiveWidget,
-                                 gpointer data,
-                                 GFreeFunc pFreeUserDataFunc);
+void cairo_dock_hide_desklet (CairoDockDesklet *pDesklet);
+void cairo_dock_show_desklet (CairoDockDesklet *pDesklet);
 
-void cd_desklet_free(CairoDockDesklet *pDialog);
-
-
-void cd_desklet_hide(CairoDockDesklet *pDialog);
-void cd_desklet_show(CairoDockDesklet *pDialog);
-
-GtkWidget *cd_desklet_steal_widget_from_desklet (CairoDockDesklet *pDialog);
+void cairo_dock_add_interactive_widget_to_desklet (GtkWidget *pInteractiveWidget, CairoDockDesklet *pDesklet);
 
 
 #endif

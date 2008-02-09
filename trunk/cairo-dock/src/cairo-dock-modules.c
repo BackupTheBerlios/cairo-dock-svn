@@ -1,11 +1,11 @@
-/******************************************************************************
+/*********************************************************************************
 
 This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
 Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
-******************************************************************************/
+*********************************************************************************/
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
@@ -421,8 +421,6 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 	
 	if (icon != NULL)
 	{
-		icon->pModule = module;
-		icon->iType = CAIRO_DOCK_APPLET;
 		icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
 	}
 	module->bActive = TRUE;
@@ -455,7 +453,7 @@ void cairo_dock_reload_module (CairoDockModule *module, CairoDock *pDock, gboole
 	}
 	
 	//\______________ Si cela n'a pas marche, on applique la sequence stop + init.
-	if (! bModuleReloaded)
+	if (! bModuleReloaded && pDock != NULL)
 	{
 		//\______________ On recupere l'eventuelle icone du module.
 		Icon *pOldIcon = cairo_dock_find_icon_from_module (module, pDock->icons);
@@ -495,17 +493,20 @@ void cairo_dock_reload_module (CairoDockModule *module, CairoDock *pDock, gboole
 			}
 	
 			g_print ("pNewIcon->fOrder <- %.1f\n", pNewIcon->fOrder);
-			cairo_dock_insert_icon_in_dock (pNewIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
+			cairo_dock_insert_icon_in_dock (pNewIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
 	
 			cairo_dock_redraw_my_icon (pNewIcon, pDock);
 		}
-		else if (pOldIcon != NULL)
+		/**else if (pOldIcon != NULL)
 		{
 			cairo_dock_update_dock_size (pDock);
 			gtk_widget_queue_draw (pDock->pWidget);
-		}
+		}*/
 		cairo_dock_free_icon (pOldIcon);
 	}
+	
+	if (bReloadAppletConf)
+		cairo_dock_update_dock_size (pDock);
 }
 
 static void _cairo_dock_deactivate_one_module (gchar *cModuleName, CairoDockModule *pModule, gpointer data)

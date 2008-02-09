@@ -135,7 +135,7 @@ cairo_surface_t *cairo_dock_load_image_for_icon (cairo_t *pSourceContext, gchar 
 }
 
 
-void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdouble fMaxScale, gboolean bHorizontalDock)
+void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdouble fMaxScale, gboolean bHorizontalDock, gboolean bApplySizeRestriction)
 {
 	//g_print ("%s (%d, %.2f, %s)\n", __func__, icon->iType, fMaxScale, icon->acFileName);
 	cairo_surface_destroy (icon->pIconBuffer);
@@ -154,18 +154,33 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 		//\_______________________ On cree la surface cairo a afficher.
 		if (cIconPath != NULL && strlen (cIconPath) > 0)
 		{
+			//cairo_surface_t *pSurface =cairo_dock_create_surface_from_image (cIconPath,
 			icon->pIconBuffer = cairo_dock_create_surface_from_image (cIconPath,
 				pSourceContext,
 				fMaxScale,
-				g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER],
-				g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER],
-				g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER],
-				g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER],
+				(bApplySizeRestriction ? g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] : 0),
+				(bApplySizeRestriction ? g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] : 0),
+				(bApplySizeRestriction ? g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] : 0),
+				(bApplySizeRestriction ? g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] : 0),
 				(bHorizontalDock ? &icon->fWidth : &icon->fHeight),
 				(bHorizontalDock ? &icon->fHeight : &icon->fWidth),
 				0,
 				1,
 				FALSE);
+			/*int w = (int) icon->fWidth * (1 + g_fAmplitude), h = (int) icon->fHeight * (1 + g_fAmplitude);
+			guchar *pSurfaceData = g_new0 (guchar, w * h * 4);
+			icon->pIconBuffer = cairo_image_surface_create_for_data (pSurfaceData,
+				CAIRO_FORMAT_ARGB32,
+				w,
+				h,
+				w * 4);
+			g_print (" + (%dx%d)\n", w, h);
+			
+			cairo_t* pCairoContext = cairo_create (icon->pIconBuffer);
+			cairo_set_source_surface (pCairoContext, pSurface, 0.0, 0.0);
+			cairo_paint (pCairoContext);
+			cairo_destroy (pCairoContext);
+			cairo_surface_destroy (pSurface);*/
 		}
 		
 		g_free (cIconPath);
@@ -176,7 +191,7 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	}
 	else if (CAIRO_DOCK_IS_APPLET (icon))  // c'est l'icône d'une applet.
 	{
-		icon->pIconBuffer = cairo_dock_create_applet_surface (icon->acFileName, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight);
+		icon->pIconBuffer = cairo_dock_create_applet_surface (icon->acFileName, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight, bApplySizeRestriction);
 	}
 	else  // c'est une icone de separation.
 	{
@@ -189,10 +204,10 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 		icon->pIconBuffer = cairo_dock_create_surface_from_image (cIconPath,
 			pSourceContext,
 			fMaxScale,
-			g_tIconAuthorizedWidth[icon->iType],
-			g_tIconAuthorizedHeight[icon->iType],
-			g_tIconAuthorizedWidth[icon->iType],
-			g_tIconAuthorizedHeight[icon->iType],
+			(bApplySizeRestriction ? g_tIconAuthorizedWidth[icon->iType] : 0),
+			(bApplySizeRestriction ? g_tIconAuthorizedHeight[icon->iType] : 0),
+			(bApplySizeRestriction ? g_tIconAuthorizedWidth[icon->iType] : 0),
+			(bApplySizeRestriction ? g_tIconAuthorizedHeight[icon->iType] : 0),
 			(bHorizontalDock ? &icon->fWidth : &icon->fHeight),
 			(bHorizontalDock ? &icon->fHeight : &icon->fWidth),
 			0,
@@ -200,6 +215,7 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 			FALSE);
 		g_free (cIconPath);
 	}
+	g_print ("%s () -> %.2fx%.2f\n", __func__, icon->fWidth, icon->fHeight);
 	
 	if (g_fAlbedo > 0 && icon->pIconBuffer != NULL && ! (CAIRO_DOCK_IS_APPLET (icon) && icon->acFileName == NULL))
 	{
@@ -291,33 +307,36 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 	icon->pTextBuffer = pNewSurface;
 }
 
-void cairo_dock_fill_one_quick_info_buffer (Icon *icon, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double fBackgroundAlpha)
+void cairo_dock_fill_one_quick_info_buffer (Icon *icon, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double fMaxScale)
 {
 	cairo_surface_destroy (icon->pQuickInfoBuffer);
 	icon->pQuickInfoBuffer = NULL;
 	if (icon->cQuickInfo == NULL)
 		return ;
 	
-	icon->pQuickInfoBuffer = cairo_dock_create_surface_from_text (icon->cQuickInfo, pSourceContext, iLabelSize, cLabelPolice, iLabelWeight, g_fLabelBackgroundColor, 1+g_fAmplitude, &icon->iQuickInfoWidth, &icon->iQuickInfoHeight, &icon->fQuickInfoXOffset, &icon->fQuickInfoYOffset);
+	icon->pQuickInfoBuffer = cairo_dock_create_surface_from_text (icon->cQuickInfo, pSourceContext, iLabelSize, cLabelPolice, iLabelWeight, g_fLabelBackgroundColor, fMaxScale, &icon->iQuickInfoWidth, &icon->iQuickInfoHeight, &icon->fQuickInfoXOffset, &icon->fQuickInfoYOffset);
 }
 
 
 
-void cairo_dock_fill_icon_buffers (Icon *icon, cairo_t *pSourceContext, double fMaxScale, gboolean bHorizontalDock)
+void cairo_dock_fill_icon_buffers (Icon *icon, cairo_t *pSourceContext, double fMaxScale, gboolean bHorizontalDock, gboolean bApplySizeRestriction)
 {
-	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, fMaxScale, bHorizontalDock);
+	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, fMaxScale, bHorizontalDock, bApplySizeRestriction);
 	
 	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : bHorizontalDock));
 	
-	cairo_dock_fill_one_quick_info_buffer (icon, pSourceContext, 12, g_cLabelPolice, PANGO_WEIGHT_HEAVY, .4);
+	cairo_dock_fill_one_quick_info_buffer (icon, pSourceContext, 12, g_cLabelPolice, PANGO_WEIGHT_HEAVY, fMaxScale);
 }
 
-void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDock *pDock)
+void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDock *pDock, CairoDockDesklet *pDesklet)
 {
 	g_return_if_fail (pIcon != NULL);
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock != NULL ? pDock : pDesklet);
 	
-	cairo_dock_fill_icon_buffers (pIcon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock);
+	if (pDock != NULL)
+		cairo_dock_fill_icon_buffers (pIcon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
+	else
+		cairo_dock_fill_icon_buffers (pIcon, pCairoContext, 1, CAIRO_DOCK_HORIZONTAL, FALSE);
 	
 	cairo_destroy (pCairoContext);
 }
@@ -345,7 +364,7 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 		if (CAIRO_DOCK_IS_APPLET (icon))
 			cairo_dock_reload_module (icon->pModule, pDock, FALSE);
 		else
-			cairo_dock_fill_icon_buffers (icon, pCairoContext, fMaxScale, pDock->bHorizontalDock);
+			cairo_dock_fill_icon_buffers (icon, pCairoContext, fMaxScale, pDock->bHorizontalDock, TRUE);
 		
 		icon->fWidth *= fRatio;
 		icon->fHeight *= fRatio;

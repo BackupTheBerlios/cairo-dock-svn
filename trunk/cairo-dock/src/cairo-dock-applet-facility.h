@@ -19,6 +19,7 @@
 */
 gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShareDataDir, gchar *cConfFileName);
 
+void cairo_dock_free_minimal_config (CairoDockMinimalAppletConfig *pMinimalConfig);
 
 /**
 *Applique une surface sur un contexte, en effacant tout au prealable.
@@ -64,8 +65,9 @@ void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, 
 *@param pSourceContext un contexte de dessin; n'est pas altere par la fonction.
 *@param cQuickInfo le texte de l'info-rapide.
 *@param pIcon l'icone.
+*@param fMaxScale le facteur de zoom max.
 */
-void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo, Icon *pIcon);
+void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo, Icon *pIcon, double fMaxScale);
 /**
 *Ecris une info-rapide sur l'icone, en prenant une chaine au format 'printf'.
 *@param pSourceContext un contexte de dessin; n'est pas altere par la fonction.
@@ -79,7 +81,7 @@ void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, Cairo
 *Efface l'info-rapide d'une icone.
 *@param pIcon l'icone.
 */
-#define cairo_dock_remove_quick_info(pIcon) cairo_dock_set_quick_info (NULL, NULL, pIcon)
+#define cairo_dock_remove_quick_info(pIcon) cairo_dock_set_quick_info (NULL, NULL, pIcon, 1)
 
 
 /**
@@ -127,7 +129,7 @@ gboolean reload (gchar *cConfFilePath);
 //\______________________ pre_init.
 /**
 *Debut de la fonction de pre-initialisation de l'applet (celle qui est appele a l'enregistrement de tous les plug-ins).
-*Defini egalement les variables globales suivantes : myIcon, myDock, et myDrawContext.
+*Defini egalement les variables globales suivantes : myIcon, myDock, myDesklet, et myDrawContext.
 *@param cName nom de sous lequel l'applet sera enregistree par Cairo-Dock.
 *@param iMajorVersion version majeure du dock necessaire au bon fonctionnement de l'applet.
 *@param iMinorVersion version mineure du dock necessaire au bon fonctionnement de l'applet.
@@ -136,6 +138,7 @@ gboolean reload (gchar *cConfFilePath);
 #define CD_APPLET_PRE_INIT_BEGIN(cName, iMajorVersion, iMinorVersion, iMicroVersion) \
 Icon *myIcon = NULL;\
 CairoDock *myDock = NULL;\
+CairoDockDesklet *myDesklet = NULL;\
 cairo_t *myDrawContext = NULL;\
 CairoDockVisitCard *pre_init (void)\
 {\
@@ -148,7 +151,10 @@ CairoDockVisitCard *pre_init (void)\
 	pVisitCard->cPreviewFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_PREVIEW_FILE);\
 	pVisitCard->cGettextDomain = g_strdup (MY_APPLET_GETTEXT_DOMAIN);\
 	pVisitCard->cDockVersionOnCompilation = g_strdup (MY_APPLET_DOCK_VERSION);\
-	pVisitCard->cConfFilePath = cairo_dock_check_conf_file_exists (MY_APPLET_USER_DATA_DIR, MY_APPLET_SHARE_DATA_DIR, MY_APPLET_CONF_FILE);
+	pVisitCard->cConfFilePath = cairo_dock_check_conf_file_exists (MY_APPLET_USER_DATA_DIR, MY_APPLET_SHARE_DATA_DIR, MY_APPLET_CONF_FILE);\
+	pVisitCard->cUserDataDir = MY_APPLET_USER_DATA_DIR;\
+	pVisitCard->cShareDataDir = MY_APPLET_SHARE_DATA_DIR;\
+	pVisitCard->cConfFileName = MY_APPLET_CONF_FILE;
 /**
 *Fin de la fonction de pre-initialisation de l'applet.
 */
@@ -173,13 +179,28 @@ CD_APPLET_PRE_INIT_END
 #define CD_APPLET_INIT_BEGIN(erreur) \
 Icon *init (CairoDock *pDock, CairoDockModule *pModule, GError **erreur) \
 { \
-	myDock = pDock; \
-	int iDesiredWidth = 48, iDesiredHeight = 48; \
-	gchar *cAppletName = NULL, *cIconName = NULL; \
 	gchar *cConfFilePath = cairo_dock_check_conf_file_exists (MY_APPLET_USER_DATA_DIR, MY_APPLET_SHARE_DATA_DIR, MY_APPLET_CONF_FILE); \
-	read_conf_file (cConfFilePath, &iDesiredWidth, &iDesiredHeight, &cAppletName, &cIconName); \
+	CairoDockMinimalAppletConfig *pMinimalConfig = read_conf_file (cConfFilePath); \
+	pModule->bCanDetach = pMinimalConfig->bCanDetach; \
 	g_free (cConfFilePath); \
-	myIcon = cairo_dock_create_icon_for_applet (pDock, iDesiredWidth, iDesiredHeight, cAppletName, cIconName, pModule); \
+	if (pMinimalConfig->bIsDetached) \
+	{\
+		myDesklet = cairo_dock_create_desklet (NULL, NULL); \
+		cairo_dock_place_desklet (myDesklet, pMinimalConfig->iDeskletWidth, pMinimalConfig->iDeskletHeight, pMinimalConfig->iDeskletPositionX, pMinimalConfig->iDeskletPositionY, pMinimalConfig->bKeepBelow, pMinimalConfig->bKeepAbove, pMinimalConfig->bOnWidgetLayer);\
+	}\
+	else \
+	{\
+		myDock = pDock; \
+	}\
+	myIcon = cairo_dock_create_icon_for_applet (myDock, myDesklet, (myDock != NULL ? pMinimalConfig->iDesiredIconWidth : MAX (1, pMinimalConfig->iDeskletWidth - 2 * g_iDockRadius)), (myDock != NULL ? pMinimalConfig->iDesiredIconHeight : MAX (1, pMinimalConfig->iDeskletHeight - 2 * g_iDockRadius)), pMinimalConfig->cLabel, pMinimalConfig->cIconFileName, pModule); \
+	myIcon->fScale = 1;\
+	myIcon->fDrawX = g_iDockRadius;\
+	myIcon->fDrawY = g_iDockRadius;\
+	if (myDesklet != NULL) \
+	{\
+		myDesklet->pIcon = myIcon; \
+		gtk_widget_queue_draw (myDesklet->pWidget);\
+	}\
 	g_return_val_if_fail (myIcon != NULL, NULL); \
 	myDrawContext = cairo_create (myIcon->pIconBuffer); \
 	g_return_val_if_fail (cairo_status (myDrawContext) == CAIRO_STATUS_SUCCESS, NULL);
@@ -187,9 +208,8 @@ Icon *init (CairoDock *pDock, CairoDockModule *pModule, GError **erreur) \
 *Fin de la fonction d'initialisation de l'applet.
 */
 #define CD_APPLET_INIT_END \
-	g_free (cAppletName); \
-	g_free (cIconName); \
-	return myIcon; \
+	cairo_dock_free_minimal_config (pMinimalConfig); \
+	return (myDock != NULL ? myIcon : NULL); \
 }
 
 //\______________________ stop.
@@ -204,6 +224,7 @@ void stop (void) \
 */
 #define CD_APPLET_STOP_END \
 	myDock = NULL; \
+	myDesklet = NULL; \
 	myIcon = NULL; \
 	cairo_destroy (myDrawContext); \
 	myDrawContext = NULL; \
@@ -217,18 +238,53 @@ void stop (void) \
 gboolean reload (gchar *cConfFilePath) \
 {\
 	g_print ("%s (%s, %d)\n", __func__, cConfFilePath, (cConfFilePath != NULL)); \
+	CairoDockMinimalAppletConfig *pMinimalConfig  = NULL;\
+	gboolean bToBeInserted = FALSE;\
 	if (cConfFilePath != NULL)\
 	{\
 		g_print ("On recharge notre config\n");\
-		int iDesiredWidth = 48, iDesiredHeight = 48;\
 		gchar *cAppletName = NULL, *cIconName = NULL;\
-		read_conf_file (cConfFilePath, &iDesiredWidth, &iDesiredHeight, &cAppletName, &cIconName);\
+		pMinimalConfig = read_conf_file (cConfFilePath);\
 		g_free (myIcon->acName);\
-		myIcon->acName = cAppletName;\
+		myIcon->acName = pMinimalConfig->cLabel;\
 		g_free (myIcon->acFileName);\
-		myIcon->acFileName = cIconName;\
+		myIcon->acFileName = pMinimalConfig->cIconFileName;\
+		if (pMinimalConfig->bIsDetached)\
+		{\
+			if (myDesklet == NULL)\
+			{\
+				cairo_dock_detach_icon_from_dock (myIcon, myDock, g_bUseSeparator);\
+				myDock = NULL;\
+				myDesklet = cairo_dock_create_desklet (NULL, NULL);\
+				cairo_dock_place_desklet (myDesklet, pMinimalConfig->iDeskletWidth, pMinimalConfig->iDeskletHeight, pMinimalConfig->iDeskletPositionX, pMinimalConfig->iDeskletPositionY, pMinimalConfig->bKeepBelow, pMinimalConfig->bKeepAbove, pMinimalConfig->bOnWidgetLayer);\
+			}\
+			myIcon->fWidth = MAX (1, myDesklet->iWidth - 2 * g_iDockRadius);\
+			myIcon->fHeight= MAX (1, myDesklet->iHeight - 2 * g_iDockRadius);\
+		}\
+		else\
+		{\
+			if (myDock == NULL)\
+			{\
+				myDock = g_pMainDock;\
+				cairo_dock_free_desklet (myDesklet);\
+				myDesklet = NULL;\
+				bToBeInserted = TRUE;\
+				myIcon->fWidth = pMinimalConfig->iDesiredIconWidth;\
+				myIcon->fHeight = pMinimalConfig->iDesiredIconHeight;\
+			}\
+		}\
 	}\
-	cairo_dock_load_one_icon_from_scratch (myIcon, myDock);\
+	cairo_dock_load_one_icon_from_scratch (myIcon, myDock, myDesklet);\
+	if (bToBeInserted)\
+		cairo_dock_insert_icon_in_dock (myIcon, myDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);\
+	if (myDesklet != NULL)\
+	{\
+		myIcon->fScale = 1;\
+		myIcon->fDrawX = g_iDockRadius;\
+		myIcon->fDrawY = g_iDockRadius;\
+		myDesklet->pIcon = myIcon;\
+		gtk_widget_queue_draw (myDesklet->pWidget);\
+	}\
 	cairo_destroy (myDrawContext);\
 	myDrawContext = cairo_create (myIcon->pIconBuffer);\
 	g_return_val_if_fail (cairo_status (myDrawContext) == CAIRO_STATUS_SUCCESS, FALSE);
@@ -237,6 +293,7 @@ gboolean reload (gchar *cConfFilePath) \
 *Fin de la fonction de rechargement de l'applet.
 */
 #define CD_APPLET_RELOAD_END \
+	g_free (pMinimalConfig);\
 	return TRUE; \
 }
 
@@ -260,40 +317,57 @@ gboolean reload (gchar *cConfFilePath) \
 *@param cDefaultIconName nom de l'icone a appliquer par defaut a l'applet, ou NULL si aucune icone ne doit etre lue dans la conf (auquel cas la surface de l'icone sera juste transparente).
 */
 #define CD_APPLET_CONFIG_BEGIN(cDefaultAppletName, cDefaultIconName) \
-void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cAppletName, gchar **cIconName) \
+CairoDockMinimalAppletConfig *read_conf_file (gchar *cConfFilePath) \
 { \
 	g_print ("%s (%s)\n", __func__, cConfFilePath); \
 	GError *erreur = NULL; \
-	gboolean bFlushConfFileNeeded = FALSE; \
+	gboolean bFlushConfFileNeeded = FALSE, bNewKeysPresent = FALSE; \
 	GKeyFile *pKeyFile = g_key_file_new (); \
 	g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur); \
 	if (erreur != NULL) \
 	{ \
 		g_print ("Attention : %s\n", erreur->message); \
 		g_error_free (erreur); \
+		return NULL; \
 	} \
-	*iWidth = cairo_dock_get_integer_key_value (pKeyFile, "Icon", "width", &bFlushConfFileNeeded, 48, NULL, NULL); \
-	*iHeight = cairo_dock_get_integer_key_value (pKeyFile, "Icon", "height", &bFlushConfFileNeeded, 48, NULL, NULL); \
+	CairoDockMinimalAppletConfig *pMinimalConfig = g_new0 (CairoDockMinimalAppletConfig, 1); \
+	pMinimalConfig->iDesiredIconWidth = cairo_dock_get_integer_key_value (pKeyFile, "Icon", "width", &bFlushConfFileNeeded, 48, NULL, NULL); \
+	pMinimalConfig->iDesiredIconHeight = cairo_dock_get_integer_key_value (pKeyFile, "Icon", "height", &bFlushConfFileNeeded, 48, NULL, NULL); \
 	if (cDefaultAppletName != NULL) \
-		*cAppletName = cairo_dock_get_string_key_value (pKeyFile, "Icon", "name", &bFlushConfFileNeeded, cDefaultAppletName, NULL, NULL); \
+		pMinimalConfig->cLabel = cairo_dock_get_string_key_value (pKeyFile, "Icon", "name", &bFlushConfFileNeeded, cDefaultAppletName, NULL, NULL); \
 	if (cDefaultIconName != NULL) \
-		*cIconName = cairo_dock_get_string_key_value (pKeyFile, "Icon", "icon", &bFlushConfFileNeeded, cDefaultIconName, NULL, NULL);
+		pMinimalConfig->cIconFileName = cairo_dock_get_string_key_value (pKeyFile, "Icon", "icon", &bFlushConfFileNeeded, cDefaultIconName, NULL, NULL); \
+	pMinimalConfig->bCanDetach = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "can detach", NULL, FALSE, NULL, NULL); \
+	if (pMinimalConfig->bCanDetach)\
+	{\
+		pMinimalConfig->iDeskletWidth = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "width", &bNewKeysPresent, 92, NULL, NULL); \
+		pMinimalConfig->iDeskletHeight = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "height", &bNewKeysPresent, 92, NULL, NULL); \
+		pMinimalConfig->iDeskletPositionX = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "x position", &bNewKeysPresent, 0, NULL, NULL); \
+		pMinimalConfig->iDeskletPositionY = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "y position", &bNewKeysPresent, 0, NULL, NULL); \
+		pMinimalConfig->bIsDetached = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "initially detached", &bNewKeysPresent, FALSE, NULL, NULL); \
+		pMinimalConfig->bKeepBelow = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "keep below", &bNewKeysPresent, FALSE, NULL, NULL); \
+		pMinimalConfig->bKeepAbove = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "keep above", &bNewKeysPresent, FALSE, NULL, NULL); \
+		pMinimalConfig->bOnWidgetLayer = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "on widget layer", &bNewKeysPresent, FALSE, NULL, NULL);\
+	}
 /**
 *Fin de la fonction de configuration de l'applet.
 */
 #define CD_APPLET_CONFIG_END \
+	if (bNewKeysPresent) \
+		cairo_dock_write_keys_to_file (pKeyFile, cConfFilePath); \
 	if (! bFlushConfFileNeeded) \
 		bFlushConfFileNeeded = cairo_dock_conf_file_needs_update (pKeyFile, MY_APPLET_VERSION); \
 	if (bFlushConfFileNeeded) \
 		cairo_dock_flush_conf_file (pKeyFile, cConfFilePath, MY_APPLET_SHARE_DATA_DIR);\
 	g_key_file_free (pKeyFile); \
+	return pMinimalConfig; \
 }
 
 /**
 *Definition de la fonction de configuration, a inclure dans le .h correspondant.
 */
 #define CD_APPLET_CONFIG_H \
-void read_conf_file (gchar *cConfFilePath, int *iWidth, int *iHeight, gchar **cAppletName, gchar **cIconName);
+CairoDockMinimalAppletConfig *read_conf_file (gchar *cConfFilePath);
 
 /**
 *Recupere la valeur d'un parametre 'booleen' du fichier de conf.
@@ -425,9 +499,6 @@ CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT (cGroupName, cKeyName, TRUE)
 *@param pColorBuffer tableau de 3 double deja alloue, et qui sera rempli avec les 3 composantes de la couleur.
 */
 #define CD_CONFIG_GET_COLOR_RVB(cGroupName, cKeyName, pColorBuffer) CD_CONFIG_GET_COLOR_RVB_WITH_DEFAULT(cGroupName, cKeyName, pColorBuffer, NULL)
-
-
-
 
 /**
 *Liste les themes contenu dans un repertoire, met a jour le fichier de conf avec, et renvoie le chemin correspondant au theme choisi.
@@ -681,43 +752,43 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 *Redessine immediatement l'icone de l'applet.
 */
 #define CD_APPLET_REDRAW_MY_ICON \
-	cairo_dock_redraw_my_icon (myIcon, myDock);
+	cairo_dock_redraw_my_icon (myIcon, (myDock != NULL ? myDock : myDesklet));
 
 /**
 *Applique une surface existante sur le contexte de dessin de l'applet, et la redessine. La surface est redimensionnee aux dimensions de l'icone.
 *@param pSurface
 */
 #define CD_APPLET_SET_SURFACE_ON_MY_ICON(pSurface) \
-	cairo_dock_set_icon_surface_with_reflect (myDrawContext, pSurface, myIcon, myDock); \
-	cairo_dock_redraw_my_icon (myIcon, myDock);
+	cairo_dock_set_icon_surface_with_reflect (myDrawContext, pSurface, myIcon, (myDock != NULL ? myDock : myDesklet)); \
+	cairo_dock_redraw_my_icon (myIcon, (myDock != NULL ? myDock : myDesklet));
 
 /**
 *Applique une image definie par son chemin sur le contexte de dessin de l'applet, et la redessine. L'image est redimensionnee aux dimensions de l'icone.
 *@param cImagePath chemin du fichier de l'image.
 */
 #define CD_APPLET_SET_IMAGE_ON_MY_ICON(cImagePath) \
-	cairo_dock_set_image_on_icon (myDrawContext, cImagePath, myIcon, myDock);
+	cairo_dock_set_image_on_icon (myDrawContext, cImagePath, myIcon, (myDock != NULL ? myDock : myDesklet));
 
 /**
 *Remplace l'etiquette de l'icone de l'applet par une nouvelle.
 *@param cIconName la nouvelle etiquette.
 */
 #define CD_APPLET_SET_NAME_FOR_MY_ICON(cIconName) \
-	cairo_dock_set_icon_name (myDrawContext, cIconName, myIcon, myDock);
+	cairo_dock_set_icon_name (myDrawContext, cIconName, myIcon, (myDock != NULL ? myDock : myDesklet));
 
 /**
 *Ecris une info-rapide sur l'icone de l'applet.
 *@param cQuickInfoFormat l'info-rapide, au format 'printf'. Ce doit etre une chaine de caracteres particulièrement petite, representant une info concise, puisque ecrite directement sur l'icone.
 */
 #define CD_APPLET_SET_QUICK_INFO_ON_MY_ICON(cQuickInfoFormat, ...) \
-	cairo_dock_set_quick_info_full (myDrawContext, myIcon, myDock, cQuickInfoFormat, ##__VA_ARGS__);
+	cairo_dock_set_quick_info_full (myDrawContext, myIcon, (myDock != NULL ? myDock : myDesklet), cQuickInfoFormat, ##__VA_ARGS__);
 /**
 *Ecris une info-rapide sur l'icone de l'applet et la redessine.
 *@param cQuickInfoFormat l'info-rapide, au format 'printf'. Ce doit etre une chaine de caracteres particulièrement petite, representant une info concise, puisque ecrite directement sur l'icone.
 */
 #define CD_APPLET_SET_QUICK_INFO_ON_MY_ICON_AND_REDRAW(cQuickInfoFormat, ...) \
-	cairo_dock_set_quick_info_full (myDrawContext, myIcon, myDock, cQuickInfoFormat, ##__VA_ARGS__); \
-	cairo_dock_redraw_my_icon (myIcon, myDock);
+	cairo_dock_set_quick_info_full (myDrawContext, myIcon, (myDock != NULL ? myDock : myDesklet), cQuickInfoFormat, ##__VA_ARGS__); \
+	cairo_dock_redraw_my_icon (myIcon, (myDock != NULL ? myDock : myDesklet));
 
 /**
 *Ecris une info-rapide sur l'icone de l'applet et la redessine.
@@ -731,14 +802,14 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 *@param iAnimationLength duree de l'animation, en nombre de tours.
 */
 #define CD_APPLET_ANIMATE_MY_ICON(iAnimationType, iAnimationLength) \
-	cairo_dock_animate_icon (myIcon, myDock, iAnimationType, iAnimationLength);
+	cairo_dock_animate_icon (myIcon, (myDock != NULL ? myDock : myDesklet), iAnimationType, iAnimationLength);
 
 /**
 *Charge une image dans une surface, aux dimensions de l'icone de l'applet.
 *@param cImagePath chemin du fichier de l'image.
 *@return la surface nouvellement creee.
 */
-#define CD_APPLET_LOAD_SURFACE_FOR_MY_APPLET(cImagePath) cairo_dock_create_surface_for_icon (cImagePath, myDrawContext, myIcon->fWidth * (1 + g_fAmplitude), myIcon->fHeight* (1 + g_fAmplitude));
+#define CD_APPLET_LOAD_SURFACE_FOR_MY_APPLET(cImagePath) cairo_dock_create_surface_for_icon (cImagePath, myDrawContext, myIcon->fWidth * (myDock != NULL ? 1 + g_fAmplitude : 1), myIcon->fHeight* (myDock != NULL ? 1 + g_fAmplitude : 1));
 
 //\_________________________________ INCLUDE
 /**
@@ -747,7 +818,8 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 #define CD_APPLET_INCLUDE_MY_VARS \
 extern Icon *myIcon; \
 extern cairo_t *myDrawContext; \
-extern CairoDock *myDock;
+extern CairoDock *myDock; \
+extern CairoDockDesklet *myDesklet;
 
 //\_________________________________ INTERNATIONNALISATION
 /**
