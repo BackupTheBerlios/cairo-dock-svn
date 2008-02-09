@@ -103,7 +103,10 @@ cairo_dock_SOURCES = \
 	cairo-dock-keybinder.c\
 	cairo-dock-keybinder.h\
 	cairo-dock-desklet.c\
-	cairo-dock-desklet.h
+	cairo-dock-desklet.h\
+	cairo-dock-log.c\
+	cairo-dock-log.h
+
 
 
 cairo_dockincludedir =\
@@ -144,4 +147,5 @@ cairo_docksubinclude_HEADERS =\
 	cairo-dock-applet-facility.h\
 	cairo-dock-file-manager.h\
 	cairo-dock-keybinder.h\
-	cairo-dock-desklet.h
+	cairo-dock-desklet.h\
+	cairo-dock-log.h
