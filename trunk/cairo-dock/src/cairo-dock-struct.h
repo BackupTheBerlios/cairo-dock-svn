@@ -288,6 +288,7 @@ struct _CairoDockMinimalAppletConfig {
 	gint iDesiredIconHeight;
 	gchar *cLabel;
 	gchar *cIconFileName;
+	gboolean bCanDetach;
 	gint iDeskletWidth;
 	gint iDeskletHeight;
 	gint iDeskletPositionX;
