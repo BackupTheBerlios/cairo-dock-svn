@@ -244,7 +244,6 @@ main (int argc, char** argv)
         //No log
         cd_log_set_level(0);
         cd_log_set_level(G_LOG_LEVEL_WARNING);
-        cd_warning("shit\n");
 	gtk_init (&argc, &argv);
 
 	//\___________________ On recupere quelques options.
