@@ -34,6 +34,27 @@
 
 static GLogLevelFlags gLogLevel = 0;
 
+
+const char*_cd_log_level_to_string(const GLogLevelFlags loglevel)
+{
+  switch(loglevel)
+  {
+  case G_LOG_LEVEL_CRITICAL:
+    return "\033[1;31mCRITICAL: \033[0m ";
+  case G_LOG_LEVEL_ERROR:
+    return "\033[1;31mERROR   : \033[0m ";
+  case G_LOG_LEVEL_WARNING:
+    return "\033[1;32mwarning : \033[0m ";
+  case G_LOG_LEVEL_MESSAGE:
+    return "\033[1;32mmessage : \033[0m ";
+  case G_LOG_LEVEL_INFO:
+    return "\033[1;33minfo    : \033[0m ";
+  case G_LOG_LEVEL_DEBUG:
+    return "\033[1;35mdebug   : \033[0m ";
+  }
+  return "";
+}
+
 void cd_log_location(const GLogLevelFlags loglevel,
                      const char *file,
                      const char *func,
@@ -42,32 +63,25 @@ void cd_log_location(const GLogLevelFlags loglevel,
                      ...)
 {
   va_list args;
+
+/* #    'black'     => "\033[30m", */
+/* #    'red'       => "\033[31m", */
+/* #    'green'     => "\033[32m", */
+/* #    'yellow'    => "\033[33m", */
+/* #    'blue'      => "\033[34m", */
+/* #    'magenta'   => "\033[35m", */
+/* #    'purple'    => "\033[35m", */
+/* #    'cyan'      => "\033[36m", */
+/* #    'white'     => "\033[37m", */
+/* #    'darkgray'  => "\033[30m"); */
+
   if (loglevel > gLogLevel)
     return;
-  g_print("(%s:%s:%d) ", file, func, line);
+  g_print(_cd_log_level_to_string(loglevel));
+  g_print("\033[0;37m(%s:%s:%d) \033[1m \n  ", file, func, line);
   va_start(args, format);
   g_logv(G_LOG_DOMAIN, loglevel, format, args);
   va_end(args);
-}
-
-const char*_cd_log_level_to_string(const GLogLevelFlags loglevel)
-{
-  switch(loglevel)
-  {
-  case G_LOG_LEVEL_CRITICAL:
-    return "CRITICAL: ";
-  case G_LOG_LEVEL_ERROR:
-    return "ERROR   : ";
-  case G_LOG_LEVEL_WARNING:
-    return "warning : ";
-  case G_LOG_LEVEL_MESSAGE:
-    return "message : ";
-  case G_LOG_LEVEL_INFO:
-    return "info    : ";
-  case G_LOG_LEVEL_DEBUG:
-    return "debug   : ";
-  }
-  return "";
 }
 
 static void cairo_dock_log_handler(const gchar *log_domain,
@@ -77,7 +91,7 @@ static void cairo_dock_log_handler(const gchar *log_domain,
 {
   if (log_level > gLogLevel)
     return;
-  g_print("%s%s", _cd_log_level_to_string(log_level), message);
+  g_print("%s", message);
 }
 
 void cd_log_init()

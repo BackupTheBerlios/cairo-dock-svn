@@ -241,7 +241,10 @@ main (int argc, char** argv)
 	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)
 		g_tIconTypeOrder[i] = i;
 	cd_log_init();
+        //No log
         cd_log_set_level(0);
+        cd_log_set_level(G_LOG_LEVEL_WARNING);
+        cd_warning("shit\n");
 	gtk_init (&argc, &argv);
 
 	//\___________________ On recupere quelques options.
