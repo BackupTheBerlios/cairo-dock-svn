@@ -34,6 +34,17 @@
 
 static GLogLevelFlags gLogLevel = 0;
 
+/* #    'default'     => "\033[1m", */
+
+/* #    'black'     => "\033[30m", */
+/* #    'red'       => "\033[31m", */
+/* #    'green'     => "\033[32m", */
+/* #    'yellow'    => "\033[33m", */
+/* #    'blue'      => "\033[34m", */
+/* #    'magenta'   => "\033[35m", */
+/* #    'cyan'      => "\033[36m", */
+/* #    'white'     => "\033[37m", */
+
 
 const char*_cd_log_level_to_string(const GLogLevelFlags loglevel)
 {
@@ -63,17 +74,6 @@ void cd_log_location(const GLogLevelFlags loglevel,
                      ...)
 {
   va_list args;
-
-/* #    'black'     => "\033[30m", */
-/* #    'red'       => "\033[31m", */
-/* #    'green'     => "\033[32m", */
-/* #    'yellow'    => "\033[33m", */
-/* #    'blue'      => "\033[34m", */
-/* #    'magenta'   => "\033[35m", */
-/* #    'purple'    => "\033[35m", */
-/* #    'cyan'      => "\033[36m", */
-/* #    'white'     => "\033[37m", */
-/* #    'darkgray'  => "\033[30m"); */
 
   if (loglevel > gLogLevel)
     return;
