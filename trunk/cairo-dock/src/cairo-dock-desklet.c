@@ -154,8 +154,8 @@ static gboolean _cairo_dock_write_desklet_config (CairoDockDesklet *pDesklet)
 	return FALSE;
 }
 static gboolean on_configure_desklet (GtkWidget* pWidget,
-	GdkEventConfigure* pEvent,
-	CairoDockDesklet *pDesklet)
+                                      GdkEventConfigure* pEvent,
+                                      CairoDockDesklet *pDesklet)
 {
 	cd_message ("%s (%dx%d ; %d,%d)\n", __func__, pEvent->width, pEvent->height, (int) pEvent->x, (int) pEvent->y);
 	if (pDesklet->iWidth != pEvent->width || pDesklet->iHeight != pEvent->height)

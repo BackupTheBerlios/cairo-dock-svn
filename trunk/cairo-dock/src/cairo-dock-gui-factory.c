@@ -142,7 +142,7 @@ static void _cairo_dock_configure (GtkButton *button, gpointer *data)
 		cairo_dock_configure_module (pDialog, pModule, g_pMainDock, &erreur);
 		if (erreur != NULL)
 		{
-			cd_message ("Attention : %s\n", erreur->message);
+			cd_warning ("%s\n", erreur->message);
 			g_error_free (erreur);
 		}
 	}
