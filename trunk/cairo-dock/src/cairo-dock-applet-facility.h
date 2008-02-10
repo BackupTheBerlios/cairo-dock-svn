@@ -581,12 +581,13 @@ gboolean CD_APPLET_ON_CLICK (gpointer *data);
 #define CD_APPLET_ON_BUILD_MENU_BEGIN \
 gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data) \
 { \
+	g_print ("MENU'\n");\
 	Icon *pClickedIcon = data[0]; \
 	CairoDock *pClickedDock = data[1]; \
 	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock)) \
 	{ \
 		GtkWidget *pAppletMenu = data[2]; \
-		GtkWidget *pMenuItem;
+		GtkWidget *pMenuItem, image;
 /**
 *Fin de la fonction de notification de construction du menu. Par defaut elle intercepte la notification si elle l'a recue.
 */
@@ -649,6 +650,14 @@ cairo_dock_create_sub_menu (cLabel, pMenu);
 *@param pMenu GtkWidget du menu auquel on rajoutera l'entree.
 */
 #define CD_APPLET_ADD_IN_MENU(cLabel, pFunction, pMenu) CD_APPLET_ADD_IN_MENU_WITH_DATA(cLabel, pFunction, pMenu, NULL)
+
+#define CD_APPLET_ADD_IN_MENU_WITH_STOCK(cLabel, gtkStock, pFunction, pMenu, pData) \
+	menu_item = gtk_image_menu_item_new_with_label (_(cLabel));\
+	image = gtk_image_new_from_stock (gtkStock, GTK_ICON_SIZE_MENU);\
+	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);\
+	gtk_menu_shell_append  (GTK_MENU_SHELL (pMenu), menu_item);\
+	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(pFunction), pData);
+
 
 /**
  * Ajoute un separateur dans un menu deja existant

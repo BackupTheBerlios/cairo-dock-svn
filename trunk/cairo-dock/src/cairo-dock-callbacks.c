@@ -953,21 +953,21 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				}
 				s_pIconClicked = NULL;
 			break ;
-
+			
 			case GDK_BUTTON_PRESS :
 				if ( ! (pButton->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK)))
 				{
 					s_pIconClicked = icon;  // on ne definit pas l'animation CAIRO_DOCK_FOLLOW_MOUSE ici , on le fera apres le 1er mouvement, pour eviter que l'icone soit dessinee comme tel quand on clique dessus alors que le dock ets en train de jouer une animation (ca provoque un flash desagreable).
 				}
 			break ;
-
+			
 			case GDK_2BUTTON_PRESS :
 				{
 					gpointer data[2] = {icon, pDock};
 					cairo_dock_notify (CAIRO_DOCK_DOUBLE_CLICK_ICON, data);
 				}
 			break ;
-
+			
 			default :
 			break ;
 		}

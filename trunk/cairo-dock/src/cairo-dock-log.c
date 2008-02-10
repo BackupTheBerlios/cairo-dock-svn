@@ -91,7 +91,7 @@ static void cairo_dock_log_handler(const gchar *log_domain,
 {
   if (log_level > gLogLevel)
     return;
-  g_print("%s", message);
+  g_print(message);
 }
 
 void cd_log_init()
