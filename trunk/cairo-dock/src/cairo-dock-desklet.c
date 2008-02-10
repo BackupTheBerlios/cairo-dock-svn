@@ -228,6 +228,13 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 					G_TYPE_INT, "Desklet", "width", pDesklet->iWidth,
 					G_TYPE_INT, "Desklet", "height", pDesklet->iHeight,
 					G_TYPE_INVALID);
+			gpointer data[2] = {pDesklet->pIcon, pDesklet};
+			cairo_dock_notify (CAIRO_DOCK_CLICK_ICON, data);
+		}
+		else if (pButton->type == GDK_2BUTTON_PRESS)
+		{
+			gpointer data[2] = {pDesklet->pIcon, pDesklet};
+			cairo_dock_notify (CAIRO_DOCK_DOUBLE_CLICK_ICON, data);
 		}
 
 		return TRUE;
@@ -243,6 +250,11 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 			NULL,
 			1,
 			gtk_get_current_event_time ());
+	}
+	else if (pButton->button == 2 && pButton->type == GDK_BUTTON_PRESS)  // clique milieu.
+	{
+		gpointer data[2] = {pDesklet->pIcon, pDesklet};
+		cairo_dock_notify (CAIRO_DOCK_MIDDLE_CLICK_ICON, data);
 	}
 	return FALSE;
 }
