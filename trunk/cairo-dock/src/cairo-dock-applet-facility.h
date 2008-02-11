@@ -581,7 +581,6 @@ gboolean CD_APPLET_ON_CLICK (gpointer *data);
 #define CD_APPLET_ON_BUILD_MENU_BEGIN \
 gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data) \
 { \
-	cd_debug ("MENU'\n");\
 	Icon *pClickedIcon = data[0]; \
 	CairoDock *pClickedDock = data[1]; \
 	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock)) \

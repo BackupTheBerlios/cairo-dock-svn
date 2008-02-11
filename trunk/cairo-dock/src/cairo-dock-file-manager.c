@@ -195,6 +195,17 @@ gchar *cairo_dock_fm_get_desktop_path (void)
 		return NULL;
 }
 
+gboolean cairo_dock_fm_logout (void)
+{
+	if (s_pVFSBackend != NULL && s_pVFSBackend->logout!= NULL)
+	{
+		s_pVFSBackend->logout ();
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
 
 Icon *cairo_dock_fm_create_icon_from_URI (const gchar *cURI, CairoDock *pDock)
 {

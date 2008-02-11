@@ -41,6 +41,7 @@ gboolean cairo_dock_fm_move_file (const gchar *cURI, const gchar *cDirectoryURI)
 
 gchar *cairo_dock_fm_get_trash_path (const gchar *cNearURI, gboolean bCreateIfNecessary);
 gchar *cairo_dock_fm_get_desktop_path (void);
+gboolean cairo_dock_fm_logout (void);
 
 
 Icon *cairo_dock_fm_create_icon_from_URI (const gchar *cURI, CairoDock *pDock);

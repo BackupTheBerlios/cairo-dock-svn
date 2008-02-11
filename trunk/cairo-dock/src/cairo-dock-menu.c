@@ -787,7 +787,7 @@ static void cairo_dock_keep_below(GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
-
+	
 	gtk_window_set_keep_below(GTK_WINDOW(pDock->pWidget), TRUE);
 	gtk_window_set_keep_above(GTK_WINDOW(pDock->pWidget), FALSE);
 	if (CAIRO_DOCK_IS_VALID_APPLET (icon))
@@ -799,18 +799,21 @@ static void cairo_dock_keep_below(GtkMenuItem *menu_item, gpointer *data)
 
 //for compiz fusion "widget layer"
 //set behaviour in compiz to: (name=cairo-dock-desklet & type=utility)
-static void cairo_dock_keep_on_widget_layer(GtkMenuItem *menu_item, CairoDockDesklet *pDesklet)
+static void cairo_dock_keep_on_widget_layer(GtkMenuItem *menu_item, gpointer *data)
 {
-	cairo_dock_hide_desklet (pDesklet);
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
+	
+	cairo_dock_hide_desklet (pDock);
 	gboolean bOnCompizWidgetLayer = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menu_item));
 	if (bOnCompizWidgetLayer)
-		gtk_window_set_type_hint(GTK_WINDOW(pDesklet->pWidget), GDK_WINDOW_TYPE_HINT_UTILITY);
+		gtk_window_set_type_hint(GTK_WINDOW(pDock->pWidget), GDK_WINDOW_TYPE_HINT_UTILITY);
 	else
-		gtk_window_set_type_hint(GTK_WINDOW(pDesklet->pWidget), GDK_WINDOW_TYPE_HINT_NORMAL);
-	cairo_dock_show_desklet (pDesklet);
+		gtk_window_set_type_hint(GTK_WINDOW(pDock->pWidget), GDK_WINDOW_TYPE_HINT_NORMAL);
+	cairo_dock_show_desklet (pDock);
 
-	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
-		cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
+	if (CAIRO_DOCK_IS_VALID_APPLET (icon))
+		cairo_dock_update_conf_file (icon->pModule->cConfFilePath,
 			G_TYPE_INT, "Desklet", "on widget layer", bOnCompizWidgetLayer,
 			G_TYPE_INVALID);
 }
