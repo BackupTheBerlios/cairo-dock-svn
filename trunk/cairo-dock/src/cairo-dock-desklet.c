@@ -28,6 +28,7 @@
 #include <string.h>
 #include <math.h>
 
+#include <gdk/gdkx.h>
 #include "cairo-dock-draw.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-dialogs.h"

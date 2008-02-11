@@ -14,6 +14,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <cairo.h>
 #include <gtk/gtk.h>
 #include <glib/gstdio.h>
+#include <gdk/gdkx.h>
 
 #include "cairo-dock-config.h"
 #include "cairo-dock-draw.h"
@@ -787,7 +788,7 @@ static void cairo_dock_keep_below(GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
-	
+
 	gtk_window_set_keep_below(GTK_WINDOW(pDock->pWidget), TRUE);
 	gtk_window_set_keep_above(GTK_WINDOW(pDock->pWidget), FALSE);
 	if (CAIRO_DOCK_IS_VALID_APPLET (icon))
@@ -803,10 +804,10 @@ static void cairo_dock_keep_on_widget_layer(GtkMenuItem *menu_item, gpointer *da
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
-	
+
 	cairo_dock_hide_desklet (pDock);
 	Window Xid = GDK_WINDOW_XID (pDock->pWidget->window);
-	
+
 	gboolean bOnCompizWidgetLayer = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menu_item));
 	g_print ("bOnCompizWidgetLayer : %d\n", bOnCompizWidgetLayer);
 	if (bOnCompizWidgetLayer)
@@ -1110,7 +1111,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		GSList *group = NULL;
 
 		GdkWindowState iState = gdk_window_get_state (pDock->pWidget->window);
-		
+
 		menu_item = gtk_radio_menu_item_new_with_label(group, _("Always on top"));
 		group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(menu_item));
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
@@ -1140,7 +1141,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		if (gtk_window_get_type_hint (pDock->pWidget) == GDK_WINDOW_TYPE_HINT_UTILITY)
 			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
 		g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(cairo_dock_keep_on_widget_layer), data);
-		
+
 	}
 
 	return CAIRO_DOCK_LET_PASS_NOTIFICATION;
