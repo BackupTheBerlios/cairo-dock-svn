@@ -805,11 +805,16 @@ static void cairo_dock_keep_on_widget_layer(GtkMenuItem *menu_item, gpointer *da
 	CairoDock *pDock = data[1];
 	
 	cairo_dock_hide_desklet (pDock);
+	Window Xid = GDK_WINDOW_XID (pDock->pWidget->window);
+	
 	gboolean bOnCompizWidgetLayer = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menu_item));
+	g_print ("bOnCompizWidgetLayer : %d\n", bOnCompizWidgetLayer);
 	if (bOnCompizWidgetLayer)
-		gtk_window_set_type_hint(GTK_WINDOW(pDock->pWidget), GDK_WINDOW_TYPE_HINT_UTILITY);
+		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_UTILITY)");
+		//gtk_window_set_type_hint(GTK_WINDOW(pDock->pWidget), GDK_WINDOW_TYPE_HINT_UTILITY);
 	else
-		gtk_window_set_type_hint(GTK_WINDOW(pDock->pWidget), GDK_WINDOW_TYPE_HINT_NORMAL);
+		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");
+		//gtk_window_set_type_hint(GTK_WINDOW(pDock->pWidget), GDK_WINDOW_TYPE_HINT_NORMAL);
 	cairo_dock_show_desklet (pDock);
 
 	if (CAIRO_DOCK_IS_VALID_APPLET (icon))
@@ -1105,7 +1110,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		GSList *group = NULL;
 
 		GdkWindowState iState = gdk_window_get_state (pDock->pWidget->window);
-
+		
 		menu_item = gtk_radio_menu_item_new_with_label(group, _("Always on top"));
 		group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(menu_item));
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
@@ -1132,7 +1137,10 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 
 		menu_item = gtk_check_menu_item_new_with_label(_("Compiz Fusion Widget"));
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+		if (gtk_window_get_type_hint (pDock->pWidget) == GDK_WINDOW_TYPE_HINT_UTILITY)
+			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
 		g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(cairo_dock_keep_on_widget_layer), data);
+		
 	}
 
 	return CAIRO_DOCK_LET_PASS_NOTIFICATION;
