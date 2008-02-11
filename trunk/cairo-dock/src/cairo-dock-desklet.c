@@ -149,7 +149,7 @@ static gboolean _cairo_dock_write_desklet_size (CairoDockDesklet *pDesklet)
 	pDesklet->iSidWriteSize = 0;
 	if (pDesklet->pIcon != NULL)
 	{
-		cairo_dock_reload_module (pDesklet->pIcon->pModule, g_pMainDock, TRUE);
+		cairo_dock_reload_module (pDesklet->pIcon->pModule, g_pMainDock, FALSE);
 		//gtk_widget_queue_draw (pDesklet->pWidget);
 	}
 	return FALSE;

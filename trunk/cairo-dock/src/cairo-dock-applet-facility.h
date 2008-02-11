@@ -274,6 +274,11 @@ gboolean reload (gchar *cConfFilePath) \
 			}\
 		}\
 	}\
+	else if (myDesklet != NULL)\
+	{\
+		myIcon->fWidth = myDesklet->iWidth;\
+		myIcon->fHeight = myDesklet->iHeight;\
+	}\
 	cairo_dock_load_one_icon_from_scratch (myIcon, myDock, myDesklet);\
 	if (bToBeInserted)\
 		cairo_dock_insert_icon_in_dock (myIcon, myDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);\

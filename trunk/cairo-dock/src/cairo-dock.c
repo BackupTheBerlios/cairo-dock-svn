@@ -89,7 +89,7 @@
 
 CairoDock *g_pMainDock;  // pointeur sur le dock principal.
 GHashTable *g_hDocksTable = NULL;  // table des docks existant.
-int g_iWmHint;  // hint pour la fenetre du dock principal.
+int g_iWmHint = GDK_WINDOW_TYPE_HINT_DOCK;  // hint pour la fenetre du dock principal.
 gboolean g_bReserveSpace;
 gchar *g_cMainDockDefaultRendererName = NULL;
 gchar *g_cSubDockDefaultRendererName = NULL;
@@ -245,90 +245,126 @@ main (int argc, char** argv)
         cd_log_set_level(0);
         cd_log_set_level(G_LOG_LEVEL_WARNING);
 	gtk_init (&argc, &argv);
+	GError *erreur = NULL;
 
 	//\___________________ On recupere quelques options.
-	g_iWmHint = GDK_WINDOW_TYPE_HINT_DOCK;
-	gboolean bDialogTest = FALSE, bSafeMode = FALSE;
-	for (i = 0; i < argc; i++)
+	gboolean bVerbose = FALSE, bDialogTest = FALSE, bSafeMode = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE;
+	gchar *cEnvironment = NULL;
+	GOptionEntry TableDesOptions[] = 
 	{
-                if (strcmp (argv[i], "--log") == 0)
-                {
-                        cd_log_set_level(G_LOG_LEVEL_DEBUG);
-                }
-                else if (strcmp (argv[i], "--glitz") == 0)
-		{
-#ifdef HAVE_GLITZ
-			g_bUseGlitz = TRUE;
-#else
-			cd_message ("Attention : Cairo-Dock was not compiled with glitz\n");
-			g_bUseGlitz = FALSE;
-#endif
-		}
-		else if (strcmp (argv[i], "--no-glitz") == 0)
-		{
-			cd_message ("Attention : this option is useless, glitz being not activated by default\n");
-		}
-		else if (strcmp (argv[i], "--keep-above") == 0)
-			g_bKeepAbove = TRUE;
-		else if (strcmp (argv[i], "--no-skip-pager") == 0)
-			g_bSkipPager = FALSE;
-		else if (strcmp (argv[i], "--no-skip-taskbar") == 0)
-			g_bSkipTaskbar = FALSE;
-		else if (strcmp (argv[i], "--no-sticky") == 0)
-			g_bSticky = FALSE;
-		else if (strcmp (argv[i], "--toolbar-hint") == 0)
-			g_iWmHint = GDK_WINDOW_TYPE_HINT_TOOLBAR;
-		else if (strcmp (argv[i], "--normal-hint") == 0)
-			g_iWmHint = GDK_WINDOW_TYPE_HINT_NORMAL;
-		else if (strcmp (argv[i], "--dock-hint") == 0)  // le dock restera devant quoiqu'il arrive, mais ne recuperera plus les touches clavier.
-			cd_message ("Attention : the '--dock-hint' option is deprecated since v1.3.7\n  It is now the default behaviour.");
-		else if (strcmp (argv[i], "--force-gnome") == 0)
-			g_iDesktopEnv = CAIRO_DOCK_GNOME;
-		else if (strcmp (argv[i], "--force-kde") == 0)
-			g_iDesktopEnv = CAIRO_DOCK_KDE;
-		else if (strcmp (argv[i], "--safe-mode") == 0)
-			bSafeMode = TRUE;
-		else if (strcmp (argv[i], "--dialog") == 0)
-			bDialogTest = TRUE;
-		else if (strcmp (argv[i], "--capuccino") == 0)
-		{
-			cd_message ("Veuillez insérer 1 euro dans la fente de votre ordinateur.\n");
-			return 0;
-		}
-		else if (strcmp (argv[i], "--cafe_latte") == 0)
-		{
-			cd_message ("Désolé, plus de sucre disponible\nVeuillez retenter plus tard.\n");
-			return 0;
-		}
-		else if (strcmp (argv[i], "--expresso") == 0)
-		{
-			cd_message ("Franchement, vous faites confiance à quelqu'un qui met des options pareilles dans son programme ?\n");
-			return 0;
-		}
-		else if (strcmp (argv[i], "--version") == 0)
-		{
-			cd_message ("v%s\n", CAIRO_DOCK_VERSION);
-			return 0;
-		}
-		else if (strcmp (argv[i], "--verbose") == 0)
-		{
-#ifdef CAIRO_DOCK_VERBOSE
-			g_bVerbose = TRUE;
-#else
-			cd_message ("Attention : Cairo-Dock was not compiled with verbose\n");
-			g_bVerbose = FALSE;
-#endif
-		}
-		else if (argv[i][0] == '-')
-		{
-			gboolean help = (strcmp (argv[i], "--help") == 0 || strcmp (argv[i], "--usage") == 0);
-			fprintf (help ? stdout : stderr,
-				 "Usage:\n%s\n  [--glitz] (use hardware acceleration (needs a glitz-enabled libcairo))\n  [--keep-above] (keep the dock above other windows whatever)\n  [--no-skip-pager] (show the dock in the pager)\n  [--no-skip-taskbar] (show the dock in taskbar)\n  [--no-sticky] (don't show the dock on all desktops)\n  [--normal-hint] (force the window manager to consider cairo-dock as a normal appli instead of a dock - not recommended)\n  [--toolbar-hint] (force the window manager to consider cairo-dock as a toolbar instead of a dock)\n  [--version] (print version and exit)\n  [--force-gnome] (force the dock to consider a gnome environnement)\n  [--force-gnome] (force the dock to consider a gnome environnement)\n  [--log] (enable log on the console)\n  [--safe-mode] (don't load any plug-ins)\n  [--expresso] (cairo-dock makes anything, including coffee !)\n  [--capuccino] (cairo-dock makes anything, including coffee !)\n  [--cafe_latte] (cairo-dock makes anything, including coffee !)\n  [--help/usage] (print this help and quit)\n",
-				 argv[0]);
-			return help ? 0 : 1;
-		}
+		{"log", 'V', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&bVerbose,
+			"enable log on the console", NULL},
+		{"glitz", 'g', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&g_bUseGlitz,
+			"use hardware acceleration through Glitz (needs a glitz-enabled libcairo)", NULL},
+		{"keep-above", 'a', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&g_bKeepAbove,
+			"keep the dock above other windows whatever", NULL},
+		{"no-skip-pager", 'p', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&bNoSkipPager,
+			"show the dock in pager", NULL},
+		{"no-skip-taskbar", 'b', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&bNoSkipTaskbar,
+			"show the dock in taskbar", NULL},
+		{"no-sticky", 's', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&bNoSticky,
+			"don't make the dock appear on all desktops", NULL},
+		{"toolbar-hint", 't', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&bToolBarHint,
+			"force the window manager to consider cairo-dock as a toolbar instead of a dock", NULL},
+		{"normal-hint", 'n', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&bNormalHint,
+			"force the window manager to consider cairo-dock as a normal appli instead of a dock", NULL},
+		{"env", 'e', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
+			&cEnvironment,
+			"force the dock to consider this environnement - it may crush the dock if not set properly.", NULL},
+		{"safe-mode", 's', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&bSafeMode,
+			"don't load any plug-ins", NULL},
+		{"dialog", 'd', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&bDialogTest,
+			"for test on dialogs only", NULL},
+		{"capuccino", 'C', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&bCappuccino,
+			"Cairo-Dock makes anything, including coffee !", NULL},
+		{"expresso", 'E', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&bExpresso,
+			"Cairo-Dock makes anything, including coffee !", NULL},
+		{"cafe-latte", 'L', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&bCafeLatte,
+			"Cairo-Dock makes anything, including coffee !", NULL},
+		{"version", 'v', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&bPrintVersion,
+			"print version and quit.", NULL},
+		{NULL}
+	};
+	
+	GOptionContext *context = g_option_context_new ("Cairo-Dock");
+	g_option_context_add_main_entries (context, TableDesOptions, NULL);
+	g_option_context_parse (context, &argc, &argv, &erreur);
+	if (erreur != NULL)
+	{
+		g_print ("ERREUR : %s\n", erreur->message);
+		exit (-1);
 	}
-
+	
+#ifndef CAIRO_DOCK_VERBOSE
+	if (bVerbose)
+		g_print ("Cairo-Dock was not compiled with verbose, but it doesn't matter for the moment\n");
+#endif
+	if (bVerbose)
+		cd_log_set_level(G_LOG_LEVEL_DEBUG);
+	
+	g_bSkipPager = ! bNoSkipPager;
+	g_bSkipTaskbar = ! bNoSkipTaskbar;
+	g_bSticky = ! bNoSticky;
+	
+	if (bToolBarHint)
+		g_iWmHint = GDK_WINDOW_TYPE_HINT_TOOLBAR;
+	if (bNormalHint)
+		g_iWmHint = GDK_WINDOW_TYPE_HINT_NORMAL;
+	if (cEnvironment != NULL)
+	{
+		if (strcmp (cEnvironment, "gnome") == 0)
+			g_iDesktopEnv = CAIRO_DOCK_GNOME;
+		else if (strcmp (cEnvironment, "kde") == 0)
+			g_iDesktopEnv = CAIRO_DOCK_KDE;
+		else if (strcmp (cEnvironment, "xfce") == 0)
+			g_iDesktopEnv = CAIRO_DOCK_XFCE;
+		else
+			cd_message ("Attention : unknown environnment '%s'\n", cEnvironment);
+		g_free (cEnvironment);
+	}
+#ifndef HAVE_GLITZ
+	if (g_bUseGlitz)
+	{
+		cd_message ("Attention : Cairo-Dock was not compiled with glitz\n");
+		g_bUseGlitz = FALSE;
+	}
+#endif
+	
+	if (bCappuccino)
+	{
+		g_print ("Please insert one coin into your PC.\n");
+		return 0;
+	}
+	if (bExpresso)
+	{
+		g_print ("Sorry, no more sugar; please try again later.\n");
+		return 0;
+	}
+	if (bCafeLatte)
+	{
+		g_print ("Honestly, you trust someone who includes such options in his code ?\n");
+		return 0;
+	}
+	if (bPrintVersion)
+	{
+		g_print ("v%s\n", CAIRO_DOCK_VERSION);
+		return 0;
+	}
+	
 	//\___________________ On internationalise l'appli.
 	bindtextdomain (CAIRO_DOCK_GETTEXT_PACKAGE, CAIRO_DOCK_LOCALE_DIR);
 	bind_textdomain_codeset (CAIRO_DOCK_GETTEXT_PACKAGE, "UTF-8");
@@ -453,7 +489,6 @@ main (int argc, char** argv)
 	{
 		gchar *cChangeLogFilePath = g_strdup_printf ("%s/ChangeLog.txt", CAIRO_DOCK_SHARE_DATA_DIR);
 		GKeyFile *pKeyFile = g_key_file_new ();
-		GError *erreur = NULL;
 		g_key_file_load_from_file (pKeyFile, cChangeLogFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 		if (erreur != NULL)
 		{

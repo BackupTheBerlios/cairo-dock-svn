@@ -937,7 +937,7 @@ GList *cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, do
 Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, double fFlatDockWidth, int iWidth, int iHeight, double fAlign, double fFoldingFactor)
 {
 	//g_print (">>>>>%s (%d/%.2f, %dx%d, %.2f, %.2f)\n", __func__, x_abs, fFlatDockWidth, iWidth, iHeight, fAlign, fFoldingFactor);
-	if (x_abs < 0 && iWidth > 0)  // ces cas limite sont la pour empecher les icones de retrecir trop rapidement quend on sort par les cotes.
+	if (x_abs < 0 && iWidth > 0)  // ces cas limite sont la pour empecher les icones de retrecir trop rapidement quand on sort par les cotes.
 		x_abs = -1;
 	else if (x_abs > fFlatDockWidth && iWidth > 0)
 		x_abs = fFlatDockWidth+1;
@@ -967,7 +967,7 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 		{
 			icon->fPhase = G_PI;
 		}
-
+		
 		//\_______________ On en deduit l'amplitude de la sinusoide au niveau de cette icone, et donc son echelle.
 		icon->fScale = 1 + fMagnitude * g_fAmplitude * sin (icon->fPhase);
 		if (icon->fPersonnalScale > 0 && iWidth > 0)
@@ -1009,7 +1009,7 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 			icon->fX = fAlign * iWidth + (icon->fX - fAlign * iWidth) * (1. - fFoldingFactor);
 			//g_print ("  a droite : icon->fX = %.2f (%.2f)\n", icon->fX, x_cumulated);
 		}
-
+		
 		//\_______________ On regarde si on pointe sur cette icone.
 		if (x_cumulated + icon->fWidth + .5*g_iIconGap >= x_abs && x_cumulated - .5*g_iIconGap <= x_abs && pointed_ic == NULL)  // on a trouve l'icone sur laquelle on pointe.
 		{
@@ -1021,10 +1021,10 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 		}
 		else
 			icon->bPointed = FALSE;
-
+			
 		ic = cairo_dock_get_next_element (ic, pIconList);
 	} while (ic != pFirstDrawnElement);
-
+	
 	//\_______________ On place les icones precedant l'icone pointee par rapport a celle-ci.
 	if (pointed_ic == NULL)  // on est a droite des icones.
 	{
@@ -1034,18 +1034,18 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 		icon->fX = fAlign * iWidth + (icon->fX - fAlign * iWidth) * (1 - fFoldingFactor);
 		//g_print ("  en dehors a droite : icon->fX = %.2f (%.2f)\n", icon->fX, x_cumulated);
 	}
-
+	
 	ic = pointed_ic;
 	while (ic != pFirstDrawnElement)
 	{
 		icon = ic->data;
-
+		
 		ic = ic->prev;
 		if (ic == NULL)
 			ic = g_list_last (pIconList);
-
+			
 		prev_icon = ic->data;
-
+		
 		prev_icon->fX = icon->fX - (prev_icon->fWidth + g_iIconGap) * prev_icon->fScale;
 		//g_print ("fX <- %.2f; fXMin : %.2f\n", prev_icon->fX, prev_icon->fXMin);
 		if (prev_icon->fX < prev_icon->fXMin + g_fAmplitude * fMagnitude * (prev_icon->fWidth + 1.5*g_iIconGap) / 8 && iWidth != 0 && x_abs < iWidth && fMagnitude > 0)  /// && prev_icon->fPhase == 0   // on rajoute 'fMagnitude > 0' sinon il y'a un leger "saut" du aux contraintes a gauche de l'icone pointee.
