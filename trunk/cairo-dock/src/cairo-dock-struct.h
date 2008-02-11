@@ -594,8 +594,10 @@ struct _CairoDockDesklet {
 	Icon *pIcon;
 	/// La fonction de rendu. NULL pour utiliser celle par defaut qui dessine l'icone comme si elle etait dans un dock. Est appelee par la callback liee a l'expose-event de la fenetre.
 	CairoDockDeskletRenderer renderer;
-	/// un timer pour retarde l'ecriture dans le fichier lors des deplacements/redimensionnements.
-	gint iSidWriteConfig;
+	/// un timer pour retarder l'ecriture dans le fichier lors des deplacements.
+	gint iSidWritePosition;
+	/// un timer pour retarder l'ecriture dans le fichier lors des redimensionnements.
+	gint iSidWriteSize;
 };
 
 

@@ -461,13 +461,16 @@ msgstr "Positionnement par rapport au bord de l'écran choisi"
 msgid "Lateral gap :"
 msgstr "Ecart latéral :"
 
-msgid "Gap from the absolute position on the screen's edge, in pixels."
+msgid "Gap from the absolute position on the screen's edge, in pixels. You can also move the dock by holding ALT or CTRL  key pressed and left-clicking on the dock."
 msgstr ""
 "Ecart par rapport à la position absolue précédemment définie le long du bord "
-"de l'écran, en pixels."
+"de l'écran, en pixels. Vous pouvez aussi déplacer le dock en maintenant les touches ALT ou CTRL enfoncées et en cliquant gauche sur le dock."
 
 msgid "Distance to the screen's edge :"
 msgstr "Distance au bord de l'écran :"
+
+msgid "in pixels. You can also move the dock by holding ALT or CTRL  key pressed and left-clicking on the dock."
+msgstr "en pixels. Vous pouvez aussi déplacer le dock en maintenant les touches ALT ou CTRL enfoncées et en cliquant gauche sur le dock."
 
 msgid "in pixels."
 msgstr "en pixels."

@@ -50,7 +50,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
                                      GdkEventExpose *pExpose,
                                      CairoDockDesklet *pDesklet)
 {
-  cd_message ("%s ()\n", __func__);
+  //cd_message ("%s ()\n", __func__);
   gint w = 0, h = 0;
 
   if (!pDesklet)
@@ -110,7 +110,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 
 		if (pIcon->pIconBuffer != NULL)
 		{
-			cd_message ("  dessin de l'icone (%.2fx%.2f)\n", pIcon->fWidth, pIcon->fHeight);
+			//cd_message ("  dessin de l'icone (%.2fx%.2f)\n", pIcon->fWidth, pIcon->fHeight);
 			cairo_translate (pCairoContext, g_iDockRadius, g_iDockRadius);
 			cairo_set_source_surface (pCairoContext, pIcon->pIconBuffer, 0.0, 0.0);
 			cairo_paint (pCairoContext);
@@ -131,26 +131,36 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 		}
 		cairo_destroy (pCairoContext);
 	}
+	else
+		cairo_destroy (pCairoContext);
 
 	return FALSE;
 }
 
 
-static gboolean _cairo_dock_write_desklet_config (CairoDockDesklet *pDesklet)
+static gboolean _cairo_dock_write_desklet_size (CairoDockDesklet *pDesklet)
 {
 	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
 		cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
 			G_TYPE_INT, "Desklet", "width", pDesklet->iWidth,
 			G_TYPE_INT, "Desklet", "height", pDesklet->iHeight,
-			G_TYPE_INT, "Desklet", "x position", pDesklet->iWindowPositionX,
-			G_TYPE_INT, "Desklet", "y position", pDesklet->iWindowPositionY,
 			G_TYPE_INVALID);
-	pDesklet->iSidWriteConfig = 0;
+	pDesklet->iSidWriteSize = 0;
 	if (pDesklet->pIcon != NULL)
 	{
 		cairo_dock_reload_module (pDesklet->pIcon->pModule, g_pMainDock, TRUE);
 		//gtk_widget_queue_draw (pDesklet->pWidget);
 	}
+	return FALSE;
+}
+static gboolean _cairo_dock_write_desklet_position (CairoDockDesklet *pDesklet)
+{
+	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
+		cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
+			G_TYPE_INT, "Desklet", "x position", pDesklet->iWindowPositionX,
+			G_TYPE_INT, "Desklet", "y position", pDesklet->iWindowPositionY,
+			G_TYPE_INVALID);
+	pDesklet->iSidWritePosition = 0;
 	return FALSE;
 }
 static gboolean on_configure_desklet (GtkWidget* pWidget,
@@ -162,23 +172,13 @@ static gboolean on_configure_desklet (GtkWidget* pWidget,
 	{
 		pDesklet->iWidth = pEvent->width;
 		pDesklet->iHeight = pEvent->height;
-		if (pDesklet->iSidWriteConfig != 0)
+		if (pDesklet->iSidWriteSize != 0)
 		{
-			g_source_remove (pDesklet->iSidWriteConfig);
-			pDesklet->iSidWriteConfig = 0;
+			g_source_remove (pDesklet->iSidWriteSize);
+			pDesklet->iSidWriteSize = 0;
 		}
 
-		pDesklet->iSidWriteConfig = g_timeout_add (100, (GSourceFunc) _cairo_dock_write_desklet_config, (gpointer) pDesklet);
-		/*if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
-			cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
-				G_TYPE_INT, "Desklet", "width", pDesklet->iWidth,
-				G_TYPE_INT, "Desklet", "height", pDesklet->iHeight,
-				G_TYPE_INVALID);
-
-		if (pDesklet->pIcon != NULL)
-		{
-			cairo_dock_reload_module (pDesklet->pIcon->pModule, g_pMainDock, TRUE);
-		}*/
+		pDesklet->iSidWriteSize = g_timeout_add (100, (GSourceFunc) _cairo_dock_write_desklet_size, (gpointer) pDesklet);
 	}
 
 	if (pDesklet->iWindowPositionX != pEvent->x || pDesklet->iWindowPositionY != pEvent->y)
@@ -186,18 +186,12 @@ static gboolean on_configure_desklet (GtkWidget* pWidget,
 		pDesklet->iWindowPositionX = pEvent->x;
 		pDesklet->iWindowPositionY = pEvent->y;
 
-		if (pDesklet->iSidWriteConfig != 0)
+		if (pDesklet->iSidWritePosition != 0)
 		{
-			g_source_remove (pDesklet->iSidWriteConfig);
-			pDesklet->iSidWriteConfig = 0;
+			g_source_remove (pDesklet->iSidWritePosition);
+			pDesklet->iSidWritePosition = 0;
 		}
-
-		pDesklet->iSidWriteConfig = g_timeout_add (100, (GSourceFunc) _cairo_dock_write_desklet_config, (gpointer) pDesklet);
-		/*if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
-			cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
-				G_TYPE_INT, "Desklet", "x position", pDesklet->iWindowPositionX,
-				G_TYPE_INT, "Desklet", "y position", pDesklet->iWindowPositionY,
-				G_TYPE_INVALID);*/
+		pDesklet->iSidWritePosition = g_timeout_add (100, (GSourceFunc) _cairo_dock_write_desklet_position, (gpointer) pDesklet);
 	}
 
 	return FALSE;
@@ -212,32 +206,35 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 	{
 		if (pButton->type == GDK_BUTTON_PRESS)
 		{
-			pDesklet->moving = TRUE;
 			pDesklet->diff_x = - pButton->x;  // pour le deplacement manuel.
 			pDesklet->diff_y = - pButton->y;
 			cd_message ("diff : %d;%d\n", pDesklet->diff_x, pDesklet->diff_y);
 		}
 		else if (pButton->type == GDK_BUTTON_RELEASE)
 		{
-			pDesklet->moving = FALSE;
 			cd_message ("GDK_BUTTON_RELEASE\n");
-			if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
-				cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
-					G_TYPE_INT, "Desklet", "x position", pDesklet->iWindowPositionX,
-					G_TYPE_INT, "Desklet", "y position", pDesklet->iWindowPositionY,
-					G_TYPE_INT, "Desklet", "width", pDesklet->iWidth,
-					G_TYPE_INT, "Desklet", "height", pDesklet->iHeight,
-					G_TYPE_INVALID);
-			gpointer data[2] = {pDesklet->pIcon, pDesklet};
-			cairo_dock_notify (CAIRO_DOCK_CLICK_ICON, data);
+			if (pDesklet->moving)
+			{
+				pDesklet->moving = FALSE;
+				/*if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
+					cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
+						G_TYPE_INT, "Desklet", "x position", pDesklet->iWindowPositionX,
+						G_TYPE_INT, "Desklet", "y position", pDesklet->iWindowPositionY,
+						G_TYPE_INT, "Desklet", "width", pDesklet->iWidth,
+						G_TYPE_INT, "Desklet", "height", pDesklet->iHeight,
+						G_TYPE_INVALID);*/
+			}
+			else
+			{
+				gpointer data[2] = {pDesklet->pIcon, pDesklet};
+				cairo_dock_notify (CAIRO_DOCK_CLICK_ICON, data);
+			}
 		}
 		else if (pButton->type == GDK_2BUTTON_PRESS)
 		{
 			gpointer data[2] = {pDesklet->pIcon, pDesklet};
 			cairo_dock_notify (CAIRO_DOCK_DOUBLE_CLICK_ICON, data);
 		}
-
-		return TRUE;
 	}
 	else if (pButton->button == 3 && pButton->type == GDK_BUTTON_PRESS)  // clique droit.
 	{
@@ -269,10 +266,9 @@ static gboolean on_motion_notify_desklet(GtkWidget *pWidget,
 		gtk_window_move (GTK_WINDOW (pWidget),
 			pMotion->x_root + pDesklet->diff_x,
 			pMotion->y_root + pDesklet->diff_y);
+		pDesklet->moving = TRUE;
 		return TRUE;
 	}
-	//pDesklet->diff_x = - pMotion->x;
-	//pDesklet->diff_y = - pMotion->y;
 	return FALSE;
 }
 
