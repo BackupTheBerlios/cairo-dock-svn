@@ -914,8 +914,49 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
 	GtkWidget *menu = data[2];
-
 	GtkWidget *menu_item, *image;
+
+	if (pDock->iType == CAIRO_DOCK_DOCK)
+	{
+		menu_item = gtk_image_menu_item_new_with_label (_("Move this icon"));
+
+		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
+		image = gtk_image_new_from_stock (GTK_STOCK_JUMP_TO, GTK_ICON_SIZE_MENU);
+		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
+		GtkWidget *pSubMenu = gtk_menu_new ();
+		gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), pSubMenu);
+
+		menu_item = gtk_image_menu_item_new_with_label (_("To the left"));
+		image = gtk_image_new_from_stock (GTK_STOCK_GO_BACK, GTK_ICON_SIZE_MENU);
+		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
+		gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
+		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_swap_with_prev_icon), data);
+
+		menu_item = gtk_image_menu_item_new_with_label (_("To the right"));
+		image = gtk_image_new_from_stock (GTK_STOCK_GO_FORWARD, GTK_ICON_SIZE_MENU);
+		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
+		gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
+		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_swap_with_next_icon), data);
+		gtk_widget_show_all (menu);
+
+		menu_item = gtk_image_menu_item_new_with_label (_("To the beginning"));
+		image = gtk_image_new_from_stock (GTK_STOCK_GOTO_FIRST, GTK_ICON_SIZE_MENU);
+		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
+		gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
+		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_move_icon_to_beginning), data);
+		gtk_widget_show_all (menu);
+
+		menu_item = gtk_image_menu_item_new_with_label (_("To the end"));
+		image = gtk_image_new_from_stock (GTK_STOCK_GOTO_LAST, GTK_ICON_SIZE_MENU);
+		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
+		gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
+		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_move_icon_to_end), data);
+
+		menu_item = gtk_separator_menu_item_new ();
+		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+
+	}
+
 	if (icon == NULL || CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon))
 	{
 		menu_item = gtk_image_menu_item_new_with_label (_("Add a launcher"));
@@ -989,6 +1030,9 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_add_separator), data);
 
+		menu_item = gtk_separator_menu_item_new ();
+		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+
 		menu_item = gtk_image_menu_item_new_with_label (_("Remove this launcher"));
 		image = gtk_image_new_from_stock (GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU);
 		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
@@ -1041,43 +1085,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_remove_module), data);
 	}
 
-	if (pDock->iType == CAIRO_DOCK_DOCK)
-	{
-		menu_item = gtk_image_menu_item_new_with_label (_("Move this icon"));
-
-		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
-		image = gtk_image_new_from_stock (GTK_STOCK_JUMP_TO, GTK_ICON_SIZE_MENU);
-		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
-		GtkWidget *pSubMenu = gtk_menu_new ();
-		gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), pSubMenu);
-
-		menu_item = gtk_image_menu_item_new_with_label (_("To the left"));
-		image = gtk_image_new_from_stock (GTK_STOCK_GO_BACK, GTK_ICON_SIZE_MENU);
-		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
-		gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
-		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_swap_with_prev_icon), data);
-
-		menu_item = gtk_image_menu_item_new_with_label (_("To the right"));
-		image = gtk_image_new_from_stock (GTK_STOCK_GO_FORWARD, GTK_ICON_SIZE_MENU);
-		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
-		gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
-		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_swap_with_next_icon), data);
-		gtk_widget_show_all (menu);
-
-		menu_item = gtk_image_menu_item_new_with_label (_("To the beginning"));
-		image = gtk_image_new_from_stock (GTK_STOCK_GOTO_FIRST, GTK_ICON_SIZE_MENU);
-		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
-		gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
-		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_move_icon_to_beginning), data);
-		gtk_widget_show_all (menu);
-
-		menu_item = gtk_image_menu_item_new_with_label (_("To the end"));
-		image = gtk_image_new_from_stock (GTK_STOCK_GOTO_LAST, GTK_ICON_SIZE_MENU);
-		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
-		gtk_menu_shell_append  (GTK_MENU_SHELL (pSubMenu), menu_item);
-		g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(cairo_dock_move_icon_to_end), data);
-	}
-	else
+	if (pDock->iType != CAIRO_DOCK_DOCK)
 	{
 		menu_item = gtk_separator_menu_item_new ();
 		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
@@ -1128,6 +1136,9 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 
 	if (CAIRO_DOCK_IS_VALID_APPLI (icon))
 	{
+		menu_item = gtk_separator_menu_item_new ();
+		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+
 		gboolean bIsMaximized = cairo_dock_window_is_maximized (icon->Xid);
 		menu_item = gtk_image_menu_item_new_with_label (bIsMaximized ? _("Unmaximize") : _("Maximize"));
 		image = gtk_image_new_from_stock (GTK_STOCK_GO_UP, GTK_ICON_SIZE_MENU);

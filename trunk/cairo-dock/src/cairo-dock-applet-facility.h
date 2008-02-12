@@ -574,7 +574,7 @@ gboolean CD_APPLET_ON_CLICK (gpointer *data);
 /**
 *Abonne l'applet aux notifications de construction du menu. A effectuer lors de l'init de l'applet.
 */
-#define CD_APPLET_REGISTER_FOR_BUILD_MENU_EVENT cairo_dock_register_notification (CAIRO_DOCK_BUILD_MENU, (CairoDockNotificationFunc) CD_APPLET_ON_BUILD_MENU, CAIRO_DOCK_RUN_FIRST);
+#define CD_APPLET_REGISTER_FOR_BUILD_MENU_EVENT cairo_dock_register_notification (CAIRO_DOCK_BUILD_MENU, (CairoDockNotificationFunc) CD_APPLET_ON_BUILD_MENU, CAIRO_DOCK_RUN_AFTER);
 /**
 *Desabonne l'applet aux notifications de construction du menu. A effectuer lors de l'arret de l'applet.
 */
