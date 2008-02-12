@@ -1,3 +1,4 @@
+/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 2; tab-width: 2 -*- */
 /*****************************************************************************************************
 **
 ** Program:
@@ -234,6 +235,26 @@ static gboolean random_dialog (gpointer user_data)
 	return TRUE;
 }
 
+static void _cairo_dock_set_verbosity(gchar *cVerbosity)
+{
+  if (!cVerbosity)
+    cd_log_set_level(G_LOG_LEVEL_WARNING);
+  else if (!strcmp(cVerbosity, "debug"))
+    cd_log_set_level(G_LOG_LEVEL_DEBUG);
+  else if (!strcmp(cVerbosity, "message"))
+    cd_log_set_level(G_LOG_LEVEL_MESSAGE);
+  else if (!strcmp(cVerbosity, "warning"))
+    cd_log_set_level(G_LOG_LEVEL_WARNING);
+  else if (!strcmp(cVerbosity, "critical"))
+    cd_log_set_level(G_LOG_LEVEL_CRITICAL);
+  else if (!strcmp(cVerbosity, "error"))
+    cd_log_set_level(G_LOG_LEVEL_ERROR);
+  else {
+    cd_log_set_level(G_LOG_LEVEL_WARNING);
+		cd_warning("bad verbosity option: default to warning");
+	}
+}
+
 int
 main (int argc, char** argv)
 {
@@ -243,18 +264,17 @@ main (int argc, char** argv)
 	cd_log_init();
         //No log
         cd_log_set_level(0);
-        cd_log_set_level(G_LOG_LEVEL_WARNING);
 	gtk_init (&argc, &argv);
 	GError *erreur = NULL;
 
 	//\___________________ On recupere quelques options.
-	gboolean bVerbose = FALSE, bDialogTest = FALSE, bSafeMode = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE;
-	gchar *cEnvironment = NULL, *cUserDefinedDataDir = NULL;
-	GOptionEntry TableDesOptions[] = 
+	gboolean bDialogTest = FALSE, bSafeMode = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE;
+	gchar *cEnvironment = NULL, *cUserDefinedDataDir = NULL, *cVerbosity = 0;
+	GOptionEntry TableDesOptions[] =
 	{
-		{"log", 'V', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
-			&bVerbose,
-			"enable log on the console", NULL},
+		{"log", 'l', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
+			&cVerbosity,
+			"log verbosity (debug,message,warning,critical,error) default is warning", NULL},
 		{"glitz", 'g', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&g_bUseGlitz,
 			"use hardware acceleration through Glitz (needs a glitz-enabled libcairo)", NULL},
@@ -302,7 +322,7 @@ main (int argc, char** argv)
 			"print version and quit.", NULL},
 		{NULL}
 	};
-	
+
 	GOptionContext *context = g_option_context_new ("Cairo-Dock");
 	g_option_context_add_main_entries (context, TableDesOptions, NULL);
 	g_option_context_parse (context, &argc, &argv, &erreur);
@@ -311,18 +331,18 @@ main (int argc, char** argv)
 		g_print ("ERREUR : %s\n", erreur->message);
 		exit (-1);
 	}
-	
-#ifndef CAIRO_DOCK_VERBOSE
-	if (bVerbose)
-		g_print ("Cairo-Dock was not compiled with verbose, but it doesn't matter for the moment\n");
-#endif
-	if (bVerbose)
-		cd_log_set_level(G_LOG_LEVEL_DEBUG);
-	
+
+/* FIXME: I dont know what to do with it */
+/* #ifndef CAIRO_DOCK_VERBOSE */
+/* 	if (!cVerbosity) */
+/* 		g_print ("Cairo-Dock was not compiled with verbose, but it doesn't matter for the moment\n"); */
+/* #endif */
+	_cairo_dock_set_verbosity(cVerbosity);
+
 	g_bSkipPager = ! bNoSkipPager;
 	g_bSkipTaskbar = ! bNoSkipTaskbar;
 	g_bSticky = ! bNoSticky;
-	
+
 	if (bToolBarHint)
 		g_iWmHint = GDK_WINDOW_TYPE_HINT_TOOLBAR;
 	if (bNormalHint)
@@ -346,7 +366,7 @@ main (int argc, char** argv)
 		g_bUseGlitz = FALSE;
 	}
 #endif
-	
+
 	if (bCappuccino)
 	{
 		g_print ("Please insert one coin into your PC.\n");
@@ -367,7 +387,7 @@ main (int argc, char** argv)
 		g_print ("v%s\n", CAIRO_DOCK_VERSION);
 		return 0;
 	}
-	
+
 	//\___________________ On internationalise l'appli.
 	bindtextdomain (CAIRO_DOCK_GETTEXT_PACKAGE, CAIRO_DOCK_LOCALE_DIR);
 	bind_textdomain_codeset (CAIRO_DOCK_GETTEXT_PACKAGE, "UTF-8");
@@ -378,26 +398,26 @@ main (int argc, char** argv)
 	if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_IS_DIR))
 	{
 		if (g_mkdir (g_cCairoDockDataDir, 7*8*8+7*8+5) != 0)
-			cd_message ("Attention : couldn't create directory %s\n", g_cCairoDockDataDir);
+			cd_warning ("Attention : couldn't create directory %s\n", g_cCairoDockDataDir);
 	}
 	gchar *cThemesDir = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_THEMES_DIR);
 	if (! g_file_test (cThemesDir, G_FILE_TEST_IS_DIR))
 	{
 		if (g_mkdir (cThemesDir, 7*8*8+7*8+5) != 0)
-			cd_message ("Attention : couldn't create directory %s\n", cThemesDir);
+			cd_warning ("Attention : couldn't create directory %s\n", cThemesDir);
 	}
 	g_free (cThemesDir);
 	g_cCurrentThemePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_CURRENT_THEME_NAME);
 	if (! g_file_test (g_cCurrentThemePath, G_FILE_TEST_IS_DIR))
 	{
 		if (g_mkdir (g_cCurrentThemePath, 7*8*8+7*8+5) != 0)
-			cd_message ("Attention : couldn't create directory %s\n", g_cCurrentThemePath);
+			cd_warning ("Attention : couldn't create directory %s\n", g_cCurrentThemePath);
 	}
 	g_cCurrentLaunchersPath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_LAUNCHERS_DIR);
 	if (! g_file_test (g_cCurrentLaunchersPath, G_FILE_TEST_IS_DIR))
 	{
 		if (g_mkdir (g_cCurrentLaunchersPath, 7*8*8+7*8+5) != 0)
-			cd_message ("Attention : couldn't create directory %s\n", g_cCurrentLaunchersPath);
+			cd_warning ("Attention : couldn't create directory %s\n", g_cCurrentLaunchersPath);
 	}
 
 	//\___________________ On initialise les numeros de version.

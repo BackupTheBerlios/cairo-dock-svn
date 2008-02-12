@@ -1,3 +1,4 @@
+/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 2; tab-width: 2 -*- */
 
 #ifndef __CAIRO_DOCK_APPLET_FACILITY__
 #define  __CAIRO_DOCK_APPLET_FACILITY__
@@ -548,13 +549,14 @@ void about (GtkMenuItem *menu_item, gpointer *data);
 /**
 *Debut de la fonction de notification au clic gauche.
 */
-#define CD_APPLET_ON_CLICK_BEGIN \
-gboolean CD_APPLET_ON_CLICK (gpointer *data) \
-{ \
-	Icon *pClickedIcon = data[0]; \
-	CairoDock *pClickedDock = data[1]; \
-	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock)) \
-	{
+#define CD_APPLET_ON_CLICK_BEGIN																				\
+	gboolean CD_APPLET_ON_CLICK (gpointer *data)													\
+	{																																			\
+		Icon *pClickedIcon = data[0];																				\
+		CairoDock *pClickedDock = data[1];																	\
+		if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock)) \
+		{
+
 /**
 *Fin de la fonction de notification au clic gauche. Par defaut elle intercepte la notification si elle l'a recue.
 */
@@ -583,32 +585,36 @@ gboolean CD_APPLET_ON_CLICK (gpointer *data);
 /**
 *Debut de la fonction de notification de construction du menu.
 */
-#define CD_APPLET_ON_BUILD_MENU_BEGIN \
-gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data) \
-{ \
-	Icon *pClickedIcon = data[0]; \
-	CairoDock *pClickedDock = data[1]; \
-	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock)) \
-	{ \
-		GtkWidget *pAppletMenu = data[2]; \
-		GtkWidget *pMenuItem, image;
+#define CD_APPLET_ON_BUILD_MENU_BEGIN								\
+	gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data) \
+	{																									\
+		Icon *pClickedIcon = data[0];										\
+		CairoDock *pClickedDock = data[1];																	\
+		if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock)) \
+		{																																		\
+			GtkWidget *pAppletMenu = data[2];																	\
+			GtkWidget *pMenuItem, image;																			\
+			pMenuItem = gtk_separator_menu_item_new ();												\
+			gtk_menu_shell_append(GTK_MENU_SHELL (pAppletMenu), pMenuItem);
+
 /**
 *Fin de la fonction de notification de construction du menu. Par defaut elle intercepte la notification si elle l'a recue.
 */
-#define CD_APPLET_ON_BUILD_MENU_END \
-	} \
-	return CAIRO_DOCK_LET_PASS_NOTIFICATION; \
+#define CD_APPLET_ON_BUILD_MENU_END							\
+	}																							\
+		return CAIRO_DOCK_LET_PASS_NOTIFICATION;		\
 }
 /**
 *Definition de la fonction precedente; a inclure dans le .h correspondant.
 */
-#define CD_APPLET_ON_BUILD_MENU_H \
-gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
+#define CD_APPLET_ON_BUILD_MENU_H										\
+	gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 
 /**
 *Menu principal de l'applet.
 */
 #define CD_APPLET_MY_MENU pAppletMenu
+
 /**
 *Icone cliquee droit.
 */

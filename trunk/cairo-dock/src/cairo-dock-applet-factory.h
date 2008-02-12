@@ -1,3 +1,4 @@
+/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 2; tab-width: 2 -*- */
 
 #ifndef __CAIRO_DOCK_APPLET_FACTORY__
 #define  __CAIRO_DOCK_APPLET_FACTORY__
