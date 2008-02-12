@@ -214,6 +214,8 @@ gboolean _cairo_dock_show_sub_dock_delayed (CairoDock *pDock)
 		cairo_dock_show_subdock (icon, FALSE, pDock);
 	return FALSE;
 }
+
+
 gboolean on_motion_notify2 (GtkWidget* pWidget,
 	GdkEventMotion* pMotion,
 	CairoDock *pDock)
@@ -222,6 +224,16 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	Icon *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
 	int iLastMouseX = pDock->iMouseX;
 	//g_print ("%s (%d,%d) (%d, %.2fms, bAtBottom:%d; iSidShrinkDown:%d)\n", __func__, (int) pMotion->x, (int) pMotion->y, pMotion->is_hint, pMotion->time - fLastTime, pDock->bAtBottom, pDock->iSidShrinkDown);
+
+        cd_debug("");
+        /*
+         * ugly fix, sometime when the mouse exit really near the border of the window
+         * enter_notify is not called
+         */
+        if (!pDock->bInside) {
+          cd_warning("manual call to enter_notify2");
+          on_enter_notify2 (pWidget, (GdkEventCrossing*)pMotion, pDock);
+        }
 
 	//\_______________ On elague le flux des MotionNotify, sinon X en envoie autant que le permet le CPU !
 	Icon *pPointedIcon;
@@ -287,7 +299,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	else  // cas d'un drag and drop.
 	{
 		if (pDock->bHorizontalDock)
-			gdk_window_get_pointer (pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
+ 			gdk_window_get_pointer (pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
 		else
 			gdk_window_get_pointer (pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);
 
@@ -455,6 +467,8 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
+        cd_debug("");
+
 	//g_print ("%s (bInside:%d; bAtBottom:%d; iRefCount:%d)\n", __func__, pDock->bInside, pDock->bAtBottom, pDock->iRefCount);
 	if (pDock->bAtBottom)  // || ! pDock->bInside
 	{
@@ -528,7 +542,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 {
 	//g_print ("%s (bIsMainDock : %d; bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bIsMainDock, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
 	s_pLastPointedDock = NULL;  // ajoute le 04/10/07 pour permettre aux sous-docks d'apparaitre si on entre en pointant tout de suite sur l'icone.
-
+        cd_debug("");
 	if (! s_bEntranceAllowed)
 	{
 		cd_message ("* entree non autorisee\n");
@@ -953,21 +967,21 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				}
 				s_pIconClicked = NULL;
 			break ;
-			
+
 			case GDK_BUTTON_PRESS :
 				if ( ! (pButton->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK)))
 				{
 					s_pIconClicked = icon;  // on ne definit pas l'animation CAIRO_DOCK_FOLLOW_MOUSE ici , on le fera apres le 1er mouvement, pour eviter que l'icone soit dessinee comme tel quand on clique dessus alors que le dock ets en train de jouer une animation (ca provoque un flash desagreable).
 				}
 			break ;
-			
+
 			case GDK_2BUTTON_PRESS :
 				{
 					gpointer data[2] = {icon, pDock};
 					cairo_dock_notify (CAIRO_DOCK_DOUBLE_CLICK_ICON, data);
 				}
 			break ;
-			
+
 			default :
 			break ;
 		}
