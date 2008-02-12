@@ -875,6 +875,9 @@ GtkWidget *cairo_dock_build_menu (Icon *icon, CairoDock *pDock)
 
 	_add_entry_in_menu ("Configure", GTK_STOCK_PREFERENCES, cairo_dock_edit_and_reload_conf, pSubMenu);
 
+	menu_item = gtk_separator_menu_item_new ();
+	gtk_menu_shell_append (GTK_MENU_SHELL (pSubMenu), menu_item);
+
 /* 	menu_item = gtk_image_menu_item_new_with_label (_("Modules")); */
 /* 	image = gtk_image_new_from_stock (GTK_STOCK_CONNECT, GTK_ICON_SIZE_MENU); */
 /* 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image); */
