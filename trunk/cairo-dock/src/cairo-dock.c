@@ -249,7 +249,7 @@ main (int argc, char** argv)
 
 	//\___________________ On recupere quelques options.
 	gboolean bVerbose = FALSE, bDialogTest = FALSE, bSafeMode = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE;
-	gchar *cEnvironment = NULL;
+	gchar *cEnvironment = NULL, *cUserDefinedDataDir = NULL;
 	GOptionEntry TableDesOptions[] = 
 	{
 		{"log", 'V', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
@@ -279,10 +279,13 @@ main (int argc, char** argv)
 		{"env", 'e', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
 			&cEnvironment,
 			"force the dock to consider this environnement - it may crush the dock if not set properly.", NULL},
+		{"dir", 'd', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
+			&cUserDefinedDataDir,
+			"force the dock to load this directory, instead of ~/.cairo-dock.", NULL},
 		{"safe-mode", 's', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&bSafeMode,
 			"don't load any plug-ins", NULL},
-		{"dialog", 'd', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+		{"dialog", 'D', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&bDialogTest,
 			"for test on dialogs only", NULL},
 		{"capuccino", 'C', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
@@ -371,7 +374,7 @@ main (int argc, char** argv)
 	textdomain (CAIRO_DOCK_GETTEXT_PACKAGE);
 
 	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
-	g_cCairoDockDataDir = g_strdup_printf ("%s/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR);
+	g_cCairoDockDataDir = (cUserDefinedDataDir != NULL ? cUserDefinedDataDir : g_strdup_printf ("%s/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR));
 	if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_IS_DIR))
 	{
 		if (g_mkdir (g_cCairoDockDataDir, 7*8*8+7*8+5) != 0)

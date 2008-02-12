@@ -506,7 +506,7 @@ void cairo_dock_reload_module (CairoDockModule *module, CairoDock *pDock, gboole
 		cairo_dock_free_icon (pOldIcon);
 	}
 
-	if (bReloadAppletConf)
+	if (bReloadAppletConf && pDock->iType == CAIRO_DOCK_DOCK)
 		cairo_dock_update_dock_size (pDock);
 }
 

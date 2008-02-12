@@ -71,8 +71,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
   cairo_save (pCairoContext);
 
 	//set the color
-	if (gtk_window_is_active(GTK_WINDOW(pDesklet->pWidget)))  /// je verrais bien un changement au survol (utiliser un flag bIsInside et les enter & leave events.) On pourrait meme avoir les 3 etats.
-	///eviter a tous prix les flags qui servent a rien qd on peut determiner l'etat autrement, flag a mettre a js = source d'erreur
+	if (gtk_window_is_active(GTK_WINDOW(pDesklet->pWidget)))
 		cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], MIN (1., g_fDialogColor[3] * 1.25));
 	else if (pDesklet->bInside)
 		cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], g_fDialogColor[3]);
@@ -112,7 +111,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 		if (pIcon->pIconBuffer != NULL)
 		{
 			//cd_message ("  dessin de l'icone (%.2fx%.2f)\n", pIcon->fWidth, pIcon->fHeight);
-			cairo_translate (pCairoContext, g_iDockRadius, g_iDockRadius);
+			//cairo_translate (pCairoContext, g_iDockRadius, g_iDockRadius);
 			cairo_set_source_surface (pCairoContext, pIcon->pIconBuffer, 0.0, 0.0);
 			cairo_paint (pCairoContext);
 		}

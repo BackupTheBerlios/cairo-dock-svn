@@ -755,69 +755,61 @@ static void cairo_dock_move_icon_to_end (GtkMenuItem *menu_item, gpointer *data)
 		cairo_dock_move_icon_after_icon (pDock, icon, pLastIcon);
 }
 
-
-static void cairo_dock_keep_above(GtkMenuItem *menu_item, gpointer *data)
+static void _cairo_dock_keep_window_in_state (gpointer *data, gboolean bAbove, gboolean bBelow)
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
-
-	gtk_window_set_keep_below(GTK_WINDOW(pDock->pWidget), FALSE);
-	gtk_window_set_keep_above(GTK_WINDOW(pDock->pWidget), TRUE);
+	
+	gtk_window_set_keep_below(GTK_WINDOW(pDock->pWidget), bBelow);
+	gtk_window_set_keep_above(GTK_WINDOW(pDock->pWidget), bAbove);
 	if (CAIRO_DOCK_IS_VALID_APPLET (icon))
 		cairo_dock_update_conf_file (icon->pModule->cConfFilePath,
-			G_TYPE_INT, "Desklet", "keep below", FALSE,
-			G_TYPE_INT, "Desklet", "keep above", TRUE,
+			G_TYPE_INT, "Desklet", "keep below", bBelow,
+			G_TYPE_INT, "Desklet", "keep above", bAbove,
 			G_TYPE_INVALID);
 }
-
-static void cairo_dock_keep_normal(GtkMenuItem *menu_item, gpointer *data)
+static void cairo_dock_keep_above(GtkCheckMenuItem *menu_item, gpointer *data)
 {
-	Icon *icon = data[0];
-	CairoDock *pDock = data[1];
-
-	gtk_window_set_keep_below(GTK_WINDOW(pDock->pWidget), FALSE);
-	gtk_window_set_keep_above(GTK_WINDOW(pDock->pWidget), FALSE);
-	if (CAIRO_DOCK_IS_VALID_APPLET (icon))
-		cairo_dock_update_conf_file (icon->pModule->cConfFilePath,
-			G_TYPE_INT, "Desklet", "keep below", FALSE,
-			G_TYPE_INT, "Desklet", "keep above", FALSE,
-			G_TYPE_INVALID);
+	g_print ("%s ()\n", __func__);
+	if (gtk_check_menu_item_get_active (menu_item))
+		_cairo_dock_keep_window_in_state (data, TRUE, FALSE);
 }
 
-static void cairo_dock_keep_below(GtkMenuItem *menu_item, gpointer *data)
+static void cairo_dock_keep_normal(GtkCheckMenuItem *menu_item, gpointer *data)
 {
-	Icon *icon = data[0];
-	CairoDock *pDock = data[1];
+	g_print ("%s ()\n", __func__);
+	if (gtk_check_menu_item_get_active (menu_item))
+		_cairo_dock_keep_window_in_state (data, FALSE, FALSE);
+}
 
-	gtk_window_set_keep_below(GTK_WINDOW(pDock->pWidget), TRUE);
-	gtk_window_set_keep_above(GTK_WINDOW(pDock->pWidget), FALSE);
-	if (CAIRO_DOCK_IS_VALID_APPLET (icon))
-		cairo_dock_update_conf_file (icon->pModule->cConfFilePath,
-			G_TYPE_INT, "Desklet", "keep below", TRUE,
-			G_TYPE_INT, "Desklet", "keep above", FALSE,
-			G_TYPE_INVALID);
+static void cairo_dock_keep_below(GtkCheckMenuItem *menu_item, gpointer *data)
+{
+	g_print ("%s ()\n", __func__);
+	if (gtk_check_menu_item_get_active (menu_item))
+		_cairo_dock_keep_window_in_state (data, FALSE, TRUE);
 }
 
 //for compiz fusion "widget layer"
 //set behaviour in compiz to: (name=cairo-dock-desklet & type=utility)
 static void cairo_dock_keep_on_widget_layer(GtkMenuItem *menu_item, gpointer *data)
 {
+	g_print ("%s ()\n", __func__);
 	Icon *icon = data[0];
-	CairoDock *pDock = data[1];
-
-	cairo_dock_hide_desklet (pDock);
-	Window Xid = GDK_WINDOW_XID (pDock->pWidget->window);
-
+	CairoDockDesklet *pDesklet = data[1];
+	
+	cairo_dock_hide_desklet (pDesklet);
+	Window Xid = GDK_WINDOW_XID (pDesklet->pWidget->window);
+	
 	gboolean bOnCompizWidgetLayer = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menu_item));
-	g_print ("bOnCompizWidgetLayer : %d\n", bOnCompizWidgetLayer);
+	g_print (" bOnCompizWidgetLayer : %d\n", bOnCompizWidgetLayer);
 	if (bOnCompizWidgetLayer)
 		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_UTILITY)");
 		//gtk_window_set_type_hint(GTK_WINDOW(pDock->pWidget), GDK_WINDOW_TYPE_HINT_UTILITY);
 	else
 		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");
 		//gtk_window_set_type_hint(GTK_WINDOW(pDock->pWidget), GDK_WINDOW_TYPE_HINT_NORMAL);
-	cairo_dock_show_desklet (pDock);
-
+	cairo_dock_show_desklet (pDesklet);
+	
 	if (CAIRO_DOCK_IS_VALID_APPLET (icon))
 		cairo_dock_update_conf_file (icon->pModule->cConfFilePath,
 			G_TYPE_INT, "Desklet", "on widget layer", bOnCompizWidgetLayer,
@@ -826,9 +818,9 @@ static void cairo_dock_keep_on_widget_layer(GtkMenuItem *menu_item, gpointer *da
 
 static void cairo_dock_delete_menu (GtkMenuShell *menu, CairoDock *pDock)
 {
-	cd_debug("");
+	g_print ("%s ()\n", __func__);
 	pDock->bMenuVisible = FALSE;
-	if (! pDock->bInside)
+	if (pDock->iType == CAIRO_DOCK_DOCK && ! pDock->bInside)
 	{
 		cd_message ("on force a quitter\n");
 		pDock->bInside = TRUE;
@@ -1107,38 +1099,46 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	{
 		menu_item = gtk_separator_menu_item_new ();
 		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
-
+		
 		GSList *group = NULL;
-
-		GdkWindowState iState = gdk_window_get_state (pDock->pWidget->window);
-
+		
+		///GdkWindowState iState = gdk_window_get_state (pDock->pWidget->window);
+		gboolean bIsAbove=FALSE, bIsBelow=FALSE;
+		Window Xid = GDK_WINDOW_XID (pDock->pWidget->window);
+		g_print ("Xid : %d\n", Xid);
+		cairo_dock_window_is_above_or_below (Xid, &bIsAbove, &bIsBelow);
+		g_print (" -> %d;%d\n", bIsAbove, bIsBelow);
+		
 		menu_item = gtk_radio_menu_item_new_with_label(group, _("Always on top"));
 		group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(menu_item));
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-		if (iState & GDK_WINDOW_STATE_ABOVE)
+		///if (iState & GDK_WINDOW_STATE_ABOVE)
+		if (bIsAbove)
 			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
-		g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(cairo_dock_keep_above), data);
+		g_signal_connect(G_OBJECT(menu_item), "toggled", G_CALLBACK(cairo_dock_keep_above), data);
 
 		menu_item = gtk_radio_menu_item_new_with_label(group, _("Normal"));
 		group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(menu_item));
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-		if ( ! (iState & (GDK_WINDOW_STATE_ABOVE | GDK_WINDOW_STATE_BELOW)) )
+		///if ( ! (iState & (GDK_WINDOW_STATE_ABOVE | GDK_WINDOW_STATE_BELOW)) )
+		if (! bIsAbove && ! bIsBelow)
 			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
-		g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(cairo_dock_keep_normal), data);
+		g_signal_connect(G_OBJECT(menu_item), "toggled", G_CALLBACK(cairo_dock_keep_normal), data);
 
 		menu_item = gtk_radio_menu_item_new_with_label(group, _("Always below"));
 		group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(menu_item));
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-		if (iState & GDK_WINDOW_STATE_BELOW)
+		///if (iState & GDK_WINDOW_STATE_BELOW)
+		if (bIsBelow)
 			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
-		g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(cairo_dock_keep_below), data);
+		g_signal_connect(G_OBJECT(menu_item), "toggled", G_CALLBACK(cairo_dock_keep_below), data);
 
 		menu_item = gtk_separator_menu_item_new ();
 		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 
 		menu_item = gtk_check_menu_item_new_with_label(_("Compiz Fusion Widget"));
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-		if (gtk_window_get_type_hint (pDock->pWidget) == GDK_WINDOW_TYPE_HINT_UTILITY)
+		if (gtk_window_get_type_hint (GTK_WINDOW (pDock->pWidget)) == GDK_WINDOW_TYPE_HINT_UTILITY)
 			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
 		g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(cairo_dock_keep_on_widget_layer), data);
 

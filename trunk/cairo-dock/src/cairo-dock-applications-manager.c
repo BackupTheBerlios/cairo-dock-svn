@@ -56,6 +56,8 @@ static Atom s_aNetDesktopViewport;
 static Atom s_aNetDesktopGeometry;
 static Atom s_aNetWmState;
 static Atom s_aNetWmFullScreen;
+static Atom s_aNetWmAbove;
+static Atom s_aNetWmBelow;
 static Atom s_aNetWmHidden;
 static Atom s_aNetWmDesktop;
 
@@ -83,6 +85,8 @@ void cairo_dock_initialize_application_manager (void)
 	s_aNetDesktopGeometry = XInternAtom (s_XDisplay, "_NET_DESKTOP_GEOMETRY", False);
 	s_aNetWmState = XInternAtom (s_XDisplay, "_NET_WM_STATE", False);
 	s_aNetWmFullScreen = XInternAtom (s_XDisplay, "_NET_WM_STATE_FULLSCREEN", False);
+	s_aNetWmAbove = XInternAtom (s_XDisplay, "_NET_WM_STATE_ABOVE", False);
+	s_aNetWmBelow = XInternAtom (s_XDisplay, "_NET_WM_STATE_BELOW", False);
 	s_aNetWmHidden = XInternAtom (s_XDisplay, "_NET_WM_STATE_HIDDEN", False);
 	s_aNetWmDesktop = XInternAtom (s_XDisplay, "_NET_WM_DESKTOP", False);
 
@@ -453,7 +457,7 @@ gboolean cairo_dock_window_is_maximized (Window Xid)
 	return (iIsMaximized == 2);
 }
 
-gboolean cairo_dock_window_is_fullscreen (Window Xid)
+static gboolean _cairo_dock_window_is_in_state (Window Xid, Atom iState)
 {
 	g_return_val_if_fail (Xid > 0, FALSE);
 	Atom aReturnedType = 0;
@@ -462,22 +466,60 @@ gboolean cairo_dock_window_is_fullscreen (Window Xid)
 	gulong *pXStateBuffer = NULL;
 	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmState, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXStateBuffer);
 
-	gboolean bIsFullScreen = FALSE;
+	gboolean bIsInState = FALSE;
 	if (iBufferNbElements > 0)
 	{
 		int i;
 		for (i = 0; i < iBufferNbElements; i ++)
 		{
-			if (pXStateBuffer[i] == s_aNetWmFullScreen)
+			if (pXStateBuffer[i] == iState)
 			{
-				bIsFullScreen = TRUE;
+				bIsInState = TRUE;
 				break;
 			}
 		}
 	}
 
 	XFree (pXStateBuffer);
-	return bIsFullScreen;
+	return bIsInState;
+}
+
+gboolean cairo_dock_window_is_fullscreen (Window Xid)
+{
+	return _cairo_dock_window_is_in_state (Xid, s_aNetWmFullScreen);
+}
+void cairo_dock_window_is_above_or_below (Window Xid, gboolean *bIsAbove, gboolean *bIsBelow)
+{
+	g_return_if_fail (Xid > 0);
+	Atom aReturnedType = 0;
+	int aReturnedFormat = 0;
+	unsigned long iLeftBytes, iBufferNbElements = 0;
+	gulong *pXStateBuffer = NULL;
+	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmState, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXStateBuffer);
+
+	if (iBufferNbElements > 0)
+	{
+		int i;
+		g_print ("iBufferNbElements : %d (%d;%d)\n", iBufferNbElements, s_aNetWmAbove, s_aNetWmBelow);
+		for (i = 0; i < iBufferNbElements; i ++)
+		{
+			g_print (" - %d\n", pXStateBuffer[i]);
+			if (pXStateBuffer[i] == s_aNetWmAbove)
+			{
+				*bIsAbove = TRUE;
+				*bIsBelow = FALSE;
+				break;
+			}
+			else if (pXStateBuffer[i] == s_aNetWmBelow)
+			{
+				*bIsAbove = FALSE;
+				*bIsBelow = TRUE;
+				break;
+			}
+		}
+	}
+
+	XFree (pXStateBuffer);
 }
 
 void cairo_dock_window_is_fullscreen_or_hidden (Window Xid, gboolean *bIsFullScreen, gboolean *bIsHidden)
