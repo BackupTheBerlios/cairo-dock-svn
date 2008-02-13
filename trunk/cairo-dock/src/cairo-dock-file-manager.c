@@ -206,6 +206,16 @@ gboolean cairo_dock_fm_logout (void)
 		return FALSE;
 }
 
+gboolean cairo_dock_fm_setup_time (void)
+{
+	if (s_pVFSBackend != NULL && s_pVFSBackend->setup_time!= NULL)
+	{
+		s_pVFSBackend->setup_time ();
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
 
 Icon *cairo_dock_fm_create_icon_from_URI (const gchar *cURI, CairoDock *pDock)
 {

@@ -548,7 +548,7 @@ typedef gboolean (*CairoDockFMMoveFileFunc) (const gchar *cURI, const gchar *cDi
 
 typedef gchar * (*CairoDockFMGetTrashFunc) (const gchar *cNearURI, gboolean bCreateIfNecessary);
 typedef gchar * (*CairoDockFMGetDesktopFunc) (void);
-typedef void (*CairoDockFMLogoutFunc) (void);
+typedef void (*CairoDockFMUserActionFunc) (void);
 
 struct _CairoDockVFSBackend {
 	CairoDockFMGetFileInfoFunc 		get_file_info;
@@ -565,7 +565,8 @@ struct _CairoDockVFSBackend {
 	CairoDockFMMoveFileFunc 		move;
 	CairoDockFMGetTrashFunc 		get_trash_path;
 	CairoDockFMGetDesktopFunc 	get_desktop_path;
-	CairoDockFMLogoutFunc			logout;
+	CairoDockFMUserActionFunc		logout;
+	CairoDockFMUserActionFunc		setup_time;
 };
 
 
