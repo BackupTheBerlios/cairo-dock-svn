@@ -921,11 +921,11 @@ void cairo_dock_redraw_my_icon (Icon *icon, CairoDock *pDock)
 	//g_print ("rect (%d;%d) (%dx%d)\n", rect.x, rect.y, rect.width, rect.height);
 	if (rect.width > 0 && rect.height > 0)
 	{
-/**#ifdef HAVE_GLITZ
+#ifdef HAVE_GLITZ
 		if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
 			gtk_widget_queue_draw (pDock->pWidget);
 		else
-#endif*/
+#endif
 		gdk_window_invalidate_rect (pDock->pWidget->window, &rect, FALSE);
 	}
 }
