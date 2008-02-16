@@ -403,26 +403,26 @@ main (int argc, char** argv)
 	if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_IS_DIR))
 	{
 		if (g_mkdir (g_cCairoDockDataDir, 7*8*8+7*8+5) != 0)
-			cd_warning ("Attention : couldn't create directory %s\n", g_cCairoDockDataDir);
+			cd_warning ("Attention : couldn't create directory %s", g_cCairoDockDataDir);
 	}
 	gchar *cThemesDir = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_THEMES_DIR);
 	if (! g_file_test (cThemesDir, G_FILE_TEST_IS_DIR))
 	{
 		if (g_mkdir (cThemesDir, 7*8*8+7*8+5) != 0)
-			cd_warning ("Attention : couldn't create directory %s\n", cThemesDir);
+			cd_warning ("Attention : couldn't create directory %s", cThemesDir);
 	}
 	g_free (cThemesDir);
 	g_cCurrentThemePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_CURRENT_THEME_NAME);
 	if (! g_file_test (g_cCurrentThemePath, G_FILE_TEST_IS_DIR))
 	{
 		if (g_mkdir (g_cCurrentThemePath, 7*8*8+7*8+5) != 0)
-			cd_warning ("Attention : couldn't create directory %s\n", g_cCurrentThemePath);
+			cd_warning ("Attention : couldn't create directory %s", g_cCurrentThemePath);
 	}
 	g_cCurrentLaunchersPath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_LAUNCHERS_DIR);
 	if (! g_file_test (g_cCurrentLaunchersPath, G_FILE_TEST_IS_DIR))
 	{
 		if (g_mkdir (g_cCurrentLaunchersPath, 7*8*8+7*8+5) != 0)
-			cd_warning ("Attention : couldn't create directory %s\n", g_cCurrentLaunchersPath);
+			cd_warning ("Attention : couldn't create directory %s", g_cCurrentLaunchersPath);
 	}
 
 	//\___________________ On initialise les numeros de version.
@@ -438,7 +438,7 @@ main (int argc, char** argv)
 	//\___________________ On detecte l'environnement de bureau.
 	if (g_iDesktopEnv == CAIRO_DOCK_UNKNOWN_ENV)
 		g_iDesktopEnv = cairo_dock_guess_environment ();
-	cd_message ("environnement de bureau : %d\n", g_iDesktopEnv);
+	cd_message ("environnement de bureau : %d", g_iDesktopEnv);
 
 	//\___________________ On initialise la table des docks.
 	g_hDocksTable = g_hash_table_new_full (g_str_hash,
@@ -614,8 +614,8 @@ main (int argc, char** argv)
 
 	rsvg_term ();
 	
-	cd_message ("Bye bye !\n");
-	g_print ("\033[0m");
+	cd_message ("Bye bye !");
+	g_print ("\033[0m\n");
 
 	return 0;
 }

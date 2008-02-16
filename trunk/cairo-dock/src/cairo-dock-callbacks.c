@@ -909,8 +909,8 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 					else if (s_pIconClicked != NULL && icon != NULL && icon != s_pIconClicked)  //  && icon->iType == s_pIconClicked->iType
 					{
 						cd_message ("deplacement de %s\n", s_pIconClicked->acName);
-						CairoDock *pOriginDock = cairo_dock_search_container_from_icon (s_pIconClicked);
-						if (pDock != pOriginDock)
+						CairoDock *pOriginDock = CAIRO_DOCK_DOCK (cairo_dock_search_container_from_icon (s_pIconClicked));
+						if (pOriginDock != NULL && pDock != pOriginDock)
 						{
 							cairo_dock_detach_icon_from_dock (s_pIconClicked, pOriginDock, TRUE);  // plutot que 'cairo_dock_remove_icon_from_dock', afin de ne pas la fermer.
 							///cairo_dock_remove_icon_from_dock (pOriginDock, s_pIconClicked);
@@ -921,7 +921,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 							cairo_dock_update_icon_s_container_name (s_pIconClicked, icon->cParentDockName);
 							if (pOriginDock->iRefCount > 0 && ! g_bSameHorizontality)
 							{
-								cairo_t* pSourceContext = cairo_dock_create_context_from_window (pDock);
+								cairo_t* pSourceContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 								cairo_dock_fill_one_text_buffer (s_pIconClicked, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : g_pMainDock->bHorizontalDock));
 								cairo_destroy (pSourceContext);
 							}
@@ -988,7 +988,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 	else if (pButton->button == 3 && pButton->type == GDK_BUTTON_PRESS)  // clique droit.
 	{
 		pDock->bMenuVisible = TRUE;
-		GtkWidget *menu = cairo_dock_build_menu (icon, pDock);  // genere un CAIRO_DOCK_BUILD_MENU.
+		GtkWidget *menu = cairo_dock_build_menu (icon, CAIRO_DOCK_CONTAINER (pDock));  // genere un CAIRO_DOCK_BUILD_MENU.
 
 		gtk_widget_show_all (menu);
 
@@ -1353,7 +1353,7 @@ gboolean cairo_dock_notification_drop_data (gpointer *data)
 		gchar *cNewDesktopFileName = cairo_dock_add_desktop_file_from_uri (cReceivedData, cDockName, fOrder, pDock, &erreur);
 		if (erreur != NULL)
 		{
-			cd_message ("Attention : %s\n", erreur->message);
+			cd_warning ("Attention : %s", erreur->message);
 			g_error_free (erreur);
 			return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 		}
@@ -1363,7 +1363,7 @@ gboolean cairo_dock_notification_drop_data (gpointer *data)
 		{
 			cairo_dock_mark_theme_as_modified (TRUE);
 
-			cairo_t* pCairoContext = cairo_dock_create_context_from_window (pReceivingDock);
+			cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pReceivingDock));
 			Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cNewDesktopFileName, pCairoContext);
 			g_free (cNewDesktopFileName);
 			cairo_destroy (pCairoContext);

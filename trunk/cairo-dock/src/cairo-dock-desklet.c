@@ -50,7 +50,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
                                      GdkEventExpose *pExpose,
                                      CairoDockDesklet *pDesklet)
 {
-  //cd_message ("%s ()\n", __func__);
+  cd_message ("%s ()", __func__);
   gint w = 0, h = 0;
 
   if (!pDesklet)
@@ -109,13 +109,14 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 		
 		if (pIcon->pIconBuffer != NULL)
 		{
-			//cd_message ("  dessin de l'icone (%.2fx%.2f)\n", pIcon->fWidth, pIcon->fHeight);
+			cd_message ("  dessin de l'icone (%.2fx%.2f)", pIcon->fWidth, pIcon->fHeight);
 			//cairo_translate (pCairoContext, g_iDockRadius, g_iDockRadius);
 			cairo_set_source_surface (pCairoContext, pIcon->pIconBuffer, 0.0, 0.0);
 			cairo_paint (pCairoContext);
 		}
 		if (pIcon->pQuickInfoBuffer != NULL)
 		{
+			cd_message ("  dessin de l'info-rapide (%dx%d)", pIcon->iQuickInfoWidth, pIcon->iQuickInfoHeight);
 			cairo_translate (pCairoContext,
 				//-icon->fQuickInfoXOffset + icon->fWidth / 2,
 				//icon->fHeight - icon->fQuickInfoYOffset);
@@ -166,7 +167,7 @@ static gboolean on_configure_desklet (GtkWidget* pWidget,
                                       GdkEventConfigure* pEvent,
                                       CairoDockDesklet *pDesklet)
 {
-	cd_message ("%s (%dx%d ; %d,%d)\n", __func__, pEvent->width, pEvent->height, (int) pEvent->x, (int) pEvent->y);
+	cd_message ("%s (%dx%d ; %d,%d)", __func__, pEvent->width, pEvent->height, (int) pEvent->x, (int) pEvent->y);
 	if (pDesklet->iWidth != pEvent->width || pDesklet->iHeight != pEvent->height)
 	{
 		pDesklet->iWidth = pEvent->width;
@@ -207,11 +208,11 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 		{
 			pDesklet->diff_x = - pButton->x;  // pour le deplacement manuel.
 			pDesklet->diff_y = - pButton->y;
-			cd_message ("diff : %d;%d\n", pDesklet->diff_x, pDesklet->diff_y);
+			cd_message ("diff : %d;%d", pDesklet->diff_x, pDesklet->diff_y);
 		}
 		else if (pButton->type == GDK_BUTTON_RELEASE)
 		{
-			cd_message ("GDK_BUTTON_RELEASE\n");
+			cd_message ("GDK_BUTTON_RELEASE");
 			if (pDesklet->moving)
 			{
 				pDesklet->moving = FALSE;
@@ -262,7 +263,7 @@ static gboolean on_motion_notify_desklet(GtkWidget *pWidget,
 {
 	if (pMotion->state & GDK_BUTTON1_MASK)
 	{
-		cd_message ("root : %d;%d\n", pMotion->x_root, pMotion->y_root);
+		cd_debug ("root : %d;%d", (int) pMotion->x_root, (int) pMotion->y_root);
 		gtk_window_move (GTK_WINDOW (pWidget),
 			pMotion->x_root + pDesklet->diff_x,
 			pMotion->y_root + pDesklet->diff_y);
@@ -329,7 +330,7 @@ static gboolean on_leave_desklet (GtkWidget* pWidget,
 
 CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiveWidget)
 {
-  cd_message ("%s ()\n", __func__);
+  cd_message ("%s ()", __func__);
   CairoDockDesklet *pDesklet = g_new0(CairoDockDesklet, 1);
   pDesklet->iType = CAIRO_DOCK_TYPE_DESKLET;
   GtkWidget* pWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -391,9 +392,9 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
   //user widget
   if (pInteractiveWidget != NULL)
   {
-    cd_message ("ref = %d\n", pInteractiveWidget->object.parent_instance.ref_count);
+    cd_message ("ref = %d", pInteractiveWidget->object.parent_instance.ref_count);
     gtk_container_add (GTK_CONTAINER (pDesklet->pWidget), pInteractiveWidget);
-    cd_message ("pack -> ref = %d\n", pInteractiveWidget->object.parent_instance.ref_count);
+    cd_message ("pack -> ref = %d", pInteractiveWidget->object.parent_instance.ref_count);
   }
 
   gtk_widget_show_all(pWindow);
@@ -404,7 +405,7 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
 
 void cairo_dock_place_desklet (CairoDockDesklet *pDesklet, int iWidth, int iHeight, int iPositionX, int iPositionY, gboolean bKeepBelow, gboolean bKeepAbove, gboolean bOnWidgetLayer)
 {
-	cd_message ("%s (%dx%d ; (%d,%d) ; %d,%d,%d)\n", __func__, iWidth, iHeight, iPositionX, iPositionY, bKeepBelow, bKeepAbove, bOnWidgetLayer);
+	cd_message ("%s (%dx%d ; (%d,%d) ; %d,%d,%d)", __func__, iWidth, iHeight, iPositionX, iPositionY, bKeepBelow, bKeepAbove, bOnWidgetLayer);
 	gdk_window_move_resize (pDesklet->pWidget->window,
 		iPositionX,
 		iPositionY,
@@ -426,7 +427,7 @@ static void _cairo_dock_steal_one_child (GtkWidget *pWidget, GtkContainer *pCont
 	cd_debug (" ref : %d", pWidget->object.parent_instance.ref_count);
 	gtk_object_ref (GTK_OBJECT (pWidget));
 	gtk_container_remove (GTK_CONTAINER (pContainer), pWidget);
-	cd_debug (" -> %d\n", pWidget->object.parent_instance.ref_count);
+	cd_debug (" -> %d", pWidget->object.parent_instance.ref_count);
 }
 void cairo_dock_free_desklet (CairoDockDesklet *pDesklet)
 {
@@ -434,7 +435,8 @@ void cairo_dock_free_desklet (CairoDockDesklet *pDesklet)
 		return;
 	
 	GtkWidget *pInteractiveWidget = gtk_bin_get_child (GTK_BIN (pDesklet->pWidget));
-	cairo_dock_steal_widget_from_its_container (pInteractiveWidget);
+	if (pInteractiveWidget != NULL)
+		cairo_dock_steal_widget_from_its_container (pInteractiveWidget);
 	
 	gtk_widget_destroy (pDesklet->pWidget);
 	pDesklet->pWidget = NULL;

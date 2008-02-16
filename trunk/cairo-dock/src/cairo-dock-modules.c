@@ -25,6 +25,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-applet-facility.h"
 #include "cairo-dock-applet-factory.h"
 #include "cairo-dock-desklet.h"
+#include "cairo-dock-animations.h"
 #include "cairo-dock-modules.h"
 
 #define CAIRO_DOCK_MODULE_PANEL_WIDTH 700
@@ -52,7 +53,7 @@ void cairo_dock_initialize_module_manager (gchar *cModuleDirPath)
 		cairo_dock_preload_module_from_directory (cModuleDirPath, s_hModuleTable, &erreur);
 		if (erreur != NULL)
 		{
-			cd_message ("Attention : %s\n  no module will be available\n", erreur->message);
+			cd_warning ("Attention : %s\n  no module will be available", erreur->message);
 			g_error_free (erreur);
 		}
 	}
@@ -661,9 +662,13 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 			cairo_dock_load_one_icon_from_scratch (pIcon, pNewContainer);
 			
 			if (bToBeInserted)
-				cairo_dock_insert_icon_in_dock (pIcon, CAIRO_DOCK_DOCK (pNewContainer), ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
-			
-			if (bReloadAppletConf)
+			{
+				CairoDock *pDock = CAIRO_DOCK_DOCK (pNewContainer);
+				cairo_dock_insert_icon_in_dock (pIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
+				if (pDock->iSidShrinkDown == 0)
+					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+			}
+			else if (bReloadAppletConf)
 				cairo_dock_update_dock_size (CAIRO_DOCK_DOCK (pNewContainer));
 		}
 		
@@ -696,7 +701,7 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 		{
 			module->bActive = FALSE;
 			cairo_dock_update_conf_file_with_active_modules (g_cConfFile, g_pMainDock->icons);
-			cd_message ("Attention : %s\n", erreur->message);
+			cd_warning ("Attention : %s", erreur->message);
 			g_error_free (erreur);
 		}
 
@@ -733,9 +738,7 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 		if (bReloadAppletConf)
 		{
 			if (CAIRO_DOCK_IS_DOCK (module->pContainer))
-				cairo_dock_update_dock_size (module->pContainer);
-			else
-				cairo_dock_update_dock_size (module->pContainer);
+				cairo_dock_update_dock_size (CAIRO_DOCK_DOCK (module->pContainer));
 		}
 	}
 }

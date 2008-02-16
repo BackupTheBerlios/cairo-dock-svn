@@ -219,7 +219,7 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 			FALSE);
 		g_free (cIconPath);
 	}
-	cd_message ("%s () -> %.2fx%.2f\n", __func__, icon->fWidth, icon->fHeight);
+	cd_debug ("%s () -> %.2fx%.2f", __func__, icon->fWidth, icon->fHeight);
 
 	if (g_fAlbedo > 0 && icon->pIconBuffer != NULL && ! (CAIRO_DOCK_IS_APPLET (icon) && icon->acFileName == NULL))
 	{
@@ -259,7 +259,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 			&erreur);  // inutile sur Ubuntu, qui est nativement UTF8, mais sur les autres on ne sait pas.
 		if (erreur != NULL)
 		{
-			cd_message ("Attention : %s\n", erreur->message);
+			cd_warning ("Attention : %s", erreur->message);
 			g_error_free (erreur);
 			erreur = NULL;
 		}

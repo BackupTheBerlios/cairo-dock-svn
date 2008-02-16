@@ -279,21 +279,21 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 		//\______________ Au moins une icone est en cours d'animation suite a un clique, on continue le 'shrink_down'.
 		if (pRemovingIcon != NULL)
 		{
-			cd_message ("au moins 1 icone en cours d'insertion/suppression (%f)\n", pRemovingIcon->fPersonnalScale);
+			cd_debug ("au moins 1 icone en cours d'insertion/suppression (%f)", pRemovingIcon->fPersonnalScale);
 			if (pRemovingIcon->fPersonnalScale == 0.05)
 			{
-				cd_message ("  fin\n");
+				cd_debug ("  fin");
 				cairo_dock_remove_icon_from_dock (pDock, pRemovingIcon);
-
+				
 				if (CAIRO_DOCK_IS_APPLI (pRemovingIcon) && pRemovingIcon->cClass != NULL && pDock == cairo_dock_search_dock_from_name (pRemovingIcon->cClass) && pDock->icons == NULL)  // il n'y a plus aucune icone de cette classe.
 				{
-					cd_message ("le sous-dock de la classe %s n'a plus d'element et sera detruit\n", pRemovingIcon->cClass);
+					cd_message ("le sous-dock de la classe %s n'a plus d'element et sera detruit", pRemovingIcon->cClass);
 					cairo_dock_destroy_dock (pDock, pRemovingIcon->cClass, NULL, NULL);
 				}
 				else
 				{
 					cairo_dock_update_dock_size (pDock);
-					cd_message ("destruction de %s\n", pRemovingIcon->acName);
+					cd_message ("destruction de %s", pRemovingIcon->acName);
 					cairo_dock_free_icon (pRemovingIcon);
 				}
 			}
@@ -341,7 +341,7 @@ void cairo_dock_arm_animation (Icon *icon, CairoDockAnimationType iAnimationType
 */
 void cairo_dock_start_animation (Icon *icon, CairoDock *pDock)
 {
-	cd_message ("%s (%s, %d)\n", __func__, icon->acName, icon->iAnimationType);
+	cd_message ("%s (%s, %d)", __func__, icon->acName, icon->iAnimationType);
 	if ((icon->iCount > 0 && icon->iAnimationType < CAIRO_DOCK_RANDOM) || icon->fPersonnalScale != 0)
 	{
 		if (pDock->iSidGrowUp != 0)

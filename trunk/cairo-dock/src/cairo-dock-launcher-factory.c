@@ -173,7 +173,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 	g_key_file_load_from_file (keyfile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : while trying to load %s : %s\n", cDesktopFileName, erreur->message);
+		cd_warning ("Attention : while trying to load %s : %s", cDesktopFileName, erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
@@ -186,7 +186,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 	icon->acFileName = g_key_file_get_string (keyfile, "Desktop Entry", "Icon", &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : while trying to load %s : %s\n", cDesktopFileName, erreur->message);
+		cd_warning ("Attention : while trying to load %s : %s", cDesktopFileName, erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
@@ -201,7 +201,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 	icon->acName = g_key_file_get_locale_string (keyfile, "Desktop Entry", "Name", NULL, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : while trying to load %s : %s\n", cDesktopFileName, erreur->message);
+		cd_warning ("Attention : while trying to load %s : %s", cDesktopFileName, erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
@@ -215,7 +215,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 	icon->acCommand = g_key_file_get_string (keyfile, "Desktop Entry", "Exec", &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : while trying to load %s : %s\n", cDesktopFileName, erreur->message);
+		cd_warning ("Attention : while trying to load %s : %s", cDesktopFileName, erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
@@ -228,7 +228,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 	icon->fOrder = g_key_file_get_double (keyfile, "Desktop Entry", "Order", &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : while trying to load %s : %s\n", cDesktopFileName, erreur->message);
+		cd_warning ("Attention : while trying to load %s : %s", cDesktopFileName, erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
@@ -269,7 +269,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 	gboolean bIsContainer = g_key_file_get_boolean (keyfile, "Desktop Entry", "Is container", &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : while trying to load %s : %s\n", cDesktopFileName, erreur->message);
+		cd_warning ("Attention : while trying to load %s : %s", cDesktopFileName, erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 		bIsContainer = FALSE;
@@ -280,7 +280,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		CairoDock *pChildDock = cairo_dock_search_dock_from_name (icon->acName);
 		if (pChildDock == NULL)
 		{
-			cd_message ("le dock fils (%s) n'existe pas, on le cree avec la vue %s\n", icon->acName, cRendererName);
+			cd_message ("le dock fils (%s) n'existe pas, on le cree avec la vue %s", icon->acName, cRendererName);
 			if (icon->cBaseURI == NULL)
 				icon->pSubDock = cairo_dock_create_subdock_from_scratch (NULL, icon->acName);
 			else
@@ -301,7 +301,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 	icon->cParentDockName = g_key_file_get_string (keyfile, "Desktop Entry", "Container", &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : while trying to load %s : %s\n", cDesktopFileName, erreur->message);
+		cd_warning ("Attention : while trying to load %s : %s", cDesktopFileName, erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 		icon->cParentDockName = NULL;

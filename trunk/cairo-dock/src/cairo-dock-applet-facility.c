@@ -166,14 +166,15 @@ void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo
 
 	g_free (pIcon->cQuickInfo);
 	pIcon->cQuickInfo = g_strdup (cQuickInfo);
-	cd_message ("cQuickInfo <- %s\n", pIcon->cQuickInfo);
-
+	cd_message ("cQuickInfo <- %s", pIcon->cQuickInfo);
+	
 	cairo_dock_fill_one_quick_info_buffer (pIcon,
 		pSourceContext,
 		12,
 		g_cLabelPolice,
 		PANGO_WEIGHT_HEAVY,
 		fMaxScale);
+	cd_message (" -> %dx%d", pIcon->iQuickInfoWidth, pIcon->iQuickInfoHeight);
 }
 
 void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, CairoDock *pDock, const gchar *cQuickInfoFormat, ...)

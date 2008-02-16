@@ -256,7 +256,7 @@ typedef void (*CairoDockModuleInit) (GKeyFile *pKeyFile, Icon *pIcon, CairoDockC
 typedef void (*CairoDockModuleStop) (void);
 
 /// Recharge le module (optionnel).
-typedef gboolean (*CairoDockModuleReload) (GKeyFile *pKeyFile, CairoDockContainer *pContainer, gchar *cConfFileToReload);
+typedef gboolean (*CairoDockModuleReload) (GKeyFile *pKeyFile, gchar *cConfFileToReload, CairoDockContainer *pContainer);
 
 struct _CairoDockModule {
 	/// chemin du .so

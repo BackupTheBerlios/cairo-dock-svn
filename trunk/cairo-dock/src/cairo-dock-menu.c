@@ -224,7 +224,7 @@ static void _cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data,
 		return ;
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : while trying to create a new launcher : %s\n", erreur->message);
+		cd_message ("Attention : while trying to create a new launcher : %s", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
@@ -240,7 +240,7 @@ static void _cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data,
 		config_ok = TRUE;
 	if (config_ok)
 	{
-		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
+		cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cNewDesktopFileName, pCairoContext);
 
 		if (iLauncherType = CAIRO_DOCK_LAUNCHER_FOR_SEPARATOR)
@@ -286,7 +286,7 @@ static void cairo_dock_add_launcher (GtkMenuItem *menu_item, gpointer *data)
 	if (answer == GTK_RESPONSE_OK)
 	{
 		GSList* selected_files = gtk_file_chooser_get_filenames (GTK_FILE_CHOOSER (pFileChooserDialog));
-		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
+		cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 		gchar *cFilePath;
 		Icon *pNewIcon;
 		gchar *cDesktopFileName;
@@ -381,7 +381,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 		///cairo_dock_remove_icon_from_dock (pDock, icon);
 
 		//\_____________ On recree l'icone de zero.
-		cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+		cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (icon->acDesktopFileName, pCairoContext);
 
 		//\_____________ On redistribue les icones du sous-dock si l'icone n'est plus un container.
@@ -832,7 +832,7 @@ static void cairo_dock_delete_menu (GtkMenuShell *menu, CairoDock *pDock)
 
 #define _add_entry_in_menu(cLabel, gtkStock, pSubMenu, pCallBack) CD_APPLET_ADD_IN_MENU_WITH_STOCK (cLabel, gtkStock, pSubMenu, pCallBack, data)
 
-GtkWidget *cairo_dock_build_menu (Icon *icon, CairoDock *pDock)
+GtkWidget *cairo_dock_build_menu (Icon *icon, CairoDockContainer *pContainer)
 {
 	static gpointer *data = NULL;
 
@@ -840,12 +840,12 @@ GtkWidget *cairo_dock_build_menu (Icon *icon, CairoDock *pDock)
 	g_signal_connect (G_OBJECT (menu),
 		"deactivate",
 		G_CALLBACK (cairo_dock_delete_menu),
-		pDock);
+		pContainer);
 
 	if (data == NULL)
 		data = g_new (gpointer, 3);
 	data[0] = icon;
-	data[1] = pDock;
+	data[1] = pContainer;
 	data[2] = menu;
 
 	GtkWidget *menu_item, *image;
@@ -892,11 +892,11 @@ GtkWidget *cairo_dock_build_menu (Icon *icon, CairoDock *pDock)
 gboolean cairo_dock_notification_build_menu (gpointer *data)
 {
 	Icon *icon = data[0];
-	CairoDock *pDock = data[1];
+	CairoDockContainer *pContainer = data[1];
 	GtkWidget *menu = data[2];
 	GtkWidget *menu_item, *image;
 
-	if (CAIRO_DOCK_IS_DOCK (pDock))
+	if (CAIRO_DOCK_IS_DOCK (pContainer))
 	{
 		menu_item = gtk_image_menu_item_new_with_label (_("Move this icon"));
 
@@ -993,22 +993,22 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 
 		if (icon->pModule->bCanDetach)
 		{
-			_add_entry_in_menu (CAIRO_DOCK_IS_DOCK (pDock) ? _("Detach this module") : _("Return to dock"), CAIRO_DOCK_IS_DOCK (pDock) ? GTK_STOCK_DISCONNECT : GTK_STOCK_CONNECT, cairo_dock_detach_module, menu);
+			_add_entry_in_menu (CAIRO_DOCK_IS_DOCK (pContainer) ? _("Detach this module") : _("Return to dock"), CAIRO_DOCK_IS_DOCK (pContainer) ? GTK_STOCK_DISCONNECT : GTK_STOCK_CONNECT, cairo_dock_detach_module, menu);
 		}
 
 		_add_entry_in_menu (_("Remove this module"), GTK_STOCK_REMOVE, cairo_dock_remove_module, menu);
 	}
 
-	if (CAIRO_DOCK_IS_DESKLET (pDock))
+	if (CAIRO_DOCK_IS_DESKLET (pContainer))
 	{
 		menu_item = gtk_separator_menu_item_new ();
 		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 
 		GSList *group = NULL;
 
-		///GdkWindowState iState = gdk_window_get_state (pDock->pWidget->window);
+		///GdkWindowState iState = gdk_window_get_state (pContainer->pWidget->window);
 		gboolean bIsAbove=FALSE, bIsBelow=FALSE;
-		Window Xid = GDK_WINDOW_XID (pDock->pWidget->window);
+		Window Xid = GDK_WINDOW_XID (pContainer->pWidget->window);
 		cd_debug ("Xid : %d\n", Xid);
 		cairo_dock_window_is_above_or_below (Xid, &bIsAbove, &bIsBelow);
 		cd_debug (" -> %d;%d\n", bIsAbove, bIsBelow);
@@ -1042,7 +1042,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 
 		menu_item = gtk_check_menu_item_new_with_label("Compiz Fusion Widget");
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-		if (gtk_window_get_type_hint (GTK_WINDOW (pDock->pWidget)) == GDK_WINDOW_TYPE_HINT_UTILITY)
+		if (gtk_window_get_type_hint (GTK_WINDOW (pContainer->pWidget)) == GDK_WINDOW_TYPE_HINT_UTILITY)
 			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
 		g_signal_connect(G_OBJECT(menu_item), "activate", G_CALLBACK(cairo_dock_keep_on_widget_layer), data);
 		
