@@ -198,7 +198,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 
 
 	g_free (icon->acName);
-	icon->acName = g_key_file_get_string (keyfile, "Desktop Entry", "Name", &erreur);
+	icon->acName = g_key_file_get_locale_string (keyfile, "Desktop Entry", "Name", NULL, &erreur);
 	if (erreur != NULL)
 	{
 		cd_message ("Attention : while trying to load %s : %s\n", cDesktopFileName, erreur->message);

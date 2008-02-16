@@ -563,7 +563,7 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 		return ;
 
 	//\___________________ On efface son eventuel dialogue, puisqu'elle n'appartiendra bientot plus a aucun dock.
-	cairo_dock_remove_dialog_if_any (icon);
+	///cairo_dock_remove_dialog_if_any (icon);
 
 	icon->iCount = 0;
 

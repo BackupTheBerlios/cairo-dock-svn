@@ -68,9 +68,9 @@ typedef enum {
 	} CairoDockTypeHorizontality;
 
 typedef enum {
-	CAIRO_DOCK_DOCK = 0,
-	CAIRO_DOCK_DESKLET,
-	CAIRO_DOCK_DIALOG
+	CAIRO_DOCK_TYPE_DOCK = 0,
+	CAIRO_DOCK_TYPE_DESKLET,
+	CAIRO_DOCK_TYPE_DIALOG
 	} CairoDockTypeContainer;
 
 struct _CairoDockContainer {
@@ -92,6 +92,8 @@ struct _CairoDockContainer {
 	gpointer padding[3];
 #endif // HAVE_GLITZ
 };
+
+#define CAIRO_DOCK_CONTAINER(p) ((CairoDockContainer *)p)
 
 
 struct _CairoDock {
@@ -232,8 +234,8 @@ struct _CairoDockVisitCard {
 	gchar *cGettextDomain;
 	/// Version du dock pour laquelle a ete compilee le module.
 	gchar *cDockVersionOnCompilation;
-	/// chemin du fichier de conf du module.
-	gchar *cConfFilePath;
+	/// version courante du module.
+	gchar *cModuleVersion;
 	/// repertoire du plug-in cote utilisateur.
 	gchar *cUserDataDir;
 	/// repertoire d'installation du plug-in.
@@ -248,17 +250,15 @@ struct _CairoDockVisitCard {
 typedef CairoDockVisitCard * (* CairoDockModulePreInit) (void);
 
 /// Initialise le module, et renvoie son icone si il en a.
-typedef Icon * (*CairoDockModuleInit) (CairoDock *pDock, CairoDockModule *pModule, GError **erreur);
+typedef void (*CairoDockModuleInit) (GKeyFile *pKeyFile, Icon *pIcon, CairoDockContainer *pContainer, gchar *cConfFilePath, GError **erreur);
 
 /// Stoppe le module et libere toutes les ressources allouees par lui.
 typedef void (*CairoDockModuleStop) (void);
 
 /// Recharge le module (optionnel).
-typedef gboolean (*CairoDockModuleReload) (gchar *cConfFileToReload);
+typedef gboolean (*CairoDockModuleReload) (GKeyFile *pKeyFile, CairoDockContainer *pContainer, gchar *cConfFileToReload);
 
 struct _CairoDockModule {
-	/// nom du module qui sert a l'identifier.
-	gchar *cModuleName;
 	/// chemin du .so
 	gchar *cSoFilePath;
 	/// structure du module, contenant les pointeurs vers les fonctions du module.
@@ -269,18 +269,18 @@ struct _CairoDockModule {
 	CairoDockModuleStop stopModule;
 	/// fonction de configuration du module. Appelee a chaque reconfiguration du module.
 	CairoDockModuleReload reloadModule;
+	/// carte de visite du module.
+	CairoDockVisitCard *pVisitCard;
 	/// chemin du fichier de conf du module.
 	gchar *cConfFilePath;
-	/// chemin du fichier readme destine a presenter de maniere succinte le module.
-	gchar *cReadmeFilePath;
 	/// TRUE si le module est actif (c'est-a-dire utilise).
 	gboolean bActive;
-	/// chemin d'une image de previsualisation.
-	gchar *cPreviewFilePath;
-	/// Nom du domaine pour la traduction du module par 'gettext'.
-	gchar *cGettextDomain;
 	/// VRAI ssi l'appet est prevue pour pouvoir se detacher.
 	gboolean bCanDetach;
+	/// le container dans lequel va se charger le module, ou NULL.
+	CairoDockContainer *pContainer;
+	/// Heure de derniere (re)activation du module.
+	double fLastLoadingTime;
 };
 
 struct _CairoDockMinimalAppletConfig {
@@ -288,7 +288,6 @@ struct _CairoDockMinimalAppletConfig {
 	gint iDesiredIconHeight;
 	gchar *cLabel;
 	gchar *cIconFileName;
-	gboolean bCanDetach;
 	gint iDeskletWidth;
 	gint iDeskletHeight;
 	gint iDeskletPositionX;
@@ -570,7 +569,7 @@ struct _CairoDockVFSBackend {
 };
 
 
-typedef void (* CairoDockDeskletRenderer) (CairoDockDesklet *pDesklet);
+typedef void (* CairoDockDeskletRenderer) (cairo_t *pCairoContext, gpointer data);
 
 struct _CairoDockDesklet {
 	/// type "desklet".
@@ -597,6 +596,8 @@ struct _CairoDockDesklet {
 	Icon *pIcon;
 	/// La fonction de rendu. NULL pour utiliser celle par defaut qui dessine l'icone comme si elle etait dans un dock. Est appelee par la callback liee a l'expose-event de la fenetre.
 	CairoDockDeskletRenderer renderer;
+	/// donees passees en argument de la fonction de rendu.
+	gpointer pRendererData;
 	/// un timer pour retarder l'ecriture dans le fichier lors des deplacements.
 	gint iSidWritePosition;
 	/// un timer pour retarder l'ecriture dans le fichier lors des redimensionnements.

@@ -258,7 +258,7 @@ void cairo_dock_write_one_name_description (gchar *cName, gchar *cDescriptionFil
 }
 void cairo_dock_write_one_module_name (gchar *cName, CairoDockModule *pModule, GString *pString)
 {
-	g_string_append_printf (pString, "%s;%s;%s;", cName, (pModule != NULL && pModule->cReadmeFilePath != NULL ? pModule->cReadmeFilePath : "none"), (pModule != NULL && pModule->cPreviewFilePath != NULL ? pModule->cPreviewFilePath : "none"));
+	g_string_append_printf (pString, "%s;%s;%s;", cName, (pModule != NULL && pModule->pVisitCard->cReadmeFilePath != NULL ? pModule->pVisitCard->cReadmeFilePath : "none"), (pModule != NULL && pModule->pVisitCard->cPreviewFilePath != NULL ? pModule->pVisitCard->cPreviewFilePath : "none"));
 }
 void cairo_dock_write_one_theme_name (gchar *cName, gchar *cThemePath, GString *pString)
 {

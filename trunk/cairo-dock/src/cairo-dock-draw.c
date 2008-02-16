@@ -69,6 +69,8 @@ extern gboolean g_bDynamicReflection;
 extern double g_fAlbedo;
 extern gboolean g_bConstantSeparatorSize;
 
+extern gboolean g_bUseGlitz;
+
 
 void cairo_dock_set_colormap_for_window (GtkWidget *pWidget)
 {
@@ -78,6 +80,73 @@ void cairo_dock_set_colormap_for_window (GtkWidget *pWidget)
 		pColormap = gdk_screen_get_rgb_colormap (pScreen);
 
 	gtk_widget_set_colormap (pWidget, pColormap);
+}
+
+void cairo_dock_set_colormap (CairoDockContainer *pContainer)
+{
+	//g_print ("%s f%d)\n", __func__, g_bUseGlitz);
+	GdkColormap* pColormap;
+#ifdef HAVE_GLITZ
+	if (g_bUseGlitz)
+	{
+		glitz_drawable_format_t templ, *format;
+		unsigned long	    mask = GLITZ_FORMAT_DOUBLEBUFFER_MASK;
+		XVisualInfo		    *vinfo = NULL;
+		int			    screen = 0;
+		GdkVisual		    *visual;
+		GdkDisplay		    *gdkdisplay;
+		Display		    *xdisplay;
+
+		templ.doublebuffer = 1;
+		gdkdisplay = gtk_widget_get_display (pContainer->pWidget);
+		xdisplay   = gdk_x11_display_get_xdisplay (gdkdisplay);
+
+		int i = 0;
+		do
+		{
+			format = glitz_glx_find_window_format (xdisplay,
+				screen,
+				mask,
+				&templ,
+				i++);
+			if (format)
+			{
+				vinfo = glitz_glx_get_visual_info_from_format (xdisplay,
+					screen,
+					format);
+				if (vinfo->depth == 32)
+				{
+					pContainer->pDrawFormat = format;
+					break;
+				}
+				else if (!pContainer->pDrawFormat)
+				{
+					pContainer->pDrawFormat = format;
+				}
+			}
+		} while (format);
+
+		if (! pContainer->pDrawFormat)
+		{
+			cd_message ("Attention : no double buffered GLX visual\n");
+		}
+		else
+		{
+			vinfo = glitz_glx_get_visual_info_from_format (xdisplay,
+				screen,
+				pContainer->pDrawFormat);
+
+			visual = gdkx_visual_get (vinfo->visualid);
+			pColormap = gdk_colormap_new (visual, TRUE);
+
+			gtk_widget_set_colormap (pContainer->pWidget, pColormap);
+			gtk_widget_set_double_buffered (pContainer->pWidget, FALSE);
+			return ;
+		}
+	}
+#endif
+	
+	cairo_dock_set_colormap_for_window (pContainer->pWidget);
 }
 
 
@@ -115,30 +184,30 @@ double cairo_dock_get_current_dock_width_linear (CairoDock *pDock)
 *@param pDock le dock sur lequel on veut dessiner.
 *@Returns le contexte sur lequel dessiner. N'est jamais nul; tester sa coherence avec #cairo_status avant de l'utiliser, et le detruire avec #cairo_destroy apres en avoir fini avec lui.
 */
-cairo_t * cairo_dock_create_context_from_window (CairoDock *pDock)
+cairo_t * cairo_dock_create_context_from_window (CairoDockContainer *pContainer)
 {
 #ifdef HAVE_GLITZ
-	if (pDock->pGlitzDrawable)
+	if (pContainer->pGlitzDrawable)
 	{
 		//g_print ("creation d'un contexte lie a une surface glitz\n");
 		glitz_surface_t* pGlitzSurface;
 		cairo_surface_t* pCairoSurface;
 		cairo_t* pCairoContext;
 
-		pGlitzSurface = glitz_surface_create (pDock->pGlitzDrawable,
-			pDock->pGlitzFormat,
-			pDock->iCurrentWidth,
-			pDock->iCurrentHeight,
+		pGlitzSurface = glitz_surface_create (pContainer->pGlitzDrawable,
+			pContainer->pGlitzFormat,
+			pContainer->iWidth,
+			pContainer->iHeight,
 			0,
 			NULL);
 
-		if (pDock->pDrawFormat->doublebuffer)
+		if (pContainer->pDrawFormat->doublebuffer)
 			glitz_surface_attach (pGlitzSurface,
-				pDock->pGlitzDrawable,
+				pContainer->pGlitzDrawable,
 				GLITZ_DRAWABLE_BUFFER_BACK_COLOR);
 		else
 			glitz_surface_attach (pGlitzSurface,
-				pDock->pGlitzDrawable,
+				pContainer->pGlitzDrawable,
 				GLITZ_DRAWABLE_BUFFER_FRONT_COLOR);
 
 		pCairoSurface = cairo_glitz_surface_create (pGlitzSurface);
@@ -150,7 +219,7 @@ cairo_t * cairo_dock_create_context_from_window (CairoDock *pDock)
 		return pCairoContext;
 	}
 #endif // HAVE_GLITZ
-	return gdk_cairo_create (pDock->pWidget->window);
+	return gdk_cairo_create (pContainer->pWidget->window);
 }
 
 static void cairo_dock_draw_frame_horizontal (cairo_t *pCairoContext, double fRadius, double fLineWidth, double fFrameWidth, double fFrameHeight, double fDockOffsetX, double fDockOffsetY, int sens, double fInclination)  // la largeur est donnee par rapport "au fond".
@@ -900,33 +969,42 @@ void cairo_dock_render_blank (CairoDock *pDock)
 *@param icon l'icone a retracer.
 *@param pDock le dock contenant l' icone.
 */
-void cairo_dock_redraw_my_icon (Icon *icon, CairoDock *pDock)
+void cairo_dock_redraw_my_icon (Icon *icon, CairoDockContainer *pContainer)
 {
-	g_return_if_fail (icon != NULL && pDock != NULL);
-	if (pDock->iType == CAIRO_DOCK_DOCK && pDock->bAtBottom && (pDock->iRefCount > 0 || g_bAutoHide))  // inutile de redessiner.
-		return ;
-	if (pDock->iType == CAIRO_DOCK_DESKLET && ! GTK_WIDGET_VISIBLE (pDock->pWidget))
+	g_return_if_fail (icon != NULL && pContainer != NULL);
+	double fReflectSize = 0;
+	gboolean bHorizontal = TRUE;
+	if (CAIRO_DOCK_IS_DOCK (pContainer))
+	{
+		CairoDock *pDock = CAIRO_DOCK_DOCK (pContainer);
+		if (pDock->bUseReflect)
+			fReflectSize = g_fReflectSize;
+		bHorizontal = pDock->bHorizontalDock;
+		if (pDock->bAtBottom && (pDock->iRefCount > 0 || g_bAutoHide))  // inutile de redessiner.
+			return ;
+	}
+	else if (! GTK_WIDGET_VISIBLE (pContainer->pWidget))
 		return ;
 	GdkRectangle rect = {(int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor)),
-		(int) icon->fDrawY - (pDock->bUseReflect && ! g_bDirectionUp ? g_fReflectSize : 0),
+		(int) icon->fDrawY - (! g_bDirectionUp ? fReflectSize : 0),
 		(int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)) - 1,
-		(int) icon->fHeight * icon->fScale + (pDock->bUseReflect ? g_fReflectSize : 0)};
-	if (! pDock->bHorizontalDock)
+		(int) icon->fHeight * icon->fScale + fReflectSize};
+	if (! bHorizontal)
 	{
-		rect.x = (int) icon->fDrawY - (pDock->bUseReflect && ! g_bDirectionUp ? g_fReflectSize : 0),
+		rect.x = (int) icon->fDrawY - (! g_bDirectionUp ? fReflectSize : 0),
 		rect.y = (int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor));
-		rect.width = (int) icon->fHeight * icon->fScale + (pDock->bUseReflect ? g_fReflectSize : 0);
+		rect.width = (int) icon->fHeight * icon->fScale + fReflectSize;
 		rect.height = (int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)) - 1;
 	}
 	//g_print ("rect (%d;%d) (%dx%d)\n", rect.x, rect.y, rect.width, rect.height);
 	if (rect.width > 0 && rect.height > 0)
 	{
 #ifdef HAVE_GLITZ
-		if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
-			gtk_widget_queue_draw (pDock->pWidget);
+		if (pContainer->pDrawFormat && pContainer->pDrawFormat->doublebuffer)
+			gtk_widget_queue_draw (pContainer->pWidget);
 		else
 #endif
-		gdk_window_invalidate_rect (pDock->pWidget->window, &rect, FALSE);
+		gdk_window_invalidate_rect (pContainer->pWidget->window, &rect, FALSE);
 	}
 }
 

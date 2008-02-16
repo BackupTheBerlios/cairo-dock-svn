@@ -261,7 +261,7 @@ Icon *cairo_dock_fm_create_icon_from_URI (const gchar *cURI, CairoDock *pDock)
 			}
 		}
 	}
-	cairo_dock_load_one_icon_from_scratch (pNewIcon, pDock, NULL);
+	cairo_dock_load_one_icon_from_scratch (pNewIcon, pDock);
 
 	return pNewIcon;
 }

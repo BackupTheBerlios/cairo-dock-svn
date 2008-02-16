@@ -45,7 +45,7 @@ void cd_log_location(const GLogLevelFlags loglevel,
 /**
  * initialise the log system
  */
-void cd_log_init();
+void cd_log_init(gboolean bBlackTerminal);
 
 /**
  * set the verbosity level

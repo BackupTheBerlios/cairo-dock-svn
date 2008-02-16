@@ -223,9 +223,8 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	static double fLastTime = 0;
 	Icon *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
 	int iLastMouseX = pDock->iMouseX;
-	//g_print ("%s (%d,%d) (%d, %.2fms, bAtBottom:%d; iSidShrinkDown:%d)\n", __func__, (int) pMotion->x, (int) pMotion->y, pMotion->is_hint, pMotion->time - fLastTime, pDock->bAtBottom, pDock->iSidShrinkDown);
+	//cd_debug ("%s (%d,%d) (%d, %.2fms, bAtBottom:%d; iSidShrinkDown:%d)\n", __func__, (int) pMotion->x, (int) pMotion->y, pMotion->is_hint, pMotion->time - fLastTime, pDock->bAtBottom, pDock->iSidShrinkDown);
 
-        cd_debug("");
         /*
          * ugly fix, sometime when the mouse exit really near the border of the window
          * enter_notify is not called
@@ -1398,8 +1397,11 @@ void on_drag_motion (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, gui
 
 gboolean on_delete (GtkWidget *pWidget, GdkEvent *event, CairoDock *pDock)
 {
-	///int answer = cairo_dock_ask_question (pDock, "Quit Cairo-Dock ?");
-	int answer = cairo_dock_ask_general_question_and_wait ("Quit Cairo-Dock ?");
+	Icon *pIcon = cairo_dock_get_pointed_icon (g_pMainDock->icons);
+	if (pIcon == NULL)
+		pIcon = cairo_dock_get_dialogless_icon ();
+	
+	int answer = cairo_dock_ask_question_and_wait (_("Quit Cairo-Dock ?"), pIcon, g_pMainDock);
 	if (answer == GTK_RESPONSE_YES)
 		gtk_main_quit ();
 	return FALSE;

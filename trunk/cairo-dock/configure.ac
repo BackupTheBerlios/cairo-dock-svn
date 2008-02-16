@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([cairo-dock], [1.5.1-090208], [Fabrice Rey (fabounet@users.berlios.de)])
+AC_INIT([cairo-dock], [1.5.1-alpha01], [Fabrice Rey (fabounet@users.berlios.de)])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
 
@@ -30,7 +30,6 @@ AC_CHECK_HEADERS([stdlib.h])
 # Checks for library functions.
 
 
-AM_CONDITIONAL(COMPIL_PLUG_IN, test x$enable_plug_in = xyes)
 AM_CONDITIONAL(COMPIL_VERBOSE, test x$enable_verbose = xyes)
 AM_CONDITIONAL(COMPIL_WITH_GLITZ, test x$enable_glitz = xyes)
 

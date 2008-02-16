@@ -46,7 +46,6 @@ extern int g_iDockRadius;
 extern double g_fDialogColor[4];
 extern gboolean g_bSticky;
 
-
 static gboolean on_expose_desklet(GtkWidget *pWidget,
                                      GdkEventExpose *pExpose,
                                      CairoDockDesklet *pDesklet)
@@ -72,9 +71,9 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 
 	//set the color
 	if (gtk_window_is_active(GTK_WINDOW(pDesklet->pWidget)))
-		cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], MIN (1., g_fDialogColor[3] * 1.25));
+		cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], MAX (.2, MIN (1., g_fDialogColor[3] * 1.25)));
 	else if (pDesklet->bInside)
-		cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], g_fDialogColor[3]);
+		cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], MAX (.1, g_fDialogColor[3]));
 	else
 		cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], g_fDialogColor[3] * .75);
 
@@ -89,25 +88,25 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
   cairo_rel_line_to (pCairoContext, w - (g_iDockRadius << 1), 0);
   cairo_rel_line_to (pCairoContext, 0, h - (g_iDockRadius << 1));
   cairo_rel_line_to (pCairoContext, -(w - (g_iDockRadius << 1)) , 0);
-  cairo_set_line_join (pCairoContext, CAIRO_LINE_JOIN_ROUND);
   cairo_close_path (pCairoContext);
   cairo_stroke (pCairoContext);
 
-  /*   cairo_set_source_rgba (pCairoContext, 1., 1., 1., 1.); */
   cairo_rectangle(pCairoContext, g_iDockRadius, g_iDockRadius, (w - (g_iDockRadius << 1)), (h - (g_iDockRadius << 1)));
   cairo_fill(pCairoContext);
 
 
+	cairo_restore (pCairoContext);
 	if (pDesklet->renderer != NULL)  // une fonction de dessin specifique a ete fournie.
 	{
+		cairo_translate (pCairoContext, g_iDockRadius, g_iDockRadius);
+		pDesklet->renderer (pCairoContext, pDesklet->pRendererData);
 		cairo_destroy (pCairoContext);
-		pDesklet->renderer (pDesklet);
 	}
-	else if (pDesklet->pIcon != NULL)
+	else if (pDesklet->pIcon != NULL)  // sinon par defaut on dessine l'icone dans le desklet.
 	{
-		cairo_restore (pCairoContext);
 		Icon *pIcon = pDesklet->pIcon;
-
+		cairo_translate (pCairoContext, pIcon->fDrawX, pIcon->fDrawY);
+		
 		if (pIcon->pIconBuffer != NULL)
 		{
 			//cd_message ("  dessin de l'icone (%.2fx%.2f)\n", pIcon->fWidth, pIcon->fHeight);
@@ -148,8 +147,8 @@ static gboolean _cairo_dock_write_desklet_size (CairoDockDesklet *pDesklet)
 	pDesklet->iSidWriteSize = 0;
 	if (pDesklet->pIcon != NULL)
 	{
-		cairo_dock_reload_module (pDesklet->pIcon->pModule, g_pMainDock, FALSE);
-		//gtk_widget_queue_draw (pDesklet->pWidget);
+		cairo_dock_reload_module (pDesklet->pIcon->pModule, FALSE);
+		gtk_widget_queue_draw (pDesklet->pWidget);  // sinon on redessine que l'interieur.
 	}
 	return FALSE;
 }
@@ -247,6 +246,7 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 			NULL,
 			1,
 			gtk_get_current_event_time ());
+		pDesklet->bInside = FALSE;
 	}
 	else if (pButton->button == 2 && pButton->type == GDK_BUTTON_PRESS)  // clique milieu.
 	{
@@ -330,12 +330,12 @@ static gboolean on_leave_desklet (GtkWidget* pWidget,
 CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiveWidget)
 {
   cd_message ("%s ()\n", __func__);
-  GtkWidget* vbox, *hbox, *btn;
   CairoDockDesklet *pDesklet = g_new0(CairoDockDesklet, 1);
-  pDesklet->iType = CAIRO_DOCK_DESKLET;
+  pDesklet->iType = CAIRO_DOCK_TYPE_DESKLET;
   GtkWidget* pWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
   pDesklet->pWidget = pWindow;
+  pDesklet->pIcon = pIcon;
 
   if (g_bSticky)
 	  gtk_window_stick(GTK_WINDOW(pWindow));
@@ -350,16 +350,6 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
   //the border is were cairo paint
   gtk_container_set_border_width(GTK_CONTAINER(pWindow), 2*g_iDockRadius);  /// 10
   gtk_window_set_default_size(GTK_WINDOW(pWindow), 4*g_iDockRadius+1, 4*g_iDockRadius+1);
-  hbox = gtk_hbox_new(0, 0);
-  gtk_container_add(GTK_CONTAINER(pWindow), hbox);
-
-  vbox = gtk_vbox_new(0, 0);
-  gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
-
-  btn = gtk_button_new_with_label("-");
-  gtk_box_pack_start(GTK_BOX(vbox), btn, FALSE, FALSE, 0);
-  g_signal_connect (G_OBJECT (btn), "clicked",
-                    G_CALLBACK (on_button_press_desklet_nbt), pDesklet);  // Nuclear, Bacteriologic, Thermic ? :-)
 
 	g_signal_connect (G_OBJECT (pWindow),
 		"expose-event",
@@ -402,15 +392,7 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
   if (pInteractiveWidget != NULL)
   {
     cd_message ("ref = %d\n", pInteractiveWidget->object.parent_instance.ref_count);
-    if (gtk_widget_get_parent (pInteractiveWidget) != NULL)
-      {
-        gtk_object_ref((gpointer)pInteractiveWidget);
-        gtk_widget_unparent(pInteractiveWidget);
-      }
-    else
-      gtk_object_ref((gpointer)pInteractiveWidget);
-    gtk_box_pack_start(GTK_BOX(hbox), pInteractiveWidget, TRUE, TRUE, 0);
-    gtk_object_unref((gpointer)pInteractiveWidget);
+    gtk_container_add (GTK_CONTAINER (pDesklet->pWidget), pInteractiveWidget);
     cd_message ("pack -> ref = %d\n", pInteractiveWidget->object.parent_instance.ref_count);
   }
 
@@ -439,14 +421,24 @@ void cairo_dock_place_desklet (CairoDockDesklet *pDesklet, int iWidth, int iHeig
 		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");
 }
 
+static void _cairo_dock_steal_one_child (GtkWidget *pWidget, GtkContainer *pContainer)
+{
+	cd_debug (" ref : %d", pWidget->object.parent_instance.ref_count);
+	gtk_object_ref (GTK_OBJECT (pWidget));
+	gtk_container_remove (GTK_CONTAINER (pContainer), pWidget);
+	cd_debug (" -> %d\n", pWidget->object.parent_instance.ref_count);
+}
 void cairo_dock_free_desklet (CairoDockDesklet *pDesklet)
 {
 	if (pDesklet == NULL)
 		return;
-
-	gtk_widget_destroy (pDesklet->pWidget);  // detruit aussi l'eventuel widget interactif.
+	
+	GtkWidget *pInteractiveWidget = gtk_bin_get_child (GTK_BIN (pDesklet->pWidget));
+	cairo_dock_steal_widget_from_its_container (pInteractiveWidget);
+	
+	gtk_widget_destroy (pDesklet->pWidget);
 	pDesklet->pWidget = NULL;
-
+	
 	g_free(pDesklet);
 }
 
@@ -466,11 +458,6 @@ void cairo_dock_show_desklet (CairoDockDesklet *pDesklet)
 void cairo_dock_add_interactive_widget_to_desklet (GtkWidget *pInteractiveWidget, CairoDockDesklet *pDesklet)
 {
 	g_return_if_fail (pDesklet != NULL);
-	GtkWidget* hbox = gtk_bin_get_child (GTK_BIN (pDesklet->pWidget));
-	GtkWidget* vbox = gtk_bin_get_child (GTK_BIN (hbox));
-	gtk_box_pack_start (GTK_BOX (vbox),
-		pInteractiveWidget,
-		TRUE,
-		TRUE,
-		0);
+	gtk_container_add (GTK_CONTAINER (pDesklet->pWidget), pInteractiveWidget);
 }
+

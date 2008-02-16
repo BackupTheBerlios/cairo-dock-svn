@@ -168,7 +168,8 @@ gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 	gboolean bValue = g_key_file_get_boolean (pKeyFile, cGroupName, cKeyName, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		if (bFlushConfFileNeeded != NULL)
+			cd_message ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -218,7 +219,8 @@ int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gch
 	int iValue = g_key_file_get_integer (pKeyFile, cGroupName, cKeyName, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		if (bFlushConfFileNeeded != NULL)
+			cd_message ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -268,7 +270,8 @@ double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 	double fValue = g_key_file_get_double (pKeyFile, cGroupName, cKeyName, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		if (bFlushConfFileNeeded != NULL)
+			cd_message ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -318,7 +321,8 @@ gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 	gchar *cValue = g_key_file_get_string (pKeyFile, cGroupName, cKeyName, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		if (bFlushConfFileNeeded != NULL)
+			cd_message ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -378,7 +382,8 @@ void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cGroupNam
 	int *iValuesList = g_key_file_get_integer_list (pKeyFile, cGroupName, cKeyName, &length, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		if (bFlushConfFileNeeded != NULL)
+			cd_message ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -450,7 +455,8 @@ void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 	double *fValuesList = g_key_file_get_double_list (pKeyFile, cGroupName, cKeyName, &length, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		if (bFlushConfFileNeeded != NULL)
+			cd_message ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -519,7 +525,8 @@ gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupN
 	gchar **cValuesList = g_key_file_get_string_list (pKeyFile, cGroupName, cKeyName, length, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		if (bFlushConfFileNeeded != NULL)
+			cd_message ("Attention : %s\n", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -1005,10 +1012,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 			g_fReflectSize = 48;
 	}
 	g_fReflectSize *= fFieldDepth;
-	cd_message ("  g_fReflectSize : %.2f pixels\n", g_fReflectSize);
-
-	///cairo_dock_remove_all_applets (pDock);  // on est obliges d'arreter tous les applets (c.a.d. les modules ayant une icone dans le dock).
-
+	cd_debug ("  g_fReflectSize : %.2f pixels\n", g_fReflectSize);
+	
 	if (bUniquePidOld != g_bUniquePid || bGroupAppliByClassOld != g_bGroupAppliByClass || bHideVisibleApplisOld != g_bHideVisibleApplis || bAppliOnCurrentDesktopOnlyOld != g_bAppliOnCurrentDesktopOnly || (cairo_dock_application_manager_is_running () && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
 	{
 		cairo_dock_stop_application_manager (pDock);
@@ -1039,8 +1044,12 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	{
 		cairo_dock_insert_separators_in_dock (pDock);
 	}
-
-	cairo_dock_activate_modules_from_list (cActiveModuleList, pDock);
+	
+	GTimeVal time_val;
+	g_get_current_time (&time_val);  // on pourrait aussi utiliser un compteur statique a la fonction ...
+	double fTime = time_val.tv_sec + time_val.tv_usec * 1e-6;
+	cairo_dock_activate_modules_from_list (cActiveModuleList, pDock, fTime);
+	cairo_dock_deactivate_old_modules (fTime);
 	g_strfreev (cActiveModuleList);
 
 	cairo_dock_set_all_views_to_default ();

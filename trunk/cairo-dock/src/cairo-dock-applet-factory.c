@@ -19,8 +19,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-animations.h"
 #include "cairo-dock-themes-manager.h"
 #include "cairo-dock-keyfile-manager.h"
-#include "cairo-dock-applet-factory.h"
+#include "cairo-dock-dock-factory.h"
+
 #include "cairo-dock-log.h"
+#include "cairo-dock-applet-factory.h"
 
 extern double g_fAmplitude;
 extern int g_iLabelSize;
@@ -71,7 +73,7 @@ cairo_surface_t *cairo_dock_create_applet_surface (gchar *cIconFileName, cairo_t
 }
 
 
-Icon *cairo_dock_create_icon_for_applet (CairoDock *pDock, CairoDockDesklet *pDesklet, int iWidth, int iHeight, gchar *cName, gchar *cIconFileName, CairoDockModule *pModule)
+Icon *cairo_dock_create_icon_for_applet (CairoDockContainer *pContainer, int iWidth, int iHeight, gchar *cName, gchar *cIconFileName, CairoDockModule *pModule)
 {
 	Icon *icon = g_new0 (Icon, 1);
 	icon->iType = CAIRO_DOCK_APPLET;
@@ -80,20 +82,24 @@ Icon *cairo_dock_create_icon_for_applet (CairoDock *pDock, CairoDockDesklet *pDe
 	icon->acName = g_strdup (cName);
 	icon->acFileName = g_strdup (cIconFileName);  // NULL si cIconFileName = NULL.
 
+	icon->fScale = 1;
 	icon->fWidth =iWidth;
 	icon->fHeight =iHeight;
 	icon->fWidthFactor = 1.;
-	cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock != NULL ? pDock : pDesklet);
+	icon->fHeightFactor = 1.;
+	cairo_t *pSourceContext = cairo_dock_create_context_from_window (pContainer);
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, icon);
 
-	if (pDock != NULL)
+	if (CAIRO_DOCK_IS_DOCK (pContainer))
 	{
+		CairoDock *pDock = CAIRO_DOCK_DOCK (pContainer);
 		cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
 		cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 	}
 	else
 	{
-		cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1., CAIRO_DOCK_HORIZONTAL, FALSE);
+		if (iWidth >= 0 && iHeight >= 0)
+			cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1., CAIRO_DOCK_HORIZONTAL, FALSE);
 	}
 
 	cairo_destroy (pSourceContext);

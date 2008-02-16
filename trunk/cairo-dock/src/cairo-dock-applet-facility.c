@@ -20,8 +20,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-themes-manager.h"
 #include "cairo-dock-keyfile-manager.h"
 #include "cairo-dock-applet-factory.h"
-#include "cairo-dock-applet-facility.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-dock-factory.h"
+#include "cairo-dock-applet-facility.h"
 
 extern gchar *g_cCurrentThemePath;
 
@@ -180,7 +181,7 @@ void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, Cairo
 	va_list args;
 	va_start (args, cQuickInfoFormat);
 	gchar *cFullText = g_strdup_vprintf (cQuickInfoFormat, args);
-	cairo_dock_set_quick_info (pSourceContext, cFullText, pIcon, (pDock->iType == CAIRO_DOCK_DOCK ? 1 + g_fAmplitude : 1));
+	cairo_dock_set_quick_info (pSourceContext, cFullText, pIcon, (CAIRO_DOCK_IS_DOCK (pDock) ? 1 + g_fAmplitude : 1));
 	g_free (cFullText);
 	va_end (args);
 }

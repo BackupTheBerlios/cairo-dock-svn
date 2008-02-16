@@ -500,10 +500,10 @@ void cairo_dock_window_is_above_or_below (Window Xid, gboolean *bIsAbove, gboole
 	if (iBufferNbElements > 0)
 	{
 		int i;
-		g_print ("iBufferNbElements : %d (%d;%d)\n", iBufferNbElements, s_aNetWmAbove, s_aNetWmBelow);
+		//g_print ("iBufferNbElements : %d (%d;%d)\n", iBufferNbElements, s_aNetWmAbove, s_aNetWmBelow);
 		for (i = 0; i < iBufferNbElements; i ++)
 		{
-			g_print (" - %d\n", pXStateBuffer[i]);
+			//g_print (" - %d\n", pXStateBuffer[i]);
 			if (pXStateBuffer[i] == s_aNetWmAbove)
 			{
 				*bIsAbove = TRUE;

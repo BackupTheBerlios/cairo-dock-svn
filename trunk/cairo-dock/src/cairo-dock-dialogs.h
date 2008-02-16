@@ -4,6 +4,18 @@
 
 #include "cairo-dock-struct.h"
 
+/**
+*Teste si le container est un dialogue.
+*@param pContainer le container.
+*@return TRUE ssi le container a ete declare comme un dialogue.
+*/
+#define CAIRO_DOCK_IS_DIALOG(pContainer) (pContainer != NULL && pContainer->iType == CAIRO_DOCK_TYPE_DIALOG)
+/**
+*Caste un container en dialogue.
+*@param pContainer le container.
+*@return le dialogue.
+*/
+#define CAIRO_DOCK_DIALOG(pContainer) ((CairoDockDialog *)pContainer)
 
 void cairo_dock_load_dialog_buttons (CairoDock *pDock, gchar *cButtonOkImage, gchar *cButtonCancelImage);
 
@@ -48,7 +60,7 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 
 void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int *iX, int *iY, gboolean *bRight, gboolean *bIsPerpendicular, gboolean *bDirectionUp);
 
-void cairo_dock_dialog_find_optimal_placement  (CairoDockDialog *pDialog, CairoDock *pDock);
+void cairo_dock_dialog_find_optimal_placement  (CairoDockDialog *pDialog);
 
 void cairo_dock_place_dialog (CairoDockDialog *pDialog, CairoDock *pDock);
 /**

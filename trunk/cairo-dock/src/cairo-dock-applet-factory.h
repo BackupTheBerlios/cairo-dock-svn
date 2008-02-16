@@ -23,14 +23,15 @@ cairo_surface_t *cairo_dock_create_applet_surface (gchar *cIconFileName, cairo_t
 
 /**
 *Cree une icone destinee a une applet.
-*@param pDock le dock ou sera inseree ulterieurement cette icone.
+*@param pContainer le container ou sera inseree ulterieurement cette icone.
 *@param iWidth la largeur desiree de l'icone.
 *@param iHeight la hauteur desiree de l'icone.
 *@param cName le nom de l'icone, tel qu'il apparaitra en etiquette de l'icone.
 *@param cIconFileName le nom d'un fichier image a afficher dans l'icone, ou NULL si l'on souhaitera dessiner soi-meme dans l'icone.
+*@param pModule le module (necessaire poru que l'icone soit consideree comme une applet lors de son remplissage).
 *@return l'icone nouvellement cree. Elle n'est _pas_ inseree dans le dock, c'est le gestionnaire de module qui se charge d'inserer les icones renvoyees par les modules.
 */
-Icon *cairo_dock_create_icon_for_applet (CairoDock *pDock, CairoDockDesklet *pDesklet, int iWidth, int iHeight, gchar *cName, gchar *cIconFileName, CairoDockModule *pModule);
+Icon *cairo_dock_create_icon_for_applet (CairoDockContainer *pContainer, int iWidth, int iHeight, gchar *cName, gchar *cIconFileName, CairoDockModule *pModule);
 
 
 #endif

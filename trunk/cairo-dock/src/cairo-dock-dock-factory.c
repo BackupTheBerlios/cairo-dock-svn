@@ -75,72 +75,6 @@ extern gboolean g_bSticky;
 extern gboolean g_bUseGlitz;
 
 
-static void _cairo_dock_set_colormap (CairoDock *pDock)
-{
-	//g_print ("%s f%d)\n", __func__, g_bUseGlitz);
-	GdkColormap* pColormap;
-#ifdef HAVE_GLITZ
-	if (g_bUseGlitz)
-	{
-		glitz_drawable_format_t templ, *format;
-		unsigned long	    mask = GLITZ_FORMAT_DOUBLEBUFFER_MASK;
-		XVisualInfo		    *vinfo = NULL;
-		int			    screen = 0;
-		GdkVisual		    *visual;
-		GdkDisplay		    *gdkdisplay;
-		Display		    *xdisplay;
-
-		templ.doublebuffer = 1;
-		gdkdisplay = gtk_widget_get_display (pDock->pWidget);
-		xdisplay   = gdk_x11_display_get_xdisplay (gdkdisplay);
-
-		int i = 0;
-		do
-		{
-			format = glitz_glx_find_window_format (xdisplay,
-				screen,
-				mask,
-				&templ,
-				i++);
-			if (format)
-			{
-				vinfo = glitz_glx_get_visual_info_from_format (xdisplay,
-					screen,
-					format);
-				if (vinfo->depth == 32)
-				{
-					pDock->pDrawFormat = format;
-					break;
-				}
-				else if (!pDock->pDrawFormat)
-				{
-					pDock->pDrawFormat = format;
-				}
-			}
-		} while (format);
-
-		if (! pDock->pDrawFormat)
-		{
-			cd_message ("Attention : no double buffered GLX visual\n");
-		}
-		else
-		{
-			vinfo = glitz_glx_get_visual_info_from_format (xdisplay,
-				screen,
-				pDock->pDrawFormat);
-
-			visual = gdkx_visual_get (vinfo->visualid);
-			pColormap = gdk_colormap_new (visual, TRUE);
-
-			gtk_widget_set_colormap (pDock->pWidget, pColormap);
-			gtk_widget_set_double_buffered (pDock->pWidget, FALSE);
-			return ;
-		}
-	}
-#endif
-
-	cairo_dock_set_colormap_for_window (pDock->pWidget);
-}
 CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockName, gchar *cRendererName)
 {
 	static pouet = 0;
@@ -152,6 +86,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 
 	//\__________________ On cree le dock.
 	CairoDock *pDock = g_new0 (CairoDock, 1);
+	pDock->iType = CAIRO_DOCK_TYPE_DOCK;
 	pDock->bAtBottom = TRUE;
 	pDock->iRefCount = 0;  // c'est un dock racine par defaut.
 	pDock->iAvoidingMouseIconType = -1;
@@ -178,7 +113,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 
 	gtk_window_set_type_hint (GTK_WINDOW (pWindow), iWmHint);
 
-	_cairo_dock_set_colormap (pDock);
+	cairo_dock_set_colormap (pDock);
 
 	gtk_widget_set_app_paintable (pWindow, TRUE);
 	gtk_window_set_decorated (GTK_WINDOW (pWindow), FALSE);
@@ -440,9 +375,12 @@ static gboolean _cairo_dock_search_icon_in_a_dock (gchar *cDockName, CairoDock *
 {
 	return (g_list_find (pDock->icons, icon) != NULL);
 }
-CairoDock *cairo_dock_search_container_from_icon (Icon *icon)
+CairoDockContainer *cairo_dock_search_container_from_icon (Icon *icon)
 {
 	g_return_val_if_fail (icon != NULL, NULL);
+	if (CAIRO_DOCK_IS_VALID_APPLET (icon))
+		return icon->pModule->pContainer;
+	
 	if (icon->cParentDockName != NULL)
 		return g_hash_table_lookup (g_hDocksTable, icon->cParentDockName);
 	else

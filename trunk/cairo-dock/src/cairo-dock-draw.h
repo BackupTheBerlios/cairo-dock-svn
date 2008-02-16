@@ -8,10 +8,17 @@
 
 
 /**
-*Applique la colormap de l'ecran a une fenetre GTK. Permet de la rendre transparente.
+*Applique la colormap de l'ecran a une fenetre GTK, lui ajoutant la transparence.
 *@param pWidget
 */
 void cairo_dock_set_colormap_for_window (GtkWidget *pWidget);
+/**
+*Applique la colormap de l'ecran a la fenetre d'un container, lui ajoutant la transparence, et active Glitz si possible.
+* @param pContainer le container.
+*/
+void cairo_dock_set_colormap (CairoDockContainer *pContainer);
+
+
 
 
 double cairo_dock_get_current_dock_width_linear (CairoDock *pDock);
@@ -21,7 +28,7 @@ double cairo_dock_get_current_dock_width_linear (CairoDock *pDock);
 *@param pDock le dock sur lequel on veut dessiner.
 *@return le contexte sur lequel dessiner. N'est jamais nul; tester sa coherence avec cairo_status() avant de l'utiliser, et le detruire avec cairo_destroy() apres en avoir fini avec lui.
 */
-cairo_t * cairo_dock_create_context_from_window (CairoDock *pDock);
+cairo_t * cairo_dock_create_context_from_window (CairoDockContainer *pContainer);
 
 /**
 *Trace sur le contexte un contour trapezoidale aux coins arrondis. Le contour n'est pas dessine, mais peut l'etre a posteriori, et peut servir de cadre pour y dessiner des choses dedans.
@@ -87,7 +94,7 @@ void cairo_dock_render_blank (CairoDock *pDock);
 *@param icon l'icone a retracer.
 *@param pDock le dock contenant l' icone.
 */
-void cairo_dock_redraw_my_icon (Icon *icon, CairoDock *pDock);
+void cairo_dock_redraw_my_icon (Icon *icon, CairoDockContainer *pContainer);
 
 
 /**

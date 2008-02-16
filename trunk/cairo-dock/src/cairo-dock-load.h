@@ -22,7 +22,7 @@ void cairo_dock_fill_one_quick_info_buffer (Icon *icon, cairo_t* pSourceContext,
 
 void cairo_dock_fill_icon_buffers (Icon *icon, cairo_t *pSourceContext, double fMaxScale, gboolean bHorizontalDock, gboolean bApplySizeRestriction);
 
-void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDock *pDock, CairoDockDesklet *pDesklet);
+void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDockContainer *pContainer);
 
 void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpointer data);
 #define cairo_dock_load_buffers_in_one_dock(pDock) cairo_dock_reload_buffers_in_dock (NULL, pDock, NULL)

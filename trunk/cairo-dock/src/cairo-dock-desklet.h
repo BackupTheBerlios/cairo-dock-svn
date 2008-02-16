@@ -28,6 +28,18 @@
 
 #include <cairo-dock-struct.h>
 
+/**
+*Teste si le container est un desklet.
+*@param pContainer le container.
+*@return TRUE ssi le container a ete declare comme un desklet.
+*/
+#define CAIRO_DOCK_IS_DESKLET(pContainer) (pContainer != NULL && pContainer->iType == CAIRO_DOCK_TYPE_DESKLET)
+/**
+*Caste un container en desklet.
+*@param pContainer le container.
+*@return le desklet.
+*/
+#define CAIRO_DOCK_DESKLET(pContainer) ((CairoDockDesklet *)pContainer)
 
 CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiveWidget);
 
@@ -41,6 +53,5 @@ void cairo_dock_hide_desklet (CairoDockDesklet *pDesklet);
 void cairo_dock_show_desklet (CairoDockDesklet *pDesklet);
 
 void cairo_dock_add_interactive_widget_to_desklet (GtkWidget *pInteractiveWidget, CairoDockDesklet *pDesklet);
-
 
 #endif

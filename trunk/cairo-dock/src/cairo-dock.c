@@ -261,7 +261,7 @@ main (int argc, char** argv)
 	gint i;
 	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)
 		g_tIconTypeOrder[i] = i;
-	cd_log_init();
+	cd_log_init(FALSE);
         //No log
         cd_log_set_level(0);
 	gtk_init (&argc, &argv);
@@ -332,12 +332,17 @@ main (int argc, char** argv)
 		exit (-1);
 	}
 
-/* FIXME: I dont know what to do with it */
-/* #ifndef CAIRO_DOCK_VERBOSE */
-/* 	if (!cVerbosity) */
-/* 		g_print ("Cairo-Dock was not compiled with verbose, but it doesn't matter for the moment\n"); */
-/* #endif */
+/* FIXME: utiliser l'option --enable-verbose du configure, l'idee etant que les fonctions de log sont non definies dans les versions officielles, histoire de pas faire le test tout le temps.
+#ifndef CAIRO_DOCK_VERBOSE
+	if (cVerbosity != NULL)
+	{
+		g_print ("Cairo-Dock was not compiled with verbose, configure it with --enable-verbose for that\n");
+		g_free (cVerbosity);
+		cVerbosity = NULL;
+	}
+#endif */
 	_cairo_dock_set_verbosity(cVerbosity);
+	g_free (cVerbosity);
 
 	g_bSkipPager = ! bNoSkipPager;
 	g_bSkipTaskbar = ! bNoSkipTaskbar;
@@ -608,8 +613,9 @@ main (int argc, char** argv)
 	gtk_main ();
 
 	rsvg_term ();
-
+	
 	cd_message ("Bye bye !\n");
+	g_print ("\033[0m");
 
 	return 0;
 }

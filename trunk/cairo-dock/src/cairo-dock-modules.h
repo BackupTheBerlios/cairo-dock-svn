@@ -17,15 +17,15 @@ void cairo_dock_preload_module_from_directory (gchar *cModuleDirPath, GHashTable
 
 
 
-void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock *pDock);
+void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock *pDock, double fTime);
+
+void cairo_dock_deactivate_old_modules (double fTime);
 
 void cairo_dock_update_conf_file_with_available_modules_full (gchar *cConfFile, gchar *cGroupName, gchar *cKeyName);
 #define cairo_dock_update_conf_file_with_available_modules(cConfFile) cairo_dock_update_conf_file_with_available_modules_full (cConfFile, "Applets", "active modules")
 #define cairo_dock_update_easy_conf_file_with_available_modules(cConfFile) cairo_dock_update_conf_file_with_available_modules_full (cConfFile, "System", "active modules")
 
 void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *pIconList);
-
-void cairo_dock_foreach_module (GHFunc pFunction, gpointer data);
 
 
 
@@ -35,7 +35,7 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 
 void cairo_dock_deactivate_module (CairoDockModule *module);
 
-void cairo_dock_reload_module (CairoDockModule *module, CairoDock *pDock, gboolean bReloadAppletConf);
+void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletConf);
 
 
 void cairo_dock_deactivate_all_modules (void);
@@ -43,7 +43,7 @@ void cairo_dock_deactivate_all_modules (void);
 void cairo_dock_configure_module (GtkWindow *pParentWindow, CairoDockModule *module, CairoDock *pDock, GError **erreur);
 
 
-Icon *cairo_dock_find_icon_from_module (CairoDockModule *module, GList *pIconList);
+Icon *cairo_dock_find_icon_from_module (CairoDockModule *module, CairoDockContainer *pContainer);
 
 CairoDockModule *cairo_dock_find_module_from_name (gchar *cModuleName);
 

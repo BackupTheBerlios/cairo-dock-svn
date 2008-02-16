@@ -6,6 +6,21 @@
 
 #include "cairo-dock-struct.h"
 
+
+/**
+*Teste si le container est un dock.
+*@param pContainer le container.
+*@return TRUE ssi le container a ete declare comme un dock.
+*/
+#define CAIRO_DOCK_IS_DOCK(pContainer) (pContainer != NULL && pContainer->iType == CAIRO_DOCK_TYPE_DOCK)
+/**
+*Caste un container en dock.
+*@param pContainer le container.
+*@return le dock.
+*/
+#define CAIRO_DOCK_DOCK(pContainer) ((CairoDock *)pContainer)
+
+
 /**
 * Cree un nouveau dock principal.
 * @param iWmHint indicateur du type de fenetre pour le WM.
@@ -35,11 +50,11 @@ CairoDock *cairo_dock_search_dock_from_name (gchar *cDockName);
 */
 Icon *cairo_dock_search_icon_pointing_on_dock (CairoDock *pDock, CairoDock **pParentDock);
 /**
-* Cherche le dock contenant l'icone donnee, en parcourant la liste des icones de tous les docks jusqu'a trouver celle passee en entree.
+* Cherche le container contenant l'icone donnee, en parcourant la liste des icones de tous les docks jusqu'a trouver celle passee en entree, ou en renvoyant son desklet dans le cas d'une applet.
 * @param icon l'icone.
-* @return le dock contenant cette icone, ou NULL si aucun n'a ete trouve.
+* @return le container contenant cette icone, ou NULL si aucun n'a ete trouve.
 */
-CairoDock *cairo_dock_search_container_from_icon (Icon *icon);
+CairoDockContainer *cairo_dock_search_container_from_icon (Icon *icon);
 
 /**
 * Demande au WM d'empecher les autres fenetres d'empieter sur l'espace du dock.
