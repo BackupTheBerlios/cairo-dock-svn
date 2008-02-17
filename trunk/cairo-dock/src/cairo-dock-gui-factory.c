@@ -563,7 +563,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 			{
 				cUsefulComment = cKeyComment;
 				while (*cUsefulComment == '#' || *cUsefulComment == ' ')  // on saute les # et les espaces.
-				cUsefulComment ++;
+					cUsefulComment ++;
 
 				iElementType = *cUsefulComment;
 				cUsefulComment ++;
