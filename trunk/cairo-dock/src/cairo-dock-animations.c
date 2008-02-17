@@ -92,7 +92,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 	}
 	else  // on se fixe en bas, et on montre la zone visible.
 	{
-		//g_print ("  on se fixe en bas\n");
+		g_print ("  on se fixe en bas\n");
 		pDock->bAtBottom = TRUE;
 		pDock->iSidMoveDown = 0;
 		int iNewWidth, iNewHeight;

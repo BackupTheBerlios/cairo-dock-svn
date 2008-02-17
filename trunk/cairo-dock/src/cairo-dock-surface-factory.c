@@ -625,10 +625,10 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection (cairo_surface_
 cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double *fBackgroundColor, double fMaxScale, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset)
 {
 	g_return_val_if_fail (cText != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
-
+	
 	//\_________________ On ecrit le texte dans un calque Pango.
 	PangoLayout *pLayout = pango_cairo_create_layout (pSourceContext);
-
+	
 	PangoFontDescription *pDesc = pango_font_description_new ();
 	pango_font_description_set_absolute_size (pDesc, fMaxScale * iLabelSize * PANGO_SCALE);
 	pango_font_description_set_family_static (pDesc, cLabelPolice);
@@ -636,22 +636,22 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 	pango_font_description_set_style (pDesc, g_iLabelStyle);
 	pango_layout_set_font_description (pLayout, pDesc);
 	pango_font_description_free (pDesc);
-
+	
 	pango_layout_set_text (pLayout, cText, -1);
-
+	
 	//\_________________ On recupere la taille effective du calque.
 	PangoRectangle ink, log;
 	pango_layout_get_pixel_extents (pLayout, &ink, &log);
-
+	
 	*iTextWidth = ink.width + 2;
 	*iTextHeight = ink.height + 2 + 1;  // +1 car certaines polices "debordent".
-
+	
 	//\_________________ On dessine le calque dans une surface cairo.
 	cairo_surface_t* pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 		CAIRO_CONTENT_COLOR_ALPHA,
 		*iTextWidth, *iTextHeight);
 	cairo_t* pCairoContext = cairo_create (pNewSurface);
-
+	
 	if (fBackgroundColor != NULL && fBackgroundColor[3] > 0)  // non transparent.
 	{
 		cairo_save (pCairoContext);
@@ -666,9 +666,9 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 		cairo_fill_preserve (pCairoContext);
 		cairo_restore(pCairoContext);
 	}
-
+	
 	cairo_translate (pCairoContext, -ink.x, -ink.y+1);  // meme remarque.
-
+	
 	cairo_push_group (pCairoContext);
 	cairo_set_source_rgb (pCairoContext, 0.2, 0.2, 0.2);
 	int i;
@@ -679,13 +679,13 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 	}
 	cairo_pop_group_to_source (pCairoContext);
 	cairo_paint_with_alpha (pCairoContext, .75);
-
+	
 	cairo_set_source_rgb (pCairoContext, 1., 1., 1.);
 	cairo_move_to (pCairoContext, 1., 1.);
 	pango_cairo_show_layout (pCairoContext, pLayout);
-
+	
 	cairo_destroy (pCairoContext);
-
+	
 	/* set_device_offset is buggy, doesn't work for positive offsets. so we use explicit offsets... so unfortunate.
 	cairo_surface_set_device_offset (pNewSurface,
 					 log.width / 2. - ink.x,
@@ -693,11 +693,10 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 	*fTextXOffset = (log.width / 2. - ink.x) / fMaxScale;
 	*fTextYOffset = - (iLabelSize - (log.height - ink.y)) / fMaxScale ;  // en tenant compte de l'ecart du bas du texte.
 	//*fTextYOffset = - (ink.y) / fMaxScale;  // pour tenir compte de l'ecart du bas du texte.
-	cd_message ("%s -> (%d;%d)", cText, *iTextWidth, *iTextHeight);
-
+	
 	*iTextWidth = *iTextWidth / fMaxScale;
 	*iTextHeight = *iTextHeight / fMaxScale;
-
+	
 	g_object_unref (pLayout);
 	return pNewSurface;
 }

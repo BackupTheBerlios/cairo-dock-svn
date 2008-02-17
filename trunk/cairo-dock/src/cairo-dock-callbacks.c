@@ -224,16 +224,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	Icon *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
 	int iLastMouseX = pDock->iMouseX;
 	//cd_debug ("%s (%d,%d) (%d, %.2fms, bAtBottom:%d; iSidShrinkDown:%d)\n", __func__, (int) pMotion->x, (int) pMotion->y, pMotion->is_hint, pMotion->time - fLastTime, pDock->bAtBottom, pDock->iSidShrinkDown);
-
-        /*
-         * ugly fix, sometime when the mouse exit really near the border of the window
-         * enter_notify is not called
-         */
-        if (!pDock->bInside) {
-          cd_warning("manual call to enter_notify2");
-          on_enter_notify2 (pWidget, (GdkEventCrossing*)pMotion, pDock);
-        }
-
+	
 	//\_______________ On elague le flux des MotionNotify, sinon X en envoie autant que le permet le CPU !
 	Icon *pPointedIcon;
 	if (pMotion != NULL)
@@ -442,17 +433,22 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 		pDock->iSidGrowUp = 0;
 	}
 
-	if (g_bAutoHide && pDock->iRefCount == 0)
+	if (pDock->iRefCount == 0)
 	{
-		pDock->fFoldingFactor = (g_fUnfoldAcceleration != 0. ? 0.03 : 0.);
-		if (pDock->iSidMoveDown == 0)  // on commence a descendre.
-			pDock->iSidMoveDown = g_timeout_add (40, (GSourceFunc) cairo_dock_move_down, (gpointer) pDock);
+		if (g_bAutoHide)
+		{
+			pDock->fFoldingFactor = (g_fUnfoldAcceleration != 0. ? 0.03 : 0.);
+			if (pDock->iSidMoveDown == 0)  // on commence a descendre.
+				pDock->iSidMoveDown = g_timeout_add (40, (GSourceFunc) cairo_dock_move_down, (gpointer) pDock);
+		}
+		else
+			pDock->bAtBottom = TRUE;
 	}
-	else if (pDock->iRefCount != 0)
+	else
 	{
 		pDock->fFoldingFactor = 0.03;
 		pDock->bAtBottom = TRUE;  // mis en commentaire le 12/11/07 pour permettre le quick-hide.
-		//g_print ("on force bAtBottom\n");
+		g_print ("on force bAtBottom\n");
 	}
 
 	///pDock->fDecorationsOffsetX = 0;

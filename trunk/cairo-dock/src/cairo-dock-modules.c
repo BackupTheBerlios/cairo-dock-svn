@@ -665,8 +665,7 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 			{
 				CairoDock *pDock = CAIRO_DOCK_DOCK (pNewContainer);
 				cairo_dock_insert_icon_in_dock (pIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
-				if (pDock->iSidShrinkDown == 0)
-					pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+				cairo_dock_start_animation (pIcon, pDock);
 			}
 			else if (bReloadAppletConf)
 				cairo_dock_update_dock_size (CAIRO_DOCK_DOCK (pNewContainer));

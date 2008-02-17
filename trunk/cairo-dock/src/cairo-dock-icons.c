@@ -1084,7 +1084,8 @@ CairoDockMousePositionType cairo_dock_check_if_mouse_inside_linear (CairoDock *p
 
 	//\_______________ On regarde si le curseur est dans le dock ou pas, et on joue sur la taille des icones en consequence.
 	int x_abs = pDock->iMouseX + (pDock->fFlatDockWidth - iWidth) / 2;  // abscisse par rapport a la gauche du dock minimal plat.
-	gboolean bMouseInsideDock = (pDock->bInside && x_abs >= 0 && x_abs <= pDock->fFlatDockWidth && iMouseX > 0 && iMouseX < iWidth);
+	gboolean bMouseInsideDock = (/**pDock->bInside && */x_abs >= 0 && x_abs <= pDock->fFlatDockWidth && iMouseX > 0 && iMouseX < iWidth);
+	g_print ("bMouseInsideDock : %d (%d;%d/%.2f)\n", bMouseInsideDock, pDock->bInside, x_abs, pDock->fFlatDockWidth);
 
 	if (! bMouseInsideDock)
 	{
@@ -1112,19 +1113,20 @@ void cairo_dock_manage_mouse_position (CairoDock *pDock, CairoDockMousePositionT
 	switch (iMousePositionType)
 	{
 		case CAIRO_DOCK_MOUSE_INSIDE :
+			g_print ("INSIDE\n");
 			if (cairo_dock_entrance_is_allowed () && pDock->iMagnitudeIndex < CAIRO_DOCK_NB_MAX_ITERATIONS && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons))  // on est dedans et la taille des icones est non maximale bien qu'aucune icone ne soit animee.  ///  && pDock->iSidMoveDown == 0
 			{
-				//g_print ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone  ne soit animee \n");
+				g_print ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone  ne soit animee \n");
 				//pDock->bInside = TRUE;
 				if (pDock->bAtBottom && pDock->iRefCount == 0 && ! g_bAutoHide)  // on le fait pas avec l'auto-hide, car un signal d'entree est deja emis a cause des mouvements/redimensionnements de la fenetre, et en rajouter un ici fout le boxon.
 				{
-					//g_print ("  on emule une re-rentree (pDock->iMagnitudeIndex:%f)\n", pDock->iMagnitudeIndex);
+					g_print ("  on emule une re-rentree (pDock->iMagnitudeIndex:%f)\n", pDock->iMagnitudeIndex);
 					///cairo_dock_render_blank (pDock);  // utile ?
 					g_signal_emit_by_name (pDock->pWidget, "enter-notify-event", NULL, &bReturn);
 				}
 				else  // on se contente de faire grossir les icones.
 				{
-					//g_print ("  on se contente de faire grossir les icones\n");
+					g_print ("  on se contente de faire grossir les icones\n");
 					pDock->bAtBottom = FALSE;
 					if (pDock->iSidShrinkDown != 0)
 					{

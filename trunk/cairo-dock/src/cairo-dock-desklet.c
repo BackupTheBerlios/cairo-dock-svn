@@ -50,7 +50,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
                                      GdkEventExpose *pExpose,
                                      CairoDockDesklet *pDesklet)
 {
-  cd_message ("%s ()", __func__);
+  cd_debug ("%s ()", __func__);
   gint w = 0, h = 0;
 
   if (!pDesklet)
@@ -109,14 +109,14 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 		
 		if (pIcon->pIconBuffer != NULL)
 		{
-			cd_message ("  dessin de l'icone (%.2fx%.2f)", pIcon->fWidth, pIcon->fHeight);
+			cd_debug ("  dessin de l'icone (%.2fx%.2f)", pIcon->fWidth, pIcon->fHeight);
 			//cairo_translate (pCairoContext, g_iDockRadius, g_iDockRadius);
 			cairo_set_source_surface (pCairoContext, pIcon->pIconBuffer, 0.0, 0.0);
 			cairo_paint (pCairoContext);
 		}
 		if (pIcon->pQuickInfoBuffer != NULL)
 		{
-			cd_message ("  dessin de l'info-rapide (%dx%d)", pIcon->iQuickInfoWidth, pIcon->iQuickInfoHeight);
+			cd_debug ("  dessin de l'info-rapide (%dx%d)", pIcon->iQuickInfoWidth, pIcon->iQuickInfoHeight);
 			cairo_translate (pCairoContext,
 				//-icon->fQuickInfoXOffset + icon->fWidth / 2,
 				//icon->fHeight - icon->fQuickInfoYOffset);
@@ -167,7 +167,7 @@ static gboolean on_configure_desklet (GtkWidget* pWidget,
                                       GdkEventConfigure* pEvent,
                                       CairoDockDesklet *pDesklet)
 {
-	cd_message ("%s (%dx%d ; %d,%d)", __func__, pEvent->width, pEvent->height, (int) pEvent->x, (int) pEvent->y);
+	cd_debug ("%s (%dx%d ; %d,%d)", __func__, pEvent->width, pEvent->height, (int) pEvent->x, (int) pEvent->y);
 	if (pDesklet->iWidth != pEvent->width || pDesklet->iHeight != pEvent->height)
 	{
 		pDesklet->iWidth = pEvent->width;
@@ -208,11 +208,11 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 		{
 			pDesklet->diff_x = - pButton->x;  // pour le deplacement manuel.
 			pDesklet->diff_y = - pButton->y;
-			cd_message ("diff : %d;%d", pDesklet->diff_x, pDesklet->diff_y);
+			cd_debug ("diff : %d;%d", pDesklet->diff_x, pDesklet->diff_y);
 		}
 		else if (pButton->type == GDK_BUTTON_RELEASE)
 		{
-			cd_message ("GDK_BUTTON_RELEASE");
+			cd_debug ("GDK_BUTTON_RELEASE");
 			if (pDesklet->moving)
 			{
 				pDesklet->moving = FALSE;
@@ -422,13 +422,7 @@ void cairo_dock_place_desklet (CairoDockDesklet *pDesklet, int iWidth, int iHeig
 		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");
 }
 
-static void _cairo_dock_steal_one_child (GtkWidget *pWidget, GtkContainer *pContainer)
-{
-	cd_debug (" ref : %d", pWidget->object.parent_instance.ref_count);
-	gtk_object_ref (GTK_OBJECT (pWidget));
-	gtk_container_remove (GTK_CONTAINER (pContainer), pWidget);
-	cd_debug (" -> %d", pWidget->object.parent_instance.ref_count);
-}
+
 void cairo_dock_free_desklet (CairoDockDesklet *pDesklet)
 {
 	if (pDesklet == NULL)
