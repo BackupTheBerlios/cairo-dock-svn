@@ -282,7 +282,7 @@ void cairo_dock_render_optimized_linear (CairoDock *pDock, GdkRectangle *pArea)
 			{
 				cairo_save (pCairoContext);
 				//g_print ("dessin optimise de %s\n", icon->acName);
-				cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect, TRUE);
+				cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect, TRUE, pDock->iCurrentWidth);
 				cairo_restore (pCairoContext);
 			}
 

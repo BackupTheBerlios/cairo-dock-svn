@@ -335,7 +335,7 @@ void cairo_dock_fill_icon_buffers (Icon *icon, cairo_t *pSourceContext, double f
 void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDockContainer *pContainer)
 {
 	g_return_if_fail (pIcon != NULL);
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pContainer);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pContainer));
 	if (CAIRO_DOCK_IS_DOCK (pContainer))
 	{
 		CairoDock *pDock = CAIRO_DOCK_DOCK (pContainer);
@@ -359,7 +359,7 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 	double fFlatDockWidth = - g_iIconGap;
 	pDock->iMaxIconHeight = 0;
 
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 	double fMaxScale = 1 + g_fAmplitude;
 
 	Icon* icon;
@@ -393,7 +393,7 @@ void cairo_dock_load_visible_zone (CairoDock *pDock, gchar *cVisibleZoneImageFil
 {
 	double fVisibleZoneWidth = iVisibleZoneWidth, fVisibleZoneHeight = iVisibleZoneHeight;
 	cairo_surface_destroy (g_pVisibleZoneSurface);
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 	g_pVisibleZoneSurface = cairo_dock_load_image (pCairoContext,
 		cVisibleZoneImageFile,
 		&fVisibleZoneWidth,
@@ -523,7 +523,7 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 		g_pBackgroundSurfaceFull[0] = NULL;
 		cairo_surface_destroy (g_pBackgroundSurfaceFull[1]);
 		g_pBackgroundSurfaceFull[1] = NULL;
-		cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+		cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 
 		if (g_cBackgroundImageFile != NULL)
 		{

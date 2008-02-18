@@ -520,7 +520,7 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 *@param bUseReflect TRUE pour dessiner les reflets.
 *@param bUseText TRUE pour dessiner les etiquettes.
 */
-void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect, gboolean bUseText)
+void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect, gboolean bUseText, int iWidth)
 {
 	//\_____________________ On separe 2 cas : dessin avec le tampon complet, et dessin avec le ou les petits tampons.
 	if (CAIRO_DOCK_IS_APPLI (icon) && ! icon->bIsHidden)
@@ -730,6 +730,11 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	//\_____________________ On dessine les etiquettes, avec un alpha proportionnel au facteur d'echelle de leur icone.
 	if (bUseText && icon->pTextBuffer != NULL && icon->fScale > 1.01 && (! g_bLabelForPointedIconOnly || icon->bPointed))  // 1.01 car sin(pi) = 1+epsilon :-/
 	{
+		double fOffsetX = -icon->fTextXOffset + icon->fWidthFactor * icon->fWidth * icon->fScale * 0.5;
+		if (fOffsetX < - icon->fDrawX)
+			fOffsetX = - icon->fDrawX;
+		else if (icon->fDrawX + fOffsetX + icon->iTextWidth > iWidth)
+			fOffsetX = iWidth - icon->iTextWidth - icon->fDrawX;
 		if (icon->fOrientation != 0)
 		{
 			cairo_rotate (pCairoContext, icon->fOrientation);
@@ -748,13 +753,13 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		else if (bHorizontalDock)
 			cairo_set_source_surface (pCairoContext,
 				icon->pTextBuffer,
-				-icon->fTextXOffset + icon->fWidthFactor * icon->fWidth * icon->fScale * 0.5,
+				fOffsetX,
 				g_bDirectionUp ? -g_iLabelSize : icon->fHeight * icon->fScale - icon->fTextYOffset);
 		else
 			cairo_set_source_surface (pCairoContext,
 				icon->pTextBuffer,
 				g_bDirectionUp ? -g_iLabelSize : icon->fHeight * icon->fScale - icon->fTextYOffset,
-				-icon->fTextXOffset + icon->fWidthFactor * icon->fWidth * icon->fScale * 0.5);
+				fOffsetX);
 		
 		double fMagnitude;
 		if (g_bLabelForPointedIconOnly)
@@ -909,7 +914,7 @@ void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, d
 		icon = ic->data;
 
 		cairo_save (pCairoContext);
-		cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect, TRUE);
+		cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect, TRUE, pDock->iCurrentWidth);
 		cairo_restore (pCairoContext);
 
 		ic = cairo_dock_get_next_element (ic, pDock->icons);
@@ -921,7 +926,7 @@ void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, d
 void cairo_dock_render_background (CairoDock *pDock)
 {
 	//g_print ("%s (%.2f)\n", __func__, g_fVisibleZoneAlpha);
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
@@ -949,7 +954,7 @@ void cairo_dock_render_background (CairoDock *pDock)
 void cairo_dock_render_blank (CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
