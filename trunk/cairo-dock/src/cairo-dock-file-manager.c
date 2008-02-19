@@ -234,7 +234,7 @@ Icon *cairo_dock_fm_create_icon_from_URI (const gchar *cURI, CairoDock *pDock)
 
 	if (bIsDirectory)
 	{
-		cd_message ("  c'est un sous-repertoire\n");
+		cd_message ("  c'est un sous-repertoire");
 	}
 
 	if (g_iFileSortType == CAIRO_DOCK_FM_SORT_BY_NAME)
@@ -270,7 +270,7 @@ void cairo_dock_fm_create_dock_from_directory (Icon *pIcon)
 {
 	if (s_pVFSBackend == NULL)
 		return;
-	cd_message ("%s ()\n", __func__);
+	cd_message ("");
 	g_free (pIcon->acCommand);
 	GList *pIconList = cairo_dock_fm_list_directory (pIcon->cBaseURI, g_iFileSortType, CAIRO_DOCK_LAUNCHER, &pIcon->acCommand);
 	pIcon->pSubDock = cairo_dock_create_subdock_from_scratch (pIconList, pIcon->acName);
@@ -291,7 +291,7 @@ static Icon *cairo_dock_fm_alter_icon_if_necessary (Icon *pIcon, CairoDock *pDoc
 
 	if (strcmp (pIcon->acName, pNewIcon->acName) != 0 || strcmp (pIcon->acFileName, pNewIcon->acFileName) != 0 || pIcon->fOrder != pNewIcon->fOrder)
 	{
-		cd_message ("  on remplace %s\n", pIcon->acName);
+		cd_message ("  on remplace %s", pIcon->acName);
 		cairo_dock_remove_one_icon_from_dock (pDock, pIcon);
 		if (pIcon->acDesktopFileName != NULL)
 			cairo_dock_fm_remove_monitor (pIcon);
@@ -332,7 +332,7 @@ static Icon *cairo_dock_fm_alter_icon_if_necessary (Icon *pIcon, CairoDock *pDoc
 void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const gchar *cURI, Icon *pIcon, CairoDockIconType iTypeOnCreation)
 {
 	g_return_if_fail (cURI != NULL && pIcon != NULL);
-	cd_message ("%s (%d sur %s)\n", __func__, iEventType, cURI);
+	cd_message ("%s (%d sur %s)", __func__, iEventType, cURI);
 
 	switch (iEventType)
 	{
@@ -353,10 +353,10 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 			}
 			else
 			{
-				cd_message ("  on n'aurait pas du recevoir cet evenement !\n");
+				cd_warning ("  on n'aurait pas du recevoir cet evenement !");
 				return ;
 			}
-			cd_message ("  %s sera supprimee\n", pConcernedIcon->acName);
+			cd_message ("  %s sera supprimee", pConcernedIcon->acName);
 
 			cairo_dock_remove_one_icon_from_dock (pParentDock, pConcernedIcon);
 			if (pConcernedIcon->acDesktopFileName != NULL)  // alors elle a un moniteur.
@@ -375,7 +375,7 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 				pNewIcon->iType = iTypeOnCreation;
 
 				cairo_dock_insert_icon_in_dock (pNewIcon, pIcon->pSubDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, ! CAIRO_DOCK_INSERT_SEPARATOR);
-				cd_message ("  %s a ete insere(e)\n", (pNewIcon != NULL ? pNewIcon->acName : "aucune icone n'"));
+				cd_message ("  %s a ete insere(e)", (pNewIcon != NULL ? pNewIcon->acName : "aucune icone n'"));
 			}
 		}
 		break ;
@@ -398,10 +398,10 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 			}
 			else
 			{
-				cd_message ("  on n'aurait pas du arriver la !\n");
+				cd_warning ("  on n'aurait pas du arriver la !");
 				return ;
 			}
-			cd_message ("  %s est modifiee (iRefCount:%d)\n", pConcernedIcon->acName, pParentDock->iRefCount);
+			cd_message ("  %s est modifiee (iRefCount:%d)", pConcernedIcon->acName, pParentDock->iRefCount);
 
 			Icon *pNewIcon = cairo_dock_fm_alter_icon_if_necessary (pConcernedIcon, pParentDock);
 
@@ -458,11 +458,11 @@ void cairo_dock_fm_action_after_mounting (gboolean bMounting, gboolean bSuccess,
 gboolean cairo_dock_fm_move_into_directory (const gchar *cURI, Icon *icon, CairoDock *pDock)
 {
 	g_return_val_if_fail (cURI != NULL && icon != NULL, FALSE);
-	cd_message (" -> copie de %s dans %s\n", cURI, icon->cBaseURI);
+	cd_message (" -> copie de %s dans %s", cURI, icon->cBaseURI);
 	gboolean bSuccess = cairo_dock_fm_move_file (cURI, icon->cBaseURI);
 	if (! bSuccess)
 	{
-		cd_message ("Attention : couldn't copy this file.\nCheck that you have writing rights, and that the new does not already exist.\n");
+		cd_warning ("Attention : couldn't copy this file.\nCheck that you have writing rights, and that the new does not already exist.");
 		gchar *cMessage = g_strdup_printf ("Attention : couldn't copy %s into %s.\nCheck that you have writing rights, and that the name does not already exist.", cURI, icon->cBaseURI);
 		cairo_dock_show_temporary_dialog (cMessage, icon, pDock, 4000);
 		g_free (cMessage);
