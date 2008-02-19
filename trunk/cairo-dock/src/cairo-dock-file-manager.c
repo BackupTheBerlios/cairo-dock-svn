@@ -261,7 +261,7 @@ Icon *cairo_dock_fm_create_icon_from_URI (const gchar *cURI, CairoDock *pDock)
 			}
 		}
 	}
-	cairo_dock_load_one_icon_from_scratch (pNewIcon, pDock);
+	cairo_dock_load_one_icon_from_scratch (pNewIcon, CAIRO_DOCK_CONTAINER (pDock));
 
 	return pNewIcon;
 }
@@ -315,7 +315,7 @@ static Icon *cairo_dock_fm_alter_icon_if_necessary (Icon *pIcon, CairoDock *pDoc
 
 		cairo_dock_insert_icon_in_dock (pNewIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, ! CAIRO_DOCK_INSERT_SEPARATOR);  // on met a jour la taille du dock pour le fXMin/fXMax, et eventuellement la taille de l'icone peut aussi avoir change.
 
-		cairo_dock_redraw_my_icon (pNewIcon, pDock);
+		cairo_dock_redraw_my_icon (pNewIcon, CAIRO_DOCK_CONTAINER (pDock));
 
 		if (pNewIcon->acDesktopFileName != NULL)
 			cairo_dock_fm_add_monitor (pNewIcon);

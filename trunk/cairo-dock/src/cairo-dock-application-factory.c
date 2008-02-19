@@ -467,7 +467,7 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 				icon->acName = g_strdup ((gchar *)pNameBuffer);
 				XFree (pNameBuffer);
 
-				pCairoContext = cairo_dock_create_context_from_window (pDock);
+				pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 				cairo_dock_fill_one_text_buffer (icon, pCairoContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 				cairo_destroy (pCairoContext);
 			}
@@ -476,10 +476,10 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 	else if (iState == PropertyNewValue && aProperty == s_aNetWmIcon)  // on prefere garder l'ancienne icone que de l'effacer.
 	{
 		//g_print ("%s change son icone\n", icon->acName);
-		pCairoContext = cairo_dock_create_context_from_window (pDock);
+		pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 		cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
 		cairo_destroy (pCairoContext);
-		cairo_dock_redraw_my_icon (icon, pDock);
+		cairo_dock_redraw_my_icon (icon, CAIRO_DOCK_CONTAINER (pDock));
 	}
 	else if (aProperty == s_aWmHints)
 	{
@@ -513,10 +513,10 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 			if (iState == PropertyNewValue && (pWMHints->flags & (IconPixmapHint | IconMaskHint | IconWindowHint)))
 			{
 				//g_print ("%s change son icone\n", icon->acName);
-				pCairoContext = cairo_dock_create_context_from_window (pDock);
+				pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 				cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
 				cairo_destroy (pCairoContext);
-				cairo_dock_redraw_my_icon (icon, pDock);
+				cairo_dock_redraw_my_icon (icon, CAIRO_DOCK_CONTAINER (pDock));
 			}
 		}
 	}

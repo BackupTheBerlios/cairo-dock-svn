@@ -60,6 +60,9 @@ static Atom s_aNetWmAbove;
 static Atom s_aNetWmBelow;
 static Atom s_aNetWmHidden;
 static Atom s_aNetWmDesktop;
+static Atom s_aNetWmWindowType;
+static Atom s_aNetWmWindowTypeNormal;
+static Atom s_aNetWmWindowTypeUtility;
 
 int cairo_dock_xerror_handler (Display * pDisplay, XErrorEvent *pXError)
 {
@@ -89,7 +92,10 @@ void cairo_dock_initialize_application_manager (void)
 	s_aNetWmBelow = XInternAtom (s_XDisplay, "_NET_WM_STATE_BELOW", False);
 	s_aNetWmHidden = XInternAtom (s_XDisplay, "_NET_WM_STATE_HIDDEN", False);
 	s_aNetWmDesktop = XInternAtom (s_XDisplay, "_NET_WM_DESKTOP", False);
-
+	s_aNetWmWindowType = XInternAtom (s_XDisplay, "_NET_WM_WINDOW_TYPE", False);
+	s_aNetWmWindowTypeNormal = XInternAtom (s_XDisplay, "_NET_WM_WINDOW_TYPE_NORMAL", False);
+	s_aNetWmWindowTypeUtility = XInternAtom (s_XDisplay, "_NET_WM_WINDOW_TYPE_UTILITY", False);
+	
 	cairo_dock_initialize_application_factory (s_XDisplay);
 }
 
@@ -152,7 +158,8 @@ void cairo_dock_set_xwindow_timestamp (Window Xid, gulong iTimeStamp)
 {
 	g_return_if_fail (Xid > 0);
 	Atom aNetWmUserTime = XInternAtom (s_XDisplay, "_NET_WM_USER_TIME", False);
-	XChangeProperty (s_XDisplay, Xid,
+	XChangeProperty (s_XDisplay,
+		Xid,
 		aNetWmUserTime,
 		XA_CARDINAL, 32, PropModeReplace,
 		(guchar *)&iTimeStamp, 1);
@@ -844,7 +851,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 								{
 									if (bIsHidden)
 										icon->fAlpha = 1.;  // ontriche un peu.
-									cairo_dock_redraw_my_icon (icon, pParentDock);
+									cairo_dock_redraw_my_icon (icon, CAIRO_DOCK_CONTAINER (pParentDock));
 								}
 							}
 						}
@@ -1012,7 +1019,7 @@ void cairo_dock_update_applis_list (CairoDock *pDock, double fTime)
 		if (! bAppliAlreadyRegistered)
 		{
 			cd_message (" cette fenetre (%ld) de la pile n'est pas dans la liste\n", Xid);
-			cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+			cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 			if (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS)
 				icon = cairo_dock_create_icon_from_xwindow (pCairoContext, Xid, pDock);
 			if (icon != NULL)
@@ -1066,7 +1073,7 @@ void cairo_dock_start_application_manager (CairoDock *pDock)
 	gulong i, iNbWindows = 0;
 	Window *pXWindowsList = cairo_dock_get_windows_list (&iNbWindows);
 
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 
 	//\__________________ On cree les icones de toutes ces applis.
@@ -1152,14 +1159,36 @@ void cairo_dock_set_strut_partial (int Xid, int left, int right, int top, int bo
 void cairo_dock_set_xwindow_type_hint (int Xid, gchar *cWindowTypeName)
 {
 	g_return_if_fail (Xid > 0);
-
-	gulong iwindowType = XInternAtom(s_XDisplay, cWindowTypeName, False);
-
+	
+	gulong iWindowType = XInternAtom (s_XDisplay, cWindowTypeName, False);
+	cd_debug ("%s (%d, %s=%d)", __func__, Xid, cWindowTypeName, iWindowType);
+	
 	XChangeProperty (s_XDisplay,
 		Xid,
-		XInternAtom (s_XDisplay, "_NET_WM_WINDOW_TYPE", False),
+		s_aNetWmWindowType,
 		XA_ATOM, 32, PropModeReplace,
-		(guchar *) &iwindowType, 1);
+		(guchar *) &iWindowType, 1);
+}
+
+gboolean cairo_dock_window_is_utility (int Xid)
+{
+	g_return_val_if_fail (Xid > 0, FALSE);
+	
+	gboolean bIsUtility;
+	Atom aReturnedType = 0;
+	int aReturnedFormat = 0;
+	unsigned long iLeftBytes, iBufferNbElements;
+	gulong *pTypeBuffer = NULL;
+	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmWindowType, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pTypeBuffer);
+	if (iBufferNbElements != 0)
+	{
+		cd_debug ("%s (%d) -> %d (%d,%d)\n", __func__, Xid, *pTypeBuffer, s_aNetWmWindowTypeNormal, s_aNetWmWindowTypeUtility);
+		bIsUtility = (*pTypeBuffer == s_aNetWmWindowTypeUtility);
+		XFree (pTypeBuffer);
+	}
+	else
+		bIsUtility = FALSE;
+	return bIsUtility;
 }
 
 

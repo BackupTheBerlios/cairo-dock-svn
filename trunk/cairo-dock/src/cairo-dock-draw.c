@@ -739,10 +739,10 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		{
 			cairo_rotate (pCairoContext, icon->fOrientation);
 		}
-		if (fRatio < 1)
+		/*if (fRatio < 1)  // bof, finalement spa top de reduire le texte.
 			cairo_scale (pCairoContext,
 				fRatio,
-				fRatio);
+				fRatio);*/
 		if (! bHorizontalDock && g_bTextAlwaysHorizontal)
 		{
 			cairo_set_source_surface (pCairoContext,

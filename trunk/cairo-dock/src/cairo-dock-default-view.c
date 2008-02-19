@@ -113,7 +113,7 @@ void cairo_dock_calculate_construction_parameters_generic (Icon *icon, int iCurr
 void cairo_dock_render_linear (CairoDock *pDock)
 {
 	//\____________________ On cree le contexte du dessin.
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 
 	cairo_set_tolerance (pCairoContext, 0.5);  // avec moins que 0.5 on ne voit pas la difference.
@@ -189,7 +189,7 @@ void cairo_dock_render_optimized_linear (CairoDock *pDock, GdkRectangle *pArea)
 	int iWidth = pDock->iCurrentWidth;
 	int iHeight = pDock->iCurrentHeight;
 
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pDock);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 	cairo_set_tolerance (pCairoContext, 0.5);
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
@@ -324,7 +324,8 @@ Icon *cairo_dock_calculate_icons_linear (CairoDock *pDock)
 void cairo_dock_register_default_renderer (void)
 {
 	CairoDockRenderer *pDefaultRenderer = g_new0 (CairoDockRenderer, 1);
-	pDefaultRenderer->cReadmeFilePath = g_strdup_printf ("%s/readme-basic-view", CAIRO_DOCK_SHARE_DATA_DIR);
+	pDefaultRenderer->cReadmeFilePath = g_strdup_printf ("%s/readme-default-view", CAIRO_DOCK_SHARE_DATA_DIR);
+	pDefaultRenderer->cPreviewFilePath = g_strdup_printf ("%s/preview-default.png", CAIRO_DOCK_SHARE_DATA_DIR);
 	pDefaultRenderer->calculate_max_dock_size = cairo_dock_calculate_max_dock_size_linear;
 	pDefaultRenderer->calculate_icons = cairo_dock_calculate_icons_linear;
 	pDefaultRenderer->render = cairo_dock_render_linear;

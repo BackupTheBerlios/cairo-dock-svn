@@ -59,6 +59,7 @@ gboolean cairo_dock_application_manager_is_running (void);
 void cairo_dock_set_strut_partial (int Xid, int left, int right, int top, int bottom, int left_start_y, int left_end_y, int right_start_y, int right_end_y, int top_start_x, int top_end_x, int bottom_start_x, int bottom_end_x);
 
 void cairo_dock_set_xwindow_type_hint (int Xid, gchar *cWindowTypeName);
+gboolean cairo_dock_window_is_utility (int Xid);
 
 
 void cairo_dock_set_one_icon_geometry_for_window_manager (Icon *icon, CairoDock *pDock);

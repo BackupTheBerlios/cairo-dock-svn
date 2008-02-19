@@ -20,10 +20,10 @@ alignment = .5
 frame2 =
 
 #i-[-1024;1024] Lateral gap :
-#{Gap from the absolute position on the screen's edge, in pixels.. You can also move the dock by holding ALT or CTRL key and left mouse button.}
+#{Gap from the absolute position on the screen's edge, in pixels. You can also move the dock by holding ALT or CTRL key and left mouse button.}
 x gap = 0
 #i-[-20;2000] Distance to the screen's edge :
-#{in pixels.. You can also move the dock by holding ALT or CTRL key and left mouse button.}
+#{in pixels. You can also move the dock by holding ALT or CTRL key and left mouse button.}
 y gap = 25
 
 #F-

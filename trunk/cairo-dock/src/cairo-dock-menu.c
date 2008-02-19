@@ -151,7 +151,8 @@ gboolean cairo_dock_notification_remove_icon (gpointer *data)
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
-
+	cd_debug ("%s", icon->acName);
+	
 	if (icon->pSubDock != NULL)
 	{
 		gboolean bDestroyIcons = TRUE;
@@ -165,11 +166,10 @@ gboolean cairo_dock_notification_remove_icon (gpointer *data)
 		cairo_dock_destroy_dock (icon->pSubDock, icon->acName, (bDestroyIcons ? NULL : g_pMainDock), (bDestroyIcons ? NULL : CAIRO_DOCK_MAIN_DOCK_NAME));
 		icon->pSubDock = NULL;
 	}
-
+	
 	icon->fPersonnalScale = 1.0;
-	if (pDock->iSidShrinkDown == 0)
-		pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
-
+	cairo_dock_start_animation (icon, pDock);
+	
 	cairo_dock_mark_theme_as_modified (TRUE);
 	return CAIRO_DOCK_INTERCEPT_NOTIFICATION;  // on l'intercepte car on ne peut plus garantir la validite de l'icone apres cela.
 }
@@ -788,19 +788,18 @@ static void cairo_dock_keep_below(GtkCheckMenuItem *menu_item, gpointer *data)
 
 //for compiz fusion "widget layer"
 //set behaviour in compiz to: (name=cairo-dock-desklet & type=utility)
-static void cairo_dock_keep_on_widget_layer(GtkMenuItem *menu_item, gpointer *data)
+static void cairo_dock_keep_on_widget_layer (GtkMenuItem *menu_item, gpointer *data)
 {
-	cd_debug ("");
 	Icon *icon = data[0];
 	CairoDockDesklet *pDesklet = data[1];
 
 	cairo_dock_hide_desklet (pDesklet);
 	Window Xid = GDK_WINDOW_XID (pDesklet->pWidget->window);
 
-	gboolean bOnCompizWidgetLayer = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menu_item));
-	cd_message (" bOnCompizWidgetLayer : %d\n", bOnCompizWidgetLayer);
+	gboolean bOnCompizWidgetLayer = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (menu_item));
+	cd_debug (" bOnCompizWidgetLayer : %d", bOnCompizWidgetLayer);
 	if (bOnCompizWidgetLayer)
-		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_UTILITY)");
+		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_UTILITY");
 		//gtk_window_set_type_hint(GTK_WINDOW(pDock->pWidget), GDK_WINDOW_TYPE_HINT_UTILITY);
 	else
 		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");
@@ -1042,7 +1041,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 
 		menu_item = gtk_check_menu_item_new_with_label("Compiz Fusion Widget");
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-		if (gtk_window_get_type_hint (GTK_WINDOW (pContainer->pWidget)) == GDK_WINDOW_TYPE_HINT_UTILITY)
+		if (cairo_dock_window_is_utility (Xid))  // gtk_window_get_type_hint me renvoie toujours 0 !
 			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
 		g_signal_connect(G_OBJECT(menu_item), "toggled", G_CALLBACK(cairo_dock_keep_on_widget_layer), data);
 		

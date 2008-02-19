@@ -220,6 +220,7 @@ void stop (void) \
 #define CD_APPLET_STOP_END \
 	myDock = NULL;\
 	myDesklet = NULL;\
+	myContainer = NULL;\
 	myIcon = NULL;\
 	if (myDrawContext != NULL)\
 		cairo_destroy (myDrawContext);\
@@ -746,36 +747,36 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 *@param pSurface
 */
 #define CD_APPLET_SET_SURFACE_ON_MY_ICON(pSurface) \
-	cairo_dock_set_icon_surface_with_reflect (myDrawContext, pSurface, myIcon, (myDock != NULL ? myDock : myDesklet)); \
-	cairo_dock_redraw_my_icon (myIcon, (myDock != NULL ? myDock : myDesklet));
+	cairo_dock_set_icon_surface_with_reflect (myDrawContext, pSurface, myIcon, myContainer); \
+	cairo_dock_redraw_my_icon (myIcon, myContainer);
 
 /**
 *Applique une image definie par son chemin sur le contexte de dessin de l'applet, et la redessine. L'image est redimensionnee aux dimensions de l'icone.
 *@param cImagePath chemin du fichier de l'image.
 */
 #define CD_APPLET_SET_IMAGE_ON_MY_ICON(cImagePath) \
-	cairo_dock_set_image_on_icon (myDrawContext, cImagePath, myIcon, (myDock != NULL ? myDock : myDesklet));
+	cairo_dock_set_image_on_icon (myDrawContext, cImagePath, myIcon, myContainer);
 
 /**
 *Remplace l'etiquette de l'icone de l'applet par une nouvelle.
 *@param cIconName la nouvelle etiquette.
 */
 #define CD_APPLET_SET_NAME_FOR_MY_ICON(cIconName) \
-	cairo_dock_set_icon_name (myDrawContext, cIconName, myIcon, (myDock != NULL ? myDock : myDesklet));
+	cairo_dock_set_icon_name (myDrawContext, cIconName, myIcon, myContainer);
 
 /**
 *Ecris une info-rapide sur l'icone de l'applet.
 *@param cQuickInfoFormat l'info-rapide, au format 'printf'. Ce doit etre une chaine de caracteres particulièrement petite, representant une info concise, puisque ecrite directement sur l'icone.
 */
 #define CD_APPLET_SET_QUICK_INFO_ON_MY_ICON(cQuickInfoFormat, ...) \
-	cairo_dock_set_quick_info_full (myDrawContext, myIcon, (myDock != NULL ? myDock : myDesklet), cQuickInfoFormat, ##__VA_ARGS__);
+	cairo_dock_set_quick_info_full (myDrawContext, myIcon, myContainer, cQuickInfoFormat, ##__VA_ARGS__);
 /**
 *Ecris une info-rapide sur l'icone de l'applet et la redessine.
 *@param cQuickInfoFormat l'info-rapide, au format 'printf'. Ce doit etre une chaine de caracteres particulièrement petite, representant une info concise, puisque ecrite directement sur l'icone.
 */
 #define CD_APPLET_SET_QUICK_INFO_ON_MY_ICON_AND_REDRAW(cQuickInfoFormat, ...) \
-	cairo_dock_set_quick_info_full (myDrawContext, myIcon, (myDock != NULL ? myDock : myDesklet), cQuickInfoFormat, ##__VA_ARGS__); \
-	cairo_dock_redraw_my_icon (myIcon, (myDock != NULL ? myDock : myDesklet));
+	cairo_dock_set_quick_info_full (myDrawContext, myIcon, myContainer, cQuickInfoFormat, ##__VA_ARGS__); \
+	cairo_dock_redraw_my_icon (myIcon, myContainer);
 
 /**
 *Ecris une info-rapide sur l'icone de l'applet et la redessine.
@@ -789,7 +790,7 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 *@param iAnimationLength duree de l'animation, en nombre de tours.
 */
 #define CD_APPLET_ANIMATE_MY_ICON(iAnimationType, iAnimationLength) \
-	cairo_dock_animate_icon (myIcon, (myDock != NULL ? myDock : myDesklet), iAnimationType, iAnimationLength);
+	cairo_dock_animate_icon (myIcon, myContainer, iAnimationType, iAnimationLength);
 
 /**
 *Charge une image dans une surface, aux dimensions de l'icone de l'applet.

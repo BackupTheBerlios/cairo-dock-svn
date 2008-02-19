@@ -22,7 +22,7 @@ msgstr ""
 #: cairo-dock-menu.c:572 src/cairo-dock-menu.c:568 src/cairo-dock-menu.c:567
 #: src/cairo-dock-menu.c:553 src/cairo-dock-menu.c:555 po/fr.po:21
 #: ../src/cairo-dock-menu.c:756 ../src/cairo-dock-menu.c:784
-#: ../src/cairo-dock-menu.c:862
+#: ../src/cairo-dock-menu.c:862 ../src/cairo-dock-menu.c:861
 msgid "Configure"
 msgstr "Configurer"
 
@@ -50,42 +50,42 @@ msgstr "Modules"
 #: cairo-dock-menu.c:601 src/cairo-dock-menu.c:597 src/cairo-dock-menu.c:596
 #: src/cairo-dock-menu.c:574 src/cairo-dock-menu.c:576 po/fr.po:44
 #: ../src/cairo-dock-menu.c:772 ../src/cairo-dock-menu.c:800
-#: ../src/cairo-dock-menu.c:868
+#: ../src/cairo-dock-menu.c:868 ../src/cairo-dock-menu.c:867
 msgid "Manage themes"
 msgstr "Gestion des themes"
 
 #: cairo-dock-menu.c:607 src/cairo-dock-menu.c:603 src/cairo-dock-menu.c:602
 #: src/cairo-dock-menu.c:580 src/cairo-dock-menu.c:582 po/fr.po:49
 #: ../src/cairo-dock-menu.c:778 ../src/cairo-dock-menu.c:806
-#: ../src/cairo-dock-menu.c:870
+#: ../src/cairo-dock-menu.c:870 ../src/cairo-dock-menu.c:869
 msgid "Check updates"
 msgstr "Verifier MaJ"
 
 #: cairo-dock-menu.c:613 src/cairo-dock-menu.c:609 src/cairo-dock-menu.c:608
 #: src/cairo-dock-menu.c:586 src/cairo-dock-menu.c:588 po/fr.po:54
 #: ../src/cairo-dock-menu.c:784 ../src/cairo-dock-menu.c:812
-#: ../src/cairo-dock-menu.c:872
+#: ../src/cairo-dock-menu.c:872 ../src/cairo-dock-menu.c:871
 msgid "About"
 msgstr "A propos"
 
 #: cairo-dock-menu.c:619 src/cairo-dock-menu.c:615 src/cairo-dock-menu.c:614
 #: src/cairo-dock-menu.c:592 src/cairo-dock-menu.c:594 po/fr.po:59
 #: ../src/cairo-dock-menu.c:790 ../src/cairo-dock-menu.c:818
-#: ../src/cairo-dock-menu.c:874
+#: ../src/cairo-dock-menu.c:874 ../src/cairo-dock-menu.c:873
 msgid "Help"
 msgstr "Aide"
 
 #: cairo-dock-menu.c:627 src/cairo-dock-menu.c:623 src/cairo-dock-menu.c:622
 #: src/cairo-dock-menu.c:600 src/cairo-dock-menu.c:602 po/fr.po:64
 #: ../src/cairo-dock-menu.c:798 ../src/cairo-dock-menu.c:826
-#: ../src/cairo-dock-menu.c:878
+#: ../src/cairo-dock-menu.c:878 ../src/cairo-dock-menu.c:877
 msgid "Quick-Hide"
 msgstr "Cachage rapide"
 
 #: cairo-dock-menu.c:634 src/cairo-dock-menu.c:630 src/cairo-dock-menu.c:629
 #: src/cairo-dock-menu.c:607 src/cairo-dock-menu.c:609 po/fr.po:69
 #: ../src/cairo-dock-menu.c:805 ../src/cairo-dock-menu.c:833
-#: ../src/cairo-dock-menu.c:881
+#: ../src/cairo-dock-menu.c:881 ../src/cairo-dock-menu.c:880
 msgid "Quit"
 msgstr "Quiter"
 
@@ -99,14 +99,15 @@ msgstr "Quiter"
 #: ../src/cairo-dock-menu.c:830 ../src/cairo-dock-menu.c:847
 #: ../src/cairo-dock-menu.c:893 ../src/cairo-dock-menu.c:858
 #: ../src/cairo-dock-menu.c:911 ../src/cairo-dock-menu.c:924
-#: ../src/cairo-dock-menu.c:965
+#: ../src/cairo-dock-menu.c:965 ../src/cairo-dock-menu.c:923
+#: ../src/cairo-dock-menu.c:964
 msgid "Add a launcher"
 msgstr "Ajouter un lanceur"
 
 #: cairo-dock-menu.c:684 src/cairo-dock-menu.c:680 src/cairo-dock-menu.c:679
 #: src/cairo-dock-menu.c:657 src/cairo-dock-menu.c:659 po/fr.po:84
 #: ../src/cairo-dock-menu.c:905 ../src/cairo-dock-menu.c:929
-#: ../src/cairo-dock-menu.c:974
+#: ../src/cairo-dock-menu.c:974 ../src/cairo-dock-menu.c:973
 msgid "Remove this launcher"
 msgstr "Supprimer ce lanceur"
 
@@ -116,112 +117,112 @@ msgstr "Supprimer ce lanceur"
 #: src/cairo-dock-menu.c:665 po/fr.po:91 ../src/cairo-dock-menu.c:338
 #: ../src/cairo-dock-menu.c:911 ../src/cairo-dock-menu.c:360
 #: ../src/cairo-dock-menu.c:935 ../src/cairo-dock-menu.c:364
-#: ../src/cairo-dock-menu.c:976
+#: ../src/cairo-dock-menu.c:976 ../src/cairo-dock-menu.c:975
 msgid "Modify this launcher"
 msgstr "Modifier ce lanceur"
 
 #: cairo-dock-menu.c:698 src/cairo-dock-menu.c:694 src/cairo-dock-menu.c:693
 #: src/cairo-dock-menu.c:671 src/cairo-dock-menu.c:673 po/fr.po:96
 #: ../src/cairo-dock-menu.c:919 ../src/cairo-dock-menu.c:943
-#: ../src/cairo-dock-menu.c:1066
+#: ../src/cairo-dock-menu.c:1066 ../src/cairo-dock-menu.c:1065
 msgid "Close"
 msgstr "Fermer"
 
 #: cairo-dock-menu.c:704 src/cairo-dock-menu.c:700 src/cairo-dock-menu.c:699
 #: src/cairo-dock-menu.c:677 src/cairo-dock-menu.c:679 po/fr.po:101
 #: ../src/cairo-dock-menu.c:925 ../src/cairo-dock-menu.c:949
-#: ../src/cairo-dock-menu.c:1064
+#: ../src/cairo-dock-menu.c:1064 ../src/cairo-dock-menu.c:1063
 msgid "Minimize"
 msgstr "Minimiser"
 
 #: cairo-dock-menu.c:711 src/cairo-dock-menu.c:707 src/cairo-dock-menu.c:706
 #: src/cairo-dock-menu.c:684 src/cairo-dock-menu.c:686 po/fr.po:106
 #: ../src/cairo-dock-menu.c:932 ../src/cairo-dock-menu.c:956
-#: ../src/cairo-dock-menu.c:1062
+#: ../src/cairo-dock-menu.c:1062 ../src/cairo-dock-menu.c:1061
 msgid "Unmaximize"
 msgstr "De-maximiser"
 
 #: cairo-dock-menu.c:711 src/cairo-dock-menu.c:707 src/cairo-dock-menu.c:706
 #: src/cairo-dock-menu.c:684 src/cairo-dock-menu.c:686 po/fr.po:111
 #: ../src/cairo-dock-menu.c:932 ../src/cairo-dock-menu.c:956
-#: ../src/cairo-dock-menu.c:1062
+#: ../src/cairo-dock-menu.c:1062 ../src/cairo-dock-menu.c:1061
 msgid "Maximize"
 msgstr "Maximiser"
 
 #: cairo-dock-menu.c:718 src/cairo-dock-menu.c:714 src/cairo-dock-menu.c:713
 #: src/cairo-dock-menu.c:691 src/cairo-dock-menu.c:693 po/fr.po:116
 #: ../src/cairo-dock-menu.c:939 ../src/cairo-dock-menu.c:963
-#: ../src/cairo-dock-menu.c:980
+#: ../src/cairo-dock-menu.c:980 ../src/cairo-dock-menu.c:979
 msgid "Other actions"
 msgstr "Autres actions"
 
 #: cairo-dock-menu.c:724 src/cairo-dock-menu.c:720 src/cairo-dock-menu.c:719
 #: src/cairo-dock-menu.c:697 src/cairo-dock-menu.c:699 po/fr.po:121
 #: ../src/cairo-dock-menu.c:945 ../src/cairo-dock-menu.c:969
-#: ../src/cairo-dock-menu.c:986
+#: ../src/cairo-dock-menu.c:986 ../src/cairo-dock-menu.c:985
 msgid "Not Fullscreen"
 msgstr "Pas plein ecran"
 
 #: cairo-dock-menu.c:724 src/cairo-dock-menu.c:720 src/cairo-dock-menu.c:719
 #: src/cairo-dock-menu.c:697 src/cairo-dock-menu.c:699 po/fr.po:126
 #: ../src/cairo-dock-menu.c:945 ../src/cairo-dock-menu.c:969
-#: ../src/cairo-dock-menu.c:986
+#: ../src/cairo-dock-menu.c:986 ../src/cairo-dock-menu.c:985
 msgid "Fullscreen"
 msgstr "Plein ecran"
 
 #: cairo-dock-menu.c:728 src/cairo-dock-menu.c:724 src/cairo-dock-menu.c:723
 #: src/cairo-dock-menu.c:701 src/cairo-dock-menu.c:703 po/fr.po:131
 #: ../src/cairo-dock-menu.c:949 ../src/cairo-dock-menu.c:973
-#: ../src/cairo-dock-menu.c:988
+#: ../src/cairo-dock-menu.c:988 ../src/cairo-dock-menu.c:987
 msgid "Move to this desktop"
 msgstr "Deplacer sur ce bureau"
 
 #: cairo-dock-menu.c:734 src/cairo-dock-menu.c:730 src/cairo-dock-menu.c:729
 #: src/cairo-dock-menu.c:707 src/cairo-dock-menu.c:709 po/fr.po:136
 #: ../src/cairo-dock-menu.c:955 ../src/cairo-dock-menu.c:979
-#: ../src/cairo-dock-menu.c:992
+#: ../src/cairo-dock-menu.c:992 ../src/cairo-dock-menu.c:991
 msgid "Configure this module"
 msgstr "Configurer ce module"
 
 #: cairo-dock-menu.c:740 src/cairo-dock-menu.c:736 src/cairo-dock-menu.c:735
 #: src/cairo-dock-menu.c:713 src/cairo-dock-menu.c:715 po/fr.po:141
 #: ../src/cairo-dock-menu.c:961 ../src/cairo-dock-menu.c:985
-#: ../src/cairo-dock-menu.c:999
+#: ../src/cairo-dock-menu.c:999 ../src/cairo-dock-menu.c:998
 msgid "Remove this module"
 msgstr "Enlever ce module"
 
 #: cairo-dock-menu.c:746 src/cairo-dock-menu.c:742 src/cairo-dock-menu.c:741
 #: src/cairo-dock-menu.c:719 src/cairo-dock-menu.c:721 po/fr.po:146
 #: ../src/cairo-dock-menu.c:967 ../src/cairo-dock-menu.c:991
-#: ../src/cairo-dock-menu.c:901
+#: ../src/cairo-dock-menu.c:901 ../src/cairo-dock-menu.c:900
 msgid "Move this icon"
 msgstr "Deplacer cette icone"
 
 #: cairo-dock-menu.c:754 src/cairo-dock-menu.c:750 src/cairo-dock-menu.c:749
 #: src/cairo-dock-menu.c:727 src/cairo-dock-menu.c:729 po/fr.po:151
 #: ../src/cairo-dock-menu.c:975 ../src/cairo-dock-menu.c:999
-#: ../src/cairo-dock-menu.c:909
+#: ../src/cairo-dock-menu.c:909 ../src/cairo-dock-menu.c:908
 msgid "To the left"
 msgstr "A gauche"
 
 #: cairo-dock-menu.c:760 src/cairo-dock-menu.c:756 src/cairo-dock-menu.c:755
 #: src/cairo-dock-menu.c:733 src/cairo-dock-menu.c:735 po/fr.po:156
 #: ../src/cairo-dock-menu.c:981 ../src/cairo-dock-menu.c:1005
-#: ../src/cairo-dock-menu.c:911
+#: ../src/cairo-dock-menu.c:911 ../src/cairo-dock-menu.c:910
 msgid "To the right"
 msgstr "A droite"
 
 #: cairo-dock-menu.c:767 src/cairo-dock-menu.c:763 src/cairo-dock-menu.c:762
 #: src/cairo-dock-menu.c:740 src/cairo-dock-menu.c:742 po/fr.po:161
 #: ../src/cairo-dock-menu.c:988 ../src/cairo-dock-menu.c:1012
-#: ../src/cairo-dock-menu.c:913
+#: ../src/cairo-dock-menu.c:913 ../src/cairo-dock-menu.c:912
 msgid "To the beginning"
 msgstr "Au debut"
 
 #: cairo-dock-menu.c:774 src/cairo-dock-menu.c:770 src/cairo-dock-menu.c:769
 #: src/cairo-dock-menu.c:747 src/cairo-dock-menu.c:749 po/fr.po:166
 #: ../src/cairo-dock-menu.c:995 ../src/cairo-dock-menu.c:1019
-#: ../src/cairo-dock-menu.c:915
+#: ../src/cairo-dock-menu.c:915 ../src/cairo-dock-menu.c:914
 msgid "To the end"
 msgstr "A la fin"
 
@@ -247,6 +248,7 @@ msgstr "Etes-vous sûr de vouloir écraser le thème %s"
 #: ../src/cairo-dock-menu.c:152 ../src/cairo-dock-menu.c:370
 #: ../src/cairo-dock-menu.c:155 ../src/cairo-dock-menu.c:392
 #: ../src/cairo-dock-menu.c:160 ../src/cairo-dock-menu.c:396
+#: ../src/cairo-dock-menu.c:161
 msgid ""
 "Do you want to re-dispatch the icons contained inside this container into "
 "the dock ?\n"
@@ -1438,6 +1440,26 @@ msgstr ""
 "  Maintenant, pourquoi ne pas essayer d'écrire une applet pour Cairo-"
 "Dock ? ;-)"
 
+msgid ""
+"v1.5.1 :\n"
+" - The 1.5 branch is still young, so this version brings a lot of bug fixes\n"
+" - Cairo-Dock is now translated in Japanese, thanks to Jiro Kawada for his "
+"work !\n"
+" - A new view has appeared : Rainbow\n"
+" - Cairo-Dock has become a desklet manager !\n"
+"  most of applets can now detached themselves from the dock\n"
+" and behave as real desklets."
+msgstr ""
+"v1.5.1 :\n"
+" - La branche 1.5 encore jeune, cette version apporte donc de nombreuses "
+"corrections\n"
+" - Cairo-Dock est maintenant traduit en japonais, merci à Jiro Kawada pour "
+"son travail !\n"
+" - Une nouvelle vue fait son apparition : Rainbow\n"
+" - Cairo-Dock devient un gestionnaire de desklets !\n"
+"  La plupart des applets peuvent se détacher du dock\n"
+"  et se comporter comme de vrais desklets."
+
 #: ../src/cairo-dock-callbacks.c:755 ../src/cairo-dock-callbacks.c:787
 #: ../src/cairo-dock-callbacks.c:806
 msgid "Do you want to mount this point ?"
@@ -1521,7 +1543,8 @@ msgstr ""
 #: ../src/cairo-dock-menu.c:836 ../src/cairo-dock-menu.c:853
 #: ../src/cairo-dock-menu.c:899 ../src/cairo-dock-menu.c:864
 #: ../src/cairo-dock-menu.c:917 ../src/cairo-dock-menu.c:926
-#: ../src/cairo-dock-menu.c:967
+#: ../src/cairo-dock-menu.c:967 ../src/cairo-dock-menu.c:925
+#: ../src/cairo-dock-menu.c:966
 msgid "Add a sub-dock"
 msgstr "Ajouter un sous-dock"
 
@@ -1540,6 +1563,7 @@ msgstr "démonté"
 
 #: ../src/cairo-dock-menu.c:870 ../src/cairo-dock-menu.c:923
 #: ../src/cairo-dock-menu.c:928 ../src/cairo-dock-menu.c:969
+#: ../src/cairo-dock-menu.c:927 ../src/cairo-dock-menu.c:968
 msgid "Add a separator"
 msgstr "Ajouter un séparateur"
 
@@ -1551,34 +1575,34 @@ msgstr "Quitter Cairo-Dock ?"
 msgid "grab"
 msgstr "récupérer"
 
-#: ../src/cairo-dock-menu.c:996
+#: ../src/cairo-dock-menu.c:996 ../src/cairo-dock-menu.c:995
 msgid "Detach this module"
 msgstr "Détacher ce module"
 
-#: ../src/cairo-dock-menu.c:996
+#: ../src/cairo-dock-menu.c:996 ../src/cairo-dock-menu.c:995
 msgid "Return to dock"
 msgstr "Retourner au dock"
 
-#: ../src/cairo-dock-menu.c:1016
+#: ../src/cairo-dock-menu.c:1016 ../src/cairo-dock-menu.c:1015
 msgid "Always on top"
 msgstr "Toujours devant"
 
-#: ../src/cairo-dock-menu.c:1024
+#: ../src/cairo-dock-menu.c:1024 ../src/cairo-dock-menu.c:1023
 msgid "Normal"
 msgstr "Normal"
 
-#: ../src/cairo-dock-menu.c:1032
+#: ../src/cairo-dock-menu.c:1032 ../src/cairo-dock-menu.c:1031
 msgid "Always below"
 msgstr "Toujours derrière"
 
-#: ../src/cairo-dock-menu.c:1052
+#: ../src/cairo-dock-menu.c:1052 ../src/cairo-dock-menu.c:1051
 msgid "set behaviour in Compiz to: (name=cairo-dock-desklet & type=utility)"
-msgstr "réglez le comportement de Compiz à : (name=cairo-dock-desklet & type=utility)"
+msgstr ""
+"réglez le comportement de Compiz à : (name=cairo-dock-desklet & type=utility)"
 
 #: ../data/messages:23
 msgid "Gap from the absolute position on the screen's edge, in pixels."
 msgstr ""
-
 
 #: ../data/messages:165
 msgid "Name"
@@ -1595,3 +1619,15 @@ msgstr "Date"
 #: ../data/messages:407 ../data/messages:415
 msgid "default"
 msgstr "défaut"
+
+#: ../data/messages:23
+msgid ""
+"Gap from the absolute position on the screen's edge, in pixels. You can also "
+"move the dock by holding ALT or CTRL key and left mouse button."
+msgstr ""
+
+#: ../data/messages:27
+msgid ""
+"in pixels. You can also move the dock by holding ALT or CTRL key and left "
+"mouse button."
+msgstr ""

@@ -411,10 +411,10 @@ void cairo_dock_place_desklet (CairoDockDesklet *pDesklet, int iWidth, int iHeig
 		iPositionY,
 		iWidth,
 		iHeight);
-
+	
 	gtk_window_set_keep_below (GTK_WINDOW (pDesklet->pWidget), bKeepBelow);
-	gtk_window_set_keep_above( GTK_WINDOW (pDesklet->pWidget), bKeepAbove);
-
+	gtk_window_set_keep_above (GTK_WINDOW (pDesklet->pWidget), bKeepAbove);
+	
 	Window Xid = GDK_WINDOW_XID (pDesklet->pWidget->window);
 	if (bOnWidgetLayer)
 		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_UTILITY");  // le hide-show le fait deconner completement, il perd son skip_task_bar ! au moins sous KDE.

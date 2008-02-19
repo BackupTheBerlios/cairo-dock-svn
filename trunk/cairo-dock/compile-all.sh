@@ -7,6 +7,8 @@ export CAIRO_DOCK_CLEAN="0"
 export CAIRO_DOCK_COMPIL="0"
 export CAIRO_DOCK_INSTALL="0"
 export CAIRO_DOCK_EXCLUDE="template"
+export CAIRO_DOCK_EXTRACT_MESSAGE=${CAIRO_DOCK_DIR}/utils/extract-message
+export CAIRO_DOCK_GEN_TRANSLATION=${CAIRO_DOCK_DIR}/cairo-dock/po/generate-translation.sh
 
 if test "$1" = "-a" -o "$2" = "-a" -o "$3" = "-a" -o "$4" = "-a"; then
 	export CAIRO_DOCK_AUTORECONF="1"
@@ -32,6 +34,17 @@ if test "$CAIRO_DOCK_CLEAN" = "1"; then
 	rm -rf autom4te.cache src/.deps src/.libs src/Makefile src/Makefile.in po/Makefile po/Makefile.in po/*.gmo src/*.o src/*.lo src/*.la
 fi
 if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
+	if test -e po; then
+		if test -x $CAIRO_DOCK_EXTRACT_MESSAGE; then
+			for c in data/*.conf.in
+			do
+				$CAIRO_DOCK_EXTRACT_MESSAGE $c
+			done;
+		fi
+		cd po
+		$CAIRO_DOCK_GEN_TRANSLATION
+		cd ..
+	fi
 	autoreconf -isvf && ./configure --prefix=$CAIRO_DOCK_PREFIX --enable-glitz
 fi
 if test "$CAIRO_DOCK_CLEAN" = "1" -a -e Makefile; then
@@ -46,7 +59,6 @@ if test "$CAIRO_DOCK_INSTALL" = "1"; then
 	sudo chmod +x $CAIRO_DOCK_PREFIX/bin/cairo-dock-update.sh
 	sudo chmod +x $CAIRO_DOCK_PREFIX/bin/launch-cairo-dock-after-beryl.sh
 fi
-
 cd ../plug-ins
 
 
@@ -61,9 +73,20 @@ do
 			echo "********************************"
 			if test "$CAIRO_DOCK_CLEAN" = "1"; then
 				rm -f config.* configure configure.lineno intltool-extract intltool-merge intltool-update libtool ltmain.sh Makefile.in Makefile aclocal.m4 missing stamp-h1 depcomp compile
-			        rm -rf autom4te.cache src/.deps src/.libs src/Makefile src/Makefile.in po/Makefile po/Makefile.in po/*.gmo src/*.o src/*.lo src/*.la
+				rm -rf autom4te.cache src/.deps src/.libs src/Makefile src/Makefile.in po/Makefile po/Makefile.in po/*.gmo src/*.o src/*.lo src/*.la
 			fi
 			if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
+				if test -e po; then
+					if test -x $CAIRO_DOCK_EXTRACT_MESSAGE; then
+						for c in data/*.conf.in
+						do
+							$CAIRO_DOCK_EXTRACT_MESSAGE $c
+						done;
+					fi
+					cd po
+					$CAIRO_DOCK_GEN_TRANSLATION
+					cd ..
+				fi
 				autoreconf -isvf && ./configure --prefix=$CAIRO_DOCK_PREFIX --enable-glitz
 			fi
 			if test "$CAIRO_DOCK_CLEAN" = "1" -a -e Makefile; then
