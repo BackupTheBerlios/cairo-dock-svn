@@ -426,9 +426,13 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 
 		cairo_dock_free_icon (icon);  // on ne le fait que maintenant pour plus de surete.
 		cairo_destroy (pCairoContext);
+		pDock->calculate_icons (pDock);
 		gtk_widget_queue_draw (pDock->pWidget);
 		if (pNewContainer != pDock)
+		{
+			pNewContainer->calculate_icons (pNewContainer);
 			gtk_widget_queue_draw (pNewContainer->pWidget);
+		}
 		cairo_dock_mark_theme_as_modified (TRUE);
 	}
 }
