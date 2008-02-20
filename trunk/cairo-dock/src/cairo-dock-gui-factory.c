@@ -1,11 +1,11 @@
-/******************************************************************************
+/*********************************************************************************
 
 This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
-******************************************************************************/
+*********************************************************************************/
 #include <string.h>
 #include <stdlib.h>
 #include <glib/gi18n.h>
@@ -14,7 +14,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-gui-factory.h"
 #include "cairo-dock-log.h"
 
-#define CAIRO_DOCK_GUI_MARGIN 6
+#define CAIRO_DOCK_GUI_MARGIN 4
 #define CAIRO_DOCK_PREVIEW_WIDTH 250
 #define CAIRO_DOCK_PREVIEW_HEIGHT 150
 
@@ -439,33 +439,19 @@ static void _cairo_dock_recup_current_color (GtkColorButton *pColorButton, GSLis
 
 
 #define _allocate_new_buffer\
-	if (iNbBuffers < s_pBufferArray->len)\
-	{\
-		data = g_ptr_array_index (s_pBufferArray, iNbBuffers);\
-	}\
-	else\
-	{\
-		data = g_new (gpointer, 3); \
-		g_ptr_array_add (s_pBufferArray, data);\
-	}\
-	iNbBuffers ++;
-GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWindow *pParentWindow, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier, gchar *cPresentedGroup, gboolean bSwitchButtonPresent, gchar *cButtonConvert, gchar *cGettextDomain)
+	data = g_new (gpointer, 3); \
+	g_ptr_array_add (pGarbage, data);
+
+GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWindow *pParentWindow, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier, gchar *cPresentedGroup, gboolean bSwitchButtonPresent, gchar *cButtonConvert, gchar *cGettextDomain, GPtrArray *pGarbage)
 {
-	static GPtrArray *s_pBufferArray = NULL;  // pour empecher les fuites memoires.
-
-	if (! cairo_dock_is_advanced_keyfile (pKeyFile))
-		return NULL;
-
-	if (s_pBufferArray == NULL)
-	{
-		s_pBufferArray = g_ptr_array_new ();
-	}
+	g_return_val_if_fail (cairo_dock_is_advanced_keyfile (pKeyFile) && pGarbage != NULL, NULL);
+	
 	gpointer *data;
 	int iNbBuffers = 0;
 	gsize length = 0;
 	gchar **pKeyList;
 	gchar **pGroupList = g_key_file_get_groups (pKeyFile, &length);
-
+	
 	GtkWidget *pOneWidget;
 	GSList * pSubWidgetList;
 	GtkWidget *pLabel;
@@ -492,7 +478,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	double fValue, fMinValue, fMaxValue, *fValueList;
 	gchar *cValue, **cValueList;
 	GdkColor gdkColor;
-
+	
 	GtkWidget *pDialog;
 	if (bApplyButtonPresent)
 	{
@@ -533,15 +519,15 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 			NULL);
 	}
 	gtk_container_set_border_width (GTK_CONTAINER (GTK_DIALOG(pDialog)->vbox), CAIRO_DOCK_GUI_MARGIN);
-
+	
 	GtkTooltips *pToolTipsGroup = gtk_tooltips_new ();
-
+	
 	GtkWidget *pNoteBook = gtk_notebook_new ();
 	gtk_notebook_set_scrollable (GTK_NOTEBOOK (pNoteBook), TRUE);
 	gtk_notebook_popup_enable (GTK_NOTEBOOK (pNoteBook));
 	g_object_set (G_OBJECT (pNoteBook), "tab-pos", GTK_POS_LEFT, NULL);
 	gtk_container_add (GTK_CONTAINER (GTK_DIALOG(pDialog)->vbox), pNoteBook);
-
+	
 	i = 0;
 	while (pGroupList[i] != NULL)
 	{
@@ -1091,9 +1077,9 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									FALSE,
 									FALSE,
 									0);
-
+									
 								_allocate_new_buffer;
-
+								
 								pButtonAdd = gtk_button_new_from_stock (GTK_STOCK_ADD);
 								g_signal_connect (G_OBJECT (pButtonAdd),
 									"clicked",
@@ -1135,7 +1121,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									GTK_SHRINK,
 									0,
 									0);
-
+								
 								data[0] = pOneWidget;
 								data[1] = pEntry;
 							}
@@ -1331,6 +1317,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	gtk_notebook_set_current_page (GTK_NOTEBOOK (pNoteBook), iPresentedNumPage);
 
 	g_strfreev (pGroupList);
+	g_ptr_array_add (pGarbage, NULL);  // on n'est jamais assez trop prudent ...
 
 	return pDialog;
 }

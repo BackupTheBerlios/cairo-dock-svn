@@ -554,6 +554,8 @@ msgstr ""
 
 #: ../data/messages:27 ../data/messages:199 ../data/messages:203
 #: ../data/messages:207 ../data/messages:257 ../data/messages:429
+#: ../data/messages:201 ../data/messages:205 ../data/messages:209
+#: ../data/messages:259 ../data/messages:431
 msgid "in pixels."
 msgstr "en pixels."
 
@@ -897,43 +899,44 @@ msgstr "Fichiers"
 msgid "Sort files by :"
 msgstr "Trier les fichiers par :"
 
-#: ../data/messages:171 ../data/messages:357
+#: ../data/messages:171 ../data/messages:357 ../data/messages:173
+#: ../data/messages:359
 msgid "Applets"
 msgstr "Applets"
 
-#: ../data/messages:173
+#: ../data/messages:173 ../data/messages:175
 msgid "Add fonctionnalities to your dock !"
 msgstr "Ajoutez des fonctionnalités à votre dock !"
 
-#: ../data/messages:175
+#: ../data/messages:175 ../data/messages:177
 msgid "Activate a plug-in to use it and configure it."
 msgstr "Activez un plug-in pour l'utiliser et le configurer."
 
-#: ../data/messages:177
+#: ../data/messages:177 ../data/messages:179
 msgid "List of available plug-ins (applets and others) :"
 msgstr "Liste des plug-ins disponibles (applets et autres) :"
 
-#: ../data/messages:179
+#: ../data/messages:179 ../data/messages:181
 msgid "Background"
 msgstr "Arrière-plan"
 
-#: ../data/messages:181
+#: ../data/messages:181 ../data/messages:183
 msgid "Callback zone"
 msgstr "Zone de rappel"
 
-#: ../data/messages:185
+#: ../data/messages:185 ../data/messages:187
 msgid "Size of the callback zone (width x height, in pixels) :"
 msgstr "Taille de la zone de rappel (largeur x hauteur) :"
 
-#: ../data/messages:183
+#: ../data/messages:183 ../data/messages:185
 msgid "Place the mouse into this zone will make the dock re-appear."
 msgstr "Placer la souris dans cette zone fera ré-apparaître le dock"
 
-#: ../data/messages:189
+#: ../data/messages:189 ../data/messages:191
 msgid "Filename of an image to put on the callback zone :"
 msgstr "Nom de fichier d'une image pour la zone de rappel :"
 
-#: ../data/messages:187
+#: ../data/messages:187 ../data/messages:189
 msgid ""
 "Any format allowed; let this field empty to have an invisible callback zone. "
 "The callback zone is what you see when the dock hides itselfs."
@@ -942,15 +945,15 @@ msgstr ""
 "rappel invisible. La zone de rappel est ce que vous voyez quand le dock se "
 "cache."
 
-#: ../data/messages:191
+#: ../data/messages:191 ../data/messages:193
 msgid "Transparency of the callback zone :"
 msgstr "Transparence de la zone de rappel :"
 
-#: ../data/messages:195
+#: ../data/messages:195 ../data/messages:197
 msgid "Rotate the callback zone's image when the dock is on top/left/right ?"
 msgstr "faire pivoter l'image de la zone de rappel avec le dock ?"
 
-#: ../data/messages:193
+#: ../data/messages:193 ../data/messages:195
 msgid ""
 "Use it when the image is an arrow pointing to the center of the screen for "
 "exemple."
@@ -958,35 +961,35 @@ msgstr ""
 "Utilisez-le lorsque l'image est une flèche pointant vers le centre de "
 "l'écran par exemple."
 
-#: ../data/messages:197
+#: ../data/messages:197 ../data/messages:199
 msgid "Extern Frame"
 msgstr "Cadre extérieur"
 
-#: ../data/messages:201
+#: ../data/messages:201 ../data/messages:203
 msgid "Corner radius :"
 msgstr "Rayon des coins :"
 
-#: ../data/messages:205
+#: ../data/messages:205 ../data/messages:207
 msgid "Linewidth of the extern line :"
 msgstr "Epaisseur de la ligne externe :"
 
-#: ../data/messages:209
+#: ../data/messages:209 ../data/messages:211
 msgid "Margin between the frame and the icons or their reflects :"
 msgstr "Marge entre le cadre et les icônes ou leurs reflets :"
 
-#: ../data/messages:211
+#: ../data/messages:211 ../data/messages:213
 msgid "Color of the extern line (r,v,b,a) :"
 msgstr "Couleur de la ligne externe (r,v,b,a) :"
 
-#: ../data/messages:213
+#: ../data/messages:213 ../data/messages:215
 msgid "Are the bottom left and right corners rounded ?"
 msgstr "Les coins du bas sont-ils aussi arrondis ?"
 
-#: ../data/messages:217
+#: ../data/messages:217 ../data/messages:219
 msgid "Maximum width that can have the dock :"
 msgstr "Largeur maximale que peut avoir le dock :"
 
-#: ../data/messages:215
+#: ../data/messages:215 ../data/messages:217
 msgid ""
 "You can scroll with the mouse's wheel to make the icons scroll, like a "
 "carousel. If you put 0, the dock will automatically adapt itself to the "
@@ -995,15 +998,15 @@ msgstr ""
 "Vous pourrez faire défiler les icônes avec la molette. Mettez 0 pour laisser "
 "le dock s'adapter à la taille de l'écran."
 
-#: ../data/messages:219
+#: ../data/messages:219 ../data/messages:221
 msgid "Background image..."
 msgstr "Image de fond..."
 
-#: ../data/messages:223
+#: ../data/messages:223 ../data/messages:225
 msgid "Image's filename to use as a background :"
 msgstr "Nom du fichier d'une image à mettre en fond du dock :"
 
-#: ../data/messages:221
+#: ../data/messages:221 ../data/messages:223
 msgid ""
 "Any format allowed; let this field empty if you don't want to use an image "
 "as background."
@@ -1011,38 +1014,38 @@ msgstr ""
 "Tous formats acceptés; laisser ce champ vide si vous ne voulez pas utiliser "
 "une image en fond"
 
-#: ../data/messages:225
+#: ../data/messages:225 ../data/messages:227
 msgid "Image's transparency :"
 msgstr "Transparence de l'image :"
 
-#: ../data/messages:227
+#: ../data/messages:227 ../data/messages:229
 msgid "Repeat image as a pattern to fill background ?"
 msgstr "Répéter l'image comme un motif pour remplir le fond ?"
 
-#: ../data/messages:229
+#: ../data/messages:229 ../data/messages:231
 msgid "...or Gradation"
 msgstr "...ou Dégradé"
 
-#: ../data/messages:231
+#: ../data/messages:231 ../data/messages:233
 msgid "Bright color (red, green, blue, alpha) :"
 msgstr "Couleur claire (rouge, vert, bleu, alpha):"
 
-#: ../data/messages:233
+#: ../data/messages:233 ../data/messages:235
 msgid "Dark color (red, green, blue, alpha) :"
 msgstr "Couleur foncée (rouge, vert, bleu, alpha):"
 
-#: ../data/messages:235
+#: ../data/messages:235 ../data/messages:237
 msgid ""
 "Angle of the stripes / gradation, in relation to the vertical (in degree) :"
 msgstr ""
 "Angle d'inclinaison du dégradé / des rayures, par rapport à la verticale (en "
 "degrés) :"
 
-#: ../data/messages:239
+#: ../data/messages:239 ../data/messages:241
 msgid "Number of stripes, in each pattern, to draw in the background :"
 msgstr "Nombre de rayures, dans chaque motif, à dessiner dans le fond :"
 
-#: ../data/messages:237
+#: ../data/messages:237 ../data/messages:239
 msgid ""
 "The bigger, the more the stripes are close to each other; with 0 stripes, "
 "the background will be filled with a single gradation."
@@ -1050,38 +1053,38 @@ msgstr ""
 "Plus c'est élevé, plus les rayures seront proches les unes des autres. Avec "
 "0 rayures, un dégradé unique remplira tout le fond."
 
-#: ../data/messages:243
+#: ../data/messages:243 ../data/messages:245
 msgid "Width of the stripes, in percentage of the pattern size :"
 msgstr "Largeur des rayures, en pourcentage de la taille d'un motif :"
 
-#: ../data/messages:241
+#: ../data/messages:241 ../data/messages:243
 msgid ""
 "1 pattern contains N stripes, so the width can be less or equal than 1/N."
 msgstr ""
 "1 motif contient N rayures, donc la largeur peut être inférieure ou égale à "
 "1/N."
 
-#: ../data/messages:245
+#: ../data/messages:245 ../data/messages:247
 msgid "Icons"
 msgstr "Icônes"
 
-#: ../data/messages:247
+#: ../data/messages:247 ../data/messages:249
 msgid "Wave's shape"
 msgstr "Forme de la vague"
 
-#: ../data/messages:251
+#: ../data/messages:251 ../data/messages:253
 msgid "Crest of the wave :"
 msgstr "Crête de la vague :"
 
-#: ../data/messages:249
+#: ../data/messages:249 ../data/messages:251
 msgid "the maximum zoom will be 1+C."
 msgstr "le zoom maximal sera de 1+C."
 
-#: ../data/messages:255
+#: ../data/messages:255 ../data/messages:257
 msgid "Width of the interval in which the wave will be effective :"
 msgstr "Largeur de l'intervalle dans lequel la vague sera effective :"
 
-#: ../data/messages:253
+#: ../data/messages:253 ../data/messages:255
 msgid ""
 "in pixels. Outside of this interval (centered on the mouse), the wave is "
 "flat."
@@ -1089,15 +1092,15 @@ msgstr ""
 "en pixels. En dehors de cet intervalle (centré sur le curseur), la vague "
 "sera plate"
 
-#: ../data/messages:259
+#: ../data/messages:259 ../data/messages:261
 msgid "Space between icons :"
 msgstr "Espace entre les icônes :"
 
-#: ../data/messages:263
+#: ../data/messages:263 ../data/messages:265
 msgid "Icons' transparency at rest :"
 msgstr "Transparence des icônes au repos :"
 
-#: ../data/messages:261
+#: ../data/messages:261 ../data/messages:263
 msgid ""
 "It is their transparency when the wave is flat; they will \"materialize\" "
 "progressively as the dock grows up. The closer to 0, the more transparent "
@@ -1107,15 +1110,15 @@ msgstr ""
 "\"matérialiseront\" progressivement au fur et à mesure que le dock grandit. "
 "Plus c'est proche de 0, plus elles seront transparentes."
 
-#: ../data/messages:265
+#: ../data/messages:265 ../data/messages:267
 msgid "Reflections"
 msgstr "Réflections"
 
-#: ../data/messages:269
+#: ../data/messages:269 ../data/messages:271
 msgid "Reflecting power of the plane :"
 msgstr "Pouvoir réflechissant du plan incliné :"
 
-#: ../data/messages:267
+#: ../data/messages:267 ../data/messages:269
 msgid ""
 "It is its albedo; at 1 the icons reflect to the maximum, at 0 reflects are "
 "not used."
@@ -1123,11 +1126,11 @@ msgstr ""
 "est son albédo; à 1 les icônes se reflètent au maximum, à 0 il n'y a pas de "
 "reflet (ils sont alors désactivés)."
 
-#: ../data/messages:273
+#: ../data/messages:273 ../data/messages:275
 msgid "Field depth of the view:"
 msgstr "Profondeur de champ de la vue :"
 
-#: ../data/messages:271
+#: ../data/messages:271 ../data/messages:273
 #, c-format
 msgid ""
 "More precisely, it is the fraction of the max icon height that will be used "
@@ -1141,15 +1144,17 @@ msgstr ""
 "distance du bord inférieur du cadre afin que le reflet soit entièrement "
 "visible."
 
-#: ../data/messages:275
+#: ../data/messages:275 ../data/messages:277
 msgid "Style of the icons' labels"
 msgstr "Style des étiquettes"
 
-#: ../data/messages:283 ../data/messages:463
+#: ../data/messages:283 ../data/messages:463 ../data/messages:285
+#: ../data/messages:465
 msgid "Family of the font used for labels :"
 msgstr "Police de caractères utilisée pour les étiquettes :"
 
-#: ../data/messages:281 ../data/messages:461
+#: ../data/messages:281 ../data/messages:461 ../data/messages:283
+#: ../data/messages:463
 msgid ""
 "for exemple Monospace, Purisa, ... Just write the font name wihtout any "
 "number or so."
@@ -1157,29 +1162,33 @@ msgstr ""
 "par exemple Monospace, Purisa, ... Ecrivez juste le nom de la police, sans "
 "aucun chiffre ou autre"
 
-#: ../data/messages:279 ../data/messages:459
+#: ../data/messages:279 ../data/messages:459 ../data/messages:281
+#: ../data/messages:461
 msgid "Size of the font :"
 msgstr "Taille de la police :"
 
-#: ../data/messages:277 ../data/messages:457
+#: ../data/messages:277 ../data/messages:457 ../data/messages:279
+#: ../data/messages:459
 msgid "approximately size in pixels, put 0 to not display labels"
 msgstr ""
 "approximativement la taille en pixels, mettre 0 pour ne pas afficher les "
 "étiquettes"
 
-#: ../data/messages:287 ../data/messages:465
+#: ../data/messages:287 ../data/messages:465 ../data/messages:289
+#: ../data/messages:467
 msgid "Weight (between 1 and 9, the bigger, the heavier):"
 msgstr "Poids (entre 1 et 9, plus c'est élevé, plus les traits sont épais):"
 
-#: ../data/messages:285 ../data/messages:467
+#: ../data/messages:285 ../data/messages:467 ../data/messages:287
+#: ../data/messages:469
 msgid "Should be italic ?"
 msgstr "Le texte est-il en italique ?"
 
-#: ../data/messages:291
+#: ../data/messages:291 ../data/messages:293
 msgid "Color of the label's background :"
 msgstr "Couleur de fond des étiquettes :"
 
-#: ../data/messages:289
+#: ../data/messages:289 ../data/messages:291
 msgid ""
 "If you set it to fully transparent, there will be no background for the "
 "text, but the letters' outline will be thicker."
@@ -1187,35 +1196,35 @@ msgstr ""
 "Si vous le rendez complètement transparent, il n'y aura pas de fond pour le "
 "texte, mais les contours des lettres seront plus épaisses."
 
-#: ../data/messages:295
+#: ../data/messages:295 ../data/messages:297
 msgid "Use background color for labels ?"
 msgstr "Utiliser une couleur de fond pour les étiquettes ?"
 
-#: ../data/messages:293
+#: ../data/messages:293 ../data/messages:295
 msgid "If false, only the quick-info will have this background color."
 msgstr "Si non, seuls les infos-rapides auront une couleur de fond."
 
-#: ../data/messages:297
+#: ../data/messages:297 ../data/messages:299
 msgid "Link the icons with a string"
 msgstr "Relier les icônes avec une ficelle"
 
-#: ../data/messages:299
+#: ../data/messages:299 ../data/messages:301
 msgid "Linewidth of the string, in pixels (0 to not use string) :"
 msgstr "Epaisseur de la ficelle, en pixels (0 pour ne pas avoir de ficelle) :"
 
-#: ../data/messages:301
+#: ../data/messages:301 ../data/messages:303
 msgid "Color of the string (red, blue, green, alpha) :"
 msgstr "Couleur de la ficelle (rouge, vert, bleu, alpha):"
 
-#: ../data/messages:303
+#: ../data/messages:303 ../data/messages:305
 msgid "Icons' themes"
 msgstr "Thèmes d'icônes"
 
-#: ../data/messages:307
+#: ../data/messages:307 ../data/messages:309
 msgid "List of icons themes or directories :"
 msgstr "Liste de thèmes d'icônes et de répertoires :"
 
-#: ../data/messages:305
+#: ../data/messages:305 ../data/messages:307
 msgid ""
 "Directories or themes where to search icons. Put some directories where you "
 "have icons you wish to see in the dock, or put some theme's name you've "
@@ -1224,69 +1233,80 @@ msgid ""
 "dock/current_theme/launchers"
 msgstr ""
 
-#: ../data/messages:309
+#: ../data/messages:309 ../data/messages:311
 msgid "Launchers"
 msgstr "Lanceurs"
 
 #: ../data/messages:313 ../data/messages:337 ../data/messages:361
-#: ../data/messages:385
+#: ../data/messages:385 ../data/messages:315 ../data/messages:339
+#: ../data/messages:363 ../data/messages:387
 msgid "Icon size at rest (width x height) :"
 msgstr "Taille des icônes au repos (largeur x hauteur) :"
 
 #: ../data/messages:311 ../data/messages:335 ../data/messages:359
-#: ../data/messages:383
+#: ../data/messages:383 ../data/messages:313 ../data/messages:337
+#: ../data/messages:361 ../data/messages:385
 msgid "Put 0 if you don't want to restrain them"
 msgstr "Mettez 0 si vous ne voulez pas les contraindre."
 
 #: ../data/messages:315 ../data/messages:339 ../data/messages:363
+#: ../data/messages:317 ../data/messages:341 ../data/messages:365
 msgid "Animation type when clicked :"
 msgstr "Type d'animation lors du clic :"
 
 #: ../data/messages:317 ../data/messages:341 ../data/messages:365
+#: ../data/messages:319 ../data/messages:343 ../data/messages:367
 msgid "bounce"
 msgstr "rebond"
 
 #: ../data/messages:319 ../data/messages:343 ../data/messages:367
+#: ../data/messages:321 ../data/messages:345 ../data/messages:369
 msgid "rotate"
 msgstr "rotation"
 
 #: ../data/messages:321 ../data/messages:345 ../data/messages:369
+#: ../data/messages:323 ../data/messages:347 ../data/messages:371
 msgid "blink"
 msgstr "clignotement"
 
 #: ../data/messages:323 ../data/messages:347 ../data/messages:371
+#: ../data/messages:325 ../data/messages:349 ../data/messages:373
 msgid "pulse"
 msgstr "pulsation"
 
 #: ../data/messages:325 ../data/messages:349 ../data/messages:373
+#: ../data/messages:327 ../data/messages:351 ../data/messages:375
 msgid "upside-down"
 msgstr "sens dessus-dessous"
 
 #: ../data/messages:327 ../data/messages:351 ../data/messages:375
+#: ../data/messages:329 ../data/messages:353 ../data/messages:377
 msgid "wobbly"
 msgstr "élastique"
 
 #: ../data/messages:329 ../data/messages:353 ../data/messages:377
+#: ../data/messages:331 ../data/messages:355 ../data/messages:379
 msgid "random"
 msgstr "aléatoire"
 
 #: ../data/messages:331 ../data/messages:355 ../data/messages:379
+#: ../data/messages:333 ../data/messages:357 ../data/messages:381
 msgid "Number of times the icon will bounce/rotate/blink/etc when clicked :"
 msgstr "Nombre de fois où l'icône va rebondir/tourner/clignoter/etc :"
 
-#: ../data/messages:333
+#: ../data/messages:333 ../data/messages:335
 msgid "Applications"
 msgstr "Applications"
 
-#: ../data/messages:381
+#: ../data/messages:381 ../data/messages:383
 msgid "Separators"
 msgstr "Séparateurs"
 
-#: ../data/messages:389
+#: ../data/messages:389 ../data/messages:391
 msgid "Automatically add separators ?"
 msgstr "Ajouter automatiquement des séparateurs ?"
 
-#: ../data/messages:387
+#: ../data/messages:387 ../data/messages:389
 msgid ""
 "Separators are icons used to make a separation between different types of "
 "icons. Cairo-dock can automatically add them between launchers, applis, and "
@@ -1296,16 +1316,16 @@ msgstr ""
 "les différents types d'icônes. Cairo-dock peut automatiquement en ajouter "
 "entre les lanceurs, les applis, et les applets."
 
-#: ../data/messages:393
+#: ../data/messages:393 ../data/messages:395
 msgid "Filename of an image to use for separators :"
 msgstr "Nom de fichier d'une image à utiliser pour les séparateurs :"
 
-#: ../data/messages:391
+#: ../data/messages:391 ../data/messages:393
 msgid "If you don't provide one, blanks will be used."
 msgstr ""
 "Tous formats acceptés; Si vous n'en spécifiez pas, des blancs seront utilisés"
 
-#: ../data/messages:395
+#: ../data/messages:395 ../data/messages:397
 msgid ""
 "Make the separator's image revolve when dock is on top/on the left/on the "
 "right ?"
@@ -1313,51 +1333,51 @@ msgstr ""
 "Faire pivoter l'image du séparateur lorsque le dock est en haut/à droite/à "
 "gauche ?"
 
-#: ../data/messages:397
+#: ../data/messages:397 ../data/messages:399
 msgid "Force separator's image size to stay constant ?"
 msgstr "Forcer l'image du séparateur à rester de taille constante ?"
 
-#: ../data/messages:399
+#: ../data/messages:399 ../data/messages:401
 msgid "Order of the different types of icons :"
 msgstr "Ordre des differents types d'icônes :"
 
-#: ../data/messages:401
+#: ../data/messages:401 ../data/messages:403
 msgid "Views"
 msgstr "Vues"
 
-#: ../data/messages:403
+#: ../data/messages:403 ../data/messages:405
 msgid "Main Dock"
 msgstr "Dock Principal"
 
-#: ../data/messages:405
+#: ../data/messages:405 ../data/messages:407
 msgid "Choose the default view for main dock :"
 msgstr "Choisissez la vue par défaut à utiliser pour le dock principal :"
 
-#: ../data/messages:409
+#: ../data/messages:409 ../data/messages:411
 msgid "Sub-Docks"
 msgstr "Sous-Docks"
 
-#: ../data/messages:413
+#: ../data/messages:413 ../data/messages:415
 msgid "Choose the default view for sub-docks :"
 msgstr "Choisissez la vue par défaut à utiliser pour les sous-docks :"
 
-#: ../data/messages:411
+#: ../data/messages:411 ../data/messages:413
 msgid "You can overwrite this parameter for each sub-dock."
 msgstr "Vous pouvez écraser cette valeur pour chaque sous-dock."
 
-#: ../data/messages:419
+#: ../data/messages:419 ../data/messages:421
 msgid "Are the sub-docks parallel to main docks ?"
 msgstr "Les sous-docks sont-ils parallèles aux docks principaux ?"
 
-#: ../data/messages:417
+#: ../data/messages:417 ../data/messages:419
 msgid "otherwise they will be perpendicular"
 msgstr "sinon ils seront perpendiculaires"
 
-#: ../data/messages:423
+#: ../data/messages:423 ../data/messages:425
 msgid "Ratio for the size of the sub-docks' icons :"
 msgstr "Ratio de la taille des icônes des sous-docks :"
 
-#: ../data/messages:421
+#: ../data/messages:421 ../data/messages:423
 msgid ""
 "You can specify a ratio for the size of the sub-docks' icons, regarding the "
 "main docks' icons size"
@@ -1365,59 +1385,60 @@ msgstr ""
 "Vous pouvez spécifier un ratio de la taille des icônes des sous-docks par "
 "rapport à celles des docks principaux :"
 
-#: ../data/messages:425
+#: ../data/messages:425 ../data/messages:427
 msgid "Dialogs"
 msgstr "Dialogues"
 
-#: ../data/messages:427
+#: ../data/messages:427 ../data/messages:429
 msgid "Buttons"
 msgstr "Boutons"
 
-#: ../data/messages:431
+#: ../data/messages:431 ../data/messages:433
 msgid "Size of buttons in the info-bubbles (width x height) :"
 msgstr "Taille des boutons dans les info-bulles (largeur x hauteur) :"
 
-#: ../data/messages:435
+#: ../data/messages:435 ../data/messages:437
 msgid "Name of an image to use for the yes/ok button :"
 msgstr "Nom de fichier d'une image à utiliser pour le bouton oui/ok :"
 
-#: ../data/messages:433 ../data/messages:437
+#: ../data/messages:433 ../data/messages:437 ../data/messages:435
+#: ../data/messages:439
 msgid "If you don't provide any, a default image will be used."
 msgstr "Si vous ne spécifiez rien, une image par défaut sera utilisée."
 
-#: ../data/messages:439
+#: ../data/messages:439 ../data/messages:441
 msgid "Name of an image to use for the no/cancel button :"
 msgstr "Nom de fichier d'une image à utiliser pour le bouton non/annuler :"
 
-#: ../data/messages:441
+#: ../data/messages:441 ../data/messages:443
 msgid "Bubble"
 msgstr "Bulle"
 
-#: ../data/messages:443
+#: ../data/messages:443 ../data/messages:445
 msgid "Background color of the bubble (r,v,b,a) :"
 msgstr "Couleur du fond de la bulle (r,v,b,a):"
 
-#: ../data/messages:447
+#: ../data/messages:447 ../data/messages:449
 msgid "Size of the icon displayed next to the text :"
 msgstr "Taille de l'icône affichée à côté du texte :"
 
-#: ../data/messages:445
+#: ../data/messages:445 ../data/messages:447
 msgid "Put 0 to let the size adapt itself to the text."
 msgstr "Mettez 0 pour que sa taille s'adapte à celle du texte."
 
-#: ../data/messages:449
+#: ../data/messages:449 ../data/messages:451
 msgid "Text"
 msgstr "Texte"
 
-#: ../data/messages:451
+#: ../data/messages:451 ../data/messages:453
 msgid "Text color (r,v,b,a) :"
 msgstr "Couleur du texte (r,v,b,a) :"
 
-#: ../data/messages:455
+#: ../data/messages:455 ../data/messages:457
 msgid "Homogeneous with icons' label ?"
 msgstr "Homogène avec les étiquettes des icônes ?"
 
-#: ../data/messages:453
+#: ../data/messages:453 ../data/messages:455
 msgid ""
 "The messages will have the same style as the icons' labels. The beneath "
 "parameters are then unused."
@@ -1487,7 +1508,7 @@ msgstr ""
 "  et se comporter comme de vrais desklets."
 
 #: ../src/cairo-dock-callbacks.c:755 ../src/cairo-dock-callbacks.c:787
-#: ../src/cairo-dock-callbacks.c:806
+#: ../src/cairo-dock-callbacks.c:806 ../src/cairo-dock-callbacks.c:805
 msgid "Do you want to mount this point ?"
 msgstr "Voulez-vous monter ce point ?"
 
@@ -1499,20 +1520,23 @@ msgstr "Voulez-vous surveiller le contenu de ce répertoire ?"
 
 #: ../src/cairo-dock-file-manager.c:369 ../src/cairo-dock-file-manager.c:416
 #: ../src/cairo-dock-file-manager.c:428 ../src/cairo-dock-file-manager.c:438
-#: ../src/cairo-dock-file-manager.c:450
+#: ../src/cairo-dock-file-manager.c:450 ../src/cairo-dock-file-manager.c:443
+#: ../src/cairo-dock-file-manager.c:455
 #, c-format
 msgid "failed to %s %s"
 msgstr "échec pour %s %s"
 
 #: ../src/cairo-dock-file-manager.c:369 ../src/cairo-dock-file-manager.c:416
 #: ../src/cairo-dock-file-manager.c:428 ../src/cairo-dock-file-manager.c:438
-#: ../src/cairo-dock-file-manager.c:450
+#: ../src/cairo-dock-file-manager.c:450 ../src/cairo-dock-file-manager.c:443
+#: ../src/cairo-dock-file-manager.c:455
 msgid "mount"
 msgstr "monter"
 
 #: ../src/cairo-dock-file-manager.c:369 ../src/cairo-dock-file-manager.c:416
 #: ../src/cairo-dock-file-manager.c:428 ../src/cairo-dock-file-manager.c:438
-#: ../src/cairo-dock-file-manager.c:450
+#: ../src/cairo-dock-file-manager.c:450 ../src/cairo-dock-file-manager.c:443
+#: ../src/cairo-dock-file-manager.c:455
 msgid "unmount"
 msgstr "démonter"
 
@@ -1576,15 +1600,18 @@ msgid "Add a sub-dock"
 msgstr "Ajouter un sous-dock"
 
 #: ../src/cairo-dock-file-manager.c:394 ../src/cairo-dock-file-manager.c:416
+#: ../src/cairo-dock-file-manager.c:421
 #, c-format
 msgid "%s is now %s"
 msgstr "%s est maintenant %s"
 
 #: ../src/cairo-dock-file-manager.c:394 ../src/cairo-dock-file-manager.c:416
+#: ../src/cairo-dock-file-manager.c:421
 msgid "mounted"
 msgstr "monté"
 
 #: ../src/cairo-dock-file-manager.c:394 ../src/cairo-dock-file-manager.c:416
+#: ../src/cairo-dock-file-manager.c:421
 msgid "unmounted"
 msgstr "démonté"
 
@@ -1595,11 +1622,11 @@ msgstr "démonté"
 msgid "Add a separator"
 msgstr "Ajouter un séparateur"
 
-#: ../src/cairo-dock-callbacks.c:1400
+#: ../src/cairo-dock-callbacks.c:1400 ../src/cairo-dock-callbacks.c:1398
 msgid "Quit Cairo-Dock ?"
 msgstr "Quitter Cairo-Dock ?"
 
-#: ../src/cairo-dock-gui-factory.c:1202
+#: ../src/cairo-dock-gui-factory.c:1202 ../src/cairo-dock-gui-factory.c:1188
 msgid "grab"
 msgstr "récupérer"
 
@@ -1650,7 +1677,8 @@ msgstr "Taille"
 msgid "Date"
 msgstr "Date"
 
-#: ../data/messages:407 ../data/messages:415
+#: ../data/messages:407 ../data/messages:415 ../data/messages:409
+#: ../data/messages:417
 msgid "default"
 msgstr "défaut"
 
@@ -1664,4 +1692,12 @@ msgstr ""
 msgid ""
 "in pixels. You can also move the dock by holding ALT or CTRL key and left "
 "mouse button."
+msgstr ""
+
+#: ../src/cairo-dock-menu.c:1055
+msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
+msgstr ""
+
+#: ../data/messages:171
+msgid "Show hidden files ?"
 msgstr ""

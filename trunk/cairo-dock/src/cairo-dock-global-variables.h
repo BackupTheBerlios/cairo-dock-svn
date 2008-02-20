@@ -95,5 +95,7 @@ extern CairoDockDesktopEnv g_iDesktopEnv;
 
 /// Type de tri des fichiers (par nom, taille, date, ...).
 extern CairoDockFMSortType g_iFileSortType;
+/// Montrer les fichiers caches ou non.
+extern gboolean g_bShowHiddenFiles;
 
 #endif

@@ -3,7 +3,7 @@
 This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
 ******************************************************************************/
 #include <string.h>
@@ -18,6 +18,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 extern CairoDockDesktopEnv g_iDesktopEnv;
 extern CairoDockFMSortType g_iFileSortType;
+extern gboolean g_bShowHiddenFiles;
 extern GHashTable *g_hDocksTable;
 
 static CairoDockVFSBackend *s_pVFSBackend = NULL;
@@ -31,11 +32,11 @@ void cairo_dock_fm_register_vfs_backend (CairoDockVFSBackend *pVFSBackend)
 
 
 
-GList * cairo_dock_fm_list_directory (const gchar *cURI, CairoDockFMSortType g_fm_iSortType, int iNewIconsType, gchar **cFullURI)
+GList * cairo_dock_fm_list_directory (const gchar *cURI, CairoDockFMSortType g_fm_iSortType, int iNewIconsType, gboolean bListHiddenFiles, gchar **cFullURI)
 {
 	if (s_pVFSBackend != NULL && s_pVFSBackend->list_directory != NULL)
 	{
-		return s_pVFSBackend->list_directory (cURI, g_fm_iSortType, iNewIconsType, cFullURI);
+		return s_pVFSBackend->list_directory (cURI, g_fm_iSortType, iNewIconsType, bListHiddenFiles, cFullURI);
 	}
 	else
 	{
@@ -272,7 +273,7 @@ void cairo_dock_fm_create_dock_from_directory (Icon *pIcon)
 		return;
 	cd_message ("");
 	g_free (pIcon->acCommand);
-	GList *pIconList = cairo_dock_fm_list_directory (pIcon->cBaseURI, g_iFileSortType, CAIRO_DOCK_LAUNCHER, &pIcon->acCommand);
+	GList *pIconList = cairo_dock_fm_list_directory (pIcon->cBaseURI, g_iFileSortType, CAIRO_DOCK_LAUNCHER, g_bShowHiddenFiles, &pIcon->acCommand);
 	pIcon->pSubDock = cairo_dock_create_subdock_from_scratch (pIconList, pIcon->acName);
 
 	cairo_dock_update_dock_size (pIcon->pSubDock);  // le 'load_buffer' ne le fait pas.
@@ -357,15 +358,19 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 				return ;
 			}
 			cd_message ("  %s sera supprimee", pConcernedIcon->acName);
-
-			cairo_dock_remove_one_icon_from_dock (pParentDock, pConcernedIcon);
-			if (pConcernedIcon->acDesktopFileName != NULL)  // alors elle a un moniteur.
+			
+			if (CAIRO_DOCK_IS_DOCK (pParentDock))
+			{
+				cairo_dock_remove_one_icon_from_dock (pParentDock, pConcernedIcon);  // enleve aussi son moniteur.
+				cairo_dock_update_dock_size (pParentDock);
+			}
+			else if (pConcernedIcon->acDesktopFileName != NULL)  // alors elle a un moniteur.
 				cairo_dock_fm_remove_monitor (pConcernedIcon);
-			cairo_dock_update_dock_size (pParentDock);
+			
 			cairo_dock_free_icon (pConcernedIcon);
 		}
 		break ;
-
+		
 		case CAIRO_DOCK_FILE_CREATED :
 		{
 			if ((pIcon->cBaseURI == NULL || strcmp (cURI, pIcon->cBaseURI) != 0) && pIcon->pSubDock != NULL)  // dans des cas foirreux, il se peut que le fichier soit cree alors qu'il existait deja dans le dock.
@@ -379,7 +384,7 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 			}
 		}
 		break ;
-
+		
 		case CAIRO_DOCK_FILE_MODIFIED :
 		{
 			Icon *pConcernedIcon;
@@ -402,9 +407,9 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 				return ;
 			}
 			cd_message ("  %s est modifiee (iRefCount:%d)", pConcernedIcon->acName, pParentDock->iRefCount);
-
+			
 			Icon *pNewIcon = cairo_dock_fm_alter_icon_if_necessary (pConcernedIcon, pParentDock);
-
+			
 			if (pNewIcon != NULL && pNewIcon != pConcernedIcon && pNewIcon->iVolumeID > 0)
 			{
 				gboolean bIsMounted = FALSE;
@@ -414,7 +419,7 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 					g_free (cActivationURI);
 				}
 				gchar *cMessage = g_strdup_printf (_("%s is now %s"), pNewIcon->acName, (bIsMounted ? _("mounted") : _("unmounted")));
-
+				
 				cairo_dock_show_temporary_dialog (cMessage, pNewIcon, pParentDock, 4000);
 				g_free (cMessage);
 			}

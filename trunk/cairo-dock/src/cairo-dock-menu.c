@@ -791,7 +791,7 @@ static void cairo_dock_keep_below(GtkCheckMenuItem *menu_item, gpointer *data)
 }
 
 //for compiz fusion "widget layer"
-//set behaviour in compiz to: (name=cairo-dock-desklet & type=utility)
+//set behaviour in compiz to: (name=cairo-dock & type=utility)
 static void cairo_dock_keep_on_widget_layer (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
@@ -1052,7 +1052,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		GtkTooltips *pToolTipsGroup = gtk_tooltips_new ();
 		gtk_tooltips_set_tip (GTK_TOOLTIPS (pToolTipsGroup),
 			menu_item,
-			_("set behaviour in Compiz to: (name=cairo-dock-desklet & type=utility)"),
+			_("set behaviour in Compiz to: (name=cairo-dock & type=utility)"),
 			"pouet");
 	}
 

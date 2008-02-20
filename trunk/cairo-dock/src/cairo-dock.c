@@ -220,6 +220,7 @@ gboolean g_bVerbose = FALSE;
 short g_iMajorVersion, g_iMinorVersion, g_iMicroVersion;
 CairoDockDesktopEnv g_iDesktopEnv = CAIRO_DOCK_UNKNOWN_ENV;
 CairoDockFMSortType g_iFileSortType;
+gboolean g_bShowHiddenFiles;
 
 
 static gboolean random_dialog (gpointer user_data)

@@ -191,6 +191,9 @@ frame_file =
 #r-[Name;Size;Date] Sort files by :
 sort files = 0
 
+#b Show hidden files ?
+show hidden files = false
+
 
 [Applets]
 

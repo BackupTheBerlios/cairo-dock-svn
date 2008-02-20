@@ -153,6 +153,9 @@ extern int g_iDialogMessageWeight;
 extern int g_iDialogMessageStyle;
 extern double g_fDialogTextColor[4];
 
+extern CairoDockFMSortType g_iFileSortType;
+extern gboolean g_bShowHiddenFiles;
+
 /**
 *Recupere une cle booleene d'un fichier de cles.
 *@param pKeyFile le fichier de cles.
@@ -855,7 +858,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_tNbAnimationRounds[CAIRO_DOCK_LAUNCHER] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "launcher number of rounds", &bFlushConfFileNeeded, 3, "Launchers", "number of animation rounds");
 
 
-	//\___________________ On recupere les parametres des aplications.
+	//\___________________ On recupere les parametres des applications.
 	g_bShowAppli = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "show applications", &bFlushConfFileNeeded, TRUE, "Applications", NULL);
 
 	g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "appli width", &bFlushConfFileNeeded, 48, "Applications", "max icon size");
@@ -961,6 +964,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	double couleur_dtext[4] = {0., 0., 0., 1.};
 	cairo_dock_get_double_list_key_value (pKeyFile, "Dialogs", "text color", &bFlushConfFileNeeded, g_fDialogTextColor, 4, couleur_dtext, NULL, NULL);
 
+	g_iFileSortType = cairo_dock_get_integer_key_value (pKeyFile, "System", "sort files", &bFlushConfFileNeeded, CAIRO_DOCK_FM_SORT_BY_NAME, NULL, NULL);
+	g_bShowHiddenFiles = cairo_dock_get_boolean_key_value (pKeyFile, "System", "show hidden files", &bFlushConfFileNeeded, FALSE, NULL, NULL);
 
 	//\___________________ On (re)charge tout, car n'importe quel parametre peut avoir change.
 	switch (iScreenBorder)
@@ -1137,7 +1142,8 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConf
 	}
 	g_key_file_remove_key (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", NULL);  // salete de traducteur automatique.
 	
-	GtkWidget *pDialog = cairo_dock_generate_advanced_ihm_from_keyfile (pKeyFile, cTitle, pWindow, &pWidgetList, (pConfigFunc != NULL), iIdentifier, cPresentedGroup, (pConfigFunc2 != NULL), cButtonConvert, cGettextDomain);
+	GPtrArray *pGarbage = g_ptr_array_new ();
+	GtkWidget *pDialog = cairo_dock_generate_advanced_ihm_from_keyfile (pKeyFile, cTitle, pWindow, &pWidgetList, (pConfigFunc != NULL), iIdentifier, cPresentedGroup, (pConfigFunc2 != NULL), cButtonConvert, cGettextDomain, pGarbage);
 	if (pDialog == NULL || pWidgetList == NULL)
 	{
 		pDialog = cairo_dock_generate_basic_ihm_from_keyfile (cConfFilePath, cTitle, pWindow, &pTextBuffer, (pConfigFunc != NULL), (pConfigFunc2 != NULL), cButtonConvert, NULL);
@@ -1158,7 +1164,7 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConf
 		g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] = gdk_screen_get_height (gdkscreen);
 	}
 	gtk_window_move (GTK_WINDOW (pDialog), (g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] - iWidth) / 2, (g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] - iHeight) / 2);
-
+	
 	if (pConfigFunc != NULL)  // alors on autorise la modification a la volee, avec un bouton "Appliquer". La fenetre doit donc laisser l'appli se derouler.
 	{
 		gpointer *user_data = g_new (gpointer, 16);
@@ -1178,7 +1184,7 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConf
 		user_data[13] = GINT_TO_POINTER ((int) iIdentifier);
 		user_data[14] = cButtonConvert;
 		user_data[15] = cButtonRevert;
-
+		
 		g_signal_connect (pDialog, "response", G_CALLBACK (_cairo_dock_user_action_on_config), user_data);
 		return FALSE;
 	}
@@ -1199,9 +1205,9 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConf
 				GtkTextIter start, end;
 				gtk_text_buffer_get_iter_at_offset (pTextBuffer, &start, 0);
 				gtk_text_buffer_get_iter_at_offset (pTextBuffer, &end, -1);
-
+				
 				gchar *cConfiguration = gtk_text_buffer_get_text (pTextBuffer, &start, &end, FALSE);
-
+				
 				gboolean write_ok = g_file_set_contents (cConfFilePath, cConfiguration, -1, NULL);
 				g_free (cConfiguration);
 				if (! write_ok)
@@ -1215,10 +1221,12 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConf
 		{
 			config_ok = FALSE;
 		}
-
+		
 		g_key_file_free (pKeyFile);
 		cairo_dock_free_generated_widget_list (pWidgetList);
 		gtk_widget_destroy (GTK_WIDGET (pDialog));
+		g_ptr_array_foreach (pGarbage, (GFunc) g_free, NULL);
+		g_ptr_array_free (pGarbage, TRUE);
 		g_free (cConfFilePath);
 		g_free (cConfFilePath2);
 		g_free (cTitle);
