@@ -1,3 +1,4 @@
+/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 2; tab-width: 2 -*- */
 /*
 ** Login : <ctaf42@gmail.com>
 ** Started on  Sun Jan 27 18:35:38 2008 Cedric GESTES
@@ -47,8 +48,8 @@ extern double g_fDialogColor[4];
 extern gboolean g_bSticky;
 
 static gboolean on_expose_desklet(GtkWidget *pWidget,
-                                     GdkEventExpose *pExpose,
-                                     CairoDockDesklet *pDesklet)
+																	GdkEventExpose *pExpose,
+																	CairoDockDesklet *pDesklet)
 {
   cd_debug ("%s ()", __func__);
   gint w = 0, h = 0;
@@ -106,7 +107,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 	{
 		Icon *pIcon = pDesklet->pIcon;
 		cairo_translate (pCairoContext, pIcon->fDrawX, pIcon->fDrawY);
-		
+
 		if (pIcon->pIconBuffer != NULL)
 		{
 			cd_debug ("  dessin de l'icone (%.2fx%.2f)", pIcon->fWidth, pIcon->fHeight);
@@ -199,8 +200,8 @@ static gboolean on_configure_desklet (GtkWidget* pWidget,
 
 
 static gboolean on_button_press_desklet(GtkWidget *widget,
-                                    GdkEventButton *pButton,
-                                    CairoDockDesklet *pDesklet)
+																				GdkEventButton *pButton,
+																				CairoDockDesklet *pDesklet)
 {
 	if (pButton->button == 1)  // clic gauche.
 	{
@@ -258,8 +259,8 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 }
 
 static gboolean on_motion_notify_desklet(GtkWidget *pWidget,
-	GdkEventMotion* pMotion,
-	CairoDockDesklet *pDesklet)
+																				 GdkEventMotion* pMotion,
+																				 CairoDockDesklet *pDesklet)
 {
 	if (pMotion->state & GDK_BUTTON1_MASK)
 	{
@@ -402,21 +403,23 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
   return pDesklet;
 }
 
-
-void cairo_dock_place_desklet (CairoDockDesklet *pDesklet, int iWidth, int iHeight, int iPositionX, int iPositionY, gboolean bKeepBelow, gboolean bKeepAbove, gboolean bOnWidgetLayer)
+void cairo_dock_place_desklet (CairoDockDesklet *pDesklet, CairoDockMinimalAppletConfig *pMinimalConfig)
 {
-	cd_message ("%s (%dx%d ; (%d,%d) ; %d,%d,%d)", __func__, iWidth, iHeight, iPositionX, iPositionY, bKeepBelow, bKeepAbove, bOnWidgetLayer);
-	gdk_window_move_resize (pDesklet->pWidget->window,
-		iPositionX,
-		iPositionY,
-		iWidth,
-		iHeight);
-	
-	gtk_window_set_keep_below (GTK_WINDOW (pDesklet->pWidget), bKeepBelow);
-	gtk_window_set_keep_above (GTK_WINDOW (pDesklet->pWidget), bKeepAbove);
-	
+	cd_message ("%s (%dx%d ; (%d,%d) ; %d,%d,%d)", __func__, pMinimalConfig->iDeskletWidth, pMinimalConfig->iDeskletHeight, pMinimalConfig->iDeskletPositionX, pMinimalConfig->iDeskletPositionY, pMinimalConfig->bKeepBelow, pMinimalConfig->bKeepAbove, pMinimalConfig->bOnWidgetLayer);
+	if (pMinimalConfig->bDeskletUseSize)
+		gdk_window_resize (pDesklet->pWidget->window,
+														pMinimalConfig->iDeskletWidth,
+														pMinimalConfig->iDeskletHeight);
+
+	gdk_window_move(pDesklet->pWidget->window,
+									pMinimalConfig->iDeskletPositionX,
+									pMinimalConfig->iDeskletPositionY);
+
+	gtk_window_set_keep_below (GTK_WINDOW (pDesklet->pWidget), pMinimalConfig->bKeepBelow);
+	gtk_window_set_keep_above (GTK_WINDOW (pDesklet->pWidget), pMinimalConfig->bKeepAbove);
+
 	Window Xid = GDK_WINDOW_XID (pDesklet->pWidget->window);
-	if (bOnWidgetLayer)
+	if (pMinimalConfig->bOnWidgetLayer)
 		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_UTILITY");  // le hide-show le fait deconner completement, il perd son skip_task_bar ! au moins sous KDE.
 	else
 		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");
@@ -427,14 +430,14 @@ void cairo_dock_free_desklet (CairoDockDesklet *pDesklet)
 {
 	if (pDesklet == NULL)
 		return;
-	
+
 	GtkWidget *pInteractiveWidget = gtk_bin_get_child (GTK_BIN (pDesklet->pWidget));
 	if (pInteractiveWidget != NULL)
 		cairo_dock_steal_widget_from_its_container (pInteractiveWidget);
-	
+
 	gtk_widget_destroy (pDesklet->pWidget);
 	pDesklet->pWidget = NULL;
-	
+
 	g_free(pDesklet);
 }
 

@@ -1,3 +1,4 @@
+/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 2; tab-width: 2 -*- */
 /*********************************************************************************
 
 This file is a part of the cairo-dock program,
@@ -118,14 +119,14 @@ struct _CairoDock {
 #else
 	gpointer padding[3];
 #endif // HAVE_GLITZ
-	
+
 	/// la liste de ses icones.
 	GList* icons;
 	/// si le dock est le dock racine.
 	gboolean bIsMainDock;
 	/// le nombre d'icones pointant sur lui.
 	gint iRefCount;
-	
+
 	//\_______________ Les parametres de position et de geometrie de la fenetre du dock.
 	/// ecart de la fenetre par rapport au bord de l'ecran.
 	gint iGapX;
@@ -135,7 +136,7 @@ struct _CairoDock {
 	gdouble fAlign;
 	/// dit si le dock est horizontal ou vertical.
 	CairoDockTypeHorizontality bHorizontalDock;
-	
+
 	/// magnitude maximale de la vague.
 	gdouble fMagnitudeMax;
 	/// max des hauteurs des icones.
@@ -154,11 +155,11 @@ struct _CairoDock {
 	gint iDecorationsWidth;
 	/// hauteur des decorations.
 	gint iDecorationsHeight;
-	
+
 	gint iMaxLabelWidth;
 	gint iRightMargin;
 	gint iTopMargin;
-	
+
 	//\_______________ Les parametres lies a une animation du dock.
 	/// pour faire defiler les icones avec la molette.
 	gint iScrollOffset;
@@ -174,19 +175,19 @@ struct _CairoDock {
 	gint iAvoidingMouseIconType;
 	/// marge d'evitement de la souris, en fraction de la largeur d'une icone (entre 0 et 0.5)
 	gdouble fAvoidingMouseMargin;
-	
+
 	/// pointeur sur le 1er element de la liste des icones a etre dessine, en partant de la gauche.
 	GList *pFirstDrawnElement;
 	/// decalage des decorations pour les faire suivre la souris.
 	gdouble fDecorationsOffsetX;
-	
+
 	/// le dock est en bas au repos.
 	gboolean bAtBottom;
 	/// le dock est en haut pret a etre utilise.
 	gboolean bAtTop;
 	/// lorsque le menu du clique droit est visible.
 	gboolean bMenuVisible;
-	
+
 	//\_______________ Les ID des threads en cours sur le dock.
 	/// serial ID du thread de descente de la fenetre.
 	gint iSidMoveDown;
@@ -198,7 +199,7 @@ struct _CairoDock {
 	gint iSidShrinkDown;
 	/// serial ID du thread qui enverra le signal de sortie retarde.
 	gint iSidLeaveDemand;
-	
+
 	//\_______________ Les fonctions de dessin du dock.
 	/// nom de la vue, utile pour charger les fonctions de rendu posterieurement a la creation du dock.
 	gchar *cRendererName;
@@ -288,6 +289,8 @@ struct _CairoDockMinimalAppletConfig {
 	gint iDesiredIconHeight;
 	gchar *cLabel;
 	gchar *cIconFileName;
+	gboolean bDeskletUseSize;
+	gboolean bDeskletAlwaysDrawIcon;
 	gint iDeskletWidth;
 	gint iDeskletHeight;
 	gint iDeskletPositionX;

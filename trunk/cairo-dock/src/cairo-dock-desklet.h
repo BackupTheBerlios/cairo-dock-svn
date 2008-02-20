@@ -43,8 +43,7 @@
 
 CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiveWidget);
 
-void cairo_dock_place_desklet (CairoDockDesklet *pDesklet, int iWidth, int iHeight, int iPositionX, int iPositionY, gboolean bKeepBelow, gboolean bKeepAbove, gboolean bOnWidgetLayer);
-
+void cairo_dock_place_desklet (CairoDockDesklet *pDesklet, CairoDockMinimalAppletConfig *pMinimalConfig);
 
 void cairo_dock_free_desklet (CairoDockDesklet *pDesklet);
 

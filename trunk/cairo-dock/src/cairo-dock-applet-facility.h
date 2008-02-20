@@ -312,8 +312,10 @@ CairoDockMinimalAppletConfig *read_conf_file (gchar *cConfFilePath) \
 	if (cDefaultIconName != NULL) \
 		pMinimalConfig->cIconFileName = cairo_dock_get_string_key_value (pKeyFile, "Icon", "icon", &bFlushConfFileNeeded, cDefaultIconName, NULL, NULL); \
 	pMinimalConfig->bCanDetach = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "can detach", NULL, FALSE, NULL, NULL); \
-	if (pMinimalConfig->bCanDetach)\
-	{\
+	if (pMinimalConfig->bCanDetach)																				\
+	{																																			\
+		pMinimalConfig->bDeskletUseSize = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "use size", NULL, TRUE, NULL, NULL); \
+		pMinimalConfig->bDeskletAlwaysDrawIcon = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "always draw icon", NULL, FALSE, NULL, NULL); \
 		pMinimalConfig->iDeskletWidth = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "width", &bNewKeysPresent, 92, NULL, NULL); \
 		pMinimalConfig->iDeskletHeight = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "height", &bNewKeysPresent, 92, NULL, NULL); \
 		pMinimalConfig->iDeskletPositionX = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "x position", &bNewKeysPresent, 0, NULL, NULL); \
@@ -321,7 +323,7 @@ CairoDockMinimalAppletConfig *read_conf_file (gchar *cConfFilePath) \
 		pMinimalConfig->bIsDetached = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "initially detached", &bNewKeysPresent, FALSE, NULL, NULL); \
 		pMinimalConfig->bKeepBelow = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "keep below", &bNewKeysPresent, FALSE, NULL, NULL); \
 		pMinimalConfig->bKeepAbove = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "keep above", &bNewKeysPresent, FALSE, NULL, NULL); \
-		pMinimalConfig->bOnWidgetLayer = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "on widget layer", &bNewKeysPresent, FALSE, NULL, NULL);\
+		pMinimalConfig->bOnWidgetLayer = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "on widget layer", &bNewKeysPresent, FALSE, NULL, NULL); \
 	}
 /**
 *Fin de la fonction de configuration de l'applet.
