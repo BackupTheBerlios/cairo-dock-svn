@@ -207,8 +207,10 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 	{
 		if (pButton->type == GDK_BUTTON_PRESS)
 		{
+
 			pDesklet->diff_x = - pButton->x;  // pour le deplacement manuel.
 			pDesklet->diff_y = - pButton->y;
+			pDesklet->moving = TRUE;
 			cd_debug ("diff : %d;%d", pDesklet->diff_x, pDesklet->diff_y);
 		}
 		else if (pButton->type == GDK_BUTTON_RELEASE)
@@ -262,13 +264,12 @@ static gboolean on_motion_notify_desklet(GtkWidget *pWidget,
 																				 GdkEventMotion* pMotion,
 																				 CairoDockDesklet *pDesklet)
 {
-	if (pMotion->state & GDK_BUTTON1_MASK)
+	if (pMotion->state & GDK_BUTTON1_MASK && pDesklet->moving)
 	{
 		cd_debug ("root : %d;%d", (int) pMotion->x_root, (int) pMotion->y_root);
 		gtk_window_move (GTK_WINDOW (pWidget),
 			pMotion->x_root + pDesklet->diff_x,
 			pMotion->y_root + pDesklet->diff_y);
-		pDesklet->moving = TRUE;
 		return TRUE;
 	}
 	return FALSE;
