@@ -425,7 +425,7 @@ struct _Icon {
 	gdouble fOrder;
 	/// Sous-dock sur lequel pointe l'icone, ou NULL si aucun.
 	CairoDock *pSubDock;
-	/// Nom du dock contenant l'icone.
+	/// Nom du dock contenant l'icone (y compris lorsque l'icone est dans un desklet).
 	gchar *cParentDockName;
 	//\____________ calcules lors du chargement de l'icone.
 	/// Largeur de l'image de l'icone.

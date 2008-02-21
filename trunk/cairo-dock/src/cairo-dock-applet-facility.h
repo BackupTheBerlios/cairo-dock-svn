@@ -285,46 +285,11 @@ gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoDockContainer *p
 *@param cDefaultAppletName nom par defaut de l'applet dans le dock (son etiquette), ou NULL si aucun nom ne doit etre lu dans la conf (habituellement l'etiquette reprend simplement le nom de l'applet).
 *@param cDefaultIconName nom de l'icone a appliquer par defaut a l'applet, ou NULL si aucune icone ne doit etre lue dans la conf (auquel cas la surface de l'icone sera juste transparente).
 */
-#define CD_APPLET_CONFIG_BEGIN(cDefaultAppletName, cDefaultIconName)\
+#define CD_APPLET_CONFIG_BEGIN(...)\
 void read_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath)\
 {\
 	gboolean bFlushConfFileNeeded = FALSE, bNewKeysPresent = FALSE;
 
-#define CD_APPLET_CONFIG_BEGIN0(cDefaultAppletName, cDefaultIconName) \
-CairoDockMinimalAppletConfig *read_conf_file (gchar *cConfFilePath) \
-{ \
-	cd_message ("%s (%s)\n", __func__, cConfFilePath); \
-	GError *erreur = NULL; \
-	gboolean bFlushConfFileNeeded = FALSE, bNewKeysPresent = FALSE; \
-	GKeyFile *pKeyFile = g_key_file_new (); \
-	g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur); \
-	if (erreur != NULL) \
-	{ \
-		cd_message ("Attention : %s\n", erreur->message); \
-		g_error_free (erreur); \
-		return NULL; \
-	} \
-	CairoDockMinimalAppletConfig *pMinimalConfig = g_new0 (CairoDockMinimalAppletConfig, 1); \
-	pMinimalConfig->iDesiredIconWidth = cairo_dock_get_integer_key_value (pKeyFile, "Icon", "width", &bFlushConfFileNeeded, 48, NULL, NULL); \
-	pMinimalConfig->iDesiredIconHeight = cairo_dock_get_integer_key_value (pKeyFile, "Icon", "height", &bFlushConfFileNeeded, 48, NULL, NULL); \
-	if (cDefaultAppletName != NULL) \
-		pMinimalConfig->cLabel = cairo_dock_get_string_key_value (pKeyFile, "Icon", "name", &bFlushConfFileNeeded, cDefaultAppletName, NULL, NULL); \
-	if (cDefaultIconName != NULL) \
-		pMinimalConfig->cIconFileName = cairo_dock_get_string_key_value (pKeyFile, "Icon", "icon", &bFlushConfFileNeeded, cDefaultIconName, NULL, NULL); \
-	pMinimalConfig->bCanDetach = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "can detach", NULL, FALSE, NULL, NULL); \
-	if (pMinimalConfig->bCanDetach)																				\
-	{																																			\
-		pMinimalConfig->bDeskletUseSize = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "use size", NULL, TRUE, NULL, NULL); \
-		pMinimalConfig->bDeskletAlwaysDrawIcon = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "always draw icon", NULL, FALSE, NULL, NULL); \
-		pMinimalConfig->iDeskletWidth = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "width", &bNewKeysPresent, 92, NULL, NULL); \
-		pMinimalConfig->iDeskletHeight = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "height", &bNewKeysPresent, 92, NULL, NULL); \
-		pMinimalConfig->iDeskletPositionX = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "x position", &bNewKeysPresent, 0, NULL, NULL); \
-		pMinimalConfig->iDeskletPositionY = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "y position", &bNewKeysPresent, 0, NULL, NULL); \
-		pMinimalConfig->bIsDetached = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "initially detached", &bNewKeysPresent, FALSE, NULL, NULL); \
-		pMinimalConfig->bKeepBelow = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "keep below", &bNewKeysPresent, FALSE, NULL, NULL); \
-		pMinimalConfig->bKeepAbove = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "keep above", &bNewKeysPresent, FALSE, NULL, NULL); \
-		pMinimalConfig->bOnWidgetLayer = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "on widget layer", &bNewKeysPresent, FALSE, NULL, NULL); \
-	}
 /**
 *Fin de la fonction de configuration de l'applet.
 */
@@ -520,12 +485,12 @@ void about (GtkMenuItem *menu_item, gpointer *data);
 /**
 *Debut de la fonction de notification au clic gauche.
 */
-#define CD_APPLET_ON_CLICK_BEGIN																				\
-	gboolean CD_APPLET_ON_CLICK (gpointer *data)													\
-	{																																			\
-		Icon *pClickedIcon = data[0];																				\
-		CairoDock *pClickedDock = data[1];																	\
-		if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock)) \
+#define CD_APPLET_ON_CLICK_BEGIN\
+	gboolean CD_APPLET_ON_CLICK (gpointer *data)\
+	{\
+		Icon *pClickedIcon = data[0];\
+		CairoDock *pClickedDock = data[1];\
+		if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock))\
 		{
 
 /**
@@ -711,7 +676,7 @@ gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data);
 #define CD_APPLET_ON_DROP_DATA_BEGIN \
 gboolean CD_APPLET_ON_DROP_DATA (gpointer *data) \
 { \
-	if (data[1] == myIcon) \
+	if (myIcon != NULL && (data[1] == myIcon || myIcon->pSubDock == data[3])) \
 	{ \
 		const gchar *cReceivedData = data[0]; \
 		g_return_val_if_fail (cReceivedData != NULL, CAIRO_DOCK_LET_PASS_NOTIFICATION);

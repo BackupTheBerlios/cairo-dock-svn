@@ -349,7 +349,8 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 			else if (pIcon->pSubDock != NULL)
 			{
 				pConcernedIcon = cairo_dock_get_icon_with_base_uri (pIcon->pSubDock->icons, cURI);
-				g_return_if_fail (pConcernedIcon != NULL);
+				if (pConcernedIcon == NULL)
+					return ;
 				pParentDock = pIcon->pSubDock;
 			}
 			else
@@ -376,7 +377,8 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 			if ((pIcon->cBaseURI == NULL || strcmp (cURI, pIcon->cBaseURI) != 0) && pIcon->pSubDock != NULL)  // dans des cas foirreux, il se peut que le fichier soit cree alors qu'il existait deja dans le dock.
 			{
 				Icon *pNewIcon = cairo_dock_fm_create_icon_from_URI (cURI, pIcon->pSubDock);
-				g_return_if_fail (pNewIcon != NULL);
+				if (pNewIcon == NULL)
+					return ;
 				pNewIcon->iType = iTypeOnCreation;
 
 				cairo_dock_insert_icon_in_dock (pNewIcon, pIcon->pSubDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, ! CAIRO_DOCK_INSERT_SEPARATOR);
