@@ -85,6 +85,8 @@ struct _CairoDockContainer {
 	int iWindowPositionX, iWindowPositionY;
 	/// Vrai ssi le pointeur est dans le desklet (widgets fils inclus).
 	gboolean bInside;
+	/// TRUE ssi le container est horizontal.
+	CairoDockTypeHorizontality bIsHorizontal;
 #ifdef HAVE_GLITZ
 	glitz_drawable_format_t *pDrawFormat;
 	glitz_drawable_t* pGlitzDrawable;
@@ -112,6 +114,8 @@ struct _CairoDock {
 	gint iWindowPositionY;
 	/// lorsque la souris est dans le dock.
 	gboolean bInside;
+	/// dit si le dock est horizontal ou vertical.
+	CairoDockTypeHorizontality bHorizontalDock;
 #ifdef HAVE_GLITZ
 	glitz_drawable_format_t *pDrawFormat;
 	glitz_drawable_t* pGlitzDrawable;
@@ -134,9 +138,7 @@ struct _CairoDock {
 	gint iGapY;
 	/// alignement, entre 0 et 1, du dock sur le bord de l'ecran.
 	gdouble fAlign;
-	/// dit si le dock est horizontal ou vertical.
-	CairoDockTypeHorizontality bHorizontalDock;
-
+	
 	/// magnitude maximale de la vague.
 	gdouble fMagnitudeMax;
 	/// max des hauteurs des icones.
@@ -319,6 +321,8 @@ struct _CairoDockDialog {
 	int iPositionY;
 	/// vrai ssi la souris est dans le dialogue, auquel cas on le garde immobile.
 	gboolean bInside;
+	/// FALSE ssi le dialogue est perpendiculaire au dock.
+	CairoDockTypeHorizontality bIsHorizontal;
 #ifdef HAVE_GLITZ
 	glitz_drawable_format_t *pDrawFormat;
 	glitz_drawable_t* pGlitzDrawable;
@@ -332,8 +336,6 @@ struct _CairoDockDialog {
 	int iAimedY;
 	/// TRUE ssi le dialogue est a droite de l'écran; dialogue a droite <=> pointe a gauche.
 	gboolean bRight;
-	/// TRUE ssi le dialogue est perpendiculaire au dock.
-	gboolean bIsPerpendicular;
 	/// TRUE ssi la pointe est orientée vers le bas.
 	gboolean bDirectionUp;
 	/// rayon des coins.
@@ -585,6 +587,8 @@ struct _CairoDockDesklet {
 	int iWindowPositionX, iWindowPositionY;
 	/// Vrai ssi le pointeur est dans le desklet (widgets fils inclus). Desole Ctaf, mais je vois pas comment faire sans ^_^
 	gboolean bInside;
+	/// Toujours vrai pour un desklet.
+	CairoDockTypeHorizontality bIsHorizontal;
 #ifdef HAVE_GLITZ
 	glitz_drawable_format_t *pDrawFormat;
 	glitz_drawable_t* pGlitzDrawable;

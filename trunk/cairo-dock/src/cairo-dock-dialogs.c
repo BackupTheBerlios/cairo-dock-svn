@@ -860,7 +860,7 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 
 	gtk_widget_show_all (pWidgetLayout);
 
-	///cairo_dock_place_dialog (pDialog, pDock);  // renseigne aussi bDirectionUp, bIsPerpendicular, et iHeight.
+	///cairo_dock_place_dialog (pDialog, pDock);  // renseigne aussi bDirectionUp, ! bIsHorizontal, et iHeight.
 	cairo_dock_remove_orphelans ();  // la liste a ete verouillee par la fonction precedente pendant longtemps, empechant les dialogues d'etre detruits.
 
 	cairo_dock_dialog_unreference (pDialog);
@@ -868,7 +868,7 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 }
 
 
-void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int *iX, int *iY, gboolean *bRight, gboolean *bIsPerpendicular, gboolean *bDirectionUp)
+void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int *iX, int *iY, gboolean *bRight, gboolean *bIsHorizontal, gboolean *bDirectionUp)
 {
 	g_return_if_fail (pIcon != NULL && pDock != NULL);
 	//g_print ("%s (%.2f, %.2f)\n", __func__, pIcon->fXAtRest, pIcon->fDrawX);
@@ -876,7 +876,7 @@ void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int
 	{
 		if (pDock->iRefCount == 0 && pDock->bAtBottom)  // un dock principal au repos.
 		{
-			*bIsPerpendicular = (pDock->bHorizontalDock == CAIRO_DOCK_VERTICAL);
+			*bIsHorizontal = (pDock->bHorizontalDock == CAIRO_DOCK_HORIZONTAL);
 			if (pDock->bHorizontalDock)
 			{
 				*bRight = (pIcon->fXAtRest > pDock->fFlatDockWidth / 2);
@@ -904,11 +904,11 @@ void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int
 		{
 			CairoDock *pParentDock = NULL;
 			Icon *pPointingIcon = cairo_dock_search_icon_pointing_on_dock (pDock, &pParentDock);
-			cairo_dock_dialog_calculate_aimed_point (pPointingIcon, pParentDock, iX, iY, bRight, bIsPerpendicular, bDirectionUp);
+			cairo_dock_dialog_calculate_aimed_point (pPointingIcon, pParentDock, iX, iY, bRight, bIsHorizontal, bDirectionUp);
 		}
 		else  // dock actif.
 		{
-			*bIsPerpendicular = (pDock->bHorizontalDock == CAIRO_DOCK_VERTICAL);
+			*bIsHorizontal = (pDock->bHorizontalDock == CAIRO_DOCK_HORIZONTAL);
 			if (pDock->bHorizontalDock)
 			{
 				*bRight = (pIcon->fXAtRest > pDock->fFlatDockWidth / 2);
@@ -928,9 +928,9 @@ void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDock *pDock, int
 	{
 		CairoDockDesklet *pDesklet = CAIRO_DOCK_DESKLET (pDock);
 		*bDirectionUp = (pDesklet->iWindowPositionY > g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] / 2);
-		*bIsPerpendicular = (pDesklet->iWindowPositionX < 50 || pDesklet->iWindowPositionX + pDesklet->iHeight > g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] - 50);
+		*bIsHorizontal = (pDesklet->iWindowPositionX > 50 && pDesklet->iWindowPositionX + pDesklet->iHeight < g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] - 50);
 		
-		if (! *bIsPerpendicular)
+		if (*bIsHorizontal)
 		{
 			*bRight = (pDesklet->iWindowPositionX > g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] / 2);
 			*iX = pDesklet->iWindowPositionX + pDesklet->iWidth * (*bRight ? .7 : .3);
@@ -955,11 +955,11 @@ void cairo_dock_dialog_find_optimal_placement  (CairoDockDialog *pDialog)
 	Icon *icon;
 	CairoDockDialog *pDialogOnOurWay;
 
-	double fXLeft = 0, fXRight = g_iScreenWidth[! pDialog->bIsPerpendicular];
+	double fXLeft = 0, fXRight = g_iScreenWidth[pDialog->bIsHorizontal];
 	if (pDialog->bRight)
 	{
 		fXLeft = -1e4;
-		fXRight = MAX (g_iScreenWidth[! pDialog->bIsPerpendicular], pDialog->iAimedX + 2*CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE + fRadius + .5*g_iDockLineWidth + 1);
+		fXRight = MAX (g_iScreenWidth[pDialog->bIsHorizontal], pDialog->iAimedX + 2*CAIRO_DOCK_DIALOG_TIP_MARGIN + CAIRO_DOCK_DIALOG_TIP_BASE + fRadius + .5*g_iDockLineWidth + 1);
 	}
 	else
 	{
@@ -1028,10 +1028,18 @@ void cairo_dock_place_dialog (CairoDockDialog *pDialog, CairoDock *pDock)
 	int iPrevPositionX = pDialog->iPositionX, iPrevPositionY = pDialog->iPositionY;
 	if (pDock != NULL && pDialog->pIcon != NULL)
 	{
-		cairo_dock_dialog_calculate_aimed_point (pDialog->pIcon, pDock, &pDialog->iAimedX, &pDialog->iAimedY, &pDialog->bRight, &pDialog->bIsPerpendicular, &pDialog->bDirectionUp);
-		cd_debug (" Aim (%d;%d) / %d,%d,%d\n", pDialog->iAimedX, pDialog->iAimedY, pDialog->bIsPerpendicular, pDialog->bDirectionUp, pDialog->bInside);
+		cairo_dock_dialog_calculate_aimed_point (pDialog->pIcon, pDock, &pDialog->iAimedX, &pDialog->iAimedY, &pDialog->bRight, &pDialog->bIsHorizontal, &pDialog->bDirectionUp);
+		cd_debug (" Aim (%d;%d) / %d,%d,%d\n", pDialog->iAimedX, pDialog->iAimedY, pDialog->bIsHorizontal, pDialog->bDirectionUp, pDialog->bInside);
 		
-		if (pDialog->bIsPerpendicular)
+		if (pDialog->bIsHorizontal)
+		{
+			if (! pDialog->bInside)
+			{
+				pDialog->iPositionY = (pDialog->bDirectionUp ? pDialog->iAimedY - (pDialog->iBubbleHeight + 2 * pDialog->iMargin + CAIRO_DOCK_DIALOG_DEFAULT_GAP) : pDialog->iAimedY + CAIRO_DOCK_DIALOG_DEFAULT_GAP);  // on place la bulle d'abord sans prendre en compte la pointe.
+				cairo_dock_dialog_find_optimal_placement (pDialog);
+			}
+		}
+		else
 		{
 			int tmp = pDialog->iAimedX;
 			pDialog->iAimedX = pDialog->iAimedY;
@@ -1040,14 +1048,6 @@ void cairo_dock_place_dialog (CairoDockDialog *pDialog, CairoDock *pDock)
 			{
 				pDialog->iPositionX = (pDialog->bRight ? pDialog->iAimedX : pDialog->iAimedX - pDialog->iWidth);
 				pDialog->iPositionY = (pDialog->bDirectionUp ? pDialog->iAimedY - (pDialog->iBubbleHeight + 2 * pDialog->iMargin + CAIRO_DOCK_DIALOG_DEFAULT_GAP) : pDialog->iAimedY + CAIRO_DOCK_DIALOG_DEFAULT_GAP);  // on place la bulle (et non pas la fenetre) sans faire d'optimisation.
-			}
-		}
-		else
-		{
-			if (! pDialog->bInside)
-			{
-				pDialog->iPositionY = (pDialog->bDirectionUp ? pDialog->iAimedY - (pDialog->iBubbleHeight + 2 * pDialog->iMargin + CAIRO_DOCK_DIALOG_DEFAULT_GAP) : pDialog->iAimedY + CAIRO_DOCK_DIALOG_DEFAULT_GAP);  // on place la bulle d'abord sans prendre en compte la pointe.
-				cairo_dock_dialog_find_optimal_placement (pDialog);
 			}
 		}
 		cd_debug (" => position : (%d;%d)\n", pDialog->iPositionX, pDialog->iPositionY);

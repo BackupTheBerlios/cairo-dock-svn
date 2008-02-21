@@ -462,13 +462,14 @@ gboolean cairo_dock_conf_file_needs_update (GKeyFile *pKeyFile, gchar *cVersion)
 {
 	gchar *cPreviousVersion = NULL;
 	cairo_dock_get_conf_file_version (pKeyFile, &cPreviousVersion);
-
+	cd_debug ("%s <> %s\n", cVersion, cPreviousVersion);
+	
 	gboolean bNeedsUpdate;
 	if (cPreviousVersion == NULL || strcmp (cPreviousVersion, cVersion) != 0)
 		bNeedsUpdate = TRUE;
 	else
 		bNeedsUpdate = FALSE;
-
+	
 	g_free (cPreviousVersion);
 	return bNeedsUpdate;
 }

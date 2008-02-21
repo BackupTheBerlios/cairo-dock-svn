@@ -44,12 +44,12 @@
 extern CairoDock *g_pMainDock;
 extern gchar *g_cConfFile;
 extern int g_iDockRadius;
-extern double g_fDialogColor[4];
+extern double g_fDeskletColor[4];
 extern gboolean g_bSticky;
 
 static gboolean on_expose_desklet(GtkWidget *pWidget,
-																	GdkEventExpose *pExpose,
-																	CairoDockDesklet *pDesklet)
+	GdkEventExpose *pExpose,
+	CairoDockDesklet *pDesklet)
 {
   cd_debug ("%s ()", __func__);
   gint w = 0, h = 0;
@@ -72,34 +72,35 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 
 	//set the color
 	if (gtk_window_is_active(GTK_WINDOW(pDesklet->pWidget)))
-		cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], MAX (.2, MIN (1., g_fDialogColor[3] * 1.25)));
+		cairo_set_source_rgba (pCairoContext, g_fDeskletColor[0], g_fDeskletColor[1], g_fDeskletColor[2], MAX (.2, MIN (1., g_fDeskletColor[3] * 1.25)));
 	else if (pDesklet->bInside)
-		cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], MAX (.1, g_fDialogColor[3]));
+		cairo_set_source_rgba (pCairoContext, g_fDeskletColor[0], g_fDeskletColor[1], g_fDeskletColor[2], MAX (.1, g_fDeskletColor[3]));
 	else
-		cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], g_fDialogColor[3] * .75);
-
-  cairo_set_line_width (pCairoContext, 2*g_iDockRadius);
-  cairo_set_line_cap (pCairoContext, CAIRO_LINE_CAP_ROUND);
-
+		cairo_set_source_rgba (pCairoContext, g_fDeskletColor[0], g_fDeskletColor[1], g_fDeskletColor[2], g_fDeskletColor[3] * .75);
+	cairo_save (pCairoContext);
+	cairo_set_line_width (pCairoContext, g_iDockRadius);
+	cairo_set_line_join (pCairoContext, CAIRO_LINE_JOIN_ROUND);
   //draw a rounded square
   //gtk_window_get_size(GTK_WINDOW(pDesklet->pWidget), &w, &h);
   w = pDesklet->iWidth;
   h = pDesklet->iHeight;
-  cairo_move_to (pCairoContext, g_iDockRadius, g_iDockRadius);
-  cairo_rel_line_to (pCairoContext, w - (g_iDockRadius << 1), 0);
-  cairo_rel_line_to (pCairoContext, 0, h - (g_iDockRadius << 1));
-  cairo_rel_line_to (pCairoContext, -(w - (g_iDockRadius << 1)) , 0);
+  cairo_move_to (pCairoContext, g_iDockRadius>>1, g_iDockRadius>>1);
+  cairo_rel_line_to (pCairoContext, w - (g_iDockRadius), 0);
+  cairo_rel_line_to (pCairoContext, 0, h - (g_iDockRadius));
+  cairo_rel_line_to (pCairoContext, -(w - (g_iDockRadius)) , 0);
   cairo_close_path (pCairoContext);
   cairo_stroke (pCairoContext);
 
+  cairo_restore (pCairoContext);
+  
   cairo_rectangle(pCairoContext, g_iDockRadius, g_iDockRadius, (w - (g_iDockRadius << 1)), (h - (g_iDockRadius << 1)));
   cairo_fill(pCairoContext);
 
 
-	cairo_restore (pCairoContext);
+	cairo_restore (pCairoContext);  // retour au debut.
 	if (pDesklet->renderer != NULL)  // une fonction de dessin specifique a ete fournie.
 	{
-		cairo_translate (pCairoContext, g_iDockRadius, g_iDockRadius);
+		//cairo_translate (pCairoContext, g_iDockRadius, g_iDockRadius);
 		pDesklet->renderer (pCairoContext, pDesklet->pRendererData);
 		cairo_destroy (pCairoContext);
 	}
@@ -200,17 +201,16 @@ static gboolean on_configure_desklet (GtkWidget* pWidget,
 
 
 static gboolean on_button_press_desklet(GtkWidget *widget,
-																				GdkEventButton *pButton,
-																				CairoDockDesklet *pDesklet)
+	GdkEventButton *pButton,
+	CairoDockDesklet *pDesklet)
 {
 	if (pButton->button == 1)  // clic gauche.
 	{
 		if (pButton->type == GDK_BUTTON_PRESS)
 		{
-
 			pDesklet->diff_x = - pButton->x;  // pour le deplacement manuel.
 			pDesklet->diff_y = - pButton->y;
-			pDesklet->moving = TRUE;
+			///pDesklet->moving = TRUE;
 			cd_debug ("diff : %d;%d", pDesklet->diff_x, pDesklet->diff_y);
 		}
 		else if (pButton->type == GDK_BUTTON_RELEASE)
@@ -261,12 +261,13 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 }
 
 static gboolean on_motion_notify_desklet(GtkWidget *pWidget,
-																				 GdkEventMotion* pMotion,
-																				 CairoDockDesklet *pDesklet)
+	GdkEventMotion* pMotion,
+	CairoDockDesklet *pDesklet)
 {
-	if (pMotion->state & GDK_BUTTON1_MASK && pDesklet->moving)
+	if (pMotion->state & GDK_BUTTON1_MASK /**&& pDesklet->moving*/)
 	{
 		cd_debug ("root : %d;%d", (int) pMotion->x_root, (int) pMotion->y_root);
+		pDesklet->moving = TRUE;
 		gtk_window_move (GTK_WINDOW (pWidget),
 			pMotion->x_root + pDesklet->diff_x,
 			pMotion->y_root + pDesklet->diff_y);
@@ -335,6 +336,7 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
   cd_message ("%s ()", __func__);
   CairoDockDesklet *pDesklet = g_new0(CairoDockDesklet, 1);
   pDesklet->iType = CAIRO_DOCK_TYPE_DESKLET;
+  pDesklet->bIsHorizontal = TRUE;
   GtkWidget* pWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
   pDesklet->pWidget = pWindow;
@@ -348,11 +350,11 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
   gtk_widget_set_app_paintable(pWindow, TRUE);
   gtk_window_set_decorated(GTK_WINDOW(pWindow), FALSE);
   gtk_window_set_resizable(GTK_WINDOW(pWindow), TRUE);
-  gtk_window_set_title(GTK_WINDOW(pWindow), "cairo-dock-desklet");  /// distinguer titre et classe ?
+  gtk_window_set_title(GTK_WINDOW(pWindow), "cairo-dock-desklet");  /// distinguer titre et classe ?...
   gtk_widget_add_events(pWindow, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_FOCUS_CHANGE_MASK);
   //the border is were cairo paint
-  gtk_container_set_border_width(GTK_CONTAINER(pWindow), 2*g_iDockRadius);  /// 10
-  gtk_window_set_default_size(GTK_WINDOW(pWindow), 4*g_iDockRadius+1, 4*g_iDockRadius+1);
+  gtk_container_set_border_width(GTK_CONTAINER(pWindow), g_iDockRadius/2);  /// re-utiliser la formule des dialgues...
+  gtk_window_set_default_size(GTK_WINDOW(pWindow), 2*g_iDockRadius+1, 2*g_iDockRadius+1);
 
 	g_signal_connect (G_OBJECT (pWindow),
 		"expose-event",
@@ -409,12 +411,12 @@ void cairo_dock_place_desklet (CairoDockDesklet *pDesklet, CairoDockMinimalApple
 	cd_message ("%s (%dx%d ; (%d,%d) ; %d,%d,%d)", __func__, pMinimalConfig->iDeskletWidth, pMinimalConfig->iDeskletHeight, pMinimalConfig->iDeskletPositionX, pMinimalConfig->iDeskletPositionY, pMinimalConfig->bKeepBelow, pMinimalConfig->bKeepAbove, pMinimalConfig->bOnWidgetLayer);
 	if (pMinimalConfig->bDeskletUseSize)
 		gdk_window_resize (pDesklet->pWidget->window,
-														pMinimalConfig->iDeskletWidth,
-														pMinimalConfig->iDeskletHeight);
+			pMinimalConfig->iDeskletWidth,
+			pMinimalConfig->iDeskletHeight);
 
 	gdk_window_move(pDesklet->pWidget->window,
-									pMinimalConfig->iDeskletPositionX,
-									pMinimalConfig->iDeskletPositionY);
+		pMinimalConfig->iDeskletPositionX,
+		pMinimalConfig->iDeskletPositionY);
 
 	gtk_window_set_keep_below (GTK_WINDOW (pDesklet->pWidget), pMinimalConfig->bKeepBelow);
 	gtk_window_set_keep_above (GTK_WINDOW (pDesklet->pWidget), pMinimalConfig->bKeepAbove);

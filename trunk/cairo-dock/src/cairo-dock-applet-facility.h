@@ -34,7 +34,7 @@ void cairo_dock_set_icon_surface (cairo_t *pIconContext, cairo_surface_t *pSurfa
 *@param pIcon l'icone.
 *@param pDock le dock contenant l'icone.
 */
-void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, CairoDock *pDock);
+void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, CairoDockContainer *pContainer);
 /**
 *Applique une surface sur le contexte d'une icone, en effacant tout au prealable et en creant les reflets correspondant.
 *@param pIconContext le contexte de dessin lie a la surface de l'icone; est modifie par la fonction.
@@ -42,7 +42,7 @@ void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, Cair
 *@param pIcon l'icone.
 *@param pDock le dock contenant l'icone.
 */
-void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoDock *pDock);
+void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoDockContainer *pContainer);
 /**
 *Applique une image sur le contexte d'une icone, en effacant tout au prealable et en creant les reflets correspondant.
 *@param pIconContext le contexte de dessin lie a la surface de l'icone; est modifie par la fonction.
@@ -50,7 +50,7 @@ void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surf
 *@param pIcon l'icone.
 *@param pDock le dock contenant l'icone.
 */
-void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Icon *pIcon, CairoDock *pDock);
+void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Icon *pIcon, CairoDockContainer *pContainer);
 
 /**
 *Modifie l'etiquette d'une icone.
@@ -77,7 +77,7 @@ void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo
 *@param cQuickInfoFormat le texte de l'info-rapide, au format 'printf' (%s, %d, etc)
 *@param ... les donnees a inserer dans la chaine de caracteres.
 */
-void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, CairoDock *pDock, const gchar *cQuickInfoFormat, ...);
+void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, const gchar *cQuickInfoFormat, ...);
 /**
 *Efface l'info-rapide d'une icone.
 *@param pIcon l'icone.
@@ -744,11 +744,6 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 #define CD_APPLET_SET_QUICK_INFO_ON_MY_ICON_AND_REDRAW(cQuickInfoFormat, ...) \
 	cairo_dock_set_quick_info_full (myDrawContext, myIcon, myContainer, cQuickInfoFormat, ##__VA_ARGS__); \
 	cairo_dock_redraw_my_icon (myIcon, myContainer);
-
-/**
-*Ecris une info-rapide sur l'icone de l'applet et la redessine.
-*@param cQuickInfoFormat l'info-rapide, au format 'printf'. Ce doit etre une chaine de caracteres particulièrement petite, representant une info concise, puisque ecrite directement sur l'icone.
-*/
 
 
 /**

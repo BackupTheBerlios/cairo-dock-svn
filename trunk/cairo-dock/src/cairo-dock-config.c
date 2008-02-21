@@ -153,6 +153,8 @@ extern int g_iDialogMessageWeight;
 extern int g_iDialogMessageStyle;
 extern double g_fDialogTextColor[4];
 
+extern double g_fDeskletColor[4];
+
 extern CairoDockFMSortType g_iFileSortType;
 extern gboolean g_bShowHiddenFiles;
 
@@ -891,9 +893,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	gboolean bHideVisibleApplisOld = g_bHideVisibleApplis;
 	g_bHideVisibleApplis = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "hide visible", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
 
-	g_fVisibleAppliAlpha = cairo_dock_get_double_key_value (pKeyFile, "TaskBar", "visible alpha", &bFlushConfFileNeeded, 1., "Applications", NULL);
-	if (g_bHideVisibleApplis)
-		g_fVisibleAppliAlpha = 1.;  // on inhibe ce parametre, puisqu'il ne sert alors a rien.
+	g_fVisibleAppliAlpha = cairo_dock_get_double_key_value (pKeyFile, "TaskBar", "visibility alpha", &bFlushConfFileNeeded, .7, "Applications", NULL);  // >0 <=> les fenetres minimisees sont transparentes.
+	if (g_bHideVisibleApplis && g_fVisibleAppliAlpha < 0)
+		g_fVisibleAppliAlpha = 0.;  // on inhibe ce parametre, puisqu'il ne sert alors a rien.
 
 	gboolean bAppliOnCurrentDesktopOnlyOld = g_bAppliOnCurrentDesktopOnly;
 	g_bAppliOnCurrentDesktopOnly = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "current desktop only", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
@@ -936,7 +938,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_iDialogButtonWidth = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "button width", &bFlushConfFileNeeded, 48, NULL, NULL);
 	g_iDialogButtonHeight = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "button height", &bFlushConfFileNeeded, 32, NULL, NULL);
 
-	double couleur_bulle[4] = {1., 1., 1.0, 0.7};
+	double couleur_bulle[4] = {1.0, 1.0, 1.0, 0.7};
 	cairo_dock_get_double_list_key_value (pKeyFile, "Dialogs", "background color", &bFlushConfFileNeeded, g_fDialogColor, 4, couleur_bulle, NULL, NULL);
 
 	g_iDialogIconSize = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "icon size", &bFlushConfFileNeeded, 48, NULL, NULL);
@@ -960,13 +962,16 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		else
 			g_iDialogMessageStyle = PANGO_STYLE_NORMAL;
 	}
-
+	
 	double couleur_dtext[4] = {0., 0., 0., 1.};
 	cairo_dock_get_double_list_key_value (pKeyFile, "Dialogs", "text color", &bFlushConfFileNeeded, g_fDialogTextColor, 4, couleur_dtext, NULL, NULL);
-
+	
+	double couleur_desklett[4] = {1.0, 1.0, 1.0, 0.7};
+	cairo_dock_get_double_list_key_value (pKeyFile, "Desklets", "background color", &bFlushConfFileNeeded, g_fDeskletColor, 4, couleur_desklett, NULL, NULL);
+	
 	g_iFileSortType = cairo_dock_get_integer_key_value (pKeyFile, "System", "sort files", &bFlushConfFileNeeded, CAIRO_DOCK_FM_SORT_BY_NAME, NULL, NULL);
 	g_bShowHiddenFiles = cairo_dock_get_boolean_key_value (pKeyFile, "System", "show hidden files", &bFlushConfFileNeeded, FALSE, NULL, NULL);
-
+	
 	//\___________________ On (re)charge tout, car n'importe quel parametre peut avoir change.
 	switch (iScreenBorder)
 	{

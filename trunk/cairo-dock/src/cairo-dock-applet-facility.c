@@ -35,17 +35,17 @@ gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShare
 {
 	if (cConfFileName == NULL)
 		return NULL;
-
+	
 	gchar *cUserDataDirPath = g_strdup_printf ("%s/plug-ins/%s", g_cCurrentThemePath, cUserDataDirName);
 	if (! g_file_test (cUserDataDirPath, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
 	{
 		cd_message ("directory %s doesn't exist, it will be added.\n", cUserDataDirPath);
-
+		
 		gchar *command = g_strdup_printf ("mkdir -p %s", cUserDataDirPath);
 		system (command);
 		g_free (command);
 	}
-
+	
 	gchar *cConfFilePath = g_strdup_printf ("%s/%s", cUserDataDirPath, cConfFileName);
 	if (! g_file_test (cConfFilePath, G_FILE_TEST_EXISTS))
 	{
@@ -53,7 +53,7 @@ gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShare
 		system (command);
 		g_free (command);
 	}
-
+	
 	if (! g_file_test (cConfFilePath, G_FILE_TEST_EXISTS))  // la copie ne s'est pas bien passee.
 	{
 		cd_message ("Attention : couldn't copy %s/%s in %s; check permissions and file's existence\n", cShareDataDir, cConfFileName, cUserDataDirPath);
@@ -61,7 +61,7 @@ gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShare
 		g_free (cConfFilePath);
 		return NULL;
 	}
-
+	
 	g_free (cUserDataDirPath);
 	return cConfFilePath;
 }
@@ -98,19 +98,22 @@ void cairo_dock_set_icon_surface (cairo_t *pIconContext, cairo_surface_t *pSurfa
 	}
 }
 
-void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, CairoDock *pDock)
+void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, CairoDockContainer *pContainer)
 {
-	g_return_if_fail (pIcon != NULL && pDock != NULL);
+	g_return_if_fail (pIcon != NULL && pContainer!= NULL);
 	if (pIcon->pReflectionBuffer != NULL)
 	{
 		cairo_surface_destroy (pIcon->pReflectionBuffer);
 		pIcon->pReflectionBuffer = NULL;
 	}
+	
+	double fAmplitude = (CAIRO_DOCK_IS_DOCK (pContainer) ? 1 + g_fAmplitude : 1);
+	gboolean bIsHorizontal = pContainer->bIsHorizontal;
 	pIcon->pReflectionBuffer = cairo_dock_create_reflection_surface (pIcon->pIconBuffer,
 		pIconContext,
-		(pDock->bHorizontalDock ? pIcon->fWidth : pIcon->fHeight) * (1 + g_fAmplitude),
-		(pDock->bHorizontalDock ? pIcon->fHeight : pIcon->fWidth) * (1 + g_fAmplitude),
-		pDock->bHorizontalDock);
+		(bIsHorizontal ? pIcon->fWidth : pIcon->fHeight) * fAmplitude,
+		(bIsHorizontal ? pIcon->fHeight : pIcon->fWidth) * fAmplitude,
+		bIsHorizontal);
 
 	if (pIcon->pFullIconBuffer != NULL)
 	{
@@ -120,27 +123,27 @@ void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, Cair
 	pIcon->pFullIconBuffer = cairo_dock_create_icon_surface_with_reflection (pIcon->pIconBuffer,
 		pIcon->pReflectionBuffer,
 		pIconContext,
-		(pDock->bHorizontalDock ? pIcon->fWidth : pIcon->fHeight) * (1 + g_fAmplitude),
-		(pDock->bHorizontalDock ? pIcon->fHeight : pIcon->fWidth) * (1 + g_fAmplitude),
-		pDock->bHorizontalDock);
+		(bIsHorizontal ? pIcon->fWidth : pIcon->fHeight) * fAmplitude,
+		(bIsHorizontal ? pIcon->fHeight : pIcon->fWidth) * fAmplitude,
+		bIsHorizontal);
 }
 
-void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoDock *pDock)
+void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoDockContainer *pContainer)
 {
 	cairo_dock_set_icon_surface (pIconContext, pSurface);
 
-	cairo_dock_add_reflection_to_icon (pIconContext, pIcon, pDock);
+	cairo_dock_add_reflection_to_icon (pIconContext, pIcon, pContainer);
 }
 
-void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Icon *pIcon, CairoDock *pDock)
+void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Icon *pIcon, CairoDockContainer *pContainer)
 {
 	cairo_surface_t *pImageSurface = cairo_dock_create_surface_for_icon (cImagePath,
 		pIconContext,
-		pIcon->fWidth * (1 + g_fAmplitude),
-		pIcon->fHeight * (1 + g_fAmplitude));
-
-	cairo_dock_set_icon_surface_with_reflect (pIconContext, pImageSurface, pIcon, pDock);
-
+		pIcon->fWidth * (CAIRO_DOCK_IS_DOCK (pContainer) ? 1 + g_fAmplitude : 1),
+		pIcon->fHeight * (CAIRO_DOCK_IS_DOCK (pContainer) ? 1 + g_fAmplitude : 1));
+	
+	cairo_dock_set_icon_surface_with_reflect (pIconContext, pImageSurface, pIcon, pContainer);
+	
 	cairo_surface_destroy (pImageSurface);
 }
 
@@ -177,12 +180,12 @@ void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo
 	cd_message (" -> %dx%d", pIcon->iQuickInfoWidth, pIcon->iQuickInfoHeight);
 }
 
-void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, CairoDock *pDock, const gchar *cQuickInfoFormat, ...)
+void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, const gchar *cQuickInfoFormat, ...)
 {
 	va_list args;
 	va_start (args, cQuickInfoFormat);
 	gchar *cFullText = g_strdup_vprintf (cQuickInfoFormat, args);
-	cairo_dock_set_quick_info (pSourceContext, cFullText, pIcon, (CAIRO_DOCK_IS_DOCK (pDock) ? 1 + g_fAmplitude : 1));
+	cairo_dock_set_quick_info (pSourceContext, cFullText, pIcon, (CAIRO_DOCK_IS_DOCK (pContainer) ? 1 + g_fAmplitude : 1));
 	g_free (cFullText);
 	va_end (args);
 }

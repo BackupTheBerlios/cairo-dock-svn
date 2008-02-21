@@ -373,7 +373,6 @@ void cairo_dock_render_decorations_in_frame (cairo_t *pCairoContext, CairoDock *
 */
 void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 {
-
 	//\_____________________ On gere l'animation de rebond.
 	if (icon->iAnimationType == CAIRO_DOCK_BOUNCE && icon->iCount > 0)
 	{
@@ -523,9 +522,15 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect, gboolean bUseText, int iWidth)
 {
 	//\_____________________ On separe 2 cas : dessin avec le tampon complet, et dessin avec le ou les petits tampons.
-	if (CAIRO_DOCK_IS_APPLI (icon) && ! icon->bIsHidden)
-		icon->fAlpha *= g_fVisibleAppliAlpha;
-
+	if (CAIRO_DOCK_IS_APPLI (icon) && g_fVisibleAppliAlpha != 0)
+	{
+		if (icon->bIsHidden)
+			icon->fAlpha *= MIN (1 - g_fVisibleAppliAlpha, 1);
+		else
+			icon->fAlpha *= MIN (g_fVisibleAppliAlpha + 1, 1);
+		//g_print ("g_fVisibleAppliAlpha : %.2f & %d => %.2f\n", g_fVisibleAppliAlpha, icon->bIsHidden, icon->fAlpha);
+	}
+	
 	/*int w = round (icon->fWidth / fRatio * (1 + g_fAmplitude));
 	int h = round (icon->fHeight / fRatio * (1 + g_fAmplitude));
 	int x, y;
@@ -597,7 +602,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		if (icon->fOrientation != 0)
 			cairo_rotate (pCairoContext, icon->fOrientation);
 	}
-
+	
 	double fPreviousAlpha = icon->fAlpha;
 	if (icon->iCount > 0 && icon->iAnimationType == CAIRO_DOCK_PULSE)
 	{
@@ -617,9 +622,9 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		}
 		icon->fAlpha = .8;
 	}
-
+	
 	double fAlpha = icon->fAlpha * (fDockMagnitude + g_fAlphaAtRest * (1 - fDockMagnitude));
-
+	
 	if (bUseReflect && icon->pReflectionBuffer != NULL)  // on dessine les reflets.
 	{
 		if (bDrawFullBuffer)  // on les dessine d'un bloc.

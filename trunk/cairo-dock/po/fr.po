@@ -322,6 +322,7 @@ msgstr ""
 
 #: src/cairo-dock-modules.c:475 po/fr.po:219 ../src/cairo-dock-modules.c:493
 #: ../src/cairo-dock-modules.c:537 ../src/cairo-dock-modules.c:770
+#: ../src/cairo-dock-modules.c:763 ../src/cairo-dock-modules.c:764
 #, c-format
 msgid "Configuration of %s"
 msgstr "Configuration de %s"
@@ -698,16 +699,20 @@ msgid "\"...\" will be added at the end if the name is too long."
 msgstr "\"...\" seront ajoutés si le nom est trop long."
 
 #: ../data/messages:85
-msgid "Transparency of icons whose window is not minimized :"
-msgstr "Transparence des icônes dont la fenêtre n'est pas minimisée :"
+msgid "Transparency of icons whose window is or isn't minimized :"
+msgstr "Transparence des icônes dont la fenêtre est ou n'est pas minimisée :"
 
 #: ../data/messages:83
 msgid ""
-"Allow to highlight hidden windows regarding to windows that ca be accessed "
-"without the dock."
+"To the right, you can control the transparency of minimized windows, to the "
+"left the transparency of visible windows. The more you go aside, the more "
+"the concerned icons will be transparent; on the middle, icons are always "
+"plain."
 msgstr ""
-"Permet de mettre en relief les fenêtres cachées par rapport aux fenêtres "
-"visibles et donc accessibles sans le dock."
+"A droite, vous pouvez contrôler la transparence des fenêtres minimisées, à "
+"gauche la transparence des fenêtres visibles. Plus vous allez d'un côté, "
+"plus les icônes concernées seront transparentes; au milieu, les icônes sont "
+"toujours opaques."
 
 #: ../data/messages:87
 msgid "System"
@@ -1521,7 +1526,8 @@ msgstr "Voulez-vous surveiller le contenu de ce répertoire ?"
 #: ../src/cairo-dock-file-manager.c:369 ../src/cairo-dock-file-manager.c:416
 #: ../src/cairo-dock-file-manager.c:428 ../src/cairo-dock-file-manager.c:438
 #: ../src/cairo-dock-file-manager.c:450 ../src/cairo-dock-file-manager.c:443
-#: ../src/cairo-dock-file-manager.c:455
+#: ../src/cairo-dock-file-manager.c:455 ../src/cairo-dock-file-manager.c:445
+#: ../src/cairo-dock-file-manager.c:457
 #, c-format
 msgid "failed to %s %s"
 msgstr "échec pour %s %s"
@@ -1529,14 +1535,16 @@ msgstr "échec pour %s %s"
 #: ../src/cairo-dock-file-manager.c:369 ../src/cairo-dock-file-manager.c:416
 #: ../src/cairo-dock-file-manager.c:428 ../src/cairo-dock-file-manager.c:438
 #: ../src/cairo-dock-file-manager.c:450 ../src/cairo-dock-file-manager.c:443
-#: ../src/cairo-dock-file-manager.c:455
+#: ../src/cairo-dock-file-manager.c:455 ../src/cairo-dock-file-manager.c:445
+#: ../src/cairo-dock-file-manager.c:457
 msgid "mount"
 msgstr "monter"
 
 #: ../src/cairo-dock-file-manager.c:369 ../src/cairo-dock-file-manager.c:416
 #: ../src/cairo-dock-file-manager.c:428 ../src/cairo-dock-file-manager.c:438
 #: ../src/cairo-dock-file-manager.c:450 ../src/cairo-dock-file-manager.c:443
-#: ../src/cairo-dock-file-manager.c:455
+#: ../src/cairo-dock-file-manager.c:455 ../src/cairo-dock-file-manager.c:445
+#: ../src/cairo-dock-file-manager.c:457
 msgid "unmount"
 msgstr "démonter"
 
@@ -1600,18 +1608,18 @@ msgid "Add a sub-dock"
 msgstr "Ajouter un sous-dock"
 
 #: ../src/cairo-dock-file-manager.c:394 ../src/cairo-dock-file-manager.c:416
-#: ../src/cairo-dock-file-manager.c:421
+#: ../src/cairo-dock-file-manager.c:421 ../src/cairo-dock-file-manager.c:423
 #, c-format
 msgid "%s is now %s"
 msgstr "%s est maintenant %s"
 
 #: ../src/cairo-dock-file-manager.c:394 ../src/cairo-dock-file-manager.c:416
-#: ../src/cairo-dock-file-manager.c:421
+#: ../src/cairo-dock-file-manager.c:421 ../src/cairo-dock-file-manager.c:423
 msgid "mounted"
 msgstr "monté"
 
 #: ../src/cairo-dock-file-manager.c:394 ../src/cairo-dock-file-manager.c:416
-#: ../src/cairo-dock-file-manager.c:421
+#: ../src/cairo-dock-file-manager.c:421 ../src/cairo-dock-file-manager.c:423
 msgid "unmounted"
 msgstr "démonté"
 
@@ -1700,4 +1708,12 @@ msgstr ""
 
 #: ../data/messages:171
 msgid "Show hidden files ?"
+msgstr ""
+
+#: ../data/messages:471
+msgid "Desklets"
+msgstr ""
+
+#: ../data/messages:473
+msgid "Background color (r,v,b,a) :"
 msgstr ""

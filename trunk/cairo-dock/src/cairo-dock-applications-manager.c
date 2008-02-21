@@ -747,7 +747,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 		Xid = event.xany.window;
 		//if (event.type == ClientMessage)
 		//	cd_message ("\n\n\n >>>>>>>>>>>< event.type : %d\n\n", event.type);
-		if (event.type == PropertyNotify)  // a priori on ne peut pas en recevoir d'autre.
+		if (event.type == PropertyNotify)
 		{
 			//g_print ("  type : %d; atom : %s; window : %d\n", event.xproperty.type, gdk_x11_get_xatom_name (event.xproperty.atom), Xid);
 			if (Xid == root)
@@ -767,7 +767,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 						icon = g_hash_table_lookup (s_hXWindowTable, &XActiveWindow);
 						if (icon != NULL)
 						{
-							//g_print ("%s devient active\n", icon->acName);
+							cd_message ("%s devient active\n", icon->acName);
 							if (icon->iCount == 0 && icon->fPersonnalScale == 0)  // sinon on laisse l'animation actuelle.
 							{
 								CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
@@ -806,11 +806,11 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 			}
 			else
 			{
-				if (event.xproperty.atom == s_aNetWmState)
+				if (event.xproperty.atom == s_aNetWmState || event.xproperty.atom == XInternAtom (s_XDisplay, "_KDE_WM_WINDOW_OPACITY", False))
 				{
 					gboolean bIsFullScreen, bIsHidden;
 					cairo_dock_window_is_fullscreen_or_hidden (Xid, &bIsFullScreen, &bIsHidden);
-					//g_print ("changement d'etat de %d => {%d ; %d}\n", Xid, bIsFullScreen, bIsHidden);
+					cd_message ("changement d'etat de %d => {%d ; %d}\n", Xid, bIsFullScreen, bIsHidden);
 					if (g_bAutoHideOnFullScreen && bIsFullScreen && ! cairo_dock_quick_hide_is_activated ())
 					{
 						cd_message (" => devient plein ecran\n");
@@ -824,12 +824,12 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 							CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 							if (pParentDock == NULL)
 								pParentDock = pDock;
-
+							
 							if (bIsHidden != icon->bIsHidden)
 							{
-								cd_message ("  changement de visibilite\n");
+								cd_message ("  changement de visibilite -> %d\n", bIsHidden);
 								icon->bIsHidden = bIsHidden;
-
+								
 								if (g_bHideVisibleApplis)
 								{
 									if (bIsHidden)
@@ -847,10 +847,9 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 									if (pParentDock != NULL)
 										gtk_widget_queue_draw (pParentDock->pWidget);
 								}
-								else if (g_fVisibleAppliAlpha < 1)
+								else if (g_fVisibleAppliAlpha != 0)
 								{
-									if (bIsHidden)
-										icon->fAlpha = 1.;  // ontriche un peu.
+									icon->fAlpha = 1;  // on triche un peu.
 									cairo_dock_redraw_my_icon (icon, CAIRO_DOCK_CONTAINER (pParentDock));
 								}
 							}
@@ -926,8 +925,9 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 		//else
 		//	cd_message ("  type : %d; window : %d\n", event.xany.type, Xid);
 	}
-	XSync (s_XDisplay, True);
-
+	///XSync (s_XDisplay, True);
+	//g_print ("XEventsQueued : %d\n", XEventsQueued (s_XDisplay, QueuedAfterFlush));  // QueuedAlready, QueuedAfterReading, QueuedAfterFlush
+	
 	bInProgress = FALSE;
 	return TRUE;
 }

@@ -326,7 +326,8 @@ msgstr ""
 
 #: src/cairo-dock-modules.c:475 po/fr.po:219 ../src/cairo-dock-modules.c:493
 #: ../src/cairo-dock-modules.c:537 ../src/cairo-dock-modules.c:539
-#: ../src/cairo-dock-modules.c:770
+#: ../src/cairo-dock-modules.c:770 ../src/cairo-dock-modules.c:763
+#: ../src/cairo-dock-modules.c:764
 #, c-format
 msgid "Configuration of %s"
 msgstr "%s の設定変更"
@@ -678,16 +679,8 @@ msgid "\"...\" will be added at the end if the name is too long."
 msgstr "名前が長すぎる場合には最後に \"...\" が加えられます。"
 
 #: ../data/messages:85
-msgid "Transparency of icons whose window is not minimized :"
-msgstr "最小化していないウィンドウのアイコンの透明度 :"
-
-#: ../data/messages:83
-msgid ""
-"Allow to highlight hidden windows regarding to windows that ca be accessed "
-"without the dock."
-msgstr ""
-"ドック外でもアクセス可能なウィンドウに対して、隠された状態のウィンドウを強調"
-"して表示します。"
+msgid "Transparency of icons whose window is or isn't minimized :"
+msgstr "最小化して(いない)ウィンドウのアイコンの透明度 :"
 
 #: ../data/messages:87
 msgid "System"
@@ -1470,7 +1463,8 @@ msgstr "このディレクトリの内容を監視しますか？"
 #: ../src/cairo-dock-file-manager.c:428 ../src/cairo-dock-file-manager.c:417
 #: ../src/cairo-dock-file-manager.c:429 ../src/cairo-dock-file-manager.c:438
 #: ../src/cairo-dock-file-manager.c:450 ../src/cairo-dock-file-manager.c:443
-#: ../src/cairo-dock-file-manager.c:455
+#: ../src/cairo-dock-file-manager.c:455 ../src/cairo-dock-file-manager.c:445
+#: ../src/cairo-dock-file-manager.c:457
 #, fuzzy, c-format
 msgid "failed to %s %s"
 msgstr "failed to %s %s"
@@ -1479,7 +1473,8 @@ msgstr "failed to %s %s"
 #: ../src/cairo-dock-file-manager.c:428 ../src/cairo-dock-file-manager.c:417
 #: ../src/cairo-dock-file-manager.c:429 ../src/cairo-dock-file-manager.c:438
 #: ../src/cairo-dock-file-manager.c:450 ../src/cairo-dock-file-manager.c:443
-#: ../src/cairo-dock-file-manager.c:455
+#: ../src/cairo-dock-file-manager.c:455 ../src/cairo-dock-file-manager.c:445
+#: ../src/cairo-dock-file-manager.c:457
 msgid "mount"
 msgstr "マウント"
 
@@ -1487,7 +1482,8 @@ msgstr "マウント"
 #: ../src/cairo-dock-file-manager.c:428 ../src/cairo-dock-file-manager.c:417
 #: ../src/cairo-dock-file-manager.c:429 ../src/cairo-dock-file-manager.c:438
 #: ../src/cairo-dock-file-manager.c:450 ../src/cairo-dock-file-manager.c:443
-#: ../src/cairo-dock-file-manager.c:455
+#: ../src/cairo-dock-file-manager.c:455 ../src/cairo-dock-file-manager.c:445
+#: ../src/cairo-dock-file-manager.c:457
 msgid "unmount"
 msgstr "アンマウント"
 
@@ -1558,17 +1554,20 @@ msgstr "サブ・ドックを追加"
 
 #: ../src/cairo-dock-file-manager.c:394 ../src/cairo-dock-file-manager.c:395
 #: ../src/cairo-dock-file-manager.c:416 ../src/cairo-dock-file-manager.c:421
+#: ../src/cairo-dock-file-manager.c:423
 #, fuzzy, c-format
 msgid "%s is now %s"
 msgstr "%s is now %s"
 
 #: ../src/cairo-dock-file-manager.c:394 ../src/cairo-dock-file-manager.c:395
 #: ../src/cairo-dock-file-manager.c:416 ../src/cairo-dock-file-manager.c:421
+#: ../src/cairo-dock-file-manager.c:423
 msgid "mounted"
 msgstr "マウント済み"
 
 #: ../src/cairo-dock-file-manager.c:394 ../src/cairo-dock-file-manager.c:395
 #: ../src/cairo-dock-file-manager.c:416 ../src/cairo-dock-file-manager.c:421
+#: ../src/cairo-dock-file-manager.c:423
 msgid "unmounted"
 msgstr "アンマウント済み"
 
@@ -1669,4 +1668,20 @@ msgstr ""
 
 #: ../data/messages:171
 msgid "Show hidden files ?"
+msgstr ""
+
+#: ../data/messages:83
+msgid ""
+"To the right, you can control the transparency of minimized windows, to the "
+"left the transparency of visible windows. The more you go aside, the more "
+"the concerned icons will be transparent; on the middle, icons are always "
+"plain."
+msgstr ""
+
+#: ../data/messages:471
+msgid "Desklets"
+msgstr ""
+
+#: ../data/messages:473
+msgid "Background color (r,v,b,a) :"
 msgstr ""

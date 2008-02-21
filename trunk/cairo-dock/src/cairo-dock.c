@@ -38,7 +38,7 @@
 **    great deal by sending me additional tweaked and optimized versions. I've
 **    now merged all that with my recent additions.
 **
-*********************** VERSION 1.x.x (2007)*********************
+*********************** VERSION 1.x.x (2007-20008)*********************
 **
 ** author(s) :
 **     Fabrice Rey <fabounet@users.berlios.de>
@@ -208,6 +208,8 @@ gchar *g_cDialogMessagePolice = NULL;  // police de caracteres des etiquettes.
 int g_iDialogMessageWeight;  // epaisseur des traits.
 int g_iDialogMessageStyle;  // italique ou droit.
 double g_fDialogTextColor[4];
+
+double g_fDeskletColor[4];
 
 gboolean g_bKeepAbove = FALSE;
 gboolean g_bSkipPager = TRUE;
