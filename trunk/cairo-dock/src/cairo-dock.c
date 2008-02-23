@@ -210,6 +210,7 @@ int g_iDialogMessageStyle;  // italique ou droit.
 double g_fDialogTextColor[4];
 
 double g_fDeskletColor[4];
+double g_fDeskletColorInside[4];
 
 gboolean g_bKeepAbove = FALSE;
 gboolean g_bSkipPager = TRUE;

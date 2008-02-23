@@ -609,6 +609,10 @@ struct _CairoDockDesklet {
 	gint iSidWritePosition;
 	/// un timer pour retarder l'ecriture dans le fichier lors des redimensionnements.
 	gint iSidWriteSize;
+	/// compeur pour le fondu lors de l'entree dans le desklet.
+	gint iGradationCount;
+	/// timer associe.
+	gint iSidGradationOnEnter;
 };
 
 

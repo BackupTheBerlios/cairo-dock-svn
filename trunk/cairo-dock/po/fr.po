@@ -1717,3 +1717,7 @@ msgstr ""
 #: ../data/messages:473
 msgid "Background color (r,v,b,a) :"
 msgstr ""
+
+#: ../data/messages:475
+msgid "Background color when mouse hovers it (r,v,b,a) :"
+msgstr ""

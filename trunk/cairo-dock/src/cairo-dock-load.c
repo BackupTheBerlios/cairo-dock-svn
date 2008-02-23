@@ -162,15 +162,16 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 			icon->pIconBuffer = cairo_dock_create_surface_from_image (cIconPath,
 				pSourceContext,
 				fMaxScale,
-				(bApplySizeRestriction ? g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] : 0),
-				(bApplySizeRestriction ? g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] : 0),
-				(bApplySizeRestriction ? g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] : 0),
-				(bApplySizeRestriction ? g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] : 0),
+				(bApplySizeRestriction ? g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] : icon->fWidth),
+				(bApplySizeRestriction ? g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] : icon->fHeight),
+				(bApplySizeRestriction ? g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] : icon->fWidth),
+				(bApplySizeRestriction ? g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] : icon->fHeight),
 				(bHorizontalDock ? &icon->fWidth : &icon->fHeight),
 				(bHorizontalDock ? &icon->fHeight : &icon->fWidth),
 				0,
 				1,
 				FALSE);
+			//g_print (" => %.2fx%.2f\n", icon->fWidth, icon->fHeight);
 			/*int w = (int) icon->fWidth * (1 + g_fAmplitude), h = (int) icon->fHeight * (1 + g_fAmplitude);
 			guchar *pSurfaceData = g_new0 (guchar, w * h * 4);
 			icon->pIconBuffer = cairo_image_surface_create_for_data (pSurfaceData,
@@ -179,14 +180,14 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 				h,
 				w * 4);
 			cd_message (" + (%dx%d)\n", w, h);
-
+			
 			cairo_t* pCairoContext = cairo_create (icon->pIconBuffer);
 			cairo_set_source_surface (pCairoContext, pSurface, 0.0, 0.0);
 			cairo_paint (pCairoContext);
 			cairo_destroy (pCairoContext);
 			cairo_surface_destroy (pSurface);*/
 		}
-
+		
 		g_free (cIconPath);
 	}
 	else if (CAIRO_DOCK_IS_VALID_APPLI (icon))  // c'est l'icône d'une appli valide.

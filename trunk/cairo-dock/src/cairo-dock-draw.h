@@ -73,6 +73,9 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock);
 void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect, gboolean bUseText, int iWidth);
 void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, double fRatio);
 
+void cairo_dock_render_one_icon_in_desklet (Icon *icon, cairo_t *pCairoContext, gboolean bUseReflect, gboolean bUseText, int iWidth);
+
+
 /**
 *Dessine une ficelle reliant le centre de toutes les icones, en commencant par la 1ere dessinee.
 *@param pCairoContext le contexte du dessin, n'est pas altere par la fonction.

@@ -45,6 +45,7 @@ extern CairoDock *g_pMainDock;
 extern gchar *g_cConfFile;
 extern int g_iDockRadius;
 extern double g_fDeskletColor[4];
+extern double g_fDeskletColorInside[4];
 extern gboolean g_bSticky;
 
 static gboolean on_expose_desklet(GtkWidget *pWidget,
@@ -71,12 +72,15 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
   cairo_save (pCairoContext);
 
 	//set the color
-	if (gtk_window_is_active(GTK_WINDOW(pDesklet->pWidget)))
-		cairo_set_source_rgba (pCairoContext, g_fDeskletColor[0], g_fDeskletColor[1], g_fDeskletColor[2], MAX (.2, MIN (1., g_fDeskletColor[3] * 1.25)));
-	else if (pDesklet->bInside)
-		cairo_set_source_rgba (pCairoContext, g_fDeskletColor[0], g_fDeskletColor[1], g_fDeskletColor[2], MAX (.1, g_fDeskletColor[3]));
-	else
-		cairo_set_source_rgba (pCairoContext, g_fDeskletColor[0], g_fDeskletColor[1], g_fDeskletColor[2], g_fDeskletColor[3] * .75);
+	double fColor[4];
+	int i;
+	for (i = 0; i < 4; i ++)
+	{
+		fColor[i] = (g_fDeskletColorInside[i] * pDesklet->iGradationCount + g_fDeskletColor[i] * (10 - pDesklet->iGradationCount)) / 10;
+	}
+	 if (gtk_window_is_active (GTK_WINDOW (pDesklet->pWidget)))
+		fColor[3] = MIN (1., fColor[3] * 1.25);
+	cairo_set_source_rgba (pCairoContext, fColor[0], fColor[1], fColor[2], fColor[3]);
 	cairo_save (pCairoContext);
 	cairo_set_line_width (pCairoContext, g_iDockRadius);
 	cairo_set_line_join (pCairoContext, CAIRO_LINE_JOIN_ROUND);
@@ -210,7 +214,7 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 		{
 			pDesklet->diff_x = - pButton->x;  // pour le deplacement manuel.
 			pDesklet->diff_y = - pButton->y;
-			pDesklet->moving = TRUE;
+			///pDesklet->moving = TRUE;  // on ne peut pas le mettre a TRUE ici, sinon au release, on saute toujours le lancement de la notification.
 			cd_debug ("diff : %d;%d", pDesklet->diff_x, pDesklet->diff_y);
 		}
 		else if (pButton->type == GDK_BUTTON_RELEASE)
@@ -219,13 +223,6 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 			if (pDesklet->moving)
 			{
 				pDesklet->moving = FALSE;
-				/*if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModule != NULL)
-					cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
-						G_TYPE_INT, "Desklet", "x position", pDesklet->iWindowPositionX,
-						G_TYPE_INT, "Desklet", "y position", pDesklet->iWindowPositionY,
-						G_TYPE_INT, "Desklet", "width", pDesklet->iWidth,
-						G_TYPE_INT, "Desklet", "height", pDesklet->iHeight,
-						G_TYPE_INVALID);*/
 			}
 			else
 			{
@@ -241,7 +238,7 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 	}
 	else if (pButton->button == 3 && pButton->type == GDK_BUTTON_PRESS)  // clique droit.
 	{
-		GtkWidget *menu = cairo_dock_build_menu (pDesklet->pIcon, pDesklet);  // genere un CAIRO_DOCK_BUILD_MENU.
+		GtkWidget *menu = cairo_dock_build_menu (pDesklet->pIcon, CAIRO_DOCK_CONTAINER (pDesklet));  // genere un CAIRO_DOCK_BUILD_MENU.
 		gtk_widget_show_all (menu);
 		gtk_menu_popup (GTK_MENU (menu),
 			NULL,
@@ -264,32 +261,23 @@ static gboolean on_motion_notify_desklet(GtkWidget *pWidget,
 	GdkEventMotion* pMotion,
 	CairoDockDesklet *pDesklet)
 {
-	if (pMotion->state & GDK_BUTTON1_MASK && pDesklet->moving)
+	if (pMotion->state & GDK_BUTTON1_MASK /**&& pDesklet->moving*/)
 	{
 		cd_debug ("root : %d;%d", (int) pMotion->x_root, (int) pMotion->y_root);
-		//pDesklet->moving = TRUE;
+		pDesklet->moving = TRUE;
 		gtk_window_move (GTK_WINDOW (pWidget),
 			pMotion->x_root + pDesklet->diff_x,
 			pMotion->y_root + pDesklet->diff_y);
 		return TRUE;
 	}
+	else  // le 'press-button' est local au sous-widget clique, alors que le 'motion-notify' est global a la fenetre; c'est donc par lui qu'on peut avoir a coup sur les coordonnees du curseur (juste avant le clic).
+	{
+		pDesklet->diff_x = -pMotion->x;
+		pDesklet->diff_y = -pMotion->y;
+		cd_debug ("diff : %d;%d", pDesklet->diff_x, pDesklet->diff_y);
+	}
 	return FALSE;
 }
-
-
-static void on_button_press_desklet_nbt(GtkButton *button, CairoDockDesklet *pDesklet)
-{
-	GtkWidget *menu = cairo_dock_build_menu (pDesklet->pIcon, pDesklet);  // genere un CAIRO_DOCK_BUILD_MENU.
-	gtk_widget_show_all (menu);
-	gtk_menu_popup (GTK_MENU (menu),
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		1,
-		gtk_get_current_event_time ());
-}
-
 
 
 static gboolean cd_desklet_on_focus_in_out(GtkWidget *widget,
@@ -301,14 +289,34 @@ static gboolean cd_desklet_on_focus_in_out(GtkWidget *widget,
 	return FALSE;
 }
 
-gboolean on_enter_desklet (GtkWidget* pWidget,
+static gboolean _cairo_dock_desklet_gradation (CairoDockDesklet *pDesklet)
+{
+	pDesklet->iGradationCount += (pDesklet->bInside ? 1 : -1);
+	gtk_widget_queue_draw (pDesklet->pWidget);
+	
+	if (pDesklet->iGradationCount <= 0 || pDesklet->iGradationCount >= 10)
+	{
+		if (pDesklet->iGradationCount < 0)
+			pDesklet->iGradationCount = 0;
+		else if (pDesklet->iGradationCount > 10)
+			pDesklet->iGradationCount = 10;
+		pDesklet->iSidGradationOnEnter = 0;
+		return FALSE;
+	}
+	return TRUE;
+}
+static gboolean on_enter_desklet (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDockDesklet *pDesklet)
 {
+	cd_debug ("%s (%d)", __func__, pDesklet->bInside);
 	if (! pDesklet->bInside)  // avant on etait dehors, on redessine donc.
 	{
 		pDesklet->bInside = TRUE;
-		gtk_widget_queue_draw (pWidget);
+		if (pDesklet->iSidGradationOnEnter == 0)
+		{
+			pDesklet->iSidGradationOnEnter = g_timeout_add (50, (GSourceFunc) _cairo_dock_desklet_gradation, (gpointer) pDesklet);
+		}
 	}
 	return FALSE;
 }
@@ -317,6 +325,7 @@ static gboolean on_leave_desklet (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDockDesklet *pDesklet)
 {
+	cd_debug ("%s (%d)", __func__, pDesklet->bInside);
 	int iMouseX, iMouseY;
 	gdk_window_get_pointer (pWidget->window, &iMouseX, &iMouseY, NULL);
 	if (iMouseX > 0 && iMouseX < pDesklet->iWidth && iMouseY > 0 && iMouseY < pDesklet->iHeight)  // en fait on est dans un widget fils, donc on ne fait rien.
@@ -325,7 +334,10 @@ static gboolean on_leave_desklet (GtkWidget* pWidget,
 	}
 
 	pDesklet->bInside = FALSE;
-	gtk_widget_queue_draw (pWidget);
+	if (pDesklet->iSidGradationOnEnter == 0)
+	{
+		pDesklet->iSidGradationOnEnter = g_timeout_add (50, (GSourceFunc) _cairo_dock_desklet_gradation, (gpointer) pDesklet);
+	}
 	return FALSE;
 }
 

@@ -198,7 +198,7 @@ cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo
 
 cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern)
 {
-	//g_print ("%s (%s)\n", __func__, cImagePath);
+	//g_print ("%s (%s ; %dx%d)\n", __func__, cImagePath, iMinIconAuthorizedWidth, iMinIconAuthorizedHeight);
 	g_return_val_if_fail (cImagePath != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	GError *erreur = NULL;
 	RsvgDimensionData rsvg_dimension_data;
@@ -253,8 +253,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 		{
 			*fImageWidth = (double) cairo_image_surface_get_width (surface_ini);
 			*fImageHeight = (double) cairo_image_surface_get_height (surface_ini);
-			//g_print ("%.2f x %.2f\n", *fImageWidth, *fImageHeight);
-
+			
 			if (! bReapeatAsPattern)
 				cairo_dock_calculate_contrainted_icon_size (fImageWidth,
 					fImageHeight,
@@ -264,15 +263,16 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 					iMaxIconAuthorizedHeight,
 					&fIconWidthSaturationFactor,
 					&fIconHeightSaturationFactor);
-
+			
+			//g_print ("%.2f x %.2f\n", *fImageWidth, *fImageHeight);
 			pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 				CAIRO_CONTENT_COLOR_ALPHA,
 				ceil ((*fImageWidth) * fMaxScale),
 				ceil ((*fImageHeight) * fMaxScale));
 			pCairoContext = cairo_create (pNewSurface);
-
+			
 			cairo_scale (pCairoContext, fMaxScale * fIconWidthSaturationFactor, fMaxScale * fIconHeightSaturationFactor);
-
+			
 			cairo_set_source_surface (pCairoContext, surface_ini, 0, 0);
 			cairo_paint (pCairoContext);
 			cairo_surface_destroy (surface_ini);

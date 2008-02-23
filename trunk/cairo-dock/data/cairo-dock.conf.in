@@ -529,4 +529,7 @@ message italic = false
 [Desklets]
 
 #c+4[0;1] Background color (r,v,b,a) :
-background color = 1.0; 1.0; 1.0; 0.7
+background color = 1.0; 1.0; 1.0; 0.3
+
+#c+4[0;1] Background color when mouse hovers it (r,v,b,a) :
+background color inside = 1.0; 1.0; 1.0; 0.7

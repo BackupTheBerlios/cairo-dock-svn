@@ -15,7 +15,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 
 void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file)
 {
-	cd_message ("%s (%s)\n", __func__, conf_file);
+	cd_message ("%s (%s)", __func__, conf_file);
 	GError *erreur = NULL;
 
 	gchar *cDirectory = g_path_get_dirname (conf_file);
@@ -30,7 +30,7 @@ void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file)
 	gchar *new_conf_file = g_key_file_to_data (key_file, &length, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Error while fetching data : %s\n", erreur->message);
+		cd_warning ("Error while fetching data : %s", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
@@ -38,7 +38,7 @@ void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file)
 	g_file_set_contents (conf_file, new_conf_file, length, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Error while writing data : %s\n", erreur->message);
+		cd_warning ("Error while writing data : %s", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
@@ -48,11 +48,11 @@ void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file)
 void cairo_dock_flush_conf_file_full (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath, gboolean bUseFileKeys, gchar *cTemplateFileName)
 {
 	gchar *cTranslatedConfFilePath = g_strdup_printf ("%s/%s", cShareDataDirPath, cTemplateFileName);
-	cd_message ("%s (%s)\n", __func__, cTranslatedConfFilePath);
+	cd_message ("%s (%s)", __func__, cTranslatedConfFilePath);
 
 	if (! g_file_test (cTranslatedConfFilePath, G_FILE_TEST_EXISTS))
 	{
-		cd_message ("Attention : couldn't find any installed conf file\n");
+		cd_warning ("Attention : couldn't find any installed conf file");
 	}
 	else
 	{
@@ -87,7 +87,7 @@ void cairo_dock_replace_comments (GKeyFile *pOriginalKeyFile, GKeyFile *pReplace
 		g_key_file_set_comment (pOriginalKeyFile, NULL, NULL, cKeyComment, &erreur);
 		if (erreur != NULL)
 		{
-			cd_message ("Attention : %s\n", erreur->message);
+			cd_warning ("Attention : %s", erreur->message);
 			g_error_free (erreur);
 			erreur = NULL;
 		}
@@ -110,7 +110,7 @@ void cairo_dock_replace_comments (GKeyFile *pOriginalKeyFile, GKeyFile *pReplace
 			cKeyComment =  g_key_file_get_comment (pReplacementKeyFile, cGroupName, cKeyName, &erreur);
 			if (erreur != NULL)
 			{
-				cd_message ("Attention : %s\n", erreur->message);
+				cd_warning ("Attention : %s", erreur->message);
 				g_error_free (erreur);
 				erreur = NULL;
 			}
@@ -136,7 +136,7 @@ void cairo_dock_replace_comments (GKeyFile *pOriginalKeyFile, GKeyFile *pReplace
 
 void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pReplacementKeyFile, gboolean bUseOriginalKeys, gchar iIdentifier)
 {
-	cd_message ("%s (%d)\n", __func__, iIdentifier);
+	cd_message ("%s (%d)", __func__, iIdentifier);
 	GError *erreur = NULL;
 	gsize length = 0;
 	gchar **pKeyList;
@@ -174,7 +174,7 @@ void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pRepla
 			cKeyValue =  g_key_file_get_string (pReplacementKeyFile, cGroupName, cKeyName, &erreur);
 			if (erreur != NULL)
 			{
-				cd_message ("Attention : %s\n", erreur->message);
+				cd_warning ("Attention : %s", erreur->message);
 				g_error_free (erreur);
 				erreur = NULL;
 			}
@@ -281,7 +281,7 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 	g_key_file_load_from_file (pKeyFile, cConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
@@ -290,7 +290,7 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 	gchar *cOldComment = g_key_file_get_comment (pKeyFile, cGroupName, cKeyName, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
@@ -345,7 +345,7 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 	g_key_file_set_comment (pKeyFile, cGroupName, cKeyName, sComment->str, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
@@ -364,7 +364,7 @@ void cairo_dock_apply_translation_on_conf_file (gchar *cConfFilePath, gchar *cTr
 	g_key_file_load_from_file (pConfKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
@@ -373,7 +373,7 @@ void cairo_dock_apply_translation_on_conf_file (gchar *cConfFilePath, gchar *cTr
 	g_key_file_load_from_file (pTranslatedKeyFile, cTranslatedConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		g_key_file_free (pConfKeyFile);
 		return ;
@@ -395,7 +395,7 @@ void cairo_dock_replace_values_in_conf_file (gchar *cConfFilePath, GKeyFile *pVa
 	g_key_file_load_from_file (pConfKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
@@ -415,7 +415,7 @@ void cairo_dock_replace_keys_by_identifier (gchar *cConfFilePath, gchar *cReplac
 	g_key_file_load_from_file (pReplacementKeyFile, cReplacementConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
@@ -462,7 +462,6 @@ gboolean cairo_dock_conf_file_needs_update (GKeyFile *pKeyFile, gchar *cVersion)
 {
 	gchar *cPreviousVersion = NULL;
 	cairo_dock_get_conf_file_version (pKeyFile, &cPreviousVersion);
-	cd_debug ("%s <> %s\n", cVersion, cPreviousVersion);
 	
 	gboolean bNeedsUpdate;
 	if (cPreviousVersion == NULL || strcmp (cPreviousVersion, cVersion) != 0)
