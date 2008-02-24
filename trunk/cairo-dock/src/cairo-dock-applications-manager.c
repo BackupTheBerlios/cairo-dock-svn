@@ -170,7 +170,7 @@ void cairo_dock_close_xwindow (Window Xid)
 {
 	//g_print ("%s (%d)\n", __func__, Xid);
 	g_return_if_fail (Xid > 0);
-
+	
 	if (g_bUniquePid)
 	{
 		gulong *pPidBuffer = NULL;
@@ -190,7 +190,7 @@ void cairo_dock_close_xwindow (Window Xid)
 	else
 	{
 		XEvent xClientMessage;
-
+		
 		xClientMessage.xclient.type = ClientMessage;
 		xClientMessage.xclient.serial = 0;
 		xClientMessage.xclient.send_event = True;
@@ -289,7 +289,7 @@ void cairo_dock_minimize_xwindow (Window Xid)
 	//cairo_dock_set_xwindow_timestamp (Xid, cairo_dock_get_xwindow_timestamp (root));
 }
 
-void cairo_dock_maximize_xwindow (Window Xid, gboolean bMaximize)
+static void _cairo_dock_change_window_state (Window Xid, gulong iNewValue, Atom iProperty1, Atom iProperty2)
 {
 	g_return_if_fail (Xid > 0);
 	XEvent xClientMessage;
@@ -301,9 +301,9 @@ void cairo_dock_maximize_xwindow (Window Xid, gboolean bMaximize)
 	xClientMessage.xclient.window = Xid;
 	xClientMessage.xclient.message_type = s_aNetWmState;
 	xClientMessage.xclient.format = 32;
-	xClientMessage.xclient.data.l[0] = bMaximize;
-	xClientMessage.xclient.data.l[1] = XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_VERT", False);
-	xClientMessage.xclient.data.l[2] = XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+	xClientMessage.xclient.data.l[0] = iNewValue;
+	xClientMessage.xclient.data.l[1] = iProperty1;
+	xClientMessage.xclient.data.l[2] = iProperty2;
 	xClientMessage.xclient.data.l[3] = 2;
 	xClientMessage.xclient.data.l[4] = 0;
 
@@ -315,35 +315,23 @@ void cairo_dock_maximize_xwindow (Window Xid, gboolean bMaximize)
 		&xClientMessage);
 
 	cairo_dock_set_xwindow_timestamp (Xid, cairo_dock_get_xwindow_timestamp (root));
+}
+
+void cairo_dock_maximize_xwindow (Window Xid, gboolean bMaximize)
+{
+	_cairo_dock_change_window_state (Xid, bMaximize, XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_VERT", False), XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_HORZ", False));
 }
 
 void cairo_dock_set_xwindow_fullscreen (Window Xid, gboolean bFullScreen)
 {
-	g_return_if_fail (Xid > 0);
-	XEvent xClientMessage;
-
-	xClientMessage.xclient.type = ClientMessage;
-	xClientMessage.xclient.serial = 0;
-	xClientMessage.xclient.send_event = True;
-	xClientMessage.xclient.display = s_XDisplay;
-	xClientMessage.xclient.window = Xid;
-	xClientMessage.xclient.message_type = s_aNetWmState;
-	xClientMessage.xclient.format = 32;
-	xClientMessage.xclient.data.l[0] = bFullScreen;
-	xClientMessage.xclient.data.l[1] = s_aNetWmFullScreen;
-	xClientMessage.xclient.data.l[2] = 0;
-	xClientMessage.xclient.data.l[3] = 2;
-	xClientMessage.xclient.data.l[4] = 0;
-
-	Window root = DefaultRootWindow (s_XDisplay);
-	XSendEvent (s_XDisplay,
-		root,
-		False,
-		SubstructureRedirectMask | SubstructureNotifyMask,
-		&xClientMessage);
-
-	cairo_dock_set_xwindow_timestamp (Xid, cairo_dock_get_xwindow_timestamp (root));
+	_cairo_dock_change_window_state (Xid, bFullScreen, s_aNetWmFullScreen, 0);
 }
+
+void cairo_dock_set_xwindow_above (Window Xid, gboolean bAbove)
+{
+	_cairo_dock_change_window_state (Xid, bAbove, s_aNetWmAbove, 0);
+}
+
 
 void cairo_dock_move_xwindow_to_nth_desktop (Window Xid, int iDesktopNumber, int iDesktopViewportX, int iDesktopViewportY)
 {

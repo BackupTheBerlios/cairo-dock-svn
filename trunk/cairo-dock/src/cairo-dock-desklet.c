@@ -343,14 +343,15 @@ static gboolean on_leave_desklet (GtkWidget* pWidget,
 
 
 
-CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiveWidget)
+CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiveWidget, gboolean bOnWidgetLayer)
 {
   cd_message ("%s ()", __func__);
   CairoDockDesklet *pDesklet = g_new0(CairoDockDesklet, 1);
   pDesklet->iType = CAIRO_DOCK_TYPE_DESKLET;
   pDesklet->bIsHorizontal = TRUE;
   GtkWidget* pWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-
+	if (bOnWidgetLayer)
+		gtk_window_set_type_hint (GTK_WINDOW (pWindow), GDK_WINDOW_TYPE_HINT_UTILITY);
   pDesklet->pWidget = pWindow;
   pDesklet->pIcon = pIcon;
 

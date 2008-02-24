@@ -41,7 +41,7 @@
 */
 #define CAIRO_DOCK_DESKLET(pContainer) ((CairoDockDesklet *)pContainer)
 
-CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiveWidget);
+CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiveWidget, gboolean bOnWidgetLayer);
 
 void cairo_dock_place_desklet (CairoDockDesklet *pDesklet, CairoDockMinimalAppletConfig *pMinimalConfig);
 

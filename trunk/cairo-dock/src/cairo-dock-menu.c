@@ -92,6 +92,7 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 
 	gchar *cImagePath = g_strdup_printf ("%s/cairo-dock.svg", CAIRO_DOCK_SHARE_DATA_DIR);
 	GtkWidget *pImage = gtk_image_new_from_file (cImagePath);
+	g_free (cImagePath);
 #if GTK_MINOR_VERSION >= 12
 	gtk_message_dialog_set_image (GTK_MESSAGE_DIALOG (pDialog), pImage);
 #endif
@@ -723,6 +724,18 @@ static void cairo_dock_move_appli_to_current_desktop (GtkMenuItem *menu_item, gp
 	}
 }
 
+static void cairo_dock_change_window_above (GtkMenuItem *menu_item, gpointer *data)
+{
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
+	if (icon->Xid > 0)
+	{
+		gboolean bIsAbove=FALSE, bIsBelow=FALSE;
+		cairo_dock_window_is_above_or_below (icon->Xid, &bIsAbove, &bIsBelow);
+		cairo_dock_set_xwindow_above (icon->Xid, ! bIsAbove);
+	}
+}
+
 
 static void cairo_dock_swap_with_prev_icon (GtkMenuItem *menu_item, gpointer *data)
 {
@@ -984,11 +997,15 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 		GtkWidget *pSubMenuOtherActions = gtk_menu_new ();
 		gtk_menu_item_set_submenu (GTK_MENU_ITEM (menu_item), pSubMenuOtherActions);
-
+		
 		gboolean bIsFullScreen = cairo_dock_window_is_fullscreen (icon->Xid);
-		_add_entry_in_menu (bIsFullScreen ? _("Not Fullscreen") : _("Fullscreen"), GTK_STOCK_FULLSCREEN, cairo_dock_set_appli_fullscreen, pSubMenuOtherActions);
-
+		_add_entry_in_menu (bIsFullScreen ? _("Not Fullscreen") : _("Fullscreen"), bIsFullScreen ? GTK_STOCK_LEAVE_FULLSCREEN : GTK_STOCK_FULLSCREEN, cairo_dock_set_appli_fullscreen, pSubMenuOtherActions);
+		
 		_add_entry_in_menu (_("Move to this desktop"), GTK_STOCK_JUMP_TO, cairo_dock_move_appli_to_current_desktop, pSubMenuOtherActions);
+		
+		gboolean bIsAbove=FALSE, bIsBelow=FALSE;
+		cairo_dock_window_is_above_or_below (icon->Xid, &bIsAbove, &bIsBelow);
+		_add_entry_in_menu (bIsAbove ? _("Don't keep above") : _("Keep above"), bIsAbove ? GTK_STOCK_GOTO_BOTTOM : GTK_STOCK_GOTO_TOP, cairo_dock_change_window_above, pSubMenuOtherActions);
 	}
 	else if (CAIRO_DOCK_IS_VALID_APPLET (icon))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module.
 	{

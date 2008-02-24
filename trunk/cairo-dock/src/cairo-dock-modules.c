@@ -504,7 +504,7 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 			
 			if (module->bCanDetach && pMinimalConfig->bIsDetached)
 			{
-				CairoDockDesklet *pDesklet = cairo_dock_create_desklet (NULL, NULL);
+				CairoDockDesklet *pDesklet = cairo_dock_create_desklet (NULL, NULL, pMinimalConfig->bOnWidgetLayer);
 				pContainer = CAIRO_DOCK_CONTAINER (pDesklet);
 				cairo_dock_place_desklet (pDesklet, pMinimalConfig);
 				while (gtk_events_pending ())
@@ -618,7 +618,7 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 					{
 						cairo_dock_detach_icon_from_dock (pIcon, CAIRO_DOCK_DOCK (pActualContainer), g_bUseSeparator);
 						cairo_dock_update_dock_size (CAIRO_DOCK_DOCK (pActualContainer));
-						pDesklet = cairo_dock_create_desklet (pIcon, NULL);
+						pDesklet = cairo_dock_create_desklet (pIcon, NULL, pMinimalConfig->bOnWidgetLayer);
 						bContainerTypeChanged = TRUE;
 					}
 					else
