@@ -1117,10 +1117,10 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	{
 		cairo_dock_flush_conf_file (pKeyFile, cConfFilePath, CAIRO_DOCK_SHARE_DATA_DIR);
 
-		cairo_dock_update_conf_file_with_available_modules (cConfFilePath);
+		cairo_dock_update_conf_file_with_available_modules (pKeyFile, cConfFilePath);
 	}
 
-	cairo_dock_update_main_conf_file_with_renderers (cConfFilePath);
+	cairo_dock_update_main_conf_file_with_renderers (pKeyFile, cConfFilePath);
 
 	//\___________________ On applique les modifs au fichier de conf easy.
 	cairo_dock_copy_to_easy_conf_file (pKeyFile, g_cEasyConfFile);
@@ -1590,12 +1590,12 @@ void cairo_dock_copy_to_easy_conf_file (GKeyFile *pMainKeyFile, gchar *cEasyConf
 
 	//\___________________ On ecrit tout.
 	cairo_dock_write_keys_to_file (pKeyFile, cEasyConfFilePath);
-	g_key_file_free (pKeyFile);
-
+	
 	//\___________________ On complete.
-	cairo_dock_update_easy_conf_file_with_available_modules (cEasyConfFilePath);
+	cairo_dock_update_easy_conf_file_with_available_modules (pKeyFile, cEasyConfFilePath);
 
-	cairo_dock_update_easy_conf_file_with_renderers (cEasyConfFilePath);
+	cairo_dock_update_easy_conf_file_with_renderers (pKeyFile, cEasyConfFilePath);
+	g_key_file_free (pKeyFile);
 }
 
 void cairo_dock_build_easy_conf_file (gchar *cMainConfFilePath, gchar *cEasyConfFilePath)

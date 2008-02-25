@@ -665,7 +665,7 @@ static void cairo_dock_remove_module (GtkMenuItem *menu_item, gpointer *data)
 		{
 			cairo_dock_deactivate_module (icon->pModule);
 		}
-		cairo_dock_update_conf_file_with_active_modules (g_cConfFile, g_pMainDock->icons);
+		cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, g_pMainDock->icons);
 		cairo_dock_free_icon (icon);
 	}
 }

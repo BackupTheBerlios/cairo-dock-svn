@@ -313,9 +313,9 @@ void cairo_dock_deactivate_old_modules (double fTime)
 	g_hash_table_foreach (s_hModuleTable, (GHFunc) _cairo_dock_deactivate_one_old_module, &fTime);
 }
 
-void cairo_dock_update_conf_file_with_available_modules_full (gchar *cConfFile, gchar *cGroupName, gchar *cKeyName)
+void cairo_dock_update_conf_file_with_available_modules_full (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cGroupName, gchar *cKeyName)
 {
-	cairo_dock_update_conf_file_with_hash_table (cConfFile, s_hModuleTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_module_name, FALSE, FALSE);  // ils sont classes par ordre dans le dock.
+	cairo_dock_update_conf_file_with_hash_table (pOpenedKeyFile, cConfFile, s_hModuleTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_module_name, FALSE, FALSE);  // ils sont classes par ordre dans le dock.
 }
 
 
@@ -328,19 +328,23 @@ static void _cairo_dock_add_one_module_name_if_active (gchar *cModuleName, Cairo
 			*pListeModule = g_slist_prepend (*pListeModule, cModuleName);
 	}
 }
-void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *pIconList)  // garde l'ordre des icones.
+void cairo_dock_update_conf_file_with_active_modules (GKeyFile *pOpenedKeyFile, gchar *cConfFile, GList *pIconList)  // garde l'ordre des icones.
 {
 	cd_message ("%s ()\n", __func__);
 	GError *erreur = NULL;
 
 	//\___________________ On ouvre le fichier de conf.
-	GKeyFile *pKeyFile = g_key_file_new ();
-	g_key_file_load_from_file (pKeyFile, cConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
-	if (erreur != NULL)
+	GKeyFile *pKeyFile = pOpenedKeyFile;
+	if (pKeyFile == NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
-		g_error_free (erreur);
-		return ;
+		pKeyFile = g_key_file_new ();
+		g_key_file_load_from_file (pKeyFile, cConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+		if (erreur != NULL)
+		{
+			cd_message ("Attention : %s\n", erreur->message);
+			g_error_free (erreur);
+			return ;
+		}
 	}
 
 	//\___________________ On dresse la liste des modules actifs, en conservant leur ordre dans le dock.
@@ -374,7 +378,8 @@ void cairo_dock_update_conf_file_with_active_modules (gchar *cConfFile, GList *p
 
 	g_slist_free (pListeModule);
 	g_string_free (cActiveModules, TRUE);
-	g_key_file_free (pKeyFile);
+	if (pOpenedKeyFile == NULL)
+		g_key_file_free (pKeyFile);
 }
 
 
@@ -693,7 +698,7 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 		if (erreur != NULL)
 		{
 			module->bActive = FALSE;
-			cairo_dock_update_conf_file_with_active_modules (g_cConfFile, g_pMainDock->icons);
+			cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, g_pMainDock->icons);
 			cd_warning ("Attention : %s", erreur->message);
 			g_error_free (erreur);
 		}

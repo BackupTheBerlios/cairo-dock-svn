@@ -36,7 +36,7 @@ int cairo_dock_ask_initial_theme (void);
 
 gboolean cairo_dock_manage_themes (GtkWidget *pWidget);
 
-#define cairo_dock_update_conf_file_with_themes(cAppletConfFilePath, pThemeTable, cGroupName, cKeyName) cairo_dock_update_conf_file_with_hash_table (cAppletConfFilePath, pThemeTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_theme_name, TRUE, FALSE)
+#define cairo_dock_update_conf_file_with_themes(pOpenedKeyFile, cAppletConfFilePath, pThemeTable, cGroupName, cKeyName) cairo_dock_update_conf_file_with_hash_table (pOpenedKeyFile, cAppletConfFilePath, pThemeTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_theme_name, TRUE, FALSE)
 
 
 #endif

@@ -276,6 +276,8 @@ gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoDockContainer *p
 */
 #define CD_APPLET_MY_CONF_FILE cConfFilePath
 
+#define CD_APPLET_MY_KEY_FILE pKeyFile
+
 
 //\_________________________________ CONFIG
 //\______________________ read_conf_file.

@@ -205,7 +205,7 @@ gchar* cairo_dock_manage_themes_for_applet (gchar *cAppletShareDataDir, gchar *c
 	GHashTable *pThemeTable = cairo_dock_list_themes (cThemesDirPath, NULL, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
@@ -214,13 +214,13 @@ gchar* cairo_dock_manage_themes_for_applet (gchar *cAppletShareDataDir, gchar *c
 	gchar *cThemePath = NULL;
 	if (pThemeTable != NULL)
 	{
-		cairo_dock_update_conf_file_with_hash_table (cAppletConfFilePath, pThemeTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_theme_name, TRUE, FALSE);
-
+		cairo_dock_update_conf_file_with_themes (pKeyFile, cAppletConfFilePath, pThemeTable, cGroupName, cKeyName);
+		
 		gchar *cChosenThemeName = cairo_dock_get_string_key_value (pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, cDefaultThemeName, NULL, NULL);
 		if (cChosenThemeName != NULL)
 			cThemePath = g_strdup (g_hash_table_lookup (pThemeTable, cChosenThemeName));
 		g_free (cChosenThemeName);
-
+		
 		if (cThemePath == NULL && cDefaultThemeName != NULL)
 			cThemePath = g_strdup (g_hash_table_lookup (pThemeTable, cDefaultThemeName));
 
@@ -237,4 +237,3 @@ GtkWidget *cairo_dock_create_sub_menu (gchar *cLabel, GtkWidget *pMenu)
 	gtk_menu_item_set_submenu (GTK_MENU_ITEM (pMenuItem), pSubMenu);
 	return pSubMenu;
 }
-

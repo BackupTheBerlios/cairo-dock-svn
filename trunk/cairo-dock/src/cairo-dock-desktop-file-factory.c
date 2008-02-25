@@ -3,7 +3,7 @@
 This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
 ******************************************************************************/
 #include <stdlib.h>
@@ -282,7 +282,7 @@ void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath, CairoDock
 	g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
@@ -290,9 +290,10 @@ void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath, CairoDock
 	if (cairo_dock_conf_file_needs_update (pKeyFile, CAIRO_DOCK_VERSION))
 		cairo_dock_flush_conf_file_full (pKeyFile, cDesktopFilePath, CAIRO_DOCK_SHARE_DATA_DIR, FALSE, (iLauncherType == CAIRO_DOCK_LAUNCHER_FOR_CONTAINER ? CAIRO_DOCK_CONTAINER_CONF_FILE : iLauncherType == CAIRO_DOCK_LAUNCHER_FOR_SEPARATOR ? CAIRO_DOCK_SEPARATOR_CONF_FILE : CAIRO_DOCK_LAUNCHER_CONF_FILE));
 
-	cairo_dock_update_conf_file_with_hash_table (cDesktopFilePath, g_hDocksTable, "Desktop Entry", "Container", NULL, (GHFunc)cairo_dock_write_one_name, FALSE, FALSE);
+	cairo_dock_update_conf_file_with_hash_table (pKeyFile, cDesktopFilePath, g_hDocksTable, "Desktop Entry", "Container", NULL, (GHFunc)cairo_dock_write_one_name, FALSE, FALSE);
 	if (iLauncherType == CAIRO_DOCK_LAUNCHER_FOR_CONTAINER)
-		cairo_dock_update_launcher_conf_file_with_renderers (cDesktopFilePath);
+		cairo_dock_update_launcher_conf_file_with_renderers (pKeyFile, cDesktopFilePath);
+	g_key_file_free (pKeyFile);
 }
 
 

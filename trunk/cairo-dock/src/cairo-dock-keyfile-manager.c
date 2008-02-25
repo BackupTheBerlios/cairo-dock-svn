@@ -270,22 +270,25 @@ void cairo_dock_write_one_renderer_name (gchar *cName, CairoDockRenderer *pRende
 	g_string_append_printf (pString, "%s;%s;%s;", cName, (pRenderer != NULL && pRenderer->cReadmeFilePath != NULL ? pRenderer->cReadmeFilePath : "none"), (pRenderer != NULL && pRenderer->cPreviewFilePath != NULL ? pRenderer->cPreviewFilePath : "none"));
 }
 
-void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, gchar *cNewUsefullComment, GHFunc pWritingFunc, gboolean bSortByKey, gboolean bAddEmptyEntry)
+void cairo_dock_update_conf_file_with_hash_table (GKeyFile *pOpenedKeyFile, gchar *cConfFile, GHashTable *pModuleTable, gchar *cGroupName, gchar *cKeyName, gchar *cNewUsefullComment, GHFunc pWritingFunc, gboolean bSortByKey, gboolean bAddEmptyEntry)
 {
-	//g_print ("%s (%s)\n", __func__, cConfFile);
+	cd_debug ("%s (%s, %s, %s)", __func__, cConfFile, cGroupName, cKeyName);
 	GError *erreur = NULL;
 
 	//\___________________ On ouvre le fichier de conf.
-	GKeyFile *pKeyFile = g_key_file_new ();
-
-	g_key_file_load_from_file (pKeyFile, cConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
-	if (erreur != NULL)
+	GKeyFile *pKeyFile = pOpenedKeyFile;
+	if (pKeyFile == NULL)
 	{
-		cd_warning ("Attention : %s", erreur->message);
-		g_error_free (erreur);
-		return ;
+		pKeyFile = g_key_file_new ();
+		g_key_file_load_from_file (pKeyFile, cConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+		if (erreur != NULL)
+		{
+			cd_warning ("Attention : %s", erreur->message);
+			g_error_free (erreur);
+			return ;
+		}
 	}
-
+	
 	gchar *cUsefullComment;
 	gchar *cOldComment = g_key_file_get_comment (pKeyFile, cGroupName, cKeyName, &erreur);
 	if (erreur != NULL)
@@ -337,9 +340,7 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 	GString *sComment = g_string_new (cPrefix);
 	g_free (cPrefix);
 	gchar *cTableContent = cairo_dock_write_table_content (pModuleTable, (pWritingFunc != NULL ? pWritingFunc : (GHFunc) cairo_dock_write_one_name), bSortByKey, bAddEmptyEntry);
-	/*g_hash_table_foreach (pModuleTable, (pWritingFunc != NULL ? pWritingFunc : (GHFunc) cairo_dock_write_one_name), sComment);
-	if (sComment->str[sComment->len-1] == ';')  // peut etre faux si aucune valeur n'a ete ecrite.
-		sComment->len --;*/
+	
 	g_string_append_printf (sComment, "%s] %s", cTableContent, (cUsefullComment != NULL ? cUsefullComment : ""));
 	g_free (cTableContent);
 	g_key_file_set_comment (pKeyFile, cGroupName, cKeyName, sComment->str, &erreur);
@@ -352,8 +353,9 @@ void cairo_dock_update_conf_file_with_hash_table (gchar *cConfFile, GHashTable *
 	g_string_free (sComment, TRUE);
 
 	cairo_dock_write_keys_to_file (pKeyFile, cConfFile);
-	g_key_file_free (pKeyFile);
 	g_free (cUsefullComment);
+	if (pOpenedKeyFile == NULL)
+		g_key_file_free (pKeyFile);
 }
 
 void cairo_dock_apply_translation_on_conf_file (gchar *cConfFilePath, gchar *cTranslatedConfFilePath)

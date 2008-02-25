@@ -3,7 +3,7 @@
 This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
 ************************************************************************************/
 #include <string.h>
@@ -102,22 +102,11 @@ gchar *cairo_dock_edit_themes (GHashTable **hThemeTable)
 	const gchar *cTmpDir = g_get_tmp_dir ();
 	gchar *cTmpConfFile = g_strdup_printf ("%s/cairo-dock-init", cTmpDir);
 
-	gchar *cDesktopFileTemplate = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_THEME_CONF_FILE);
-	gchar *cCommand = g_strdup_printf ("cp %s %s", cDesktopFileTemplate, cTmpConfFile);
-	g_free (cDesktopFileTemplate);
+	gchar *cCommand = g_strdup_printf ("cp %s/%s %s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_THEME_CONF_FILE, cTmpConfFile);
 	system (cCommand);
 	g_free (cCommand);
 
 	//\___________________ On met a jour ce fichier de conf.
-	///cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, *hThemeTable, "Themes", "chosen theme", NULL, (GHFunc) cairo_dock_write_one_theme_name, TRUE, FALSE);
-	cairo_dock_update_conf_file_with_themes (cTmpConfFile, *hThemeTable, "Themes", "chosen theme");
-	///cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, hUserThemeTable, "Delete", "wanted themes", NULL, (GHFunc) cairo_dock_write_one_name, TRUE, FALSE);
-	cairo_dock_update_conf_file_with_themes (cTmpConfFile, hUserThemeTable, "Delete", "wanted themes");
-	//g_hash_table_insert (hUserThemeTable, g_strdup (""), g_strdup (""));
-	///cairo_dock_update_conf_file_with_hash_table (cTmpConfFile, hUserThemeTable, "Save", "theme name", NULL, (GHFunc) cairo_dock_write_one_name, TRUE, FALSE);
-	cairo_dock_update_conf_file_with_themes (cTmpConfFile, hUserThemeTable, "Save", "theme name");
-	g_hash_table_destroy (hUserThemeTable);
-
 	GKeyFile *pKeyFile = g_key_file_new ();
 	g_key_file_load_from_file (pKeyFile, cTmpConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
@@ -126,10 +115,14 @@ gchar *cairo_dock_edit_themes (GHashTable **hThemeTable)
 		g_error_free (erreur);
 		return NULL;
 	}
-
+	
+	cairo_dock_update_conf_file_with_themes (pKeyFile, cTmpConfFile, *hThemeTable, "Themes", "chosen theme");
+	cairo_dock_update_conf_file_with_themes (pKeyFile, cTmpConfFile, hUserThemeTable, "Delete", "wanted themes");
+	cairo_dock_update_conf_file_with_themes (pKeyFile, cTmpConfFile, hUserThemeTable, "Save", "theme name");
+	g_hash_table_destroy (hUserThemeTable);
+	
 	g_key_file_set_string (pKeyFile, "Delete", "wanted themes", cUserThemeNames);  // sThemeNames
 	g_free (cUserThemeNames);
-	//g_string_free (sThemeNames, TRUE);
 
 	cairo_dock_write_keys_to_file (pKeyFile, cTmpConfFile);
 	g_key_file_free (pKeyFile);
@@ -208,7 +201,7 @@ void cairo_dock_load_theme (gchar *cThemePath)
 	g_pMainDock->bIsMainDock = TRUE;
 
 	//\___________________ On lit son fichier de conf et on charge tout.
-	cairo_dock_update_conf_file_with_available_modules (g_cConfFile);
+	cairo_dock_update_conf_file_with_available_modules (NULL, g_cConfFile);
 
 	cairo_dock_read_conf_file (g_cConfFile, g_pMainDock);  // chargera des valeurs par defaut si le fichier de conf fourni est incorrect.
 	cairo_dock_mark_theme_as_modified (FALSE);  // le chargement du fichier de conf le marque a 'TRUE'.

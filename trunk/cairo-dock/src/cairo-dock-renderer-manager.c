@@ -3,7 +3,7 @@
 This file is a part of the cairo-dock program, 
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
 ******************************************************************************/
 #include <stdlib.h>
@@ -92,29 +92,29 @@ void cairo_dock_set_default_renderer (CairoDock *pDock)
 }
 
 
-#define _cairo_dock_update_conf_file_with_renderers(cConfFile, cGroupName, cKeyName, bAddEmptyRenderer) cairo_dock_update_conf_file_with_hash_table (cConfFile, s_hRendererTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_renderer_name, FALSE, bAddEmptyRenderer)
+#define _cairo_dock_update_conf_file_with_renderers(pOpenedKeyFile, cConfFile, cGroupName, cKeyName, bAddEmptyRenderer) cairo_dock_update_conf_file_with_hash_table (pOpenedKeyFile, cConfFile, s_hRendererTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_renderer_name, FALSE, bAddEmptyRenderer)
 
-void cairo_dock_update_conf_file_with_renderers (gchar *cConfFile, gchar *cGroupName, gchar *cKeyName)
+void cairo_dock_update_conf_file_with_renderers (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cGroupName, gchar *cKeyName)
 {
-	_cairo_dock_update_conf_file_with_renderers(cConfFile, cGroupName, cKeyName, TRUE);
+	_cairo_dock_update_conf_file_with_renderers(pOpenedKeyFile, cConfFile, cGroupName, cKeyName, TRUE);
 }
 
-void cairo_dock_update_main_conf_file_with_renderers (gchar *cConfFile)
+void cairo_dock_update_main_conf_file_with_renderers (GKeyFile *pOpenedKeyFile, gchar *cConfFile)
 {
-	_cairo_dock_update_conf_file_with_renderers (cConfFile, "Views", "main dock view", FALSE);
-	_cairo_dock_update_conf_file_with_renderers (cConfFile, "Views", "sub-dock view", FALSE);
+	_cairo_dock_update_conf_file_with_renderers (pOpenedKeyFile, cConfFile, "Views", "main dock view", FALSE);
+	_cairo_dock_update_conf_file_with_renderers (pOpenedKeyFile, cConfFile, "Views", "sub-dock view", FALSE);
 }
 
-void cairo_dock_update_launcher_conf_file_with_renderers (gchar *cConfFile)
+void cairo_dock_update_launcher_conf_file_with_renderers (GKeyFile *pOpenedKeyFile, gchar *cConfFile)
 {
-	_cairo_dock_update_conf_file_with_renderers (cConfFile, "Desktop Entry", "Renderer", TRUE);
+	_cairo_dock_update_conf_file_with_renderers (pOpenedKeyFile, cConfFile, "Desktop Entry", "Renderer", TRUE);
 }
 
-void cairo_dock_update_easy_conf_file_with_renderers (gchar *cConfFile)
+void cairo_dock_update_easy_conf_file_with_renderers (GKeyFile *pOpenedKeyFile, gchar *cConfFile)
 {
 	//g_print ("%s (%s)\n", __func__, cConfFile);
-	_cairo_dock_update_conf_file_with_renderers (cConfFile, "Personnalisation", "main dock view", FALSE);
-	_cairo_dock_update_conf_file_with_renderers (cConfFile, "Personnalisation", "sub-dock view", FALSE);
+	_cairo_dock_update_conf_file_with_renderers (pOpenedKeyFile, cConfFile, "Personnalisation", "main dock view", FALSE);
+	_cairo_dock_update_conf_file_with_renderers (pOpenedKeyFile, cConfFile, "Personnalisation", "sub-dock view", FALSE);
 }
 
 static void _cairo_dock_reset_one_dock_view (gchar *cDockName, CairoDock *pDock, gpointer data)
@@ -137,10 +137,4 @@ void cairo_dock_set_all_views_to_default (void)
 {
 	//g_print ("%s ()\n", __func__);
 	g_hash_table_foreach (g_hDocksTable, (GHFunc) _cairo_dock_set_one_dock_view_to_default, NULL);
-}
-
-
-int cairo_dock_get_number_of_renderers (void)
-{
-	return g_hash_table_size (s_hRendererTable);
 }
