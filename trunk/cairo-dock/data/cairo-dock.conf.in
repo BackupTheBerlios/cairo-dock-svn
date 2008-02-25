@@ -76,7 +76,7 @@ close on middle click = true
 
 #b- Automatically quick-hide the dock when a window becomes fullscreen ?
 #{This is only usefull if don't already use the auto-hide, and if your WM let the dock in front of fullscreen windows.}
-auto quick hide = true
+auto quick hide = false
 
 #b- Signal the applications demanding your attention with a dialog tip ?
 demands attention with dialog = true

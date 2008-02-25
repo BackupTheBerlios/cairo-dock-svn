@@ -426,12 +426,12 @@ cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t 
 
 
 
-static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight)
+static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale)
 {
 	g_return_val_if_fail (pSurface != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 
 	//\_______________ On cree la surface d'une fraction hauteur de l'image originale.
-	double fReflectHeight = g_fReflectSize * (1 + g_fAmplitude);
+	double fReflectHeight = g_fReflectSize * fMaxScale;
 	if (fReflectHeight == 0 || g_fAlbedo == 0)
 		return NULL;
 	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
@@ -488,12 +488,12 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_
 	return pNewSurfaceGradated;
 }
 
-static cairo_surface_t * cairo_dock_create_reflection_surface_vertical (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight)
+static cairo_surface_t * cairo_dock_create_reflection_surface_vertical (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale)
 {
 	g_return_val_if_fail (pSurface != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 
 	//\_______________ On cree la surface d'une fraction hauteur de l'image originale.
-	double fReflectWidth = g_fReflectSize * (1 + g_fAmplitude);
+	double fReflectWidth = g_fReflectSize * fMaxScale;
 	if (fReflectWidth == 0 || g_fAlbedo == 0)
 		return NULL;
 	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
@@ -549,21 +549,21 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_vertical (cairo_su
 	return pNewSurfaceGradated;
 }
 
-cairo_surface_t * cairo_dock_create_reflection_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, gboolean bHorizontalDock)
+cairo_surface_t * cairo_dock_create_reflection_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, gboolean bHorizontalDock, double fMaxScale)
 {
 	if (bHorizontalDock)
-		return cairo_dock_create_reflection_surface_horizontal (pSurface, pSourceContext, fImageWidth, fImageHeight);
+		return cairo_dock_create_reflection_surface_horizontal (pSurface, pSourceContext, fImageWidth, fImageHeight,fMaxScale);
 	else
-		return cairo_dock_create_reflection_surface_vertical (pSurface, pSourceContext, fImageWidth, fImageHeight);
+		return cairo_dock_create_reflection_surface_vertical (pSurface, pSourceContext, fImageWidth, fImageHeight, fMaxScale);
 }
 
 
-cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_horizontal (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight)
+cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_horizontal (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale)
 {
 	g_return_val_if_fail (pIconSurface != NULL && pReflectionSurface!= NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 
 	//\_______________ On cree la surface de telle facon qu'elle contienne les 2 surfaces.
-	double fReflectHeight = g_fReflectSize * (1 + g_fAmplitude);
+	double fReflectHeight = g_fReflectSize * fMaxScale;
 	if (fReflectHeight == 0 || g_fAlbedo == 0)
 		return NULL;
 	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
@@ -585,12 +585,12 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_horizontal (cai
 	cairo_destroy (pCairoContext);
 	return pNewSurface;
 }
-cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_vertical (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight)
+cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_vertical (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale)
 {
 	g_return_val_if_fail (pIconSurface != NULL && pReflectionSurface!= NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 
 	//\_______________ On cree la surface de telle facon qu'elle contienne les 2 surfaces.
-	double fReflectWidth = g_fReflectSize * (1 + g_fAmplitude);
+	double fReflectWidth = g_fReflectSize * fMaxScale;
 	if (fReflectWidth == 0 || g_fAlbedo == 0)
 		return NULL;
 	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
@@ -613,12 +613,12 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_vertical (cairo
 	return pNewSurface;
 }
 
-cairo_surface_t * cairo_dock_create_icon_surface_with_reflection (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, gboolean bHorizontalDock)
+cairo_surface_t * cairo_dock_create_icon_surface_with_reflection (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, gboolean bHorizontalDock, double fMaxScale)
 {
 	if (bHorizontalDock)
-		return cairo_dock_create_icon_surface_with_reflection_horizontal (pIconSurface, pReflectionSurface, pSourceContext, fImageWidth, fImageHeight);
+		return cairo_dock_create_icon_surface_with_reflection_horizontal (pIconSurface, pReflectionSurface, pSourceContext, fImageWidth, fImageHeight, fMaxScale);
 	else
-		return cairo_dock_create_icon_surface_with_reflection_vertical (pIconSurface, pReflectionSurface, pSourceContext, fImageWidth, fImageHeight);
+		return cairo_dock_create_icon_surface_with_reflection_vertical (pIconSurface, pReflectionSurface, pSourceContext, fImageWidth, fImageHeight, fMaxScale);
 }
 
 

@@ -228,14 +228,16 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 			pSourceContext,
 			(bHorizontalDock ? icon->fWidth : icon->fHeight) * fMaxScale,
 			(bHorizontalDock ? icon->fHeight : icon->fWidth) * fMaxScale,
-			bHorizontalDock);
+			bHorizontalDock,
+			fMaxScale);
 
 		icon->pFullIconBuffer = cairo_dock_create_icon_surface_with_reflection (icon->pIconBuffer,
 			icon->pReflectionBuffer,
 			pSourceContext,
 			(bHorizontalDock ? icon->fWidth : icon->fHeight) * fMaxScale,
 			(bHorizontalDock ? icon->fHeight : icon->fWidth) * fMaxScale,
-			bHorizontalDock);
+			bHorizontalDock,
+			fMaxScale);
 	}
 }
 

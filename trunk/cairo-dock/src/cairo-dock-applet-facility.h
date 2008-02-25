@@ -678,7 +678,7 @@ gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data);
 #define CD_APPLET_ON_DROP_DATA_BEGIN \
 gboolean CD_APPLET_ON_DROP_DATA (gpointer *data) \
 { \
-	if (myIcon != NULL && (data[1] == myIcon || myIcon->pSubDock == data[3])) \
+	if (myIcon != NULL && (data[1] == myIcon || myIcon->pSubDock == data[3] || myDesklet == data[3])) \
 	{ \
 		const gchar *cReceivedData = data[0]; \
 		g_return_val_if_fail (cReceivedData != NULL, CAIRO_DOCK_LET_PASS_NOTIFICATION);

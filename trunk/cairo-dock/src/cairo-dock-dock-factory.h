@@ -129,7 +129,8 @@ CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, g
 * Autorise un widget a accepter les glisse-deposes.
 * @param pWidget un widget.
 * @param pCallBack la fonction qui sera appelee lors d'une reception de donnee.
+* @param data donnees passees en entree de la callback.
 */
-void cairo_dock_allow_widget_to_receive_data (GtkWidget *pWidget, GCallback pCallBack);
+void cairo_dock_allow_widget_to_receive_data (GtkWidget *pWidget, GCallback pCallBack, gpointer data);
 
 #endif

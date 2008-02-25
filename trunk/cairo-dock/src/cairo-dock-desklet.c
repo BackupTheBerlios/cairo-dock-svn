@@ -76,7 +76,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 	int i;
 	for (i = 0; i < 4; i ++)
 	{
-		fColor[i] = (g_fDeskletColorInside[i] * pDesklet->iGradationCount + g_fDeskletColor[i] * (10 - pDesklet->iGradationCount)) / 10;
+		fColor[i] = (g_fDeskletColorInside[i] * pDesklet->iGradationCount + g_fDeskletColor[i] * (CD_NB_ITER_FOR_GRADUATION - pDesklet->iGradationCount)) / CD_NB_ITER_FOR_GRADUATION;
 	}
 	 if (gtk_window_is_active (GTK_WINDOW (pDesklet->pWidget)))
 		fColor[3] = MIN (1., fColor[3] * 1.25);
@@ -257,6 +257,28 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 	return FALSE;
 }
 
+void on_drag_data_received_desklet (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, GtkSelectionData *selection_data, guint info, guint t, CairoDockDesklet *pDesklet)
+{
+	//g_print ("%s (%dx%d)\n", __func__, x, y);
+	
+	//\_________________ On recupere l'URI.
+	gchar *cReceivedData = (gchar *) selection_data->data;
+	g_return_if_fail (cReceivedData != NULL);
+	int length = strlen (cReceivedData);
+	if (cReceivedData[length-1] == '\n')
+		cReceivedData[--length] = '\0';  // on vire le retour chariot final.
+	if (cReceivedData[length-1] == '\r')
+		cReceivedData[--length] = '\0';
+	cd_message (">>> cReceivedData : %s", cReceivedData);
+	
+	pDesklet->diff_x = - x;
+	pDesklet->diff_y = - y;
+	
+	double fOrder = 0;
+	gpointer data[4] = {cReceivedData, pDesklet->pIcon, &fOrder, pDesklet};
+	cairo_dock_notify (CAIRO_DOCK_DROP_DATA, data);
+}
+
 static gboolean on_motion_notify_desklet(GtkWidget *pWidget,
 	GdkEventMotion* pMotion,
 	CairoDockDesklet *pDesklet)
@@ -294,12 +316,12 @@ static gboolean _cairo_dock_desklet_gradation (CairoDockDesklet *pDesklet)
 	pDesklet->iGradationCount += (pDesklet->bInside ? 1 : -1);
 	gtk_widget_queue_draw (pDesklet->pWidget);
 	
-	if (pDesklet->iGradationCount <= 0 || pDesklet->iGradationCount >= 10)
+	if (pDesklet->iGradationCount <= 0 || pDesklet->iGradationCount >= CD_NB_ITER_FOR_GRADUATION)
 	{
 		if (pDesklet->iGradationCount < 0)
 			pDesklet->iGradationCount = 0;
-		else if (pDesklet->iGradationCount > 10)
-			pDesklet->iGradationCount = 10;
+		else if (pDesklet->iGradationCount > CD_NB_ITER_FOR_GRADUATION)
+			pDesklet->iGradationCount = CD_NB_ITER_FOR_GRADUATION;
 		pDesklet->iSidGradationOnEnter = 0;
 		return FALSE;
 	}
@@ -405,6 +427,7 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
 		"leave-notify-event",
 		G_CALLBACK (on_leave_desklet),
 		pDesklet);
+	cairo_dock_allow_widget_to_receive_data (pWindow, on_drag_data_received_desklet, pDesklet);
 
   //user widget
   if (pInteractiveWidget != NULL)

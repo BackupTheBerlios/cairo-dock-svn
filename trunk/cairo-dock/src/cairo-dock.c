@@ -449,7 +449,11 @@ main (int argc, char** argv)
 		g_str_equal,
 		g_free,
 		NULL);
-
+	
+	//\___________________ On initialise le multi-threading.
+	if (!g_thread_supported ())
+		g_thread_init (NULL);
+	
 	//\___________________ initialise the keybinder
 	cd_keybinder_init();
 

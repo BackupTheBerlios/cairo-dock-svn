@@ -28,6 +28,8 @@
 
 #include <cairo-dock-struct.h>
 
+#define CD_NB_ITER_FOR_GRADUATION 10
+
 /**
 *Teste si le container est un desklet.
 *@param pContainer le container.

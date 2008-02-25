@@ -107,13 +107,14 @@ void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, Cair
 		pIcon->pReflectionBuffer = NULL;
 	}
 	
-	double fAmplitude = (CAIRO_DOCK_IS_DOCK (pContainer) ? 1 + g_fAmplitude : 1);
+	double fMaxScale = (CAIRO_DOCK_IS_DOCK (pContainer) ? 1 + g_fAmplitude : 1);
 	gboolean bIsHorizontal = pContainer->bIsHorizontal;
 	pIcon->pReflectionBuffer = cairo_dock_create_reflection_surface (pIcon->pIconBuffer,
 		pIconContext,
-		(bIsHorizontal ? pIcon->fWidth : pIcon->fHeight) * fAmplitude,
-		(bIsHorizontal ? pIcon->fHeight : pIcon->fWidth) * fAmplitude,
-		bIsHorizontal);
+		(bIsHorizontal ? pIcon->fWidth : pIcon->fHeight) * fMaxScale,
+		(bIsHorizontal ? pIcon->fHeight : pIcon->fWidth) * fMaxScale,
+		bIsHorizontal,
+		fMaxScale);
 
 	if (pIcon->pFullIconBuffer != NULL)
 	{
@@ -123,9 +124,10 @@ void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, Cair
 	pIcon->pFullIconBuffer = cairo_dock_create_icon_surface_with_reflection (pIcon->pIconBuffer,
 		pIcon->pReflectionBuffer,
 		pIconContext,
-		(bIsHorizontal ? pIcon->fWidth : pIcon->fHeight) * fAmplitude,
-		(bIsHorizontal ? pIcon->fHeight : pIcon->fWidth) * fAmplitude,
-		bIsHorizontal);
+		(bIsHorizontal ? pIcon->fWidth : pIcon->fHeight) * fMaxScale,
+		(bIsHorizontal ? pIcon->fHeight : pIcon->fWidth) * fMaxScale,
+		bIsHorizontal,
+		fMaxScale);
 }
 
 void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoDockContainer *pContainer)

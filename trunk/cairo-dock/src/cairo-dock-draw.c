@@ -815,11 +815,11 @@ void cairo_dock_render_one_icon_in_desklet (Icon *icon, cairo_t *pCairoContext, 
 	int iCurrentWidth= 1;
 	//\_____________________ On dessine l'icone en fonction de son placement, son angle, et sa transparence.
 	//cairo_push_group (pCairoContext);
-	//g_print ("%s (%.2f;%.2f)\n", __func__, icon->fDrawX, icon->fDrawY);
+	//g_print ("%s (%.2f;%.2f x %.2f)\n", __func__, icon->fDrawX, icon->fDrawY, icon->fScale);
 	cairo_translate (pCairoContext, icon->fDrawX, icon->fDrawY);
 	cairo_save (pCairoContext);
-	if (bDrawFullBuffer && ! g_bDirectionUp)
-		cairo_translate (pCairoContext, 0, - g_fReflectSize * icon->fScale);
+	/**if (bDrawFullBuffer&& ! g_bDirectionUp)
+		cairo_translate (pCairoContext, 0, - g_fReflectSize * icon->fScale);*/
 	if (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (icon))
 	{
 		cairo_translate (pCairoContext, icon->fWidthFactor * icon->fWidth * (icon->fScale - 1) / 2, icon->fHeightFactor * icon->fHeight * (icon->fScale - 1));
@@ -893,7 +893,7 @@ void cairo_dock_render_one_icon_in_desklet (Icon *icon, cairo_t *pCairoContext, 
 			
 			cairo_set_source_surface (pCairoContext, icon->pReflectionBuffer, 0.0, 0.0);
 			
-			if (g_bDynamicReflection && icon->fScale > 1)
+			if (g_bDynamicReflection && icon->fScale != 1)
 			{
 				cairo_pattern_t *pGradationPattern = cairo_pattern_create_linear (0.,
 					0.,
@@ -1160,7 +1160,7 @@ void cairo_dock_render_blank (CairoDock *pDock)
 /**
 *Efface et redessine entierement une seule icone. Appelle la fonction de trace optimise de la vue courante; si cette derniere ne fournit pas de trace optimise, retrace tout le dock (ce qui peut etre penalisant).
 *@param icon l'icone a retracer.
-*@param pDock le dock contenant l' icone.
+*@param pContainer le container contenant l' icone.
 */
 void cairo_dock_redraw_my_icon (Icon *icon, CairoDockContainer *pContainer)
 {

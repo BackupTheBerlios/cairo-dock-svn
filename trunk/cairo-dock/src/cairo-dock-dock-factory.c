@@ -77,7 +77,7 @@ extern gboolean g_bUseGlitz;
 
 CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockName, gchar *cRendererName)
 {
-	static pouet = 0;
+	//static pouet = 0;
 	//g_print ("%s ()\n", __func__);
 	g_return_val_if_fail (cDockName != NULL, NULL);
 	CairoDock *pExistingDock = g_hash_table_lookup (g_hDocksTable, cDockName);
@@ -173,10 +173,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 		"leave-notify-event",
 		G_CALLBACK (on_leave_notify2),
 		pDock);
-	g_signal_connect (G_OBJECT (pWindow),
-		"drag_data_received",
-		G_CALLBACK (on_drag_data_received),
-		pDock);
+	cairo_dock_allow_widget_to_receive_data (pWindow, on_drag_data_received, pDock);
 	g_signal_connect (G_OBJECT (pWindow),
 		"drag_motion",
 		G_CALLBACK (on_drag_motion),
@@ -191,22 +188,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 		G_CALLBACK (on_selection_notify_event),
 		pDock);*/
 
-	GtkTargetEntry *pTargetEntry = g_new0 (GtkTargetEntry, 6);
-	pTargetEntry[0].target = "text/*";
-	pTargetEntry[0].flags = (GtkTargetFlags) 0;
-	pTargetEntry[0].info = 0;
-	pTargetEntry[1].target = "text/uri-list";
-	pTargetEntry[2].target = "text/plain";
-	pTargetEntry[3].target = "text/plain;charset=UTF-8";
-	pTargetEntry[4].target = "text/directory";
-	pTargetEntry[5].target = "text/html";
-	gtk_drag_dest_set (pWindow,
-		GTK_DEST_DEFAULT_DROP | GTK_DEST_DEFAULT_MOTION,  // GTK_DEST_DEFAULT_HIGHLIGHT ne rend pas joli je trouve.
-		pTargetEntry,
-		6,
-		GDK_ACTION_COPY);
-	g_free (pTargetEntry);
-
+	
 	g_hash_table_insert (g_hDocksTable, g_strdup (cDockName), pDock);
 	gtk_window_get_size (GTK_WINDOW (pWindow), &pDock->iCurrentWidth, &pDock->iCurrentHeight);  // ca n'est que la taille initiale allouee par GTK.
 	gtk_widget_show_all (pWindow);
@@ -824,7 +806,7 @@ CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, g
 
 
 
-void cairo_dock_allow_widget_to_receive_data (GtkWidget *pWidget, GCallback pCallBack)
+void cairo_dock_allow_widget_to_receive_data (GtkWidget *pWidget, GCallback pCallBack, gpointer data)
 {
 	GtkTargetEntry *pTargetEntry = g_new0 (GtkTargetEntry, 6);
 	pTargetEntry[0].target = "text/*";
@@ -845,5 +827,5 @@ void cairo_dock_allow_widget_to_receive_data (GtkWidget *pWidget, GCallback pCal
 	g_signal_connect (G_OBJECT (pWidget),
 		"drag_data_received",
 		pCallBack,
-		NULL);
+		data);
 }
