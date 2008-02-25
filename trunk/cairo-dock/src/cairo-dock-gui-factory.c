@@ -209,9 +209,9 @@ static void _cairo_dock_selection_changed (GtkTreeModel *model, GtkTreeIter iter
 		gsize length = 0;
 		GError *erreur = NULL;
 		g_file_get_contents  (cDescriptionFilePath,
-					&cDescription,
-					&length,
-					&erreur);
+			&cDescription,
+			&length,
+			&erreur);
 		if (erreur != NULL)
 		{
 			g_error_free (erreur);

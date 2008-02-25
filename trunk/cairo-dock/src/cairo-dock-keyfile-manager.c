@@ -262,7 +262,7 @@ void cairo_dock_write_one_module_name (gchar *cName, CairoDockModule *pModule, G
 }
 void cairo_dock_write_one_theme_name (gchar *cName, gchar *cThemePath, GString *pString)
 {
-	g_string_append_printf (pString, "%s;%s/readme;%s/preview.png;", cName, cThemePath, cThemePath);
+	g_string_append_printf (pString, "%s;%s/readme;%s/preview;", cName, cThemePath, cThemePath);
 }
 void cairo_dock_write_one_renderer_name (gchar *cName, CairoDockRenderer *pRenderer, GString *pString)
 {
