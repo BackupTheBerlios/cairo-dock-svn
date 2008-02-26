@@ -40,6 +40,9 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 
 void cairo_dock_deactivate_all_modules (void);
 
+void cairo_dock_activate_module_and_load (gchar *cModuleName);
+void cairo_dock_deactivate_module_and_unload (gchar *cModuleName);
+
 void cairo_dock_configure_module (GtkWindow *pParentWindow, CairoDockModule *module, CairoDock *pDock, GError **erreur);
 
 

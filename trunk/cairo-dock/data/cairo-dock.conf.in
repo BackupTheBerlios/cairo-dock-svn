@@ -201,7 +201,7 @@ show hidden files = false
 frame_applet =
 
 #M-999[] List of available plug-ins (applets and others) :
-#{Activate a plug-in to use it and configure it.}/
+#{Just check the box to activate a plug-in, or uncheck to deactivate it. Once activated, you can use it and configure it.}/
 active modules = clock;dustbin
 
 

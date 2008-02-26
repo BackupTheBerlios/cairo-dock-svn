@@ -260,7 +260,6 @@ void cairo_dock_preload_module_from_directory (gchar *cModuleDirPath, GHashTable
 }
 
 
-
 void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock *pDock, double fTime)
 {
 	if (cActiveModuleList == NULL)
@@ -283,7 +282,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 				Icon *pIcon = cairo_dock_activate_module (pModule, pDock, &erreur);
 				if (erreur != NULL)
 				{
-					cd_message ("Attention : %s\n", erreur->message);
+					cd_warning ("Attention : %s", erreur->message);
 					g_error_free (erreur);
 					erreur = NULL;
 				}
@@ -741,6 +740,8 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 	}
 }
 
+
+
 static void _cairo_dock_deactivate_one_module (gchar *cModuleName, CairoDockModule *pModule, gpointer data)
 {
 	cairo_dock_deactivate_module (pModule);
@@ -748,6 +749,42 @@ static void _cairo_dock_deactivate_one_module (gchar *cModuleName, CairoDockModu
 void cairo_dock_deactivate_all_modules (void)
 {
 	g_hash_table_foreach (s_hModuleTable, (GHFunc) _cairo_dock_deactivate_one_module, NULL);
+}
+
+
+void cairo_dock_activate_module_and_load (gchar *cModuleName)
+{
+	gpointer list[2] = {cModuleName, NULL};
+	cairo_dock_activate_modules_from_list (list, g_pMainDock, 0);
+	
+	CairoDockModule *pModule = cairo_dock_find_module_from_name (cModuleName);
+	if (CAIRO_DOCK_IS_DOCK (pModule->pContainer))
+	{
+		CairoDock *pDock = CAIRO_DOCK_DOCK (pModule->pContainer);
+		cairo_dock_update_dock_size (pDock);
+		gtk_widget_queue_draw (pDock->pWidget);
+	}
+	
+	cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, g_pMainDock->icons);
+}
+void cairo_dock_deactivate_module_and_unload (gchar *cModuleName)
+{
+	CairoDockModule *pModule = cairo_dock_find_module_from_name (cModuleName);
+	Icon *pIcon = cairo_dock_find_icon_from_module (pModule, pModule->pContainer);
+	
+	if (CAIRO_DOCK_IS_DOCK (pModule->pContainer))
+	{
+		CairoDock *pDock = CAIRO_DOCK_DOCK (pModule->pContainer);
+		cairo_dock_remove_icon_from_dock (pDock, pIcon);  // desactive le module.
+		cairo_dock_update_dock_size (pDock);
+		gtk_widget_queue_draw (pDock->pWidget);
+	}
+	else
+	{
+		cairo_dock_deactivate_module (pModule);
+	}
+	cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, g_pMainDock->icons);
+	cairo_dock_free_icon (pIcon);
 }
 
 

@@ -193,6 +193,8 @@ gboolean g_bAnimateOnActiveWindow;  // jouer une breve animation de l'icone lors
 double g_fVisibleAppliAlpha;  // transparence des icones des applis dont la fenetre est visible.
 gboolean g_bHideVisibleApplis;  // TRUE <=> cacher les applis dont la fenetre est visible.
 gboolean g_bAppliOnCurrentDesktopOnly;  // TRUE <=> cacher les applis dont la fenetre n'est pas sur le bureau courant.
+int g_iNbDesktops;  // nombre de bureaux.
+int g_iNbFacesForViewportX, g_iNbFacesForViewportY;  // nombre de "faces du cube".
 
 gboolean g_bUseSeparator = TRUE;  // utiliser les separateurs ou pas.
 gchar *g_cSeparatorImage = NULL;

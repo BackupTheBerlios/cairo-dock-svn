@@ -3,7 +3,7 @@
 This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
 ******************************************************************************/
 #include <math.h>
@@ -45,6 +45,8 @@ extern gboolean g_bHideVisibleApplis;
 extern double g_fVisibleAppliAlpha;
 extern gboolean g_bAppliOnCurrentDesktopOnly;
 extern gboolean g_bGroupAppliByClass;
+extern int g_iNbDesktops;
+extern int g_iNbFacesForViewportX,g_iNbFacesForViewportY ;
 
 static GHashTable *s_hXWindowTable = NULL;  // table des fenetres X affichees dans le dock.
 static Display *s_XDisplay = NULL;
@@ -95,6 +97,9 @@ void cairo_dock_initialize_application_manager (void)
 	s_aNetWmWindowType = XInternAtom (s_XDisplay, "_NET_WM_WINDOW_TYPE", False);
 	s_aNetWmWindowTypeNormal = XInternAtom (s_XDisplay, "_NET_WM_WINDOW_TYPE_NORMAL", False);
 	s_aNetWmWindowTypeUtility = XInternAtom (s_XDisplay, "_NET_WM_WINDOW_TYPE_UTILITY", False);
+	
+	g_iNbDesktops = cairo_dock_get_nb_desktops ();
+	cairo_dock_get_nb_face_in_viewport (&g_iNbFacesForViewportX, &g_iNbFacesForViewportY);
 	
 	cairo_dock_initialize_application_factory (s_XDisplay);
 }
@@ -374,7 +379,7 @@ void cairo_dock_move_xwindow_to_nth_desktop (Window Xid, int iDesktopNumber, int
 		y_return += g_iScreenHeight[CAIRO_DOCK_HORIZONTAL];
 	while (y_return >= g_iScreenHeight[CAIRO_DOCK_HORIZONTAL])
 		y_return -= g_iScreenHeight[CAIRO_DOCK_HORIZONTAL];
-	//g_print ("position relative : (%d;%d)\n", x_return, y_return);
+	g_print ("position relative : (%d;%d)\n", x_return, y_return);
 
 	xClientMessage.xclient.type = ClientMessage;
 	xClientMessage.xclient.serial = 0;
@@ -422,6 +427,55 @@ void cairo_dock_show_hide_desktop (gboolean bShow)
 		&xClientMessage);
 }
 
+void cairo_dock_set_current_viewport (int iDesktopViewportX, int iDesktopViewportY)
+{
+	XEvent xClientMessage;
+	Window root = DefaultRootWindow (s_XDisplay);
+	
+	xClientMessage.xclient.type = ClientMessage;
+	xClientMessage.xclient.serial = 0;
+	xClientMessage.xclient.send_event = True;
+	xClientMessage.xclient.display = s_XDisplay;
+	xClientMessage.xclient.window = root;
+	xClientMessage.xclient.message_type = s_aNetDesktopViewport;
+	xClientMessage.xclient.format = 32;
+	xClientMessage.xclient.data.l[0] = iDesktopViewportX;
+	xClientMessage.xclient.data.l[1] = iDesktopViewportY;
+	xClientMessage.xclient.data.l[2] = 0;
+	xClientMessage.xclient.data.l[3] = 0;
+	xClientMessage.xclient.data.l[4] = 0;
+	
+	XSendEvent (s_XDisplay,
+		root,
+		False,
+		SubstructureRedirectMask | SubstructureNotifyMask,
+		&xClientMessage);
+}
+void cairo_dock_set_current_desktop (int iDesktopNumber)
+{
+	Window root = DefaultRootWindow (s_XDisplay);
+	int iTimeStamp = cairo_dock_get_xwindow_timestamp (root);
+	XEvent xClientMessage;
+	
+	xClientMessage.xclient.type = ClientMessage;
+	xClientMessage.xclient.serial = 0;
+	xClientMessage.xclient.send_event = True;
+	xClientMessage.xclient.display = s_XDisplay;
+	xClientMessage.xclient.window = root;
+	xClientMessage.xclient.message_type = s_aNetCurrentDesktop;
+	xClientMessage.xclient.format = 32;
+	xClientMessage.xclient.data.l[0] = iDesktopNumber;
+	xClientMessage.xclient.data.l[1] = iTimeStamp;
+	xClientMessage.xclient.data.l[2] = 0;
+	xClientMessage.xclient.data.l[3] = 0;
+	xClientMessage.xclient.data.l[4] = 0;
+
+	XSendEvent (s_XDisplay,
+		root,
+		False,
+		SubstructureRedirectMask | SubstructureNotifyMask,
+		&xClientMessage);
+}
 
 
 gboolean cairo_dock_window_is_maximized (Window Xid)
@@ -603,14 +657,45 @@ void cairo_dock_get_window_desktop_and_position (int Xid, int *iDesktopNumber, i
 		&x_return, &y_return,
 		&width_return, &height_return,
 		&border_width_return, &depth_return);  // renvoie les coordonnees du coin haut gauche dans le referentiel du viewport actuel.
-
+	
 	*iGlobalPositionX = x_return;  // on pourrait tenir compte de border_width_return...
 	*iGlobalPositionY = y_return;  // idem.
 	*iWidthExtent = width_return;  // idem.
 	*iHeightExtent = height_return;  // idem.
+	g_print ("%s () -> %d;%d %dx%d / %d,%d\n", __func__, x_return, y_return, *iWidthExtent, *iHeightExtent, border_width_return, depth_return);
 }
 
-void cairo_dock_get_current_desktop (int *iDesktopNumber, int *iDesktopViewportX, int *iDesktopViewportY)
+void cairo_dock_get_current_viewport (int *iCurrentViewPortX, int *iCurrentViewPortY)
+{
+	Window root = DefaultRootWindow (s_XDisplay);
+	
+	Window root_return;
+	int x_return=1, y_return=1;
+	unsigned int width_return, height_return, border_width_return, depth_return;
+	XGetGeometry (s_XDisplay, root,
+		&root_return,
+		&x_return, &y_return,
+		&width_return, &height_return,
+		&border_width_return, &depth_return);
+	*iCurrentViewPortX = x_return;
+	*iCurrentViewPortY = y_return;
+	
+	
+	Atom aReturnedType = 0;
+	int aReturnedFormat = 0;
+	unsigned long iLeftBytes, iBufferNbElements = 0;
+	gulong *pViewportsXY = NULL;
+	XGetWindowProperty (s_XDisplay, root, s_aNetDesktopViewport, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pViewportsXY);
+	if (iBufferNbElements > 0)
+	{
+		*iCurrentViewPortX = pViewportsXY[0];
+		*iCurrentViewPortY = pViewportsXY[1];
+		XFree (pViewportsXY);
+	}
+	
+}
+
+int cairo_dock_get_current_desktop (void)
 {
 	Window root = DefaultRootWindow (s_XDisplay);
 	Atom aReturnedType = 0;
@@ -619,39 +704,44 @@ void cairo_dock_get_current_desktop (int *iDesktopNumber, int *iDesktopViewportX
 	gulong *pXDesktopNumberBuffer = NULL;
 	XGetWindowProperty (s_XDisplay, root, s_aNetCurrentDesktop, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXDesktopNumberBuffer);
 
+	int iDesktopNumber;
 	if (iBufferNbElements > 0)
-		*iDesktopNumber = *pXDesktopNumberBuffer;
+		iDesktopNumber = *pXDesktopNumberBuffer;
 	else
-		*iDesktopNumber = 0;
+		iDesktopNumber = 0;
+	
 	XFree (pXDesktopNumberBuffer);
+	return iDesktopNumber;
+}
 
-	if (iDesktopViewportX != NULL && iDesktopViewportY != NULL)
-	{
-		iBufferNbElements = 0;
-		gulong *pXDesktopViewport = NULL;
-		XGetWindowProperty (s_XDisplay, root, s_aNetDesktopViewport, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXDesktopViewport);
-		if (iBufferNbElements > 1)
-		{
-			if (iBufferNbElements > 2 * (*iDesktopNumber))
-			{
-				*iDesktopViewportX = pXDesktopViewport[2*(*iDesktopNumber)];
-				*iDesktopViewportY = pXDesktopViewport[2*(*iDesktopNumber)+1];
-			}
-			else
-			{
-				*iDesktopViewportX = pXDesktopViewport[0];
-				*iDesktopViewportY = pXDesktopViewport[1];
-			}
-		}
-		else
-		{
+int cairo_dock_get_nb_desktops (void)
+{
+	Window root = DefaultRootWindow (s_XDisplay);
+	Atom aReturnedType = 0;
+	int aReturnedFormat = 0;
+	unsigned long iLeftBytes, iBufferNbElements = 0;
+	gulong *pXDesktopNumberBuffer = NULL;
+	XGetWindowProperty (s_XDisplay, root, XInternAtom (s_XDisplay, "_NET_NUMBER_OF_DESKTOPS", False), 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXDesktopNumberBuffer);
+	
+	int iNumberOfDesktops;
+	if (iBufferNbElements > 0)
+		iNumberOfDesktops = *pXDesktopNumberBuffer;
+	else
+		iNumberOfDesktops = 0;
+	
+	return iNumberOfDesktops;
+}
 
-			*iDesktopViewportX = 0;
-			*iDesktopViewportY = 0;
-		}
-		XFree (pXDesktopViewport);
-		//g_print ("viewport actuel : (%d;%d), bureau : %d\n", *iDesktopViewportX, *iDesktopViewportY, *iDesktopNumber);
-	}
+int cairo_dock_get_viewports_coordinates (gulong **pViewportsXY)
+{
+	Window root = DefaultRootWindow (s_XDisplay);
+	Atom aReturnedType = 0;
+	int aReturnedFormat = 0;
+	unsigned long iLeftBytes, iBufferNbElements = 0;
+	*pViewportsXY = NULL;
+	XGetWindowProperty (s_XDisplay, root, s_aNetDesktopViewport, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)pViewportsXY);
+	g_print ("%d viewports\n", iBufferNbElements/2);
+	return iBufferNbElements;
 	/*Atom aNetWorkArea = XInternAtom (s_XDisplay, "_NET_WORKAREA", False);
 	iBufferNbElements = 0;
 	gulong *pXWorkArea = NULL;
@@ -664,13 +754,46 @@ void cairo_dock_get_current_desktop (int *iDesktopNumber, int *iDesktopViewportX
 	XFree (pXWorkArea);*/
 }
 
+void cairo_dock_get_nb_face_in_viewport (int *iNbFacesForViewportX, int *iNbFacesForViewportY)
+{
+	/*Window root = DefaultRootWindow (s_XDisplay);
+	Window root_return;
+	int x_return=1, y_return=1;
+	unsigned int width_return, height_return, border_width_return, depth_return;
+	XGetGeometry (s_XDisplay, root,
+		&root_return,
+		&x_return, &y_return,
+		&width_return, &height_return,
+		&border_width_return, &depth_return);*/
+	
+	
+	Screen *XScreen = XDefaultScreenOfDisplay (s_XDisplay);
+	//g_print ("screen : %dx%d ; root : %dx%d\n", WidthOfScreen (XScreen), HeightOfScreen (XScreen), width_return, height_return);
+	
+	Window root = DefaultRootWindow (s_XDisplay);
+	Atom aReturnedType = 0;
+	int aReturnedFormat = 0;
+	unsigned long iLeftBytes, iBufferNbElements = 0;
+	gulong *pVirtualScreenSizeBuffer = NULL;
+	XGetWindowProperty (s_XDisplay, root, s_aNetDesktopGeometry, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pVirtualScreenSizeBuffer);
+	if (iBufferNbElements > 0)
+	{
+		g_print ("pVirtualScreenSizeBuffer : %dx%d\n", pVirtualScreenSizeBuffer[0], pVirtualScreenSizeBuffer[1]);
+		*iNbFacesForViewportX = pVirtualScreenSizeBuffer[0] / WidthOfScreen (XScreen);
+		*iNbFacesForViewportY = pVirtualScreenSizeBuffer[1] / HeightOfScreen (XScreen);
+		XFree (pVirtualScreenSizeBuffer);
+	}
+}
+
+
+
 gboolean cairo_dock_window_is_on_this_desktop (int Xid, int iDesktopNumber)
 {
-	cd_message ("%s ()\n", __func__);
+	cd_message ("", __func__);
 	int iWindowDesktopNumber, iGlobalPositionX, iGlobalPositionY, iWidthExtent, iHeightExtent;  // coordonnees du coin haut gauche dans le referentiel du viewport actuel.
 	cairo_dock_get_window_desktop_and_position (Xid, &iWindowDesktopNumber, &iGlobalPositionX, &iGlobalPositionY, &iWidthExtent, &iHeightExtent);
 
-	cd_message (" -> %d/%d ; (%d ; %d)\n", iWindowDesktopNumber, iDesktopNumber, iGlobalPositionX, iGlobalPositionY);
+	cd_message (" -> %d/%d ; (%d ; %d)", iWindowDesktopNumber, iDesktopNumber, iGlobalPositionX, iGlobalPositionY);
 	return ( (iWindowDesktopNumber == iDesktopNumber || iWindowDesktopNumber == -1) &&
 		iGlobalPositionX + iWidthExtent >= 0 &&
 		iGlobalPositionX < g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] &&
@@ -680,9 +803,9 @@ gboolean cairo_dock_window_is_on_this_desktop (int Xid, int iDesktopNumber)
 
 gboolean cairo_dock_window_is_on_current_desktop (int Xid)
 {
-	cd_message ("%s ()\n", __func__);
+	cd_message ("", __func__);
 	int iDesktopNumber, iDesktopViewportX, iDesktopViewportY;
-	cairo_dock_get_current_desktop (&iDesktopNumber, NULL, NULL);
+	iDesktopNumber = cairo_dock_get_current_desktop ();
 
 	return cairo_dock_window_is_on_this_desktop (Xid, iDesktopNumber);
 }
@@ -693,18 +816,18 @@ static void _cairo_dock_hide_show_windows_on_other_desktops (Window *Xid, Icon *
 
 	if (icon != NULL && (! g_bHideVisibleApplis || icon->bIsHidden))
 	{
-		cd_message ("%s (%d)\n", __func__, *Xid);
+		cd_message ("%s (%d)", __func__, *Xid);
 		CairoDock *pParentDock;
 
 		if (cairo_dock_window_is_on_this_desktop (*Xid, pCurrentDesktop[0]))
 		{
-			cd_message (" => est sur le bureau actuel.\n");
+			cd_message (" => est sur le bureau actuel.");
 			CairoDock *pMainDock = GINT_TO_POINTER (pCurrentDesktop[1]);
 			pParentDock = cairo_dock_insert_appli_in_dock (icon, pMainDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON);
 		}
 		else
 		{
-			cd_message (" => n'est pas sur le bureau actuel.\n");
+			cd_message (" => n'est pas sur le bureau actuel.");
 			CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 			g_return_if_fail (pParentDock != NULL);
 			cairo_dock_detach_icon_from_dock (icon, pParentDock, TRUE);
@@ -775,8 +898,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 					cd_message ("on change de bureau\n");
 					if (g_bAppliOnCurrentDesktopOnly)
 					{
-						int iDesktopNumber, iDesktopViewportX, iDesktopViewportY;
-						cairo_dock_get_current_desktop (&iDesktopNumber, NULL, NULL);
+						int iDesktopNumber = cairo_dock_get_current_desktop ();
 						int data[2] = {iDesktopNumber, GPOINTER_TO_INT (pDock)};
 						g_hash_table_foreach (s_hXWindowTable, (GHFunc) _cairo_dock_hide_show_windows_on_other_desktops, data);
 					}
@@ -789,7 +911,10 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 					{
 						cairo_dock_set_window_position_at_balance (pDock, pDock->iCurrentWidth, pDock->iCurrentHeight);
 						gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);
+						cairo_dock_notify (CAIRO_DOCK_SCREEN_GEOMETRY_ALTERED, NULL);
 					}
+					g_iNbDesktops = cairo_dock_get_nb_desktops ();
+					cairo_dock_get_nb_face_in_viewport (&g_iNbFacesForViewportX, &g_iNbFacesForViewportY);
 				}
 			}
 			else
@@ -849,8 +974,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 					cd_message ("changement de bureau pour %d\n", Xid);
 					if (g_bAppliOnCurrentDesktopOnly)
 					{
-						int iDesktopNumber, iDesktopViewportX, iDesktopViewportY;
-						cairo_dock_get_current_desktop (&iDesktopNumber, NULL, NULL);
+						int iDesktopNumber = cairo_dock_get_current_desktop ();
 
 						int data[2] = {iDesktopNumber, GPOINTER_TO_INT (pDock)};
 						icon = g_hash_table_lookup (s_hXWindowTable, &Xid);

@@ -38,7 +38,13 @@ gboolean cairo_dock_desktop_is_visible (void);
 Window cairo_dock_get_active_window (void);
 
 void cairo_dock_get_window_desktop_and_position (int Xid, int *iDesktopNumber, int *iGlobalPositionX, int *iGlobalPositionY, int *iWidthExtent, int *iHeightExtent);
-void cairo_dock_get_current_desktop (int *iDesktopNumber, int *iDesktopViewportX, int *iDesktopViewportY);
+void cairo_dock_get_current_viewport (int *iCurrentViewPortX, int *iCurrentViewPortY);
+int cairo_dock_get_current_desktop (void);
+int cairo_dock_get_nb_desktops (void);
+int cairo_dock_get_viewports_coordinates (gulong **pViewportsXY);
+void cairo_dock_get_nb_face_in_viewport (int *iNbFacesForViewportX, int *iNbFacesForViewportY);
+
+
 gboolean cairo_dock_window_is_on_this_desktop (int Xid, int iDesktopNumber);
 gboolean cairo_dock_window_is_on_current_desktop (int Xid);
 

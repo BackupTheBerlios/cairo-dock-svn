@@ -390,7 +390,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			{
 				//pDock->iMouseX = iX;
 				s_iSidShowSubDockDemand = g_timeout_add (g_iShowSubDockDelay, (GSourceFunc) _cairo_dock_show_sub_dock_delayed, pDock);
-				g_print ("s_iSidShowSubDockDemand <- %d\n", s_iSidShowSubDockDemand);
+				//cd_debug ("s_iSidShowSubDockDemand <- %d\n", s_iSidShowSubDockDemand);
 			}
 			else
 				cairo_dock_show_subdock (pPointedIcon, FALSE, pDock);

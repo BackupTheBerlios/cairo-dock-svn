@@ -24,6 +24,8 @@ typedef enum {
 	CAIRO_DOCK_DESKTOP_CHANGED,
 	/// notification appellee lorsqu'une fenetre est redimensionnee ou deplacee. data : XConfigureEvent.
 	CAIRO_DOCK_WINDOW_CONFIGURED,
+	/// notification appellee lorsque la geometrie du bureau a change (nombre de viewports/bureaux, dimensions). data : NULL
+	CAIRO_DOCK_SCREEN_GEOMETRY_ALTERED,
 	CAIRO_DOCK_NB_NOTIFICATIONS
 	} CairoDockNotificationType;
 

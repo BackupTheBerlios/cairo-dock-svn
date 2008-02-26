@@ -40,6 +40,27 @@ static void _cairo_dock_activate_one_element (GtkCellRendererToggle * cell_rende
 
 	gtk_list_store_set (GTK_LIST_STORE (model), &iter, CAIRO_DOCK_MODEL_ACTIVE, !bState, -1);
 }
+static void _cairo_dock_activate_one_module (GtkCellRendererToggle * cell_renderer, gchar * path, GtkTreeModel * model)
+{
+	GtkTreeIter iter;
+	gtk_tree_model_get_iter_from_string (model, &iter, path);
+	gboolean bState;
+	gchar *cModuleName = NULL;
+	gtk_tree_model_get (model, &iter,
+		CAIRO_DOCK_MODEL_ACTIVE, &bState,
+		CAIRO_DOCK_MODEL_NAME, &cModuleName, -1);
+	
+	if (! bState)
+	{
+		cairo_dock_activate_module_and_load (cModuleName);
+	}
+	else
+	{
+		cairo_dock_deactivate_module_and_unload (cModuleName);
+	}
+	g_free (cModuleName);
+	gtk_list_store_set (GTK_LIST_STORE (model), &iter, CAIRO_DOCK_MODEL_ACTIVE, !bState, -1);
+}
 
 static gboolean _cairo_dock_increase_order (GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter, int *pOrder)
 {
@@ -923,7 +944,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							{
 								rend = gtk_cell_renderer_toggle_new ();
 								gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (pOneWidget), -1, NULL, rend, "active", CAIRO_DOCK_MODEL_ACTIVE, NULL);
-								g_signal_connect (G_OBJECT (rend), "toggled", (GCallback) _cairo_dock_activate_one_element, modele);
+								g_signal_connect (G_OBJECT (rend), "toggled", (GCallback) (iElementType == 'M' ? _cairo_dock_activate_one_module : _cairo_dock_activate_one_element), modele);
 							}
 
 							rend = gtk_cell_renderer_text_new ();

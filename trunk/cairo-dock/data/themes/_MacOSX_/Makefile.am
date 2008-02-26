@@ -6,4 +6,4 @@ theme_DATA = \
 	cairo-dock.conf\
 	readme\
 	_x_.bg.png.png\
-	preview.png
+	preview

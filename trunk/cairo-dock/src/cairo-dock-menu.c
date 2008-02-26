@@ -4,7 +4,7 @@
 This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
 ******************************************************************************/
 #include <math.h>
@@ -51,6 +51,9 @@ extern gchar *g_cConfFile;
 extern gchar *g_cEasyConfFile;
 extern gchar *g_cCurrentLaunchersPath;
 
+extern int g_iNbDesktops;
+extern int g_iNbFacesForViewportX,g_iNbFacesForViewportY ;
+extern int g_iScreenWidth[2], g_iScreenHeight[2];
 
 static void cairo_dock_edit_and_reload_conf (GtkMenuItem *menu_item, gpointer *data)
 {
@@ -651,11 +654,12 @@ static void cairo_dock_remove_module (GtkMenuItem *menu_item, gpointer *data)
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
 
-	gchar *question = g_strdup_printf (_("You're about to remove this module (%s) from the dock. Sure ?"), icon->acName);
+	gchar *question = g_strdup_printf (_("You're about to remove this module (%s) from the dock. Sure ?"), icon->pModule->pVisitCard->cModuleName);
 	int answer = cairo_dock_ask_question_and_wait (question, icon, pDock);
 	if (answer == GTK_RESPONSE_YES)
 	{
-		if (CAIRO_DOCK_IS_DOCK (pDock))
+		cairo_dock_deactivate_module_and_unload (icon->pModule->pVisitCard->cModuleName);
+		/*if (CAIRO_DOCK_IS_DOCK (pDock))
 		{
 			cairo_dock_remove_icon_from_dock (pDock, icon);  // desactive le module.
 			cairo_dock_update_dock_size (pDock);
@@ -666,7 +670,7 @@ static void cairo_dock_remove_module (GtkMenuItem *menu_item, gpointer *data)
 			cairo_dock_deactivate_module (icon->pModule);
 		}
 		cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, g_pMainDock->icons);
-		cairo_dock_free_icon (icon);
+		cairo_dock_free_icon (icon);*/
 	}
 }
 
@@ -717,10 +721,31 @@ static void cairo_dock_move_appli_to_current_desktop (GtkMenuItem *menu_item, gp
 	CairoDock *pDock = data[1];
 	if (icon->Xid > 0)
 	{
-		int iCurrentDesktop, iDesktopViewportX, iDesktopViewportY;
-		cairo_dock_get_current_desktop (&iCurrentDesktop, &iDesktopViewportX, &iDesktopViewportY);
-
+		int iCurrentDesktop = cairo_dock_get_current_desktop ();
 		cairo_dock_move_xwindow_to_nth_desktop (icon->Xid, iCurrentDesktop, 0, 0);  // on ne veut pas decaler son viewport par rapport a nous.
+	}
+}
+
+static void cairo_dock_move_appli_to_desktop (GtkMenuItem *menu_item, gpointer *user_data)
+{
+	gpointer *data = user_data[0];
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
+	int iDesktopNumber = GPOINTER_TO_INT (user_data[1]);
+	int iViewPortNumberY = GPOINTER_TO_INT (user_data[2]);
+	int iViewPortNumberX = GPOINTER_TO_INT (user_data[3]);
+	g_print ("%s (%d;%d;%d)\n", __func__, iDesktopNumber, iViewPortNumberX, iViewPortNumberY);
+	if (icon->Xid > 0)
+	{
+		int iCurrentDesktopNumber, iGlobalPositionX, iGlobalPositionY, iWidthExtent, iHeightExtent;
+		cairo_dock_get_window_desktop_and_position (icon->Xid, &iCurrentDesktopNumber, &iGlobalPositionX, &iGlobalPositionY, &iWidthExtent, &iHeightExtent);
+		g_print (" window : %d / (%d;%d)\n", iCurrentDesktopNumber, iGlobalPositionX, iGlobalPositionY);
+		
+		int iCurrentViewPortX, iCurrentViewPortY;
+		cairo_dock_get_current_viewport (&iCurrentViewPortX, &iCurrentViewPortY);
+		g_print (" current_viewport : %d;%d\n", iCurrentViewPortX, iCurrentViewPortY);
+		
+		cairo_dock_move_xwindow_to_nth_desktop (icon->Xid, iDesktopNumber, iViewPortNumberX * g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] - iCurrentViewPortX, iViewPortNumberY * g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] - iCurrentViewPortY);
 	}
 }
 
@@ -911,6 +936,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	CairoDockContainer *pContainer = data[1];
 	GtkWidget *menu = data[2];
 	GtkWidget *menu_item, *image;
+	static gpointer *pDesktopData = NULL;
 
 	if (CAIRO_DOCK_IS_DOCK (pContainer))
 	{
@@ -1006,6 +1032,47 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		gboolean bIsAbove=FALSE, bIsBelow=FALSE;
 		cairo_dock_window_is_above_or_below (icon->Xid, &bIsAbove, &bIsBelow);
 		_add_entry_in_menu (bIsAbove ? _("Don't keep above") : _("Keep above"), bIsAbove ? GTK_STOCK_GOTO_BOTTOM : GTK_STOCK_GOTO_TOP, cairo_dock_change_window_above, pSubMenuOtherActions);
+		g_print ("g_iNbDesktops : %d ; g_iNbFacesForViewportX : %d ; g_iNbFacesForViewportY : %d\n", g_iNbDesktops, g_iNbFacesForViewportX, g_iNbFacesForViewportY);
+		if (g_iNbDesktops > 1 || g_iNbFacesForViewportX > 1 || g_iNbFacesForViewportY > 1)
+		{
+			int i, j, k, iDesktopCode;
+			const gchar *cLabel;
+			if (g_iNbDesktops > 1 && (g_iNbFacesForViewportX > 1 || g_iNbFacesForViewportY > 1))
+				cLabel = _("Move to desktop %d - face %d");
+			else if (g_iNbDesktops > 1)
+				cLabel = _("Move to desktop %d");
+			else
+				cLabel = _("Move to face %d");
+			GString *sDesktop = g_string_new ("");
+			g_free (pDesktopData);
+			pDesktopData = g_new0 (gpointer, 4 * g_iNbDesktops * g_iNbFacesForViewportX * g_iNbFacesForViewportY);
+			gpointer *user_data;
+			
+			for (i = 0; i < g_iNbDesktops; i ++)  // on range par bureau.
+			{
+				for (j = 0; j < g_iNbFacesForViewportY; j ++)  // puis par rangee.
+				{
+					for (k = 0; k < g_iNbFacesForViewportX; k ++)
+					{
+						if (g_iNbDesktops > 1 && (g_iNbFacesForViewportX > 1 || g_iNbFacesForViewportY > 1))
+							g_string_printf (sDesktop, cLabel, i+1, j*g_iNbFacesForViewportX+k+1);
+						else if (g_iNbDesktops > 1)
+							g_string_printf (sDesktop, cLabel, i+1);
+						else
+							g_string_printf (sDesktop, cLabel, j*g_iNbFacesForViewportX+k+1);
+						iDesktopCode = i * g_iNbFacesForViewportY * g_iNbFacesForViewportX + j * g_iNbFacesForViewportY + k;
+						user_data = &pDesktopData[4*iDesktopCode];
+						user_data[0] = data;
+						user_data[1] = GINT_TO_POINTER (i);
+						user_data[2] = GINT_TO_POINTER (j);
+						user_data[3] = GINT_TO_POINTER (k);
+						
+						CD_APPLET_ADD_IN_MENU_WITH_STOCK (sDesktop->str, NULL, cairo_dock_move_appli_to_desktop, pSubMenuOtherActions, user_data);
+					}
+				}
+			}
+			g_string_free (sDesktop, TRUE);
+		}
 	}
 	else if (CAIRO_DOCK_IS_VALID_APPLET (icon))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module.
 	{
@@ -1026,17 +1093,16 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 
 		GSList *group = NULL;
 
-		///GdkWindowState iState = gdk_window_get_state (pContainer->pWidget->window);
+		//GdkWindowState iState = gdk_window_get_state (pContainer->pWidget->window);  // buggue.
 		gboolean bIsAbove=FALSE, bIsBelow=FALSE;
 		Window Xid = GDK_WINDOW_XID (pContainer->pWidget->window);
-		cd_debug ("Xid : %d\n", Xid);
+		cd_debug ("Xid : %d", Xid);
 		cairo_dock_window_is_above_or_below (Xid, &bIsAbove, &bIsBelow);
-		cd_debug (" -> %d;%d\n", bIsAbove, bIsBelow);
+		cd_debug (" -> %d;%d", bIsAbove, bIsBelow);
 
 		menu_item = gtk_radio_menu_item_new_with_label(group, _("Always on top"));
 		group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(menu_item));
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-		///if (iState & GDK_WINDOW_STATE_ABOVE)
 		if (bIsAbove)
 			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
 		g_signal_connect(G_OBJECT(menu_item), "toggled", G_CALLBACK(cairo_dock_keep_above), data);
@@ -1044,7 +1110,6 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		menu_item = gtk_radio_menu_item_new_with_label(group, _("Normal"));
 		group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(menu_item));
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-		///if ( ! (iState & (GDK_WINDOW_STATE_ABOVE | GDK_WINDOW_STATE_BELOW)) )
 		if (! bIsAbove && ! bIsBelow)
 			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
 		g_signal_connect(G_OBJECT(menu_item), "toggled", G_CALLBACK(cairo_dock_keep_normal), data);
@@ -1052,7 +1117,6 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		menu_item = gtk_radio_menu_item_new_with_label(group, _("Always below"));
 		group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(menu_item));
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-		///if (iState & GDK_WINDOW_STATE_BELOW)
 		if (bIsBelow)
 			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
 		g_signal_connect(G_OBJECT(menu_item), "toggled", G_CALLBACK(cairo_dock_keep_below), data);

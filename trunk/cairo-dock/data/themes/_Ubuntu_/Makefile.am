@@ -7,4 +7,4 @@ theme_DATA = \
 	readme\
 	background-ubuntu.png\
 	separateur.svg\
-	preview.png
+	preview
