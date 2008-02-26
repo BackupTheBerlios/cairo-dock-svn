@@ -150,9 +150,9 @@ void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Ico
 }
 
 
-void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, Icon *pIcon, CairoDock *pDock)  // fonction proposee par Necropotame.
+void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, Icon *pIcon, CairoDockContainer *pContainer)  // fonction proposee par Necropotame.
 {
-	g_return_if_fail (pIcon != NULL && pDock != NULL);  // le contexte sera verifie plus loin.
+	g_return_if_fail (pIcon != NULL && pContainer != NULL);  // le contexte sera verifie plus loin.
 
 	g_free (pIcon->acName);
 	pIcon->acName = g_strdup (cIconName);
@@ -162,7 +162,7 @@ void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, 
 		pSourceContext,
 		g_iLabelSize,
 		g_cLabelPolice,
-		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
+		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pContainer->bIsHorizontal));
 }
 
 void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo, Icon *pIcon, double fMaxScale)

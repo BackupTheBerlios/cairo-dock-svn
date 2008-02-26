@@ -59,7 +59,7 @@ void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Ico
 *@param pIcon l'icone.
 *@param pDock le dock contenant l'icone.
 */
-void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, Icon *pIcon, CairoDock *pDock);
+void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, Icon *pIcon, CairoDockContainer *pContainer);
 
 /**
 *Ecris une info-rapide sur l'icone. C'est un petit texte (quelques caracteres) qui vient se superposer sur l'icone, avec un fond fonce.
@@ -465,7 +465,7 @@ cairo_dock_manage_themes_for_applet (MY_APPLET_SHARE_DATA_DIR, cThemesDirName, C
 #define CD_APPLET_ABOUT(cMessage) \
 void about (GtkMenuItem *menu_item, gpointer *data) \
 { \
-	cairo_dock_show_temporary_dialog (cMessage, myIcon, myDock, 0); \
+	cairo_dock_show_temporary_dialog (cMessage, myIcon, myContainer, 0); \
 }
 /**
 *Definition de la fonction precedente; a inclure dans le .h correspondant.
