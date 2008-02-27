@@ -886,7 +886,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 									pParentDock = pDock;
 								if (cairo_dock_animation_will_be_visible (pParentDock) && ! pParentDock->bInside && g_bAnimateOnActiveWindow)
 								{
-									cairo_dock_arm_animation (icon, CAIRO_DOCK_BLINK, 1);  // un clignotement. il faut choisir une animation qui ne necessite pas que la fenetre du dock soit de taille maximale.
+									cairo_dock_arm_animation (icon, CAIRO_DOCK_WOBBLY, 1);  // un clignotement. il faut choisir une animation qui ne necessite pas que la fenetre du dock soit de taille maximale.
 									cairo_dock_start_animation (icon, pParentDock);
 								}
 							}

@@ -7,4 +7,4 @@ theme_DATA = \
 	readme\
 	background-snow.svg\
 	separateur.svg\
-	preview.png
+	preview

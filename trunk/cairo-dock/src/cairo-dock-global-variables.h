@@ -11,8 +11,13 @@ extern CairoDock *g_pMainDock;
 extern GHashTable *g_hDocksTable;
 /// Largeur de l'ecran en mode horizontal/vertical.
 extern gint g_iScreenWidth[2];
-/// Hauteur/largeur de l'ecran en mode horizontal/vertical.
+/// Hauteur de l'ecran en mode horizontal/vertical.
 extern gint g_iScreenHeight[2];
+/// Nombre de bureaux virtuels.
+extern int g_iNbDesktops;
+/// Nombre de "faces" du cube en largeur et en hauteur.
+extern int g_iNbFacesForViewportX,g_iNbFacesForViewportY ;
+
 
 /// Epaisseur du cadre (en pixels).
 extern gint g_iDockLineWidth;
