@@ -74,7 +74,7 @@ void cairo_dock_free_icon (Icon *icon)
 	if (icon == NULL)
 		return ;
 
-	cd_message ("%s (%s)\n", __func__, icon->acName);
+	cd_message ("%s (%s)", __func__, icon->acName);
 
 	cairo_dock_remove_dialog_if_any (icon);
 	cairo_dock_unregister_appli (icon);
@@ -444,7 +444,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 			g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 			if (erreur != NULL)
 			{
-				cd_message ("Attention : %s\n", erreur->message);
+				cd_warning ("Attention : %s", erreur->message);
 				g_error_free (erreur);
 				return ;
 			}
@@ -462,7 +462,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 			g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 			if (erreur != NULL)
 			{
-				cd_message ("Attention : %s\n", erreur->message);
+				cd_warning ("Attention : %s", erreur->message);
 				g_error_free (erreur);
 				return ;
 			}
@@ -527,7 +527,7 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 		g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 		if (erreur != NULL)
 		{
-			cd_message ("Attention : %s\n", erreur->message);
+			cd_warning ("Attention : %s", erreur->message);
 			g_error_free (erreur);
 			erreur = NULL;
 		}
@@ -694,6 +694,10 @@ static void _cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon,
 	{
 		cairo_dock_deactivate_module (icon->pModule);  // desactive le module mais ne le ferme pas.
 		icon->pModule = NULL;  // pour ne pas le liberer lors du free_icon.
+	}
+	else
+	{
+		cd_message ("automatic separator : nothing to do");
 	}
 
 	//\___________________ On detache l'icone du dock.
@@ -1116,17 +1120,17 @@ void cairo_dock_manage_mouse_position (CairoDock *pDock, CairoDockMousePositionT
 			//g_print ("INSIDE\n");
 			if (cairo_dock_entrance_is_allowed () && pDock->iMagnitudeIndex < CAIRO_DOCK_NB_MAX_ITERATIONS && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons))  // on est dedans et la taille des icones est non maximale bien qu'aucune icone ne soit animee.  ///  && pDock->iSidMoveDown == 0
 			{
-				cd_debug ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone  ne soit animee \n");
+				cd_debug ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone  ne soit animee");
 				//pDock->bInside = TRUE;
-				if (pDock->bAtBottom && pDock->iRefCount == 0 && ! g_bAutoHide)  // on le fait pas avec l'auto-hide, car un signal d'entree est deja emis a cause des mouvements/redimensionnements de la fenetre, et en rajouter un ici fout le boxon.
+				if ((pDock->bAtBottom && pDock->iRefCount == 0 && ! g_bAutoHide) || (pDock->iCurrentWidth != pDock->iMaxDockWidth || pDock->iCurrentHeight != pDock->iMaxDockHeight))  // on le fait pas avec l'auto-hide, car un signal d'entree est deja emis a cause des mouvements/redimensionnements de la fenetre, et en rajouter un ici fout le boxon.
 				{
-					cd_debug ("  on emule une re-rentree (pDock->iMagnitudeIndex:%f)\n", pDock->iMagnitudeIndex);
+					cd_debug ("  on emule une re-rentree (pDock->iMagnitudeIndex:%f)", pDock->iMagnitudeIndex);
 					///cairo_dock_render_blank (pDock);  // utile ?
 					g_signal_emit_by_name (pDock->pWidget, "enter-notify-event", NULL, &bReturn);
 				}
 				else  // on se contente de faire grossir les icones.
 				{
-					cd_debug ("  on se contente de faire grossir les icones\n");
+					cd_debug ("  on se contente de faire grossir les icones");
 					pDock->bAtBottom = FALSE;
 					if (pDock->iSidShrinkDown != 0)
 					{
@@ -1333,7 +1337,7 @@ void cairo_dock_update_icon_s_container_name (Icon *icon, const gchar *cNewParen
 		g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 		if (erreur != NULL)
 		{
-			cd_message ("Attention : %s\n", erreur->message);
+			cd_warning ("Attention : %s", erreur->message);
 			g_error_free (erreur);
 			g_free (cDesktopFilePath);
 			return ;

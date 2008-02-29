@@ -370,7 +370,8 @@ void cairo_dock_move_xwindow_to_nth_desktop (Window Xid, int iDesktopNumber, int
 		&root_return,
 		&x_return, &y_return,
 		&width_return, &height_return,
-		&border_width_return, &depth_return);  // renvoie les coordonnees du coin haut gauche dans le referentiel du viewport actuel.
+		&border_width_return, &depth_return);  // renvoie les coordonnees du coin haut gauche dans le referentiel du viewport actuel. // sous KDE, x et y sont toujours nuls ! (meme avec XGetWindowAttributes).
+	
 	while (x_return < 0)  // on passe au referentiel du viewport de la fenetre; inutile de connaitre sa position, puisqu'ils ont tous la meme taille.
 		x_return += g_iScreenWidth[CAIRO_DOCK_HORIZONTAL];
 	while (x_return >= g_iScreenWidth[CAIRO_DOCK_HORIZONTAL])
@@ -379,7 +380,7 @@ void cairo_dock_move_xwindow_to_nth_desktop (Window Xid, int iDesktopNumber, int
 		y_return += g_iScreenHeight[CAIRO_DOCK_HORIZONTAL];
 	while (y_return >= g_iScreenHeight[CAIRO_DOCK_HORIZONTAL])
 		y_return -= g_iScreenHeight[CAIRO_DOCK_HORIZONTAL];
-	g_print ("position relative : (%d;%d)\n", x_return, y_return);
+	g_print ("position relative : (%d;%d) taille : %dx%d\n", x_return, y_return, width_return, height_return);
 
 	xClientMessage.xclient.type = ClientMessage;
 	xClientMessage.xclient.serial = 0;

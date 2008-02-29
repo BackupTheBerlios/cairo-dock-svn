@@ -210,7 +210,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	GdkEventExpose *pExpose,
 	CairoDockDialog *pDialog)
 {
-	cd_message ("%s (%dx%d)", __func__, pDialog->iWidth, pDialog->iHeight);
+	//cd_message ("%s (%dx%d)", __func__, pDialog->iWidth, pDialog->iHeight);
 	if (! cairo_dock_dialog_reference (pDialog))
 		return FALSE;
 
@@ -231,7 +231,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 
 	if (pDialog->iWidth == 20 && pDialog->iHeight == 20)
 	{
-		cd_message ("dialogue incomplet");
+		cd_debug ("dialogue incomplet");
 		cairo_destroy (pCairoContext);
 		cairo_dock_dialog_unreference (pDialog);
 		return FALSE;
@@ -354,7 +354,7 @@ static gboolean on_configure_dialog (GtkWidget* pWidget,
 	GdkEventConfigure* pEvent,
 	CairoDockDialog *pDialog)
 {
-	cd_message ("%s (%dx%d)", __func__, pEvent->width, pEvent->height);
+	//cd_message ("%s (%dx%d)", __func__, pEvent->width, pEvent->height);
 	if (! cairo_dock_dialog_reference (pDialog))
 		return FALSE;
 
@@ -620,8 +620,6 @@ GtkWidget *cairo_dock_build_common_interactive_widget_for_dialog (const gchar *c
 		gtk_range_set_value (GTK_RANGE (pWidget), fValueForHScale);
 
 		gtk_widget_set (pWidget, "width-request", 150, NULL);
-		//gtk_widget_set (pWidget, "height-request", 25, NULL);
-
 	}
 	return pWidget;
 }
@@ -828,7 +826,9 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 		TRUE,
 		TRUE,
 		0);
-
+	
+	gtk_widget_show_all (pWidgetLayout);
+	
 	//\________________ On connecte les signaux utiles.
 	g_signal_connect (G_OBJECT (pWindow),
 		"expose-event",
@@ -858,9 +858,7 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 			pDialog);
 	}
 
-	gtk_widget_show_all (pWidgetLayout);
-
-	///cairo_dock_place_dialog (pDialog, pContainer);  // renseigne aussi bDirectionUp, ! bIsHorizontal, et iHeight.
+	cairo_dock_place_dialog (pDialog, pContainer);  // renseigne aussi bDirectionUp, ! bIsHorizontal, et iHeight.
 	cairo_dock_remove_orphelans ();  // la liste a ete verouillee par la fonction precedente pendant longtemps, empechant les dialogues d'etre detruits.
 
 	cairo_dock_dialog_unreference (pDialog);

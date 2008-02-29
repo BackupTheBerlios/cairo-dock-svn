@@ -1116,7 +1116,10 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	if (bFlushConfFileNeeded)
 	{
 		cairo_dock_flush_conf_file (pKeyFile, cConfFilePath, CAIRO_DOCK_SHARE_DATA_DIR);
-
+		g_key_file_free (pKeyFile);
+		pKeyFile = g_key_file_new ();
+		g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
+		
 		cairo_dock_update_conf_file_with_available_modules (pKeyFile, cConfFilePath);
 	}
 

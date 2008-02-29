@@ -541,7 +541,7 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 			if (CAIRO_DOCK_IS_DESKLET (pContainer))
 			{
 				CairoDockDesklet *pDesklet = CAIRO_DOCK_DESKLET (pContainer);
-				pDesklet->pIcon = pIcon;  // je sens que ca va jareter ca ...
+				pDesklet->pIcon = pIcon;
 				///gtk_widget_queue_draw (pContainer->pWidget);
 			}
 			cairo_dock_free_minimal_config (pMinimalConfig);

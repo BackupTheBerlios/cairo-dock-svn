@@ -938,7 +938,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	GtkWidget *menu_item, *image;
 	static gpointer *pDesktopData = NULL;
 
-	if (CAIRO_DOCK_IS_DOCK (pContainer))
+	if (CAIRO_DOCK_IS_DOCK (pContainer) && icon != NULL && ! CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon))
 	{
 		menu_item = gtk_image_menu_item_new_with_label (_("Move this icon"));
 

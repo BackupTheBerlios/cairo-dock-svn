@@ -407,12 +407,20 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	return FALSE;
 }
 
-gboolean cairo_dock_emit_leave_signal (CairoDock *pDock)
+gboolean cairo_dock_emit_signal_on_dock (CairoDock *pDock, const gchar *cSignal)
 {
 	static gboolean bReturn;
 	//g_print ("demande de quitter\n");
-	g_signal_emit_by_name (pDock->pWidget, "leave-notify-event", NULL, &bReturn);
+	g_signal_emit_by_name (pDock->pWidget, cSignal, NULL, &bReturn);
 	return FALSE;
+}
+gboolean cairo_dock_emit_leave_signal (CairoDock *pDock)
+{
+	cairo_dock_emit_signal_on_dock (pDock, "leave-notify-event");
+}
+gboolean cairo_dock_emit_enter_signal (CairoDock *pDock)
+{
+	cairo_dock_emit_signal_on_dock (pDock, "enter-notify-event");
 }
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
@@ -467,7 +475,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-        cd_debug("");
+        cd_debug ("");
 
 	//g_print ("%s (bInside:%d; bAtBottom:%d; iRefCount:%d)\n", __func__, pDock->bInside, pDock->bAtBottom, pDock->iRefCount);
 	if (pDock->bAtBottom)  // || ! pDock->bInside
@@ -1198,7 +1206,7 @@ gboolean on_configure (GtkWidget* pWidget,
 			pDock->iMouseX = 0;
 
 		pDock->calculate_icons (pDock);
-		///gtk_widget_queue_draw (pWidget);  // il semble qu'il soit inutile d'en rajouter un ici.
+		gtk_widget_queue_draw (pWidget);  // il semble qu'il soit necessaire d'en rajouter un la pour eviter un "clignotement" a l'entree dans le dock.
 #ifdef HAVE_GLITZ
 		if (pDock->pGlitzDrawable)
 		{
@@ -1432,6 +1440,7 @@ void cairo_dock_deactivate_temporary_auto_hide (void)
 	{
 		s_bTemporaryAutoHide = FALSE;
 		g_bAutoHide = s_bAutoHideInitialValue;
+		g_pMainDock->bAtBottom = TRUE;
 	}
 }
 
@@ -1483,4 +1492,11 @@ gboolean on_selection_notify_event (GtkWidget *pWidget, GdkEventSelection *event
 {
 	cd_message ("***%s ()", __func__);
 	return FALSE;
+}
+
+
+void cairo_dock_raise_from_keyboard (const char *cKeyShortcut, gpointer data)
+{
+	//if (g_pMainDock->bAtBottom)
+		
 }
