@@ -967,9 +967,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	double couleur_dtext[4] = {0., 0., 0., 1.};
 	cairo_dock_get_double_list_key_value (pKeyFile, "Dialogs", "text color", &bFlushConfFileNeeded, g_fDialogTextColor, 4, couleur_dtext, NULL, NULL);
 	
-	double couleur_desklett[4] = {1.0, 1.0, 1.0, 0.3};
+	double couleur_desklett[4] = {1.0, 1.0, 1.0, 0.2};
 	cairo_dock_get_double_list_key_value (pKeyFile, "Desklets", "background color", &bFlushConfFileNeeded, g_fDeskletColor, 4, couleur_desklett, NULL, NULL);
-	couleur_desklett[3] = .7;
+	couleur_desklett[3] = .6;
 	cairo_dock_get_double_list_key_value (pKeyFile, "Desklets", "background color inside", &bFlushConfFileNeeded, g_fDeskletColorInside, 4, couleur_desklett, NULL, NULL);
 	
 	g_iFileSortType = cairo_dock_get_integer_key_value (pKeyFile, "System", "sort files", &bFlushConfFileNeeded, CAIRO_DOCK_FM_SORT_BY_NAME, NULL, NULL);

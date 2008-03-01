@@ -85,7 +85,7 @@ void cairo_dock_set_icon_surface (cairo_t *pIconContext, cairo_surface_t *pSurfa
 	cairo_set_operator (pIconContext, CAIRO_OPERATOR_SOURCE);
 	cairo_paint (pIconContext);
 	cairo_set_operator (pIconContext, CAIRO_OPERATOR_OVER);
-
+	
 	//\________________ On applique la nouvelle image.
 	if (pSurface != NULL)
 	{

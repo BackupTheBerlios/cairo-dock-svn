@@ -39,6 +39,7 @@
 #include "cairo-dock-notifications.h"
 #include "cairo-dock-log.h"
 #include "cairo-dock-menu.h"
+#include "cairo-dock-dock-factory.h"
 #include "cairo-dock-desklet.h"
 
 extern CairoDock *g_pMainDock;
@@ -52,7 +53,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 	GdkEventExpose *pExpose,
 	CairoDockDesklet *pDesklet)
 {
-  cd_debug ("%s ()", __func__);
+  //cd_debug ("%s ()", __func__);
   gint w = 0, h = 0;
 
   if (!pDesklet)
@@ -115,14 +116,14 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 
 		if (pIcon->pIconBuffer != NULL)
 		{
-			cd_debug ("  dessin de l'icone (%.2fx%.2f)", pIcon->fWidth, pIcon->fHeight);
+			//cd_debug ("  dessin de l'icone (%.2fx%.2f)", pIcon->fWidth, pIcon->fHeight);
 			//cairo_translate (pCairoContext, g_iDockRadius, g_iDockRadius);
 			cairo_set_source_surface (pCairoContext, pIcon->pIconBuffer, 0.0, 0.0);
 			cairo_paint (pCairoContext);
 		}
 		if (pIcon->pQuickInfoBuffer != NULL)
 		{
-			cd_debug ("  dessin de l'info-rapide (%dx%d)", pIcon->iQuickInfoWidth, pIcon->iQuickInfoHeight);
+			//cd_debug ("  dessin de l'info-rapide (%dx%d)", pIcon->iQuickInfoWidth, pIcon->iQuickInfoHeight);
 			cairo_translate (pCairoContext,
 				//-icon->fQuickInfoXOffset + icon->fWidth / 2,
 				//icon->fHeight - icon->fQuickInfoYOffset);
@@ -173,7 +174,7 @@ static gboolean on_configure_desklet (GtkWidget* pWidget,
                                       GdkEventConfigure* pEvent,
                                       CairoDockDesklet *pDesklet)
 {
-	cd_debug ("%s (%dx%d ; %d,%d)", __func__, pEvent->width, pEvent->height, (int) pEvent->x, (int) pEvent->y);
+	//cd_debug ("%s (%dx%d ; %d,%d)", __func__, pEvent->width, pEvent->height, (int) pEvent->x, (int) pEvent->y);
 	if (pDesklet->iWidth != pEvent->width || pDesklet->iHeight != pEvent->height)
 	{
 		pDesklet->iWidth = pEvent->width;
@@ -290,14 +291,13 @@ static gboolean on_motion_notify_desklet(GtkWidget *pWidget,
 		gtk_window_move (GTK_WINDOW (pWidget),
 			pMotion->x_root + pDesklet->diff_x,
 			pMotion->y_root + pDesklet->diff_y);
-		return TRUE;
 	}
 	else  // le 'press-button' est local au sous-widget clique, alors que le 'motion-notify' est global a la fenetre; c'est donc par lui qu'on peut avoir a coup sur les coordonnees du curseur (juste avant le clic).
 	{
 		pDesklet->diff_x = -pMotion->x;
 		pDesklet->diff_y = -pMotion->y;
-		cd_debug ("diff : %d;%d", pDesklet->diff_x, pDesklet->diff_y);
 	}
+	gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);  // pour recevoir d'autres MotionNotify.
 	return FALSE;
 }
 
@@ -427,7 +427,7 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
 		"leave-notify-event",
 		G_CALLBACK (on_leave_desklet),
 		pDesklet);
-	cairo_dock_allow_widget_to_receive_data (pWindow, on_drag_data_received_desklet, pDesklet);
+	cairo_dock_allow_widget_to_receive_data (pWindow, G_CALLBACK (on_drag_data_received_desklet), pDesklet);
 
   //user widget
   if (pInteractiveWidget != NULL)
