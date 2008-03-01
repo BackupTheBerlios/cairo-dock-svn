@@ -1443,15 +1443,17 @@ CairoDockDesktopEnv cairo_dock_guess_environment (void)
 		cEnv = g_getenv ("KDE_FULL_SESSION");
 		if (cEnv == NULL || *cEnv == '\0')
 		{
-			iDesktopEnv = CAIRO_DOCK_UNKNOWN_ENV;
+			if (! cairo_dock_property_is_present_on_root ("_DT_SAVE_MODE"))
+				iDesktopEnv = CAIRO_DOCK_UNKNOWN_ENV;
+			else
+				iDesktopEnv = CAIRO_DOCK_XFCE;
 		}
 		else
 			iDesktopEnv = CAIRO_DOCK_KDE;
 	}
 	else
-	{
 		iDesktopEnv = CAIRO_DOCK_GNOME;
-	}
+	
 	return iDesktopEnv;
 }
 

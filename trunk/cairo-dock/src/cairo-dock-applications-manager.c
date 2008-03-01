@@ -1365,3 +1365,21 @@ gboolean cairo_dock_update_screen_geometry (CairoDock *pDock)
 	else
 		return FALSE;
 }
+
+
+gboolean cairo_dock_property_is_present_on_root (gchar *cPropertyName)
+{
+	g_return_val_if_fail (s_XDisplay != NULL, FALSE);
+	Atom atom = XInternAtom (s_XDisplay, cPropertyName, False);
+	Window root = DefaultRootWindow (s_XDisplay);
+	int iNbProperties;
+	Atom *pAtomList = XListProperties (s_XDisplay, root, &iNbProperties);
+	int i;
+	for (i = 0; i < iNbProperties; i ++)
+	{
+		if (pAtomList[i] == atom)
+			break;
+	}
+	XFree (pAtomList);
+	return (i != iNbProperties);
+}

@@ -367,13 +367,13 @@ main (int argc, char** argv)
 		else if (strcmp (cEnvironment, "xfce") == 0)
 			g_iDesktopEnv = CAIRO_DOCK_XFCE;
 		else
-			cd_message ("Attention : unknown environnment '%s'\n", cEnvironment);
+			cd_warning ("Attention : unknown environnment '%s'", cEnvironment);
 		g_free (cEnvironment);
 	}
 #ifndef HAVE_GLITZ
 	if (g_bUseGlitz)
 	{
-		cd_message ("Attention : Cairo-Dock was not compiled with glitz\n");
+		cd_warning ("Attention : Cairo-Dock was not compiled with glitz");
 		g_bUseGlitz = FALSE;
 	}
 #endif
@@ -441,11 +441,6 @@ main (int argc, char** argv)
 		g_iMicroVersion = atoi (cVersions[2]);
 	g_strfreev (cVersions);
 
-	//\___________________ On detecte l'environnement de bureau.
-	if (g_iDesktopEnv == CAIRO_DOCK_UNKNOWN_ENV)
-		g_iDesktopEnv = cairo_dock_guess_environment ();
-	cd_message ("environnement de bureau : %d", g_iDesktopEnv);
-
 	//\___________________ On initialise la table des docks.
 	g_hDocksTable = g_hash_table_new_full (g_str_hash,
 		g_str_equal,
@@ -461,7 +456,12 @@ main (int argc, char** argv)
 
 	//\___________________ On initialise le gestionnaire des applications ouvertes.
 	cairo_dock_initialize_application_manager ();
-
+	
+	//\___________________ On detecte l'environnement de bureau (apres les applis et avant les modules).
+	if (g_iDesktopEnv == CAIRO_DOCK_UNKNOWN_ENV)
+		g_iDesktopEnv = cairo_dock_guess_environment ();
+	cd_message ("environnement de bureau : %d", g_iDesktopEnv);
+	
 	//\___________________ On initialise le gestionnaire de modules et on pre-charge les modules existant.
 	if (g_module_supported () && ! bSafeMode)
 		cairo_dock_initialize_module_manager (CAIRO_DOCK_MODULES_DIR);

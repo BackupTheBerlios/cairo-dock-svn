@@ -75,5 +75,6 @@ void cairo_dock_set_icons_geometry_for_window_manager (CairoDock *pDock);
 
 gboolean cairo_dock_update_screen_geometry (CairoDock *pDock);
 
+gboolean cairo_dock_property_is_present_on_root (gchar *cPropertyName);
 
 #endif
