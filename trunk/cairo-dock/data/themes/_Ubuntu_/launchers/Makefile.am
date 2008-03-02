@@ -8,10 +8,10 @@ launchers_DATA = \
 	01pidgin.desktop\
 	01thunderbird.desktop\
 	01synaptic.desktop\
-	music.svg\
+	bmp.svg\
 	nautilus.svg\
 	mozilla-thunderbird.svg\
 	firefox.svg\
 	terminal.svg\
-	gaim.svg\
+	pidgin.svg\
 	synaptic.svg

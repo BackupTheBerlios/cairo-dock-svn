@@ -8,7 +8,7 @@ Name=Terminal
 #s Commande à exécuter lors du clique :
 Exec=gnome-terminal
 #S Nom ou chemin de l'image :
-Icon=terminal.svg
+Icon=terminal
 #f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
 Order=3
 #E[_MainDock_]  Nom du container auquel il appartient :

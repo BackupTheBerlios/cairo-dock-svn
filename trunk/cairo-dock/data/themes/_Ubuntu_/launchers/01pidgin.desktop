@@ -8,7 +8,7 @@ Name=Pidgin Internet Messenger
 #s Commande à exécuter lors du clique :
 Exec=pidgin
 #S Nom ou chemin de l'image :
-Icon=gaim.svg
+Icon=pidgin
 #f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
 Order=1
 #E[_MainDock_]  Nom du container auquel il appartient :
