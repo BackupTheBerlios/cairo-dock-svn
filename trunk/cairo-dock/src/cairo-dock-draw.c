@@ -774,7 +774,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		else
 		{
 			fMagnitude = (icon->fScale - 1) / g_fAmplitude;
-			fMagnitude = (fMagnitude > 1. - 1. / g_fLabelAlphaThreshold ? 1.0 : fRatio / (1. - fMagnitude) / g_fLabelAlphaThreshold);
+			fMagnitude = (fMagnitude > 1. - 1. / g_fLabelAlphaThreshold ? 1.0 : (1. - fMagnitude) / g_fLabelAlphaThreshold);
 		}
 		cairo_paint_with_alpha (pCairoContext, fMagnitude);
 	}

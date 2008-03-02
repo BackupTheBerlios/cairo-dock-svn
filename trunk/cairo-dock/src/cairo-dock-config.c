@@ -1286,7 +1286,7 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 			gboolean write_ok = g_file_set_contents (cConfFilePath, cConfiguration, -1, NULL);
 			g_free (cConfiguration);
 			if (! write_ok)
-				cd_message ("error while writing to %s\n", cConfFilePath);
+				cd_warning ("error while writing to %s", cConfFilePath);
 		}
 
 		if (pConfigFunc != NULL)
@@ -1338,7 +1338,8 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 *@param pConfigFunc2
 *@param cConfFilePath2
 *@param cButtonConvert
-*@param  cButtonRevert
+*@param cButtonRevert
+*@param cGettextDomain
 @Returns TRUE si l'utilisateur a ferme le panneau de conf en appuyant sur OK, FALSE sinon.
 */
 gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert, gchar *cGettextDomain)
@@ -1414,22 +1415,6 @@ void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int
 		G_TYPE_INT, "Position", "x gap", x,
 		G_TYPE_INT, "Position", "y gap", y,
 		G_TYPE_INVALID);
-	/*GKeyFile *pKeyFile = g_key_file_new ();
-
-	GError *erreur = NULL;
-	g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
-	if (erreur != NULL)
-	{
-		cd_message ("Attention : %s\n", erreur->message);
-		g_error_free (erreur);
-		return ;
-	}
-
-	g_key_file_set_integer (pKeyFile, "Position", "x gap", x);
-	g_key_file_set_integer (pKeyFile, "Position", "y gap", y);
-
-	cairo_dock_write_keys_to_file (pKeyFile, g_cConfFile);
-	g_key_file_free (pKeyFile);*/
 }
 
 
