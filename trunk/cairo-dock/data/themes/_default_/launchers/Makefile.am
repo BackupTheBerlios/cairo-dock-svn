@@ -7,7 +7,7 @@ launchers_DATA = \
 	01gnome-terminal.desktop\
 	01nautilus.desktop\
 	01thunderbird.desktop\
-	music.svg\
+	bmp.svg\
 	nautilus.svg\
 	mozilla-thunderbird.svg\
 	firefox.svg\

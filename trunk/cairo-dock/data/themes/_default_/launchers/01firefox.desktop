@@ -5,9 +5,9 @@
 #s Nom de ce lanceur :
 Name=Firefox Web Browser
 #s Commande à exécuter lors du clique :
-Exec=firefox 
+Exec=firefox
 #S Nom ou chemin de l'image :
-Icon=firefox.svg
+Icon=firefox
 #f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
 Order=5
 #E[_MainDock_]  Nom du container auquel il appartient :

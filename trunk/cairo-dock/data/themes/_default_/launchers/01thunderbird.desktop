@@ -8,7 +8,7 @@ Name=Mozilla Thunderbird Mail/News
 #s Commande à exécuter lors du clique :
 Exec=thunderbird 
 #S Nom ou chemin de l'image :
-Icon=mozilla-thunderbird.svg
+Icon=mozilla-thunderbird
 #f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
 Order=4
 #E[_MainDock_]  Nom du container auquel il appartient :
