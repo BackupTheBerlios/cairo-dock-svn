@@ -6,7 +6,7 @@ Name=File Browser
 #s Commande à exécuter lors du clique :
 Exec=nautilus --no-desktop --browser 
 #S Nom ou chemin de l'image :
-Icon=nautilus.svg
+Icon=nautilus
 #f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
 Order=2
 #E[_MainDock_;Web;System]  Nom du container auquel il appartient :

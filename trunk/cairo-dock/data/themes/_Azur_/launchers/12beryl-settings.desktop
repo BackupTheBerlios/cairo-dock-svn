@@ -6,7 +6,7 @@ Name=Beryl Settings Manager
 #s Exec command :
 Exec=beryl-settings
 #s Image's name or path :
-Icon=beryl-settings.svg
+Icon=beryl-settings
 #f Order you want for this launcher among the other launchers :
 Order=2
 #s Name of the container it belongs to:

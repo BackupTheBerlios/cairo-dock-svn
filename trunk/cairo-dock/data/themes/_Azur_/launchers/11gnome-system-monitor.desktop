@@ -74,7 +74,7 @@ Name[zh_TW]=系統監控
 #s Exec command :
 Exec=gnome-system-monitor
 #s Image's name or path :
-Icon=utilities-system-monitor.svg
+Icon=utilities-system-monitor
 #f Order you want for this launcher among the other launchers :
 Order=3
 #s Name of the container it belongs to:

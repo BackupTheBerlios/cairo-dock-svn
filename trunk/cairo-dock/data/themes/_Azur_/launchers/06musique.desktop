@@ -5,7 +5,7 @@ Name=Musique
 #s Exec command:
 Exec=beep-media-player
 #s image's name or path:
-Icon=music.svg
+Icon=bmp
 #f Order you want for this launcher among the other launchers:
 Order=6
 #s Name of the container it belongs to:

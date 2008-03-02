@@ -6,7 +6,7 @@ Name=BitTorrent
 #s Commande à exécuter lors du clique :
 Exec=transmission-gtk 
 #S Nom ou chemin de l'image :
-Icon=transmission.png
+Icon=transmission
 #f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
 Order=1
 #E[_MainDock_;Web;System]  Nom du container auquel il appartient :

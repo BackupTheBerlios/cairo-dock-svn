@@ -8,7 +8,7 @@ launchers_DATA = \
 	gnome-terminal.desktop\
 	terminal.svg\
 	bmp.desktop\
-	music.svg\
+	bmp.svg\
 	05web.desktop\
 	web-browser.svg\
 	thunderbird.desktop\
@@ -20,7 +20,7 @@ launchers_DATA = \
 	09system.desktop\
 	gnome-main-menu.svg\
 	10synaptic.desktop\
-	synaptic.png\
+	synaptic.svg\
 	11gnome-system-monitor.desktop\
 	utilities-system-monitor.svg\
 	12beryl-settings.desktop\
