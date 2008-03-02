@@ -175,7 +175,7 @@ gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 	if (erreur != NULL)
 	{
 		if (bFlushConfFileNeeded != NULL)
-			cd_message ("Attention : %s\n", erreur->message);
+			cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -198,10 +198,10 @@ gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 					bValue = bDefaultValue;
 				}
 				else
-					cd_message (" (recuperee)\n");
+					cd_message (" (recuperee)");
 			}
 			else
-				cd_message (" (recuperee)\n");
+				cd_message (" (recuperee)");
 		}
 
 		g_key_file_set_boolean (pKeyFile, cGroupName, cKeyName, bValue);
@@ -226,7 +226,7 @@ int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gch
 	if (erreur != NULL)
 	{
 		if (bFlushConfFileNeeded != NULL)
-			cd_message ("Attention : %s\n", erreur->message);
+			cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -248,10 +248,10 @@ int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gch
 					iValue = iDefaultValue;
 				}
 				else
-					cd_message (" (recuperee)\n");
+					cd_message (" (recuperee)");
 			}
 			else
-				cd_message (" (recuperee)\n");
+				cd_message (" (recuperee)");
 		}
 		g_free (cGroupNameUpperCase);
 
@@ -277,7 +277,7 @@ double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 	if (erreur != NULL)
 	{
 		if (bFlushConfFileNeeded != NULL)
-			cd_message ("Attention : %s\n", erreur->message);
+			cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -299,10 +299,10 @@ double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 					fValue = fDefaultValue;
 				}
 				else
-					cd_message (" (recuperee)\n");
+					cd_message (" (recuperee)");
 			}
 			else
-				cd_message (" (recuperee)\n");
+				cd_message (" (recuperee)");
 		}
 		g_free (cGroupNameUpperCase);
 
@@ -328,7 +328,7 @@ gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 	if (erreur != NULL)
 	{
 		if (bFlushConfFileNeeded != NULL)
-			cd_message ("Attention : %s\n", erreur->message);
+			cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -350,10 +350,10 @@ gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 					cValue = g_strdup (cDefaultValue);
 				}
 				else
-					cd_message (" (recuperee)\n");
+					cd_message (" (recuperee)");
 			}
 			else
-				cd_message (" (recuperee)\n");
+				cd_message (" (recuperee)");
 		}
 		g_free (cGroupNameUpperCase);
 
@@ -389,7 +389,7 @@ void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cGroupNam
 	if (erreur != NULL)
 	{
 		if (bFlushConfFileNeeded != NULL)
-			cd_message ("Attention : %s\n", erreur->message);
+			cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -411,14 +411,14 @@ void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cGroupNam
 				}
 				else
 				{
-					cd_message (" (recuperee)\n");
+					cd_message (" (recuperee)");
 					if (length > 0)
 						memcpy (iValueBuffer, iValuesList, MIN (iNbElements, length) * sizeof (int));
 				}
 			}
 			else
 			{
-				cd_message (" (recuperee)\n");
+				cd_message (" (recuperee)");
 				if (length > 0)
 					memcpy (iValueBuffer, iValuesList, MIN (iNbElements, length) * sizeof (int));
 			}
@@ -462,7 +462,7 @@ void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 	if (erreur != NULL)
 	{
 		if (bFlushConfFileNeeded != NULL)
-			cd_message ("Attention : %s\n", erreur->message);
+			cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -484,14 +484,14 @@ void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 				}
 				else
 				{
-					cd_message (" (recuperee)\n");
+					cd_message (" (recuperee)");
 					if (length > 0)
 						memcpy (fValueBuffer, fValuesList, MIN (iNbElements, length) * sizeof (double));
 				}
 			}
 			else
 			{
-				cd_message (" (recuperee)\n");
+				cd_message (" (recuperee)");
 				if (length > 0)
 					memcpy (fValueBuffer, fValuesList, MIN (iNbElements, length) * sizeof (double));
 			}
@@ -532,7 +532,7 @@ gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupN
 	if (erreur != NULL)
 	{
 		if (bFlushConfFileNeeded != NULL)
-			cd_message ("Attention : %s\n", erreur->message);
+			cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -603,7 +603,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
@@ -1223,7 +1223,7 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConf
 				g_free (cConfiguration);
 				if (! write_ok)
 				{
-					cd_message ("error while writing to %s\n", cConfFilePath);
+					cd_warning ("error while writing to %s", cConfFilePath);
 					config_ok = FALSE;
 				}
 			}
@@ -1350,7 +1350,7 @@ gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePat
 
 void cairo_dock_update_conf_file (gchar *cConfFilePath, GType iFirstDataType, ...)  // type, groupe, nom, valeur, etc. finir par G_TYPE_INVALID.
 {
-	cd_message ("%s (%s)\n", __func__, cConfFilePath);
+	cd_message ("%s (%s)", __func__, cConfFilePath);
 	va_list args;
 	va_start (args, iFirstDataType);
 
@@ -1359,7 +1359,7 @@ void cairo_dock_update_conf_file (gchar *cConfFilePath, GType iFirstDataType, ..
 	g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		va_end (args);
 		return ;
@@ -1449,7 +1449,7 @@ static void cairo_dock_copy_value_to_keyfile (GKeyFile *pKeyFile, gchar *cGroupN
 	gchar *cValue = g_key_file_get_string (pKeyFile, cGroupName, cKeyName, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 	}
 	else
@@ -1468,7 +1468,7 @@ void cairo_dock_copy_easy_conf_file (gchar *cEasyConfFilePath, GKeyFile *pMainKe
 	g_key_file_load_from_file (pKeyFile, cEasyConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
@@ -1535,7 +1535,7 @@ void cairo_dock_copy_to_easy_conf_file (GKeyFile *pMainKeyFile, gchar *cEasyConf
 	g_free (cEasyConfTemplate);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
@@ -1595,7 +1595,7 @@ void cairo_dock_build_easy_conf_file (gchar *cMainConfFilePath, gchar *cEasyConf
 	g_key_file_load_from_file (pMainKeyFile, cMainConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
@@ -1612,7 +1612,7 @@ void cairo_dock_read_easy_conf_file (gchar *cEasyConfFilePath, gpointer data)
 	g_key_file_load_from_file (pMainKeyFile, g_cConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n", erreur->message);
+		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
