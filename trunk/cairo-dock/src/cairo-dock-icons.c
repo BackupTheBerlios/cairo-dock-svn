@@ -672,18 +672,15 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 static void _cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon, gboolean bCheckUnusedSeparator)
 {
 	//\___________________ On effectue les taches de fermeture de l'icone suivant son type.
-	if (CAIRO_DOCK_IS_LAUNCHER (icon) || CAIRO_DOCK_IS_USER_SEPARATOR (icon))
+	if (icon->acDesktopFileName != NULL)
 	{
-		if (icon->acDesktopFileName != NULL)
-		{
-			gchar *icon_path = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
-			g_remove (icon_path);
-			g_free (icon_path);
+		gchar *icon_path = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
+		g_remove (icon_path);
+		g_free (icon_path);
 
-			if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
-			{
-				cairo_dock_fm_remove_monitor (icon);
-			}
+		if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
+		{
+			cairo_dock_fm_remove_monitor (icon);
 		}
 	}
 	else if (CAIRO_DOCK_IS_VALID_APPLI (icon))
