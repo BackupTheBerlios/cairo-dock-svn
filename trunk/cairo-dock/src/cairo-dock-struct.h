@@ -621,6 +621,8 @@ struct _CairoDockDesklet {
 #define CAIRO_DOCK_FM_VFS_ROOT_NETWORK "_vfsroot+network_"
 
 
+typedef void (* CairoDockForeachDeskletFunc) (CairoDockDesklet *pDesklet, CairoDockModule *pModule, gpointer data);
+
 typedef void (* CairoDockForeachIconFunc) (Icon *icon, CairoDock *pDock, gpointer data);
 
 typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);

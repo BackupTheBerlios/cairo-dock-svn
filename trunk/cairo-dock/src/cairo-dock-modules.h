@@ -31,6 +31,8 @@ void cairo_dock_update_conf_file_with_active_modules (GKeyFile *pOpenedKeyFile, 
 
 void cairo_dock_free_module (CairoDockModule *module);
 
+GKeyFile *cairo_dock_pre_read_module_config (CairoDockModule *pModule, CairoDockMinimalAppletConfig *pMinimalConfig);
+
 Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GError **erreur);
 
 void cairo_dock_deactivate_module (CairoDockModule *module);
@@ -50,5 +52,6 @@ Icon *cairo_dock_find_icon_from_module (CairoDockModule *module, CairoDockContai
 
 CairoDockModule *cairo_dock_find_module_from_name (gchar *cModuleName);
 
+void cairo_dock_foreach_desklet (CairoDockForeachDeskletFunc pCallback, gpointer user_data);
 
 #endif

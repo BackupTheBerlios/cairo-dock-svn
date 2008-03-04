@@ -40,6 +40,7 @@
 #include "cairo-dock-log.h"
 #include "cairo-dock-menu.h"
 #include "cairo-dock-dock-factory.h"
+#include "cairo-dock-X-utilities.h"
 #include "cairo-dock-desklet.h"
 
 extern CairoDock *g_pMainDock;
@@ -499,3 +500,43 @@ void cairo_dock_add_interactive_widget_to_desklet (GtkWidget *pInteractiveWidget
 	gtk_container_add (GTK_CONTAINER (pDesklet->pWidget), pInteractiveWidget);
 }
 
+
+
+static void _cairo_dock_set_one_desklet_visible (CairoDockDesklet *pDesklet, CairoDockModule *pModule, gpointer data)
+{
+	gboolean bOnWidgetLayerToo = GPOINTER_TO_INT (data);
+	if (bOnWidgetLayerToo)
+	{
+		Window Xid = GDK_WINDOW_XID (pDesklet->pWidget->window);
+		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");
+	}
+	
+	gtk_window_set_keep_below (GTK_WINDOW (pDesklet->pWidget), FALSE);
+	gtk_window_set_keep_above (GTK_WINDOW (pDesklet->pWidget), TRUE);
+	
+	cairo_dock_show_desklet (pDesklet);
+}
+void cairo_dock_set_all_desklets_visible (gboolean bOnWidgetLayerToo)
+{
+	cairo_dock_foreach_desklet (_cairo_dock_set_one_desklet_visible, GINT_TO_POINTER (bOnWidgetLayerToo));
+}
+
+static void _cairo_dock_set_one_desklet_visibility_to_default (CairoDockDesklet *pDesklet, CairoDockModule *pModule, CairoDockMinimalAppletConfig *pMinimalConfig)
+{
+	GKeyFile *pKeyFile = cairo_dock_pre_read_module_config (pModule, pMinimalConfig);
+	g_key_file_free (pKeyFile);
+	
+	gtk_window_set_keep_below (GTK_WINDOW (pDesklet->pWidget), pMinimalConfig->bKeepBelow);
+	gtk_window_set_keep_above (GTK_WINDOW (pDesklet->pWidget), pMinimalConfig->bKeepAbove);
+	
+	Window Xid = GDK_WINDOW_XID (pDesklet->pWidget->window);
+	if (pMinimalConfig->bOnWidgetLayer)
+		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_UTILITY");
+	else
+		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");
+}
+void cairo_dock_set_desklets_visibility_to_default (void)
+{
+	CairoDockMinimalAppletConfig pMinimalConfig;
+	cairo_dock_foreach_desklet (_cairo_dock_set_one_desklet_visibility_to_default, &pMinimalConfig);
+}

@@ -55,4 +55,8 @@ void cairo_dock_show_desklet (CairoDockDesklet *pDesklet);
 
 void cairo_dock_add_interactive_widget_to_desklet (GtkWidget *pInteractiveWidget, CairoDockDesklet *pDesklet);
 
+
+void cairo_dock_set_all_desklets_visible (gboolean bOnWidgetLayerToo);
+void cairo_dock_set_desklets_visibility_to_default (void);
+
 #endif

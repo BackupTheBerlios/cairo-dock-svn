@@ -87,6 +87,7 @@
 #include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-keybinder.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-X-utilities.h"
 
 CairoDock *g_pMainDock;  // pointeur sur le dock principal.
 GHashTable *g_hDocksTable = NULL;  // table des docks existant.
@@ -194,7 +195,7 @@ double g_fVisibleAppliAlpha;  // transparence des icones des applis dont la fene
 gboolean g_bHideVisibleApplis;  // TRUE <=> cacher les applis dont la fenetre est visible.
 gboolean g_bAppliOnCurrentDesktopOnly;  // TRUE <=> cacher les applis dont la fenetre n'est pas sur le bureau courant.
 int g_iNbDesktops;  // nombre de bureaux.
-int g_iNbFacesForViewportX, g_iNbFacesForViewportY;  // nombre de "faces du cube".
+int g_iNbViewportX, g_iNbViewportY;  // nombre de "faces du cube".
 
 gboolean g_bUseSeparator = TRUE;  // utiliser les separateurs ou pas.
 gchar *g_cSeparatorImage = NULL;
@@ -454,8 +455,8 @@ main (int argc, char** argv)
 	//\___________________ initialise the keybinder
 	cd_keybinder_init();
 
-	//\___________________ On initialise le gestionnaire des applications ouvertes.
-	cairo_dock_initialize_application_manager ();
+	//\___________________ On initialise le support de X.
+	cairo_dock_initialize_X_support ();
 	
 	//\___________________ On detecte l'environnement de bureau (apres les applis et avant les modules).
 	if (g_iDesktopEnv == CAIRO_DOCK_UNKNOWN_ENV)

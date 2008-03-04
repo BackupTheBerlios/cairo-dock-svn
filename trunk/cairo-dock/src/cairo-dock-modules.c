@@ -424,7 +424,7 @@ GKeyFile *cairo_dock_pre_read_module_config (CairoDockModule *pModule, CairoDock
 		g_key_file_load_from_file (pKeyFile, pModule->cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 		if (erreur != NULL)
 		{
-			cd_message ("Attention : %s\n", erreur->message);
+			cd_warning ("Attention : %s", erreur->message);
 			g_error_free (erreur);
 			return NULL;
 		}
@@ -458,7 +458,7 @@ GKeyFile *cairo_dock_pre_read_module_config (CairoDockModule *pModule, CairoDock
 		pMinimalConfig->bIsDetached = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "initially detached", NULL, FALSE, NULL, NULL);
 		pMinimalConfig->bKeepBelow = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "keep below", NULL, FALSE, NULL, NULL);
 		pMinimalConfig->bKeepAbove = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "keep above", NULL, FALSE, NULL, NULL);
-		pMinimalConfig->bOnWidgetLayer = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "on widget layer", NULL, FALSE, NULL, NULL);\
+		pMinimalConfig->bOnWidgetLayer = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "on widget layer", NULL, FALSE, NULL, NULL);
 	}
 	return pKeyFile;
 }
@@ -687,7 +687,7 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 		cairo_dock_deactivate_module (module);
 		if (bToBeRemoved)
 		{
-			cd_message ("  enlevement de l'ancienne icone (%.1f)\n", pOldIcon->fOrder);
+			cd_message ("  enlevement de l'ancienne icone (%.1f)", pOldIcon->fOrder);
 			pOldIcon->pModule = NULL;
 			cairo_dock_remove_icon_from_dock (CAIRO_DOCK_DOCK (pActualContainer), pOldIcon);
 		}
@@ -717,7 +717,7 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 				pNewIcon->fAlpha = pOldIcon->fAlpha;
 			}
 
-			cd_message ("pNewIcon->fOrder <- %.1f\n", pNewIcon->fOrder);
+			cd_message ("pNewIcon->fOrder <- %.1f", pNewIcon->fOrder);
 			if (CAIRO_DOCK_IS_DOCK (module->pContainer))
 			{
 				cairo_dock_insert_icon_in_dock (pNewIcon, CAIRO_DOCK_DOCK (module->pContainer), ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
@@ -754,7 +754,7 @@ void cairo_dock_deactivate_all_modules (void)
 
 void cairo_dock_activate_module_and_load (gchar *cModuleName)
 {
-	gpointer list[2] = {cModuleName, NULL};
+	gchar *list[2] = {cModuleName, NULL};
 	cairo_dock_activate_modules_from_list (list, g_pMainDock, 0);
 	
 	CairoDockModule *pModule = cairo_dock_find_module_from_name (cModuleName);
@@ -843,4 +843,24 @@ CairoDockModule *cairo_dock_find_module_from_name (gchar *cModuleName)
 	//g_print ("%s (%s)\n", __func__, cModuleName);
 	g_return_val_if_fail (cModuleName != NULL, NULL);
 	return g_hash_table_lookup (s_hModuleTable, cModuleName);
+}
+
+
+
+
+static void _cairo_dock_for_one_desklet (gchar *cModuleName, CairoDockModule *pModule, gpointer *data)
+{
+	if (CAIRO_DOCK_IS_DESKLET (pModule->pContainer))
+	{
+		CairoDockDesklet *pDesklet = CAIRO_DOCK_DESKLET (pModule->pContainer);
+		CairoDockForeachDeskletFunc pCallback = data[0];
+		gpointer user_data = data[1];
+		
+		pCallback (pDesklet, pModule, user_data);
+	}
+}
+void cairo_dock_foreach_desklet (CairoDockForeachDeskletFunc pCallback, gpointer user_data)
+{
+	gpointer data[2] = {pCallback, user_data};
+	g_hash_table_foreach (s_hModuleTable, (GHFunc) _cairo_dock_for_one_desklet, data);
 }

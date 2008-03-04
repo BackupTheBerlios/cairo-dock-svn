@@ -105,7 +105,9 @@ cairo_dock_SOURCES = \
 	cairo-dock-desklet.c\
 	cairo-dock-desklet.h\
 	cairo-dock-log.c\
-	cairo-dock-log.h
+	cairo-dock-log.h\
+	cairo-dock-X-utilities.c\
+	cairo-dock-X-utilities.h
 
 
 

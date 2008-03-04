@@ -35,6 +35,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-log.h"
 #include "cairo-dock-desklet.h"
 #include "cairo-dock-applet-facility.h"
+#include "cairo-dock-X-utilities.h"
 #include "cairo-dock-menu.h"
 
 #define CAIRO_DOCK_CONF_PANEL_WIDTH 800
@@ -52,7 +53,7 @@ extern gchar *g_cEasyConfFile;
 extern gchar *g_cCurrentLaunchersPath;
 
 extern int g_iNbDesktops;
-extern int g_iNbFacesForViewportX,g_iNbFacesForViewportY ;
+extern int g_iNbViewportX,g_iNbViewportY ;
 extern int g_iScreenWidth[2], g_iScreenHeight[2];
 
 static void cairo_dock_edit_and_reload_conf (GtkMenuItem *menu_item, gpointer *data)
@@ -162,7 +163,7 @@ gboolean cairo_dock_notification_remove_icon (gpointer *data)
 		gboolean bDestroyIcons = TRUE;
 		if (! CAIRO_DOCK_IS_URI_LAUNCHER (icon) && icon->pSubDock->icons != NULL)  // alors on propose de repartir les icones de son sous-dock dans le dock principal.
 		{
-			int answer = cairo_dock_ask_question_and_wait (_("Do you want to re-dispatch the icons contained inside this container into the dock ?\n (otherwise they will be destroyed)"), icon, pDock);
+			int answer = cairo_dock_ask_question_and_wait (_("Do you want to re-dispatch the icons contained inside this container into the dock ?\n (otherwise they will be destroyed)"), icon, CAIRO_DOCK_CONTAINER (pDock));
 			g_return_val_if_fail (answer != GTK_RESPONSE_NONE, CAIRO_DOCK_LET_PASS_NOTIFICATION);
 			if (answer == GTK_RESPONSE_YES)
 				bDestroyIcons = FALSE;
@@ -183,7 +184,7 @@ static void cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 	CairoDock *pDock = data[1];
 
 	gchar *question = g_strdup_printf (_("You're about to remove this icon (%s) from the dock. Sure ?"), icon->acName);
-	int answer = cairo_dock_ask_question_and_wait (question, icon, pDock);
+	int answer = cairo_dock_ask_question_and_wait (question, icon, CAIRO_DOCK_CONTAINER (pDock));
 	g_free (question);
 	if (answer == GTK_RESPONSE_YES)
 	{
@@ -559,7 +560,7 @@ static void _cairo_dock_delete_file (GtkMenuItem *menu_item, gpointer *data)
 	cd_message ("%s (%s)\n", __func__, icon->acName);
 
 	gchar *question = g_strdup_printf (_("You're about to delete this file\n  (%s)\nfrom your hard-disk. Sure ?"), icon->acCommand);
-	int answer = cairo_dock_ask_question_and_wait (question, icon, pDock);
+	int answer = cairo_dock_ask_question_and_wait (question, icon, CAIRO_DOCK_CONTAINER (pDock));
 	g_free (question);
 	if (answer == GTK_RESPONSE_YES)
 	{
@@ -568,7 +569,7 @@ static void _cairo_dock_delete_file (GtkMenuItem *menu_item, gpointer *data)
 		{
 			cd_message ("Attention : couldn't delete this file.\nCheck that you have writing rights on this file.\n");
 			gchar *cMessage = g_strdup_printf (_("Attention : couldn't delete this file.\nCheck that you have writing rights on it."));
-			cairo_dock_show_temporary_dialog_with_default_icon (cMessage, icon, pDock, 4000);
+			cairo_dock_show_temporary_dialog_with_default_icon (cMessage, icon, CAIRO_DOCK_CONTAINER (pDock), 4000);
 			g_free (cMessage);
 		}
 		cairo_dock_remove_icon_from_dock (pDock, icon);
@@ -591,7 +592,7 @@ static void _cairo_dock_rename_file (GtkMenuItem *menu_item, gpointer *data)
 	CairoDock *pDock = data[1];
 	cd_message ("%s (%s)\n", __func__, icon->acName);
 
-	gchar *cNewName = cairo_dock_show_demand_and_wait (_("Rename to :"), icon, pDock, icon->acName);
+	gchar *cNewName = cairo_dock_show_demand_and_wait (_("Rename to :"), icon, CAIRO_DOCK_CONTAINER (pDock), icon->acName);
 	if (cNewName != NULL && *cNewName != '\0')
 	{
 		gboolean bSuccess = cairo_dock_fm_rename_file (icon->acCommand, cNewName);
@@ -599,7 +600,7 @@ static void _cairo_dock_rename_file (GtkMenuItem *menu_item, gpointer *data)
 		{
 			cd_message ("Attention : couldn't rename this file.\nCheck that you have writing rights, and that the new name does not already exist.\n");
 			gchar *cMessage = g_strdup_printf (_("Attention : couldn't rename %s.\nCheck that you have writing rights,\n and that the new name does not already exist."), icon->acCommand);
-			cairo_dock_show_temporary_dialog (cMessage, icon, pDock, 5000);
+			cairo_dock_show_temporary_dialog (cMessage, icon, CAIRO_DOCK_CONTAINER (pDock), 5000);
 			g_free (cMessage);
 		}
 	}
@@ -655,7 +656,7 @@ static void cairo_dock_remove_module (GtkMenuItem *menu_item, gpointer *data)
 	CairoDock *pDock = data[1];
 
 	gchar *question = g_strdup_printf (_("You're about to remove this module (%s) from the dock. Sure ?"), icon->pModule->pVisitCard->cModuleName);
-	int answer = cairo_dock_ask_question_and_wait (question, icon, pDock);
+	int answer = cairo_dock_ask_question_and_wait (question, icon, CAIRO_DOCK_CONTAINER (pDock));
 	if (answer == GTK_RESPONSE_YES)
 	{
 		cairo_dock_deactivate_module_and_unload (icon->pModule->pVisitCard->cModuleName);
@@ -737,9 +738,7 @@ static void cairo_dock_move_appli_to_desktop (GtkMenuItem *menu_item, gpointer *
 	g_print ("%s (%d;%d;%d)\n", __func__, iDesktopNumber, iViewPortNumberX, iViewPortNumberY);
 	if (icon->Xid > 0)
 	{
-		int iCurrentDesktopNumber, iGlobalPositionX, iGlobalPositionY, iWidthExtent, iHeightExtent;
-		cairo_dock_get_window_desktop_and_position (icon->Xid, &iCurrentDesktopNumber, &iGlobalPositionX, &iGlobalPositionY, &iWidthExtent, &iHeightExtent);
-		g_print (" window : %d / (%d;%d)\n", iCurrentDesktopNumber, iGlobalPositionX, iGlobalPositionY);
+		int iCurrentDesktopNumber = cairo_dock_get_window_desktop (icon->Xid);
 		
 		int iCurrentViewPortX, iCurrentViewPortY;
 		cairo_dock_get_current_viewport (&iCurrentViewPortX, &iCurrentViewPortY);
@@ -1032,12 +1031,12 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		gboolean bIsAbove=FALSE, bIsBelow=FALSE;
 		cairo_dock_window_is_above_or_below (icon->Xid, &bIsAbove, &bIsBelow);
 		_add_entry_in_menu (bIsAbove ? _("Don't keep above") : _("Keep above"), bIsAbove ? GTK_STOCK_GOTO_BOTTOM : GTK_STOCK_GOTO_TOP, cairo_dock_change_window_above, pSubMenuOtherActions);
-		g_print ("g_iNbDesktops : %d ; g_iNbFacesForViewportX : %d ; g_iNbFacesForViewportY : %d\n", g_iNbDesktops, g_iNbFacesForViewportX, g_iNbFacesForViewportY);
-		if (g_iNbDesktops > 1 || g_iNbFacesForViewportX > 1 || g_iNbFacesForViewportY > 1)
+		g_print ("g_iNbDesktops : %d ; g_iNbViewportX : %d ; g_iNbViewportY : %d\n", g_iNbDesktops, g_iNbViewportX, g_iNbViewportY);
+		if (g_iNbDesktops > 1 || g_iNbViewportX > 1 || g_iNbViewportY > 1)
 		{
 			int i, j, k, iDesktopCode;
 			const gchar *cLabel;
-			if (g_iNbDesktops > 1 && (g_iNbFacesForViewportX > 1 || g_iNbFacesForViewportY > 1))
+			if (g_iNbDesktops > 1 && (g_iNbViewportX > 1 || g_iNbViewportY > 1))
 				cLabel = _("Move to desktop %d - face %d");
 			else if (g_iNbDesktops > 1)
 				cLabel = _("Move to desktop %d");
@@ -1045,22 +1044,22 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 				cLabel = _("Move to face %d");
 			GString *sDesktop = g_string_new ("");
 			g_free (pDesktopData);
-			pDesktopData = g_new0 (gpointer, 4 * g_iNbDesktops * g_iNbFacesForViewportX * g_iNbFacesForViewportY);
+			pDesktopData = g_new0 (gpointer, 4 * g_iNbDesktops * g_iNbViewportX * g_iNbViewportY);
 			gpointer *user_data;
 			
 			for (i = 0; i < g_iNbDesktops; i ++)  // on range par bureau.
 			{
-				for (j = 0; j < g_iNbFacesForViewportY; j ++)  // puis par rangee.
+				for (j = 0; j < g_iNbViewportY; j ++)  // puis par rangee.
 				{
-					for (k = 0; k < g_iNbFacesForViewportX; k ++)
+					for (k = 0; k < g_iNbViewportX; k ++)
 					{
-						if (g_iNbDesktops > 1 && (g_iNbFacesForViewportX > 1 || g_iNbFacesForViewportY > 1))
-							g_string_printf (sDesktop, cLabel, i+1, j*g_iNbFacesForViewportX+k+1);
+						if (g_iNbDesktops > 1 && (g_iNbViewportX > 1 || g_iNbViewportY > 1))
+							g_string_printf (sDesktop, cLabel, i+1, j*g_iNbViewportX+k+1);
 						else if (g_iNbDesktops > 1)
 							g_string_printf (sDesktop, cLabel, i+1);
 						else
-							g_string_printf (sDesktop, cLabel, j*g_iNbFacesForViewportX+k+1);
-						iDesktopCode = i * g_iNbFacesForViewportY * g_iNbFacesForViewportX + j * g_iNbFacesForViewportY + k;
+							g_string_printf (sDesktop, cLabel, j*g_iNbViewportX+k+1);
+						iDesktopCode = i * g_iNbViewportY * g_iNbViewportX + j * g_iNbViewportY + k;
 						user_data = &pDesktopData[4*iDesktopCode];
 						user_data[0] = data;
 						user_data[1] = GINT_TO_POINTER (i);

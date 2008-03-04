@@ -37,6 +37,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-file-manager.h"
 #include "cairo-dock-dock-factory.h"
+#include "cairo-dock-X-utilities.h"
 #include "cairo-dock-log.h"
 
 extern int g_iWmHint;
@@ -512,7 +513,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 
 	if (! g_bSameHorizontality)
 	{
-		cairo_t* pSourceContext = cairo_dock_create_context_from_window (pDock);
+		cairo_t* pSourceContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 		cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 		cairo_destroy (pSourceContext);
 	}
@@ -532,7 +533,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 				int iSeparatorType = iOrder + 1;
 				cd_message ("insertion de %s -> iSeparatorType : %d\n", icon->acName, iSeparatorType);
 
-				cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock);
+				cairo_t *pSourceContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 				Icon *pSeparatorIcon = cairo_dock_create_separator_icon (pSourceContext, iSeparatorType, pDock, bApplyRatio);
 				if (pSeparatorIcon != NULL)
 				{
@@ -553,7 +554,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 				int iSeparatorType = iOrder - 1;
 				cd_message ("insertion de %s -> iSeparatorType : %d\n", icon->acName, iSeparatorType);
 
-				cairo_t *pSourceContext = cairo_dock_create_context_from_window (pDock);
+				cairo_t *pSourceContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 				Icon *pSeparatorIcon = cairo_dock_create_separator_icon (pSourceContext, iSeparatorType, pDock, bApplyRatio);
 				if (pSeparatorIcon != NULL)
 				{
@@ -607,7 +608,7 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 	Icon* icon;
 	const gchar *cFileName;
 	CairoDock *pParentDock;
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pMainDock);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pMainDock));
 
 	do
 	{
@@ -774,7 +775,7 @@ void cairo_dock_reference_dock (CairoDock *pDock)
 
 			if (! g_bSameHorizontality)
 			{
-				cairo_t* pSourceContext = cairo_dock_create_context_from_window (pDock);
+				cairo_t* pSourceContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 				cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
 				cairo_destroy (pSourceContext);
 			}
