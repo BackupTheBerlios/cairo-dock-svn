@@ -523,30 +523,30 @@ gboolean CD_APPLET_ON_CLICK (gpointer *data);
 /**
 *Debut de la fonction de notification de construction du menu.
 */
-#define CD_APPLET_ON_BUILD_MENU_BEGIN								\
-	gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data) \
-	{																									\
-		Icon *pClickedIcon = data[0];										\
-		CairoDock *pClickedDock = data[1];																	\
-		if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock)) \
-		{																																		\
-			GtkWidget *pAppletMenu = data[2];																	\
-			GtkWidget *pMenuItem, image;																			\
-			pMenuItem = gtk_separator_menu_item_new ();												\
-			gtk_menu_shell_append(GTK_MENU_SHELL (pAppletMenu), pMenuItem);
+#define CD_APPLET_ON_BUILD_MENU_BEGIN \
+gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data) \
+{ \
+	Icon *pClickedIcon = data[0]; \
+	CairoDock *pClickedDock = data[1]; \
+	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock)) \
+	{ \
+		GtkWidget *pAppletMenu = data[2]; \
+		GtkWidget *pMenuItem, image; \
+		pMenuItem = gtk_separator_menu_item_new (); \
+		gtk_menu_shell_append(GTK_MENU_SHELL (pAppletMenu), pMenuItem);
 
 /**
 *Fin de la fonction de notification de construction du menu. Par defaut elle intercepte la notification si elle l'a recue.
 */
-#define CD_APPLET_ON_BUILD_MENU_END							\
-	}																							\
-		return CAIRO_DOCK_LET_PASS_NOTIFICATION;		\
+#define CD_APPLET_ON_BUILD_MENU_END \
+	} \
+	return CAIRO_DOCK_LET_PASS_NOTIFICATION; \
 }
 /**
 *Definition de la fonction precedente; a inclure dans le .h correspondant.
 */
-#define CD_APPLET_ON_BUILD_MENU_H										\
-	gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
+#define CD_APPLET_ON_BUILD_MENU_H \
+gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 
 /**
 *Menu principal de l'applet.
@@ -577,7 +577,7 @@ gboolean CD_APPLET_ON_CLICK (gpointer *data);
 *@return le GtkWidget du sous-menu.
 */
 #define CD_APPLET_CREATE_AND_ADD_SUB_MENU(cLabel, pMenu) \
-cairo_dock_create_sub_menu (cLabel, pMenu);
+	cairo_dock_create_sub_menu (cLabel, pMenu);
 
 /**
 *Cree et ajoute un sous-menu a un menu.
@@ -600,19 +600,19 @@ cairo_dock_create_sub_menu (cLabel, pMenu);
 #define CD_APPLET_ADD_IN_MENU(cLabel, pFunction, pMenu) CD_APPLET_ADD_IN_MENU_WITH_DATA(cLabel, pFunction, pMenu, NULL)
 
 #define CD_APPLET_ADD_IN_MENU_WITH_STOCK(cLabel, gtkStock, pFunction, pMenu, pData) \
-	menu_item = gtk_image_menu_item_new_with_label (_(cLabel));\
-	image = gtk_image_new_from_stock (gtkStock, GTK_ICON_SIZE_MENU);\
-	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);\
-	gtk_menu_shell_append  (GTK_MENU_SHELL (pMenu), menu_item);\
+	menu_item = gtk_image_menu_item_new_with_label (_(cLabel)); \
+	image = gtk_image_new_from_stock (gtkStock, GTK_ICON_SIZE_MENU); \
+	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image); \
+	gtk_menu_shell_append  (GTK_MENU_SHELL (pMenu), menu_item); \
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(pFunction), pData);
 
 
 /**
  * Ajoute un separateur dans un menu deja existant
  */
-#define CD_APPLET_ADD_SEPARATOR()                               \
-  pMenuItem = gtk_separator_menu_item_new ();                   \
-  gtk_menu_shell_append(GTK_MENU_SHELL (pSubMenu), pMenuItem);
+#define CD_APPLET_ADD_SEPARATOR() \
+	pMenuItem = gtk_separator_menu_item_new (); \
+	gtk_menu_shell_append(GTK_MENU_SHELL (pSubMenu), pMenuItem);
 
 /**
 *Ajoute une entree pour la fonction 'A propos'.

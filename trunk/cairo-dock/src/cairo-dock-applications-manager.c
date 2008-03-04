@@ -459,22 +459,6 @@ void cairo_dock_window_is_fullscreen_or_hidden (Window Xid, gboolean *bIsFullScr
 	XFree (pXStateBuffer);
 }
 
-gboolean cairo_dock_desktop_is_visible (void)
-{
-	Atom aNetShowingDesktop = XInternAtom (s_XDisplay, "_NET_SHOWING_DESKTOP", False);
-	gulong iLeftBytes, iBufferNbElements = 0;
-	Atom aReturnedType = 0;
-	int aReturnedFormat = 0;
-	gulong *pXBuffer = NULL;
-	Window root = DefaultRootWindow (s_XDisplay);
-	XGetWindowProperty (s_XDisplay, root, aNetShowingDesktop, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXBuffer);
-
-	gboolean bDesktopIsShown = (iBufferNbElements > 0 && pXBuffer != NULL ? *pXBuffer : FALSE);
-	XFree (pXBuffer);
-	return bDesktopIsShown;
-}
-
-
 Window cairo_dock_get_active_window (void)
 {
 	Atom aNetActiveWindow = XInternAtom (s_XDisplay, "_NET_ACTIVE_WINDOW", False);
@@ -602,11 +586,11 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 	static XEvent event;
 	static int iLastActiveWindow = 0;
 	static gboolean bInProgress = FALSE;
+	
+	g_return_val_if_fail (pDock != NULL, FALSE);
 	if (bInProgress)
 		return TRUE;
 	bInProgress = TRUE;
-
-	g_return_val_if_fail (pDock != NULL, FALSE);
 
 	long event_mask = 0xFFFFFFFF;  // on les recupere tous, ca vide la pile au fur et a mesure plutot que tout a la fin.
 	Window Xid;
@@ -797,7 +781,8 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 		//else
 		//	cd_message ("  type : %d; window : %d\n", event.xany.type, Xid);
 	}
-	///XSync (s_XDisplay, True);
+	if (XEventsQueued (s_XDisplay, QueuedAlready) != 0)
+		XSync (s_XDisplay, True);  // True <=> discard.
 	//g_print ("XEventsQueued : %d\n", XEventsQueued (s_XDisplay, QueuedAfterFlush));  // QueuedAlready, QueuedAfterReading, QueuedAfterFlush
 	
 	bInProgress = FALSE;

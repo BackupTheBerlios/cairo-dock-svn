@@ -353,8 +353,8 @@ static void cairo_dock_add_separator (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
-
-	_cairo_dock_create_launcher (menu_item, data, CAIRO_DOCK_LAUNCHER_FOR_SEPARATOR);
+	if (icon != NULL)
+		_cairo_dock_create_launcher (menu_item, data, CAIRO_DOCK_LAUNCHER_FOR_SEPARATOR);
 }
 
 static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
@@ -966,7 +966,10 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		
 		_add_entry_in_menu (_("Add a sub-dock"), GTK_STOCK_ADD, cairo_dock_add_container, menu);
 		
-		_add_entry_in_menu (_("Add a separator"), GTK_STOCK_ADD, cairo_dock_add_separator, menu);
+		if (icon != NULL)
+		{
+			_add_entry_in_menu (_("Add a separator"), GTK_STOCK_ADD, cairo_dock_add_separator, menu);
+		}
 
 		return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 	}
@@ -1001,13 +1004,16 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 				g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(_cairo_dock_show_file_properties), data);
 			}
 			if (icon->acDesktopFileName == NULL)
-				return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
+				return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 		}
 		_add_entry_in_menu (_("Add a launcher"), GTK_STOCK_ADD, cairo_dock_add_launcher, menu);
 
 		_add_entry_in_menu (_("Add a sub-dock"), GTK_STOCK_ADD, cairo_dock_add_container, menu);
 		
-		_add_entry_in_menu (_("Add a separator"), GTK_STOCK_ADD, cairo_dock_add_separator, menu);
+		if (icon != NULL)
+		{
+			_add_entry_in_menu (_("Add a separator"), GTK_STOCK_ADD, cairo_dock_add_separator, menu);
+		}
 
 		menu_item = gtk_separator_menu_item_new ();
 		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
