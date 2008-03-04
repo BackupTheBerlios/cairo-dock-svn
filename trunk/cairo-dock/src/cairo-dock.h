@@ -34,5 +34,6 @@
 #include <cairo-dock-keybinder.h>
 #include <cairo-dock-desklet.h>
 #include <cairo-dock-log.h>
+#include <cairo-dock-X-utilities.h>
 
 #endif

@@ -150,4 +150,5 @@ cairo_docksubinclude_HEADERS =\
 	cairo-dock-file-manager.h\
 	cairo-dock-keybinder.h\
 	cairo-dock-desklet.h\
-	cairo-dock-log.h
+	cairo-dock-log.h\
+	cairo-dock-X-utilities.h
