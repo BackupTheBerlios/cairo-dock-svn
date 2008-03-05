@@ -208,14 +208,19 @@ static gboolean on_configure_desklet (GtkWidget* pWidget,
 
 Icon *_cairo_dock_find_clicked_icon_in_desklet (CairoDockDesklet *pDesklet)
 {
+	int iMouseX = - (int) pDesklet->diff_x;
+	int iMouseY = - (int) pDesklet->diff_y;
+	cd_debug (" clic en (%d;%d)", iMouseX, iMouseY);
+	
+	Icon *icon = pDesklet->pIcon;
+	if (icon->fDrawX < iMouseX && icon->fDrawX + icon->fWidth * icon->fScale > iMouseX && icon->fDrawY < iMouseY && icon->fDrawY + icon->fHeight * icon->fScale > iMouseY)
+	{
+		return icon;
+	}
+	
 	if (pDesklet->icons != NULL)
 	{
-		int iMouseX = - (int) pDesklet->diff_x;
-		int iMouseY = - (int) pDesklet->diff_y;
-		cd_debug (" clic en (%d;%d)", iMouseX, iMouseY);
-		
 		GList* ic;
-		Icon *icon;
 		for (ic = pDesklet->icons; ic != NULL; ic = ic->next)
 		{
 			icon = ic->data;
@@ -250,22 +255,22 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 			}
 			else
 			{
-				Icon *pClickedfIcon = _cairo_dock_find_clicked_icon_in_desklet (pDesklet);
-				gpointer data[2] = {pClickedfIcon, pDesklet};
+				Icon *pClickedIcon = _cairo_dock_find_clicked_icon_in_desklet (pDesklet);
+				gpointer data[2] = {pClickedIcon, pDesklet};
 				cairo_dock_notify (CAIRO_DOCK_CLICK_ICON, data);
 			}
 		}
 		else if (pButton->type == GDK_2BUTTON_PRESS)
 		{
-			Icon *pClickedfIcon = _cairo_dock_find_clicked_icon_in_desklet (pDesklet);
-			gpointer data[2] = {pClickedfIcon, pDesklet};
+			Icon *pClickedIcon = _cairo_dock_find_clicked_icon_in_desklet (pDesklet);
+			gpointer data[2] = {pClickedIcon, pDesklet};
 			cairo_dock_notify (CAIRO_DOCK_DOUBLE_CLICK_ICON, data);
 		}
 	}
 	else if (pButton->button == 3 && pButton->type == GDK_BUTTON_PRESS)  // clique droit.
 	{
-		Icon *pClickedfIcon = _cairo_dock_find_clicked_icon_in_desklet (pDesklet);
-		GtkWidget *menu = cairo_dock_build_menu (pClickedfIcon, CAIRO_DOCK_CONTAINER (pDesklet));  // genere un CAIRO_DOCK_BUILD_MENU.
+		Icon *pClickedIcon = _cairo_dock_find_clicked_icon_in_desklet (pDesklet);
+		GtkWidget *menu = cairo_dock_build_menu (pClickedIcon, CAIRO_DOCK_CONTAINER (pDesklet));  // genere un CAIRO_DOCK_BUILD_MENU.
 		gtk_widget_show_all (menu);
 		gtk_menu_popup (GTK_MENU (menu),
 			NULL,
@@ -302,7 +307,8 @@ void on_drag_data_received_desklet (GtkWidget *pWidget, GdkDragContext *dc, gint
 	pDesklet->diff_y = - y;
 	
 	double fOrder = 0;
-	gpointer data[4] = {cReceivedData, pDesklet->pIcon, &fOrder, pDesklet};
+	Icon *pClickedIcon = _cairo_dock_find_clicked_icon_in_desklet (pDesklet);
+	gpointer data[4] = {cReceivedData, pClickedIcon, &fOrder, pDesklet};
 	cairo_dock_notify (CAIRO_DOCK_DROP_DATA, data);
 }
 

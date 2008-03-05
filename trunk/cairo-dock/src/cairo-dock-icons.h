@@ -275,7 +275,7 @@ void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType)
 *@param data un pointeur qui sera passe en entree de l'action.
 *@return le separateur avec le type a gauche si il y'en a, NULL sinon.
 */
-Icon *cairo_dock_foreach_icons_of_type (CairoDock *pDock, CairoDockIconType iType, CairoDockForeachIconFunc pFuntion, gpointer data);
+Icon *cairo_dock_foreach_icons_of_type (GList *pIconList, CairoDockIconType iType, CairoDockForeachIconFunc pFuntion, gpointer data);
 /**
 *Enleve et detruit toutes les icones de separateurs automatiques.
 *@param pDock le dock duquel supprimer les icones.

@@ -96,7 +96,7 @@ struct _CairoDockContainer {
 #endif // HAVE_GLITZ
 };
 
-#define CAIRO_DOCK_CONTAINER(p) ((CairoDockContainer *)p)
+#define CAIRO_DOCK_CONTAINER(p) ((CairoDockContainer *) (p))
 
 
 struct _CairoDock {
@@ -499,6 +499,8 @@ struct _Icon {
 	double fLastCheckTime;
 	/// TRUE ssi la fenetre de l'application correspondante est minimisee.
 	gboolean bIsHidden;
+	/// Position et taille de la fenetre.
+	GtkAllocation windowGeometry;
 	//\____________ Pour les modules.
 	/// Module que represente l'icone.
 	CairoDockModule *pModule;
@@ -625,7 +627,7 @@ struct _CairoDockDesklet {
 
 typedef void (* CairoDockForeachDeskletFunc) (CairoDockDesklet *pDesklet, CairoDockModule *pModule, gpointer data);
 
-typedef void (* CairoDockForeachIconFunc) (Icon *icon, CairoDock *pDock, gpointer data);
+typedef void (* CairoDockForeachIconFunc) (Icon *icon, gpointer data);
 
 typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
 

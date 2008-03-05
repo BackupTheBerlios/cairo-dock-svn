@@ -122,9 +122,9 @@ GtkWidget *cairo_dock_create_sub_menu (gchar *cLabel, GtkWidget *pMenu);
 *Definition des fonctions d'initialisation de l'applet; a inclure dans le .h du fichier d'init de l'applet.
 */
 #define CD_APPLET_H \
-CairoDockVisitCard *pre_init (void);\
-void init (GKeyFile *pKeyFile, Icon *pIcon, CairoDockContainer *pContainer, gchar *cConfFilePath, GError **erreur);\
-void stop (void);\
+CairoDockVisitCard *pre_init (void); \
+void init (GKeyFile *pKeyFile, Icon *pIcon, CairoDockContainer *pContainer, gchar *cConfFilePath, GError **erreur); \
+void stop (void); \
 gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoDockContainer *pNewContainer);
 
 //\______________________ pre_init.
@@ -137,31 +137,31 @@ gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoDockContainer *p
 *@param iMicroVersion version micro du dock necessaire au bon fonctionnement de l'applet.
 */
 #define CD_APPLET_PRE_INIT_BEGIN(cName, iMajorVersion, iMinorVersion, iMicroVersion) \
-Icon *myIcon = NULL;\
-CairoDock *myDock = NULL;\
-CairoDockDesklet *myDesklet = NULL;\
-CairoDockContainer *myContainer = NULL;\
-cairo_t *myDrawContext = NULL;\
-CairoDockVisitCard *pre_init (void)\
-{\
-	CairoDockVisitCard *pVisitCard = g_new0 (CairoDockVisitCard, 1);\
-	pVisitCard->cModuleName = g_strdup (cName);\
-	pVisitCard->cReadmeFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_README_FILE);\
-	pVisitCard->iMajorVersionNeeded = iMajorVersion;\
-	pVisitCard->iMinorVersionNeeded = iMinorVersion;\
-	pVisitCard->iMicroVersionNeeded = iMicroVersion;\
-	pVisitCard->cPreviewFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_PREVIEW_FILE);\
-	pVisitCard->cGettextDomain = g_strdup (MY_APPLET_GETTEXT_DOMAIN);\
-	pVisitCard->cDockVersionOnCompilation = g_strdup (MY_APPLET_DOCK_VERSION);\
-	pVisitCard->cUserDataDir = g_strdup (MY_APPLET_USER_DATA_DIR);\
-	pVisitCard->cShareDataDir = g_strdup (MY_APPLET_SHARE_DATA_DIR);\
-	pVisitCard->cConfFileName = (MY_APPLET_CONF_FILE != NULL && strcmp (MY_APPLET_CONF_FILE, "none") != 0 ? g_strdup (MY_APPLET_CONF_FILE) : NULL);\
+Icon *myIcon = NULL; \
+CairoDock *myDock = NULL; \
+CairoDockDesklet *myDesklet = NULL; \
+CairoDockContainer *myContainer = NULL; \
+cairo_t *myDrawContext = NULL; \
+CairoDockVisitCard *pre_init (void) \
+{ \
+	CairoDockVisitCard *pVisitCard = g_new0 (CairoDockVisitCard, 1); \
+	pVisitCard->cModuleName = g_strdup (cName); \
+	pVisitCard->cReadmeFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_README_FILE); \
+	pVisitCard->iMajorVersionNeeded = iMajorVersion; \
+	pVisitCard->iMinorVersionNeeded = iMinorVersion; \
+	pVisitCard->iMicroVersionNeeded = iMicroVersion; \
+	pVisitCard->cPreviewFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_PREVIEW_FILE); \
+	pVisitCard->cGettextDomain = g_strdup (MY_APPLET_GETTEXT_DOMAIN); \
+	pVisitCard->cDockVersionOnCompilation = g_strdup (MY_APPLET_DOCK_VERSION); \
+	pVisitCard->cUserDataDir = g_strdup (MY_APPLET_USER_DATA_DIR); \
+	pVisitCard->cShareDataDir = g_strdup (MY_APPLET_SHARE_DATA_DIR); \
+	pVisitCard->cConfFileName = (MY_APPLET_CONF_FILE != NULL && strcmp (MY_APPLET_CONF_FILE, "none") != 0 ? g_strdup (MY_APPLET_CONF_FILE) : NULL); \
 	pVisitCard->cModuleVersion = g_strdup (MY_APPLET_VERSION);
 /**
 *Fin de la fonction de pre-initialisation de l'applet.
 */
 #define CD_APPLET_PRE_INIT_END \
-	return pVisitCard;\
+	return pVisitCard; \
 }
 /**
 *Fonction de pre-initialisation generique. Ne fais que definir l'applet (en appelant les 2 macros precedentes), la plupart du temps cela est suffisant.
@@ -178,28 +178,28 @@ CD_APPLET_PRE_INIT_END
 *Lis le fichier de conf de l'applet, et cree son icone ainsi que son contexte de dessin.
 *@param erreur une GError, utilisable pour reporter une erreur ayant lieu durant l'initialisation.
 */
-#define CD_APPLET_INIT_BEGIN(erreur)\
-void init (GKeyFile *pKeyFile, Icon *pIcon, CairoDockContainer *pContainer, gchar *cConfFilePath, GError **erreur)\
-{\
-	g_return_if_fail (pContainer != NULL && pIcon != NULL);\
-	myIcon = pIcon;\
-	myContainer = pContainer;\
-	myDock = (CAIRO_DOCK_IS_DOCK (pContainer) ? CAIRO_DOCK_DOCK (pContainer) : NULL);\
-	myDesklet = (CAIRO_DOCK_IS_DESKLET (pContainer) ? CAIRO_DOCK_DESKLET (pContainer) : NULL);\
-	read_conf_file (pKeyFile, cConfFilePath);\
-	if (CAIRO_DOCK_IS_DOCK (myContainer))\
-	{\
-		myDrawContext = cairo_create (myIcon->pIconBuffer);\
-		g_return_if_fail (cairo_status (myDrawContext) == CAIRO_STATUS_SUCCESS);\
-	}\
-	else\
+#define CD_APPLET_INIT_BEGIN(erreur) \
+void init (GKeyFile *pKeyFile, Icon *pIcon, CairoDockContainer *pContainer, gchar *cConfFilePath, GError **erreur) \
+{ \
+	g_return_if_fail (pContainer != NULL && pIcon != NULL); \
+	myIcon = pIcon; \
+	myContainer = pContainer; \
+	myDock = (CAIRO_DOCK_IS_DOCK (pContainer) ? CAIRO_DOCK_DOCK (pContainer) : NULL); \
+	myDesklet = (CAIRO_DOCK_IS_DESKLET (pContainer) ? CAIRO_DOCK_DESKLET (pContainer) : NULL); \
+	read_conf_file (pKeyFile, cConfFilePath); \
+	if (CAIRO_DOCK_IS_DOCK (myContainer)) \
+	{ \
+		myDrawContext = cairo_create (myIcon->pIconBuffer); \
+		g_return_if_fail (cairo_status (myDrawContext) == CAIRO_STATUS_SUCCESS); \
+	} \
+	else \
 		myDrawContext = NULL;
 
 /**
 *Fin de la fonction d'initialisation de l'applet.
 */
-#define CD_APPLET_INIT_END\
-	return;\
+#define CD_APPLET_INIT_END \
+	return; \
 }
 
 #define CD_APPLET_INIT_END0 \
@@ -218,13 +218,13 @@ void stop (void) \
 *Fin de la fonction d'arret de l'applet.
 */
 #define CD_APPLET_STOP_END \
-	myDock = NULL;\
-	myDesklet = NULL;\
-	myContainer = NULL;\
-	myIcon = NULL;\
-	if (myDrawContext != NULL)\
-		cairo_destroy (myDrawContext);\
-	myDrawContext = NULL;\
+	myDock = NULL; \
+	myDesklet = NULL; \
+	myContainer = NULL; \
+	myIcon = NULL; \
+	if (myDrawContext != NULL) \
+		cairo_destroy (myDrawContext); \
+	myDrawContext = NULL; \
 }
 
 //\______________________ reload.
@@ -234,23 +234,23 @@ void stop (void) \
 
 #define CD_APPLET_RELOAD_BEGIN \
 gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoDockContainer *pNewContainer) \
-{\
-	cd_message ("%s (%s)\n", __func__, cConfFilePath);\
-	g_return_val_if_fail (pNewContainer != NULL, FALSE);\
-	gboolean bContainerTypeChanged = (myContainer == NULL || myContainer->iType != pNewContainer->iType);\
-	myContainer = pNewContainer;\
-	myDock = (CAIRO_DOCK_IS_DOCK (pNewContainer) ? CAIRO_DOCK_DOCK (pNewContainer) : NULL);\
-	myDesklet = (CAIRO_DOCK_IS_DESKLET (pNewContainer) ? CAIRO_DOCK_DESKLET (pNewContainer) : NULL);\
-	if (pKeyFile != NULL)\
-		read_conf_file (pKeyFile, cConfFilePath);\
-	if (myDrawContext != NULL)\
-		cairo_destroy (myDrawContext);\
-	if (CAIRO_DOCK_IS_DOCK (myContainer))\
-	{\
-		myDrawContext = cairo_create (myIcon->pIconBuffer);\
-		g_return_val_if_fail (cairo_status (myDrawContext) == CAIRO_STATUS_SUCCESS, FALSE);\
-	}\
-	else\
+{ \
+	cd_message ("%s (%s)\n", __func__, cConfFilePath); \
+	g_return_val_if_fail (pNewContainer != NULL, FALSE); \
+	gboolean bContainerTypeChanged = (myContainer == NULL || myContainer->iType != pNewContainer->iType); \
+	myContainer = pNewContainer; \
+	myDock = (CAIRO_DOCK_IS_DOCK (pNewContainer) ? CAIRO_DOCK_DOCK (pNewContainer) : NULL); \
+	myDesklet = (CAIRO_DOCK_IS_DESKLET (pNewContainer) ? CAIRO_DOCK_DESKLET (pNewContainer) : NULL); \
+	if (pKeyFile != NULL) \
+		read_conf_file (pKeyFile, cConfFilePath); \
+	if (myDrawContext != NULL) \
+		cairo_destroy (myDrawContext); \
+	if (CAIRO_DOCK_IS_DOCK (myContainer)) \
+	{ \
+		myDrawContext = cairo_create (myIcon->pIconBuffer); \
+		g_return_val_if_fail (cairo_status (myDrawContext) == CAIRO_STATUS_SUCCESS, FALSE); \
+	} \
+	else \
 		myDrawContext = NULL;
 
 /**
@@ -275,7 +275,9 @@ gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoDockContainer *p
 *Chemin du fichier de conf de l'applet, appelable durant les fonctions d'init, de config, et de reload.
 */
 #define CD_APPLET_MY_CONF_FILE cConfFilePath
-
+/**
+*Fichier de cles de l'applet, appelable durant les fonctions d'init, de config, et de reload.
+*/
 #define CD_APPLET_MY_KEY_FILE pKeyFile
 
 
@@ -283,13 +285,10 @@ gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoDockContainer *p
 //\______________________ read_conf_file.
 /**
 *Debut de la fonction de configuration de l'applet (celle qui est appelee au debt de l'init).
-*Ouvre le fichier de conf de l'applet, et charge les parametres generiques suivant (groupe "Icon") : largeur ("width"), hauteur ("height), nom ("name", optionnel), et icone ("icon", optionnel).
-*@param cDefaultAppletName nom par defaut de l'applet dans le dock (son etiquette), ou NULL si aucun nom ne doit etre lu dans la conf (habituellement l'etiquette reprend simplement le nom de l'applet).
-*@param cDefaultIconName nom de l'icone a appliquer par defaut a l'applet, ou NULL si aucune icone ne doit etre lue dans la conf (auquel cas la surface de l'icone sera juste transparente).
 */
-#define CD_APPLET_CONFIG_BEGIN(...)\
-void read_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath)\
-{\
+#define CD_APPLET_CONFIG_BEGIN \
+void read_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath) \
+{ \
 	gboolean bFlushConfFileNeeded = FALSE, bNewKeysPresent = FALSE;
 
 /**
@@ -309,9 +308,6 @@ void read_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath)\
 */
 #define CD_APPLET_CONFIG_H \
 void read_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath);
-
-#define CD_APPLET_CONFIG_H0 \
-CairoDockMinimalAppletConfig *read_conf_file (gchar *cConfFilePath);
 
 /**
 *Recupere la valeur d'un parametre 'booleen' du fichier de conf.
@@ -487,12 +483,12 @@ void about (GtkMenuItem *menu_item, gpointer *data);
 /**
 *Debut de la fonction de notification au clic gauche.
 */
-#define CD_APPLET_ON_CLICK_BEGIN\
-	gboolean CD_APPLET_ON_CLICK (gpointer *data)\
-	{\
-		Icon *pClickedIcon = data[0];\
-		CairoDock *pClickedDock = data[1];\
-		if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock) || pClickedDock == myDesklet)\
+#define CD_APPLET_ON_CLICK_BEGIN \
+	gboolean CD_APPLET_ON_CLICK (gpointer *data) \
+	{ \
+		Icon *pClickedIcon = data[0]; \
+		CairoDockContainer *pClickedContainer = data[1]; \
+		if (pClickedIcon == myIcon || (myIcon != NULL && pClickedContainer == CAIRO_DOCK_CONTAINER (myIcon->pSubDock)) || pClickedContainer == CAIRO_DOCK_CONTAINER (myDesklet)) \
 		{
 
 /**
@@ -527,8 +523,8 @@ gboolean CD_APPLET_ON_CLICK (gpointer *data);
 gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data) \
 { \
 	Icon *pClickedIcon = data[0]; \
-	CairoDock *pClickedDock = data[1]; \
-	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock) || (pClickedDock == myDesklet)) \
+	CairoDockContainer *pClickedContainer = data[1]; \
+	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedContainer == CAIRO_DOCK_CONTAINER (myIcon->pSubDock)) || pClickedContainer == CAIRO_DOCK_CONTAINER (myDesklet)) \
 	{ \
 		GtkWidget *pAppletMenu = data[2]; \
 		GtkWidget *pMenuItem, image; \
@@ -554,9 +550,13 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 #define CD_APPLET_MY_MENU pAppletMenu
 
 /**
-*Icone cliquee droit.
+*Icone cliquee.
 */
 #define CD_APPLET_CLICKED_ICON pClickedIcon
+/**
+*Container clique.
+*/
+#define CD_APPLET_CLICKED_CONTAINER pClickedContainer
 
 /**
 *Cree et ajoute un sous-menu a un menu.
@@ -644,8 +644,8 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data) \
 { \
 	Icon *pClickedIcon = data[0]; \
-	CairoDock *pClickedDock = data[1]; \
-	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock)) \
+	CairoDockContainer *pClickedContainer = data[1]; \
+	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedContainer == CAIRO_DOCK_CONTAINER (myIcon->pSubDock)) || pClickedContainer == CAIRO_DOCK_CONTAINER (myDesklet)) \
 	{
 /**
 *Fin de la fonction de notification du clic du milieu. Par defaut elle intercepte la notification si elle l'a recue.
@@ -678,7 +678,9 @@ gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data);
 #define CD_APPLET_ON_DROP_DATA_BEGIN \
 gboolean CD_APPLET_ON_DROP_DATA (gpointer *data) \
 { \
-	if (myIcon != NULL && (data[1] == myIcon || myIcon->pSubDock == data[3] || myDesklet == data[3])) \
+	Icon *pClickedIcon = data[1]; \
+	CairoDockContainer *pClickedContainer = data[3]; \
+	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedContainer == CAIRO_DOCK_CONTAINER (myIcon->pSubDock)) || pClickedContainer == CAIRO_DOCK_CONTAINER (myDesklet)) \
 	{ \
 		const gchar *cReceivedData = data[0]; \
 		g_return_val_if_fail (cReceivedData != NULL, CAIRO_DOCK_LET_PASS_NOTIFICATION);
@@ -771,7 +773,7 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 extern Icon *myIcon; \
 extern cairo_t *myDrawContext; \
 extern CairoDock *myDock; \
-extern CairoDockDesklet *myDesklet;\
+extern CairoDockDesklet *myDesklet; \
 extern CairoDockContainer *myContainer;
 
 //\_________________________________ INTERNATIONNALISATION

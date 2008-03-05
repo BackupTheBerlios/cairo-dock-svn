@@ -39,7 +39,7 @@ gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShare
 	gchar *cUserDataDirPath = g_strdup_printf ("%s/plug-ins/%s", g_cCurrentThemePath, cUserDataDirName);
 	if (! g_file_test (cUserDataDirPath, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
 	{
-		cd_message ("directory %s doesn't exist, it will be added.\n", cUserDataDirPath);
+		cd_message ("directory %s doesn't exist, it will be added.", cUserDataDirPath);
 		
 		gchar *command = g_strdup_printf ("mkdir -p %s", cUserDataDirPath);
 		system (command);
@@ -56,7 +56,7 @@ gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShare
 	
 	if (! g_file_test (cConfFilePath, G_FILE_TEST_EXISTS))  // la copie ne s'est pas bien passee.
 	{
-		cd_message ("Attention : couldn't copy %s/%s in %s; check permissions and file's existence\n", cShareDataDir, cConfFileName, cUserDataDirPath);
+		cd_warning ("Attention : couldn't copy %s/%s in %s; check permissions and file's existence", cShareDataDir, cConfFileName, cUserDataDirPath);
 		g_free (cUserDataDirPath);
 		g_free (cConfFilePath);
 		return NULL;

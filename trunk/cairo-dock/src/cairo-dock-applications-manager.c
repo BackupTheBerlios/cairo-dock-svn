@@ -612,6 +612,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 					GTimeVal time_val;
 					g_get_current_time (&time_val);  // on pourrait aussi utiliser un compteur statique a la fonction ...
 					cairo_dock_update_applis_list (pDock, time_val.tv_sec + time_val.tv_usec * 1e-6);
+					cairo_dock_notify (CAIRO_DOCK_WINDOW_CONFIGURED, NULL);
 				}
 				else if (event.xproperty.atom == s_aNetActiveWindow)
 				{
@@ -741,13 +742,17 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 		else if (event.type == ConfigureNotify)
 		{
 			//g_print ("  type : %d; (%d;%d) %dx%d window : %d\n", event.xconfigure.type, event.xconfigure.x, event.xconfigure.y, event.xconfigure.width, event.xconfigure.height, Xid);
-
+			icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
+			if (icon != NULL)
+			{
+				memcpy (&icon->windowGeometry, &event.xconfigure.x, sizeof (GtkAllocation));
+			}
+			
 			if (g_bAppliOnCurrentDesktopOnly)
 			{
-				icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
 				if (icon != NULL && icon->fPersonnalScale <= 0)  // pour une icone en cours de supression, on ne fait rien.
 				{
-					if (event.xconfigure.x + event.xconfigure.width < 0 || event.xconfigure.x > g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] || event.xconfigure.y + event.xconfigure.height < 0 || event.xconfigure.y > g_iScreenHeight[CAIRO_DOCK_HORIZONTAL])  // en fait il faudrait faire ca modulo le nombre de viewports * la largeur d'un bureau, car avec une fenetre a droite, elle peut revenir sur le bureau par la gauche si elle est tres large.
+					if (event.xconfigure.x + event.xconfigure.width < 0 || event.xconfigure.x > g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] || event.xconfigure.y + event.xconfigure.height < 0 || event.xconfigure.y > g_iScreenHeight[CAIRO_DOCK_HORIZONTAL])  // en fait il faudrait faire ca modulo le nombre de viewports * la largeur d'un bureau, car avec une fenetre a droite, elle peut revenir sur le bureau par la gauche si elle est tres large...
 					{
 						CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 						if (pParentDock == NULL)

@@ -81,6 +81,8 @@ extern int g_iSinusoidWidth;
 
 /// Utiliser les separateurs ou pas.
 extern gboolean g_bUseSeparator;
+/// Ordre des groupe d'icones.
+extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 
 
 /// La direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.

@@ -586,12 +586,12 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 
 				if (pClassSubDock->icons != NULL)
 				{
-					cd_message ("  on re-attribue le sous-dock de la classe a l'icone deplacee\n");
+					cd_message ("  on re-attribue le sous-dock de la classe a l'icone deplacee");
 					pSameClassIcon->pSubDock = pClassSubDock;
 				}
 				else
 				{
-					cd_message ("  plus d'icone de cette classe\n");
+					cd_message ("  plus d'icone de cette classe");
 					const gchar *cClassSubDockName = cairo_dock_search_dock_name (pClassSubDock);  // on aurait pu utiliser l'ancien 'cParentDockName' de pSameClassIcon mais bon ...
 					cairo_dock_destroy_dock (pClassSubDock, cClassSubDockName, NULL, NULL);
 				}
@@ -600,7 +600,7 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 
 		if (pDock == cairo_dock_search_dock_from_name (icon->cClass) && g_list_length (pDock->icons) == 1)  // il n'y aura plus aucune icone de cette classe.
 		{
-			cd_message ("le sous-dock de la classe %s n'a plus d'element\n", icon->cClass);
+			cd_message ("le sous-dock de la classe %s n'a plus d'element", icon->cClass);
 			Icon *pPointingIcon = cairo_dock_search_icon_pointing_on_dock (pDock, NULL);
 			if (pPointingIcon != NULL)
 				pPointingIcon->pSubDock = NULL;
@@ -713,8 +713,9 @@ void cairo_dock_remove_icon_from_dock (CairoDock *pDock, Icon *icon)
 	_cairo_dock_remove_one_icon_from_dock (pDock, icon, TRUE);
 }
 
-static void _cairo_dock_remove_one_icon (Icon *icon, CairoDock *pDock, gpointer data)
+static void _cairo_dock_remove_one_icon (Icon *icon, gpointer data)
 {
+	CairoDock *pDock = data;
 	if (CAIRO_DOCK_IS_APPLI (icon) && icon->pSubDock != NULL && cairo_dock_search_dock_from_name (icon->cClass) == icon->pSubDock)
 		cairo_dock_destroy_dock (icon->pSubDock, icon->cClass, NULL, NULL);
 	cairo_dock_remove_one_icon_from_dock (pDock, icon);
@@ -772,7 +773,7 @@ void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType)
 		cairo_dock_remove_one_icon_from_dock (pDock, pSeparatorIcon);
 		cairo_dock_free_icon (pSeparatorIcon);
 	}*/
-	Icon *pSeparatorIcon = cairo_dock_foreach_icons_of_type (pDock, iType, _cairo_dock_remove_one_icon, NULL);
+	Icon *pSeparatorIcon = cairo_dock_foreach_icons_of_type (pDock->icons, iType, _cairo_dock_remove_one_icon, pDock);
 	if (pSeparatorIcon != NULL)
 	{
 		//g_print ("  on enleve un separateur\n");
@@ -781,17 +782,17 @@ void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType)
 	}
 }
 
-Icon *cairo_dock_foreach_icons_of_type (CairoDock *pDock, CairoDockIconType iType, CairoDockForeachIconFunc pFuntion, gpointer data)
+Icon *cairo_dock_foreach_icons_of_type (GList *pIconList, CairoDockIconType iType, CairoDockForeachIconFunc pFuntion, gpointer data)
 {
 	//g_print ("%s (%d)\n", __func__, iType);
-	if (pDock->icons == NULL)
+	if (pIconList == NULL)
 		return NULL;
 
 	Icon *icon;
 	GList *ic;
 	gboolean bOneIconFound = FALSE;
 	Icon *pSeparatorIcon = NULL;
-	ic = pDock->icons;
+	ic = pIconList;
 	do
 	{
 		if (ic->next == NULL)
@@ -801,7 +802,7 @@ Icon *cairo_dock_foreach_icons_of_type (CairoDock *pDock, CairoDockIconType iTyp
 		if (icon->iType == iType)
 		{
 			bOneIconFound = TRUE;
-			pFuntion (icon, pDock, data);
+			pFuntion (icon, data);
 		}
 		else
 		{
@@ -814,11 +815,11 @@ Icon *cairo_dock_foreach_icons_of_type (CairoDock *pDock, CairoDockIconType iTyp
 		}
 	} while (TRUE);  // on parcourt tout, inutile de complexifier la chose pour gagner 3ns.
 
-	icon = cairo_dock_get_first_icon_of_type (pDock->icons, iType);
+	icon = cairo_dock_get_first_icon_of_type (pIconList, iType);
 	if (icon != NULL && icon->iType == iType)
 	{
 		bOneIconFound = TRUE;
-		pFuntion (icon, pDock, data);
+		pFuntion (icon, data);
 	}
 
 	if (bOneIconFound)
