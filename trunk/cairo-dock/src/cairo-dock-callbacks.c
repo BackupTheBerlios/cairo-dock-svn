@@ -845,7 +845,7 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 			cairo_dock_show_appli (icon->Xid);
 		return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
 	}
-	else
+	else if (icon != NULL)
 	{
 		cd_message ("No known action");
 		icon->iCount = 0;

@@ -624,10 +624,12 @@ static void cairo_dock_initiate_config_module_from_module (GtkMenuItem *menu_ite
 static void cairo_dock_initiate_config_module (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
-	CairoDock *pDock = data[1];
-
+	CairoDockContainer *pContainer= data[1];
+	if (CAIRO_DOCK_IS_DESKLET (pContainer))
+		icon = (CAIRO_DOCK_DESKLET (pContainer))->pIcon;  // l'icone cliquee du desklet n'est pas forcement celle qui contient le module !
+	
 	GError *erreur = NULL;
-	cairo_dock_configure_module (GTK_WINDOW (pDock->pWidget), icon->pModule, pDock, &erreur);
+	cairo_dock_configure_module (GTK_WINDOW (pContainer->pWidget), icon->pModule, g_pMainDock, &erreur);
 	if (erreur != NULL)
 	{
 		cd_message ("Attention : %s\n", erreur->message);
@@ -638,12 +640,14 @@ static void cairo_dock_initiate_config_module (GtkMenuItem *menu_item, gpointer 
 static void cairo_dock_detach_module (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
-	CairoDock *pDock = data[1];
+	CairoDockContainer *pContainer= data[1];
+	if (CAIRO_DOCK_IS_DESKLET (pContainer))
+		icon = (CAIRO_DOCK_DESKLET (pContainer))->pIcon;  // l'icone cliquee du desklet n'est pas forcement celle qui contient le module !
 
 	if (icon->pModule != NULL)
 	{
 		cairo_dock_update_conf_file (icon->pModule->cConfFilePath,
-			G_TYPE_BOOLEAN, "Desklet", "initially detached", CAIRO_DOCK_IS_DOCK (pDock),
+			G_TYPE_BOOLEAN, "Desklet", "initially detached", CAIRO_DOCK_IS_DOCK (pContainer),
 			G_TYPE_INVALID);
 
 		cairo_dock_reload_module (icon->pModule, TRUE);
@@ -653,25 +657,15 @@ static void cairo_dock_detach_module (GtkMenuItem *menu_item, gpointer *data)
 static void cairo_dock_remove_module (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
-	CairoDock *pDock = data[1];
+	CairoDockContainer *pContainer= data[1];
+	if (CAIRO_DOCK_IS_DESKLET (pContainer))
+		icon = (CAIRO_DOCK_DESKLET (pContainer))->pIcon;  // l'icone cliquee du desklet n'est pas forcement celle qui contient le module !
 
 	gchar *question = g_strdup_printf (_("You're about to remove this module (%s) from the dock. Sure ?"), icon->pModule->pVisitCard->cModuleName);
-	int answer = cairo_dock_ask_question_and_wait (question, icon, CAIRO_DOCK_CONTAINER (pDock));
+	int answer = cairo_dock_ask_question_and_wait (question, icon, CAIRO_DOCK_CONTAINER (pContainer));
 	if (answer == GTK_RESPONSE_YES)
 	{
 		cairo_dock_deactivate_module_and_unload (icon->pModule->pVisitCard->cModuleName);
-		/*if (CAIRO_DOCK_IS_DOCK (pDock))
-		{
-			cairo_dock_remove_icon_from_dock (pDock, icon);  // desactive le module.
-			cairo_dock_update_dock_size (pDock);
-			gtk_widget_queue_draw (pDock->pWidget);
-		}
-		else
-		{
-			cairo_dock_deactivate_module (icon->pModule);
-		}
-		cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, g_pMainDock->icons);
-		cairo_dock_free_icon (icon);*/
 	}
 }
 
@@ -960,7 +954,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 
 	}
 
-	if (icon == NULL || CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon))
+	if (CAIRO_DOCK_IS_DOCK (pContainer) && (icon == NULL || CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon)))
 	{
 		_add_entry_in_menu (_("Add a launcher"), GTK_STOCK_ADD, cairo_dock_add_launcher, menu);
 		
@@ -1006,21 +1000,25 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 			if (icon->acDesktopFileName == NULL)
 				return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 		}
-		_add_entry_in_menu (_("Add a launcher"), GTK_STOCK_ADD, cairo_dock_add_launcher, menu);
-
-		_add_entry_in_menu (_("Add a sub-dock"), GTK_STOCK_ADD, cairo_dock_add_container, menu);
 		
-		if (icon != NULL)
+		if (CAIRO_DOCK_IS_DOCK (pContainer))
 		{
-			_add_entry_in_menu (_("Add a separator"), GTK_STOCK_ADD, cairo_dock_add_separator, menu);
+			_add_entry_in_menu (_("Add a launcher"), GTK_STOCK_ADD, cairo_dock_add_launcher, menu);
+	
+			_add_entry_in_menu (_("Add a sub-dock"), GTK_STOCK_ADD, cairo_dock_add_container, menu);
+			
+			if (icon != NULL)
+			{
+				_add_entry_in_menu (_("Add a separator"), GTK_STOCK_ADD, cairo_dock_add_separator, menu);
+			}
+			
+			menu_item = gtk_separator_menu_item_new ();
+			gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+	
+			_add_entry_in_menu (_("Remove this launcher"), GTK_STOCK_REMOVE, cairo_dock_remove_launcher, menu);
+	
+			_add_entry_in_menu (_("Modify this launcher"), GTK_STOCK_EDIT, cairo_dock_modify_launcher, menu);
 		}
-
-		menu_item = gtk_separator_menu_item_new ();
-		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
-
-		_add_entry_in_menu (_("Remove this launcher"), GTK_STOCK_REMOVE, cairo_dock_remove_launcher, menu);
-
-		_add_entry_in_menu (_("Modify this launcher"), GTK_STOCK_EDIT, cairo_dock_modify_launcher, menu);
 	}
 	else if (CAIRO_DOCK_IS_VALID_APPLI (icon))
 	{
@@ -1079,11 +1077,11 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 			g_string_free (sDesktop, TRUE);
 		}
 	}
-	else if (CAIRO_DOCK_IS_VALID_APPLET (icon))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module.
+	else if (CAIRO_DOCK_IS_VALID_APPLET (icon) || CAIRO_DOCK_IS_DESKLET (pContainer))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module.
 	{
 		_add_entry_in_menu (_("Configure this module"), GTK_STOCK_PROPERTIES, cairo_dock_initiate_config_module, menu);
 
-		if (icon->pModule->bCanDetach)
+		if ((CAIRO_DOCK_IS_VALID_APPLET (icon) && icon->pModule->bCanDetach) || (CAIRO_DOCK_IS_DESKLET (pContainer) && CAIRO_DOCK_DESKLET (pContainer)->pIcon->pModule->bCanDetach))
 		{
 			_add_entry_in_menu (CAIRO_DOCK_IS_DOCK (pContainer) ? _("Detach this module") : _("Return to dock"), CAIRO_DOCK_IS_DOCK (pContainer) ? GTK_STOCK_DISCONNECT : GTK_STOCK_CONNECT, cairo_dock_detach_module, menu);
 		}

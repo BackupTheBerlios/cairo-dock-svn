@@ -596,6 +596,8 @@ struct _CairoDockDesklet {
 #else
 	gpointer padding[3];
 #endif // HAVE_GLITZ
+	/// Liste eventuelle d'icones placees sur le desklet, et susceptibles de recevoir des clics.
+	GList *icons;
 	/// pour le deplacement manuel de la fenetre.
 	gint diff_x, diff_y;
 	gboolean moving;

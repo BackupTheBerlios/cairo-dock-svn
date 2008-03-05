@@ -492,7 +492,7 @@ void about (GtkMenuItem *menu_item, gpointer *data);
 	{\
 		Icon *pClickedIcon = data[0];\
 		CairoDock *pClickedDock = data[1];\
-		if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock))\
+		if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock) || pClickedDock == myDesklet)\
 		{
 
 /**
@@ -528,7 +528,7 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data) \
 { \
 	Icon *pClickedIcon = data[0]; \
 	CairoDock *pClickedDock = data[1]; \
-	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock)) \
+	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedDock == myIcon->pSubDock) || (pClickedDock == myDesklet)) \
 	{ \
 		GtkWidget *pAppletMenu = data[2]; \
 		GtkWidget *pMenuItem, image; \
