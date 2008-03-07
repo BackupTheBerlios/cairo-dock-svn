@@ -94,9 +94,6 @@ gchar *cairo_dock_edit_themes (GHashTable **hThemeTable)
 	g_free (cThemesDir);
 
 	gchar *cUserThemeNames = cairo_dock_write_table_content (hUserThemeTable, (GHFunc) cairo_dock_write_one_name, TRUE, FALSE);
-	/*GString *sThemeNames = g_string_new ("");
-	g_hash_table_foreach (hUserThemeTable, (GHFunc) cairo_dock_write_one_name, sThemeNames);
-	sThemeNames->str[sThemeNames->len-1] = '\0';*/
 
 	//\___________________ On cree un fichier de conf temporaire.
 	const gchar *cTmpDir = g_get_tmp_dir ();
@@ -193,7 +190,7 @@ void cairo_dock_load_theme (gchar *cThemePath)
 	//g_print ("%s (%s)\n", __func__, cThemePath);
 	g_return_if_fail (cThemePath != NULL && g_file_test (cThemePath, G_FILE_TEST_IS_DIR));
 
-	//\___________________ On libere toute la memoire allouee pour les docks (stoppe aussi tous les threads).
+	//\___________________ On libere toute la memoire allouee pour les docks (stoppe aussi tous les timeout).
 	cairo_dock_free_all_docks (g_pMainDock);
 
 	//\___________________ On cree le dock principal.
@@ -308,7 +305,7 @@ static void _cairo_dock_delete_one_theme (gchar *cThemeName, gchar *cThemePath, 
 }
 gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 {
-	gchar *cCommand;
+	GString *sCommand = g_string_new ("");
 	GHashTable *hThemeTable = NULL;
 	gchar *cInitConfFile = cairo_dock_edit_themes (&hThemeTable);
 
@@ -362,10 +359,9 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 			//\___________________ On charge les parametres de comportement.
 			if (g_key_file_get_boolean (pKeyFile, "Themes", "use theme behaviour", NULL))
 			{
-				cCommand = g_strdup_printf ("/bin/cp '%s'/%s '%s'", cNewThemePath, CAIRO_DOCK_CONF_FILE, g_cCurrentThemePath);
-				cd_message ("%s\n", cCommand);
-				system (cCommand);
-				g_free (cCommand);
+				g_string_printf (sCommand, "/bin/cp '%s'/%s '%s'", cNewThemePath, CAIRO_DOCK_CONF_FILE, g_cCurrentThemePath);
+				cd_message ("%s", sCommand->str);
+				system (sCommand->str);
 			}
 			else
 			{
@@ -373,29 +369,34 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 				cairo_dock_replace_keys_by_identifier (g_cConfFile, cNewConfFilePath, '+');
 				g_free (cNewConfFilePath);
 			}
-			//\___________________ On charge les lanceurs.
+			//\___________________ On charge les icones.
+			g_string_printf (sCommand, "find '%s' ! -mindepth 1 -name '*.desktop' -delete", g_cCurrentLaunchersPath);
+			cd_message ("%s", sCommand->str);
+			system (sCommand->str);
+			g_string_printf (sCommand, "find '%s/%s' -mindepth 1 ! -name '*.desktop' -exec /bin/cp -p '{}' '%s' \\;", cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR, g_cCurrentLaunchersPath);
+			cd_message ("%s", sCommand->str);
+			system (sCommand->str);
+			
+			//\___________________ On charge les lanceurs si necessaire.
 			if (g_key_file_get_boolean (pKeyFile, "Themes", "use theme launchers", NULL))
 			{
-				cCommand = g_strdup_printf ("rm -f '%s'/*", g_cCurrentLaunchersPath);
-				cd_message ("%s\n", cCommand);
-				system (cCommand);
-				g_free (cCommand);
+				g_string_printf (sCommand, "rm -f '%s'/*.desktop", g_cCurrentLaunchersPath);
+				cd_message ("%s", sCommand->str);
+				system (sCommand->str);
 
-				cCommand = g_strdup_printf ("cp '%s/%s'/* '%s'", cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR, g_cCurrentLaunchersPath);
-				cd_message ("%s\n", cCommand);
-				system (cCommand);
-				g_free (cCommand);
+				g_string_printf (sCommand, "cp '%s/%s'/*.desktop '%s'", cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR, g_cCurrentLaunchersPath);
+				cd_message ("%s", sCommand->str);
+				system (sCommand->str);
 			}
+			
 			//\___________________ On remplace tous les autres fichiers par les nouveaux.
-			cCommand = g_strdup_printf ("find '%s' -mindepth 1 -maxdepth 1  ! -name '*.conf' ! -name %s -exec rm -rf '{}' \\;", g_cCurrentThemePath, CAIRO_DOCK_LAUNCHERS_DIR);  // efface aussi les conf des plug-ins.
-			cd_message ("%s\n", cCommand);
-			system (cCommand);
-			g_free (cCommand);
+			g_string_printf (sCommand, "find '%s' -mindepth 1 -maxdepth 1  ! -name '*.conf' ! -name %s -exec rm -rf '{}' \\;", g_cCurrentThemePath, CAIRO_DOCK_LAUNCHERS_DIR);  // efface aussi les conf des plug-ins.
+			cd_message ("%s", sCommand->str);
+			system (sCommand->str);
 
-			cCommand = g_strdup_printf ("find '%s'/* -prune ! -name '*.conf' ! -name %s -exec /bin/cp -r '{}' '%s' \\;", cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR, g_cCurrentThemePath);
-			cd_message ("%s\n", cCommand);
-			system (cCommand);
-			g_free (cCommand);
+			g_string_printf (sCommand, "find '%s'/* -prune ! -name '*.conf' ! -name %s -exec /bin/cp -r '{}' '%s' \\;", cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR, g_cCurrentThemePath);
+			cd_message ("%s", sCommand->str);
+			system (sCommand->str);
 
 			//\___________________ On charge le theme courant.
 			cairo_dock_load_theme (g_cCurrentThemePath);
@@ -431,7 +432,7 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 				cd_message ("  theme existant");
 				if (strncmp (cNewThemePath, CAIRO_DOCK_SHARE_THEMES_DIR, strlen (CAIRO_DOCK_SHARE_THEMES_DIR)) == 0)  // c'est un theme pre-installe.
 				{
-					cd_message ("Can't overwrite pre-installed theme\n");
+					cd_warning ("You can't overwrite a pre-installed theme");
 				}
 				else
 				{
@@ -449,10 +450,9 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 						gchar *cNewConfFilePath = g_strdup_printf ("%s/%s", cNewThemePath, CAIRO_DOCK_CONF_FILE);
 						if (g_key_file_get_boolean (pKeyFile, "Save", "save current behaviour", NULL))
 						{
-							cCommand = g_strdup_printf ("/bin/cp '%s' '%s'", g_cConfFile, cNewConfFilePath);
-							cd_message ("%s\n", cCommand);
-							system (cCommand);
-							g_free (cCommand);
+							g_string_printf (sCommand, "/bin/cp '%s' '%s'", g_cConfFile, cNewConfFilePath);
+							cd_message ("%s", sCommand->str);
+							system (sCommand->str);
 						}
 						else
 						{
@@ -462,21 +462,18 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 
 						if (g_key_file_get_boolean (pKeyFile, "Save", "save current launchers", NULL))
 						{
-							cCommand = g_strdup_printf ("rm -f '%s/%s'/*", cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR);
-							cd_message ("%s\n", cCommand);
-							system (cCommand);
-							g_free (cCommand);
-
-							cCommand = g_strdup_printf ("cp '%s'/* '%s/%s'", g_cCurrentLaunchersPath, cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR);
-							cd_message ("%s\n", cCommand);
-							system (cCommand);
-							g_free (cCommand);
+							g_string_printf (sCommand, "rm -f '%s/%s'/*", cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR);
+							cd_message ("%s", sCommand->str);
+							system (sCommand->str);
+							
+							g_string_printf (sCommand, "cp '%s'/* '%s/%s'", g_cCurrentLaunchersPath, cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR);
+							cd_message ("%s", sCommand->str);
+							system (sCommand->str);
 						}
 
-						cCommand = g_strdup_printf ("find '%s' -mindepth 1 -maxdepth 1  ! -name '*.conf' ! -name '%s' -exec /bin/cp -r '{}' '%s' \\;", g_cCurrentThemePath, CAIRO_DOCK_LAUNCHERS_DIR, cNewThemePath);
-						cd_message ("%s\n", cCommand);
-						system (cCommand);
-						g_free (cCommand);
+						g_string_printf (sCommand, "find '%s' -mindepth 1 -maxdepth 1  ! -name '*.conf' ! -name '%s' -exec /bin/cp -r '{}' '%s' \\;", g_cCurrentThemePath, CAIRO_DOCK_LAUNCHERS_DIR, cNewThemePath);
+						cd_message ("%s", sCommand->str);
+						system (sCommand->str);
 
 						bThemeSaved = TRUE;
 					}
@@ -485,16 +482,15 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 			else
 			{
 				cNewThemePath = g_strdup_printf ("%s/%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_THEMES_DIR, cNewThemeName);
-				cd_message ("  nouveau theme (%s)\n", cNewThemePath);
+				cd_message ("  nouveau theme (%s)", cNewThemePath);
 
 				if (g_mkdir (cNewThemePath, 7*8*8+7*8+5) != 0)
 					bThemeSaved = FALSE;
 				else
 				{
-					cCommand = g_strdup_printf ("cp -r '%s'/* '%s'", g_cCurrentThemePath, cNewThemePath);
-					cd_message ("%s\n", cCommand);
-					system (cCommand);
-					g_free (cCommand);
+					g_string_printf (sCommand, "cp -r '%s'/* '%s'", g_cCurrentThemePath, cNewThemePath);
+					cd_message ("%s", sCommand->str);
+					system (sCommand->str);
 
 					g_free (cNewThemePath);
 					bThemeSaved = TRUE;
@@ -538,7 +534,8 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 		g_free (cNewThemeName);
 		g_key_file_free (pKeyFile);
 	}
-
+	
+	g_string_free (sCommand, TRUE);
 	g_hash_table_destroy (hThemeTable);
 	return FALSE;
 }

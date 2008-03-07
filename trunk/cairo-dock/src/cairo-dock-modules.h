@@ -52,6 +52,6 @@ Icon *cairo_dock_find_icon_from_module (CairoDockModule *module, CairoDockContai
 
 CairoDockModule *cairo_dock_find_module_from_name (gchar *cModuleName);
 
-void cairo_dock_foreach_desklet (CairoDockForeachDeskletFunc pCallback, gpointer user_data);
+CairoDockModule *cairo_dock_foreach_desklet (CairoDockForeachDeskletFunc pCallback, gpointer user_data);
 
 #endif

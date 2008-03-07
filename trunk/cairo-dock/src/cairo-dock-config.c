@@ -1517,7 +1517,10 @@ void cairo_dock_copy_easy_conf_file (gchar *cEasyConfFilePath, GKeyFile *pMainKe
 	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "police", pMainKeyFile, "Icons", "police");
 
 	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "font size", pMainKeyFile, "Icons", "size");
-
+	
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "desklet bg color", pMainKeyFile, "Desklets", "background color");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "desklet bg color inside", pMainKeyFile, "Desklets", "background color inside");
+	
 	g_key_file_free (pKeyFile);
 }
 
@@ -1575,7 +1578,10 @@ void cairo_dock_copy_to_easy_conf_file (GKeyFile *pMainKeyFile, gchar *cEasyConf
 	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Icons", "police", pKeyFile, "Personnalisation", "police");
 
 	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Icons", "size", pKeyFile, "Personnalisation", "font size");
-
+	
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Desklets", "background color", pKeyFile, "Personnalisation", "desklet bg color");
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Desklets", "background color inside", pKeyFile, "Personnalisation", "desklet bg color inside");
+	
 	//\___________________ On ecrit tout.
 	cairo_dock_write_keys_to_file (pKeyFile, cEasyConfFilePath);
 	

@@ -450,7 +450,6 @@ GKeyFile *cairo_dock_pre_read_module_config (CairoDockModule *pModule, CairoDock
 	else
 	{
 		pMinimalConfig->bDeskletUseSize = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "use size", NULL, TRUE, NULL, NULL);
-		pMinimalConfig->bDeskletAlwaysDrawIcon = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "always draw icon", NULL, FALSE, NULL, NULL);
 		pMinimalConfig->iDeskletWidth = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "width", NULL, 92, NULL, NULL);
 		pMinimalConfig->iDeskletHeight = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "height", NULL, 92, NULL, NULL);
 		pMinimalConfig->iDeskletPositionX = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "x position", NULL, 0, NULL, NULL);
@@ -848,7 +847,7 @@ CairoDockModule *cairo_dock_find_module_from_name (gchar *cModuleName)
 
 
 
-static void _cairo_dock_for_one_desklet (gchar *cModuleName, CairoDockModule *pModule, gpointer *data)
+static gboolean _cairo_dock_for_one_desklet (gchar *cModuleName, CairoDockModule *pModule, gpointer *data)
 {
 	if (CAIRO_DOCK_IS_DESKLET (pModule->pContainer))
 	{
@@ -856,11 +855,12 @@ static void _cairo_dock_for_one_desklet (gchar *cModuleName, CairoDockModule *pM
 		CairoDockForeachDeskletFunc pCallback = data[0];
 		gpointer user_data = data[1];
 		
-		pCallback (pDesklet, pModule, user_data);
+		return pCallback (pDesklet, pModule, user_data);
 	}
+	return FALSE;
 }
-void cairo_dock_foreach_desklet (CairoDockForeachDeskletFunc pCallback, gpointer user_data)
+CairoDockModule *cairo_dock_foreach_desklet (CairoDockForeachDeskletFunc pCallback, gpointer user_data)
 {
 	gpointer data[2] = {pCallback, user_data};
-	g_hash_table_foreach (s_hModuleTable, (GHFunc) _cairo_dock_for_one_desklet, data);
+	return g_hash_table_find (s_hModuleTable, (GHRFunc) _cairo_dock_for_one_desklet, data);
 }

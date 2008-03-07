@@ -636,6 +636,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 								}
 							}
 						}
+						cairo_dock_notify (CAIRO_DOCK_WINDOW_ACTIVATED, &XActiveWindow);
 					}
 				}
 				else if (event.xproperty.atom == s_aNetCurrentDesktop || event.xproperty.atom == s_aNetDesktopViewport)

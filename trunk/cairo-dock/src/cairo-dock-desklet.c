@@ -533,26 +533,32 @@ void cairo_dock_add_interactive_widget_to_desklet (GtkWidget *pInteractiveWidget
 
 
 
-static void _cairo_dock_set_one_desklet_visible (CairoDockDesklet *pDesklet, CairoDockModule *pModule, gpointer data)
+static gboolean _cairo_dock_set_one_desklet_visible (CairoDockDesklet *pDesklet, CairoDockModule *pModule, gpointer data)
 {
 	gboolean bOnWidgetLayerToo = GPOINTER_TO_INT (data);
-	if (bOnWidgetLayerToo)
+	Window Xid = GDK_WINDOW_XID (pDesklet->pWidget->window);
+	gboolean bIsOnWidgetLayer = cairo_dock_window_is_utility (Xid);
+	if (bOnWidgetLayerToo || ! bIsOnWidgetLayer)
 	{
-		Window Xid = GDK_WINDOW_XID (pDesklet->pWidget->window);
-		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");
+		cd_debug ("%s (%d)", __func__, Xid);
+		
+		if (bIsOnWidgetLayer)  // on le passe sur la couche visible.
+			cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");
+		
+		gtk_window_set_keep_below (GTK_WINDOW (pDesklet->pWidget), FALSE);
+		///gtk_window_set_keep_above (GTK_WINDOW (pDesklet->pWidget), TRUE);
+		
+		cairo_dock_show_desklet (pDesklet);
 	}
-	
-	gtk_window_set_keep_below (GTK_WINDOW (pDesklet->pWidget), FALSE);
-	gtk_window_set_keep_above (GTK_WINDOW (pDesklet->pWidget), TRUE);
-	
-	cairo_dock_show_desklet (pDesklet);
+	return FALSE;
 }
 void cairo_dock_set_all_desklets_visible (gboolean bOnWidgetLayerToo)
 {
+	cd_debug ("%s (%d)", __func__, bOnWidgetLayerToo);
 	cairo_dock_foreach_desklet (_cairo_dock_set_one_desklet_visible, GINT_TO_POINTER (bOnWidgetLayerToo));
 }
 
-static void _cairo_dock_set_one_desklet_visibility_to_default (CairoDockDesklet *pDesklet, CairoDockModule *pModule, CairoDockMinimalAppletConfig *pMinimalConfig)
+static gboolean _cairo_dock_set_one_desklet_visibility_to_default (CairoDockDesklet *pDesklet, CairoDockModule *pModule, CairoDockMinimalAppletConfig *pMinimalConfig)
 {
 	GKeyFile *pKeyFile = cairo_dock_pre_read_module_config (pModule, pMinimalConfig);
 	g_key_file_free (pKeyFile);
@@ -565,9 +571,20 @@ static void _cairo_dock_set_one_desklet_visibility_to_default (CairoDockDesklet 
 		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_UTILITY");
 	else
 		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");
+	return FALSE;
 }
 void cairo_dock_set_desklets_visibility_to_default (void)
 {
 	CairoDockMinimalAppletConfig pMinimalConfig;
 	cairo_dock_foreach_desklet (_cairo_dock_set_one_desklet_visibility_to_default, &pMinimalConfig);
+}
+
+static gboolean _cairo_dock_test_one_desklet_Xid (CairoDockDesklet *pDesklet, CairoDockModule *pModule, Window *pXid)
+{
+	return (GDK_WINDOW_XID (pDesklet->pWidget->window) == *pXid);
+}
+CairoDockDesklet *cairo_dock_get_desklet_by_Xid (Window Xid)
+{
+	CairoDockModule *pModule = cairo_dock_foreach_desklet (_cairo_dock_test_one_desklet_Xid, &Xid);
+	return (pModule != NULL ? CAIRO_DOCK_DESKLET (pModule->pContainer) : NULL);;
 }
