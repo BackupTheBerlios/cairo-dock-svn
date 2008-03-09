@@ -246,8 +246,8 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			}
 			else
 			{
-				pDock->iWindowPositionX = pMotion->y_root - pDock->iMouseY;
-				pDock->iWindowPositionY = pMotion->x_root - pDock->iMouseX;
+				pDock->iWindowPositionX = pMotion->y_root - pDock->iMouseX;
+				pDock->iWindowPositionY = pMotion->x_root - pDock->iMouseY;
 				gtk_window_move (GTK_WINDOW (pWidget),
 					pDock->iWindowPositionY,
 					pDock->iWindowPositionX);
@@ -1176,8 +1176,8 @@ gboolean on_scroll (GtkWidget* pWidget,
 
 
 gboolean on_configure (GtkWidget* pWidget,
-					GdkEventConfigure* pEvent,
-					CairoDock *pDock)
+	GdkEventConfigure* pEvent,
+	CairoDock *pDock)
 {
 	//g_print ("%s (main dock : %d) : (%d;%d) (%dx%d)\n", __func__, pDock->bIsMainDock, pEvent->x, pEvent->y, pEvent->width, pEvent->height);
 	gint iNewWidth, iNewHeight;
