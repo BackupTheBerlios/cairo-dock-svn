@@ -12,6 +12,6 @@ launchers_DATA = \
 	nautilus.svg\
 	mozilla-thunderbird.svg\
 	firefox.svg\
-	terminal.svg\
+	gnome-terminal.svg\
 	pidgin.svg\
 	synaptic.svg
