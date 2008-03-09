@@ -10,7 +10,14 @@ launchers_DATA = \
 	bmp.svg\
 	nautilus.svg\
 	mozilla-thunderbird.svg\
-	firefox.svg\
 	transmission.png\
+	web-browser.svg\
 	terminal.svg\
-	logout.svg
+	logout.svg\
+	firefox.svg\
+	opera.svg\
+	epiphany.svg\
+	konsole.svg\
+	gnome-terminal.svg\
+	xfce4-terminal.svg
+
