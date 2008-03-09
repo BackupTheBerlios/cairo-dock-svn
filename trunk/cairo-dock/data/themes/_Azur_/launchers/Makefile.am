@@ -10,7 +10,6 @@ launchers_DATA = \
 	bmp.desktop\
 	bmp.svg\
 	05web.desktop\
-	web-browser.svg\
 	thunderbird.desktop\
 	mozilla-thunderbird.svg\
 	firefox.desktop\
@@ -18,10 +17,14 @@ launchers_DATA = \
 	pidgin.desktop\
 	pidgin.svg\
 	09system.desktop\
-	gnome-main-menu.svg\
+	container-system.svg\
 	10synaptic.desktop\
 	synaptic.svg\
 	11gnome-system-monitor.desktop\
 	utilities-system-monitor.svg\
 	12beryl-settings.desktop\
-	beryl-settings.svg
+	beryl-settings.svg\
+	container-web.svg\
+	gnome-terminal.svg\
+	konsole.svg\
+	xfce4-terminal.svg

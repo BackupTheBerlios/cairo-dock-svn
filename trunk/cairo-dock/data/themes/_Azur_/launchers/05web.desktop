@@ -5,7 +5,7 @@ Name=Web
 #s Exec command:
 Exec=
 #s image's name or path:
-Icon=web-browser.svg
+Icon=web.svg
 #f Order you want for this launcher among the other launchers:
 Order=5
 #s Name of the container it belongs to:
