@@ -1,0 +1,38 @@
+#!fr
+
+[Desktop Entry]
+#s Nom de ce lanceur :
+Name=XChat IRC
+#s Commande à exécuter lors du clique :
+Exec=xchat
+#S Nom ou chemin de l'image :
+Icon=xchat
+#f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
+Order=3
+#E[_MainDock_;nautilus;download]  Nom du container auquel il appartient :
+Container=_MainDock_
+#b Cette icône est-elle un container ?
+Is container=false
+
+Base URI=
+Is mounting point=false
+Encoding=UTF-8
+Name[zh_TW]=網路清談
+Comment[de]=IRC-Client
+Comment[es]=Aplicación de IRC
+Comment[fi]=IRC-sovellus
+Comment[fr]=Client IRC
+Comment[hu]=IRC-kliens
+Comment[lt]=IRC klientas
+Comment[no]=IRC-klient
+Comment[pt_BR]=Cliente de IRC
+Comment[sl]=Odjemalec IRC
+Comment[sv]=IRC-klient
+Comment[ro]=Client de IRC
+Comment[zh_TW]=X-Chat 聊天程式
+Comment=Chat with other people using Internet Relay Chat
+Terminal=false
+Type=Application
+Categories=Application;Network;
+StartupNotify=true
+Is URI=false

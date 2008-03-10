@@ -11,23 +11,29 @@ export CAIRO_DOCK_EXCLUDE="template"
 export CAIRO_DOCK_EXTRACT_MESSAGE=${CAIRO_DOCK_DIR}/utils/extract-message
 export CAIRO_DOCK_GEN_TRANSLATION=${CAIRO_DOCK_DIR}/cairo-dock/po/generate-translation.sh
 
+echo "this script will process : "
 while getopts "acCit" flag
 do
-	echo "$flag" $OPTIND $OPTARG
+	echo " option $flag" $OPTIND $OPTARG
 	case "$flag" in
 	a)
+		echo " => re-generation of files"
 		export CAIRO_DOCK_AUTORECONF="1"
 		;;
 	c)
+		echo " => cleaning"
 		export CAIRO_DOCK_CLEAN="1"
 		;;
 	C)
+		echo " => compilation"
 		export CAIRO_DOCK_COMPIL="1"
 		;;
 	i)
+		echo " => installation"
 		export CAIRO_DOCK_INSTALL="1"
 		;;
 	t)
+		echo " => themes too"
 		export CAIRO_DOCK_THEMES="1"
 		;;
 	*)
@@ -144,7 +150,7 @@ echo "fini !"
 if test "$CAIRO_DOCK_INSTALL" = "1"; then
 	echo "verification :"
 	echo "------------"
-	date +"compil finie a %T le %D"
+	date +"compil ended at %c"
 	ls -l $CAIRO_DOCK_PREFIX/bin/cairo-dock
 	ls -l $CAIRO_DOCK_PREFIX/share/cairo-dock/plug-in
 fi

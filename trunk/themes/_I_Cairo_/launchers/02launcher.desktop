@@ -1,0 +1,23 @@
+#!en
+
+[Desktop Entry]
+#s Launcher's name :
+Name=kvirc
+#s Command to launch on click :
+Exec=kvirc
+#S Image's name or path :
+Icon=kvirc
+
+#X[Extra parameters]
+frame1=
+#f Order you want for this launcher among the others:
+Order=5
+#E[_MainDock_]  Name of the container it belongs to:
+Container=_MainDock_
+
+Is container=false
+
+Renderer=
+
+Base URI=
+Is mounting point=false

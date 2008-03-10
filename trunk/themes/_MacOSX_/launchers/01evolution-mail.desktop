@@ -1,0 +1,51 @@
+#!fr
+#
+[Desktop Entry]
+Categories=GNOME;Application;Network;
+Comment=Read and write emails
+Comment[da]=Læs og skriv e-breve
+Comment[de]=Emails lesen und schreiben
+Comment[es]=Cliente de correo Evolution
+Comment[fi]=Evolution-sähköposti
+Comment[fr]=Lire et écrire des courriers électroniques
+Comment[he]=קרא דואר באמצעות אבולושיין
+Comment[is]=Evolution Póstur
+Comment[it]=Leggi e scrivi email
+Comment[pt_BR]=Leia e envie e-mails
+Comment[ro]=Evolution Mail
+Comment[sv]=Visa en notifieringsikon när dokument skrivs ut
+Comment[xh]=I-Imeyili ye-Evolution
+Comment[zh_CN]=Evolution 电子邮件
+#s Commande à exécuter lors du clique :
+Exec=evolution --component=mail
+#S Nom ou chemin de l'image :
+Icon=evolution
+#s Nom de ce lanceur :
+Name=Evolution Mail
+Name[da]=Evolution - e-post-program
+Name[de]=Evolution eMail
+Name[es]=Cliente de correo Evolution
+Name[fi]=Evolution-sähköposti
+Name[fr]=Lecteur de courrier Evolution
+Name[he]=דואר אבולושיין
+Name[is]=Evolution Póstur
+Name[it]=Gestore di posta Evolution
+Name[pt_BR]=Leitor de E-mail Evolution
+Name[ro]=Evolution Mail
+Name[sv]=Evolution e-post
+Name[xh]=I-Imeyili ye-Evolution
+Name[zh_CN]=Evolution 电子邮件
+NoDisplay=false
+StartupNotify=true
+Terminal=false
+Type=Application
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-OtherBinaries=evolution-data-server-1.0;evolution-exchange-storage;evolution-alarm-notify;
+X-GNOME-Bugzilla-Product=Evolution
+#f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
+Order=0.8281707763671875
+#E[] Nom du container auquel il appartient :
+Container=_MainDock_
+#b Cette icône est-elle un container ?
+Is container=false
+Is URI=false

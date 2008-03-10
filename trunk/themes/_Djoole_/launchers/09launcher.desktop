@@ -1,0 +1,18 @@
+#!fr
+
+[Desktop Entry]
+#s Nom de ce lanceur :
+Name=HellaNZB
+#s Commande à exécuter lors du clique :
+Exec=alltray -i /usr/share/icons/Neu/scalable/categories/gnome-globe.svg -stask "gnome-terminal -t HellaNZB -x hellanzb"
+#S Nom ou chemin de l'image :
+Icon=internet.svg
+#f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
+Order=10
+#E[_MainDock_;_V.F.S._]  Nom du container auquel il appartient :
+Container=_MainDock_
+#b Cette icône est-elle un container ?
+Is container=false
+
+Base URI=
+Is mounting point=false

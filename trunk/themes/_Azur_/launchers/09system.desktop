@@ -1,0 +1,18 @@
+#!fr
+
+[Desktop Entry]
+#s Nom de ce lanceur :
+Name=System
+#s Commande à exécuter lors du clique :
+Exec=
+#S Nom ou chemin de l'image :
+Icon=container-system
+#f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
+Order=0
+#E[_MainDock_;Web;System]  Nom du container auquel il appartient :
+Container=_MainDock_
+#b Cette icône est-elle un container ?
+Is container=true
+
+Base URI=
+Is mounting point=false

@@ -1,0 +1,21 @@
+#!
+
+[Desktop Entry]
+#s Launcher's name :
+Name=Beep Media Player
+Comment=Play music
+#s Exec command :
+Exec=beep-media-player
+#s Image's name or path :
+Icon=bmp
+MimeType=audio/x-scpls;audio/x-mpegurl;audio/mpegurl;audio/mp3;audio/x-mp3;audio/mpeg;audio/x-mpeg;audio/x-wav;application/x-ogg;application/ogg
+Categories=Application;GTK;AudioVideo;Player;
+Terminal=false
+Type=Application
+Encoding=UTF-8
+#f Order you want for this launcher among the other launchers :
+Order=1
+#s Name of the container it belongs to:
+Container=music et video
+#b Is this icon a container ?
+Is container=false
