@@ -1,5 +1,5 @@
 
-SUBDIRS = . themes
+SUBDIRS = . default-theme
 
 essentialdatadir = $(pkgdatadir)
 
@@ -17,5 +17,6 @@ essentialdata_DATA = \
 	cairo-dock-cancel.svg\
 	readme-default-view\
 	preview-default.png\
-	ChangeLog.txt
+	ChangeLog.txt\
+	License
 	

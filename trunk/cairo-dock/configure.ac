@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([cairo-dock], [1.5.2.1], [Fabrice Rey (fabounet@users.berlios.de)])
+AC_INIT([cairo-dock], [1.5.3.beta1], [Fabrice Rey (fabounet@users.berlios.de)])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
 
@@ -43,40 +43,7 @@ AC_CONFIG_FILES([Makefile
 		po/Makefile.in
 		data/Makefile
 		data/cairo-dock.conf
-		data/themes/Makefile
-		data/themes/_default_/Makefile
-		data/themes/_default_/launchers/Makefile
-		data/themes/_Azur_/Makefile
-		data/themes/_Azur_/launchers/Makefile
-		data/themes/_Ubuntu_/Makefile
-		data/themes/_Ubuntu_/launchers/Makefile
-		data/themes/_Verde_/Makefile
-		data/themes/_Verde_/launchers/Makefile
-		data/themes/_Djoole_/Makefile
-		data/themes/_Djoole_/launchers/Makefile
-		data/themes/_Cobalt_/Makefile
-		data/themes/_Cobalt_/launchers/Makefile
-		data/themes/_Glattering_/Makefile
-		data/themes/_Glattering_/launchers/Makefile
-		data/themes/_TapisVert_/Makefile
-		data/themes/_TapisVert_/launchers/Makefile
-		data/themes/_TapisVert_/plug-ins/Makefile
-		data/themes/_TapisVert_/plug-ins/file-manager/Makefile
-		data/themes/_TapisVert_/plug-ins/rendering/Makefile
-		data/themes/_TapisVert_/plug-ins/logout/Makefile
-		data/themes/_TapisVert_/plug-ins/dustbin/Makefile
-		data/themes/_MacOSX_/Makefile
-		data/themes/_MacOSX_/launchers/Makefile
-		data/themes/_MacOSX_/plug-ins/Makefile
-		data/themes/_MacOSX_/plug-ins/clock/Makefile
-		data/themes/_MacOSX_/plug-ins/dustbin/Makefile
-		data/themes/_MacOSX_/plug-ins/rendering/Makefile
-		data/themes/_I_Cairo_/Makefile
-		data/themes/_I_Cairo_/launchers/Makefile
-		data/themes/_I_Cairo_/plug-ins/Makefile
-		data/themes/_I_Cairo_/plug-ins/clock/Makefile
-		data/themes/_I_Cairo_/plug-ins/dustbin/Makefile
-		data/themes/_I_Cairo_/plug-ins/logout/Makefile
-		data/themes/_I_Cairo_/plug-ins/rendering/Makefile
+		data/default-theme/Makefile
+		data/default-theme/launchers/Makefile
 		])
 AC_OUTPUT

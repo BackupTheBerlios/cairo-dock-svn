@@ -15,3 +15,5 @@
 1.5.1 = v1.5.1 :\n - The 1.5 branch is still young, so this version brings a lot of bug fixes\n - Cairo-Dock is now translated in Japanese, thanks to Jiro Kawada for his work !\n - A new view has appeared : Rainbow\n - Cairo-Dock has become a desklet manager !\n  most of applets can now detached themselves from the dock\n and behave as real desklets.
 
 1.5.2.1 = v1.5.2.1 :\n - a lot of bug fixes, especially on desklets.\n - New applet : weather !\n - Cairo-Dock is now fully translated in Japanese, thanks to Jiro Kawada !
+
+1.5.3 = v1.5.3 :\n - Themes have been deeply reviewed\n you can now switch from one to another completely.\n - New applet : alsaMixer !\n The 'Shortcuts' applet dans now detached itself from the dock.\n - Updates in translations.\n - And the usual bug fixes. ^_^
