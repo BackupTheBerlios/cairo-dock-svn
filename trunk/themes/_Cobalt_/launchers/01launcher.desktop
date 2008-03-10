@@ -6,7 +6,7 @@ Name=Internet
 #s Exec command :
 Exec=
 #s Image's name or path :
-Icon=net.svg
+Icon=container-web
 #f Order you want for this launcher among the other launchers :
 Order=5
 #s Name of the container it belongs to:

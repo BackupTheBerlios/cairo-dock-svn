@@ -2,7 +2,7 @@
 
 find . -type l -delete
 
-for t in `ls`
+for t in `ls` ../cairo-dock/data/default-theme
 do
 	if test -d $t -a -e $t/Makefile.am; then
 		echo "normalisation du theme $t ..."

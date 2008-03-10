@@ -6,7 +6,7 @@ Name=Internet
 #s Commande à exécuter lors du clique :
 Exec=
 #S Nom ou chemin de l'image :
-Icon=net.svg
+Icon=container-web
 #f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
 Order=5
 #E[music et video;_MainDock_;OOo;Internet]  Nom du container auquel il appartient :

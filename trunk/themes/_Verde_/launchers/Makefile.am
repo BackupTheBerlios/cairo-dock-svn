@@ -18,9 +18,9 @@ launchers_DATA = \
 	transmission-gtk.desktop\
 	bmp.desktop\
 	ooo-writer.svg\
-	net.svg\
-	mv.svg\
-	ooo.svg\
+	container-web.svg\
+	container-multimedia.svg\
+	container-office.svg\
 	ooo-calc.svg\
 	firefox.svg\
 	mozilla-thunderbird.svg\

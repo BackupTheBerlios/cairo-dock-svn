@@ -22,8 +22,8 @@ launchers_DATA = \
 	synaptic.svg\
 	11gnome-system-monitor.desktop\
 	utilities-system-monitor.svg\
-	12beryl-settings.desktop\
-	beryl-settings.svg\
+	01ccsm.desktop\
+	ccsm.svg\
 	container-web.svg\
 	gnome-terminal.svg\
 	konsole.svg\

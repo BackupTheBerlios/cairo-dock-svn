@@ -1,0 +1,28 @@
+#!en
+
+[Desktop Entry]
+#s Launcher's name :
+Name=Advanced Desktop Effects Settings
+#s Command to launch on click :
+Exec=ccsm
+#S Image's name or path :
+Icon=ccsm
+
+#X[Extra parameters]
+frame_extra=
+#f Order you want for this launcher among the others:
+Order=2
+#E[] Name of the container it belongs to:
+Container=System
+
+Is container=false
+
+Renderer=
+
+Base URI=false
+Is mounting point=false
+Encoding=UTF-8
+Comment=Configure Compiz with CompizConfig
+Terminal=false
+Type=Application
+Categories=Compiz;Settings;DesktopSettings;

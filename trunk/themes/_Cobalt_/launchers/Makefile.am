@@ -40,11 +40,11 @@ launchers_DATA = \
 	firefox.svg\
 	ooo-calc.svg\
 	terminal.svg\
-	system.svg\
-	ooo.svg\
-	mv.svg\
-	dessin.svg\
-	net.svg\
+	container-system.svg\
+	container-office.svg\
+	container-multimedia.svg\
+	container-image.svg\
+	container-web.svg\
 	xmms.svg\
 	beep-media-player.svg\
 	pidgin.svg\

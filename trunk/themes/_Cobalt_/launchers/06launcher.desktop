@@ -6,7 +6,7 @@ Name=system
 #s Exec command :
 Exec=
 #s Image's name or path :
-Icon=system.svg
+Icon=container-system
 #f Order you want for this launcher among the other launchers :
 Order=8
 #s Name of the container it belongs to:

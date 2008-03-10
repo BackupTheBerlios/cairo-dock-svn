@@ -6,7 +6,7 @@ Name=music et video
 #s Exec command :
 Exec=
 #s Image's name or path :
-Icon=mv.svg
+Icon=container-multimedia
 #f Order you want for this launcher among the other launchers :
 Order=6
 #s Name of the container it belongs to:
