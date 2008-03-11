@@ -80,6 +80,7 @@ gboolean cairo_dock_fm_launch_uri (const gchar *cURI)
 
 gboolean cairo_dock_fm_add_monitor_full (const gchar *cURI, gboolean bDirectory, const gchar *cMountedURI, CairoDockFMMonitorCallback pCallback, gpointer data)
 {
+	g_return_val_if_fail (cURI != NULL, FALSE);
 	if (s_pVFSBackend != NULL && s_pVFSBackend->add_monitor != NULL)
 	{
 		if (cMountedURI != NULL && strcmp (cMountedURI, cURI) != 0)
@@ -100,6 +101,7 @@ gboolean cairo_dock_fm_add_monitor_full (const gchar *cURI, gboolean bDirectory,
 
 gboolean cairo_dock_fm_remove_monitor_full (const gchar *cURI, gboolean bDirectory, const gchar *cMountedURI)
 {
+	g_return_val_if_fail (cURI != NULL, FALSE);
 	if (s_pVFSBackend != NULL && s_pVFSBackend->remove_monitor != NULL)
 	{
 		s_pVFSBackend->remove_monitor (cURI);

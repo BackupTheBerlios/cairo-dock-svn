@@ -199,7 +199,7 @@ void cairo_dock_write_one_name_description (gchar *cName, gchar *cDescriptionFil
 }
 void cairo_dock_write_one_module_name (gchar *cName, CairoDockModule *pModule, GString *pString)
 {
-	g_string_append_printf (pString, "%s;%s;%s;", cName, (pModule != NULL && pModule->pVisitCard->cReadmeFilePath != NULL ? pModule->pVisitCard->cReadmeFilePath : "none"), (pModule != NULL && pModule->pVisitCard->cPreviewFilePath != NULL ? pModule->pVisitCard->cPreviewFilePath : "none"));
+	g_string_append_printf (pString, "%s;%s;%s;%s;", cName, (pModule != NULL && pModule->pVisitCard->cReadmeFilePath != NULL ? pModule->pVisitCard->cReadmeFilePath : "none"), (pModule != NULL && pModule->pVisitCard->cPreviewFilePath != NULL ? pModule->pVisitCard->cPreviewFilePath : "none"), (pModule != NULL && pModule->pVisitCard->cIconFilePath != NULL ? pModule->pVisitCard->cIconFilePath : "none"));
 }
 void cairo_dock_write_one_theme_name (gchar *cName, gchar *cThemePath, GString *pString)
 {
@@ -223,6 +223,7 @@ void cairo_dock_update_conf_file_with_hash_table (GKeyFile *pOpenedKeyFile, gcha
 
 void cairo_dock_update_conf_file_with_list (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cList, gchar *cGroupName, gchar *cKeyName, gchar *cNewUsefullComment)
 {
+	g_return_if_fail (pOpenedKeyFile != NULL || cConfFile != NULL);
 	cd_debug ("%s (%s, %s, %s)", __func__, cConfFile, cGroupName, cKeyName);
 	GError *erreur = NULL;
 
@@ -299,8 +300,9 @@ void cairo_dock_update_conf_file_with_list (GKeyFile *pOpenedKeyFile, gchar *cCo
 		erreur = NULL;
 	}
 	g_string_free (sComment, TRUE);
-
-	cairo_dock_write_keys_to_file (pKeyFile, cConfFile);
+	
+	if (cConfFile != NULL)
+		cairo_dock_write_keys_to_file (pKeyFile, cConfFile);
 	g_free (cUsefullComment);
 	if (pOpenedKeyFile == NULL)
 		g_key_file_free (pKeyFile);

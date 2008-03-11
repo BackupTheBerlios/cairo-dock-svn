@@ -220,6 +220,13 @@ struct _CairoDock {
 };
 
 
+typedef enum {
+	CAIRO_DOCK_CATEGORY_ACCESSORY=0,
+	CAIRO_DOCK_CATEGORY_DESKTOP,
+	CAIRO_DOCK_CATEGORY_CONTROL,
+	CAIRO_DOCK_NB_CATEGORY
+	} CairoDockPluginCategory;
+
 struct _CairoDockVisitCard {
 	/// nom du module qui servira a l'identifier.
 	gchar *cModuleName;
@@ -245,8 +252,12 @@ struct _CairoDockVisitCard {
 	gchar *cShareDataDir;
 	/// nom de son fichier de conf.
 	gchar *cConfFileName;
+	/// categorie de l'applet.
+	CairoDockPluginCategory iCategory;
+	/// chemin d'une image pour l'icone du module dans le panneau de conf du dock.
+	gchar *cIconFilePath;
 	/// octets reserves pour preserver la compatibilite binaire lors de futurs ajouts sur l'interface entre plug-ins et dock.
-	char reserved[48];
+	char reserved[40];
 };
 
 /// Construit et renvoie la carte de visite du module.

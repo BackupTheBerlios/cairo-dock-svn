@@ -100,6 +100,7 @@ void cairo_dock_free_visit_card (CairoDockVisitCard *pVisitCard)
 	g_free (pVisitCard->cShareDataDir);
 	g_free (pVisitCard->cConfFileName);
 	g_free (pVisitCard->cModuleVersion);
+	g_free (pVisitCard->cIconFilePath);
 	g_free (pVisitCard);
 }
 
@@ -329,7 +330,7 @@ static void _cairo_dock_add_one_module_name_if_active (gchar *cModuleName, Cairo
 }
 void cairo_dock_update_conf_file_with_active_modules (GKeyFile *pOpenedKeyFile, gchar *cConfFile, GList *pIconList)  // garde l'ordre des icones.
 {
-	cd_message ("%s ()\n", __func__);
+	cd_message ("%s (%s)\n", __func__, cConfFile);
 	GError *erreur = NULL;
 
 	//\___________________ On ouvre le fichier de conf.
@@ -340,7 +341,7 @@ void cairo_dock_update_conf_file_with_active_modules (GKeyFile *pOpenedKeyFile, 
 		g_key_file_load_from_file (pKeyFile, cConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 		if (erreur != NULL)
 		{
-			cd_message ("Attention : %s\n", erreur->message);
+			cd_warning ("Attention : %s", erreur->message);
 			g_error_free (erreur);
 			return ;
 		}
@@ -387,7 +388,7 @@ void cairo_dock_free_module (CairoDockModule *module)
 {
 	if (module == NULL)
 		return ;
-	cd_message ("%s (%s)\n", __func__, module->pVisitCard->cModuleName);
+	cd_message ("%s (%s)", __func__, module->pVisitCard->cModuleName);
 
 	cairo_dock_deactivate_module (module);
 
@@ -863,4 +864,29 @@ CairoDockModule *cairo_dock_foreach_desklet (CairoDockForeachDeskletFunc pCallba
 {
 	gpointer data[2] = {pCallback, user_data};
 	return g_hash_table_find (s_hModuleTable, (GHRFunc) _cairo_dock_for_one_desklet, data);
+}
+
+
+
+static void _cairo_dock_write_one_module_by_category (gchar *cModuleName, CairoDockModule *pModule, gpointer *data)
+{
+	GString **pStrings = data[0];
+	gboolean bActiveOnly = GPOINTER_TO_INT (data[1]);
+	if (! bActiveOnly || pModule->bActive)
+	{
+		GString *sModuleInCategory = pStrings[pModule->pVisitCard->iCategory];
+		cairo_dock_write_one_module_name (cModuleName, pModule, sModuleInCategory);
+	}
+}
+GString **cairo_dock_list_modules_by_category (gboolean bActiveOnly)
+{
+	GString **pStrings = g_new (GString *, CAIRO_DOCK_NB_CATEGORY);
+	int i;
+	for (i = 0; i < CAIRO_DOCK_NB_CATEGORY; i ++)
+		pStrings[i] = g_string_new ("");
+	gpointer data[2] = {pStrings, GINT_TO_POINTER (bActiveOnly)};
+	
+	g_hash_table_foreach (s_hModuleTable, (GHFunc) _cairo_dock_write_one_module_by_category, data);
+	
+	return pStrings;
 }

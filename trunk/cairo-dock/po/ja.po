@@ -1547,7 +1547,8 @@ msgstr "このディレクトリの内容を監視しますか？"
 #: ../src/cairo-dock-file-manager.c:450 ../src/cairo-dock-file-manager.c:443
 #: ../src/cairo-dock-file-manager.c:455 ../src/cairo-dock-file-manager.c:445
 #: ../src/cairo-dock-file-manager.c:457 ../src/cairo-dock-file-manager.c:446
-#: ../src/cairo-dock-file-manager.c:458
+#: ../src/cairo-dock-file-manager.c:458 ../src/cairo-dock-file-manager.c:448
+#: ../src/cairo-dock-file-manager.c:460
 #, fuzzy, c-format
 msgid "failed to %s %s"
 msgstr "failed to %s %s"
@@ -1558,7 +1559,8 @@ msgstr "failed to %s %s"
 #: ../src/cairo-dock-file-manager.c:450 ../src/cairo-dock-file-manager.c:443
 #: ../src/cairo-dock-file-manager.c:455 ../src/cairo-dock-file-manager.c:445
 #: ../src/cairo-dock-file-manager.c:457 ../src/cairo-dock-file-manager.c:446
-#: ../src/cairo-dock-file-manager.c:458
+#: ../src/cairo-dock-file-manager.c:458 ../src/cairo-dock-file-manager.c:448
+#: ../src/cairo-dock-file-manager.c:460
 msgid "mount"
 msgstr "マウント"
 
@@ -1568,7 +1570,8 @@ msgstr "マウント"
 #: ../src/cairo-dock-file-manager.c:450 ../src/cairo-dock-file-manager.c:443
 #: ../src/cairo-dock-file-manager.c:455 ../src/cairo-dock-file-manager.c:445
 #: ../src/cairo-dock-file-manager.c:457 ../src/cairo-dock-file-manager.c:446
-#: ../src/cairo-dock-file-manager.c:458
+#: ../src/cairo-dock-file-manager.c:458 ../src/cairo-dock-file-manager.c:448
+#: ../src/cairo-dock-file-manager.c:460
 msgid "unmount"
 msgstr "アンマウント"
 
@@ -1656,6 +1659,7 @@ msgstr "サブ・ドックを追加"
 #: ../src/cairo-dock-file-manager.c:394 ../src/cairo-dock-file-manager.c:395
 #: ../src/cairo-dock-file-manager.c:416 ../src/cairo-dock-file-manager.c:421
 #: ../src/cairo-dock-file-manager.c:423 ../src/cairo-dock-file-manager.c:424
+#: ../src/cairo-dock-file-manager.c:426
 #, fuzzy, c-format
 msgid "%s is now %s"
 msgstr "%s is now %s"
@@ -1663,12 +1667,14 @@ msgstr "%s is now %s"
 #: ../src/cairo-dock-file-manager.c:394 ../src/cairo-dock-file-manager.c:395
 #: ../src/cairo-dock-file-manager.c:416 ../src/cairo-dock-file-manager.c:421
 #: ../src/cairo-dock-file-manager.c:423 ../src/cairo-dock-file-manager.c:424
+#: ../src/cairo-dock-file-manager.c:426
 msgid "mounted"
 msgstr "マウント済み"
 
 #: ../src/cairo-dock-file-manager.c:394 ../src/cairo-dock-file-manager.c:395
 #: ../src/cairo-dock-file-manager.c:416 ../src/cairo-dock-file-manager.c:421
 #: ../src/cairo-dock-file-manager.c:423 ../src/cairo-dock-file-manager.c:424
+#: ../src/cairo-dock-file-manager.c:426
 msgid "unmounted"
 msgstr "アンマウント済み"
 
@@ -1685,7 +1691,8 @@ msgid "Add a separator"
 msgstr "区切りを追加"
 
 #: ../src/cairo-dock-gui-factory.c:1202 ../src/cairo-dock-gui-factory.c:1188
-#: ../src/cairo-dock-gui-factory.c:1209
+#: ../src/cairo-dock-gui-factory.c:1209 ../src/cairo-dock-gui-factory.c:1253
+#: ../src/cairo-dock-gui-factory.c:1257 ../src/cairo-dock-gui-factory.c:1274
 msgid "grab"
 msgstr "取得"
 

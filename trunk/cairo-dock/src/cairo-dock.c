@@ -228,6 +228,7 @@ CairoDockDesktopEnv g_iDesktopEnv = CAIRO_DOCK_UNKNOWN_ENV;
 CairoDockFMSortType g_iFileSortType;
 gboolean g_bShowHiddenFiles;
 
+gchar *g_pPluginCategories[CAIRO_DOCK_NB_CATEGORY] = {"Accessory", "Desktop", "Controler"};
 
 static gboolean random_dialog (gpointer user_data)
 {

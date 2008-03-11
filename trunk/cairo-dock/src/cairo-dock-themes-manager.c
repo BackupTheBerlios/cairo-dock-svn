@@ -370,7 +370,7 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 				g_free (cNewConfFilePath);
 			}
 			//\___________________ On charge les icones.
-			g_string_printf (sCommand, "find '%s' ! -mindepth 1 -name '*.desktop' -delete", g_cCurrentLaunchersPath);
+			g_string_printf (sCommand, "find '%s' -mindepth 1 ! -name '*.desktop' ! -name 'container-*' -delete", g_cCurrentLaunchersPath);
 			cd_message ("%s", sCommand->str);
 			system (sCommand->str);
 			g_string_printf (sCommand, "find '%s/%s' -mindepth 1 ! -name '*.desktop' -exec /bin/cp -p '{}' '%s' \\;", cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR, g_cCurrentLaunchersPath);

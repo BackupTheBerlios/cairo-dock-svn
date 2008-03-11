@@ -1450,7 +1450,8 @@ msgstr "Voulez-vous surveiller le contenu de ce répertoire ?"
 #: ../src/cairo-dock-file-manager.c:450 ../src/cairo-dock-file-manager.c:443
 #: ../src/cairo-dock-file-manager.c:455 ../src/cairo-dock-file-manager.c:445
 #: ../src/cairo-dock-file-manager.c:457 ../src/cairo-dock-file-manager.c:446
-#: ../src/cairo-dock-file-manager.c:458
+#: ../src/cairo-dock-file-manager.c:458 ../src/cairo-dock-file-manager.c:448
+#: ../src/cairo-dock-file-manager.c:460
 #, c-format
 msgid "failed to %s %s"
 msgstr "échec pour %s %s"
@@ -1460,7 +1461,8 @@ msgstr "échec pour %s %s"
 #: ../src/cairo-dock-file-manager.c:450 ../src/cairo-dock-file-manager.c:443
 #: ../src/cairo-dock-file-manager.c:455 ../src/cairo-dock-file-manager.c:445
 #: ../src/cairo-dock-file-manager.c:457 ../src/cairo-dock-file-manager.c:446
-#: ../src/cairo-dock-file-manager.c:458
+#: ../src/cairo-dock-file-manager.c:458 ../src/cairo-dock-file-manager.c:448
+#: ../src/cairo-dock-file-manager.c:460
 msgid "mount"
 msgstr "monter"
 
@@ -1469,7 +1471,8 @@ msgstr "monter"
 #: ../src/cairo-dock-file-manager.c:450 ../src/cairo-dock-file-manager.c:443
 #: ../src/cairo-dock-file-manager.c:455 ../src/cairo-dock-file-manager.c:445
 #: ../src/cairo-dock-file-manager.c:457 ../src/cairo-dock-file-manager.c:446
-#: ../src/cairo-dock-file-manager.c:458
+#: ../src/cairo-dock-file-manager.c:458 ../src/cairo-dock-file-manager.c:448
+#: ../src/cairo-dock-file-manager.c:460
 msgid "unmount"
 msgstr "démonter"
 
@@ -1554,20 +1557,20 @@ msgstr "Ajouter un sous-dock"
 
 #: ../src/cairo-dock-file-manager.c:394 ../src/cairo-dock-file-manager.c:416
 #: ../src/cairo-dock-file-manager.c:421 ../src/cairo-dock-file-manager.c:423
-#: ../src/cairo-dock-file-manager.c:424
+#: ../src/cairo-dock-file-manager.c:424 ../src/cairo-dock-file-manager.c:426
 #, c-format
 msgid "%s is now %s"
 msgstr "%s est maintenant %s"
 
 #: ../src/cairo-dock-file-manager.c:394 ../src/cairo-dock-file-manager.c:416
 #: ../src/cairo-dock-file-manager.c:421 ../src/cairo-dock-file-manager.c:423
-#: ../src/cairo-dock-file-manager.c:424
+#: ../src/cairo-dock-file-manager.c:424 ../src/cairo-dock-file-manager.c:426
 msgid "mounted"
 msgstr "monté"
 
 #: ../src/cairo-dock-file-manager.c:394 ../src/cairo-dock-file-manager.c:416
 #: ../src/cairo-dock-file-manager.c:421 ../src/cairo-dock-file-manager.c:423
-#: ../src/cairo-dock-file-manager.c:424
+#: ../src/cairo-dock-file-manager.c:424 ../src/cairo-dock-file-manager.c:426
 msgid "unmounted"
 msgstr "démonté"
 
@@ -1591,7 +1594,8 @@ msgid "Quit Cairo-Dock ?"
 msgstr "Quitter Cairo-Dock ?"
 
 #: ../src/cairo-dock-gui-factory.c:1202 ../src/cairo-dock-gui-factory.c:1188
-#: ../src/cairo-dock-gui-factory.c:1209
+#: ../src/cairo-dock-gui-factory.c:1209 ../src/cairo-dock-gui-factory.c:1253
+#: ../src/cairo-dock-gui-factory.c:1257 ../src/cairo-dock-gui-factory.c:1274
 msgid "grab"
 msgstr "récupérer"
 
