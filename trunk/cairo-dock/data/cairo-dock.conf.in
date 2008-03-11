@@ -3,9 +3,10 @@
 ######## It is parsed by cairo-dock to automatically generate an appropriate GUI,##########
 ######## so don't mess into it, except if you know what you're doing ! ;-)##########
 
+#[gtk-fullscreen]
 [Position]
 
-#F-[Position on the screen]
+#F-[Position on the screen;gtk-fullscreen]
 frame1 =
 
 #r-[bottom;top;left;right] Choose the screen border regarding to which the dock will place itself :
@@ -16,7 +17,7 @@ screen border = bottom
 #{At 0, the dock will place itself regarding the left corner if horizontal and the top corner if vertical, at 1 regarding the right corner if horizontal and the bottom corner if vertical, and at 0.5, regarding the middle of the screen's edge.}
 alignment = .5
 
-#F-[Position regarding the chosen screen's edge]
+#F-[Position regarding the chosen screen's edge;gtk-leave-fullscreen]
 frame2 =
 
 #i-[-1024;1024] Lateral gap :
@@ -41,6 +42,7 @@ reserve space = false
 auto-hide = false
 
 
+#[gtk-dnd-multiple]
 [TaskBar]
 
 #F-[Behaviour]
@@ -99,6 +101,7 @@ max name length = 15
 visibility alpha = 0.3
 
 
+#[gtk-preferences]
 [System]
 
 #F-[Movement parameters]
@@ -195,6 +198,7 @@ sort files = 0
 show hidden files = false
 
 
+#[gtk-disconnect]
 [Applets]
 
 #F-[Add fonctionnalities to your dock !]
@@ -207,9 +211,11 @@ active modules = clock;dustbin
 
 
 
+
+#[gtk-orientation-portrait]
 [Background]
 
-#F+[Callback zone]
+#F+[Callback zone;gtk-goto-bottom]
 frame1 =
 
 #i+ Size of the callback zone (width x height, in pixels) :
@@ -288,7 +294,7 @@ number of stripes = 15
 stripes width = 0.03
 
 
-
+#[gtk-about]
 [Icons]
 
 #F+[Wave's shape]
@@ -447,7 +453,7 @@ sep_sep =
 #T+3[launchers;applications;applets] Order of the different types of icons :
 icon's type order = launchers;applications;applets
 
-
+#[gtk-zoom-fit]
 [Views]
 
 #F[Main Dock]
@@ -472,6 +478,7 @@ same horizontality = true
 relative icon size = 1.
 
 
+#[gtk-dialog-question]
 [Dialogs]
 
 #F+[Buttons]
@@ -526,6 +533,7 @@ message weight = 5
 message italic = false
 
 
+#[gtk-convert]
 [Desklets]
 
 #c+4[0;1] Background color (r,v,b,a) :
