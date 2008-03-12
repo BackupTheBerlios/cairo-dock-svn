@@ -354,7 +354,7 @@ static gboolean on_configure_dialog (GtkWidget* pWidget,
 	GdkEventConfigure* pEvent,
 	CairoDockDialog *pDialog)
 {
-	//cd_message ("%s (%dx%d)", __func__, pEvent->width, pEvent->height);
+	cd_message ("%s (%dx%d)", __func__, pEvent->width, pEvent->height);
 	if (! cairo_dock_dialog_reference (pDialog))
 		return FALSE;
 
@@ -381,9 +381,9 @@ static gboolean on_configure_dialog (GtkWidget* pWidget,
 		{
 			CairoDockContainer *pContainer = cairo_dock_search_container_from_icon (pDialog->pIcon);
 			cairo_dock_place_dialog (pDialog, pContainer);
-			gtk_widget_queue_draw (pDialog->pWidget);
 		}
 	}
+	gtk_widget_queue_draw (pDialog->pWidget);  // les widgets internes peuvent avoir changer de taille sans que le dialogue n'en ait change, il faut donc redessiner tout le temps.
 
 	cairo_dock_dialog_unreference (pDialog);
 	return FALSE;

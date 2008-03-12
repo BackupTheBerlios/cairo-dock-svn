@@ -490,8 +490,11 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 	cairo_dock_update_dock_size (pDock);
 
 	//\_________________ On met a jour l'ordre des applets dans le fichier de conf.
-	if (CAIRO_DOCK_IS_VALID_APPLET (icon1))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module.
-		cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, pDock->icons);
+	if (CAIRO_DOCK_IS_VALID_APPLET (icon1))
+		cairo_dock_update_module_order (icon1->pModule, icon1->fOrder);
+		///cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, pDock->icons);
+	if (CAIRO_DOCK_IS_VALID_APPLET (icon2))
+		cairo_dock_update_module_order (icon2->pModule, icon2->fOrder);
 }
 
 void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2)
@@ -551,8 +554,9 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 	cairo_dock_update_dock_size (pDock);
 
 	//\_________________ On prend en compte le changement de position pour les applets.
-	if (CAIRO_DOCK_IS_VALID_APPLET (icon1))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module, au cas ou il y'aurait plusieurs icones pour un meme module.
-		cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, pDock->icons);
+	if (CAIRO_DOCK_IS_VALID_APPLET (icon1))
+		cairo_dock_update_module_order (icon1->pModule, icon1->fOrder);
+		///cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, pDock->icons);
 }
 
 

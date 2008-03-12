@@ -395,6 +395,18 @@ static gboolean on_leave_desklet (GtkWidget* pWidget,
 	return FALSE;
 }
 
+gboolean on_delete_desklet (GtkWidget *pWidget, GdkEvent *event, CairoDockDesklet *pDesklet)
+{
+	if (pDesklet->pIcon->pModule != NULL)
+	{
+		cairo_dock_update_conf_file (pDesklet->pIcon->pModule->cConfFilePath,
+			G_TYPE_BOOLEAN, "Desklet", "initially detached", FALSE,
+			G_TYPE_INVALID);
+
+		cairo_dock_reload_module (pDesklet->pIcon->pModule, TRUE);
+	}
+	return TRUE;
+}
 
 
 CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiveWidget, gboolean bOnWidgetLayer)
@@ -458,6 +470,10 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
 	g_signal_connect (G_OBJECT (pWindow),
 		"leave-notify-event",
 		G_CALLBACK (on_leave_desklet),
+		pDesklet);
+	g_signal_connect (G_OBJECT (pWindow),
+		"delete-event",
+		G_CALLBACK (on_delete_desklet),
 		pDesklet);
 	cairo_dock_allow_widget_to_receive_data (pWindow, G_CALLBACK (on_drag_data_received_desklet), pDesklet);
 

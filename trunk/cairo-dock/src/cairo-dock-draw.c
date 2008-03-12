@@ -1215,7 +1215,7 @@ static gboolean _cairo_dock_hide_dock (gchar *cDockName, CairoDock *pDock, Cairo
 
 	if (pPointedIcon != NULL)
 	{
-		cd_message (" il faut cacher ce dock parent\n");
+		cd_message (" il faut cacher ce dock parent");
 		if (pDock->iRefCount == 0)  // pDock->bIsMainDock
 		{
 			cairo_dock_leave_from_main_dock (pDock);
@@ -1231,7 +1231,7 @@ static gboolean _cairo_dock_hide_dock (gchar *cDockName, CairoDock *pDock, Cairo
 				pDock->render (pDock);  // peut-etre qu'il faudrait faire un redraw.
 			}
 
-			cd_message ("on cache %s par parente\n", cDockName);
+			cd_message ("on cache %s par parente", cDockName);
 			gtk_widget_hide (pDock->pWidget);
 			cairo_dock_hide_parent_dock (pDock);
 		}
@@ -1255,14 +1255,14 @@ gboolean cairo_dock_hide_child_docks (CairoDock *pDock)
 		{
 			if (icon->pSubDock->bInside)
 			{
-				cd_message ("on est dans le sous-dock, donc on ne le cache pas\n");
+				cd_message ("on est dans le sous-dock, donc on ne le cache pas");
 				pDock->bInside = FALSE;
 				pDock->bAtTop = FALSE;
 				return FALSE;
 			}
 			else if (icon->pSubDock->iSidLeaveDemand == 0)  // si on sort du dock sans passer par le sous-dock, par exemple en sortant par le bas.
 			{
-				cd_message ("on cache %s par filiation\n", icon->acName);
+				cd_message ("on cache %s par filiation", icon->acName);
 				icon->pSubDock->iScrollOffset = 0;
 				icon->pSubDock->fFoldingFactor = 0;
 				gtk_widget_hide (icon->pSubDock->pWidget);

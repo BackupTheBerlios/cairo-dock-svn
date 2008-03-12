@@ -47,6 +47,8 @@ extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS];
 
+extern CairoDock *g_pMainDock;
+extern gboolean g_bHideAfterShortcut;
 
 gboolean cairo_dock_move_up (CairoDock *pDock)
 {
@@ -92,7 +94,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 	}
 	else  // on se fixe en bas, et on montre la zone visible.
 	{
-		cd_debug ("  on se fixe en bas\n");
+		cd_debug ("  on se fixe en bas");
 		pDock->bAtBottom = TRUE;
 		pDock->iSidMoveDown = 0;
 		int iNewWidth, iNewHeight;
@@ -273,6 +275,11 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 			}
 
 			pDock->iSidShrinkDown = 0;
+			if (g_bHideAfterShortcut && GTK_WIDGET_VISIBLE (g_pMainDock->pWidget))
+			{
+				gtk_widget_hide (g_pMainDock->pWidget);
+				g_bHideAfterShortcut = FALSE;
+			}
 			return FALSE;
 		}
 

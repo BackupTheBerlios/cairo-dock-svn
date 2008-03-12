@@ -223,7 +223,7 @@ struct _CairoDock {
 typedef enum {
 	CAIRO_DOCK_CATEGORY_ACCESSORY=0,
 	CAIRO_DOCK_CATEGORY_DESKTOP,
-	CAIRO_DOCK_CATEGORY_CONTROL,
+	CAIRO_DOCK_CATEGORY_CONTROLER,
 	CAIRO_DOCK_NB_CATEGORY
 	} CairoDockPluginCategory;
 
@@ -302,6 +302,7 @@ struct _CairoDockMinimalAppletConfig {
 	gint iDesiredIconHeight;
 	gchar *cLabel;
 	gchar *cIconFileName;
+	gdouble fOrder;
 	gboolean bDeskletUseSize;
 	gint iDeskletWidth;
 	gint iDeskletHeight;

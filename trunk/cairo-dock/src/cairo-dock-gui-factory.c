@@ -17,6 +17,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #define CAIRO_DOCK_GUI_MARGIN 4
 #define CAIRO_DOCK_PREVIEW_WIDTH 250
 #define CAIRO_DOCK_PREVIEW_HEIGHT 150
+#define CAIRO_DOCK_APPLET_ICON_SIZE 32
+#define CAIRO_DOCK_TAB_ICON_SIZE 24
+#define CAIRO_DOCK_FRAME_ICON_SIZE 32
 
 extern CairoDock *g_pMainDock;
 
@@ -31,6 +34,8 @@ typedef enum {
 	CAIRO_DOCK_MODEL_NB_COLUMNS
 	} _CairoDockModelColumns;
 
+static GtkListStore **s_pModuleListStore = NULL;
+static GtkListStore **s_pRendererListStore = NULL;
 
 static void _cairo_dock_activate_one_element (GtkCellRendererToggle * cell_renderer, gchar * path, GtkTreeModel * model)
 {
@@ -622,7 +627,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								GTK_ICON_SIZE_BUTTON,
 								NULL);
 						else
-							pixbuf = gdk_pixbuf_new_from_file_at_size (cSmallGroupIcon, 32, 32, NULL);
+							pixbuf = gdk_pixbuf_new_from_file_at_size (cSmallGroupIcon, CAIRO_DOCK_FRAME_ICON_SIZE, CAIRO_DOCK_FRAME_ICON_SIZE, NULL);
 						if (pixbuf != NULL)
 						{
 							gtk_image_set_from_pixbuf (GTK_IMAGE (pImage), pixbuf);
@@ -940,7 +945,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 										snprintf (cResult, 10, "%d", k);
 									}
 									if (iElementType == 'M')
-										pixbuf = gdk_pixbuf_new_from_file_at_size (pAuthorizedValuesList[k+3], 24, 24, NULL);
+										pixbuf = gdk_pixbuf_new_from_file_at_size (pAuthorizedValuesList[k+3], CAIRO_DOCK_APPLET_ICON_SIZE, CAIRO_DOCK_APPLET_ICON_SIZE, NULL);
 									gtk_list_store_set (GTK_LIST_STORE (modele), &iter,
 										CAIRO_DOCK_MODEL_NAME, (iElementType == 'r' ? dgettext (cGettextDomain, pAuthorizedValuesList[k]) : pAuthorizedValuesList[k]),
 										CAIRO_DOCK_MODEL_RESULT, (cResult != NULL ? cResult : pAuthorizedValuesList[k]),
@@ -1011,7 +1016,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (pScrolledWindow), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 							gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (pScrolledWindow), pOneWidget);
 							if (iElementType == 'M')
-								gtk_widget_set (pScrolledWindow, "height-request", (int) (200 + CAIRO_DOCK_PREVIEW_HEIGHT), NULL);
+								gtk_widget_set (pScrolledWindow, "height-request", (int) (150 + CAIRO_DOCK_PREVIEW_HEIGHT), NULL);
 							gtk_box_pack_start (GTK_BOX (pHBox),
 								pScrolledWindow,
 								FALSE,
@@ -1025,29 +1030,31 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								FALSE,
 								0);
 
-							pButtonUp = gtk_button_new_from_stock (GTK_STOCK_GO_UP);
-							g_signal_connect (G_OBJECT (pButtonUp),
-								"clicked",
-								G_CALLBACK (_cairo_dock_go_up),
-								pOneWidget);
-							gtk_box_pack_start (GTK_BOX (pSmallVBox),
-								pButtonUp,
-								FALSE,
-								FALSE,
-								0);
-
-							pButtonDown = gtk_button_new_from_stock (GTK_STOCK_GO_DOWN);
-							g_signal_connect (G_OBJECT (pButtonDown),
-								"clicked",
-								G_CALLBACK (_cairo_dock_go_down),
-								pOneWidget);
-							gtk_box_pack_start (GTK_BOX (pSmallVBox),
-								pButtonDown,
-								FALSE,
-								FALSE,
-								0);
-
-							if (iElementType == 'M')
+							if (iElementType != 'M')
+							{
+								pButtonUp = gtk_button_new_from_stock (GTK_STOCK_GO_UP);
+								g_signal_connect (G_OBJECT (pButtonUp),
+									"clicked",
+									G_CALLBACK (_cairo_dock_go_up),
+									pOneWidget);
+								gtk_box_pack_start (GTK_BOX (pSmallVBox),
+									pButtonUp,
+									FALSE,
+									FALSE,
+									0);
+	
+								pButtonDown = gtk_button_new_from_stock (GTK_STOCK_GO_DOWN);
+								g_signal_connect (G_OBJECT (pButtonDown),
+									"clicked",
+									G_CALLBACK (_cairo_dock_go_down),
+									pOneWidget);
+								gtk_box_pack_start (GTK_BOX (pSmallVBox),
+									pButtonDown,
+									FALSE,
+									FALSE,
+									0);
+							}
+							else
 							{
 								_allocate_new_buffer;
 								data[0] = pOneWidget;
@@ -1087,7 +1094,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 										memset (&iter, 0, sizeof (GtkTreeIter));
 										gtk_list_store_append (modele, &iter);
 										if (iElementType == 'M')
-											pixbuf = gdk_pixbuf_new_from_file_at_size (pAuthorizedValuesList[k+3], 24, 24, NULL);
+											pixbuf = gdk_pixbuf_new_from_file_at_size (pAuthorizedValuesList[k+3], CAIRO_DOCK_APPLET_ICON_SIZE, CAIRO_DOCK_APPLET_ICON_SIZE, NULL);
 										gtk_list_store_set (modele, &iter,
 											CAIRO_DOCK_MODEL_ACTIVE, TRUE,
 											CAIRO_DOCK_MODEL_NAME, cValue,
@@ -1115,7 +1122,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 										memset (&iter, 0, sizeof (GtkTreeIter));
 										gtk_list_store_append (modele, &iter);
 										if (iElementType == 'M')
-											pixbuf = gdk_pixbuf_new_from_file_at_size (pAuthorizedValuesList[k+3], 24, 24, NULL);
+											pixbuf = gdk_pixbuf_new_from_file_at_size (pAuthorizedValuesList[k+3], CAIRO_DOCK_APPLET_ICON_SIZE, CAIRO_DOCK_APPLET_ICON_SIZE, NULL);
 										gtk_list_store_set (modele, &iter,
 											CAIRO_DOCK_MODEL_ACTIVE, FALSE,
 											CAIRO_DOCK_MODEL_NAME, cValue,
@@ -1311,50 +1318,58 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							}
 							gchar *cFrameTitle;
 
+							
+							cFrameTitle = g_strdup_printf ("<b>%s</b>", dgettext (cGettextDomain, cValue));
+							pLabel= gtk_label_new (NULL);
+							gtk_label_set_markup (GTK_LABEL (pLabel), cFrameTitle);
+							
+							pLabelContainer = NULL;
+							if (cSmallIcon != NULL)
+							{
+								pLabelContainer = gtk_hbox_new (FALSE, 0);
+								GtkWidget *pImage = gtk_image_new ();
+								GdkPixbuf *pixbuf;
+								if (*cSmallIcon != '/')
+									pixbuf = gtk_widget_render_icon (pImage,
+										cSmallIcon ,
+										GTK_ICON_SIZE_MENU,
+										NULL);
+								else
+									pixbuf = gdk_pixbuf_new_from_file_at_size (cSmallIcon, CAIRO_DOCK_FRAME_ICON_SIZE, CAIRO_DOCK_FRAME_ICON_SIZE, NULL);
+								if (pixbuf != NULL)
+								{
+									gtk_image_set_from_pixbuf (GTK_IMAGE (pImage), pixbuf);
+									gdk_pixbuf_unref (pixbuf);
+									gtk_container_add (GTK_CONTAINER (pLabelContainer),
+										pImage);
+								}
+								gtk_container_add (GTK_CONTAINER (pLabelContainer),
+									pLabel);
+							}
+							
+							GtkWidget *pExternFrame;
 							if (iElementType == 'F')
 							{
-								cFrameTitle = g_strdup_printf ("<b>%s</b>", dgettext (cGettextDomain, cValue));
-								pLabel= gtk_label_new (NULL);
-								gtk_label_set_markup (GTK_LABEL (pLabel), cFrameTitle);
-								
-								pLabelContainer = NULL;
-								if (cSmallIcon != NULL)
-								{
-									pLabelContainer = gtk_hbox_new (FALSE, 0);
-									GtkWidget *pImage = gtk_image_new ();
-									GdkPixbuf *pixbuf;
-									if (*cSmallIcon != '/')
-										pixbuf = gtk_widget_render_icon (pImage,
-											cSmallIcon ,
-											GTK_ICON_SIZE_MENU,
-											NULL);
-									else
-										pixbuf = gdk_pixbuf_new_from_file_at_size (cSmallIcon, 24, 24, NULL);
-									if (pixbuf != NULL)
-									{
-										gtk_image_set_from_pixbuf (GTK_IMAGE (pImage), pixbuf);
-										gdk_pixbuf_unref (pixbuf);
-										gtk_container_add (GTK_CONTAINER (pLabelContainer),
-											pImage);
-									}
-									gtk_container_add (GTK_CONTAINER (pLabelContainer),
-										pLabel);
-								}
-								
-								pFrame = gtk_frame_new (NULL);
-								gtk_container_set_border_width (GTK_CONTAINER (pFrame), CAIRO_DOCK_GUI_MARGIN);
-								gtk_frame_set_label_widget (GTK_FRAME (pFrame), (pLabelContainer != NULL ? pLabelContainer : pLabel));
-								gtk_frame_set_shadow_type (GTK_FRAME (pFrame), GTK_SHADOW_OUT);
+								pExternFrame = gtk_frame_new (NULL);
+								gtk_container_set_border_width (GTK_CONTAINER (pExternFrame), CAIRO_DOCK_GUI_MARGIN);
+								gtk_frame_set_shadow_type (GTK_FRAME (pExternFrame), GTK_SHADOW_OUT);
+								gtk_frame_set_label_widget (GTK_FRAME (pExternFrame), (pLabelContainer != NULL ? pLabelContainer : pLabel));
+								pFrame = pExternFrame;
 							}
 							else
 							{
-								cFrameTitle = g_strdup_printf ("<u><b>%s</b></u>", dgettext (cGettextDomain, cValue));
-								pFrame = gtk_expander_new (cFrameTitle);
-								gtk_expander_set_use_markup (GTK_EXPANDER (pFrame), TRUE);
-								gtk_expander_set_expanded (GTK_EXPANDER (pFrame), FALSE);
+								pExternFrame = gtk_expander_new (NULL);
+								gtk_expander_set_expanded (GTK_EXPANDER (pExternFrame), FALSE);
+								gtk_expander_set_label_widget (GTK_EXPANDER (pExternFrame), (pLabelContainer != NULL ? pLabelContainer : pLabel));
+								pFrame = gtk_frame_new (NULL);
+								gtk_container_set_border_width (GTK_CONTAINER (pFrame), CAIRO_DOCK_GUI_MARGIN);
+								gtk_frame_set_shadow_type (GTK_FRAME (pFrame), GTK_SHADOW_OUT);
+								gtk_container_add (GTK_CONTAINER (pExternFrame),
+									pFrame);
 							}
+							
 							gtk_box_pack_start (GTK_BOX (pVBox),
-								pFrame,
+								pExternFrame,
 								FALSE,
 								FALSE,
 								0);

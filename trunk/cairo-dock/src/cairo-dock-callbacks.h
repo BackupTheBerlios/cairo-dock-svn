@@ -81,4 +81,7 @@ gboolean on_selection_request_event (GtkWidget *pWidget, GdkEventSelection *even
 gboolean on_selection_notify_event (GtkWidget *pWidget, GdkEventSelection *event, gpointer user_data);
 
 
+void cairo_dock_raise_from_keyboard (const char *cKeyShortcut, gpointer data);
+
+
 #endif

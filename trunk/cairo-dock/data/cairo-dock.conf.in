@@ -34,13 +34,16 @@ frame2_ =
 separator_ = 
 
 #b- Reserve space at the edge of the screen for the dock ?
-#{This will prevent other windows from overlapping the dock.}
+#{This will prevent other windows from overlapping the dock. It has no effect if you defined the 'show/hide' shortcut below, cause then the dock behaves like a menu.}
 reserve space = false
 
 #b- Activate auto-hide ?
 #{The dock will automatically hide itself outside of the scren when the mouse leaves it and will show a callback zone instead. Place the mouse into this zone will make the dock re-appear.}
 auto-hide = false
 
+#K Keyboard shortcut to show/hide the dock :
+#{When you press the shortcut, the dock will hide or show itself at the potition of your mouse, thus acting like a menu.}
+raise shortcut = 
 
 #[gtk-dnd-multiple]
 [TaskBar]
@@ -201,14 +204,27 @@ show hidden files = false
 #[gtk-disconnect]
 [Applets]
 
-#F-[Add fonctionnalities to your dock !]
-frame_applet =
 
-#M-999[] List of available plug-ins (applets and others) :
+#F-[Choose some useful accessories for your dock !]
+frame_m0 =
+
+#M-999[] List of available accessories :
 #{Just check the box to activate a plug-in, or uncheck to deactivate it. Once activated, you can use it and configure it.}/
-active modules = clock;dustbin
+modules_0 = 
 
+#F-[Add fonctionnalities to your dock !]
+frame_m1 =
 
+#M-999[] List of available desktop enhancements :
+#{Just check the box to activate a plug-in, or uncheck to deactivate it. Once activated, you can use it and configure it.}/
+modules_1 = 
+
+#F-[Control your PC from your dock !]
+frame_m2 =
+
+#M-999[] List of available controlers :
+#{Just check the box to activate a plug-in, or uncheck to deactivate it. Once activated, you can use it and configure it.}/
+modules_2 = 
 
 
 

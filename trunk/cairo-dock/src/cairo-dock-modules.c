@@ -249,7 +249,7 @@ void cairo_dock_preload_module_from_directory (gchar *cModuleDirPath, GHashTable
 			pModule = cairo_dock_load_module (cFilePath, pModuleTable, &tmp_erreur);
 			if (tmp_erreur != NULL)
 			{
-				cd_message ("Attention : %s\n", tmp_erreur->message);
+				cd_warning ("Attention : %s", tmp_erreur->message);
 				g_error_free (tmp_erreur);
 				tmp_erreur = NULL;
 			}
@@ -289,7 +289,9 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 				}
 				if (pIcon != NULL)
 				{
-					pIcon->fOrder = iOrder ++;
+					if (pIcon->fOrder == CAIRO_DOCK_LAST_ORDER)
+						pIcon->fOrder = iOrder;
+					iOrder ++;
 					if (CAIRO_DOCK_IS_DOCK (pModule->pContainer))
 						cairo_dock_insert_icon_in_dock (pIcon, CAIRO_DOCK_DOCK (pModule->pContainer), ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
 				}
@@ -313,14 +315,14 @@ void cairo_dock_deactivate_old_modules (double fTime)
 	g_hash_table_foreach (s_hModuleTable, (GHFunc) _cairo_dock_deactivate_one_old_module, &fTime);
 }
 
-void cairo_dock_update_conf_file_with_available_modules_full (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cGroupName, gchar *cKeyName)
+/*void cairo_dock_update_conf_file_with_available_modules_full (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cGroupName, gchar *cKeyName)
 {
 	cairo_dock_update_conf_file_with_hash_table (pOpenedKeyFile, cConfFile, s_hModuleTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_module_name, FALSE, FALSE);  // ils sont classes par ordre dans le dock.
-}
+}*/
 
 
 
-static void _cairo_dock_add_one_module_name_if_active (gchar *cModuleName, CairoDockModule *pModule, GSList **pListeModule)
+/*static void _cairo_dock_add_one_module_name_if_active (gchar *cModuleName, CairoDockModule *pModule, GSList **pListeModule)
 {
 	if (pModule->bActive)
 	{
@@ -380,7 +382,7 @@ void cairo_dock_update_conf_file_with_active_modules (GKeyFile *pOpenedKeyFile, 
 	g_string_free (cActiveModules, TRUE);
 	if (pOpenedKeyFile == NULL)
 		g_key_file_free (pKeyFile);
-}
+}*/
 
 
 
@@ -437,12 +439,13 @@ GKeyFile *cairo_dock_pre_read_module_config (CairoDockModule *pModule, CairoDock
 		pMinimalConfig->iDesiredIconHeight = -1;
 		return pKeyFile;
 	}
-
+	
 	pMinimalConfig->iDesiredIconWidth = cairo_dock_get_integer_key_value (pKeyFile, "Icon", "width", NULL, 48, NULL, NULL);
 	pMinimalConfig->iDesiredIconHeight = cairo_dock_get_integer_key_value (pKeyFile, "Icon", "height", NULL, 48, NULL, NULL);
 	pMinimalConfig->cLabel = cairo_dock_get_string_key_value (pKeyFile, "Icon", "name", NULL, NULL, NULL, NULL);
 	pMinimalConfig->cIconFileName = cairo_dock_get_string_key_value (pKeyFile, "Icon", "icon", NULL, NULL, NULL, NULL);
-
+	pMinimalConfig->fOrder = cairo_dock_get_double_key_value (pKeyFile, "Icon", "order", NULL, CAIRO_DOCK_LAST_ORDER, NULL, NULL);
+	
 	if (! g_key_file_has_group (pKeyFile, "Desklet"))  // cette applet ne peut pas se detacher.
 	{
 		pMinimalConfig->iDeskletWidth = -1;
@@ -537,6 +540,7 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 				pMinimalConfig->cLabel,
 				pMinimalConfig->cIconFileName,
 				module);
+			pIcon->fOrder = pMinimalConfig->fOrder;
 			pIcon->cParentDockName = g_strdup (cDockName);
 			if (CAIRO_DOCK_IS_DESKLET (pContainer))
 			{
@@ -697,7 +701,9 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 		if (erreur != NULL)
 		{
 			module->bActive = FALSE;
-			cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, g_pMainDock->icons);
+			///cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, g_pMainDock->icons);
+			cairo_dock_update_conf_file_with_active_modules2 (NULL, g_cConfFile);
+			
 			cd_warning ("Attention : %s", erreur->message);
 			g_error_free (erreur);
 		}
@@ -765,7 +771,8 @@ void cairo_dock_activate_module_and_load (gchar *cModuleName)
 		gtk_widget_queue_draw (pDock->pWidget);
 	}
 	
-	cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, g_pMainDock->icons);
+	///cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, g_pMainDock->icons);
+	cairo_dock_update_conf_file_with_active_modules2 (NULL, g_cConfFile);
 }
 void cairo_dock_deactivate_module_and_unload (gchar *cModuleName)
 {
@@ -783,7 +790,8 @@ void cairo_dock_deactivate_module_and_unload (gchar *cModuleName)
 	{
 		cairo_dock_deactivate_module (pModule);
 	}
-	cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, g_pMainDock->icons);
+	///cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, g_pMainDock->icons);
+	cairo_dock_update_conf_file_with_active_modules2 (NULL, g_cConfFile);
 	cairo_dock_free_icon (pIcon);
 }
 
@@ -875,7 +883,10 @@ static void _cairo_dock_write_one_module_by_category (gchar *cModuleName, CairoD
 	if (! bActiveOnly || pModule->bActive)
 	{
 		GString *sModuleInCategory = pStrings[pModule->pVisitCard->iCategory];
-		cairo_dock_write_one_module_name (cModuleName, pModule, sModuleInCategory);
+		if (bActiveOnly)
+			cairo_dock_write_one_name (cModuleName, pModule, sModuleInCategory);
+		else
+			cairo_dock_write_one_module_name (cModuleName, pModule, sModuleInCategory);
 	}
 }
 GString **cairo_dock_list_modules_by_category (gboolean bActiveOnly)
@@ -888,5 +899,64 @@ GString **cairo_dock_list_modules_by_category (gboolean bActiveOnly)
 	
 	g_hash_table_foreach (s_hModuleTable, (GHFunc) _cairo_dock_write_one_module_by_category, data);
 	
+	for (i = 0; i < CAIRO_DOCK_NB_CATEGORY; i ++)
+	{
+		if (pStrings[i]->len > 0)
+			pStrings[i]->str[pStrings[i]->len-1] = '\0';
+	}
+	
 	return pStrings;
+}
+
+void cairo_dock_update_conf_file_with_modules_full (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cGroupName, gchar *cKeyNameBase, gboolean bActiveOnly)
+{
+	cd_debug ("%s (%s ; %d)", __func__, cConfFile, bActiveOnly);
+	GKeyFile *pKeyFile = pOpenedKeyFile;
+	if (pKeyFile == NULL)
+	{
+		pKeyFile = g_key_file_new ();
+		GError *erreur = NULL;
+		g_key_file_load_from_file (pKeyFile, cConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+		if (erreur != NULL)
+		{
+			cd_warning ("Attention : %s", erreur->message);
+			g_error_free (erreur);
+			return ;
+		}
+	}
+	
+	GString **pStrings = cairo_dock_list_modules_by_category (bActiveOnly);
+	GString *sKeyName = g_string_new (cKeyNameBase);
+	int i;
+	for (i = 0; i < CAIRO_DOCK_NB_CATEGORY; i ++)
+	{
+		g_string_printf (sKeyName, "%s_%d", cKeyNameBase, i);
+		if (bActiveOnly)
+			g_key_file_set_string (pKeyFile, cGroupName, sKeyName->str, pStrings[i]->str);
+		else
+			cairo_dock_update_conf_file_with_list (pKeyFile, NULL, pStrings[i]->str, cGroupName, sKeyName->str, NULL);
+		//g_print ("%s <- %s\n", sKeyName->str, pStrings[i]->str);
+		g_string_free (pStrings[i], TRUE);
+	}
+	cairo_dock_write_keys_to_file (pKeyFile, cConfFile);
+	
+	g_free (pStrings);
+	g_string_free (sKeyName, TRUE);
+	if (pOpenedKeyFile == NULL)
+		g_key_file_free (pKeyFile);
+}
+
+
+int cairo_dock_get_nb_modules (void)
+{
+	return g_hash_table_size (s_hModuleTable);
+}
+
+
+void cairo_dock_update_module_order (CairoDockModule *pModule, double fOrder)
+{
+	cd_message ("%s <- %.2f", pModule->pVisitCard->cModuleName, fOrder);
+	cairo_dock_update_conf_file (pModule->cConfFilePath,
+		G_TYPE_DOUBLE, "Icon", "order", fOrder,
+		G_TYPE_INVALID);
 }

@@ -215,6 +215,9 @@ double g_fDialogTextColor[4];
 double g_fDeskletColor[4];
 double g_fDeskletColorInside[4];
 
+gchar *g_cRaiseDockShortcut = NULL;
+gboolean g_bHideAfterShortcut = FALSE;
+
 gboolean g_bKeepAbove = FALSE;
 gboolean g_bSkipPager = TRUE;
 gboolean g_bSkipTaskbar = TRUE;
@@ -622,6 +625,8 @@ main (int argc, char** argv)
 		/*double fAnswer = cairo_dock_show_value_and_wait ("Test :", cairo_dock_get_first_appli (g_pMainDock->icons), g_pMainDock, .7);
 		cd_message (" ==> %.2f\n", fAnswer);*/
 	}
+	
+	
 	gtk_main ();
 
 	rsvg_term ();

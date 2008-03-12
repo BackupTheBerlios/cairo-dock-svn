@@ -27,8 +27,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-menu.h"
 #include "cairo-dock-callbacks.h"
 #include "cairo-dock-dialogs.h"
-#include "cairo-dock-config.h"
+#include "cairo-dock-X-utilities.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-keybinder.h"
+#include "cairo-dock-config.h"
 
 #define CAIRO_DOCK_TYPE_CONF_FILE_FILE ".cairo-dock-conf-file"
 
@@ -158,6 +160,7 @@ extern double g_fDeskletColorInside[4];
 
 extern CairoDockFMSortType g_iFileSortType;
 extern gboolean g_bShowHiddenFiles;
+extern gchar *g_cRaiseDockShortcut;
 
 /**
 *Recupere une cle booleene d'un fichier de cles.
@@ -910,9 +913,30 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_tAnimationType[CAIRO_DOCK_APPLET] = cairo_dock_get_animation_type_key_value (pKeyFile, "Icons", "applet animation", &bFlushConfFileNeeded, CAIRO_DOCK_ROTATE, "Applets", "animation type");
 
 	g_tNbAnimationRounds[CAIRO_DOCK_APPLET] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "applet number of rounds", &bFlushConfFileNeeded, 2, "Applets", "number of animation rounds");
-
-	gchar **cActiveModuleList = cairo_dock_get_string_list_key_value (pKeyFile, "Applets", "active modules", &bFlushConfFileNeeded, &length, NULL, NULL, NULL);
-
+	
+	///gchar **cActiveModuleList = cairo_dock_get_string_list_key_value (pKeyFile, "Applets", "active modules", &bFlushConfFileNeeded, &length, NULL, NULL, NULL);
+	int iNbModules = cairo_dock_get_nb_modules ();
+	gchar **cActiveModuleList = g_new0 (gchar *, iNbModules + 1), **cActiveModuleList_n;  // +1 pour le NULL terminal.
+	GString *sKeyName = g_string_new ("");
+	guint i, iNbActiveModules=0;
+	for (i = 0; i < CAIRO_DOCK_NB_CATEGORY; i ++)
+	{
+		g_string_printf (sKeyName, "%s_%d", "modules", i);
+		cActiveModuleList_n = cairo_dock_get_string_list_key_value (pKeyFile, "Applets", sKeyName->str, &bFlushConfFileNeeded, &length, NULL, "Applets", "active modules");
+		
+		if (cActiveModuleList_n != NULL)
+		{
+			int j = 0;
+			while (cActiveModuleList_n[j] != NULL && iNbActiveModules < iNbModules)
+			{
+				cActiveModuleList[iNbActiveModules] = cActiveModuleList_n[j];
+				iNbActiveModules ++;
+				j ++;
+			}
+			g_free (cActiveModuleList_n);
+		}
+	}
+	g_string_free (sKeyName, TRUE);
 
 	//\___________________ On recupere les parametres des separateurs.
 	g_tIconAuthorizedWidth[CAIRO_DOCK_SEPARATOR12] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "separator width", &bFlushConfFileNeeded, 48, "Separators", "min icon size");
@@ -975,6 +999,14 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_iFileSortType = cairo_dock_get_integer_key_value (pKeyFile, "System", "sort files", &bFlushConfFileNeeded, CAIRO_DOCK_FM_SORT_BY_NAME, NULL, NULL);
 	g_bShowHiddenFiles = cairo_dock_get_boolean_key_value (pKeyFile, "System", "show hidden files", &bFlushConfFileNeeded, FALSE, NULL, NULL);
 	
+	if (g_cRaiseDockShortcut != NULL)
+	{
+		cd_keybinder_unbind (g_cRaiseDockShortcut, (CDBindkeyHandler) cairo_dock_raise_from_keyboard);
+		g_free (g_cRaiseDockShortcut);
+	}
+	g_cRaiseDockShortcut = cairo_dock_get_string_key_value (pKeyFile, "Position", "raise shortcut", &bFlushConfFileNeeded, NULL, NULL, NULL);
+	
+	
 	//\___________________ On (re)charge tout, car n'importe quel parametre peut avoir change.
 	switch (iScreenBorder)
 	{
@@ -1004,7 +1036,6 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_free (cButtonCancelImage);
 
 	g_fReflectSize = 0;
-	guint i;
 	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)
 	{
 		if (g_tIconAuthorizedHeight[i] > 0)
@@ -1064,7 +1095,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_strfreev (cActiveModuleList);
 
 	cairo_dock_set_all_views_to_default ();
-
+	
+	g_bReserveSpace = g_bReserveSpace && (g_cRaiseDockShortcut == NULL);
 	cairo_dock_reserve_space_for_dock (pDock, g_bReserveSpace);
 
 
@@ -1118,11 +1150,15 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		pKeyFile = g_key_file_new ();
 		g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
 		
-		cairo_dock_update_conf_file_with_available_modules (pKeyFile, cConfFilePath);
+		///cairo_dock_update_conf_file_with_available_modules (pKeyFile, cConfFilePath);
+		cairo_dock_update_conf_file_with_available_modules2 (pKeyFile, cConfFilePath);
 	}
 
 	cairo_dock_update_main_conf_file_with_renderers (pKeyFile, cConfFilePath);
-
+	
+	if (g_cRaiseDockShortcut != NULL)
+		cd_keybinder_bind (g_cRaiseDockShortcut, (CDBindkeyHandler) cairo_dock_raise_from_keyboard, (gpointer)NULL);
+	
 	//\___________________ On applique les modifs au fichier de conf easy.
 	cairo_dock_copy_to_easy_conf_file (pKeyFile, g_cEasyConfFile);
 
@@ -1478,7 +1514,14 @@ void cairo_dock_copy_easy_conf_file (gchar *cEasyConfFilePath, GKeyFile *pMainKe
 
 	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "show applications", pMainKeyFile, "TaskBar", "show applications");
 
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "System", "active modules", pMainKeyFile, "Applets", "active modules");
+	GString *sKeyName = g_string_new ("");
+	int i;
+	for (i = 0; i < CAIRO_DOCK_NB_CATEGORY; i ++)
+	{
+		g_string_printf (sKeyName, "%s_%d", "modules", i);
+		cairo_dock_copy_value_to_keyfile (pKeyFile, "System", sKeyName->str, pMainKeyFile, "Applets", sKeyName->str);
+	}
+	g_string_free (sKeyName, TRUE);
 
 	//\___________________ On recupere les parametres de personnalisation.
 	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "callback image", pMainKeyFile, "Background", "callback image");
@@ -1548,7 +1591,14 @@ void cairo_dock_copy_to_easy_conf_file (GKeyFile *pMainKeyFile, gchar *cEasyConf
 
 	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "TaskBar", "show applications", pKeyFile, "System", "show applications");
 
-	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Applets", "active modules", pKeyFile, "System", "active modules");
+	GString *sKeyName = g_string_new ("");
+	int i;
+	for (i = 0; i < CAIRO_DOCK_NB_CATEGORY; i ++)
+	{
+		g_string_printf (sKeyName, "%s_%d", "modules", i);
+		cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Applets", sKeyName->str, pKeyFile, "System", sKeyName->str);
+	}
+	g_string_free (sKeyName, TRUE);
 
 	//\___________________ On ecrit les parametres de personnalisation.
 	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Background", "callback image", pKeyFile, "Personnalisation", "callback image");
@@ -1586,7 +1636,8 @@ void cairo_dock_copy_to_easy_conf_file (GKeyFile *pMainKeyFile, gchar *cEasyConf
 	cairo_dock_write_keys_to_file (pKeyFile, cEasyConfFilePath);
 	
 	//\___________________ On complete.
-	cairo_dock_update_easy_conf_file_with_available_modules (pKeyFile, cEasyConfFilePath);
+	///cairo_dock_update_easy_conf_file_with_available_modules (pKeyFile, cEasyConfFilePath);
+	cairo_dock_update_easy_conf_file_with_available_modules2 (pKeyFile, cEasyConfFilePath);
 
 	cairo_dock_update_easy_conf_file_with_renderers (pKeyFile, cEasyConfFilePath);
 	g_key_file_free (pKeyFile);

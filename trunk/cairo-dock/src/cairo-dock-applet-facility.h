@@ -136,7 +136,7 @@ gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoDockContainer *p
 *@param iMinorVersion version mineure du dock necessaire au bon fonctionnement de l'applet.
 *@param iMicroVersion version micro du dock necessaire au bon fonctionnement de l'applet.
 */
-#define CD_APPLET_PRE_INIT_BEGIN(cName, iMajorVersion, iMinorVersion, iMicroVersion) \
+#define CD_APPLET_PRE_INIT_BEGIN(cName, iMajorVersion, iMinorVersion, iMicroVersion, iAppletCategory) \
 Icon *myIcon = NULL; \
 CairoDock *myDock = NULL; \
 CairoDockDesklet *myDesklet = NULL; \
@@ -157,7 +157,7 @@ CairoDockVisitCard *pre_init (void) \
 	pVisitCard->cShareDataDir = g_strdup (MY_APPLET_SHARE_DATA_DIR); \
 	pVisitCard->cConfFileName = (MY_APPLET_CONF_FILE != NULL && strcmp (MY_APPLET_CONF_FILE, "none") != 0 ? g_strdup (MY_APPLET_CONF_FILE) : NULL); \
 	pVisitCard->cModuleVersion = g_strdup (MY_APPLET_VERSION);\
-	pVisitCard->iCategory = 0;\
+	pVisitCard->iCategory =iAppletCategory ;\
 	pVisitCard->cIconFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_ICON_FILE);
 /**
 *Fin de la fonction de pre-initialisation de l'applet.
@@ -168,8 +168,8 @@ CairoDockVisitCard *pre_init (void) \
 /**
 *Fonction de pre-initialisation generique. Ne fais que definir l'applet (en appelant les 2 macros precedentes), la plupart du temps cela est suffisant.
 */
-#define CD_APPLET_DEFINITION(cName, iMajorVersion, iMinorVersion, iMicroVersion) \
-CD_APPLET_PRE_INIT_BEGIN (cName, iMajorVersion, iMinorVersion, iMicroVersion) \
+#define CD_APPLET_DEFINITION(cName, iMajorVersion, iMinorVersion, iMicroVersion, iAppletCategory) \
+CD_APPLET_PRE_INIT_BEGIN (cName, iMajorVersion, iMinorVersion, iMicroVersion, iAppletCategory) \
 CD_APPLET_PRE_INIT_END
 
 

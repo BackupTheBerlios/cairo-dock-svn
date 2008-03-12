@@ -21,11 +21,11 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 
 void cairo_dock_deactivate_old_modules (double fTime);
 
-void cairo_dock_update_conf_file_with_available_modules_full (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cGroupName, gchar *cKeyName);
+/*void cairo_dock_update_conf_file_with_available_modules_full (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cGroupName, gchar *cKeyName);
 #define cairo_dock_update_conf_file_with_available_modules(pOpenedKeyFile, cConfFile) cairo_dock_update_conf_file_with_available_modules_full (pOpenedKeyFile, cConfFile, "Applets", "active modules")
 #define cairo_dock_update_easy_conf_file_with_available_modules(pOpenedKeyFile, cConfFile) cairo_dock_update_conf_file_with_available_modules_full (pOpenedKeyFile, cConfFile, "System", "active modules")
 
-void cairo_dock_update_conf_file_with_active_modules (GKeyFile *pOpenedKeyFile, gchar *cConfFile, GList *pIconList);
+void cairo_dock_update_conf_file_with_active_modules (GKeyFile *pOpenedKeyFile, gchar *cConfFile, GList *pIconList);*/
 
 
 
@@ -53,5 +53,19 @@ Icon *cairo_dock_find_icon_from_module (CairoDockModule *module, CairoDockContai
 CairoDockModule *cairo_dock_find_module_from_name (gchar *cModuleName);
 
 CairoDockModule *cairo_dock_foreach_desklet (CairoDockForeachDeskletFunc pCallback, gpointer user_data);
+
+
+GString **cairo_dock_list_modules_by_category (gboolean bActiveOnly);
+void cairo_dock_update_conf_file_with_modules_full (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cGroupName, gchar *cKeyNameBase, gboolean bActiveOnly);
+#define cairo_dock_update_conf_file_with_available_modules2(pOpenedKeyFile, cConfFile) cairo_dock_update_conf_file_with_modules_full (pOpenedKeyFile, cConfFile, "Applets", "modules", FALSE)
+#define cairo_dock_update_easy_conf_file_with_available_modules2(pOpenedKeyFile, cConfFile) cairo_dock_update_conf_file_with_modules_full (pOpenedKeyFile, cConfFile, "System", "modules", FALSE)
+
+#define cairo_dock_update_conf_file_with_active_modules2(pOpenedKeyFile, cConfFile) cairo_dock_update_conf_file_with_modules_full (pOpenedKeyFile, cConfFile, "Applets", "modules", TRUE)
+
+
+int cairo_dock_get_nb_modules (void);
+
+void cairo_dock_update_module_order (CairoDockModule *pModule, double fOrder);
+
 
 #endif

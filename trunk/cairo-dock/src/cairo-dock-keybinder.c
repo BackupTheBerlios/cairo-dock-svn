@@ -38,15 +38,6 @@
 #include "cairo-dock-keybinder.h"
 #include "cairo-dock-log.h"
 
-/* Uncomment the next line to print a debug trace. */
-/* #define DEBUG */
-
-#ifdef DEBUG
-#  define TRACE(x) x
-#else
-#  define TRACE(x) do {} while (FALSE);
-#endif
-
 typedef unsigned int uint;
 typedef struct _Binding {
 	CDBindkeyHandler        handler;
@@ -130,20 +121,20 @@ do_grab_key (Binding *binding)
 					    &virtual_mods))
 		return FALSE;
 
-	TRACE (g_print ("Got accel %d, %d\n", keysym, virtual_mods));
+	cd_debug ("Got accel %d, %d", keysym, virtual_mods);
 
 	binding->keycode = XKeysymToKeycode (GDK_WINDOW_XDISPLAY (rootwin),
 					     keysym);
 	if (binding->keycode == 0)
 		return FALSE;
 
-	TRACE (g_print ("Got keycode %d\n", binding->keycode));
+	cd_debug ("Got keycode %d", binding->keycode);
 
 	egg_keymap_resolve_virtual_modifiers (keymap,
 					      virtual_mods,
 					      &binding->modifiers);
 
-	TRACE (g_print ("Got modmask %d\n", binding->modifiers));
+	cd_debug ("Got modmask %d", binding->modifiers);
 
 	gdk_error_trap_push ();
 
@@ -154,7 +145,7 @@ do_grab_key (Binding *binding)
 	gdk_flush ();
 
 	if (gdk_error_trap_pop ()) {
-	   g_warning ("Binding '%s' failed!\n", binding->keystring);
+	   g_warning ("Binding '%s' failed!", binding->keystring);
 	   return FALSE;
 	}
 
@@ -166,7 +157,7 @@ do_ungrab_key (Binding *binding)
 {
 	GdkWindow *rootwin = gdk_get_default_root_window ();
 
-	TRACE (g_print ("Removing grab for '%s'\n", binding->keystring));
+	cd_debug ("Removing grab for '%s'", binding->keystring);
 
 	grab_ungrab_with_ignorable_modifiers (rootwin,
 					      binding,
@@ -183,13 +174,13 @@ filter_func (GdkXEvent *gdk_xevent, GdkEvent *event, gpointer data)
 	guint event_mods;
 	GSList *iter;
 
-	TRACE (g_print ("Got Event! %d, %d\n", xevent->type, event->type));
+	cd_debug ("Got Event! %d, %d", xevent->type, event->type);
 
 	switch (xevent->type) {
 	case KeyPress:
-		TRACE (g_print ("Got KeyPress! keycode: %d, modifiers: %d\n",
+		cd_debug ("Got KeyPress! keycode: %d, modifiers: %d",
 				xevent->xkey.keycode,
-				xevent->xkey.state));
+				xevent->xkey.state);
 
 		/*
 		 * Set the last event time for use when showing
@@ -208,8 +199,8 @@ filter_func (GdkXEvent *gdk_xevent, GdkEvent *event, gpointer data)
 			if (binding->keycode == xevent->xkey.keycode &&
 			    binding->modifiers == event_mods) {
 
-				TRACE (g_print ("Calling handler for '%s'...\n",
-						binding->keystring));
+				cd_debug ("Calling handler for '%s'...",
+						binding->keystring);
 
 				(binding->handler) (binding->keystring,
 						    binding->user_data);
@@ -219,7 +210,7 @@ filter_func (GdkXEvent *gdk_xevent, GdkEvent *event, gpointer data)
 		processing_event = FALSE;
 		break;
 	case KeyRelease:
-		TRACE (g_print ("Got KeyRelease! \n"));
+		cd_debug ("Got KeyRelease! ");
 		break;
 	}
 
@@ -232,7 +223,7 @@ keymap_changed (GdkKeymap *map)
 	GdkKeymap *keymap = gdk_keymap_get_default ();
 	GSList *iter;
 
-	TRACE (g_print ("Keymap changed! Regrabbing keys..."));
+	cd_debug ("Keymap changed! Regrabbing keys...");
 
 	for (iter = bindings; iter != NULL; iter = iter->next) {
 		Binding *binding = (Binding *) iter->data;
@@ -281,11 +272,13 @@ cd_keybinder_bind (const char           *keystring,
 	binding->user_data = user_data;
 
 	/* Sets the binding's keycode and modifiers */
+	cd_debug ("%s", keystring);
 	success = do_grab_key (binding);
 
 	if (success) {
 		bindings = g_slist_prepend (bindings, binding);
 	} else {
+		cd_warning ("couldnt bind %s", keystring);
 		g_free (binding->keystring);
 		g_free (binding);
 	}

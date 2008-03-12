@@ -83,6 +83,8 @@ extern int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS];
 extern gboolean g_bUseGlitz;
 extern CairoDockFMSortType g_iFileSortType;
 
+extern gboolean g_bHideAfterShortcut;
+
 
 static gboolean s_bTemporaryAutoHide = FALSE;
 static gboolean s_bEntranceAllowed = TRUE;
@@ -226,7 +228,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	static double fLastTime = 0;
 	Icon *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
 	int iLastMouseX = pDock->iMouseX;
-	//cd_debug ("%s (%d,%d) (%d, %.2fms, bAtBottom:%d; iSidShrinkDown:%d)\n", __func__, (int) pMotion->x, (int) pMotion->y, pMotion->is_hint, pMotion->time - fLastTime, pDock->bAtBottom, pDock->iSidShrinkDown);
+	//g_print ("%s (%d,%d) (%d, %.2fms, bAtBottom:%d; iSidShrinkDown:%d)\n", __func__, (int) pMotion->x, (int) pMotion->y, pMotion->is_hint, pMotion->time - fLastTime, pDock->bAtBottom, pDock->iSidShrinkDown);
 	
 	//\_______________ On elague le flux des MotionNotify, sinon X en envoie autant que le permet le CPU !
 	Icon *pPointedIcon;
@@ -906,12 +908,16 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 						if (icon->pSubDock != NULL && bShowSubDockOnClick && ! CAIRO_DOCK_IS_APPLI (icon))
 						{
 							cairo_dock_show_subdock (icon, FALSE, pDock);
+							cairo_dock_arm_animation (icon, 0, 0);
 						}
-
-						gpointer data[2] = {icon, pDock};
-						cairo_dock_notify (CAIRO_DOCK_CLICK_ICON, data);
-
-						cairo_dock_start_animation (icon, pDock);
+						else
+						{
+							gpointer data[2] = {icon, pDock};
+							cairo_dock_notify (CAIRO_DOCK_CLICK_ICON, data);
+							g_bHideAfterShortcut = TRUE;
+							
+							cairo_dock_start_animation (icon, pDock);
+						}
 					}
 					else if (s_pIconClicked != NULL && icon != NULL && icon != s_pIconClicked)  //  && icon->iType == s_pIconClicked->iType
 					{
@@ -1495,8 +1501,33 @@ gboolean on_selection_notify_event (GtkWidget *pWidget, GdkEventSelection *event
 }
 
 
+
 void cairo_dock_raise_from_keyboard (const char *cKeyShortcut, gpointer data)
 {
-	//if (g_pMainDock->bAtBottom)
+	if (GTK_WIDGET_VISIBLE (g_pMainDock->pWidget))
+	{
+		gtk_widget_hide (g_pMainDock->pWidget);
+	}
+	else
+	{
+		int iMouseX, iMouseY;
+		if (g_pMainDock->bHorizontalDock)
+			gdk_window_get_pointer (g_pMainDock->pWidget->window, &iMouseX, &iMouseY, NULL);
+		else
+			gdk_window_get_pointer (g_pMainDock->pWidget->window, &iMouseY, &iMouseX, NULL);
+		g_print (" %d;%d\n", iMouseX, iMouseY);
 		
+		g_pMainDock->iGapX = g_pMainDock->iWindowPositionX + iMouseX - g_iScreenWidth[g_pMainDock->bHorizontalDock] * g_pMainDock->fAlign;
+		g_pMainDock->iGapY = (g_bDirectionUp ? g_iScreenHeight[g_pMainDock->bHorizontalDock] - (g_pMainDock->iWindowPositionY + iMouseY) : g_pMainDock->iWindowPositionY + iMouseY);
+		g_print (" => %d;%d\n", g_pMainDock->iGapX, g_pMainDock->iGapY);
+		
+		cairo_dock_set_window_position_at_balance (g_pMainDock, g_pMainDock->iCurrentWidth, g_pMainDock->iCurrentHeight);
+		g_print ("   => (%d;%d)\n", g_pMainDock->iWindowPositionX, g_pMainDock->iWindowPositionY);
+		
+		gtk_window_move (GTK_WINDOW (g_pMainDock->pWidget),
+			(g_pMainDock->bHorizontalDock ? g_pMainDock->iWindowPositionX : g_pMainDock->iWindowPositionY),
+			(g_pMainDock->bHorizontalDock ? g_pMainDock->iWindowPositionY : g_pMainDock->iWindowPositionX));
+		gtk_widget_show (g_pMainDock->pWidget);
+	}
+	g_bHideAfterShortcut = FALSE;
 }
