@@ -626,6 +626,7 @@ main (int argc, char** argv)
 		cd_message (" ==> %.2f\n", fAnswer);*/
 	}
 	
+	cd_dbus_init();
 	
 	gtk_main ();
 

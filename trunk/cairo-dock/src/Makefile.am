@@ -50,6 +50,9 @@ cairo_dock_SOURCES = \
 	cairo-dock-callbacks.c \
 	cairo-dock-callbacks.h \
 	cairo-dock.c \
+	cairo-dock-dbus.c \
+	cairo-dock-dbus.h \
+	cairo-dock-dbus-spec.h \
 	cairo-dock-draw.c \
 	cairo-dock-draw.h \
 	cairo-dock-config.c \

@@ -34,7 +34,7 @@ AM_CONDITIONAL(COMPIL_VERBOSE, test x$enable_verbose = xyes)
 AM_CONDITIONAL(COMPIL_WITH_GLITZ, test x$enable_glitz = xyes)
 
 
-PKG_CHECK_MODULES(PACKAGE, "gtk+-2.0 gthread-2.0 cairo librsvg-2.0 glitz")
+PKG_CHECK_MODULES(PACKAGE, "gtk+-2.0 gthread-2.0 cairo librsvg-2.0 glitz dbus-glib-1")
 PKG_CHECK_MODULES(GLITZ, "glitz-glx")
 
 AC_CONFIG_FILES([Makefile
