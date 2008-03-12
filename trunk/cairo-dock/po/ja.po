@@ -1547,6 +1547,7 @@ msgstr ""
 #: ../src/cairo-dock-callbacks.c:797 ../src/cairo-dock-callbacks.c:806
 #: ../src/cairo-dock-callbacks.c:805 ../src/cairo-dock-callbacks.c:810
 #: ../src/cairo-dock-callbacks.c:818 ../src/cairo-dock-callbacks.c:820
+#: ../src/cairo-dock-callbacks.c:819
 msgid "Do you want to mount this point ?"
 msgstr "このポイントにマウントしますか？"
 

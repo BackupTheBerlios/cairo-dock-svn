@@ -107,7 +107,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 	if (pDesklet->renderer != NULL)  // une fonction de dessin specifique a ete fournie.
 	{
 		//cairo_translate (pCairoContext, g_iDockRadius, g_iDockRadius);
-		pDesklet->renderer (pCairoContext, pDesklet->pRendererData);
+		pDesklet->renderer (pCairoContext, pDesklet);
 		cairo_destroy (pCairoContext);
 	}
 	else if (pDesklet->pIcon != NULL)  // sinon par defaut on dessine l'icone dans le desklet.
@@ -603,4 +603,12 @@ CairoDockDesklet *cairo_dock_get_desklet_by_Xid (Window Xid)
 {
 	CairoDockModule *pModule = cairo_dock_foreach_desklet (_cairo_dock_test_one_desklet_Xid, &Xid);
 	return (pModule != NULL ? CAIRO_DOCK_DESKLET (pModule->pContainer) : NULL);;
+}
+
+
+void cairo_dock_define_renderer (CairoDockDesklet *pDesklet, CairoDockDeskletRenderer renderer, gpointer user_data)
+{
+	g_return_if_fail (pDesklet != NULL);
+	pDesklet->renderer = renderer;
+	pDesklet->pRendererData = user_data;
 }

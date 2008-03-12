@@ -48,7 +48,6 @@ extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS];
 
 extern CairoDock *g_pMainDock;
-extern gboolean g_bHideAfterShortcut;
 
 gboolean cairo_dock_move_up (CairoDock *pDock)
 {
@@ -275,10 +274,10 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 			}
 
 			pDock->iSidShrinkDown = 0;
-			if (g_bHideAfterShortcut && GTK_WIDGET_VISIBLE (g_pMainDock->pWidget))
+			if (cairo_dock_hide_dock_like_a_menu () && GTK_WIDGET_VISIBLE (g_pMainDock->pWidget))
 			{
 				gtk_widget_hide (g_pMainDock->pWidget);
-				g_bHideAfterShortcut = FALSE;
+				cairo_dock_has_been_hidden_like_a_menu ();
 			}
 			return FALSE;
 		}

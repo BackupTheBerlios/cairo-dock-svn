@@ -216,7 +216,6 @@ double g_fDeskletColor[4];
 double g_fDeskletColorInside[4];
 
 gchar *g_cRaiseDockShortcut = NULL;
-gboolean g_bHideAfterShortcut = FALSE;
 
 gboolean g_bKeepAbove = FALSE;
 gboolean g_bSkipPager = TRUE;
@@ -230,8 +229,6 @@ short g_iMajorVersion, g_iMinorVersion, g_iMicroVersion;
 CairoDockDesktopEnv g_iDesktopEnv = CAIRO_DOCK_UNKNOWN_ENV;
 CairoDockFMSortType g_iFileSortType;
 gboolean g_bShowHiddenFiles;
-
-gchar *g_pPluginCategories[CAIRO_DOCK_NB_CATEGORY] = {"Accessory", "Desktop", "Controler"};
 
 static gboolean random_dialog (gpointer user_data)
 {

@@ -83,5 +83,8 @@ gboolean on_selection_notify_event (GtkWidget *pWidget, GdkEventSelection *event
 
 void cairo_dock_raise_from_keyboard (const char *cKeyShortcut, gpointer data);
 
+gboolean cairo_dock_hide_dock_like_a_menu (void);
+void cairo_dock_has_been_hidden_like_a_menu (void);
+
 
 #endif

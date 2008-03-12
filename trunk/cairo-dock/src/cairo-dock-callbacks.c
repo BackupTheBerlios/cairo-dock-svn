@@ -82,13 +82,12 @@ extern int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS];
 
 extern gboolean g_bUseGlitz;
 extern CairoDockFMSortType g_iFileSortType;
-
-extern gboolean g_bHideAfterShortcut;
-
+extern gchar *g_cRaiseDockShortcut;
 
 static gboolean s_bTemporaryAutoHide = FALSE;
 static gboolean s_bEntranceAllowed = TRUE;
 static gboolean s_bAutoHideInitialValue;
+static gboolean s_bHideAfterShortcut = FALSE;
 
 
 gboolean on_expose (GtkWidget *pWidget,
@@ -817,7 +816,7 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 		g_free (cActivationURI);
 		if (icon->iVolumeID > 0 && ! bIsMounted)
 		{
-			int answer =cairo_dock_ask_question_and_wait (_("Do you want to mount this point ?"), icon, pDock);
+			int answer =cairo_dock_ask_question_and_wait (_("Do you want to mount this point ?"), icon, CAIRO_DOCK_CONTAINER (pDock));
 			if (answer != GTK_RESPONSE_YES)
 				return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 
@@ -914,7 +913,8 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 						{
 							gpointer data[2] = {icon, pDock};
 							cairo_dock_notify (CAIRO_DOCK_CLICK_ICON, data);
-							g_bHideAfterShortcut = TRUE;
+							if (g_cRaiseDockShortcut != NULL)
+								s_bHideAfterShortcut = TRUE;
 							
 							cairo_dock_start_animation (icon, pDock);
 						}
@@ -1418,7 +1418,7 @@ gboolean on_delete (GtkWidget *pWidget, GdkEvent *event, CairoDock *pDock)
 	if (pIcon == NULL)
 		pIcon = cairo_dock_get_dialogless_icon ();
 	
-	int answer = cairo_dock_ask_question_and_wait (_("Quit Cairo-Dock ?"), pIcon, g_pMainDock);
+	int answer = cairo_dock_ask_question_and_wait (_("Quit Cairo-Dock ?"), pIcon, CAIRO_DOCK_CONTAINER (g_pMainDock));
 	if (answer == GTK_RESPONSE_YES)
 		gtk_main_quit ();
 	return FALSE;
@@ -1529,5 +1529,15 @@ void cairo_dock_raise_from_keyboard (const char *cKeyShortcut, gpointer data)
 			(g_pMainDock->bHorizontalDock ? g_pMainDock->iWindowPositionY : g_pMainDock->iWindowPositionX));
 		gtk_widget_show (g_pMainDock->pWidget);
 	}
-	g_bHideAfterShortcut = FALSE;
+	s_bHideAfterShortcut = FALSE;
+}
+
+gboolean cairo_dock_hide_dock_like_a_menu (void)
+{
+	return s_bHideAfterShortcut;
+}
+
+void cairo_dock_has_been_hidden_like_a_menu (void)
+{
+	s_bHideAfterShortcut = FALSE;
 }
