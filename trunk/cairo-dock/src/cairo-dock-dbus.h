@@ -2,6 +2,8 @@
 #ifndef __CAIRO_DOCK_DBUS__
 #define  __CAIRO_DOCK_DBUS__
 
+#include <dbus/dbus-glib.h>
+#include <dbus/dbus-glib-bindings.h>
 #include "cairo-dock-struct.h"
 
 typedef struct
