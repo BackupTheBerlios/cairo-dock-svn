@@ -16,6 +16,9 @@ Written by Adrien Pilleboue (for any bug report, please mail me to adrien.pilleb
 extern gchar *g_cConfFile;
 extern CairoDock *g_pMainDock;
 
+gboolean dbus_deskletVisible = FALSE;
+Window dbus_xLastActiveWindow;
+
 G_DEFINE_TYPE(dbusCallback, cd_dbus_callback, G_TYPE_OBJECT);
 
 void cd_dbus_callback_class_init(dbusCallbackClass *class)
@@ -73,6 +76,22 @@ void cd_dbus_init(void)
 gboolean cd_dbus_callback_hello(dbusCallback *pDbusCallback, GError **error)
 {
 	cairo_dock_show_general_message("Hello !",3000);
+	return TRUE;
+}
+
+gboolean cd_dbus_callback_show_desklet(dbusCallback *pDbusCallback, gboolean *widgetLayer, GError **error)
+{
+	if (dbus_deskletVisible)
+	{
+		cairo_dock_set_desklets_visibility_to_default ();
+		cairo_dock_show_appli (dbus_xLastActiveWindow);
+	}
+	else
+	{
+		dbus_xLastActiveWindow = cairo_dock_get_active_window ();
+		cairo_dock_set_all_desklets_visible (widgetLayer);
+	}
+	dbus_deskletVisible = !dbus_deskletVisible;
 	return TRUE;
 }
 
