@@ -126,6 +126,7 @@ cairo_docksubincludedir =\
 cairo_docksubinclude_HEADERS =\
 	cairo-dock-struct.h\
 	cairo-dock-callbacks.h\
+	cairo-dock-dbus.h\
 	cairo-dock-draw.h\
 	cairo-dock-config.h\
 	cairo-dock-load.h\
