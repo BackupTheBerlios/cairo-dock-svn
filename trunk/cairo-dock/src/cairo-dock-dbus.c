@@ -35,7 +35,7 @@ void cd_dbus_callback_init(dbusCallback *server)
 	// Initialise the DBus connection
 	server->connection = dbus_g_bus_get(DBUS_BUS_SESSION, &error);
 	if (server->connection == NULL) {
-		g_warning("Unable to connect to dbus: %s", error->message);
+		cd_warning("Unable to connect to dbus: %s", error->message);
 		g_error_free(error);
 		return;
 	}
@@ -49,7 +49,7 @@ void cd_dbus_callback_init(dbusCallback *server)
 	driver_proxy = dbus_g_proxy_new_for_name(server->connection, DBUS_SERVICE_DBUS, DBUS_PATH_DBUS, DBUS_INTERFACE_DBUS);
 
 	if (!org_freedesktop_DBus_request_name (driver_proxy, "org.cairodock.CairoDock", 0, &request_ret, &error)) {
-		g_warning("Unable to register service: %s", error->message);
+		cd_warning("Unable to register service: %s", error->message);
 		g_error_free(error);
 	}
 	
@@ -61,14 +61,11 @@ void cd_dbus_init(void)
 	GMainLoop *main_loop;
 	dbusCallback *server;
 
-	cd_message("dbus : Lancement du service\n");
+	cd_message("dbus : Lancement du service");
 
 	g_type_init();
 
 	server = g_object_new(cd_dbus_callback_get_type(), NULL);
-
-	main_loop = g_main_loop_new(NULL, FALSE);
-	g_main_loop_run(main_loop);
 
 	return 0;
 }

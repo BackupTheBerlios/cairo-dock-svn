@@ -1171,36 +1171,39 @@ CairoDockDialog *cairo_dock_show_dialog_full (const gchar *cText, Icon *pIcon, C
 
 
 
-void cairo_dock_show_temporary_dialog_with_icon (const gchar *cText, Icon *pIcon, CairoDockContainer *pContainer, double fTimeLength, gchar *cIconPath, ...)
+CairoDockDialog *cairo_dock_show_temporary_dialog_with_icon (const gchar *cText, Icon *pIcon, CairoDockContainer *pContainer, double fTimeLength, gchar *cIconPath, ...)
 {
 	va_list args;
 	va_start (args, cIconPath);
 	gchar *cFullText = g_strdup_vprintf (cText, args);
-	cairo_dock_show_dialog_full (cFullText, pIcon, pContainer, fTimeLength, cIconPath, GTK_BUTTONS_NONE, NULL, NULL, NULL, NULL);
+	CairoDockDialog *pDialog = cairo_dock_show_dialog_full (cFullText, pIcon, pContainer, fTimeLength, cIconPath, GTK_BUTTONS_NONE, NULL, NULL, NULL, NULL);
 	g_free (cFullText);
 	va_end (args);
+	return pDialog;
 }
 
-void cairo_dock_show_temporary_dialog (const gchar *cText, Icon *pIcon, CairoDockContainer *pContainer, double fTimeLength, ...)
+CairoDockDialog *cairo_dock_show_temporary_dialog (const gchar *cText, Icon *pIcon, CairoDockContainer *pContainer, double fTimeLength, ...)
 {
 	va_list args;
 	va_start (args, fTimeLength);
 	gchar *cFullText = g_strdup_vprintf (cText, args);
-	cairo_dock_show_dialog_full (cFullText, pIcon, pContainer, fTimeLength, NULL, GTK_BUTTONS_NONE, NULL, NULL, NULL, NULL);
+	CairoDockDialog *pDialog = cairo_dock_show_dialog_full (cFullText, pIcon, pContainer, fTimeLength, NULL, GTK_BUTTONS_NONE, NULL, NULL, NULL, NULL);
 	g_free (cFullText);
 	va_end (args);
+	return pDialog;
 }
 
-void cairo_dock_show_temporary_dialog_with_default_icon (const gchar *cText, Icon *pIcon, CairoDockContainer *pContainer, double fTimeLength, ...)
+CairoDockDialog *cairo_dock_show_temporary_dialog_with_default_icon (const gchar *cText, Icon *pIcon, CairoDockContainer *pContainer, double fTimeLength, ...)
 {
 	va_list args;
 	va_start (args, fTimeLength);
 	gchar *cFullText = g_strdup_vprintf (cText, args);
 	gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-icon.svg", CAIRO_DOCK_SHARE_DATA_DIR);
-	cairo_dock_show_dialog_full (cFullText, pIcon, pContainer, fTimeLength, cIconPath, GTK_BUTTONS_NONE, NULL, NULL, NULL, NULL);
+	CairoDockDialog *pDialog = cairo_dock_show_dialog_full (cFullText, pIcon, pContainer, fTimeLength, cIconPath, GTK_BUTTONS_NONE, NULL, NULL, NULL, NULL);
 	g_free (cIconPath);
 	g_free (cFullText);
 	va_end (args);
+	return pDialog;
 }
 
 
@@ -1377,11 +1380,13 @@ Icon *cairo_dock_get_dialogless_icon (void)
 	return pIcon;
 }
 
-void cairo_dock_show_general_message (const gchar *cMessage, double fTimeLength)
+CairoDockDialog *cairo_dock_show_general_message (const gchar *cMessage, double fTimeLength)
 {
 	Icon *pIcon = cairo_dock_get_dialogless_icon ();
 	if (pIcon != NULL)
-		cairo_dock_show_temporary_dialog (cMessage, pIcon, CAIRO_DOCK_CONTAINER (g_pMainDock), fTimeLength);
+		return cairo_dock_show_temporary_dialog (cMessage, pIcon, CAIRO_DOCK_CONTAINER (g_pMainDock), fTimeLength);
+	else
+		return NULL;
 }
 
 int cairo_dock_ask_general_question_and_wait (const gchar *cQuestion)

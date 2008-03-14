@@ -1515,14 +1515,14 @@ void cairo_dock_raise_from_keyboard (const char *cKeyShortcut, gpointer data)
 			gdk_window_get_pointer (g_pMainDock->pWidget->window, &iMouseX, &iMouseY, NULL);
 		else
 			gdk_window_get_pointer (g_pMainDock->pWidget->window, &iMouseY, &iMouseX, NULL);
-		g_print (" %d;%d\n", iMouseX, iMouseY);
+		//g_print (" %d;%d\n", iMouseX, iMouseY);
 		
 		g_pMainDock->iGapX = g_pMainDock->iWindowPositionX + iMouseX - g_iScreenWidth[g_pMainDock->bHorizontalDock] * g_pMainDock->fAlign;
 		g_pMainDock->iGapY = (g_bDirectionUp ? g_iScreenHeight[g_pMainDock->bHorizontalDock] - (g_pMainDock->iWindowPositionY + iMouseY) : g_pMainDock->iWindowPositionY + iMouseY);
-		g_print (" => %d;%d\n", g_pMainDock->iGapX, g_pMainDock->iGapY);
+		//g_print (" => %d;%d\n", g_pMainDock->iGapX, g_pMainDock->iGapY);
 		
 		cairo_dock_set_window_position_at_balance (g_pMainDock, g_pMainDock->iCurrentWidth, g_pMainDock->iCurrentHeight);
-		g_print ("   => (%d;%d)\n", g_pMainDock->iWindowPositionX, g_pMainDock->iWindowPositionY);
+		//g_print ("   => (%d;%d)\n", g_pMainDock->iWindowPositionX, g_pMainDock->iWindowPositionY);
 		
 		gtk_window_move (GTK_WINDOW (g_pMainDock->pWidget),
 			(g_pMainDock->bHorizontalDock ? g_pMainDock->iWindowPositionX : g_pMainDock->iWindowPositionY),

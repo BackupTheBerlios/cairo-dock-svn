@@ -780,8 +780,9 @@ extern CairoDockContainer *myContainer;
 
 //\_________________________________ INTERNATIONNALISATION
 /**
-*Macro pour gettext, similaire a _() et _N(), mais avec le nom de domaine en parametre. Encadrez toutes vos chaines de caracteres statiques avec ca, de maniere a ce que l'utilitaire 'xgettext' puisse les trouver et les inclure autimatiquement dans les fichiers de traduction.
+*Macro pour gettext, similaire a _() et N_(), mais avec le nom de domaine en parametre. Encadrez toutes vos chaines de caracteres statiques avec ca, de maniere a ce que l'utilitaire 'xgettext' puisse les trouver et les inclure autimatiquement dans les fichiers de traduction.
 */
-#define _D(message) dgettext (MY_APPLET_GETTEXT_DOMAIN, message)
+#define D_(message) dgettext (MY_APPLET_GETTEXT_DOMAIN, message)
+#define _D D_
 
 #endif

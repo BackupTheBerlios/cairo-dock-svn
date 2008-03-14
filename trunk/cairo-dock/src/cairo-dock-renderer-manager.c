@@ -21,7 +21,8 @@ extern GHashTable *g_hDocksTable;
 extern gchar *g_cMainDockDefaultRendererName;
 extern gchar *g_cSubDockDefaultRendererName;
 
-static GHashTable *s_hRendererTable = NULL;  // table des modules de rendus.
+static GHashTable *s_hRendererTable = NULL;  // table des fonctions de rendus de dock.
+static GHashTable *s_hDeskletRendererTable = NULL;  // table des fonctions de rendus des desklets.
 
 
 CairoDockRenderer *cairo_dock_get_renderer (gchar *cRendererName, gboolean bForMainDock)
@@ -61,6 +62,11 @@ void cairo_dock_initialize_renderer_manager (void)
 	g_return_if_fail (s_hRendererTable == NULL);
 	
 	s_hRendererTable = g_hash_table_new_full (g_str_hash,
+		g_str_equal,
+		g_free,
+		g_free);
+	
+	s_hDeskletRendererTable = g_hash_table_new_full (g_str_hash,
 		g_str_equal,
 		g_free,
 		g_free);
@@ -138,3 +144,7 @@ void cairo_dock_set_all_views_to_default (void)
 	//g_print ("%s ()\n", __func__);
 	g_hash_table_foreach (g_hDocksTable, (GHFunc) _cairo_dock_set_one_dock_view_to_default, NULL);
 }
+
+
+
+

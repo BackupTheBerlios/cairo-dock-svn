@@ -93,8 +93,9 @@ CairoDockDialog *cairo_dock_show_dialog_full (const gchar *cText, Icon *pIcon, C
 *@param fTimeLength la duree de vie du dialogue (ou 0 pour une duree de vie illimitee).
 *@param cIconPath le chemin vers une icone.
 *@param ... les arguments a inserer dans la chaine de texte, facon printf.
+*@return Le dialogue nouvellement cree et visible, avec une reference a 1.
 */
-void cairo_dock_show_temporary_dialog_with_icon (const gchar *cText, Icon *pIcon, CairoDockContainer *pContainer, double fTimeLength, gchar *cIconPath, ...);
+CairoDockDialog *cairo_dock_show_temporary_dialog_with_icon (const gchar *cText, Icon *pIcon, CairoDockContainer *pContainer, double fTimeLength, gchar *cIconPath, ...);
 /**
 *Fait apparaitre un dialogue a duree de vie limitee sans icone.
 *@param cText le message du dialogue.
@@ -102,8 +103,9 @@ void cairo_dock_show_temporary_dialog_with_icon (const gchar *cText, Icon *pIcon
 *@param pDock le dock contenant l'icone.
 *@param fTimeLength la duree de vie du dialogue (ou 0 pour une duree de vie illimitee).
 *@param ... les arguments a inserer dans la chaine de texte.
+*@return Le dialogue nouvellement cree et visible, avec une reference a 1.
 */
-void cairo_dock_show_temporary_dialog (const gchar *cText, Icon *pIcon, CairoDockContainer *pContainer, double fTimeLength, ...);
+CairoDockDialog *cairo_dock_show_temporary_dialog (const gchar *cText, Icon *pIcon, CairoDockContainer *pContainer, double fTimeLength, ...);
 /**
 *Fait apparaitre un dialogue a duree de vie limitee et avec l'icone par defaut.
 *@param cText le message du dialogue.
@@ -111,8 +113,9 @@ void cairo_dock_show_temporary_dialog (const gchar *cText, Icon *pIcon, CairoDoc
 *@param pDock le dock contenant l'icone.
 *@param fTimeLength la duree de vie du dialogue (ou 0 pour une duree de vie illimitee).
 *@param ... les arguments a inserer dans la chaine de texte, facon printf.
+*@return Le dialogue nouvellement cree et visible, avec une reference a 1.
 */
-void cairo_dock_show_temporary_dialog_with_default_icon (const gchar *cText, Icon *pIcon, CairoDockContainer *pContainer, double fTimeLength, ...);
+CairoDockDialog *cairo_dock_show_temporary_dialog_with_default_icon (const gchar *cText, Icon *pIcon, CairoDockContainer *pContainer, double fTimeLength, ...);
 
 /**
 *Fait apparaitre un dialogue a duree de vie illimitee avec une question et 2 boutons oui/non. Lorsque l'utilisateur clique sur "oui", la fonction d'action est appelee avec "yes", et avec "no" s'il a clique sur "non".
@@ -123,7 +126,7 @@ void cairo_dock_show_temporary_dialog_with_default_icon (const gchar *cText, Ico
 *@param pActionFunc la fonction d'action, appelee lors du clique utilisateur.
 *@param data pointeur qui sera passe en argument de la fonction d'action.
 *@param pFreeDataFunc fonction qui liberera le pointeur.
-*@return le dialogue nouvellement cree.
+*@return Le dialogue nouvellement cree et visible, avec une reference a 1.
 */
 CairoDockDialog *cairo_dock_show_dialog_with_question (const gchar *cText, Icon *pIcon, CairoDockContainer *pContainer, gchar *cIconPath, CairoDockActionOnAnswerFunc pActionFunc, gpointer data, GFreeFunc pFreeDataFunc);
 /**
@@ -210,8 +213,9 @@ Icon *cairo_dock_get_dialogless_icon (void);
 *Fait apparaitre un dialogue de message non bloquant, et pointant sur une icone de separateur si possible, ou sinon sur l'icone pointee du dock principal (ou la 1ere icone sans dialogue si aucune n'est pointee). Cela permet a cairo-dock de poser une question d'ordre general.
 *@param cMessage le message.
 *@param fTimeLength la duree de vie du dialogue.
+*@return Le dialogue nouvellement cree et visible, avec une reference a 1.
 */
-void cairo_dock_show_general_message (const gchar *cMessage, double fTimeLength);
+CairoDockDialog * cairo_dock_show_general_message (const gchar *cMessage, double fTimeLength);
 /**
 *Fait apparaitre un dialogue de question bloquant, et pointant sur une icone de separateur si possible, ou sinon sur l'icone pointee du dock principal (ou la 1ere icone sans dialogue si aucune n'est pointee). Cela permet a cairo-dock de poser une question d'ordre general.
 *@param cQuestion la question a poser.
