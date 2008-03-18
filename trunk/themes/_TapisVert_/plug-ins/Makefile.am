@@ -1,5 +1,5 @@
 SUBDIRS = . \
-	file-manager\
+	dustbin\
 	logout\
 	rendering
 

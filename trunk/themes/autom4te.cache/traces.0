@@ -9264,7 +9264,7 @@ m4trace:configure.ac:10: -1- _LT_AC_LANG_F77
 m4trace:configure.ac:10: -1- _LT_AC_SHELL_INIT([tagnames=${tagnames+${tagnames},}F77])
 m4trace:configure.ac:13: -1- m4_pattern_allow([^pkgdatadir$])
 m4trace:configure.ac:18: -1- m4_pattern_allow([^STDC_HEADERS$])
-m4trace:configure.ac:59: -1- m4_pattern_allow([^LIB@&t@OBJS$])
-m4trace:configure.ac:59: -1- m4_pattern_allow([^LTLIBOBJS$])
-m4trace:configure.ac:59: -1- _AC_AM_CONFIG_HEADER_HOOK([$ac_file])
-m4trace:configure.ac:59: -1- _AM_OUTPUT_DEPENDENCY_COMMANDS
+m4trace:configure.ac:66: -1- m4_pattern_allow([^LIB@&t@OBJS$])
+m4trace:configure.ac:66: -1- m4_pattern_allow([^LTLIBOBJS$])
+m4trace:configure.ac:66: -1- _AC_AM_CONFIG_HEADER_HOOK([$ac_file])
+m4trace:configure.ac:66: -1- _AM_OUTPUT_DEPENDENCY_COMMANDS

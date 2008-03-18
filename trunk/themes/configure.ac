@@ -38,7 +38,6 @@ AC_CONFIG_FILES([Makefile
 		_TapisVert_/Makefile
 		_TapisVert_/launchers/Makefile
 		_TapisVert_/plug-ins/Makefile
-		_TapisVert_/plug-ins/file-manager/Makefile
 		_TapisVert_/plug-ins/rendering/Makefile
 		_TapisVert_/plug-ins/logout/Makefile
 		_TapisVert_/plug-ins/dustbin/Makefile
@@ -55,5 +54,13 @@ AC_CONFIG_FILES([Makefile
 		_I_Cairo_/plug-ins/dustbin/Makefile
 		_I_Cairo_/plug-ins/logout/Makefile
 		_I_Cairo_/plug-ins/rendering/Makefile
+		_Wood_/Makefile
+		_Wood_/launchers/Makefile
+		_Wood_/plug-ins/Makefile
+		_Wood_/plug-ins/clock/Makefile
+		_Wood_/plug-ins/dustbin/Makefile
+		_Wood_/plug-ins/logout/Makefile
+		_Wood_/plug-ins/rendering/Makefile
+		_Wood_/plug-ins/weather/Makefile
 		])
 AC_OUTPUT

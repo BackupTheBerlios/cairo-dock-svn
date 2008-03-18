@@ -7,4 +7,5 @@ SUBDIRS = \
 	_Glattering_\
 	_TapisVert_\
 	_MacOSX_\
-	_I_Cairo_
+	_I_Cairo_\
+	_Wood_
