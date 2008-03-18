@@ -25,15 +25,19 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <cairo-glitz.h>
 #endif
 
-typedef struct _CairoDock CairoDock;
-typedef struct _CairoDockModule CairoDockModule;
-typedef struct _CairoDockDialog CairoDockDialog;
+typedef struct _CairoDockRenderer CairoDockRenderer;
+typedef struct _CairoDockDeskletRenderer CairoDockDeskletRenderer;
+
 typedef struct _Icon Icon;
-typedef struct _CairoDockVisitCard CairoDockVisitCard;
-typedef struct _CairoDockVFSBackend CairoDockVFSBackend;
-typedef struct _CairoDockDesklet CairoDockDesklet;
-typedef struct _CairoDockMinimalAppletConfig CairoDockMinimalAppletConfig;
 typedef struct _CairoDockContainer CairoDockContainer;
+typedef struct _CairoDock CairoDock;
+typedef struct _CairoDockDesklet CairoDockDesklet;
+typedef struct _CairoDockDialog CairoDockDialog;
+
+typedef struct _CairoDockModule CairoDockModule;
+typedef struct _CairoDockVisitCard CairoDockVisitCard;
+typedef struct _CairoDockMinimalAppletConfig CairoDockMinimalAppletConfig;
+typedef struct _CairoDockVFSBackend CairoDockVFSBackend;
 
 
 typedef void (*CairoDockCalculateMaxDockSizeFunc) (CairoDock *pDock);
@@ -42,7 +46,7 @@ typedef void (*CairoDockRenderFunc) (CairoDock *pDock);
 typedef void (*CairoDockRenderOptimizedFunc) (CairoDock *pDock, GdkRectangle *pArea);
 typedef void (*CairoDockSetSubDockPositionFunc) (Icon *pPointedIcon, CairoDock *pParentDock);
 
-typedef struct _CairoDockRenderer {
+struct _CairoDockRenderer {
 	/// chemin d'un fichier readme destine a presenter de maniere succinte la vue.
 	gchar *cReadmeFilePath;
 	/// fonction calculant la taille max d'un dock.
@@ -59,7 +63,7 @@ typedef struct _CairoDockRenderer {
 	gboolean bUseReflect;
 	/// chemin d'une image de previsualisation.
 	gchar *cPreviewFilePath;
-	} CairoDockRenderer;
+	};
 
 
 
@@ -587,7 +591,16 @@ struct _CairoDockVFSBackend {
 };
 
 
-typedef void (* CairoDockDeskletRenderer) (cairo_t *pCairoContext, CairoDockDesklet *pDesklet);
+typedef void (* CairoDockDeskletRendererFunc) (cairo_t *pCairoContext, CairoDockDesklet *pDesklet);
+typedef gpointer (* CairoDockDeskletLoadRendererFunc) (CairoDockDesklet *pDesklet, cairo_t *pSourceContext);
+typedef void (* CairoDockDeskletFreeRendererDataFunc) (CairoDockDesklet *pDesklet);
+typedef void (* CairoDockDeskletLoadIconsFunc) (CairoDockDesklet *pDesklet);
+struct _CairoDockDeskletRenderer {
+	CairoDockDeskletRendererFunc render;
+	CairoDockDeskletLoadRendererFunc load_data;
+	CairoDockDeskletFreeRendererDataFunc free_data;
+	CairoDockDeskletLoadIconsFunc load_icons;
+};
 
 struct _CairoDockDesklet {
 	/// type "desklet".
@@ -617,8 +630,8 @@ struct _CairoDockDesklet {
 	/// L'icone de l'applet.
 	Icon *pIcon;
 	/// La fonction de rendu. NULL pour utiliser celle par defaut qui dessine l'icone comme si elle etait dans un dock. Est appelee par la callback liee a l'expose-event de la fenetre.
-	CairoDockDeskletRenderer renderer;
-	/// donnees pouvant etre utilisees dans la focntion de rendu.
+	CairoDockDeskletRendererFunc renderer;
+	/// donnees pouvant etre utilisees dans la fonction de rendu.
 	gpointer pRendererData;
 	/// un timer pour retarder l'ecriture dans le fichier lors des deplacements.
 	gint iSidWritePosition;
@@ -628,6 +641,7 @@ struct _CairoDockDesklet {
 	gint iGradationCount;
 	/// timer associe.
 	gint iSidGradationOnEnter;
+	CairoDockDeskletRenderer *pRenderer;
 };
 
 

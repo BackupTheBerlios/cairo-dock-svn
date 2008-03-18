@@ -88,6 +88,7 @@
 #include "cairo-dock-keybinder.h"
 #include "cairo-dock-log.h"
 #include "cairo-dock-X-utilities.h"
+#include "cairo-dock-dbus.h"
 
 CairoDock *g_pMainDock;  // pointeur sur le dock principal.
 GHashTable *g_hDocksTable = NULL;  // table des docks existant.
@@ -473,7 +474,7 @@ main (int argc, char** argv)
 	cairo_dock_register_notification (CAIRO_DOCK_DROP_DATA, (CairoDockNotificationFunc) cairo_dock_notification_drop_data, CAIRO_DOCK_RUN_AFTER);
 	cairo_dock_register_notification (CAIRO_DOCK_CLICK_ICON, (CairoDockNotificationFunc) cairo_dock_notification_click_icon, CAIRO_DOCK_RUN_AFTER);
 	cairo_dock_register_notification (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) cairo_dock_notification_middle_click_icon, CAIRO_DOCK_RUN_AFTER);
-	cairo_dock_register_notification (CAIRO_DOCK_REMOVE_ICON, (CairoDockNotificationFunc) cairo_dock_notification_remove_icon, CAIRO_DOCK_RUN_FIRST);
+	cairo_dock_register_notification (CAIRO_DOCK_REMOVE_ICON, (CairoDockNotificationFunc) cairo_dock_notification_remove_icon, CAIRO_DOCK_RUN_AFTER);
 	
 	
 	//\___________________ On initialise le gestionnaire de vues.

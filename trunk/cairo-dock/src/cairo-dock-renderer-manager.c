@@ -57,6 +57,26 @@ void cairo_dock_remove_renderer (gchar *cRendererName)
 }
 
 
+CairoDockDeskletRenderer *cairo_dock_get_desklet_renderer (gchar *cRendererName)
+{
+	if (cRendererName != NULL)
+		return g_hash_table_lookup (s_hDeskletRendererTable, cRendererName);
+	else
+		return NULL;
+}
+
+void cairo_dock_register_desklet_renderer (gchar *cRendererName, CairoDockDeskletRenderer *pRenderer)
+{
+	g_hash_table_insert (s_hDeskletRendererTable, g_strdup (cRendererName), pRenderer);
+}
+
+void cairo_dock_remove_desklet_renderer (gchar *cRendererName)
+{
+	g_hash_table_remove (s_hDeskletRendererTable, cRendererName);
+}
+
+
+
 void cairo_dock_initialize_renderer_manager (void)
 {
 	g_return_if_fail (s_hRendererTable == NULL);
@@ -96,6 +116,36 @@ void cairo_dock_set_default_renderer (CairoDock *pDock)
 	g_return_if_fail (pDock != NULL);
 	cairo_dock_set_renderer (pDock, (pDock->cRendererName != NULL ? pDock->cRendererName : NULL));  // NULL => laissera le champ cRendererName nul plutot que de mettre le nom de la vue par defaut.
 }
+
+
+void cairo_dock_set_desklet_renderer (CairoDockDesklet *pDesklet, CairoDockDeskletRenderer *pRenderer, cairo_t *pSourceContext)
+{
+	g_return_if_fail (pDesklet != NULL);
+	
+	if (pDesklet->pRenderer != NULL && pDesklet->pRenderer->free_data != NULL)
+	{
+		pDesklet->pRenderer->free_data (pDesklet->pRendererData);
+		pDesklet->pRendererData = NULL;
+	}
+	
+	pDesklet->pRenderer = pRenderer;
+	if (pRenderer != NULL && pRenderer->load_data != NULL)
+	{
+		pDesklet->pRendererData =pRenderer->load_data (pDesklet, pSourceContext);
+	}
+}
+
+void cairo_dock_set_desklet_renderer_by_name (CairoDockDesklet *pDesklet, gchar *cRendererName, cairo_t *pSourceContext, gboolean bLoadIcons)
+{
+	g_return_if_fail (cRendererName != NULL);
+	CairoDockDeskletRenderer *pRenderer = cairo_dock_get_desklet_renderer (cRendererName);
+	
+	cairo_dock_set_desklet_renderer (pDesklet, pRenderer, pSourceContext);
+	
+	if (bLoadIcons && pRenderer != NULL && pRenderer->load_icons != NULL )
+		pRenderer->load_icons (pDesklet);
+}
+
 
 
 #define _cairo_dock_update_conf_file_with_renderers(pOpenedKeyFile, cConfFile, cGroupName, cKeyName, bAddEmptyRenderer) cairo_dock_update_conf_file_with_hash_table (pOpenedKeyFile, cConfFile, s_hRendererTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_renderer_name, FALSE, bAddEmptyRenderer)
@@ -144,7 +194,3 @@ void cairo_dock_set_all_views_to_default (void)
 	//g_print ("%s ()\n", __func__);
 	g_hash_table_foreach (g_hDocksTable, (GHFunc) _cairo_dock_set_one_dock_view_to_default, NULL);
 }
-
-
-
-

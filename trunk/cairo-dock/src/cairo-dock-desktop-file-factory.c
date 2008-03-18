@@ -72,12 +72,12 @@ gchar *cairo_dock_generate_desktop_file_for_launcher (const gchar *cDesktopURI, 
 		return NULL;
 	}
 
-	//\___________________ On lui rajoute nos champs, dans l'ordre.
-	g_key_file_set_string (pKeyFile, "Desktop Entry", "frame_extra", "");
+	//\___________________ On renseigne nos champs.
+	///g_key_file_set_string (pKeyFile, "Desktop Entry", "frame_extra", "");
 	g_key_file_set_double (pKeyFile, "Desktop Entry", "Order", fOrder);
 	g_key_file_set_string (pKeyFile, "Desktop Entry", "Container", cDockName);
-	g_key_file_set_boolean (pKeyFile, "Desktop Entry", "Is container", FALSE);
-	g_key_file_set_boolean (pKeyFile, "Desktop Entry", "Base URI", FALSE);
+	///g_key_file_set_boolean (pKeyFile, "Desktop Entry", "Is container", FALSE);
+	///g_key_file_set_string (pKeyFile, "Desktop Entry", "Base URI", "");
 	
 	//\___________________ On elimine les indesirables.
 	g_key_file_remove_key (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", NULL);

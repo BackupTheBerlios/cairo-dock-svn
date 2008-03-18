@@ -811,9 +811,12 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 
 	if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
 	{
-		gboolean bIsMounted = TRUE;
-		gchar *cActivationURI = cairo_dock_fm_is_mounted (icon->acCommand, &bIsMounted);
-		g_free (cActivationURI);
+		gboolean bIsMounted = FALSE;
+		if (icon->iVolumeID > 0)
+		{
+			gchar *cActivationURI = cairo_dock_fm_is_mounted (icon->acCommand, &bIsMounted);
+			g_free (cActivationURI);
+		}
 		if (icon->iVolumeID > 0 && ! bIsMounted)
 		{
 			int answer =cairo_dock_ask_question_and_wait (_("Do you want to mount this point ?"), icon, CAIRO_DOCK_CONTAINER (pDock));

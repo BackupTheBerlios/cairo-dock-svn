@@ -110,7 +110,7 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 <b>Translations :</b>\n  Fabounet\n  Ppmt \n  Jiro Kawada\n\
 <b>Installation scripts and repository :</b>\n  Mav\n\
 <b>Site (cairo-dock.org) :</b>\n  Tdey\n  Necropotame\n\
-<b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Mav\n  Necropotame\n  Ppmt\n  Sombrero\n  Vilraleur");
+<b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Mav\n  Necropotame\n  Nochka85\n  Ppmt\n  Sombrero\n  Vilraleur");
 	gtk_label_set_markup (GTK_LABEL (pLabel), cAboutText);
 	g_free (cAboutText);
 	gtk_container_add (GTK_CONTAINER (GTK_DIALOG (pDialog)->vbox), pLabel);

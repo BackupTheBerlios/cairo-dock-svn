@@ -56,17 +56,32 @@ void cd_dbus_callback_init(dbusCallback *server)
 	g_object_unref(driver_proxy);
 }
 
+
+static gpointer _cairo_dock_threaded_dbus_init (gpointer data)
+{
+	GError *erreur = NULL;
+	
+	dbusCallback *server = g_object_new(cd_dbus_callback_get_type(), NULL);
+	
+	cd_message ("*** fin du thread dbus");
+	return NULL;
+}
 void cd_dbus_init(void)
 {
-	dbusCallback *server;
-
-	cd_message("dbus : Lancement du service");
-
 	g_type_init();
-
-	server = g_object_new(cd_dbus_callback_get_type(), NULL);
-
-	return 0;
+	cd_message("dbus : Lancement du service");
+	
+	/**GError *erreur = NULL;
+	GThread* pThread = g_thread_create ((GThreadFunc) _cairo_dock_threaded_dbus_init,
+		NULL,
+		FALSE,
+		&erreur);
+	if (erreur != NULL)
+	{
+		cd_warning ("Attention : %s", erreur->message);
+		g_error_free (erreur);
+	}*/
+	_cairo_dock_threaded_dbus_init (NULL);  // utile de le threader ? des fois j'ai l'impression que l'init prend du temps.
 }
 
 gboolean cd_dbus_callback_hello(dbusCallback *pDbusCallback, GError **error)
@@ -85,7 +100,7 @@ gboolean cd_dbus_callback_show_desklet(dbusCallback *pDbusCallback, gboolean *wi
 	else
 	{
 		dbus_xLastActiveWindow = cairo_dock_get_active_window ();
-		cairo_dock_set_all_desklets_visible (widgetLayer);
+		cairo_dock_set_all_desklets_visible (widgetLayer != NULL ? *widgetLayer : FALSE);
 	}
 	dbus_deskletVisible = !dbus_deskletVisible;
 	return TRUE;

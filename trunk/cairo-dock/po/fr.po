@@ -1459,6 +1459,7 @@ msgstr ""
 #: ../src/cairo-dock-callbacks.c:806 ../src/cairo-dock-callbacks.c:805
 #: ../src/cairo-dock-callbacks.c:810 ../src/cairo-dock-callbacks.c:818
 #: ../src/cairo-dock-callbacks.c:820 ../src/cairo-dock-callbacks.c:819
+#: ../src/cairo-dock-callbacks.c:822
 msgid "Do you want to mount this point ?"
 msgstr "Voulez-vous monter ce point ?"
 
@@ -1615,7 +1616,7 @@ msgstr "Ajouter un séparateur"
 #: ../src/cairo-dock-callbacks.c:1400 ../src/cairo-dock-callbacks.c:1398
 #: ../src/cairo-dock-callbacks.c:1407 ../src/cairo-dock-callbacks.c:1415
 #: ../src/cairo-dock-callbacks.c:1418 ../src/cairo-dock-callbacks.c:1420
-#: ../src/cairo-dock-callbacks.c:1421
+#: ../src/cairo-dock-callbacks.c:1421 ../src/cairo-dock-callbacks.c:1424
 msgid "Quit Cairo-Dock ?"
 msgstr "Quitter Cairo-Dock ?"
 

@@ -61,6 +61,5 @@ void cairo_dock_set_desklets_visibility_to_default (void);
 
 CairoDockDesklet *cairo_dock_get_desklet_by_Xid (Window Xid);
 
-void cairo_dock_define_renderer (CairoDockDesklet *pDesklet, CairoDockDeskletRenderer renderer, gpointer user_data);
 
 #endif
