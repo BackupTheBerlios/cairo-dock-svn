@@ -1,0 +1,117 @@
+#!en
+#
+
+[Desktop Entry]
+#s Launcher's name :
+Name=Brasero Disc Burning Application
+Name[ar]=برنامج براسيرو
+Name[dz]=བ་ར་སིརོ་ཌིསིཀ་བཙུགས་སྤྱོད་འབད་ནི་གློག་རིམ།
+Name[es]=Aplicación de grabación discos Brasero
+Name[fi]=Brasero-levynkirjoitusohjelma
+Name[fr]=Brasero
+Name[it]=Brasero - Applicazione di scrittura dischi
+Name[lt]=CD/DVD įrašymo programa Brasero
+Name[pa]=ਬਰਾਸੀਰੋ ਡਿਸਕ ਲਿਖਣ ਕਾਰਜ
+Name[pl]=Nagrywanie płyt Brasero
+Name[pt]=Aplicação de Gravação de Discos Brasero
+Name[pt_BR]=Aplicação de Gravação de Disco Brasero
+Name[ru]=Приложение для записи дисков
+Name[sr]=Програм за упис дискова
+Name[sr@Latn]=Program za upis diskova
+Name[sv]=Skivbränningsprogrammet Brasero
+Comment=Write and copy CD / DVD
+Comment[ar]=اكتب و انسخ اقراص CD / DVD
+Comment[ca]=Escriu i copia CD / DVD
+Comment[de]=Schreibe und kopiere CD/DVDs
+Comment[dz]=སི་ཌི་/ཌི་ཉི་ཌི་ བྲིས་སྦེ་འདྲ་བཤུས་རྐྱབས།
+Comment[es]=Escribir y copiar CD/DVD
+Comment[fi]=Kirjoita ja kopio CD- ja DVD-levyjä
+Comment[fr]=Écrit et copie des CD et DVD
+Comment[hu]=CD / DVD írása és másolása
+Comment[it]=Scrive e copia CD / DVD
+Comment[ja]=CD / DVD に書き込んだりコピーを作成します
+Comment[lt]=Įrašyti ir kopijuoti CD / DVD
+Comment[pa]=CD / DVD ਲਿਖੋ ਅਤੇ ਨਕਲ ਕਰੋ
+Comment[pl]=Nagrywanie i kopiowanie płyt CD/DVD
+Comment[pt]=Grave e copie CDs e DVDs
+Comment[pt_BR]=Grave e copie CDs e DVDs
+Comment[ru]=Записать и копировать CD / DVD
+Comment[sl]=Zapisujte in kopirajte CD / DVD
+Comment[sr]=Упиши и умножи ЦД/ДВД
+Comment[sr@Latn]=Upiši i umnoži CD/DVD
+Comment[sv]=Skriv och kopiera cd / dvd
+Categories=GNOME;Application;AudioVideo;
+Encoding=UTF-8
+#s Command to launch on click :
+Exec=brasero 
+#S Image's name or path :
+Icon=brasero
+MimeType=application/x-cd-image;application/x-cdrdao-toc;application/x-toc;application/x-cue;application/x-brasero;
+StartupNotify=true
+Terminal=false
+Type=Application
+
+Actions=BurnImage;OpenProject;
+#f Order you want for this launcher among the others:
+Order=10.125
+#E[_MainDock_]  Name of the container it belongs to:
+Container=_MainDock_
+Is container=false
+Is URI=false
+#X[Extra parameters]
+frame_extra=
+
+[Desktop Action BurnImage]
+Icon=brasero
+MimeType=application/x-cd-image;application/x-cdrdao-toc;application/x-cue;application/x-toc;
+Exec=brasero -i %u
+Name=Burn Image
+Name[ar]=احرق صورة
+Name[de]=Brenne ein Abbild
+Name[dz]=གཟུགས་བརྙན་བཙུགས་སྤྱོད་འབད་
+Name[es]=Grabar una imagen
+Name[fi]=Kirjoita levykuva
+Name[fr]=Graver une image
+Name[hu]=Kép kiírása
+Name[it]=Masterizza un'immagine
+Name[ja]=イメージの作成
+Name[lt]=Įrašyti atvaizdį
+Name[pa]=ਈਮੇਜ਼ ਲਿਖੋ
+Name[pl]=Nagrywanie obrazu
+Name[pt]=Gravar Imagem
+Name[pt_BR]=Gravar Imagem
+Name[ru]=Запись образа
+Name[sl]=Zapiši sliko
+Name[sr]=Упиши одраз
+Name[sr@Latn]=Upiši odraz
+Name[sv]=Bränn avbild
+
+[Desktop Action OpenProject]
+Icon=brasero
+MimeType=application/x-brasero;
+Exec=brasero -p %u
+Name=Open project
+Name[ar]=افتح المشروع
+Name[de]=Öffne ein Projekt
+Name[dz]=ལས་འགུལ་ཁ་ཕྱེ་
+Name[es]=Abrir proyecto
+Name[fi]=Avaa projekti
+Name[fr]=Ouvrir un projet
+Name[hu]=Projekt megnyitása
+Name[it]=Apri un progetto
+Name[ja]=プロジェクトを開く
+Name[lt]=Atverti projektą
+Name[pa]=ਪ੍ਰੋਜੈਕਟ ਖੋਲ੍ਹੋ
+Name[pl]=Otwórz projekt
+Name[pt]=Abrir projeto
+Name[pt_BR]=Abrir projeto
+Name[ru]=Открыть проект
+Name[sl]=Odpri projekt
+Name[sr]=Отвори пројекат
+Name[sr@Latn]=Otvori projekat
+Name[sv]=Öppna projekt
+
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-Product=bonfire
+X-GNOME-Bugzilla-Component=general
+X-Ubuntu-Gettext-Domain=brasero
