@@ -675,6 +675,7 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 }
 static void _cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon, gboolean bCheckUnusedSeparator)
 {
+	g_return_if_fail (icon != NULL);
 	//\___________________ On effectue les taches de fermeture de l'icone suivant son type.
 	if (icon->acDesktopFileName != NULL)
 	{

@@ -309,7 +309,6 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 				pRemovingIcon->fPersonnalScale = 0;
 			}
 		}
-
 		return TRUE;
 	}
 	else

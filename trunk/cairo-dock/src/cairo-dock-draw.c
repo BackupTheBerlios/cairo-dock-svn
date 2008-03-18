@@ -797,7 +797,10 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			icon->pQuickInfoBuffer,
 			0,
 			0);
-		cairo_paint (pCairoContext);
+		if (fAlpha == 1)
+			cairo_paint (pCairoContext);
+		else
+			cairo_paint_with_alpha (pCairoContext, fAlpha);
 	}
 	/*if (pSurfaceDataIni != NULL)
 	{

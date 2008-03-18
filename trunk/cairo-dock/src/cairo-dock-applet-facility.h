@@ -191,8 +191,11 @@ void init (GKeyFile *pKeyFile, Icon *pIcon, CairoDockContainer *pContainer, gcha
 	read_conf_file (pKeyFile, cConfFilePath); \
 	if (CAIRO_DOCK_IS_DOCK (myContainer)) \
 	{ \
-		myDrawContext = cairo_create (myIcon->pIconBuffer); \
-		g_return_if_fail (cairo_status (myDrawContext) == CAIRO_STATUS_SUCCESS); \
+		if (myIcon != NULL) \
+		{ \
+			myDrawContext = cairo_create (myIcon->pIconBuffer); \
+			g_return_if_fail (cairo_status (myDrawContext) == CAIRO_STATUS_SUCCESS); \
+		} \
 	} \
 	else \
 		myDrawContext = NULL;
@@ -202,11 +205,6 @@ void init (GKeyFile *pKeyFile, Icon *pIcon, CairoDockContainer *pContainer, gcha
 */
 #define CD_APPLET_INIT_END \
 	return; \
-}
-
-#define CD_APPLET_INIT_END0 \
-	cairo_dock_free_minimal_config (pMinimalConfig); \
-	return (myDock != NULL ? myIcon : NULL); \
 }
 
 //\______________________ stop.
@@ -476,7 +474,7 @@ void about (GtkMenuItem *menu_item, gpointer *data);
 /**
 *Abonne l'applet aux notifications du clic gauche. A effectuer lors de l'init de l'applet.
 */
-#define CD_APPLET_REGISTER_FOR_CLICK_EVENT cairo_dock_register_notification (CAIRO_DOCK_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_CLICK, CAIRO_DOCK_RUN_FIRST);
+#define CD_APPLET_REGISTER_FOR_CLICK_EVENT cairo_dock_register_notification (CAIRO_DOCK_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_CLICK, CAIRO_DOCK_RUN_AFTER);
 /**
 *Desabonne l'applet aux notifications du clic gauche. A effectuer lors de l'arret de l'applet.
 */
@@ -486,12 +484,12 @@ void about (GtkMenuItem *menu_item, gpointer *data);
 *Debut de la fonction de notification au clic gauche.
 */
 #define CD_APPLET_ON_CLICK_BEGIN \
-	gboolean CD_APPLET_ON_CLICK (gpointer *data) \
-	{ \
-		Icon *pClickedIcon = data[0]; \
-		CairoDockContainer *pClickedContainer = data[1]; \
-		if (pClickedIcon == myIcon || (myIcon != NULL && pClickedContainer == CAIRO_DOCK_CONTAINER (myIcon->pSubDock)) || pClickedContainer == CAIRO_DOCK_CONTAINER (myDesklet)) \
-		{
+gboolean CD_APPLET_ON_CLICK (gpointer *data) \
+{ \
+	Icon *pClickedIcon = data[0]; \
+	CairoDockContainer *pClickedContainer = data[1]; \
+	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedContainer == CAIRO_DOCK_CONTAINER (myIcon->pSubDock)) || pClickedContainer == CAIRO_DOCK_CONTAINER (myDesklet)) \
+	{
 
 /**
 *Fin de la fonction de notification au clic gauche. Par defaut elle intercepte la notification si elle l'a recue.
@@ -633,7 +631,7 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 /**
 *Abonne l'applet aux notifications du clic du milieu. A effectuer lors de l'init de l'applet.
 */
-#define CD_APPLET_REGISTER_FOR_MIDDLE_CLICK_EVENT cairo_dock_register_notification (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_MIDDLE_CLICK, CAIRO_DOCK_RUN_FIRST);
+#define CD_APPLET_REGISTER_FOR_MIDDLE_CLICK_EVENT cairo_dock_register_notification (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_MIDDLE_CLICK, CAIRO_DOCK_RUN_AFTER);
 /**
 *Desabonne l'applet aux notifications du clic du milieu. A effectuer lors de l'arret de l'applet.
 */

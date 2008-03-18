@@ -58,7 +58,6 @@ void cd_dbus_callback_init(dbusCallback *server)
 
 void cd_dbus_init(void)
 {
-	GMainLoop *main_loop;
 	dbusCallback *server;
 
 	cd_message("dbus : Lancement du service");

@@ -66,6 +66,16 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
     return FALSE;
   }
 
+	if (pExpose->area.x > 0 || pExpose->area.y > 0)
+	{
+		cairo_rectangle (pCairoContext,
+		pExpose->area.x,
+		pExpose->area.y,
+		pExpose->area.width,
+		pExpose->area.height);
+		cairo_clip (pCairoContext);
+	}
+
   //erase the background
   cairo_set_source_rgba (pCairoContext, 0., 0., 0., 0.);
   cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);

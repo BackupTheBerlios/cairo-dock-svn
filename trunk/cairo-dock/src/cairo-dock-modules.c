@@ -782,8 +782,15 @@ void cairo_dock_deactivate_module_and_unload (gchar *cModuleName)
 	if (CAIRO_DOCK_IS_DOCK (pModule->pContainer))
 	{
 		CairoDock *pDock = CAIRO_DOCK_DOCK (pModule->pContainer);
-		cairo_dock_remove_icon_from_dock (pDock, pIcon);  // desactive le module.
-		cairo_dock_update_dock_size (pDock);
+		if (pIcon != NULL)
+		{
+			cairo_dock_remove_icon_from_dock (pDock, pIcon);  // desactive le module.
+			cairo_dock_update_dock_size (pDock);
+		}
+		else
+		{
+			cairo_dock_deactivate_module (pModule);
+		}
 		gtk_widget_queue_draw (pDock->pWidget);
 	}
 	else
