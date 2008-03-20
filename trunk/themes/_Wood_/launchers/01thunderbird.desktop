@@ -9,8 +9,8 @@ Exec=thunderbird
 Icon=mozilla-thunderbird
 #f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
 Order=2
-#E[_MainDock_;Web;System]  Nom du container auquel il appartient :
-Container=Web
+#E[_MainDock_]  Nom du container auquel il appartient :
+Container=_MainDock_
 #b Cette icône est-elle un container ?
 Is container=false
 
