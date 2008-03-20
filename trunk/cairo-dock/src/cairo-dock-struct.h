@@ -591,12 +591,12 @@ struct _CairoDockVFSBackend {
 };
 
 
-typedef void (* CairoDockDeskletRendererFunc) (cairo_t *pCairoContext, CairoDockDesklet *pDesklet);
-typedef gpointer (* CairoDockDeskletLoadRendererFunc) (CairoDockDesklet *pDesklet, cairo_t *pSourceContext);
+typedef void (* CairoDockDeskletRenderFunc) (cairo_t *pCairoContext, CairoDockDesklet *pDesklet);
+typedef gpointer (* CairoDockDeskletLoadRendererFunc) (CairoDockDesklet *pDesklet, cairo_t *pSourceContext, gpointer *pConfig);
 typedef void (* CairoDockDeskletFreeRendererDataFunc) (CairoDockDesklet *pDesklet);
-typedef void (* CairoDockDeskletLoadIconsFunc) (CairoDockDesklet *pDesklet);
+typedef void (* CairoDockDeskletLoadIconsFunc) (CairoDockDesklet *pDesklet, cairo_t *pSourceContext);
 struct _CairoDockDeskletRenderer {
-	CairoDockDeskletRendererFunc render;
+	CairoDockDeskletRenderFunc render;
 	CairoDockDeskletLoadRendererFunc load_data;
 	CairoDockDeskletFreeRendererDataFunc free_data;
 	CairoDockDeskletLoadIconsFunc load_icons;
@@ -630,7 +630,7 @@ struct _CairoDockDesklet {
 	/// L'icone de l'applet.
 	Icon *pIcon;
 	/// La fonction de rendu. NULL pour utiliser celle par defaut qui dessine l'icone comme si elle etait dans un dock. Est appelee par la callback liee a l'expose-event de la fenetre.
-	CairoDockDeskletRendererFunc renderer;
+	CairoDockDeskletRenderFunc renderer;
 	/// donnees pouvant etre utilisees dans la fonction de rendu.
 	gpointer pRendererData;
 	/// un timer pour retarder l'ecriture dans le fichier lors des deplacements.
@@ -673,6 +673,8 @@ typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
 
 #define CAIRO_DOCK_LAST_ORDER -1e9
 #define CAIRO_DOCK_NB_MAX_ITERATIONS 1000
+
+#define CAIRO_DOCK_LOAD_ICONS_FOR_DESKLET TRUE
 
 #define CAIRO_DOCK_UPDATE_DOCK_SIZE TRUE
 #define CAIRO_DOCK_ANIMATE_ICON TRUE

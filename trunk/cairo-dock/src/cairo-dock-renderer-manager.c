@@ -14,6 +14,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-keyfile-manager.h"
 #include "cairo-dock-default-view.h"
 #include "cairo-dock-dock-factory.h"
+#include "cairo-dock-log.h"
 #include "cairo-dock-renderer-manager.h"
 
 extern GHashTable *g_hDocksTable;
@@ -48,6 +49,7 @@ CairoDockRenderer *cairo_dock_get_renderer (gchar *cRendererName, gboolean bForM
 
 void cairo_dock_register_renderer (gchar *cRendererName, CairoDockRenderer *pRenderer)
 {
+	cd_message ("%s (%s)", __func__, cRendererName);
 	g_hash_table_insert (s_hRendererTable, g_strdup (cRendererName), pRenderer);
 }
 
@@ -67,6 +69,7 @@ CairoDockDeskletRenderer *cairo_dock_get_desklet_renderer (gchar *cRendererName)
 
 void cairo_dock_register_desklet_renderer (gchar *cRendererName, CairoDockDeskletRenderer *pRenderer)
 {
+	cd_message ("%s (%s)", __func__, cRendererName);
 	g_hash_table_insert (s_hDeskletRendererTable, g_strdup (cRendererName), pRenderer);
 }
 
@@ -98,7 +101,7 @@ void cairo_dock_initialize_renderer_manager (void)
 void cairo_dock_set_renderer (CairoDock *pDock, gchar *cRendererName)
 {
 	g_return_if_fail (pDock != NULL);
-	//g_print ("%s (%s)\n", __func__, cRendererName);
+	cd_message ("%s (%s)", __func__, cRendererName);
 	CairoDockRenderer *pRenderer = cairo_dock_get_renderer (cRendererName, (pDock->iRefCount == 0));
 	
 	pDock->calculate_max_dock_size = pRenderer->calculate_max_dock_size;
@@ -118,32 +121,44 @@ void cairo_dock_set_default_renderer (CairoDock *pDock)
 }
 
 
-void cairo_dock_set_desklet_renderer (CairoDockDesklet *pDesklet, CairoDockDeskletRenderer *pRenderer, cairo_t *pSourceContext)
+void cairo_dock_set_desklet_renderer (CairoDockDesklet *pDesklet, CairoDockDeskletRenderer *pRenderer, cairo_t *pSourceContext, gpointer *pConfig)
 {
 	g_return_if_fail (pDesklet != NULL);
+	cd_message ("%s (%x)", __func__, pRenderer);
 	
 	if (pDesklet->pRenderer != NULL && pDesklet->pRenderer->free_data != NULL)
 	{
-		pDesklet->pRenderer->free_data (pDesklet->pRendererData);
+		pDesklet->pRenderer->free_data (pDesklet);
 		pDesklet->pRendererData = NULL;
 	}
 	
 	pDesklet->pRenderer = pRenderer;
 	if (pRenderer != NULL && pRenderer->load_data != NULL)
 	{
-		pDesklet->pRendererData =pRenderer->load_data (pDesklet, pSourceContext);
+		cairo_t *pCairoContext = (pSourceContext != NULL ? pSourceContext : cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDesklet)));
+		
+		pDesklet->pRendererData = pRenderer->load_data (pDesklet, pCairoContext, pConfig);
+		
+		if (pSourceContext == NULL)
+			cairo_destroy (pCairoContext);
 	}
 }
 
-void cairo_dock_set_desklet_renderer_by_name (CairoDockDesklet *pDesklet, gchar *cRendererName, cairo_t *pSourceContext, gboolean bLoadIcons)
+void cairo_dock_set_desklet_renderer_by_name (CairoDockDesklet *pDesklet, gchar *cRendererName, cairo_t *pSourceContext, gboolean bLoadIcons, gpointer *pConfig)
 {
+	cd_message ("%s (%s, %d)", __func__, cRendererName, bLoadIcons);
 	g_return_if_fail (cRendererName != NULL);
 	CairoDockDeskletRenderer *pRenderer = cairo_dock_get_desklet_renderer (cRendererName);
 	
-	cairo_dock_set_desklet_renderer (pDesklet, pRenderer, pSourceContext);
+	cairo_t *pCairoContext = (pSourceContext != NULL ? pSourceContext : cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDesklet)));
+	
+	cairo_dock_set_desklet_renderer (pDesklet, pRenderer, pCairoContext, pConfig);
 	
 	if (bLoadIcons && pRenderer != NULL && pRenderer->load_icons != NULL )
-		pRenderer->load_icons (pDesklet);
+		pRenderer->load_icons (pDesklet, pCairoContext);
+	
+	if (pSourceContext == NULL)
+		cairo_destroy (pCairoContext);
 }
 
 

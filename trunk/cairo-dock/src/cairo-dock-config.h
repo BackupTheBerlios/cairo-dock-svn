@@ -106,7 +106,18 @@ gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupN
 */
 CairoDockAnimationType cairo_dock_get_animation_type_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, CairoDockAnimationType iDefaultAnimation, gchar *cDefaultGroupName, gchar *cDefaultKeyName);
 
+/**
+*Lis le fichier de conf et recharge l'appli en consequence.
+*@param cConfFilePath chemin du fichier de conf.
+*@param pDock le dock principal, cree prealablement si necessaire.
+*/
 void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock);
+
+/**
+*Dis si l'appli est en cours de chargement.
+*@return TRUE ssi le dock est en cours de rechargement.
+*/
+gboolean cairo_dock_is_loading (void);
 
 /**
 *Lis un fichier de conf, construit l'IHM appropriee, et la presente a l'utilisateur.

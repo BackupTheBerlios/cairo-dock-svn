@@ -15,11 +15,12 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-log.h"
 
 #define CAIRO_DOCK_GUI_MARGIN 4
+#define CAIRO_DOCK_ICON_MARGIN 6
 #define CAIRO_DOCK_PREVIEW_WIDTH 250
 #define CAIRO_DOCK_PREVIEW_HEIGHT 150
 #define CAIRO_DOCK_APPLET_ICON_SIZE 32
-#define CAIRO_DOCK_TAB_ICON_SIZE 24
-#define CAIRO_DOCK_FRAME_ICON_SIZE 32
+#define CAIRO_DOCK_TAB_ICON_SIZE 32
+#define CAIRO_DOCK_FRAME_ICON_SIZE 24
 
 extern CairoDock *g_pMainDock;
 
@@ -615,7 +616,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					GtkWidget *pAlign = NULL;
 					if (cSmallGroupIcon != NULL && *cSmallGroupIcon != '\0')
 					{
-						pLabelContainer = gtk_hbox_new (FALSE, 6);
+						pLabelContainer = gtk_hbox_new (FALSE, CAIRO_DOCK_ICON_MARGIN);
 						pAlign = gtk_alignment_new (0., 0.5, 0., 0.);
 						gtk_container_add (GTK_CONTAINER (pAlign), pLabelContainer);
 						
@@ -627,7 +628,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								GTK_ICON_SIZE_BUTTON,
 								NULL);
 						else
-							pixbuf = gdk_pixbuf_new_from_file_at_size (cSmallGroupIcon, CAIRO_DOCK_FRAME_ICON_SIZE, CAIRO_DOCK_FRAME_ICON_SIZE, NULL);
+							pixbuf = gdk_pixbuf_new_from_file_at_size (cSmallGroupIcon, CAIRO_DOCK_TAB_ICON_SIZE, CAIRO_DOCK_TAB_ICON_SIZE, NULL);
 						if (pixbuf != NULL)
 						{
 							gtk_image_set_from_pixbuf (GTK_IMAGE (pImage), pixbuf);
@@ -1326,7 +1327,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							pLabelContainer = NULL;
 							if (cSmallIcon != NULL)
 							{
-								pLabelContainer = gtk_hbox_new (FALSE, 0);
+								pLabelContainer = gtk_hbox_new (FALSE, CAIRO_DOCK_ICON_MARGIN/2);
 								GtkWidget *pImage = gtk_image_new ();
 								GdkPixbuf *pixbuf;
 								if (*cSmallIcon != '/')

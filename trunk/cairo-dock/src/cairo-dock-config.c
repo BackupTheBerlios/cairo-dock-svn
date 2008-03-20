@@ -162,6 +162,8 @@ extern CairoDockFMSortType g_iFileSortType;
 extern gboolean g_bShowHiddenFiles;
 extern gchar *g_cRaiseDockShortcut;
 
+static gboolean s_bLoading = FALSE;
+
 /**
 *Recupere une cle booleene d'un fichier de cles.
 *@param pKeyFile le fichier de cles.
@@ -609,13 +611,15 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
+		return ;
 	}
-
+	
+	s_bLoading = TRUE;
+	
 	//\___________________ On recupere la position du dock.
 	pDock->iGapX = cairo_dock_get_integer_key_value (pKeyFile, "Position", "x gap", &bFlushConfFileNeeded, 0, NULL, NULL);
 	pDock->iGapY = cairo_dock_get_integer_key_value (pKeyFile, "Position", "y gap", &bFlushConfFileNeeded, 0, NULL, NULL);
 
-	///gchar *cScreenBorder = cairo_dock_get_string_key_value (pKeyFile, "Position", "screen border", &bFlushConfFileNeeded, "bottom");
 	CairoDockPositionType iScreenBorder = cairo_dock_get_integer_key_value (pKeyFile, "Position", "screen border", &bFlushConfFileNeeded, 0, NULL, NULL);
 	if (iScreenBorder < 0 || iScreenBorder >= CAIRO_DOCK_NB_POSITIONS)
 		iScreenBorder = 0;
@@ -697,7 +701,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 
 	g_free (g_cMainDockDefaultRendererName);
 	g_cMainDockDefaultRendererName = cairo_dock_get_string_key_value (pKeyFile, "Views", "main dock view", &bFlushConfFileNeeded, CAIRO_DOCK_DEFAULT_RENDERER_NAME, "Cairo Dock", NULL);
-	cd_message ("g_cMainDockDefaultRendererName <- %s\n", g_cMainDockDefaultRendererName);
+	cd_message ("g_cMainDockDefaultRendererName <- %s", g_cMainDockDefaultRendererName);
 
 	double fUserValue = cairo_dock_get_double_key_value (pKeyFile, "System", "unfold factor", &bFlushConfFileNeeded, 8., "Cairo Dock", NULL);
 	g_fUnfoldAcceleration = 1 - pow (2, - fUserValue);
@@ -762,7 +766,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_fStripesWidth = cairo_dock_get_double_key_value (pKeyFile, "Background", "stripes width", &bFlushConfFileNeeded, 0.02, NULL, NULL);
 	if (g_iNbStripes > 0 && g_fStripesWidth > 1. / g_iNbStripes)
 	{
-		cd_message ("Attention : the stripes' width is greater than the space between them.\n");
+		cd_warning ("Attention : the stripes' width is greater than the space between them.");
 		g_fStripesWidth = 0.99 / g_iNbStripes;
 	}
 
@@ -1165,6 +1169,13 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_key_file_free (pKeyFile);
 
 	cairo_dock_mark_theme_as_modified (TRUE);
+	
+	s_bLoading = FALSE;
+}
+
+gboolean cairo_dock_is_loading (void)
+{
+	return s_bLoading;
 }
 
 

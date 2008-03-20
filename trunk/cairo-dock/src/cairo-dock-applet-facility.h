@@ -237,6 +237,7 @@ gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoDockContainer *p
 { \
 	cd_message ("%s (%s)\n", __func__, cConfFilePath); \
 	g_return_val_if_fail (pNewContainer != NULL, FALSE); \
+	CairoDockContainer *pOldContainer = myContainer; \
 	gboolean bContainerTypeChanged = (myContainer == NULL || myContainer->iType != pNewContainer->iType); \
 	myContainer = pNewContainer; \
 	myDock = (CAIRO_DOCK_IS_DOCK (pNewContainer) ? CAIRO_DOCK_DOCK (pNewContainer) : NULL); \
@@ -269,6 +270,11 @@ gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoDockContainer *p
 *TRUE ssi le type de container a change.
 */
 #define CD_APPLET_MY_CONTAINER_TYPE_CHANGED bContainerTypeChanged
+
+/**
+*Le conteneur precedent le reload.
+*/
+#define CD_APPLET_MY_OLD_CONTAINER pOldContainer;
 
 
 /**
@@ -474,7 +480,7 @@ void about (GtkMenuItem *menu_item, gpointer *data);
 /**
 *Abonne l'applet aux notifications du clic gauche. A effectuer lors de l'init de l'applet.
 */
-#define CD_APPLET_REGISTER_FOR_CLICK_EVENT cairo_dock_register_notification (CAIRO_DOCK_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_CLICK, CAIRO_DOCK_RUN_AFTER);
+#define CD_APPLET_REGISTER_FOR_CLICK_EVENT cairo_dock_register_notification (CAIRO_DOCK_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_CLICK, CAIRO_DOCK_RUN_FIRST);
 /**
 *Desabonne l'applet aux notifications du clic gauche. A effectuer lors de l'arret de l'applet.
 */
@@ -631,7 +637,7 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 /**
 *Abonne l'applet aux notifications du clic du milieu. A effectuer lors de l'init de l'applet.
 */
-#define CD_APPLET_REGISTER_FOR_MIDDLE_CLICK_EVENT cairo_dock_register_notification (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_MIDDLE_CLICK, CAIRO_DOCK_RUN_AFTER);
+#define CD_APPLET_REGISTER_FOR_MIDDLE_CLICK_EVENT cairo_dock_register_notification (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_MIDDLE_CLICK, CAIRO_DOCK_RUN_FIRST);
 /**
 *Desabonne l'applet aux notifications du clic du milieu. A effectuer lors de l'arret de l'applet.
 */

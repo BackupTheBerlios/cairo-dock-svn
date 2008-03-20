@@ -601,6 +601,7 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 		GKeyFile *pKeyFile = NULL;
 		CairoDockMinimalAppletConfig *pMinimalConfig = NULL;
 		gboolean bToBeInserted = FALSE;
+		gboolean bNeedFreeDesklet = FALSE;
 		CairoDockContainer *pNewContainer = NULL;
 		if (bReloadAppletConf && module->cConfFilePath != NULL)
 		{
@@ -642,8 +643,10 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 					if (CAIRO_DOCK_IS_DESKLET (pActualContainer))  // elle etait dans un desklet.
 					{
 						pDock = g_pMainDock;  // par defaut.
-						cairo_dock_free_desklet (CAIRO_DOCK_DESKLET (pActualContainer));
-						pActualContainer = NULL;
+						bNeedFreeDesklet = TRUE;
+						cairo_dock_steal_interactive_widget_from_desklet (CAIRO_DOCK_DESKLET (pActualContainer));
+						///cairo_dock_free_desklet (CAIRO_DOCK_DESKLET (pActualContainer));
+						///pActualContainer = NULL;
 						bToBeInserted = TRUE;
 						bContainerTypeChanged = TRUE;
 					}
@@ -678,71 +681,9 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 		cairo_dock_free_minimal_config (pMinimalConfig);
 		if (pKeyFile != NULL)
 			g_key_file_free (pKeyFile);
-	}
-
-	//\______________ Si cela n'a pas marche, on applique la sequence stop + init.
-	if (! bModuleReloaded)
-	{
-		//\______________ On recupere l'eventuelle icone du module.
-		Icon *pOldIcon = cairo_dock_find_icon_from_module (module, pActualContainer);
-
-		//\______________ On desactive le module et on retire son eventuelle icone du dock.
-		gboolean bToBeRemoved = (pOldIcon != NULL && CAIRO_DOCK_IS_DOCK (pActualContainer));
-		cairo_dock_deactivate_module (module);
-		if (bToBeRemoved)
-		{
-			cd_message ("  enlevement de l'ancienne icone (%.1f)", pOldIcon->fOrder);
-			pOldIcon->pModule = NULL;
-			cairo_dock_remove_icon_from_dock (CAIRO_DOCK_DOCK (pActualContainer), pOldIcon);
-		}
-
-		//\______________ On le reactive.
-		Icon *pNewIcon = cairo_dock_activate_module (module, g_pMainDock, &erreur);
-		if (erreur != NULL)
-		{
-			module->bActive = FALSE;
-			///cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, g_pMainDock->icons);
-			cairo_dock_update_conf_file_with_active_modules2 (NULL, g_cConfFile);
-			
-			cd_warning ("Attention : %s", erreur->message);
-			g_error_free (erreur);
-		}
-
-		//\______________ On insere sa nouvelle eventuelle icone en reprenant quelques parametres de l'ancienne.
-		if (pNewIcon != NULL)
-		{
-			if (pOldIcon != NULL)
-			{
-				pNewIcon->fOrder = pOldIcon->fOrder;
-				pNewIcon->fX = pOldIcon->fX;
-				pNewIcon->fY = pOldIcon->fY;
-				pNewIcon->fScale = pOldIcon->fScale;
-				pNewIcon->fDrawX = pOldIcon->fDrawX;
-				pNewIcon->fDrawY = pOldIcon->fDrawY;
-				pNewIcon->fWidthFactor = pOldIcon->fWidthFactor;
-				pNewIcon->fAlpha = pOldIcon->fAlpha;
-			}
-
-			cd_message ("pNewIcon->fOrder <- %.1f", pNewIcon->fOrder);
-			if (CAIRO_DOCK_IS_DOCK (module->pContainer))
-			{
-				cairo_dock_insert_icon_in_dock (pNewIcon, CAIRO_DOCK_DOCK (module->pContainer), ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
-
-				cairo_dock_redraw_my_icon (pNewIcon, module->pContainer);
-			}
-		}
-		/**else if (pOldIcon != NULL)
-		{
-			cairo_dock_update_dock_size (pDock);
-			gtk_widget_queue_draw (pDock->pWidget);
-		}*/
-		cairo_dock_free_icon (pOldIcon);
-
-		if (bReloadAppletConf)
-		{
-			if (CAIRO_DOCK_IS_DOCK (module->pContainer))
-				cairo_dock_update_dock_size (CAIRO_DOCK_DOCK (module->pContainer));
-		}
+		
+		if (bNeedFreeDesklet)
+			cairo_dock_free_desklet (CAIRO_DOCK_DESKLET (pActualContainer));
 	}
 }
 

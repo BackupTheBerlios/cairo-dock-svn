@@ -242,6 +242,7 @@ msgstr ""
 #: ../src/cairo-dock-modules.c:769 ../src/cairo-dock-modules.c:806
 #: ../src/cairo-dock-modules.c:805 ../src/cairo-dock-modules.c:810
 #: ../src/cairo-dock-modules.c:814 ../src/cairo-dock-modules.c:821
+#: ../src/cairo-dock-modules.c:762
 #, c-format
 msgid "Configuration of %s"
 msgstr "Configuration de %s"
@@ -1624,7 +1625,7 @@ msgstr "Quitter Cairo-Dock ?"
 #: ../src/cairo-dock-gui-factory.c:1209 ../src/cairo-dock-gui-factory.c:1253
 #: ../src/cairo-dock-gui-factory.c:1257 ../src/cairo-dock-gui-factory.c:1274
 #: ../src/cairo-dock-gui-factory.c:1276 ../src/cairo-dock-gui-factory.c:1279
-#: ../src/cairo-dock-gui-factory.c:1281
+#: ../src/cairo-dock-gui-factory.c:1281 ../src/cairo-dock-gui-factory.c:1282
 msgid "grab"
 msgstr "récupérer"
 

@@ -528,7 +528,7 @@ void cairo_dock_place_desklet (CairoDockDesklet *pDesklet, CairoDockMinimalApple
 }
 
 
-void cairo_dock_free_desklet (CairoDockDesklet *pDesklet)
+void cairo_dock_steal_interactive_widget_from_desklet (CairoDockDesklet *pDesklet)
 {
 	if (pDesklet == NULL)
 		return;
@@ -536,10 +536,34 @@ void cairo_dock_free_desklet (CairoDockDesklet *pDesklet)
 	GtkWidget *pInteractiveWidget = gtk_bin_get_child (GTK_BIN (pDesklet->pWidget));
 	if (pInteractiveWidget != NULL)
 		cairo_dock_steal_widget_from_its_container (pInteractiveWidget);
+}
+
+void cairo_dock_free_desklet (CairoDockDesklet *pDesklet)
+{
+	if (pDesklet == NULL)
+		return;
+
+	cairo_dock_steal_interactive_widget_from_desklet (pDesklet);
 
 	gtk_widget_destroy (pDesklet->pWidget);
 	pDesklet->pWidget = NULL;
-
+	
+	if (pDesklet->pRenderer != NULL)
+	{
+		if (pDesklet->pRenderer->free_data != NULL)
+		{
+			pDesklet->pRenderer->free_data (pDesklet);
+			pDesklet->pRendererData = NULL;
+		}
+	}
+	
+	if (pDesklet && pDesklet->icons != NULL)
+	{
+		g_list_foreach (pDesklet->icons, (GFunc) cairo_dock_free_icon, NULL);
+		g_list_free (pDesklet->icons);
+		pDesklet->icons = NULL;
+	}
+	
 	g_free(pDesklet);
 }
 
