@@ -107,7 +107,7 @@ visibility alpha = 0.3
 #[gtk-preferences]
 [System]
 
-#F-[Movement parameters]
+#F-[Movement parameters;@prefix@/@DATADIRNAME@/@PACKAGE@/icon-movment.png]
 frame_mov =
 
 #e-[0.;12.] Icons' lateral unfolding acceleration :
@@ -126,7 +126,7 @@ move up speed = 0.35
 #f-[0.1;0.9] ...
 move down speed = 0.25
 
-#F[Mouse]
+#F[Mouse;@prefix@/@DATADIRNAME@/@PACKAGE@/icon-mouse.png]
 frame_mouse = 
 
 #e-[0;1] Scroll speed factor for background decorations :
@@ -148,7 +148,7 @@ reset scroll = true
 #{The more it's close to 0, the faster the scroll will be.}
 reset scroll acceleration = .9
 
-#F-[Sub-docks]
+#F-[Sub-docks;@prefix@/@DATADIRNAME@/@PACKAGE@/icon-subdock.png]
 frame_sub =
 
 #i- Delay before you effectively leave from a sub-dock or to a sub-dock :
@@ -167,7 +167,7 @@ show on click = false
 #{Always true if sub-docks appear with mouse click.}
 animate subdocks = true
 
-#F-[CPU]
+#F-[CPU;gtk-execute]
 frame_cpu =
 
 #i-[5;40] Refresh frequency when mouving cursor into the dock :
@@ -178,7 +178,7 @@ refresh frequency = 35
 #{The transparency gradation pattern will then be re-calculated in real time. May needs more CPU power.}
 dynamic reflection = false
 
-#F-[Labels]
+#F-[Labels;gtk-underline]
 frame_label =
 
 #b- Show label of the currently pointed icon only ?
@@ -191,7 +191,7 @@ always horizontal = FALSE
 #{the bigger, the more the labels next to the pointed icon will be transparent.}
 alpha threshold = 10.
 
-#F-[Files]
+#F-[Files;gtk-file]
 frame_file =
 
 #r-[Name;Size;Date] Sort files by :
@@ -252,7 +252,7 @@ alpha = 0.5
 reverse visible image = true
 
 
-#F+[Extern Frame]
+#F+[Extern Frame;@prefix@/@DATADIRNAME@/@PACKAGE@/icon-frame.png]
 frame4 =
 #i+[0;30] Corner radius :
 #{in pixels.}
@@ -276,7 +276,7 @@ rounded bottom corner = true
 #{You can scroll with the mouse's wheel to make the icons scroll, like a carousel. If you put 0, the dock will automatically adapt itself to the desktop's size.}
 max autorized width = 0
 
-#F+[Background image...]
+#F+[Background image...;gtk-orientation-portrait]
 frame2 = 
 
 #S+ Image's filename to use as a background :
@@ -289,7 +289,7 @@ image alpha = 0.5
 #b+ Repeat image as a pattern to fill background ?
 repeat image = true
 
-#F+[...or Gradation]
+#F+[...or Gradation;@prefix@/@DATADIRNAME@/@PACKAGE@/icon-gradation.png]
 frame3 = 
 
 #c+4[0;1] Bright color (red, green, blue, alpha) :
@@ -342,7 +342,7 @@ albedo = 1
 #{More precisely, it is the fraction of the max icon height that will be used to draw reflect. So setting it to 0.33 will mean that 33% of the icons will reflect on the ground, and the icons will be placed at the right distance from the front border of the frame so that the reflect is fully visible.}
 field depth = 0.5
 
-#F+[Style of the icons' labels]
+#F+[Style of the icons' labels;gtk-select-font]
 frame_label =
 
 #i+[0;40] Size of the font :
@@ -524,7 +524,7 @@ background color = 1.0; 1.0; 1.0; 0.7
 #{Put 0 to let the size adapt itself to the text.}
 icon size = 48
 
-#F+[Text]
+#F+[Text;gtk-select-font]
 frame_text =
 
 #c+4[0;1] Text color (r,v,b,a) :

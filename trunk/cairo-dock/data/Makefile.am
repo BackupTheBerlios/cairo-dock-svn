@@ -18,5 +18,11 @@ essentialdata_DATA = \
 	readme-default-view\
 	preview-default.png\
 	ChangeLog.txt\
-	License
+	License\
+	icon-gradation.png\
+	icon-movment.png\
+	icon-mouse.png\
+	icon-speed.png\
+	icon-subdock.png\
+	icon-frame.png
 	
