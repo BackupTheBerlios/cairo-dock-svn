@@ -21,6 +21,8 @@ void cairo_dock_fill_one_quick_info_buffer (Icon *icon, cairo_t* pSourceContext,
 
 
 void cairo_dock_fill_icon_buffers (Icon *icon, cairo_t *pSourceContext, double fMaxScale, gboolean bHorizontalDock, gboolean bApplySizeRestriction);
+#define cairo_dock_fill_icon_buffers_for_desklet(pIcon, pSourceContext, bLoadReflect) cairo_dock_fill_icon_buffers (pIcon, pSourceContext, 1, CAIRO_DOCK_HORIZONTAL, bLoadReflect);
+#define cairo_dock_fill_icon_buffers_for_dock(pIcon, pSourceContext, pDock) cairo_dock_fill_icon_buffers (pIcon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
 
 void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDockContainer *pContainer);
 

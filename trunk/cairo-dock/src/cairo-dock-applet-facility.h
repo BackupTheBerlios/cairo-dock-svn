@@ -297,6 +297,10 @@ void read_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath) \
 { \
 	gboolean bFlushConfFileNeeded = FALSE, bNewKeysPresent = FALSE;
 
+#define CD_APPLET_GET_CONFIG_BEGIN \
+CD_APPLET_CONFIG_BEGIN \
+	reset_config ();
+
 /**
 *Fin de la fonction de configuration de l'applet.
 */
@@ -309,11 +313,23 @@ void read_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath) \
 		cairo_dock_flush_conf_file (pKeyFile, cConfFilePath, MY_APPLET_SHARE_DATA_DIR);\
 }
 
+#define CD_APPLET_GET_CONFIG_END CD_APPLET_CONFIG_END
+
+
 /**
 *Definition de la fonction de configuration, a inclure dans le .h correspondant.
 */
 #define CD_APPLET_CONFIG_H \
 void read_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath);
+
+/**
+*Definition de la fonction de configuration, a inclure dans le .h correspondant.
+*/
+#define CD_APPLET_CONFIG__H \
+void read_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath); \
+void reset_config (void); \
+void reset_data (void);
+
 
 /**
 *Recupere la valeur d'un parametre 'booleen' du fichier de conf.
@@ -457,6 +473,31 @@ CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT (cGroupName, cKeyName, TRUE)
 #define CD_CONFIG_GET_THEME_PATH(cGroupName, cKeyName, cThemesDirName, cDefaultThemeName) \
 cairo_dock_manage_themes_for_applet (MY_APPLET_SHARE_DATA_DIR, cThemesDirName, CD_APPLET_MY_CONF_FILE, pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, cDefaultThemeName)
 
+/**
+*Debut de la fonction de liberation des donnees de la config.
+*/
+#define CD_APPLET_RESET_CONFIG_BEGIN \
+void reset_config (void) \
+{
+/**
+*Fin de la fonction de liberation des donnees de la config.
+*/
+#define CD_APPLET_RESET_CONFIG_END \
+	memset (&myConfig, 0, sizeof (AppletConfig)); \
+}
+
+/**
+*Debut de la fonction de liberation des donnees internes.
+*/
+#define CD_APPLET_RESET_DATA_BEGIN \
+void reset_data(void) \
+{
+/**
+*Fin de la fonction de liberation des donnees internes.
+*/
+#define CD_APPLET_RESET_DATA_END \
+	memset (&myData, 0, sizeof (AppletData)); \
+}
 
 //\_________________________________ NOTIFICATIONS
 //\______________________ fonction about.
@@ -728,11 +769,23 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 	cairo_dock_redraw_my_icon (myIcon, myContainer);
 
 /**
-*Applique une image definie par son chemin sur le contexte de dessin de l'applet, et la redessine. L'image est redimensionnee aux dimensions de l'icone.
+*Applique une image definie par son chemin sur le contexte de dessin de l'applet, mais ne la rafraichit pas. L'image est redimensionnee aux dimensions de l'icone.
 *@param cImagePath chemin du fichier de l'image.
 */
 #define CD_APPLET_SET_IMAGE_ON_MY_ICON(cImagePath) \
 	cairo_dock_set_image_on_icon (myDrawContext, cImagePath, myIcon, myContainer);
+
+/**
+*Applique une image definie par son nom local au repertoire de l'applet sur le contexte de dessin de l'applet, mais ne la rafraichit pas. L'image est redimensionnee aux dimensions de l'icone.
+*@param cImagePath chemin du fichier de l'image.
+*/
+#define CD_APPLET_SET_LOCAL_IMAGE_ON_MY_ICON(cImageName) \
+	{ \
+		gchar *cImageFilePath = g_strconcat (MY_APPLET_SHARE_DATA_DIR, "/", cImageName, NULL); \
+		cairo_dock_set_image_on_icon (myDrawContext, cImageFilePath, myIcon, myContainer); \
+		g_free (cImageFilePath); \
+	}
+
 
 /**
 *Remplace l'etiquette de l'icone de l'applet par une nouvelle.

@@ -202,7 +202,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 	g_return_val_if_fail (cImagePath != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	GError *erreur = NULL;
 	RsvgDimensionData rsvg_dimension_data;
-	RsvgHandle *rsvg_handle;
+	RsvgHandle *rsvg_handle = NULL;
 	cairo_surface_t* surface_ini;
 	cairo_surface_t* pNewSurface = NULL;
 	cairo_t* pCairoContext = NULL;
@@ -221,6 +221,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 		}
 		else
 		{
+			g_return_val_if_fail (rsvg_handle != NULL, NULL);
 			rsvg_handle_get_dimensions (rsvg_handle, &rsvg_dimension_data);
 			*fImageWidth = (gdouble) rsvg_dimension_data.width;
 			*fImageHeight = (gdouble) rsvg_dimension_data.height;
@@ -244,6 +245,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 			cairo_scale (pCairoContext, fMaxScale * fIconWidthSaturationFactor, fMaxScale * fIconHeightSaturationFactor);
 
 			rsvg_handle_render_cairo (rsvg_handle, pCairoContext);
+			g_object_unref (rsvg_handle);
 		}
 	}
 	else if (g_str_has_suffix (cImagePath, ".png"))

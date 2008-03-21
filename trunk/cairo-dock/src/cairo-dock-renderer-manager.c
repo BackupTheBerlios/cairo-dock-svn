@@ -133,6 +133,7 @@ void cairo_dock_set_desklet_renderer (CairoDockDesklet *pDesklet, CairoDockDeskl
 	}
 	
 	pDesklet->pRenderer = pRenderer;
+	
 	if (pRenderer != NULL && pRenderer->load_data != NULL)
 	{
 		cairo_t *pCairoContext = (pSourceContext != NULL ? pSourceContext : cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDesklet)));

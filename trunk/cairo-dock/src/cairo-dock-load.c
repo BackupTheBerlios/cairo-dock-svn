@@ -342,11 +342,11 @@ void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDockContainer *pCo
 	if (CAIRO_DOCK_IS_DOCK (pContainer))
 	{
 		CairoDock *pDock = CAIRO_DOCK_DOCK (pContainer);
-		cairo_dock_fill_icon_buffers (pIcon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
+		cairo_dock_fill_icon_buffers_for_dock (pIcon, pCairoContext, pDock);
 	}
 	else
 	{
-		cairo_dock_fill_icon_buffers (pIcon, pCairoContext, 1, CAIRO_DOCK_HORIZONTAL, FALSE);
+		cairo_dock_fill_icon_buffers_for_desklet (pIcon, pCairoContext, FALSE);
 	}
 	cairo_destroy (pCairoContext);
 }
