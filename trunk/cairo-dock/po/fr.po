@@ -72,7 +72,7 @@ msgstr "Cachage rapide"
 #: ../src/cairo-dock-menu.c:922 ../src/cairo-dock-menu.c:921
 #: ../src/cairo-dock-menu.c:915 ../src/cairo-dock-menu.c:918
 msgid "Quit"
-msgstr "Quiter"
+msgstr "Quitter"
 
 #: ../src/cairo-dock-menu.c:959 ../src/cairo-dock-menu.c:1011
 #: ../src/cairo-dock-menu.c:1015 ../src/cairo-dock-menu.c:965

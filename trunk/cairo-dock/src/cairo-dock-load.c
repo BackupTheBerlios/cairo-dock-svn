@@ -346,7 +346,7 @@ void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDockContainer *pCo
 	}
 	else
 	{
-		cairo_dock_fill_icon_buffers_for_desklet (pIcon, pCairoContext, FALSE);
+		cairo_dock_fill_icon_buffers_for_desklet (pIcon, pCairoContext);
 	}
 	cairo_destroy (pCairoContext);
 }

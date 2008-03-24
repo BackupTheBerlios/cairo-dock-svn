@@ -12,7 +12,7 @@ export CAIRO_DOCK_EXTRACT_MESSAGE=${CAIRO_DOCK_DIR}/utils/extract-message
 export CAIRO_DOCK_GEN_TRANSLATION=${CAIRO_DOCK_DIR}/cairo-dock/po/generate-translation.sh
 
 echo "this script will process : "
-while getopts "acCit" flag
+while getopts "acCith" flag
 do
 	echo " option $flag" $OPTIND $OPTARG
 	case "$flag" in
@@ -35,6 +35,14 @@ do
 	t)
 		echo " => themes too"
 		export CAIRO_DOCK_THEMES="1"
+		;;
+	h)
+		echo "-a : run autoreconf"
+		echo "-c : clean all"
+		echo "-C : compil"
+		echo "-i : install (will ask root password)"
+		echo "-t : compil themes too"
+		exit 0
 		;;
 	*)
 		echo "unexpected argument"

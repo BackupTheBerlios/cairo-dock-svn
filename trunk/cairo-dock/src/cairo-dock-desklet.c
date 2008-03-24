@@ -118,9 +118,8 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 	{
 		if (pDesklet->pRenderer->render != NULL)
 			pDesklet->pRenderer->render (pCairoContext, pDesklet);
-		cairo_destroy (pCairoContext);
 	}
-	else if (pDesklet->renderer != NULL)  // une fonction de dessin specifique a ete fournie.
+	/*else if (pDesklet->renderer != NULL)  // une fonction de dessin specifique a ete fournie.
 	{
 		pDesklet->renderer (pCairoContext, pDesklet);
 		cairo_destroy (pCairoContext);
@@ -153,10 +152,9 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 			cairo_paint (pCairoContext);
 		}
 		cairo_destroy (pCairoContext);
-	}
-	else
-		cairo_destroy (pCairoContext);
-
+	}*/
+	
+	cairo_destroy (pCairoContext);
 	return FALSE;
 }
 

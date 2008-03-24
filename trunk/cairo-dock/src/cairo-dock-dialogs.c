@@ -763,8 +763,11 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 	pDialog->pInteractiveWidget = pInteractiveWidget;
 	if (pInteractiveWidget != NULL)
 	{
-		pDialog->iMessageHeight += CAIRO_DOCK_DIALOG_VGAP;
-		gtk_widget_set (pDialog->pMessageWidget, "height-request", pDialog->iMessageHeight, NULL);
+		if (pDialog->pMessageWidget != NULL)
+		{
+			pDialog->iMessageHeight += CAIRO_DOCK_DIALOG_VGAP;
+			gtk_widget_set (pDialog->pMessageWidget, "height-request", pDialog->iMessageHeight, NULL);
+		}
 
 		GtkRequisition requisition;
 		gtk_widget_size_request (pInteractiveWidget, &requisition);

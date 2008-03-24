@@ -76,7 +76,7 @@ void cairo_dock_free_minimal_config (CairoDockMinimalAppletConfig *pMinimalConfi
 }
 
 
-void cairo_dock_set_icon_surface (cairo_t *pIconContext, cairo_surface_t *pSurface)  // fonction proposee par Necropotame.
+void cairo_dock_set_icon_surface_full (cairo_t *pIconContext, cairo_surface_t *pSurface, double fScale, double fAlpha, Icon *pIcon, CairoDockContainer *pContainer)
 {
 	g_return_if_fail (cairo_status (pIconContext) == CAIRO_STATUS_SUCCESS);
 
@@ -87,14 +87,25 @@ void cairo_dock_set_icon_surface (cairo_t *pIconContext, cairo_surface_t *pSurfa
 	cairo_set_operator (pIconContext, CAIRO_OPERATOR_OVER);
 	
 	//\________________ On applique la nouvelle image.
-	if (pSurface != NULL)
+	if (pSurface != NULL && fScale > 0)
 	{
+		if (fScale != 1 && pIcon != NULL)
+		{
+			double fMaxScale = (CAIRO_DOCK_IS_DOCK (pContainer) ? 1 + g_fAmplitude : 1);
+			cairo_translate (pIconContext, pIcon->fWidth * fMaxScale / 2 * (1 - fScale) , pIcon->fHeight * fMaxScale / 2 * (1 - fScale));
+			cairo_scale (pIconContext, fScale, fScale);
+		}
+		
 		cairo_set_source_surface (
 			pIconContext,
 			pSurface,
 			0.,
 			0.);
-		cairo_paint (pIconContext);
+		
+		if (fAlpha != 1)
+			cairo_paint_with_alpha (pIconContext, fAlpha);
+		else
+			cairo_paint (pIconContext);
 	}
 }
 
@@ -147,6 +158,43 @@ void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Ico
 	cairo_dock_set_icon_surface_with_reflect (pIconContext, pImageSurface, pIcon, pContainer);
 	
 	cairo_surface_destroy (pImageSurface);
+}
+
+void cairo_dock_draw_bar_on_icon (cairo_t *pIconContext, double fValue, Icon *pIcon, CairoDockContainer *pContainer)
+{
+	double fMaxScale = (CAIRO_DOCK_IS_DOCK (pContainer) ? 1 + g_fAmplitude : 1);
+	cairo_pattern_t *pGradationPattern = cairo_pattern_create_linear (0.,
+		0.,
+		pIcon->fWidth * fMaxScale,
+		0.);  // de gauche a droite.
+	g_return_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS);
+	
+	cairo_pattern_set_extend (pGradationPattern, CAIRO_EXTEND_NONE);
+	cairo_pattern_add_color_stop_rgba (pGradationPattern,
+		0.,
+		1.,
+		0.,
+		0.,
+		1.);
+	cairo_pattern_add_color_stop_rgba (pGradationPattern,
+		1.,
+		0.,
+		1.,
+		0.,
+		1.);
+	
+	cairo_set_operator (pIconContext, CAIRO_OPERATOR_OVER);
+	
+	cairo_set_line_width (pIconContext, 6);
+	cairo_set_line_cap (pIconContext, CAIRO_LINE_CAP_ROUND);
+	
+	cairo_move_to (pIconContext, 3, pIcon->fHeight * fMaxScale - 3);
+	cairo_rel_line_to (pIconContext, (pIcon->fWidth * fMaxScale - 6) * fValue, 0);
+	
+	cairo_set_source (pIconContext, pGradationPattern);
+	cairo_stroke (pIconContext);
+	
+	cairo_pattern_destroy (pGradationPattern);
 }
 
 
