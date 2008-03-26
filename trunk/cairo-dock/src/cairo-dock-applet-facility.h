@@ -103,6 +103,10 @@ void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, Cairo
 */
 #define cairo_dock_remove_quick_info(pIcon) cairo_dock_set_quick_info (NULL, NULL, pIcon, 1)
 
+void cairo_dock_set_hours_minutes_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, int iTimeInSeconds);
+void cairo_dock_set_minutes_secondes_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, int iTimeInSeconds);
+
+
 
 /**
 *Prepare l'animation d'une icone, et la lance immediatement.
@@ -161,6 +165,8 @@ CairoDock *myDock = NULL; \
 CairoDockDesklet *myDesklet = NULL; \
 CairoDockContainer *myContainer = NULL; \
 cairo_t *myDrawContext = NULL; \
+AppletConfig myConfig; \
+AppletData myData; \
 CairoDockVisitCard *pre_init (void) \
 { \
 	CairoDockVisitCard *pVisitCard = g_new0 (CairoDockVisitCard, 1); \
@@ -311,19 +317,16 @@ gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoDockContainer *p
 /**
 *Debut de la fonction de configuration de l'applet (celle qui est appelee au debt de l'init).
 */
-#define CD_APPLET_CONFIG_BEGIN \
+#define CD_APPLET_GET_CONFIG_BEGIN \
 void read_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath) \
 { \
-	gboolean bFlushConfFileNeeded = FALSE, bNewKeysPresent = FALSE;
-
-#define CD_APPLET_GET_CONFIG_BEGIN \
-CD_APPLET_CONFIG_BEGIN \
+	gboolean bFlushConfFileNeeded = FALSE, bNewKeysPresent = FALSE; \
 	reset_config ();
 
 /**
 *Fin de la fonction de configuration de l'applet.
 */
-#define CD_APPLET_CONFIG_END \
+#define CD_APPLET_GET_CONFIG_END \
 	if (bNewKeysPresent) \
 		cairo_dock_write_keys_to_file (pKeyFile, cConfFilePath); \
 	if (! bFlushConfFileNeeded) \
@@ -332,19 +335,11 @@ CD_APPLET_CONFIG_BEGIN \
 		cairo_dock_flush_conf_file (pKeyFile, cConfFilePath, MY_APPLET_SHARE_DATA_DIR);\
 }
 
-#define CD_APPLET_GET_CONFIG_END CD_APPLET_CONFIG_END
-
 
 /**
 *Definition de la fonction de configuration, a inclure dans le .h correspondant.
 */
 #define CD_APPLET_CONFIG_H \
-void read_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath);
-
-/**
-*Definition de la fonction de configuration, a inclure dans le .h correspondant.
-*/
-#define CD_APPLET_CONFIG__H \
 void read_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath); \
 void reset_config (void); \
 void reset_data (void);
@@ -843,7 +838,6 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 	cairo_dock_redraw_my_icon (myIcon, myContainer);
 
 
-
 /**
 *Remplace l'etiquette de l'icone de l'applet par une nouvelle.
 *@param cIconName la nouvelle etiquette.
@@ -864,6 +858,19 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 #define CD_APPLET_SET_QUICK_INFO_ON_MY_ICON_AND_REDRAW(cQuickInfoFormat, ...) \
 	cairo_dock_set_quick_info_full (myDrawContext, myIcon, myContainer, cQuickInfoFormat, ##__VA_ARGS__); \
 	cairo_dock_redraw_my_icon (myIcon, myContainer);
+/**
+*Ecris le temps en heures-minutes en info-rapide sur l'icone de l'applet.
+*@param iTimeInSeconds le temps en secondes.
+*/
+#define CD_APPLET_SET_HOURS_MINUTES_AS_QUICK_INFO(iTimeInSeconds) \
+	cairo_dock_set_hours_minutes_as_quick_info (myDrawContext, myIcon, myContainer, iTimeInSeconds);
+/**
+*Ecris le temps en minutes-secondes en info-rapide sur l'icone de l'applet.
+*@param iTimeInSeconds le temps en secondes.
+*/
+#define CD_APPLET_SET_MINUTES_SECONDES_AS_QUICK_INFO(iTimeInSeconds) \
+	cairo_dock_set_minutes_secondes_as_quick_info (myDrawContext, myIcon, myContainer, iTimeInSeconds);
+
 
 
 /**
@@ -891,6 +898,20 @@ extern cairo_t *myDrawContext; \
 extern CairoDock *myDock; \
 extern CairoDockDesklet *myDesklet; \
 extern CairoDockContainer *myContainer;
+
+/**
+*Exportation des variables globales de l'applet. A inclure dans chaque .c ou elles sont utilisees (directement ou via les macros).
+*/
+#define CD_APPLET_INCLUDE_ALL_MY_VARS \
+extern Icon *myIcon; \
+extern cairo_t *myDrawContext; \
+extern CairoDock *myDock; \
+extern CairoDockDesklet *myDesklet; \
+extern CairoDockContainer *myContainer; \
+extern AppletConfig myConfig; \
+extern AppletData myData;
+
+
 
 //\_________________________________ INTERNATIONNALISATION
 /**

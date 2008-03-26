@@ -358,7 +358,7 @@ Icon *cairo_dock_get_icon_with_command (GList *pIconList, gchar *cCommand)
 	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
-		if (strcmp (icon->acCommand, cCommand) == 0)
+		if (icon->acCommand != NULL && strncmp (icon->acCommand, cCommand, MIN (strlen (icon->acCommand), strlen (cCommand))) == 0)
 			return icon;
 	}
 	return NULL;
@@ -417,6 +417,7 @@ Icon *cairo_dock_get_icon_with_class (GList *pIconList, gchar *cClass)
 	}
 	return NULL;
 }
+
 
 
 void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)

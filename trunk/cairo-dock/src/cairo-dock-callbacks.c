@@ -912,6 +912,11 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 							cairo_dock_show_subdock (icon, FALSE, pDock);
 							cairo_dock_arm_animation (icon, 0, 0);
 						}
+						else if (pButton->state & GDK_SHIFT_MASK && CAIRO_DOCK_IS_LAUNCHER (icon) && CAIRO_DOCK_IS_APPLI (icon))
+						{
+							gpointer data[2] = {icon, pDock};
+							cairo_dock_notification_click_icon (data);  // on court-circuite la notifiaction, pour pouvoir lancer une autre instance de l'appli par SHIFT+clic.
+						}
 						else
 						{
 							gpointer data[2] = {icon, pDock};

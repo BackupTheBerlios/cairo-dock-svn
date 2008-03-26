@@ -240,6 +240,27 @@ void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, Cairo
 	va_end (args);
 }
 
+void cairo_dock_set_hours_minutes_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, int iTimeInSeconds)
+{
+	int hours = iTimeInSeconds / 3600;
+	int minutes = (iTimeInSeconds % 3600) / 60;
+	if (hours != 0)
+		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%dh%02d", hours, abs (minutes));
+	else
+		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%d", minutes);
+}
+
+void cairo_dock_set_minutes_secondes_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, int iTimeInSeconds)
+{
+	int minutes = iTimeInSeconds / 60;
+	int secondes = iTimeInSeconds % 60;
+	if (minutes != 0)
+		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%d:%02d", minutes, abs (secondes));
+	else
+		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%d", secondes);
+}
+
+
 
 void cairo_dock_animate_icon (Icon *pIcon, CairoDock *pDock, CairoDockAnimationType iAnimationType, int iNbRounds)
 {

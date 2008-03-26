@@ -735,7 +735,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	//\_____________________ On dessine les etiquettes, avec un alpha proportionnel au facteur d'echelle de leur icone.
 	if (bUseText && icon->pTextBuffer != NULL && icon->fScale > 1.01 && (! g_bLabelForPointedIconOnly || icon->bPointed) && icon->iCount == 0)  // 1.01 car sin(pi) = 1+epsilon :-/
 	{
-		double fOffsetX = -icon->fTextXOffset + icon->fWidthFactor * icon->fWidth * icon->fScale * 0.5;
+		double fOffsetX = -icon->fTextXOffset + icon->fWidthFactor * icon->fWidth * icon->fScale / 2;
 		if (fOffsetX < - icon->fDrawX)
 			fOffsetX = - icon->fDrawX;
 		else if (icon->fDrawX + fOffsetX + icon->iTextWidth > iWidth)
@@ -786,7 +786,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		cairo_translate (pCairoContext,
 			//-icon->fQuickInfoXOffset + icon->fWidth / 2,
 			//icon->fHeight - icon->fQuickInfoYOffset);
-			(- icon->iQuickInfoWidth + icon->fWidth) / 2 * icon->fScale,
+			(- icon->iQuickInfoWidth + icon->fWidthFactor * icon->fWidth) / 2 * icon->fScale,
 			(icon->fHeight - icon->iQuickInfoHeight) * icon->fScale);
 		
 		cairo_scale (pCairoContext,

@@ -80,7 +80,7 @@ void cairo_dock_initialize_application_factory (Display *pXDisplay)
 	s_aNetWmWindowType = XInternAtom (s_XDisplay, "_NET_WM_WINDOW_TYPE", False);
 	s_aNetWmWindowTypeNormal = XInternAtom (s_XDisplay, "_NET_WM_WINDOW_TYPE_NORMAL", False);
 	s_aNetWmWindowTypeDialog = XInternAtom (s_XDisplay, "_NET_WM_WINDOW_TYPE_DIALOG", False);
-
+	
 	s_aNetWmName = XInternAtom (s_XDisplay, "_NET_WM_NAME", False);
 	s_aUtf8String = XInternAtom (s_XDisplay, "UTF8_STRING", False);
 	s_aWmName = XInternAtom (s_XDisplay, "WM_NAME", False);
@@ -386,7 +386,8 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 		//else
 		//	cd_message (" pas de type defini -> on suppose que son type est 'normal'\n");
 	}
-
+	
+	
 	//\__________________ On recupere son nom.
 	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmName, 0, G_MAXULONG, False, s_aUtf8String, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
 	if (iBufferNbElements == 0)
@@ -401,7 +402,22 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 		return NULL;
 	}
 	cd_message ("recuperation de '%s' (bIsHidden : %d)\n", pNameBuffer, bIsHidden);
-
+	
+	
+	//\__________________ On recupere la classe.
+	XClassHint *pClassHint = XAllocClassHint ();
+	gchar *cClass = NULL;
+	if (XGetClassHint (s_XDisplay, Xid, pClassHint) != 0)
+	{
+		g_print ("  res_name : %s(%x); res_class : %s(%x)", pClassHint->res_name, pClassHint->res_name, pClassHint->res_class, pClassHint->res_class);
+		cClass = g_ascii_strdown (pClassHint->res_class, -1);  // on la passe en minuscule, car certaines applis ont la bonne idee de donner des classes avec une majuscule ou non suivant les fenetres. Il reste le cas des aplis telles que Glade2 ('Glade' et 'Glade-2' ...)
+		XFree (pClassHint->res_name);
+		XFree (pClassHint->res_class);
+		//g_print (".\n");
+	}
+	XFree (pClassHint);
+	
+	
 	//\__________________ On cree, on remplit l'icone, et on l'enregistre, par contre elle sera inseree plus tard.
 	Icon *icon = g_new0 (Icon, 1);
 	icon->acName = g_strdup ((gchar *)pNameBuffer);
@@ -421,17 +437,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	cairo_dock_register_appli (icon);
 	XFree (pNameBuffer);
 
-	//\__________________ On regarde si il faut la grouper avec une autre.
-	XClassHint *pClassHint = XAllocClassHint ();
-	if (XGetClassHint (s_XDisplay, Xid, pClassHint) != 0)
-	{
-		//g_print ("  res_name : %s(%x); res_class : %s(%x)", pClassHint->res_name, pClassHint->res_name, pClassHint->res_class, pClassHint->res_class);
-		icon->cClass = g_ascii_strdown (pClassHint->res_class, -1);  // on la passe en minuscule, car certaines applis ont la bonne idee de donner des classes avec une majuscule ou non suivant les fenetres. Il reste le cas des aplis telles que Glade2 ('Glade' et 'Glade-2' ...)
-		XFree (pClassHint->res_name);
-		XFree (pClassHint->res_class);
-		//g_print (".\n");
-	}
-	XFree (pClassHint);
+	icon->cClass = cClass;
 
 	///cairo_dock_manage_appli_class (icon, pDock);
 	icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);

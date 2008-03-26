@@ -899,7 +899,7 @@ void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDockContainer *p
 			}
 			else
 			{
-				*iX = pDock->iWindowPositionX + pIcon->fDrawX + pIcon->fWidth * (*bRight ? .7 : .3);
+				*iX = pDock->iWindowPositionX + pIcon->fDrawX + pIcon->fWidth * pIcon->fScale * pIcon->fWidthFactor / 2 + pIcon->fWidth * (*bRight ? .2 : - .2);
 			}
 		}
 		else if (pDock->iRefCount > 0 && ! GTK_WIDGET_VISIBLE (pDock->pWidget))  // sous-dock invisible.  // pDock->bAtBottom
@@ -923,7 +923,7 @@ void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoDockContainer *p
 				*bDirectionUp = (pIcon->fXAtRest > pDock->fFlatDockWidth / 2);
 				*iY = (! (*bRight) ? pDock->iWindowPositionY : pDock->iWindowPositionY + pDock->iCurrentHeight);
 			}
-			*iX = pDock->iWindowPositionX + pIcon->fDrawX + pIcon->fWidth * pIcon->fScale * (*bRight ? .7 : .3);
+			*iX = pDock->iWindowPositionX + pIcon->fDrawX + pIcon->fWidth * pIcon->fScale * pIcon->fWidthFactor / 2 + pIcon->fWidth * (*bRight ? .2 : - .2);
 		}
 	}
 	else if (CAIRO_DOCK_IS_DESKLET (pContainer))

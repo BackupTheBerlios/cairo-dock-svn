@@ -1029,7 +1029,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 			_add_entry_in_menu (_("Modify this launcher"), GTK_STOCK_EDIT, cairo_dock_modify_launcher, menu);
 		}
 	}
-	else if (CAIRO_DOCK_IS_VALID_APPLI (icon))
+	if (CAIRO_DOCK_IS_VALID_APPLI (icon))
 	{
 		//\_________________________ On rajoute les actions supplementaires sur les icones d'applis.
 		menu_item = gtk_menu_item_new_with_label (_("Other actions"));
