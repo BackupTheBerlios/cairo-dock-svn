@@ -1761,6 +1761,7 @@ msgstr "Compiz Fusion ウィジェット"
 #: ../src/cairo-dock-callbacks.c:1407 ../src/cairo-dock-callbacks.c:1415
 #: ../src/cairo-dock-callbacks.c:1418 ../src/cairo-dock-callbacks.c:1420
 #: ../src/cairo-dock-callbacks.c:1421 ../src/cairo-dock-callbacks.c:1424
+#: ../src/cairo-dock-callbacks.c:1429
 msgid "Quit Cairo-Dock ?"
 msgstr "Cairo-Dock 終了？"
 

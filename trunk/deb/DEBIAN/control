@@ -1,0 +1,16 @@
+Package: cairo-dock
+Version: 1.5.4
+Section: desktop
+Priority: optional
+Architecture: all
+Essential: no
+Depends: libgtk2.0-0 (>= 2.10.0), libcairo2 (>=1.4.2), librsvg2-2 (>=2.16.0), libglitz1, libglitz-glx1, libdbus-glib-1-2
+Recommends: cairo-dock-plug-ins
+Installed-Size: 1024
+Maintainer: Fabrice Rey fabounet@users.berlios.de
+Provides: cairo-dock
+Description: A light and eye-candy dock to launch your programs easily.
+ Uses cairo to render nice graphics, and Glitz to use hardware acceleration.
+ It's fully configurable and can be a taskbar too.
+ You can easily plug applets into it.
+

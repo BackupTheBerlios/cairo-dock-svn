@@ -1,0 +1,12 @@
+Package: cairo-dock-plug-ins
+Version: 1.5.4
+Section: desktop
+Priority: optional
+Architecture: all
+Essential: no
+Depends: cairo-dock, dbus, libdbus-1-3, libdbus-glib-1-2, libvte9, libxxf86vm1, libxml2, libasound2
+Installed-Size: 1024
+Maintainer: Fabrice Rey fabounet@users.berlios.de
+Provides: cairo-dock-plug-ins
+Description: A collection of official plug-ins and applets for cairo-dock, that will add fonctionnalities, desktop enhancement, and accessories to your dock.
+

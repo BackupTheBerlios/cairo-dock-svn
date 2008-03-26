@@ -1,0 +1,27 @@
+#! /bin/sh
+
+set -e
+
+case "$1" in
+	configure)
+		echo 'installation complete'
+		echo 'You can start using cairo-dock by just typing "cairo-dock" in a terminal !'
+		echo 'Cairo-Dock is currently translated in french and english.'
+	;;
+	
+	abort-upgrade|abort-remove|abort-deconfigure)
+	;;
+	
+	*)
+		echo "postinst called with unknown argument \`$1'" >&2
+		exit 0
+	;;
+esac
+
+
+#if [ "$1" = "configure" ] && [ -x "`which update-menus 2>/dev/null`" ]; then
+#	update-menus
+#fi
+
+exit 0
+
