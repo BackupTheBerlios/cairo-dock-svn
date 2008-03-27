@@ -897,20 +897,9 @@ extern Icon *myIcon; \
 extern cairo_t *myDrawContext; \
 extern CairoDock *myDock; \
 extern CairoDockDesklet *myDesklet; \
-extern CairoDockContainer *myContainer;
-
-/**
-*Exportation des variables globales de l'applet. A inclure dans chaque .c ou elles sont utilisees (directement ou via les macros).
-*/
-#define CD_APPLET_INCLUDE_ALL_MY_VARS \
-extern Icon *myIcon; \
-extern cairo_t *myDrawContext; \
-extern CairoDock *myDock; \
-extern CairoDockDesklet *myDesklet; \
 extern CairoDockContainer *myContainer; \
 extern AppletConfig myConfig; \
 extern AppletData myData;
-
 
 
 //\_________________________________ INTERNATIONNALISATION

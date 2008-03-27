@@ -119,40 +119,6 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 		if (pDesklet->pRenderer->render != NULL)
 			pDesklet->pRenderer->render (pCairoContext, pDesklet);
 	}
-	/*else if (pDesklet->renderer != NULL)  // une fonction de dessin specifique a ete fournie.
-	{
-		pDesklet->renderer (pCairoContext, pDesklet);
-		cairo_destroy (pCairoContext);
-	}
-	else if (pDesklet->pIcon != NULL)  // sinon par defaut on dessine l'icone dans le desklet.
-	{
-		Icon *pIcon = pDesklet->pIcon;
-		cairo_translate (pCairoContext, pIcon->fDrawX, pIcon->fDrawY);
-
-		if (pIcon->pIconBuffer != NULL)
-		{
-			//cd_debug ("  dessin de l'icone (%.2fx%.2f)", pIcon->fWidth, pIcon->fHeight);
-			//cairo_translate (pCairoContext, g_iDockRadius, g_iDockRadius);
-			cairo_set_source_surface (pCairoContext, pIcon->pIconBuffer, 0.0, 0.0);
-			cairo_paint (pCairoContext);
-		}
-		if (pIcon->pQuickInfoBuffer != NULL)
-		{
-			//cd_debug ("  dessin de l'info-rapide (%dx%d)", pIcon->iQuickInfoWidth, pIcon->iQuickInfoHeight);
-			cairo_translate (pCairoContext,
-				//-icon->fQuickInfoXOffset + icon->fWidth / 2,
-				//icon->fHeight - icon->fQuickInfoYOffset);
-				(- pIcon->iQuickInfoWidth + pIcon->fWidth) / 2 * pIcon->fScale,
-				(pIcon->fHeight - pIcon->iQuickInfoHeight) * pIcon->fScale);
-
-			cairo_set_source_surface (pCairoContext,
-				pIcon->pQuickInfoBuffer,
-				0,
-				0);
-			cairo_paint (pCairoContext);
-		}
-		cairo_destroy (pCairoContext);
-	}*/
 	
 	cairo_destroy (pCairoContext);
 	return FALSE;
@@ -185,8 +151,8 @@ static gboolean _cairo_dock_write_desklet_position (CairoDockDesklet *pDesklet)
 	return FALSE;
 }
 static gboolean on_configure_desklet (GtkWidget* pWidget,
-                                      GdkEventConfigure* pEvent,
-                                      CairoDockDesklet *pDesklet)
+	GdkEventConfigure* pEvent,
+	CairoDockDesklet *pDesklet)
 {
 	//cd_debug ("%s (%dx%d ; %d,%d)", __func__, pEvent->width, pEvent->height, (int) pEvent->x, (int) pEvent->y);
 	if (pDesklet->iWidth != pEvent->width || pDesklet->iHeight != pEvent->height)

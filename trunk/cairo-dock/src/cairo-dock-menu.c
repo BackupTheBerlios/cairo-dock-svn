@@ -82,6 +82,28 @@ static void cairo_dock_initiate_theme_management (GtkMenuItem *menu_item, gpoint
 	} while (bRefreshGUI);
 }
 
+
+static void _cairo_dock_add_about_page (GtkWidget *pNoteBook, const gchar *cPageLabel, const gchar *cAboutText)
+{
+	GtkWidget *pVBox, *pScrolledWindow;
+	GtkWidget *pPageLabel, *pAboutLabel;
+	
+	pPageLabel = gtk_label_new (cPageLabel);
+	pVBox = gtk_vbox_new (FALSE, 0);
+	pScrolledWindow = gtk_scrolled_window_new (NULL, NULL);
+	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (pScrolledWindow), GTK_POLICY_AUTOMATIC, GTK_POLICY_NEVER);
+	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (pScrolledWindow), pVBox);
+	gtk_notebook_append_page (GTK_NOTEBOOK (pNoteBook), pScrolledWindow, pPageLabel);
+	
+	pAboutLabel = gtk_label_new (NULL);
+	gtk_label_set_use_markup (GTK_LABEL (pAboutLabel), TRUE);
+	gtk_box_pack_start (GTK_BOX (pVBox),
+		pAboutLabel,
+		FALSE,
+		FALSE,
+		0);
+	gtk_label_set_markup (GTK_LABEL (pAboutLabel), cAboutText);
+}
 static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
@@ -93,28 +115,33 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 		GTK_BUTTONS_CLOSE,
 		cTitle);
 	g_free (cTitle);
-
+	
 	gchar *cImagePath = g_strdup_printf ("%s/cairo-dock.svg", CAIRO_DOCK_SHARE_DATA_DIR);
 	GtkWidget *pImage = gtk_image_new_from_file (cImagePath);
 	g_free (cImagePath);
 #if GTK_MINOR_VERSION >= 12
 	gtk_message_dialog_set_image (GTK_MESSAGE_DIALOG (pDialog), pImage);
 #endif
-	GtkWidget *pLabel = gtk_label_new (NULL);
-	gtk_label_set_use_markup (GTK_LABEL (pLabel), TRUE);
-	gchar *cAboutText = g_strdup_printf ("<b>Original idea/first development :</b>\n  Mac Slow\n\
-<b>Main developer :</b>\n  Fabounet (Fabrice Rey)\n\
+	GtkWidget *pNoteBook = gtk_notebook_new ();
+	gtk_notebook_set_scrollable (GTK_NOTEBOOK (pNoteBook), TRUE);
+	gtk_notebook_popup_enable (GTK_NOTEBOOK (pNoteBook));
+	gtk_container_add (GTK_CONTAINER (GTK_DIALOG(pDialog)->vbox), pNoteBook);
+	
+	_cairo_dock_add_about_page (pNoteBook,
+		_("Development"),
+		"<b>Main developer :</b>\n  Fabounet (Fabrice Rey)\n\
+<b>Original idea/first development :</b>\n  Mac Slow\n\
 <b>Applets :</b>\n  Fabounet\n  Necropotame\n  Ctaf\n\
 <b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole\n  Glattering\n  Vilraleur\n  Lord Northam\n\
 <b>Patchs :</b>\n  Robrob\n  Tshirtman\n  Ctaf\n\
-<b>Translations :</b>\n  Fabounet\n  Ppmt \n  Jiro Kawada\n\
-<b>Installation scripts and repository :</b>\n  Mav\n\
+<b>Translations :</b>\n  Fabounet\n  Ppmt \n  Jiro Kawada");
+	
+	_cairo_dock_add_about_page (pNoteBook,
+		_("Support"),
+		"<b>Installation scripts and repository :</b>\n  Mav\n\
 <b>Site (cairo-dock.org) :</b>\n  Tdey\n  Necropotame\n\
 <b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Mav\n  Necropotame\n  Nochka85\n  Ppmt\n  Sombrero\n  Vilraleur");
-	gtk_label_set_markup (GTK_LABEL (pLabel), cAboutText);
-	g_free (cAboutText);
-	gtk_container_add (GTK_CONTAINER (GTK_DIALOG (pDialog)->vbox), pLabel);
-
+	
 	gtk_widget_show_all (pDialog);
 	gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER_ALWAYS);  // un GTK_WIN_POS_CENTER simple ne marche pas, probablement parceque la fenetre n'est pas encore realisee. le 'always' ne pose pas de probleme, puisqu'on ne peut pas redimensionner le dialogue.
 	gtk_dialog_run (GTK_DIALOG (pDialog));
@@ -129,10 +156,10 @@ static void cairo_dock_update (GtkMenuItem *menu_item, gpointer *data)
 static void cairo_dock_help (GtkMenuItem *menu_item, gpointer *data)
 {
 	GError *erreur = NULL;
-	g_spawn_command_line_async ("firefox http://doc.ubuntu-fr.org/cairo-dock", &erreur);
+	g_spawn_command_line_async ("firefox http://www.cairo-dock.org", &erreur);
 	if (erreur != NULL)
 	{
-		cd_message ("Attention : %s\n  you can consult the wiki at http://doc.ubuntu-fr.org/cairo-dock\n", erreur->message);
+		cd_message ("Attention : %s\n  you can consult the wiki at http://www.cairo-dock.org\n", erreur->message);
 		g_error_free (erreur);
 	}
 }

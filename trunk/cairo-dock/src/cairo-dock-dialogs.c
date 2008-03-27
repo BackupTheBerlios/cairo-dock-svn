@@ -350,6 +350,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	return FALSE;
 }
 
+
 static gboolean on_configure_dialog (GtkWidget* pWidget,
 	GdkEventConfigure* pEvent,
 	CairoDockDialog *pDialog)
@@ -1069,7 +1070,7 @@ void cairo_dock_place_dialog (CairoDockDialog *pDialog, CairoDockContainer *pCon
 		if (pDialog->iDistanceToDock != iOldDistance)
 		{
 			//g_print ("  On change la taille de la pointe a : %d pixels ( -> %d)\n", pDialog->iDistanceToDock, pDialog->iMessageHeight + pDialog->iInteractiveHeight +pDialog->iButtonsHeight + pDialog->iDistanceToDock);
-			gtk_widget_set (pDialog->pTipWidget, "height-request", pDialog->iDistanceToDock, NULL);
+			gtk_widget_set (pDialog->pTipWidget, "height-request", MAX (0, pDialog->iDistanceToDock), NULL);
 
 			if (iOldDistance == 0 || pDialog->iDistanceToDock < iOldDistance)
 			{

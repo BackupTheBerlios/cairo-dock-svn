@@ -148,8 +148,7 @@ void cairo_dock_set_desklet_renderer (CairoDockDesklet *pDesklet, CairoDockDeskl
 void cairo_dock_set_desklet_renderer_by_name (CairoDockDesklet *pDesklet, gchar *cRendererName, cairo_t *pSourceContext, gboolean bLoadIcons, gpointer *pConfig)
 {
 	cd_message ("%s (%s, %d)", __func__, cRendererName, bLoadIcons);
-	g_return_if_fail (cRendererName != NULL);
-	CairoDockDeskletRenderer *pRenderer = cairo_dock_get_desklet_renderer (cRendererName);
+	CairoDockDeskletRenderer *pRenderer = (cRendererName != NULL ? cairo_dock_get_desklet_renderer (cRendererName) : NULL);
 	
 	cairo_t *pCairoContext = (pSourceContext != NULL ? pSourceContext : cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDesklet)));
 	

@@ -895,7 +895,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					case 'P' :  // string avec un selecteur de font a cote du GtkEntry.
 					case 'r' :  // string representee par son numero dans une liste de choix.
 					case 'M' :  // string, avec un label pour la description et un bouton configurer (specialement fait pour les modules).
-					case 'K' :  // string avec un selecteur de touche clavier (Merci Ctaf !)
+					case 'k' :  // string avec un selecteur de touche clavier (Merci Ctaf !)
 						//g_print ("  + string (%s)\n", cUsefulComment);
 						pEntry = NULL;
 						pDescriptionLabel = NULL;
@@ -1387,7 +1387,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					case 'v' :  // separateur.
 					break ;
 
-					case 'k' :
+					/*case 'k' :
 						cValue = g_key_file_get_string(pKeyFile, cGroupName, cKeyName, NULL);
 
 						pOneWidget = gtk_entry_new();
@@ -1412,7 +1412,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						g_signal_connect (G_OBJECT (w),
 							"clicked",
 							G_CALLBACK (_cairo_dock_key_grab_clicked),
-							data);
+							data);*/
 
 					break;
 
