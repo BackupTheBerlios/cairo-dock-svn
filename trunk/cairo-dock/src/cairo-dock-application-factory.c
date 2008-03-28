@@ -41,7 +41,6 @@ extern gboolean g_bDemandsAttentionWithDialog;
 extern gboolean g_bDemandsAttentionWithAnimation;
 
 static GHashTable *s_hAppliTable = NULL;  // table des PID connus de cairo-dock (affichees ou non dans le dock).
-static GHashTable *s_hIgnoredAppliTable = NULL;
 static Display *s_XDisplay = NULL;
 static Atom s_aNetWmIcon;
 static Atom s_aNetWmState;
@@ -66,11 +65,6 @@ void cairo_dock_initialize_application_factory (Display *pXDisplay)
 
 	s_hAppliTable = g_hash_table_new_full (g_int_hash,
 		g_int_equal,
-		g_free,
-		NULL);
-	
-	s_hIgnoredAppliTable = g_hash_table_new_full (g_str_hash,
-		g_direct_equal,
 		g_free,
 		NULL);
 	

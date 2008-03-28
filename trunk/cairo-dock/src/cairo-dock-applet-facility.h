@@ -888,6 +888,7 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 */
 #define CD_APPLET_LOAD_SURFACE_FOR_MY_APPLET(cImagePath) cairo_dock_create_surface_for_icon (cImagePath, myDrawContext, myIcon->fWidth * (myDock != NULL ? 1 + g_fAmplitude : 1), myIcon->fHeight* (myDock != NULL ? 1 + g_fAmplitude : 1));
 
+
 //\_________________________________ INCLUDE
 /**
 *Exportation des variables globales de l'applet. A inclure dans chaque .c ou elles sont utilisees (directement ou via les macros).

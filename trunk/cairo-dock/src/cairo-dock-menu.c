@@ -108,7 +108,7 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
-	gchar *cTitle = g_strdup_printf ("\nCairo-Dock (2007)\n version %s", CAIRO_DOCK_VERSION);
+	gchar *cTitle = g_strdup_printf ("\nCairo-Dock (2007-2008)\n version %s", CAIRO_DOCK_VERSION);
 	GtkWidget *pDialog = gtk_message_dialog_new (GTK_WINDOW (pDock->pWidget),
 		GTK_DIALOG_DESTROY_WITH_PARENT,
 		GTK_MESSAGE_INFO,
@@ -131,9 +131,9 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 		_("Development"),
 		"<b>Main developer :</b>\n  Fabounet (Fabrice Rey)\n\
 <b>Original idea/first development :</b>\n  Mac Slow\n\
-<b>Applets :</b>\n  Fabounet\n  Necropotame\n  Ctaf\n\
+<b>Applets :</b>\n  Fabounet\n  Necropotame\n  Ctaf\n  ChAnGFu\
 <b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole\n  Glattering\n  Vilraleur\n  Lord Northam\n\
-<b>Patchs :</b>\n  Robrob\n  Tshirtman\n  Ctaf\n\
+<b>Patchs :</b>\n  Ctaf\n  Robrob\n  Tshirtman\n\
 <b>Translations :</b>\n  Fabounet\n  Ppmt \n  Jiro Kawada");
 	
 	_cairo_dock_add_about_page (pNoteBook,

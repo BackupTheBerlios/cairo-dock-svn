@@ -3,7 +3,7 @@
 export CAIRO_DOCK_DIR=/opt/cairo-dock/trunk
 export CAIRO_DOCK_FAST="0" 
 export BUILD_TAR="0" 
-export UNWANTED_APPLETS="xmms xfce-integration Cairo-Penguin tomboy mail wifi"
+export UNWANTED_APPLETS="xfce-integration tomboy mail netspeed switcher"
 if test "$1" = "-f" -o "$2" = "-f"; then
 	export CAIRO_DOCK_FAST="1"
 fi

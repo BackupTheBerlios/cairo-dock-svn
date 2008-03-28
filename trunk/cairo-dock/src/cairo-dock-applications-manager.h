@@ -51,4 +51,10 @@ void cairo_dock_stop_application_manager (CairoDock *pDock);
 
 gboolean cairo_dock_application_manager_is_running (void);
 
+
+gboolean cairo_dock_inhibate_class (const gchar *cClass);
+gboolean cairo_dock_class_is_inhibited (const gchar *cClass);
+GList *cairo_dock_list_inhibited_existing_appli_by_class (const gchar *cClass);
+void cairo_dock_deinhibate_class (const gchar *cClass);
+
 #endif

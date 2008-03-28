@@ -50,6 +50,7 @@ extern int g_iNbDesktops;
 extern int g_iNbViewportX,g_iNbViewportY ;
 
 static GHashTable *s_hXWindowTable = NULL;  // table des fenetres X affichees dans le dock.
+static GList *s_pInhibitedAppliList = NULL;
 static Display *s_XDisplay = NULL;
 static int s_iSidUpdateAppliList = 0;
 static Atom s_aNetClientList;
@@ -507,7 +508,7 @@ void cairo_dock_get_window_geometry (int Xid, int *iGlobalPositionX, int *iGloba
 	*iGlobalPositionY = y_return;  // idem.
 	*iWidthExtent = width_return;  // idem.
 	*iHeightExtent = height_return;  // idem.
-	g_print ("%s () -> %d;%d %dx%d / %d,%d\n", __func__, x_return, y_return, *iWidthExtent, *iHeightExtent, border_width_return, depth_return);
+	//g_print ("%s () -> %d;%d %dx%d / %d,%d\n", __func__, x_return, y_return, *iWidthExtent, *iHeightExtent, border_width_return, depth_return);
 }
 
 void cairo_dock_get_window_position_on_its_viewport (int Xid, int *iRelativePositionX, int *iRelativePositionY)
@@ -820,6 +821,9 @@ Window *cairo_dock_get_windows_list (gulong *iNbWindows)
 CairoDock *cairo_dock_insert_appli_in_dock (Icon *icon, CairoDock *pMainDock, gboolean bUpdateSize, gboolean bAnimate)
 {
 	//\_________________ On determine dans quel dock l'inserer.
+	if (cairo_dock_class_is_inhibited (icon->cClass))
+		return NULL;
+	
 	CairoDock *pParentDock = cairo_dock_manage_appli_class (icon, pMainDock);
 	g_return_val_if_fail (pParentDock != NULL, NULL);
 
@@ -974,4 +978,85 @@ void cairo_dock_stop_application_manager (CairoDock *pDock)
 gboolean cairo_dock_application_manager_is_running (void)
 {
 	return (s_iSidUpdateAppliList != 0);
+}
+
+
+
+gboolean cairo_dock_inhibate_class (const gchar *cClass)
+{
+	g_return_val_if_fail (cClass != NULL, FALSE);
+	if (cairo_dock_class_is_inhibited (cClass))
+		return FALSE;
+	
+	Icon *pIcon = cairo_dock_get_icon_with_class (g_pMainDock->icons, cClass);  // A FAIRE : chercher dans la table des Xid, et toutes les supprimer.
+	if (pIcon != NULL)
+	{
+		cairo_dock_remove_icon_from_dock (g_pMainDock, pIcon);
+		//cairo_dock_detach_icon_from_dock (pIcon, g_pMainDock, g_bUseSeparator);
+		cairo_dock_blacklist_appli (pIcon->Xid);
+		cairo_dock_free_icon (pIcon);
+	}
+	
+	if (! cairo_dock_is_loading ())
+	{
+		cairo_dock_update_dock_size (g_pMainDock);
+		gtk_widget_queue_draw (g_pMainDock->pWidget);
+	}
+	
+	s_pInhibitedAppliList = g_list_prepend (s_pInhibitedAppliList, g_strdup (cClass));
+	return TRUE;
+}
+
+gboolean cairo_dock_class_is_inhibited (const gchar *cClass)
+{
+	g_return_val_if_fail (cClass != NULL, FALSE);
+	gboolean bIsInhibited = FALSE;
+	GList *pElement;
+	for (pElement = s_pInhibitedAppliList; pElement != NULL; pElement = pElement->next)
+	{
+		if (strcmp (cClass, pElement->data) == 0)
+			return TRUE;
+	}
+	return FALSE;
+}
+
+static void _cairo_dock_list_appli_if_inhibited (Window *Xid, Icon *pIcon, gpointer *data)
+{
+	gchar * cClass = data[0];
+	GList **pList = data[1];
+	if (pIcon != NULL && pIcon->cClass != NULL && strcmp (pIcon->cClass, cClass) == 0)
+	{
+		*pList = g_list_prepend (*pList, pIcon);
+	}
+}
+GList *cairo_dock_list_inhibited_existing_appli_by_class (const gchar *cClass)
+{
+	g_return_val_if_fail (cClass != NULL, NULL);
+	GList *pList = NULL;
+	gpointer data[2] = {cClass, &pList};
+	g_hash_table_foreach (s_hXWindowTable, (GHFunc) _cairo_dock_list_appli_if_inhibited, data);
+	
+	return pList;
+}
+
+void cairo_dock_deinhibate_class (const gchar *cClass)
+{
+	GList *pElement;
+	for (pElement = s_pInhibitedAppliList; pElement != NULL; pElement = pElement->next)
+	{
+		if (strcmp (cClass, pElement->data) == 0)
+		{
+			g_free (pElement->data);
+			s_pInhibitedAppliList = g_list_delete_link (s_pInhibitedAppliList, pElement);
+			break ;
+		}
+	}
+	
+	GList *pList = cairo_dock_list_inhibited_existing_appli_by_class (cClass);
+	Icon *pIcon;
+	for (pElement = pList; pElement != NULL; pElement = pElement->next)
+	{
+		pIcon = pElement->data;
+		cairo_dock_insert_appli_in_dock (pIcon, g_pMainDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON);
+	}
 }
