@@ -41,7 +41,7 @@ reserve space = false
 #{The dock will automatically hide itself outside of the scren when the mouse leaves it and will show a callback zone instead. Place the mouse into this zone will make the dock re-appear.}
 auto-hide = false
 
-#K Keyboard shortcut to show/hide the dock :
+#k Keyboard shortcut to show/hide the dock :
 #{When you press the shortcut, the dock will hide or show itself at the potition of your mouse, thus acting like a menu.}
 raise shortcut = 
 

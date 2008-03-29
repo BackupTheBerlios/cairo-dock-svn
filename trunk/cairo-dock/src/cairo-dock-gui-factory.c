@@ -1277,7 +1277,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								FALSE,
 								0);
 						}
-						else if (iElementType == 'K' && pEntry != NULL)
+						else if (iElementType == 'k' && pEntry != NULL)
 						{
 							GtkWidget *pGrabKeyButton = gtk_button_new_with_label(_("grab"));
 
