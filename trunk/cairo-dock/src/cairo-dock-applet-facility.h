@@ -239,10 +239,13 @@ void init (GKeyFile *pKeyFile, Icon *pIcon, CairoDockContainer *pContainer, gcha
 #define CD_APPLET_STOP_BEGIN \
 void stop (void) \
 {
+
 /**
 *Fin de la fonction d'arret de l'applet.
 */
 #define CD_APPLET_STOP_END \
+	reset_data (); \
+	reset_config (); \
 	myDock = NULL; \
 	myDesklet = NULL; \
 	myContainer = NULL; \
@@ -256,7 +259,6 @@ void stop (void) \
 /**
 *Debut de la fonction de rechargement de l'applet.
 */
-
 #define CD_APPLET_RELOAD_BEGIN \
 gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoDockContainer *pNewContainer) \
 { \
@@ -571,7 +573,7 @@ gboolean CD_APPLET_ON_CLICK (gpointer *data);
 /**
 *Abonne l'applet aux notifications de construction du menu. A effectuer lors de l'init de l'applet.
 */
-#define CD_APPLET_REGISTER_FOR_BUILD_MENU_EVENT cairo_dock_register_notification (CAIRO_DOCK_BUILD_MENU, (CairoDockNotificationFunc) CD_APPLET_ON_BUILD_MENU, CAIRO_DOCK_RUN_AFTER);
+#define CD_APPLET_REGISTER_FOR_BUILD_MENU_EVENT cairo_dock_register_notification (CAIRO_DOCK_BUILD_MENU, (CairoDockNotificationFunc) CD_APPLET_ON_BUILD_MENU, CAIRO_DOCK_RUN_FIRST);
 /**
 *Desabonne l'applet aux notifications de construction du menu. A effectuer lors de l'arret de l'applet.
 */

@@ -66,7 +66,8 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
     return FALSE;
   }
 
-	if (pExpose->area.x > 0 || pExpose->area.y > 0)
+	gboolean bRenderOptimized = (pExpose->area.x > 0 || pExpose->area.y > 0);
+	if (bRenderOptimized)
 	{
 		cairo_rectangle (pCairoContext,
 		pExpose->area.x,
@@ -117,7 +118,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 	if (pDesklet->pRenderer != NULL)  // un moteur de rendu specifique a ete fourni.
 	{
 		if (pDesklet->pRenderer->render != NULL)
-			pDesklet->pRenderer->render (pCairoContext, pDesklet);
+			pDesklet->pRenderer->render (pCairoContext, pDesklet, bRenderOptimized);
 	}
 	
 	cairo_destroy (pCairoContext);
@@ -521,7 +522,7 @@ void cairo_dock_free_desklet (CairoDockDesklet *pDesklet)
 		}
 	}
 	
-	if (pDesklet && pDesklet->icons != NULL)
+	if (pDesklet->icons != NULL)
 	{
 		g_list_foreach (pDesklet->icons, (GFunc) cairo_dock_free_icon, NULL);
 		g_list_free (pDesklet->icons);

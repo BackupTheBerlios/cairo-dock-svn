@@ -591,7 +591,7 @@ struct _CairoDockVFSBackend {
 };
 
 
-typedef void (* CairoDockDeskletRenderFunc) (cairo_t *pCairoContext, CairoDockDesklet *pDesklet);
+typedef void (* CairoDockDeskletRenderFunc) (cairo_t *pCairoContext, CairoDockDesklet *pDesklet, gboolean bRenderOptimized);
 typedef gpointer (* CairoDockDeskletLoadRendererFunc) (CairoDockDesklet *pDesklet, cairo_t *pSourceContext, gpointer *pConfig);
 typedef void (* CairoDockDeskletFreeRendererDataFunc) (CairoDockDesklet *pDesklet);
 typedef void (* CairoDockDeskletLoadIconsFunc) (CairoDockDesklet *pDesklet, cairo_t *pSourceContext);

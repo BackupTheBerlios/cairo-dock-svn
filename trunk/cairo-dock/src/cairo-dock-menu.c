@@ -944,9 +944,6 @@ GtkWidget *cairo_dock_build_menu (Icon *icon, CairoDockContainer *pContainer)
 
 	_add_entry_in_menu (_("Quit"), GTK_STOCK_QUIT, cairo_dock_quit, pSubMenu);
 
-	menu_item = gtk_separator_menu_item_new ();
-	gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
-
 	//\_________________________ On passe la main a ceux qui veulent y rajouter des choses.
 	cairo_dock_notify (CAIRO_DOCK_BUILD_MENU, data);
 
@@ -961,7 +958,10 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	GtkWidget *menu = data[2];
 	GtkWidget *menu_item, *image;
 	static gpointer *pDesktopData = NULL;
-
+	
+	menu_item = gtk_separator_menu_item_new ();
+	gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
+	
 	//\_________________________ On construit un sous-menu pour deplacer l'icone.
 	if (CAIRO_DOCK_IS_DOCK (pContainer) && icon != NULL && ! CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon))
 	{
