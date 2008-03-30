@@ -89,6 +89,7 @@
 #include "cairo-dock-log.h"
 #include "cairo-dock-X-utilities.h"
 #include "cairo-dock-dbus.h"
+#include "cairo-dock-gauge.h"
 
 CairoDock *g_pMainDock;  // pointeur sur le dock principal.
 GHashTable *g_hDocksTable = NULL;  // table des docks existant.

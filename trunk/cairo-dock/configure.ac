@@ -45,5 +45,8 @@ AC_CONFIG_FILES([Makefile
 		data/cairo-dock.conf
 		data/default-theme/Makefile
 		data/default-theme/launchers/Makefile
-		])
+		data/gauges/Makefile
+		data/gauges/radium/Makefile
+		data/gauges/radium-fuel/Makefile
+		data/gauges/battery/Makefile])
 AC_OUTPUT

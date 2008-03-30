@@ -110,7 +110,9 @@ cairo_dock_SOURCES = \
 	cairo-dock-log.c\
 	cairo-dock-log.h\
 	cairo-dock-X-utilities.c\
-	cairo-dock-X-utilities.h
+	cairo-dock-X-utilities.h\
+	cairo-dock-gauge.c\
+	cairo-dock-gauge.h
 
 
 
@@ -155,4 +157,5 @@ cairo_docksubinclude_HEADERS =\
 	cairo-dock-keybinder.h\
 	cairo-dock-desklet.h\
 	cairo-dock-log.h\
-	cairo-dock-X-utilities.h
+	cairo-dock-X-utilities.h\
+	cairo-dock-gauge.h

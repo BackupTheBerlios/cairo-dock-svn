@@ -1,5 +1,5 @@
 
-SUBDIRS = . default-theme
+SUBDIRS = . default-theme gauges
 
 essentialdatadir = $(pkgdatadir)
 
