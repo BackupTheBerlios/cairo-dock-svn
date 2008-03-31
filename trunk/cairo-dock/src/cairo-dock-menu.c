@@ -711,8 +711,21 @@ static void cairo_dock_minimize_appli (GtkMenuItem *menu_item, gpointer *data)
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
 	if (icon->Xid > 0)
+	{
 		cairo_dock_minimize_xwindow (icon->Xid);
+	}
 }
+
+static void _cairo_dock_show_appli (GtkMenuItem *menu_item, gpointer *data)
+{
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
+	if (icon->Xid > 0)
+	{
+		cairo_dock_show_appli (icon->Xid);
+	}
+}
+
 
 static void cairo_dock_maximize_appli (GtkMenuItem *menu_item, gpointer *data)
 {
@@ -963,7 +976,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 	
 	//\_________________________ On construit un sous-menu pour deplacer l'icone.
-	if (CAIRO_DOCK_IS_DOCK (pContainer) && icon != NULL && ! CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon))
+	/*if (CAIRO_DOCK_IS_DOCK (pContainer) && icon != NULL && ! CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon))
 	{
 		menu_item = gtk_image_menu_item_new_with_label (_("Move this icon"));
 
@@ -983,8 +996,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 
 		menu_item = gtk_separator_menu_item_new ();
 		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
-
-	}
+	}*/
 
 	//\_________________________ Si pas d'icone dans un dock, on s'arrete la.
 	if (CAIRO_DOCK_IS_DOCK (pContainer) && (icon == NULL || CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon)))
@@ -1122,6 +1134,8 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		_add_entry_in_menu (bIsMaximized ? _("Unmaximize") : _("Maximize"), GTK_STOCK_GO_UP, cairo_dock_maximize_appli, menu);
 
 		_add_entry_in_menu (_("Minimize"), GTK_STOCK_GO_DOWN, cairo_dock_minimize_appli, menu);
+		
+		_add_entry_in_menu (_("Show"), GTK_STOCK_FIND, _cairo_dock_show_appli, menu);
 
 		_add_entry_in_menu (_("Close"), GTK_STOCK_CLOSE, cairo_dock_close_appli, menu);
 	}

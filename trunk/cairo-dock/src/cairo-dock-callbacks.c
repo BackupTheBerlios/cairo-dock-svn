@@ -343,7 +343,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 
 	if (pPointedIcon != pLastPointedIcon || s_pLastPointedDock == NULL)
 	{
-		cd_message ("on change d'icone (-> %s)\n", (pPointedIcon != NULL ? pPointedIcon->acName : "rien"));
+		//cd_debug ("on change d'icone (-> %s)\n", (pPointedIcon != NULL ? pPointedIcon->acName : "rien"));
 		if (s_iSidShowSubDockDemand != 0)
 		{
 			cd_debug ("on annule la demande de montrage de sous-dock");

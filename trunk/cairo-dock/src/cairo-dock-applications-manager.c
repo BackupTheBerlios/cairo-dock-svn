@@ -1025,9 +1025,10 @@ gboolean cairo_dock_inhibate_class (const gchar *cClass)
 		CairoDockContainer *pContainer = cairo_dock_search_container_from_icon (pIcon);
 		if (CAIRO_DOCK_IS_DOCK (pContainer))
 		{
-			cairo_dock_remove_icon_from_dock (g_pMainDock, pIcon);  // on pourrait aussi choisir de la detacher pour ne pas avoir a la recreer plus tard.
+			/*cairo_dock_remove_icon_from_dock (g_pMainDock, pIcon);  // on pourrait aussi choisir de la detacher pour ne pas avoir a la recreer plus tard.
 			cairo_dock_free_icon (pIcon);
-			pElement->data = NULL;
+			pElement->data = NULL;*/
+			cairo_dock_detach_icon_from_dock (pIcon, CAIRO_DOCK_DOCK (pContainer), g_bUseSeparator);  // on la garde, elle pourra servir car elle contient l'Xid.
 			bNeedsRedraw = (pContainer == g_pMainDock);
 		}
 	}

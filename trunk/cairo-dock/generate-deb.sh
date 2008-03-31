@@ -1,11 +1,11 @@
 #!/bin/sh
 
 export CAIRO_DOCK_DIR=/opt/cairo-dock/trunk
-export CAIRO_DOCK_FAST="0" 
+export FAST_COMPIL="0" 
 export BUILD_TAR="0" 
-export UNWANTED_APPLETS="xfce-integration tomboy mail netspeed switcher"
+export UNSTABLE_APPLETS="xfce-integration tomboy mail netspeed switcher"
 if test "$1" = "-f" -o "$2" = "-f"; then
-	export CAIRO_DOCK_FAST="1"
+	export FAST_COMPIL="1"
 fi
 if test "$1" = "-t" -o "$2" = "-t"; then
 	export BUILD_TAR="1"
@@ -50,7 +50,7 @@ fi
 
 #\_____________ On compile de zero.
 cd ../cairo-dock
-if test "$CAIRO_DOCK_FAST" = "1"; then
+if test "$FAST_COMPIL" = "1"; then
 	./compile-all.sh -C -i
 else
 	./compile-all.sh -a -C -i -t
@@ -66,6 +66,7 @@ sudo mkdir usr/share/applications
 sudo mkdir usr/share/pixmaps
 for lang in `cat ../cairo-dock/po/LINGUAS`; do
 	sudo mkdir -p usr/share/locale/$lang/LC_MESSAGES
+	sudo cp /usr/share/locale/$lang/LC_MESSAGES/cairo-dock.mo usr/share/locale/$lang/LC_MESSAGES
 done;
 
 sudo cp /usr/bin/cairo-dock usr/bin
@@ -85,12 +86,10 @@ cd deb-plug-ins
 sudo mkdir -p usr/share/cairo-dock
 for lang in `cat ../cairo-dock/po/LINGUAS`; do
 	sudo mkdir -p usr/share/locale/$lang/LC_MESSAGES
-done;
-for lang in `cat ../cairo-dock/po/LINGUAS`; do
-        sudo cp /usr/share/locale/$lang/LC_MESSAGES/cd-*.mo usr/share/locale/$lang/LC_MESSAGES
+	sudo cp /usr/share/locale/$lang/LC_MESSAGES/cd-*.mo usr/share/locale/$lang/LC_MESSAGES
 done;
 sudo cp -r /usr/share/cairo-dock/plug-in usr/share/cairo-dock
-for applet in $UNWANTED_APPLETS; do
+for applet in $UNSTABLE_APPLETS; do
 	sudo rm -f "usr/share/cairo-dock/plug-in/libcd-$applet.so"
 	sudo rm -rf "usr/share/cairo-dock/plug-in/$applet"
 done;

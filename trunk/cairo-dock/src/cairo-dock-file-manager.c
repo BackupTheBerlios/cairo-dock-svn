@@ -222,7 +222,7 @@ gboolean cairo_dock_fm_setup_time (void)
 
 Icon *cairo_dock_fm_create_icon_from_URI (const gchar *cURI, CairoDock *pDock)
 {
-	if (s_pVFSBackend == NULL)
+	if (s_pVFSBackend == NULL || s_pVFSBackend->get_file_info == NULL)
 		return NULL;
 	Icon *pNewIcon = g_new0 (Icon, 1);
 	pNewIcon->iType = CAIRO_DOCK_LAUNCHER;
@@ -351,6 +351,10 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 			else if (pIcon->pSubDock != NULL)
 			{
 				pConcernedIcon = cairo_dock_get_icon_with_base_uri (pIcon->pSubDock->icons, cURI);
+				if (pConcernedIcon == NULL)  // on cherche par nom.
+				{
+					pConcernedIcon = cairo_dock_get_icon_with_name (pIcon->pSubDock->icons, cURI);
+				}
 				if (pConcernedIcon == NULL)
 					return ;
 				pParentDock = pIcon->pSubDock;
@@ -385,6 +389,20 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 
 				cairo_dock_insert_icon_in_dock (pNewIcon, pIcon->pSubDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, ! CAIRO_DOCK_INSERT_SEPARATOR);
 				cd_message ("  %s a ete insere(e)", (pNewIcon != NULL ? pNewIcon->acName : "aucune icone n'"));
+				
+				if (pNewIcon->iVolumeID > 0)
+				{
+					gboolean bIsMounted;
+					gchar *cUri = cairo_dock_fm_is_mounted (pNewIcon->cBaseURI, &bIsMounted);
+					g_free (cUri);
+					if (bIsMounted)
+					{
+						g_print (" >>> MONTE !\n");
+						gchar *cMessage = g_strdup_printf (_("%s is now %s"), pNewIcon->acName, _("mounted"));
+						cairo_dock_show_temporary_dialog (cMessage, pNewIcon, pIcon->pSubDock, 4000);
+						g_free (cMessage);
+					}
+				}
 			}
 		}
 		break ;
@@ -403,6 +421,10 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 			{
 				pConcernedIcon = cairo_dock_get_icon_with_base_uri (pIcon->pSubDock->icons, cURI);
 				g_print ("cURI : %s\n", cURI);
+				if (pConcernedIcon == NULL)  // on cherche par nom.
+				{
+					pConcernedIcon = cairo_dock_get_icon_with_name (pIcon->pSubDock->icons, cURI);
+				}
 				g_return_if_fail (pConcernedIcon != NULL);
 				pParentDock = pIcon->pSubDock;
 			}
@@ -417,6 +439,7 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 			
 			if (pNewIcon != NULL && pNewIcon != pConcernedIcon && pNewIcon->iVolumeID > 0)
 			{
+				cd_message ("ce volume a change\n");
 				gboolean bIsMounted = FALSE;
 				if (s_pVFSBackend->is_mounted != NULL)
 				{
@@ -441,11 +464,9 @@ void cairo_dock_fm_action_on_file_event (CairoDockFMEventType iEventType, const 
 void cairo_dock_fm_action_after_mounting (gboolean bMounting, gboolean bSuccess, const gchar *cName, Icon *icon, CairoDock *pDock)
 {
 	cd_message ("%s (%s) : %d\n", __func__, (bMounting ? "mount" : "unmount"), bSuccess);  // en cas de demontage effectif, l'icone n'est plus valide !
-
-	gchar *cMessage;
-	if (! bSuccess && pDock != NULL)  // dans l'autre cas (succes), l'icone peut ne plus etre valide ! mais on s'en fout, puisqu'en cas de succes, il y'aura rechargement de l'icone, et donc on pourra balancer le message a ce moment-la.
+	if ((! bSuccess && pDock != NULL) || icon == NULL)  // dans l'autre cas (succes), l'icone peut ne plus etre valide ! mais on s'en fout, puisqu'en cas de succes, il y'aura rechargement de l'icone, et donc on pourra balancer le message a ce moment-la.
 	{
-		cMessage = g_strdup_printf (_("failed to %s %s"), (bMounting ? _("mount") : _("unmount")), cName);
+		gchar *cMessage = g_strdup_printf (_("failed to %s %s"), (bMounting ? _("mount") : _("unmount")), cName);
 		if (icon != NULL)
 			cairo_dock_show_temporary_dialog (cMessage, icon, pDock, 4000);
 		else
@@ -453,12 +474,6 @@ void cairo_dock_fm_action_after_mounting (gboolean bMounting, gboolean bSuccess,
 			cairo_dock_show_general_message (cMessage, 4000);
 		}
 
-		g_free (cMessage);
-	}
-	else if (icon == NULL)
-	{
-		cMessage = g_strdup_printf (_("failed to %s %s"), (bMounting ? _("mount") : _("unmount")), cName);
-		cairo_dock_show_general_message (cMessage, 4000);
 		g_free (cMessage);
 	}
 }

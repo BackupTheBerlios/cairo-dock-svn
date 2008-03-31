@@ -197,6 +197,9 @@ Icon *cairo_dock_get_icon_with_command (GList *pIconList, gchar *cCommand);
 *@return la 1ere icone ayant le champ 'cBaseURI' identique a l'URI fournie, ou NULL si aucune icone ne correspond.
 */
 Icon *cairo_dock_get_icon_with_base_uri (GList *pIconList, const gchar *cBaseURI);
+
+Icon *cairo_dock_get_icon_with_name (GList *pIconList, const gchar *cName);
+
 /**
 *Cherche l'icone pointant sur un sous-dock donne parmi une liste d'icones.
 *@param pIconList la liste d'icones.

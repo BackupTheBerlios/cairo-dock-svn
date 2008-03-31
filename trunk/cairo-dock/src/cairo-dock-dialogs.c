@@ -355,7 +355,7 @@ static gboolean on_configure_dialog (GtkWidget* pWidget,
 	GdkEventConfigure* pEvent,
 	CairoDockDialog *pDialog)
 {
-	cd_message ("%s (%dx%d)", __func__, pEvent->width, pEvent->height);
+	//cd_message ("%s (%dx%d)", __func__, pEvent->width, pEvent->height);
 	if (! cairo_dock_dialog_reference (pDialog))
 		return FALSE;
 

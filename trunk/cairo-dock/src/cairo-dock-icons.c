@@ -378,6 +378,20 @@ Icon *cairo_dock_get_icon_with_base_uri (GList *pIconList, const gchar *cBaseURI
 	return NULL;
 }
 
+Icon *cairo_dock_get_icon_with_name (GList *pIconList, const gchar *cName)
+{
+	g_return_val_if_fail (cName != NULL, NULL);
+	GList* ic;
+	Icon *icon;
+	for (ic = pIconList; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (icon->acName != NULL && strcmp (icon->acName, cName) == 0)
+			return icon;
+	}
+	return NULL;
+}
+
 Icon *cairo_dock_get_icon_with_subdock (GList *pIconList, CairoDock *pSubDock)
 {
 	GList* ic;
