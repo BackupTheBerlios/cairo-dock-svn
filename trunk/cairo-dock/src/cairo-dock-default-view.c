@@ -289,6 +289,16 @@ void cairo_dock_render_optimized_linear (CairoDock *pDock, GdkRectangle *pArea)
 			{
 				cairo_save (pCairoContext);
 				//g_print ("dessin optimise de %s\n", icon->acName);
+				
+				if (icon->fDrawX >= 0 && icon->fDrawX + icon->fWidth * icon->fScale <= pDock->iCurrentWidth)
+				{
+					icon->fAlpha = 1;
+				}
+				else
+				{
+					icon->fAlpha = .25;
+				}
+				
 				cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect, TRUE, pDock->iCurrentWidth);
 				cairo_restore (pCairoContext);
 			}
