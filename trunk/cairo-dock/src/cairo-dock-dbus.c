@@ -13,6 +13,9 @@ Written by Adrien Pilleboue (for any bug report, please mail me to adrien.pilleb
 #include "cairo-dock-dbus-spec.h"
 #include "cairo-dock-dbus.h"
 
+static DBusGConnection *s_pDBusConnexion = NULL;
+static DBusGProxy *s_pDBusProxy = NULL;
+
 extern gchar *g_cConfFile;
 extern CairoDock *g_pMainDock;
 
@@ -24,21 +27,26 @@ G_DEFINE_TYPE(dbusCallback, cd_dbus_callback, G_TYPE_OBJECT);
 void cd_dbus_callback_class_init(dbusCallbackClass *class)
 {
 	// Nothing here
+	cd_message("");
 }
 
 void cd_dbus_callback_init(dbusCallback *server)
 {
-	GError *error = NULL;
-	DBusGProxy *driver_proxy;
-	int request_ret;
+	g_return_if_fail (s_pDBusConnexion == NULL);
 	
 	// Initialise the DBus connection
-	server->connection = dbus_g_bus_get(DBUS_BUS_SESSION, &error);
-	if (server->connection == NULL) {
-		cd_warning("Unable to connect to dbus: %s", error->message);
-		g_error_free(error);
-		return;
+	cd_message ("Connexion au bus ... ");
+	GError *erreur = NULL;
+	s_pDBusConnexion = dbus_g_bus_get (DBUS_BUS_SESSION, &erreur);
+	if (erreur != NULL)
+	{
+		cd_warning ("Attention : %s\n", erreur->message);
+		g_error_free (erreur);
+		s_pDBusConnexion = NULL;
 	}
+	if (s_pDBusConnexion == NULL)
+		return ;
+	server->connection = s_pDBusConnexion;
 	
 	dbus_g_object_type_install_info(cd_dbus_callback_get_type(), &dbus_glib_cd_dbus_callback_object_info);
 	
@@ -46,22 +54,26 @@ void cd_dbus_callback_init(dbusCallback *server)
 	dbus_g_connection_register_g_object(server->connection, "/org/cairodock/CairoDock", G_OBJECT(server));
 
 	// Register the service name, the constants here are defined in dbus-glib-bindings.h
-	driver_proxy = dbus_g_proxy_new_for_name(server->connection, DBUS_SERVICE_DBUS, DBUS_PATH_DBUS, DBUS_INTERFACE_DBUS);
+	s_pDBusProxy = dbus_g_proxy_new_for_name(server->connection,
+		DBUS_SERVICE_DBUS,
+		DBUS_PATH_DBUS,
+		DBUS_INTERFACE_DBUS);
 
-	if (!org_freedesktop_DBus_request_name (driver_proxy, "org.cairodock.CairoDock", 0, &request_ret, &error)) {
-		cd_warning("Unable to register service: %s", error->message);
-		g_error_free(error);
+	int request_ret;
+	if (!org_freedesktop_DBus_request_name (s_pDBusProxy, "org.cairodock.CairoDock", 0, &request_ret, &erreur))
+	{
+		cd_warning ("Unable to register service: %s", erreur->message);
+		g_error_free (erreur);
 	}
-	
-	g_object_unref(driver_proxy);
 }
 
 
 static gpointer _cairo_dock_threaded_dbus_init (gpointer data)
 {
+	cd_message("");
 	GError *erreur = NULL;
 	
-	dbusCallback *server = g_object_new(cd_dbus_callback_get_type(), NULL);
+	dbusCallback *server = g_object_new(cd_dbus_callback_get_type(), NULL);  // -> appelle cd_dbus_callback_class_init() et cd_dbus_callback_init().
 	
 	cd_message ("*** fin du thread dbus");
 	return NULL;
@@ -81,7 +93,7 @@ void cd_dbus_init(void)
 		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
 	}*/
-	_cairo_dock_threaded_dbus_init (NULL);  // utile de le threader ? des fois j'ai l'impression que l'init prend du temps.
+	_cairo_dock_threaded_dbus_init (NULL);  // est-ce utile de le threader ? des fois j'ai l'impression que l'init prend du temps...
 }
 
 gboolean cd_dbus_callback_hello(dbusCallback *pDbusCallback, GError **error)
@@ -116,4 +128,52 @@ gboolean cd_dbus_callback_reboot(dbusCallback *pDbusCallback, GError **error)
 {
 	cairo_dock_read_conf_file (g_cConfFile,g_pMainDock);
 	return TRUE;
+}
+
+
+
+gboolean cairo_dock_bdus_is_enabled (void)
+{
+	return (s_pDBusConnexion != NULL);
+}
+
+DBusGProxy *cairo_dock_create_new_dbus_proxy (const char *name, const char *path, const char *interface)
+{
+	if (s_pDBusConnexion)
+		return dbus_g_proxy_new_for_name (
+			s_pDBusConnexion,
+			name,
+			path,
+			interface);
+	else
+		return NULL;
+}
+
+gboolean cairo_dock_dbus_detect_application (const gchar *cName)
+{
+	cd_message ("");
+	if (! s_pDBusConnexion)
+		return FALSE;
+	
+	gchar **name_list = NULL;
+	gboolean bPresent = FALSE;
+	if(dbus_g_proxy_call (s_pDBusProxy, "ListNames", NULL,
+		G_TYPE_INVALID,
+		G_TYPE_STRV,
+		&name_list,
+		G_TYPE_INVALID))
+	{
+		cd_message ("detection du service %s ...", cName);
+		int i;
+		for (i = 0; name_list[i] != NULL; i ++)
+		{
+			if (strcmp (name_list[i], cName) == 0)
+			{
+				bPresent = TRUE;
+				break;
+			}
+		}
+	}
+	g_strfreev (name_list);
+	return bPresent;
 }

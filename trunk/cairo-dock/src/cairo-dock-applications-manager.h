@@ -53,8 +53,10 @@ gboolean cairo_dock_application_manager_is_running (void);
 
 
 GList *cairo_dock_list_existing_appli_with_class (const gchar *cClass);
-gboolean cairo_dock_inhibate_class (const gchar *cClass);
+gboolean cairo_dock_inhibate_class (const gchar *cClass, Icon *pInhibatorIcon);
 gboolean cairo_dock_class_is_inhibited (const gchar *cClass);
-void cairo_dock_deinhibate_class (const gchar *cClass);
+gboolean cairo_dock_prevent_inhibated_class (Icon *pIcon);
+void cairo_dock_deinhibate_class (const gchar *cClass, Icon *pInhibatorIcon);
+void cairo_dock_udpate_Xid_on_inhibators (Window Xid, const gchar *cClass);
 
 #endif

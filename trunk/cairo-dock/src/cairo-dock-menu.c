@@ -972,12 +972,13 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	GtkWidget *menu_item, *image;
 	static gpointer *pDesktopData = NULL;
 	
-	menu_item = gtk_separator_menu_item_new ();
-	gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 	
 	//\_________________________ On construit un sous-menu pour deplacer l'icone.
 	/*if (CAIRO_DOCK_IS_DOCK (pContainer) && icon != NULL && ! CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon))
 	{
+		menu_item = gtk_separator_menu_item_new ();
+		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
+		
 		menu_item = gtk_image_menu_item_new_with_label (_("Move this icon"));
 
 		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
@@ -1132,16 +1133,20 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 
 		gboolean bIsMaximized = cairo_dock_window_is_maximized (icon->Xid);
 		_add_entry_in_menu (bIsMaximized ? _("Unmaximize") : _("Maximize"), GTK_STOCK_GO_UP, cairo_dock_maximize_appli, menu);
-
-		_add_entry_in_menu (_("Minimize"), GTK_STOCK_GO_DOWN, cairo_dock_minimize_appli, menu);
 		
 		_add_entry_in_menu (_("Show"), GTK_STOCK_FIND, _cairo_dock_show_appli, menu);
 
+		_add_entry_in_menu (_("Minimize"), GTK_STOCK_GO_DOWN, cairo_dock_minimize_appli, menu);
+
 		_add_entry_in_menu (_("Close"), GTK_STOCK_CLOSE, cairo_dock_close_appli, menu);
 	}
-	else if (CAIRO_DOCK_IS_VALID_APPLET (icon) || CAIRO_DOCK_IS_DESKLET (pContainer))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module.
+	
+	if (CAIRO_DOCK_IS_VALID_APPLET (icon) || CAIRO_DOCK_IS_DESKLET (pContainer))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module.
 	{
 		//\_________________________ On rajoute les actions propres a un module.
+		menu_item = gtk_separator_menu_item_new ();
+		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+		
 		_add_entry_in_menu (_("Configure this module"), GTK_STOCK_PROPERTIES, cairo_dock_initiate_config_module, menu);
 
 		if ((CAIRO_DOCK_IS_VALID_APPLET (icon) && icon->pModule->bCanDetach) || (CAIRO_DOCK_IS_DESKLET (pContainer) && CAIRO_DOCK_DESKLET (pContainer)->pIcon->pModule->bCanDetach))

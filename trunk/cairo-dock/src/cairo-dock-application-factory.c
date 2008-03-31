@@ -246,11 +246,10 @@ CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
 {
 	cd_message ("%s (%s)\n", __func__, icon->acName);
 	CairoDock *pParentDock = pMainDock;
+	g_free (icon->cParentDockName);
 	if (CAIRO_DOCK_IS_APPLI (icon) && g_bGroupAppliByClass && icon->cClass != NULL)
 	{
 		Icon *pSameClassIcon = cairo_dock_get_icon_with_class (pMainDock->icons, icon->cClass);
-		g_free (icon->cParentDockName);
-		icon->cParentDockName = NULL;
 		if (pSameClassIcon == NULL || pSameClassIcon == icon)
 		{
 			cd_message ("  classe %s encore vide\n", icon->cClass);
@@ -409,7 +408,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	gchar *cClass = NULL;
 	if (XGetClassHint (s_XDisplay, Xid, pClassHint) != 0)
 	{
-		g_print ("  res_name : %s(%x); res_class : %s(%x)", pClassHint->res_name, pClassHint->res_name, pClassHint->res_class, pClassHint->res_class);
+		cd_debug ("  res_name : %s(%x); res_class : %s(%x)", pClassHint->res_name, pClassHint->res_name, pClassHint->res_class, pClassHint->res_class);
 		cClass = g_ascii_strdown (pClassHint->res_class, -1);  // on la passe en minuscule, car certaines applis ont la bonne idee de donner des classes avec une majuscule ou non suivant les fenetres. Il reste le cas des aplis telles que Glade2 ('Glade' et 'Glade-2' ...)
 		XFree (pClassHint->res_name);
 		XFree (pClassHint->res_class);
@@ -440,7 +439,6 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	icon->cClass = cClass;
 
 	///cairo_dock_manage_appli_class (icon, pDock);
-	icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
 
 	cairo_dock_set_window_mask (Xid, PropertyChangeMask | StructureNotifyMask);
 
@@ -496,7 +494,7 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 			{
 				if (iState == PropertyNewValue)
 				{
-					cd_message ("%s vous interpelle !\n", icon->acName);
+					cd_message ("%s vous interpelle !", icon->acName);
 					if (g_bDemandsAttentionWithDialog)
 						cairo_dock_show_temporary_dialog (icon->acName, icon, pDock, 2000);
 					if (g_bDemandsAttentionWithAnimation)
@@ -507,14 +505,14 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 				}
 				else if (iState == PropertyDelete)
 				{
-					cd_message ("%s arrette de vous interpeler.\n", icon->acName);
+					cd_message ("%s arrette de vous interpeler.", icon->acName);
 					if (g_bDemandsAttentionWithDialog)
 						cairo_dock_remove_dialog_if_any (icon);
 					if (g_bDemandsAttentionWithAnimation)
 						cairo_dock_arm_animation (icon, -1, 0);  // arrete son animation quelqu'elle soit.
 				}
 				else
-					cd_message ("  etat du changement inconnu !\n");
+					cd_message ("  etat du changement inconnu !");
 			}
 			if (iState == PropertyNewValue && (pWMHints->flags & (IconPixmapHint | IconMaskHint | IconWindowHint)))
 			{

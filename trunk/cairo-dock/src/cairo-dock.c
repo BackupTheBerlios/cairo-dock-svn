@@ -464,6 +464,9 @@ main (int argc, char** argv)
 	//\___________________ On initialise le support de X.
 	cairo_dock_initialize_X_support ();
 	
+	//\___________________ On initialise le support de DBus.
+	cd_dbus_init();
+	
 	//\___________________ On detecte l'environnement de bureau (apres les applis et avant les modules).
 	if (g_iDesktopEnv == CAIRO_DOCK_UNKNOWN_ENV)
 		g_iDesktopEnv = cairo_dock_guess_environment ();
@@ -479,7 +482,6 @@ main (int argc, char** argv)
 	cairo_dock_register_notification (CAIRO_DOCK_CLICK_ICON, (CairoDockNotificationFunc) cairo_dock_notification_click_icon, CAIRO_DOCK_RUN_AFTER);
 	cairo_dock_register_notification (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) cairo_dock_notification_middle_click_icon, CAIRO_DOCK_RUN_AFTER);
 	cairo_dock_register_notification (CAIRO_DOCK_REMOVE_ICON, (CairoDockNotificationFunc) cairo_dock_notification_remove_icon, CAIRO_DOCK_RUN_AFTER);
-	
 	
 	//\___________________ On charge le dernier theme ou on demande a l'utilisateur d'en choisir un.
 	g_cConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
@@ -497,7 +499,6 @@ main (int argc, char** argv)
 	}
 
 	cairo_dock_load_theme (g_cCurrentThemePath);
-
 
 	//\___________________ On affiche le changelog en cas de nouvelle version.
 	gchar *cLastVersionFilePath = g_strdup_printf ("%s/.cairo-dock-last-version", g_cCairoDockDataDir);
@@ -575,8 +576,8 @@ main (int argc, char** argv)
 	//const gchar *cSillyMessage = "Sondage :\nVoulez-vous voir plus de filles nues dans Cairo-Dock ?";
 	//const gchar *cSillyMessage = "C'est les soldes !\n Pour tout sous-dock acheté, un sous-dock offert !";
 	//const gchar *cSillyMessage = "J-2 avant la 1.5, la tension monte !";
-	const gchar *cSillyMessage = NULL;
-	const gchar *cNumSilllyMessage = "14";
+	const gchar *cSillyMessage = "Cairo-Dock : sans danger si l'on se conforme au mode d'emploi.";
+	const gchar *cNumSilllyMessage = "15";
 	gboolean bWriteSillyMessage;
 	if (! g_file_test (cSillyMessageFilePath, G_FILE_TEST_EXISTS))
 	{
@@ -625,8 +626,6 @@ main (int argc, char** argv)
 		cd_message (" ==> %.2f\n", fAnswer);*/
 	}
 	
-	cd_dbus_init();
-	
 	gtk_main ();
 
 	rsvg_term ();
@@ -636,4 +635,3 @@ main (int argc, char** argv)
 
 	return 0;
 }
-

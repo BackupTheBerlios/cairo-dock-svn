@@ -576,10 +576,10 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 
 
 
-void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bCheckUnusedSeparator)
+gboolean cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bCheckUnusedSeparator)
 {
 	if (g_list_find (pDock->icons, icon) == NULL)  // elle est deja detachee.
-		return ;
+		return FALSE;
 
 	//\___________________ On efface son eventuel dialogue, puisqu'elle n'appartiendra bientot plus a aucun dock.
 	///cairo_dock_remove_dialog_if_any (icon);
@@ -600,6 +600,7 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 				cairo_dock_detach_icon_from_dock (pSameClassIcon, pClassSubDock, FALSE);  // inutile de verifier si un separateur est present.
 
 				pSameClassIcon->fOrder = icon->fOrder;
+				g_free (pSameClassIcon->cParentDockName);
 				pSameClassIcon->cParentDockName = g_strdup (cairo_dock_search_dock_name (pDock));
 				cairo_dock_insert_icon_in_dock (pSameClassIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, ! CAIRO_DOCK_INSERT_SEPARATOR);
 
@@ -624,6 +625,8 @@ void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bC
 			if (pPointingIcon != NULL)
 				pPointingIcon->pSubDock = NULL;
 		}
+		g_free (icon->cParentDockName);
+		icon->cParentDockName = NULL;
 	}
 
 	//\___________________ On l'enleve de la liste.
@@ -703,19 +706,15 @@ static void _cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon,
 			cairo_dock_fm_remove_monitor (icon);
 		}
 	}
-	else if (CAIRO_DOCK_IS_VALID_APPLI (icon))
+	if (CAIRO_DOCK_IS_VALID_APPLI (icon))
 	{
 		cairo_dock_unregister_appli (icon);
 	}
-	else if (CAIRO_DOCK_IS_VALID_APPLET (icon))
+	if (CAIRO_DOCK_IS_VALID_APPLET (icon))
 	{
 		cairo_dock_deactivate_module (icon->pModule);  // desactive le module mais ne le ferme pas.
 		icon->pModule = NULL;  // pour ne pas le liberer lors du free_icon.
-	}
-	else
-	{
-		cd_message ("automatic separator : nothing to do");
-	}
+	}  // rien a faire pour les separateurs automatiques.
 
 	//\___________________ On detache l'icone du dock.
 	cairo_dock_detach_icon_from_dock (icon, pDock, bCheckUnusedSeparator);

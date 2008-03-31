@@ -21,13 +21,6 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 
 void cairo_dock_deactivate_old_modules (double fTime);
 
-/*void cairo_dock_update_conf_file_with_available_modules_full (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cGroupName, gchar *cKeyName);
-#define cairo_dock_update_conf_file_with_available_modules(pOpenedKeyFile, cConfFile) cairo_dock_update_conf_file_with_available_modules_full (pOpenedKeyFile, cConfFile, "Applets", "active modules")
-#define cairo_dock_update_easy_conf_file_with_available_modules(pOpenedKeyFile, cConfFile) cairo_dock_update_conf_file_with_available_modules_full (pOpenedKeyFile, cConfFile, "System", "active modules")
-
-void cairo_dock_update_conf_file_with_active_modules (GKeyFile *pOpenedKeyFile, gchar *cConfFile, GList *pIconList);*/
-
-
 
 void cairo_dock_free_module (CairoDockModule *module);
 

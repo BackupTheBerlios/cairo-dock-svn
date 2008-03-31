@@ -19,6 +19,17 @@ typedef struct
 
 void cd_dbus_init(void);
 
+typedef gboolean (*CairoDockDBusDetectServiceFunc) (const gchar *cName);
+typedef gpointer (*CairoDockDBusCreateProxyFunc) (const char *name, const char *path, const char *interface);
+typedef gboolean (*CairoDockDBusIsEnabledFunc) (void);
+
+typedef struct
+{
+	CairoDockDBusDetectServiceFunc detect;
+	CairoDockDBusCreateProxyFunc create_proxy;
+	CairoDockDBusIsEnabledFunc is_enabled;
+} CairoDockDBusBackend;
+
 gboolean cd_dbus_callback_hello(dbusCallback *pDbusCallback, GError **error);
 gboolean cd_dbus_callback_show_dialog(dbusCallback *pDbusCallback, gchar *message, GError **error);
 gboolean cd_dbus_callback_show_desklet(dbusCallback *pDbusCallback, gboolean *widgetLayer, GError **error);

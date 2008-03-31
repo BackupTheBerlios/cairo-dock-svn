@@ -240,8 +240,9 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 *@param icon l'icone a detacher.
 *@param pDock le dock contenant l'icone.
 *@param bCheckUnusedSeparator si TRUE, alors teste si des separateurs sont devenus superflus, et les enleve le cas echeant.
+*@return TRUE ssi l'icone a effectivement ete enlevee, FALSE si elle l'etait deja.
 */
-void cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bCheckUnusedSeparator);
+gboolean cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bCheckUnusedSeparator);
 /**
 *Detache une icone de son dock, sans verifier la presence de separateurs superflus. L'icone n'est pas detruite, et garde son sous-dock, mais perd son dialogue et est fermee (son .desktop est detruit, son module est desactive, et son Xid est effacee du registre (la classe est geree aussi)).
 *@param pDock le dock contenant l'icone.

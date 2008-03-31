@@ -302,6 +302,11 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 					cd_message ("destruction de %s", pRemovingIcon->acName);
 					cairo_dock_free_icon (pRemovingIcon);
 				}
+				
+				if (CAIRO_DOCK_IS_APPLI (pRemovingIcon) && pRemovingIcon->cClass != NULL)
+				{
+					cairo_dock_udpate_Xid_on_inhibators (pRemovingIcon->Xid, pRemovingIcon->cClass);
+				}
 			}
 			else if (pRemovingIcon->fPersonnalScale == -0.05)
 			{

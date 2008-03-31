@@ -395,13 +395,11 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 					gboolean bIsMounted;
 					gchar *cUri = cairo_dock_fm_is_mounted (pNewIcon->cBaseURI, &bIsMounted);
 					g_free (cUri);
-					if (bIsMounted)
-					{
-						g_print (" >>> MONTE !\n");
-						gchar *cMessage = g_strdup_printf (_("%s is now %s"), pNewIcon->acName, _("mounted"));
-						cairo_dock_show_temporary_dialog (cMessage, pNewIcon, pIcon->pSubDock, 4000);
-						g_free (cMessage);
-					}
+					
+					cd_message (" c'est un volume, on considere qu'il vient de se faire (de)monter");
+					gchar *cMessage = g_strdup_printf (_("%s is now %s"), pNewIcon->acName, (bIsMounted ? _("mounted") : _("unmounted")));
+					cairo_dock_show_temporary_dialog (cMessage, pNewIcon, pIcon->pSubDock, 4000);
+					g_free (cMessage);
 				}
 			}
 		}
