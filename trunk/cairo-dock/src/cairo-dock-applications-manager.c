@@ -445,13 +445,13 @@ void cairo_dock_window_is_fullscreen_or_hidden (Window Xid, gboolean *bIsFullScr
 		{
 			if (pXStateBuffer[i] == s_aNetWmFullScreen)
 			{
-				cd_message (  "s_aNetWmFullScreen\n");
+				cd_message (  "s_aNetWmFullScreen");
 				*bIsFullScreen = TRUE;
 				break ;
 			}
 			else if (pXStateBuffer[i] == s_aNetWmHidden)
 			{
-				cd_message (  "s_aNetWmHidden\n");
+				cd_message (  "s_aNetWmHidden");
 				*bIsHidden = TRUE;
 				break ;
 			}
@@ -625,8 +625,8 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 						icon = g_hash_table_lookup (s_hXWindowTable, &XActiveWindow);
 						if (icon != NULL)
 						{
-							cd_message ("%s devient active\n", icon->acName);
-							if (icon->iCount == 0 && icon->fPersonnalScale == 0)  // sinon on laisse l'animation actuelle.
+							cd_message ("%s devient active", icon->acName);
+							if ((icon->iCount == 0 || icon->iCount > 1e5) && icon->fPersonnalScale == 0)  // sinon on laisse l'animation actuelle.
 							{
 								CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 								if (pParentDock == NULL)
@@ -643,7 +643,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 				}
 				else if (event.xproperty.atom == s_aNetCurrentDesktop || event.xproperty.atom == s_aNetDesktopViewport)
 				{
-					cd_message ("on change de bureau\n");
+					cd_message ("on change de bureau");
 					if (g_bAppliOnCurrentDesktopOnly)
 					{
 						int iDesktopNumber = cairo_dock_get_current_desktop ();
@@ -654,7 +654,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 				}
 				else if (event.xproperty.atom == s_aNetDesktopGeometry)
 				{
-					cd_message ("geometrie du bureau alteree\n");
+					cd_message ("geometrie du bureau alteree");
 					if (cairo_dock_update_screen_geometry ())  // modification largeur et/ou hauteur.
 					{
 						cairo_dock_set_window_position_at_balance (pDock, pDock->iCurrentWidth, pDock->iCurrentHeight);
@@ -671,10 +671,10 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 				{
 					gboolean bIsFullScreen, bIsHidden;
 					cairo_dock_window_is_fullscreen_or_hidden (Xid, &bIsFullScreen, &bIsHidden);
-					cd_message ("changement d'etat de %d => {%d ; %d}\n", Xid, bIsFullScreen, bIsHidden);
+					cd_message ("changement d'etat de %d => {%d ; %d}", Xid, bIsFullScreen, bIsHidden);
 					if (g_bAutoHideOnFullScreen && bIsFullScreen && ! cairo_dock_quick_hide_is_activated ())
 					{
-						cd_message (" => devient plein ecran\n");
+						cd_message (" => devient plein ecran");
 						cairo_dock_activate_temporary_auto_hide (g_pMainDock);
 					}
 					else
@@ -688,20 +688,20 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 							
 							if (bIsHidden != icon->bIsHidden)
 							{
-								cd_message ("  changement de visibilite -> %d\n", bIsHidden);
+								cd_message ("  changement de visibilite -> %d", bIsHidden);
 								icon->bIsHidden = bIsHidden;
 								
 								if (g_bHideVisibleApplis)
 								{
 									if (bIsHidden)
 									{
-										cd_message (" => se cache\n");
+										cd_message (" => se cache");
 										if (! g_bAppliOnCurrentDesktopOnly || cairo_dock_window_is_on_current_desktop (Xid))
 											pParentDock = cairo_dock_insert_appli_in_dock (icon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON);
 									}
 									else
 									{
-										cd_message (" => re-apparait\n");
+										cd_message (" => re-apparait");
 										cairo_dock_detach_icon_from_dock (icon, pParentDock, TRUE);
 										cairo_dock_update_dock_size (pParentDock);
 									}
@@ -719,7 +719,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 				}
 				if (event.xproperty.atom == s_aNetWmDesktop)  // cela ne gere pas les changements de viewports, qui eux se font en changeant les coordonnees. Il faudrait donc recueillir les ConfigureNotify, qui donnent les redimensionnements et les deplacements.
 				{
-					cd_message ("changement de bureau pour %d\n", Xid);
+					cd_message ("changement de bureau pour %d", Xid);
 					if (g_bAppliOnCurrentDesktopOnly)
 					{
 						int iDesktopNumber = cairo_dock_get_current_desktop ();
@@ -830,7 +830,7 @@ CairoDock *cairo_dock_insert_appli_in_dock (Icon *icon, CairoDock *pMainDock, gb
 
 	//\_________________ On l'insere dans son dock parent en animant ce dernier eventuellement.
 	cairo_dock_insert_icon_in_dock (icon, pParentDock, bUpdateSize, bAnimate, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
-	cd_message (" insertion de %s complete (%.2f)\n", icon->acName, icon->fPersonnalScale);
+	cd_message (" insertion de %s complete (%.2f)", icon->acName, icon->fPersonnalScale);
 
 	if (bAnimate && cairo_dock_animation_will_be_visible (pParentDock))
 	{
@@ -854,7 +854,7 @@ static void _cairo_dock_remove_old_applis (Window *Xid, Icon *icon, double *fTim
 		//g_print ("%s (%s, %f / %f)\n", __func__, icon->acName, icon->fLastCheckTime, *fTime);
 		if (icon->fLastCheckTime > 0 && icon->fLastCheckTime < *fTime && icon->fPersonnalScale <= 0)
 		{
-			cd_message ("cette fenetre (%ld) est trop vieille\n", *Xid);
+			cd_message ("cette fenetre (%ld) est trop vieille", *Xid);
 			CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 			if (pParentDock != NULL)
 			{
@@ -867,7 +867,7 @@ static void _cairo_dock_remove_old_applis (Window *Xid, Icon *icon, double *fTim
 			}
 			else
 			{
-				cd_message ("pas de container, on la detruit donc\n");
+				cd_message ("pas de container, on la detruit donc");
 				if (icon->cClass != NULL)
 				{
 					cairo_dock_udpate_Xid_on_inhibators (icon->Xid, icon->cClass);
@@ -895,7 +895,7 @@ void cairo_dock_update_applis_list (CairoDock *pDock, double fTime)
 		bAppliAlreadyRegistered = g_hash_table_lookup_extended (s_hXWindowTable, &Xid, &pOriginalXid, (gpointer *) &icon);
 		if (! bAppliAlreadyRegistered)
 		{
-			cd_message (" cette fenetre (%ld) de la pile n'est pas dans la liste\n", Xid);
+			cd_message (" cette fenetre (%ld) de la pile n'est pas dans la liste", Xid);
 			cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 			if (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS)
 				icon = cairo_dock_create_icon_from_xwindow (pCairoContext, Xid, pDock);
@@ -904,7 +904,7 @@ void cairo_dock_update_applis_list (CairoDock *pDock, double fTime)
 				icon->fLastCheckTime = fTime;
 				if ((icon->bIsHidden || ! g_bHideVisibleApplis) && (! g_bAppliOnCurrentDesktopOnly || cairo_dock_window_is_on_current_desktop (Xid)))
 				{
-					cd_message (" insertion de %s dans %s\n", icon->acName, icon->cParentDockName);
+					cd_message (" insertion de %s dans %s", icon->acName, icon->cParentDockName);
 					cairo_dock_insert_appli_in_dock (icon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON);
 				}
 			}

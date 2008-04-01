@@ -10,6 +10,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <cairo.h>
@@ -929,8 +930,10 @@ GtkWidget *cairo_dock_build_menu (Icon *icon, CairoDockContainer *pContainer)
 	GtkWidget *menu_item, *image;
 	menu_item = gtk_image_menu_item_new_with_label ("Cairo-Dock");
 	gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-icon.svg", CAIRO_DOCK_SHARE_DATA_DIR);
-	image = gtk_image_new_from_file (cIconPath);
+	GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_size (cIconPath, 32, 32, NULL);
+	image = gtk_image_new_from_pixbuf (pixbuf);
 	g_free (cIconPath);
+	g_object_unref (pixbuf);
 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image);
 	gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 
@@ -1071,6 +1074,9 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	}
 	if (CAIRO_DOCK_IS_VALID_APPLI (icon))
 	{
+		menu_item = gtk_separator_menu_item_new ();
+		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+		
 		//\_________________________ On rajoute les actions supplementaires sur les icones d'applis.
 		menu_item = gtk_menu_item_new_with_label (_("Other actions"));
 		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
@@ -1128,9 +1134,6 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		}
 		
 		//\_________________________ On rajoute les actions courantes sur les icones d'applis.
-		menu_item = gtk_separator_menu_item_new ();
-		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
-
 		gboolean bIsMaximized = cairo_dock_window_is_maximized (icon->Xid);
 		_add_entry_in_menu (bIsMaximized ? _("Unmaximize") : _("Maximize"), GTK_STOCK_GO_UP, cairo_dock_maximize_appli, menu);
 		
