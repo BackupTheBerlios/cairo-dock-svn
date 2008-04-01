@@ -37,6 +37,12 @@ extern gchar *g_cLabelPolice;
 extern int g_iLabelWeight;
 /// Italique ou droit.
 extern int g_iLabelStyle;
+/// facteur de visibilite des etiquettes adjacentes a l'icone pointee.
+extern double g_fLabelAlphaThreshold;
+/// le texte est-il toujours horizontal ?
+extern gboolean g_bTextAlwaysHorizontal;
+/// seule l'etiquette de l'icone pointee doit-elle etre dessinee ?
+extern gboolean g_bLabelForPointedIconOnly;
 
 /// TRUE ssi les coins du bas sont arrondis.
 extern gboolean g_bRoundedBottomCorner;

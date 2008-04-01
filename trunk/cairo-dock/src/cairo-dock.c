@@ -176,6 +176,7 @@ gboolean g_bUseBackgroundForLabel;
 
 double g_fAlphaAtRest;
 
+gboolean g_bAnimateOnAutoHide;
 double g_fUnfoldAcceleration = 0;
 int g_iGrowUpInterval;
 int g_iShrinkDownInterval;
@@ -577,7 +578,7 @@ main (int argc, char** argv)
 	//const gchar *cSillyMessage = "C'est les soldes !\n Pour tout sous-dock acheté, un sous-dock offert !";
 	//const gchar *cSillyMessage = "J-2 avant la 1.5, la tension monte !";
 	const gchar *cSillyMessage = "Cairo-Dock : sans danger si l'on se conforme au mode d'emploi.";
-	const gchar *cNumSilllyMessage = "15";
+	const gchar *cNumSilllyMessage = "16";
 	gboolean bWriteSillyMessage;
 	if (! g_file_test (cSillyMessageFilePath, G_FILE_TEST_EXISTS))
 	{
@@ -606,7 +607,7 @@ main (int argc, char** argv)
 
 	if (bWriteSillyMessage && ! bWriteChangeLog && cSillyMessage != NULL)
 	{
-		///cairo_dock_show_general_message (cSillyMessage, 4000);
+		cairo_dock_show_general_message (cSillyMessage, 4000);
 		/*double fAnswer = cairo_dock_show_value_and_wait (cSillyMessage, pFirstIcon, g_pMainDock, 1.);
 		cd_message (" ==> %.2f\n", fAnswer);
 		if (fAnswer == 0)

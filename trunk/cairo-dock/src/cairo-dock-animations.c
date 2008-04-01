@@ -37,6 +37,7 @@ extern gboolean g_bDirectionUp;
 
 extern int g_iVisibleZoneHeight;
 
+extern gboolean g_bAnimateOnAutoHide;
 extern double g_fUnfoldAcceleration;
 extern int g_iGrowUpInterval;
 extern int g_iShrinkDownInterval;
@@ -127,7 +128,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 			pDock->iScrollOffset = 0;
 
 			pDock->calculate_max_dock_size (pDock);
-			pDock->fFoldingFactor = g_fUnfoldAcceleration;
+			pDock->fFoldingFactor = (g_bAnimateOnAutoHide ? g_fUnfoldAcceleration : 0);
 
 			cairo_dock_allow_entrance ();
 		}
@@ -288,7 +289,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 			cd_debug ("au moins 1 icone en cours d'insertion/suppression (%f)", pRemovingIcon->fPersonnalScale);
 			if (pRemovingIcon->fPersonnalScale == 0.05)
 			{
-				cd_debug ("  fin");
+				cd_debug ("  va etre supprimee");
 				cairo_dock_remove_icon_from_dock (pDock, pRemovingIcon);
 				
 				if (CAIRO_DOCK_IS_APPLI (pRemovingIcon) && pRemovingIcon->cClass != NULL && pDock == cairo_dock_search_dock_from_name (pRemovingIcon->cClass) && pDock->icons == NULL)  // il n'y a plus aucune icone de cette classe.
@@ -299,14 +300,9 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 				else
 				{
 					cairo_dock_update_dock_size (pDock);
-					cd_message ("destruction de %s", pRemovingIcon->acName);
-					cairo_dock_free_icon (pRemovingIcon);
 				}
-				
-				if (CAIRO_DOCK_IS_APPLI (pRemovingIcon) && pRemovingIcon->cClass != NULL)
-				{
-					cairo_dock_udpate_Xid_on_inhibators (pRemovingIcon->Xid, pRemovingIcon->cClass);
-				}
+				cd_message ("destruction de %s", pRemovingIcon->acName);
+				cairo_dock_free_icon (pRemovingIcon);
 			}
 			else if (pRemovingIcon->fPersonnalScale == -0.05)
 			{

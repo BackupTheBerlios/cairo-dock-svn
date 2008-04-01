@@ -1179,7 +1179,7 @@ void cairo_dock_manage_mouse_position (CairoDock *pDock, CairoDockMousePositionT
 		case CAIRO_DOCK_MOUSE_OUTSIDE :
 			//g_print ("en dehors du dock (%d;%d;%d;%d)\n", pDock->iSidGrowUp, pDock->iSidShrinkDown, pDock->iMagnitudeIndex, pDock->iSidLeaveDemand);
 			///pDock->fDecorationsOffsetX = - pDock->iCurrentWidth / 2;  // on fixe les decorations.
-			if (pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0 && pDock->iSidLeaveDemand == 0)  //  && pDock->iMagnitudeIndex > 0
+			if (pDock->iSidGrowUp == 0 && pDock->iSidShrinkDown == 0 && pDock->iSidLeaveDemand == 0 && ! pDock->bAtBottom)  // bAtBottom ajoute pour la 1.5.4
 			{
 				//g_print ("on force a quitter (iRefCount:%d)\n", pDock->iRefCount);
 				if (pDock->iRefCount > 0 && g_iLeaveSubDockDelay > 0)

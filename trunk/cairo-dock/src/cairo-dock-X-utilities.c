@@ -159,6 +159,7 @@ void cairo_dock_set_strut_partial (int Xid, int left, int right, int top, int bo
 {
 	g_return_if_fail (Xid > 0);
 
+	cd_message ("%s (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", __func__, left, right, top, bottom, left_start_y, left_end_y, right_start_y, right_end_y, top_start_x, top_end_x, bottom_start_x, bottom_end_x);
 	gulong iGeometryStrut[12] = {left, right, top, bottom, left_start_y, left_end_y, right_start_y, right_end_y, top_start_x, top_end_x, bottom_start_x, bottom_end_x};
 
 	XChangeProperty (s_XDisplay,
@@ -166,8 +167,9 @@ void cairo_dock_set_strut_partial (int Xid, int left, int right, int top, int bo
 		XInternAtom (s_XDisplay, "_NET_WM_STRUT", False),
 		XA_CARDINAL, 32, PropModeReplace,
 		(guchar *) iGeometryStrut, 12);
-
-	//cairo_dock_set_xwindow_timestamp (Xid, cairo_dock_get_xwindow_timestamp (root));
+	
+	Window root = DefaultRootWindow (s_XDisplay);
+	cairo_dock_set_xwindow_timestamp (Xid, cairo_dock_get_xwindow_timestamp (root));
 }
 
 void cairo_dock_set_xwindow_type_hint (int Xid, gchar *cWindowTypeName)

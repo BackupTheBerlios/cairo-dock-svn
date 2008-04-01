@@ -52,6 +52,7 @@ extern int g_iNbViewportX,g_iNbViewportY ;
 
 static GHashTable *s_hXWindowTable = NULL;  // table des fenetres X affichees dans le dock.
 static GList *s_pInhibatedAppliList = NULL;
+static GHashTable *s_hClassTable = NULL;
 static Display *s_XDisplay = NULL;
 static int s_iSidUpdateAppliList = 0;
 static Atom s_aNetClientList;
@@ -75,6 +76,11 @@ void cairo_dock_initialize_application_manager (Display *pDisplay)
 		g_int_equal,
 		g_free,
 		NULL);
+	
+	s_hClassTable = g_hash_table_new_full (g_str_hash,
+		g_str_equal,
+		g_free,
+		g_free);  /// cairo_dock_free_class_appli
 
 	s_aNetClientList = XInternAtom (s_XDisplay, "_NET_CLIENT_LIST", False);
 	s_aNetActiveWindow = XInternAtom (s_XDisplay, "_NET_ACTIVE_WINDOW", False);
@@ -115,7 +121,9 @@ void cairo_dock_unregister_appli (Icon *icon)
 	if (CAIRO_DOCK_IS_VALID_APPLI (icon))
 	{
 		g_hash_table_remove (s_hXWindowTable, &icon->Xid);
-
+		
+		cairo_dock_udpate_Xid_on_inhibators (icon->Xid, icon->cClass);
+		
 		cairo_dock_unregister_pid (icon);  // on n'efface pas sa classe ici car on peut en avoir besoin encore.
 	}
 }
@@ -575,9 +583,11 @@ static void _cairo_dock_hide_show_windows_on_other_desktops (Window *Xid, Icon *
 		{
 			cd_message (" => n'est pas sur le bureau actuel.");
 			CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
-			g_return_if_fail (pParentDock != NULL);
-			cairo_dock_detach_icon_from_dock (icon, pParentDock, TRUE);
-			cairo_dock_update_dock_size (pParentDock);
+			if (pParentDock != NULL)
+			{
+				cairo_dock_detach_icon_from_dock (icon, pParentDock, TRUE);
+				cairo_dock_update_dock_size (pParentDock);
+			}
 		}
 		if (pParentDock != NULL)
 			gtk_widget_queue_draw (pParentDock->pWidget);
@@ -868,10 +878,6 @@ static void _cairo_dock_remove_old_applis (Window *Xid, Icon *icon, double *fTim
 			else
 			{
 				cd_message ("pas de container, on la detruit donc");
-				if (icon->cClass != NULL)
-				{
-					cairo_dock_udpate_Xid_on_inhibators (icon->Xid, icon->cClass);
-				}
 				cairo_dock_free_icon (icon);
 			}
 		}
@@ -992,20 +998,15 @@ gboolean cairo_dock_application_manager_is_running (void)
 }
 
 
-typedef struct {
-	gchar *cClass;
-	gint iRefCount;
-	GList *pInhibatorList;
-	} CairoDockInhibatedClass;
-
 
 static void _cairo_dock_list_appli_if_inhibated (Window *Xid, Icon *pIcon, gpointer *data)
 {
 	gchar * cClass = data[0];
 	GList **pList = data[1];
+
 	if (pIcon != NULL && pIcon->cClass != NULL && strcmp (pIcon->cClass, cClass) == 0)
 	{
-		g_print ("%s est actuellement inhibee\n", pIcon->acName);
+		cd_debug ("%s est actuellement inhibee", pIcon->acName);
 		*pList = g_list_prepend (*pList, pIcon);
 	}
 }
@@ -1019,33 +1020,21 @@ GList *cairo_dock_list_existing_appli_with_class (const gchar *cClass)
 	return pList;
 }
 
-static CairoDockInhibatedClass *cairo_dock_find_inhibated_class (const gchar *cClass)
-{
-	g_return_val_if_fail (cClass != NULL, NULL);
-	CairoDockInhibatedClass *pInhibatedClass;
-	GList *pElement;
-	for (pElement = s_pInhibatedAppliList; pElement != NULL; pElement = pElement->next)
-	{
-		pInhibatedClass = pElement->data;
-		if (strcmp (cClass, pInhibatedClass->cClass) == 0)
-			return pInhibatedClass;
-	}
-	return NULL;
-}
 
-gboolean cairo_dock_inhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
+Window cairo_dock_detach_appli_of_class (const gchar *cClass)
 {
-	g_return_val_if_fail (cClass != NULL, FALSE);
+	g_return_val_if_fail (cClass != NULL, 0);
 	
 	GList *pList = cairo_dock_list_existing_appli_with_class (cClass);
 	Icon *pIcon;
 	GList *pElement;
 	gboolean bNeedsRedraw = FALSE, bDetached;
 	CairoDock *pParentDock;
+	Window XFirstFoundId = 0;
 	for (pElement = pList; pElement != NULL; pElement = pElement->next)
 	{
 		pIcon = pElement->data;
-		g_print ("inhibition de l'icone %s\n", pIcon->acName);
+		cd_debug ("detachement de l'icone %s", pIcon->acName);
 		CairoDockContainer *pContainer = cairo_dock_search_container_from_icon (pIcon);
 		if (CAIRO_DOCK_IS_DOCK (pContainer))
 		{
@@ -1059,12 +1048,8 @@ gboolean cairo_dock_inhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
 			else
 				bNeedsRedraw |= (bDetached);
 			
-			if (pInhibatorIcon != NULL && pInhibatorIcon->Xid == 0)
-			{
-				pInhibatorIcon->Xid = pIcon->Xid;
-				g_free (pInhibatorIcon->cClass);
-				pInhibatorIcon->cClass = g_strdup (cClass);
-			}
+			if (XFirstFoundId == 0)
+				XFirstFoundId = pIcon->Xid;
 		}
 	}
 	if (! cairo_dock_is_loading () && bNeedsRedraw)
@@ -1073,6 +1058,20 @@ gboolean cairo_dock_inhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
 		gtk_widget_queue_draw (g_pMainDock->pWidget);
 	}
 	g_list_free (pList);
+	return XFirstFoundId;
+}
+
+/*gboolean cairo_dock_inhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
+{
+	g_return_val_if_fail (cClass != NULL, FALSE);
+	
+	Window XFirstFoundId = cairo_dock_detach_appli_of_class (cClass);
+	if (pInhibatorIcon != NULL)
+	{
+		pInhibatorIcon->Xid = XFirstFoundId;
+		g_free (pInhibatorIcon->cClass);
+		pInhibatorIcon->cClass = g_strdup (cClass);
+	}
 	
 	CairoDockInhibatedClass *pInhibatedClass = cairo_dock_find_inhibated_class (cClass);
 	if (pInhibatedClass == NULL)
@@ -1177,6 +1176,169 @@ void cairo_dock_udpate_Xid_on_inhibators (Window Xid, const gchar *cClass)
 		Icon *pIcon;
 		GList *pElement;
 		for (pElement = pInhibatedClass->pInhibatorList; pElement != NULL; pElement = pElement->next)
+		{
+			pIcon = pElement->data;
+			if (pIcon->Xid == Xid)
+			{
+				if (iNextXid == -1)
+				{
+					GList *pList = cairo_dock_list_existing_appli_with_class (cClass);
+					if (pList != NULL)
+					{
+						Icon *pNextIcon = pList->data;
+						if (pNextIcon->Xid != Xid)
+							iNextXid = pNextIcon->Xid;
+						else if (pList->next != NULL)
+						{
+							pNextIcon = pList->next->data;
+							iNextXid = pNextIcon->Xid;
+						}
+						else
+							iNextXid = 0;
+						g_list_free (pList);
+					}
+					else
+						iNextXid = 0;
+				}
+				pIcon->Xid = iNextXid;
+			}
+		}
+	}
+}*/
+
+
+void cairo_dock_free_class_appli (CairoDockClassAppli *pClassAppli)
+{
+	g_list_free (pClassAppli->pIconsOfClass);
+	g_free (pClassAppli);
+}
+
+static CairoDockClassAppli *cairo_dock_find_class_appli (const gchar *cClass)
+{
+	return (cClass != NULL ? g_hash_table_lookup (s_hClassTable, cClass) : NULL);
+}
+
+static gboolean cairo_dock_register_to_class (const gchar *cClass, Icon *pIcon)
+{
+	g_return_val_if_fail (cClass != NULL, FALSE);
+	
+	CairoDockClassAppli *pClassAppli = cairo_dock_find_class_appli (cClass);
+	if (pClassAppli == NULL)
+	{
+		pClassAppli = g_new0 (CairoDockClassAppli, 1);
+		g_hash_table_insert (s_hClassTable, g_strdup (cClass), pClassAppli);
+	}
+	if (pIcon != NULL)
+	{
+		g_return_val_if_fail (g_list_find (pClassAppli->pIconsOfClass, pIcon) == NULL, TRUE);
+		pClassAppli->pIconsOfClass = g_list_prepend (pClassAppli->pIconsOfClass, pIcon);
+	}
+	
+	return TRUE;
+}
+
+gboolean cairo_dock_inhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
+{
+	g_return_val_if_fail (cClass != NULL, FALSE);
+	
+	Window XFirstFoundId = cairo_dock_detach_appli_of_class (cClass);
+	if (pInhibatorIcon != NULL)
+	{
+		pInhibatorIcon->Xid = XFirstFoundId;
+		if (pInhibatorIcon->cClass != cClass)
+		{
+			g_free (pInhibatorIcon->cClass);
+			pInhibatorIcon->cClass = g_strdup (cClass);
+		}
+	}
+	
+	return cairo_dock_register_to_class (cClass, pInhibatorIcon);
+}
+
+gboolean cairo_dock_class_is_inhibated (const gchar *cClass)
+{
+	CairoDockClassAppli *pClassAppli = cairo_dock_find_class_appli (cClass);
+	return (pClassAppli != NULL && pClassAppli->pIconsOfClass != NULL);
+}
+
+gboolean cairo_dock_prevent_inhibated_class (Icon *pIcon)
+{
+	g_return_val_if_fail (pIcon != NULL, FALSE);
+	
+	CairoDockClassAppli *pClassAppli = cairo_dock_find_class_appli (pIcon->cClass);
+	if (pClassAppli != NULL)
+	{
+		Icon *pInhibatorIcon;
+		GList *pElement;
+		for (pElement = pClassAppli->pIconsOfClass; pElement != NULL; pElement = pElement->next)
+		{
+			pInhibatorIcon = pElement->data;
+			if (pInhibatorIcon->Xid == 0)
+				pInhibatorIcon->Xid = pIcon->Xid;
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
+
+void cairo_dock_deinhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
+{
+	cd_message ("%s", cClass);
+	gboolean bStillInhibated = TRUE;
+	CairoDockClassAppli *pClassAppli = cairo_dock_find_class_appli (cClass);
+	if (pClassAppli != NULL)
+	{
+		pClassAppli->pIconsOfClass = g_list_remove (pClassAppli->pIconsOfClass, pInhibatorIcon);
+		if (pClassAppli->pIconsOfClass == NULL && ! pClassAppli->bUseXIcon)  // cette classe ne sert plus a rien.
+		{
+			cd_debug (" la classe n'a plus d'interet");
+			g_hash_table_remove (s_hClassTable, cClass);
+		}
+		bStillInhibated = (pClassAppli->pIconsOfClass != NULL);
+	}
+	
+	cd_debug ("bStillInhibated : %d", bStillInhibated);
+	if (! bStillInhibated)
+	{
+		GList *pList = cairo_dock_list_existing_appli_with_class (cClass);
+		Icon *pIcon;
+		gboolean bNeedsRedraw = FALSE;
+		CairoDock *pParentDock;
+		GList *pElement;
+		for (pElement = pList; pElement != NULL; pElement = pElement->next)
+		{
+			pIcon = pElement->data;
+			cd_message ("rajout de l'icone precedemment inhibee (%x)", pIcon->cParentDockName);
+			pIcon->fPersonnalScale = 0;
+			pIcon->fScale = 1.;
+			pParentDock = cairo_dock_insert_appli_in_dock (pIcon, g_pMainDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON);
+			bNeedsRedraw = (pParentDock != NULL && pParentDock->bIsMainDock);
+		}
+		if (bNeedsRedraw)
+			gtk_widget_queue_draw (g_pMainDock->pWidget);
+		g_list_free (pList);
+	}
+	
+	if (pInhibatorIcon != NULL)
+	{
+		cd_debug (" l'inhibiteur a perdu toute sa mana\n");
+		pInhibatorIcon->Xid = 0;
+		g_free (pInhibatorIcon->cClass);
+		pInhibatorIcon->cClass = NULL;
+	}
+}
+
+
+void cairo_dock_udpate_Xid_on_inhibators (Window Xid, const gchar *cClass)
+{
+	cd_message ("%s", cClass);
+	CairoDockClassAppli *pClassAppli = cairo_dock_find_class_appli (cClass);
+	if (pClassAppli != NULL)
+	{
+		int iNextXid = -1;
+		Icon *pIcon;
+		GList *pElement;
+		for (pElement = pClassAppli->pIconsOfClass; pElement != NULL; pElement = pElement->next)
 		{
 			pIcon = pElement->data;
 			if (pIcon->Xid == Xid)

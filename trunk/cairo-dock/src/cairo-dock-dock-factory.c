@@ -577,7 +577,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 	if (bUpdateSize)
 		cairo_dock_update_dock_size (pDock);
 
-	if (pDock->bIsMainDock && g_bReserveSpace && ! g_bAutoHide && ! pDock->bInside && (pDock->fFlatDockWidth != iPreviousMinWidth || pDock->iMaxIconHeight != iPreviousMaxIconHeight))
+	if (pDock->bIsMainDock && g_bReserveSpace && bUpdateSize && ! g_bAutoHide && (pDock->fFlatDockWidth != iPreviousMinWidth || pDock->iMaxIconHeight != iPreviousMaxIconHeight))  // && ! pDock->bInside
 		cairo_dock_reserve_space_for_dock (pDock, TRUE);
 }
 

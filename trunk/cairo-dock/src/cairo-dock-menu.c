@@ -1005,6 +1005,9 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	//\_________________________ Si pas d'icone dans un dock, on s'arrete la.
 	if (CAIRO_DOCK_IS_DOCK (pContainer) && (icon == NULL || CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon)))
 	{
+		menu_item = gtk_separator_menu_item_new ();
+		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
+		
 		_add_entry_in_menu (_("Add a launcher"), GTK_STOCK_ADD, cairo_dock_add_launcher, menu);
 		
 		_add_entry_in_menu (_("Add a sub-dock"), GTK_STOCK_ADD, cairo_dock_add_container, menu);
@@ -1055,6 +1058,9 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		//\_________________________ On rajoute des actions de modifications sur le dock.
 		if (CAIRO_DOCK_IS_DOCK (pContainer))
 		{
+			menu_item = gtk_separator_menu_item_new ();
+			gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
+			
 			_add_entry_in_menu (_("Add a launcher"), GTK_STOCK_ADD, cairo_dock_add_launcher, menu);
 	
 			_add_entry_in_menu (_("Add a sub-dock"), GTK_STOCK_ADD, cairo_dock_add_container, menu);

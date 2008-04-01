@@ -126,6 +126,10 @@ move up speed = 0.35
 #f-[0.1;0.9] ...
 move down speed = 0.25
 
+#b Animate the dock when auto-hiding ?
+#{The dock will unfold when it hides/shows itself. No effect if auto-hide is not activated or unfold acceleration is nul.}
+animate on auto-hide = true
+
 #F[Mouse;@prefix@/@DATADIRNAME@/@PACKAGE@/icon-mouse.png]
 frame_mouse = 
 
@@ -187,7 +191,7 @@ pointed icon only = false
 #b- Should the labels be always horizontal, even when dock is vertical ?
 always horizontal = FALSE
 
-#f-[5.;40.] label's visibility threshold :
+#f-[0.;50.] label's visibility threshold :
 #{the bigger, the more the labels next to the pointed icon will be transparent.}
 alpha threshold = 10.
 

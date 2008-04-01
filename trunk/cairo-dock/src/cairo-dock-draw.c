@@ -740,7 +740,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			fOffsetX = - icon->fDrawX;
 		else if (icon->fDrawX + fOffsetX + icon->iTextWidth > iWidth)
 			fOffsetX = iWidth - icon->iTextWidth - icon->fDrawX;
-		if (icon->fOrientation != 0)
+		if (icon->fOrientation != 0 && ! g_bTextAlwaysHorizontal)
 		{
 			cairo_rotate (pCairoContext, icon->fOrientation);
 		}
@@ -773,10 +773,11 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		}
 		else
 		{
-			fMagnitude = (icon->fScale - 1) / g_fAmplitude;
-			fMagnitude = (fMagnitude > 1 - 1. / g_fLabelAlphaThreshold ? 1.0 : 1 / (1 - 1./g_fLabelAlphaThreshold) * (fMagnitude));
+			fMagnitude = (icon->fScale - 1) / g_fAmplitude;  /// il faudrait diviser par pDock->fMagnitudeMax ...
+			fMagnitude *= (fMagnitude * g_fLabelAlphaThreshold + 1) / (g_fLabelAlphaThreshold + 1);
 		}
-		cairo_paint_with_alpha (pCairoContext, fMagnitude);
+		if (fMagnitude > .1)
+			cairo_paint_with_alpha (pCairoContext, fMagnitude);
 	}
 	
 	//\_____________________ On dessine les infos additionnelles.

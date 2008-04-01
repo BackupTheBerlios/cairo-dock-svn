@@ -113,6 +113,7 @@ extern double g_fStripesAngle;
 extern int g_iScreenWidth[2];
 extern int g_iScreenHeight[2];
 
+extern gboolean g_bAnimateOnAutoHide;
 extern double g_fUnfoldAcceleration;
 extern int g_iGrowUpInterval;
 extern int g_iShrinkDownInterval;
@@ -705,7 +706,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 
 	double fUserValue = cairo_dock_get_double_key_value (pKeyFile, "System", "unfold factor", &bFlushConfFileNeeded, 8., "Cairo Dock", NULL);
 	g_fUnfoldAcceleration = 1 - pow (2, - fUserValue);
-
+	
+	g_bAnimateOnAutoHide = cairo_dock_get_boolean_key_value (pKeyFile, "System", "animate on auto-hide", &bFlushConfFileNeeded, TRUE, NULL, NULL);
+	
 	int iNbSteps = cairo_dock_get_integer_key_value (pKeyFile, "System", "grow up steps", &bFlushConfFileNeeded, 8, "Cairo Dock", NULL);
 	iNbSteps = MAX (iNbSteps, 1);
 	g_iGrowUpInterval = MAX (1, CAIRO_DOCK_NB_MAX_ITERATIONS / iNbSteps);
@@ -1121,7 +1124,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		if (g_bAutoHide && pDock->iRefCount == 0)
 		{
 			cairo_dock_get_window_position_and_geometry_at_balance (pDock, CAIRO_DOCK_MIN_SIZE, &iNewWidth, &iNewHeight);
-			pDock->fFoldingFactor = g_fUnfoldAcceleration;
+			pDock->fFoldingFactor = (g_bAnimateOnAutoHide ? g_fUnfoldAcceleration : 0);
 		}
 		else
 		{

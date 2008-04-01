@@ -44,6 +44,7 @@ static int s_iSidShowSubDockDemand = 0;
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
 extern gboolean g_bAnimateSubDock;
+extern gboolean g_bAnimateOnAutoHide;
 extern double g_fUnfoldAcceleration;
 extern int g_iLeaveSubDockDelay;
 extern int g_iShowSubDockDelay;
@@ -155,13 +156,14 @@ static void cairo_dock_show_subdock (Icon *pPointedIcon, gboolean bUpdate, Cairo
 
 	pSubDock->set_subdock_position (pPointedIcon, pDock);
 
-	pSubDock->fFoldingFactor = g_fUnfoldAcceleration;
+	pSubDock->fFoldingFactor = (g_bAnimateSubDock ? g_fUnfoldAcceleration : 0);
 	pSubDock->bAtBottom = FALSE;
 	int iNewWidth, iNewHeight;
-	if (! g_bAnimateSubDock || g_fUnfoldAcceleration == 0)
+	if (pSubDock->fFoldingFactor == 0)
 	{
 		cd_debug ("  on montre le sous-dock sans animation");
-		cairo_dock_get_window_position_and_geometry_at_balance (pSubDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
+		cairo_dock_get_window_position_and_geometry_at_balance (pSubDock, CAIRO_DOCK_MAX_SIZE, &iNewWidth, &iNewHeight);  // CAIRO_DOCK_NORMAL_SIZE -> CAIRO_DOCK_MAX_SIZE pour la 1.5.4
+		pSubDock->bAtBottom = TRUE;  // bAtBottom ajoute pour la 1.5.4
 
 		gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
 		if (pSubDock->bHorizontalDock)
@@ -451,7 +453,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	{
 		if (g_bAutoHide)
 		{
-			pDock->fFoldingFactor = (g_fUnfoldAcceleration != 0. ? 0.03 : 0.);
+			pDock->fFoldingFactor = (g_bAnimateOnAutoHide && g_fUnfoldAcceleration != 0. ? 0.03 : 0.);
 			if (pDock->iSidMoveDown == 0)  // on commence a descendre.
 				pDock->iSidMoveDown = g_timeout_add (40, (GSourceFunc) cairo_dock_move_down, (gpointer) pDock);
 		}
@@ -479,11 +481,11 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
         cd_debug ("");
 
 	//g_print ("%s (bInside:%d; bAtBottom:%d; iRefCount:%d)\n", __func__, pDock->bInside, pDock->bAtBottom, pDock->iRefCount);
-	if (pDock->bAtBottom)  // || ! pDock->bInside
+	/**if (pDock->bAtBottom)  // || ! pDock->bInside  // mis en commentaire pour la 1.5.4
 	{
 		pDock->iSidLeaveDemand = 0;
 		return FALSE;
-	}
+	}*/
 	if (pEvent != NULL && (pEvent->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK)) && (pEvent->state & GDK_BUTTON1_MASK))
 	{
 		return FALSE;

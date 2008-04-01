@@ -39,6 +39,7 @@ typedef struct _CairoDockVisitCard CairoDockVisitCard;
 typedef struct _CairoDockMinimalAppletConfig CairoDockMinimalAppletConfig;
 typedef struct _CairoDockVFSBackend CairoDockVFSBackend;
 
+typedef struct _CairoDockClassAppli CairoDockClassAppli;
 
 typedef void (*CairoDockCalculateMaxDockSizeFunc) (CairoDock *pDock);
 typedef Icon * (*CairoDockCalculateIconsFunc) (CairoDock *pDock);
@@ -655,6 +656,12 @@ typedef gboolean (* CairoDockForeachDeskletFunc) (CairoDockDesklet *pDesklet, Ca
 typedef void (* CairoDockForeachIconFunc) (Icon *icon, gpointer data);
 
 typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
+
+
+struct _CairoDockClassAppli {
+	gboolean bUseXIcon;
+	GList *pIconsOfClass;
+	};
 
 
 /// Nom du repertoire de travail de cairo-dock.

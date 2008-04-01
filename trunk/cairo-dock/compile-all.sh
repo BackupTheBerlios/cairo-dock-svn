@@ -5,6 +5,7 @@ export CAIRO_DOCK_PREFIX=/usr
 export CAIRO_DOCK_AUTORECONF="0"
 export CAIRO_DOCK_CLEAN="0"
 export CAIRO_DOCK_COMPIL="0"
+export CAIRO_DOCK_UNSTABLE="0"
 export CAIRO_DOCK_INSTALL="0"
 export CAIRO_DOCK_THEMES="0"
 export CAIRO_DOCK_EXCLUDE="template"
@@ -12,7 +13,7 @@ export CAIRO_DOCK_EXTRACT_MESSAGE=${CAIRO_DOCK_DIR}/utils/extract-message
 export CAIRO_DOCK_GEN_TRANSLATION=${CAIRO_DOCK_DIR}/cairo-dock/po/generate-translation.sh
 
 echo "this script will process : "
-while getopts "acCith" flag
+while getopts "acCituh" flag
 do
 	echo " option $flag" $OPTIND $OPTARG
 	case "$flag" in
@@ -36,12 +37,17 @@ do
 		echo " => themes too"
 		export CAIRO_DOCK_THEMES="1"
 		;;
+	u)
+		echo " => include unstable applets"
+		export CAIRO_DOCK_UNSTABLE="1"
+		;;
 	h)
 		echo "-a : run autoreconf"
 		echo "-c : clean all"
 		echo "-C : compil"
 		echo "-i : install (will ask root password)"
 		echo "-t : compil themes too"
+		echo "-u : include still unstable applets"
 		exit 0
 		;;
 	*)
@@ -49,7 +55,7 @@ do
 		;;
 	esac
 done
-
+echo ""
 
 cd $CAIRO_DOCK_DIR
 find . -name linguas -execdir mv linguas LINGUAS \;
@@ -83,6 +89,10 @@ if test "$CAIRO_DOCK_COMPIL" = "1"; then
 fi
 if test "$CAIRO_DOCK_INSTALL" = "1"; then
 	echo "installation de cairo-dock..."
+	if test "$CAIRO_DOCK_CLEAN" = "1"; then
+		sudo rm -f $CAIRO_DOCK_PREFIX/bin/cairo-dock
+		sudo rm -rf $CAIRO_DOCK_PREFIX/share/cairo-dock
+	fi
 	sudo make install
 	sudo chmod +x $CAIRO_DOCK_PREFIX/bin/cairo-dock-update.sh
 	sudo chmod +x $CAIRO_DOCK_PREFIX/bin/launch-cairo-dock-after-beryl.sh
@@ -112,14 +122,21 @@ fi
 
 
 cd plug-ins
-for plugin in *
+if test "$CAIRO_DOCK_UNSTABLE" = "1" -o ! -e "Applets.stable"; then
+	export liste="`ls`"
+else
+	export liste="`sed "/^#/d" Applets.stable`"
+fi
+echo "the following applets will be compiled :"
+echo "$liste"
+for plugin in $liste
 do
 	if test -d $plugin; then
 		cd $plugin
 		if test -e Makefile.am -a "$plugin" != "$CAIRO_DOCK_EXCLUDE"; then
-			echo "********************************"
+			echo "**********************************"
 			echo "* Compilation du module $plugin ... *"
-			echo "********************************"
+			echo "**********************************"
 			if test "$CAIRO_DOCK_CLEAN" = "1"; then
 				rm -f config.* configure configure.lineno intltool-extract intltool-merge intltool-update libtool ltmain.sh Makefile.in Makefile aclocal.m4 missing stamp-h1 depcomp compile
 				rm -rf autom4te.cache src/.deps src/.libs src/Makefile src/Makefile.in po/Makefile po/Makefile.in po/*.gmo src/*.o src/*.lo src/*.la
