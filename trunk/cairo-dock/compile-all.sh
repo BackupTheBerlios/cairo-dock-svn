@@ -66,6 +66,9 @@ cd cairo-dock
 if test "$CAIRO_DOCK_CLEAN" = "1"; then
 	rm -f config.* configure configure.lineno intltool-extract intltool-merge intltool-update libtool ltmain.sh Makefile.in Makefile aclocal.m4 install-sh install depcomp missing compile cairo-dock.pc stamp-h1 cairo-dock.conf 
 	rm -rf autom4te.cache src/.deps src/.libs src/Makefile src/Makefile.in po/Makefile po/Makefile.in po/*.gmo src/*.o src/*.lo src/*.la
+	
+	sudo rm -f $CAIRO_DOCK_PREFIX/bin/cairo-dock
+	sudo rm -rf $CAIRO_DOCK_PREFIX/share/cairo-dock
 fi
 if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
 	if test -e po; then
@@ -88,11 +91,7 @@ if test "$CAIRO_DOCK_COMPIL" = "1"; then
 	make
 fi
 if test "$CAIRO_DOCK_INSTALL" = "1"; then
-	echo "installation de cairo-dock..."
-	if test "$CAIRO_DOCK_CLEAN" = "1"; then
-		sudo rm -f $CAIRO_DOCK_PREFIX/bin/cairo-dock
-		sudo rm -rf $CAIRO_DOCK_PREFIX/share/cairo-dock
-	fi
+	echo "installation of cairo-dock..."
 	sudo make install
 	sudo chmod +x $CAIRO_DOCK_PREFIX/bin/cairo-dock-update.sh
 	sudo chmod +x $CAIRO_DOCK_PREFIX/bin/launch-cairo-dock-after-beryl.sh
@@ -114,7 +113,7 @@ if test "$CAIRO_DOCK_THEMES" = "1"; then
 		make
 	fi
 	if test "$CAIRO_DOCK_INSTALL" = "1"; then
-		echo "installation des themes ..."
+		echo "installation of themes ..."
 		sudo make install
 	fi
 	cd ..
@@ -162,7 +161,7 @@ do
 				make
 			fi
 			if test "$CAIRO_DOCK_INSTALL" = "1"; then
-				echo "installation du module $plugin..."
+				echo "installation of module $plugin..."
 				sudo make install
 			fi
 		fi
@@ -170,14 +169,17 @@ do
 	fi
 done;
 
-echo "fini !"
 
 if test "$CAIRO_DOCK_INSTALL" = "1"; then
-	echo "verification :"
+	echo "check :"
 	echo "------------"
 	date +"compil ended at %c"
 	ls -l $CAIRO_DOCK_PREFIX/bin/cairo-dock
 	ls -l $CAIRO_DOCK_PREFIX/share/cairo-dock/plug-in
 fi
+
+cd ..
+echo "number of lines/word/caracters of sources :"
+sed '/ $/d' cairo-dock/src/*.c plug-ins/*/src/*.c | sed '/\t$/d' | sed '/^$/d' | sed '/^\t*\/\/*/d' | wc
 
 exit

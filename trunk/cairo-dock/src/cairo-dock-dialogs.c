@@ -516,14 +516,15 @@ void cairo_dock_free_dialog (CairoDockDialog *pDialog)
 	g_free (pDialog);
 }
 
-void cairo_dock_remove_dialog_if_any (Icon *icon)
+gboolean cairo_dock_remove_dialog_if_any (Icon *icon)
 {
 	g_return_if_fail (icon != NULL);
 	CairoDockDialog *pDialog;
 	GSList *ic;
+	gboolean bDialogRemoved = FALSE;
 
 	if (s_pDialogList == NULL)
-		return ;
+		return FALSE;
 	g_static_rw_lock_writer_lock (&s_mDialogsMutex);
 
 	ic = s_pDialogList;
@@ -537,6 +538,7 @@ void cairo_dock_remove_dialog_if_any (Icon *icon)
 		{
 			if (cairo_dock_dialog_unreference (pDialog))
 				cairo_dock_free_dialog (pDialog);  // la liberation n'a pas pu se faire a cause du lock.
+			bDialogRemoved = TRUE;
 		}
 		else
 		{
@@ -549,9 +551,11 @@ void cairo_dock_remove_dialog_if_any (Icon *icon)
 	{
 		if (cairo_dock_dialog_unreference (pDialog))
 			cairo_dock_free_dialog (pDialog);  // la liberation n'a pas pu se faire a cause du lock.
+		bDialogRemoved = TRUE;
 	}
 
 	g_static_rw_lock_writer_unlock (&s_mDialogsMutex);
+	return bDialogRemoved;
 }
 
 void cairo_dock_remove_orphelans (void)

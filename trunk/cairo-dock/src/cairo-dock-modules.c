@@ -41,14 +41,13 @@ static GHashTable *s_hModuleTable = NULL;
 
 void cairo_dock_initialize_module_manager (gchar *cModuleDirPath)
 {
-	g_return_if_fail (s_hModuleTable == NULL);
+	if (s_hModuleTable == NULL)
+		s_hModuleTable = g_hash_table_new_full (g_str_hash,
+			g_str_equal,
+			NULL,  // la cle est le nom du module, et pointe directement sur le champ 'cModuleName' du module.
+			(GDestroyNotify) cairo_dock_free_module);
 
-	s_hModuleTable = g_hash_table_new_full (g_str_hash,
-		g_str_equal,
-		NULL,  // la cle est le nom du module, et pointe directement sur le champ 'cModuleName' du module.
-		(GDestroyNotify) cairo_dock_free_module);
-
-	if (cModuleDirPath != NULL)
+	if (cModuleDirPath != NULL && g_file_test (cModuleDirPath, G_FILE_TEST_IS_DIR))
 	{
 		GError *erreur = NULL;
 		cairo_dock_preload_module_from_directory (cModuleDirPath, s_hModuleTable, &erreur);
@@ -225,7 +224,7 @@ CairoDockModule * cairo_dock_load_module (gchar *cSoFilePath, GHashTable *pModul
 
 void cairo_dock_preload_module_from_directory (gchar *cModuleDirPath, GHashTable *pModuleTable, GError **erreur)
 {
-	//g_print ("%s (%s)\n", __func__, cModuleDirPath);
+	cd_message ("%s (%s)", __func__, cModuleDirPath);
 	GError *tmp_erreur = NULL;
 	GDir *dir = g_dir_open (cModuleDirPath, 0, &tmp_erreur);
 	if (tmp_erreur != NULL)

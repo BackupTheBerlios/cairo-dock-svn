@@ -162,6 +162,8 @@ struct _CairoDock {
 	gint iDecorationsWidth;
 	/// hauteur des decorations.
 	gint iDecorationsHeight;
+	/// ratio applique aux icones.
+	gdouble fRatio;
 
 	gint iMaxLabelWidth;
 	gint iRightMargin;

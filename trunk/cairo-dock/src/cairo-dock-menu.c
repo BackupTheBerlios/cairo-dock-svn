@@ -117,7 +117,7 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 		cTitle);
 	g_free (cTitle);
 	
-	gchar *cImagePath = g_strdup_printf ("%s/cairo-dock.svg", CAIRO_DOCK_SHARE_DATA_DIR);
+	gchar *cImagePath = g_strdup_printf ("%s/cairo-dock.png", CAIRO_DOCK_SHARE_DATA_DIR);
 	GtkWidget *pImage = gtk_image_new_from_file (cImagePath);
 	g_free (cImagePath);
 #if GTK_MINOR_VERSION >= 12

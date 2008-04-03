@@ -4,7 +4,7 @@
 
 Gauge *init_cd_Gauge(cairo_t *pSourceContext, gchar *themePath, int iWidth, int iHeight)
 {
-	cd_debug("gauge : %s\n",__func__);
+	cd_debug("");
 	Gauge *pGauge = g_new0 (Gauge, 1);
 	if (themePath != NULL)
 	{
@@ -31,7 +31,7 @@ Gauge *init_cd_Gauge(cairo_t *pSourceContext, gchar *themePath, int iWidth, int 
 			pGauge->themeName = cairo_dock_get_string_key_value (pThemeKeyFile, "Informations", "name", &bFlushConfFileNeeded, "", NULL, NULL);
 			pGauge->themeType = cairo_dock_get_string_key_value (pThemeKeyFile, "Informations", "format", &bFlushConfFileNeeded, "", NULL, NULL);
 			
-			cd_debug("gauge : Load theme (%s,%s)\n",pGauge->themeName,pGauge->themeType);
+			cd_debug("gauge : Load theme (%s,%s)",pGauge->themeName,pGauge->themeType);
 			
 			gchar *imagePath;
 			//On charge l'image de fond
@@ -274,7 +274,9 @@ void draw_cd_Gauge_image(cairo_t *pSourceContext, Gauge *pGauge, double dValue)
 
 void free_cd_Gauge(Gauge *pGauge)
 {
-	cd_debug("gauge : %s\n",__func__);
+	cd_debug("");
+	if (pGauge == NULL)
+		return ;
 	
 	if(pGauge->themeName != NULL) g_free(pGauge->themeName);
 	if(pGauge->themeType != NULL) g_free(pGauge->themeType);
@@ -293,7 +295,7 @@ void free_cd_Gauge(Gauge *pGauge)
 
 void free_cd_GaugeImage(GaugeImage *pGaugeImage)
 {
-	cd_debug("gauge : %s\n",__func__);
+	cd_debug("");
 	
 	if(pGaugeImage->svgNeedle != NULL) rsvg_handle_free (pGaugeImage->svgNeedle);
 	if(pGaugeImage->cairoSurface != NULL) cairo_surface_destroy (pGaugeImage->cairoSurface);
@@ -304,10 +306,10 @@ void free_cd_GaugeImage(GaugeImage *pGaugeImage)
 gchar *cairo_dock_get_gauge_key_value(gchar *cAppletConfFilePath, GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultThemeName)
 {
 	gchar *themePath;
-	themePath = cairo_dock_manage_themes_for_applet (CAIRO_DOCK_SHARE_DATA_DIR, g_strdup_printf("gauges"), cAppletConfFilePath, pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, cDefaultThemeName);
-	cd_debug("Clés du theme : [%s] %s\n",cGroupName,cKeyName);
-	cd_debug("Theme de la jauge : %s\n",themePath);
-	cd_debug("Dossier des jauges : %s/gauges\n",CAIRO_DOCK_SHARE_DATA_DIR);
+	themePath = cairo_dock_manage_themes_for_applet (CAIRO_DOCK_SHARE_DATA_DIR, "gauges", cAppletConfFilePath, pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, cDefaultThemeName);
+	cd_debug("Clés du theme : [%s] %s",cGroupName,cKeyName);
+	cd_debug("Theme de la jauge : %s",themePath);
+	cd_debug("Dossier des jauges : %s/gauges",CAIRO_DOCK_SHARE_DATA_DIR);
 	return themePath;
 	g_free(themePath);
 }

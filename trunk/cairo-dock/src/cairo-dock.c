@@ -89,7 +89,6 @@
 #include "cairo-dock-log.h"
 #include "cairo-dock-X-utilities.h"
 #include "cairo-dock-dbus.h"
-#include "cairo-dock-gauge.h"
 
 CairoDock *g_pMainDock;  // pointeur sur le dock principal.
 GHashTable *g_hDocksTable = NULL;  // table des docks existant.
@@ -280,7 +279,7 @@ main (int argc, char** argv)
 
 	//\___________________ On recupere quelques options.
 	gboolean bDialogTest = FALSE, bSafeMode = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE;
-	gchar *cEnvironment = NULL, *cUserDefinedDataDir = NULL, *cVerbosity = 0;
+	gchar *cEnvironment = NULL, *cUserDefinedDataDir = NULL, *cVerbosity = 0, *cUserDefinedModuleDir = NULL;
 	GOptionEntry TableDesOptions[] =
 	{
 		{"log", 'l', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
@@ -331,6 +330,9 @@ main (int argc, char** argv)
 		{"version", 'v', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&bPrintVersion,
 			"print version and quit.", NULL},
+		{"modules-dir", 'm', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
+			&cUserDefinedModuleDir,
+			"ask the dock to load additionnal modules contained in this directory (It is unsafe for your dock to load unnofficial modules).", NULL},
 		{NULL}
 	};
 
@@ -475,8 +477,17 @@ main (int argc, char** argv)
 	
 	//\___________________ On initialise le gestionnaire de modules et on pre-charge les modules existant.
 	if (g_module_supported () && ! bSafeMode)
+	{
 		cairo_dock_initialize_module_manager (CAIRO_DOCK_MODULES_DIR);
-
+		
+		if (cUserDefinedModuleDir != NULL)
+		{
+			cairo_dock_initialize_module_manager (cUserDefinedModuleDir);
+			g_free (cUserDefinedModuleDir);
+			cUserDefinedModuleDir = NULL;
+		}
+	}
+	
 	//\___________________ On enregistre nos notifications.
 	cairo_dock_register_notification (CAIRO_DOCK_BUILD_MENU, (CairoDockNotificationFunc) cairo_dock_notification_build_menu, CAIRO_DOCK_RUN_AFTER);
 	cairo_dock_register_notification (CAIRO_DOCK_DROP_DATA, (CairoDockNotificationFunc) cairo_dock_notification_drop_data, CAIRO_DOCK_RUN_AFTER);

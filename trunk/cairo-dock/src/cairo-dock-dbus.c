@@ -68,69 +68,13 @@ void cd_dbus_callback_init(dbusCallback *server)
 }
 
 
-static gpointer _cairo_dock_threaded_dbus_init (gpointer data)
-{
-	cd_message("");
-	GError *erreur = NULL;
-	
-	dbusCallback *server = g_object_new(cd_dbus_callback_get_type(), NULL);  // -> appelle cd_dbus_callback_class_init() et cd_dbus_callback_init().
-	
-	cd_message ("*** fin du thread dbus");
-	return NULL;
-}
 void cd_dbus_init(void)
 {
 	g_type_init();
 	cd_message("dbus : Lancement du service");
 	
-	/**GError *erreur = NULL;
-	GThread* pThread = g_thread_create ((GThreadFunc) _cairo_dock_threaded_dbus_init,
-		NULL,
-		FALSE,
-		&erreur);
-	if (erreur != NULL)
-	{
-		cd_warning ("Attention : %s", erreur->message);
-		g_error_free (erreur);
-	}*/
-	_cairo_dock_threaded_dbus_init (NULL);  // est-ce utile de le threader ? des fois j'ai l'impression que l'init prend du temps...
+	dbusCallback *server = g_object_new(cd_dbus_callback_get_type(), NULL);  // -> appelle cd_dbus_callback_class_init() et cd_dbus_callback_init().
 }
-
-gboolean cd_dbus_callback_hello(dbusCallback *pDbusCallback, GError **error)
-{
-	cairo_dock_show_general_message("Hello !",3000);
-	return TRUE;
-}
-
-gboolean cd_dbus_callback_show_desklet(dbusCallback *pDbusCallback, gboolean *widgetLayer, GError **error)
-{
-	if (dbus_deskletVisible)
-	{
-		cairo_dock_set_desklets_visibility_to_default ();
-		cairo_dock_show_appli (dbus_xLastActiveWindow);
-	}
-	else
-	{
-		dbus_xLastActiveWindow = cairo_dock_get_active_window ();
-		cairo_dock_set_all_desklets_visible (widgetLayer != NULL ? *widgetLayer : FALSE);
-	}
-	dbus_deskletVisible = !dbus_deskletVisible;
-	return TRUE;
-}
-
-gboolean cd_dbus_callback_show_dialog(dbusCallback *pDbusCallback, gchar *message, GError **error)
-{
-	cairo_dock_show_general_message(message,3000);
-	return TRUE;
-}
-
-gboolean cd_dbus_callback_reboot(dbusCallback *pDbusCallback, GError **error)
-{
-	cairo_dock_read_conf_file (g_cConfFile,g_pMainDock);
-	return TRUE;
-}
-
-
 
 gboolean cairo_dock_bdus_is_enabled (void)
 {
@@ -176,4 +120,40 @@ gboolean cairo_dock_dbus_detect_application (const gchar *cName)
 	}
 	g_strfreev (name_list);
 	return bPresent;
+}
+
+
+
+gboolean cd_dbus_callback_hello(dbusCallback *pDbusCallback, GError **error)
+{
+	cairo_dock_show_general_message("Hello !",3000);
+	return TRUE;
+}
+
+gboolean cd_dbus_callback_show_desklet(dbusCallback *pDbusCallback, gboolean *widgetLayer, GError **error)
+{
+	if (dbus_deskletVisible)
+	{
+		cairo_dock_set_desklets_visibility_to_default ();
+		cairo_dock_show_appli (dbus_xLastActiveWindow);
+	}
+	else
+	{
+		dbus_xLastActiveWindow = cairo_dock_get_active_window ();
+		cairo_dock_set_all_desklets_visible (widgetLayer != NULL ? *widgetLayer : FALSE);
+	}
+	dbus_deskletVisible = !dbus_deskletVisible;
+	return TRUE;
+}
+
+gboolean cd_dbus_callback_show_dialog(dbusCallback *pDbusCallback, gchar *message, GError **error)
+{
+	cairo_dock_show_general_message(message,3000);
+	return TRUE;
+}
+
+gboolean cd_dbus_callback_reboot(dbusCallback *pDbusCallback, GError **error)
+{
+	cairo_dock_read_conf_file (g_cConfFile,g_pMainDock);
+	return TRUE;
 }

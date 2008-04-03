@@ -3,7 +3,6 @@
 export CAIRO_DOCK_DIR=/opt/cairo-dock/trunk
 export FAST_COMPIL="0" 
 export BUILD_TAR="0" 
-export UNSTABLE_APPLETS="xfce-integration tomboy mail netspeed switcher"
 if test "$1" = "-f" -o "$2" = "-f"; then
 	export FAST_COMPIL="1"
 fi
@@ -17,25 +16,15 @@ cd $CAIRO_DOCK_DIR
 find . -name "*~" -delete
 find . -name "core*" -delete
 find . -name ".#*" -delete
+rm -f cairo-dock-sources*.tar.bz2 *.deb
 
 cd themes
 ./cairo-dock-finalize-theme.sh
 cd ..
 
-rm -f cairo-dock-sources*.tar.bz2 *.deb
-
 cd cairo-dock
 ./compile-all.sh -ct
 
-if test "$BUILD_TAR" = "1"; then
-	cd /tmp
-	tar cf `date +"cairo-dock-sources-%Y%m%d.tar"` $CAIRO_DOCK_DIR/cairo-dock $CAIRO_DOCK_DIR/plug-ins $CAIRO_DOCK_DIR/themes
-	cd $CAIRO_DOCK_DIR
-	mv `date +"/tmp/cairo-dock-sources-%Y%m%d.tar"` .
-	bzip2 *.tar 
-fi
-
-#\_____________ On nettoie l'arborescence des paquets.
 sudo rm -rf deb/usr
 sudo rm -rf deb-plug-ins/usr
 
@@ -47,6 +36,15 @@ cd ../deb-plug-ins
 if test -e debian; then
 	mv debian DEBIAN
 fi
+
+if test "$BUILD_TAR" = "1"; then
+	cd /tmp
+	tar cf `date +"cairo-dock-sources-%Y%m%d.tar"` $CAIRO_DOCK_DIR/cairo-dock $CAIRO_DOCK_DIR/plug-ins $CAIRO_DOCK_DIR/themes
+	cd $CAIRO_DOCK_DIR
+	mv `date +"/tmp/cairo-dock-sources-%Y%m%d.tar"` .
+	bzip2 *.tar 
+fi
+
 
 #\_____________ On compile de zero.
 cd ../cairo-dock
@@ -89,11 +87,6 @@ for lang in `cat ../cairo-dock/po/LINGUAS`; do
 	sudo cp /usr/share/locale/$lang/LC_MESSAGES/cd-*.mo usr/share/locale/$lang/LC_MESSAGES
 done;
 sudo cp -r /usr/share/cairo-dock/plug-in usr/share/cairo-dock
-for applet in $UNSTABLE_APPLETS; do
-	sudo rm -f "usr/share/cairo-dock/plug-in/libcd-$applet.so"
-	sudo rm -rf "usr/share/cairo-dock/plug-in/$applet"
-done;
-
 
 
 cd $CAIRO_DOCK_DIR

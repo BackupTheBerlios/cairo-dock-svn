@@ -45,8 +45,9 @@ void cairo_dock_free_dialog (CairoDockDialog *pDialog);
 /**
 *Dereference tous les dialogues pointant sur une icone; si les dialogues sont utilises par quelqu'un d'autre, il seront detruits plus tard, mais seront au moins isoles, et ne pourront donc plus etre utilises par une nouvelle personne.
 *@param icon l'icone dont on veut supprimer les dialogues.
+*@returns TRUE ssi au moins un dialogue a ete detruit.
 */
-void cairo_dock_remove_dialog_if_any (Icon *icon);
+gboolean cairo_dock_remove_dialog_if_any (Icon *icon);
 /**
 *Detruit et enleve de la liste tous les dialogues dont la reference est a 0, et qui n'ont pas ete enleves de la liste.
 */

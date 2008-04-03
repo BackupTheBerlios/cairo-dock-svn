@@ -300,6 +300,7 @@ msgstr ""
 #: ../src/cairo-dock-modules.c:805 ../src/cairo-dock-modules.c:810
 #: ../src/cairo-dock-modules.c:814 ../src/cairo-dock-modules.c:821
 #: ../src/cairo-dock-modules.c:762 ../src/cairo-dock-modules.c:693
+#: ../src/cairo-dock-modules.c:692
 #, c-format
 msgid "Configuration of %s"
 msgstr "Configuration de %s"

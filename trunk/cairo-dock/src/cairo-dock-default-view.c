@@ -170,6 +170,7 @@ void cairo_dock_render_linear (CairoDock *pDock)
 
 	//\____________________ On dessine les icones et les etiquettes, en tenant compte de l'ordre pour dessiner celles en arriere-plan avant celles en avant-plan.
 	double fRatio = (pDock->iRefCount == 0 ? 1 : g_fSubDockSizeRatio);
+	fRatio = pDock->fRatio;
 	cairo_dock_render_icons_linear (pCairoContext, pDock, fRatio);
 
 	cairo_destroy (pCairoContext);
@@ -274,6 +275,7 @@ void cairo_dock_render_optimized_linear (CairoDock *pDock, GdkRectangle *pArea)
 		double fXMin = (pDock->bHorizontalDock ? pArea->x : pArea->y), fXMax = (pDock->bHorizontalDock ? pArea->x + pArea->width : pArea->y + pArea->height);
 		double fDockMagnitude = cairo_dock_calculate_magnitude (pDock->iMagnitudeIndex);
 		double fRatio = (pDock->iRefCount == 0 ? 1 : g_fSubDockSizeRatio);
+		fRatio = pDock->fRatio;
 		double fXLeft, fXRight;
 
 		Icon *icon;

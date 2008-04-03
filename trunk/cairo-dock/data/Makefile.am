@@ -10,7 +10,7 @@ essentialdata_DATA = \
 	container.conf\
 	separator.conf\
 	themes.conf\
-	cairo-dock.svg\
+	cairo-dock.png\
 	cairo-dock-icon.svg\
 	default-icon.svg\
 	cairo-dock-ok.svg\
