@@ -367,18 +367,22 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 
 	Icon* icon;
 	GList* ic;
-	double fRatio = (pDock->iRefCount == 0 ? 1 : g_fSubDockSizeRatio);
+	//double fRatio = (pDock->iRefCount == 0 ? 1 : g_fSubDockSizeRatio);
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
-		if (CAIRO_DOCK_IS_APPLET (icon))
+		icon->fWidth /= pDock->fRatio;
+		icon->fHeight /= pDock->fRatio;
+		
+		/*if (CAIRO_DOCK_IS_APPLET (icon))
 			cairo_dock_reload_module (icon->pModule, FALSE);
-		else
+		else*/
+		if (! CAIRO_DOCK_IS_APPLET (icon))
 			cairo_dock_fill_icon_buffers (icon, pCairoContext, fMaxScale, pDock->bHorizontalDock, TRUE);
 
-		icon->fWidth *= fRatio;
-		icon->fHeight *= fRatio;
-		//g_print (" =size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
+		icon->fWidth *= pDock->fRatio;
+		icon->fHeight *= pDock->fRatio;
+		g_print (" =size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
 		fFlatDockWidth += g_iIconGap + icon->fWidth;
 		pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, icon->fHeight);
 	}

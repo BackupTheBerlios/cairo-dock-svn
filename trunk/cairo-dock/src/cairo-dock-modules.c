@@ -297,7 +297,21 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 			}
 			else
 			{
+				/*CairoDock *pMyDock = NULL;
+				Icon *pIcon = NULL;
+				if (CAIRO_DOCK_IS_DOCK (pModule->pContainer))
+				{
+					pIcon = cairo_dock_find_icon_from_module (pModule, pModule->pContainer);
+					pMyDock = CAIRO_DOCK_DOCK (pModule->pContainer);
+					pIcon->fWidth /= pMyDock->fRatio;
+					pIcon->fHeight /= pMyDock->fRatio;
+				}*/
 				cairo_dock_reload_module (pModule, FALSE);
+				/*if (pMyDock != NULL && pIcon != NULL)
+				{
+					pIcon->fWidth *= pMyDock->fRatio;
+					pIcon->fHeight *= pMyDock->fRatio;
+				}*/
 			}
 		}
 		i ++;
@@ -483,7 +497,17 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 	}
 
 	//\____________________ On initialise le module.
+	if (CAIRO_DOCK_IS_DOCK (pContainer))
+	{
+		pIcon->fWidth *= CAIRO_DOCK_DOCK (pContainer)->fRatio;
+		pIcon->fHeight *= CAIRO_DOCK_DOCK (pContainer)->fRatio;
+	}
 	module->initModule (pKeyFile, pIcon, pContainer, module->cConfFilePath, &tmp_erreur);
+	if (CAIRO_DOCK_IS_DOCK (pContainer))
+	{
+		pIcon->fWidth /= CAIRO_DOCK_DOCK (pContainer)->fRatio;
+		pIcon->fHeight /= CAIRO_DOCK_DOCK (pContainer)->fRatio;
+	}
 	if (pKeyFile != NULL)
 		g_key_file_free (pKeyFile);
 	if (tmp_erreur != NULL)
@@ -527,6 +551,7 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 	if (module->bActive && module->reloadModule != NULL)
 	{
 		Icon *pIcon = cairo_dock_find_icon_from_module (module, pActualContainer);
+		//g_print ("avant reload : %.2f\n", pIcon->fWidth);
 
 		GKeyFile *pKeyFile = NULL;
 		CairoDockMinimalAppletConfig *pMinimalConfig = NULL;
@@ -602,12 +627,29 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 				cairo_dock_insert_icon_in_dock (pIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
 				cairo_dock_start_animation (pIcon, pDock);
 			}
-			else if (bReloadAppletConf)
-				cairo_dock_update_dock_size (CAIRO_DOCK_DOCK (pNewContainer));
+			else
+			{
+				pIcon->fWidth *= CAIRO_DOCK_DOCK (pActualContainer)->fRatio;
+				pIcon->fHeight *= CAIRO_DOCK_DOCK (pActualContainer)->fRatio;
+				
+				if (bReloadAppletConf)
+					cairo_dock_update_dock_size (CAIRO_DOCK_DOCK (pNewContainer));
+			}
+			/*CairoDock *pDock = CAIRO_DOCK_DOCK (pActualContainer);
+			pIcon->fWidth /= pDock->fRatio;
+			pIcon->fHeight /= pDock->fRatio;*/
 		}
-
+		
 		bModuleReloaded = module->reloadModule (pKeyFile, module->cConfFilePath, pNewContainer);
-
+		
+		/*if (CAIRO_DOCK_IS_DOCK (pNewContainer))
+		{
+			CairoDock *pDock = CAIRO_DOCK_DOCK (pActualContainer);
+			pIcon->fWidth *= pDock->fRatio;
+			pIcon->fHeight *= pDock->fRatio;
+		}*/
+		//g_print ("apres reload : %.2f\n", pIcon->fWidth);
+		
 		cairo_dock_free_minimal_config (pMinimalConfig);
 		if (pKeyFile != NULL)
 			g_key_file_free (pKeyFile);

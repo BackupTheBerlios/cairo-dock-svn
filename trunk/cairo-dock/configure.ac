@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([cairo-dock], [1.5.4], [Fabrice Rey (fabounet@users.berlios.de)])
+AC_INIT([cairo-dock], [1.5.4.1], [Fabrice Rey (fabounet@users.berlios.de)])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
 
@@ -23,11 +23,14 @@ AC_PROG_CC
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([stdlib.h])
+AC_CHECK_HEADERS([math.h stdlib.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
+# AC_C_CONST
+# AC_TYPE_PID_T
 
 # Checks for library functions.
+# AC_CHECK_FUNCS([sscanf])
 
 
 AM_CONDITIONAL(COMPIL_VERBOSE, test x$enable_verbose = xyes)

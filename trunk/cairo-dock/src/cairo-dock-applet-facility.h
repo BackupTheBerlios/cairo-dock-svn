@@ -888,7 +888,7 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 *@param cImagePath chemin du fichier de l'image.
 *@return la surface nouvellement creee.
 */
-#define CD_APPLET_LOAD_SURFACE_FOR_MY_APPLET(cImagePath) cairo_dock_create_surface_for_icon (cImagePath, myDrawContext, myIcon->fWidth * (myDock != NULL ? 1 + g_fAmplitude : 1), myIcon->fHeight* (myDock != NULL ? 1 + g_fAmplitude : 1));
+#define CD_APPLET_LOAD_SURFACE_FOR_MY_APPLET(cImagePath) cairo_dock_create_surface_for_icon (cImagePath, myDrawContext, myIcon->fWidth * (myDock != NULL ? (1 + g_fAmplitude) / myDock->fRatio : 1), myIcon->fHeight* (myDock != NULL ? (1 + g_fAmplitude) / myDock->fRatio : 1));
 
 
 //\_________________________________ INCLUDE
@@ -907,7 +907,7 @@ extern AppletData myData;
 
 //\_________________________________ INTERNATIONNALISATION
 /**
-*Macro pour gettext, similaire a _() et N_(), mais avec le nom de domaine en parametre. Encadrez toutes vos chaines de caracteres statiques avec ca, de maniere a ce que l'utilitaire 'xgettext' puisse les trouver et les inclure autimatiquement dans les fichiers de traduction.
+*Macro pour gettext, similaire a _() et N_(), mais avec le nom de domaine en parametre. Encadrez toutes vos chaines de caracteres statiques avec ca, de maniere a ce que l'utilitaire 'xgettext' puisse les trouver et les inclure automatiquement dans les fichiers de traduction.
 */
 #define D_(message) dgettext (MY_APPLET_GETTEXT_DOMAIN, message)
 #define _D D_

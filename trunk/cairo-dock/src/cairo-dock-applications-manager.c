@@ -840,7 +840,7 @@ CairoDock *cairo_dock_insert_appli_in_dock (Icon *icon, CairoDock *pMainDock, gb
 
 	//\_________________ On l'insere dans son dock parent en animant ce dernier eventuellement.
 	cairo_dock_insert_icon_in_dock (icon, pParentDock, bUpdateSize, bAnimate, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
-	cd_message (" insertion de %s complete (%.2f)", icon->acName, icon->fPersonnalScale);
+	cd_message (" insertion de %s complete (%.2f %.2fx%.2f)", icon->acName, icon->fPersonnalScale, icon->fWidth, icon->fHeight);
 
 	if (bAnimate && cairo_dock_animation_will_be_visible (pParentDock))
 	{
@@ -1218,9 +1218,9 @@ static CairoDockClassAppli *cairo_dock_find_class_appli (const gchar *cClass)
 	return (cClass != NULL ? g_hash_table_lookup (s_hClassTable, cClass) : NULL);
 }
 
-static gboolean cairo_dock_register_to_class (const gchar *cClass, Icon *pIcon)
+static CairoDockClassAppli *cairo_dock_get_class (const gchar *cClass)
 {
-	g_return_val_if_fail (cClass != NULL, FALSE);
+	g_return_val_if_fail (cClass != NULL, NULL);
 	
 	CairoDockClassAppli *pClassAppli = cairo_dock_find_class_appli (cClass);
 	if (pClassAppli == NULL)
@@ -1228,6 +1228,14 @@ static gboolean cairo_dock_register_to_class (const gchar *cClass, Icon *pIcon)
 		pClassAppli = g_new0 (CairoDockClassAppli, 1);
 		g_hash_table_insert (s_hClassTable, g_strdup (cClass), pClassAppli);
 	}
+	return pClassAppli;
+}
+
+static gboolean cairo_dock_add_inhibator_to_class (const gchar *cClass, Icon *pIcon)
+{
+	CairoDockClassAppli *pClassAppli = cairo_dock_get_class (cClass);
+	g_return_val_if_fail (pClassAppli!= NULL, FALSE);
+	
 	if (pIcon != NULL)
 	{
 		g_return_val_if_fail (g_list_find (pClassAppli->pIconsOfClass, pIcon) == NULL, TRUE);
@@ -1235,6 +1243,17 @@ static gboolean cairo_dock_register_to_class (const gchar *cClass, Icon *pIcon)
 	}
 	
 	return TRUE;
+}
+
+gboolean cairo_dock_set_class_use_xicon (const gchar *cClass, gboolean bUseXIcon)
+{
+	CairoDockClassAppli *pClassAppli = cairo_dock_get_class (cClass);
+	g_return_val_if_fail (pClassAppli!= NULL, FALSE);
+	
+	gboolean bStateChanged = (pClassAppli->bUseXIcon != bUseXIcon);
+	pClassAppli->bUseXIcon = bUseXIcon;
+	
+	return bStateChanged;
 }
 
 gboolean cairo_dock_inhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
@@ -1252,7 +1271,7 @@ gboolean cairo_dock_inhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
 		}
 	}
 	
-	return cairo_dock_register_to_class (cClass, pInhibatorIcon);
+	return cairo_dock_add_inhibator_to_class (cClass, pInhibatorIcon);
 }
 
 gboolean cairo_dock_class_is_inhibated (const gchar *cClass)
@@ -1265,6 +1284,7 @@ gboolean cairo_dock_prevent_inhibated_class (Icon *pIcon)
 {
 	g_return_val_if_fail (pIcon != NULL, FALSE);
 	
+	gboolean bToBeInhibited = FALSE;
 	CairoDockClassAppli *pClassAppli = cairo_dock_find_class_appli (pIcon->cClass);
 	if (pClassAppli != NULL)
 	{
@@ -1273,12 +1293,39 @@ gboolean cairo_dock_prevent_inhibated_class (Icon *pIcon)
 		for (pElement = pClassAppli->pIconsOfClass; pElement != NULL; pElement = pElement->next)
 		{
 			pInhibatorIcon = pElement->data;
-			if (pInhibatorIcon->Xid == 0)
-				pInhibatorIcon->Xid = pIcon->Xid;
+			if (pInhibatorIcon == NULL)  // cette appli est inhibee par Dieu.
+				bToBeInhibited = TRUE;
+			else
+			{
+				if (pInhibatorIcon->Xid == 0)  // cette icone inhibe cette classe mais ne controle encore aucune appli, on s'y asservit.
+				{
+					pInhibatorIcon->Xid = pIcon->Xid;
+					if (CAIRO_DOCK_IS_NORMAL_LAUNCHER (pInhibatorIcon))
+						g_print (">>> %s prendra un indicateur au prochain redraw !\n", pInhibatorIcon->acName);
+				}
+				
+				if (pInhibatorIcon->Xid == pIcon->Xid)  // cette icone nous controle deja. Sinon elle controle deja une autre appli, auquel cas on n'est pas inhibe.
+				{
+					bToBeInhibited = TRUE;
+					if (CAIRO_DOCK_IS_NORMAL_LAUNCHER (pInhibatorIcon))
+						g_print (">>> %s a donc un indicateur !\n", pInhibatorIcon->acName);
+					CairoDock *pInhibhatorDock = cairo_dock_search_dock_from_name (pInhibatorIcon->cParentDockName);
+					if (pInhibhatorDock != NULL)
+					{
+						if (pInhibhatorDock->iRefCount == 0)
+						{
+							g_print ("  l'inhibiteur est dans un dock principal\n");
+						}
+						else
+						{
+							g_print ("  l'inhibiteur est dans un sous-dock\n");
+						}
+					}
+				}
+			}
 		}
-		return TRUE;
 	}
-	return FALSE;
+	return bToBeInhibited;
 }
 
 void cairo_dock_deinhibate_class (const gchar *cClass, Icon *pInhibatorIcon)

@@ -467,6 +467,7 @@ msgstr ""
 #: ../src/cairo-dock-modules.c:810 ../src/cairo-dock-modules.c:814
 #: ../src/cairo-dock-modules.c:821 ../src/cairo-dock-modules.c:762
 #: ../src/cairo-dock-modules.c:693 ../src/cairo-dock-modules.c:692
+#: ../src/cairo-dock-modules.c:734
 #, c-format
 msgid "Configuration of %s"
 msgstr "%s の設定"
@@ -674,9 +675,6 @@ msgstr "選択した画面端における位置"
 #: ../data/messages:25
 msgid "Lateral gap :"
 msgstr "側面方向の隙間 :"
-
-msgid "Gap from the absolute position on the screen's edge, in pixels."
-msgstr "画面端の絶対位置からの隙間（ピクセル単位）です。"
 
 #: ../data/messages:29
 msgid "Distance to the screen's edge :"
@@ -1898,6 +1896,7 @@ msgstr "区切りを追加"
 #: ../src/cairo-dock-gui-factory.c:1257 ../src/cairo-dock-gui-factory.c:1274
 #: ../src/cairo-dock-gui-factory.c:1276 ../src/cairo-dock-gui-factory.c:1279
 #: ../src/cairo-dock-gui-factory.c:1281 ../src/cairo-dock-gui-factory.c:1282
+#: ../src/cairo-dock-gui-factory.c:1316
 msgid "grab"
 msgstr "取得"
 
@@ -1960,6 +1959,7 @@ msgstr "Compiz Fusion ウィジェット"
 #: ../src/cairo-dock-callbacks.c:1418 ../src/cairo-dock-callbacks.c:1420
 #: ../src/cairo-dock-callbacks.c:1421 ../src/cairo-dock-callbacks.c:1424
 #: ../src/cairo-dock-callbacks.c:1429 ../src/cairo-dock-callbacks.c:1431
+#: ../src/cairo-dock-callbacks.c:1447
 msgid "Quit Cairo-Dock ?"
 msgstr "Cairo-Dock 終了？"
 

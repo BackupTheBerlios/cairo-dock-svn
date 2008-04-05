@@ -501,7 +501,7 @@ relative icon size = 1.
 #[gtk-dialog-question]
 [Dialogs]
 
-#F+[Buttons]
+#F+[Buttons;@prefix@/@DATADIRNAME@/@PACKAGE@/icon-buttons.png]
 frame_button =
 
 #i+[10;99] Size of buttons in the info-bubbles (width x height) :
@@ -518,7 +518,7 @@ button_ok image =
 #{If you don't provide any, a default image will be used.}
 button_cancel image = 
 
-#F+[Bubble]
+#F+[Bubble;@prefix@/@DATADIRNAME@/@PACKAGE@/icon-bubble.png]
 frame_bubble =
 
 #c+4[0;1] Background color of the bubble (r,v,b,a) :

@@ -300,7 +300,7 @@ msgstr ""
 #: ../src/cairo-dock-modules.c:805 ../src/cairo-dock-modules.c:810
 #: ../src/cairo-dock-modules.c:814 ../src/cairo-dock-modules.c:821
 #: ../src/cairo-dock-modules.c:762 ../src/cairo-dock-modules.c:693
-#: ../src/cairo-dock-modules.c:692
+#: ../src/cairo-dock-modules.c:692 ../src/cairo-dock-modules.c:734
 #, c-format
 msgid "Configuration of %s"
 msgstr "Configuration de %s"
@@ -1495,7 +1495,7 @@ msgstr "Taille des boutons dans les info-bulles (largeur x hauteur) :"
 #: ../data/messages:435 ../data/messages:437 ../data/messages:453
 #: ../data/messages:457
 msgid "Name of an image to use for the yes/ok button :"
-msgstr "Nom de fichier d'une image à utiliser pour le bouton oui/ok :"
+msgstr "Fichier image à utiliser pour le bouton oui/ok :"
 
 #: ../data/messages:433 ../data/messages:437 ../data/messages:435
 #: ../data/messages:439 ../data/messages:451 ../data/messages:455
@@ -1506,7 +1506,7 @@ msgstr "Si vous ne spécifiez rien, une image par défaut sera utilisée."
 #: ../data/messages:439 ../data/messages:441 ../data/messages:457
 #: ../data/messages:461
 msgid "Name of an image to use for the no/cancel button :"
-msgstr "Nom de fichier d'une image à utiliser pour le bouton non/annuler :"
+msgstr "Fichier image à utiliser pour le bouton non/annuler :"
 
 #: ../data/messages:441 ../data/messages:443 ../data/messages:459
 #: ../data/messages:463
@@ -1626,24 +1626,17 @@ msgstr ""
 "Kawada !"
 
 msgid ""
-"v1.5.4 : a huge release !\n"
-" - add a cute pinguin in your dock with the new applet Cairo-Penguin\n"
-" - monitor your wifi connection with the Wifi applet\n"
-" - control xmms, audacious, banshee and exaile with the Xmms applet\n"
-" - Cairo-Dock is now fully integrated into XFCE environment !\n"
-" - Better detection of battery in the Powermanager applet\n"
-" - lot of improvments in the Terminal applet.\n"
-" - refresh your dock with the new theme : Wood\n"
-" - 3 more themes in Weather"
+"v1.5.4.1 : a huge release !\n - add a cute pinguin in your dock with the new applet Cairo-Penguin\n - monitor your wifi connection with the Wifi applet\n - control xmms, audacious, banshee and exaile with the Xmms applet\n - Cairo-Dock is now fully integrated into XFCE environment !\n - better detection of battery in the Powermanager applet\n - lot of improvments in the Terminal applet.\n - the dock can auto-resize when it grows too large\n - refresh your dock with the new theme : Wood\n - 3 more themes in Weather"
 msgstr ""
-"v1.5.4 : une énorme mise à jour !\n"
+"v1.5.4.1 : une énorme mise à jour !\n"
 " - ajoutez un pingouin trognon dans votre dock avec la nouvelle applet Cairo-"
 "Penguin\n"
 " - surveillez votre connexion wifi avec l'applet Wifi\n"
 " - contrôlez xmms, audacious, banshee et exaile avec l'applet Xmms\n"
 " - Cairo-Dock est désormais totalement intégré à l'environnement XFCE !\n"
-" - Meilleure détection de la batterie dans l'appletPowermanager\n"
+" - meilleure détection de la batterie dans l'appletPowermanager\n"
 " - de nombreuses améliorations dans l'applet Terminal\n"
+" - le dock se redimensionne automatiquement quand il devient trop large\n"
 " - rafraîchissez votre dock avec le nouveau thème Wood\n"
 " - 3 thèmes supplémentaires pour l'applet Weather."
 
@@ -1829,6 +1822,7 @@ msgstr "Ajouter un séparateur"
 #: ../src/cairo-dock-callbacks.c:1418 ../src/cairo-dock-callbacks.c:1420
 #: ../src/cairo-dock-callbacks.c:1421 ../src/cairo-dock-callbacks.c:1424
 #: ../src/cairo-dock-callbacks.c:1429 ../src/cairo-dock-callbacks.c:1431
+#: ../src/cairo-dock-callbacks.c:1447
 msgid "Quit Cairo-Dock ?"
 msgstr "Quitter Cairo-Dock ?"
 
@@ -1837,6 +1831,7 @@ msgstr "Quitter Cairo-Dock ?"
 #: ../src/cairo-dock-gui-factory.c:1257 ../src/cairo-dock-gui-factory.c:1274
 #: ../src/cairo-dock-gui-factory.c:1276 ../src/cairo-dock-gui-factory.c:1279
 #: ../src/cairo-dock-gui-factory.c:1281 ../src/cairo-dock-gui-factory.c:1282
+#: ../src/cairo-dock-gui-factory.c:1316
 msgid "grab"
 msgstr "récupérer"
 
@@ -1905,10 +1900,6 @@ msgstr "Toujours derrière"
 msgid "set behaviour in Compiz to: (name=cairo-dock-desklet & type=utility)"
 msgstr ""
 "réglez le comportement de Compiz à : (name=cairo-dock-desklet & type=utility)"
-
-#: ../data/messages:23
-msgid "Gap from the absolute position on the screen's edge, in pixels."
-msgstr ""
 
 #: ../data/messages:165 ../data/messages:169 ../data/messages:173
 msgid "Name"
@@ -2064,23 +2055,25 @@ msgstr "Liste des contrôleurs disponibles :"
 
 #: ../src/cairo-dock-menu.c:131 ../src/cairo-dock-menu.c:132
 msgid "Development"
-msgstr ""
+msgstr "Développement"
 
 #: ../src/cairo-dock-menu.c:140 ../src/cairo-dock-menu.c:141
 msgid "Support"
-msgstr ""
+msgstr "Support"
 
 #: ../src/cairo-dock-menu.c:1138 ../src/cairo-dock-menu.c:1136
 #: ../src/cairo-dock-menu.c:1140 ../src/cairo-dock-menu.c:1146
 msgid "Show"
-msgstr ""
+msgstr "Montrer"
 
 #: ../data/messages:107
 msgid ""
 "The dock will unfold when it hides/shows itself. No effect if auto-hide is "
 "not activated or unfold acceleration is nul."
 msgstr ""
+"Le dock se dépliera lorsqu'il se cache/montre. Aucun effet si l'auto-hide "
+"n'est pas activé, ou si l'accélération de dépliage est nulle."
 
 #: ../data/messages:109
 msgid "Animate the dock when auto-hiding ?"
-msgstr ""
+msgstr "Animer the dock lorsqu'il se cache ?"

@@ -518,7 +518,7 @@ void cairo_dock_free_dialog (CairoDockDialog *pDialog)
 
 gboolean cairo_dock_remove_dialog_if_any (Icon *icon)
 {
-	g_return_if_fail (icon != NULL);
+	g_return_val_if_fail (icon != NULL, FALSE);
 	CairoDockDialog *pDialog;
 	GSList *ic;
 	gboolean bDialogRemoved = FALSE;
@@ -1206,7 +1206,7 @@ CairoDockDialog *cairo_dock_show_temporary_dialog_with_default_icon (const gchar
 	va_list args;
 	va_start (args, fTimeLength);
 	gchar *cFullText = g_strdup_vprintf (cText, args);
-	gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-icon.svg", CAIRO_DOCK_SHARE_DATA_DIR);
+	gchar *cIconPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_ICON);
 	CairoDockDialog *pDialog = cairo_dock_show_dialog_full (cFullText, pIcon, pContainer, fTimeLength, cIconPath, GTK_BUTTONS_NONE, NULL, NULL, NULL, NULL);
 	g_free (cIconPath);
 	g_free (cFullText);
@@ -1304,7 +1304,7 @@ int cairo_dock_show_dialog_and_wait (const gchar *cText, Icon *pIcon, CairoDockC
 gchar *cairo_dock_show_demand_and_wait (const gchar *cMessage, Icon *pIcon, CairoDockContainer *pContainer, const gchar *cInitialAnswer)
 {
 	GtkWidget *pWidget = cairo_dock_build_common_interactive_widget_for_dialog ((cInitialAnswer != NULL ? cInitialAnswer : ""), -1, -1);
-	gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-icon.svg", CAIRO_DOCK_SHARE_DATA_DIR);
+	gchar *cIconPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_ICON);
 
 	int iAnswer = cairo_dock_show_dialog_and_wait (cMessage, pIcon, pContainer, 0, cIconPath, GTK_BUTTONS_OK_CANCEL, pWidget);
 	g_free (cIconPath);
@@ -1321,7 +1321,7 @@ double cairo_dock_show_value_and_wait (const gchar *cMessage, Icon *pIcon, Cairo
 	fInitialValue = MAX (0, fInitialValue);
 	fInitialValue = MIN (fMaxValue, fInitialValue);
 	GtkWidget *pWidget = cairo_dock_build_common_interactive_widget_for_dialog (NULL, fInitialValue, fMaxValue);
-	gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-icon.svg", CAIRO_DOCK_SHARE_DATA_DIR);
+	gchar *cIconPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_ICON);
 
 	int iAnswer = cairo_dock_show_dialog_and_wait (cMessage, pIcon, pContainer, 0, cIconPath, GTK_BUTTONS_OK_CANCEL, pWidget);
 	g_free (cIconPath);
@@ -1335,7 +1335,7 @@ double cairo_dock_show_value_and_wait (const gchar *cMessage, Icon *pIcon, Cairo
 
 int cairo_dock_ask_question_and_wait (const gchar *cQuestion, Icon *pIcon, CairoDockContainer *pContainer)
 {
-	gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-icon.svg", CAIRO_DOCK_SHARE_DATA_DIR);  // trouver une icone de question.
+	gchar *cIconPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_ICON);  // trouver une icone de question.
 	int iAnswer = cairo_dock_show_dialog_and_wait (cQuestion, pIcon, pContainer, 0, cIconPath, GTK_BUTTONS_YES_NO, NULL);
 	g_free (cIconPath);
 

@@ -66,7 +66,7 @@ extern gchar *g_cConfFile;
 
 
 /**
-*Libere toutes les ressources liees a une icone, ainsi que cette derniere. Le sous-dock pointee par elle n'est pas dereferencee, cela doit etre fait au prealable.
+*Libere toutes les ressources liees a une icone, ainsi que cette derniere. Le sous-dock pointee par elle n'est pas dereference, cela doit etre fait au prealable.
 *@param icon l'icone a liberer.
 */
 void cairo_dock_free_icon (Icon *icon)
@@ -659,12 +659,12 @@ gboolean cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolea
 	}
 
 	//\___________________ On la remet a la taille normale en vue d'une reinsertion quelque part.
-	if (pDock->iRefCount > 0)
+	///if (pDock->iRefCount > 0)
 	{
-		icon->fWidth /= g_fSubDockSizeRatio;
-		icon->fHeight /= g_fSubDockSizeRatio;
+		icon->fWidth /= pDock->fRatio;  /// g_fSubDockSizeRatio
+		icon->fHeight /= pDock->fRatio;
 	}
-	//g_print (" -size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
+	g_print (" -size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
 
 	//\___________________ On enleve le separateur si c'est la derniere icone de son type.
 	if (bCheckUnusedSeparator)
@@ -893,7 +893,7 @@ void cairo_dock_insert_separators_in_dock (CairoDock *pDock)
 				{
 					int iSeparatorType = g_tIconTypeOrder[next_icon->iType] - 1;
 					cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
-					Icon *pSeparator = cairo_dock_create_separator_icon (pCairoContext, iSeparatorType, pDock, CAIRO_DOCK_APPLY_RATIO);
+					Icon *pSeparator = cairo_dock_create_separator_icon (pCairoContext, iSeparatorType, pDock, ! CAIRO_DOCK_APPLY_RATIO);
 					cairo_destroy (pCairoContext);
 
 					cairo_dock_insert_icon_in_dock (pSeparator, pDock, !CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, ! CAIRO_DOCK_INSERT_SEPARATOR);
@@ -915,7 +915,7 @@ void cairo_dock_insert_separator_between_launchers_and_applis (CairoDock *pDock)
 		if (cairo_dock_get_first_icon_of_type (pDock->icons, iSeparatorType) == NULL)
 		{
 			cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
-			Icon *pSeparator = cairo_dock_create_separator_icon (pCairoContext, iSeparatorType, pDock, CAIRO_DOCK_APPLY_RATIO);
+			Icon *pSeparator = cairo_dock_create_separator_icon (pCairoContext, iSeparatorType, pDock, ! CAIRO_DOCK_APPLY_RATIO);
 			cairo_destroy (pCairoContext);
 
 			cairo_dock_insert_icon_in_dock (pSeparator, pDock, !CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, ! CAIRO_DOCK_INSERT_SEPARATOR);
@@ -1006,7 +1006,7 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 				icon->fPersonnalScale = -0.05;
 		}
 		icon->fY = (g_bDirectionUp ? iHeight - g_iDockLineWidth - g_iFrameMargin - icon->fScale * icon->fHeight : g_iDockLineWidth + g_iFrameMargin);
-
+		
 		//\_______________ Si on avait deja defini l'icone pointee, on peut placer l'icone courante par rapport a la precedente.
 		if (pointed_ic != NULL)
 		{

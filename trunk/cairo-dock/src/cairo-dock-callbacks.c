@@ -1297,8 +1297,24 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 			}
 		}
 	}
-	gpointer data[4] = {cReceivedData, pPointedIcon, &fOrder, pDock};
-	cairo_dock_notify (CAIRO_DOCK_DROP_DATA, data);
+	
+	gpointer data[4] = {NULL, pPointedIcon, &fOrder, pDock};
+	gchar *str;
+	do
+	{
+		if (*cReceivedData == '\0')
+			break ;
+		data[0] = cReceivedData;
+		
+		str = strchr (cReceivedData, '\n');
+		if (str != NULL)
+		{
+			*str = '\0';
+			cReceivedData = str + 1;
+		}
+		
+		cairo_dock_notify (CAIRO_DOCK_DROP_DATA, data);
+	} while (str != NULL);
 }
 
 gboolean cairo_dock_notification_drop_data (gpointer *data)

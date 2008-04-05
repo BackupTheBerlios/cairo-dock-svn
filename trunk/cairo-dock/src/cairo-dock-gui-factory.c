@@ -35,8 +35,7 @@ typedef enum {
 	CAIRO_DOCK_MODEL_NB_COLUMNS
 	} _CairoDockModelColumns;
 
-static GtkListStore **s_pModuleListStore = NULL;
-static GtkListStore **s_pRendererListStore = NULL;
+static GtkListStore *s_pRendererListStore = NULL;
 
 static void _cairo_dock_activate_one_element (GtkCellRendererToggle * cell_renderer, gchar * path, GtkTreeModel * model)
 {
@@ -465,14 +464,48 @@ static void _cairo_dock_recup_current_color (GtkColorButton *pColorButton, GSLis
 		gtk_color_button_set_alpha (pColorButton, gtk_spin_button_get_value (pSpinButton) * 65535);
 }
 
+/*static gboolean _cairo_dock_free_conf_widget_data (GtkWidget *pWidget, GdkEvent *event, gpointer *user_data)
+{
+	g_print ("%s ()\n", __func__);
+	GSList *pWidgetList = user_data[0];
+	GPtrArray *pDataGarbage = user_data[1];
+	GPtrArray *pModelGarbage = user_data[2];
+	
+	if (pWidgetList != NULL)
+	{
+		cairo_dock_free_generated_widget_list (pWidgetList);
+	}
+	if (pDataGarbage != NULL)
+	{
+		g_ptr_array_foreach (pDataGarbage, (GFunc) g_free, NULL);
+		g_ptr_array_free (pDataGarbage, TRUE);
+	}
+	if (pModelGarbage != NULL)
+	{
+		//g_ptr_array_foreach (pModelGarbage, (GFunc) gtk_list_store_clear, NULL);
+		//g_ptr_array_foreach (pModelGarbage, (GFunc) g_object_unref, NULL);
+		g_ptr_array_free (pModelGarbage, TRUE);
+	}
+	g_free (user_data);
+	g_print (" FINn", __func__);
+	
+	return FALSE;
+}*/
+
 
 #define _allocate_new_buffer\
 	data = g_new (gpointer, 3); \
-	g_ptr_array_add (pGarbage, data);
+	g_ptr_array_add (pDataGarbage, data);
 
-GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWindow *pParentWindow, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier, gchar *cPresentedGroup, gboolean bSwitchButtonPresent, gchar *cButtonConvert, gchar *cGettextDomain, GPtrArray *pGarbage)
+#define _allocate_new_model\
+	modele = gtk_list_store_new (CAIRO_DOCK_MODEL_NB_COLUMNS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_INT, G_TYPE_STRING, GDK_TYPE_PIXBUF);
+
+GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWindow *pParentWindow, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier, gchar *cPresentedGroup, gboolean bSwitchButtonPresent, gchar *cButtonConvert, gchar *cGettextDomain, GPtrArray *pDataGarbage)
 {
-	g_return_val_if_fail (cairo_dock_is_advanced_keyfile (pKeyFile) && pGarbage != NULL, NULL);
+	g_return_val_if_fail (cairo_dock_is_advanced_keyfile (pKeyFile), NULL);
+	
+	//GPtrArray *pDataGarbage = g_ptr_array_new ();
+	//GPtrArray *pModelGarbage = g_ptr_array_new ();
 	
 	gpointer *data;
 	int iNbBuffers = 0;
@@ -506,6 +539,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	double fValue, fMinValue, fMaxValue, *fValueList;
 	gchar *cValue, **cValueList, *cSmallIcon;
 	GdkColor gdkColor;
+	GtkListStore *modele;
 	
 	GtkWidget *pDialog;
 	if (bApplyButtonPresent)
@@ -914,7 +948,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							}
 							else
 							{
-								GtkListStore *modele = gtk_list_store_new (CAIRO_DOCK_MODEL_NB_COLUMNS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_INT, G_TYPE_STRING, GDK_TYPE_PIXBUF);
+								_allocate_new_model
 								if (iElementType == 'E')
 								{
 									pOneWidget = gtk_combo_box_entry_new_with_model (GTK_TREE_MODEL (modele), CAIRO_DOCK_MODEL_NAME);
@@ -988,7 +1022,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						else
 						{
 							pOneWidget = gtk_tree_view_new ();
-							GtkListStore *modele = gtk_list_store_new (CAIRO_DOCK_MODEL_NB_COLUMNS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_INT, G_TYPE_STRING, GDK_TYPE_PIXBUF);
+							_allocate_new_model
 							gtk_tree_view_set_model (GTK_TREE_VIEW (pOneWidget), GTK_TREE_MODEL (modele));
 							gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (modele), CAIRO_DOCK_MODEL_ORDER, GTK_SORT_ASCENDING);
 							gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (pOneWidget), FALSE);
@@ -1447,8 +1481,17 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	gtk_notebook_set_current_page (GTK_NOTEBOOK (pNoteBook), iPresentedNumPage);
 
 	g_strfreev (pGroupList);
-	g_ptr_array_add (pGarbage, NULL);  // on n'est jamais assez trop prudent ...
-
+	
+	/*gpointer *user_data = g_new (gpointer, 3);
+	user_data[0] = *pWidgetList;
+	user_data[1] = pDataGarbage;
+	user_data[2] = pModelGarbage;
+	g_print ("CONNECT\n");
+	g_signal_connect (G_OBJECT (pDialog),
+		"delete-event",
+		G_CALLBACK (_cairo_dock_free_conf_widget_data),
+		user_data);*/
+		
 	return pDialog;
 }
 

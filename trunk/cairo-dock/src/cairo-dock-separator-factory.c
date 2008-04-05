@@ -109,10 +109,10 @@ Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorT
 	icon->iType = iSeparatorType;
 	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
 
-	if (bApplyRatio && pDock->iRefCount > 0)
+	if (bApplyRatio)  ///  && pDock->iRefCount > 0
 	{
-		icon->fWidth *= g_fSubDockSizeRatio;
-		icon->fHeight *= g_fSubDockSizeRatio;
+		icon->fWidth *= pDock->fRatio;  /// g_fSubDockSizeRatio
+		icon->fHeight *= pDock->fRatio;
 	}
 	//g_print ("1 separateur : %.2fx%.2f\n", icon->fWidth, icon->fHeight);
 

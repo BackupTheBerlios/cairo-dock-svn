@@ -10,8 +10,8 @@ essentialdata_DATA = \
 	container.conf\
 	separator.conf\
 	themes.conf\
-	cairo-dock.png\
-	cairo-dock-icon.svg\
+	cairo-dock-logo.png\
+	cairo-dock.svg\
 	default-icon.svg\
 	cairo-dock-ok.svg\
 	cairo-dock-cancel.svg\
@@ -22,7 +22,8 @@ essentialdata_DATA = \
 	icon-gradation.png\
 	icon-movment.png\
 	icon-mouse.png\
-	icon-speed.png\
 	icon-subdock.png\
-	icon-frame.png
+	icon-frame.png\
+	icon-buttons.png\
+	icon-bubble.png
 	

@@ -311,7 +311,47 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		g_free (icon->cParentDockName);
 		icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
 	}
-
+	
+	g_free (icon->cClass);
+	if (icon->acCommand != NULL)
+	{
+		gchar *cStartupWMClass = g_key_file_get_string (keyfile, "Desktop Entry", "StartupWMClass", NULL);
+		if (cStartupWMClass == NULL || *cStartupWMClass == '\0')
+		{
+			g_free (cStartupWMClass);
+			cStartupWMClass = g_ascii_strdown (icon->acCommand, -1);
+			gchar *str = strchr (cStartupWMClass, ' ');
+			if (str != NULL)
+				*str = '\0';
+			if (strcmp (cStartupWMClass, "gksu") == 0 || strcmp (cStartupWMClass, "kdesu") == 0)
+				icon->cClass = str + 1;
+			else
+				icon->cClass = cStartupWMClass;
+			
+			while (*icon->cClass == ' ')
+				icon->cClass ++;
+			
+			if (*icon->cClass == '/')
+			{
+				str = strrchr (icon->cClass, '/');  // forcement non NULL.
+				icon->cClass = str + 1;
+			}
+			
+			if (*icon->cClass != '\0')
+				icon->cClass = g_strdup (icon->cClass);
+			else
+				icon->cClass = NULL;
+			cd_warning ("Attention : no class defined for the launcher %s\n we will assume that its class is '%s'", cDesktopFileName, icon->cClass);
+		}
+		else
+		{
+			icon->cClass = g_ascii_strdown (cStartupWMClass, -1);
+		}
+		g_free (cStartupWMClass);
+	}
+	else
+		icon->cClass = NULL;
+	
 	g_free (cDesktopFilePath);
 	g_key_file_free (keyfile);
 }

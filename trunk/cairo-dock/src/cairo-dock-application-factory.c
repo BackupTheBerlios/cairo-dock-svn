@@ -409,7 +409,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	if (XGetClassHint (s_XDisplay, Xid, pClassHint) != 0)
 	{
 		cd_debug ("  res_name : %s(%x); res_class : %s(%x)", pClassHint->res_name, pClassHint->res_name, pClassHint->res_class, pClassHint->res_class);
-		cClass = g_ascii_strdown (pClassHint->res_class, -1);  // on la passe en minuscule, car certaines applis ont la bonne idee de donner des classes avec une majuscule ou non suivant les fenetres. Il reste le cas des aplis telles que Glade2 ('Glade' et 'Glade-2' ...)
+		cClass = g_ascii_strdown (pClassHint->res_class, -1);  // on la passe en minuscule, car certaines applis ont la bonne idee de donner des classes avec une majuscule ou non suivant les fenetres. Il reste le cas des applis telles que Glade2 ('Glade' et 'Glade-2' ...)
 		XFree (pClassHint->res_name);
 		XFree (pClassHint->res_class);
 		//g_print (".\n");
@@ -481,7 +481,11 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 	{
 		//g_print ("%s change son icone\n", icon->acName);
 		pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
+		icon->fWidth /= pDock->fRatio;
+		icon->fHeight /= pDock->fRatio;
 		cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
+		icon->fWidth *= pDock->fRatio;
+		icon->fHeight *= pDock->fRatio;
 		cairo_destroy (pCairoContext);
 		cairo_dock_redraw_my_icon (icon, CAIRO_DOCK_CONTAINER (pDock));
 	}
@@ -509,7 +513,7 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 					if (g_bDemandsAttentionWithDialog)
 						cairo_dock_remove_dialog_if_any (icon);
 					if (g_bDemandsAttentionWithAnimation)
-						cairo_dock_arm_animation (icon, -1, 0);  // arrete son animation quelqu'elle soit.
+						cairo_dock_arm_animation (icon, 0, 0);  // arrete son animation quelqu'elle soit.
 				}
 				else
 					cd_message ("  etat du changement inconnu !");
@@ -518,7 +522,11 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 			{
 				//g_print ("%s change son icone\n", icon->acName);
 				pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
+				icon->fWidth /= pDock->fRatio;
+				icon->fHeight /= pDock->fRatio;
 				cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
+				icon->fWidth *= pDock->fRatio;
+				icon->fHeight *= pDock->fRatio;
 				cairo_destroy (pCairoContext);
 				cairo_dock_redraw_my_icon (icon, CAIRO_DOCK_CONTAINER (pDock));
 			}

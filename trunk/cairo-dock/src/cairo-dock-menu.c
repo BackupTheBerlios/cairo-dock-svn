@@ -117,7 +117,7 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 		cTitle);
 	g_free (cTitle);
 	
-	gchar *cImagePath = g_strdup_printf ("%s/cairo-dock.png", CAIRO_DOCK_SHARE_DATA_DIR);
+	gchar *cImagePath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_LOGO);
 	GtkWidget *pImage = gtk_image_new_from_file (cImagePath);
 	g_free (cImagePath);
 #if GTK_MINOR_VERSION >= 12
@@ -929,7 +929,7 @@ GtkWidget *cairo_dock_build_menu (Icon *icon, CairoDockContainer *pContainer)
 	//\_________________________ On ajoute le sous-menu Cairo-Dock, toujours present.
 	GtkWidget *menu_item, *image;
 	menu_item = gtk_image_menu_item_new_with_label ("Cairo-Dock");
-	gchar *cIconPath = g_strdup_printf ("%s/cairo-dock-icon.svg", CAIRO_DOCK_SHARE_DATA_DIR);
+	gchar *cIconPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_ICON);
 	GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_size (cIconPath, 32, 32, NULL);
 	image = gtk_image_new_from_pixbuf (pixbuf);
 	g_free (cIconPath);

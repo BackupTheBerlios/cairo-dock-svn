@@ -1201,8 +1201,8 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConf
 	}
 	g_key_file_remove_key (pKeyFile, "Desktop Entry", "X-Ubuntu-Gettext-Domain", NULL);  // salete de traducteur automatique.
 	
-	GPtrArray *pGarbage = g_ptr_array_new ();
-	GtkWidget *pDialog = cairo_dock_generate_advanced_ihm_from_keyfile (pKeyFile, cTitle, pWindow, &pWidgetList, (pConfigFunc != NULL), iIdentifier, cPresentedGroup, (pConfigFunc2 != NULL), cButtonConvert, cGettextDomain, pGarbage);
+	GPtrArray *pDataGarbage = g_ptr_array_new ();
+	GtkWidget *pDialog = cairo_dock_generate_advanced_ihm_from_keyfile (pKeyFile, cTitle, pWindow, &pWidgetList, (pConfigFunc != NULL), iIdentifier, cPresentedGroup, (pConfigFunc2 != NULL), cButtonConvert, cGettextDomain, pDataGarbage);
 	if (pDialog == NULL || pWidgetList == NULL)
 	{
 		pDialog = cairo_dock_generate_basic_ihm_from_keyfile (cConfFilePath, cTitle, pWindow, &pTextBuffer, (pConfigFunc != NULL), (pConfigFunc2 != NULL), cButtonConvert, NULL);
@@ -1226,7 +1226,7 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConf
 	
 	if (pConfigFunc != NULL)  // alors on autorise la modification a la volee, avec un bouton "Appliquer". La fenetre doit donc laisser l'appli se derouler.
 	{
-		gpointer *user_data = g_new (gpointer, 16);
+		gpointer *user_data = g_new (gpointer, 17);
 		user_data[0] = pKeyFile;
 		user_data[1] = pWidgetList;
 		user_data[2] = cConfFilePath;
@@ -1243,6 +1243,7 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConf
 		user_data[13] = GINT_TO_POINTER ((int) iIdentifier);
 		user_data[14] = cButtonConvert;
 		user_data[15] = cButtonRevert;
+		user_data[16] = pDataGarbage;
 		
 		g_signal_connect (pDialog, "response", G_CALLBACK (_cairo_dock_user_action_on_config), user_data);
 		return FALSE;
@@ -1250,6 +1251,7 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConf
 	else  // sinon on bloque l'appli jusqu'a ce que l'utilisateur valide ou annule.
 	{
 		gboolean config_ok;
+		g_print ("RUN\n");
 		gint action = gtk_dialog_run (GTK_DIALOG (pDialog));
 		if (action == GTK_RESPONSE_ACCEPT)
 		{
@@ -1284,8 +1286,8 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConf
 		g_key_file_free (pKeyFile);
 		cairo_dock_free_generated_widget_list (pWidgetList);
 		gtk_widget_destroy (GTK_WIDGET (pDialog));
-		g_ptr_array_foreach (pGarbage, (GFunc) g_free, NULL);
-		g_ptr_array_free (pGarbage, TRUE);
+		g_ptr_array_foreach (pDataGarbage, (GFunc) g_free, NULL);
+		g_ptr_array_free (pDataGarbage, TRUE);
 		g_free (cConfFilePath);
 		g_free (cConfFilePath2);
 		g_free (cTitle);
@@ -1313,6 +1315,7 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 	gchar iIdentifier = GPOINTER_TO_INT (user_data[13]);
 	gchar *cButtonConvert = user_data[14];
 	gchar *cButtonRevert = user_data[15];
+	GPtrArray *pDataGarbage = user_data[16];
 
 	if (action == GTK_RESPONSE_ACCEPT || action == GTK_RESPONSE_APPLY)
 	{
@@ -1350,6 +1353,8 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 		gtk_widget_destroy (GTK_WIDGET (pDialog));
 		g_key_file_free (pKeyFile);
 		cairo_dock_free_generated_widget_list (pWidgetList);
+		g_ptr_array_foreach (pDataGarbage, (GFunc) g_free, NULL);
+		g_ptr_array_free (pDataGarbage, TRUE);
 		g_free (cConfFilePath);
 		g_free (cConfFilePath2);
 		g_free (cTitle);
@@ -1364,6 +1369,8 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 		gtk_widget_destroy (GTK_WIDGET (pDialog));
 		g_key_file_free (pKeyFile);
 		cairo_dock_free_generated_widget_list (pWidgetList);
+		g_ptr_array_foreach (pDataGarbage, (GFunc) g_free, NULL);
+		g_ptr_array_free (pDataGarbage, TRUE);
 		g_free (user_data);
 
 		cairo_dock_edit_conf_file_core (pWindow, cConfFilePath2, cTitle, iWindowWidth, iWindowHeight, iIdentifier, NULL, pConfigFunc2, data, pFreeUserDataFunc, pConfigFunc, cConfFilePath, cButtonRevert, cButtonConvert, NULL);

@@ -534,6 +534,8 @@ struct _Icon {
 	double fQuickInfoXOffset;
 	/// Decalage en Y de la surface de l'info rapide.
 	double fQuickInfoYOffset;
+	
+	gboolean bHasIndicator;
 };
 
 

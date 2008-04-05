@@ -91,7 +91,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	pDock->iType = CAIRO_DOCK_TYPE_DOCK;
 	pDock->bAtBottom = TRUE;
 	pDock->iRefCount = 0;  // c'est un dock racine par defaut.
-	pDock->fRatio = 1;
+	pDock->fRatio = 1.;
 	pDock->iAvoidingMouseIconType = -1;
 	pDock->fFlatDockWidth = - g_iIconGap;
 	if (g_pMainDock != NULL)
@@ -437,10 +437,26 @@ void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et fFlatD
 {
 	//g_print ("%s (bInside : %d ; iSidShrinkDown : %d)\n", __func__, pDock->bInside, pDock->iSidShrinkDown);
 	double fPrevRatio = pDock->fRatio;
-	pDock->fRatio = MIN (1., g_iMaxAuthorizedWidth / pDock->fFlatDockWidth);  // g_iScreenWidth[pDock->bHorizontalDock]
+	g_print ("%s (%d / %d)\n", __func__, (int)pDock->fFlatDockWidth, g_iMaxAuthorizedWidth);
+	if (pDock->fFlatDockWidth > g_iMaxAuthorizedWidth)  // g_iScreenWidth[pDock->bHorizontalDock]
+	{
+		pDock->fRatio *= g_iMaxAuthorizedWidth / pDock->fFlatDockWidth;
+	}
+	else
+	{
+		double fMaxRatio = (pDock->iRefCount == 0 ? 1 : g_fSubDockSizeRatio);
+		if (pDock->fRatio < fMaxRatio)
+		{
+			pDock->fRatio *= g_iMaxAuthorizedWidth / pDock->fFlatDockWidth;
+			pDock->fRatio = MIN (pDock->fRatio, fMaxRatio);
+		}
+		else
+			pDock->fRatio = fMaxRatio;
+	}
+	
 	if (fPrevRatio != pDock->fRatio)
 	{
-		g_print ("changement du ratio pour faire tenir le dock dans l'ecran : %.2f -> %.2f (%d)\n", fPrevRatio, pDock->fRatio, pDock->iRefCount);
+		g_print ("changement du ratio : %.3f -> %.3f (%d)\n", fPrevRatio, pDock->fRatio, pDock->iRefCount);
 		Icon *icon;
 		GList *ic;
 		pDock->fFlatDockWidth = -g_iIconGap;
@@ -525,12 +541,12 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 		icon,
 		(GCompareFunc) cairo_dock_compare_icons_order);
 
-	if (bApplyRatio && pDock->iRefCount > 0)
+	if (bApplyRatio)
 	{
-		icon->fWidth *= g_fSubDockSizeRatio;
-		icon->fHeight *= g_fSubDockSizeRatio;
+		icon->fWidth *= pDock->fRatio;  /// g_fSubDockSizeRatio
+		icon->fHeight *= pDock->fRatio;
 	}
-	//g_print (" +size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
+	g_print (" +size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
 
 	if (! g_bSameHorizontality)
 	{
@@ -758,10 +774,10 @@ void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDoc
 		{
 			cairo_dock_update_icon_s_container_name (icon, cReceivingDockName);
 
-			if (pDock->iRefCount > 0)
+			///if (pDock->iRefCount > 0)
 			{
-				icon->fWidth /= g_fSubDockSizeRatio;
-				icon->fHeight /= g_fSubDockSizeRatio;
+				icon->fWidth /= pDock->fRatio;  /// g_fSubDockSizeRatio
+				icon->fHeight /= pDock->fRatio;
 			}
 			cairo_dock_insert_icon_in_dock (icon, ReceivingDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
 		}
@@ -783,7 +799,8 @@ void cairo_dock_reference_dock (CairoDock *pDock)
 	if (pDock->iRefCount == 1)  // il devient un sous-dock.
 	{
 		pDock->bHorizontalDock = (g_bSameHorizontality ? g_pMainDock->bHorizontalDock : ! g_pMainDock->bHorizontalDock);
-		pDock->fRatio *= g_fSubDockSizeRatio;
+		double fPrevRatio = pDock->fRatio;
+		pDock->fRatio = MIN (pDock->fRatio, g_fSubDockSizeRatio);
 
 		Icon *icon;
 		GList *ic;
@@ -791,8 +808,8 @@ void cairo_dock_reference_dock (CairoDock *pDock)
 		for (ic = pDock->icons; ic != NULL; ic = ic->next)
 		{
 			icon = ic->data;
-			icon->fWidth *= g_fSubDockSizeRatio;
-			icon->fHeight *= g_fSubDockSizeRatio;
+			icon->fWidth *= pDock->fRatio / fPrevRatio;
+			icon->fHeight *= pDock->fRatio / fPrevRatio;
 			pDock->fFlatDockWidth += icon->fWidth + g_iIconGap;
 
 			if (! g_bSameHorizontality)
@@ -802,7 +819,7 @@ void cairo_dock_reference_dock (CairoDock *pDock)
 				cairo_destroy (pSourceContext);
 			}
 		}
-		pDock->iMaxIconHeight *= g_fSubDockSizeRatio;
+		pDock->iMaxIconHeight *= pDock->fRatio / fPrevRatio;
 
 		cairo_dock_set_default_renderer (pDock);
 

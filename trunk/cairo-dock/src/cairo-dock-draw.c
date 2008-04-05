@@ -576,7 +576,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			cairo_translate (pCairoContext, 0, - g_fReflectSize * icon->fScale);
 		if (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (icon))
 		{
-			cairo_translate (pCairoContext, fRatio * icon->fWidthFactor * icon->fWidth * (icon->fScale - 1) / 2, (g_bDirectionUp ? fRatio * icon->fHeightFactor * icon->fHeight * (icon->fScale - 1) : 0));  /// Verifier s'il faut vraiment fRatio dans la translation ...
+			cairo_translate (pCairoContext, 1 * icon->fWidthFactor * icon->fWidth * (icon->fScale - 1) / 2, (g_bDirectionUp ? 1 * icon->fHeightFactor * icon->fHeight * (icon->fScale - 1) : 0));  /// Verifier s'il faut vraiment fRatio dans la translation ...
 			cairo_scale (pCairoContext, fRatio * icon->fWidthFactor / (1 + g_fAmplitude), fRatio * icon->fHeightFactor / (1 + g_fAmplitude));
 		}
 		else
@@ -594,7 +594,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			cairo_translate (pCairoContext, - g_fReflectSize * icon->fScale, 0);
 		if (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (icon))
 		{
-			cairo_translate (pCairoContext, fRatio * icon->fHeightFactor * icon->fHeight * (icon->fScale - 1) / 2, (g_bDirectionUp ? fRatio * icon->fWidthFactor * icon->fWidth * (icon->fScale - 1) : 0));  /// Verifier s'il faut vraiment fRatio dans la translation ...
+			cairo_translate (pCairoContext, 1 * icon->fHeightFactor * icon->fHeight * (icon->fScale - 1) / 2, (g_bDirectionUp ? 1 * icon->fWidthFactor * icon->fWidth * (icon->fScale - 1) : 0));  /// Verifier s'il faut vraiment fRatio dans la translation ...
 			cairo_scale (pCairoContext, fRatio * icon->fHeightFactor / (1 + g_fAmplitude), fRatio * icon->fWidthFactor / (1 + g_fAmplitude));
 		}
 		else
@@ -1182,6 +1182,7 @@ void cairo_dock_redraw_my_icon (Icon *icon, CairoDockContainer *pContainer)
 	}
 	else if (! GTK_WIDGET_VISIBLE (pContainer->pWidget))
 		return ;
+	
 	GdkRectangle rect = {(int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor)),
 		(int) icon->fDrawY - (! g_bDirectionUp ? fReflectSize : 0),
 		(int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)) - 1,
@@ -1300,12 +1301,14 @@ void cairo_dock_get_window_position_and_geometry_at_balance (CairoDock *pDock, C
 {
 	if (iSizeType == CAIRO_DOCK_MAX_SIZE)
 	{
-		*iNewWidth = MIN (g_iMaxAuthorizedWidth, pDock->iMaxDockWidth);
+		///*iNewWidth = MIN (g_iMaxAuthorizedWidth, pDock->iMaxDockWidth);
+		*iNewWidth = pDock->iMaxDockWidth;
 		*iNewHeight = pDock->iMaxDockHeight;
 	}
 	else if (iSizeType == CAIRO_DOCK_NORMAL_SIZE)
 	{
-		*iNewWidth = MIN (g_iMaxAuthorizedWidth, pDock->iMinDockWidth);
+		///*iNewWidth = MIN (g_iMaxAuthorizedWidth, pDock->iMinDockWidth);
+		*iNewWidth = pDock->iMinDockWidth;
 		*iNewHeight = pDock->iMinDockHeight;
 	}
 	else
