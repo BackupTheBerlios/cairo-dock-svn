@@ -1,7 +1,7 @@
 themedir = $(pkgdatadir)/gauges/tomato
 
 theme_DATA = \
-	background.svg
+	background.svg\
 	tomato0.svg\
 	tomato5.svg\
 	tomato10.svg\
