@@ -1,0 +1,11 @@
+<gauge>
+	<name>Battery</name>
+	<author>Adrien Pilleboue</author>
+	<indicator>
+		<file key="image">battery0.svg</file>
+		<file key="image">battery1.svg</file>
+		<file key="image">battery2.svg</file>
+		<file key="image">battery3.svg</file>
+		<file key="image">battery4.svg</file>
+	</indicator>
+</gauge>
