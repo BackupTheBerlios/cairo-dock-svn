@@ -21,6 +21,13 @@
      id="defs3727">
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
+       id="perspective169"
+       inkscape:vp_x="-50 : 600 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="700 : 600 : 1"
+       inkscape:persp3d-origin="300 : 400 : 1" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
        id="perspective164"
        inkscape:vp_x="-50 : 600 : 1"
        inkscape:vp_y="0 : 1000 : 0"
@@ -962,24 +969,5 @@
        style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#a9a9a9;stroke-width:0.4084827;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 50.030385,78.232359 L 50.024829,76.982943"
        id="path8748" />
-    <g
-       style="display:inline"
-       inkscape:label="tmp"
-       id="g8750"
-       transform="matrix(1.0212067,0,0,1.0212067,-1.2166837,-1.5214798)">
-      <path
-         transform="translate(-0.304913,0.271782)"
-         sodipodi:open="true"
-         sodipodi:end="10.995574"
-         sodipodi:start="4.712389"
-         d="M 50.304913,48.071635 A 1.6565833,1.6565833 0 1 1 50.304912,48.071635"
-         sodipodi:ry="1.6565833"
-         sodipodi:rx="1.6565833"
-         sodipodi:cy="49.728218"
-         sodipodi:cx="50.304913"
-         id="path8752"
-         style="opacity:1;fill:url(#radialGradient8782);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.30000001;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-         sodipodi:type="arc" />
-    </g>
   </g>
 </svg>
