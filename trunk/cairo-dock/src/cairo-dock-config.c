@@ -752,7 +752,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 
 	g_bRoundedBottomCorner = cairo_dock_get_boolean_key_value (pKeyFile, "Background", "rounded bottom corner", &bFlushConfFileNeeded, TRUE, NULL, NULL);
 
-	g_iMaxAuthorizedWidth = cairo_dock_get_integer_key_value (pKeyFile, "Background", "max autorized width", &bFlushConfFileNeeded, 0, NULL, NULL);
+	g_iMaxAuthorizedWidth = cairo_dock_get_integer_key_value (pKeyFile, "Position", "max autorized width", &bFlushConfFileNeeded, 0, "Background", NULL);
 
 	double couleur2[4] = {.7, .9, .7, .4};
 	cairo_dock_get_double_list_key_value (pKeyFile, "Background", "stripes color bright", &bFlushConfFileNeeded, g_fStripesColorBright, 4, couleur2, NULL, NULL);

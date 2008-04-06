@@ -37,7 +37,7 @@ msgid "Appearance"
 msgstr "Apparence"
 
 #: cairo-dock-menu.c:587 src/cairo-dock-menu.c:583 src/cairo-dock-menu.c:582
-#: po/fr.po:34 ../data/messages:41 ../data/messages:45
+#: po/fr.po:34 ../data/messages:41 ../data/messages:45 ../data/messages:49
 msgid "Behaviour"
 msgstr "Comportement"
 
@@ -530,15 +530,15 @@ msgstr "Distance au bord de l'écran :"
 #: ../data/messages:259 ../data/messages:431 ../data/messages:217
 #: ../data/messages:221 ../data/messages:225 ../data/messages:275
 #: ../data/messages:447 ../data/messages:229 ../data/messages:279
-#: ../data/messages:451
+#: ../data/messages:451 ../data/messages:233
 msgid "in pixels."
 msgstr "en pixels."
 
-#: ../data/messages:33
+#: ../data/messages:33 ../data/messages:37
 msgid "Reserve space at the edge of the screen for the dock ?"
 msgstr "Reserver l'espace au bord de l'écran pour le dock ?"
 
-#: ../data/messages:31
+#: ../data/messages:31 ../data/messages:35
 msgid ""
 "This will prevent other windows from overlapping the dock. It has no effect "
 "if you defined the 'show/hide' shortcut below, cause then the dock behaves "
@@ -551,11 +551,11 @@ msgstr ""
 msgid "Auto-Hide"
 msgstr "Masquage automatique"
 
-#: ../data/messages:37
+#: ../data/messages:37 ../data/messages:41
 msgid "Activate auto-hide ?"
 msgstr "Activer le masquage automatique"
 
-#: ../data/messages:35
+#: ../data/messages:35 ../data/messages:39
 msgid ""
 "The dock will automatically hide itself outside of the scren when the mouse "
 "leaves it and will show a callback zone instead. Place the mouse into this "
@@ -565,15 +565,15 @@ msgstr ""
 "quittera, et montrera une zone de rappel à sa place. Placer la souris dans "
 "cette zone fera ré-apparaître le dock."
 
-#: ../data/messages:39 ../data/messages:43
+#: ../data/messages:39 ../data/messages:43 ../data/messages:47
 msgid "TaskBar"
 msgstr "Barre des tâches"
 
-#: ../data/messages:45 ../data/messages:49
+#: ../data/messages:45 ../data/messages:49 ../data/messages:53
 msgid "Show the current applications in the dock ?"
 msgstr "Montrer les applications actuellement ouvertes dans le dock ?"
 
-#: ../data/messages:43 ../data/messages:47
+#: ../data/messages:43 ../data/messages:47 ../data/messages:51
 msgid ""
 "Cairo-Dock will then replace your taskbar. It is recommanded to remove any "
 "other taskbar, and to not force the dock's type to normal."
@@ -582,19 +582,19 @@ msgstr ""
 "supprimer toute autre barre des tâches, et de ne pas forcer le type du dock "
 "à normal"
 
-#: ../data/messages:47 ../data/messages:51
+#: ../data/messages:47 ../data/messages:51 ../data/messages:55
 msgid "Should the applications with same PID be displayed only once ?"
 msgstr ""
 "Les applications avec le même PID ne devraient être affichées qu'une seule "
 "fois ?"
 
-#: ../data/messages:51 ../data/messages:55
+#: ../data/messages:51 ../data/messages:55 ../data/messages:59
 msgid "Should the applications with same class be grouped in a sub-dock ?"
 msgstr ""
 "Les applications avec la même classe doivent-elles être groupées dans un "
 "sous-dock ?"
 
-#: ../data/messages:49 ../data/messages:53
+#: ../data/messages:49 ../data/messages:53 ../data/messages:57
 msgid ""
 "This allows to group windows in some soft like Gimp, and to have only 1 icon "
 "in the main dock.The 1st window will appear in the main dock, and the others "
@@ -605,19 +605,19 @@ msgstr ""
 "le dock principal, et les autres seront dans un container associé à cette "
 "1ère icône."
 
-#: ../data/messages:53 ../data/messages:57
+#: ../data/messages:53 ../data/messages:57 ../data/messages:61
 msgid "Only show icons whose window is minimized ?"
 msgstr "Ne montrer que les icônes dont la fenêtre est minimisée ?"
 
-#: ../data/messages:55 ../data/messages:59
+#: ../data/messages:55 ../data/messages:59 ../data/messages:63
 msgid "Only show applis on current desktop ?"
 msgstr "Ne montrer que les applis du bureau courant ?"
 
-#: ../data/messages:57 ../data/messages:61
+#: ../data/messages:57 ../data/messages:61 ../data/messages:65
 msgid "Interaction"
 msgstr "Interaction"
 
-#: ../data/messages:61 ../data/messages:65
+#: ../data/messages:61 ../data/messages:65 ../data/messages:69
 msgid ""
 "Minimize the window when its icon is clicked, if it was already the active "
 "window ?"
@@ -625,25 +625,25 @@ msgstr ""
 "Minimiser la fenêtre lors d'un clique sur son icône, si elle était déjà la "
 "fenêtre active ? "
 
-#: ../data/messages:59 ../data/messages:63
+#: ../data/messages:59 ../data/messages:63 ../data/messages:67
 msgid "It is the default behaviour of most of taskbars."
 msgstr "C'est le comportement par défaut de la plupart des barres de tâches."
 
-#: ../data/messages:65 ../data/messages:69
+#: ../data/messages:65 ../data/messages:69 ../data/messages:73
 msgid "Middle click on an icon closes its relative application ?"
 msgstr "Clique du milieu sur une icône ferme l'application correspondante ?"
 
-#: ../data/messages:63 ../data/messages:67
+#: ../data/messages:63 ../data/messages:67 ../data/messages:71
 msgid "In a Firefox's tabs manner."
 msgstr "A la manière des onglets sous Firefox."
 
-#: ../data/messages:69 ../data/messages:73
+#: ../data/messages:69 ../data/messages:73 ../data/messages:77
 msgid "Automatically quick-hide the dock when a window becomes fullscreen ?"
 msgstr ""
 "Activer le masquage-rapide automatiquement quand une fenêtre passe en plein "
 "écran ?"
 
-#: ../data/messages:67 ../data/messages:71
+#: ../data/messages:67 ../data/messages:71 ../data/messages:75
 msgid ""
 "This is only usefull if don't already use the auto-hide, and if your WM let "
 "the dock in front of fullscreen windows."
@@ -651,38 +651,38 @@ msgstr ""
 "Cela n'est utile que si vous n'avez pas déjà l'auto-hide, et que votre WM "
 "laisse le dock devant les fenêtres plein écran."
 
-#: ../data/messages:71 ../data/messages:75
+#: ../data/messages:71 ../data/messages:75 ../data/messages:79
 msgid "Signal the applications demanding your attention with a dialog tip ?"
 msgstr ""
 "Signaler les fenêtres demandant votre attention par une bulle de dialogue ?"
 
-#: ../data/messages:73 ../data/messages:77
+#: ../data/messages:73 ../data/messages:77 ../data/messages:81
 msgid "Signal the applications demanding your attention with an animation ?"
 msgstr "Signaler les fenêtres demandant votre attention par une animation ?"
 
-#: ../data/messages:75 ../data/messages:79
+#: ../data/messages:75 ../data/messages:79 ../data/messages:83
 msgid "Play a short animation of the icon when its window becomes active ?"
 msgstr ""
 "Jouer une breve animation de l'icône lorsque la fenêtre correspondante "
 "devient active ?"
 
-#: ../data/messages:77 ../data/messages:81
+#: ../data/messages:77 ../data/messages:81 ../data/messages:85
 msgid "Representation"
 msgstr "Représentation"
 
-#: ../data/messages:81 ../data/messages:85
+#: ../data/messages:81 ../data/messages:85 ../data/messages:89
 msgid "Maximum number of caracters in application's name :"
 msgstr "Nombre maximum de caractères dans le nom des applications :"
 
-#: ../data/messages:79 ../data/messages:83
+#: ../data/messages:79 ../data/messages:83 ../data/messages:87
 msgid "\"...\" will be added at the end if the name is too long."
 msgstr "\"...\" seront ajoutés si le nom est trop long."
 
-#: ../data/messages:85 ../data/messages:89
+#: ../data/messages:85 ../data/messages:89 ../data/messages:93
 msgid "Transparency of icons whose window is or isn't minimized :"
 msgstr "Transparence des icônes dont la fenêtre est ou n'est pas minimisée :"
 
-#: ../data/messages:83 ../data/messages:87
+#: ../data/messages:83 ../data/messages:87 ../data/messages:91
 msgid ""
 "To the right, you can control the transparency of minimized windows, to the "
 "left the transparency of visible windows. The more you go aside, the more "
@@ -694,19 +694,19 @@ msgstr ""
 "plus les icônes concernées seront transparentes; au milieu, les icônes sont "
 "toujours opaques."
 
-#: ../data/messages:87 ../data/messages:91
+#: ../data/messages:87 ../data/messages:91 ../data/messages:95
 msgid "System"
 msgstr "Système"
 
-#: ../data/messages:89 ../data/messages:93
+#: ../data/messages:89 ../data/messages:93 ../data/messages:97
 msgid "Movement parameters"
 msgstr "Caractéristiques du mouvement"
 
-#: ../data/messages:93 ../data/messages:97
+#: ../data/messages:93 ../data/messages:97 ../data/messages:101
 msgid "Icons' lateral unfolding acceleration :"
 msgstr "Acceleration de depliage latéral des icônes :"
 
-#: ../data/messages:91 ../data/messages:95
+#: ../data/messages:91 ../data/messages:95 ../data/messages:99
 msgid ""
 "The icons will appear folded on themselves, regarding the alignement point, "
 "then will unfold untill they fill the whole dock. Use 0 to not use "
@@ -716,21 +716,21 @@ msgstr ""
 "d'alignement, puis se déplieront jusqu'à remplir tout le dock. Mettre 0 pour "
 "ne pas utiliser le dépliage, plus c'est proche de 0, plus c'est rapide."
 
-#: ../data/messages:97 ../data/messages:101
+#: ../data/messages:97 ../data/messages:101 ../data/messages:105
 msgid "Number of steps for icons' resizing (grow up/shrink down) :"
 msgstr ""
 "Nombre d'étapes dans le redimensionnement des icônes (grossissemt/"
 "rétrécissemt) :"
 
-#: ../data/messages:95 ../data/messages:99
+#: ../data/messages:95 ../data/messages:99 ../data/messages:103
 msgid "The more there are, the slower it will be"
 msgstr "Plus il y'en a, plus celui-ci sera lent"
 
-#: ../data/messages:101 ../data/messages:105
+#: ../data/messages:101 ../data/messages:105 ../data/messages:109
 msgid "Window's move acceleration (move up/move down) :"
 msgstr "Acceleration du mouvement de la fenêtre lors de l'auto-hide :"
 
-#: ../data/messages:99 ../data/messages:103
+#: ../data/messages:99 ../data/messages:103 ../data/messages:107
 msgid ""
 "in percentage of the distance it can move at each step . After n steps, the "
 "remaining distance will be reduced by (1-s)^n."
@@ -739,14 +739,17 @@ msgstr ""
 "descente). Après n étapes, la distance restante sera réduite par (1-a)^n"
 
 #: ../data/messages:103 ../data/messages:107 ../data/messages:111
+#: ../data/messages:115
 msgid "Mouse"
 msgstr "Souris"
 
 #: ../data/messages:107 ../data/messages:111 ../data/messages:115
+#: ../data/messages:119
 msgid "Scroll speed factor for background decorations :"
 msgstr "Facteur de vitesse de défilement pour les décorations du fond :"
 
 #: ../data/messages:105 ../data/messages:109 ../data/messages:113
+#: ../data/messages:117
 msgid ""
 "The smaller, the lower the decorations will move along with the cursor. At 0 "
 "they will be static."
@@ -755,10 +758,12 @@ msgstr ""
 "le curseur. A 0 elles seront immobiles."
 
 #: ../data/messages:111 ../data/messages:115 ../data/messages:119
+#: ../data/messages:123
 msgid "Should the decorations be enslaved to the cursor ?"
 msgstr "Les décorations doivent-elles être asservies au curseur ?"
 
 #: ../data/messages:109 ../data/messages:113 ../data/messages:117
+#: ../data/messages:121
 msgid ""
 "Otherwise the amount of movement of the decorations will only depend on the "
 "direction of the cursor's movement, as if the decorations were \"gliding\"."
@@ -768,82 +773,101 @@ msgstr ""
 "\"glissaient\"."
 
 #: ../data/messages:115 ../data/messages:119 ../data/messages:123
+#: ../data/messages:127
 msgid "Amount of pixels the icons will scroll at each wheel scroll :"
 msgstr ""
 "De combien de pixels les icônes vont défiler à chaque coup de molette :"
 
 #: ../data/messages:113 ../data/messages:117 ../data/messages:121
+#: ../data/messages:125
 msgid "If you put 0, this will make them scroll of exactly one icon each time."
 msgstr ""
 "Si vous mettez 0, cela les fera défiler d'une icône exactement à chaque fois."
 
 #: ../data/messages:117 ../data/messages:121 ../data/messages:125
+#: ../data/messages:129
 msgid "Re-center the dock on leaving if it has been scrolled ?"
 msgstr "Recentrer le dock en quittant ?"
 
 #: ../data/messages:121 ../data/messages:125 ../data/messages:129
+#: ../data/messages:133
 msgid "If so, you can specify the scrolling acceleration :"
 msgstr "Si oui, vous pouvez spécifier l'accélération du défilement :"
 
 #: ../data/messages:119 ../data/messages:123 ../data/messages:127
+#: ../data/messages:131
 msgid "The more it's close to 0, the faster the scroll will be."
 msgstr "Plus c'est proche de 0, plus le défilement sera rapide."
 
 #: ../data/messages:123 ../data/messages:127 ../data/messages:131
+#: ../data/messages:135
 msgid "Sub-docks"
 msgstr "Sous-Docks"
 
 #: ../data/messages:127 ../data/messages:131 ../data/messages:135
+#: ../data/messages:139
 msgid "Delay before you effectively leave from a sub-dock or to a sub-dock :"
 msgstr "Délai avant de sortir effectivement d'un sous-dock :"
 
 #: ../data/messages:125 ../data/messages:129 ../data/messages:133
+#: ../data/messages:137
 msgid "in ms."
 msgstr "en ms."
 
 #: ../data/messages:131 ../data/messages:135 ../data/messages:139
+#: ../data/messages:143
 msgid "Delay before displaying a sub-dock :"
 msgstr "Délai avant l'affichage d'un sous-dock :"
 
 #: ../data/messages:129 ../data/messages:133 ../data/messages:137
+#: ../data/messages:141
 msgid "in ms. Unused if you set up to click to show sub-docks."
 msgstr "en ms. Inutile si vous devez cliquer pour montrer les sous-docks."
 
 #: ../data/messages:135 ../data/messages:139 ../data/messages:143
+#: ../data/messages:147
 msgid "Click to show sub-docks ?"
 msgstr "Cliquer pour montrer les sous-docks ?"
 
 #: ../data/messages:133 ../data/messages:137 ../data/messages:141
+#: ../data/messages:145
 msgid ""
 "Otherwise they will appear when you linger over the icon pointing on it."
 msgstr "Sinon ils apparaîtront quand vous survolez l'icône pointant dessus."
 
 #: ../data/messages:139 ../data/messages:143 ../data/messages:147
+#: ../data/messages:151
 msgid "Animate sub-docks when they appear ?"
 msgstr "Animer les sous-docks lors de leur apparition ?"
 
 #: ../data/messages:137 ../data/messages:141 ../data/messages:145
+#: ../data/messages:149
 msgid "Always true if sub-docks appear with mouse click."
 msgstr "Toujours vrai si les sous-docks apparaissent au clic."
 
 #: ../data/messages:141 ../data/messages:145 ../data/messages:149
+#: ../data/messages:153
 msgid "CPU"
 msgstr "CPU"
 
 #: ../data/messages:145 ../data/messages:149 ../data/messages:153
+#: ../data/messages:157
 msgid "Refresh frequency when mouving cursor into the dock :"
 msgstr ""
 "Fréquence de rafraîchissement lorsqu'on bouge le curseur dans le dock :"
 
 #: ../data/messages:143 ../data/messages:147 ../data/messages:151
+#: ../data/messages:155
 msgid "in Hz. This is to adjust regarding your CPU power."
 msgstr "en Hz. Ceci est à ajuster en fonction de la puissance du processeur."
 
 #: ../data/messages:149 ../data/messages:153 ../data/messages:157
+#: ../data/messages:161
 msgid "Reflections should be calculated in real-time ?"
 msgstr "Les reflets doivent-ils être recalculés en temps réel ?"
 
 #: ../data/messages:147 ../data/messages:151 ../data/messages:155
+#: ../data/messages:159
 msgid ""
 "The transparency gradation pattern will then be re-calculated in real time. "
 "May needs more CPU power."
@@ -852,24 +876,29 @@ msgstr ""
 "peut consommer plus de CPU."
 
 #: ../data/messages:151 ../data/messages:155 ../data/messages:159
+#: ../data/messages:163
 msgid "Labels"
 msgstr "Etiquettes"
 
 #: ../data/messages:153 ../data/messages:157 ../data/messages:161
+#: ../data/messages:165
 msgid "Show label of the currently pointed icon only ?"
 msgstr "Ne montrer que l'étiquette de l'icône pointée ?"
 
 #: ../data/messages:155 ../data/messages:159 ../data/messages:163
+#: ../data/messages:167
 msgid "Should the labels be always horizontal, even when dock is vertical ?"
 msgstr ""
 "Les etiquettes doivent être toujours horizontales, même quand le dock est "
 "vertical ?"
 
 #: ../data/messages:159 ../data/messages:163 ../data/messages:167
+#: ../data/messages:171
 msgid "label's visibility threshold :"
 msgstr "Seuil de visibilité des étiquettes :"
 
 #: ../data/messages:157 ../data/messages:161 ../data/messages:165
+#: ../data/messages:169
 msgid ""
 "the bigger, the more the labels next to the pointed icon will be transparent."
 msgstr ""
@@ -877,21 +906,23 @@ msgstr ""
 "sont transparentes."
 
 #: ../data/messages:161 ../data/messages:165 ../data/messages:169
+#: ../data/messages:173
 msgid "Files"
 msgstr "Fichiers"
 
 #: ../data/messages:163 ../data/messages:167 ../data/messages:171
+#: ../data/messages:175
 msgid "Sort files by :"
 msgstr "Trier les fichiers par :"
 
 #: ../data/messages:171 ../data/messages:357 ../data/messages:173
 #: ../data/messages:359 ../data/messages:177 ../data/messages:375
-#: ../data/messages:181 ../data/messages:379
+#: ../data/messages:181 ../data/messages:379 ../data/messages:185
 msgid "Applets"
 msgstr "Applets"
 
 #: ../data/messages:173 ../data/messages:175 ../data/messages:185
-#: ../data/messages:189
+#: ../data/messages:189 ../data/messages:193
 msgid "Add fonctionnalities to your dock !"
 msgstr "Ajoutez des fonctionnalités à votre dock !"
 
@@ -904,32 +935,32 @@ msgid "List of available plug-ins (applets and others) :"
 msgstr "Liste des plug-ins disponibles (applets et autres) :"
 
 #: ../data/messages:179 ../data/messages:181 ../data/messages:197
-#: ../data/messages:201
+#: ../data/messages:201 ../data/messages:205
 msgid "Background"
 msgstr "Arrière-plan"
 
 #: ../data/messages:181 ../data/messages:183 ../data/messages:199
-#: ../data/messages:203
+#: ../data/messages:203 ../data/messages:207
 msgid "Callback zone"
 msgstr "Zone de rappel"
 
 #: ../data/messages:185 ../data/messages:187 ../data/messages:203
-#: ../data/messages:207
+#: ../data/messages:207 ../data/messages:211
 msgid "Size of the callback zone (width x height, in pixels) :"
 msgstr "Taille de la zone de rappel (largeur x hauteur) :"
 
 #: ../data/messages:183 ../data/messages:185 ../data/messages:201
-#: ../data/messages:205
+#: ../data/messages:205 ../data/messages:209
 msgid "Place the mouse into this zone will make the dock re-appear."
 msgstr "Placer la souris dans cette zone fera ré-apparaître le dock"
 
 #: ../data/messages:189 ../data/messages:191 ../data/messages:207
-#: ../data/messages:211
+#: ../data/messages:211 ../data/messages:215
 msgid "Filename of an image to put on the callback zone :"
 msgstr "Nom de fichier d'une image pour la zone de rappel :"
 
 #: ../data/messages:187 ../data/messages:189 ../data/messages:205
-#: ../data/messages:209
+#: ../data/messages:209 ../data/messages:213
 msgid ""
 "Any format allowed; let this field empty to have an invisible callback zone. "
 "The callback zone is what you see when the dock hides itselfs."
@@ -939,17 +970,17 @@ msgstr ""
 "cache."
 
 #: ../data/messages:191 ../data/messages:193 ../data/messages:209
-#: ../data/messages:213
+#: ../data/messages:213 ../data/messages:217
 msgid "Transparency of the callback zone :"
 msgstr "Transparence de la zone de rappel :"
 
 #: ../data/messages:195 ../data/messages:197 ../data/messages:213
-#: ../data/messages:217
+#: ../data/messages:217 ../data/messages:221
 msgid "Rotate the callback zone's image when the dock is on top/left/right ?"
 msgstr "faire pivoter l'image de la zone de rappel avec le dock ?"
 
 #: ../data/messages:193 ../data/messages:195 ../data/messages:211
-#: ../data/messages:215
+#: ../data/messages:215 ../data/messages:219
 msgid ""
 "Use it when the image is an arrow pointing to the center of the screen for "
 "exemple."
@@ -958,32 +989,32 @@ msgstr ""
 "l'écran par exemple."
 
 #: ../data/messages:197 ../data/messages:199 ../data/messages:215
-#: ../data/messages:219
+#: ../data/messages:219 ../data/messages:223
 msgid "Extern Frame"
 msgstr "Cadre extérieur"
 
 #: ../data/messages:201 ../data/messages:203 ../data/messages:219
-#: ../data/messages:223
+#: ../data/messages:223 ../data/messages:227
 msgid "Corner radius :"
 msgstr "Rayon des coins :"
 
 #: ../data/messages:205 ../data/messages:207 ../data/messages:223
-#: ../data/messages:227
+#: ../data/messages:227 ../data/messages:231
 msgid "Linewidth of the extern line :"
 msgstr "Epaisseur de la ligne externe :"
 
 #: ../data/messages:209 ../data/messages:211 ../data/messages:227
-#: ../data/messages:231
+#: ../data/messages:231 ../data/messages:235
 msgid "Margin between the frame and the icons or their reflects :"
 msgstr "Marge entre le cadre et les icônes ou leurs reflets :"
 
 #: ../data/messages:211 ../data/messages:213 ../data/messages:229
-#: ../data/messages:233
+#: ../data/messages:233 ../data/messages:237
 msgid "Color of the extern line (r,v,b,a) :"
 msgstr "Couleur de la ligne externe (r,v,b,a) :"
 
 #: ../data/messages:213 ../data/messages:215 ../data/messages:231
-#: ../data/messages:235
+#: ../data/messages:235 ../data/messages:239
 msgid "Are the bottom left and right corners rounded ?"
 msgstr "Les coins du bas sont-ils aussi arrondis ?"
 
@@ -1626,7 +1657,15 @@ msgstr ""
 "Kawada !"
 
 msgid ""
-"v1.5.4.1 : a huge release !\n - add a cute pinguin in your dock with the new applet Cairo-Penguin\n - monitor your wifi connection with the Wifi applet\n - control xmms, audacious, banshee and exaile with the Xmms applet\n - Cairo-Dock is now fully integrated into XFCE environment !\n - better detection of battery in the Powermanager applet\n - lot of improvments in the Terminal applet.\n - the dock can auto-resize when it grows too large\n - refresh your dock with the new theme : Wood\n - 3 more themes in Weather"
+"v1.5.4.1 : a huge release !\n"
+" - add a cute pinguin in your dock with the new applet Cairo-Penguin\n"
+" - monitor your wifi connection with the Wifi applet\n"
+" - control xmms, audacious, banshee and exaile with the Xmms applet\n"
+" - Cairo-Dock is now fully integrated into XFCE environment !\n"
+" - lot of improvments in the Terminal applet.\n"
+" - the dock can auto-resize when it grows too large\n"
+" - refresh your dock with the new theme : Wood\n"
+" - 3 more themes in Weather"
 msgstr ""
 "v1.5.4.1 : une énorme mise à jour !\n"
 " - ajoutez un pingouin trognon dans votre dock avec la nouvelle applet Cairo-"
@@ -1634,9 +1673,8 @@ msgstr ""
 " - surveillez votre connexion wifi avec l'applet Wifi\n"
 " - contrôlez xmms, audacious, banshee et exaile avec l'applet Xmms\n"
 " - Cairo-Dock est désormais totalement intégré à l'environnement XFCE !\n"
-" - meilleure détection de la batterie dans l'appletPowermanager\n"
 " - de nombreuses améliorations dans l'applet Terminal\n"
-" - le dock se redimensionne automatiquement quand il devient trop large\n"
+" - le dock se redimensionne lorsqu'il devient trop large\n"
 " - rafraîchissez votre dock avec le nouveau thème Wood\n"
 " - 3 thèmes supplémentaires pour l'applet Weather."
 
@@ -1822,7 +1860,7 @@ msgstr "Ajouter un séparateur"
 #: ../src/cairo-dock-callbacks.c:1418 ../src/cairo-dock-callbacks.c:1420
 #: ../src/cairo-dock-callbacks.c:1421 ../src/cairo-dock-callbacks.c:1424
 #: ../src/cairo-dock-callbacks.c:1429 ../src/cairo-dock-callbacks.c:1431
-#: ../src/cairo-dock-callbacks.c:1447
+#: ../src/cairo-dock-callbacks.c:1447 ../src/cairo-dock-callbacks.c:1450
 msgid "Quit Cairo-Dock ?"
 msgstr "Quitter Cairo-Dock ?"
 
@@ -1902,14 +1940,17 @@ msgstr ""
 "réglez le comportement de Compiz à : (name=cairo-dock-desklet & type=utility)"
 
 #: ../data/messages:165 ../data/messages:169 ../data/messages:173
+#: ../data/messages:177
 msgid "Name"
 msgstr "Nom"
 
 #: ../data/messages:167 ../data/messages:171 ../data/messages:175
+#: ../data/messages:179
 msgid "Size"
 msgstr "Taille"
 
 #: ../data/messages:169 ../data/messages:173 ../data/messages:177
+#: ../data/messages:181
 msgid "Date"
 msgstr "Date"
 
@@ -1947,6 +1988,7 @@ msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr "Réglez le comportement de Compiz à : (name=cairo-dock & type=utility)"
 
 #: ../data/messages:171 ../data/messages:175 ../data/messages:179
+#: ../data/messages:183
 msgid "Show hidden files ?"
 msgstr "Montrer les fichiers cachés ?"
 
@@ -2012,7 +2054,8 @@ msgstr "Aller sur la face %d"
 
 #: ../data/messages:177 ../data/messages:181 ../data/messages:187
 #: ../data/messages:193 ../data/messages:185 ../data/messages:191
-#: ../data/messages:197
+#: ../data/messages:197 ../data/messages:189 ../data/messages:195
+#: ../data/messages:201
 msgid ""
 "Just check the box to activate a plug-in, or uncheck to deactivate it. Once "
 "activated, you can use it and configure it."
@@ -2021,7 +2064,7 @@ msgstr ""
 "décochez-la pour le désactiver. Une fois activé, vous pourrez l'utiliser et "
 "le configurer."
 
-#: ../data/messages:39
+#: ../data/messages:39 ../data/messages:43
 msgid ""
 "When you press the shortcut, the dock will hide or show itself at the "
 "potition of your mouse, thus acting like a menu."
@@ -2029,27 +2072,27 @@ msgstr ""
 "Lorsque vous presserez le raccourci, le dock se cachera ou se montrera à la "
 "position de la souris, se comportant ainsi comme un menu."
 
-#: ../data/messages:41
+#: ../data/messages:41 ../data/messages:45
 msgid "Keyboard shortcut to show/hide the dock :"
 msgstr "Raccourci clavier pour montrer/cacher le dock :"
 
-#: ../data/messages:179 ../data/messages:183
+#: ../data/messages:179 ../data/messages:183 ../data/messages:187
 msgid "Choose some useful accessories for your dock !"
 msgstr "Choisissez des accessoires utiles pour votre dock !"
 
-#: ../data/messages:183 ../data/messages:187
+#: ../data/messages:183 ../data/messages:187 ../data/messages:191
 msgid "List of available accessories :"
 msgstr "Liste des accessoires disponibles :"
 
-#: ../data/messages:189 ../data/messages:193
+#: ../data/messages:189 ../data/messages:193 ../data/messages:197
 msgid "List of available desktop enhancements :"
 msgstr "Liste des améliorations disponibles pour le bureau :"
 
-#: ../data/messages:191 ../data/messages:195
+#: ../data/messages:191 ../data/messages:195 ../data/messages:199
 msgid "Control your PC from your dock !"
 msgstr "Contrôlez votre PC à partir du dock !"
 
-#: ../data/messages:195 ../data/messages:199
+#: ../data/messages:195 ../data/messages:199 ../data/messages:203
 msgid "List of available controlers :"
 msgstr "Liste des contrôleurs disponibles :"
 
@@ -2066,7 +2109,7 @@ msgstr "Support"
 msgid "Show"
 msgstr "Montrer"
 
-#: ../data/messages:107
+#: ../data/messages:107 ../data/messages:111
 msgid ""
 "The dock will unfold when it hides/shows itself. No effect if auto-hide is "
 "not activated or unfold acceleration is nul."
@@ -2074,6 +2117,18 @@ msgstr ""
 "Le dock se dépliera lorsqu'il se cache/montre. Aucun effet si l'auto-hide "
 "n'est pas activé, ou si l'accélération de dépliage est nulle."
 
-#: ../data/messages:109
+#: ../data/messages:109 ../data/messages:113
 msgid "Animate the dock when auto-hiding ?"
 msgstr "Animer the dock lorsqu'il se cache ?"
+
+#: ../data/messages:33
+msgid "Size allowed for the dock :"
+msgstr "Taille autorisée pour le dock :"
+
+#: ../data/messages:31
+msgid ""
+"The dock will automatically resize itself to fit this size. Set it to 0 to "
+"make the dock fit the screen's size."
+msgstr ""
+"Le dock se redimensionnera automatiquement pour satisfaire à cette "
+"contrainte. Mettez 0 pour lui indiquer de prendre la taille de l'écran."

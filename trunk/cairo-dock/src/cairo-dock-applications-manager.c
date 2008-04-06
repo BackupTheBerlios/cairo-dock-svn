@@ -1280,6 +1280,12 @@ gboolean cairo_dock_class_is_inhibated (const gchar *cClass)
 	return (pClassAppli != NULL && pClassAppli->pIconsOfClass != NULL);
 }
 
+gboolean cairo_dock_class_is_using_xicon (const gchar *cClass)
+{
+	CairoDockClassAppli *pClassAppli = cairo_dock_find_class_appli (cClass);
+	return (pClassAppli != NULL && pClassAppli->bUseXIcon);
+}
+
 gboolean cairo_dock_prevent_inhibated_class (Icon *pIcon)
 {
 	g_return_val_if_fail (pIcon != NULL, FALSE);

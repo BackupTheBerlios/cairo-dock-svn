@@ -341,7 +341,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 				icon->cClass = g_strdup (icon->cClass);
 			else
 				icon->cClass = NULL;
-			cd_warning ("Attention : no class defined for the launcher %s\n we will assume that its class is '%s'", cDesktopFileName, icon->cClass);
+			cd_message ("no class defined for the launcher %s\n we will assume that its class is '%s'", cDesktopFileName, icon->cClass);
 		}
 		else
 		{
@@ -369,7 +369,7 @@ Icon * cairo_dock_create_icon_from_desktop_file (const gchar *cDesktopFileName, 
 	CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 	if (pParentDock == NULL)
 	{
-		cd_message ("le dock parent (%s) n'existe pas, on le cree\n", icon->cParentDockName);
+		cd_message ("le dock parent (%s) n'existe pas, on le cree", icon->cParentDockName);
 		pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_DOCK, icon->cParentDockName, NULL);
 	}
 

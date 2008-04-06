@@ -436,42 +436,49 @@ void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
 void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et fFlatDockWidth doivent avoir ete mis a jour au prealable.
 {
 	//g_print ("%s (bInside : %d ; iSidShrinkDown : %d)\n", __func__, pDock->bInside, pDock->iSidShrinkDown);
-	double fPrevRatio = pDock->fRatio;
-	g_print ("%s (%d / %d)\n", __func__, (int)pDock->fFlatDockWidth, g_iMaxAuthorizedWidth);
-	if (pDock->fFlatDockWidth > g_iMaxAuthorizedWidth)  // g_iScreenWidth[pDock->bHorizontalDock]
+	
+	int n = 0;
+	do
 	{
-		pDock->fRatio *= g_iMaxAuthorizedWidth / pDock->fFlatDockWidth;
-	}
-	else
-	{
-		double fMaxRatio = (pDock->iRefCount == 0 ? 1 : g_fSubDockSizeRatio);
-		if (pDock->fRatio < fMaxRatio)
+		pDock->calculate_max_dock_size (pDock);
+		
+		double fPrevRatio = pDock->fRatio;
+		g_print ("%s (%d / %d)\n", __func__, (int)pDock->iMaxDockWidth, g_iMaxAuthorizedWidth);
+		if (pDock->iMaxDockWidth > g_iMaxAuthorizedWidth)  // g_iScreenWidth[pDock->bHorizontalDock]
 		{
-			pDock->fRatio *= g_iMaxAuthorizedWidth / pDock->fFlatDockWidth;
-			pDock->fRatio = MIN (pDock->fRatio, fMaxRatio);
+			pDock->fRatio *= 1. * g_iMaxAuthorizedWidth / pDock->iMaxDockWidth;
 		}
 		else
-			pDock->fRatio = fMaxRatio;
-	}
-	
-	if (fPrevRatio != pDock->fRatio)
-	{
-		g_print ("changement du ratio : %.3f -> %.3f (%d)\n", fPrevRatio, pDock->fRatio, pDock->iRefCount);
-		Icon *icon;
-		GList *ic;
-		pDock->fFlatDockWidth = -g_iIconGap;
-		for (ic = pDock->icons; ic != NULL; ic = ic->next)
 		{
-			icon = ic->data;
-			icon->fWidth *= pDock->fRatio / fPrevRatio;
-			icon->fHeight *= pDock->fRatio / fPrevRatio;
-			pDock->fFlatDockWidth += icon->fWidth + g_iIconGap;
+			double fMaxRatio = (pDock->iRefCount == 0 ? 1 : g_fSubDockSizeRatio);
+			if (pDock->fRatio < fMaxRatio)
+			{
+				pDock->fRatio *= 1. * g_iMaxAuthorizedWidth / pDock->iMaxDockWidth;
+				pDock->fRatio = MIN (pDock->fRatio, fMaxRatio);
+			}
+			else
+				pDock->fRatio = fMaxRatio;
 		}
-		pDock->iMaxIconHeight *= pDock->fRatio / fPrevRatio;
-	}
+		
+		if (fPrevRatio != pDock->fRatio)
+		{
+			g_print ("changement du ratio : %.3f -> %.3f (%d, %d try)\n", fPrevRatio, pDock->fRatio, pDock->iRefCount, n);
+			Icon *icon;
+			GList *ic;
+			pDock->fFlatDockWidth = -g_iIconGap;
+			for (ic = pDock->icons; ic != NULL; ic = ic->next)
+			{
+				icon = ic->data;
+				icon->fWidth *= pDock->fRatio / fPrevRatio;
+				icon->fHeight *= pDock->fRatio / fPrevRatio;
+				pDock->fFlatDockWidth += icon->fWidth + g_iIconGap;
+			}
+			pDock->iMaxIconHeight *= pDock->fRatio / fPrevRatio;
+		}
+		n ++;
+	} while (pDock->iMaxDockWidth > g_iMaxAuthorizedWidth && n < 3);
 	
-	pDock->calculate_max_dock_size (pDock);
-
+	
 	if (! pDock->bInside && (g_bAutoHide && pDock->iRefCount == 0))
 		return;
 	else if (GTK_WIDGET_VISIBLE (pDock->pWidget))

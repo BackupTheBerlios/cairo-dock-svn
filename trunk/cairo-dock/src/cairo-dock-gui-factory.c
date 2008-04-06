@@ -1419,6 +1419,16 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						break;
 
 					case 'v' :  // separateur.
+						{
+							GtkWidget *pAlign = gtk_alignment_new (.5, 0., 0.5, 0.);
+							pOneWidget = gtk_hseparator_new ();
+							gtk_container_add (GTK_CONTAINER (pAlign), pOneWidget);
+							gtk_box_pack_start(GTK_BOX (pFrameVBox != NULL ? pFrameVBox : pVBox),
+								pAlign,
+								FALSE,
+								FALSE,
+								0);
+						}
 					break ;
 
 					/*case 'k' :
@@ -1451,7 +1461,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 					break;
 
 					default :
-						cd_message ("Attention : this conf file seems to be incorrect !\n");
+						cd_warning ("Attention : this conf file seems to be incorrect !");
 					break ;
 				}
 

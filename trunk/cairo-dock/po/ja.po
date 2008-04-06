@@ -38,7 +38,7 @@ msgid "Appearance"
 msgstr "外観"
 
 #: cairo-dock-menu.c:587 src/cairo-dock-menu.c:583 src/cairo-dock-menu.c:582
-#: po/fr.po:34 ../data/messages:41 ../data/messages:45
+#: po/fr.po:34 ../data/messages:41 ../data/messages:45 ../data/messages:49
 msgid "Behaviour"
 msgstr "動作"
 
@@ -686,10 +686,11 @@ msgstr "画面最端までの距離 :"
 #: ../data/messages:431 ../data/messages:217 ../data/messages:221
 #: ../data/messages:225 ../data/messages:275 ../data/messages:447
 #: ../data/messages:229 ../data/messages:279 ../data/messages:451
+#: ../data/messages:233
 msgid "in pixels."
 msgstr "ピクセル単位"
 
-#: ../data/messages:33
+#: ../data/messages:33 ../data/messages:37
 msgid "Reserve space at the edge of the screen for the dock ?"
 msgstr "ドックのために画面の端に空間を確保？"
 
@@ -700,11 +701,11 @@ msgstr "これによって他のウィンドウがドックに覆いかぶさる
 msgid "Auto-Hide"
 msgstr "自動で隠す"
 
-#: ../data/messages:37
+#: ../data/messages:37 ../data/messages:41
 msgid "Activate auto-hide ?"
 msgstr "自動で隠す？"
 
-#: ../data/messages:35
+#: ../data/messages:35 ../data/messages:39
 msgid ""
 "The dock will automatically hide itself outside of the scren when the mouse "
 "leaves it and will show a callback zone instead. Place the mouse into this "
@@ -713,15 +714,15 @@ msgstr ""
 "マウスがドックから離れた時、自動的にドックが隠れ、代わりに呼び戻しゾーンを表"
 "示します。このゾーンにマウスを置くことで再びドックが表示されます。"
 
-#: ../data/messages:39 ../data/messages:43
+#: ../data/messages:39 ../data/messages:43 ../data/messages:47
 msgid "TaskBar"
 msgstr "タスクバー"
 
-#: ../data/messages:45 ../data/messages:49
+#: ../data/messages:45 ../data/messages:49 ../data/messages:53
 msgid "Show the current applications in the dock ?"
 msgstr "ドック上に現在のアプリケーションを表示？"
 
-#: ../data/messages:43 ../data/messages:47
+#: ../data/messages:43 ../data/messages:47 ../data/messages:51
 msgid ""
 "Cairo-Dock will then replace your taskbar. It is recommanded to remove any "
 "other taskbar, and to not force the dock's type to normal."
@@ -730,15 +731,15 @@ msgstr ""
 "クバーを取り除くことをお薦めします。その場合、ドックのウィンドウ・タイプを "
 "normal に強制しないこともお薦めします。"
 
-#: ../data/messages:47 ../data/messages:51
+#: ../data/messages:47 ../data/messages:51 ../data/messages:55
 msgid "Should the applications with same PID be displayed only once ?"
 msgstr "同じ PID を持つアプリーションの表示は１つだけに限定？"
 
-#: ../data/messages:51 ../data/messages:55
+#: ../data/messages:51 ../data/messages:55 ../data/messages:59
 msgid "Should the applications with same class be grouped in a sub-dock ?"
 msgstr "同じクラスを持つアプリケーションはサブ・ドック内でグループ化？"
 
-#: ../data/messages:49 ../data/messages:53
+#: ../data/messages:49 ../data/messages:53 ../data/messages:57
 msgid ""
 "This allows to group windows in some soft like Gimp, and to have only 1 icon "
 "in the main dock.The 1st window will appear in the main dock, and the others "
@@ -748,42 +749,42 @@ msgstr ""
 "イコンを1つだけ持たせることが可能になります。最初のウィンドウはメイン・ドック"
 "に表示され、その他は最初のアイコンに関連付けられたコンテナに置かれます。"
 
-#: ../data/messages:53 ../data/messages:57
+#: ../data/messages:53 ../data/messages:57 ../data/messages:61
 msgid "Only show icons whose window is minimized ?"
 msgstr "最小化されたウィンドウのアイコンのみを表示？"
 
-#: ../data/messages:55 ../data/messages:59
+#: ../data/messages:55 ../data/messages:59 ../data/messages:63
 msgid "Only show applis on current desktop ?"
 msgstr "現在のデスクトップ上のアプリケーションのみを表示？"
 
-#: ../data/messages:57 ../data/messages:61
+#: ../data/messages:57 ../data/messages:61 ../data/messages:65
 msgid "Interaction"
 msgstr "状況的動作"
 
-#: ../data/messages:61 ../data/messages:65
+#: ../data/messages:61 ../data/messages:65 ../data/messages:69
 msgid ""
 "Minimize the window when its icon is clicked, if it was already the active "
 "window ?"
 msgstr ""
 "アクティブ・ウィンドウのアイコンをクリックしたときはそのウィンドウを最小化？"
 
-#: ../data/messages:59 ../data/messages:63
+#: ../data/messages:59 ../data/messages:63 ../data/messages:67
 msgid "It is the default behaviour of most of taskbars."
 msgstr "これは大抵のタスクバーのデフォルトの動作です。"
 
-#: ../data/messages:65 ../data/messages:69
+#: ../data/messages:65 ../data/messages:69 ../data/messages:73
 msgid "Middle click on an icon closes its relative application ?"
 msgstr "アイコンを中クリックしたときはその関係アプリーションを閉じる？"
 
-#: ../data/messages:63 ../data/messages:67
+#: ../data/messages:63 ../data/messages:67 ../data/messages:71
 msgid "In a Firefox's tabs manner."
 msgstr "Firefox のタブのような動作です。"
 
-#: ../data/messages:69 ../data/messages:73
+#: ../data/messages:69 ../data/messages:73 ../data/messages:77
 msgid "Automatically quick-hide the dock when a window becomes fullscreen ?"
 msgstr "ウィンドウが全画面表示になったときは自動的にドックを一時的に隠す？"
 
-#: ../data/messages:67 ../data/messages:71
+#: ../data/messages:67 ../data/messages:71 ../data/messages:75
 msgid ""
 "This is only usefull if don't already use the auto-hide, and if your WM let "
 "the dock in front of fullscreen windows."
@@ -791,48 +792,48 @@ msgstr ""
 "自動で隠す設定を使用していない場合や、ウィンドウ・マネージャがドックを全画面"
 "ウィンドウの手前に表示させてしまう場合にのみ役立ちます。"
 
-#: ../data/messages:71 ../data/messages:75
+#: ../data/messages:71 ../data/messages:75 ../data/messages:79
 msgid "Signal the applications demanding your attention with a dialog tip ?"
 msgstr ""
 "アプリケーションが注視を求めていることをダイアログ・チップを使用して通知？"
 
-#: ../data/messages:73 ../data/messages:77
+#: ../data/messages:73 ../data/messages:77 ../data/messages:81
 msgid "Signal the applications demanding your attention with an animation ?"
 msgstr "アプリケーションが注視を求めていることをアニメーションを使用して通知？"
 
-#: ../data/messages:75 ../data/messages:79
+#: ../data/messages:75 ../data/messages:79 ../data/messages:83
 msgid "Play a short animation of the icon when its window becomes active ?"
 msgstr "ウィンドウがアクティブになったときアイコンの短いアニメーションを再生？"
 
-#: ../data/messages:77 ../data/messages:81
+#: ../data/messages:77 ../data/messages:81 ../data/messages:85
 msgid "Representation"
 msgstr "表示"
 
-#: ../data/messages:81 ../data/messages:85
+#: ../data/messages:81 ../data/messages:85 ../data/messages:89
 msgid "Maximum number of caracters in application's name :"
 msgstr "アプリケーションの名前の最大文字数 :"
 
-#: ../data/messages:79 ../data/messages:83
+#: ../data/messages:79 ../data/messages:83 ../data/messages:87
 msgid "\"...\" will be added at the end if the name is too long."
 msgstr "名前が長すぎる場合には最後に \"...\" が加えられます。"
 
-#: ../data/messages:85 ../data/messages:89
+#: ../data/messages:85 ../data/messages:89 ../data/messages:93
 msgid "Transparency of icons whose window is or isn't minimized :"
 msgstr "最小化または非最小化ウィンドウのアイコンの透明度 :"
 
-#: ../data/messages:87 ../data/messages:91
+#: ../data/messages:87 ../data/messages:91 ../data/messages:95
 msgid "System"
 msgstr "システム"
 
-#: ../data/messages:89 ../data/messages:93
+#: ../data/messages:89 ../data/messages:93 ../data/messages:97
 msgid "Movement parameters"
 msgstr "ドック自動（非）表示動作のパラメータ"
 
-#: ../data/messages:93 ../data/messages:97
+#: ../data/messages:93 ../data/messages:97 ../data/messages:101
 msgid "Icons' lateral unfolding acceleration :"
 msgstr "アイコンの側面方向の展開加速度 :"
 
-#: ../data/messages:91 ../data/messages:95
+#: ../data/messages:91 ../data/messages:95 ../data/messages:99
 msgid ""
 "The icons will appear folded on themselves, regarding the alignement point, "
 "then will unfold untill they fill the whole dock. Use 0 to not use "
@@ -842,19 +843,19 @@ msgstr ""
 "ように展開します。0 に指定すると展開は使用されません。0 に近い数字ほど、展開"
 "速度は速くなります。"
 
-#: ../data/messages:97 ../data/messages:101
+#: ../data/messages:97 ../data/messages:101 ../data/messages:105
 msgid "Number of steps for icons' resizing (grow up/shrink down) :"
 msgstr "アイコンのサイズ変更の段階数（拡大/縮小） :"
 
-#: ../data/messages:95 ../data/messages:99
+#: ../data/messages:95 ../data/messages:99 ../data/messages:103
 msgid "The more there are, the slower it will be"
 msgstr "大きな数字ほど、サイズ変更速度が遅くなります。"
 
-#: ../data/messages:101 ../data/messages:105
+#: ../data/messages:101 ../data/messages:105 ../data/messages:109
 msgid "Window's move acceleration (move up/move down) :"
 msgstr "ドック・ウィンドウの移動加速度（上/下 動） :"
 
-#: ../data/messages:99 ../data/messages:103
+#: ../data/messages:99 ../data/messages:103 ../data/messages:107
 msgid ""
 "in percentage of the distance it can move at each step . After n steps, the "
 "remaining distance will be reduced by (1-s)^n."
@@ -863,14 +864,17 @@ msgstr ""
 "まります。"
 
 #: ../data/messages:103 ../data/messages:107 ../data/messages:111
+#: ../data/messages:115
 msgid "Mouse"
 msgstr "マウス"
 
 #: ../data/messages:107 ../data/messages:111 ../data/messages:115
+#: ../data/messages:119
 msgid "Scroll speed factor for background decorations :"
 msgstr "背景装飾のスクロール速度 :"
 
 #: ../data/messages:105 ../data/messages:109 ../data/messages:113
+#: ../data/messages:117
 msgid ""
 "The smaller, the lower the decorations will move along with the cursor. At 0 "
 "they will be static."
@@ -879,10 +883,12 @@ msgstr ""
 "した場合は静止状態になります。"
 
 #: ../data/messages:111 ../data/messages:115 ../data/messages:119
+#: ../data/messages:123
 msgid "Should the decorations be enslaved to the cursor ?"
 msgstr "装飾をカーソルに追従させる？"
 
 #: ../data/messages:109 ../data/messages:113 ../data/messages:117
+#: ../data/messages:121
 msgid ""
 "Otherwise the amount of movement of the decorations will only depend on the "
 "direction of the cursor's movement, as if the decorations were \"gliding\"."
@@ -891,83 +897,102 @@ msgstr ""
 "\"すべる\"ような感じになります。"
 
 #: ../data/messages:115 ../data/messages:119 ../data/messages:123
+#: ../data/messages:127
 msgid "Amount of pixels the icons will scroll at each wheel scroll :"
 msgstr "1回のホイールスクロールにつきアイコンがスクロールするピクセル数 :"
 
 #: ../data/messages:113 ../data/messages:117 ../data/messages:121
+#: ../data/messages:125
 msgid "If you put 0, this will make them scroll of exactly one icon each time."
 msgstr "0 に指定すると、ちょうど 1 アイコン単位のスクロールになります。"
 
 #: ../data/messages:117 ../data/messages:121 ../data/messages:125
+#: ../data/messages:129
 msgid "Re-center the dock on leaving if it has been scrolled ?"
 msgstr "アイコンをスクロールさせた場合はドックからの退出時に元の配列に戻す？"
 
 #: ../data/messages:121 ../data/messages:125 ../data/messages:129
+#: ../data/messages:133
 msgid "If so, you can specify the scrolling acceleration :"
 msgstr "元の配列に戻す場合のスクロール加速度の指定 :"
 
 #: ../data/messages:119 ../data/messages:123 ../data/messages:127
+#: ../data/messages:131
 msgid "The more it's close to 0, the faster the scroll will be."
 msgstr "0 に近いほどスクロールが速くなります。"
 
 #: ../data/messages:123 ../data/messages:127 ../data/messages:131
+#: ../data/messages:135
 msgid "Sub-docks"
 msgstr "サブ・ドック"
 
 #: ../data/messages:127 ../data/messages:131 ../data/messages:135
+#: ../data/messages:139
 msgid "Delay before you effectively leave from a sub-dock or to a sub-dock :"
 msgstr "有効にサブ・ドックから退出またはサブ・ドックへ退出するまでの遅延時間 :"
 
 #: ../data/messages:125 ../data/messages:129 ../data/messages:133
+#: ../data/messages:137
 msgid "in ms."
 msgstr "ミリ秒単位"
 
 #: ../data/messages:131 ../data/messages:135 ../data/messages:139
+#: ../data/messages:143
 msgid "Delay before displaying a sub-dock :"
 msgstr "サブ・ドック表示の開始遅延時間 :"
 
 #: ../data/messages:129 ../data/messages:133 ../data/messages:137
+#: ../data/messages:141
 msgid "in ms. Unused if you set up to click to show sub-docks."
 msgstr ""
 "ミリ秒単位です。クリックでサブ・ドックを表示するようにしている場合は使用され"
 "ません。"
 
 #: ../data/messages:135 ../data/messages:139 ../data/messages:143
+#: ../data/messages:147
 msgid "Click to show sub-docks ?"
 msgstr "クリックでサブ・ドックを表示？"
 
 #: ../data/messages:133 ../data/messages:137 ../data/messages:141
+#: ../data/messages:145
 msgid ""
 "Otherwise they will appear when you linger over the icon pointing on it."
 msgstr ""
 "無効の場合は、アイコン上をしばらくポイントするとサブ・ドックが現れます。"
 
 #: ../data/messages:139 ../data/messages:143 ../data/messages:147
+#: ../data/messages:151
 msgid "Animate sub-docks when they appear ?"
 msgstr "サブ・ドック表示時にアニメーション効果？"
 
 #: ../data/messages:137 ../data/messages:141 ../data/messages:145
+#: ../data/messages:149
 msgid "Always true if sub-docks appear with mouse click."
 msgstr ""
 "マウスのクリックでサブ・ドックが表示される場合、常に効果有りになります。"
 
 #: ../data/messages:141 ../data/messages:145 ../data/messages:149
+#: ../data/messages:153
 msgid "CPU"
 msgstr "CPU"
 
 #: ../data/messages:145 ../data/messages:149 ../data/messages:153
+#: ../data/messages:157
 msgid "Refresh frequency when mouving cursor into the dock :"
 msgstr "ドック内にカーソルを移動させた際の描画更新頻度 :"
 
 #: ../data/messages:143 ../data/messages:147 ../data/messages:151
+#: ../data/messages:155
 msgid "in Hz. This is to adjust regarding your CPU power."
 msgstr "Hz 単位。CPU パワーに合わせた調整のためです。"
 
 #: ../data/messages:149 ../data/messages:153 ../data/messages:157
+#: ../data/messages:161
 msgid "Reflections should be calculated in real-time ?"
 msgstr "反射をリアルタイムで計算？"
 
 #: ../data/messages:147 ../data/messages:151 ../data/messages:155
+#: ../data/messages:159
 msgid ""
 "The transparency gradation pattern will then be re-calculated in real time. "
 "May needs more CPU power."
@@ -976,22 +1001,27 @@ msgstr ""
 "より多くの CPU パワーが要求される可能性があります。"
 
 #: ../data/messages:151 ../data/messages:155 ../data/messages:159
+#: ../data/messages:163
 msgid "Labels"
 msgstr "ラベル"
 
 #: ../data/messages:153 ../data/messages:157 ../data/messages:161
+#: ../data/messages:165
 msgid "Show label of the currently pointed icon only ?"
 msgstr "ポインタが現在置かれているアイコンのみラベルを表示？"
 
 #: ../data/messages:155 ../data/messages:159 ../data/messages:163
+#: ../data/messages:167
 msgid "Should the labels be always horizontal, even when dock is vertical ?"
 msgstr "ドックが垂直のときでもラベルは常に水平に表示？"
 
 #: ../data/messages:159 ../data/messages:163 ../data/messages:167
+#: ../data/messages:171
 msgid "label's visibility threshold :"
 msgstr "ラベル表示のしきい値 :"
 
 #: ../data/messages:157 ../data/messages:161 ../data/messages:165
+#: ../data/messages:169
 msgid ""
 "the bigger, the more the labels next to the pointed icon will be transparent."
 msgstr ""
@@ -999,21 +1029,23 @@ msgstr ""
 "す。"
 
 #: ../data/messages:161 ../data/messages:165 ../data/messages:169
+#: ../data/messages:173
 msgid "Files"
 msgstr "ファイル"
 
 #: ../data/messages:163 ../data/messages:167 ../data/messages:171
+#: ../data/messages:175
 msgid "Sort files by :"
 msgstr "ファイルの整列 :"
 
 #: ../data/messages:171 ../data/messages:357 ../data/messages:173
 #: ../data/messages:359 ../data/messages:177 ../data/messages:375
-#: ../data/messages:181 ../data/messages:379
+#: ../data/messages:181 ../data/messages:379 ../data/messages:185
 msgid "Applets"
 msgstr "アプレット"
 
 #: ../data/messages:173 ../data/messages:175 ../data/messages:185
-#: ../data/messages:189
+#: ../data/messages:189 ../data/messages:193
 msgid "Add fonctionnalities to your dock !"
 msgstr "あなたのドックに機能を追加！"
 
@@ -1026,32 +1058,32 @@ msgid "List of available plug-ins (applets and others) :"
 msgstr "利用可能なプラグインのリスト（アプレット等） :"
 
 #: ../data/messages:179 ../data/messages:181 ../data/messages:197
-#: ../data/messages:201
+#: ../data/messages:201 ../data/messages:205
 msgid "Background"
 msgstr "背景"
 
 #: ../data/messages:181 ../data/messages:183 ../data/messages:199
-#: ../data/messages:203
+#: ../data/messages:203 ../data/messages:207
 msgid "Callback zone"
 msgstr "呼び戻しゾーン"
 
 #: ../data/messages:185 ../data/messages:187 ../data/messages:203
-#: ../data/messages:207
+#: ../data/messages:207 ../data/messages:211
 msgid "Size of the callback zone (width x height, in pixels) :"
 msgstr "呼び戻しゾーンの大きさ（幅×高さ、ピクセル単位） :"
 
 #: ../data/messages:183 ../data/messages:185 ../data/messages:201
-#: ../data/messages:205
+#: ../data/messages:205 ../data/messages:209
 msgid "Place the mouse into this zone will make the dock re-appear."
 msgstr "ドックを再表示させるには、このゾーンにマウスを置きます。"
 
 #: ../data/messages:189 ../data/messages:191 ../data/messages:207
-#: ../data/messages:211
+#: ../data/messages:211 ../data/messages:215
 msgid "Filename of an image to put on the callback zone :"
 msgstr "呼び戻しゾーン上に配置する画像のファイル名 :"
 
 #: ../data/messages:187 ../data/messages:189 ../data/messages:205
-#: ../data/messages:209
+#: ../data/messages:209 ../data/messages:213
 msgid ""
 "Any format allowed; let this field empty to have an invisible callback zone. "
 "The callback zone is what you see when the dock hides itselfs."
@@ -1060,49 +1092,49 @@ msgstr ""
 "い。ドックが隠れた際に見られるのが、呼び戻しゾーンです。"
 
 #: ../data/messages:191 ../data/messages:193 ../data/messages:209
-#: ../data/messages:213
+#: ../data/messages:213 ../data/messages:217
 msgid "Transparency of the callback zone :"
 msgstr "呼び戻しゾーンの透明度 :"
 
 #: ../data/messages:195 ../data/messages:197 ../data/messages:213
-#: ../data/messages:217
+#: ../data/messages:217 ../data/messages:221
 msgid "Rotate the callback zone's image when the dock is on top/left/right ?"
 msgstr "ドックが上/左/右に配置されたとき呼び戻しゾーンの画像を回転？"
 
 #: ../data/messages:193 ../data/messages:195 ../data/messages:211
-#: ../data/messages:215
+#: ../data/messages:215 ../data/messages:219
 msgid ""
 "Use it when the image is an arrow pointing to the center of the screen for "
 "exemple."
 msgstr "例えば、画像が画面の中央を指した矢印などの場合に使用してください。."
 
 #: ../data/messages:197 ../data/messages:199 ../data/messages:215
-#: ../data/messages:219
+#: ../data/messages:219 ../data/messages:223
 msgid "Extern Frame"
 msgstr "外枠"
 
 #: ../data/messages:201 ../data/messages:203 ../data/messages:219
-#: ../data/messages:223
+#: ../data/messages:223 ../data/messages:227
 msgid "Corner radius :"
 msgstr "角の丸み :"
 
 #: ../data/messages:205 ../data/messages:207 ../data/messages:223
-#: ../data/messages:227
+#: ../data/messages:227 ../data/messages:231
 msgid "Linewidth of the extern line :"
 msgstr "外枠線の幅 :"
 
 #: ../data/messages:209 ../data/messages:211 ../data/messages:227
-#: ../data/messages:231
+#: ../data/messages:231 ../data/messages:235
 msgid "Margin between the frame and the icons or their reflects :"
 msgstr "枠とアイコンまたはそれらの反射の間の余白 :"
 
 #: ../data/messages:211 ../data/messages:213 ../data/messages:229
-#: ../data/messages:233
+#: ../data/messages:233 ../data/messages:237
 msgid "Color of the extern line (r,v,b,a) :"
 msgstr "外枠線の色（赤、緑、青、透明） :"
 
 #: ../data/messages:213 ../data/messages:215 ../data/messages:231
-#: ../data/messages:235
+#: ../data/messages:235 ../data/messages:239
 msgid "Are the bottom left and right corners rounded ?"
 msgstr "左右の下角を丸める？"
 
@@ -1959,7 +1991,7 @@ msgstr "Compiz Fusion ウィジェット"
 #: ../src/cairo-dock-callbacks.c:1418 ../src/cairo-dock-callbacks.c:1420
 #: ../src/cairo-dock-callbacks.c:1421 ../src/cairo-dock-callbacks.c:1424
 #: ../src/cairo-dock-callbacks.c:1429 ../src/cairo-dock-callbacks.c:1431
-#: ../src/cairo-dock-callbacks.c:1447
+#: ../src/cairo-dock-callbacks.c:1447 ../src/cairo-dock-callbacks.c:1450
 msgid "Quit Cairo-Dock ?"
 msgstr "Cairo-Dock 終了？"
 
@@ -1977,14 +2009,17 @@ msgstr ""
 "とマウス左ボタンを押し続けることで、ドックを移動させることも可能です。"
 
 #: ../data/messages:165 ../data/messages:169 ../data/messages:173
+#: ../data/messages:177
 msgid "Name"
 msgstr "名前"
 
 #: ../data/messages:167 ../data/messages:171 ../data/messages:175
+#: ../data/messages:179
 msgid "Size"
 msgstr "サイズ"
 
 #: ../data/messages:169 ../data/messages:173 ../data/messages:177
+#: ../data/messages:181
 msgid "Date"
 msgstr "日付"
 
@@ -2020,10 +2055,11 @@ msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr "Compiz の動作設定での指定法: (name=cairo-dock-desklet & type=utility)"
 
 #: ../data/messages:171 ../data/messages:175 ../data/messages:179
+#: ../data/messages:183
 msgid "Show hidden files ?"
 msgstr "隠しファイルを表示？"
 
-#: ../data/messages:83 ../data/messages:87
+#: ../data/messages:83 ../data/messages:87 ../data/messages:91
 msgid ""
 "To the right, you can control the transparency of minimized windows, to the "
 "left the transparency of visible windows. The more you go aside, the more "
@@ -2088,7 +2124,8 @@ msgstr "面 %d へ移動"
 
 #: ../data/messages:177 ../data/messages:181 ../data/messages:187
 #: ../data/messages:193 ../data/messages:185 ../data/messages:191
-#: ../data/messages:197
+#: ../data/messages:197 ../data/messages:189 ../data/messages:195
+#: ../data/messages:201
 msgid ""
 "Just check the box to activate a plug-in, or uncheck to deactivate it. Once "
 "activated, you can use it and configure it."
@@ -2096,21 +2133,21 @@ msgstr ""
 "プラグインを有効にするにはボックスにチェックを入れ、無効にするにはチェックを"
 "外してください。有効にするとそのプラグインの使用と設定が可能になります。"
 
-#: ../data/messages:39
+#: ../data/messages:39 ../data/messages:43
 msgid ""
 "When you press the shortcut, the dock will hide or show itself at the "
 "potition of your mouse, thus acting like a menu."
 msgstr ""
 
-#: ../data/messages:41
+#: ../data/messages:41 ../data/messages:45
 msgid "Keyboard shortcut to show/hide the dock :"
 msgstr ""
 
-#: ../data/messages:179 ../data/messages:183
+#: ../data/messages:179 ../data/messages:183 ../data/messages:187
 msgid "Choose some useful accessories for your dock !"
 msgstr ""
 
-#: ../data/messages:183 ../data/messages:187
+#: ../data/messages:183 ../data/messages:187 ../data/messages:191
 msgid "List of available accessories :"
 msgstr ""
 
@@ -2118,22 +2155,22 @@ msgstr ""
 msgid "List of available desktop enhancement :"
 msgstr ""
 
-#: ../data/messages:191 ../data/messages:195
+#: ../data/messages:191 ../data/messages:195 ../data/messages:199
 msgid "Control your PC from your dock !"
 msgstr ""
 
-#: ../data/messages:195 ../data/messages:199
+#: ../data/messages:195 ../data/messages:199 ../data/messages:203
 msgid "List of available controlers :"
 msgstr ""
 
-#: ../data/messages:31
+#: ../data/messages:31 ../data/messages:35
 msgid ""
 "This will prevent other windows from overlapping the dock. It has no effect "
 "if you defined the 'show/hide' shortcut below, cause then the dock behaves "
 "like a menu."
 msgstr ""
 
-#: ../data/messages:189 ../data/messages:193
+#: ../data/messages:189 ../data/messages:193 ../data/messages:197
 msgid "List of available desktop enhancements :"
 msgstr ""
 
@@ -2150,12 +2187,22 @@ msgstr ""
 msgid "Show"
 msgstr ""
 
-#: ../data/messages:107
+#: ../data/messages:107 ../data/messages:111
 msgid ""
 "The dock will unfold when it hides/shows itself. No effect if auto-hide is "
 "not activated or unfold acceleration is nul."
 msgstr ""
 
-#: ../data/messages:109
+#: ../data/messages:109 ../data/messages:113
 msgid "Animate the dock when auto-hiding ?"
+msgstr ""
+
+#: ../data/messages:31
+msgid ""
+"The dock will automatically resize itself to fit this size. Set it to 0 to "
+"make the dock fit the screen's size."
+msgstr ""
+
+#: ../data/messages:33
+msgid "Size allowed for the dock :"
 msgstr ""

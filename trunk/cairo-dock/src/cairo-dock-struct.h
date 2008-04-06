@@ -663,9 +663,13 @@ typedef void (* CairoDockConfigFunc) (gchar *cConfFile, gpointer data);
 
 
 struct _CairoDockClassAppli {
+	/// TRUE ssi l'appli doit utiliser l'icone fournie par X au lieu de celle du theme.
 	gboolean bUseXIcon;
+	/// Liste des inhibiteurs de la classe.
 	GList *pIconsOfClass;
-	};
+	/// Liste des icones d'appli de cette classe.
+	GList *pAppliOfClass;
+};
 
 
 /// Nom du repertoire de travail de cairo-dock.

@@ -30,12 +30,16 @@ y gap = 25
 #F-
 frame2_ = 
 
-#v
-separator_ = 
+#i-[0;9999] Size allowed for the dock :
+#{The dock will automatically resize itself to fit this size. Set it to 0 to make the dock fit the screen's size.}
+max autorized width = 0
 
 #b- Reserve space at the edge of the screen for the dock ?
 #{This will prevent other windows from overlapping the dock. It has no effect if you defined the 'show/hide' shortcut below, cause then the dock behaves like a menu.}
 reserve space = false
+
+#v-
+separator_ = 
 
 #b- Activate auto-hide ?
 #{The dock will automatically hide itself outside of the scren when the mouse leaves it and will show a callback zone instead. Place the mouse into this zone will make the dock re-appear.}
@@ -112,7 +116,7 @@ frame_mov =
 
 #e-[0.;12.] Icons' lateral unfolding acceleration :
 #{The icons will appear folded on themselves, regarding the alignement point, then will unfold untill they fill the whole dock. Use 0 to not use unfolding, the more it's close to 0, the faster it will be}
-unfold factor = 0
+unfold factor = 8
 
 #I-[5;50] Number of steps for icons' resizing (grow up/shrink down) :
 #{The more there are, the slower it will be}
@@ -276,9 +280,6 @@ line color = 0.0; 0.0; 0.8; 0.4
 #b+ Are the bottom left and right corners rounded ?
 rounded bottom corner = true
 
-#i+[0;9999] Maximum width that can have the dock :
-#{You can scroll with the mouse's wheel to make the icons scroll, like a carousel. If you put 0, the dock will automatically adapt itself to the desktop's size.}
-max autorized width = 0
 
 #F+[Background image...;gtk-orientation-portrait]
 frame2 = 
@@ -389,9 +390,6 @@ frame_theme=
 default icon directory = _ThemeDirectory_
 
 
-#v
-separator_ = 
-
 #X+[Launchers]
 frame_launcher =
 
@@ -447,9 +445,6 @@ separator width = 0
 #i+ ...
 separator height = 0
 
-#v
-sep_sep =
-
 #b Automatically add separators ?
 #{Separators are icons used to make a separation between different types of icons. Cairo-dock can automatically add them between launchers, applis, and applets.}
 use separator = true
@@ -466,9 +461,6 @@ force size = false
 
 #X+
 frame_sep_ =
-
-#v
-sep_sep =
 
 #T+3[launchers;applications;applets] Order of the different types of icons :
 icon's type order = launchers;applications;applets

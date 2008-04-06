@@ -1310,9 +1310,12 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 		if (str != NULL)
 		{
 			*str = '\0';
+			if (str != cReceivedData && *(str - 1) == '\r')
+				*(str - 1) = '\0';
 			cReceivedData = str + 1;
 		}
 		
+		cd_debug (" notification de drop '%s'", data[0]);
 		cairo_dock_notify (CAIRO_DOCK_DROP_DATA, data);
 	} while (str != NULL);
 }

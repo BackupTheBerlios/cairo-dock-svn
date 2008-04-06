@@ -58,7 +58,8 @@ GList *cairo_dock_list_existing_appli_with_class (const gchar *cClass);
 gboolean cairo_dock_set_class_use_xicon (const gchar *cClass, gboolean bUseXIcon);
 gboolean cairo_dock_inhibate_class (const gchar *cClass, Icon *pInhibatorIcon);
 
-gboolean cairo_dock_class_is_inhibited (const gchar *cClass);
+gboolean cairo_dock_class_is_inhibated (const gchar *cClass);
+gboolean cairo_dock_class_is_using_xicon (const gchar *cClass);
 gboolean cairo_dock_prevent_inhibated_class (Icon *pIcon);
 
 void cairo_dock_deinhibate_class (const gchar *cClass, Icon *pInhibatorIcon);
