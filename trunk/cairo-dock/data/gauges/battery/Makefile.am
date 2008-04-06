@@ -6,6 +6,6 @@ theme_DATA = \
 	battery2.svg\
 	battery3.svg\
 	battery4.svg\
-	theme.conf
+	theme.xml
 
 EXTRA_DIST = $(theme_DATA)

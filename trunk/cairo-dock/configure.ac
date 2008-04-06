@@ -37,7 +37,7 @@ AM_CONDITIONAL(COMPIL_VERBOSE, test x$enable_verbose = xyes)
 AM_CONDITIONAL(COMPIL_WITH_GLITZ, test x$enable_glitz = xyes)
 
 
-PKG_CHECK_MODULES(PACKAGE, "gtk+-2.0 gthread-2.0 cairo librsvg-2.0 glitz dbus-glib-1")
+PKG_CHECK_MODULES(PACKAGE, "gtk+-2.0 gthread-2.0 cairo librsvg-2.0 glitz dbus-glib-1 libxml-2.0")
 PKG_CHECK_MODULES(GLITZ, "glitz-glx")
 
 AC_CONFIG_FILES([Makefile
@@ -51,5 +51,9 @@ AC_CONFIG_FILES([Makefile
 		data/gauges/Makefile
 		data/gauges/radium/Makefile
 		data/gauges/radium-fuel/Makefile
-		data/gauges/battery/Makefile])
+		data/gauges/battery/Makefile
+		data/gauges/old-square/Makefile
+		data/gauges/turbo-night/Makefile
+		data/gauges/turbo-night-fuel/Makefile
+		data/gauges/tomato/Makefile])
 AC_OUTPUT
