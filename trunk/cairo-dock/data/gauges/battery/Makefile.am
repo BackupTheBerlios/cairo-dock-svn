@@ -1,6 +1,8 @@
 themedir = $(pkgdatadir)/gauges/battery
 
 theme_DATA = \
+	background.svg\
+	foreground.svg\
 	battery0.svg\
 	battery1.svg\
 	battery2.svg\
