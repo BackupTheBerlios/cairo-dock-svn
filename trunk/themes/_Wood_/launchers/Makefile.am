@@ -34,4 +34,14 @@ launchers_DATA = \
 	konqueror.svg\
 	kmail.svg\
 	mozilla-thunderbird.svg\
-	xfce4-terminal.svg
+	xfce4-terminal.svg\
+	cd-burner.svg\
+	nautilus-cd-burner.svg\
+	graveman.svg\
+	gnome-baker.svg\
+	k3b.svg\
+	brasero.svg
+	
+	
+	
+	
