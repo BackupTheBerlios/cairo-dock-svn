@@ -27,7 +27,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-log.h"
 
 extern CairoDock *g_pMainDock;
-extern GHashTable *g_hDocksTable;
 extern double g_fSubDockSizeRatio;
 extern gboolean g_bAutoHide;
 extern gboolean g_bTextAlwaysHorizontal;
@@ -1204,77 +1203,6 @@ void cairo_dock_redraw_my_icon (Icon *icon, CairoDockContainer *pContainer)
 #endif
 		gdk_window_invalidate_rect (pContainer->pWidget->window, &rect, FALSE);
 	}
-}
-
-
-
-
-static gboolean _cairo_dock_hide_dock (gchar *cDockName, CairoDock *pDock, CairoDock *pChildDock)
-{
-	if (pDock->bInside)
-		return FALSE;
-
-	Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
-	if (pPointedIcon == NULL || pPointedIcon->pSubDock != pChildDock)
-		pPointedIcon = cairo_dock_get_icon_with_subdock (pDock->icons, pChildDock);
-
-	if (pPointedIcon != NULL)
-	{
-		cd_message (" il faut cacher ce dock parent");
-		if (pDock->iRefCount == 0)  // pDock->bIsMainDock
-		{
-			cairo_dock_leave_from_main_dock (pDock);
-		}
-		else
-		{
-			if (pDock->iScrollOffset != 0)  // on remet systematiquement a 0 l'offset pour les containers.
-			{
-				pDock->iScrollOffset = 0;
-				pDock->iMouseX = pDock->iCurrentWidth / 2;  // utile ?
-				pDock->iMouseY = 0;
-				pDock->calculate_icons (pDock);
-				pDock->render (pDock);  // peut-etre qu'il faudrait faire un redraw.
-			}
-
-			cd_message ("on cache %s par parente", cDockName);
-			gtk_widget_hide (pDock->pWidget);
-			cairo_dock_hide_parent_dock (pDock);
-		}
-		return TRUE;
-	}
-	return FALSE;
-}
-void cairo_dock_hide_parent_dock (CairoDock *pDock)
-{
-	 g_hash_table_find (g_hDocksTable, (GHRFunc)_cairo_dock_hide_dock, pDock);
-}
-
-gboolean cairo_dock_hide_child_docks (CairoDock *pDock)
-{
-	GList* ic;
-	Icon *icon;
-	for (ic = pDock->icons; ic != NULL; ic = ic->next)
-	{
-		icon = ic->data;
-		if (icon->pSubDock != NULL && GTK_WIDGET_VISIBLE (icon->pSubDock->pWidget))
-		{
-			if (icon->pSubDock->bInside)
-			{
-				cd_message ("on est dans le sous-dock, donc on ne le cache pas");
-				pDock->bInside = FALSE;
-				pDock->bAtTop = FALSE;
-				return FALSE;
-			}
-			else if (icon->pSubDock->iSidLeaveDemand == 0)  // si on sort du dock sans passer par le sous-dock, par exemple en sortant par le bas.
-			{
-				cd_message ("on cache %s par filiation", icon->acName);
-				icon->pSubDock->iScrollOffset = 0;
-				icon->pSubDock->fFoldingFactor = 0;
-				gtk_widget_hide (icon->pSubDock->pWidget);
-			}
-		}
-	}
-	return TRUE;
 }
 
 

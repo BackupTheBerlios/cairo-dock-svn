@@ -505,10 +505,10 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 	cairo_dock_update_dock_size (pDock);
 
 	//\_________________ On met a jour l'ordre des applets dans le fichier de conf.
-	if (CAIRO_DOCK_IS_VALID_APPLET (icon1))
+	if (CAIRO_DOCK_IS_APPLET (icon1))
 		cairo_dock_update_module_order (icon1->pModule, icon1->fOrder);
 		///cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, pDock->icons);
-	if (CAIRO_DOCK_IS_VALID_APPLET (icon2))
+	if (CAIRO_DOCK_IS_APPLET (icon2))
 		cairo_dock_update_module_order (icon2->pModule, icon2->fOrder);
 }
 
@@ -569,7 +569,7 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 	cairo_dock_update_dock_size (pDock);
 
 	//\_________________ On prend en compte le changement de position pour les applets.
-	if (CAIRO_DOCK_IS_VALID_APPLET (icon1))
+	if (CAIRO_DOCK_IS_APPLET (icon1))
 		cairo_dock_update_module_order (icon1->pModule, icon1->fOrder);
 		///cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, pDock->icons);
 }
@@ -706,11 +706,11 @@ static void _cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon,
 			cairo_dock_fm_remove_monitor (icon);
 		}
 	}
-	if (CAIRO_DOCK_IS_VALID_APPLI (icon))
+	if (CAIRO_DOCK_IS_APPLI (icon))
 	{
 		cairo_dock_unregister_appli (icon);
 	}
-	if (CAIRO_DOCK_IS_VALID_APPLET (icon))
+	if (CAIRO_DOCK_IS_APPLET (icon))
 	{
 		cairo_dock_deactivate_module (icon->pModule);  // desactive le module mais ne le ferme pas.
 		icon->pModule = NULL;  // pour ne pas le liberer lors du free_icon.

@@ -45,7 +45,7 @@ separator_ =
 #{The dock will automatically hide itself outside of the scren when the mouse leaves it and will show a callback zone instead. Place the mouse into this zone will make the dock re-appear.}
 auto-hide = false
 
-#k Keyboard shortcut to show/hide the dock :
+#k- Keyboard shortcut to show/hide the dock :
 #{When you press the shortcut, the dock will hide or show itself at the potition of your mouse, thus acting like a menu.}
 raise shortcut = 
 
@@ -130,11 +130,11 @@ move up speed = 0.35
 #f-[0.1;0.9] ...
 move down speed = 0.25
 
-#b Animate the dock when auto-hiding ?
+#b- Animate the dock when auto-hiding ?
 #{The dock will unfold when it hides/shows itself. No effect if auto-hide is not activated or unfold acceleration is nul.}
 animate on auto-hide = true
 
-#F[Mouse;@prefix@/@DATADIRNAME@/@PACKAGE@/icon-mouse.png]
+#F-[Mouse;@prefix@/@DATADIRNAME@/@PACKAGE@/icon-mouse.png]
 frame_mouse = 
 
 #e-[0;1] Scroll speed factor for background decorations :
@@ -205,7 +205,7 @@ frame_file =
 #r-[Name;Size;Date] Sort files by :
 sort files = 0
 
-#b Show hidden files ?
+#b- Show hidden files ?
 show hidden files = false
 
 

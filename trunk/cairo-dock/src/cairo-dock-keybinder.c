@@ -51,7 +51,7 @@ static GSList *bindings = NULL;
 static guint32 last_event_time = 0;
 static gboolean processing_event = FALSE;
 
-static guint num_lock_mask, caps_lock_mask, scroll_lock_mask;
+static guint num_lock_mask=0, caps_lock_mask=0, scroll_lock_mask=0;
 
 static void
 lookup_ignorable_modifiers (GdkKeymap *keymap)
@@ -247,14 +247,32 @@ cd_keybinder_init (void)
 	lookup_ignorable_modifiers (keymap);
 
 	gdk_window_add_filter (rootwin,
-			       filter_func,
-			       NULL);
+		filter_func,
+		NULL);
 
 	g_signal_connect (keymap,
-			  "keys_changed",
-			  G_CALLBACK (keymap_changed),
-			  NULL);
+		"keys_changed",
+		G_CALLBACK (keymap_changed),
+		NULL);
 }
+
+void
+cd_keybinder_stop (void)
+{
+	GdkKeymap *keymap = gdk_keymap_get_default ();
+	GdkWindow *rootwin = gdk_get_default_root_window ();
+
+	num_lock_mask=0, caps_lock_mask=0, scroll_lock_mask=0;
+
+	g_signal_handlers_disconnect_by_func (keymap,
+		G_CALLBACK (keymap_changed),
+		NULL);
+	
+	gdk_window_remove_filter (rootwin,
+		filter_func,
+		NULL);
+}
+
 
 gboolean
 cd_keybinder_bind (const char           *keystring,

@@ -36,20 +36,20 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-file-manager.h"
-#include "cairo-dock-dock-factory.h"
 #include "cairo-dock-X-utilities.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-keyfile-manager.h"
+#include "cairo-dock-dock-factory.h"
 
 extern int g_iWmHint;
 extern CairoDock *g_pMainDock;
-extern GHashTable *g_hDocksTable;
 extern gboolean g_bSameHorizontality;
 extern double g_fSubDockSizeRatio;
 extern gboolean g_bReserveSpace;
 extern gchar *g_cMainDockDefaultRendererName;
 extern gchar *g_cSubDockDefaultRendererName;
 
-extern int g_iScreenWidth[2];
+extern int g_iScreenHeight[2];
 extern int g_iMaxAuthorizedWidth;
 extern gint g_iDockLineWidth;
 extern int g_iIconGap;
@@ -76,13 +76,25 @@ extern gboolean g_bSticky;
 
 extern gboolean g_bUseGlitz;
 
+static GHashTable *s_hDocksTable = NULL;  // table des docks existant.
+
+
+void cairo_dock_initialize_dock_factory (void)
+{
+	cd_message ("");
+	if (s_hDocksTable == NULL)
+		s_hDocksTable = g_hash_table_new_full (g_str_hash,
+			g_str_equal,
+			g_free,
+			NULL);
+}
 
 CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockName, gchar *cRendererName)
 {
 	//static pouet = 0;
 	//g_print ("%s ()\n", __func__);
 	g_return_val_if_fail (cDockName != NULL, NULL);
-	CairoDock *pExistingDock = g_hash_table_lookup (g_hDocksTable, cDockName);
+	CairoDock *pExistingDock = g_hash_table_lookup (s_hDocksTable, cDockName);
 	if (pExistingDock != NULL)
 		return pExistingDock;
 
@@ -192,7 +204,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 		pDock);*/
 
 	
-	g_hash_table_insert (g_hDocksTable, g_strdup (cDockName), pDock);
+	g_hash_table_insert (s_hDocksTable, g_strdup (cDockName), pDock);
 	gtk_window_get_size (GTK_WINDOW (pWindow), &pDock->iCurrentWidth, &pDock->iCurrentHeight);  // ca n'est que la taille initiale allouee par GTK.
 	gtk_widget_show_all (pWindow);
 
@@ -319,7 +331,7 @@ const gchar *cairo_dock_search_dock_name (CairoDock *pDock)
 	gchar *cDockName = NULL;
 	gpointer data[2] = {pDock, &cDockName};
 
-	g_hash_table_find (g_hDocksTable, (GHRFunc)_cairo_dock_search_dock_name_from_subdock, data);
+	g_hash_table_find (s_hDocksTable, (GHRFunc)_cairo_dock_search_dock_name_from_subdock, data);
 	return cDockName;
 }
 
@@ -327,7 +339,7 @@ CairoDock *cairo_dock_search_dock_from_name (gchar *cDockName)
 {
 	if (cDockName == NULL)
 		return NULL;
-	return g_hash_table_lookup (g_hDocksTable, cDockName);
+	return g_hash_table_lookup (s_hDocksTable, cDockName);
 }
 
 static gboolean _cairo_dock_search_icon_from_subdock (gchar *cDockName, CairoDock *pDock, gpointer *data)
@@ -353,7 +365,7 @@ Icon *cairo_dock_search_icon_pointing_on_dock (CairoDock *pDock, CairoDock **pPa
 		return NULL;
 	Icon *pPointingIcon = NULL;
 	gpointer data[3] = {pDock, &pPointingIcon, pParentDock};
-	g_hash_table_find (g_hDocksTable, (GHRFunc)_cairo_dock_search_icon_from_subdock, data);
+	g_hash_table_find (s_hDocksTable, (GHRFunc)_cairo_dock_search_icon_from_subdock, data);
 	return pPointingIcon;
 }
 
@@ -364,13 +376,13 @@ static gboolean _cairo_dock_search_icon_in_a_dock (gchar *cDockName, CairoDock *
 CairoDockContainer *cairo_dock_search_container_from_icon (Icon *icon)
 {
 	g_return_val_if_fail (icon != NULL, NULL);
-	if (CAIRO_DOCK_IS_VALID_APPLET (icon))
+	if (CAIRO_DOCK_IS_APPLET (icon))
 		return icon->pModule->pContainer;
 	
 	if (icon->cParentDockName != NULL)
-		return g_hash_table_lookup (g_hDocksTable, icon->cParentDockName);
+		return g_hash_table_lookup (s_hDocksTable, icon->cParentDockName);
 	else
-		return g_hash_table_find (g_hDocksTable, (GHRFunc) _cairo_dock_search_icon_in_a_dock, icon);
+		return g_hash_table_find (s_hDocksTable, (GHRFunc) _cairo_dock_search_icon_in_a_dock, icon);
 }
 
 
@@ -436,14 +448,13 @@ void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
 void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et fFlatDockWidth doivent avoir ete mis a jour au prealable.
 {
 	//g_print ("%s (bInside : %d ; iSidShrinkDown : %d)\n", __func__, pDock->bInside, pDock->iSidShrinkDown);
+	pDock->calculate_max_dock_size (pDock);
 	
 	int n = 0;
 	do
 	{
-		pDock->calculate_max_dock_size (pDock);
-		
 		double fPrevRatio = pDock->fRatio;
-		g_print ("%s (%d / %d)\n", __func__, (int)pDock->iMaxDockWidth, g_iMaxAuthorizedWidth);
+		cd_debug ("  %s (%d / %d)", __func__, (int)pDock->iMaxDockWidth, g_iMaxAuthorizedWidth);
 		if (pDock->iMaxDockWidth > g_iMaxAuthorizedWidth)  // g_iScreenWidth[pDock->bHorizontalDock]
 		{
 			pDock->fRatio *= 1. * g_iMaxAuthorizedWidth / pDock->iMaxDockWidth;
@@ -460,9 +471,14 @@ void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et fFlatD
 				pDock->fRatio = fMaxRatio;
 		}
 		
+		if (pDock->iMaxDockHeight > g_iScreenHeight[pDock->bHorizontalDock])
+		{
+			pDock->fRatio = MIN (pDock->fRatio, fPrevRatio * g_iScreenHeight[pDock->bHorizontalDock] / pDock->iMaxDockHeight);
+		}
+		
 		if (fPrevRatio != pDock->fRatio)
 		{
-			g_print ("changement du ratio : %.3f -> %.3f (%d, %d try)\n", fPrevRatio, pDock->fRatio, pDock->iRefCount, n);
+			cd_debug ("  -> changement du ratio : %.3f -> %.3f (%d, %d try)", fPrevRatio, pDock->fRatio, pDock->iRefCount, n);
 			Icon *icon;
 			GList *ic;
 			pDock->fFlatDockWidth = -g_iIconGap;
@@ -474,10 +490,12 @@ void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et fFlatD
 				pDock->fFlatDockWidth += icon->fWidth + g_iIconGap;
 			}
 			pDock->iMaxIconHeight *= pDock->fRatio / fPrevRatio;
+			
+			pDock->calculate_max_dock_size (pDock);
 		}
+		
 		n ++;
-	} while (pDock->iMaxDockWidth > g_iMaxAuthorizedWidth && n < 3);
-	
+	} while ((pDock->iMaxDockWidth > g_iMaxAuthorizedWidth || pDock->iMaxDockHeight > g_iScreenHeight[pDock->bHorizontalDock]) && n < 3);
 	
 	if (! pDock->bInside && (g_bAutoHide && pDock->iRefCount == 0))
 		return;
@@ -553,7 +571,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 		icon->fWidth *= pDock->fRatio;  /// g_fSubDockSizeRatio
 		icon->fHeight *= pDock->fRatio;
 	}
-	g_print (" +size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
+	//g_print (" +size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
 
 	if (! g_bSameHorizontality)
 	{
@@ -665,7 +683,7 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 			icon = cairo_dock_create_icon_from_desktop_file (cFileName, pCairoContext);
 			g_return_if_fail (icon->cParentDockName != NULL);
 
-			pParentDock = g_hash_table_lookup (g_hDocksTable, icon->cParentDockName);
+			pParentDock = g_hash_table_lookup (s_hDocksTable, icon->cParentDockName);
 
 			if (pParentDock != NULL)  // a priori toujours vrai.
 				cairo_dock_insert_icon_in_dock (icon, pParentDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, ! CAIRO_DOCK_INSERT_SEPARATOR);
@@ -673,7 +691,7 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 	} while (1);
 	g_dir_close (dir);
 
-	//g_hash_table_foreach (g_hDocksTable, (GHFunc) _cairo_dock_update_child_dock_size, NULL);  // on mettra a jour la taille du dock principal apres y avoir insere les applis/applets, car pour l'instant les docks fils n'en ont pas.
+	//g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_update_child_dock_size, NULL);  // on mettra a jour la taille du dock principal apres y avoir insere les applis/applets, car pour l'instant les docks fils n'en ont pas.
 }
 
 
@@ -735,7 +753,7 @@ void cairo_dock_free_all_docks (CairoDock *pMainDock)
 
 	cairo_dock_pause_application_manager ();
 
-	g_hash_table_foreach_remove (g_hDocksTable, (GHRFunc) _cairo_dock_free_one_dock, NULL);
+	g_hash_table_foreach_remove (s_hDocksTable, (GHRFunc) _cairo_dock_free_one_dock, NULL);
 	g_pMainDock = NULL;
 }
 
@@ -794,7 +812,7 @@ void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDoc
 
 	g_list_free (pIconsList);
 
-	g_hash_table_remove (g_hDocksTable, cDockName);
+	g_hash_table_remove (s_hDocksTable, cDockName);
 
 	g_free (pDock);
 }
@@ -876,3 +894,135 @@ void cairo_dock_allow_widget_to_receive_data (GtkWidget *pWidget, GCallback pCal
 		pCallBack,
 		data);
 }
+
+
+void cairo_dock_update_conf_file_with_containers (GKeyFile *pKeyFile, gchar *cDesktopFilePath)
+{
+	cairo_dock_update_conf_file_with_hash_table (pKeyFile, cDesktopFilePath, s_hDocksTable, "Desktop Entry", "Container", NULL, (GHFunc)cairo_dock_write_one_name, FALSE, FALSE);
+}
+
+
+static void _cairo_dock_get_one_decoration_size (gchar *cDockName, CairoDock *pDock, int *data)
+{
+	if (pDock->iDecorationsWidth > data[0])
+		data[0] = pDock->iDecorationsWidth;
+	if (pDock->iDecorationsHeight > data[1])
+		data[1] = pDock->iDecorationsHeight;
+}
+void cairo_dock_search_max_decorations_size (int *iWidth, int *iHeight)
+{
+	int data[2] = {0, 0};
+	g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_get_one_decoration_size, &data);
+	cd_message ("  decorations max : %dx%d", data[0], data[1]);
+	*iWidth = data[0];
+	*iHeight = data[1];
+}
+
+
+static gboolean _cairo_dock_hide_dock_if_parent (gchar *cDockName, CairoDock *pDock, CairoDock *pChildDock)
+{
+	if (pDock->bInside)
+		return FALSE;
+
+	Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
+	if (pPointedIcon == NULL || pPointedIcon->pSubDock != pChildDock)
+		pPointedIcon = cairo_dock_get_icon_with_subdock (pDock->icons, pChildDock);
+
+	if (pPointedIcon != NULL)
+	{
+		cd_message (" il faut cacher ce dock parent");
+		if (pDock->iRefCount == 0)
+		{
+			cairo_dock_leave_from_main_dock (pDock);
+		}
+		else
+		{
+			if (pDock->iScrollOffset != 0)  // on remet systematiquement a 0 l'offset pour les containers.
+			{
+				pDock->iScrollOffset = 0;
+				pDock->iMouseX = pDock->iCurrentWidth / 2;  // utile ?
+				pDock->iMouseY = 0;
+				pDock->calculate_icons (pDock);
+				pDock->render (pDock);  // peut-etre qu'il faudrait faire un redraw.
+			}
+
+			cd_message ("on cache %s par parente", cDockName);
+			gtk_widget_hide (pDock->pWidget);
+			cairo_dock_hide_parent_dock (pDock);
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
+void cairo_dock_hide_parent_dock (CairoDock *pDock)
+{
+	 g_hash_table_find (s_hDocksTable, (GHRFunc)_cairo_dock_hide_dock_if_parent, pDock);
+}
+
+gboolean cairo_dock_hide_child_docks (CairoDock *pDock)
+{
+	GList* ic;
+	Icon *icon;
+	for (ic = pDock->icons; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (icon->pSubDock != NULL && GTK_WIDGET_VISIBLE (icon->pSubDock->pWidget))
+		{
+			if (icon->pSubDock->bInside)
+			{
+				cd_message ("on est dans le sous-dock, donc on ne le cache pas");
+				pDock->bInside = FALSE;
+				pDock->bAtTop = FALSE;
+				return FALSE;
+			}
+			else if (icon->pSubDock->iSidLeaveDemand == 0)  // si on sort du dock sans passer par le sous-dock, par exemple en sortant par le bas.
+			{
+				cd_message ("on cache %s par filiation", icon->acName);
+				icon->pSubDock->iScrollOffset = 0;
+				icon->pSubDock->fFoldingFactor = 0;
+				gtk_widget_hide (icon->pSubDock->pWidget);
+			}
+		}
+	}
+	return TRUE;
+}
+
+
+void cairo_dock_reload_buffers_in_all_docks (void)
+{
+	g_hash_table_foreach (s_hDocksTable, (GHFunc) cairo_dock_reload_buffers_in_dock, NULL);
+}
+
+void cairo_dock_rename_dock (const gchar *cDockName, CairoDock *pDock, const gchar *cNewName)
+{
+	g_return_if_fail (cDockName != NULL && cNewName != NULL);
+	if (pDock == NULL)
+		pDock = g_hash_table_lookup (s_hDocksTable, cDockName);
+	
+	g_hash_table_steal (s_hDocksTable, cDockName);
+	g_hash_table_insert (s_hDocksTable, cNewName, pDock);
+}
+
+
+static void _cairo_dock_reset_one_dock_view (gchar *cDockName, CairoDock *pDock, gpointer data)
+{
+	cairo_dock_set_renderer (pDock, NULL);  // on met NULL plutot que CAIRO_DOCK_DEFAULT_RENDERER_NAME pour ne pas ecraser le nom de la vue.
+}
+void cairo_dock_reset_all_views (void)
+{
+	//g_print ("%s ()\n", __func__);
+	g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_reset_one_dock_view, NULL);
+}
+
+static void _cairo_dock_set_one_dock_view_to_default (gchar *cDockName, CairoDock *pDock, gpointer data)
+{
+	//g_print ("%s (%s)\n", __func__, cDockName);
+	cairo_dock_set_default_renderer (pDock);
+	cairo_dock_update_dock_size (pDock);
+}
+void cairo_dock_set_all_views_to_default (void)
+{
+	//g_print ("%s ()\n", __func__);
+	g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_set_one_dock_view_to_default, NULL);
+}
+

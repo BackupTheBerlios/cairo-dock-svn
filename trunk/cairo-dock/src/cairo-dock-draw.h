@@ -100,18 +100,6 @@ void cairo_dock_render_blank (CairoDock *pDock);
 void cairo_dock_redraw_my_icon (Icon *icon, CairoDockContainer *pContainer);
 
 
-/**
-*Cache le dock pere d'un dock.
-*@param pDock le dock fils.
-*/
-void cairo_dock_hide_parent_dock (CairoDock *pDock);
-/**
-*Cache recursivement tous les sous-docks fils d'un dock donne.
-*@param pDock le dock parent.
-*/
-gboolean cairo_dock_hide_child_docks (CairoDock *pDock);
-
-
 void cairo_dock_set_window_position_at_balance (CairoDock *pDock, int iNewWidth, int iNewHeight);
 void cairo_dock_get_window_position_and_geometry_at_balance (CairoDock *pDock, CairoDockSizeType iSizeType, int *iNewWidth, int *iNewHeight);
 

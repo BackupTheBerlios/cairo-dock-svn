@@ -20,6 +20,10 @@
 */
 #define CAIRO_DOCK_DOCK(pContainer) ((CairoDock *)pContainer)
 
+/**
+* Initialise la classe des docks. N'a aucun effet la 2eme fois.
+*/
+void cairo_dock_initialize_dock_factory (void);
 
 /**
 * Cree un nouveau dock principal.
@@ -132,5 +136,31 @@ CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, g
 * @param data donnees passees en entree de la callback.
 */
 void cairo_dock_allow_widget_to_receive_data (GtkWidget *pWidget, GCallback pCallBack, gpointer data);
+
+
+void cairo_dock_update_conf_file_with_containers (GKeyFile *pKeyFile, gchar *cDesktopFilePath);
+
+void cairo_dock_search_max_decorations_size (int *iWidth, int *iHeight);
+
+/**
+*Cache recursivement tous les dock peres d'un dock.
+*@param pDock le dock fils.
+*/
+void cairo_dock_hide_parent_dock (CairoDock *pDock);
+/**
+*Cache recursivement tous les sous-docks fils d'un dock donne.
+*@param pDock le dock parent.
+*/
+gboolean cairo_dock_hide_child_docks (CairoDock *pDock);
+/**
+*Recharge les buffers de toutes les icones de tous les docks.
+*/
+void cairo_dock_reload_buffers_in_all_docks (void);
+
+void cairo_dock_rename_dock (const gchar *cDockName, CairoDock *pDock, const gchar *cNewName);
+
+void cairo_dock_reset_all_views (void);
+void cairo_dock_set_all_views_to_default (void);
+
 
 #endif

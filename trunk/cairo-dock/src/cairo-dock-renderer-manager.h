@@ -30,8 +30,4 @@ void cairo_dock_update_launcher_conf_file_with_renderers (GKeyFile *pOpenedKeyFi
 void cairo_dock_update_easy_conf_file_with_renderers (GKeyFile *pOpenedKeyFile, gchar *cConfFile);
 
 
-void cairo_dock_reset_all_views (void);
-void cairo_dock_set_all_views_to_default (void);
-
-
 #endif

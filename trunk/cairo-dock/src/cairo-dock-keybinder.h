@@ -38,6 +38,8 @@ G_BEGIN_DECLS
 typedef void (* CDBindkeyHandler) (const char *keystring, gpointer user_data);
 
 void cd_keybinder_init (void);
+void cd_keybinder_stop (void);
+
 
 gboolean cd_keybinder_bind (const char           *keystring,
                             CDBindkeyHandler  handler,

@@ -19,7 +19,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 extern CairoDockDesktopEnv g_iDesktopEnv;
 extern CairoDockFMSortType g_iFileSortType;
 extern gboolean g_bShowHiddenFiles;
-extern GHashTable *g_hDocksTable;
 
 static CairoDockVFSBackend *s_pVFSBackend = NULL;
 
@@ -308,8 +307,7 @@ static Icon *cairo_dock_fm_alter_icon_if_necessary (Icon *pIcon, CairoDock *pDoc
 
 			if (pNewIcon->acName != NULL && strcmp (pIcon->acName, pNewIcon->acName) != 0)
 			{
-				g_hash_table_steal (g_hDocksTable, pIcon->acName);
-				g_hash_table_insert (g_hDocksTable, pNewIcon->acName, pNewIcon->pSubDock);
+				cairo_dock_rename_dock (pIcon->acName, pNewIcon->pSubDock, pNewIcon->acName);
 			}  // else : detruire le sous-dock.
 		}
 		pNewIcon->fX = pIcon->fX;

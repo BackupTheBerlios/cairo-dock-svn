@@ -55,6 +55,8 @@ gboolean cairo_dock_application_manager_is_running (void);
 void cairo_dock_free_class_appli (CairoDockClassAppli *pClassAppli);
 GList *cairo_dock_list_existing_appli_with_class (const gchar *cClass);
 
+gboolean cairo_dock_add_appli_to_class (Icon *pIcon);
+gboolean cairo_dock_remove_appli_from_class (Icon *pIcon);
 gboolean cairo_dock_set_class_use_xicon (const gchar *cClass, gboolean bUseXIcon);
 gboolean cairo_dock_inhibate_class (const gchar *cClass, Icon *pInhibatorIcon);
 

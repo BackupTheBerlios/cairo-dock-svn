@@ -37,7 +37,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 static const gchar * s_cIconTypeNames[(CAIRO_DOCK_NB_TYPES+1)/2] = {"launchers", "applications", "applets"};
 
 extern CairoDock *g_pMainDock;
-extern GHashTable *g_hDocksTable;
 extern gboolean g_bReverseVisibleImage;
 extern gboolean g_bReserveSpace;
 extern gchar *g_cMainDockDefaultRendererName;
@@ -1081,7 +1080,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		cairo_dock_build_docks_tree_with_desktop_files (pDock, g_cCurrentLaunchersPath);
 	}
 	else
-		cairo_dock_reload_buffers_in_all_docks (g_hDocksTable);
+		cairo_dock_reload_buffers_in_all_docks ();
 
 
 	if (! cairo_dock_application_manager_is_running () && g_bShowAppli)  // maintenant on veut voir les applis !

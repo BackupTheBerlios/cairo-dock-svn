@@ -380,6 +380,8 @@ Icon * cairo_dock_create_icon_from_desktop_file (const gchar *cDesktopFileName, 
 		g_iLabelSize,
 		g_cLabelPolice,
 		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pParentDock->bHorizontalDock));
-
+	
+	/// Ajouter ce lanceur dans sa clase ...
+	
 	return icon;
 }

@@ -91,7 +91,6 @@
 #include "cairo-dock-dbus.h"
 
 CairoDock *g_pMainDock;  // pointeur sur le dock principal.
-GHashTable *g_hDocksTable = NULL;  // table des docks existant.
 int g_iWmHint = GDK_WINDOW_TYPE_HINT_DOCK;  // hint pour la fenetre du dock principal.
 gboolean g_bReserveSpace;
 gchar *g_cMainDockDefaultRendererName = NULL;
@@ -448,11 +447,8 @@ main (int argc, char** argv)
 		g_iMicroVersion = atoi (cVersions[2]);
 	g_strfreev (cVersions);
 
-	//\___________________ On initialise la table des docks.
-	g_hDocksTable = g_hash_table_new_full (g_str_hash,
-		g_str_equal,
-		g_free,
-		NULL);
+	//\___________________ On initialise le gestionnaire de docks (a faire en 1er).
+	cairo_dock_initialize_dock_factory ();
 	
 	//\___________________ On initialise le gestionnaire de vues.
 	cairo_dock_initialize_renderer_manager ();
@@ -468,7 +464,7 @@ main (int argc, char** argv)
 	cairo_dock_initialize_X_support ();
 	
 	//\___________________ On initialise le support de DBus.
-	cd_dbus_init();
+	cairo_dock_initialize_dbus_manager ();
 	
 	//\___________________ On detecte l'environnement de bureau (apres les applis et avant les modules).
 	if (g_iDesktopEnv == CAIRO_DOCK_UNKNOWN_ENV)

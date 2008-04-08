@@ -123,7 +123,8 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 			Icon *pRemovingIcon = cairo_dock_get_removing_or_inserting_icon (pDock->icons);
 			if (pRemovingIcon != NULL)  // idem.
 			{
-				pRemovingIcon->fPersonnalScale = 0.001;
+				pRemovingIcon->fPersonnalScale = -0.05;
+				//g_print ("fPersonnalScale <- %f\n", pRemovingIcon->fPersonnalScale);
 			}
 			pDock->iScrollOffset = 0;
 

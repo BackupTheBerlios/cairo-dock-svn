@@ -83,6 +83,7 @@ void cairo_dock_remove_desklet_renderer (gchar *cRendererName)
 void cairo_dock_initialize_renderer_manager (void)
 {
 	g_return_if_fail (s_hRendererTable == NULL);
+	cd_message ("");
 	
 	s_hRendererTable = g_hash_table_new_full (g_str_hash,
 		g_str_equal,
@@ -186,26 +187,4 @@ void cairo_dock_update_easy_conf_file_with_renderers (GKeyFile *pOpenedKeyFile, 
 	//g_print ("%s (%s)\n", __func__, cConfFile);
 	_cairo_dock_update_conf_file_with_renderers (pOpenedKeyFile, cConfFile, "Personnalisation", "main dock view", FALSE);
 	_cairo_dock_update_conf_file_with_renderers (pOpenedKeyFile, cConfFile, "Personnalisation", "sub-dock view", FALSE);
-}
-
-static void _cairo_dock_reset_one_dock_view (gchar *cDockName, CairoDock *pDock, gpointer data)
-{
-	cairo_dock_set_renderer (pDock, NULL);  // on met NULL plutot que CAIRO_DOCK_DEFAULT_RENDERER_NAME pour ne pas ecraser le nom de la vue.
-}
-void cairo_dock_reset_all_views (void)
-{
-	//g_print ("%s ()\n", __func__);
-	g_hash_table_foreach (g_hDocksTable, (GHFunc) _cairo_dock_reset_one_dock_view, NULL);
-}
-
-static void _cairo_dock_set_one_dock_view_to_default (gchar *cDockName, CairoDock *pDock, gpointer data)
-{
-	//g_print ("%s (%s)\n", __func__, cDockName);
-	cairo_dock_set_default_renderer (pDock);
-	cairo_dock_update_dock_size (pDock);
-}
-void cairo_dock_set_all_views_to_default (void)
-{
-	//g_print ("%s ()\n", __func__);
-	g_hash_table_foreach (g_hDocksTable, (GHFunc) _cairo_dock_set_one_dock_view_to_default, NULL);
 }

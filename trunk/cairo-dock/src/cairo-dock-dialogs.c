@@ -231,7 +231,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 
 	if (pDialog->iWidth == 20 && pDialog->iHeight == 20)
 	{
-		cd_debug ("dialogue incomplet");
+		//cd_debug ("dialogue incomplet");
 		cairo_destroy (pCairoContext);
 		cairo_dock_dialog_unreference (pDialog);
 		return FALSE;
@@ -330,7 +330,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 		GtkRequisition requisition = {0, 0};
 		if (pDialog->pInteractiveWidget != NULL)
 			gtk_widget_size_request (pDialog->pInteractiveWidget, &requisition);
-		cd_message (" pInteractiveWidget : %dx%d", requisition.width, requisition.height);
+		//cd_message (" pInteractiveWidget : %dx%d", requisition.width, requisition.height);
 
 		int iButtonY = pDialog->iMargin + pDialog->iMessageHeight + pDialog->iInteractiveHeight + 0*CAIRO_DOCK_DIALOG_VGAP;  // requisition.height
 		if (! pDialog->bDirectionUp)
@@ -778,7 +778,7 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 		gtk_widget_size_request (pInteractiveWidget, &requisition);
 		pDialog->iInteractiveWidth = requisition.width;
 		pDialog->iInteractiveHeight = requisition.height;
-		cd_debug (" pInteractiveWidget : %dx%d", pDialog->iInteractiveWidth, pDialog->iInteractiveHeight);
+		//cd_debug (" pInteractiveWidget : %dx%d", pDialog->iInteractiveWidth, pDialog->iInteractiveHeight);
 
 		pDialog->iBubbleWidth = MAX (pDialog->iBubbleWidth, pDialog->iInteractiveWidth);
 		pDialog->iBubbleHeight += CAIRO_DOCK_DIALOG_VGAP + pDialog->iInteractiveHeight;
@@ -1036,7 +1036,7 @@ void cairo_dock_place_dialog (CairoDockDialog *pDialog, CairoDockContainer *pCon
 	if (pContainer != NULL && pDialog->pIcon != NULL)
 	{
 		cairo_dock_dialog_calculate_aimed_point (pDialog->pIcon, pContainer, &pDialog->iAimedX, &pDialog->iAimedY, &pDialog->bRight, &pDialog->bIsHorizontal, &pDialog->bDirectionUp);
-		cd_debug (" Aim (%d;%d) / %d,%d,%d", pDialog->iAimedX, pDialog->iAimedY, pDialog->bIsHorizontal, pDialog->bDirectionUp, pDialog->bInside);
+		//cd_debug (" Aim (%d;%d) / %d,%d,%d", pDialog->iAimedX, pDialog->iAimedY, pDialog->bIsHorizontal, pDialog->bDirectionUp, pDialog->bInside);
 		
 		if (pDialog->bIsHorizontal)
 		{
@@ -1057,7 +1057,7 @@ void cairo_dock_place_dialog (CairoDockDialog *pDialog, CairoDockContainer *pCon
 				pDialog->iPositionY = (pDialog->bDirectionUp ? pDialog->iAimedY - (pDialog->iBubbleHeight + 2 * pDialog->iMargin + CAIRO_DOCK_DIALOG_DEFAULT_GAP) : pDialog->iAimedY + CAIRO_DOCK_DIALOG_DEFAULT_GAP);  // on place la bulle (et non pas la fenetre) sans faire d'optimisation.
 			}
 		}
-		cd_debug (" => position : (%d;%d)", pDialog->iPositionX, pDialog->iPositionY);
+		//cd_debug (" => position : (%d;%d)", pDialog->iPositionX, pDialog->iPositionY);
 		int iOldDistance = pDialog->iDistanceToDock;
 		pDialog->iDistanceToDock =  (pDialog->bDirectionUp ? pDialog->iAimedY - pDialog->iPositionY - pDialog->iBubbleHeight - 2*pDialog->iMargin : pDialog->iPositionY - pDialog->iAimedY);
 		///pDialog->iHeight = (pDialog->bDirectionUp ? pDialog->iAimedY - pDialog->iPositionY : pDialog->iPositionY + pDialog->iBubbleHeight + 2 * dy(pDialog->fRadius, fLineWidth) - pDialog->iAimedY);

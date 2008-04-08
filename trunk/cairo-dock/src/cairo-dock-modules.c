@@ -551,7 +551,6 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 	if (module->bActive && module->reloadModule != NULL)
 	{
 		Icon *pIcon = cairo_dock_find_icon_from_module (module, pActualContainer);
-		//g_print ("avant reload : %.2f\n", pIcon->fWidth);
 
 		GKeyFile *pKeyFile = NULL;
 		CairoDockMinimalAppletConfig *pMinimalConfig = NULL;
@@ -617,7 +616,7 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 			pNewContainer = pActualContainer;
 
 		module->pContainer = pNewContainer;
-		if (CAIRO_DOCK_IS_DOCK (pNewContainer))
+		if (CAIRO_DOCK_IS_DOCK (pNewContainer) && pIcon != NULL)
 		{
 			cairo_dock_load_one_icon_from_scratch (pIcon, pNewContainer);
 

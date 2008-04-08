@@ -31,7 +31,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-log.h"
 
 extern CairoDock *g_pMainDock;
-extern GHashTable *g_hDocksTable;
 extern double g_fSubDockSizeRatio;
 extern gboolean g_bSameHorizontality;
 
@@ -190,7 +189,7 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 		
 		g_free (cIconPath);
 	}
-	else if (CAIRO_DOCK_IS_VALID_APPLI (icon))  // c'est l'icône d'une appli valide.
+	else if (CAIRO_DOCK_IS_APPLI (icon))  // c'est l'icône d'une appli valide.
 	{
 		icon->pIconBuffer = cairo_dock_create_surface_from_xwindow (icon->Xid, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight);
 	}
@@ -353,7 +352,7 @@ void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoDockContainer *pCo
 
 void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpointer data)
 {
-	cd_message ("%s (%s)\n", __func__, cDockName);
+	cd_message ("%s (%s)", __func__, cDockName);
 	if (pDock->iRefCount > 0)
 		pDock->bHorizontalDock = (g_bSameHorizontality ? g_pMainDock->bHorizontalDock : ! g_pMainDock->bHorizontalDock);
 	else
@@ -382,18 +381,13 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 
 		icon->fWidth *= pDock->fRatio;
 		icon->fHeight *= pDock->fRatio;
-		g_print (" =size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
+		//g_print (" =size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
 		fFlatDockWidth += g_iIconGap + icon->fWidth;
 		pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, icon->fHeight);
 	}
-	pDock->fFlatDockWidth = (int) fFlatDockWidth;
+	pDock->fFlatDockWidth = (int) fFlatDockWidth;  /// pourquoi (int) ?...
 	cairo_destroy (pCairoContext);
 }
-void cairo_dock_reload_buffers_in_all_docks (GHashTable *hDocksTable)
-{
-	g_hash_table_foreach (hDocksTable, (GHFunc) cairo_dock_reload_buffers_in_dock, NULL);
-}
-
 
 
 void cairo_dock_load_visible_zone (CairoDock *pDock, gchar *cVisibleZoneImageFile, int iVisibleZoneWidth, int iVisibleZoneHeight, double fVisibleZoneAlpha)
@@ -576,19 +570,13 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 	}
 }
 
-static void _cairo_dock_search_max_decorations_size (gchar *cDockName, CairoDock *pDock, int *data)
-{
-	if (pDock->iDecorationsWidth > data[0])
-		data[0] = pDock->iDecorationsWidth;
-	if (pDock->iDecorationsHeight > data[1])
-		data[1] = pDock->iDecorationsHeight;
-}
+
 void cairo_dock_load_background_decorations (CairoDock *pDock)
 {
-	int data[2] = {0, 0};
-	g_hash_table_foreach (g_hDocksTable, (GHFunc) _cairo_dock_search_max_decorations_size, &data);
-	cd_message ("  decorations max : %dx%d", data[0], data[1]);
+	int iWidth, iHeight;
+	cairo_dock_search_max_decorations_size (&iWidth, &iHeight);
+	
 	g_fBackgroundImageWidth = 0;
 	g_fBackgroundImageHeight = 0;
-	cairo_dock_update_background_decorations_if_necessary (pDock, data[0], data[1]);
+	cairo_dock_update_background_decorations_if_necessary (pDock, iWidth, iHeight);
 }

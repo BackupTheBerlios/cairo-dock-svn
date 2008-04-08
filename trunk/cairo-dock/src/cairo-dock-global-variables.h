@@ -7,8 +7,6 @@
 
 /// Pointeur sur le dock principal.
 extern CairoDock *g_pMainDock;
-/// Table des docks existant.
-extern GHashTable *g_hDocksTable;
 /// Largeur de l'ecran en mode horizontal/vertical.
 extern gint g_iScreenWidth[2];
 /// Hauteur de l'ecran en mode horizontal/vertical.
@@ -17,7 +15,8 @@ extern gint g_iScreenHeight[2];
 extern int g_iNbDesktops;
 /// Nombre de "faces" du cube en largeur et en hauteur.
 extern int g_iNbFacesForViewportX,g_iNbFacesForViewportY ;
-
+/// Chemin du fichier de conf de l'appli.
+extern gchar *g_cConfFile;
 
 /// Epaisseur du cadre (en pixels).
 extern gint g_iDockLineWidth;

@@ -15,7 +15,7 @@
 *TRUE ssi l'icone est une icone d'appli.
 *@param icon une icone.
 */
-#define CAIRO_DOCK_IS_APPLI(icon) (icon != NULL && icon->Xid != 0)
+#define CAIRO_DOCK_IS_APPLI(icon) (icon != NULL && icon->Xid != 0 && icon->acDesktopFileName == NULL)
 /**
 *TRUE ssi l'icone est une icone d'applet.
 *@param icon une icone.
@@ -38,16 +38,6 @@
 */
 #define CAIRO_DOCK_IS_URI_LAUNCHER(icon) (CAIRO_DOCK_IS_LAUNCHER (icon) && icon->cBaseURI != NULL)
 /**
-*TRUE ssi l'icone est une icone d'appli correspondant a une ressource X valide.
-*@param icon une icone.
-*/
-#define CAIRO_DOCK_IS_VALID_APPLI(icon) (CAIRO_DOCK_IS_APPLI (icon) && icon->Xid != 0)
-/**
-*TRUE ssi l'icone est une icone d'applet possedant un module valide.
-*@param icon une icone.
-*/
-#define CAIRO_DOCK_IS_VALID_APPLET(icon) (CAIRO_DOCK_IS_APPLET (icon) && icon->pModule != NULL)
-/**
 *TRUE ssi l'icone est une icone de separateur ajoutee automatiquement.
 *@param icon une icone.
 */
@@ -57,7 +47,11 @@
 *@param icon une icone.
 */
 #define CAIRO_DOCK_IS_USER_SEPARATOR(icon) (CAIRO_DOCK_IS_SEPARATOR (icon) && icon->acDesktopFileName != NULL)
-
+/**
+*TRUE ssi l'icone est une icone d'appli seulement.
+*@param icon une icone.
+*/
+#define CAIRO_DOCK_IS_NORMAL_APPLI(icon) (icon != NULL && icon->Xid != 0 && icon->acDesktopFileName == NULL && icon->pModule == NULL)
 
 /**
 *Libere toutes les ressources liees a une icone, ainsi que cette derniere. Le sous-dock pointee par elle n'est pas dereferencee, cela doit etre fait au prealable.

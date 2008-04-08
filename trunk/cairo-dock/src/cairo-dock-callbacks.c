@@ -843,7 +843,7 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 			icon->iCount = 0;
 		}
 	}
-	else if (CAIRO_DOCK_IS_VALID_APPLI (icon))
+	else if (CAIRO_DOCK_IS_APPLI (icon))
 	{
 		if (cairo_dock_get_active_window () == icon->Xid && g_bMinimizeOnClick)  // ne marche que si le dock est une fenêtre de type 'dock', sinon il prend le focus.
 			cairo_dock_minimize_xwindow (icon->Xid);
@@ -865,7 +865,7 @@ gboolean cairo_dock_notification_middle_click_icon (gpointer *data)
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
 
-	if (CAIRO_DOCK_IS_VALID_APPLI (icon) && g_bCloseAppliOnMiddleClick)
+	if (CAIRO_DOCK_IS_APPLI (icon) && g_bCloseAppliOnMiddleClick)
 	{
 		cairo_dock_close_xwindow (icon->Xid);
 		return CAIRO_DOCK_INTERCEPT_NOTIFICATION;

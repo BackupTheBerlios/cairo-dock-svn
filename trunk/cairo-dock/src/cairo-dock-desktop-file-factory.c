@@ -27,7 +27,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-desktop-file-factory.h"
 #include "cairo-dock-log.h"
 
-extern GHashTable *g_hDocksTable;
 extern gchar *g_cCurrentThemePath;
 extern gchar *g_cCurrentLaunchersPath;
 
@@ -292,7 +291,8 @@ void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath, CairoDock
 		g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
 	}
 	
-	cairo_dock_update_conf_file_with_hash_table (pKeyFile, cDesktopFilePath, g_hDocksTable, "Desktop Entry", "Container", NULL, (GHFunc)cairo_dock_write_one_name, FALSE, FALSE);
+	cairo_dock_update_conf_file_with_containers (pKeyFile, cDesktopFilePath);
+	
 	if (iLauncherType == CAIRO_DOCK_LAUNCHER_FOR_CONTAINER)
 		cairo_dock_update_launcher_conf_file_with_renderers (pKeyFile, cDesktopFilePath);
 	g_key_file_free (pKeyFile);

@@ -147,7 +147,7 @@ struct _CairoDock {
 	/// magnitude maximale de la vague.
 	gdouble fMagnitudeMax;
 	/// max des hauteurs des icones.
-	gint iMaxIconHeight;
+	gdouble iMaxIconHeight;
 	/// largeur du dock a plat, avec juste les icones.
 	gdouble fFlatDockWidth;
 	/// largeur du dock au repos.

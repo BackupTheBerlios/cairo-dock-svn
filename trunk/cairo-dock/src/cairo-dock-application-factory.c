@@ -423,6 +423,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	if (g_bUniquePid)
 		icon->iPid = *pPidBuffer;
 	icon->Xid = Xid;
+	icon->cClass = cClass;
 	Icon * pLastAppli = cairo_dock_get_last_appli (pDock->icons);
 	icon->fOrder = (pLastAppli != NULL ? pLastAppli->fOrder + 1 : 1);
 	icon->iType = CAIRO_DOCK_APPLI;
@@ -435,8 +436,6 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 		g_hash_table_insert (s_hAppliTable, pPidBuffer, icon);
 	cairo_dock_register_appli (icon);
 	XFree (pNameBuffer);
-
-	icon->cClass = cClass;
 
 	///cairo_dock_manage_appli_class (icon, pDock);
 

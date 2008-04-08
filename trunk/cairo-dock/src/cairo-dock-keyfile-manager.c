@@ -331,7 +331,7 @@ void cairo_dock_replace_values_in_conf_file (gchar *cConfFilePath, GKeyFile *pVa
 
 void cairo_dock_replace_keys_by_identifier (gchar *cConfFilePath, gchar *cReplacementConfFilePath, gchar iIdentifier)
 {
-	//g_print ("%s (%s <- %s, '%c')\n", __func__, cConfFilePath, cReplacementConfFilePath, iIdentifier);
+	g_print ("%s (%s <- %s, '%c')\n", __func__, cConfFilePath, cReplacementConfFilePath, iIdentifier);
 	GError *erreur = NULL;
 	GKeyFile *pReplacementKeyFile = g_key_file_new ();
 	g_key_file_load_from_file (pReplacementKeyFile, cReplacementConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);

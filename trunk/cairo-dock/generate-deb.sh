@@ -79,7 +79,7 @@ sudo cp /usr/bin/launch-cairo-dock-after-beryl.sh usr/bin
 sudo cp /usr/bin/cairo-dock-update.sh usr/bin
 sudo cp -rp /usr/share/cairo-dock/ usr/share/
 sudo rm -rf usr/share/cairo-dock/plug-in
-sudo cp ../cairo-dock/data/cairo-dock-icon.svg usr/share/pixmaps
+sudo cp ../cairo-dock/data/cairo-dock.svg usr/share/pixmaps
 sudo cp ../cairo-dock/data/cairo-dock usr/share/menu
 sudo cp ../cairo-dock/data/cairo-dock.desktop usr/share/applications
 
