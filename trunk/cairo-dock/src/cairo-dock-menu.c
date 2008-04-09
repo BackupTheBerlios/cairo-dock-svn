@@ -37,6 +37,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-desklet.h"
 #include "cairo-dock-applet-facility.h"
 #include "cairo-dock-X-utilities.h"
+#include "cairo-dock-dock-manager.h"
 #include "cairo-dock-menu.h"
 
 #define CAIRO_DOCK_CONF_PANEL_WIDTH 800
@@ -424,7 +425,7 @@ static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 				gboolean bDestroyIcons = TRUE;
 				int answer = GTK_RESPONSE_NONE;
 				while (answer == GTK_RESPONSE_NONE)
-					answer = cairo_dock_ask_question_and_wait (_("Do you want to re-dispatch the icons contained inside this container into the dock ?\n (otherwise they will be destroyed)"), icon, pDock);
+					answer = cairo_dock_ask_question_and_wait (_("Do you want to re-dispatch the icons contained inside this container into the dock ?\n (otherwise they will be destroyed)"), icon, CAIRO_DOCK_CONTAINER (pDock));
 				if (answer == GTK_RESPONSE_YES)
 					bDestroyIcons = FALSE;
 				cairo_dock_destroy_dock (icon->pSubDock, icon->acName, (bDestroyIcons ? NULL : g_pMainDock), (bDestroyIcons ? NULL : CAIRO_DOCK_MAIN_DOCK_NAME));

@@ -25,8 +25,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-surface-factory.h"
 #include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-file-manager.h"
-#include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-dock-manager.h"
+#include "cairo-dock-applications-manager.h"
+#include "cairo-dock-launcher-factory.h"
 
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
@@ -382,6 +384,9 @@ Icon * cairo_dock_create_icon_from_desktop_file (const gchar *cDesktopFileName, 
 		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pParentDock->bHorizontalDock));
 	
 	/// Ajouter ce lanceur dans sa clase ...
+	g_print ("%s/%s\n", icon->acName, icon->cClass);
+	if (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon) && icon->acCommand != NULL)  // pas un lanceur de sous-dock.
+		cairo_dock_inhibate_class (icon->cClass, icon);
 	
 	return icon;
 }

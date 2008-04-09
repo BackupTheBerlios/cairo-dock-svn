@@ -6,7 +6,6 @@
 
 #include <cairo-dock-struct.h>
 #include <cairo-dock-callbacks.h>
-#include <cairo-dock-gauge.h>
 #include <cairo-dock-draw.h>
 #include <cairo-dock-config.h>
 #include <cairo-dock-load.h>
@@ -37,5 +36,7 @@
 #include <cairo-dock-log.h>
 #include <cairo-dock-X-utilities.h>
 #include <cairo-dock-dbus.h>
+#include <cairo-dock-gauge.h>
+#include <cairo-dock-dock-manager.h>
 
 #endif

@@ -1752,7 +1752,7 @@ msgstr ""
 #: ../src/cairo-dock-callbacks.c:805 ../src/cairo-dock-callbacks.c:810
 #: ../src/cairo-dock-callbacks.c:818 ../src/cairo-dock-callbacks.c:820
 #: ../src/cairo-dock-callbacks.c:819 ../src/cairo-dock-callbacks.c:822
-#: ../src/cairo-dock-callbacks.c:824
+#: ../src/cairo-dock-callbacks.c:824 ../src/cairo-dock-callbacks.c:826
 msgid "Do you want to mount this point ?"
 msgstr "このポイントにマウントしますか？"
 
@@ -1773,6 +1773,7 @@ msgstr "このディレクトリの内容を監視しますか？"
 #: ../src/cairo-dock-file-manager.c:458 ../src/cairo-dock-file-manager.c:448
 #: ../src/cairo-dock-file-manager.c:460 ../src/cairo-dock-file-manager.c:469
 #: ../src/cairo-dock-file-manager.c:467 ../src/cairo-dock-file-manager.c:465
+#: ../src/cairo-dock-file-manager.c:466
 #, fuzzy, c-format
 msgid "failed to %s %s"
 msgstr "failed to %s %s"
@@ -1786,6 +1787,7 @@ msgstr "failed to %s %s"
 #: ../src/cairo-dock-file-manager.c:458 ../src/cairo-dock-file-manager.c:448
 #: ../src/cairo-dock-file-manager.c:460 ../src/cairo-dock-file-manager.c:469
 #: ../src/cairo-dock-file-manager.c:467 ../src/cairo-dock-file-manager.c:465
+#: ../src/cairo-dock-file-manager.c:466
 msgid "mount"
 msgstr "マウント"
 
@@ -1798,6 +1800,7 @@ msgstr "マウント"
 #: ../src/cairo-dock-file-manager.c:458 ../src/cairo-dock-file-manager.c:448
 #: ../src/cairo-dock-file-manager.c:460 ../src/cairo-dock-file-manager.c:469
 #: ../src/cairo-dock-file-manager.c:467 ../src/cairo-dock-file-manager.c:465
+#: ../src/cairo-dock-file-manager.c:466
 msgid "unmount"
 msgstr "アンマウント"
 
@@ -1897,7 +1900,8 @@ msgstr "サブ・ドックを追加"
 #: ../src/cairo-dock-file-manager.c:426 ../src/cairo-dock-file-manager.c:401
 #: ../src/cairo-dock-file-manager.c:449 ../src/cairo-dock-file-manager.c:400
 #: ../src/cairo-dock-file-manager.c:447 ../src/cairo-dock-file-manager.c:398
-#: ../src/cairo-dock-file-manager.c:445
+#: ../src/cairo-dock-file-manager.c:445 ../src/cairo-dock-file-manager.c:399
+#: ../src/cairo-dock-file-manager.c:446
 #, fuzzy, c-format
 msgid "%s is now %s"
 msgstr "%s is now %s"
@@ -1908,7 +1912,8 @@ msgstr "%s is now %s"
 #: ../src/cairo-dock-file-manager.c:426 ../src/cairo-dock-file-manager.c:401
 #: ../src/cairo-dock-file-manager.c:449 ../src/cairo-dock-file-manager.c:400
 #: ../src/cairo-dock-file-manager.c:447 ../src/cairo-dock-file-manager.c:398
-#: ../src/cairo-dock-file-manager.c:445
+#: ../src/cairo-dock-file-manager.c:445 ../src/cairo-dock-file-manager.c:399
+#: ../src/cairo-dock-file-manager.c:446
 msgid "mounted"
 msgstr "マウント済み"
 
@@ -1918,6 +1923,7 @@ msgstr "マウント済み"
 #: ../src/cairo-dock-file-manager.c:426 ../src/cairo-dock-file-manager.c:449
 #: ../src/cairo-dock-file-manager.c:400 ../src/cairo-dock-file-manager.c:447
 #: ../src/cairo-dock-file-manager.c:398 ../src/cairo-dock-file-manager.c:445
+#: ../src/cairo-dock-file-manager.c:399 ../src/cairo-dock-file-manager.c:446
 msgid "unmounted"
 msgstr "アンマウント済み"
 
@@ -2009,6 +2015,7 @@ msgstr "Compiz Fusion ウィジェット"
 #: ../src/cairo-dock-callbacks.c:1421 ../src/cairo-dock-callbacks.c:1424
 #: ../src/cairo-dock-callbacks.c:1429 ../src/cairo-dock-callbacks.c:1431
 #: ../src/cairo-dock-callbacks.c:1447 ../src/cairo-dock-callbacks.c:1450
+#: ../src/cairo-dock-callbacks.c:1449
 msgid "Quit Cairo-Dock ?"
 msgstr "Cairo-Dock 終了？"
 

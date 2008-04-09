@@ -24,8 +24,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-draw.h"
 #include "cairo-dock-dialogs.h"
 #include "cairo-dock-applications-manager.h"
-#include "cairo-dock-animations.h"
+#include "cairo-dock-dock-manager.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-animations.h"
 
 extern double g_fScrollAcceleration;
 extern gboolean g_bResetScrollOnLeave;

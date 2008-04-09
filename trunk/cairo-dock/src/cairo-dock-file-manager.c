@@ -13,8 +13,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-load.h"
 #include "cairo-dock-draw.h"
 #include "cairo-dock-dialogs.h"
-#include "cairo-dock-file-manager.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-dock-manager.h"
+#include "cairo-dock-file-manager.h"
 
 extern CairoDockDesktopEnv g_iDesktopEnv;
 extern CairoDockFMSortType g_iFileSortType;

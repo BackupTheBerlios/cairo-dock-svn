@@ -76,7 +76,7 @@
 #include "cairo-dock-applications-manager.h"
 #include "cairo-dock-callbacks.h"
 #include "cairo-dock-modules.h"
-#include "cairo-dock-dock-factory.h"
+#include "cairo-dock-dock-manager.h"
 #include "cairo-dock-menu.h"
 #include "cairo-dock-themes-manager.h"
 #include "cairo-dock-dialogs.h"
@@ -230,6 +230,8 @@ short g_iMajorVersion, g_iMinorVersion, g_iMicroVersion;
 CairoDockDesktopEnv g_iDesktopEnv = CAIRO_DOCK_UNKNOWN_ENV;
 CairoDockFMSortType g_iFileSortType;
 gboolean g_bShowHiddenFiles;
+cairo_surface_t *g_pIndicatorSurface = NULL;
+
 
 static gboolean random_dialog (gpointer user_data)
 {
@@ -448,7 +450,7 @@ main (int argc, char** argv)
 	g_strfreev (cVersions);
 
 	//\___________________ On initialise le gestionnaire de docks (a faire en 1er).
-	cairo_dock_initialize_dock_factory ();
+	cairo_dock_initialize_dock_manager ();
 	
 	//\___________________ On initialise le gestionnaire de vues.
 	cairo_dock_initialize_renderer_manager ();

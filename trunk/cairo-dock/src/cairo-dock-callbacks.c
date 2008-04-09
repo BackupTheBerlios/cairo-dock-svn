@@ -33,8 +33,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-themes-manager.h"
 #include "cairo-dock-dialogs.h"
 #include "cairo-dock-file-manager.h"
-#include "cairo-dock-callbacks.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-dock-manager.h"
+#include "cairo-dock-callbacks.h"
 
 static Icon *s_pIconClicked = NULL;  // pour savoir quand on deplace une icone a la souris. Dangereux si l'icone se fait effacer en cours ...
 static CairoDock *s_pLastPointedDock = NULL;  // pour savoir quand on passe d'un dock a un autre.
@@ -810,7 +811,8 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
-
+	guint iButtonState = GPOINTER_TO_INT (data[2]); \
+	
 	if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
 	{
 		gboolean bIsMounted = FALSE;
@@ -831,6 +833,16 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 			cairo_dock_fm_launch_uri (icon->acCommand);
 		return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
 	}
+	else if (CAIRO_DOCK_IS_APPLI (icon) && ! (iButtonState & GDK_SHIFT_MASK && CAIRO_DOCK_IS_LAUNCHER (icon)))
+	{
+		{
+			if (cairo_dock_get_active_window () == icon->Xid && g_bMinimizeOnClick)  // ne marche que si le dock est une fenêtre de type 'dock', sinon il prend le focus.
+				cairo_dock_minimize_xwindow (icon->Xid);
+			else
+				cairo_dock_show_appli (icon->Xid);
+		}
+		return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
+	}
 	else if (CAIRO_DOCK_IS_LAUNCHER (icon))
 	{
 		if (icon->acCommand != NULL)
@@ -842,14 +854,6 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 		{
 			icon->iCount = 0;
 		}
-	}
-	else if (CAIRO_DOCK_IS_APPLI (icon))
-	{
-		if (cairo_dock_get_active_window () == icon->Xid && g_bMinimizeOnClick)  // ne marche que si le dock est une fenêtre de type 'dock', sinon il prend le focus.
-			cairo_dock_minimize_xwindow (icon->Xid);
-		else
-			cairo_dock_show_appli (icon->Xid);
-		return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
 	}
 	else if (icon != NULL)
 	{
@@ -914,14 +918,9 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 							cairo_dock_show_subdock (icon, FALSE, pDock);
 							cairo_dock_arm_animation (icon, 0, 0);
 						}
-						else if (pButton->state & GDK_SHIFT_MASK && CAIRO_DOCK_IS_LAUNCHER (icon) && CAIRO_DOCK_IS_APPLI (icon))
-						{
-							gpointer data[2] = {icon, pDock};
-							cairo_dock_notification_click_icon (data);  // on court-circuite la notifiaction, pour pouvoir lancer une autre instance de l'appli par SHIFT+clic.
-						}
 						else
 						{
-							gpointer data[2] = {icon, pDock};
+							gpointer data[3] = {icon, pDock, GINT_TO_POINTER (pButton->state)};
 							cairo_dock_notify (CAIRO_DOCK_CLICK_ICON, data);
 							if (g_cRaiseDockShortcut != NULL)
 								s_bHideAfterShortcut = TRUE;

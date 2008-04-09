@@ -64,6 +64,7 @@ gboolean cairo_dock_class_is_inhibated (const gchar *cClass);
 gboolean cairo_dock_class_is_using_xicon (const gchar *cClass);
 gboolean cairo_dock_prevent_inhibated_class (Icon *pIcon);
 
+gboolean cairo_dock_remove_icon_from_class (Icon *pInhibatorIcon);
 void cairo_dock_deinhibate_class (const gchar *cClass, Icon *pInhibatorIcon);
 void cairo_dock_udpate_Xid_on_inhibators (Window Xid, const gchar *cClass);
 

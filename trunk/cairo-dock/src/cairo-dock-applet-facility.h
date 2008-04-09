@@ -551,6 +551,7 @@ gboolean CD_APPLET_ON_CLICK (gpointer *data) \
 { \
 	Icon *pClickedIcon = data[0]; \
 	CairoDockContainer *pClickedContainer = data[1]; \
+	guint iButtonState = GPOINTER_TO_INT (data[2]); \
 	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedContainer == CAIRO_DOCK_CONTAINER (myIcon->pSubDock)) || pClickedContainer == CAIRO_DOCK_CONTAINER (myDesklet)) \
 	{
 
@@ -620,6 +621,20 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 *Container clique.
 */
 #define CD_APPLET_CLICKED_CONTAINER pClickedContainer
+
+/**
+* La touche 'SHIFT' est-elle enfoncee au moment du clic ?
+*/
+#define CD_APPLET_SHIFT_CLICK (iButtonState & GDK_SHIFT_MASK)
+/**
+* La touche 'CTRL' est-elle enfoncee au moment du clic ?
+*/
+#define CD_APPLET_CTRL_CLICK (iButtonState & GDK_CONTROL_MASK)
+/**
+* La touche 'ALT' est-elle enfoncee au moment du clic ?
+*/
+#define CD_APPLET_ALT_CLICK (iButtonState & GDK_MOD1_MASK)
+
 
 /**
 *Cree et ajoute un sous-menu a un menu.

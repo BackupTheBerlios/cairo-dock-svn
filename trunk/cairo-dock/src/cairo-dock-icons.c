@@ -33,8 +33,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-applications-manager.h"
 #include "cairo-dock-separator-factory.h"
 #include "cairo-dock-file-manager.h"
-#include "cairo-dock-icons.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-dock-manager.h"
+#include "cairo-dock-icons.h"
 
 
 extern gint g_iScreenWidth;
@@ -74,11 +75,14 @@ void cairo_dock_free_icon (Icon *icon)
 	if (icon == NULL)
 		return ;
 
-	cd_message ("%s (%s)", __func__, icon->acName);
+	cd_message ("%s (%s , %s)", __func__, icon->acName, icon->cClass);
 
 	cairo_dock_remove_dialog_if_any (icon);
-	cairo_dock_unregister_appli (icon);
-
+	if (CAIRO_DOCK_IS_NORMAL_APPLI (icon))
+		cairo_dock_unregister_appli (icon);
+	else
+		cairo_dock_remove_icon_from_class (icon);
+	
 	g_free (icon->acDesktopFileName);
 	g_free (icon->acFileName);
 	g_free (icon->acName);

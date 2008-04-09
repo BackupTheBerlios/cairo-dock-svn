@@ -10,7 +10,7 @@ typedef gboolean (* CairoDockNotificationFunc) (gpointer *data);
 typedef enum {
 	/// notification appellee lorsque l'utilisateur supprime un lanceur via le menu. data : {Icon, CairoDock}
 	CAIRO_DOCK_REMOVE_ICON=0,
-	/// notification appellee lorsque l'utilisateur clique sur une icone; l'animation est preparee juste avant, et lancee juste apres. data : Icon
+	/// notification appellee lorsque l'utilisateur clique sur une icone; l'animation est preparee juste avant, et lancee juste apres. data : {Icon, CairoDock, iState}
 	CAIRO_DOCK_CLICK_ICON,
 	/// notification appellee lorsque l'utilisateur double clique sur une icone. data : Icon
 	CAIRO_DOCK_DOUBLE_CLICK_ICON,

@@ -159,7 +159,7 @@ void cairo_dock_set_strut_partial (int Xid, int left, int right, int top, int bo
 {
 	g_return_if_fail (Xid > 0);
 
-	cd_message ("%s (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", __func__, left, right, top, bottom, left_start_y, left_end_y, right_start_y, right_end_y, top_start_x, top_end_x, bottom_start_x, bottom_end_x);
+	cd_debug ("%s (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d", __func__, left, right, top, bottom, left_start_y, left_end_y, right_start_y, right_end_y, top_start_x, top_end_x, bottom_start_x, bottom_end_x);
 	gulong iGeometryStrut[12] = {left, right, top, bottom, left_start_y, left_end_y, right_start_y, right_end_y, top_start_x, top_end_x, bottom_start_x, bottom_end_x};
 
 	XChangeProperty (s_XDisplay,
@@ -198,7 +198,7 @@ gboolean cairo_dock_window_is_utility (int Xid)
 	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmWindowType, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pTypeBuffer);
 	if (iBufferNbElements != 0)
 	{
-		cd_debug ("%s (%d) -> %d (%d,%d)\n", __func__, Xid, *pTypeBuffer, s_aNetWmWindowTypeNormal, s_aNetWmWindowTypeUtility);
+		cd_debug ("%s (%d) -> %d (%d,%d)", __func__, Xid, *pTypeBuffer, s_aNetWmWindowTypeNormal, s_aNetWmWindowTypeUtility);
 		bIsUtility = (*pTypeBuffer == s_aNetWmWindowTypeUtility);
 		XFree (pTypeBuffer);
 	}
@@ -346,7 +346,7 @@ void cairo_dock_get_nb_viewports (int *iNbViewportX, int *iNbViewportY)
 	XGetWindowProperty (s_XDisplay, root, s_aNetDesktopGeometry, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pVirtualScreenSizeBuffer);
 	if (iBufferNbElements > 0)
 	{
-		cd_debug ("pVirtualScreenSizeBuffer : %dx%d\n", pVirtualScreenSizeBuffer[0], pVirtualScreenSizeBuffer[1]);
+		cd_debug ("pVirtualScreenSizeBuffer : %dx%d", pVirtualScreenSizeBuffer[0], pVirtualScreenSizeBuffer[1]);
 		*iNbViewportX = pVirtualScreenSizeBuffer[0] / WidthOfScreen (XScreen);
 		*iNbViewportY = pVirtualScreenSizeBuffer[1] / HeightOfScreen (XScreen);
 		XFree (pVirtualScreenSizeBuffer);

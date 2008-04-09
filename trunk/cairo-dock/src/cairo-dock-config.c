@@ -30,6 +30,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-X-utilities.h"
 #include "cairo-dock-log.h"
 #include "cairo-dock-keybinder.h"
+#include "cairo-dock-dock-manager.h"
 #include "cairo-dock-config.h"
 
 #define CAIRO_DOCK_TYPE_CONF_FILE_FILE ".cairo-dock-conf-file"
@@ -161,6 +162,7 @@ extern double g_fDeskletColorInside[4];
 extern CairoDockFMSortType g_iFileSortType;
 extern gboolean g_bShowHiddenFiles;
 extern gchar *g_cRaiseDockShortcut;
+extern cairo_surface_t *g_pIndicatorSurface;
 
 static gboolean s_bLoading = FALSE;
 
@@ -910,7 +912,11 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	gboolean bAppliOnCurrentDesktopOnlyOld = g_bAppliOnCurrentDesktopOnly;
 	g_bAppliOnCurrentDesktopOnly = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "current desktop only", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
 
-
+	gchar *cIndicatorImagePath = NULL;  /// a rajouter au fichier de conf...
+	if (cIndicatorImagePath == NULL)
+		cIndicatorImagePath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, "indicator.png");
+	
+	
 	//\___________________ On recupere les parametres des applets.
 	g_tIconAuthorizedWidth[CAIRO_DOCK_APPLET] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "applet width", &bFlushConfFileNeeded, 48, "Applets", "max icon size");
 
@@ -1040,6 +1046,19 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	cairo_dock_load_dialog_buttons (pDock, cButtonOkImage, cButtonCancelImage);
 	g_free (cButtonOkImage);
 	g_free (cButtonCancelImage);
+	
+	cairo_surface_destroy (g_pIndicatorSurface);
+	if (g_bShowAppli)
+	{
+		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
+		g_pIndicatorSurface = cairo_dock_create_surface_for_icon (cIndicatorImagePath,
+			pCairoContext,
+			g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER],
+			g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER]);
+	}
+	else
+		g_pIndicatorSurface = NULL;
+	g_free (cIndicatorImagePath);
 
 	g_fReflectSize = 0;
 	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)
@@ -1250,7 +1269,6 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConf
 	else  // sinon on bloque l'appli jusqu'a ce que l'utilisateur valide ou annule.
 	{
 		gboolean config_ok;
-		g_print ("RUN\n");
 		gint action = gtk_dialog_run (GTK_DIALOG (pDialog));
 		if (action == GTK_RESPONSE_ACCEPT)
 		{
