@@ -75,9 +75,8 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 
 /**
 * Detruit tous les docks et toutes les icones contenues dedans, et libere la memoire qui leur etait allouee. Les applets sont stoppees au prealable, ainsi que la barre des taches.
-* @param pMainDock le dock principal contenant les applets.
 */
-void cairo_dock_free_all_docks (CairoDock *pMainDock);
+void cairo_dock_free_all_docks (void);
 
 
 

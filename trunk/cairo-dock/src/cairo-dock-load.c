@@ -28,6 +28,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-load.h"
+#include "cairo-dock-dock-manager.h"
+#include "cairo-dock-class-manager.h"
 #include "cairo-dock-log.h"
 
 extern CairoDock *g_pMainDock;
@@ -191,7 +193,9 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	}
 	else if (CAIRO_DOCK_IS_APPLI (icon))  // c'est l'icône d'une appli valide.
 	{
-		icon->pIconBuffer = cairo_dock_create_surface_from_xwindow (icon->Xid, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight);
+		icon->pIconBuffer = cairo_dock_create_surface_from_class (icon->cClass, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight);
+		if (icon->pIconBuffer == NULL)
+			icon->pIconBuffer = cairo_dock_create_surface_from_xwindow (icon->Xid, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight);
 	}
 	else if (CAIRO_DOCK_IS_APPLET (icon))  // c'est l'icône d'une applet.
 	{

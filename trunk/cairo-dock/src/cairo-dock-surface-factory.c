@@ -702,3 +702,33 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 	g_object_unref (pLayout);
 	return pNewSurface;
 }
+
+
+cairo_surface_t * cairo_dock_duplicate_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fWidth, double fHeight, double fDesiredWidth, double fDesiredHeight)
+{
+	g_return_val_if_fail (pSurface != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
+
+	//\_______________ On cree la surface de la taille desiree.
+	if (fDesiredWidth == 0)
+		fDesiredWidth = fWidth;
+	if (fDesiredHeight == 0)
+		fDesiredHeight = fHeight;
+	
+	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+		CAIRO_CONTENT_COLOR_ALPHA,
+		fDesiredWidth,
+		fDesiredHeight);
+	cairo_t *pCairoContext = cairo_create (pNewSurface);
+
+	//\_______________ On plaque la surface originale dessus.
+	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
+	cairo_scale (pCairoContext,
+		fDesiredWidth / fWidth,
+		fDesiredHeight / fHeight);
+	
+	cairo_set_source_surface (pCairoContext, pSurface, 0., 0.);
+	cairo_paint (pCairoContext);
+	cairo_destroy (pCairoContext);
+	
+	return pNewSurface;
+}

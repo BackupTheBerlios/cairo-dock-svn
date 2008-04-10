@@ -41,6 +41,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-keyfile-manager.h"
 #include "cairo-dock-dock-manager.h"
 #include "cairo-dock-notifications.h"
+#include "cairo-dock-class-manager.h"
 #include "cairo-dock-dock-factory.h"
 
 extern int g_iWmHint;
@@ -512,14 +513,15 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 	//g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_update_child_dock_size, NULL);  // on mettra a jour la taille du dock principal apres y avoir insere les applis/applets, car pour l'instant les docks fils n'en ont pas.
 }
 
-void cairo_dock_free_all_docks (CairoDock *pMainDock)
+void cairo_dock_free_all_docks (void)
 {
-	if (pMainDock == NULL)
+	if (g_pMainDock == NULL)
 		return ;
 
 	cairo_dock_deactivate_all_modules ();  // y compris les modules qui n'ont pas d'icone.
-
-	cairo_dock_pause_application_manager ();
+	
+	cairo_dock_reset_class_table ();  // enleve aussi les inhibiteurs.
+	cairo_dock_stop_application_manager ();
 
 	cairo_dock_reset_docks_table ();
 }

@@ -89,8 +89,6 @@ static gboolean _cairo_dock_free_one_dock (gchar *cDockName, CairoDock *pDock, g
 }
 void cairo_dock_reset_docks_table (void)
 {
-	cairo_dock_stop_application_manager (g_pMainDock);
-	
 	g_hash_table_foreach_remove (s_hDocksTable, (GHRFunc) _cairo_dock_free_one_dock, NULL);
 	g_pMainDock = NULL;
 }
@@ -162,7 +160,7 @@ CairoDockContainer *cairo_dock_search_container_from_icon (Icon *icon)
 	
 	if (icon->cParentDockName != NULL)
 		return g_hash_table_lookup (s_hDocksTable, icon->cParentDockName);
-	else
+	else  /// pas tres utile ...
 		return g_hash_table_find (s_hDocksTable, (GHRFunc) _cairo_dock_search_icon_in_a_dock, icon);
 }
 

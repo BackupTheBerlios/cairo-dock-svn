@@ -38,5 +38,6 @@
 #include <cairo-dock-dbus.h>
 #include <cairo-dock-gauge.h>
 #include <cairo-dock-dock-manager.h>
+#include <cairo-dock-class-manager.h>
 
 #endif

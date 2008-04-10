@@ -24,8 +24,7 @@ extern CairoDock *g_pMainDock;
 
 void cairo_dock_initialize_dbus_manager (void)
 {
-	g_type_init();
-	
+	g_return_if_fail (s_pDBusConnexion == NULL);
 	cd_message ("");
 	GError *erreur = NULL;
 	s_pDBusConnexion = dbus_g_bus_get (DBUS_BUS_SESSION, &erreur);

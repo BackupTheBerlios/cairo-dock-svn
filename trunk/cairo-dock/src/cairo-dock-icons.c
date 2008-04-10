@@ -35,6 +35,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-file-manager.h"
 #include "cairo-dock-log.h"
 #include "cairo-dock-dock-manager.h"
+#include "cairo-dock-class-manager.h"
 #include "cairo-dock-icons.h"
 
 
@@ -79,9 +80,19 @@ void cairo_dock_free_icon (Icon *icon)
 	cairo_dock_remove_dialog_if_any (icon);
 	if (CAIRO_DOCK_IS_NORMAL_APPLI (icon))
 		cairo_dock_unregister_appli (icon);
-	else
+	else  // c'est un inhibiteur.
 		cairo_dock_deinhibate_class (icon->cClass, icon);
 	cairo_dock_deactivate_module (icon->pModule);
+	
+	cairo_dock_free_icon_buffers (icon);
+	
+	g_free (icon);
+}
+
+void cairo_dock_free_icon_buffers (Icon *icon)
+{
+	if (icon == NULL)
+		return ;
 	
 	g_free (icon->acDesktopFileName);
 	g_free (icon->acFileName);
@@ -98,8 +109,6 @@ void cairo_dock_free_icon (Icon *icon)
 	cairo_surface_destroy (icon->pFullIconBuffer);
 	cairo_surface_destroy (icon->pTextBuffer);
 	cairo_surface_destroy (icon->pQuickInfoBuffer);
-
-	g_free (icon);
 }
 
 CairoDockIconType cairo_dock_get_icon_type (Icon *icon)
@@ -591,7 +600,7 @@ gboolean cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolea
 	icon->iCount = 0;
 
 	//\___________________ On gere le cas des classes d'applis.
-	if (CAIRO_DOCK_IS_APPLI (icon))
+	if (CAIRO_DOCK_IS_NORMAL_APPLI (icon))
 	{
 		CairoDock *pClassSubDock = icon->pSubDock;
 		if (pClassSubDock != NULL)  // cette icone pointe sur le sous-dock de sa classe, il faut enlever la 1ere icone de ce sous-dock, la deplacer au dock parent, et lui affecter le sous-dock si il est non vide, ou sinon le detruire.

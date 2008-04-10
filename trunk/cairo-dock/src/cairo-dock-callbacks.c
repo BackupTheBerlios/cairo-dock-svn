@@ -279,7 +279,6 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 
 		//\_______________ On recalcule toutes les icones.
 		pPointedIcon = pDock->calculate_icons (pDock);
-
 		gtk_widget_queue_draw (pWidget);
 		fLastTime = pMotion->time;
 

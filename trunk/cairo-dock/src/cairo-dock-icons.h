@@ -54,10 +54,16 @@
 #define CAIRO_DOCK_IS_NORMAL_APPLI(icon) (CAIRO_DOCK_IS_APPLI (icon) && icon->acDesktopFileName == NULL && icon->pModule == NULL)
 
 /**
-*Libere toutes les ressources liees a une icone, ainsi que cette derniere. Le sous-dock pointee par elle n'est pas dereferencee, cela doit etre fait au prealable.
+* Desactive une icone, et libere tous ses buffers, ainsi qu'elle-meme. Le sous-dock pointee par elle n'est pas dereferencee, cela doit etre fait au prealable.
 *@param icon l'icone a liberer.
 */
 void cairo_dock_free_icon (Icon *icon);
+/**
+* Libere tous les buffers d'une incone.
+*@param icon l'icone.
+*/
+void cairo_dock_free_icon_buffers (Icon *icon);
+
 
 #define cairo_dock_get_group_order(icon) (icon->iType < CAIRO_DOCK_NB_TYPES ? g_tIconTypeOrder[icon->iType] : icon->iType)
 
@@ -267,7 +273,7 @@ void cairo_dock_remove_icons_of_type (CairoDock *pDock, CairoDockIconType iType)
 #define cairo_dock_remove_all_applets(pDock) cairo_dock_remove_icons_of_type (pDock, CAIRO_DOCK_APPLET)
 /**
 *Effectue une action sur toutes les icones d'un type donne. L'action peut meme detruire et enlever de la liste l'icone courante.
-*@param pDock le dock duquel supprimer les icones.
+*@param pIconList la liste d'icones a parcourir.
 *@param iType le type d'icone.
 *@param pFuntion l'action a effectuer sur chaque icone.
 *@param data un pointeur qui sera passe en entree de l'action.

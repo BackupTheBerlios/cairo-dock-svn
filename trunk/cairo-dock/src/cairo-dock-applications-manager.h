@@ -48,28 +48,9 @@ void cairo_dock_start_application_manager (CairoDock *pDock);
 
 void cairo_dock_pause_application_manager (void);
 
-void cairo_dock_stop_application_manager (CairoDock *pDock);
+void cairo_dock_stop_application_manager (void);
 
 gboolean cairo_dock_application_manager_is_running (void);
-
-
-void cairo_dock_free_class_appli (CairoDockClassAppli *pClassAppli);
-const GList *cairo_dock_list_existing_appli_with_class (const gchar *cClass);
-
-gboolean cairo_dock_add_appli_to_class (Icon *pIcon);
-gboolean cairo_dock_remove_appli_from_class (Icon *pIcon);
-gboolean cairo_dock_set_class_use_xicon (const gchar *cClass, gboolean bUseXIcon);
-gboolean cairo_dock_inhibate_class (const gchar *cClass, Icon *pInhibatorIcon);
-
-gboolean cairo_dock_class_is_inhibated (const gchar *cClass);
-gboolean cairo_dock_class_is_using_xicon (const gchar *cClass);
-gboolean cairo_dock_prevent_inhibated_class (Icon *pIcon);
-
-gboolean cairo_dock_remove_icon_from_class (Icon *pInhibatorIcon);
-void cairo_dock_deinhibate_class (const gchar *cClass, Icon *pInhibatorIcon);
-void cairo_dock_update_Xid_on_inhibators (Window Xid, const gchar *cClass);
-//void cairo_dock_remove_indicator_on_inhibators (void);
-void cairo_dock_reset_class_table (void);
 
 
 #endif

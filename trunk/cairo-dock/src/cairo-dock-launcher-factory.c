@@ -28,6 +28,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-log.h"
 #include "cairo-dock-dock-manager.h"
 #include "cairo-dock-applications-manager.h"
+#include "cairo-dock-class-manager.h"
 #include "cairo-dock-launcher-factory.h"
 
 extern CairoDock *g_pMainDock;

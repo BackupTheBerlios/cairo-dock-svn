@@ -67,7 +67,7 @@ void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surf
 *@param pIconContext le contexte de dessin lie a la surface de l'icone; est modifie par la fonction.
 *@param cImagePath chemin de l'image a appliquer a l'icone.
 *@param pIcon l'icone.
-*@param pDock le dock contenant l'icone.
+*@param pContainer le container de l'icone.
 */
 void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Icon *pIcon, CairoDockContainer *pContainer);
 
@@ -76,7 +76,7 @@ void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Ico
 *@param pSourceContext un contexte de dessin; n'est pas altere par la fonction.
 *@param cIconName la nouvelle etiquette de l'icone.
 *@param pIcon l'icone.
-*@param pDock le dock contenant l'icone.
+*@param pContainer le container de l'icone.
 */
 void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, Icon *pIcon, CairoDockContainer *pContainer);
 
@@ -92,7 +92,7 @@ void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo
 *Ecris une info-rapide sur l'icone, en prenant une chaine au format 'printf'.
 *@param pSourceContext un contexte de dessin; n'est pas altere par la fonction.
 *@param pIcon l'icone.
-*@param pDock le dock contenant l'icone.
+*@param pContainer le container de l'icone.
 *@param cQuickInfoFormat le texte de l'info-rapide, au format 'printf' (%s, %d, etc)
 *@param ... les donnees a inserer dans la chaine de caracteres.
 */
@@ -158,6 +158,7 @@ gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoDockContainer *p
 *@param iMajorVersion version majeure du dock necessaire au bon fonctionnement de l'applet.
 *@param iMinorVersion version mineure du dock necessaire au bon fonctionnement de l'applet.
 *@param iMicroVersion version micro du dock necessaire au bon fonctionnement de l'applet.
+*@param iAppletCategory Catégorie de l'applet (CAIRO_DOCK_CATEGORY_ACCESSORY, CAIRO_DOCK_CATEGORY_DESKTOP, CAIRO_DOCK_CATEGORY_CONTROLER)
 */
 #define CD_APPLET_PRE_INIT_BEGIN(cName, iMajorVersion, iMinorVersion, iMicroVersion, iAppletCategory) \
 Icon *myIcon = NULL; \
@@ -793,15 +794,15 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 
 /**
 *Applique une surface existante sur le contexte de dessin de l'applet, et la redessine. La surface est redimensionnee aux dimensions de l'icone.
-*@param pSurface
+*@param pSurface la surface cairo a dessiner.
 */
 #define CD_APPLET_SET_SURFACE_ON_MY_ICON(pSurface) \
 	cairo_dock_set_icon_surface_with_reflect (myDrawContext, pSurface, myIcon, myContainer); \
 	cairo_dock_redraw_my_icon (myIcon, myContainer);
 /**
 *Applique une surface existante sur le contexte de dessin de l'applet, et la redessine. La surface est redimensionnee aux dimensions de l'icone, et zoomee.
-*@param pSurface
-*@param fScale
+*@param pSurface la surface cairo a dessiner.
+*@param fScale le facteur de zoom (>= 0)
 */
 #define CD_APPLET_SET_SURFACE_ON_MY_ICON_WITH_ZOOM(pSurface, fScale) \
 	cairo_dock_set_icon_surface_full (myDrawContext, pSurface, fScale, 1., myIcon, myContainer); \
@@ -809,17 +810,17 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 	cairo_dock_redraw_my_icon (myIcon, myContainer);
 /**
 *Applique une surface existante sur le contexte de dessin de l'applet, et la redessine. La surface est redimensionnee aux dimensions de l'icone, et avec un facteur de transparence.
-*@param pSurface
-*@param fAlpha
+*@param pSurface la surface cairo a dessiner.
+*@param fAlpha la transparence (dans [0 , 1]).
 */
-#define CD_APPLET_SET_SURFACE_ON_MY_ICON_WITH_ALPHA(pSurface, fScale) \
+#define CD_APPLET_SET_SURFACE_ON_MY_ICON_WITH_ALPHA(pSurface, fAlpha) \
 	cairo_dock_set_icon_surface_full (myDrawContext, pSurface, 1., fAlpha, myIcon, myContainer); \
 	cairo_dock_add_reflection_to_icon (myDrawContext, myIcon, myContainer); \
 	cairo_dock_redraw_my_icon (myIcon, myContainer);
 /**
 *Applique une surface existante sur le contexte de dessin de l'applet, et la redessine. La surface est redimensionnee aux dimensions de l'icone, et une barre est dessinee a sa base.
-*@param pSurface
-*@param fAlpha
+*@param pSurface la surface cairo a dessiner.
+*@param fValue la valeur en fraction de la valeur max (donc dans [0 , 1]).
 */
 #define CD_APPLET_SET_SURFACE_ON_MY_ICON_WITH_BAR(pSurface, fValue) \
 	cairo_dock_set_icon_surface_full (myDrawContext, pSurface, 1., 1., myIcon, myContainer); \
@@ -836,7 +837,7 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 
 /**
 *Applique une image definie par son nom local au repertoire de l'applet sur le contexte de dessin de l'applet, mais ne la rafraichit pas. L'image est redimensionnee aux dimensions de l'icone.
-*@param cImagePath chemin du fichier de l'image.
+*@param cImageName nom du fichier de l'image.
 */
 #define CD_APPLET_SET_LOCAL_IMAGE_ON_MY_ICON(cImageName) \
 	{ \

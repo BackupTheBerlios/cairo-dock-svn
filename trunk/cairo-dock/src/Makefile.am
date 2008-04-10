@@ -116,7 +116,9 @@ cairo_dock_SOURCES = \
 	cairo-dock-gauge.c\
 	cairo-dock-gauge.h\
 	cairo-dock-dock-manager.c\
-	cairo-dock-dock-manager.h
+	cairo-dock-dock-manager.h\
+	cairo-dock-class-manager.c\
+	cairo-dock-class-manager.h
 
 
 
@@ -163,4 +165,5 @@ cairo_docksubinclude_HEADERS =\
 	cairo-dock-log.h\
 	cairo-dock-X-utilities.h\
 	cairo-dock-gauge.h\
-	cairo-dock-dock-manager.h
+	cairo-dock-dock-manager.h\
+	cairo-dock-class-manager.h

@@ -523,12 +523,15 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect, gboolean bUseText, int iWidth)
 {
 	//\_____________________ On separe 2 cas : dessin avec le tampon complet, et dessin avec le ou les petits tampons.
-	if (CAIRO_DOCK_IS_APPLI (icon) && g_fVisibleAppliAlpha != 0)
+	if (CAIRO_DOCK_IS_APPLI (icon) && g_fVisibleAppliAlpha != 0 && ! CAIRO_DOCK_IS_APPLET (icon))
 	{
-		if (icon->bIsHidden)
+		double fAlpha = (icon->bIsHidden ? MIN (1 - g_fVisibleAppliAlpha, 1) : MIN (g_fVisibleAppliAlpha + 1, 1));
+		if (fAlpha != 1)
+			icon->fAlpha = fAlpha;  // astuce bidon pour pas multiplier 2 fois.
+		/**if (icon->bIsHidden)
 			icon->fAlpha *= MIN (1 - g_fVisibleAppliAlpha, 1);
 		else
-			icon->fAlpha *= MIN (g_fVisibleAppliAlpha + 1, 1);
+			icon->fAlpha *= MIN (g_fVisibleAppliAlpha + 1, 1);*/
 		//g_print ("g_fVisibleAppliAlpha : %.2f & %d => %.2f\n", g_fVisibleAppliAlpha, icon->bIsHidden, icon->fAlpha);
 	}
 	

@@ -915,9 +915,17 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	gboolean bAppliOnCurrentDesktopOnlyOld = g_bAppliOnCurrentDesktopOnly;
 	g_bAppliOnCurrentDesktopOnly = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "current desktop only", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
 
-	gchar *cIndicatorImagePath = cairo_dock_get_string_key_value (pKeyFile, "Icons", "indicator image", &bFlushConfFileNeeded, NULL, NULL, NULL);
-	if (cIndicatorImagePath == NULL)
+	gchar *cIndicatorImageName = cairo_dock_get_string_key_value (pKeyFile, "Icons", "indicator image", &bFlushConfFileNeeded, NULL, NULL, NULL);
+	gchar *cIndicatorImagePath;
+	if (cIndicatorImageName != NULL)
+	{
+		cIndicatorImagePath = cairo_dock_generate_file_path (cIndicatorImageName);
+		g_free (cIndicatorImageName);
+	}
+	else
+	{
 		cIndicatorImagePath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_DEFAULT_INDICATOR_NAME);
+	}
 	
 	g_fIndicatorRatio = cairo_dock_get_double_key_value (pKeyFile, "Icons", "indicator ratio", &bFlushConfFileNeeded, 1., NULL, NULL);
 	
@@ -1092,7 +1100,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	if (bUniquePidOld != g_bUniquePid || bGroupAppliByClassOld != g_bGroupAppliByClass || bHideVisibleApplisOld != g_bHideVisibleApplis || bAppliOnCurrentDesktopOnlyOld != g_bAppliOnCurrentDesktopOnly || (bMixLauncherAppliOld != g_bMixLauncherAppli) || (cairo_dock_application_manager_is_running () && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
 	{
-		cairo_dock_stop_application_manager (pDock);
+		cairo_dock_stop_application_manager ();
 	}
 
 	pDock->icons = g_list_sort (pDock->icons, (GCompareFunc) cairo_dock_compare_icons_order);  // on reordonne car l'ordre des types a pu changer.

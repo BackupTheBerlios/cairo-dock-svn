@@ -19,6 +19,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-applications-manager.h"
 #include "cairo-dock-application-factory.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-class-manager.h"
 #include "cairo-dock-X-utilities.h"
 
 extern int g_iNbDesktops;
@@ -57,6 +58,7 @@ void cairo_dock_initialize_X_support (void)
 	g_iNbDesktops = cairo_dock_get_nb_desktops ();
 	cairo_dock_get_nb_viewports (&g_iNbViewportX, &g_iNbViewportY);
 	
+	cairo_dock_initialize_class_manager ();
 	cairo_dock_initialize_application_manager (s_XDisplay);
 	cairo_dock_initialize_application_factory (s_XDisplay);
 	

@@ -618,7 +618,7 @@ struct _CairoDockDesklet {
 	gint iWidth, iHeight;
 	/// Position de la fenetre.
 	int iWindowPositionX, iWindowPositionY;
-	/// Vrai ssi le pointeur est dans le desklet (widgets fils inclus). Desole Ctaf, mais je vois pas comment faire sans ^_^
+	/// Vrai ssi le pointeur est dans le desklet (widgets fils inclus).
 	gboolean bInside;
 	/// Toujours vrai pour un desklet.
 	CairoDockTypeHorizontality bIsHorizontal;
@@ -636,10 +636,6 @@ struct _CairoDockDesklet {
 	gboolean moving;
 	/// L'icone de l'applet.
 	Icon *pIcon;
-	/// La fonction de rendu. NULL pour utiliser celle par defaut qui dessine l'icone comme si elle etait dans un dock. Est appelee par la callback liee a l'expose-event de la fenetre.
-	CairoDockDeskletRenderFunc renderer;
-	/// donnees pouvant etre utilisees dans la fonction de rendu.
-	gpointer pRendererData;
 	/// un timer pour retarder l'ecriture dans le fichier lors des deplacements.
 	gint iSidWritePosition;
 	/// un timer pour retarder l'ecriture dans le fichier lors des redimensionnements.
@@ -648,7 +644,10 @@ struct _CairoDockDesklet {
 	gint iGradationCount;
 	/// timer associe.
 	gint iSidGradationOnEnter;
+	/// le moteur de rendu utilise pour dessiner se desklet.
 	CairoDockDeskletRenderer *pRenderer;
+	/// donnees pouvant etre utilisees par le moteur de rendu.
+	gpointer pRendererData;
 };
 
 

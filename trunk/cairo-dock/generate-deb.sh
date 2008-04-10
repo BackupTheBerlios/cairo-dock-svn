@@ -56,7 +56,7 @@ fi
 #\_____________ On compile de zero.
 cd $CAIRO_DOCK_DIR/cairo-dock
 if test "$FAST_COMPIL" = "1"; then
-	./compile-all.sh -C -i
+	./compile-all.sh -C -i -t
 else
 	./compile-all.sh -a -C -i -t
 fi

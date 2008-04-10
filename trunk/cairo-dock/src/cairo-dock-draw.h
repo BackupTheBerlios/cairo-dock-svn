@@ -25,7 +25,7 @@ double cairo_dock_get_current_dock_width_linear (CairoDock *pDock);
 
 /**
 *Cree un contexte de dessin pour la libcairo. Si glitz est active, le contexte sera lie a une surface glitz (et donc on dessinera directement sur la carte graphique), sinon a une surface X representant la fenetre du dock.
-*@param pDock le dock sur lequel on veut dessiner.
+*@param pContainer le container sur lequel on veut dessiner.
 *@return le contexte sur lequel dessiner. N'est jamais nul; tester sa coherence avec cairo_status() avant de l'utiliser, et le detruire avec cairo_destroy() apres en avoir fini avec lui.
 */
 cairo_t * cairo_dock_create_context_from_window (CairoDockContainer *pContainer);
@@ -69,6 +69,8 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock);
 *@param fRatio le ratio de taille des icones dans ce dock.
 *@param fDockMagnitude la magnitude actuelle du dock.
 *@param bUseReflect TRUE pour dessiner les reflets.
+*@param bUseText TRUE pour dessiner les etiquettes.
+*@param iWidth largeur du container, utilisee pour que les etiquettes n'en debordent pas.
 */
 void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect, gboolean bUseText, int iWidth);
 void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, double fRatio);
@@ -95,7 +97,7 @@ void cairo_dock_render_blank (CairoDock *pDock);
 /**
 *Efface et redessine entierement une seule icone. Appelle la fonction de trace optimise de la vue courante; si cette derniere ne fournit pas de trace optimise, retrace tout le dock (ce qui peut etre penalisant).
 *@param icon l'icone a retracer.
-*@param pDock le dock contenant l' icone.
+*@param pContainer le container de l'icone.
 */
 void cairo_dock_redraw_my_icon (Icon *icon, CairoDockContainer *pContainer);
 

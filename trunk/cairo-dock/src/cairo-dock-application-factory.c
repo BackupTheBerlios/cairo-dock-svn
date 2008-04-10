@@ -25,6 +25,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-surface-factory.h"
 #include "cairo-dock-applications-manager.h"
 #include "cairo-dock-application-factory.h"
+#include "cairo-dock-dock-manager.h"
 #include "cairo-dock-log.h"
 
 extern double g_fAmplitude;
@@ -150,7 +151,7 @@ static GdkPixbuf *_cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bA
 cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
 {
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
-
+	
 	Atom aReturnedType = 0;
 	int aReturnedFormat = 0;
 	unsigned long iLeftBytes, iBufferNbElements = 0;
