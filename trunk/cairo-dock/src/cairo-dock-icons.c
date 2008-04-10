@@ -74,19 +74,20 @@ void cairo_dock_free_icon (Icon *icon)
 {
 	if (icon == NULL)
 		return ;
-
 	cd_message ("%s (%s , %s)", __func__, icon->acName, icon->cClass);
 
 	cairo_dock_remove_dialog_if_any (icon);
 	if (CAIRO_DOCK_IS_NORMAL_APPLI (icon))
 		cairo_dock_unregister_appli (icon);
 	else
-		cairo_dock_remove_icon_from_class (icon);
+		cairo_dock_deinhibate_class (icon->cClass, icon);
+	cairo_dock_deactivate_module (icon->pModule);
 	
 	g_free (icon->acDesktopFileName);
 	g_free (icon->acFileName);
 	g_free (icon->acName);
 	g_free (icon->acCommand);
+	g_free (icon->cWorkingDirectory);
 	g_free (icon->cBaseURI);
 	g_free (icon->cParentDockName);  // on ne liberera pas le sous-dock ici sous peine de se mordre la queue, donc il faut l'avoir fait avant.
 	g_free (icon->cClass);
@@ -97,8 +98,6 @@ void cairo_dock_free_icon (Icon *icon)
 	cairo_surface_destroy (icon->pFullIconBuffer);
 	cairo_surface_destroy (icon->pTextBuffer);
 	cairo_surface_destroy (icon->pQuickInfoBuffer);
-
-	cairo_dock_deactivate_module (icon->pModule);
 
 	g_free (icon);
 }
@@ -585,8 +584,9 @@ gboolean cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolea
 	if (g_list_find (pDock->icons, icon) == NULL)  // elle est deja detachee.
 		return FALSE;
 
-	//\___________________ On efface son eventuel dialogue, puisqu'elle n'appartiendra bientot plus a aucun dock.
-	///cairo_dock_remove_dialog_if_any (icon);
+	cd_message ("%s (%s)\n", __func__, icon->acName);
+	g_free (icon->cParentDockName);
+	icon->cParentDockName = NULL;
 
 	icon->iCount = 0;
 
@@ -618,19 +618,19 @@ gboolean cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolea
 					cd_message ("  plus d'icone de cette classe");
 					const gchar *cClassSubDockName = cairo_dock_search_dock_name (pClassSubDock);  // on aurait pu utiliser l'ancien 'cParentDockName' de pSameClassIcon mais bon ...
 					cairo_dock_destroy_dock (pClassSubDock, cClassSubDockName, NULL, NULL);
+					icon->pSubDock = NULL;
+					pClassSubDock = NULL;
 				}
 			}
 		}
 
 		if (pDock == cairo_dock_search_dock_from_name (icon->cClass) && g_list_length (pDock->icons) == 1)  // il n'y aura plus aucune icone de cette classe.
 		{
-			cd_message ("le sous-dock de la classe %s n'a plus d'element", icon->cClass);
-			Icon *pPointingIcon = cairo_dock_search_icon_pointing_on_dock (pDock, NULL);
+			cd_message ("  le sous-dock de la classe %s n'aura plus d'element", icon->cClass);
+			/**Icon *pPointingIcon = cairo_dock_search_icon_pointing_on_dock (pDock, NULL);
 			if (pPointingIcon != NULL)
-				pPointingIcon->pSubDock = NULL;
+				pPointingIcon->pSubDock = NULL;*/
 		}
-		g_free (icon->cParentDockName);
-		icon->cParentDockName = NULL;
 	}
 
 	//\___________________ On l'enleve de la liste.
@@ -710,7 +710,7 @@ static void _cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon,
 			cairo_dock_fm_remove_monitor (icon);
 		}
 	}
-	if (CAIRO_DOCK_IS_APPLI (icon))
+	if (CAIRO_DOCK_IS_NORMAL_APPLI (icon))
 	{
 		cairo_dock_unregister_appli (icon);
 	}

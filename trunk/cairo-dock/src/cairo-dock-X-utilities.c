@@ -208,7 +208,7 @@ gboolean cairo_dock_window_is_utility (int Xid)
 }
 
 
-void cairo_dock_set_one_icon_geometry_for_window_manager (int Xid, int iX, int iY, int iWidth, int iHeight)
+void cairo_dock_set_xicon_geometry (int Xid, int iX, int iY, int iWidth, int iHeight)
 {
 	g_return_if_fail (Xid > 0);
 

@@ -28,6 +28,7 @@ cairo_dock_CFLAGS = \
 	-DCAIRO_DOCK_SEPARATOR_CONF_FILE=\""separator.conf"\"\
 	-DCAIRO_DOCK_THEME_CONF_FILE=\""themes.conf"\"\
 	-DCAIRO_DOCK_DEFAULT_ICON_NAME=\""default-icon.svg"\"\
+	-DCAIRO_DOCK_DEFAULT_INDICATOR_NAME=\""default-indicator.png"\"\
 	-DCAIRO_DOCK_VERSION=\""$(VERSION)"\"\
 	-DCAIRO_DOCK_LOCALE_DIR=\""$(datadir)/locale"\"\
 	-DCAIRO_DOCK_GETTEXT_PACKAGE=\""$(GETTEXT_PACKAGE)"\"\

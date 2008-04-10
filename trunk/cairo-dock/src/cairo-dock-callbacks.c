@@ -847,7 +847,36 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 	{
 		if (icon->acCommand != NULL)
 		{
-			g_spawn_command_line_async (icon->acCommand, NULL);
+			GError *erreur = NULL;
+			int argc;
+			gchar **argv = NULL;
+			g_shell_parse_argv (icon->acCommand,
+				&argc,
+				&argv,
+				&erreur);
+			if (erreur != NULL)
+			{
+				cd_warning ("Attention : %s", erreur->message);
+				g_error_free (erreur);
+				return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
+			}
+			
+			g_spawn_async (icon->cWorkingDirectory,
+				argv,
+				NULL,  // env
+				G_SPAWN_SEARCH_PATH,
+				NULL,
+				NULL,
+				NULL,
+				&erreur);
+			g_strfreev (argv);
+			if (erreur != NULL)
+			{
+				cd_warning ("Attention : %s", erreur->message);
+				g_error_free (erreur);
+			}
+			cairo_dock_arm_animation (icon, CAIRO_DOCK_LAUNCHER, -1);  // au cas ou ce serait aussi une appli
+			///g_spawn_command_line_async (icon->acCommand, NULL);
 			return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
 		}
 		else
@@ -1040,8 +1069,11 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 
 	//g_print ("%s (%d, %.2f)\n", __func__, pDock->iSidShrinkDown, pDock->fMagnitude);
 	if (pDock->iSidShrinkDown != 0 || pDock->iMagnitudeIndex == 0)
+	{
+		cairo_dock_set_icons_geometry_for_window_manager (pDock);
 		return FALSE;
-
+	}
+	
 	Icon *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
 	Icon *pNeighborIcon;
 	if (pScroll->direction == GDK_SCROLL_UP)
@@ -1061,6 +1093,7 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 	else
 	{
 		//g_print ("stop\n");
+		cairo_dock_set_icons_geometry_for_window_manager (pDock);
 		return FALSE;
 	}
 
@@ -1072,7 +1105,6 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 
 	///cairo_dock_update_dock_size (pDock);  // gourmand en ressources a cause de X.
 	pDock->calculate_max_dock_size (pDock);  // recalcule le pFirstDrawnElement.
-	cairo_dock_set_icons_geometry_for_window_manager (pDock);
 
 	//\_______________ On recalcule toutes les icones.
 	Icon *pPointedIcon;
@@ -1262,7 +1294,7 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 	cd_message (">>> cReceivedData : %s", cReceivedData);
 
 	//\_________________ On calcule la position a laquelle on l'a lache.
-	double fOrder = 0;
+	double fOrder = CAIRO_DOCK_LAST_ORDER;
 	Icon *pPointedIcon = NULL, *pNeighboorIcon = NULL;
 	GList *ic;
 	Icon *icon;
@@ -1297,26 +1329,7 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 		}
 	}
 	
-	gpointer data[4] = {NULL, pPointedIcon, &fOrder, pDock};
-	gchar *str;
-	do
-	{
-		if (*cReceivedData == '\0')
-			break ;
-		data[0] = cReceivedData;
-		
-		str = strchr (cReceivedData, '\n');
-		if (str != NULL)
-		{
-			*str = '\0';
-			if (str != cReceivedData && *(str - 1) == '\r')
-				*(str - 1) = '\0';
-			cReceivedData = str + 1;
-		}
-		
-		cd_debug (" notification de drop '%s'", data[0]);
-		cairo_dock_notify (CAIRO_DOCK_DROP_DATA, data);
-	} while (str != NULL);
+	cairo_dock_notify_drop_data (cReceivedData, pPointedIcon, fOrder, pDock);
 }
 
 gboolean cairo_dock_notification_drop_data (gpointer *data)

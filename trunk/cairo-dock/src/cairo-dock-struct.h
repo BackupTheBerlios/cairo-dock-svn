@@ -434,11 +434,13 @@ struct _Icon {
 	/// ID d'un volume.
 	gint iVolumeID;
 	/// Nom (et non pas chemin) du fichier de l'image, ou NULL si son image n'est pas definie pas un fichier.
-	gchar* acFileName;
+	gchar *acFileName;
 	/// Nom de l'icone tel qu'il apparaitra dans son etiquette. Donne le nom au sous-dock.
-	gchar* acName;
+	gchar *acName;
 	/// Commande a executer lors d'un clique gauche clique, ou NULL si aucune.
-	gchar* acCommand;
+	gchar *acCommand;
+	/// Repertoire ou s'executera la commande.
+	gchar *cWorkingDirectory;
 	/// Type de l'icone.
 	CairoDockIconType iType;
 	/// Ordre de l'icone dans son dock, parmi les icones de meme type.

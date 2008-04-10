@@ -31,6 +31,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-log.h"
 #include "cairo-dock-keybinder.h"
 #include "cairo-dock-dock-manager.h"
+#include "cairo-dock-surface-factory.h"
 #include "cairo-dock-config.h"
 
 #define CAIRO_DOCK_TYPE_CONF_FILE_FILE ".cairo-dock-conf-file"
@@ -163,6 +164,8 @@ extern CairoDockFMSortType g_iFileSortType;
 extern gboolean g_bShowHiddenFiles;
 extern gchar *g_cRaiseDockShortcut;
 extern cairo_surface_t *g_pIndicatorSurface;
+extern gboolean g_bMixLauncherAppli;
+extern double g_fIndicatorRatio;
 
 static gboolean s_bLoading = FALSE;
 
@@ -912,9 +915,14 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	gboolean bAppliOnCurrentDesktopOnlyOld = g_bAppliOnCurrentDesktopOnly;
 	g_bAppliOnCurrentDesktopOnly = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "current desktop only", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
 
-	gchar *cIndicatorImagePath = NULL;  /// a rajouter au fichier de conf...
+	gchar *cIndicatorImagePath = cairo_dock_get_string_key_value (pKeyFile, "Icons", "indicator image", &bFlushConfFileNeeded, NULL, NULL, NULL);
 	if (cIndicatorImagePath == NULL)
-		cIndicatorImagePath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, "indicator.png");
+		cIndicatorImagePath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_DEFAULT_INDICATOR_NAME);
+	
+	g_fIndicatorRatio = cairo_dock_get_double_key_value (pKeyFile, "Icons", "indicator ratio", &bFlushConfFileNeeded, 1., NULL, NULL);
+	
+	gboolean bMixLauncherAppliOld = g_bMixLauncherAppli;
+	g_bMixLauncherAppli = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "mix launcher appli", &bFlushConfFileNeeded, TRUE, "Applications", NULL);
 	
 	
 	//\___________________ On recupere les parametres des applets.
@@ -1050,11 +1058,12 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	cairo_surface_destroy (g_pIndicatorSurface);
 	if (g_bShowAppli)
 	{
-		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pDock);
+		cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 		g_pIndicatorSurface = cairo_dock_create_surface_for_icon (cIndicatorImagePath,
 			pCairoContext,
-			g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER],
-			g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER]);
+			g_fIndicatorRatio * g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] * (1 + g_fAmplitude),
+			g_fIndicatorRatio * g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] * (1 + g_fAmplitude));
+		cairo_destroy (pCairoContext);
 	}
 	else
 		g_pIndicatorSurface = NULL;
@@ -1081,7 +1090,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_fReflectSize *= fFieldDepth;
 	cd_debug ("  g_fReflectSize : %.2f pixels\n", g_fReflectSize);
 	
-	if (bUniquePidOld != g_bUniquePid || bGroupAppliByClassOld != g_bGroupAppliByClass || bHideVisibleApplisOld != g_bHideVisibleApplis || bAppliOnCurrentDesktopOnlyOld != g_bAppliOnCurrentDesktopOnly || (cairo_dock_application_manager_is_running () && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
+	if (bUniquePidOld != g_bUniquePid || bGroupAppliByClassOld != g_bGroupAppliByClass || bHideVisibleApplisOld != g_bHideVisibleApplis || bAppliOnCurrentDesktopOnlyOld != g_bAppliOnCurrentDesktopOnly || (bMixLauncherAppliOld != g_bMixLauncherAppli) || (cairo_dock_application_manager_is_running () && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
 	{
 		cairo_dock_stop_application_manager (pDock);
 	}
@@ -1090,7 +1099,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 
 	if (bUseSeparatorOld && ! g_bUseSeparator)
 		cairo_dock_remove_all_separators (pDock);
-
+		
 	g_fBackgroundImageWidth = 1e4;  // inutile de mettre a jour les decorations maintenant.
 	g_fBackgroundImageHeight = 1e4;
 	if (pDock->icons == NULL)

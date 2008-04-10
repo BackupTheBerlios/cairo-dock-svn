@@ -228,10 +228,13 @@ gboolean g_bVerbose = FALSE;
 
 short g_iMajorVersion, g_iMinorVersion, g_iMicroVersion;
 CairoDockDesktopEnv g_iDesktopEnv = CAIRO_DOCK_UNKNOWN_ENV;
+
 CairoDockFMSortType g_iFileSortType;
 gboolean g_bShowHiddenFiles;
-cairo_surface_t *g_pIndicatorSurface = NULL;
 
+cairo_surface_t *g_pIndicatorSurface = NULL;
+gboolean g_bMixLauncherAppli = FALSE;
+double g_fIndicatorRatio;
 
 static gboolean random_dialog (gpointer user_data)
 {

@@ -226,7 +226,18 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		g_free (icon->acCommand);
 		icon->acCommand = NULL;
 	}
-
+	
+	if (icon->acCommand != NULL)
+	{
+		g_free (icon->cWorkingDirectory);
+		icon->cWorkingDirectory = g_key_file_get_string (keyfile, "Desktop Entry", "Path", NULL);
+		if (icon->cWorkingDirectory != NULL && *icon->cWorkingDirectory == '\0')
+		{
+			g_free (icon->cWorkingDirectory);
+			icon->cWorkingDirectory = NULL;
+		}
+	}
+	
 	icon->fOrder = g_key_file_get_double (keyfile, "Desktop Entry", "Order", &erreur);
 	if (erreur != NULL)
 	{

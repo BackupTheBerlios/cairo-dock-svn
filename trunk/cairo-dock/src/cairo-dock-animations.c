@@ -292,18 +292,18 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 			if (pRemovingIcon->fPersonnalScale == 0.05)
 			{
 				cd_debug ("  va etre supprimee");
+				gboolean bIsAppli = CAIRO_DOCK_IS_NORMAL_APPLI (pRemovingIcon);  // car apres avoir ete enleve du dock elle n'est plus rien.
 				cairo_dock_remove_icon_from_dock (pDock, pRemovingIcon);
 				
-				if (CAIRO_DOCK_IS_APPLI (pRemovingIcon) && pRemovingIcon->cClass != NULL && pDock == cairo_dock_search_dock_from_name (pRemovingIcon->cClass) && pDock->icons == NULL)  // il n'y a plus aucune icone de cette classe.
+				if (bIsAppli && pRemovingIcon->cClass != NULL && pDock == cairo_dock_search_dock_from_name (pRemovingIcon->cClass) && pDock->icons == NULL)  // il n'y a plus aucune icone de cette classe.
 				{
-					cd_message ("le sous-dock de la classe %s n'a plus d'element et sera detruit", pRemovingIcon->cClass);
+					cd_message ("le sous-dock de la classe %s n'a plus d'element et va etre detruit", pRemovingIcon->cClass);
 					cairo_dock_destroy_dock (pDock, pRemovingIcon->cClass, NULL, NULL);
 				}
 				else
 				{
 					cairo_dock_update_dock_size (pDock);
 				}
-				cd_message ("destruction de %s", pRemovingIcon->acName);
 				cairo_dock_free_icon (pRemovingIcon);
 			}
 			else if (pRemovingIcon->fPersonnalScale == -0.05)

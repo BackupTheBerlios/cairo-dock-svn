@@ -119,5 +119,7 @@ void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve);
 */
 void cairo_dock_allow_widget_to_receive_data (GtkWidget *pWidget, GCallback pCallBack, gpointer data);
 
+void cairo_dock_notify_drop_data (gchar *cReceivedData, Icon *pPointedIcon, double fOrder, CairoDockContainer *pContainer);
+
 
 #endif

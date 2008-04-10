@@ -72,6 +72,10 @@ hide visible = false
 #b- Only show applis on current desktop ?
 current desktop only = false
 
+#b- Mix launchers and applis ?
+#{Allow launchers to act as applis when their program has been launched, and displaying an indicator on their icon to signal it. You can launch other occurences of the program with SHIFT+click.}
+mix launcher appli = true
+
 #F-[Interaction]
 frame2 =
 
@@ -405,6 +409,13 @@ launcher animation = bounce
 #i+ Number of times the icon will bounce/rotate/blink/etc when clicked :
 launcher number of rounds = 4
 
+#S+ Filename of an image to use for indicators :
+#{Indicators are drawn on launchers icons to show that they have already been launched. Let blank to use the default one.}
+indicator image = 
+
+#e+[0.1;1] Indicator size ratio :
+#{The ratio between indicator's size and icon's size. The bigger, the bigger the indicators are.}
+indicator ratio = 1.
 
 #X+[Applications]
 frame_appli =
@@ -420,6 +431,7 @@ appli animation = bounce
 
 #i+ Number of times the icon will bounce/rotate/blink/etc when clicked :
 appli number of rounds = 4
+
 
 #X+[Applets]
 frame_applet =

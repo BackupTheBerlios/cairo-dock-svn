@@ -168,20 +168,20 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 		XWMHints *pWMHints = XGetWMHints (s_XDisplay, Xid);
 		if (pWMHints == NULL)
 		{
-			cd_message ("  aucun WMHints\n");
+			cd_debug ("  aucun WMHints");
 			return NULL;
 		}
 		//\__________________ On recupere les donnees dans un  pixbuf.
 		GdkPixbuf *pIconPixbuf = NULL;
 		if (pWMHints->flags & IconWindowHint)
 		{
-			cd_message ("  pas de _NET_WM_ICON, mais une fenetre\n");
+			cd_debug ("  pas de _NET_WM_ICON, mais une fenetre");
 			Window XIconID = pWMHints->icon_window;
 			pIconPixbuf = _cairo_dock_get_pixbuf_from_pixmap (XIconID, TRUE);  // pas teste.
 		}
 		else if (pWMHints->flags & IconPixmapHint)
 		{
-			cd_message ("  pas de _NET_WM_ICON, mais un pixmap\n");
+			cd_debug ("  pas de _NET_WM_ICON, mais un pixmap");
 			Pixmap XPixmapID = pWMHints->icon_pixmap;
 			pIconPixbuf = _cairo_dock_get_pixbuf_from_pixmap (XPixmapID, TRUE);
 
@@ -244,7 +244,7 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 
 CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
 {
-	cd_message ("%s (%s)\n", __func__, icon->acName);
+	cd_message ("%s (%s)", __func__, icon->acName);
 	CairoDock *pParentDock = pMainDock;
 	g_free (icon->cParentDockName);
 	if (CAIRO_DOCK_IS_APPLI (icon) && g_bGroupAppliByClass && icon->cClass != NULL)
@@ -252,7 +252,7 @@ CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
 		Icon *pSameClassIcon = cairo_dock_get_icon_with_class (pMainDock->icons, icon->cClass);
 		if (pSameClassIcon == NULL || pSameClassIcon == icon)
 		{
-			cd_message ("  classe %s encore vide\n", icon->cClass);
+			cd_message ("  classe %s encore vide", icon->cClass);
 			icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
 		}
 		else
@@ -262,13 +262,13 @@ CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
 			pParentDock = cairo_dock_search_dock_from_name (icon->cClass);
 			if (pParentDock == NULL)  // alors il faut creer le sous-dock, et on decide de l'associer a pSameClassIcon.
 			{
-				cd_message ("  creation du dock pour la classe %s\n", icon->cClass);
+				cd_message ("  creation du dock pour la classe %s", icon->cClass);
 				pParentDock = cairo_dock_create_subdock_for_class_appli (icon->cClass);
 				pSameClassIcon->pSubDock = pParentDock;
 			}
 			else
 			{
-				cd_message ("  sous-dock de la classe %s existant\n", icon->cClass);
+				cd_message ("  sous-dock de la classe %s existant", icon->cClass);
 				if (pSameClassIcon->pSubDock == NULL)
 					pSameClassIcon->pSubDock = pParentDock;
 			}
@@ -400,7 +400,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 			g_hash_table_insert (s_hAppliTable, pPidBuffer, NULL);  // On rajoute son PID meme si c'est une appli qu'on n'affichera pas.
 		return NULL;
 	}
-	cd_message ("recuperation de '%s' (bIsHidden : %d)\n", pNameBuffer, bIsHidden);
+	cd_message ("recuperation de '%s' (bIsHidden : %d)", pNameBuffer, bIsHidden);
 	
 	
 	//\__________________ On recupere la classe.
@@ -493,7 +493,7 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 		XWMHints *pWMHints = XGetWMHints (s_XDisplay, icon->Xid);
 		if (pWMHints != NULL)
 		{
-			if (pWMHints->flags & XUrgencyHint && (g_bDemandsAttentionWithDialog || g_bDemandsAttentionWithAnimation))
+			if ((pWMHints->flags & XUrgencyHint) && (g_bDemandsAttentionWithDialog || g_bDemandsAttentionWithAnimation))
 			{
 				if (iState == PropertyNewValue)
 				{
@@ -515,7 +515,7 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 						cairo_dock_arm_animation (icon, 0, 0);  // arrete son animation quelqu'elle soit.
 				}
 				else
-					cd_message ("  etat du changement inconnu !");
+					cd_warning ("  etat du changement inconnu !");
 			}
 			if (iState == PropertyNewValue && (pWMHints->flags & (IconPixmapHint | IconMaskHint | IconWindowHint)))
 			{

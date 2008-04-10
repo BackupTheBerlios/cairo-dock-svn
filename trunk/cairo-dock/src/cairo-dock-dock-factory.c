@@ -40,6 +40,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-log.h"
 #include "cairo-dock-keyfile-manager.h"
 #include "cairo-dock-dock-manager.h"
+#include "cairo-dock-notifications.h"
 #include "cairo-dock-dock-factory.h"
 
 extern int g_iWmHint;
@@ -801,4 +802,30 @@ void cairo_dock_allow_widget_to_receive_data (GtkWidget *pWidget, GCallback pCal
 		"drag_data_received",
 		pCallBack,
 		data);
+}
+
+void cairo_dock_notify_drop_data (gchar *cReceivedData, Icon *pPointedIcon, double fOrder, CairoDockContainer *pContainer)
+{
+	g_return_if_fail (cReceivedData != NULL);
+	gpointer data[4] = {NULL, pPointedIcon, &fOrder, pContainer};
+	gchar *str;
+	do
+	{
+		data[0] = cReceivedData;
+		if (*cReceivedData == '\0')
+			break ;
+		
+		str = strchr (cReceivedData, '\n');
+		if (str != NULL)
+		{
+			*str = '\0';
+			if (str != cReceivedData && *(str - 1) == '\r')
+				*(str - 1) = '\0';
+			cReceivedData = str + 1;
+		}
+		
+		cd_debug (" notification de drop '%s'", data[0]);
+		
+		cairo_dock_notify (CAIRO_DOCK_DROP_DATA, data);
+	} while (str != NULL);
 }

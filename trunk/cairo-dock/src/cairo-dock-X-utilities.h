@@ -19,7 +19,7 @@ void cairo_dock_set_strut_partial (int Xid, int left, int right, int top, int bo
 void cairo_dock_set_xwindow_type_hint (int Xid, gchar *cWindowTypeName);
 gboolean cairo_dock_window_is_utility (int Xid);
 
-void cairo_dock_set_one_icon_geometry_for_window_manager (int Xid, int iX, int iY, int iWidth, int iHeight);
+void cairo_dock_set_xicon_geometry (int Xid, int iX, int iY, int iWidth, int iHeight);
 
 
 gboolean cairo_dock_update_screen_geometry (void);

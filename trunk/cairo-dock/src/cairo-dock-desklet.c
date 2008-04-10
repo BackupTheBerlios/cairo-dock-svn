@@ -276,20 +276,11 @@ void on_drag_data_received_desklet (GtkWidget *pWidget, GdkDragContext *dc, gint
 	//\_________________ On recupere l'URI.
 	gchar *cReceivedData = (gchar *) selection_data->data;
 	g_return_if_fail (cReceivedData != NULL);
-	int length = strlen (cReceivedData);
-	if (cReceivedData[length-1] == '\n')
-		cReceivedData[--length] = '\0';  // on vire le retour chariot final.
-	if (cReceivedData[length-1] == '\r')
-		cReceivedData[--length] = '\0';
-	cd_message (">>> cReceivedData : %s", cReceivedData);
 	
 	pDesklet->diff_x = - x;
 	pDesklet->diff_y = - y;
-	
-	double fOrder = 0;
 	Icon *pClickedIcon = _cairo_dock_find_clicked_icon_in_desklet (pDesklet);
-	gpointer data[4] = {cReceivedData, pClickedIcon, &fOrder, pDesklet};
-	cairo_dock_notify (CAIRO_DOCK_DROP_DATA, data);
+	cairo_dock_notify_drop_data (cReceivedData, pClickedIcon, 0, pDesklet);
 }
 
 static gboolean on_motion_notify_desklet(GtkWidget *pWidget,
