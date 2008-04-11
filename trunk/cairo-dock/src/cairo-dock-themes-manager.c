@@ -67,7 +67,7 @@ GHashTable *cairo_dock_list_themes (gchar *cThemesDir, GHashTable *hProvidedTabl
 }
 
 
-gchar *cairo_dock_edit_themes (GHashTable **hThemeTable)
+gchar *cairo_dock_edit_themes (GHashTable **hThemeTable, gboolean bSafeMode)
 {
 	//\___________________ On recupere la liste des themes existant (pre-installes et utilisateur).
 	GError *erreur = NULL;
@@ -114,8 +114,8 @@ gchar *cairo_dock_edit_themes (GHashTable **hThemeTable)
 	}
 	
 	cairo_dock_update_conf_file_with_themes (pKeyFile, cTmpConfFile, *hThemeTable, "Themes", "chosen theme");
-	cairo_dock_update_conf_file_with_themes (pKeyFile, cTmpConfFile, hUserThemeTable, "Delete", "wanted themes");
-	cairo_dock_update_conf_file_with_themes (pKeyFile, cTmpConfFile, hUserThemeTable, "Save", "theme name");
+	cairo_dock_update_conf_file_with_hash_table (pKeyFile, cTmpConfFile, hUserThemeTable, "Delete", "wanted themes", NULL, (GHFunc) cairo_dock_write_one_name, TRUE, FALSE);
+	cairo_dock_update_conf_file_with_hash_table (pKeyFile, cTmpConfFile, hUserThemeTable, "Save", "theme name", NULL, (GHFunc) cairo_dock_write_one_name, TRUE, FALSE);
 	g_hash_table_destroy (hUserThemeTable);
 	
 	g_key_file_set_string (pKeyFile, "Delete", "wanted themes", cUserThemeNames);  // sThemeNames
@@ -126,13 +126,24 @@ gchar *cairo_dock_edit_themes (GHashTable **hThemeTable)
 
 	//\___________________ On laisse l'utilisateur l'editer.
 	gchar *cPresentedGroup = (cairo_dock_theme_need_save () ? "Save" : NULL);
-	gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTmpConfFile, "Manage themes", CAIRO_DOCK_THEME_PANEL_WIDTH, CAIRO_DOCK_THEME_PANEL_HEIGHT, 0, cPresentedGroup, NULL, NULL, NULL, NULL);
+	const gchar *cTitle = (bSafeMode ? _("< Safe Mode >") : _("Manage Themes"));
+	
+	CairoDockDialog *pDialog = NULL;
+	if (bSafeMode)
+	{
+		pDialog = cairo_dock_show_general_message (_("You are running Cairo-Dock in safe mode.\nWhy ? Probably because a plug-in has messed into your dock,\n or maybe your theme has got corrupted.\nSo, no plug-in will be available, and you can now save your current theme if you want\n before you start using the dock.\nTry with your current theme, if it works, it means a plug-in is wrong.\nOtherwise, try with another theme.\nSave a config that is working, and restart the dock in normal mode.\nThen, activate plug-ins one by one to guess which one is wrong."), 0.);
+	}
+	
+	gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTmpConfFile, cTitle, CAIRO_DOCK_THEME_PANEL_WIDTH, CAIRO_DOCK_THEME_PANEL_HEIGHT, 0, cPresentedGroup, NULL, NULL, NULL, NULL);
 	if (! bChoiceOK)
 	{
 		g_remove (cTmpConfFile);
 		g_free (cTmpConfFile);
 		cTmpConfFile = NULL;
 	}
+	if (bSafeMode)
+		cairo_dock_dialog_unreference (pDialog);
+	
 	return cTmpConfFile;
 }
 
@@ -235,11 +246,11 @@ gboolean cairo_dock_theme_need_save (void)
 	return bNeedSave;
 }
 
-int cairo_dock_ask_initial_theme (void)
+/*int cairo_dock_ask_initial_theme (void)
 {
 	int iInitialChoiceOK = -1;
 	GHashTable *hThemeTable = NULL;
-	gchar *cInitConfFile = cairo_dock_edit_themes (&hThemeTable);
+	gchar *cInitConfFile = cairo_dock_edit_themes (&hThemeTable, _("Manage themes"));
 
 	if (cInitConfFile != NULL)
 	{
@@ -268,7 +279,7 @@ int cairo_dock_ask_initial_theme (void)
 
 	g_hash_table_destroy (hThemeTable);
 	return iInitialChoiceOK;
-}
+}*/
 
 static void _cairo_dock_delete_one_theme (gchar *cThemeName, gchar *cThemePath, gpointer *data)
 {
@@ -303,11 +314,11 @@ static void _cairo_dock_delete_one_theme (gchar *cThemeName, gchar *cThemePath, 
 		}
 	}
 }
-gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
+gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode)
 {
 	GString *sCommand = g_string_new ("");
 	GHashTable *hThemeTable = NULL;
-	gchar *cInitConfFile = cairo_dock_edit_themes (&hThemeTable);
+	gchar *cInitConfFile = cairo_dock_edit_themes (&hThemeTable, bSafeMode);
 
 	if (cInitConfFile != NULL)
 	{
@@ -357,7 +368,7 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 
 			gchar *cNewThemePath = g_hash_table_lookup (hThemeTable, cNewThemeName);
 			//\___________________ On charge les parametres de comportement.
-			if (g_key_file_get_boolean (pKeyFile, "Themes", "use theme behaviour", NULL))
+			if (g_pMainDock == NULL || g_key_file_get_boolean (pKeyFile, "Themes", "use theme behaviour", NULL))
 			{
 				g_string_printf (sCommand, "/bin/cp '%s'/%s '%s'", cNewThemePath, CAIRO_DOCK_CONF_FILE, g_cCurrentThemePath);
 				cd_message ("%s", sCommand->str);
@@ -378,7 +389,7 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget)
 			system (sCommand->str);
 			
 			//\___________________ On charge les lanceurs si necessaire.
-			if (g_key_file_get_boolean (pKeyFile, "Themes", "use theme launchers", NULL))
+			if (g_pMainDock == NULL || g_key_file_get_boolean (pKeyFile, "Themes", "use theme launchers", NULL))
 			{
 				g_string_printf (sCommand, "rm -f '%s'/*.desktop", g_cCurrentLaunchersPath);
 				cd_message ("%s", sCommand->str);

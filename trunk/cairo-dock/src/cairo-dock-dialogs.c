@@ -146,7 +146,7 @@ static gboolean on_button_press_dialog (GtkWidget* pWidget,
 	GdkEventButton* pButton,
 	CairoDockDialog *pDialog)
 {
-	//g_print ("%s (%d/%d)\n", __func__, pButton->type, pButton->button);
+	g_print ("%s (%d/%d)\n", __func__, pButton->type, pButton->button);
 	if (! cairo_dock_dialog_reference (pDialog))
 		return FALSE;
 
@@ -734,7 +734,7 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 
 		cairo_save (pSurfaceContext);
 		cairo_translate (pSurfaceContext, -ink.x + (pIconSurface != NULL ? fImageSize + CAIRO_DOCK_DIALOG_TEXT_MARGIN : 0), -ink.y + (pIconSurface != NULL && fImageSize > ink.height ? (fImageSize - ink.height) / 2: 0));
-		cairo_set_source_rgba (pSurfaceContext, g_fDialogTextColor[0], g_fDialogTextColor[1], g_fDialogTextColor[2], g_fDialogTextColor[3]);
+		cairo_set_source_rgba (pSurfaceContext, g_fDialogTextColor[0], g_fDialogTextColor[1], g_fDialogTextColor[2], (g_fDialogTextColor[3] != 0 ? g_fDialogTextColor[3] : 1));
 		pango_cairo_show_layout (pSurfaceContext, pLayout);
 
 		if (pIconSurface != NULL)
@@ -801,6 +801,9 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 	pDialog->iButtonsType = iButtonsType;
 	if (pDialog->iButtonsType != GTK_BUTTONS_NONE)
 	{
+		if (s_pButtonOkSurface == NULL || s_pButtonCancelSurface == NULL)
+			cairo_dock_load_dialog_buttons (pDialog, NULL, NULL);
+		
 		pDialog->iButtonsWidth = 2 * g_iDialogButtonWidth + CAIRO_DOCK_DIALOG_BUTTON_GAP + 2 * CAIRO_DOCK_DIALOG_TEXT_MARGIN;
 		pDialog->iButtonsHeight = CAIRO_DOCK_DIALOG_VGAP + g_iDialogButtonHeight;
 
@@ -1364,7 +1367,7 @@ gboolean cairo_dock_icon_has_dialog (Icon *pIcon)
 
 Icon *cairo_dock_get_dialogless_icon (void)
 {
-	if (g_pMainDock->icons == NULL)
+	if (g_pMainDock == NULL || g_pMainDock->icons == NULL)
 		return NULL;
 
 	Icon *pIcon = cairo_dock_get_first_icon_of_type (g_pMainDock->icons, CAIRO_DOCK_SEPARATOR12);
@@ -1392,19 +1395,13 @@ Icon *cairo_dock_get_dialogless_icon (void)
 CairoDockDialog *cairo_dock_show_general_message (const gchar *cMessage, double fTimeLength)
 {
 	Icon *pIcon = cairo_dock_get_dialogless_icon ();
-	if (pIcon != NULL)
-		return cairo_dock_show_temporary_dialog (cMessage, pIcon, CAIRO_DOCK_CONTAINER (g_pMainDock), fTimeLength);
-	else
-		return NULL;
+	return cairo_dock_show_temporary_dialog (cMessage, pIcon, CAIRO_DOCK_CONTAINER (g_pMainDock), fTimeLength);
 }
 
 int cairo_dock_ask_general_question_and_wait (const gchar *cQuestion)
 {
 	Icon *pIcon = cairo_dock_get_dialogless_icon ();
-	if (pIcon == NULL)
-		return GTK_RESPONSE_NONE;
-	else
-		return cairo_dock_ask_question_and_wait (cQuestion, pIcon, CAIRO_DOCK_CONTAINER (g_pMainDock));
+	return cairo_dock_ask_question_and_wait (cQuestion, pIcon, CAIRO_DOCK_CONTAINER (g_pMainDock));
 }
 
 

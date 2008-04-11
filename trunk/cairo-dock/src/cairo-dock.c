@@ -162,7 +162,7 @@ int g_iLeaveSubDockDelay;
 int g_iShowSubDockDelay;
 gboolean bShowSubDockOnClick;  // TRUE <=> ne montrer les sous-docks qu'au clique, sinon au survol.
 
-int g_iLabelSize;  // taille de la police des etiquettes.
+int g_iLabelSize = 0;  // taille de la police des etiquettes.
 gchar *g_cLabelPolice = NULL;  // police de caracteres des etiquettes.
 int g_iLabelWeight;  // epaisseur des traits.
 int g_iLabelStyle;  // italique ou droit.
@@ -203,8 +203,8 @@ gchar *g_cSeparatorImage = NULL;
 gboolean g_bRevolveSeparator;  // faire pivoter l'image des separateurs.
 gboolean g_bConstantSeparatorSize;  // garder les separateurs de taille constante.
 
-int g_iDialogButtonWidth;
-int g_iDialogButtonHeight;
+int g_iDialogButtonWidth = 48;
+int g_iDialogButtonHeight = 48;
 double g_fDialogColor[4];
 int g_iDialogIconSize;
 int g_iDialogMessageSize;  // taille de la police des messagez.
@@ -266,7 +266,7 @@ static void _cairo_dock_set_verbosity(gchar *cVerbosity)
     cd_log_set_level(G_LOG_LEVEL_ERROR);
   else {
     cd_log_set_level(G_LOG_LEVEL_WARNING);
-		cd_warning("bad verbosity option: default to warning");
+    cd_warning("bad verbosity option: default to warning");
 	}
 }
 
@@ -337,7 +337,7 @@ main (int argc, char** argv)
 			"print version and quit.", NULL},
 		{"modules-dir", 'm', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
 			&cUserDefinedModuleDir,
-			"ask the dock to load additionnal modules contained in this directory (It is unsafe for your dock to load unnofficial modules).", NULL},
+			"ask the dock to load additionnal modules contained in this directory (Though it is unsafe for your dock to load unnofficial modules).", NULL},
 		{NULL}
 	};
 
@@ -502,14 +502,20 @@ main (int argc, char** argv)
 	g_cEasyConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_EASY_CONF_FILE);
 	if (! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS) || bSafeMode)
 	{
-		cairo_dock_mark_theme_as_modified (FALSE);
-		int r;
+		if (! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS))
+			cairo_dock_mark_theme_as_modified (FALSE);  // le fichier n'existe pas, on ne proposera pas de sauvegarder ce theme.
+		do
+		{
+			cairo_dock_manage_themes (NULL, bSafeMode);
+		}
+		while (g_pMainDock == NULL);
+		/**int r;
 		while ((r = cairo_dock_ask_initial_theme ()) == 0);
 		if (r == -1)
 		{
-			cd_message ("mata ne !\n");
+			g_print ("mata ne !\n");
 			exit (0);
-		}
+		}*/
 	}
 
 	cairo_dock_load_theme (g_cCurrentThemePath);
@@ -549,7 +555,7 @@ main (int argc, char** argv)
 		g_key_file_load_from_file (pKeyFile, cChangeLogFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 		if (erreur != NULL)
 		{
-			cd_message ("Attention : %s\n", erreur->message);
+			cd_warning ("Attention : %s", erreur->message);
 			g_error_free (erreur);
 			erreur = NULL;
 		}

@@ -24,8 +24,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-file-manager.h"
 #include "cairo-dock-dialogs.h"
-#include "cairo-dock-desktop-file-factory.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-dock-manager.h"
+#include "cairo-dock-desktop-file-factory.h"
 
 extern gchar *g_cCurrentThemePath;
 extern gchar *g_cCurrentLaunchersPath;

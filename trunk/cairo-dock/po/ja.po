@@ -2353,3 +2353,10 @@ msgstr ""
 #: ../data/messages:365
 msgid "Indicator size ratio :"
 msgstr ""
+
+#: ../data/messages:65
+msgid ""
+"Allow launchers to act as applis when their program has been launched, and "
+"displaying an indicator on their icon to signal it. You can launch other "
+"occurences of the program with SHIFT+click."
+msgstr ""

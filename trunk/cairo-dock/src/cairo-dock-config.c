@@ -168,6 +168,7 @@ extern cairo_surface_t *g_pIndicatorSurface;
 extern gboolean g_bMixLauncherAppli;
 extern double g_fIndicatorRatio;
 extern gboolean g_bOverWriteXIcons;
+double g_fIndicatorWidth, g_fIndicatorHeight;
 
 static gchar **g_cUseXIconAppliList = NULL;
 static gboolean s_bLoading = FALSE;
@@ -1099,17 +1100,39 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_free (cButtonCancelImage);
 	
 	cairo_surface_destroy (g_pIndicatorSurface);
+	g_pIndicatorSurface = NULL;
 	if (g_bShowAppli)
 	{
 		cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
-		g_pIndicatorSurface = cairo_dock_create_surface_for_icon (cIndicatorImagePath,
-			pCairoContext,
-			g_fIndicatorRatio * g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] * (1 + g_fAmplitude),
-			g_fIndicatorRatio * g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] * (1 + g_fAmplitude));
+		double fRawWidth = 0, fRawHeight = 0;
+		cairo_surface_t *pRawSurface = cairo_dock_load_image (pCairoContext,
+			cIndicatorImagePath,
+			&fRawWidth,
+			&fRawHeight,
+			0.,
+			1.,
+			FALSE);
+		
+		double fLauncherWidth = (g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] != 0 ? g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] : 48);
+		double fLauncherHeight = (g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] != 0 ? g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] : 48);
+		double fRawRatio = MIN (fLauncherWidth / fRawWidth, fLauncherHeight / fRawHeight);
+		
+		g_fIndicatorWidth = fRawWidth * fRawRatio * g_fIndicatorRatio;
+		g_fIndicatorHeight = fRawHeight * fRawRatio * g_fIndicatorRatio;
+		cd_message ("<indicateur> : %.2f x %.2f", g_fIndicatorWidth, g_fIndicatorHeight);
+		
+		if (pRawSurface != NULL)
+		{
+			g_pIndicatorSurface = cairo_dock_duplicate_surface (pRawSurface,
+				pCairoContext,
+				fRawWidth,
+				fRawHeight,
+				g_fIndicatorWidth * (1 + g_fAmplitude),
+				g_fIndicatorHeight * (1 + g_fAmplitude));
+			cairo_surface_destroy (pRawSurface);
+		}
 		cairo_destroy (pCairoContext);
 	}
-	else
-		g_pIndicatorSurface = NULL;
 	g_free (cIndicatorImagePath);
 
 	g_fReflectSize = 0;

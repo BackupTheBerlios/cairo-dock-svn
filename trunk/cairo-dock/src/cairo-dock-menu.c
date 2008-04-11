@@ -80,7 +80,7 @@ static void cairo_dock_initiate_theme_management (GtkMenuItem *menu_item, gpoint
 	gboolean bRefreshGUI;
 	do
 	{
-		bRefreshGUI = cairo_dock_manage_themes (pDock->pWidget);
+		bRefreshGUI = cairo_dock_manage_themes (pDock->pWidget, FALSE);
 	} while (bRefreshGUI);
 }
 
@@ -723,6 +723,16 @@ static void _cairo_dock_show_appli (GtkMenuItem *menu_item, gpointer *data)
 	}
 }
 
+static void _cairo_dock_launch_new (GtkMenuItem *menu_item, gpointer *data)
+{
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
+	if (icon->Xid > 0)
+	{
+		gpointer data[3] = {icon, pDock, GINT_TO_POINTER (GDK_SHIFT_MASK)};
+		cairo_dock_notify (CAIRO_DOCK_CLICK_ICON, data);  // on emule un shift+clic gauche .
+	}
+}
 
 static void cairo_dock_maximize_appli (GtkMenuItem *menu_item, gpointer *data)
 {
@@ -1093,7 +1103,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		gboolean bIsAbove=FALSE, bIsBelow=FALSE;
 		cairo_dock_window_is_above_or_below (icon->Xid, &bIsAbove, &bIsBelow);
 		_add_entry_in_menu (bIsAbove ? _("Don't keep above") : _("Keep above"), bIsAbove ? GTK_STOCK_GOTO_BOTTOM : GTK_STOCK_GOTO_TOP, cairo_dock_change_window_above, pSubMenuOtherActions);
-		g_print ("g_iNbDesktops : %d ; g_iNbViewportX : %d ; g_iNbViewportY : %d\n", g_iNbDesktops, g_iNbViewportX, g_iNbViewportY);
+		cd_debug ("g_iNbDesktops : %d ; g_iNbViewportX : %d ; g_iNbViewportY : %d", g_iNbDesktops, g_iNbViewportX, g_iNbViewportY);
 		if (g_iNbDesktops > 1 || g_iNbViewportX > 1 || g_iNbViewportY > 1)
 		{
 			int i, j, k, iDesktopCode;
@@ -1136,6 +1146,11 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		}
 		
 		//\_________________________ On rajoute les actions courantes sur les icones d'applis.
+		if (icon->acDesktopFileName != NULL)  // c'est un lanceur inhibiteur.
+		{
+			_add_entry_in_menu (_("Launch new"), GTK_STOCK_ADD, _cairo_dock_launch_new, menu);
+		}
+		
 		gboolean bIsMaximized = cairo_dock_window_is_maximized (icon->Xid);
 		_add_entry_in_menu (bIsMaximized ? _("Unmaximize") : _("Maximize"), GTK_STOCK_GO_UP, cairo_dock_maximize_appli, menu);
 		

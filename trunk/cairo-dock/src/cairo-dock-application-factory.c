@@ -40,6 +40,7 @@ extern gboolean g_bUniquePid;
 extern gboolean g_bGroupAppliByClass;
 extern gboolean g_bDemandsAttentionWithDialog;
 extern gboolean g_bDemandsAttentionWithAnimation;
+extern gboolean g_bOverWriteXIcons;
 
 static GHashTable *s_hAppliTable = NULL;  // table des PID connus de cairo-dock (affichees ou non dans le dock).
 static Display *s_XDisplay = NULL;
@@ -477,17 +478,20 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 			}
 		}
 	}
-	else if (iState == PropertyNewValue && aProperty == s_aNetWmIcon)  // on prefere garder l'ancienne icone que de l'effacer.
+	else if (iState == PropertyNewValue && aProperty == s_aNetWmIcon)
 	{
 		//g_print ("%s change son icone\n", icon->acName);
-		pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
-		icon->fWidth /= pDock->fRatio;
-		icon->fHeight /= pDock->fRatio;
-		cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
-		icon->fWidth *= pDock->fRatio;
-		icon->fHeight *= pDock->fRatio;
-		cairo_destroy (pCairoContext);
-		cairo_dock_redraw_my_icon (icon, CAIRO_DOCK_CONTAINER (pDock));
+		if (cairo_dock_class_is_using_xicon (icon->cClass) || ! g_bOverWriteXIcons)
+		{
+			pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
+			icon->fWidth /= pDock->fRatio;
+			icon->fHeight /= pDock->fRatio;
+			cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
+			icon->fWidth *= pDock->fRatio;
+			icon->fHeight *= pDock->fRatio;
+			cairo_destroy (pCairoContext);
+			cairo_dock_redraw_my_icon (icon, CAIRO_DOCK_CONTAINER (pDock));
+		}
 	}
 	else if (aProperty == s_aWmHints)
 	{
@@ -516,19 +520,22 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 						cairo_dock_arm_animation (icon, 0, 0);  // arrete son animation quelqu'elle soit.
 				}
 				else
-					cd_warning ("  etat du changement inconnu !");
+					cd_warning ("  etat du changement inconnu sur %s !", icon->acName);
 			}
 			if (iState == PropertyNewValue && (pWMHints->flags & (IconPixmapHint | IconMaskHint | IconWindowHint)))
 			{
 				//g_print ("%s change son icone\n", icon->acName);
-				pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
-				icon->fWidth /= pDock->fRatio;
-				icon->fHeight /= pDock->fRatio;
-				cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
-				icon->fWidth *= pDock->fRatio;
-				icon->fHeight *= pDock->fRatio;
-				cairo_destroy (pCairoContext);
-				cairo_dock_redraw_my_icon (icon, CAIRO_DOCK_CONTAINER (pDock));
+				if (cairo_dock_class_is_using_xicon (icon->cClass) || ! g_bOverWriteXIcons)
+				{
+					pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
+					icon->fWidth /= pDock->fRatio;
+					icon->fHeight /= pDock->fRatio;
+					cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
+					icon->fWidth *= pDock->fRatio;
+					icon->fHeight *= pDock->fRatio;
+					cairo_destroy (pCairoContext);
+					cairo_dock_redraw_my_icon (icon, CAIRO_DOCK_CONTAINER (pDock));
+				}
 			}
 		}
 	}

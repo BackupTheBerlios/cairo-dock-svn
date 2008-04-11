@@ -80,7 +80,7 @@ void cairo_dock_free_icon (Icon *icon)
 	cairo_dock_remove_dialog_if_any (icon);
 	if (CAIRO_DOCK_IS_NORMAL_APPLI (icon))
 		cairo_dock_unregister_appli (icon);
-	else  // c'est un inhibiteur.
+	else if (icon->cClass != NULL)  // c'est un inhibiteur.
 		cairo_dock_deinhibate_class (icon->cClass, icon);
 	cairo_dock_deactivate_module (icon->pModule);
 	
@@ -677,7 +677,7 @@ gboolean cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolea
 		icon->fWidth /= pDock->fRatio;  /// g_fSubDockSizeRatio
 		icon->fHeight /= pDock->fRatio;
 	}
-	g_print (" -size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
+	//g_print (" -size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
 
 	//\___________________ On enleve le separateur si c'est la derniere icone de son type.
 	if (bCheckUnusedSeparator)

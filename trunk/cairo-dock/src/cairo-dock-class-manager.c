@@ -36,10 +36,11 @@ static GHashTable *s_hClassTable = NULL;
 
 void cairo_dock_initialize_class_manager (void)
 {
-	s_hClassTable = g_hash_table_new_full (g_str_hash,
-		g_str_equal,
-		g_free,
-		(GDestroyNotify) cairo_dock_free_class_appli);
+	if (s_hClassTable == NULL)
+		s_hClassTable = g_hash_table_new_full (g_str_hash,
+			g_str_equal,
+			g_free,
+			(GDestroyNotify) cairo_dock_free_class_appli);
 }
 
 
@@ -104,6 +105,38 @@ Window cairo_dock_detach_appli_of_class (const gchar *cClass)
 	return XFirstFoundId;
 }
 
+static void _cairo_dock_set_same_indicator_on_sub_dock (Icon *pInhibhatorIcon)
+{
+	CairoDock *pInhibhatorDock = cairo_dock_search_dock_from_name (pInhibhatorIcon->cParentDockName);
+	if (pInhibhatorDock != NULL && pInhibhatorDock->iRefCount > 0)  // l'inhibiteur est dans un sous-dock.
+	{
+		gboolean bSubDockHasIndicator = FALSE;
+		if (pInhibhatorIcon->bHasIndicator)
+		{
+			bSubDockHasIndicator = TRUE;
+		}
+		else
+		{
+			GList* ic;
+			Icon *icon;
+			for (ic =pInhibhatorDock->icons ; ic != NULL; ic = ic->next)
+			{
+				icon = ic->data;
+				if (icon->bHasIndicator)
+				{
+					bSubDockHasIndicator = TRUE;
+					break;
+				}
+			}
+		}
+		Icon *pPointingIcon = cairo_dock_search_icon_pointing_on_dock (pInhibhatorDock, NULL);
+		if (pPointingIcon != NULL)
+		{
+			cd_message ("  pour le sous-dock %s : indicateur <- %d", pPointingIcon->acName, bSubDockHasIndicator);
+			pPointingIcon->bHasIndicator = bSubDockHasIndicator;
+		}
+	}
+}
 
 void cairo_dock_free_class_appli (CairoDockClassAppli *pClassAppli)
 {
@@ -112,9 +145,10 @@ void cairo_dock_free_class_appli (CairoDockClassAppli *pClassAppli)
 	for (pElement = pClassAppli->pIconsOfClass; pElement != NULL; pElement = pElement->next)
 	{
 		pInhibatorIcon = pElement->data;
+		cd_message ("%s perd sa mana", pInhibatorIcon->acName);
 		pInhibatorIcon->Xid = 0;
 		pInhibatorIcon->bHasIndicator = FALSE;
-		cd_message ("%s perd sa mana", pInhibatorIcon->acName);
+		_cairo_dock_set_same_indicator_on_sub_dock (pInhibatorIcon);
 	}
 	g_list_free (pClassAppli->pIconsOfClass);
 	g_list_free (pClassAppli->pAppliOfClass);
@@ -217,6 +251,7 @@ gboolean cairo_dock_inhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
 		pInhibatorIcon->Xid = XFirstFoundId;
 		///if (CAIRO_DOCK_IS_NORMAL_LAUNCHER (pInhibatorIcon))  // pas d'indicateur pour les applets.
 			pInhibatorIcon->bHasIndicator = (XFirstFoundId > 0);
+			_cairo_dock_set_same_indicator_on_sub_dock (pInhibatorIcon);
 		if (pInhibatorIcon->cClass != cClass)
 		{
 			g_free (pInhibatorIcon->cClass);
@@ -265,6 +300,7 @@ gboolean cairo_dock_prevent_inhibated_class (Icon *pIcon)
 					{
 						cd_message (">>> %s prendra un indicateur au prochain redraw ! (Xid : %d)", pInhibatorIcon->acName, pInhibatorIcon->Xid);
 						pInhibatorIcon->bHasIndicator = TRUE;
+						_cairo_dock_set_same_indicator_on_sub_dock (pInhibatorIcon);
 					}
 				}
 				
@@ -276,23 +312,6 @@ gboolean cairo_dock_prevent_inhibated_class (Icon *pIcon)
 						if (pInhibhatorDock != NULL)
 							cairo_dock_set_one_icon_geometry_for_window_manager (pInhibatorIcon, pInhibhatorDock);
 						bToBeInhibited = TRUE;
-					}
-					if (pInhibhatorDock != NULL)
-					{
-						if (pInhibhatorDock->iRefCount == 0)
-						{
-							cd_message ("  l'inhibiteur est dans un dock principal");
-						}
-						else
-						{
-							cd_message ("  l'inhibiteur est dans un sous-dock");
-							Icon *pPointingIcon = cairo_dock_search_icon_pointing_on_dock (pInhibhatorDock, NULL);
-							if (pPointingIcon != NULL)
-							{
-								cd_message ("    -> l'icone %s va aussi prendre un indicateur\n", pPointingIcon->acName);
-								pPointingIcon->bHasIndicator = TRUE;
-							}
-						}
 					}
 				}
 			}
@@ -315,9 +334,11 @@ gboolean cairo_dock_remove_icon_from_class (Icon *pInhibatorIcon)
 		if (pClassAppli->pIconsOfClass == NULL && pClassAppli->pAppliOfClass == NULL && ! pClassAppli->bUseXIcon)  // cette classe ne sert plus a rien.
 		{
 			cd_message ("  cette classe n'a plus d'interet");
-			g_hash_table_remove (s_hClassTable, pInhibatorIcon->cClass);
+			g_hash_table_remove (s_hClassTable, pInhibatorIcon->cClass);  // detruit pClassAppli.
+			bStillInhibated = FALSE;
 		}
-		bStillInhibated = (pClassAppli->pIconsOfClass != NULL);
+		else
+			bStillInhibated = (pClassAppli->pIconsOfClass != NULL);
 	}
 	return bStillInhibated;
 }
@@ -392,10 +413,13 @@ void cairo_dock_update_Xid_on_inhibators (Window Xid, const gchar *cClass)
 						cd_message ("  c'est %s qui va la remplacer", pSameClassIcon->acName);
 						CairoDock *pClassSubDock = cairo_dock_search_dock_from_name (pSameClassIcon->cParentDockName);
 						cairo_dock_detach_icon_from_dock (pSameClassIcon, pClassSubDock, FALSE);  // dans le cas ou elle etait dans le sous-dock de sa classe, detruit ce dernier s'il devient vide.
+						cairo_dock_update_dock_size (pClassSubDock);
+						
 					}
 				}
 				pIcon->Xid = iNextXid;
 				pIcon->bHasIndicator = (iNextXid != 0);
+				_cairo_dock_set_same_indicator_on_sub_dock (pIcon);
 				cd_message (" %s : bHasIndicator <- %d, Xid <- %d", pIcon->acName, pIcon->bHasIndicator, pIcon->Xid);
 			}
 		}
@@ -407,13 +431,14 @@ static void _cairo_dock_remove_all_applis_from_class (gchar *cClass, CairoDockCl
 	g_list_free (pClassAppli->pAppliOfClass);
 	pClassAppli->pAppliOfClass = NULL;
 	
-	Icon *pIcon;
+	Icon *pInhibatorIcon;
 	GList *pElement;
 	for (pElement = pClassAppli->pIconsOfClass; pElement != NULL; pElement = pElement->next)
 	{
-		pIcon = pElement->data;
-		pIcon->bHasIndicator = FALSE;
-		pIcon->Xid = 0;
+		pInhibatorIcon = pElement->data;
+		pInhibatorIcon->bHasIndicator = FALSE;
+		pInhibatorIcon->Xid = 0;
+		_cairo_dock_set_same_indicator_on_sub_dock (pInhibatorIcon);
 	}
 }
 void cairo_dock_remove_all_applis_from_class_table (void)

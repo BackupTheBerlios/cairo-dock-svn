@@ -16,7 +16,7 @@
 GHashTable *cairo_dock_list_themes (gchar *cThemesDir, GHashTable *hProvidedTable, GError **erreur);
 
 
-gchar *cairo_dock_edit_themes (GHashTable **hThemeTable);
+gchar *cairo_dock_edit_themes (GHashTable **hThemeTable, gboolean bSafeMode);
 
 
 gchar *cairo_dock_get_chosen_theme (gchar *cConfFile, gboolean *bUseThemeBehaviour, gboolean *bUseThemeLaunchers);
@@ -32,9 +32,9 @@ void cairo_dock_mark_theme_as_modified (gboolean bModified);
 gboolean cairo_dock_theme_need_save (void);
 
 
-int cairo_dock_ask_initial_theme (void);
+///int cairo_dock_ask_initial_theme (void);
 
-gboolean cairo_dock_manage_themes (GtkWidget *pWidget);
+gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode);
 
 #define cairo_dock_update_conf_file_with_themes(pOpenedKeyFile, cAppletConfFilePath, pThemeTable, cGroupName, cKeyName) cairo_dock_update_conf_file_with_hash_table (pOpenedKeyFile, cAppletConfFilePath, pThemeTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_theme_name, TRUE, FALSE)
 

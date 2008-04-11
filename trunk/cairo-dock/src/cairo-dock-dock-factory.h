@@ -7,17 +7,24 @@
 #include "cairo-dock-struct.h"
 
 /**
-*Teste si le container est un dock.
-*@param pContainer le container.
-*@return TRUE ssi le container a ete declare comme un dock.
+* Teste si le container est un dock.
+* @param pContainer le container.
+* @return TRUE ssi le container a ete declare comme un dock.
 */
 #define CAIRO_DOCK_IS_DOCK(pContainer) (pContainer != NULL && pContainer->iType == CAIRO_DOCK_TYPE_DOCK)
 /**
-*Caste un container en dock.
-*@param pContainer le container.
-*@return le dock.
+* Caste un container en dock.
+* @param pContainer le container.
+* @return le dock.
 */
 #define CAIRO_DOCK_DOCK(pContainer) ((CairoDock *)pContainer)
+
+/**
+* Retourne le zoom max des icones contenues dans un conteneur donne.
+* @param pContainer le container.
+* @return le facteur d'echelle max.
+*/
+#define cairo_dock_get_max_scale(pContainer) (CAIRO_DOCK_IS_DOCK (pContainer) ? (1 + g_fAmplitude) / CAIRO_DOCK_DOCK (pContainer)->fRatio : 1)
 
 /**
 * Cree un nouveau dock principal.

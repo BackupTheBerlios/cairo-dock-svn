@@ -192,16 +192,16 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 		
 		g_free (cIconPath);
 	}
-	else if (CAIRO_DOCK_IS_APPLI (icon))  // c'est l'icône d'une appli valide.
+	else if (CAIRO_DOCK_IS_APPLET (icon))  // c'est l'icône d'une applet.
+	{
+		icon->pIconBuffer = cairo_dock_create_applet_surface (icon->acFileName, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight, bApplySizeRestriction);
+	}
+	else if (CAIRO_DOCK_IS_APPLI (icon))  // c'est l'icône d'une appli valide. Dans cet ordre on n'a pas besoin de verifier que c'est NORMAL_APPLI.
 	{
 		if (g_bOverWriteXIcons && ! cairo_dock_class_is_using_xicon (icon->cClass))
 			icon->pIconBuffer = cairo_dock_create_surface_from_class (icon->cClass, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight);
 		if (icon->pIconBuffer == NULL)
 			icon->pIconBuffer = cairo_dock_create_surface_from_xwindow (icon->Xid, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight);
-	}
-	else if (CAIRO_DOCK_IS_APPLET (icon))  // c'est l'icône d'une applet.
-	{
-		icon->pIconBuffer = cairo_dock_create_applet_surface (icon->acFileName, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight, bApplySizeRestriction);
 	}
 	else  // c'est une icone de separation.
 	{
