@@ -21,6 +21,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-config.h"
 #include "cairo-dock-applications-manager.h"
 #include "cairo-dock-draw.h"
+#include "cairo-dock-load.h"
 #include "cairo-dock-class-manager.h"
 
 extern gboolean g_bUseSeparator;
@@ -61,10 +62,6 @@ static void _cairo_dock_list_appli_if_inhibated (Window *Xid, Icon *pIcon, gpoin
 const GList *cairo_dock_list_existing_appli_with_class (const gchar *cClass)
 {
 	g_return_val_if_fail (cClass != NULL, NULL);
-	/*GList *pList = NULL;
-	gpointer data[2] = {cClass, &pList};
-	g_hash_table_foreach (s_hXWindowTable, (GHFunc) _cairo_dock_list_appli_if_inhibated, data);
-	return pList;*/
 	
 	CairoDockClassAppli *pClassAppli = cairo_dock_find_class_appli (cClass);
 	return (pClassAppli != NULL ? pClassAppli->pAppliOfClass : NULL);
@@ -88,9 +85,6 @@ Window cairo_dock_detach_appli_of_class (const gchar *cClass)
 		CairoDockContainer *pContainer = cairo_dock_search_container_from_icon (pIcon);
 		if (CAIRO_DOCK_IS_DOCK (pContainer))
 		{
-			/*cairo_dock_remove_icon_from_dock (g_pMainDock, pIcon);  // on pourrait aussi choisir de la detacher pour ne pas avoir a la recreer plus tard.
-			cairo_dock_free_icon (pIcon);
-			pElement->data = NULL;*/
 			pParentDock = CAIRO_DOCK_DOCK (pContainer);
 			bDetached = cairo_dock_detach_icon_from_dock (pIcon, pParentDock, g_bUseSeparator);  // on la garde, elle pourra servir car elle contient l'Xid.
 			if (! pParentDock->bIsMainDock)
@@ -188,10 +182,28 @@ gboolean cairo_dock_set_class_use_xicon (const gchar *cClass, gboolean bUseXIcon
 	CairoDockClassAppli *pClassAppli = cairo_dock_get_class (cClass);
 	g_return_val_if_fail (pClassAppli!= NULL, FALSE);
 	
-	gboolean bStateChanged = (pClassAppli->bUseXIcon != bUseXIcon);
-	pClassAppli->bUseXIcon = bUseXIcon;
+	if (pClassAppli->bUseXIcon == bUseXIcon)  // rien a faire.
+		return FALSE;
 	
-	return bStateChanged;
+	GList *pElement;
+	Icon *pAppliIcon;
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (g_pMainDock));
+	for (pElement = pClassAppli->pAppliOfClass; pElement != NULL; pElement = pElement->next)
+	{
+		pAppliIcon = pElement->data;
+		if (bUseXIcon)
+		{
+			cd_message ("%s prend l'icone de X", pAppliIcon->acName);
+		}
+		else
+		{
+			cd_message ("%s n'utilise plus l'icone de X", pAppliIcon->acName);
+		}
+		cairo_dock_fill_one_icon_buffer (pAppliIcon, pCairoContext, (1 + g_fAmplitude), g_pMainDock->bHorizontalDock, TRUE);
+	}
+	cairo_destroy (pCairoContext);
+	
+	return TRUE;
 }
 
 gboolean cairo_dock_inhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
@@ -463,6 +475,7 @@ cairo_surface_t *cairo_dock_create_surface_from_class (gchar *cClass, cairo_t *p
 	return NULL;
 }
 
+
 void cairo_dock_update_visibility_on_inhibators (gchar *cClass, Window Xid, gboolean bIsHidden)
 {
 	CairoDockClassAppli *pClassAppli = cairo_dock_get_class (cClass);
@@ -478,12 +491,34 @@ void cairo_dock_update_visibility_on_inhibators (gchar *cClass, Window Xid, gboo
 			{
 				cd_message (" %s aussi se %s", pInhibatorIcon->acName, (bIsHidden ? "cache" : "montre"));
 				pInhibatorIcon->bIsHidden = bIsHidden;
-				 if (! CAIRO_DOCK_IS_APPLET (pInhibatorIcon) && g_fVisibleAppliAlpha != 0)
+				if (! CAIRO_DOCK_IS_APPLET (pInhibatorIcon) && g_fVisibleAppliAlpha != 0)
 				{
 					CairoDock *pInhibhatorDock = cairo_dock_search_dock_from_name (pInhibatorIcon->cParentDockName);
 					pInhibatorIcon->fAlpha = 1;  // on triche un peu.
 					cairo_dock_redraw_my_icon (pInhibatorIcon, CAIRO_DOCK_CONTAINER (pInhibhatorDock));
 				}
+			}
+		}
+	}
+}
+
+void cairo_dock_update_activity_on_inhibators (gchar *cClass, Window Xid)
+{
+	CairoDockClassAppli *pClassAppli = cairo_dock_get_class (cClass);
+	if (pClassAppli != NULL)
+	{
+		GList *pElement;
+		Icon *pInhibatorIcon;
+		for (pElement = pClassAppli->pIconsOfClass; pElement != NULL; pElement = pElement->next)
+		{
+			pInhibatorIcon = pElement->data;
+			
+			if (pInhibatorIcon->Xid == Xid)
+			{
+				cd_message (" %s aussi devient active", pInhibatorIcon->acName);
+				CairoDock *pParentDock = cairo_dock_search_dock_from_name (pInhibatorIcon->cParentDockName);
+				if (pParentDock != NULL)
+					cairo_dock_animate_icon_on_active (pInhibatorIcon, pParentDock);
 			}
 		}
 	}

@@ -2260,21 +2260,26 @@ msgstr "Fichier image à utiliser pour les indicateurs :"
 
 #: ../data/messages:65
 msgid ""
-"Allow launchers to act as applis when their program has been launched, and "
-"displaying an indicator on their icon to signal it. You can launch other "
+"Allows launchers to act as applis when their program has been launched, and "
+"displays an indicator on their icon to signal it. You can launch other "
 "occurences of the program with SHIFT+click."
 msgstr ""
+"Permet aux lanceurs de se comporter comme des applis quand leur programme a "
+"été lancé, and afficheun indicateur sur leur icône pour le signaler. Vous "
+"pouvez lancer d'autres occurrences du programme avec SHIFT+clic."
 
 #: ../data/messages:67
 msgid "Mix launchers and applis ?"
-msgstr ""
+msgstr "Mélanger les lanceurs et les applis ?"
 
 #: ../data/messages:363
 msgid ""
 "The ratio between indicator's size and icon's size. The bigger, the bigger "
 "the indicators are."
 msgstr ""
+"Le ratio entre la taille des indicateurs et celle des icônes de lanceurs. "
+"Plus c'est élevé, plus les indicateurs sont gros."
 
 #: ../data/messages:365
 msgid "Indicator size ratio :"
-msgstr ""
+msgstr "Ratio sur la taille des indicateurs :"

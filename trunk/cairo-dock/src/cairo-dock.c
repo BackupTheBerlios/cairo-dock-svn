@@ -235,6 +235,7 @@ gboolean g_bShowHiddenFiles;
 cairo_surface_t *g_pIndicatorSurface = NULL;
 gboolean g_bMixLauncherAppli = FALSE;
 double g_fIndicatorRatio;
+gboolean g_bOverWriteXIcons = TRUE;
 
 static gboolean random_dialog (gpointer user_data)
 {

@@ -27,6 +27,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 
 typedef struct _CairoDockRenderer CairoDockRenderer;
 typedef struct _CairoDockDeskletRenderer CairoDockDeskletRenderer;
+typedef struct _CairoDockDialogRenderer CairoDockDialogRenderer;
 
 typedef struct _Icon Icon;
 typedef struct _CairoDockContainer CairoDockContainer;
@@ -323,6 +324,14 @@ struct _CairoDockMinimalAppletConfig {
 
 
 typedef void (* CairoDockActionOnAnswerFunc) (int iAnswer, GtkWidget *pWidget, gpointer data);
+typedef void (* CairoDockDialogRenderFunc) (cairo_t *pCairoContext, CairoDockDialog *pDialog, gboolean bRenderOptimized);
+typedef gpointer (* CairoDockDialogLoadRendererFunc) (CairoDockDialog *pDialog, cairo_t *pSourceContext, gpointer *pConfig);
+typedef void (* CairoDockDialogFreeRendererDataFunc) (CairoDockDialog *pDesklet);
+struct _CairoDockDialogRenderer {
+	CairoDockDialogRenderFunc render;
+	CairoDockDialogLoadRendererFunc load_data;
+	CairoDockDialogFreeRendererDataFunc free_data;
+};
 
 struct _CairoDockDialog {
 	/// type de container.
@@ -348,6 +357,10 @@ struct _CairoDockDialog {
 #else
 	gpointer padding[3];
 #endif // HAVE_GLITZ
+	/// le moteur de rendu utilise pour dessiner le dialogue.
+	CairoDockDialogRenderer *pRenderer;
+	/// donnees pouvant etre utilisees par le moteur de rendu.
+	gpointer pRendererData;
 	/// position en X visee par la pointe dans le référentiel de l'écran.
 	int iAimedX;
 	/// position en Y visee par la pointe dans le référentiel de l'écran.
@@ -536,7 +549,7 @@ struct _Icon {
 	double fQuickInfoXOffset;
 	/// Decalage en Y de la surface de l'info rapide.
 	double fQuickInfoYOffset;
-	
+	/// TRUE ssi l'icone a un indicateur (elle controle une appli).
 	gboolean bHasIndicator;
 };
 
@@ -629,6 +642,10 @@ struct _CairoDockDesklet {
 #else
 	gpointer padding[3];
 #endif // HAVE_GLITZ
+	/// le moteur de rendu utilise pour dessiner le desklet.
+	CairoDockDeskletRenderer *pRenderer;
+	/// donnees pouvant etre utilisees par le moteur de rendu.
+	gpointer pRendererData;
 	/// Liste eventuelle d'icones placees sur le desklet, et susceptibles de recevoir des clics.
 	GList *icons;
 	/// pour le deplacement manuel de la fenetre.
@@ -640,14 +657,10 @@ struct _CairoDockDesklet {
 	gint iSidWritePosition;
 	/// un timer pour retarder l'ecriture dans le fichier lors des redimensionnements.
 	gint iSidWriteSize;
-	/// compeur pour le fondu lors de l'entree dans le desklet.
+	/// compteur pour le fondu lors de l'entree dans le desklet.
 	gint iGradationCount;
 	/// timer associe.
 	gint iSidGradationOnEnter;
-	/// le moteur de rendu utilise pour dessiner se desklet.
-	CairoDockDeskletRenderer *pRenderer;
-	/// donnees pouvant etre utilisees par le moteur de rendu.
-	gpointer pRendererData;
 };
 
 

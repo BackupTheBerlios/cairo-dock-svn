@@ -30,6 +30,7 @@ void cairo_dock_reset_class_table (void);
 cairo_surface_t *cairo_dock_create_surface_from_class (gchar *cClass, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight);
 
 void cairo_dock_update_visibility_on_inhibators (gchar *cClass, Window Xid, gboolean bIsHidden);
+void cairo_dock_update_activity_on_inhibators (gchar *cClass, Window Xid);
 
 
 #endif

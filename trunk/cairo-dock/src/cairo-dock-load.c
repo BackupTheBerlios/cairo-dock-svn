@@ -78,6 +78,7 @@ extern unsigned int g_iAppliMaxNameLength;
 
 extern int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconAuthorizedHeight[CAIRO_DOCK_NB_TYPES];
+extern gboolean g_bOverWriteXIcons;
 
 extern gboolean g_bUseGlitz;
 
@@ -193,7 +194,8 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	}
 	else if (CAIRO_DOCK_IS_APPLI (icon))  // c'est l'icône d'une appli valide.
 	{
-		icon->pIconBuffer = cairo_dock_create_surface_from_class (icon->cClass, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight);
+		if (g_bOverWriteXIcons && ! cairo_dock_class_is_using_xicon (icon->cClass))
+			icon->pIconBuffer = cairo_dock_create_surface_from_class (icon->cClass, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight);
 		if (icon->pIconBuffer == NULL)
 			icon->pIconBuffer = cairo_dock_create_surface_from_xwindow (icon->Xid, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight);
 	}

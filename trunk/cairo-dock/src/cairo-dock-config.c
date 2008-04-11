@@ -32,6 +32,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-keybinder.h"
 #include "cairo-dock-dock-manager.h"
 #include "cairo-dock-surface-factory.h"
+#include "cairo-dock-class-manager.h"
 #include "cairo-dock-config.h"
 
 #define CAIRO_DOCK_TYPE_CONF_FILE_FILE ".cairo-dock-conf-file"
@@ -166,7 +167,9 @@ extern gchar *g_cRaiseDockShortcut;
 extern cairo_surface_t *g_pIndicatorSurface;
 extern gboolean g_bMixLauncherAppli;
 extern double g_fIndicatorRatio;
+extern gboolean g_bOverWriteXIcons;
 
+static gchar **g_cUseXIconAppliList = NULL;
 static gboolean s_bLoading = FALSE;
 
 /**
@@ -930,7 +933,39 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_fIndicatorRatio = cairo_dock_get_double_key_value (pKeyFile, "Icons", "indicator ratio", &bFlushConfFileNeeded, 1., NULL, NULL);
 	
 	gboolean bMixLauncherAppliOld = g_bMixLauncherAppli;
-	g_bMixLauncherAppli = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "mix launcher appli", &bFlushConfFileNeeded, TRUE, "Applications", NULL);
+	g_bMixLauncherAppli = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "mix launcher appli", &bFlushConfFileNeeded, TRUE, NULL, NULL);
+	
+	length = 0;
+	guint i, j;
+	/**gchar **cUseXIconAppliListNew = cairo_dock_get_string_list_key_value (pKeyFile, "TaskBar", "use xicon", &bFlushConfFileNeeded, &length, NULL, NULL, NULL);
+	if (cUseXIconAppliListNew != NULL)
+	{
+		for (i = 0; cUseXIconAppliListNew[i] != NULL; i ++)
+		{
+			cairo_dock_set_class_use_xicon (cUseXIconAppliListNew[i], TRUE);
+		}
+	}
+	if (g_cUseXIconAppliList != NULL)
+	{
+		for (i = 0; g_cUseXIconAppliList[i] != NULL; i ++)
+		{
+			if (cUseXIconAppliListNew != NULL)
+			{
+				for (j = 0; cUseXIconAppliListNew[j] != NULL; j ++)
+				{
+					if (strcmp (g_cUseXIconAppliList[i], cUseXIconAppliListNew[j]) == 0)
+						break ;
+				}
+			}
+			if (cUseXIconAppliListNew == NULL || cUseXIconAppliListNew[j] == NULL)  // pas trouve.
+				cairo_dock_set_class_use_xicon (g_cUseXIconAppliList[i], FALSE);
+		}
+		g_strfreev (g_cUseXIconAppliList);
+	}
+	g_cUseXIconAppliList = cUseXIconAppliListNew;*/
+	
+	gboolean bOverWriteXIconsOld = g_bOverWriteXIcons;
+	g_bOverWriteXIcons = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "overwrite xicon", &bFlushConfFileNeeded, TRUE, NULL, NULL);
 	
 	
 	//\___________________ On recupere les parametres des applets.
@@ -946,7 +981,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	int iNbModules = cairo_dock_get_nb_modules ();
 	gchar **cActiveModuleList = g_new0 (gchar *, iNbModules + 1), **cActiveModuleList_n;  // +1 pour le NULL terminal.
 	GString *sKeyName = g_string_new ("");
-	guint i, iNbActiveModules=0;
+	guint iNbActiveModules=0;
 	for (i = 0; i < CAIRO_DOCK_NB_CATEGORY; i ++)
 	{
 		g_string_printf (sKeyName, "%s_%d", "modules", i);
@@ -1098,7 +1133,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_fReflectSize *= fFieldDepth;
 	cd_debug ("  g_fReflectSize : %.2f pixels\n", g_fReflectSize);
 	
-	if (bUniquePidOld != g_bUniquePid || bGroupAppliByClassOld != g_bGroupAppliByClass || bHideVisibleApplisOld != g_bHideVisibleApplis || bAppliOnCurrentDesktopOnlyOld != g_bAppliOnCurrentDesktopOnly || (bMixLauncherAppliOld != g_bMixLauncherAppli) || (cairo_dock_application_manager_is_running () && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
+	if (bUniquePidOld != g_bUniquePid || bGroupAppliByClassOld != g_bGroupAppliByClass || bHideVisibleApplisOld != g_bHideVisibleApplis || bAppliOnCurrentDesktopOnlyOld != g_bAppliOnCurrentDesktopOnly || (bMixLauncherAppliOld != g_bMixLauncherAppli) || (bOverWriteXIconsOld != g_bOverWriteXIcons) || (cairo_dock_application_manager_is_running () && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
 	{
 		cairo_dock_stop_application_manager ();
 	}

@@ -138,7 +138,9 @@ static gboolean _cairo_dock_delete_one_appli (Window *pXid, Icon *pIcon, gpointe
 	if (pDock != NULL)
 	{
 		cairo_dock_detach_icon_from_dock (pIcon, pDock, g_bUseSeparator);
-		if (! pDock->bIsMainDock)
+		if (pDock->icons == NULL)
+			cairo_dock_destroy_dock (pDock, pIcon->cParentDockName, NULL, NULL);
+		else if (! pDock->bIsMainDock)
 			cairo_dock_update_dock_size (pDock);
 	}
 	
@@ -592,6 +594,19 @@ gboolean cairo_dock_window_is_on_current_desktop (int Xid)
 	return cairo_dock_window_is_on_this_desktop (Xid, iDesktopNumber);
 }
 
+
+void cairo_dock_animate_icon_on_active (Icon *icon, CairoDock *pParentDock)
+{
+	if ((icon->iCount == 0 || icon->iCount > 1e5) && icon->fPersonnalScale == 0)  // sinon on laisse l'animation actuelle.
+	{
+		if (cairo_dock_animation_will_be_visible (pParentDock) && ! pParentDock->bInside && g_bAnimateOnActiveWindow)
+		{
+			cairo_dock_arm_animation (icon, CAIRO_DOCK_WOBBLY, 1);  // un clignotement. il faut choisir une animation qui ne necessite pas que la fenetre du dock soit de taille maximale.
+			cairo_dock_start_animation (icon, pParentDock);
+		}
+	}
+}
+
 static void _cairo_dock_hide_show_windows_on_other_desktops (Window *Xid, Icon *icon, int *pCurrentDesktop)
 {
 	g_return_if_fail (Xid != NULL && pCurrentDesktop != NULL);
@@ -664,17 +679,16 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 						if (icon != NULL)
 						{
 							cd_message ("%s devient active", icon->acName);
-							if ((icon->iCount == 0 || icon->iCount > 1e5) && icon->fPersonnalScale == 0)  // sinon on laisse l'animation actuelle.
+							CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+							if (pParentDock == NULL)  // elle est inhibee.
 							{
-								CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
-								if (pParentDock == NULL)
-									pParentDock = pDock;
-								if (cairo_dock_animation_will_be_visible (pParentDock) && ! pParentDock->bInside && g_bAnimateOnActiveWindow)
-								{
-									cairo_dock_arm_animation (icon, CAIRO_DOCK_WOBBLY, 1);  // un clignotement. il faut choisir une animation qui ne necessite pas que la fenetre du dock soit de taille maximale.
-									cairo_dock_start_animation (icon, pParentDock);
-								}
+								cairo_dock_update_activity_on_inhibators (icon->cClass, icon->Xid);
 							}
+							else
+							{
+								cairo_dock_animate_icon_on_active (icon, pParentDock);
+							}
+							
 						}
 						cairo_dock_notify (CAIRO_DOCK_WINDOW_ACTIVATED, &XActiveWindow);
 					}
@@ -875,7 +889,6 @@ CairoDock *cairo_dock_insert_appli_in_dock (Icon *icon, CairoDock *pMainDock, gb
 	if (bAnimate && cairo_dock_animation_will_be_visible (pParentDock))
 	{
 		cairo_dock_start_animation (icon, pParentDock);
-		///return NULL;
 	}
 	else
 	{
@@ -1041,7 +1054,6 @@ void cairo_dock_stop_application_manager (void)
 {
 	cairo_dock_pause_application_manager ();
 	
-	///cairo_dock_reset_class_table ();  // enleve aussi les indicateurs.
 	cairo_dock_remove_all_applis_from_class_table ();  // enleve aussi les indicateurs.
 	
 	cairo_dock_reset_appli_table ();

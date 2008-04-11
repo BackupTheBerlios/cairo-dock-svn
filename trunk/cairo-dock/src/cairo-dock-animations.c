@@ -336,7 +336,6 @@ void cairo_dock_arm_animation (Icon *icon, CairoDockAnimationType iAnimationType
 	if (icon->iAnimationType == CAIRO_DOCK_RANDOM)
 		icon->iAnimationType = g_random_int_range (0, CAIRO_DOCK_NB_ANIMATIONS-1);  // [a;b[
 
-
 	if (iNbRounds == -1)
 		iNbRounds = g_tNbAnimationRounds[iType];
 	icon->iCount = MAX (0, g_tNbIterInOneRound[icon->iAnimationType] * iNbRounds - 1);
