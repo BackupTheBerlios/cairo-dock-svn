@@ -69,6 +69,7 @@ extern double g_fAlbedo;
 extern gboolean g_bConstantSeparatorSize;
 extern cairo_surface_t *g_pIndicatorSurface;
 extern double g_fIndicatorRatio;
+extern double g_fIndicatorWidth, g_fIndicatorHeight;
 
 extern gboolean g_bUseGlitz;
 
@@ -540,12 +541,12 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		cairo_save (pCairoContext);
 		if (bHorizontalDock)
 		{
-			cairo_translate (pCairoContext, icon->fDrawX + (1 - g_fIndicatorRatio) * icon->fWidth * icon->fScale / (1 + g_fAmplitude), icon->fDrawY + (1 - g_fIndicatorRatio) * icon->fHeight* icon->fScale);
+			cairo_translate (pCairoContext, icon->fDrawX + (icon->fWidth - g_fIndicatorWidth) * icon->fScale / (1 + g_fAmplitude), icon->fDrawY + (icon->fHeight - g_fIndicatorHeight) * icon->fScale);
 			cairo_scale (pCairoContext, fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude));
 		}
 		else
 		{
-			cairo_translate (pCairoContext, icon->fDrawY, icon->fDrawX);
+			cairo_translate (pCairoContext, icon->fDrawY + (icon->fHeight - g_fIndicatorHeight) * icon->fScale, icon->fDrawX + (icon->fWidth - g_fIndicatorWidth) * icon->fScale / (1 + g_fAmplitude));
 			cairo_scale (pCairoContext, fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude));
 		}
 		cairo_set_source_surface (pCairoContext, g_pIndicatorSurface, 0.0, 0.0);

@@ -345,10 +345,13 @@ gboolean cairo_dock_remove_icon_from_class (Icon *pInhibatorIcon)
 
 void cairo_dock_deinhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
 {
+	cd_message ("%s (%s)", __func__, cClass);
 	gboolean bStillInhibated = cairo_dock_remove_icon_from_class (pInhibatorIcon);
-	
 	cd_debug ("bStillInhibated : %d", bStillInhibated);
-	if (! bStillInhibated)
+	if (! bStillInhibated)  // il n'y a plus personne das cette classe.
+		return ;
+	
+	if (pInhibatorIcon == NULL || pInhibatorIcon->Xid != 0)
 	{
 		const GList *pList = cairo_dock_list_existing_appli_with_class (cClass);
 		Icon *pIcon;
@@ -358,16 +361,20 @@ void cairo_dock_deinhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
 		for (pElement = pList; pElement != NULL; pElement = pElement->next)
 		{
 			pIcon = pElement->data;
-			cd_message ("rajout de l'icone precedemment inhibee (Xid:%d)", pIcon->Xid);
-			pIcon->fPersonnalScale = 0;
-			pIcon->fScale = 1.;
-			pParentDock = cairo_dock_insert_appli_in_dock (pIcon, g_pMainDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON);
-			bNeedsRedraw = (pParentDock != NULL && pParentDock->bIsMainDock);
+			if (pInhibatorIcon == NULL || pIcon->Xid == pInhibatorIcon->Xid)
+			{
+				cd_message ("rajout de l'icone precedemment inhibee (Xid:%d)", pIcon->Xid);
+				pIcon->fPersonnalScale = 0;
+				pIcon->fScale = 1.;
+				pParentDock = cairo_dock_insert_appli_in_dock (pIcon, g_pMainDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON);
+				bNeedsRedraw = (pParentDock != NULL && pParentDock->bIsMainDock);
+				if (pInhibatorIcon != NULL)
+					break ;
+			}
 		}
 		if (bNeedsRedraw)
 			gtk_widget_queue_draw (g_pMainDock->pWidget);  /// pDock->calculate_icons (pDock); ?...
 	}
-	
 	if (pInhibatorIcon != NULL)
 	{
 		cd_message (" l'inhibiteur a perdu toute sa mana");

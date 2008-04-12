@@ -235,6 +235,7 @@ gboolean g_bShowHiddenFiles;
 cairo_surface_t *g_pIndicatorSurface = NULL;
 gboolean g_bMixLauncherAppli = FALSE;
 double g_fIndicatorRatio;
+double g_fIndicatorWidth, g_fIndicatorHeight;
 gboolean g_bOverWriteXIcons = TRUE;
 
 static gboolean random_dialog (gpointer user_data)
@@ -283,7 +284,7 @@ main (int argc, char** argv)
 	GError *erreur = NULL;
 
 	//\___________________ On recupere quelques options.
-	gboolean bDialogTest = FALSE, bSafeMode = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE;
+	gboolean bDialogTest = FALSE, bSafeMode = FALSE, bMaintenance = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE;
 	gchar *cEnvironment = NULL, *cUserDefinedDataDir = NULL, *cVerbosity = 0, *cUserDefinedModuleDir = NULL;
 	GOptionEntry TableDesOptions[] =
 	{
@@ -317,9 +318,12 @@ main (int argc, char** argv)
 		{"dir", 'd', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
 			&cUserDefinedDataDir,
 			"force the dock to load this directory, instead of ~/.cairo-dock.", NULL},
-		{"safe-mode", 's', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+		{"maintenance", 'm', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&bMaintenance,
+			"allow to edit the config before the dock is started and show the config panel on start", NULL},
+		{"safe-mode", 'f', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&bSafeMode,
-			"don't load any plug-ins", NULL},
+			"don't load any plug-ins and show the theme manager on start", NULL},
 		{"dialog", 'D', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&bDialogTest,
 			"for test on dialogs only", NULL},
@@ -335,7 +339,7 @@ main (int argc, char** argv)
 		{"version", 'v', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&bPrintVersion,
 			"print version and quit.", NULL},
-		{"modules-dir", 'm', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
+		{"modules-dir", 'M', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
 			&cUserDefinedModuleDir,
 			"ask the dock to load additionnal modules contained in this directory (Though it is unsafe for your dock to load unnofficial modules).", NULL},
 		{NULL}
@@ -463,14 +467,15 @@ main (int argc, char** argv)
 	if (!g_thread_supported ())
 		g_thread_init (NULL);
 	
-	//\___________________ initialise the keybinder
-	cd_keybinder_init();
-
 	//\___________________ On initialise le support de X.
 	cairo_dock_initialize_X_support ();
 	
+	//\___________________ initialise the keybinder
+	cd_keybinder_init();
+	
 	//\___________________ On initialise le support de DBus.
-	cairo_dock_initialize_dbus_manager ();
+	if (! bSafeMode)
+		cairo_dock_initialize_dbus_manager ();
 	
 	//\___________________ On detecte l'environnement de bureau (apres les applis et avant les modules).
 	if (g_iDesktopEnv == CAIRO_DOCK_UNKNOWN_ENV)
@@ -500,6 +505,12 @@ main (int argc, char** argv)
 	//\___________________ On charge le dernier theme ou on demande a l'utilisateur d'en choisir un.
 	g_cConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
 	g_cEasyConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_EASY_CONF_FILE);
+	
+	gboolean config_ok;
+	if (bMaintenance)
+		config_ok = cairo_dock_edit_conf_file (NULL, g_cConfFile, _("< Maintenance mode >"), 800, 600, 0, NULL, NULL, NULL, NULL, NULL);
+		//cairo_dock_edit_conf_file_full (NULL, g_cConfFile, "< Maintenance mode >", 800, 600, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL, cairo_dock_read_easy_conf_file, g_cEasyConfFile, _("Easy Mode"), _("Advanced mode"), NULL);
+	
 	if (! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS) || bSafeMode)
 	{
 		if (! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS))

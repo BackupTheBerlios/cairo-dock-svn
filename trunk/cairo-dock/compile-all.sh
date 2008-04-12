@@ -66,9 +66,9 @@ find . -name potfiles.in -execdir mv potfiles.in POTFILES.in \;
 
 
 cd $CAIRO_DOCK_DIR/cairo-dock
-echo "*****************************"
+echo "*********************************"
 echo "* Compilation of cairo-dock ... *"
-echo "*****************************"
+echo "*********************************"
 if test "$CAIRO_DOCK_CLEAN" = "1"; then
 	rm -f config.* configure configure.lineno intltool-extract intltool-merge intltool-update libtool ltmain.sh Makefile.in Makefile aclocal.m4 install-sh install depcomp missing compile cairo-dock.pc stamp-h1 cairo-dock.conf 
 	rm -rf autom4te.cache src/.deps src/.libs src/Makefile src/Makefile.in po/Makefile po/Makefile.in po/*.gmo src/*.o src/*.lo src/*.la
@@ -126,9 +126,9 @@ fi
 cd ..
 if test "$CAIRO_DOCK_THEMES" = "1"; then
 	cd $CAIRO_DOCK_DIR/themes
-	echo "***************************"
+	echo "*****************************"
 	echo "* Compilation of themes ... *"
-	echo "***************************"
+	echo "*****************************"
 	if test "$CAIRO_DOCK_CLEAN" = "1"; then
 		rm -f config.* configure configure.lineno intltool-extract intltool-merge intltool-update libtool ltmain.sh Makefile.in Makefile aclocal.m4 install-sh install depcomp missing compile stamp-h1
 		rm -rf autom4te.cache
@@ -184,9 +184,9 @@ do
 	if test -d $plugin; then
 		cd $plugin
 		if test -e Makefile.am -a "$plugin" != "$CAIRO_DOCK_EXCLUDE"; then
-			echo "**********************************"
+			echo "************************************"
 			echo "* Compilation of module $plugin ... *"
-			echo "**********************************"
+			echo "************************************"
 			if test "$CAIRO_DOCK_CLEAN" = "1"; then
 				rm -f config.* configure configure.lineno intltool-extract intltool-merge intltool-update libtool ltmain.sh Makefile.in Makefile aclocal.m4 missing stamp-h1 depcomp compile
 				rm -rf autom4te.cache src/.deps src/.libs src/Makefile src/Makefile.in po/Makefile po/Makefile.in po/*.gmo src/*.o src/*.lo src/*.la

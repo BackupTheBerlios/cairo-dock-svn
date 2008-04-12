@@ -66,10 +66,9 @@ static void cairo_dock_edit_and_reload_conf (GtkMenuItem *menu_item, gpointer *d
 	cairo_dock_build_easy_conf_file (g_cConfFile, g_cEasyConfFile);
 
 	if (cairo_dock_use_full_conf_file ())
-		cairo_dock_edit_conf_file_full (GTK_WINDOW (pDock->pWidget), g_cConfFile, "Configuration of Cairo-Dock", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL, cairo_dock_read_easy_conf_file, g_cEasyConfFile, _("Well, maybe not ..."), _("Do you want to know more ?"), NULL);
+		cairo_dock_edit_conf_file_full (GTK_WINDOW (pDock->pWidget), g_cConfFile, "Configuration of Cairo-Dock", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL, cairo_dock_read_easy_conf_file, g_cEasyConfFile, _("Easy Mode"), _("Advanced mode"), NULL);
 	else
-		cairo_dock_edit_conf_file_full (GTK_WINDOW (pDock->pWidget), g_cEasyConfFile, "Configuration of Cairo-Dock", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_easy_conf_file, g_pMainDock, NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_cConfFile, _("Do you want to know more ?"), _("Well, maybe not ..."), NULL);
-
+		cairo_dock_edit_conf_file_full (GTK_WINDOW (pDock->pWidget), g_cEasyConfFile, "Configuration of Cairo-Dock", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_easy_conf_file, g_pMainDock, NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_cConfFile, _("Advanced mode"), _("Easy Mode"), NULL);
 }
 
 static void cairo_dock_initiate_theme_management (GtkMenuItem *menu_item, gpointer *data)
@@ -190,7 +189,7 @@ gboolean cairo_dock_notification_remove_icon (gpointer *data)
 	if (icon->pSubDock != NULL)
 	{
 		gboolean bDestroyIcons = TRUE;
-		if (! CAIRO_DOCK_IS_URI_LAUNCHER (icon) && icon->pSubDock->icons != NULL)  // alors on propose de repartir les icones de son sous-dock dans le dock principal.
+		if (! CAIRO_DOCK_IS_URI_LAUNCHER (icon) && ! CAIRO_DOCK_IS_APPLI (icon) && icon->pSubDock->icons != NULL)  // alors on propose de repartir les icones de son sous-dock dans le dock principal.
 		{
 			int answer = cairo_dock_ask_question_and_wait (_("Do you want to re-dispatch the icons contained inside this container into the dock ?\n (otherwise they will be destroyed)"), icon, CAIRO_DOCK_CONTAINER (pDock));
 			g_return_val_if_fail (answer != GTK_RESPONSE_NONE, CAIRO_DOCK_LET_PASS_NOTIFICATION);
@@ -634,17 +633,6 @@ static void _cairo_dock_rename_file (GtkMenuItem *menu_item, gpointer *data)
 
 
 
-
-static void cairo_dock_initiate_config_module_from_module (GtkMenuItem *menu_item, CairoDockModule *pModule)
-{
-	GError *erreur = NULL;
-	cairo_dock_configure_module (GTK_WINDOW (g_pMainDock->pWidget), pModule, g_pMainDock, &erreur);
-	if (erreur != NULL)
-	{
-		cd_warning ("Attention : %s", erreur->message);
-		g_error_free (erreur);
-	}
-}
 static void cairo_dock_initiate_config_module (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
@@ -653,7 +641,7 @@ static void cairo_dock_initiate_config_module (GtkMenuItem *menu_item, gpointer 
 		icon = (CAIRO_DOCK_DESKLET (pContainer))->pIcon;  // l'icone cliquee du desklet n'est pas forcement celle qui contient le module !
 	
 	GError *erreur = NULL;
-	cairo_dock_configure_module (GTK_WINDOW (pContainer->pWidget), icon->pModule, g_pMainDock, &erreur);
+	cairo_dock_configure_module (GTK_WINDOW (pContainer->pWidget), icon->pModule, &erreur);
 	if (erreur != NULL)
 	{
 		cd_warning ("Attention : %s", erreur->message);

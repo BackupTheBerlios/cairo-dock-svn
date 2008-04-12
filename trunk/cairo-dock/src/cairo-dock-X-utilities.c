@@ -125,6 +125,10 @@ const Display *cairo_dock_get_Xdisplay (void)
 	return s_XDisplay;
 }
 
+guint cairo_dock_get_root_id (void)
+{
+	return DefaultRootWindow (s_XDisplay);
+}
 
 
 gulong cairo_dock_get_xwindow_timestamp (Window Xid)

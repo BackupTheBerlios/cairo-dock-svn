@@ -168,7 +168,7 @@ extern cairo_surface_t *g_pIndicatorSurface;
 extern gboolean g_bMixLauncherAppli;
 extern double g_fIndicatorRatio;
 extern gboolean g_bOverWriteXIcons;
-double g_fIndicatorWidth, g_fIndicatorHeight;
+extern double g_fIndicatorWidth, g_fIndicatorHeight;
 
 static gchar **g_cUseXIconAppliList = NULL;
 static gboolean s_bLoading = FALSE;

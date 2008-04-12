@@ -38,7 +38,7 @@ void cairo_dock_deactivate_all_modules (void);
 void cairo_dock_activate_module_and_load (gchar *cModuleName);
 void cairo_dock_deactivate_module_and_unload (gchar *cModuleName);
 
-void cairo_dock_configure_module (GtkWindow *pParentWindow, CairoDockModule *module, CairoDock *pDock, GError **erreur);
+void cairo_dock_configure_module (GtkWindow *pParentWindow, CairoDockModule *module, GError **erreur);
 
 
 Icon *cairo_dock_find_icon_from_module (CairoDockModule *module, CairoDockContainer *pContainer);

@@ -436,6 +436,12 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 		}
 	}
 	
+	if (pDock == NULL)
+	{
+		module->bActive = TRUE;
+		return NULL;
+	}
+	
 	//\____________________ On cree le container de l'applet, ainsi que son icone.
 	CairoDockContainer *pContainer = NULL;
 	Icon *pIcon = NULL;
@@ -672,22 +678,25 @@ void cairo_dock_deactivate_all_modules (void)
 
 void cairo_dock_activate_module_and_load (gchar *cModuleName)
 {
+	if (g_pMainDock == NULL)
+		return ;
 	gchar *list[2] = {cModuleName, NULL};
 	cairo_dock_activate_modules_from_list (list, g_pMainDock, 0);
 	
 	CairoDockModule *pModule = cairo_dock_find_module_from_name (cModuleName);
-	if (CAIRO_DOCK_IS_DOCK (pModule->pContainer))
+	if (pModule != NULL && CAIRO_DOCK_IS_DOCK (pModule->pContainer))
 	{
 		CairoDock *pDock = CAIRO_DOCK_DOCK (pModule->pContainer);
 		cairo_dock_update_dock_size (pDock);
 		gtk_widget_queue_draw (pDock->pWidget);
 	}
 	
-	///cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, g_pMainDock->icons);
 	cairo_dock_update_conf_file_with_active_modules2 (NULL, g_cConfFile);
 }
 void cairo_dock_deactivate_module_and_unload (gchar *cModuleName)
 {
+	if (g_pMainDock == NULL)
+		return ;
 	CairoDockModule *pModule = cairo_dock_find_module_from_name (cModuleName);
 	Icon *pIcon = cairo_dock_find_icon_from_module (pModule, pModule->pContainer);
 	
@@ -722,7 +731,7 @@ static void _cairo_dock_configure_module_callback (gchar *cConfFile, gpointer *d
 	gboolean bReloadAppletConf = GPOINTER_TO_INT (data[1]);
 	cairo_dock_reload_module (module, bReloadAppletConf);
 }
-void cairo_dock_configure_module (GtkWindow *pParentWindow, CairoDockModule *module, CairoDock *pDock, GError **erreur)
+void cairo_dock_configure_module (GtkWindow *pParentWindow, CairoDockModule *module, GError **erreur)
 {
 	g_return_if_fail (module != NULL);
 	//g_print ("%s (%s)\n", __func__, module->cConfFilePath);

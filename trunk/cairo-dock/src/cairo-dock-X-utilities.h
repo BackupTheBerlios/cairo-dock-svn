@@ -9,6 +9,7 @@ void cairo_dock_initialize_X_support (void);
 
 const Display *cairo_dock_get_Xdisplay (void);
 
+guint cairo_dock_get_root_id (void);
 
 gulong cairo_dock_get_xwindow_timestamp (Window Xid);
 void cairo_dock_set_xwindow_timestamp (Window Xid, gulong iTimeStamp);

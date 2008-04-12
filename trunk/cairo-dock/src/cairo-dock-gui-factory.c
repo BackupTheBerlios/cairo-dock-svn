@@ -22,8 +22,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #define CAIRO_DOCK_TAB_ICON_SIZE 32
 #define CAIRO_DOCK_FRAME_ICON_SIZE 24
 
-extern CairoDock *g_pMainDock;
-
 typedef enum {
 	CAIRO_DOCK_MODEL_NAME = 0,
 	CAIRO_DOCK_MODEL_RESULT,
@@ -166,10 +164,10 @@ static void _cairo_dock_configure (GtkButton *button, gpointer *data)
 	if (pModule != NULL)
 	{
 		GError *erreur = NULL;
-		cairo_dock_configure_module (pDialog, pModule, g_pMainDock, &erreur);
+		cairo_dock_configure_module (pDialog, pModule, &erreur);
 		if (erreur != NULL)
 		{
-			cd_warning ("%s\n", erreur->message);
+			cd_warning ("%s", erreur->message);
 			g_error_free (erreur);
 		}
 	}

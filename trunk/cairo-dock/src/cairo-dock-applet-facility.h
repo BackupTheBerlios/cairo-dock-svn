@@ -909,13 +909,18 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 
 
 /**
-*Definit le moteur de rendu de l'applet en mode desklet. A appeler a l'init mais ausi au reload pour prendre en compte les redimensionnements.
-*@param cImagePath chemin du fichier de l'image.
-*@return la surface nouvellement creee.
+*Definit le moteur de rendu de l'applet en mode desklet et le contexte de dessin associe a l'icone. A appeler a l'init mais ausi au reload pour prendre en compte les redimensionnements.
+*@param cRendererName nom du rendu.
+*@param pConfig donnees de configuration du rendu.
 */
-#define CD_APPLET_SET_DESKLET_RENDERER(cRendererName) \
-	cairo_dock_set_desklet_renderer_by_name (myDesklet, cRendererName, NULL, CAIRO_DOCK_LOAD_ICONS_FOR_DESKLET, NULL); \
-	myDrawContext = cairo_create (myIcon->pIconBuffer); \
+#define CD_APPLET_SET_DESKLET_RENDERER_WITH_DATA(cRendererName, pConfig) \
+	cairo_dock_set_desklet_renderer_by_name (myDesklet, cRendererName, NULL, CAIRO_DOCK_LOAD_ICONS_FOR_DESKLET, pConfig); \
+	myDrawContext = cairo_create (myIcon->pIconBuffer);
+/**
+*Definit le moteur de rendu de l'applet en mode desklet et le contexte de dessin associe a l'icone. A appeler a l'init mais ausi au reload pour prendre en compte les redimensionnements.
+*@param cRendererName nom du rendu.
+*/
+#define CD_APPLET_SET_DESKLET_RENDERER(cRendererName) CD_APPLET_SET_DESKLET_RENDERER_WITH_DATA (cRendererName, NULL)
 
 //\_________________________________ INCLUDE
 /**

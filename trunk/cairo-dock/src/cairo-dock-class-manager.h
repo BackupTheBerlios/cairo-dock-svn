@@ -67,16 +67,56 @@ gboolean cairo_dock_class_is_using_xicon (const gchar *cClass);
 */
 gboolean cairo_dock_prevent_inhibated_class (Icon *pIcon);
 
-
+/**
+* Enleve un inhibiteur de la classe donnee.
+* @param pInhibatorIcon l'icone inhibitrice.
+* @return TRUE ssi la classe est encore inhibee après l'enlèvement, FALSE sinon.
+*/
 gboolean cairo_dock_remove_icon_from_class (Icon *pInhibatorIcon);
+/**
+* Empeche une icone d'inhiber sa classe; l'icone est enlevee de sa classe, son controle sur une appli est desactive, sa classe remise a 0, et l'appli controlee est inseree dans le dock.
+* @param cClass la classe.
+* @param pInhibatorIcon l'icone inhibitrice.
+*/
 void cairo_dock_deinhibate_class (const gchar *cClass, Icon *pInhibatorIcon);
+/**
+* Met a jour les inhibiteurs controlant une appli donnee pour leur en faire controler une autre.
+* @param Xid l'ID de l'appli.
+* @param cClass sa classe.
+*/
 void cairo_dock_update_Xid_on_inhibators (Window Xid, const gchar *cClass);
+/**
+* Enleve toutes les applis de toutes les classes, et met a jour les inhibiteurs.
+*/
 void cairo_dock_remove_all_applis_from_class_table (void);
+/**
+* Detruit toutes les classes, enlevant tous les inhibiteurs et toutes les applis de toutes les classes.
+*/
 void cairo_dock_reset_class_table (void);
 
+/**
+* Cree la surface d'une appli en utilisant le lanceur correspondant, si la classe n'utilise pas les icones X.
+* @param cClass la classe.
+* @param pSourceContext un contexte de dessin, ne sera pas altere.
+* @param fMaxScale zoom max.
+* @param fWidth largeur de la surface, renseignee.
+* @param fHeight hauteur de la surface, renseignee.
+* @return la surface nouvellement creee, ou NULL si aucun lanceur n'a pu etre trouve ou si l'on veut explicitement les icones X pour cette classe.
+*/
 cairo_surface_t *cairo_dock_create_surface_from_class (gchar *cClass, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight);
 
+/**
+* Met a jour les inhibiteurs controlant une appli donnee pour les faire reagir au changement de visibilite de la fenetre, de la meme maniere que si l'icone etait dans la barre des taches.
+* @param cClass la classe.
+* @param Xid l'ID de l'appli.
+* @param bIsHidden TRUE ssi a fenetre vient de se cacher.
+*/
 void cairo_dock_update_visibility_on_inhibators (gchar *cClass, Window Xid, gboolean bIsHidden);
+/**
+* Met a jour les inhibiteurs controlant une appli donnee pour les faire reagir a la prise d'activite de la fenetre, de la meme maniere que si l'icone etait dans la barre des taches.
+* @param cClass la classe.
+* @param Xid l'ID de l'appli.
+*/
 void cairo_dock_update_activity_on_inhibators (gchar *cClass, Window Xid);
 
 
