@@ -904,8 +904,18 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 *@param cImagePath chemin du fichier de l'image.
 *@return la surface nouvellement creee.
 */
-#define CD_APPLET_LOAD_SURFACE_FOR_MY_APPLET(cImagePath) cairo_dock_create_surface_for_icon (cImagePath, myDrawContext, myIcon->fWidth * (myDock != NULL ? (1 + g_fAmplitude) / myDock->fRatio : 1), myIcon->fHeight* (myDock != NULL ? (1 + g_fAmplitude) / myDock->fRatio : 1));
+#define CD_APPLET_LOAD_SURFACE_FOR_MY_APPLET(cImagePath) \
+	cairo_dock_create_surface_for_icon (cImagePath, myDrawContext, myIcon->fWidth * (myDock ? (1 + g_fAmplitude) / myDock->fRatio : 1), myIcon->fHeight* (myDock ? (1 + g_fAmplitude) / myDock->fRatio : 1));
 
+
+/**
+*Definit le moteur de rendu de l'applet en mode desklet. A appeler a l'init mais ausi au reload pour prendre en compte les redimensionnements.
+*@param cImagePath chemin du fichier de l'image.
+*@return la surface nouvellement creee.
+*/
+#define CD_APPLET_SET_DESKLET_RENDERER(cRendererName) \
+	cairo_dock_set_desklet_renderer_by_name (myDesklet, cRendererName, NULL, CAIRO_DOCK_LOAD_ICONS_FOR_DESKLET, NULL); \
+	myDrawContext = cairo_create (myIcon->pIconBuffer); \
 
 //\_________________________________ INCLUDE
 /**

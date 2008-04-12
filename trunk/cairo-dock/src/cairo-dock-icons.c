@@ -593,7 +593,7 @@ gboolean cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolea
 	if (g_list_find (pDock->icons, icon) == NULL)  // elle est deja detachee.
 		return FALSE;
 
-	cd_message ("%s (%s)\n", __func__, icon->acName);
+	cd_message ("%s (%s)", __func__, icon->acName);
 	g_free (icon->cParentDockName);
 	icon->cParentDockName = NULL;
 

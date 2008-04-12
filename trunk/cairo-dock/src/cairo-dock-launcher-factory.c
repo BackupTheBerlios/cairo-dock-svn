@@ -1,11 +1,11 @@
-/******************************************************************************
+/*********************************************************************************
 
 This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
-******************************************************************************/
+*********************************************************************************/
 #include <math.h>
 #include <string.h>
 #include <cairo.h>
@@ -71,7 +71,7 @@ gchar *cairo_dock_search_icon_s_path (gchar *cFileName)
 	}
 	else if (*cFileName == '/')
 	{
-		g_string_printf (sIconPath, "%s", cFileName);
+		g_string_printf (sIconPath, cFileName);
 	}
 	else
 	{
@@ -111,7 +111,7 @@ gchar *cairo_dock_search_icon_s_path (gchar *cFileName)
 				}
 				else if (g_pDefaultIconDirectory[2*i+1] != NULL)
 				{
-					g_string_printf (sIconPath, "%s", cFileName);
+					g_string_printf (sIconPath, cFileName);
 					if (! bAddSuffix)
 					{
 						gchar *str = strrchr (sIconPath->str, '.');
@@ -125,7 +125,7 @@ gchar *cairo_dock_search_icon_s_path (gchar *cFileName)
 						GTK_ICON_LOOKUP_FORCE_SVG);
 					if (pIconInfo != NULL)
 					{
-						g_string_printf (sIconPath, "%s", gtk_icon_info_get_filename (pIconInfo));
+						g_string_printf (sIconPath, gtk_icon_info_get_filename (pIconInfo));
 						bFileFound = TRUE;
 						gtk_icon_info_free (pIconInfo);
 					}
@@ -136,7 +136,7 @@ gchar *cairo_dock_search_icon_s_path (gchar *cFileName)
 
 		if (! bFileFound)
 		{
-			g_string_printf (sIconPath, "%s", cFileName);
+			g_string_printf (sIconPath, cFileName);
 			if (! bAddSuffix)
 			{
 				gchar *str = strrchr (sIconPath->str, '.');
@@ -152,7 +152,7 @@ gchar *cairo_dock_search_icon_s_path (gchar *cFileName)
 
 			if (pIconInfo != NULL)
 			{
-				g_string_printf (sIconPath, "%s", gtk_icon_info_get_filename (pIconInfo));
+				g_string_printf (sIconPath, gtk_icon_info_get_filename (pIconInfo));
 				gtk_icon_info_free (pIconInfo);
 			}
 			else
@@ -326,8 +326,10 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
 	}
 	
+	gboolean bPreventFromInhibating = g_key_file_get_boolean (keyfile, "Desktop Entry", "prevent inhibate", NULL);  // FALSE si la cle n'existe pas.
+	
 	g_free (icon->cClass);
-	if (icon->acCommand != NULL)
+	if (! bPreventFromInhibating && icon->acCommand != NULL)
 	{
 		gchar *cStartupWMClass = g_key_file_get_string (keyfile, "Desktop Entry", "StartupWMClass", NULL);
 		if (cStartupWMClass == NULL || *cStartupWMClass == '\0')
@@ -396,8 +398,8 @@ Icon * cairo_dock_create_icon_from_desktop_file (const gchar *cDesktopFileName, 
 		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pParentDock->bHorizontalDock));
 	
 	/// Ajouter ce lanceur dans sa clase ...
-	g_print ("%s/%s\n", icon->acName, icon->cClass);
-	if (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon) && icon->acCommand != NULL)  // pas un lanceur de sous-dock.
+	cd_message ("+ %s/%s", icon->acName, icon->cClass);
+	if (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon) && icon->acCommand != NULL && icon->cClass != NULL)  // pas un lanceur de sous-dock.
 		cairo_dock_inhibate_class (icon->cClass, icon);
 	
 	return icon;

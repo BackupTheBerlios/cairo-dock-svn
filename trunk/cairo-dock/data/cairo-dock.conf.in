@@ -76,7 +76,7 @@ current desktop only = false
 sep_app =
 
 #b- Mix launchers and applis ?
-#{Allows launchers to act as applis when their program has been launched, and displays an indicator on their icon to signal it. You can launch other occurences of the program with SHIFT+click.}
+#{Allows launchers to act as applis when their program is running, and displays an indicator on their icon to signal it. You can launch other occurences of the program with SHIFT+click.}
 mix launcher appli = true
 
 #b- Overwrite X icons with launchers' one ?

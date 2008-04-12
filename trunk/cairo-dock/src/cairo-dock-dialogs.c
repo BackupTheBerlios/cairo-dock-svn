@@ -146,7 +146,6 @@ static gboolean on_button_press_dialog (GtkWidget* pWidget,
 	GdkEventButton* pButton,
 	CairoDockDialog *pDialog)
 {
-	g_print ("%s (%d/%d)\n", __func__, pButton->type, pButton->button);
 	if (! cairo_dock_dialog_reference (pDialog))
 		return FALSE;
 
