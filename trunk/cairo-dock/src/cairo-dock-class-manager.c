@@ -271,7 +271,7 @@ gboolean cairo_dock_class_is_inhibated (const gchar *cClass)
 gboolean cairo_dock_class_is_using_xicon (const gchar *cClass)
 {
 	CairoDockClassAppli *pClassAppli = cairo_dock_find_class_appli (cClass);
-	return (pClassAppli != NULL && pClassAppli->bUseXIcon);
+	return (pClassAppli == NULL || pClassAppli->bUseXIcon);  // si pClassAppli == NULL, il n'y a donc pas de lanceur pouvant lui filer son icone.
 }
 
 gboolean cairo_dock_prevent_inhibated_class (Icon *pIcon)

@@ -678,12 +678,19 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 */
 #define CD_APPLET_ADD_IN_MENU(cLabel, pFunction, pMenu) CD_APPLET_ADD_IN_MENU_WITH_DATA(cLabel, pFunction, pMenu, NULL)
 
+/**
+*Ajoute une entree avec une icone GTK a un menu deja existant.
+*@param cLabel nom de l'entree, tel qu'il apparaitra dans le menu.
+*@param pFunction fonction appelee lors de la selection de cette entree.
+*@param pMenu GtkWidget du menu auquel on rajoutera l'entree.
+*/
 #define CD_APPLET_ADD_IN_MENU_WITH_STOCK(cLabel, gtkStock, pFunction, pMenu, pData) \
 	menu_item = gtk_image_menu_item_new_with_label (_(cLabel)); \
 	image = gtk_image_new_from_stock (gtkStock, GTK_ICON_SIZE_MENU); \
 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image); \
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pMenu), menu_item); \
 	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(pFunction), pData);
+
 
 
 /**
@@ -833,17 +840,38 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 *@param cImagePath chemin du fichier de l'image.
 */
 #define CD_APPLET_SET_IMAGE_ON_MY_ICON(cImagePath) \
+	if (cImagePath != myIcon->acFileName) \
+	{ \
+		g_free (myIcon->acFileName); \
+		myIcon->acFileName = g_strdup (cImagePath); \
+	} \
 	cairo_dock_set_image_on_icon (myDrawContext, cImagePath, myIcon, myContainer);
 
 /**
-*Applique une image definie par son nom local au repertoire de l'applet sur le contexte de dessin de l'applet, mais ne la rafraichit pas. L'image est redimensionnee aux dimensions de l'icone.
-*@param cImageName nom du fichier de l'image.
+*Idem que precedemment mais l'image est definie par son nom localement au repertoire d'installation de l'applet
+*@param cImageName nom du fichier de l'image 
 */
 #define CD_APPLET_SET_LOCAL_IMAGE_ON_MY_ICON(cImageName) \
 	{ \
 		gchar *cImageFilePath = g_strconcat (MY_APPLET_SHARE_DATA_DIR, "/", cImageName, NULL); \
-		cairo_dock_set_image_on_icon (myDrawContext, cImageFilePath, myIcon, myContainer); \
+		CD_APPLET_SET_IMAGE_ON_MY_ICON (cImageFilePath); \
 		g_free (cImageFilePath); \
+	}
+
+/**
+*Idem que precedemment mais l'image est definie relativement au repertoire utilisateur, ou relativement au repertoire d'installation de l'applet si la 1ere est NULL.
+*@param cUserImageName nom du fichier de l'image cote utilisateur.
+*@param cDefaultLocalImageName image locale par defaut cote installation.
+*/
+#define CD_APPLET_SET_USER_IMAGE_ON_MY_ICON(cUserImageName, cDefaultLocalImageName) \
+	{ \
+		gchar *cImagePath; \
+		if (cUserImageName != NULL) \
+			cImagePath = cairo_dock_generate_file_path (cUserImageName); \
+		else \
+			cImagePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, cDefaultLocalImageName); \
+		CD_APPLET_SET_IMAGE_ON_MY_ICON (cImagePath); \
+		g_free (cImagePath); \
 	}
 
 /**

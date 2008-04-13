@@ -806,11 +806,47 @@ gboolean on_key_press (GtkWidget *pWidget,
 }
 
 
+gboolean cairo_dock_launch_command_full (const gchar *cCommand, gchar *cWorkingDirectory)
+{
+	g_return_val_if_fail (cCommand != NULL, FALSE);
+	GError *erreur = NULL;
+	int argc;
+	gchar **argv = NULL;
+	g_shell_parse_argv (cCommand,
+		&argc,
+		&argv,
+		&erreur);
+	if (erreur != NULL)
+	{
+		cd_warning ("Attention : %s", erreur->message);
+		g_error_free (erreur);
+		return FALSE;
+	}
+	
+	GPid iChildPID;
+	g_spawn_async (cWorkingDirectory,
+		argv,
+		NULL,  // env
+		G_SPAWN_SEARCH_PATH,
+		NULL,
+		NULL,
+		&iChildPID,
+		&erreur);
+	g_strfreev (argv);
+	if (erreur != NULL)
+	{
+		cd_warning ("Attention : %s", erreur->message);
+		g_error_free (erreur);
+		return FALSE;
+	}
+	return TRUE;
+}
+
 gboolean cairo_dock_notification_click_icon (gpointer *data)
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
-	guint iButtonState = GPOINTER_TO_INT (data[2]); \
+	guint iButtonState = GPOINTER_TO_INT (data[2]);
 	
 	if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
 	{
@@ -846,36 +882,10 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 	{
 		if (icon->acCommand != NULL)
 		{
-			GError *erreur = NULL;
-			int argc;
-			gchar **argv = NULL;
-			g_shell_parse_argv (icon->acCommand,
-				&argc,
-				&argv,
-				&erreur);
-			if (erreur != NULL)
-			{
-				cd_warning ("Attention : %s", erreur->message);
-				g_error_free (erreur);
-				return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
-			}
-			
-			g_spawn_async (icon->cWorkingDirectory,
-				argv,
-				NULL,  // env
-				G_SPAWN_SEARCH_PATH,
-				NULL,
-				NULL,
-				NULL,
-				&erreur);
-			g_strfreev (argv);
-			if (erreur != NULL)
-			{
-				cd_warning ("Attention : %s", erreur->message);
-				g_error_free (erreur);
-			}
-			cairo_dock_arm_animation (icon, CAIRO_DOCK_LAUNCHER, -1);  // au cas ou ce serait aussi une appli
-			///g_spawn_command_line_async (icon->acCommand, NULL);
+			if (cairo_dock_launch_command_full (icon->acCommand, icon->cWorkingDirectory))
+				cairo_dock_arm_animation (icon, CAIRO_DOCK_LAUNCHER, -1);  // au cas ou ce serait aussi une appli
+			else
+				cairo_dock_arm_animation (icon, -1, 0);  // pas d'animation si echec.
 			return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
 		}
 		else
