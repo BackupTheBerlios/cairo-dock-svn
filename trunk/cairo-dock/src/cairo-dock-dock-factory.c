@@ -121,7 +121,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 
 	gtk_window_set_type_hint (GTK_WINDOW (pWindow), iWmHint);
 
-	cairo_dock_set_colormap (pDock);
+	cairo_dock_set_colormap (CAIRO_DOCK_CONTAINER (pDock));
 
 	gtk_widget_set_app_paintable (pWindow, TRUE);
 	gtk_window_set_decorated (GTK_WINDOW (pWindow), FALSE);
@@ -181,12 +181,15 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 		"leave-notify-event",
 		G_CALLBACK (on_leave_notify2),
 		pDock);
-	cairo_dock_allow_widget_to_receive_data (pWindow, on_drag_data_received, pDock);
+	cairo_dock_allow_widget_to_receive_data (pWindow, G_CALLBACK (on_drag_data_received), pDock);
 	g_signal_connect (G_OBJECT (pWindow),
 		"drag_motion",
 		G_CALLBACK (on_drag_motion),
 		pDock);
-
+	g_signal_connect (G_OBJECT (pWindow),
+		"drag_leave",
+		G_CALLBACK (on_drag_leave),
+		pDock);
 	/*g_signal_connect (G_OBJECT (pWindow),
 		"selection_request_event",
 		G_CALLBACK (on_selection_request_event),

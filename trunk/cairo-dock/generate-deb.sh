@@ -1,14 +1,39 @@
 #!/bin/sh
 
-export CAIRO_DOCK_DIR=/opt/cairo-dock/trunk
-export FAST_COMPIL="0" 
-export BUILD_TAR="0" 
-if test "$1" = "-f" -o "$2" = "-f"; then
-	export FAST_COMPIL="1"
-fi
-if test "$1" = "-t" -o "$2" = "-t"; then
-	export BUILD_TAR="1"
-fi
+export CAIRO_DOCK_DIR="/opt/cairo-dock/trunk"
+export FAST_COMPIL="0"
+export BUILD_TAR="0"
+
+echo "packaging options : "
+while getopts "dfT" flag
+do
+	echo " option $flag" $OPTIND $OPTARG
+	case "$flag" in
+	d)
+		echo " => use folder $OPTARG"
+		export CAIRO_DOCK_DIR="$OPTARG"
+		;;
+	f)
+		echo " => fast compil"
+		export FAST_COMPIL="1"
+		;;
+	T)
+		echo " => build tar"
+		export BUILD_TAR="1"
+		;;
+	h)
+		echo "-d ref : build in the folder 'rep'"
+		echo "-f : fast compil (no cleaning of sources before)"
+		echo "-T : build the sources tarball"
+		exit 0
+		;;
+	*)
+		echo "unexpected argument"
+		exit 1
+		;;
+	esac
+done
+
 
 #\_____________ On nettoie tout et on fait une archive des sources.
 cd $CAIRO_DOCK_DIR
@@ -17,11 +42,16 @@ find . -name "core*" -delete
 find . -name ".#*" -delete
 rm -f cairo-dock-sources*.tar.bz2 *.deb
 
+if ! test  -d cairo-dock -o ! -d themes -o ! -d plug-ins - ! -d deb -o ! -d deb-plug-ins; then
+	echo "Attention : folder missing in $CAIRO_DOCK_DIR !"
+	exit 1
+fi
+
 cd $CAIRO_DOCK_DIR/themes
 ./cairo-dock-finalize-theme.sh
 
 cd $CAIRO_DOCK_DIR/cairo-dock
-./compile-all.sh -ct
+./compile-all.sh -ct -d $CAIRO_DOCK_DIR
 
 cd $CAIRO_DOCK_DIR
 sudo rm -rf deb/usr
@@ -56,12 +86,20 @@ fi
 #\_____________ On compile de zero.
 cd $CAIRO_DOCK_DIR/cairo-dock
 if test "$FAST_COMPIL" = "1"; then
-	./compile-all.sh -C -i -t
+	./compile-all.sh -C -i -t -d $CAIRO_DOCK_DIR
 else
-	./compile-all.sh -a -C -i -t
+	./compile-all.sh -a -C -i -t -d $CAIRO_DOCK_DIR
 fi
 
 #\_____________ On cree les paquets.
+cd $CAIRO_DOCK_DIR
+sudo chmod -R 755 deb deb-plug-ins
+mv deb/.svn ./.svn-deb
+mv deb-plug-ins/.svn ./.svn-deb-plug-ins
+mv deb/DEBIAN/.svn ./.svn-deb-DEIAN
+mv deb-plug-ins/DEBIAN/.svn ./.svn-deb-plug-ins-DEIAN
+
+
 cd $CAIRO_DOCK_DIR/deb
 sudo mkdir usr
 sudo mkdir usr/bin
@@ -84,17 +122,12 @@ sudo cp ../cairo-dock/data/cairo-dock usr/share/menu
 sudo cp ../cairo-dock/data/cairo-dock.desktop usr/share/applications
 
 cd $CAIRO_DOCK_DIR
-sudo chmod -R 755 deb deb-plug-ins
-mv deb/.svn ./.svn-deb
-mv deb-plug-ins/.svn ./.svn-deb-plug-ins
-mv deb/DEBIAN/.svn ./.svn-deb-DEIAN
-mv deb-plug-ins/DEBIAN/.svn ./.svn-deb-plug-ins-DEIAN
-
-dpkg -b deb "cairo-dock_`./cairo-dock/src/cairo-dock --version`_i686-32bits.deb"
+dpkg -b deb "cairo-dock_`cairo-dock --version`_i686-32bits.deb"
 mv .svn-deb deb/.svn
 mv .svn-deb-DEIAN deb/DEBIAN/.svn
 
-cd deb-plug-ins
+
+cd $CAIRO_DOCK_DIR/deb-plug-ins
 sudo mkdir -p usr/share/cairo-dock
 for lang in `cat ../cairo-dock/po/LINGUAS`; do
 	sudo mkdir -p usr/share/locale/$lang/LC_MESSAGES
@@ -102,14 +135,14 @@ for lang in `cat ../cairo-dock/po/LINGUAS`; do
 done;
 sudo cp -r /usr/share/cairo-dock/plug-in usr/share/cairo-dock
 
-
 cd $CAIRO_DOCK_DIR
-dpkg -b deb-plug-ins "cairo-dock-plug-ins_`./cairo-dock/src/cairo-dock --version`_i686-32bits.deb"
+dpkg -b deb-plug-ins "cairo-dock-plug-ins_`cairo-dock --version`_i686-32bits.deb"
 mv .svn-deb-plug-ins deb-plug-ins/.svn
 mv .svn-deb-plug-ins-DEIAN deb-plug-ins/DEBIAN/.svn
 
 
 #\_____________ On liste les sommes de controle des fichiers.
+cd $CAIRO_DOCK_DIR
 rm -f md5sum.txt
 for f in *.deb *.bz2; do echo `md5sum $f`>> md5sum.txt; done;
 echo "generated files :"

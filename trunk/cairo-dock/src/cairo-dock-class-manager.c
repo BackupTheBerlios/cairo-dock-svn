@@ -75,7 +75,7 @@ Window cairo_dock_detach_appli_of_class (const gchar *cClass)
 	
 	const GList *pList = cairo_dock_list_existing_appli_with_class (cClass);
 	Icon *pIcon;
-	GList *pElement;
+	const GList *pElement;
 	gboolean bNeedsRedraw = FALSE, bDetached;
 	CairoDock *pParentDock;
 	Window XFirstFoundId = 0;
@@ -357,7 +357,7 @@ void cairo_dock_deinhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
 		Icon *pIcon;
 		gboolean bNeedsRedraw = FALSE;
 		CairoDock *pParentDock;
-		GList *pElement;
+		const GList *pElement;
 		for (pElement = pList; pElement != NULL; pElement = pElement->next)
 		{
 			pIcon = pElement->data;

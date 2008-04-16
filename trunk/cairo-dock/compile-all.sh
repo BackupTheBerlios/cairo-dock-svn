@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export CAIRO_DOCK_DIR=/opt/cairo-dock/trunk
+export CAIRO_DOCK_DIR="/opt/cairo-dock/trunk"
 export CAIRO_DOCK_PREFIX=/usr
 export CAIRO_DOCK_AUTORECONF="0"
 export CAIRO_DOCK_CLEAN="0"
@@ -8,14 +8,15 @@ export CAIRO_DOCK_COMPIL="0"
 export CAIRO_DOCK_UNSTABLE="0"
 export CAIRO_DOCK_INSTALL="0"
 export CAIRO_DOCK_THEMES="0"
+export CAIRO_DOCK_DOC="0"
 export CAIRO_DOCK_EXCLUDE="template"
 export CAIRO_DOCK_EXTRACT_MESSAGE=${CAIRO_DOCK_DIR}/utils/extract-message
 export CAIRO_DOCK_GEN_TRANSLATION=${CAIRO_DOCK_DIR}/cairo-dock/po/generate-translation.sh
 
 echo "this script will process : "
-while getopts "acCituh" flag
+while getopts "acCituhd:D" flag
 do
-	echo " option $flag" $OPTIND $OPTARG
+	echo " option $flag $OPTIND $OPTARG"
 	case "$flag" in
 	a)
 		echo " => re-generation of files"
@@ -41,6 +42,14 @@ do
 		echo " => include unstable applets"
 		export CAIRO_DOCK_UNSTABLE="1"
 		;;
+	d)
+		echo " => use folder $OPTARG"
+		export CAIRO_DOCK_DIR="$OPTARG"
+		;;
+	D)
+		echo " => build documentation $OPTARG"
+		export CAIRO_DOCK_DOC="1"
+		;;
 	h)
 		echo "-a : run autoreconf"
 		echo "-c : clean all"
@@ -48,6 +57,7 @@ do
 		echo "-i : install (will ask root password)"
 		echo "-t : compil themes too"
 		echo "-u : include still unstable applets"
+		echo "-d rep : compile in the folder 'rep'"
 		exit 0
 		;;
 	*)
@@ -106,6 +116,18 @@ if test "$CAIRO_DOCK_COMPIL" = "1"; then
 	else
 		echo "  -> passed"
 	fi
+fi
+if test "$CAIRO_DOCK_DOC" = "1"; then
+	echo  "* generating documentation ..."
+	cd doc
+	/usr/bin/time -f "  time elapsed : %Us" doxygen dox.config > /dev/null
+	if test ! "$?" = "0"; then
+		echo "  Attention : an error has occured !"
+		echo "Error while generating documentation" >> $CAIRO_DOCK_DIR/compile.log
+	else
+		echo "  -> passed"
+	fi
+	cd ..
 fi
 if test "$CAIRO_DOCK_INSTALL" = "1"; then
 	echo "*  installation of cairo-dock..."

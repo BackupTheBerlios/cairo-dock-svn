@@ -140,6 +140,55 @@ gchar* cairo_dock_manage_themes_for_applet (gchar *cAppletShareDataDir, gchar *c
 GtkWidget *cairo_dock_create_sub_menu (gchar *cLabel, GtkWidget *pMenu);
 
 
+typedef struct {
+	gint iSidTimer;
+	gint iSidTimerRedraw;
+	gint iThreadIsRunning;
+	GMutex *pMutexData;
+	GVoidFunc acquisition;
+	GVoidFunc read;
+	GVoidFunc update;
+	gint iCheckInterval;
+} CairoDockMeasure;
+
+/**
+*Lance les mesures periodiques, prealablement preparee avec #cairo_dock_new_measure_timer. La 1ere iteration est executee immediatement. L'acquisition et la lecture des donnees est faite de maniere asynchrone (dans un thread secondaire), alors que le chargement des mesures se fait dans la boucle principale.
+*@param pMeasureTimer la mesure periodique.
+*/
+void cairo_dock_launch_measure (CairoDockMeasure *pMeasureTimer);
+/**
+*Cree une mesure periodique.
+*@param iCheckInterval l'intervalle en ms entre 2 mesures.
+*@param acquisition fonction d'acquisition des donnees.
+*@param read fonction de lecture des donnees acquises.
+*@param update fonction de mise a jour de l'interface en fonction des nouvelles donnees.
+*@return la mesure nouvellement allouee. A liberer avec #cairo_dock_free_measure_timer.
+*/
+CairoDockMeasure *cairo_dock_new_measure_timer (int iCheckInterval, GVoidFunc acquisition, GVoidFunc read, GVoidFunc update);
+/**
+*Stoppe les mesures. Si une mesure est en cours, le thread d'acquisition/lecture se terminera tout seul plus tard, et la mesure sera ignoree. On peut reprendre les mesures par un simple #cairo_dock_launch_measure.
+*@param pMeasureTimer la mesure periodique.
+*/
+void cairo_dock_stop_measure_timer (CairoDockMeasure *pMeasureTimer);
+/**
+*Stoppe et detruit une mesure periodique, liberant toutes ses ressources allouees.
+*@param pMeasureTimer la mesure periodique.
+*/
+void cairo_dock_free_measure_timer (CairoDockMeasure *pMeasureTimer);
+/**
+*Dis si une mesure est active, c'est a dire si elle est appelee periodiquement.
+*@param pMeasureTimer la mesure periodique.
+*@return TRUE ssi la mesure est active.
+*/
+gboolean cairo_dock_measure_is_active (CairoDockMeasure *pMeasureTimer);
+/**
+*Change la frequence des mesures. La prochaine mesure aura lien dans 1 iteration si elle etait deja active.
+*@param pMeasureTimer la mesure periodique.
+*@param iNewCheckInterval le nouvel intervalle entre 2 mesures, en ms.
+*/
+void cairo_dock_change_measure_frequency (CairoDockMeasure *pMeasureTimer, int iNewCheckInterval);
+
+
 //\_________________________________ INIT
 /**
 *Definition des fonctions d'initialisation de l'applet; a inclure dans le .h du fichier d'init de l'applet.
@@ -681,8 +730,10 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 /**
 *Ajoute une entree avec une icone GTK a un menu deja existant.
 *@param cLabel nom de l'entree, tel qu'il apparaitra dans le menu.
+*@param gtkStock nom d'une icone de GTK.
 *@param pFunction fonction appelee lors de la selection de cette entree.
 *@param pMenu GtkWidget du menu auquel on rajoutera l'entree.
+*@param pData donnees passees en parametre de la fonction.
 */
 #define CD_APPLET_ADD_IN_MENU_WITH_STOCK(cLabel, gtkStock, pFunction, pMenu, pData) \
 	menu_item = gtk_image_menu_item_new_with_label (_(cLabel)); \
@@ -972,3 +1023,53 @@ extern AppletData myData;
 #define _D D_
 
 #endif
+
+
+
+
+#define CD_APPLET_DEFINE_TIMER(_get_data, _read_data, _load_data) \
+static int s_iThreadIsRunning = 0, s_iSidTimerRedraw = 0; \
+static GStaticMutex mutexData = G_STATIC_MUTEX_INIT; \
+static gboolean _cairo_dock_timer (gpointer data) { \
+	_cairo_dock_launch_measure (); \
+	return TRUE; } \
+static gpointer _cairo_dock_threaded_calculation (gpointer data) { \
+	_get_data (); \
+	g_static_mutex_lock (&mutexData); \
+	_read_data ();  \
+	g_static_mutex_unlock (&mutexData); \
+	g_atomic_int_set (&s_iThreadIsRunning, 0); \
+	return NULL; } \
+static gboolean _cairo_dock_check_for_redraw (gpointer data) { \
+	int iThreadIsRunning = g_atomic_int_get (&s_iThreadIsRunning); \
+	if (! iThreadIsRunning) { \
+		s_iSidTimerRedraw = 0; \
+		if (myIcon == NULL) { \
+			cd_warning ("annulation du chargement de l'applet"); \
+			return FALSE; } \
+		g_static_mutex_lock (&mutexData); \
+		_load_data (); \
+		g_static_mutex_unlock (&mutexData); \
+		if (myData.iSidTimer == 0) \
+			myData.iSidTimer = g_timeout_add (myConfig.iCheckInterval, (GSourceFunc) _cairo_dock_timer, NULL); \
+		return FALSE; } \
+	return TRUE; } \
+void cairo_dock_launch_measure (void) { \
+	if (g_atomic_int_compare_and_exchange (&s_iThreadIsRunning, 0, 1)) { \
+		if (s_iSidTimerRedraw == 0) \
+			s_iSidTimerRedraw = g_timeout_add (250, (GSourceFunc) _cairo_dock_check_for_redraw, (gpointer) NULL); \
+		GError *erreur = NULL; \
+		GThread* pThread = g_thread_create ((GThreadFunc) _cairo_dock_threaded_calculation, NULL, FALSE, &erreur); \
+		if (erreur != NULL) { \
+			cd_warning ("Attention : %s", erreur->message); \
+			g_error_free (erreur); } } }
+
+#define CD_APPLET_START_TIMER \
+	cairo_dock_launch_measure ();
+
+#define CD_APPLET_STOP_TIMER \
+	if (myData.iSidTimer != 0) { \
+		g_source_remove (myData.iSidTimer); \
+		myData.iSidTimer = 0; }
+
+#define CD_APPLET_TIMER_IS_RUNNING (myData.iSidTimer != 0)

@@ -247,7 +247,7 @@ static gboolean random_dialog (gpointer user_data)
 	Icon *icon = g_list_nth_data (g_pMainDock->icons, num_icone);
 	if (CAIRO_DOCK_IS_SEPARATOR (icon))
 		return random_dialog (user_data);
-	cairo_dock_show_temporary_dialog (icon->acName, icon, g_pMainDock, 7000);
+	cairo_dock_show_temporary_dialog (icon->acName, icon, CAIRO_DOCK_CONTAINER (g_pMainDock), 7000);
 	return TRUE;
 }
 
@@ -581,7 +581,7 @@ main (int argc, char** argv)
 			else
 			{
 				Icon *pFirstIcon = cairo_dock_get_first_icon (g_pMainDock->icons);
-				cairo_dock_show_temporary_dialog_with_default_icon (gettext (cChangeLogMessage), pFirstIcon, g_pMainDock, 0);
+				cairo_dock_show_temporary_dialog_with_default_icon (gettext (cChangeLogMessage), pFirstIcon, CAIRO_DOCK_CONTAINER (g_pMainDock), 0);
 			}
 			g_free (cChangeLogMessage);
 		}

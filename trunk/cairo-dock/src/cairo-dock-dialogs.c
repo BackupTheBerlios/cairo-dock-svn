@@ -801,7 +801,7 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 	if (pDialog->iButtonsType != GTK_BUTTONS_NONE)
 	{
 		if (s_pButtonOkSurface == NULL || s_pButtonCancelSurface == NULL)
-			cairo_dock_load_dialog_buttons (pDialog, NULL, NULL);
+			cairo_dock_load_dialog_buttons (CAIRO_DOCK_CONTAINER (pDialog), NULL, NULL);
 		
 		pDialog->iButtonsWidth = 2 * g_iDialogButtonWidth + CAIRO_DOCK_DIALOG_BUTTON_GAP + 2 * CAIRO_DOCK_DIALOG_TEXT_MARGIN;
 		pDialog->iButtonsHeight = CAIRO_DOCK_DIALOG_VGAP + g_iDialogButtonHeight;

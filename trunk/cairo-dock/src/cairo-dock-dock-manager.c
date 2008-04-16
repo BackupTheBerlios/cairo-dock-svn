@@ -53,7 +53,7 @@ void cairo_dock_initialize_dock_manager (void)
 		s_hDocksTable = g_hash_table_new_full (g_str_hash,
 			g_str_equal,
 			g_free,
-			NULL);
+			NULL);  // donc on peut utiliser g_hash_table_remove plutot que g_hash_table_steal.
 }
 
 CairoDock *cairo_dock_register_dock (const gchar *cDockName, CairoDock *pDock)
@@ -267,8 +267,8 @@ void cairo_dock_rename_dock (const gchar *cDockName, CairoDock *pDock, const gch
 	if (pDock == NULL)
 		pDock = g_hash_table_lookup (s_hDocksTable, cDockName);
 	
-	g_hash_table_steal (s_hDocksTable, cDockName);
-	g_hash_table_insert (s_hDocksTable, cNewName, pDock);
+	g_hash_table_remove (s_hDocksTable, cDockName);  // libere la cle, mais pas la valeur puisque la GDestroyFunc est a NULL.
+	g_hash_table_insert (s_hDocksTable, g_strdup (cNewName), pDock);
 	
 	GList* ic;
 	Icon *icon;

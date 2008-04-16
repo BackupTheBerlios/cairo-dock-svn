@@ -1095,7 +1095,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	if (g_iMaxAuthorizedWidth == 0)
 		g_iMaxAuthorizedWidth = g_iScreenWidth[pDock->bHorizontalDock];
 
-	cairo_dock_load_dialog_buttons (pDock, cButtonOkImage, cButtonCancelImage);
+	cairo_dock_load_dialog_buttons (CAIRO_DOCK_CONTAINER (pDock), cButtonOkImage, cButtonCancelImage);
 	g_free (cButtonOkImage);
 	g_free (cButtonCancelImage);
 	

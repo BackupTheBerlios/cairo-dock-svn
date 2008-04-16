@@ -197,6 +197,8 @@ struct _CairoDock {
 	gboolean bAtTop;
 	/// lorsque le menu du clique droit est visible.
 	gboolean bMenuVisible;
+	/// Est-on en train de survoler le dock avec quelque chose dans la souris ?
+	gboolean bIsDragging;
 
 	//\_______________ Les ID des threads en cours sur le dock.
 	/// serial ID du thread de descente de la fenetre.

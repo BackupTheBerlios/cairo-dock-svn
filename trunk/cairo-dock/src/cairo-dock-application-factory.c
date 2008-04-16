@@ -505,7 +505,7 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 				{
 					cd_message ("%s vous interpelle !", icon->acName);
 					if (g_bDemandsAttentionWithDialog)
-						cairo_dock_show_temporary_dialog (icon->acName, icon, pDock, 2000);
+						cairo_dock_show_temporary_dialog (icon->acName, icon, CAIRO_DOCK_CONTAINER (pDock), 2000);
 					if (g_bDemandsAttentionWithAnimation)
 					{
 						cairo_dock_arm_animation (icon, -1, 1e6);  // animation sans fin.
@@ -540,4 +540,26 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 			}
 		}
 	}
+}
+
+
+gchar *cairo_dock_get_dragged (Atom xAtom, Window sourceXid)
+{
+	guchar *pNameBuffer = NULL;
+	Atom aReturnedType = 0;
+	int aReturnedFormat = 0;
+	unsigned long iLeftBytes, iBufferNbElements;
+	
+	XGetWindowProperty (s_XDisplay, sourceXid, xAtom, 0, G_MAXULONG, False, s_aUtf8String, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
+	if (iBufferNbElements == 0)
+	{
+		XGetWindowProperty (s_XDisplay, sourceXid, s_aWmName, 0, G_MAXULONG, False, s_aString, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
+	}
+	g_print ("iBufferNbElements : %d\n", iBufferNbElements);
+	if (iBufferNbElements == 0)
+	{
+		g_print ("dommage !\n");
+		return NULL;
+	}
+	else return pNameBuffer;
 }
