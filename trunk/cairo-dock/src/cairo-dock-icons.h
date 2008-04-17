@@ -54,7 +54,7 @@
 #define CAIRO_DOCK_IS_NORMAL_APPLI(icon) (CAIRO_DOCK_IS_APPLI (icon) && icon->acDesktopFileName == NULL && icon->pModule == NULL)
 
 /**
-* Desactive une icone, et libere tous ses buffers, ainsi qu'elle-meme. Le sous-dock pointee par elle n'est pas dereferencee, cela doit etre fait au prealable.
+* Desactive une icone, et libere tous ses buffers, ainsi qu'elle-meme. Le sous-dock pointee par elle n'est pas dereferencee, cela doit etre fait au prealable. Gere egalement la classe.
 *@param icon l'icone a liberer.
 */
 void cairo_dock_free_icon (Icon *icon);

@@ -317,7 +317,6 @@ static gboolean _cairo_dock_timer (CairoDockMeasure *pMeasureTimer)
 	cairo_dock_launch_measure (pMeasureTimer);
 	return TRUE;
 }
-
 static gpointer _cairo_dock_threaded_calculation (CairoDockMeasure *pMeasureTimer)
 {
 	pMeasureTimer->acquisition ();
@@ -327,14 +326,13 @@ static gpointer _cairo_dock_threaded_calculation (CairoDockMeasure *pMeasureTime
 	g_mutex_unlock (pMeasureTimer->pMutexData);
 	
 	g_atomic_int_set (&pMeasureTimer->iThreadIsRunning, 0);
-	cd_message ("*** fin du thread");
+	cd_debug ("*** fin du thread");
 	return NULL;
 }
-
 static gboolean _cairo_dock_check_for_redraw (CairoDockMeasure *pMeasureTimer)
 {
 	int iThreadIsRunning = g_atomic_int_get (&pMeasureTimer->iThreadIsRunning);
-	cd_message ("%s (%d)", __func__, iThreadIsRunning);
+	cd_debug ("%s (%d)", __func__, iThreadIsRunning);
 	if (! iThreadIsRunning)
 	{
 		//\_______________________ On recharge les icones avec ces nouvelles donnees.
@@ -351,13 +349,12 @@ static gboolean _cairo_dock_check_for_redraw (CairoDockMeasure *pMeasureTimer)
 	}
 	return TRUE;
 }
-
 void cairo_dock_launch_measure (CairoDockMeasure *pMeasureTimer)
 {
-	cd_message ("");
+	g_return_if_fail (pMeasureTimer != NULL);
 	if (g_atomic_int_compare_and_exchange (&pMeasureTimer->iThreadIsRunning, 0, 1))  // il etait egal a 0, on lui met 1 et on lance le thread.
 	{
-		cd_message (" ==> lancement du thread de calcul");
+		cd_debug (" ==> lancement du thread de calcul");
 		
 		if (pMeasureTimer->iSidTimerRedraw == 0)
 			pMeasureTimer->iSidTimerRedraw = g_timeout_add (333, (GSourceFunc) _cairo_dock_check_for_redraw, pMeasureTimer);
@@ -389,6 +386,8 @@ CairoDockMeasure *cairo_dock_new_measure_timer (int iCheckInterval, GVoidFunc ac
 
 void cairo_dock_stop_measure_timer (CairoDockMeasure *pMeasureTimer)
 {
+	if (pMeasureTimer == NULL)
+		return ;
 	if (pMeasureTimer->iSidTimerRedraw != 0)
 	{
 		g_source_remove (pMeasureTimer->iSidTimerRedraw);
@@ -403,6 +402,8 @@ void cairo_dock_stop_measure_timer (CairoDockMeasure *pMeasureTimer)
 
 void cairo_dock_free_measure_timer (CairoDockMeasure *pMeasureTimer)
 {
+	if (pMeasureTimer == NULL)
+		return ;
 	cairo_dock_stop_measure_timer (pMeasureTimer);
 	
 	cd_message ("on attend que le thread termine...\n");
@@ -415,11 +416,12 @@ void cairo_dock_free_measure_timer (CairoDockMeasure *pMeasureTimer)
 
 gboolean cairo_dock_measure_is_active (CairoDockMeasure *pMeasureTimer)
 {
-	return (pMeasureTimer->iSidTimer != 0);
+	return (pMeasureTimer != NULL && pMeasureTimer->iSidTimer != 0);
 }
 
 void cairo_dock_change_measure_frequency (CairoDockMeasure *pMeasureTimer, int iNewCheckInterval)
 {
+	g_return_if_fail (pMeasureTimer != NULL);
 	pMeasureTimer->iCheckInterval = iNewCheckInterval;
 	
 	gboolean bNeedsRestart = (pMeasureTimer->iSidTimer != 0);

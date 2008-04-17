@@ -397,7 +397,6 @@ Icon * cairo_dock_create_icon_from_desktop_file (const gchar *cDesktopFileName, 
 		g_cLabelPolice,
 		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pParentDock->bHorizontalDock));
 	
-	/// Ajouter ce lanceur dans sa clase ...
 	cd_message ("+ %s/%s", icon->acName, icon->cClass);
 	if (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon) && icon->acCommand != NULL && icon->cClass != NULL)  // pas un lanceur de sous-dock.
 		cairo_dock_inhibate_class (icon->cClass, icon);

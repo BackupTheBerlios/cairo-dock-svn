@@ -67,7 +67,7 @@ Gauge *init_cd_Gauge(cairo_t *pSourceContext, gchar *themePath, int iWidth, int 
 					cd_debug("gauge : Nom du theme(%s)",pGauge->themeName);
 				}
 				if (xmlStrcmp (pGaugeNode->name, (const xmlChar *) "file") == 0)
-				{					
+				{
 					ap = xmlHasProp(pGaugeNode, "key");
 					if(strcmp(xmlNodeGetContent(ap->xmlChildrenNode),"background") == 0)
 					{
@@ -75,8 +75,8 @@ Gauge *init_cd_Gauge(cairo_t *pSourceContext, gchar *themePath, int iWidth, int 
 						pGauge->imageBackground = init_cd_GaugeImage(imagePath);
 						draw_cd_GaugeImage(pSourceContext, pGauge->imageBackground, iWidth, iHeight);
 					}
-					if(strcmp(xmlNodeGetContent(ap->xmlChildrenNode),"foreground") == 0)
-					{				
+					else if(strcmp(xmlNodeGetContent(ap->xmlChildrenNode),"foreground") == 0)
+					{
 						imagePath = g_strdup_printf("%s/%s", themePath,xmlNodeGetContent(pGaugeNode));
 						pGauge->imageForeground = init_cd_GaugeImage(imagePath);
 						draw_cd_GaugeImage(pSourceContext, pGauge->imageForeground, iWidth, iHeight);
@@ -96,11 +96,11 @@ Gauge *init_cd_Gauge(cairo_t *pSourceContext, gchar *themePath, int iWidth, int 
 							pGaugeIndicator->posX = strtod(xmlNodeGetContent(pGaugeSubNode),NULL);
 							cd_debug("gauge : posX(%s,%d)",xmlNodeGetContent(pGaugeSubNode),pGaugeIndicator->posX);
 						}
-						if(xmlStrcmp (pGaugeSubNode->name, (const xmlChar *) "direction") == 0) pGaugeIndicator->direction = strtod(xmlNodeGetContent(pGaugeSubNode),NULL);
-						if(xmlStrcmp (pGaugeSubNode->name, (const xmlChar *) "posY") == 0) pGaugeIndicator->posY = strtod(xmlNodeGetContent(pGaugeSubNode),NULL);
-						if(xmlStrcmp (pGaugeSubNode->name, (const xmlChar *) "posStart") == 0) pGaugeIndicator->posStart = strtod(xmlNodeGetContent(pGaugeSubNode),NULL);
-						if(xmlStrcmp (pGaugeSubNode->name, (const xmlChar *) "posStop") == 0) pGaugeIndicator->posStop = strtod(xmlNodeGetContent(pGaugeSubNode),NULL);
-						if(xmlStrcmp (pGaugeSubNode->name, (const xmlChar *) "file") == 0)
+						else if(xmlStrcmp (pGaugeSubNode->name, (const xmlChar *) "direction") == 0) pGaugeIndicator->direction = strtod(xmlNodeGetContent(pGaugeSubNode),NULL);
+						else if(xmlStrcmp (pGaugeSubNode->name, (const xmlChar *) "posY") == 0) pGaugeIndicator->posY = strtod(xmlNodeGetContent(pGaugeSubNode),NULL);
+						else if(xmlStrcmp (pGaugeSubNode->name, (const xmlChar *) "posStart") == 0) pGaugeIndicator->posStart = strtod(xmlNodeGetContent(pGaugeSubNode),NULL);
+						else if(xmlStrcmp (pGaugeSubNode->name, (const xmlChar *) "posStop") == 0) pGaugeIndicator->posStop = strtod(xmlNodeGetContent(pGaugeSubNode),NULL);
+						else if(xmlStrcmp (pGaugeSubNode->name, (const xmlChar *) "file") == 0)
 						{
 							cd_debug("gauge : On charge un fichier(%s)",xmlNodeGetContent(pGaugeSubNode));
 							ap = xmlHasProp(pGaugeSubNode, "key");

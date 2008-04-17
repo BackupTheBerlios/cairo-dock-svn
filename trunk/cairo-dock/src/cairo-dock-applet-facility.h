@@ -141,13 +141,21 @@ GtkWidget *cairo_dock_create_sub_menu (gchar *cLabel, GtkWidget *pMenu);
 
 
 typedef struct {
+	/// Sid du timer des mesures.
 	gint iSidTimer;
+	/// Sid du timer de fin de mesure.
 	gint iSidTimerRedraw;
+	/// Valeur atomique a 1 ssi le thread de mesure est en cours.
 	gint iThreadIsRunning;
+	/// mutex d'accessibilite a la structure des resultats.
 	GMutex *pMutexData;
+	/// fonction realisant l'acquisition des donnees. N'accede jamais a la structure des resultats.
 	GVoidFunc acquisition;
+	/// fonction realisant la lecture des donnees precedemment acquises; stocke les resultats dans la structures des resultats.
 	GVoidFunc read;
+	/// fonction realisant la mise a jour de l'IHM en fonction des nouveaux resultats.
 	GVoidFunc update;
+	/// intervalle de temps
 	gint iCheckInterval;
 } CairoDockMeasure;
 
@@ -159,9 +167,9 @@ void cairo_dock_launch_measure (CairoDockMeasure *pMeasureTimer);
 /**
 *Cree une mesure periodique.
 *@param iCheckInterval l'intervalle en ms entre 2 mesures.
-*@param acquisition fonction d'acquisition des donnees.
-*@param read fonction de lecture des donnees acquises.
-*@param update fonction de mise a jour de l'interface en fonction des nouvelles donnees.
+*@param acquisition fonction realisant l'acquisition des donnees. N'accede jamais a la structure des resultats.
+*@param read fonction realisant la lecture des donnees precedemment acquises; stocke les resultats dans la structures des resultats.
+*@param update fonction realisant la mise a jour de l'interface en fonction des nouveaux resultats, lus dans la structures des resultats.
 *@return la mesure nouvellement allouee. A liberer avec #cairo_dock_free_measure_timer.
 */
 CairoDockMeasure *cairo_dock_new_measure_timer (int iCheckInterval, GVoidFunc acquisition, GVoidFunc read, GVoidFunc update);
@@ -976,7 +984,7 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 *@param iAnimationLength duree de l'animation, en nombre de tours.
 */
 #define CD_APPLET_ANIMATE_MY_ICON(iAnimationType, iAnimationLength) \
-	cairo_dock_animate_icon (myIcon, myContainer, iAnimationType, iAnimationLength);
+	cairo_dock_animate_icon (myIcon, myDock, iAnimationType, iAnimationLength);
 
 /**
 *Charge une image dans une surface, aux dimensions de l'icone de l'applet.

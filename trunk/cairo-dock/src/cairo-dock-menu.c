@@ -1064,12 +1064,15 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 				_add_entry_in_menu (_("Add a separator"), GTK_STOCK_ADD, cairo_dock_add_separator, menu);
 			}
 			
-			menu_item = gtk_separator_menu_item_new ();
-			gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
-	
-			_add_entry_in_menu (_("Remove this launcher"), GTK_STOCK_REMOVE, cairo_dock_remove_launcher, menu);
-	
-			_add_entry_in_menu (_("Modify this launcher"), GTK_STOCK_EDIT, cairo_dock_modify_launcher, menu);
+			if (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon))  // possede un .desktop.
+			{
+				menu_item = gtk_separator_menu_item_new ();
+				gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+		
+				_add_entry_in_menu (_("Remove this launcher"), GTK_STOCK_REMOVE, cairo_dock_remove_launcher, menu);
+		
+				_add_entry_in_menu (_("Modify this launcher"), GTK_STOCK_EDIT, cairo_dock_modify_launcher, menu);
+			}
 		}
 	}
 	if (CAIRO_DOCK_IS_APPLI (icon))
