@@ -16,7 +16,8 @@ void  cairo_dock_set_one_icon_geometry_for_window_manager (Icon *icon, CairoDock
 void cairo_dock_set_icons_geometry_for_window_manager (CairoDock *pDock);;
 
 void cairo_dock_close_xwindow (Window Xid);
-void cairo_dock_show_appli (Window Xid);
+void cairo_dock_kill_xwindow (Window Xid);
+void cairo_dock_show_xwindow (Window Xid);
 void cairo_dock_minimize_xwindow (Window Xid);
 void cairo_dock_maximize_xwindow (Window Xid, gboolean bMaximize);
 void cairo_dock_set_xwindow_fullscreen (Window Xid, gboolean bFullScreen);

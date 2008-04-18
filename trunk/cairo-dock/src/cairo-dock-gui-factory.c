@@ -429,7 +429,7 @@ static void _cairo_dock_set_color (GtkColorButton *pColorButton, GSList *pWidget
 	}
 }
 
-static void _cairo_dock_recup_current_color (GtkColorButton *pColorButton, GSList *pWidgetList)
+static void _cairo_dock_get_current_color (GtkColorButton *pColorButton, GSList *pWidgetList)
 {
 	GdkColor gdkColor;
 	GtkSpinButton *pSpinButton;
@@ -913,7 +913,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								FALSE,
 								0);
 							g_signal_connect (G_OBJECT (pColorButton), "color-set", G_CALLBACK(_cairo_dock_set_color), pSubWidgetList);
-							g_signal_connect (G_OBJECT (pColorButton), "clicked", G_CALLBACK(_cairo_dock_recup_current_color), pSubWidgetList);
+							g_signal_connect (G_OBJECT (pColorButton), "clicked", G_CALLBACK(_cairo_dock_get_current_color), pSubWidgetList);
 						}
 						g_free (fValueList);
 					break;

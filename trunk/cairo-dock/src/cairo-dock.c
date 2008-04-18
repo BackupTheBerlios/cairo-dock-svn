@@ -232,10 +232,11 @@ CairoDockDesktopEnv g_iDesktopEnv = CAIRO_DOCK_UNKNOWN_ENV;
 CairoDockFMSortType g_iFileSortType;
 gboolean g_bShowHiddenFiles;
 
-cairo_surface_t *g_pIndicatorSurface = NULL;
+cairo_surface_t *g_pIndicatorSurface[2] = {NULL, NULL};
 gboolean g_bMixLauncherAppli = FALSE;
 double g_fIndicatorRatio;
 double g_fIndicatorWidth, g_fIndicatorHeight;
+int g_iIndicatorDeltaY;
 gboolean g_bOverWriteXIcons = TRUE;
 
 static gboolean random_dialog (gpointer user_data)

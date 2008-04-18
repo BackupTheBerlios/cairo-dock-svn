@@ -67,9 +67,9 @@ extern int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS];
 extern gboolean g_bDynamicReflection;
 extern double g_fAlbedo;
 extern gboolean g_bConstantSeparatorSize;
-extern cairo_surface_t *g_pIndicatorSurface;
-extern double g_fIndicatorRatio;
+extern cairo_surface_t *g_pIndicatorSurface[2];
 extern double g_fIndicatorWidth, g_fIndicatorHeight;
+extern int g_iIndicatorDeltaY;
 
 extern gboolean g_bUseGlitz;
 
@@ -536,20 +536,32 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		//g_print ("g_fVisibleAppliAlpha : %.2f & %d => %.2f\n", g_fVisibleAppliAlpha, icon->bIsHidden, icon->fAlpha);
 	}
 	
-	if (icon->bHasIndicator && g_pIndicatorSurface != NULL)
+	if (icon->bHasIndicator && g_pIndicatorSurface[0] != NULL)
 	{
 		cairo_save (pCairoContext);
 		if (bHorizontalDock)
 		{
-			cairo_translate (pCairoContext, icon->fDrawX + (icon->fWidth - g_fIndicatorWidth) * icon->fScale / (1 + g_fAmplitude), icon->fDrawY + (icon->fHeight - g_fIndicatorHeight) * icon->fScale);
-			cairo_scale (pCairoContext, fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude));
+			cairo_translate (pCairoContext,
+				icon->fDrawX + (icon->fWidth - g_fIndicatorWidth * fRatio) * icon->fScale / (1 + g_fAmplitude),
+				icon->fDrawY + (g_bDirectionUp ? 
+					(icon->fHeight - (g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * fRatio) * icon->fScale : 
+					(g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * icon->fScale * fRatio));
+			cairo_scale (pCairoContext,
+				fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude),
+				fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude) * (g_bDirectionUp ? 1 : -1));
 		}
 		else
 		{
-			cairo_translate (pCairoContext, icon->fDrawY + (icon->fHeight - g_fIndicatorHeight) * icon->fScale, icon->fDrawX + (icon->fWidth - g_fIndicatorWidth) * icon->fScale / (1 + g_fAmplitude));
-			cairo_scale (pCairoContext, fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude));
+			cairo_translate (pCairoContext,
+				icon->fDrawY + (g_bDirectionUp ? 
+					(icon->fHeight - (g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * fRatio) * icon->fScale : 
+					(g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * icon->fScale * fRatio),
+					icon->fDrawX + (icon->fWidth - g_fIndicatorWidth * fRatio) * icon->fScale / (1 + g_fAmplitude));
+			cairo_scale (pCairoContext,
+				fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude) * (g_bDirectionUp ? 1 : -1),
+				fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude));
 		}
-		cairo_set_source_surface (pCairoContext, g_pIndicatorSurface, 0.0, 0.0);
+		cairo_set_source_surface (pCairoContext, g_pIndicatorSurface[bHorizontalDock], 0.0, 0.0);
 		cairo_paint (pCairoContext);
 		cairo_restore (pCairoContext);
 	}
@@ -702,26 +714,51 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			
 			if (g_bDynamicReflection && icon->fScale > 1)
 			{
-				cairo_pattern_t *pGradationPattern = cairo_pattern_create_linear (0.,
-					0.,
-					0.,
-					g_fReflectSize * (1 + g_fAmplitude) / icon->fScale);  // de haut en bas.
-				g_return_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS);
-				
-				cairo_pattern_set_extend (pGradationPattern, CAIRO_EXTEND_NONE);
-				cairo_pattern_add_color_stop_rgba (pGradationPattern,
-					0.,
-					0.,
-					0.,
-					0.,
-					(g_bDirectionUp ? 1. : 1 - (icon->fScale - 1) / g_fAmplitude));  // astuce pour ne pas avoir a re-creer la surface de la reflection.
-				cairo_pattern_add_color_stop_rgba (pGradationPattern,
-					1.,
-					0.,
-					0.,
-					0.,
-					(g_bDirectionUp ? 1 - (icon->fScale - 1) / g_fAmplitude : 1.));
-
+				cairo_pattern_t *pGradationPattern;
+				if (bHorizontalDock)
+				{
+					pGradationPattern = cairo_pattern_create_linear (0.,
+						0.,
+						0.,
+						g_fReflectSize * (1 + g_fAmplitude) / icon->fScale);  // de haut en bas.
+					g_return_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS);
+					
+					cairo_pattern_set_extend (pGradationPattern, CAIRO_EXTEND_NONE);
+					cairo_pattern_add_color_stop_rgba (pGradationPattern,
+						0.,
+						0.,
+						0.,
+						0.,
+						(g_bDirectionUp ? 1. : 1 - (icon->fScale - 1) / g_fAmplitude));  // astuce pour ne pas avoir a re-creer la surface de la reflection.
+					cairo_pattern_add_color_stop_rgba (pGradationPattern,
+						1.,
+						0.,
+						0.,
+						0.,
+						(g_bDirectionUp ? 1 - (icon->fScale - 1) / g_fAmplitude : 1.));
+				}
+				else  // ca buggue a gauche...
+				{
+					pGradationPattern = cairo_pattern_create_linear (0.,
+						0.,
+						g_fReflectSize * (1 + g_fAmplitude) / icon->fScale,
+						0.);
+					g_return_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS);
+					
+					cairo_pattern_set_extend (pGradationPattern, CAIRO_EXTEND_NONE);
+					cairo_pattern_add_color_stop_rgba (pGradationPattern,
+						0.,
+						0.,
+						0.,
+						0.,
+						(g_bDirectionUp ? 1. : 1 - (icon->fScale - 1) / g_fAmplitude));  // astuce pour ne pas avoir a re-creer la surface de la reflection.
+					cairo_pattern_add_color_stop_rgba (pGradationPattern,
+						1.,
+						0.,
+						0.,
+						0.,
+						(g_bDirectionUp ? 1 - (icon->fScale - 1) / g_fAmplitude : 1.));
+				}
 				cairo_save (pCairoContext);
 				cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 				cairo_translate (pCairoContext, 0, 0);

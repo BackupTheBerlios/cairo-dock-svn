@@ -319,7 +319,8 @@ static gboolean _cairo_dock_timer (CairoDockMeasure *pMeasureTimer)
 }
 static gpointer _cairo_dock_threaded_calculation (CairoDockMeasure *pMeasureTimer)
 {
-	pMeasureTimer->acquisition ();
+	if (pMeasureTimer->acquisition != NULL)
+		pMeasureTimer->acquisition ();
 	
 	g_mutex_lock (pMeasureTimer->pMutexData);
 	pMeasureTimer->read ();

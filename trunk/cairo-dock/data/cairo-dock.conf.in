@@ -424,6 +424,10 @@ indicator image =
 #{The ratio between indicator's size and icon's size. The bigger, the bigger the indicators are.}
 indicator ratio = 1.
 
+#i[-10;64] Vertical offset :
+#{i pixels. You can use this parameter to adjust the indicator's vertical position.}
+indicator deltaY = 0
+
 #X+[Applications]
 frame_appli =
 

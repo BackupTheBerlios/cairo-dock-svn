@@ -164,11 +164,12 @@ extern double g_fDeskletColorInside[4];
 extern CairoDockFMSortType g_iFileSortType;
 extern gboolean g_bShowHiddenFiles;
 extern gchar *g_cRaiseDockShortcut;
-extern cairo_surface_t *g_pIndicatorSurface;
+extern cairo_surface_t *g_pIndicatorSurface[2];
 extern gboolean g_bMixLauncherAppli;
 extern double g_fIndicatorRatio;
 extern gboolean g_bOverWriteXIcons;
 extern double g_fIndicatorWidth, g_fIndicatorHeight;
+extern int g_iIndicatorDeltaY;
 
 static gchar **g_cUseXIconAppliList = NULL;
 static gboolean s_bLoading = FALSE;
@@ -933,6 +934,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_fIndicatorRatio = cairo_dock_get_double_key_value (pKeyFile, "Icons", "indicator ratio", &bFlushConfFileNeeded, 1., NULL, NULL);
 	
+	g_iIndicatorDeltaY = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "indicator deltaY", &bFlushConfFileNeeded, 0, NULL, NULL);
+	
 	gboolean bMixLauncherAppliOld = g_bMixLauncherAppli;
 	g_bMixLauncherAppli = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "mix launcher appli", &bFlushConfFileNeeded, TRUE, NULL, NULL);
 	
@@ -1099,8 +1102,10 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_free (cButtonOkImage);
 	g_free (cButtonCancelImage);
 	
-	cairo_surface_destroy (g_pIndicatorSurface);
-	g_pIndicatorSurface = NULL;
+	cairo_surface_destroy (g_pIndicatorSurface[0]);
+	cairo_surface_destroy (g_pIndicatorSurface[1]);
+	g_pIndicatorSurface[0] = NULL;
+	g_pIndicatorSurface[1] = NULL;
 	if (g_bShowAppli)
 	{
 		cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
@@ -1123,12 +1128,19 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		
 		if (pRawSurface != NULL)
 		{
-			g_pIndicatorSurface = cairo_dock_duplicate_surface (pRawSurface,
+			g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL] = cairo_dock_duplicate_surface (pRawSurface,
 				pCairoContext,
 				fRawWidth,
 				fRawHeight,
 				g_fIndicatorWidth * (1 + g_fAmplitude),
 				g_fIndicatorHeight * (1 + g_fAmplitude));
+			
+			g_pIndicatorSurface[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL],
+				pCairoContext, 
+				g_fIndicatorWidth * (1 + g_fAmplitude),
+				g_fIndicatorHeight * (1 + g_fAmplitude),
+				- G_PI / 2);
+			
 			cairo_surface_destroy (pRawSurface);
 		}
 		cairo_destroy (pCairoContext);

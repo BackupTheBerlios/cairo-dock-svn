@@ -682,7 +682,7 @@ static void cairo_dock_remove_module (GtkMenuItem *menu_item, gpointer *data)
 }
 
 
-static void cairo_dock_close_appli (GtkMenuItem *menu_item, gpointer *data)
+static void _cairo_dock_close_appli (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
@@ -690,8 +690,15 @@ static void cairo_dock_close_appli (GtkMenuItem *menu_item, gpointer *data)
 	if (CAIRO_DOCK_IS_APPLI (icon))
 		cairo_dock_close_xwindow (icon->Xid);
 }
+static void _cairo_dock_kill_appli (GtkMenuItem *menu_item, gpointer *data)
+{
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
 
-static void cairo_dock_minimize_appli (GtkMenuItem *menu_item, gpointer *data)
+	if (CAIRO_DOCK_IS_APPLI (icon))
+		cairo_dock_kill_xwindow (icon->Xid);
+}
+static void _cairo_dock_minimize_appli (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
@@ -707,7 +714,7 @@ static void _cairo_dock_show_appli (GtkMenuItem *menu_item, gpointer *data)
 	CairoDock *pDock = data[1];
 	if (icon->Xid > 0)
 	{
-		cairo_dock_show_appli (icon->Xid);
+		cairo_dock_show_xwindow (icon->Xid);
 	}
 }
 
@@ -1147,9 +1154,11 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		
 		_add_entry_in_menu (_("Show"), GTK_STOCK_FIND, _cairo_dock_show_appli, menu);
 
-		_add_entry_in_menu (_("Minimize"), GTK_STOCK_GO_DOWN, cairo_dock_minimize_appli, menu);
+		_add_entry_in_menu (_("Minimize"), GTK_STOCK_GO_DOWN, _cairo_dock_minimize_appli, menu);
 
-		_add_entry_in_menu (_("Close"), GTK_STOCK_CLOSE, cairo_dock_close_appli, menu);
+		_add_entry_in_menu (_("Close"), GTK_STOCK_CLOSE, _cairo_dock_close_appli, menu);
+		
+		_add_entry_in_menu (_("Kill"), GTK_STOCK_CANCEL, _cairo_dock_kill_appli, menu);
 	}
 	
 	if (CAIRO_DOCK_IS_APPLET (icon) || CAIRO_DOCK_IS_DESKLET (pContainer))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module.

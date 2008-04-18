@@ -113,14 +113,11 @@ void cairo_dock_free_icon_buffers (Icon *icon)
 
 CairoDockIconType cairo_dock_get_icon_type (Icon *icon)
 {
-	if (icon == NULL)
-		return CAIRO_DOCK_LAUNCHER;
-
-	if (icon->Xid != 0)
+	if (CAIRO_DOCK_IS_APPLI (icon))
 		return CAIRO_DOCK_APPLI;
-	else if (icon->pModule != NULL)
+	else if (CAIRO_DOCK_IS_APPLET (icon))
 		return CAIRO_DOCK_APPLET;
-	else if (icon->acName == NULL)
+	else if (CAIRO_DOCK_IS_SEPARATOR (icon))
 		return CAIRO_DOCK_SEPARATOR12;
 	else
 		return CAIRO_DOCK_LAUNCHER;

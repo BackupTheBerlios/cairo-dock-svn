@@ -25,7 +25,7 @@
 *TRUE ssi l'icone est une icone de separateur.
 *@param icon une icone.
 */
-#define CAIRO_DOCK_IS_SEPARATOR(icon) (icon != NULL && ((icon->iType & 1) || (icon->pModule == NULL && icon->Xid == 0 && icon->acName == NULL)))
+#define CAIRO_DOCK_IS_SEPARATOR(icon) (icon != NULL && (icon->acName == NULL && icon->pModule == NULL && icon->Xid == 0))  /* (icon->iType & 1) || */
 
 /**
 *TRUE ssi l'icone est une icone de lanceur defini par un fichier .desktop.

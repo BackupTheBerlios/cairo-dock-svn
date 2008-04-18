@@ -236,9 +236,14 @@ void cairo_dock_close_xwindow (Window Xid)
 	}
 }
 
-void cairo_dock_show_appli (Window Xid)
+void cairo_dock_kill_xwindow (Window Xid)
 {
-	//g_print ("%s (%d)\n", __func__, Xid);
+	g_return_if_fail (Xid > 0);
+	XKillClient (s_XDisplay, Xid);
+}
+
+void cairo_dock_show_xwindow (Window Xid)
+{
 	g_return_if_fail (Xid > 0);
 	XEvent xClientMessage;
 	Window root = DefaultRootWindow (s_XDisplay);

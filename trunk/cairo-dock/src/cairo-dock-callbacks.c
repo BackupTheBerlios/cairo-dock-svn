@@ -229,9 +229,9 @@ gboolean _cairo_dock_show_sub_dock_delayed (CairoDock *pDock)
 }
 
 
-static gboolean _cairo_dock_show_appli_for_drop (Icon *pIcon)
+static gboolean _cairo_dock_show_xwindow_for_drop (Icon *pIcon)
 {
-	cairo_dock_show_appli (pIcon->Xid);
+	cairo_dock_show_xwindow (pIcon->Xid);
 	return FALSE;
 }
 gboolean on_motion_notify2 (GtkWidget* pWidget,
@@ -373,7 +373,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		cairo_dock_replace_all_dialogs ();
 		if (pMotion == NULL && CAIRO_DOCK_IS_APPLI (pPointedIcon))
 		{
-			s_iSidShowAppliForDrop = g_timeout_add (500, (GSourceFunc) _cairo_dock_show_appli_for_drop, (gpointer) pPointedIcon);
+			s_iSidShowAppliForDrop = g_timeout_add (500, (GSourceFunc) _cairo_dock_show_xwindow_for_drop, (gpointer) pPointedIcon);
 		}
 		if ((pDock == s_pLastPointedDock || s_pLastPointedDock == NULL) && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
 		{
@@ -884,7 +884,7 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 			if (cairo_dock_get_active_window () == icon->Xid && g_bMinimizeOnClick)  // ne marche que si le dock est une fenêtre de type 'dock', sinon il prend le focus.
 				cairo_dock_minimize_xwindow (icon->Xid);
 			else
-				cairo_dock_show_appli (icon->Xid);
+				cairo_dock_show_xwindow (icon->Xid);
 		}
 		return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
 	}
@@ -893,7 +893,10 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 		if (icon->acCommand != NULL)
 		{
 			if (cairo_dock_launch_command_full (icon->acCommand, icon->cWorkingDirectory))
-				cairo_dock_arm_animation (icon, CAIRO_DOCK_LAUNCHER, -1);  // au cas ou ce serait aussi une appli
+			{
+				if (CAIRO_DOCK_IS_APPLI (icon))  // on remet l'animation du lanceur.
+					cairo_dock_arm_animation (icon, g_tAnimationType[CAIRO_DOCK_LAUNCHER], g_tNbAnimationRounds[CAIRO_DOCK_LAUNCHER]);
+			}
 			else
 				cairo_dock_arm_animation (icon, -1, 0);  // pas d'animation si echec.
 			return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
