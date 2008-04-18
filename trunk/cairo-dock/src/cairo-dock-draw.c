@@ -26,14 +26,11 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-draw.h"
 #include "cairo-dock-log.h"
 
-extern CairoDock *g_pMainDock;
-extern double g_fSubDockSizeRatio;
 extern gboolean g_bAutoHide;
 extern gboolean g_bTextAlwaysHorizontal;
 
 extern gint g_iScreenWidth[2];
 extern gint g_iScreenHeight[2];
-extern gint g_iMaxAuthorizedWidth;
 
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
@@ -720,7 +717,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 					pGradationPattern = cairo_pattern_create_linear (0.,
 						0.,
 						0.,
-						g_fReflectSize * (1 + g_fAmplitude) / icon->fScale);  // de haut en bas.
+						g_fReflectSize / fRatio * (1 + g_fAmplitude) / icon->fScale);  // de haut en bas.
 					g_return_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS);
 					
 					cairo_pattern_set_extend (pGradationPattern, CAIRO_EXTEND_NONE);
@@ -741,7 +738,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 				{
 					pGradationPattern = cairo_pattern_create_linear (0.,
 						0.,
-						g_fReflectSize * (1 + g_fAmplitude) / icon->fScale,
+						g_fReflectSize / fRatio * (1 + g_fAmplitude) / icon->fScale,
 						0.);
 					g_return_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS);
 					
@@ -1288,13 +1285,11 @@ void cairo_dock_get_window_position_and_geometry_at_balance (CairoDock *pDock, C
 {
 	if (iSizeType == CAIRO_DOCK_MAX_SIZE)
 	{
-		///*iNewWidth = MIN (g_iMaxAuthorizedWidth, pDock->iMaxDockWidth);
 		*iNewWidth = pDock->iMaxDockWidth;
 		*iNewHeight = pDock->iMaxDockHeight;
 	}
 	else if (iSizeType == CAIRO_DOCK_NORMAL_SIZE)
 	{
-		///*iNewWidth = MIN (g_iMaxAuthorizedWidth, pDock->iMinDockWidth);
 		*iNewWidth = pDock->iMinDockWidth;
 		*iNewHeight = pDock->iMinDockHeight;
 	}

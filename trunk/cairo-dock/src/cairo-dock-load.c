@@ -194,7 +194,7 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	}
 	else if (CAIRO_DOCK_IS_APPLET (icon))  // c'est l'icône d'une applet.
 	{
-		g_print ("  icon->acFileName : %s\n", icon->acFileName);
+		//g_print ("  icon->acFileName : %s\n", icon->acFileName);
 		icon->pIconBuffer = cairo_dock_create_applet_surface (icon->acFileName, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight, bApplySizeRestriction);
 	}
 	else if (CAIRO_DOCK_IS_APPLI (icon))  // c'est l'icône d'une appli valide. Dans cet ordre on n'a pas besoin de verifier que c'est NORMAL_APPLI.

@@ -276,7 +276,7 @@ echo "number of lines/word/caracters of sources :"
 sed '/^ *$/d' cairo-dock/src/*.c plug-ins/*/src/*.c | sed '/^\t*$/d'  | sed '/^\t*\/\/*/d' | wc
 
 if test -e compile.log; then
-	echo "Some errors were encountered :"
+	echo "\033[8;34mSome errors were encountered :\033[0m"
 	cat compile.log
 else
 	echo "Compile is a success !"

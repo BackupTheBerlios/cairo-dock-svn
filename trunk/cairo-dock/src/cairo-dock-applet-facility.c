@@ -343,7 +343,10 @@ static gboolean _cairo_dock_check_for_redraw (CairoDockMeasure *pMeasureTimer)
 		
 		//\_______________________ On lance le timer si necessaire.
 		if (pMeasureTimer->iSidTimer == 0)
+		{
+			pMeasureTimer->iFrequencyState = 
 			pMeasureTimer->iSidTimer = g_timeout_add (pMeasureTimer->iCheckInterval, (GSourceFunc) _cairo_dock_timer, pMeasureTimer);
+		}
 		
 		pMeasureTimer->iSidTimerRedraw = 0;
 		return FALSE;
@@ -370,6 +373,7 @@ void cairo_dock_launch_measure (CairoDockMeasure *pMeasureTimer)
 	}
 	else if (pMeasureTimer->iSidTimer == 0)
 	{
+		pMeasureTimer->iFrequencyState = CAIRO_DOCK_FREQUENCY_NORMAL;
 		pMeasureTimer->iSidTimer = g_timeout_add (pMeasureTimer->iCheckInterval, (GSourceFunc) _cairo_dock_timer, pMeasureTimer);
 	}
 }
@@ -420,14 +424,55 @@ gboolean cairo_dock_measure_is_active (CairoDockMeasure *pMeasureTimer)
 	return (pMeasureTimer != NULL && pMeasureTimer->iSidTimer != 0);
 }
 
+static void _cairo_dock_restart_timer_with_frequency (CairoDockMeasure *pMeasureTimer, int iNewCheckInterval)
+{
+	gboolean bNeedsRestart = (pMeasureTimer->iSidTimer != 0);
+	cairo_dock_stop_measure_timer (pMeasureTimer);
+	
+	if (bNeedsRestart)
+		pMeasureTimer->iSidTimer = g_timeout_add (iNewCheckInterval, (GSourceFunc) _cairo_dock_timer, pMeasureTimer);
+}
+
 void cairo_dock_change_measure_frequency (CairoDockMeasure *pMeasureTimer, int iNewCheckInterval)
 {
 	g_return_if_fail (pMeasureTimer != NULL);
 	pMeasureTimer->iCheckInterval = iNewCheckInterval;
 	
-	gboolean bNeedsRestart = (pMeasureTimer->iSidTimer != 0);
-	cairo_dock_stop_measure_timer (pMeasureTimer);
-	
-	if (bNeedsRestart)
-		pMeasureTimer->iSidTimer = g_timeout_add (pMeasureTimer->iCheckInterval, (GSourceFunc) _cairo_dock_timer, pMeasureTimer);
+	_cairo_dock_restart_timer_with_frequency (pMeasureTimer, iNewCheckInterval);
+}
+
+void cairo_dock_downgrade_frequency_state (CairoDockMeasure *pMeasureTimer)
+{
+	if (pMeasureTimer->iFrequencyState < CAIRO_DOCK_FREQUENCY_SLEEP)
+	{
+		pMeasureTimer->iFrequencyState ++;
+		int iNewCheckInterval;
+		switch (pMeasureTimer->iFrequencyState)
+		{
+			case CAIRO_DOCK_FREQUENCY_LOW :
+				iNewCheckInterval = 2 * pMeasureTimer->iCheckInterval;
+			break ;
+			case CAIRO_DOCK_FREQUENCY_VERY_LOW :
+				iNewCheckInterval = 4 * pMeasureTimer->iCheckInterval;
+			break ;
+			case CAIRO_DOCK_FREQUENCY_SLEEP :
+				iNewCheckInterval = 10 * pMeasureTimer->iCheckInterval;
+			break ;
+			default :  // ne doit pas arriver.
+				iNewCheckInterval = pMeasureTimer->iCheckInterval;
+			break ;
+		}
+		
+		cd_message ("degradation de la mesure (etat <- %d/%d)", pMeasureTimer->iFrequencyState, CAIRO_DOCK_NB_FREQUENCIES-1);
+		_cairo_dock_restart_timer_with_frequency (pMeasureTimer, iNewCheckInterval);
+	}
+}
+
+void cairo_dock_set_normal_frequency_state (CairoDockMeasure *pMeasureTimer)
+{
+	if (pMeasureTimer->iFrequencyState != CAIRO_DOCK_FREQUENCY_NORMAL)
+	{
+		pMeasureTimer->iFrequencyState = CAIRO_DOCK_FREQUENCY_NORMAL;
+		_cairo_dock_restart_timer_with_frequency (pMeasureTimer, pMeasureTimer->iCheckInterval);
+	}
 }

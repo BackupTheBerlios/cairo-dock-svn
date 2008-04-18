@@ -139,6 +139,13 @@ gchar* cairo_dock_manage_themes_for_applet (gchar *cAppletShareDataDir, gchar *c
 */
 GtkWidget *cairo_dock_create_sub_menu (gchar *cLabel, GtkWidget *pMenu);
 
+typedef enum {
+	CAIRO_DOCK_FREQUENCY_NORMAL = 0,
+	CAIRO_DOCK_FREQUENCY_LOW,
+	CAIRO_DOCK_FREQUENCY_VERY_LOW,
+	CAIRO_DOCK_FREQUENCY_SLEEP,
+	CAIRO_DOCK_NB_FREQUENCIES
+} CairoDockFrequencyState;
 
 typedef struct {
 	/// Sid du timer des mesures.
@@ -157,10 +164,12 @@ typedef struct {
 	GVoidFunc update;
 	/// intervalle de temps
 	gint iCheckInterval;
+	/// etat de la frequence des mesures.
+	CairoDockFrequencyState iFrequencyState;
 } CairoDockMeasure;
 
 /**
-*Lance les mesures periodiques, prealablement preparee avec #cairo_dock_new_measure_timer. La 1ere iteration est executee immediatement. L'acquisition et la lecture des donnees est faite de maniere asynchrone (dans un thread secondaire), alors que le chargement des mesures se fait dans la boucle principale.
+*Lance les mesures periodiques, prealablement preparee avec #cairo_dock_new_measure_timer. La 1ere iteration est executee immediatement. L'acquisition et la lecture des donnees est faite de maniere asynchrone (dans un thread secondaire), alors que le chargement des mesures se fait dans la boucle principale. La frequence est remise a son etat normal.
 *@param pMeasureTimer la mesure periodique.
 */
 void cairo_dock_launch_measure (CairoDockMeasure *pMeasureTimer);
@@ -195,7 +204,16 @@ gboolean cairo_dock_measure_is_active (CairoDockMeasure *pMeasureTimer);
 *@param iNewCheckInterval le nouvel intervalle entre 2 mesures, en ms.
 */
 void cairo_dock_change_measure_frequency (CairoDockMeasure *pMeasureTimer, int iNewCheckInterval);
-
+/**
+*Degrade la frequence des mesures. La mesure passe dans un etat moins actif (typiquement utile si la mesure a echouee).
+*@param pMeasureTimer la mesure periodique.
+*/
+void cairo_dock_downgrade_frequency_state (CairoDockMeasure *pMeasureTimer);
+/**
+*Remet la frequence des mesures a un etat normal. Notez que cela est fait automatiquement au 1er lancement de la mesure.
+*@param pMeasureTimer la mesure periodique.
+*/
+void cairo_dock_set_normal_frequency_state (CairoDockMeasure *pMeasureTimer);
 
 //\_________________________________ INIT
 /**
