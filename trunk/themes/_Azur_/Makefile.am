@@ -7,4 +7,5 @@ theme_DATA = \
 	readme\
 	background-cairo-dock.svg\
 	separateur.svg\
-	preview
+	preview\
+	indicator.svg
