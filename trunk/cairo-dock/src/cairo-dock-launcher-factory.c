@@ -329,7 +329,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 	gboolean bPreventFromInhibating = g_key_file_get_boolean (keyfile, "Desktop Entry", "prevent inhibate", NULL);  // FALSE si la cle n'existe pas.
 	
 	g_free (icon->cClass);
-	if (! bPreventFromInhibating && icon->acCommand != NULL)
+	if (! bPreventFromInhibating && icon->acCommand != NULL && icon->cBaseURI == NULL)
 	{
 		gchar *cStartupWMClass = g_key_file_get_string (keyfile, "Desktop Entry", "StartupWMClass", NULL);
 		if (cStartupWMClass == NULL || *cStartupWMClass == '\0')

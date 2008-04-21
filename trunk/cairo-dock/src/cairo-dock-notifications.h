@@ -12,13 +12,13 @@ typedef enum {
 	CAIRO_DOCK_REMOVE_ICON=0,
 	/// notification appellee lorsque l'utilisateur clique sur une icone; l'animation est preparee juste avant, et lancee juste apres. data : {Icon, CairoDock, iState}
 	CAIRO_DOCK_CLICK_ICON,
-	/// notification appellee lorsque l'utilisateur double clique sur une icone. data : Icon
+	/// notification appellee lorsque l'utilisateur double clique sur une icone. data : {Icon, CairoDock}
 	CAIRO_DOCK_DOUBLE_CLICK_ICON,
-	/// data : Icon
+	/// notification appellee lorsque l'utilisateur clique-milieu  sur une icone. data : {Icon, CairoDock}
 	CAIRO_DOCK_MIDDLE_CLICK_ICON,
 	/// data : {Icon, CairoDock, GtkMenu}
 	CAIRO_DOCK_BUILD_MENU,
-	/// data : {gchar, Icon, double, CairoDock}
+	/// data : {gchar*, Icon, double*, CairoDock}
 	CAIRO_DOCK_DROP_DATA,
 	/// notification appellee lors d'un changement de bureau ou de viewport. data : NULL
 	CAIRO_DOCK_DESKTOP_CHANGED,
@@ -28,6 +28,8 @@ typedef enum {
 	CAIRO_DOCK_SCREEN_GEOMETRY_ALTERED,
 	/// notification appellee lorsque la fenetre active a change. data : Xid
 	CAIRO_DOCK_WINDOW_ACTIVATED,
+	/// notification appellee lorsque l'utilisateur scrolle sur une icone en maintenant la touche SHIFT ou CTRL enfoncee. data : {Icon, CairoDock, iDirection}
+	CAIRO_DOCK_SCROLL_ICON,
 	CAIRO_DOCK_NB_NOTIFICATIONS
 	} CairoDockNotificationType;
 

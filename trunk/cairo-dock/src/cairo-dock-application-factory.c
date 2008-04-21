@@ -541,17 +541,17 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 }
 
 
-gchar *cairo_dock_get_dragged (Atom xAtom, Window sourceXid)
+gchar *cairo_dock_get_property_name_on_xwindow (Window Xid, Atom xPropertyAtom)
 {
 	guchar *pNameBuffer = NULL;
 	Atom aReturnedType = 0;
 	int aReturnedFormat = 0;
 	unsigned long iLeftBytes, iBufferNbElements;
 	
-	XGetWindowProperty (s_XDisplay, sourceXid, xAtom, 0, G_MAXULONG, False, s_aUtf8String, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
+	XGetWindowProperty (s_XDisplay, Xid, xPropertyAtom, 0, G_MAXULONG, False, s_aUtf8String, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
 	if (iBufferNbElements == 0)
 	{
-		XGetWindowProperty (s_XDisplay, sourceXid, s_aWmName, 0, G_MAXULONG, False, s_aString, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
+		XGetWindowProperty (s_XDisplay, Xid, xPropertyAtom, 0, G_MAXULONG, False, s_aString, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
 	}
 	g_print ("iBufferNbElements : %d\n", iBufferNbElements);
 	if (iBufferNbElements == 0)

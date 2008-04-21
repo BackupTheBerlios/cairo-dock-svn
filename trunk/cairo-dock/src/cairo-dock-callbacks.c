@@ -746,8 +746,8 @@ static int _move_right_by_arrow (int iMoveByArrow, CairoDock *pDock)
 	return iEffectiveMove;
 }
 gboolean on_key_press (GtkWidget *pWidget,
-			GdkEventKey *pKey,
-			CairoDock *pDock)
+	GdkEventKey *pKey,
+	CairoDock *pDock)
 {
 	cd_message ("");
 	if (pKey->type == GDK_KEY_PRESS)
@@ -870,15 +870,17 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 		{
 			int answer =cairo_dock_ask_question_and_wait (_("Do you want to mount this point ?"), icon, CAIRO_DOCK_CONTAINER (pDock));
 			if (answer != GTK_RESPONSE_YES)
+			{
+				icon->iCount = 0;
 				return CAIRO_DOCK_LET_PASS_NOTIFICATION;
-
+			}
 			cairo_dock_fm_mount (icon, pDock);
 		}
 		else
 			cairo_dock_fm_launch_uri (icon->acCommand);
 		return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
 	}
-	else if (CAIRO_DOCK_IS_APPLI (icon) && ! (iButtonState & GDK_SHIFT_MASK && CAIRO_DOCK_IS_LAUNCHER (icon)))
+	else if (CAIRO_DOCK_IS_APPLI (icon) && ! ((iButtonState & GDK_SHIFT_MASK) && CAIRO_DOCK_IS_LAUNCHER (icon)))
 	{
 		{
 			if (cairo_dock_get_active_window () == icon->Xid && g_bMinimizeOnClick)  // ne marche que si le dock est une fenêtre de type 'dock', sinon il prend le focus.
@@ -895,10 +897,10 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 			if (cairo_dock_launch_command_full (icon->acCommand, icon->cWorkingDirectory))
 			{
 				if (CAIRO_DOCK_IS_APPLI (icon))  // on remet l'animation du lanceur.
-					cairo_dock_arm_animation (icon, g_tAnimationType[CAIRO_DOCK_LAUNCHER], g_tNbAnimationRounds[CAIRO_DOCK_LAUNCHER]);
+					cairo_dock_arm_animation_by_type (icon, CAIRO_DOCK_LAUNCHER);  // on remet l'animation du lanceur.
 			}
 			else
-				cairo_dock_arm_animation (icon, -1, 0);  // pas d'animation si echec.
+				cairo_dock_arm_animation (icon, CAIRO_DOCK_BLINK, 1);  // 1 clignotement si echec.
 			return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
 		}
 		else
@@ -925,12 +927,17 @@ gboolean cairo_dock_notification_middle_click_icon (gpointer *data)
 		cairo_dock_close_xwindow (icon->Xid);
 		return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
 	}
+	if (CAIRO_DOCK_IS_URI_LAUNCHER (icon) && icon->pSubDock != NULL)  // icone de repertoire.
+	{
+		cairo_dock_fm_launch_uri (icon->acCommand);
+		return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
+	}
 	return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 }
 
 gboolean on_button_press2 (GtkWidget* pWidget,
-				GdkEventButton* pButton,
-				CairoDock *pDock)
+	GdkEventButton* pButton,
+	CairoDock *pDock)
 {
 	//g_print ("%s (%d/%d)\n", __func__, pButton->type, pButton->button);
 	if (pDock->bHorizontalDock)  // utile ?
@@ -964,7 +971,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 					{
 						cairo_dock_arm_animation (icon, -1, -1);
 
-						if (icon->pSubDock != NULL && bShowSubDockOnClick && ! CAIRO_DOCK_IS_APPLI (icon))
+						if (icon->pSubDock != NULL && bShowSubDockOnClick && ! CAIRO_DOCK_IS_APPLI (icon) && ! (pButton->state & GDK_SHIFT_MASK))  // icone de sous-dock.
 						{
 							cairo_dock_show_subdock (icon, FALSE, pDock);
 							cairo_dock_arm_animation (icon, 0, 0);
@@ -1194,8 +1201,8 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 	return TRUE;
 }
 gboolean on_scroll (GtkWidget* pWidget,
-			GdkEventScroll* pScroll,
-			CairoDock *pDock)
+	GdkEventScroll* pScroll,
+	CairoDock *pDock)
 {
 	static double fLastTime = 0;
 	static int iNbSimultaneousScroll = 0;
@@ -1203,7 +1210,15 @@ gboolean on_scroll (GtkWidget* pWidget,
 	static gpointer data[3] = {&scrollBuffer, NULL, NULL};
 	if (pDock->icons == NULL)
 		return FALSE;
-
+	
+	if (pScroll->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK))
+	{
+		Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
+		gpointer data[3] = {icon, pDock, GINT_TO_POINTER (pScroll->direction)};
+		cairo_dock_notify (CAIRO_DOCK_SCROLL_ICON, data);
+		return FALSE;
+	}
+	
 	//g_print ("%s (%d)\n", __func__, pScroll->direction);
 	if (pScroll->time - fLastTime < g_fRefreshInterval && s_iSidNonStopScrolling == 0)
 		iNbSimultaneousScroll ++;
@@ -1238,7 +1253,6 @@ gboolean on_scroll (GtkWidget* pWidget,
 	fLastTime = pScroll->time;
 	gpointer user_data[3] = {pScroll, pDock, GINT_TO_POINTER (0)};
 	_cairo_dock_autoscroll (user_data);
-
 
 	return FALSE;
 }
@@ -1482,21 +1496,22 @@ void on_drag_motion (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, gui
 	{
 		g_print ("start dragging\n");
 		
-		GdkAtom gdkAtom = gdk_drag_get_selection (dc);
+		/*GdkAtom gdkAtom = gdk_drag_get_selection (dc);
 		Atom xAtom = gdk_x11_atom_to_xatom (gdkAtom);
 		
 		Window Xid = GDK_WINDOW_XID (dc->source_window);
-		g_print (" <%s>\n", cairo_dock_get_dragged (xAtom, Xid));
+		g_print (" <%s>\n", cairo_dock_get_property_name_on_xwindow (Xid, xAtom));*/
 		
 		pDock->bIsDragging = TRUE;
-		//pDock->iAvoidingMouseIconType = -1;
+		/*pDock->iAvoidingMouseIconType = -1;
 		
-		/*GdkAtom target = gtk_drag_dest_find_target (pWidget, dc, NULL);
+		GdkAtom target = gtk_drag_dest_find_target (pWidget, dc, NULL);
 		if (target == GDK_NONE)
 			gdk_drag_status (dc, 0, time);
 		else
-			gtk_drag_get_data (pWidget, dc, target, time);*/
-		
+			gtk_drag_get_data (pWidget, dc, target, time);
+		gtk_drag_get_data (pWidget, dc, target, time);
+		g_print ("get-data envoye\n");*/
 		on_enter_notify2 (pWidget, NULL, pDock);  // ne sera effectif que la 1ere fois a chaque entree dans un dock.
 	}
 	else
@@ -1594,12 +1609,12 @@ gboolean on_selection_request_event (GtkWidget *pWidget, GdkEventSelection *even
 	cd_message ("***%s ()", __func__);
 	return FALSE;
 }
-
+*/
 gboolean on_selection_notify_event (GtkWidget *pWidget, GdkEventSelection *event, gpointer user_data)
 {
-	cd_message ("***%s ()", __func__);
+	g_print ("***%s ()\n", __func__);
 	return FALSE;
-}*/
+}
 
 
 

@@ -668,7 +668,8 @@ struct _CairoDockDesklet {
 
 #define CAIRO_DOCK_FM_VFS_ROOT "_vfsroot_"
 #define CAIRO_DOCK_FM_NETWORK "_network_"
-#define CAIRO_DOCK_FM_VFS_ROOT_NETWORK "_vfsroot+network_"
+#define CAIRO_DOCK_FM_TRASH "_trash_"
+#define CAIRO_DOCK_FM_DESKTOP "_desktop_"
 
 
 typedef gboolean (* CairoDockForeachDeskletFunc) (CairoDockDesklet *pDesklet, CairoDockModule *pModule, gpointer data);

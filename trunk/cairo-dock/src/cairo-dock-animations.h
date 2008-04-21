@@ -27,6 +27,12 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock);
 */
 void cairo_dock_arm_animation (Icon *icon, CairoDockAnimationType iAnimationType, int iNbRounds);
 /**
+*Arme l'animation d'une icone correspondant a un type donne.
+*@param icon l'icone a animer.
+*@param iType le type d'icone qui sera considere.
+*/
+void cairo_dock_arm_animation_by_type (Icon *icon, CairoDockIconType iType);
+/**
 *Lance l'animation de l'icone. Ne fait rien si l'icone ne sera pas animee.
 *@param icon l'icone a animer.
 *@param pDock le dock contenant l'icone.

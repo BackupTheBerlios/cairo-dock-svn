@@ -206,7 +206,7 @@ gboolean cairo_dock_notification_remove_icon (gpointer *data)
 	cairo_dock_mark_theme_as_modified (TRUE);
 	return CAIRO_DOCK_INTERCEPT_NOTIFICATION;  // on l'intercepte car on ne peut plus garantir la validite de l'icone apres cela.
 }
-static void cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
+static void _cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
@@ -385,7 +385,7 @@ static void cairo_dock_add_separator (GtkMenuItem *menu_item, gpointer *data)
 		_cairo_dock_create_launcher (menu_item, data, CAIRO_DOCK_LAUNCHER_FOR_SEPARATOR);
 }
 
-static void cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
+static void _cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
@@ -1071,14 +1071,14 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 				_add_entry_in_menu (_("Add a separator"), GTK_STOCK_ADD, cairo_dock_add_separator, menu);
 			}
 			
-			if (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon))  // possede un .desktop.
+			if (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon) || CAIRO_DOCK_IS_USER_SEPARATOR (icon))  // possede un .desktop.
 			{
 				menu_item = gtk_separator_menu_item_new ();
 				gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
-		
-				_add_entry_in_menu (_("Remove this launcher"), GTK_STOCK_REMOVE, cairo_dock_remove_launcher, menu);
-		
-				_add_entry_in_menu (_("Modify this launcher"), GTK_STOCK_EDIT, cairo_dock_modify_launcher, menu);
+			
+				_add_entry_in_menu (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon) ? _("Remove this launcher") : _("Remove this separator"), GTK_STOCK_REMOVE, _cairo_dock_remove_launcher, menu);
+			
+				_add_entry_in_menu (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon) ? _("Modify this launcher") : _("Modify this separator"), GTK_STOCK_EDIT, _cairo_dock_modify_launcher, menu);
 			}
 		}
 	}
