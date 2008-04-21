@@ -1,11 +1,11 @@
-/******************************************************************************
+/*********************************************************************************
 
 This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
-******************************************************************************/
+*********************************************************************************/
 #include <math.h>
 #include <string.h>
 #include <cairo.h>
@@ -62,28 +62,28 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 				fRotationAngle = -G_PI/2;
 			else
 				fRotationAngle = G_PI/2;
-		cd_message ("%s (%s)\n", __func__, cImagePath);
+		
 		pNewSurface = cairo_dock_create_surface_from_image (cImagePath,
 			pSourceContext,
 			fMaxScale,
 			g_tIconAuthorizedWidth[CAIRO_DOCK_SEPARATOR12],
 			g_tIconAuthorizedHeight[CAIRO_DOCK_SEPARATOR12],
-			g_tIconAuthorizedWidth[CAIRO_DOCK_SEPARATOR12],
-			g_tIconAuthorizedHeight[CAIRO_DOCK_SEPARATOR12],
 			fWidth,
 			fHeight,
-			fRotationAngle,
-			1,
 			FALSE);
+		if (fRotationAngle != 0)
+		{
+			cairo_surface_t *pNewSurfaceRotated = cairo_dock_rotate_surface (pNewSurface, pSourceContext, *fWidth * fMaxScale, *fHeight * fMaxScale, fRotationAngle);
+			cairo_surface_destroy (pNewSurface);
+			pNewSurface = pNewSurfaceRotated;
+		}
 		g_free (cImagePath);
 	}
 	else
 	{
 		double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
-		cairo_dock_calculate_contrainted_icon_size (fWidth,
+		cairo_dock_calculate_contrainted_size (fWidth,
 			fHeight,
-			g_tIconAuthorizedWidth[CAIRO_DOCK_SEPARATOR12],
-			g_tIconAuthorizedHeight[CAIRO_DOCK_SEPARATOR12],
 			g_tIconAuthorizedWidth[CAIRO_DOCK_SEPARATOR12],
 			g_tIconAuthorizedHeight[CAIRO_DOCK_SEPARATOR12],
 			&fIconWidthSaturationFactor, &fIconHeightSaturationFactor);

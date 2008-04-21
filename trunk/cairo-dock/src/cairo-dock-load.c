@@ -104,7 +104,6 @@ gchar *cairo_dock_generate_file_path (gchar *cImageFile)
 
 cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFile, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern)
 {
-	//g_print ("%s (%dx%d)\n", __func__, image_width, image_height);
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	cairo_surface_t *pNewSurface = NULL;
 
@@ -112,22 +111,61 @@ cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFi
 	{
 		gchar *cImagePath = cairo_dock_generate_file_path (cImageFile);
 
+		int iDesiredWidth = (int) (*fImageWidth), iDesiredHeight = (int) (*fImageHeight);
 		pNewSurface = cairo_dock_create_surface_from_image (cImagePath,
 			pSourceContext,
 			1.,
-			(int) (*fImageWidth),
-			(int) (*fImageHeight),
-			(int) (*fImageWidth),
-			(int) (*fImageHeight),
+			bReapeatAsPattern ? 0 : iDesiredWidth,  // pas de contrainte sur
+			bReapeatAsPattern ? 0 : iDesiredHeight,  // la taille du motif initialement.
 			fImageWidth,
 			fImageHeight,
-			fRotationAngle,
-			fAlpha,
-			bReapeatAsPattern);
-
+			FALSE);
+		
+		if (bReapeatAsPattern)
+		{
+			cairo_surface_t *pNewSurfaceFilled = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+				CAIRO_CONTENT_COLOR_ALPHA,
+				iDesiredWidth,
+				iDesiredHeight);
+			cairo_t *pCairoContext = cairo_create (pNewSurfaceFilled);
+	
+			cairo_pattern_t* pPattern = cairo_pattern_create_for_surface (pNewSurface);
+			cairo_pattern_set_extend (pPattern, CAIRO_EXTEND_REPEAT);
+	
+			cairo_set_source (pCairoContext, pPattern);
+			cairo_paint (pCairoContext);
+			cairo_destroy (pCairoContext);
+	
+			cairo_surface_destroy (pNewSurface);
+			pNewSurface = pNewSurfaceFilled;
+		}
+		
+		if (fAlpha < 1)
+		{
+			cairo_surface_t *pNewSurfaceAlpha = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+				CAIRO_CONTENT_COLOR_ALPHA,
+				iDesiredWidth,
+				iDesiredHeight);
+			cairo_t *pCairoContext = cairo_create (pNewSurfaceAlpha);
+	
+			cairo_set_source_surface (pCairoContext, pNewSurface, 0, 0);
+			cairo_paint_with_alpha (pCairoContext, fAlpha);
+			cairo_destroy (pCairoContext);
+	
+			cairo_surface_destroy (pNewSurface);
+			pNewSurface = pNewSurfaceAlpha;
+		}
+		
+		if (fRotationAngle != 0)
+		{
+			cairo_surface_t *pNewSurfaceRotated = cairo_dock_rotate_surface (pNewSurface, pSourceContext, iDesiredWidth, iDesiredHeight, fRotationAngle);
+			cairo_surface_destroy (pNewSurface);
+			pNewSurface = pNewSurfaceRotated;
+		}
+		
 		g_free (cImagePath);
 	}
-
+	
 	return pNewSurface;
 }
 
@@ -166,12 +204,8 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 				fMaxScale,
 				(bApplySizeRestriction ? g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] : icon->fWidth),
 				(bApplySizeRestriction ? g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] : icon->fHeight),
-				(bApplySizeRestriction ? g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] : icon->fWidth),
-				(bApplySizeRestriction ? g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] : icon->fHeight),
 				(bHorizontalDock ? &icon->fWidth : &icon->fHeight),
 				(bHorizontalDock ? &icon->fHeight : &icon->fWidth),
-				0,
-				1,
 				FALSE);
 			//g_print (" => %.2fx%.2f\n", icon->fWidth, icon->fHeight);
 			/*int w = (int) icon->fWidth * (1 + g_fAmplitude), h = (int) icon->fHeight * (1 + g_fAmplitude);
@@ -217,12 +251,8 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 			fMaxScale,
 			(bApplySizeRestriction ? g_tIconAuthorizedWidth[icon->iType] : icon->fWidth),
 			(bApplySizeRestriction ? g_tIconAuthorizedHeight[icon->iType] : icon->fHeight),
-			(bApplySizeRestriction ? g_tIconAuthorizedWidth[icon->iType] : icon->fWidth),
-			(bApplySizeRestriction ? g_tIconAuthorizedHeight[icon->iType] : icon->fHeight),
 			(bHorizontalDock ? &icon->fWidth : &icon->fHeight),
 			(bHorizontalDock ? &icon->fHeight : &icon->fWidth),
-			0,
-			1,
 			FALSE);
 		g_free (cIconPath);
 	}
@@ -392,7 +422,7 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 		fFlatDockWidth += g_iIconGap + icon->fWidth;
 		pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, icon->fHeight);
 	}
-	pDock->fFlatDockWidth = (int) fFlatDockWidth;  /// pourquoi (int) ?...
+	pDock->fFlatDockWidth = (int) fFlatDockWidth;  /// (int) n'est plus tellement necessaire ...
 	cairo_destroy (pCairoContext);
 }
 
@@ -519,7 +549,7 @@ cairo_surface_t *cairo_dock_load_stripes (cairo_t* pSourceContext, int iStripesW
 
 void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, int iNewDecorationsWidth, int iNewDecorationsHeight)
 {
-	cd_debug ("%s (%dx%d) [%.2fx%.2f]", __func__, iNewDecorationsWidth, iNewDecorationsHeight, g_fBackgroundImageWidth, g_fBackgroundImageHeight);
+	//g_print ("%s (%dx%d) [%.2fx%.2f]\n", __func__, iNewDecorationsWidth, iNewDecorationsHeight, g_fBackgroundImageWidth, g_fBackgroundImageHeight);
 	if (2 * iNewDecorationsWidth > g_fBackgroundImageWidth || iNewDecorationsHeight > g_fBackgroundImageHeight)
 	{
 		cairo_surface_destroy (g_pBackgroundSurface[0]);

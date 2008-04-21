@@ -1108,41 +1108,28 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_pIndicatorSurface[1] = NULL;
 	if (g_bShowAppli)
 	{
-		cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
-		double fRawWidth = 0, fRawHeight = 0;
-		cairo_surface_t *pRawSurface = cairo_dock_load_image (pCairoContext,
-			cIndicatorImagePath,
-			&fRawWidth,
-			&fRawHeight,
-			0.,
-			1.,
-			FALSE);
-		
 		double fLauncherWidth = (g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] != 0 ? g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] : 48);
 		double fLauncherHeight = (g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] != 0 ? g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] : 48);
-		double fRawRatio = MIN (fLauncherWidth / fRawWidth, fLauncherHeight / fRawHeight);
 		
-		g_fIndicatorWidth = fRawWidth * fRawRatio * g_fIndicatorRatio;
-		g_fIndicatorHeight = fRawHeight * fRawRatio * g_fIndicatorRatio;
-		cd_message ("<indicateur> : %.2f x %.2f", g_fIndicatorWidth, g_fIndicatorHeight);
+		cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 		
-		if (pRawSurface != NULL)
-		{
-			g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL] = cairo_dock_duplicate_surface (pRawSurface,
-				pCairoContext,
-				fRawWidth,
-				fRawHeight,
-				g_fIndicatorWidth * (1 + g_fAmplitude),
-				g_fIndicatorHeight * (1 + g_fAmplitude));
-			
-			g_pIndicatorSurface[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL],
-				pCairoContext, 
-				g_fIndicatorWidth * (1 + g_fAmplitude),
-				g_fIndicatorHeight * (1 + g_fAmplitude),
-				- G_PI / 2);
-			
-			cairo_surface_destroy (pRawSurface);
-		}
+		g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL] = cairo_dock_create_surface_from_image (
+			cIndicatorImagePath,
+			pCairoContext,
+			1 + g_fAmplitude,
+			fLauncherWidth * g_fIndicatorRatio,
+			fLauncherHeight * g_fIndicatorRatio,
+			&g_fIndicatorWidth,
+			&g_fIndicatorHeight,
+			TRUE);
+		//g_print ("g_pIndicatorSurface : %.2fx%.2f\n", g_fIndicatorWidth, g_fIndicatorHeight);
+		g_pIndicatorSurface[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (
+			g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL],
+			pCairoContext, 
+			g_fIndicatorWidth * (1 + g_fAmplitude),
+			g_fIndicatorHeight * (1 + g_fAmplitude),
+			- G_PI / 2);
+		
 		cairo_destroy (pCairoContext);
 	}
 	g_free (cIndicatorImagePath);

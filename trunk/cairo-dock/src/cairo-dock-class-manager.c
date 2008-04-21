@@ -463,10 +463,8 @@ void cairo_dock_reset_class_table (void)
 static cairo_surface_t *cairo_dock_duplicate_inhibator_surface_for_appli (cairo_t *pSourceContext, Icon *pInhibatorIcon, double fMaxScale, double *fWidth, double *fHeight)
 {
 	double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
-	cairo_dock_calculate_contrainted_icon_size (fWidth,
+	cairo_dock_calculate_contrainted_size (fWidth,
 		fHeight,
-		g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI],
-		g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI],
 		g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI],
 		g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI],
 		&fIconWidthSaturationFactor,

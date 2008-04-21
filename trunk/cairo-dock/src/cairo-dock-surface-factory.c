@@ -1,11 +1,11 @@
-/******************************************************************************
+/*********************************************************************************
 
 This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
-******************************************************************************/
+*********************************************************************************/
 #include <math.h>
 #include <librsvg/rsvg.h>
 #include <librsvg/rsvg-cairo.h>
@@ -27,31 +27,37 @@ extern int g_iLabelWeight;
 extern int g_iLabelStyle;
 extern int g_iDockRadius;
 
-void cairo_dock_calculate_contrainted_icon_size (double *fImageWidth, double *fImageHeight, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fIconWidthSaturationFactor, double *fIconHeightSaturationFactor)
-{
-	*fIconWidthSaturationFactor = 1;
-	*fIconHeightSaturationFactor = 1;
 
-	if (iMaxIconAuthorizedWidth > 0 && (*fImageWidth) > iMaxIconAuthorizedWidth)
+void cairo_dock_calculate_contrainted_size (double *fImageWidth, double *fImageHeight, int iWidthConstraint, int iHeightConstraint, double *fZoomWidth, double *fZoomHeight)
+{
+	if (iWidthConstraint != 0)
 	{
-		*fIconWidthSaturationFactor = 1. * iMaxIconAuthorizedWidth / (*fImageWidth);
-		*fImageWidth = (double) iMaxIconAuthorizedWidth;
+		*fZoomWidth = 1. * iWidthConstraint / (*fImageWidth);
+		*fImageWidth = (double) iWidthConstraint;
 	}
-	if (iMaxIconAuthorizedHeight > 0 && (*fImageHeight) > iMaxIconAuthorizedHeight)
+	else
+		*fZoomWidth = 1.;
+	if (iHeightConstraint != 0)
 	{
-		*fIconHeightSaturationFactor = 1. * iMaxIconAuthorizedHeight / (*fImageHeight);
-		*fImageHeight = (double) iMaxIconAuthorizedHeight;
+		*fZoomHeight = 1. * iHeightConstraint / (*fImageHeight);
+		*fImageHeight = (double) iHeightConstraint;
 	}
-	if (iMinIconAuthorizedWidth > 0 && (*fImageWidth) < iMinIconAuthorizedWidth)
-	{
-		*fIconWidthSaturationFactor = 1. * iMinIconAuthorizedWidth / (*fImageWidth);
-		*fImageWidth = (double) iMinIconAuthorizedWidth;
-	}
-	if (iMinIconAuthorizedHeight > 0 && (*fImageHeight) < iMinIconAuthorizedHeight)
-	{
-		*fIconHeightSaturationFactor = 1. * iMinIconAuthorizedHeight / (*fImageHeight);
-		*fImageHeight = (double) iMinIconAuthorizedHeight;
-	}
+	else
+		*fZoomHeight = 1.;
+}
+
+void cairo_dock_calculate_size_constant_ratio (double *fImageWidth, double *fImageHeight, int iWidthConstraint, int iHeightConstraint, double *fZoom)
+{
+	if (iWidthConstraint != 0 && iHeightConstraint != 0)
+		*fZoom = MIN (iWidthConstraint / (*fImageWidth), iHeightConstraint / (*fImageHeight));
+	else if (iWidthConstraint != 0)
+		*fZoom = iWidthConstraint / (*fImageWidth);
+	else if (iHeightConstraint != 0)
+		*fZoom = iHeightConstraint / (*fImageHeight);
+	else
+		*fZoom = 1.;
+	*fImageWidth = (*fImageWidth) * (*fZoom);
+	*fImageHeight = (*fImageHeight) * (*fZoom);
 }
 
 
@@ -99,10 +105,8 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 		(int) iStride);
 
 	double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
-	cairo_dock_calculate_contrainted_icon_size (fWidth,
+	cairo_dock_calculate_contrainted_size (fWidth,
 		fHeight,
-		g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI],
-		g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI],
 		g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI],
 		g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI],
 		&fIconWidthSaturationFactor,
@@ -125,21 +129,30 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 }
 
 
-cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo_t *pSourceContext, double fMaxScale, gboolean bConstraintSize, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fImageWidth, double *fImageHeight)
+cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo_t *pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, gboolean bKeepRatio, double *fImageWidth, double *fImageHeight)
 {
 	*fImageWidth = gdk_pixbuf_get_width (pixbuf);
 	*fImageHeight = gdk_pixbuf_get_height (pixbuf);
 
 	double fIconWidthSaturationFactor = 1., fIconHeightSaturationFactor = 1.;
-	if (bConstraintSize)
-		cairo_dock_calculate_contrainted_icon_size (fImageWidth,
+	if (bKeepRatio)
+	{
+		cairo_dock_calculate_size_constant_ratio (fImageWidth,
 			fImageHeight,
-			iMinIconAuthorizedWidth,
-			iMinIconAuthorizedHeight,
-			iMaxIconAuthorizedWidth,
-			iMaxIconAuthorizedHeight,
+			iWidthConstraint,
+			iHeightConstraint,
+			&fIconWidthSaturationFactor);
+		fIconHeightSaturationFactor = fIconWidthSaturationFactor;
+	}
+	else
+	{
+		cairo_dock_calculate_contrainted_size (fImageWidth,
+			fImageHeight,
+			iWidthConstraint,
+			iHeightConstraint,
 			&fIconWidthSaturationFactor,
 			&fIconHeightSaturationFactor);
+	}
 
 	GdkPixbuf *pPixbufWithAlpha = pixbuf;
 	if (! gdk_pixbuf_get_has_alpha (pixbuf))  // on lui rajoute un canal alpha s'il n'en a pas.
@@ -196,9 +209,9 @@ cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo
 }
 
 
-cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iMinIconAuthorizedWidth, int iMinIconAuthorizedHeight, int iMaxIconAuthorizedWidth, int iMaxIconAuthorizedHeight, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern)
+cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, double *fImageWidth, double *fImageHeight, gboolean bKeepRatio)
 {
-	//g_print ("%s (%s ; %dx%d)\n", __func__, cImagePath, iMinIconAuthorizedWidth, iMinIconAuthorizedHeight);
+	//g_print ("%s (%s, %dx%dx%.2f)\n", __func__, cImagePath, iWidthConstraint, iHeightConstraint, fMaxScale);
 	g_return_val_if_fail (cImagePath != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	GError *erreur = NULL;
 	RsvgDimensionData rsvg_dimension_data;
@@ -206,10 +219,9 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 	cairo_surface_t* surface_ini;
 	cairo_surface_t* pNewSurface = NULL;
 	cairo_t* pCairoContext = NULL;
-
 	double fIconWidthSaturationFactor = 1.;
 	double fIconHeightSaturationFactor = 1.;
-
+	
 	if (g_str_has_suffix (cImagePath, ".svg"))
 	{
 		rsvg_handle = rsvg_handle_new_from_file (cImagePath, &erreur);
@@ -226,16 +238,25 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 			*fImageWidth = (gdouble) rsvg_dimension_data.width;
 			*fImageHeight = (gdouble) rsvg_dimension_data.height;
 			//g_print ("%.2fx%.2f\n", *fImageWidth, *fImageHeight);
-			if (! bReapeatAsPattern)
-				cairo_dock_calculate_contrainted_icon_size (fImageWidth,
+			if (bKeepRatio)
+			{
+				cairo_dock_calculate_size_constant_ratio (fImageWidth,
 					fImageHeight,
-					iMinIconAuthorizedWidth,
-					iMinIconAuthorizedHeight,
-					iMaxIconAuthorizedWidth,
-					iMaxIconAuthorizedHeight,
+					iWidthConstraint,
+					iHeightConstraint,
+					&fIconWidthSaturationFactor);
+				fIconHeightSaturationFactor = fIconWidthSaturationFactor;
+			}
+			else
+			{
+				cairo_dock_calculate_contrainted_size (fImageWidth,
+					fImageHeight,
+					iWidthConstraint,
+					iHeightConstraint,
 					&fIconWidthSaturationFactor,
 					&fIconHeightSaturationFactor);
-			//g_print ("-> x%.2f ; x%.2f\n", fIconWidthSaturationFactor, fIconHeightSaturationFactor);
+			}
+			
 			pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 				CAIRO_CONTENT_COLOR_ALPHA,
 				ceil ((*fImageWidth) * fMaxScale),
@@ -256,17 +277,25 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 			*fImageWidth = (double) cairo_image_surface_get_width (surface_ini);
 			*fImageHeight = (double) cairo_image_surface_get_height (surface_ini);
 			
-			if (! bReapeatAsPattern)
-				cairo_dock_calculate_contrainted_icon_size (fImageWidth,
+			if (bKeepRatio)
+			{
+				cairo_dock_calculate_size_constant_ratio (fImageWidth,
 					fImageHeight,
-					iMinIconAuthorizedWidth,
-					iMinIconAuthorizedHeight,
-					iMaxIconAuthorizedWidth,
-					iMaxIconAuthorizedHeight,
+					iWidthConstraint,
+					iHeightConstraint,
+					&fIconWidthSaturationFactor);
+				fIconHeightSaturationFactor = fIconWidthSaturationFactor;
+			}
+			else
+			{
+				cairo_dock_calculate_contrainted_size (fImageWidth,
+					fImageHeight,
+					iWidthConstraint,
+					iHeightConstraint,
 					&fIconWidthSaturationFactor,
 					&fIconHeightSaturationFactor);
+			}
 			
-			//g_print ("%.2f x %.2f\n", *fImageWidth, *fImageHeight);
 			pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 				CAIRO_CONTENT_COLOR_ALPHA,
 				ceil ((*fImageWidth) * fMaxScale),
@@ -293,67 +322,14 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 		pNewSurface = cairo_dock_create_surface_from_pixbuf (pixbuf,
 			pSourceContext,
 			fMaxScale,
-			TRUE,
-			iMinIconAuthorizedWidth,
-			iMinIconAuthorizedHeight,
-			iMaxIconAuthorizedWidth,
-			iMaxIconAuthorizedHeight,
+			iWidthConstraint,
+			iHeightConstraint,
+			FALSE,
 			fImageWidth,
 			fImageHeight);
 	}
 	cairo_destroy (pCairoContext);
-
-	if (bReapeatAsPattern)
-	{
-		cairo_dock_calculate_contrainted_icon_size (fImageWidth,
-			fImageHeight,
-			iMinIconAuthorizedWidth,
-			iMinIconAuthorizedHeight,
-			iMaxIconAuthorizedWidth,
-			iMaxIconAuthorizedHeight,
-			&fIconWidthSaturationFactor,
-			&fIconHeightSaturationFactor);
-
-		cairo_surface_t *pNewSurfaceFilled = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-			CAIRO_CONTENT_COLOR_ALPHA,
-			*fImageWidth* fMaxScale,
-			*fImageHeight* fMaxScale);
-		pCairoContext = cairo_create (pNewSurfaceFilled);
-
-		cairo_pattern_t* pPattern = cairo_pattern_create_for_surface (pNewSurface);
-		cairo_pattern_set_extend (pPattern, CAIRO_EXTEND_REPEAT);
-
-		cairo_set_source (pCairoContext, pPattern);
-		cairo_paint (pCairoContext);
-		cairo_destroy (pCairoContext);
-
-		cairo_surface_destroy (pNewSurface);
-		pNewSurface = pNewSurfaceFilled;
-	}
-
-	if (fAlpha < 1)
-	{
-		cairo_surface_t *pNewSurfaceAlpha = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-			CAIRO_CONTENT_COLOR_ALPHA,
-			*fImageWidth * fMaxScale,
-			*fImageHeight * fMaxScale);
-		pCairoContext = cairo_create (pNewSurfaceAlpha);
-
-		cairo_set_source_surface (pCairoContext, pNewSurface, 0, 0);
-		cairo_paint_with_alpha (pCairoContext, fAlpha);
-		cairo_destroy (pCairoContext);
-
-		cairo_surface_destroy (pNewSurface);
-		pNewSurface = pNewSurfaceAlpha;
-	}
-
-	if (fRotationAngle != 0)
-	{
-		cairo_surface_t *pNewSurfaceRotated = cairo_dock_rotate_surface (pNewSurface, pSourceContext, *fImageWidth * fMaxScale, *fImageHeight * fMaxScale, fRotationAngle);
-		cairo_surface_destroy (pNewSurface);
-		pNewSurface = pNewSurfaceRotated;
-	}
-
+	
 	return pNewSurface;
 }
 
@@ -365,14 +341,11 @@ cairo_surface_t *cairo_dock_create_surface_for_icon (gchar *cImagePath, cairo_t*
 		1.,
 		fImageWidth,
 		fImageHeight,
-		fImageWidth,
-		fImageHeight,
 		&fImageWidth_,
 		&fImageHeight_,
-		0.,
-		1.,
 		FALSE);
 }
+
 
 
 cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fRotationAngle)
@@ -425,7 +398,6 @@ cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t 
 		return NULL;
 	}
 }
-
 
 
 static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale)

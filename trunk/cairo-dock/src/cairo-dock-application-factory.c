@@ -229,11 +229,9 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 			cairo_surface_t *pNewSurface = cairo_dock_create_surface_from_pixbuf (pIconPixbuf,
 				pSourceContext,
 				fMaxScale,
-				TRUE,
 				g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI],
 				g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI],
-				g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI],
-				g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI],
+				FALSE,
 				fWidth,
 				fHeight);
 

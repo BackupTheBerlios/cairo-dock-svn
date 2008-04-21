@@ -35,17 +35,15 @@ extern int g_tIconAuthorizedHeight[CAIRO_DOCK_NB_TYPES];
 
 cairo_surface_t *cairo_dock_create_applet_surface (gchar *cIconFileName, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight, gboolean bApplySizeRestriction)
 {
-	cd_message ("%s (%.2fx%.2f x %.2f / %d)\n", __func__, *fWidth, *fHeight,fMaxScale, bApplySizeRestriction);
+	cd_message ("%s (%.2fx%.2f x %.2f / %d)", __func__, *fWidth, *fHeight,fMaxScale, bApplySizeRestriction);
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
-	cairo_dock_calculate_contrainted_icon_size (fWidth,
+	cairo_dock_calculate_contrainted_size (fWidth,
 		fHeight,
 		(bApplySizeRestriction ? g_tIconAuthorizedWidth[CAIRO_DOCK_APPLET] : 0),
 		(bApplySizeRestriction ? g_tIconAuthorizedHeight[CAIRO_DOCK_APPLET] : 0),
-		(bApplySizeRestriction ? g_tIconAuthorizedWidth[CAIRO_DOCK_APPLET] : 0),
-		(bApplySizeRestriction ? g_tIconAuthorizedHeight[CAIRO_DOCK_APPLET] : 0),
 		&fIconWidthSaturationFactor, &fIconHeightSaturationFactor);
-	cd_message (" -> %.2fx%.2f x %.2f\n", *fWidth, *fHeight,fMaxScale);
+	cd_message (" -> %.2fx%.2f x %.2f", *fWidth, *fHeight,fMaxScale);
 	cairo_surface_t *pNewSurface;
 	if (cIconFileName == NULL)
 		pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
@@ -60,12 +58,8 @@ cairo_surface_t *cairo_dock_create_applet_surface (gchar *cIconFileName, cairo_t
 			fMaxScale,
 			*fWidth,
 			*fHeight,
-			*fWidth,
-			*fHeight,
 			fWidth,
 			fHeight,
-			0,
-			1,
 			FALSE);
 		g_free (cIconPath);
 	}
