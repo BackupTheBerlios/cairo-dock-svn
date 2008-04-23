@@ -1141,6 +1141,8 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 				}
 			}
 			g_string_free (sDesktop, TRUE);
+			
+			_add_entry_in_menu (_("Kill"), GTK_STOCK_CANCEL, _cairo_dock_kill_appli, pSubMenuOtherActions);
 		}
 		
 		//\_________________________ On rajoute les actions courantes sur les icones d'applis.
@@ -1157,8 +1159,6 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		_add_entry_in_menu (_("Minimize"), GTK_STOCK_GO_DOWN, _cairo_dock_minimize_appli, menu);
 
 		_add_entry_in_menu (_("Close"), GTK_STOCK_CLOSE, _cairo_dock_close_appli, menu);
-		
-		_add_entry_in_menu (_("Kill"), GTK_STOCK_CANCEL, _cairo_dock_kill_appli, menu);
 	}
 	
 	if (CAIRO_DOCK_IS_APPLET (icon) || CAIRO_DOCK_IS_DESKLET (pContainer))  // on regarde si pModule != NULL de facon a le faire que pour l'icone qui detient effectivement le module.

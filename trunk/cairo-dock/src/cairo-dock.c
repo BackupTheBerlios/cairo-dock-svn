@@ -234,10 +234,10 @@ gboolean g_bShowHiddenFiles;
 
 cairo_surface_t *g_pIndicatorSurface[2] = {NULL, NULL};
 gboolean g_bMixLauncherAppli = FALSE;
-double g_fIndicatorRatio;
 double g_fIndicatorWidth, g_fIndicatorHeight;
 int g_iIndicatorDeltaY;
-gboolean g_bOverWriteXIcons = TRUE;
+gboolean g_bOverWriteXIcons = TRUE; // il faut le savoir avant.
+gboolean g_bLinkIndicatorWithIcon;
 
 static gboolean random_dialog (gpointer user_data)
 {
@@ -412,7 +412,7 @@ main (int argc, char** argv)
 	}
 	if (bPrintVersion)
 	{
-		g_print ("v%s\n", CAIRO_DOCK_VERSION);
+		g_print ("%s\n", CAIRO_DOCK_VERSION);
 		return 0;
 	}
 
@@ -475,8 +475,8 @@ main (int argc, char** argv)
 	cd_keybinder_init();
 	
 	//\___________________ On initialise le support de DBus.
-	if (! bSafeMode)
-		cairo_dock_initialize_dbus_manager ();
+	///if (! bSafeMode)
+	///	cairo_dock_initialize_dbus_manager ();
 	
 	//\___________________ On detecte l'environnement de bureau (apres les applis et avant les modules).
 	if (g_iDesktopEnv == CAIRO_DOCK_UNKNOWN_ENV)

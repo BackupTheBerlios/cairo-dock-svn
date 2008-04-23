@@ -17,6 +17,8 @@ extern int g_iNbDesktops;
 extern int g_iNbFacesForViewportX,g_iNbFacesForViewportY ;
 /// Chemin du fichier de conf de l'appli.
 extern gchar *g_cConfFile;
+/// doublets de repertoires d'icones (pair) et de themes d'icones GTK (impair).
+extern gpointer *g_pDefaultIconDirectory;
 
 /// Epaisseur du cadre (en pixels).
 extern gint g_iDockLineWidth;
@@ -63,8 +65,6 @@ extern int g_iVisibleZoneWidth;
 /// hauteur de la zone de rappel.
 extern int g_iVisibleZoneHeight;
 
-/// Le theme d'icone choisi.
-extern GtkIconTheme *g_pIconTheme;
 /// Le chemin vers le repertoire racine.
 extern gchar *g_cCairoDockDataDir;
 /// Le chemin vers le repertoire du theme courant.

@@ -156,12 +156,18 @@ gchar *cairo_dock_search_icon_s_path (gchar *cFileName)
 				gtk_icon_info_free (pIconInfo);
 			}
 			else
-				g_string_printf (sIconPath, cFileName);
+				///g_string_printf (sIconPath, cFileName);
+				g_string_printf (sIconPath, "");
 		}
 	}
 
 	gchar *cIconPath = sIconPath->str;
 	g_string_free (sIconPath, FALSE);
+	if (cIconPath == NULL || *cIconPath == '\0')
+	{
+		g_free (cIconPath);
+		cIconPath= NULL;
+	}
 	return cIconPath;
 }
 

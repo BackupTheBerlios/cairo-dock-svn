@@ -144,8 +144,8 @@ cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFi
 		{
 			cairo_surface_t *pNewSurfaceAlpha = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 				CAIRO_CONTENT_COLOR_ALPHA,
-				iDesiredWidth,
-				iDesiredHeight);
+				*fImageWidth,
+				*fImageHeight);
 			cairo_t *pCairoContext = cairo_create (pNewSurfaceAlpha);
 	
 			cairo_set_source_surface (pCairoContext, pNewSurface, 0, 0);
@@ -158,7 +158,11 @@ cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFi
 		
 		if (fRotationAngle != 0)
 		{
-			cairo_surface_t *pNewSurfaceRotated = cairo_dock_rotate_surface (pNewSurface, pSourceContext, iDesiredWidth, iDesiredHeight, fRotationAngle);
+			cairo_surface_t *pNewSurfaceRotated = cairo_dock_rotate_surface (pNewSurface,
+				pSourceContext,
+				*fImageWidth,
+				*fImageHeight,
+				fRotationAngle);
 			cairo_surface_destroy (pNewSurface);
 			pNewSurface = pNewSurfaceRotated;
 		}

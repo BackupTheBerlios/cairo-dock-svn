@@ -222,7 +222,33 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 	double fIconWidthSaturationFactor = 1.;
 	double fIconHeightSaturationFactor = 1.;
 	
-	if (g_str_has_suffix (cImagePath, ".svg"))
+	//\_______________ On cherche a determiner le type de l'image. En effet, les SVG et les PNG sont charges differemment des autres.
+	gboolean bIsSVG = FALSE, bIsPNG = FALSE, bIsXPM = FALSE;
+	FILE *fd = fopen (cImagePath, "r");
+	if (fd != NULL)
+	{
+		char buffer[6];
+		if (fgets (buffer, 5, fd) != NULL)
+		{
+			if (strncmp (buffer+2, "SVG", 3) == 0)
+				bIsSVG = TRUE;
+			else if (strncmp (buffer+1, "PNG", 3) == 0)
+				bIsPNG = TRUE;
+			else if (strncmp (buffer+2, "XPM", 3) == 0)
+				bIsXPM = TRUE;
+		}
+		fclose (fd);
+	}
+	if (! bIsSVG && ! bIsPNG && ! bIsXPM)  // sinon en desespoir de cause on se base sur l'extension.
+	{
+		cd_debug ("  on se base sur l'extension en desespoir de cause.");
+		if (g_str_has_suffix (cImagePath, ".svg"))
+			bIsSVG = TRUE;
+		else if (g_str_has_suffix (cImagePath, ".png"))
+			bIsPNG = TRUE;
+	}
+	
+	if (bIsSVG)
 	{
 		rsvg_handle = rsvg_handle_new_from_file (cImagePath, &erreur);
 		if (erreur != NULL)
@@ -269,7 +295,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 			g_object_unref (rsvg_handle);
 		}
 	}
-	else if (g_str_has_suffix (cImagePath, ".png"))
+	else if (bIsPNG)
 	{
 		surface_ini = cairo_image_surface_create_from_png (cImagePath);
 		if (cairo_surface_status (surface_ini) == CAIRO_STATUS_SUCCESS)
@@ -311,7 +337,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 	}
 	else  // le code suivant permet de charger tout type d'image, mais en fait c'est un peu idiot d'utiliser des icones n'ayant pas de transparence.
 	{
-		GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file (cImagePath, &erreur);
+		GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file (cImagePath, &erreur);  // semble se baser sur l'extension pour definir le type !
 		if (erreur != NULL)
 		{
 			cd_warning ("Attention : %s", erreur->message);

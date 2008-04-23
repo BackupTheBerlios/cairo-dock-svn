@@ -166,10 +166,10 @@ extern gboolean g_bShowHiddenFiles;
 extern gchar *g_cRaiseDockShortcut;
 extern cairo_surface_t *g_pIndicatorSurface[2];
 extern gboolean g_bMixLauncherAppli;
-extern double g_fIndicatorRatio;
 extern gboolean g_bOverWriteXIcons;
 extern double g_fIndicatorWidth, g_fIndicatorHeight;
 extern int g_iIndicatorDeltaY;
+extern gboolean g_bLinkIndicatorWithIcon;
 
 static gchar **g_cUseXIconAppliList = NULL;
 static gboolean s_bLoading = FALSE;
@@ -932,9 +932,11 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		cIndicatorImagePath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_DEFAULT_INDICATOR_NAME);
 	}
 	
-	g_fIndicatorRatio = cairo_dock_get_double_key_value (pKeyFile, "Icons", "indicator ratio", &bFlushConfFileNeeded, 1., NULL, NULL);
+	double fIndicatorRatio = cairo_dock_get_double_key_value (pKeyFile, "Icons", "indicator ratio", &bFlushConfFileNeeded, 1., NULL, NULL);
 	
-	g_iIndicatorDeltaY = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "indicator deltaY", &bFlushConfFileNeeded, 0, NULL, NULL);
+	g_bLinkIndicatorWithIcon = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "link indicator", &bFlushConfFileNeeded, TRUE, NULL, NULL);
+	
+	g_iIndicatorDeltaY = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "indicator deltaY", &bFlushConfFileNeeded, 2, NULL, NULL);
 	
 	gboolean bMixLauncherAppliOld = g_bMixLauncherAppli;
 	g_bMixLauncherAppli = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "mix launcher appli", &bFlushConfFileNeeded, TRUE, NULL, NULL);
@@ -1113,12 +1115,13 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		
 		cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
 		
+		double fMasxScale = (g_bLinkIndicatorWithIcon ? (1 + g_fAmplitude) : 1 + 0);
 		g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL] = cairo_dock_create_surface_from_image (
 			cIndicatorImagePath,
 			pCairoContext,
-			1 + g_fAmplitude,
-			fLauncherWidth * g_fIndicatorRatio,
-			fLauncherHeight * g_fIndicatorRatio,
+			fMasxScale,
+			fLauncherWidth * fIndicatorRatio,
+			fLauncherHeight * fIndicatorRatio,
 			&g_fIndicatorWidth,
 			&g_fIndicatorHeight,
 			TRUE);
@@ -1126,8 +1129,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		g_pIndicatorSurface[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (
 			g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL],
 			pCairoContext, 
-			g_fIndicatorWidth * (1 + g_fAmplitude),
-			g_fIndicatorHeight * (1 + g_fAmplitude),
+			g_fIndicatorWidth * fMasxScale,
+			g_fIndicatorHeight * fMasxScale,
 			- G_PI / 2);
 		
 		cairo_destroy (pCairoContext);
