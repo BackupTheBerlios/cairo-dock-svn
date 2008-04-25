@@ -164,7 +164,7 @@ void cairo_dock_set_desklet_renderer_by_name (CairoDockDesklet *pDesklet, gchar 
 
 
 
-#define _cairo_dock_update_conf_file_with_renderers(pOpenedKeyFile, cConfFile, cGroupName, cKeyName, bAddEmptyRenderer) cairo_dock_update_conf_file_with_hash_table (pOpenedKeyFile, cConfFile, s_hRendererTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_renderer_name, FALSE, bAddEmptyRenderer)
+/*#define _cairo_dock_update_conf_file_with_renderers(pOpenedKeyFile, cConfFile, cGroupName, cKeyName, bAddEmptyRenderer) cairo_dock_update_conf_file_with_hash_table (pOpenedKeyFile, cConfFile, s_hRendererTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_renderer_name, FALSE, bAddEmptyRenderer)
 
 void cairo_dock_update_conf_file_with_renderers (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cGroupName, gchar *cKeyName)
 {
@@ -187,4 +187,9 @@ void cairo_dock_update_easy_conf_file_with_renderers (GKeyFile *pOpenedKeyFile, 
 	//g_print ("%s (%s)\n", __func__, cConfFile);
 	_cairo_dock_update_conf_file_with_renderers (pOpenedKeyFile, cConfFile, "Personnalisation", "main dock view", FALSE);
 	_cairo_dock_update_conf_file_with_renderers (pOpenedKeyFile, cConfFile, "Personnalisation", "sub-dock view", FALSE);
+}*/
+
+void cairo_dock_update_renderer_list_for_gui (void)
+{
+	cairo_dock_build_renderer_list_for_gui (s_hRendererTable);
 }

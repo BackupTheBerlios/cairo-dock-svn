@@ -42,7 +42,7 @@ find . -name "core*" -delete
 find . -name ".#*" -delete
 rm -f cairo-dock-sources*.tar.bz2 *.deb
 
-if ! test  -d cairo-dock -o ! -d themes -o ! -d plug-ins - ! -d deb -o ! -d deb-plug-ins; then
+if ! test  -d cairo-dock -o ! -d themes -o ! -d plug-ins -o ! -d deb -o ! -d deb-plug-ins; then
 	echo "Attention : folder missing in $CAIRO_DOCK_DIR !"
 	exit 1
 fi
@@ -122,7 +122,9 @@ sudo cp ../cairo-dock/data/cairo-dock usr/share/menu
 sudo cp ../cairo-dock/data/cairo-dock.desktop usr/share/applications
 
 cd $CAIRO_DOCK_DIR
-dpkg -b deb "cairo-dock_`cairo-dock --version`_i686-32bits.deb"
+sed "s/^Version:.*/Version: "`cairo-dock --version`"/g" deb/DEBIAN/control > tmp
+mv tmp deb/DEBIAN/control
+dpkg -b deb "cairo-dock_v`cairo-dock --version`_i686-32bits.deb"
 mv .svn-deb deb/.svn
 mv .svn-deb-DEIAN deb/DEBIAN/.svn
 
@@ -136,7 +138,9 @@ done;
 sudo cp -r /usr/share/cairo-dock/plug-in usr/share/cairo-dock
 
 cd $CAIRO_DOCK_DIR
-dpkg -b deb-plug-ins "cairo-dock-plug-ins_`cairo-dock --version`_i686-32bits.deb"
+sed "s/^Version:.*/Version: "`cairo-dock --version`"/g" deb-plug-ins/DEBIAN/control > tmp
+mv tmp deb-plug-ins/DEBIAN/control
+dpkg -b deb-plug-ins "cairo-dock-plug-ins_v`cairo-dock --version`_i686-32bits.deb"
 mv .svn-deb-plug-ins deb-plug-ins/.svn
 mv .svn-deb-plug-ins-DEIAN deb-plug-ins/DEBIAN/.svn
 

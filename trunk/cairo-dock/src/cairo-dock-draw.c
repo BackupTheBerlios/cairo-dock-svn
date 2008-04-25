@@ -179,11 +179,6 @@ double cairo_dock_get_current_dock_width_linear (CairoDock *pDock)
 		*fHeight = MAX (pFirstIcon->fY + pFirstIcon->fHeight * pFirstIcon->fScale - pLastIcon->fY, pLastIcon->fHeight * pLastIcon->fScale);
 }*/
 
-/**
-*Cree un contexte de dessin pour la libcairo. Si glitz est active, le contexte sera lie a une surface glitz (et donc on dessinera directement sur la carte graphique via OpenGL), sinon a une surface X representant la fenetre du dock.
-*@param pDock le dock sur lequel on veut dessiner.
-*@Returns le contexte sur lequel dessiner. N'est jamais nul; tester sa coherence avec #cairo_status avant de l'utiliser, et le detruire avec #cairo_destroy apres en avoir fini avec lui.
-*/
 cairo_t * cairo_dock_create_context_from_window (CairoDockContainer *pContainer)
 {
 #ifdef HAVE_GLITZ
@@ -302,19 +297,6 @@ static void cairo_dock_draw_frame_vertical (cairo_t *pCairoContext, double fRadi
 	if (fRadius < 1)
 		cairo_close_path (pCairoContext);
 }
-/**
-*Trace sur le contexte un contour trapezoidale aux coins arrondis. Le contour n'est pas dessine, mais peut l'etre a posteriori, et peut servir de cadre pour y dessiner des choses dedans.
-*@param pCairoContext le contexte du dessin, contenant le cadre a la fin de la fonction.
-*@param fRadius le rayon en pixels des coins.
-*@param fLineWidth l'epaisseur en pixels du contour.
-*@param fFrameWidth la largeur de la plus petite base du trapeze.
-*@param fFrameHeight la hauteur du trapeze.
-*@param fDockOffsetX un decalage, dans le sens de la largeur du dock, a partir duquel commencer a tracer la plus petite base du trapeze.
-*@param fDockOffsetY un decalage, dans le sens de la hauteur du dock, a partir duquel commencer a tracer la plus petite base du trapeze.
-*@param sens 1 pour un tracer dans le sens des aiguilles d'une montre (indirect), -1 sinon.
-*@param fInclination tangente de l'angle d'inclinaison des cotes du trapeze par rapport a la vertical. 0 pour tracer un rectangle.
-*@param bHorizontal CAIRO_DOCK_HORIZONTAL ou CAIRO_DOCK_VERTICAL suivant l'horizontalité du dock.
-*/
 void cairo_dock_draw_frame (cairo_t *pCairoContext, double fRadius, double fLineWidth, double fFrameWidth, double fFrameHeight, double fDockOffsetX, double fDockOffsetY, int sens, double fInclination, gboolean bHorizontal)
 {
 	if (bHorizontal)
@@ -323,12 +305,6 @@ void cairo_dock_draw_frame (cairo_t *pCairoContext, double fRadius, double fLine
 		cairo_dock_draw_frame_vertical (pCairoContext, fRadius, fLineWidth, fFrameWidth, fFrameHeight, fDockOffsetX, fDockOffsetY, sens, fInclination);
 }
 
-/**
-*Dessine les decorations d'un dock a l'interieur d'un cadre prealablement trace sur le contexte.
-*@param pCairoContext le contexte du dessin, est laisse intact par la fonction.
-*@param pDock le dock sur lequel appliquer les decorations.
-*@param fOffsetY un decalage, dans le sens de la hauteur du dock, a partir duquel appliquer les decorations.
-*/
 void cairo_dock_render_decorations_in_frame (cairo_t *pCairoContext, CairoDock *pDock, double fOffsetY)
 {
 	//g_print ("%.2f\n", pDock->fDecorationsOffsetX);
@@ -367,14 +343,10 @@ void cairo_dock_render_decorations_in_frame (cairo_t *pCairoContext, CairoDock *
 	}
 }
 
-/**
-*Dessine entierement une icone, dont toutes les caracteristiques ont ete prealablement calculees. Gere sa position, sa transparence (modulee par la transparence du dock au repos), son reflet, son placement de profil, son etiquette, et son info-rapide.
-*@param
-*/
+
 void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 {
-	icon->fX = icon->fDrawX;
-	icon->fY = icon->fDrawY;
+	icon->fY = icon->fDrawY;  // on ne peut pas toucher fX, mais fY ca semble ok et suffisant...
 	//\_____________________ On gere l'animation de rebond.
 	if (icon->iAnimationType == CAIRO_DOCK_BOUNCE && icon->iCount > 0)
 	{
@@ -511,16 +483,6 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 }
 
 
-/**
-*Dessine entierement une icone, dont toutes les caracteristiques ont ete prealablement calculees. Gere sa position, sa transparence (modulee par la transparence du dock au repos), son reflet, son placement de profil, son etiquette, et son info-rapide.
-*@param icon l'icone a dessiner.
-*@param pCairoContext le contexte du dessin, est altere pendant le dessin.
-*@param bHorizontalDock l'horizontalite du dock contenant l'icone.
-*@param fRatio le ratio de taille des icones dans ce dock.
-*@param fDockMagnitude la magnitude actuelle du dock, sans la limite du fMagnitudeMax.
-*@param bUseReflect TRUE pour dessiner les reflets.
-*@param bUseText TRUE pour dessiner les etiquettes.
-*/
 void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect, gboolean bUseText, int iWidth)
 {
 	//\_____________________ On separe 2 cas : dessin avec le tampon complet, et dessin avec le ou les petits tampons.
@@ -577,10 +539,10 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			else
 			{
 				cairo_translate (pCairoContext,
-					icon->fDrawY + (g_bDirectionUp ? 
+					icon->fY + (g_bDirectionUp ? 
 						(icon->fHeight - (g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * fRatio) * icon->fScale : 
 						(g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * icon->fScale * fRatio),
-						icon->fDrawX + (icon->fWidth * icon->fScale - g_fIndicatorWidth * fRatio) / 2);
+						icon->fX + (icon->fWidth * icon->fScale - g_fIndicatorWidth * fRatio) / 2);
 			}
 		}
 		cairo_set_source_surface (pCairoContext, g_pIndicatorSurface[bHorizontalDock], 0.0, 0.0);
@@ -1074,13 +1036,6 @@ void cairo_dock_render_one_icon_in_desklet (Icon *icon, cairo_t *pCairoContext, 
 
 
 
-/**
-*Dessine une ficelle reliant le centre de toutes les icones, en commencant par la 1ere dessinee.
-*@param pCairoContext le contexte du dessin, n'est pas altere par la fonction.
-*@param pDock le dock contenant les icônes a relier.
-*@param fStringLineWidth epaisseur de la ligne.
-*@param bIsLoop TRUE si on veut boucler (relier la derniere icone a la 1ere).
-*/
 void cairo_dock_draw_string (cairo_t *pCairoContext, CairoDock *pDock, double fStringLineWidth, gboolean bIsLoop, gboolean bForceConstantSeparator)
 {
 	bForceConstantSeparator = bForceConstantSeparator || g_bConstantSeparatorSize;
@@ -1241,11 +1196,6 @@ void cairo_dock_render_blank (CairoDock *pDock)
 }
 
 
-/**
-*Efface et redessine entierement une seule icone. Appelle la fonction de trace optimise de la vue courante; si cette derniere ne fournit pas de trace optimise, retrace tout le dock (ce qui peut etre penalisant).
-*@param icon l'icone a retracer.
-*@param pContainer le container contenant l' icone.
-*/
 void cairo_dock_redraw_my_icon (Icon *icon, CairoDockContainer *pContainer)
 {
 	g_return_if_fail (icon != NULL && pContainer != NULL);

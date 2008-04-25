@@ -141,7 +141,7 @@ static void cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 		_("Support"),
 		"<b>Installation scripts and repository :</b>\n  Mav\n\
 <b>Site (cairo-dock.org) :</b>\n  Tdey\n  Necropotame\n\
-<b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Mav\n  Necropotame\n  Nochka85\n  Ppmt\n  Sombrero\n  Vilraleur");
+<b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Mav\n  Necropotame\n  Nochka85\n  Ppmt\n  Rhinopierroce\n  Sombrero\n  Vilraleur");
 	
 	gtk_widget_show_all (pDialog);
 	gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER_ALWAYS);  // un GTK_WIN_POS_CENTER simple ne marche pas, probablement parceque la fenetre n'est pas encore realisee. le 'always' ne pose pas de probleme, puisqu'on ne peut pas redimensionner le dialogue.

@@ -27,10 +27,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-applet-factory.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-modules.h"
-#include "cairo-dock-load.h"
+#include "cairo-dock-log.h"
 #include "cairo-dock-dock-manager.h"
 #include "cairo-dock-class-manager.h"
-#include "cairo-dock-log.h"
+#include "cairo-dock-load.h"
 
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
@@ -138,6 +138,8 @@ cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFi
 	
 			cairo_surface_destroy (pNewSurface);
 			pNewSurface = pNewSurfaceFilled;
+			*fImageWidth = iDesiredWidth;
+			*fImageHeight = iDesiredHeight;
 		}
 		
 		if (fAlpha < 1)

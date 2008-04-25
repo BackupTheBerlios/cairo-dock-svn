@@ -16,7 +16,7 @@
    inkscape:version="0.45.1"
    version="1.0"
    sodipodi:docbase="/opt/cairo-dock/trunk/cairo-dock/data"
-   sodipodi:docname="cairo-dock-icon.svg"
+   sodipodi:docname="cairo-dock.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs3940">
@@ -748,11 +748,11 @@
       <stop
          offset="0"
          id="stop6340"
-         style="stop-color:#6a879b;stop-opacity:1;" />
+         style="stop-color:#3b5e76;stop-opacity:1;" />
       <stop
          style="stop-color:#afc2d0;stop-opacity:0;"
          id="stop16465"
-         offset="0.69999999" />
+         offset="0.75" />
       <stop
          style="stop-color:#afc2d0;stop-opacity:0;"
          id="stop16463"
@@ -776,9 +776,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="112.28028"
-     inkscape:cy="66.739306"
+     inkscape:zoom="3.959798"
+     inkscape:cx="96.218399"
+     inkscape:cy="56.637781"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      width="48px"
@@ -1410,7 +1410,7 @@
          x="383.51154"
          y="262.66238">CD</tspan></text>
     <path
-       style="fill:url(#linearGradient4066);fill-opacity:1;fill-rule:evenodd;stroke:#afc1d8;stroke-width:1.19767797;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
+       style="fill:url(#linearGradient4066);fill-opacity:1;fill-rule:evenodd;stroke:#aabdd6;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
        d="M 372.95006,267.29001 C 390.57937,267.75451 391.49953,260.71533 395.30919,260.78718 C 400.08057,260.87847 398.28409,267.85266 415.48343,267.38817"
        id="path4064"
        sodipodi:nodetypes="css" />

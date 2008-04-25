@@ -294,8 +294,8 @@ void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath, CairoDock
 	
 	cairo_dock_update_conf_file_with_containers (pKeyFile, cDesktopFilePath);
 	
-	if (iLauncherType == CAIRO_DOCK_LAUNCHER_FOR_CONTAINER)
-		cairo_dock_update_launcher_conf_file_with_renderers (pKeyFile, cDesktopFilePath);
+	//if (iLauncherType == CAIRO_DOCK_LAUNCHER_FOR_CONTAINER)
+	//	cairo_dock_update_launcher_conf_file_with_renderers (pKeyFile, cDesktopFilePath);
 	g_key_file_free (pKeyFile);
 }
 

@@ -20,7 +20,6 @@ void cairo_dock_set_colormap (CairoDockContainer *pContainer);
 
 
 
-
 double cairo_dock_get_current_dock_width_linear (CairoDock *pDock);
 
 /**

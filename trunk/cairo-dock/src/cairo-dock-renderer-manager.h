@@ -24,10 +24,11 @@ void cairo_dock_set_desklet_renderer (CairoDockDesklet *pDesklet, CairoDockDeskl
 void cairo_dock_set_desklet_renderer_by_name (CairoDockDesklet *pDesklet, gchar *cRendererName, cairo_t *pSourceContext, gboolean bLoadIcons, gpointer *pConfig);
 
 
-void cairo_dock_update_conf_file_with_renderers (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cGroupName, gchar *cKeyName);
+/*void cairo_dock_update_conf_file_with_renderers (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cGroupName, gchar *cKeyName);
 void cairo_dock_update_main_conf_file_with_renderers (GKeyFile *pOpenedKeyFile, gchar *cConfFile);
 void cairo_dock_update_launcher_conf_file_with_renderers (GKeyFile *pOpenedKeyFile, gchar *cConfFile);
-void cairo_dock_update_easy_conf_file_with_renderers (GKeyFile *pOpenedKeyFile, gchar *cConfFile);
+void cairo_dock_update_easy_conf_file_with_renderers (GKeyFile *pOpenedKeyFile, gchar *cConfFile);*/
+void cairo_dock_update_renderer_list_for_gui (void);
 
 
 #endif

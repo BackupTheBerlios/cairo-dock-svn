@@ -105,6 +105,7 @@ void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, Cairo
 
 void cairo_dock_set_hours_minutes_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, int iTimeInSeconds);
 void cairo_dock_set_minutes_secondes_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, int iTimeInSeconds);
+void cairo_dock_set_size_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, long long int iSizeInBytes);
 
 
 
@@ -993,7 +994,12 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 */
 #define CD_APPLET_SET_MINUTES_SECONDES_AS_QUICK_INFO(iTimeInSeconds) \
 	cairo_dock_set_minutes_secondes_as_quick_info (myDrawContext, myIcon, myContainer, iTimeInSeconds);
-
+/**
+*Ecris une taille en octets en info-rapide sur l'icone de l'applet.
+*@param iSize la taille en octets.
+*/
+#define CD_APPLET_SET_SIZE_AS_QUICK_INFO(iSizeInBytes) \
+	cairo_dock_set_size_as_quick_info (myDrawContext, myIcon, myContainer, iSizeInBytes);
 
 
 /**

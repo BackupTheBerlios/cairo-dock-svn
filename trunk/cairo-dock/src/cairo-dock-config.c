@@ -711,6 +711,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 
 	g_free (g_cMainDockDefaultRendererName);
 	g_cMainDockDefaultRendererName = cairo_dock_get_string_key_value (pKeyFile, "Views", "main dock view", &bFlushConfFileNeeded, CAIRO_DOCK_DEFAULT_RENDERER_NAME, "Cairo Dock", NULL);
+	if (g_cMainDockDefaultRendererName == NULL)
+		g_cMainDockDefaultRendererName = g_strdup (CAIRO_DOCK_DEFAULT_RENDERER_NAME);
 	cd_message ("g_cMainDockDefaultRendererName <- %s", g_cMainDockDefaultRendererName);
 
 	double fUserValue = cairo_dock_get_double_key_value (pKeyFile, "System", "unfold factor", &bFlushConfFileNeeded, 8., "Cairo Dock", NULL);
@@ -736,6 +738,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	//\___________________ On recupere les parametres propres aux sous-docks.
 	g_free (g_cSubDockDefaultRendererName);
 	g_cSubDockDefaultRendererName = cairo_dock_get_string_key_value (pKeyFile, "Views", "sub-dock view", &bFlushConfFileNeeded, CAIRO_DOCK_DEFAULT_RENDERER_NAME, "Sub-Docks", NULL);
+	if (g_cSubDockDefaultRendererName == NULL)
+		g_cSubDockDefaultRendererName = g_strdup (CAIRO_DOCK_DEFAULT_RENDERER_NAME);
 
 	g_bSameHorizontality = cairo_dock_get_boolean_key_value (pKeyFile, "Views", "same horizontality", &bFlushConfFileNeeded, TRUE, "Sub-Docks", NULL);
 
@@ -1252,11 +1256,11 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		pKeyFile = g_key_file_new ();
 		g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
 		
-		///cairo_dock_update_conf_file_with_available_modules (pKeyFile, cConfFilePath);
 		cairo_dock_update_conf_file_with_available_modules2 (pKeyFile, cConfFilePath);
 	}
 
-	cairo_dock_update_main_conf_file_with_renderers (pKeyFile, cConfFilePath);
+	//cairo_dock_update_main_conf_file_with_renderers (pKeyFile, cConfFilePath);
+	cairo_dock_update_renderer_list_for_gui ();
 	
 	if (g_cRaiseDockShortcut != NULL)
 		cd_keybinder_bind (g_cRaiseDockShortcut, (CDBindkeyHandler) cairo_dock_raise_from_keyboard, (gpointer)NULL);
@@ -1751,10 +1755,9 @@ void cairo_dock_copy_to_easy_conf_file (GKeyFile *pMainKeyFile, gchar *cEasyConf
 	cairo_dock_write_keys_to_file (pKeyFile, cEasyConfFilePath);
 	
 	//\___________________ On complete.
-	///cairo_dock_update_easy_conf_file_with_available_modules (pKeyFile, cEasyConfFilePath);
 	cairo_dock_update_easy_conf_file_with_available_modules2 (pKeyFile, cEasyConfFilePath);
 
-	cairo_dock_update_easy_conf_file_with_renderers (pKeyFile, cEasyConfFilePath);
+	//cairo_dock_update_easy_conf_file_with_renderers (pKeyFile, cEasyConfFilePath);
 	g_key_file_free (pKeyFile);
 }
 

@@ -490,6 +490,52 @@ static void _cairo_dock_get_current_color (GtkColorButton *pColorButton, GSList 
 	return FALSE;
 }*/
 
+void _cairo_dock_add_one_renderer_item (gchar *cName, CairoDockRenderer *pRenderer, GtkListStore *pModele)
+{
+	GtkTreeIter iter;
+	memset (&iter, 0, sizeof (GtkTreeIter));
+	gtk_list_store_append (GTK_LIST_STORE (pModele), &iter);
+	gtk_list_store_set (GTK_LIST_STORE (pModele), &iter,
+		CAIRO_DOCK_MODEL_NAME, cName,
+		CAIRO_DOCK_MODEL_RESULT, cName,
+		CAIRO_DOCK_MODEL_DESCRIPTION_FILE, (pRenderer != NULL ? pRenderer->cReadmeFilePath : "none"),
+		CAIRO_DOCK_MODEL_IMAGE, (pRenderer != NULL ? pRenderer->cPreviewFilePath : "none"), -1);
+}
+void cairo_dock_build_renderer_list_for_gui (GHashTable *pHashTable)
+{
+	if (s_pRendererListStore != NULL)
+		g_object_unref (s_pRendererListStore);  // gtk_list_store_clear (s_pRendererListStore) fait planter :-(
+	
+	s_pRendererListStore = gtk_list_store_new (CAIRO_DOCK_MODEL_NB_COLUMNS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_INT, G_TYPE_STRING, GDK_TYPE_PIXBUF);
+	//g_object_ref (s_pRendererListStore);
+	
+	_cairo_dock_add_one_renderer_item ("", NULL, s_pRendererListStore);
+	g_hash_table_foreach (pHashTable, (GHFunc) _cairo_dock_add_one_renderer_item, s_pRendererListStore);
+}
+
+static gboolean _cairo_dock_test_one_renderer_name (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer *data)
+{
+	gchar *cName = NULL;
+	gtk_tree_model_get (model, iter, CAIRO_DOCK_MODEL_NAME, &cName, -1);
+	if (strcmp (data[0], cName) == 0)
+	{
+		GtkTreeIter *iter_to_fill = data[1];
+		memcpy (iter_to_fill, iter, sizeof (GtkTreeIter));
+		gboolean *bFound = data[2];
+		*bFound = TRUE;
+		return TRUE;
+	}
+	return FALSE;
+}
+gboolean _cairo_dock_find_iter_from_renderer_name (gchar *cName, GtkTreeIter *iter)
+{
+	if (cName == NULL)
+		return FALSE;
+	gboolean bFound = FALSE;
+	gpointer data[3] = {cName, iter, &bFound};
+	gtk_tree_model_foreach (GTK_TREE_MODEL (s_pRendererListStore), (GtkTreeModelForeachFunc) _cairo_dock_test_one_renderer_name, data);
+	return bFound;
+}
 
 #define _allocate_new_buffer\
 	data = g_new (gpointer, 3); \
@@ -918,6 +964,52 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						g_free (fValueList);
 					break;
 
+					case 'n' :
+						cValue = g_key_file_get_string (pKeyFile, cGroupName, cKeyName, NULL);
+						modele = s_pRendererListStore;
+						pOneWidget = gtk_combo_box_new_with_model (GTK_TREE_MODEL (modele));
+						GtkCellRenderer *rend = gtk_cell_renderer_text_new ();
+						gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (pOneWidget), rend, FALSE);
+						gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (pOneWidget), rend, "text", CAIRO_DOCK_MODEL_NAME, NULL);
+						
+						pDescriptionLabel = gtk_label_new (NULL);
+						gtk_label_set_use_markup  (GTK_LABEL (pDescriptionLabel), TRUE);
+						pPreviewImage = gtk_image_new_from_pixbuf (NULL);
+						_allocate_new_buffer;
+						data[0] = pDescriptionLabel;
+						data[1] = pPreviewImage;
+						g_signal_connect (G_OBJECT (pOneWidget), "changed", G_CALLBACK (_cairo_dock_select_one_item_in_combo), data);
+						
+						GtkWidget *pPreviewBox = gtk_vbox_new (FALSE, CAIRO_DOCK_GUI_MARGIN);
+						gtk_box_pack_start (GTK_BOX (pHBox),
+							pPreviewBox,
+							FALSE,
+							FALSE,
+							0);
+						gtk_box_pack_start (GTK_BOX (pPreviewBox),
+							pDescriptionLabel,
+							FALSE,
+							FALSE,
+							0);
+						gtk_box_pack_start (GTK_BOX (pPreviewBox),
+							pPreviewImage,
+							FALSE,
+							FALSE,
+							0);
+						
+						GtkTreeIter iter;
+						if (_cairo_dock_find_iter_from_renderer_name (cValue, &iter))
+							gtk_combo_box_set_active_iter (GTK_COMBO_BOX (pOneWidget), &iter);
+						
+						pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
+						gtk_box_pack_start (GTK_BOX (pHBox),
+							pOneWidget,
+							FALSE,
+							FALSE,
+							0);
+						g_free (cValue);
+					break ;
+					
 					case 's' :  // string
 					case 'S' :  // string avec un selecteur de fichier a cote du GtkEntry.
 					case 'D' :  // string avec un selecteur de repertoire a cote du GtkEntry.
@@ -994,7 +1086,6 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 									}
 								}
 								g_free (cResult);
-
 								if (iElementType == 'R' || iElementType == 'M')
 								{
 									pDescriptionLabel = gtk_label_new (NULL);
@@ -1020,7 +1111,14 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						else
 						{
 							pOneWidget = gtk_tree_view_new ();
-							_allocate_new_model
+							if (iElementType == 'n')
+							{
+								modele = s_pRendererListStore;
+							}
+							else
+							{
+								_allocate_new_model
+							}
 							gtk_tree_view_set_model (GTK_TREE_VIEW (pOneWidget), GTK_TREE_MODEL (modele));
 							gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (modele), CAIRO_DOCK_MODEL_ORDER, GTK_SORT_ASCENDING);
 							gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (pOneWidget), FALSE);

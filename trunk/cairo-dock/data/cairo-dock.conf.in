@@ -420,13 +420,17 @@ launcher number of rounds = 4
 #{Indicators are drawn on launchers icons to show that they have already been launched. Let blank to use the default one.}
 indicator image = 
 
-#e+[0.1;1] Indicator size ratio :
+#e+[0.1;1.5] Indicator size ratio :
 #{The ratio between indicator's size and icon's size. The bigger, the bigger the indicators are.}
 indicator ratio = 1.
 
+#b Link the indicator with its icon ?
+#{It will then be resized like the icon, move like the icon, etc. Otherwise it will be drawn directly on the dock.}
+link indicator = TRUE
+
 #i[-10;64] Vertical offset :
 #{i pixels. You can use this parameter to adjust the indicator's vertical position.}
-indicator deltaY = 0
+indicator deltaY = 2
 
 #X+[Applications]
 frame_appli =
@@ -494,13 +498,13 @@ icon's type order = launchers;applications;applets
 #F[Main Dock]
 frame_main =
 
-#R+1[default] Choose the default view for main dock :/
+#n+ Choose the default view for main dock :/
 main dock view = default
 
 #F[Sub-Docks]
 frame_sub =
 
-#R+1[default] Choose the default view for sub-docks :
+#n+ Choose the default view for sub-docks :
 #{You can overwrite this parameter for each sub-dock.}/
 sub-dock view = default
 

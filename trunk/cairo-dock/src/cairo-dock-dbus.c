@@ -103,7 +103,8 @@ void cairo_dock_register_service_name (const gchar *cServiceName)
 		return ;
 	GError *erreur = NULL;
 	int request_ret;
-	if (!org_freedesktop_DBus_request_name (pProxy, cServiceName, 0, &request_ret, &erreur))
+	org_freedesktop_DBus_request_name (pProxy, cServiceName, 0, &request_ret, &erreur);
+	if (erreur != NULL)
 	{
 		cd_warning ("Unable to register service: %s", erreur->message);
 		g_error_free (erreur);

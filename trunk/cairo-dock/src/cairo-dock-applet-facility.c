@@ -3,7 +3,7 @@
 This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
 ******************************************************************************/
 #include <math.h>
@@ -261,7 +261,25 @@ void cairo_dock_set_minutes_secondes_as_quick_info (cairo_t *pSourceContext, Ico
 		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%d", secondes);
 }
 
-
+void cairo_dock_set_size_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, long long int iSizeInBytes)
+{
+	if (iSizeInBytes < 1024)
+	{
+		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%dB", iSizeInBytes);
+	}
+	else if (iSizeInBytes < (1 << 20))
+	{
+		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%dK", (int) (iSizeInBytes>>10));
+	}
+	else if (iSizeInBytes < (1 << 30))
+	{
+		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%dM", (int) (iSizeInBytes>>20));
+	}
+	else
+	{
+		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%dG", (int) (iSizeInBytes>>30));
+	}
+}
 
 void cairo_dock_animate_icon (Icon *pIcon, CairoDock *pDock, CairoDockAnimationType iAnimationType, int iNbRounds)
 {
