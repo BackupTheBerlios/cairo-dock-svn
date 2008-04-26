@@ -220,7 +220,6 @@ void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo
 
 	g_free (pIcon->cQuickInfo);
 	pIcon->cQuickInfo = g_strdup (cQuickInfo);
-	cd_message ("cQuickInfo <- '%s'", pIcon->cQuickInfo);
 	
 	cairo_dock_fill_one_quick_info_buffer (pIcon,
 		pSourceContext,
@@ -228,7 +227,7 @@ void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo
 		g_cLabelPolice,
 		PANGO_WEIGHT_HEAVY,
 		fMaxScale);
-	cd_message (" -> %dx%d", pIcon->iQuickInfoWidth, pIcon->iQuickInfoHeight);
+	cd_debug (" cQuickInfo <- '%s' (%dx%d)", pIcon->cQuickInfo, pIcon->iQuickInfoWidth, pIcon->iQuickInfoHeight);
 }
 
 void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, const gchar *cQuickInfoFormat, ...)
@@ -429,9 +428,9 @@ void cairo_dock_free_measure_timer (CairoDockMeasure *pMeasureTimer)
 		return ;
 	cairo_dock_stop_measure_timer (pMeasureTimer);
 	
-	cd_message ("on attend que le thread termine...\n");
+	cd_message ("on attend que le thread termine...");
 	while (g_atomic_int_get (&pMeasureTimer->iThreadIsRunning));
-	cd_message ("temine\n");
+	cd_message ("temine.");
 	
 	g_mutex_free (pMeasureTimer->pMutexData);
 	g_free (pMeasureTimer);

@@ -182,7 +182,7 @@ static gboolean on_configure_desklet (GtkWidget* pWidget,
 }
 
 
-Icon *_cairo_dock_find_clicked_icon_in_desklet (CairoDockDesklet *pDesklet)
+Icon *cairo_dock_find_clicked_icon_in_desklet (CairoDockDesklet *pDesklet)
 {
 	int iMouseX = - (int) pDesklet->diff_x;
 	int iMouseY = - (int) pDesklet->diff_y;
@@ -231,21 +231,21 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 			}
 			else
 			{
-				Icon *pClickedIcon = _cairo_dock_find_clicked_icon_in_desklet (pDesklet);
+				Icon *pClickedIcon = cairo_dock_find_clicked_icon_in_desklet (pDesklet);
 				gpointer data[2] = {pClickedIcon, pDesklet};
 				cairo_dock_notify (CAIRO_DOCK_CLICK_ICON, data);
 			}
 		}
 		else if (pButton->type == GDK_2BUTTON_PRESS)
 		{
-			Icon *pClickedIcon = _cairo_dock_find_clicked_icon_in_desklet (pDesklet);
+			Icon *pClickedIcon = cairo_dock_find_clicked_icon_in_desklet (pDesklet);
 			gpointer data[2] = {pClickedIcon, pDesklet};
 			cairo_dock_notify (CAIRO_DOCK_DOUBLE_CLICK_ICON, data);
 		}
 	}
 	else if (pButton->button == 3 && pButton->type == GDK_BUTTON_PRESS)  // clique droit.
 	{
-		Icon *pClickedIcon = _cairo_dock_find_clicked_icon_in_desklet (pDesklet);
+		Icon *pClickedIcon = cairo_dock_find_clicked_icon_in_desklet (pDesklet);
 		GtkWidget *menu = cairo_dock_build_menu (pClickedIcon, CAIRO_DOCK_CONTAINER (pDesklet));  // genere un CAIRO_DOCK_BUILD_MENU.
 		gtk_widget_show_all (menu);
 		gtk_menu_popup (GTK_MENU (menu),
@@ -277,7 +277,7 @@ void on_drag_data_received_desklet (GtkWidget *pWidget, GdkDragContext *dc, gint
 	
 	pDesklet->diff_x = - x;
 	pDesklet->diff_y = - y;
-	Icon *pClickedIcon = _cairo_dock_find_clicked_icon_in_desklet (pDesklet);
+	Icon *pClickedIcon = cairo_dock_find_clicked_icon_in_desklet (pDesklet);
 	cairo_dock_notify_drop_data (cReceivedData, pClickedIcon, 0, CAIRO_DOCK_CONTAINER (pDesklet));
 }
 

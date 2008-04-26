@@ -15,6 +15,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-default-view.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-gui-factory.h"
 #include "cairo-dock-renderer-manager.h"
 
 extern GHashTable *g_hDocksTable;
@@ -122,7 +123,7 @@ void cairo_dock_set_default_renderer (CairoDock *pDock)
 }
 
 
-void cairo_dock_set_desklet_renderer (CairoDockDesklet *pDesklet, CairoDockDeskletRenderer *pRenderer, cairo_t *pSourceContext, gpointer *pConfig)
+void cairo_dock_set_desklet_renderer (CairoDockDesklet *pDesklet, CairoDockDeskletRenderer *pRenderer, cairo_t *pSourceContext, gboolean bLoadIcons, gpointer *pConfig)
 {
 	g_return_if_fail (pDesklet != NULL);
 	cd_message ("%s (%x)", __func__, pRenderer);
@@ -135,11 +136,18 @@ void cairo_dock_set_desklet_renderer (CairoDockDesklet *pDesklet, CairoDockDeskl
 	
 	pDesklet->pRenderer = pRenderer;
 	
-	if (pRenderer != NULL && pRenderer->load_data != NULL)
+	if (pRenderer != NULL)
 	{
 		cairo_t *pCairoContext = (pSourceContext != NULL ? pSourceContext : cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDesklet)));
 		
-		pDesklet->pRendererData = pRenderer->load_data (pDesklet, pCairoContext, pConfig);
+		if (pRenderer->configure != NULL)
+			pDesklet->pRendererData = pRenderer->configure (pDesklet, pCairoContext, pConfig);
+		
+		if (bLoadIcons && pRenderer->load_icons != NULL)
+			pRenderer->load_icons (pDesklet, pCairoContext);
+		
+		if (pRenderer->load_data != NULL)
+			pRenderer->load_data (pDesklet, pCairoContext);
 		
 		if (pSourceContext == NULL)
 			cairo_destroy (pCairoContext);
@@ -153,10 +161,7 @@ void cairo_dock_set_desklet_renderer_by_name (CairoDockDesklet *pDesklet, gchar 
 	
 	cairo_t *pCairoContext = (pSourceContext != NULL ? pSourceContext : cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDesklet)));
 	
-	cairo_dock_set_desklet_renderer (pDesklet, pRenderer, pCairoContext, pConfig);
-	
-	if (bLoadIcons && pRenderer != NULL && pRenderer->load_icons != NULL )
-		pRenderer->load_icons (pDesklet, pCairoContext);
+	cairo_dock_set_desklet_renderer (pDesklet, pRenderer, pCairoContext, bLoadIcons, pConfig);
 	
 	if (pSourceContext == NULL)
 		cairo_destroy (pCairoContext);

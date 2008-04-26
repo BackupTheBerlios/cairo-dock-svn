@@ -1835,3 +1835,20 @@ void cairo_dock_mark_prefered_conf_file (gchar *cConfFilePath)
 	}
 	g_free (cConfFileName);
 }
+
+
+void cairo_dock_get_version_from_string (gchar *cVersionString, int *iMajorVersion, int *iMinorVersion, int *iMicroVersion)
+{
+	gchar **cVersions = g_strsplit (cVersionString, ".", -1);
+	if (cVersions[0] != NULL)
+	{
+		*iMajorVersion = atoi (cVersions[0]);
+		if (cVersions[1] != NULL)
+		{
+			*iMinorVersion = atoi (cVersions[1]);
+			if (cVersions[2] != NULL)
+				*iMicroVersion = atoi (cVersions[2]);
+		}
+	}
+	g_strfreev (cVersions);
+}

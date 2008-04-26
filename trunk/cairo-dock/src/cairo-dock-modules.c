@@ -603,11 +603,11 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 					if (CAIRO_DOCK_IS_DESKLET (pActualContainer))  // elle etait dans un desklet.
 					{
 						pDock = g_pMainDock;  // par defaut.
-						bNeedFreeDesklet = TRUE;
+						bNeedFreeDesklet = TRUE;  // le desklet sera detruit apres le reload.
 						cairo_dock_steal_interactive_widget_from_desklet (CAIRO_DOCK_DESKLET (pActualContainer));
 						///cairo_dock_free_desklet (CAIRO_DOCK_DESKLET (pActualContainer));
 						///pActualContainer = NULL;
-						bToBeInserted = TRUE;
+						bToBeInserted = TRUE;  // l'icone sera inseree dans le dock avant le reload.
 						bContainerTypeChanged = TRUE;
 					}
 					else
@@ -624,6 +624,8 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 		module->pContainer = pNewContainer;
 		if (CAIRO_DOCK_IS_DOCK (pNewContainer) && pIcon != NULL)
 		{
+			pIcon->fWidth = pMinimalConfig->iDesiredIconWidth;
+			pIcon->fHeight = pMinimalConfig->iDesiredIconHeight;
 			cairo_dock_load_one_icon_from_scratch (pIcon, pNewContainer);
 
 			if (bToBeInserted)

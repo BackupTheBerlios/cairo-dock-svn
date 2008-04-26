@@ -513,6 +513,7 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 		}
 	} while (1);
 	g_dir_close (dir);
+	cairo_destroy (pCairoContext);
 	//g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_update_child_dock_size, NULL);  // on mettra a jour la taille du dock principal apres y avoir insere les applis/applets, car pour l'instant les docks fils n'en ont pas.
 }
 
@@ -800,7 +801,7 @@ void cairo_dock_allow_widget_to_receive_data (GtkWidget *pWidget, GCallback pCal
 		GTK_DEST_DEFAULT_DROP | GTK_DEST_DEFAULT_MOTION,  // GTK_DEST_DEFAULT_HIGHLIGHT ne rend pas joli je trouve.
 		pTargetEntry,
 		6,
-		GDK_ACTION_COPY);
+		GDK_ACTION_COPY | GDK_ACTION_MOVE);  // le 'GDK_ACTION_MOVE' c'est pour KDE.
 	g_free (pTargetEntry);
 
 	g_signal_connect (G_OBJECT (pWidget),

@@ -614,14 +614,17 @@ struct _CairoDockVFSBackend {
 
 
 typedef void (* CairoDockDeskletRenderFunc) (cairo_t *pCairoContext, CairoDockDesklet *pDesklet, gboolean bRenderOptimized);
-typedef gpointer (* CairoDockDeskletLoadRendererFunc) (CairoDockDesklet *pDesklet, cairo_t *pSourceContext, gpointer *pConfig);
+typedef gpointer (* CairoDockDeskletConfigureRendererFunc) (CairoDockDesklet *pDesklet, cairo_t *pSourceContext, gpointer *pConfig);
+typedef gpointer (* CairoDockDeskletLoadRendererFunc) (CairoDockDesklet *pDesklet, cairo_t *pSourceContext);
 typedef void (* CairoDockDeskletFreeRendererDataFunc) (CairoDockDesklet *pDesklet);
 typedef void (* CairoDockDeskletLoadIconsFunc) (CairoDockDesklet *pDesklet, cairo_t *pSourceContext);
 struct _CairoDockDeskletRenderer {
 	CairoDockDeskletRenderFunc render;
+	CairoDockDeskletConfigureRendererFunc configure;
 	CairoDockDeskletLoadRendererFunc load_data;
 	CairoDockDeskletFreeRendererDataFunc free_data;
 	CairoDockDeskletLoadIconsFunc load_icons;
+	gboolean bLoadIconsFirst;
 };
 
 struct _CairoDockDesklet {
@@ -736,7 +739,8 @@ typedef enum {
 	CAIRO_DOCK_UNKNOWN_ENV=0,
 	CAIRO_DOCK_GNOME,
 	CAIRO_DOCK_KDE,
-	CAIRO_DOCK_XFCE
+	CAIRO_DOCK_XFCE,
+	CAIRO_DOCK_NO_DESKTOP
 	} CairoDockDesktopEnv;
 
 typedef enum

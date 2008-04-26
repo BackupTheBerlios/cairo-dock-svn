@@ -165,5 +165,13 @@ void cairo_dock_read_easy_conf_file (gchar *cEasyConfFilePath, gpointer data);
 gboolean cairo_dock_use_full_conf_file (void);
 void cairo_dock_mark_prefered_conf_file (gchar *cConfFilePath);
 
+/**
+*Recupere les 3 numeros de version d'une chaine.
+*@param cVersionString la version representee par une chaine.
+*@param iMajorVersion numero de version majeure renvoyee.
+*@param iMinorVersion numero de version mineure renvoyee.
+*@param iMicroVersionnumero de version micro renvoyee.
+*/
+void cairo_dock_get_version_from_string (gchar *cVersionString, int *iMajorVersion, int *iMinorVersion, int *iMicroVersion);
 
 #endif

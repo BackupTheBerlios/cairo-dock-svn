@@ -355,6 +355,7 @@ msgstr ""
 #: ../src/cairo-dock-modules.c:762 ../src/cairo-dock-modules.c:693
 #: ../src/cairo-dock-modules.c:692 ../src/cairo-dock-modules.c:734
 #: ../src/cairo-dock-modules.c:733 ../src/cairo-dock-modules.c:742
+#: ../src/cairo-dock-modules.c:744
 #, c-format
 msgid "Configuration of %s"
 msgstr "Configuration de %s"
@@ -2504,6 +2505,7 @@ msgid "Advanced mode"
 msgstr "Mode avancé"
 
 #: ../src/cairo-dock.c:511 ../src/cairo-dock.c:512 ../src/cairo-dock.c:513
+#: ../src/cairo-dock.c:507
 msgid "< Maintenance mode >"
 msgstr "< Mode Maintenance >"
 

@@ -226,7 +226,7 @@ gboolean g_bSticky = TRUE;
 gboolean g_bUseGlitz = FALSE;
 gboolean g_bVerbose = FALSE;
 
-short g_iMajorVersion, g_iMinorVersion, g_iMicroVersion;
+int g_iMajorVersion, g_iMinorVersion, g_iMicroVersion;
 CairoDockDesktopEnv g_iDesktopEnv = CAIRO_DOCK_UNKNOWN_ENV;
 
 CairoDockFMSortType g_iFileSortType;
@@ -383,6 +383,8 @@ main (int argc, char** argv)
 			g_iDesktopEnv = CAIRO_DOCK_KDE;
 		else if (strcmp (cEnvironment, "xfce") == 0)
 			g_iDesktopEnv = CAIRO_DOCK_XFCE;
+		else if (strcmp (cEnvironment, "none") == 0)
+			g_iDesktopEnv = CAIRO_DOCK_NO_DESKTOP;
 		else
 			cd_warning ("Attention : unknown environnment '%s'", cEnvironment);
 		g_free (cEnvironment);
@@ -449,14 +451,7 @@ main (int argc, char** argv)
 	}
 
 	//\___________________ On initialise les numeros de version.
-	gchar **cVersions = g_strsplit (CAIRO_DOCK_VERSION, ".", -1);
-	if (cVersions[0] != NULL)
-		g_iMajorVersion = atoi (cVersions[0]);
-	if (cVersions[1] != NULL)
-		g_iMinorVersion = atoi (cVersions[1]);
-	if (cVersions[2] != NULL)
-		g_iMicroVersion = atoi (cVersions[2]);
-	g_strfreev (cVersions);
+	cairo_dock_get_version_from_string (CAIRO_DOCK_VERSION, &g_iMajorVersion, &g_iMinorVersion, &g_iMicroVersion);
 
 	//\___________________ On initialise le gestionnaire de docks (a faire en 1er).
 	cairo_dock_initialize_dock_manager ();

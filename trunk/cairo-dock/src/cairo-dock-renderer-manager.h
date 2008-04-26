@@ -20,7 +20,7 @@ void cairo_dock_initialize_renderer_manager (void);
 void cairo_dock_set_renderer (CairoDock *pDock, gchar *cRendererName);
 void cairo_dock_set_default_renderer (CairoDock *pDock);
 
-void cairo_dock_set_desklet_renderer (CairoDockDesklet *pDesklet, CairoDockDeskletRenderer *pRenderer, cairo_t *pSourceContext, gpointer *pConfig);
+void cairo_dock_set_desklet_renderer (CairoDockDesklet *pDesklet, CairoDockDeskletRenderer *pRenderer, cairo_t *pSourceContext, gboolean bLoadIcons, gpointer *pConfig);
 void cairo_dock_set_desklet_renderer_by_name (CairoDockDesklet *pDesklet, gchar *cRendererName, cairo_t *pSourceContext, gboolean bLoadIcons, gpointer *pConfig);
 
 
