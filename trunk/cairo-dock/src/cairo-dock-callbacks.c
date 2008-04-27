@@ -816,9 +816,14 @@ gboolean on_key_press (GtkWidget *pWidget,
 }
 
 
-gboolean cairo_dock_launch_command_full (const gchar *cCommand, gchar *cWorkingDirectory)
+gboolean cairo_dock_launch_command_full (const gchar *cCommandFormat, gchar *cWorkingDirectory, ...)
 {
-	g_return_val_if_fail (cCommand != NULL, FALSE);
+	g_return_val_if_fail (cCommandFormat != NULL, FALSE);
+	
+	va_list args;
+	va_start (args, cWorkingDirectory);
+	gchar *cCommand = g_strdup_vprintf (cCommandFormat, args);
+	
 	GError *erreur = NULL;
 	int argc;
 	gchar **argv = NULL;
@@ -830,6 +835,8 @@ gboolean cairo_dock_launch_command_full (const gchar *cCommand, gchar *cWorkingD
 	{
 		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
+		g_free (cCommand);
+		va_end (args);
 		return FALSE;
 	}
 	
@@ -847,8 +854,13 @@ gboolean cairo_dock_launch_command_full (const gchar *cCommand, gchar *cWorkingD
 	{
 		cd_warning ("Attention : when trying to execute '%s' : %s", cCommand, erreur->message);
 		g_error_free (erreur);
+		g_free (cCommand);
+		va_end (args);
 		return FALSE;
 	}
+	
+	g_free (cCommand);
+	va_end (args);
 	return TRUE;
 }
 

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: 1.4.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-12-11 18:15+0100\n"
-"PO-Revision-Date: 2008-04-08 23:30+0900\n"
+"PO-Revision-Date: 2008-04-24 22:25+0900\n"
 "Last-Translator: jiro kawada <jiro.kawada@gmail.com>\n"
 "Language-Team: Japanese <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -461,9 +461,8 @@ msgstr "ランチャーの選択または作成"
 #: ../src/cairo-dock-menu.c:239 ../src/cairo-dock-menu.c:242
 #: ../src/cairo-dock-menu.c:244 ../src/cairo-dock-menu.c:243
 #: ../src/cairo-dock-menu.c:270 ../src/cairo-dock-menu.c:271
-#, fuzzy
 msgid "Fill this launcher"
-msgstr "Remplissez ce lanceur"
+msgstr "このランチャー設定項目を入力"
 
 #: src/cairo-dock-menu.c:417 src/cairo-dock-menu.c:416
 #: src/cairo-dock-menu.c:402 po/fr.po:205 ../src/cairo-dock-menu.c:602
@@ -723,7 +722,6 @@ msgstr "画面最端までの距離 :"
 #: ../data/messages:229 ../data/messages:279 ../data/messages:451
 #: ../data/messages:233 ../data/messages:237 ../data/messages:241
 #: ../data/messages:287 ../data/messages:467 ../data/messages:471
-#: ../data/messages:475
 msgid "in pixels."
 msgstr "ピクセル単位"
 
@@ -1390,14 +1388,14 @@ msgstr "アイコンのラベルのスタイル"
 #: ../data/messages:283 ../data/messages:463 ../data/messages:285
 #: ../data/messages:465 ../data/messages:301 ../data/messages:481
 #: ../data/messages:305 ../data/messages:485 ../data/messages:313
-#: ../data/messages:501 ../data/messages:505 ../data/messages:509
+#: ../data/messages:501 ../data/messages:505
 msgid "Family of the font used for labels :"
 msgstr "ラベルに使用するフォント・ファミリー :"
 
 #: ../data/messages:281 ../data/messages:461 ../data/messages:283
 #: ../data/messages:463 ../data/messages:299 ../data/messages:479
 #: ../data/messages:303 ../data/messages:483 ../data/messages:311
-#: ../data/messages:499 ../data/messages:503 ../data/messages:507
+#: ../data/messages:499 ../data/messages:503
 msgid ""
 "for exemple Monospace, Purisa, ... Just write the font name wihtout any "
 "number or so."
@@ -1408,14 +1406,14 @@ msgstr ""
 #: ../data/messages:279 ../data/messages:459 ../data/messages:281
 #: ../data/messages:461 ../data/messages:297 ../data/messages:477
 #: ../data/messages:301 ../data/messages:481 ../data/messages:309
-#: ../data/messages:497 ../data/messages:501 ../data/messages:505
+#: ../data/messages:497 ../data/messages:501
 msgid "Size of the font :"
 msgstr "フォントの大きさ :"
 
 #: ../data/messages:277 ../data/messages:457 ../data/messages:279
 #: ../data/messages:459 ../data/messages:295 ../data/messages:475
 #: ../data/messages:299 ../data/messages:479 ../data/messages:307
-#: ../data/messages:495 ../data/messages:499 ../data/messages:503
+#: ../data/messages:495 ../data/messages:499
 msgid "approximately size in pixels, put 0 to not display labels"
 msgstr ""
 "ピクセル単位のおよその大きさです。ラベルを非表示にする場合は 0 を指定します。"
@@ -1423,14 +1421,14 @@ msgstr ""
 #: ../data/messages:287 ../data/messages:465 ../data/messages:289
 #: ../data/messages:467 ../data/messages:305 ../data/messages:483
 #: ../data/messages:309 ../data/messages:487 ../data/messages:317
-#: ../data/messages:503 ../data/messages:507 ../data/messages:511
+#: ../data/messages:503 ../data/messages:507
 msgid "Weight (between 1 and 9, the bigger, the heavier):"
 msgstr "太さ（1 から 9 までの数字、大きな数字ほど太い）:"
 
 #: ../data/messages:285 ../data/messages:467 ../data/messages:287
 #: ../data/messages:469 ../data/messages:303 ../data/messages:485
 #: ../data/messages:307 ../data/messages:489 ../data/messages:315
-#: ../data/messages:505 ../data/messages:509 ../data/messages:513
+#: ../data/messages:505 ../data/messages:509
 msgid "Should be italic ?"
 msgstr "イタリック表示？"
 
@@ -1688,43 +1686,39 @@ msgstr "メイン・ドックのデフォルトの外観の選択 :"
 
 #: ../data/messages:409 ../data/messages:411 ../data/messages:427
 #: ../data/messages:431 ../data/messages:447 ../data/messages:451
-#: ../data/messages:455 ../data/messages:453
+#: ../data/messages:453
 msgid "Sub-Docks"
 msgstr "サブ・ドック"
 
 #: ../data/messages:413 ../data/messages:415 ../data/messages:431
 #: ../data/messages:435 ../data/messages:451 ../data/messages:455
-#: ../data/messages:459 ../data/messages:457
+#: ../data/messages:457
 msgid "Choose the default view for sub-docks :"
 msgstr "サブ・ドックのデフォルトの外観の選択 :"
 
 #: ../data/messages:411 ../data/messages:413 ../data/messages:429
 #: ../data/messages:433 ../data/messages:449 ../data/messages:453
-#: ../data/messages:457 ../data/messages:455
+#: ../data/messages:455
 msgid "You can overwrite this parameter for each sub-dock."
 msgstr "このパラメータは各サブ・ドックごとに上書きできます。"
 
 #: ../data/messages:419 ../data/messages:421 ../data/messages:437
 #: ../data/messages:441 ../data/messages:457 ../data/messages:461
-#: ../data/messages:465
 msgid "Are the sub-docks parallel to main docks ?"
 msgstr "サブ・ドックをメイン・ドックに平行に配置？"
 
 #: ../data/messages:417 ../data/messages:419 ../data/messages:435
 #: ../data/messages:439 ../data/messages:455 ../data/messages:459
-#: ../data/messages:463
 msgid "otherwise they will be perpendicular"
 msgstr "有効にしない場合は、垂直に配置されます。"
 
 #: ../data/messages:423 ../data/messages:425 ../data/messages:441
 #: ../data/messages:445 ../data/messages:461 ../data/messages:465
-#: ../data/messages:469
 msgid "Ratio for the size of the sub-docks' icons :"
 msgstr "サブ・ドックのアイコンの大きさの割合 :"
 
 #: ../data/messages:421 ../data/messages:423 ../data/messages:439
 #: ../data/messages:443 ../data/messages:459 ../data/messages:463
-#: ../data/messages:467
 msgid ""
 "You can specify a ratio for the size of the sub-docks' icons, regarding the "
 "main docks' icons size"
@@ -1734,86 +1728,73 @@ msgstr ""
 
 #: ../data/messages:425 ../data/messages:427 ../data/messages:443
 #: ../data/messages:447 ../data/messages:463 ../data/messages:467
-#: ../data/messages:471
 msgid "Dialogs"
 msgstr "ダイアログ"
 
 #: ../data/messages:427 ../data/messages:429 ../data/messages:445
 #: ../data/messages:449 ../data/messages:465 ../data/messages:469
-#: ../data/messages:473
 msgid "Buttons"
 msgstr "ボタン"
 
 #: ../data/messages:431 ../data/messages:433 ../data/messages:449
 #: ../data/messages:453 ../data/messages:469 ../data/messages:473
-#: ../data/messages:477
 msgid "Size of buttons in the info-bubbles (width x height) :"
 msgstr "情報を通知する吹き出し内のボタンの大きさ（幅×高さ） :"
 
 #: ../data/messages:435 ../data/messages:437 ../data/messages:453
 #: ../data/messages:457 ../data/messages:473 ../data/messages:477
-#: ../data/messages:481
 msgid "Name of an image to use for the yes/ok button :"
 msgstr "はい/OK ボタンに使用する画像の名前 :"
 
 #: ../data/messages:433 ../data/messages:437 ../data/messages:435
 #: ../data/messages:439 ../data/messages:451 ../data/messages:455
 #: ../data/messages:459 ../data/messages:471 ../data/messages:475
-#: ../data/messages:479 ../data/messages:483
+#: ../data/messages:479
 msgid "If you don't provide any, a default image will be used."
 msgstr "何も指定しない場合は、デフォルトの画像が使用されます。"
 
 #: ../data/messages:439 ../data/messages:441 ../data/messages:457
 #: ../data/messages:461 ../data/messages:477 ../data/messages:481
-#: ../data/messages:485
 msgid "Name of an image to use for the no/cancel button :"
 msgstr "いいえ/キャンセル ボタンに使用する画像の名前 :"
 
 #: ../data/messages:441 ../data/messages:443 ../data/messages:459
 #: ../data/messages:463 ../data/messages:479 ../data/messages:483
-#: ../data/messages:487
 msgid "Bubble"
 msgstr "吹き出し"
 
 #: ../data/messages:443 ../data/messages:445 ../data/messages:461
 #: ../data/messages:465 ../data/messages:481 ../data/messages:485
-#: ../data/messages:489
 msgid "Background color of the bubble (r,v,b,a) :"
 msgstr "吹き出しの背景色（赤、緑、青、透明）:"
 
 #: ../data/messages:447 ../data/messages:449 ../data/messages:465
 #: ../data/messages:469 ../data/messages:485 ../data/messages:489
-#: ../data/messages:493
 msgid "Size of the icon displayed next to the text :"
 msgstr "テキストの隣に表示するアイコンの大きさ :"
 
 #: ../data/messages:445 ../data/messages:447 ../data/messages:463
 #: ../data/messages:467 ../data/messages:483 ../data/messages:487
-#: ../data/messages:491
 msgid "Put 0 to let the size adapt itself to the text."
 msgstr "0 に指定すると、テキストに合わせて大きさを調整します。"
 
 #: ../data/messages:449 ../data/messages:451 ../data/messages:467
 #: ../data/messages:471 ../data/messages:487 ../data/messages:491
-#: ../data/messages:495
 msgid "Text"
 msgstr "テキスト"
 
 #: ../data/messages:451 ../data/messages:453 ../data/messages:469
 #: ../data/messages:473 ../data/messages:489 ../data/messages:493
-#: ../data/messages:497
 msgid "Text color (r,v,b,a) :"
 msgstr "テキストの色（赤、緑、青、透明）:"
 
 #: ../data/messages:455 ../data/messages:457 ../data/messages:473
 #: ../data/messages:477 ../data/messages:493 ../data/messages:497
-#: ../data/messages:501
 msgid "Homogeneous with icons' label ?"
 msgstr "アイコンのラベルと同質にする？"
 
 #: ../data/messages:453 ../data/messages:455 ../data/messages:471
 #: ../data/messages:475 ../data/messages:491 ../data/messages:495
-#: ../data/messages:499
 msgid ""
 "The messages will have the same style as the icons' labels. The beneath "
 "parameters are then unused."
@@ -1866,6 +1847,7 @@ msgstr ""
 #: ../src/cairo-dock-callbacks.c:818 ../src/cairo-dock-callbacks.c:820
 #: ../src/cairo-dock-callbacks.c:819 ../src/cairo-dock-callbacks.c:822
 #: ../src/cairo-dock-callbacks.c:824 ../src/cairo-dock-callbacks.c:871
+#: ../src/cairo-dock-callbacks.c:883
 msgid "Do you want to mount this point ?"
 msgstr "このポイントにマウントしますか？"
 
@@ -2140,7 +2122,7 @@ msgstr "Compiz Fusion ウィジェット"
 #: ../src/cairo-dock-callbacks.c:1429 ../src/cairo-dock-callbacks.c:1431
 #: ../src/cairo-dock-callbacks.c:1447 ../src/cairo-dock-callbacks.c:1450
 #: ../src/cairo-dock-callbacks.c:1519 ../src/cairo-dock-callbacks.c:1522
-#: ../src/cairo-dock-callbacks.c:1537
+#: ../src/cairo-dock-callbacks.c:1549
 msgid "Quit Cairo-Dock ?"
 msgstr "Cairo-Dock 終了？"
 
@@ -2176,7 +2158,6 @@ msgstr "日付"
 #: ../data/messages:417 ../data/messages:425 ../data/messages:433
 #: ../data/messages:429 ../data/messages:437 ../data/messages:445
 #: ../data/messages:453 ../data/messages:449 ../data/messages:457
-#: ../data/messages:461
 msgid "default"
 msgstr "デフォルト"
 
@@ -2225,17 +2206,17 @@ msgstr ""
 "るほどアイコンは透明になり、真ん中にするとアイコンに変化は起きません。"
 
 #: ../data/messages:471 ../data/messages:487 ../data/messages:491
-#: ../data/messages:507 ../data/messages:511 ../data/messages:515
+#: ../data/messages:507 ../data/messages:511
 msgid "Desklets"
 msgstr "デスクレット"
 
 #: ../data/messages:473 ../data/messages:489 ../data/messages:493
-#: ../data/messages:509 ../data/messages:513 ../data/messages:517
+#: ../data/messages:509 ../data/messages:513
 msgid "Background color (r,v,b,a) :"
 msgstr "背景色（赤、緑、青、透明）:"
 
 #: ../data/messages:475 ../data/messages:491 ../data/messages:495
-#: ../data/messages:511 ../data/messages:515 ../data/messages:519
+#: ../data/messages:511 ../data/messages:515
 msgid "Background color when mouse hovers it (r,v,b,a) :"
 msgstr "マウスを置いたときの背景色（赤、緑、青、透明）:"
 
@@ -2390,24 +2371,24 @@ msgstr "ドックの上限サイズ :"
 
 #: ../src/cairo-dock-menu.c:69 ../src/cairo-dock-menu.c:71
 msgid "Easy Mode"
-msgstr ""
+msgstr "簡単設定モード"
 
 #: ../src/cairo-dock-menu.c:69 ../src/cairo-dock-menu.c:71
 msgid "Advanced mode"
-msgstr ""
+msgstr "詳細設定モード"
 
 #: ../src/cairo-dock-menu.c:1139 ../src/cairo-dock-menu.c:1142
 #: ../src/cairo-dock-menu.c:1149 ../src/cairo-dock-menu.c:1151
 msgid "Launch new"
-msgstr ""
+msgstr "追加起動"
 
 #: ../src/cairo-dock-themes-manager.c:129
 msgid "< Safe Mode >"
-msgstr ""
+msgstr "< セーフモード >"
 
 #: ../src/cairo-dock-themes-manager.c:129
 msgid "Manage Themes"
-msgstr ""
+msgstr "テーマの管理"
 
 #: ../src/cairo-dock-themes-manager.c:134
 msgid ""
@@ -2422,11 +2403,21 @@ msgid ""
 "Save a config that is working, and restart the dock in normal mode.\n"
 "Then, activate plug-ins one by one to guess which one is wrong."
 msgstr ""
+"セーフモードで Cairo-Dock を実行中です。\n"
+"ドック内でプラグインが混乱した状態になっているか、\n"
+"テーマ設定が壊れていることが原因と思われます。\n"
+"従って、このままではプラグインを利用することはできません。\n"
+"ドックの使用を開始する前に現在のテーマを直ちに保存しておくことができます。現"
+"在のテーマが機能しているようであればそれを使用してみてください。この場合、プ"
+"ラグインに問題があることになります。\n"
+"それ以外の場合には、別のテーマを試してください。機能している設定を保存した上"
+"で、ドックを通常モードで再起動させます。\n"
+"その後、問題のあるプラグインの特定のためにプラグインを1つずつ有効化してみてく"
+"ださい。"
 
-#: ../src/cairo-dock.c:511 ../src/cairo-dock.c:512 ../src/cairo-dock.c:513
-#: ../src/cairo-dock.c:507
+#: ../src/cairo-dock.c:511 ../src/cairo-dock.c:512 ../src/cairo-dock.c:507
 msgid "< Maintenance mode >"
-msgstr ""
+msgstr "< メンテナンスモード >"
 
 #: ../data/messages:65
 msgid ""
@@ -2434,54 +2425,66 @@ msgid ""
 "displays an indicator on their icon to signal it. You can launch other "
 "occurences of the program with SHIFT+click."
 msgstr ""
+"ランチャーの対象プログラムが実行中の時はそのランチャーをアプリとして動作さ"
+"せ、それを示す標示をアイコン上に表示します。そのプログラムを新たに追加的に開"
+"くには SHIFT+クリック を使用します。"
 
 #: ../data/messages:67
 msgid "Mix launchers and applis ?"
-msgstr ""
+msgstr "ランチャーとアプリを合同化？"
 
 #: ../data/messages:69
 msgid ""
 "If not set, will use the icon provided by X for each appli. If set, the same "
 "icon as the corresponding launcher will be used for each appli."
 msgstr ""
+"これが有効でない場合、X により提供されるアイコンが各アプリに使用されます。 有"
+"効にした場合、ランチャーに使用しているアイコンがそのランチャーに対応するアプ"
+"リにそのまま使用されます。"
 
 #: ../data/messages:71
 msgid "Overwrite X icons with launchers' one ?"
-msgstr ""
+msgstr "X のアイコンをランチャーのアイコンで上書き？"
 
 #: ../data/messages:363
 msgid ""
 "Indicators are drawn on launchers icons to show that they have already been "
 "launched. Let blank to use the default one."
 msgstr ""
+"ランチャーのアイコン上に標示を描画して、それらが起動済みであることを示しま"
+"す。デフォルトの画像を使用するには空欄のままにしてください。"
 
 #: ../data/messages:365
 msgid "Filename of an image to use for indicators :"
-msgstr ""
+msgstr "標示に使用する画像のファイル名 :"
 
 #: ../data/messages:367
 msgid ""
 "The ratio between indicator's size and icon's size. The bigger, the bigger "
 "the indicators are."
 msgstr ""
+"標示の大きさとアイコンの大きさとの割合です。数字が大きいほど標示は大きくなり"
+"ます。"
 
 #: ../data/messages:369
 msgid "Indicator size ratio :"
-msgstr ""
+msgstr "標示の大きさの割合 :"
 
 #: ../src/cairo-dock-menu.c:1161 ../src/cairo-dock-menu.c:1145
 msgid "Kill"
-msgstr ""
+msgstr "強制終了"
 
 #: ../data/messages:371 ../data/messages:375
 msgid ""
 "i pixels. You can use this parameter to adjust the indicator's vertical "
 "position."
 msgstr ""
+"ピクセル単位。このパラメータを使用して標示の垂直方向の位置を調節することがで"
+"きます。"
 
 #: ../data/messages:373 ../data/messages:377
 msgid "Vertical offset :"
-msgstr ""
+msgstr "垂直方向のオフセット :"
 
 #: ../src/cairo-dock-menu.c:1079
 msgid "Remove this separator"

@@ -206,6 +206,13 @@ gboolean cairo_dock_measure_is_active (CairoDockMeasure *pMeasureTimer);
 */
 void cairo_dock_change_measure_frequency (CairoDockMeasure *pMeasureTimer, int iNewCheckInterval);
 /**
+*Change la frequence des mesures et les relance immediatement. La prochaine mesure est donc tout de suite.
+*@param pMeasureTimer la mesure periodique.
+*@param iNewCheckInterval le nouvel intervalle entre 2 mesures, en ms.
+*/
+void cairo_dock_relaunch_measure_immediately (CairoDockMeasure *pMeasureTimer, int iNewCheckInterval);
+
+/**
 *Degrade la frequence des mesures. La mesure passe dans un etat moins actif (typiquement utile si la mesure a echouee).
 *@param pMeasureTimer la mesure periodique.
 */

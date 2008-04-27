@@ -458,6 +458,13 @@ void cairo_dock_change_measure_frequency (CairoDockMeasure *pMeasureTimer, int i
 	_cairo_dock_restart_timer_with_frequency (pMeasureTimer, iNewCheckInterval);
 }
 
+void cairo_dock_relaunch_measure_immediately (CairoDockMeasure *pMeasureTimer, int iNewCheckInterval)
+{
+	cairo_dock_stop_measure_timer (pMeasureTimer);  // on stoppe avant car on ne veut pas attendre la prochaine iteration.
+	cairo_dock_change_measure_frequency (pMeasureTimer, iNewCheckInterval); // nouvelle frequence eventuelement.
+	cairo_dock_launch_measure (pMeasureTimer);  // mesure immediate.
+}
+
 void cairo_dock_downgrade_frequency_state (CairoDockMeasure *pMeasureTimer)
 {
 	if (pMeasureTimer->iFrequencyState < CAIRO_DOCK_FREQUENCY_SLEEP)
