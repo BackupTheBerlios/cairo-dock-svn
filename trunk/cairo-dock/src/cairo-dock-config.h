@@ -148,7 +148,7 @@ gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePat
 */
 void cairo_dock_update_conf_file (gchar *cConfFilePath, GType iFirstDataType, ...);
 
-void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int y);
+void cairo_dock_update_conf_file_with_position (const gchar *cConfFilePath, int x, int y);
 
 /**
 *Essaye de determiner l'environnement de bureau dela session courante.

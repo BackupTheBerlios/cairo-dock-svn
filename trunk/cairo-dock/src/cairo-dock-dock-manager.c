@@ -37,11 +37,14 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-file-manager.h"
 #include "cairo-dock-X-utilities.h"
 #include "cairo-dock-log.h"
-#include "cairo-dock-keyfile-manager.h"
+#include "cairo-dock-keyfile-utilities.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-dock-manager.h"
 
 extern CairoDock *g_pMainDock;
+extern gboolean g_bDirectionUp;
+extern gchar *g_cConfFile;
+extern gchar *g_cCurrentThemePath;
 
 static GHashTable *s_hDocksTable = NULL;  // table des docks existant.
 
@@ -165,9 +168,9 @@ CairoDockContainer *cairo_dock_search_container_from_icon (Icon *icon)
 }
 
 
-void cairo_dock_update_conf_file_with_containers (GKeyFile *pKeyFile, gchar *cDesktopFilePath)
+void cairo_dock_update_conf_file_with_containers_full (GKeyFile *pKeyFile, gchar *cDesktopFilePath, gchar *cGroupName, gchar *cKeyName)
 {
-	cairo_dock_update_conf_file_with_hash_table (pKeyFile, cDesktopFilePath, s_hDocksTable, "Desktop Entry", "Container", NULL, (GHFunc)cairo_dock_write_one_name, FALSE, FALSE);
+	cairo_dock_update_conf_file_with_hash_table (pKeyFile, cDesktopFilePath, s_hDocksTable, cGroupName, cKeyName, NULL, (GHFunc)cairo_dock_write_one_name, FALSE, FALSE);
 }
 
 static void _cairo_dock_get_one_decoration_size (gchar *cDockName, CairoDock *pDock, int *data)
@@ -300,4 +303,116 @@ void cairo_dock_set_all_views_to_default (void)
 {
 	//g_print ("%s ()\n", __func__);
 	g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_set_one_dock_view_to_default, NULL);
+}
+
+
+
+/*void cairo_dock_write_main_docks_posotions (GKeyFile *pKeyFile)
+{
+	g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_write_one_main_dock_position, pKeyFile);
+}*/
+
+void cairo_dock_write_main_dock_gaps (CairoDock *pDock)
+{
+	if (pDock->iRefCount > 0)
+		return;
+	cairo_dock_prevent_dock_from_out_of_screen (pDock);
+	if (pDock->bIsMainDock)
+	{
+		cairo_dock_update_conf_file_with_position (g_cConfFile, pDock->iGapX, pDock->iGapY);
+	}
+	else
+	{
+		const gchar *cDockName = cairo_dock_search_dock_name (pDock);
+		gchar *cConfFilePath = g_strdup_printf ("%s/%s.conf", g_cCurrentThemePath, cDockName);
+		cairo_dock_update_conf_file_with_position (cDockName, pDock->iGapX, pDock->iGapY);
+		g_free (cConfFilePath);
+	}
+}
+
+void cairo_dock_write_main_dock_position (gchar *cDockName, CairoDock *pDock)
+{
+	g_return_if_fail (cDockName != NULL && pDock != NULL);
+	if (pDock->iRefCount > 0)
+		return;
+	
+	gchar *cConfFilePath = (pDock->bIsMainDock ? g_cConfFile : g_strdup_printf ("%s/%s.conf", g_cCurrentThemePath, cDockName));
+	
+	CairoDockPositionType iScreenBorder;
+	if (pDock->bHorizontalDock == CAIRO_DOCK_HORIZONTAL)
+	{
+		if (g_bDirectionUp)
+			iScreenBorder = CAIRO_DOCK_BOTTOM;
+		else
+			iScreenBorder = CAIRO_DOCK_TOP;
+	}
+	else
+	{
+		if (g_bDirectionUp)
+			iScreenBorder = CAIRO_DOCK_RIGHT;
+		else
+			iScreenBorder = CAIRO_DOCK_LEFT;
+	}
+	cairo_dock_update_conf_file (cConfFilePath,
+		G_TYPE_INT, "Position", "screen border", iScreenBorder,
+		G_TYPE_DOUBLE, "Position", "alignment", pDock->fAlign,
+		G_TYPE_INT, "Position", "x gap", pDock->iGapX,
+		G_TYPE_INT, "Position", "y gap", pDock->iGapY,
+		G_TYPE_INVALID);
+	if (! pDock->bIsMainDock)
+		g_free (cConfFilePath);
+}
+
+void cairo_dock_get_main_dock_position (gchar *cDockName, CairoDock *pDock)
+{
+	g_return_if_fail (cDockName != NULL && pDock != NULL);
+	if (pDock->iRefCount > 0 || pDock->bIsMainDock)
+		return;
+	
+	gchar *cConfFilePath = (pDock->bIsMainDock ? g_cConfFile : g_strdup_printf ("%s/%s.conf", g_cCurrentThemePath, cDockName));
+	
+	GKeyFile *pKeyFile = g_key_file_new ();
+	GError *erreur = NULL;
+	g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+	if (erreur != NULL)
+	{
+		cd_warning ("Attention : %s", erreur->message);
+		g_error_free (erreur);
+		return ;
+	}
+	else
+	{
+		gboolean bFlushConfFileNeeded = FALSE;
+		pDock->iGapX = cairo_dock_get_integer_key_value (pKeyFile, "Position", "x gap", &bFlushConfFileNeeded, 0, NULL, NULL);
+		pDock->iGapY = cairo_dock_get_integer_key_value (pKeyFile, "Position", "y gap", &bFlushConfFileNeeded, 0, NULL, NULL);
+	
+		CairoDockPositionType iScreenBorder = cairo_dock_get_integer_key_value (pKeyFile, "Position", "screen border", &bFlushConfFileNeeded, 0, NULL, NULL);
+		if (iScreenBorder < 0 || iScreenBorder >= CAIRO_DOCK_NB_POSITIONS)
+			iScreenBorder = 0;
+	
+		pDock->fAlign = cairo_dock_get_double_key_value (pKeyFile, "Position", "alignment", &bFlushConfFileNeeded, 0.5, NULL, NULL);
+		
+		switch (iScreenBorder)
+		{
+			case CAIRO_DOCK_BOTTOM :
+				pDock->bHorizontalDock = CAIRO_DOCK_HORIZONTAL;
+				g_bDirectionUp = TRUE;
+			break;
+			case CAIRO_DOCK_TOP :
+				pDock->bHorizontalDock = CAIRO_DOCK_HORIZONTAL;
+				g_bDirectionUp = FALSE;
+			break;
+			case CAIRO_DOCK_LEFT :
+				pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
+				g_bDirectionUp = FALSE;
+			break;
+			case CAIRO_DOCK_RIGHT :
+				pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
+				g_bDirectionUp = TRUE;
+			break;
+		}
+	}
+	
+	if (! pDock->bIsMainDock)
+		g_free (cConfFilePath);
 }

@@ -79,6 +79,14 @@ void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Ico
 *@param pContainer le container de l'icone.
 */
 void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, Icon *pIcon, CairoDockContainer *pContainer);
+/**
+*Modifie l'etiquette d'une icone, en prenant une chaine au format 'printf'.
+*@param pSourceContext un contexte de dessin; n'est pas altere par la fonction.
+*@param pIcon l'icone.
+*@param pContainer le container de l'icone.
+*@param cIconNameFormat la nouvelle etiquette de l'icone.
+*/
+void cairo_dock_set_icon_name_full (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, const gchar *cIconNameFormat, ...);
 
 /**
 *Ecris une info-rapide sur l'icone. C'est un petit texte (quelques caracteres) qui vient se superposer sur l'icone, avec un fond fonce.
@@ -107,6 +115,12 @@ void cairo_dock_set_hours_minutes_as_quick_info (cairo_t *pSourceContext, Icon *
 void cairo_dock_set_minutes_secondes_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, int iTimeInSeconds);
 void cairo_dock_set_size_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, long long int iSizeInBytes);
 
+typedef enum {
+	CAIRO_DOCK_INFO_NONE = 0,
+	CAIRO_DOCK_INFO_ON_ICON,
+	CAIRO_DOCK_INFO_ON_LABEL,
+	CAIRO_DOCK_NB_INFO_DISPLAY
+} CairoDockInfoDisplay;
 
 
 /**
@@ -139,6 +153,7 @@ gchar* cairo_dock_manage_themes_for_applet (gchar *cAppletShareDataDir, gchar *c
 *@return le sous-menu cree et ajoute au menu.
 */
 GtkWidget *cairo_dock_create_sub_menu (gchar *cLabel, GtkWidget *pMenu);
+
 
 typedef enum {
 	CAIRO_DOCK_FREQUENCY_NORMAL = 0,
@@ -222,6 +237,8 @@ void cairo_dock_downgrade_frequency_state (CairoDockMeasure *pMeasureTimer);
 *@param pMeasureTimer la mesure periodique.
 */
 void cairo_dock_set_normal_frequency_state (CairoDockMeasure *pMeasureTimer);
+
+
 
 //\_________________________________ INIT
 /**
@@ -975,20 +992,26 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 */
 #define CD_APPLET_SET_NAME_FOR_MY_ICON(cIconName) \
 	cairo_dock_set_icon_name (myDrawContext, cIconName, myIcon, myContainer);
+/**
+*Remplace l'etiquette de l'icone de l'applet par une nouvelle.
+*@param cIconName la nouvelle etiquette au format 'printf'.
+*/
+#define CD_APPLET_SET_NAME_FOR_MY_ICON_PRINTF(cIconNameFormat, ...) \
+	cairo_dock_set_icon_name_full (myDrawContext, myIcon, myContainer, cIconNameFormat, ##__VA_ARGS__);
 
+/**
+*Ecris une info-rapide sur l'icone de l'applet.
+*@param cQuickInfo l'info-rapide. Ce doit etre une chaine de caracteres particulièrement petite, representant une info concise, puisque ecrite directement sur l'icone.
+*/
+#define CD_APPLET_SET_QUICK_INFO_ON_MY_ICON(cQuickInfo) \
+	cairo_dock_set_quick_info (myDrawContext, cQuickInfo, myIcon, myDock ? (1 + g_fAmplitude) / 1 : 1);
 /**
 *Ecris une info-rapide sur l'icone de l'applet.
 *@param cQuickInfoFormat l'info-rapide, au format 'printf'. Ce doit etre une chaine de caracteres particulièrement petite, representant une info concise, puisque ecrite directement sur l'icone.
 */
-#define CD_APPLET_SET_QUICK_INFO_ON_MY_ICON(cQuickInfoFormat, ...) \
+#define CD_APPLET_SET_QUICK_INFO_ON_MY_ICON_PRINTF(cQuickInfoFormat, ...) \
 	cairo_dock_set_quick_info_full (myDrawContext, myIcon, myContainer, cQuickInfoFormat, ##__VA_ARGS__);
-/**
-*Ecris une info-rapide sur l'icone de l'applet et la redessine.
-*@param cQuickInfoFormat l'info-rapide, au format 'printf'. Ce doit etre une chaine de caracteres particulièrement petite, representant une info concise, puisque ecrite directement sur l'icone.
-*/
-#define CD_APPLET_SET_QUICK_INFO_ON_MY_ICON_AND_REDRAW(cQuickInfoFormat, ...) \
-	cairo_dock_set_quick_info_full (myDrawContext, myIcon, myContainer, cQuickInfoFormat, ##__VA_ARGS__); \
-	cairo_dock_redraw_my_icon (myIcon, myContainer);
+
 /**
 *Ecris le temps en heures-minutes en info-rapide sur l'icone de l'applet.
 *@param iTimeInSeconds le temps en secondes.
@@ -1062,53 +1085,3 @@ extern AppletData myData;
 #define _D D_
 
 #endif
-
-
-
-
-#define CD_APPLET_DEFINE_TIMER(_get_data, _read_data, _load_data) \
-static int s_iThreadIsRunning = 0, s_iSidTimerRedraw = 0; \
-static GStaticMutex mutexData = G_STATIC_MUTEX_INIT; \
-static gboolean _cairo_dock_timer (gpointer data) { \
-	_cairo_dock_launch_measure (); \
-	return TRUE; } \
-static gpointer _cairo_dock_threaded_calculation (gpointer data) { \
-	_get_data (); \
-	g_static_mutex_lock (&mutexData); \
-	_read_data ();  \
-	g_static_mutex_unlock (&mutexData); \
-	g_atomic_int_set (&s_iThreadIsRunning, 0); \
-	return NULL; } \
-static gboolean _cairo_dock_check_for_redraw (gpointer data) { \
-	int iThreadIsRunning = g_atomic_int_get (&s_iThreadIsRunning); \
-	if (! iThreadIsRunning) { \
-		s_iSidTimerRedraw = 0; \
-		if (myIcon == NULL) { \
-			cd_warning ("annulation du chargement de l'applet"); \
-			return FALSE; } \
-		g_static_mutex_lock (&mutexData); \
-		_load_data (); \
-		g_static_mutex_unlock (&mutexData); \
-		if (myData.iSidTimer == 0) \
-			myData.iSidTimer = g_timeout_add (myConfig.iCheckInterval, (GSourceFunc) _cairo_dock_timer, NULL); \
-		return FALSE; } \
-	return TRUE; } \
-void cairo_dock_launch_measure (void) { \
-	if (g_atomic_int_compare_and_exchange (&s_iThreadIsRunning, 0, 1)) { \
-		if (s_iSidTimerRedraw == 0) \
-			s_iSidTimerRedraw = g_timeout_add (250, (GSourceFunc) _cairo_dock_check_for_redraw, (gpointer) NULL); \
-		GError *erreur = NULL; \
-		GThread* pThread = g_thread_create ((GThreadFunc) _cairo_dock_threaded_calculation, NULL, FALSE, &erreur); \
-		if (erreur != NULL) { \
-			cd_warning ("Attention : %s", erreur->message); \
-			g_error_free (erreur); } } }
-
-#define CD_APPLET_START_TIMER \
-	cairo_dock_launch_measure ();
-
-#define CD_APPLET_STOP_TIMER \
-	if (myData.iSidTimer != 0) { \
-		g_source_remove (myData.iSidTimer); \
-		myData.iSidTimer = 0; }
-
-#define CD_APPLET_TIMER_IS_RUNNING (myData.iSidTimer != 0)

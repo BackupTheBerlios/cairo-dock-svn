@@ -660,40 +660,17 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 }
 
 
-void cairo_dock_update_gaps_with_window_position (CairoDock *pDock)
-{
-	int x, y;  // position du point invariant du dock.
-	x = pDock->iWindowPositionX +  pDock->iCurrentWidth * pDock->fAlign;
-	y = (g_bDirectionUp ? pDock->iWindowPositionY + pDock->iCurrentHeight : pDock->iWindowPositionY);
-	cd_message ("%s (%d;%d)", __func__, x, y);
-	
-	pDock->iGapX = x - g_iScreenWidth[pDock->bHorizontalDock] * pDock->fAlign;
-	pDock->iGapY = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - y : y);
-	cd_message (" -> (%d;%d)", pDock->iGapX, pDock->iGapY);
-	
-	if (pDock->iGapX < - g_iScreenWidth[pDock->bHorizontalDock]/2)
-		pDock->iGapX = - g_iScreenWidth[pDock->bHorizontalDock]/2;
-	if (pDock->iGapX > g_iScreenWidth[pDock->bHorizontalDock]/2)
-		pDock->iGapX = g_iScreenWidth[pDock->bHorizontalDock]/2;
-	if (pDock->iGapY < 0)
-		pDock->iGapY = 0;
-	if (pDock->iGapY > g_iScreenHeight[pDock->bHorizontalDock])
-		pDock->iGapY = g_iScreenHeight[pDock->bHorizontalDock];
-
-	if (pDock->bIsMainDock)
-		cairo_dock_update_conf_file_with_position (g_cConfFile, pDock->iGapX, pDock->iGapY);
-}
-
 static int iMoveByArrow = 0;
 gboolean on_key_release (GtkWidget *pWidget,
-			GdkEventKey *pKey,
-			CairoDock *pDock)
+	GdkEventKey *pKey,
+	CairoDock *pDock)
 {
 	cd_message ("");
 	iMoveByArrow = 0;
 	if (pKey->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK))  // On relache la touche ALT, typiquement apres avoir fait un ALT + clique gauche + deplacement.
 	{
-		cairo_dock_update_gaps_with_window_position (pDock);
+		if (pDock->iRefCount == 0)
+			cairo_dock_write_main_dock_gaps (pDock);
 	}
 	return FALSE;
 }
@@ -1053,8 +1030,8 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				}
 				else
 				{
-					if (pDock->bIsMainDock)
-						cairo_dock_update_gaps_with_window_position (pDock);
+					if (pDock->iRefCount == 0)
+						cairo_dock_write_main_dock_gaps (pDock);
 				}
 				s_pIconClicked = NULL;
 			break ;
@@ -1226,8 +1203,11 @@ gboolean on_scroll (GtkWidget* pWidget,
 	if (pScroll->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK))
 	{
 		Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
-		gpointer data[3] = {icon, pDock, GINT_TO_POINTER (pScroll->direction)};
-		cairo_dock_notify (CAIRO_DOCK_SCROLL_ICON, data);
+		if (icon != NULL)
+		{
+			gpointer data[3] = {icon, pDock, GINT_TO_POINTER (pScroll->direction)};
+			cairo_dock_notify (CAIRO_DOCK_SCROLL_ICON, data);
+		}
 		return FALSE;
 	}
 	

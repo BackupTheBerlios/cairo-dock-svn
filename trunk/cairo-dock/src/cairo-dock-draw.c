@@ -830,12 +830,12 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		cairo_translate (pCairoContext,
 			//-icon->fQuickInfoXOffset + icon->fWidth / 2,
 			//icon->fHeight - icon->fQuickInfoYOffset);
-			(- icon->iQuickInfoWidth + icon->fWidthFactor * icon->fWidth) / 2 * icon->fScale,
-			(icon->fHeight - icon->iQuickInfoHeight) * icon->fScale);
+			(- icon->iQuickInfoWidth * fRatio + icon->fWidthFactor * icon->fWidth) / 2 * icon->fScale,
+			(icon->fHeight - icon->iQuickInfoHeight * fRatio) * icon->fScale);
 		
 		cairo_scale (pCairoContext,
-			fRatio * icon->fScale / (1 + g_fAmplitude),
-			fRatio * icon->fScale / (1 + g_fAmplitude));
+			fRatio * icon->fScale / (1 + g_fAmplitude) * 1,
+			fRatio * icon->fScale / (1 + g_fAmplitude) * 1);
 		
 		cairo_set_source_surface (pCairoContext,
 			icon->pQuickInfoBuffer,

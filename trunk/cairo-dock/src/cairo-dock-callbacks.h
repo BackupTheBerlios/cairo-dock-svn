@@ -28,8 +28,6 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 					CairoDock *pDock);
 
 
-void cairo_dock_update_gaps_with_window_position (CairoDock *pDock);
-
 gboolean on_key_release (GtkWidget *pWidget,
 				GdkEventKey *pKey,
 				CairoDock *pDock);

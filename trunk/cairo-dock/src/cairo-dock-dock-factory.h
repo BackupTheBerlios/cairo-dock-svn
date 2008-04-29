@@ -118,6 +118,17 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve);
 
 /**
+* Met un dock principal a sa taille et a sa place initiale.
+* @param pDock le dock.
+*/
+void cairo_dock_place_main_dock (CairoDock *pDock);
+/**
+* Borne la position d'un dock a l'intetieur de l'ecran.
+* @param pDock le dock.
+*/
+void cairo_dock_prevent_dock_from_out_of_screen (CairoDock *pDock);
+
+/**
 * Autorise un widget a accepter les glisse-deposes.
 * @param pWidget un widget.
 * @param pCallBack la fonction qui sera appelee lors d'une reception de donnee.

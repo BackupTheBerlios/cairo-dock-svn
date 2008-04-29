@@ -19,7 +19,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-icons.h"
 #include "cairo-dock-applications-manager.h"
 #include "cairo-dock-modules.h"
-#include "cairo-dock-keyfile-manager.h"
+#include "cairo-dock-keyfile-utilities.h"
 #include "cairo-dock-gui-factory.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-themes-manager.h"
@@ -646,7 +646,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	gchar *cVisibleZoneImageFile = cairo_dock_get_string_key_value (pKeyFile, "Background", "callback image", &bFlushConfFileNeeded, NULL, "Auto-Hide", "background image");
 
 	g_iVisibleZoneWidth = cairo_dock_get_integer_key_value (pKeyFile, "Background", "zone width", &bFlushConfFileNeeded, 150, "Auto-Hide", NULL);
+	if (g_iVisibleZoneWidth < 10) g_iVisibleZoneWidth = 10;
 	g_iVisibleZoneHeight = cairo_dock_get_integer_key_value (pKeyFile, "Background", "zone height", &bFlushConfFileNeeded, 25, "Auto-Hide", NULL);
+	if (g_iVisibleZoneHeight < 1) g_iVisibleZoneHeight = 1;
 
 	g_fVisibleZoneAlpha = cairo_dock_get_double_key_value (pKeyFile, "Background", "alpha", &bFlushConfFileNeeded, 0.5, "Auto-Hide", NULL);
 
@@ -987,7 +989,6 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 
 	g_tNbAnimationRounds[CAIRO_DOCK_APPLET] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "applet number of rounds", &bFlushConfFileNeeded, 2, "Applets", "number of animation rounds");
 	
-	///gchar **cActiveModuleList = cairo_dock_get_string_list_key_value (pKeyFile, "Applets", "active modules", &bFlushConfFileNeeded, &length, NULL, NULL, NULL);
 	int iNbModules = cairo_dock_get_nb_modules ();
 	gchar **cActiveModuleList = g_new0 (gchar *, iNbModules + 1), **cActiveModuleList_n;  // +1 pour le NULL terminal.
 	GString *sKeyName = g_string_new ("");
@@ -1089,15 +1090,15 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		break;
 		case CAIRO_DOCK_TOP :
 			pDock->bHorizontalDock = CAIRO_DOCK_HORIZONTAL;
-		g_bDirectionUp = FALSE;
+			g_bDirectionUp = FALSE;
 		break;
 		case CAIRO_DOCK_LEFT :
 			pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
-		g_bDirectionUp = FALSE;
+			g_bDirectionUp = FALSE;
 		break;
 		case CAIRO_DOCK_RIGHT :
 			pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
-		g_bDirectionUp = TRUE;
+			g_bDirectionUp = TRUE;
 		break;
 	}
 
@@ -1214,36 +1215,13 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 
 	pDock->iMouseX = 0;  // on se place hors du dock initialement.
 	pDock->iMouseY = 0;
+	pDock->calculate_max_dock_size (pDock);
 	pDock->calculate_icons (pDock);
-	gtk_widget_queue_draw (pDock->pWidget);  //   // le 'gdk_window_move_resize' ci-dessous ne provoquera pas le redessin si la taille n'a pas change.
+	gtk_widget_queue_draw (pDock->pWidget);  // le 'gdk_window_move_resize' ci-dessous ne provoquera pas le redessin si la taille n'a pas change.
 
 	if (pDock->bAtBottom)
 	{
-		int iNewWidth, iNewHeight;
-		if (g_bAutoHide && pDock->iRefCount == 0)
-		{
-			cairo_dock_get_window_position_and_geometry_at_balance (pDock, CAIRO_DOCK_MIN_SIZE, &iNewWidth, &iNewHeight);
-			pDock->fFoldingFactor = (g_bAnimateOnAutoHide ? g_fUnfoldAcceleration : 0);
-		}
-		else
-		{
-			pDock->fFoldingFactor = 0;
-			cairo_dock_get_window_position_and_geometry_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
-		}
-
-		//g_print ("on commence en bas a %dx%d (%d;%d)\n", g_iVisibleZoneWidth, g_iVisibleZoneHeight, pDock->iWindowPositionX, pDock->iWindowPositionY);
-		if (pDock->bHorizontalDock)
-			gdk_window_move_resize (pDock->pWidget->window,
-				pDock->iWindowPositionX,
-				pDock->iWindowPositionY,
-				iNewWidth,
-				iNewHeight);
-		else
-			gdk_window_move_resize (pDock->pWidget->window,
-				pDock->iWindowPositionY,
-				pDock->iWindowPositionX,
-				iNewHeight,
-				iNewWidth);
+		cairo_dock_place_main_dock (pDock);
 	}
 
 	//\___________________ On ecrit si necessaire.
@@ -1259,7 +1237,6 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		cairo_dock_update_conf_file_with_available_modules2 (pKeyFile, cConfFilePath);
 	}
 
-	//cairo_dock_update_main_conf_file_with_renderers (pKeyFile, cConfFilePath);
 	cairo_dock_update_renderer_list_for_gui ();
 	
 	if (g_cRaiseDockShortcut != NULL)
@@ -1514,8 +1491,8 @@ void cairo_dock_update_conf_file (gchar *cConfFilePath, GType iFirstDataType, ..
 	{
 		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
-		va_end (args);
-		return ;
+		//va_end (args);
+		//return ;
 	}
 
 	GType iType = iFirstDataType;
@@ -1561,9 +1538,9 @@ void cairo_dock_update_conf_file (gchar *cConfFilePath, GType iFirstDataType, ..
 }
 
 
-void cairo_dock_update_conf_file_with_position (gchar *cConfFilePath, int x, int y)
+void cairo_dock_update_conf_file_with_position (const gchar *cConfFilePath, int x, int y)
 {
-	//g_print ("%s (%d;%d)\n", __func__, x, y);
+	//g_print ("%s (%s ; %d;%d)\n", __func__, cConfFilePath, x, y);
 	cairo_dock_update_conf_file (cConfFilePath,
 		G_TYPE_INT, "Position", "x gap", x,
 		G_TYPE_INT, "Position", "y gap", y,

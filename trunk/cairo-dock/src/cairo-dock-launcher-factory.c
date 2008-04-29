@@ -166,7 +166,7 @@ gchar *cairo_dock_search_icon_s_path (gchar *cFileName)
 	if (cIconPath == NULL || *cIconPath == '\0')
 	{
 		g_free (cIconPath);
-		cIconPath= NULL;
+		cIconPath = NULL;
 	}
 	return cIconPath;
 }

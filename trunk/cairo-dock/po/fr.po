@@ -355,7 +355,7 @@ msgstr ""
 #: ../src/cairo-dock-modules.c:762 ../src/cairo-dock-modules.c:693
 #: ../src/cairo-dock-modules.c:692 ../src/cairo-dock-modules.c:734
 #: ../src/cairo-dock-modules.c:733 ../src/cairo-dock-modules.c:742
-#: ../src/cairo-dock-modules.c:744
+#: ../src/cairo-dock-modules.c:744 ../src/cairo-dock-modules.c:782
 #, c-format
 msgid "Configuration of %s"
 msgstr "Configuration de %s"
@@ -2100,7 +2100,7 @@ msgstr "Ajouter un séparateur"
 #: ../src/cairo-dock-callbacks.c:1461 ../src/cairo-dock-callbacks.c:1471
 #: ../src/cairo-dock-callbacks.c:1534 ../src/cairo-dock-callbacks.c:1519
 #: ../src/cairo-dock-callbacks.c:1522 ../src/cairo-dock-callbacks.c:1537
-#: ../src/cairo-dock-callbacks.c:1549
+#: ../src/cairo-dock-callbacks.c:1549 ../src/cairo-dock-callbacks.c:1552
 msgid "Quit Cairo-Dock ?"
 msgstr "Quitter Cairo-Dock ?"
 

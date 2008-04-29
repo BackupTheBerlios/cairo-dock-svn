@@ -716,7 +716,7 @@ CairoDockDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, Cairo
 	if (g_iDialogIconSize == 0 && cText != NULL)
 		fImageSize= ink.height;
 	else
-		fImageSize = g_iDialogIconSize;
+		fImageSize = MAX (g_iDialogIconSize, 16);
 
 	cairo_surface_t *pIconSurface = NULL;
 	if (cImageFilePath != NULL)

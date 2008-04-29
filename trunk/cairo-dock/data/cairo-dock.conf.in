@@ -253,7 +253,7 @@ modules_2 =
 #F+[Callback zone;gtk-goto-bottom]
 frame1 =
 
-#i+ Size of the callback zone (width x height, in pixels) :
+#i[1;1024]+ Size of the callback zone (width x height, in pixels) :
 #{Place the mouse into this zone will make the dock re-appear.}
 zone width = 200
 #i+ ...

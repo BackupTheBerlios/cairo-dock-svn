@@ -313,6 +313,7 @@ struct _CairoDockMinimalAppletConfig {
 	gchar *cLabel;
 	gchar *cIconFileName;
 	gdouble fOrder;
+	gchar *cDockName;
 	gboolean bDeskletUseSize;
 	gint iDeskletWidth;
 	gint iDeskletHeight;

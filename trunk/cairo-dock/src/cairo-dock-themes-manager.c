@@ -13,7 +13,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 
 #include "cairo-dock-applet-factory.h"
 #include "cairo-dock-config.h"
-#include "cairo-dock-keyfile-manager.h"
+#include "cairo-dock-keyfile-utilities.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-renderer-manager.h"

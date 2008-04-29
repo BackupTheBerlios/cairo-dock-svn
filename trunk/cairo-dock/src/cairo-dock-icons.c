@@ -25,7 +25,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-draw.h"
 #include "cairo-dock-animations.h"
 #include "cairo-dock-config.h"
-#include "cairo-dock-keyfile-manager.h"
+#include "cairo-dock-keyfile-utilities.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-callbacks.h"
 #include "cairo-dock-dock-factory.h"
@@ -1355,7 +1355,7 @@ void cairo_dock_update_icon_s_container_name (Icon *icon, const gchar *cNewParen
 	g_free (icon->cParentDockName);
 	icon->cParentDockName = g_strdup (cNewParentDockName);
 
-	if (icon->acDesktopFileName != NULL)
+	if (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon))  // icon->acDesktopFileName != NULL
 	{
 		gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
 
@@ -1374,6 +1374,21 @@ void cairo_dock_update_icon_s_container_name (Icon *icon, const gchar *cNewParen
 		cairo_dock_write_keys_to_file (pKeyFile, cDesktopFilePath);
 
 		g_free (cDesktopFilePath);
+		g_key_file_free (pKeyFile);
+	}
+	else if (CAIRO_DOCK_IS_APPLET (icon))
+	{
+		GError *erreur = NULL;
+		GKeyFile *pKeyFile = g_key_file_new ();
+		g_key_file_load_from_file (pKeyFile, icon->pModule->cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+		if (erreur != NULL)
+		{
+			cd_warning ("Attention : %s", erreur->message);
+			g_error_free (erreur);
+			return ;
+		}
+		g_key_file_set_string (pKeyFile, "Icon", "dock name", cNewParentDockName);
+		cairo_dock_write_keys_to_file (pKeyFile, icon->pModule->cConfFilePath);
 		g_key_file_free (pKeyFile);
 	}
 }

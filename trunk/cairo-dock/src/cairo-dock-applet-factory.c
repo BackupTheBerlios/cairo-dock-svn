@@ -13,14 +13,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 
 #include "cairo-dock-load.h"
 #include "cairo-dock-draw.h"
-#include "cairo-dock-config.h"
 #include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-surface-factory.h"
 #include "cairo-dock-animations.h"
-#include "cairo-dock-themes-manager.h"
-#include "cairo-dock-keyfile-manager.h"
 #include "cairo-dock-dock-factory.h"
-
 #include "cairo-dock-log.h"
 #include "cairo-dock-applet-factory.h"
 

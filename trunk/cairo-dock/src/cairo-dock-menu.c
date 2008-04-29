@@ -333,7 +333,7 @@ static void cairo_dock_add_launcher (GtkMenuItem *menu_item, gpointer *data)
 			cDesktopFileName = cairo_dock_add_desktop_file_from_uri (cFilePath, cDockName, CAIRO_DOCK_LAST_ORDER, pDock, &erreur);
 			if (erreur != NULL)
 			{
-				cd_message ("Attention : %s\n", erreur->message);
+				cd_warning ("Attention : %s", erreur->message);
 				g_error_free (erreur);
 				erreur = NULL;
 				continue;

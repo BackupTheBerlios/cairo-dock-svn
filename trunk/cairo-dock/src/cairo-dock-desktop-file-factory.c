@@ -18,7 +18,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #endif
 
 #include "cairo-dock-icons.h"
-#include "cairo-dock-keyfile-manager.h"
+#include "cairo-dock-keyfile-utilities.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-config.h"
 #include "cairo-dock-renderer-manager.h"
@@ -294,8 +294,6 @@ void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath, CairoDock
 	
 	cairo_dock_update_conf_file_with_containers (pKeyFile, cDesktopFilePath);
 	
-	//if (iLauncherType == CAIRO_DOCK_LAUNCHER_FOR_CONTAINER)
-	//	cairo_dock_update_launcher_conf_file_with_renderers (pKeyFile, cDesktopFilePath);
 	g_key_file_free (pKeyFile);
 }
 

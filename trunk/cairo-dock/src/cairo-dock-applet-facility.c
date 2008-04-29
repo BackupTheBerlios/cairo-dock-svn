@@ -18,7 +18,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-surface-factory.h"
 #include "cairo-dock-animations.h"
 #include "cairo-dock-themes-manager.h"
-#include "cairo-dock-keyfile-manager.h"
+#include "cairo-dock-keyfile-utilities.h"
 #include "cairo-dock-applet-factory.h"
 #include "cairo-dock-log.h"
 #include "cairo-dock-dock-factory.h"
@@ -72,6 +72,7 @@ void cairo_dock_free_minimal_config (CairoDockMinimalAppletConfig *pMinimalConfi
 		return;
 	g_free (pMinimalConfig->cLabel);
 	g_free (pMinimalConfig->cIconFileName);
+	g_free (pMinimalConfig->cDockName);
 	g_free (pMinimalConfig);
 }
 
@@ -213,6 +214,15 @@ void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, 
 		g_cLabelPolice,
 		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pContainer->bIsHorizontal));
 }
+void cairo_dock_set_icon_name_full (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, const gchar *cIconNameFormat, ...)
+{
+	va_list args;
+	va_start (args, cIconNameFormat);
+	gchar *cFullText = g_strdup_vprintf (cIconNameFormat, args);
+	cairo_dock_set_icon_name (pSourceContext, cFullText, pIcon, pContainer);
+	g_free (cFullText);
+	va_end (args);
+}
 
 void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo, Icon *pIcon, double fMaxScale)
 {
@@ -235,7 +245,7 @@ void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, Cairo
 	va_list args;
 	va_start (args, cQuickInfoFormat);
 	gchar *cFullText = g_strdup_vprintf (cQuickInfoFormat, args);
-	cairo_dock_set_quick_info (pSourceContext, cFullText, pIcon, (CAIRO_DOCK_IS_DOCK (pContainer) ? (1 + g_fAmplitude) / CAIRO_DOCK_DOCK (pContainer)->fRatio : 1));
+	cairo_dock_set_quick_info (pSourceContext, cFullText, pIcon, (CAIRO_DOCK_IS_DOCK (pContainer) ? (1 + g_fAmplitude) / 1 : 1));
 	g_free (cFullText);
 	va_end (args);
 }

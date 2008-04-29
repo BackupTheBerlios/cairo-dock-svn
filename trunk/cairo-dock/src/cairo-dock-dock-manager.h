@@ -57,13 +57,27 @@ Icon *cairo_dock_search_icon_pointing_on_dock (CairoDock *pDock, CairoDock **pPa
 CairoDockContainer *cairo_dock_search_container_from_icon (Icon *icon);
 
 
-
+/**
+* Met a jour un fichier .desktop avec la liste des docks.
+* @param pKeyFile fichier de conf ouvert.
+* @param cDesktopFilePath chemin du fichier de conf.
+* @param cGroupName nom du groupe
+* @param cKeyName nom de la cle.
+*/
+void cairo_dock_update_conf_file_with_containers_full (GKeyFile *pKeyFile, gchar *cDesktopFilePath, gchar *cGroupName, gchar *cKeyName);
 /**
 * Met a jour un fichier .desktop avec la liste des docks dans le champ "Container".
 * @param pKeyFile fichier de conf ouvert.
 * @param cDesktopFilePath chemin du fichier de conf.
 */
-void cairo_dock_update_conf_file_with_containers (GKeyFile *pKeyFile, gchar *cDesktopFilePath);
+#define cairo_dock_update_conf_file_with_containers(pKeyFile, cDesktopFilePath) cairo_dock_update_conf_file_with_containers_full (pKeyFile, cDesktopFilePath, "Desktop Entry", "Container");
+/**
+* Met a jour un fichier de conf dd'applet avec la liste des docks dans le champ "dock name".
+* @param pKeyFile fichier de conf ouvert.
+* @param cDesktopFilePath chemin du fichier de conf.
+*/
+#define cairo_dock_update_applet_conf_file_with_containers(pKeyFile, cDesktopFilePath) cairo_dock_update_conf_file_with_containers_full (pKeyFile, cDesktopFilePath, "Icon", "dock name");
+
 
 void cairo_dock_search_max_decorations_size (int *iWidth, int *iHeight);
 
@@ -91,6 +105,24 @@ void cairo_dock_rename_dock (const gchar *cDockName, CairoDock *pDock, const gch
 
 void cairo_dock_reset_all_views (void);
 void cairo_dock_set_all_views_to_default (void);
+
+/**
+* Ecrit les ecarts en x et en y d'un dock principal dans son fichier de conf.
+*@param pDock le dock.
+*/
+void cairo_dock_write_main_dock_gaps (CairoDock *pDock);
+/**
+* Ecrit le positionnement complet d'un dock principal dans son fichier de conf.
+*@param cDockName nom du dock.
+*@param pDock le dock.
+*/
+void cairo_dock_write_main_dock_position (gchar *cDockName, CairoDock *pDock);
+/**
+* Recupere le positionnement complet d'un dock principal a partir de son fichier de conf.
+*@param cDockName nom du dock.
+*@param pDock le dock.
+*/
+void cairo_dock_get_main_dock_position (gchar *cDockName, CairoDock *pDock);
 
 
 #endif

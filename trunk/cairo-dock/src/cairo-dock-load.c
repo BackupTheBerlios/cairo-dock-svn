@@ -202,7 +202,7 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 		//g_print (" -> %s\n", cIconPath);
 
 		//\_______________________ On cree la surface cairo a afficher.
-		if (cIconPath != NULL && strlen (cIconPath) > 0)
+		if (cIconPath != NULL && *cIconPath != '\0')
 		{
 			//cairo_surface_t *pSurface =cairo_dock_create_surface_from_image (cIconPath,
 			icon->pIconBuffer = cairo_dock_create_surface_from_image (cIconPath,

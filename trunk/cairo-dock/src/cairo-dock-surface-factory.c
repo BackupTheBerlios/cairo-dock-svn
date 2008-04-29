@@ -6,6 +6,7 @@ released under the terms of the GNU General Public License.
 Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
 *********************************************************************************/
+#include <string.h>
 #include <math.h>
 #include <librsvg/rsvg.h>
 #include <librsvg/rsvg-cairo.h>

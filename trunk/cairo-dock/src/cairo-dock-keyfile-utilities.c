@@ -3,13 +3,13 @@
 This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
 
-Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.fr)
+Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
 ******************************************************************************/
 #include <string.h>
 #include <stdlib.h>
 
-#include "cairo-dock-keyfile-manager.h"
+#include "cairo-dock-keyfile-utilities.h"
 #include "cairo-dock-log.h"
 
 
@@ -388,3 +388,25 @@ gboolean cairo_dock_conf_file_needs_update (GKeyFile *pKeyFile, gchar *cVersion)
 	g_free (cPreviousVersion);
 	return bNeedsUpdate;
 }
+
+
+/*void cairo_dock_delete_key_by_prefix (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cPrefix)
+{
+	g_return_if_fail (cPrefix != NULL);
+	gchar **pKeyList = g_key_file_get_keys (pKeyFile, cGroupName, NULL, NULL);
+	
+	int iPrefixLen = strlen (cPrefix);
+	gchar *cKeyName;
+	int i = 0;
+	while (pKeyList[i] != NULL)
+	{
+		cKeyName = pKeyList[i];
+		if (strncmp (cKeyName, cPrefix, iPrefixLen) == 0)
+		{
+			g_key_file_remove_key (pKeyFile, cGroupName, cKeyName, NULL);
+		}
+	}
+	g_strfreev (pKeyList);
+}*/
+
+

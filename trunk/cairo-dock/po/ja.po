@@ -501,6 +501,7 @@ msgstr ""
 #: ../src/cairo-dock-modules.c:693 ../src/cairo-dock-modules.c:692
 #: ../src/cairo-dock-modules.c:734 ../src/cairo-dock-modules.c:733
 #: ../src/cairo-dock-modules.c:742 ../src/cairo-dock-modules.c:744
+#: ../src/cairo-dock-modules.c:782
 #, c-format
 msgid "Configuration of %s"
 msgstr "%s の設定"
@@ -2122,7 +2123,7 @@ msgstr "Compiz Fusion ウィジェット"
 #: ../src/cairo-dock-callbacks.c:1429 ../src/cairo-dock-callbacks.c:1431
 #: ../src/cairo-dock-callbacks.c:1447 ../src/cairo-dock-callbacks.c:1450
 #: ../src/cairo-dock-callbacks.c:1519 ../src/cairo-dock-callbacks.c:1522
-#: ../src/cairo-dock-callbacks.c:1549
+#: ../src/cairo-dock-callbacks.c:1549 ../src/cairo-dock-callbacks.c:1552
 msgid "Quit Cairo-Dock ?"
 msgstr "Cairo-Dock 終了？"
 

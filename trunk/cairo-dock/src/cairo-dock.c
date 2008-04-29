@@ -81,7 +81,7 @@
 #include "cairo-dock-themes-manager.h"
 #include "cairo-dock-dialogs.h"
 #include "cairo-dock-notifications.h"
-#include "cairo-dock-keyfile-manager.h"
+#include "cairo-dock-keyfile-utilities.h"
 #include "cairo-dock-config.h"
 #include "cairo-dock-file-manager.h"
 #include "cairo-dock-renderer-manager.h"

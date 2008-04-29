@@ -181,6 +181,22 @@ static gboolean on_configure_desklet (GtkWidget* pWidget,
 	return FALSE;
 }
 
+gboolean on_scroll_desklet (GtkWidget* pWidget,
+	GdkEventScroll* pScroll,
+	CairoDockDesklet *pDesklet)
+{
+	if (pScroll->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK))
+	{
+		Icon *icon = cairo_dock_find_clicked_icon_in_desklet (pDesklet);
+		if (icon != NULL)
+		{
+			gpointer data[3] = {icon, pDesklet, GINT_TO_POINTER (pScroll->direction)};
+			cairo_dock_notify (CAIRO_DOCK_SCROLL_ICON, data);
+		}
+	}
+	return FALSE;
+}
+
 
 Icon *cairo_dock_find_clicked_icon_in_desklet (CairoDockDesklet *pDesklet)
 {
@@ -443,6 +459,10 @@ CairoDockDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiv
 	g_signal_connect (G_OBJECT (pWindow),
 		"delete-event",
 		G_CALLBACK (on_delete_desklet),
+		pDesklet);
+	g_signal_connect (G_OBJECT (pWindow),
+		"scroll-event",
+		G_CALLBACK (on_scroll_desklet),
 		pDesklet);
 	cairo_dock_allow_widget_to_receive_data (pWindow, G_CALLBACK (on_drag_data_received_desklet), pDesklet);
 
