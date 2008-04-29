@@ -34,7 +34,6 @@ extern gboolean g_bResetScrollOnLeave;
 extern int g_iScreenHeight[2];
 
 extern gboolean g_bAutoHide;
-extern gboolean g_bDirectionUp;
 
 extern int g_iVisibleZoneHeight;
 
@@ -54,11 +53,11 @@ extern CairoDock *g_pMainDock;
 gboolean cairo_dock_move_up (CairoDock *pDock)
 {
 	int deltaY_possible;
-	deltaY_possible = pDock->iWindowPositionY - (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - pDock->iMaxDockHeight - pDock->iGapY : pDock->iGapY);
+	deltaY_possible = pDock->iWindowPositionY - (pDock->bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - pDock->iMaxDockHeight - pDock->iGapY : pDock->iGapY);
 	//g_print ("%s (%dx%d -> %d)\n", __func__, pDock->iWindowPositionX, pDock->iWindowPositionY, deltaY_possible);
-	if ((g_bDirectionUp && deltaY_possible > 0) || (! g_bDirectionUp && deltaY_possible < 0))  // alors on peut encore monter.
+	if ((pDock->bDirectionUp && deltaY_possible > 0) || (! pDock->bDirectionUp && deltaY_possible < 0))  // alors on peut encore monter.
 	{
-		pDock->iWindowPositionY -= (int) (deltaY_possible * g_fMoveUpSpeed) + (g_bDirectionUp ? 1 : -1);
+		pDock->iWindowPositionY -= (int) (deltaY_possible * g_fMoveUpSpeed) + (pDock->bDirectionUp ? 1 : -1);
 		//g_print ("  move to (%dx%d)\n", g_iWindowPositionX, g_iWindowPositionY);
 		if (pDock->bHorizontalDock)
 			gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);
@@ -80,11 +79,11 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 	//g_print ("%s ()\n", __func__);
 	if (pDock->iMagnitudeIndex > 0 || (g_bResetScrollOnLeave && pDock->iScrollOffset != 0))  // on retarde le cachage du dock pour apercevoir les effets.
 		return TRUE;
-	int deltaY_possible = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - pDock->iGapY - 0 : pDock->iGapY + 0 - pDock->iMaxDockHeight) - pDock->iWindowPositionY;  // 0 <-> g_iVisibleZoneHeight
+	int deltaY_possible = (pDock->bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - pDock->iGapY - 0 : pDock->iGapY + 0 - pDock->iMaxDockHeight) - pDock->iWindowPositionY;  // 0 <-> g_iVisibleZoneHeight
 	//g_print ("%s (%d)\n", __func__, deltaY_possible);
-	if ((g_bDirectionUp && deltaY_possible > 8) || (! g_bDirectionUp && deltaY_possible < -8))  // alors on peut encore descendre.
+	if ((pDock->bDirectionUp && deltaY_possible > 8) || (! pDock->bDirectionUp && deltaY_possible < -8))  // alors on peut encore descendre.
 	{
-		pDock->iWindowPositionY += (int) (deltaY_possible * g_fMoveDownSpeed) + (g_bDirectionUp ? 1 : -1);  // 0.33
+		pDock->iWindowPositionY += (int) (deltaY_possible * g_fMoveDownSpeed) + (pDock->bDirectionUp ? 1 : -1);  // 0.33
 		//g_print ("pDock->iWindowPositionY <- %d\n", pDock->iWindowPositionY);
 		if (pDock->bHorizontalDock)
 			gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);

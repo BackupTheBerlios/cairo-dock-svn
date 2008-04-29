@@ -63,7 +63,7 @@ cairo_surface_t *cairo_dock_create_applet_surface (gchar *cIconFileName, cairo_t
 }
 
 
-Icon *cairo_dock_create_icon_for_applet (CairoDockContainer *pContainer, int iWidth, int iHeight, gchar *cName, gchar *cIconFileName, CairoDockModule *pModule)
+Icon *cairo_dock_create_icon_for_applet (CairoContainer *pContainer, int iWidth, int iHeight, gchar *cName, gchar *cIconFileName, CairoDockModule *pModule)
 {
 	Icon *icon = g_new0 (Icon, 1);
 	icon->iType = CAIRO_DOCK_APPLET;
@@ -82,14 +82,15 @@ Icon *cairo_dock_create_icon_for_applet (CairoDockContainer *pContainer, int iWi
 
 	if (CAIRO_DOCK_IS_DOCK (pContainer))
 	{
-		CairoDock *pDock = CAIRO_DOCK_DOCK (pContainer);
-		cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
-		cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
+		CairoDock *pDock = CAIRO_DOCK (pContainer);
+		///cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE, pDock->bDirectionUp);
+		///cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
+		cairo_dock_fill_icon_buffers_for_dock (icon, pSourceContext, pDock);
 	}
 	else
 	{
 		if (iWidth >= 0 && iHeight >= 0)
-			cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1., CAIRO_DOCK_HORIZONTAL, FALSE);
+			cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1., CAIRO_DOCK_HORIZONTAL, FALSE, pContainer->bDirectionUp);
 	}
 
 	cairo_destroy (pSourceContext);

@@ -31,7 +31,7 @@ void cairo_dock_free_minimal_config (CairoDockMinimalAppletConfig *pMinimalConfi
 *@param pIcon l'icone.
 *@param pContainer le container de l'icone.
 */
-void cairo_dock_set_icon_surface_full (cairo_t *pIconContext, cairo_surface_t *pSurface, double fScale, double fAlpha, Icon *pIcon, CairoDockContainer *pContainer);
+void cairo_dock_set_icon_surface_full (cairo_t *pIconContext, cairo_surface_t *pSurface, double fScale, double fAlpha, Icon *pIcon, CairoContainer *pContainer);
 /**
 *Applique une surface sur un contexte, en effacant tout au prealable.
 *@param pIconContext le contexte du dessin; est modifie par la fonction.
@@ -45,7 +45,7 @@ void cairo_dock_set_icon_surface_full (cairo_t *pIconContext, cairo_surface_t *p
 *@param pIcon l'icone.
 *@param pContainer le container de l'icone.
 */
-void cairo_dock_draw_bar_on_icon (cairo_t *pIconContext, double fValue, Icon *pIcon, CairoDockContainer *pContainer);
+void cairo_dock_draw_bar_on_icon (cairo_t *pIconContext, double fValue, Icon *pIcon, CairoContainer *pContainer);
 
 /**
 *Cree les surfaces de reflection d'une icone.
@@ -53,7 +53,7 @@ void cairo_dock_draw_bar_on_icon (cairo_t *pIconContext, double fValue, Icon *pI
 *@param pIcon l'icone.
 *@param pContainer le container de l'icone.
 */
-void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, CairoDockContainer *pContainer);
+void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, CairoContainer *pContainer);
 /**
 *Applique une surface sur le contexte d'une icone, en effacant tout au prealable et en creant les reflets correspondant.
 *@param pIconContext le contexte de dessin lie a la surface de l'icone; est modifie par la fonction.
@@ -61,7 +61,7 @@ void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, Cair
 *@param pIcon l'icone.
 *@param pContainer le container de l'icone.
 */
-void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoDockContainer *pContainer);
+void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoContainer *pContainer);
 /**
 *Applique une image sur le contexte d'une icone, en effacant tout au prealable et en creant les reflets correspondant.
 *@param pIconContext le contexte de dessin lie a la surface de l'icone; est modifie par la fonction.
@@ -69,7 +69,7 @@ void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surf
 *@param pIcon l'icone.
 *@param pContainer le container de l'icone.
 */
-void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Icon *pIcon, CairoDockContainer *pContainer);
+void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Icon *pIcon, CairoContainer *pContainer);
 
 /**
 *Modifie l'etiquette d'une icone.
@@ -78,7 +78,7 @@ void cairo_dock_set_image_on_icon (cairo_t *pIconContext, gchar *cImagePath, Ico
 *@param pIcon l'icone.
 *@param pContainer le container de l'icone.
 */
-void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, Icon *pIcon, CairoDockContainer *pContainer);
+void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, Icon *pIcon, CairoContainer *pContainer);
 /**
 *Modifie l'etiquette d'une icone, en prenant une chaine au format 'printf'.
 *@param pSourceContext un contexte de dessin; n'est pas altere par la fonction.
@@ -86,7 +86,7 @@ void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, 
 *@param pContainer le container de l'icone.
 *@param cIconNameFormat la nouvelle etiquette de l'icone.
 */
-void cairo_dock_set_icon_name_full (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, const gchar *cIconNameFormat, ...);
+void cairo_dock_set_icon_name_full (cairo_t *pSourceContext, Icon *pIcon, CairoContainer *pContainer, const gchar *cIconNameFormat, ...);
 
 /**
 *Ecris une info-rapide sur l'icone. C'est un petit texte (quelques caracteres) qui vient se superposer sur l'icone, avec un fond fonce.
@@ -104,16 +104,16 @@ void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo
 *@param cQuickInfoFormat le texte de l'info-rapide, au format 'printf' (%s, %d, etc)
 *@param ... les donnees a inserer dans la chaine de caracteres.
 */
-void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, const gchar *cQuickInfoFormat, ...);
+void cairo_dock_set_quick_info_full (cairo_t *pSourceContext, Icon *pIcon, CairoContainer *pContainer, const gchar *cQuickInfoFormat, ...);
 /**
 *Efface l'info-rapide d'une icone.
 *@param pIcon l'icone.
 */
 #define cairo_dock_remove_quick_info(pIcon) cairo_dock_set_quick_info (NULL, NULL, pIcon, 1)
 
-void cairo_dock_set_hours_minutes_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, int iTimeInSeconds);
-void cairo_dock_set_minutes_secondes_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, int iTimeInSeconds);
-void cairo_dock_set_size_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoDockContainer *pContainer, long long int iSizeInBytes);
+void cairo_dock_set_hours_minutes_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoContainer *pContainer, int iTimeInSeconds);
+void cairo_dock_set_minutes_secondes_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoContainer *pContainer, int iTimeInSeconds);
+void cairo_dock_set_size_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoContainer *pContainer, long long int iSizeInBytes);
 
 typedef enum {
 	CAIRO_DOCK_INFO_NONE = 0,
@@ -246,9 +246,9 @@ void cairo_dock_set_normal_frequency_state (CairoDockMeasure *pMeasureTimer);
 */
 #define CD_APPLET_H \
 CairoDockVisitCard *pre_init (void); \
-void init (GKeyFile *pKeyFile, Icon *pIcon, CairoDockContainer *pContainer, gchar *cConfFilePath, GError **erreur); \
+void init (GKeyFile *pKeyFile, Icon *pIcon, CairoContainer *pContainer, gchar *cConfFilePath, GError **erreur); \
 void stop (void); \
-gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoDockContainer *pNewContainer);
+gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoContainer *pNewContainer);
 
 //\______________________ pre_init.
 /**
@@ -263,8 +263,8 @@ gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoDockContainer *p
 #define CD_APPLET_PRE_INIT_BEGIN(cName, iMajorVersion, iMinorVersion, iMicroVersion, iAppletCategory) \
 Icon *myIcon = NULL; \
 CairoDock *myDock = NULL; \
-CairoDockDesklet *myDesklet = NULL; \
-CairoDockContainer *myContainer = NULL; \
+CairoDesklet *myDesklet = NULL; \
+CairoContainer *myContainer = NULL; \
 cairo_t *myDrawContext = NULL; \
 AppletConfig myConfig; \
 AppletData myData; \
@@ -307,13 +307,13 @@ CD_APPLET_PRE_INIT_END
 *@param erreur une GError, utilisable pour reporter une erreur ayant lieu durant l'initialisation.
 */
 #define CD_APPLET_INIT_BEGIN(erreur) \
-void init (GKeyFile *pKeyFile, Icon *pIcon, CairoDockContainer *pContainer, gchar *cConfFilePath, GError **erreur) \
+void init (GKeyFile *pKeyFile, Icon *pIcon, CairoContainer *pContainer, gchar *cConfFilePath, GError **erreur) \
 { \
 	g_return_if_fail (pContainer != NULL && pIcon != NULL); \
 	myIcon = pIcon; \
 	myContainer = pContainer; \
-	myDock = (CAIRO_DOCK_IS_DOCK (pContainer) ? CAIRO_DOCK_DOCK (pContainer) : NULL); \
-	myDesklet = (CAIRO_DOCK_IS_DESKLET (pContainer) ? CAIRO_DOCK_DESKLET (pContainer) : NULL); \
+	myDock = (CAIRO_DOCK_IS_DOCK (pContainer) ? CAIRO_DOCK (pContainer) : NULL); \
+	myDesklet = (CAIRO_DOCK_IS_DESKLET (pContainer) ? CAIRO_DESKLET (pContainer) : NULL); \
 	read_conf_file (pKeyFile, cConfFilePath); \
 	if (CAIRO_DOCK_IS_DOCK (myContainer)) \
 	{ \
@@ -361,15 +361,15 @@ void stop (void) \
 *Debut de la fonction de rechargement de l'applet.
 */
 #define CD_APPLET_RELOAD_BEGIN \
-gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoDockContainer *pNewContainer) \
+gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoContainer *pNewContainer) \
 { \
 	cd_message ("%s (%s)\n", __func__, cConfFilePath); \
 	g_return_val_if_fail (pNewContainer != NULL, FALSE); \
-	CairoDockContainer *pOldContainer = myContainer; \
+	CairoContainer *pOldContainer = myContainer; \
 	gboolean bContainerTypeChanged = (myContainer == NULL || myContainer->iType != pNewContainer->iType); \
 	myContainer = pNewContainer; \
-	myDock = (CAIRO_DOCK_IS_DOCK (pNewContainer) ? CAIRO_DOCK_DOCK (pNewContainer) : NULL); \
-	myDesklet = (CAIRO_DOCK_IS_DESKLET (pNewContainer) ? CAIRO_DOCK_DESKLET (pNewContainer) : NULL); \
+	myDock = (CAIRO_DOCK_IS_DOCK (pNewContainer) ? CAIRO_DOCK (pNewContainer) : NULL); \
+	myDesklet = (CAIRO_DOCK_IS_DESKLET (pNewContainer) ? CAIRO_DESKLET (pNewContainer) : NULL); \
 	if (pKeyFile != NULL) \
 		read_conf_file (pKeyFile, cConfFilePath); \
 	if (myDrawContext != NULL) \
@@ -651,9 +651,9 @@ void about (GtkMenuItem *menu_item, gpointer *data);
 gboolean CD_APPLET_ON_CLICK (gpointer *data) \
 { \
 	Icon *pClickedIcon = data[0]; \
-	CairoDockContainer *pClickedContainer = data[1]; \
+	CairoContainer *pClickedContainer = data[1]; \
 	guint iButtonState = GPOINTER_TO_INT (data[2]); \
-	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedContainer == CAIRO_DOCK_CONTAINER (myIcon->pSubDock)) || pClickedContainer == CAIRO_DOCK_CONTAINER (myDesklet)) \
+	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedContainer == CAIRO_CONTAINER (myIcon->pSubDock)) || pClickedContainer == CAIRO_CONTAINER (myDesklet)) \
 	{
 
 /**
@@ -688,8 +688,8 @@ gboolean CD_APPLET_ON_CLICK (gpointer *data);
 gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data) \
 { \
 	Icon *pClickedIcon = data[0]; \
-	CairoDockContainer *pClickedContainer = data[1]; \
-	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedContainer == CAIRO_DOCK_CONTAINER (myIcon->pSubDock)) || pClickedContainer == CAIRO_DOCK_CONTAINER (myDesklet)) \
+	CairoContainer *pClickedContainer = data[1]; \
+	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedContainer == CAIRO_CONTAINER (myIcon->pSubDock)) || pClickedContainer == CAIRO_CONTAINER (myDesklet)) \
 	{ \
 		GtkWidget *pAppletMenu = data[2]; \
 		GtkWidget *pMenuItem, image; \
@@ -832,8 +832,8 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data) \
 { \
 	Icon *pClickedIcon = data[0]; \
-	CairoDockContainer *pClickedContainer = data[1]; \
-	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedContainer == CAIRO_DOCK_CONTAINER (myIcon->pSubDock)) || pClickedContainer == CAIRO_DOCK_CONTAINER (myDesklet)) \
+	CairoContainer *pClickedContainer = data[1]; \
+	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedContainer == CAIRO_CONTAINER (myIcon->pSubDock)) || pClickedContainer == CAIRO_CONTAINER (myDesklet)) \
 	{
 /**
 *Fin de la fonction de notification du clic du milieu. Par defaut elle intercepte la notification si elle l'a recue.
@@ -867,8 +867,8 @@ gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data);
 gboolean CD_APPLET_ON_DROP_DATA (gpointer *data) \
 { \
 	Icon *pClickedIcon = data[1]; \
-	CairoDockContainer *pClickedContainer = data[3]; \
-	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedContainer == CAIRO_DOCK_CONTAINER (myIcon->pSubDock)) || pClickedContainer == CAIRO_DOCK_CONTAINER (myDesklet)) \
+	CairoContainer *pClickedContainer = data[3]; \
+	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedContainer == CAIRO_CONTAINER (myIcon->pSubDock)) || pClickedContainer == CAIRO_CONTAINER (myDesklet)) \
 	{ \
 		const gchar *cReceivedData = data[0]; \
 		g_return_val_if_fail (cReceivedData != NULL, CAIRO_DOCK_LET_PASS_NOTIFICATION);
@@ -892,6 +892,55 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data) \
 #define CD_APPLET_ON_DROP_DATA_H \
 gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 
+//\______________________ notification de scroll molette.
+#define CD_APPLET_ON_SCROLL action_on_scroll
+/**
+*Abonne l'applet aux notifications du clic gauche. A effectuer lors de l'init de l'applet.
+*/
+#define CD_APPLET_REGISTER_FOR_SCROLL_EVENT cairo_dock_register_notification (CAIRO_DOCK_SCROLL_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_SCROLL, CAIRO_DOCK_RUN_FIRST);
+/**
+*Desabonne l'applet aux notifications du clic gauche. A effectuer lors de l'arret de l'applet.
+*/
+#define CD_APPLET_UNREGISTER_FOR_SCROLL_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_SCROLL_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_SCROLL);
+
+/**
+*Debut de la fonction de notification au clic gauche.
+*/
+#define CD_APPLET_ON_SCROLL_BEGIN \
+gboolean CD_APPLET_ON_SCROLL (gpointer *data) \
+{ \
+	Icon *pClickedIcon = data[0]; \
+	CairoContainer *pClickedContainer = data[1]; \
+	int iDirection = GPOINTER_TO_INT (data[2]); \
+	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedContainer == CAIRO_CONTAINER (myIcon->pSubDock)) || pClickedContainer == CAIRO_CONTAINER (myDesklet)) \
+	{
+
+/**
+*Fin de la fonction de notification au clic gauche. Par defaut elle intercepte la notification si elle l'a recue.
+*/
+#define CD_APPLET_ON_SCROLL_END \
+		return CAIRO_DOCK_INTERCEPT_NOTIFICATION; \
+	} \
+	return CAIRO_DOCK_LET_PASS_NOTIFICATION; \
+}
+/**
+*Definition de la fonction precedente; a inclure dans le .h correspondant.
+*/
+#define CD_APPLET_ON_SCROLL_H \
+gboolean CD_APPLET_ON_SCROLL (gpointer *data);
+
+/**
+*Direction du scroll.
+*/
+#define CD_APPLET_SCROLL_DIRECTION iDirection
+/**
+*Scroll vers le haut.
+*/
+#define CD_APPLET_SCROLL_UP (CD_APPLET_SCROLL_DIRECTION == GDK_SCROLL_UP)
+/**
+*Scroll vers le bas.
+*/
+#define CD_APPLET_SCROLL_DOWN (CD_APPLET_SCROLL_DIRECTION == GDK_SCROLL_DOWN)
 
 //\_________________________________ DESSIN
 
@@ -1071,8 +1120,8 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
 extern Icon *myIcon; \
 extern cairo_t *myDrawContext; \
 extern CairoDock *myDock; \
-extern CairoDockDesklet *myDesklet; \
-extern CairoDockContainer *myContainer; \
+extern CairoDesklet *myDesklet; \
+extern CairoContainer *myContainer; \
 extern AppletConfig myConfig; \
 extern AppletData myData;
 

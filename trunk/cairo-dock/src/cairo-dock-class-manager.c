@@ -83,10 +83,10 @@ Window cairo_dock_detach_appli_of_class (const gchar *cClass)
 	{
 		pIcon = pElement->data;
 		cd_debug ("detachement de l'icone %s", pIcon->acName);
-		CairoDockContainer *pContainer = cairo_dock_search_container_from_icon (pIcon);
+		CairoContainer *pContainer = cairo_dock_search_container_from_icon (pIcon);
 		if (CAIRO_DOCK_IS_DOCK (pContainer))
 		{
-			pParentDock = CAIRO_DOCK_DOCK (pContainer);
+			pParentDock = CAIRO_DOCK (pContainer);
 			bDetached = cairo_dock_detach_icon_from_dock (pIcon, pParentDock, g_bUseSeparator);  // on la garde, elle pourra servir car elle contient l'Xid.
 			if (! pParentDock->bIsMainDock)
 				cairo_dock_update_dock_size (pParentDock);
@@ -221,7 +221,7 @@ gboolean cairo_dock_set_class_use_xicon (const gchar *cClass, gboolean bUseXIcon
 	
 	GList *pElement;
 	Icon *pAppliIcon;
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (g_pMainDock));
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (g_pMainDock));
 	for (pElement = pClassAppli->pAppliOfClass; pElement != NULL; pElement = pElement->next)
 	{
 		pAppliIcon = pElement->data;
@@ -233,7 +233,7 @@ gboolean cairo_dock_set_class_use_xicon (const gchar *cClass, gboolean bUseXIcon
 		{
 			cd_message ("%s n'utilise plus l'icone de X", pAppliIcon->acName);
 		}
-		cairo_dock_fill_one_icon_buffer (pAppliIcon, pCairoContext, (1 + g_fAmplitude), g_pMainDock->bHorizontalDock, TRUE);
+		cairo_dock_fill_one_icon_buffer (pAppliIcon, pCairoContext, (1 + g_fAmplitude), g_pMainDock->bHorizontalDock, TRUE, g_pMainDock->bDirectionUp);
 	}
 	cairo_destroy (pCairoContext);
 	
@@ -470,8 +470,8 @@ static cairo_surface_t *cairo_dock_duplicate_inhibator_surface_for_appli (cairo_
 		&fIconWidthSaturationFactor,
 		&fIconHeightSaturationFactor);
 	
-	CairoDockContainer *pInhibhatorContainer= cairo_dock_search_container_from_icon (pInhibatorIcon);
-	double fInhibatorMaxScale = (CAIRO_DOCK_IS_DOCK (pInhibhatorContainer) ? (1 + g_fAmplitude) / CAIRO_DOCK_DOCK (pInhibhatorContainer)->fRatio : 1);
+	CairoContainer *pInhibhatorContainer= cairo_dock_search_container_from_icon (pInhibatorIcon);
+	double fInhibatorMaxScale = (CAIRO_DOCK_IS_DOCK (pInhibhatorContainer) ? (1 + g_fAmplitude) / CAIRO_DOCK (pInhibhatorContainer)->fRatio : 1);
 	
 	cairo_surface_t *pSurface = cairo_dock_duplicate_surface (pInhibatorIcon->pIconBuffer,
 		pSourceContext,
@@ -525,7 +525,7 @@ void cairo_dock_update_visibility_on_inhibators (gchar *cClass, Window Xid, gboo
 				{
 					CairoDock *pInhibhatorDock = cairo_dock_search_dock_from_name (pInhibatorIcon->cParentDockName);
 					pInhibatorIcon->fAlpha = 1;  // on triche un peu.
-					cairo_dock_redraw_my_icon (pInhibatorIcon, CAIRO_DOCK_CONTAINER (pInhibhatorDock));
+					cairo_dock_redraw_my_icon (pInhibatorIcon, CAIRO_CONTAINER (pInhibhatorDock));
 				}
 			}
 		}

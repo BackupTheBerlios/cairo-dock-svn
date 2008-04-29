@@ -1,6 +1,6 @@
 
-#ifndef __CAIRO_DOCK_DOCK_MANAGER__
-#define  __CAIRO_DOCK_DOCK_MANAGER__
+#ifndef __CAIRO_DOCK_MANAGER__
+#define  __CAIRO_DOCK_MANAGER__
 
 #include <glib.h>
 
@@ -54,7 +54,7 @@ Icon *cairo_dock_search_icon_pointing_on_dock (CairoDock *pDock, CairoDock **pPa
 * @param icon l'icone.
 * @return le container contenant cette icone, ou NULL si aucun n'a ete trouve.
 */
-CairoDockContainer *cairo_dock_search_container_from_icon (Icon *icon);
+CairoContainer *cairo_dock_search_container_from_icon (Icon *icon);
 
 
 /**
@@ -106,23 +106,22 @@ void cairo_dock_rename_dock (const gchar *cDockName, CairoDock *pDock, const gch
 void cairo_dock_reset_all_views (void);
 void cairo_dock_set_all_views_to_default (void);
 
+
 /**
 * Ecrit les ecarts en x et en y d'un dock principal dans son fichier de conf.
 *@param pDock le dock.
 */
 void cairo_dock_write_main_dock_gaps (CairoDock *pDock);
 /**
-* Ecrit le positionnement complet d'un dock principal dans son fichier de conf.
-*@param cDockName nom du dock.
-*@param pDock le dock.
-*/
-void cairo_dock_write_main_dock_position (gchar *cDockName, CairoDock *pDock);
-/**
 * Recupere le positionnement complet d'un dock principal a partir de son fichier de conf.
 *@param cDockName nom du dock.
 *@param pDock le dock.
 */
-void cairo_dock_get_main_dock_position (gchar *cDockName, CairoDock *pDock);
-
+void cairo_dock_get_main_dock_position (const gchar *cDockName, CairoDock *pDock);
+/**
+* Supprime le fichier de conf d'un dock principal.
+*@param pDock le dock.
+*/
+void cairo_dock_remove_main_dock_config (const gchar *cDockName);
 
 #endif

@@ -37,8 +37,8 @@ void cd_xml_open_file(gchar *filePath,gchar *mainNodeName,xmlDocPtr *xmlDoc,xmlN
 Gauge *init_cd_Gauge(cairo_t *pSourceContext, gchar *themeName, int iWidth, int iHeight);
 GaugeImage *init_cd_GaugeImage(gchar *sImagePath);
 
-void make_cd_Gauge(cairo_t *pSourceContext, CairoDock *pDock, Icon *pIcon, Gauge *pGauge, double dValue);
-void make_cd_Gauge_multiValue(cairo_t *pSourceContext, CairoDock *pDock, Icon *pIcon, Gauge *pGauge, GList *valueList);
+void make_cd_Gauge(cairo_t *pSourceContext, CairoContainer *pContainer, Icon *pIcon, Gauge *pGauge, double dValue);
+void make_cd_Gauge_multiValue(cairo_t *pSourceContext, CairoContainer *pContainer, Icon *pIcon, Gauge *pGauge, GList *valueList);
 void draw_cd_Gauge_needle(cairo_t *pSourceContext, Gauge *pGauge, GaugeIndicator *pGaugeIndicator, double dValue);
 void draw_cd_Gauge_image(cairo_t *pSourceContext, Gauge *pGauge, GaugeIndicator *pGaugeIndicator, double dValue);
 void draw_cd_GaugeImage(cairo_t *pSourceContext, GaugeImage *pGaugeImage, int iWidth, int iHeight);

@@ -63,7 +63,6 @@ extern double g_fAlphaAtRest;
 
 extern gboolean g_bAutoHide;
 extern double g_fVisibleZoneAlpha;
-extern gboolean g_bDirectionUp;
 extern gboolean g_bSameHorizontality;
 extern double g_fSubDockSizeRatio;
 extern gboolean g_bAnimateSubDock;
@@ -1086,26 +1085,26 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	{
 		case CAIRO_DOCK_BOTTOM :
 			pDock->bHorizontalDock = CAIRO_DOCK_HORIZONTAL;
-			g_bDirectionUp = TRUE;
+			pDock->bDirectionUp = TRUE;
 		break;
 		case CAIRO_DOCK_TOP :
 			pDock->bHorizontalDock = CAIRO_DOCK_HORIZONTAL;
-			g_bDirectionUp = FALSE;
+			pDock->bDirectionUp = FALSE;
 		break;
 		case CAIRO_DOCK_LEFT :
 			pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
-			g_bDirectionUp = FALSE;
+			pDock->bDirectionUp = FALSE;
 		break;
 		case CAIRO_DOCK_RIGHT :
 			pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
-			g_bDirectionUp = TRUE;
+			pDock->bDirectionUp = TRUE;
 		break;
 	}
 
 	if (g_iMaxAuthorizedWidth == 0)
 		g_iMaxAuthorizedWidth = g_iScreenWidth[pDock->bHorizontalDock];
 
-	cairo_dock_load_dialog_buttons (CAIRO_DOCK_CONTAINER (pDock), cButtonOkImage, cButtonCancelImage);
+	cairo_dock_load_dialog_buttons (CAIRO_CONTAINER (pDock), cButtonOkImage, cButtonCancelImage);
 	g_free (cButtonOkImage);
 	g_free (cButtonCancelImage);
 	
@@ -1118,7 +1117,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		double fLauncherWidth = (g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] != 0 ? g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] : 48);
 		double fLauncherHeight = (g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] != 0 ? g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] : 48);
 		
-		cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
+		cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 		
 		double fMasxScale = (g_bLinkIndicatorWithIcon ? (1 + g_fAmplitude) : 1 + 0);
 		g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL] = cairo_dock_create_surface_from_image (

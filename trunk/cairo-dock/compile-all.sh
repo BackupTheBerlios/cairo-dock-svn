@@ -210,7 +210,7 @@ do
 			echo "* Compilation of module $plugin ... *"
 			echo "************************************"
 			if test "$CAIRO_DOCK_CLEAN" = "1"; then
-				rm -f config.* configure configure.lineno intltool-extract intltool-merge intltool-update libtool ltmain.sh Makefile.in Makefile aclocal.m4 missing stamp-h1 depcomp compile
+				rm -f config.* configure configure.lineno intltool-extract intltool-merge intltool-update libtool ltmain.sh Makefile.in Makefile aclocal.m4 missing stamp-h1 depcomp compile install-sh
 				rm -rf autom4te.cache src/.deps src/.libs src/Makefile src/Makefile.in po/Makefile po/Makefile.in po/*.gmo src/*.o src/*.lo src/*.la
 			fi
 			if test "$CAIRO_DOCK_AUTORECONF" = "1"; then

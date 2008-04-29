@@ -26,21 +26,21 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #endif
 
 typedef struct _CairoDockRenderer CairoDockRenderer;
-typedef struct _CairoDockDeskletRenderer CairoDockDeskletRenderer;
-typedef struct _CairoDockDialogRenderer CairoDockDialogRenderer;
+typedef struct _CairoDeskletRenderer CairoDeskletRenderer;
+typedef struct _CairoDialogRenderer CairoDialogRenderer;
 
 typedef struct _Icon Icon;
-typedef struct _CairoDockContainer CairoDockContainer;
+typedef struct _CairoContainer CairoContainer;
 typedef struct _CairoDock CairoDock;
-typedef struct _CairoDockDesklet CairoDockDesklet;
-typedef struct _CairoDockDialog CairoDockDialog;
+typedef struct _CairoDesklet CairoDesklet;
+typedef struct _CairoDialog CairoDialog;
 
 typedef struct _CairoDockModule CairoDockModule;
 typedef struct _CairoDockVisitCard CairoDockVisitCard;
 typedef struct _CairoDockMinimalAppletConfig CairoDockMinimalAppletConfig;
 typedef struct _CairoDockVFSBackend CairoDockVFSBackend;
-
 typedef struct _CairoDockClassAppli CairoDockClassAppli;
+
 
 typedef void (*CairoDockCalculateMaxDockSizeFunc) (CairoDock *pDock);
 typedef Icon * (*CairoDockCalculateIconsFunc) (CairoDock *pDock);
@@ -80,7 +80,7 @@ typedef enum {
 	CAIRO_DOCK_TYPE_DIALOG
 	} CairoDockTypeContainer;
 
-struct _CairoDockContainer {
+struct _CairoContainer {
 	/// type de container.
 	CairoDockTypeContainer iType;
 	/// La fenetre du widget.
@@ -93,6 +93,8 @@ struct _CairoDockContainer {
 	gboolean bInside;
 	/// TRUE ssi le container est horizontal.
 	CairoDockTypeHorizontality bIsHorizontal;
+	/// TRUE ssi le container est oriente vers le haut.
+	gboolean bDirectionUp;
 #ifdef HAVE_GLITZ
 	glitz_drawable_format_t *pDrawFormat;
 	glitz_drawable_t* pGlitzDrawable;
@@ -102,7 +104,7 @@ struct _CairoDockContainer {
 #endif // HAVE_GLITZ
 };
 
-#define CAIRO_DOCK_CONTAINER(p) ((CairoDockContainer *) (p))
+#define CAIRO_CONTAINER(p) ((CairoContainer *) (p))
 
 
 struct _CairoDock {
@@ -122,6 +124,8 @@ struct _CairoDock {
 	gboolean bInside;
 	/// dit si le dock est horizontal ou vertical.
 	CairoDockTypeHorizontality bHorizontalDock;
+	/// donne l'orientation du dock.
+	gboolean bDirectionUp;
 #ifdef HAVE_GLITZ
 	glitz_drawable_format_t *pDrawFormat;
 	glitz_drawable_t* pGlitzDrawable;
@@ -274,13 +278,13 @@ struct _CairoDockVisitCard {
 typedef CairoDockVisitCard * (* CairoDockModulePreInit) (void);
 
 /// Initialise le module, et renvoie son icone si il en a.
-typedef void (*CairoDockModuleInit) (GKeyFile *pKeyFile, Icon *pIcon, CairoDockContainer *pContainer, gchar *cConfFilePath, GError **erreur);
+typedef void (*CairoDockModuleInit) (GKeyFile *pKeyFile, Icon *pIcon, CairoContainer *pContainer, gchar *cConfFilePath, GError **erreur);
 
 /// Stoppe le module et libere toutes les ressources allouees par lui.
 typedef void (*CairoDockModuleStop) (void);
 
 /// Recharge le module (optionnel).
-typedef gboolean (*CairoDockModuleReload) (GKeyFile *pKeyFile, gchar *cConfFileToReload, CairoDockContainer *pContainer);
+typedef gboolean (*CairoDockModuleReload) (GKeyFile *pKeyFile, gchar *cConfFileToReload, CairoContainer *pContainer);
 
 struct _CairoDockModule {
 	/// chemin du .so
@@ -302,7 +306,7 @@ struct _CairoDockModule {
 	/// VRAI ssi l'appet est prevue pour pouvoir se detacher.
 	gboolean bCanDetach;
 	/// le container dans lequel va se charger le module, ou NULL.
-	CairoDockContainer *pContainer;
+	CairoContainer *pContainer;
 	/// Heure de derniere (re)activation du module.
 	double fLastLoadingTime;
 };
@@ -327,16 +331,16 @@ struct _CairoDockMinimalAppletConfig {
 
 
 typedef void (* CairoDockActionOnAnswerFunc) (int iAnswer, GtkWidget *pWidget, gpointer data);
-typedef void (* CairoDockDialogRenderFunc) (cairo_t *pCairoContext, CairoDockDialog *pDialog, gboolean bRenderOptimized);
-typedef gpointer (* CairoDockDialogLoadRendererFunc) (CairoDockDialog *pDialog, cairo_t *pSourceContext, gpointer *pConfig);
-typedef void (* CairoDockDialogFreeRendererDataFunc) (CairoDockDialog *pDesklet);
-struct _CairoDockDialogRenderer {
-	CairoDockDialogRenderFunc render;
-	CairoDockDialogLoadRendererFunc load_data;
-	CairoDockDialogFreeRendererDataFunc free_data;
+typedef void (* CairoDialogRenderFunc) (cairo_t *pCairoContext, CairoDialog *pDialog, gboolean bRenderOptimized);
+typedef gpointer (* CairoDialogLoadRendererFunc) (CairoDialog *pDialog, cairo_t *pSourceContext, gpointer *pConfig);
+typedef void (* CairoDialogFreeRendererDataFunc) (CairoDialog *pDesklet);
+struct _CairoDialogRenderer {
+	CairoDialogRenderFunc render;
+	CairoDialogLoadRendererFunc load_data;
+	CairoDialogFreeRendererDataFunc free_data;
 };
 
-struct _CairoDockDialog {
+struct _CairoDialog {
 	/// type de container.
 	CairoDockTypeContainer iType;
 	/// la fenetre GTK du dialogue.
@@ -353,6 +357,8 @@ struct _CairoDockDialog {
 	gboolean bInside;
 	/// FALSE ssi le dialogue est perpendiculaire au dock.
 	CairoDockTypeHorizontality bIsHorizontal;
+	/// TRUE ssi la pointe est orientée vers le bas.
+	gboolean bDirectionUp;
 #ifdef HAVE_GLITZ
 	glitz_drawable_format_t *pDrawFormat;
 	glitz_drawable_t* pGlitzDrawable;
@@ -361,7 +367,7 @@ struct _CairoDockDialog {
 	gpointer padding[3];
 #endif // HAVE_GLITZ
 	/// le moteur de rendu utilise pour dessiner le dialogue.
-	CairoDockDialogRenderer *pRenderer;
+	CairoDialogRenderer *pRenderer;
 	/// donnees pouvant etre utilisees par le moteur de rendu.
 	gpointer pRendererData;
 	/// position en X visee par la pointe dans le référentiel de l'écran.
@@ -370,8 +376,6 @@ struct _CairoDockDialog {
 	int iAimedY;
 	/// TRUE ssi le dialogue est a droite de l'écran; dialogue a droite <=> pointe a gauche.
 	gboolean bRight;
-	/// TRUE ssi la pointe est orientée vers le bas.
-	gboolean bDirectionUp;
 	/// rayon des coins.
 	double fRadius;
 	/// hauteur de la pointe, sans la partie "aiguisee".
@@ -614,21 +618,20 @@ struct _CairoDockVFSBackend {
 };
 
 
-typedef void (* CairoDockDeskletRenderFunc) (cairo_t *pCairoContext, CairoDockDesklet *pDesklet, gboolean bRenderOptimized);
-typedef gpointer (* CairoDockDeskletConfigureRendererFunc) (CairoDockDesklet *pDesklet, cairo_t *pSourceContext, gpointer *pConfig);
-typedef gpointer (* CairoDockDeskletLoadRendererFunc) (CairoDockDesklet *pDesklet, cairo_t *pSourceContext);
-typedef void (* CairoDockDeskletFreeRendererDataFunc) (CairoDockDesklet *pDesklet);
-typedef void (* CairoDockDeskletLoadIconsFunc) (CairoDockDesklet *pDesklet, cairo_t *pSourceContext);
-struct _CairoDockDeskletRenderer {
-	CairoDockDeskletRenderFunc render;
-	CairoDockDeskletConfigureRendererFunc configure;
-	CairoDockDeskletLoadRendererFunc load_data;
-	CairoDockDeskletFreeRendererDataFunc free_data;
-	CairoDockDeskletLoadIconsFunc load_icons;
-	gboolean bLoadIconsFirst;
+typedef void (* CairoDeskletRenderFunc) (cairo_t *pCairoContext, CairoDesklet *pDesklet, gboolean bRenderOptimized);
+typedef gpointer (* CairoDeskletConfigureRendererFunc) (CairoDesklet *pDesklet, cairo_t *pSourceContext, gpointer *pConfig);
+typedef gpointer (* CairoDeskletLoadRendererFunc) (CairoDesklet *pDesklet, cairo_t *pSourceContext);
+typedef void (* CairoDeskletFreeRendererDataFunc) (CairoDesklet *pDesklet);
+typedef void (* CairoDeskletLoadIconsFunc) (CairoDesklet *pDesklet, cairo_t *pSourceContext);
+struct _CairoDeskletRenderer {
+	CairoDeskletRenderFunc render;
+	CairoDeskletConfigureRendererFunc configure;
+	CairoDeskletLoadRendererFunc load_data;
+	CairoDeskletFreeRendererDataFunc free_data;
+	CairoDeskletLoadIconsFunc load_icons;
 };
 
-struct _CairoDockDesklet {
+struct _CairoDesklet {
 	/// type "desklet".
 	CairoDockTypeContainer iType;
 	/// La fenetre du widget.
@@ -641,6 +644,8 @@ struct _CairoDockDesklet {
 	gboolean bInside;
 	/// Toujours vrai pour un desklet.
 	CairoDockTypeHorizontality bIsHorizontal;
+	/// donne l'orientation du desket (toujours TRUE).
+	gboolean bDirectionUp;
 #ifdef HAVE_GLITZ
 	glitz_drawable_format_t *pDrawFormat;
 	glitz_drawable_t* pGlitzDrawable;
@@ -649,7 +654,7 @@ struct _CairoDockDesklet {
 	gpointer padding[3];
 #endif // HAVE_GLITZ
 	/// le moteur de rendu utilise pour dessiner le desklet.
-	CairoDockDeskletRenderer *pRenderer;
+	CairoDeskletRenderer *pRenderer;
 	/// donnees pouvant etre utilisees par le moteur de rendu.
 	gpointer pRendererData;
 	/// Liste eventuelle d'icones placees sur le desklet, et susceptibles de recevoir des clics.
@@ -676,7 +681,7 @@ struct _CairoDockDesklet {
 #define CAIRO_DOCK_FM_DESKTOP "_desktop_"
 
 
-typedef gboolean (* CairoDockForeachDeskletFunc) (CairoDockDesklet *pDesklet, CairoDockModule *pModule, gpointer data);
+typedef gboolean (* CairoDockForeachDeskletFunc) (CairoDesklet *pDesklet, CairoDockModule *pModule, gpointer data);
 
 typedef void (* CairoDockForeachIconFunc) (Icon *icon, gpointer data);
 

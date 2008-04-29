@@ -27,7 +27,6 @@ extern double g_fAmplitude;
 extern int g_iDockLineWidth;
 extern double g_fSubDockSizeRatio;
 
-extern gboolean g_bDirectionUp;
 extern gboolean g_bHorizontalDock;
 
 extern int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];
@@ -39,7 +38,7 @@ extern gboolean g_bRevolveSeparator;
 extern gboolean g_bUseGlitz;
 
 
-cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, double fMaxScale, gboolean bHorizontalDock, double *fWidth, double *fHeight)
+cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, double fMaxScale, gboolean bHorizontalDock, gboolean bDirectionUp, double *fWidth, double *fHeight)
 {
 	*fWidth = 10;
 	*fHeight = 48;
@@ -53,12 +52,12 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 		if (! g_bRevolveSeparator)
 			fRotationAngle = 0;
 		else if (bHorizontalDock)
-			if (g_bDirectionUp)
+			if (bDirectionUp)
 				fRotationAngle = 0;
 			else
 				fRotationAngle = G_PI;
 		else
-			if (g_bDirectionUp)
+			if (bDirectionUp)
 				fRotationAngle = -G_PI/2;
 			else
 				fRotationAngle = G_PI/2;
@@ -107,7 +106,7 @@ Icon *cairo_dock_create_separator_icon (cairo_t *pSourceContext, int iSeparatorT
 
 	Icon *icon = g_new0 (Icon, 1);
 	icon->iType = iSeparatorType;
-	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
+	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE, pDock->bDirectionUp);
 
 	if (bApplyRatio)  ///  && pDock->iRefCount > 0
 	{

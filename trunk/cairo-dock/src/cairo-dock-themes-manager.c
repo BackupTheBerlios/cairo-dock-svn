@@ -128,7 +128,7 @@ gchar *cairo_dock_edit_themes (GHashTable **hThemeTable, gboolean bSafeMode)
 	gchar *cPresentedGroup = (cairo_dock_theme_need_save () ? "Save" : NULL);
 	const gchar *cTitle = (bSafeMode ? _("< Safe Mode >") : _("Manage Themes"));
 	
-	CairoDockDialog *pDialog = NULL;
+	CairoDialog *pDialog = NULL;
 	if (bSafeMode)
 	{
 		pDialog = cairo_dock_show_general_message (_("You are running Cairo-Dock in safe mode.\nWhy ? Probably because a plug-in has messed into your dock,\n or maybe your theme has got corrupted.\nSo, no plug-in will be available, and you can now save your current theme if you want\n before you start using the dock.\nTry with your current theme, if it works, it means a plug-in is wrong.\nOtherwise, try with another theme.\nSave a config that is working, and restart the dock in normal mode.\nThen, activate plug-ins one by one to guess which one is wrong."), 0.);

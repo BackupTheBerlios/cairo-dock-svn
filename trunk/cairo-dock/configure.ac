@@ -46,6 +46,7 @@ AC_CONFIG_FILES([Makefile
 		po/Makefile.in
 		data/Makefile
 		data/cairo-dock.conf
+		data/main-dock.conf
 		data/default-theme/Makefile
 		data/default-theme/launchers/Makefile
 		data/gauges/Makefile

@@ -184,98 +184,91 @@ void draw_cd_GaugeImage(cairo_t *pSourceContext, GaugeImage *pGaugeImage, int iW
 	pGaugeImage->cairoSurface = pNewSurface;
 }
 
-void make_cd_Gauge(cairo_t *pSourceContext, CairoDock *pDock, Icon *pIcon, Gauge *pGauge, double dValue)
+void make_cd_Gauge(cairo_t *pSourceContext, CairoContainer *pContainer, Icon *pIcon, Gauge *pGauge, double fValue)
 {
 	GList *pList = NULL;
-	double *pValue2;
+	pList = g_list_prepend (pList, &fValue);
 	
-	pValue2 = g_new (double, 1);
-	*pValue2 = dValue;
-	pList = g_list_prepend (pList, pValue2);
+	make_cd_Gauge_multiValue(pSourceContext,pContainer,pIcon,pGauge,pList);
 	
-	make_cd_Gauge_multiValue(pSourceContext,pDock,pIcon,pGauge,pList);
-	
-	g_list_foreach (pList, (GFunc) g_free, NULL);
 	g_list_free (pList);
-	pList = NULL;
 }
 
-void make_cd_Gauge_multiValue(cairo_t *pSourceContext, CairoDock *pDock, Icon *pIcon, Gauge *pGauge, GList *valueList)
+void make_cd_Gauge_multiValue(cairo_t *pSourceContext, CairoContainer *pContainer, Icon *pIcon, Gauge *pGauge, GList *valueList)
 {
-	if(pGauge != NULL)
+	g_return_if_fail (pGauge != NULL && pContainer != NULL && pSourceContext != NULL);
+	cd_debug("gauge : %s ()",__func__);
+	
+	double fMaxScale = 1 + g_fAmplitude;
+	//fMaxScale = cairo_dock_get_max_scale (pContainer);
+	GaugeImage *pGaugeImage;
+	
+	cairo_set_source_rgba (pSourceContext, 0.0, 0.0, 0.0, 0.0);
+	cairo_set_operator (pSourceContext, CAIRO_OPERATOR_SOURCE);
+	cairo_paint (pSourceContext);
+	cairo_set_operator (pSourceContext, CAIRO_OPERATOR_OVER);
+	
+	//On affiche le fond
+	if(pGauge->imageBackground != NULL)
 	{
-		cd_debug("gauge : %s\n",__func__);
-		
-		double fMaxScale = (pDock != NULL ? 1 + g_fAmplitude : 1);
-		
-		GaugeImage *pGaugeImage;
-		
-		cairo_set_source_rgba (pSourceContext, 0.0, 0.0, 0.0, 0.0);
-		cairo_set_operator (pSourceContext, CAIRO_OPERATOR_SOURCE);
+		pGaugeImage = pGauge->imageBackground;
+		cairo_set_source_surface (pSourceContext, pGaugeImage->cairoSurface, 0.0f, 0.0f);
 		cairo_paint (pSourceContext);
-		cairo_set_operator (pSourceContext, CAIRO_OPERATOR_OVER);
-		
-		//On affiche le fond
-		if(pGauge->imageBackground != NULL)
-		{
-			pGaugeImage = pGauge->imageBackground;
-			cairo_set_source_surface (pSourceContext, pGaugeImage->cairoSurface, 0.0f, 0.0f);
-			cairo_paint (pSourceContext);
-		}
-		
-		GList *pIndicatorElement;
-		GList *pValueList;
-		double *pValue;
-		
-		pIndicatorElement = pGauge->indicatorList;
-		for(pValueList = valueList; pValueList != NULL; pValueList = pValueList->next)
-		{
-			pValue = pValueList->data;
-			if(*pValue > 1) *pValue = 1;
-			else if(*pValue < 0) *pValue = 0;
-			draw_cd_Gauge_image(pSourceContext, pGauge, pIndicatorElement->data, *pValue);
-			
-			if(pIndicatorElement->next != NULL) pIndicatorElement = pIndicatorElement->next;
-		}
-		
-		cairo_paint (pSourceContext);
-		
-		pIndicatorElement = pGauge->indicatorList;
-		for(pValueList = valueList; pValueList != NULL; pValueList = pValueList->next)
-		{
-			pValue = pValueList->data;
-			if(*pValue > 1) *pValue = 1;
-			else if(*pValue < 0) *pValue = 0;
-			
-			draw_cd_Gauge_needle(pSourceContext, pGauge, pIndicatorElement->data, *pValue);
-			
-			if(pIndicatorElement->next != NULL) pIndicatorElement = pIndicatorElement->next;
-		}
-				
-		//On affiche le fond
-		if(pGauge->imageForeground != NULL)
-		{
-			pGaugeImage = pGauge->imageForeground;
-			cairo_set_source_surface (pSourceContext, pGaugeImage->cairoSurface, 0.0f, 0.0f);
-			cairo_paint (pSourceContext);
-		}
-		
-		if (pDock != NULL && pDock->bUseReflect)
-		{
-			cairo_surface_t *pReflet = pIcon->pReflectionBuffer;
-			pIcon->pReflectionBuffer = NULL;
-			cairo_surface_destroy (pReflet);
-			
-			pIcon->pReflectionBuffer = cairo_dock_create_reflection_surface (pIcon->pIconBuffer,
-				pSourceContext,
-				(pDock->bHorizontalDock ? pIcon->fWidth : pIcon->fHeight) * fMaxScale,
-				(pDock->bHorizontalDock ? pIcon->fHeight : pIcon->fWidth) * fMaxScale,
-				pDock->bHorizontalDock,
-				1 + g_fAmplitude);
-		}
-		
-		cairo_dock_redraw_my_icon(pIcon,CAIRO_DOCK_CONTAINER(pDock));
 	}
+	
+	GList *pIndicatorElement;
+	GList *pValueList;
+	double *pValue;
+	
+	pIndicatorElement = pGauge->indicatorList;
+	for(pValueList = valueList; pValueList != NULL; pValueList = pValueList->next)
+	{
+		pValue = pValueList->data;
+		if(*pValue > 1) *pValue = 1;
+		else if(*pValue < 0) *pValue = 0;
+		draw_cd_Gauge_image(pSourceContext, pGauge, pIndicatorElement->data, *pValue);
+		
+		if(pIndicatorElement->next != NULL) pIndicatorElement = pIndicatorElement->next;
+	}
+	
+	cairo_paint (pSourceContext);
+	
+	pIndicatorElement = pGauge->indicatorList;
+	for(pValueList = valueList; pValueList != NULL; pValueList = pValueList->next)
+	{
+		pValue = pValueList->data;
+		if(*pValue > 1) *pValue = 1;
+		else if(*pValue < 0) *pValue = 0;
+		
+		draw_cd_Gauge_needle(pSourceContext, pGauge, pIndicatorElement->data, *pValue);
+		
+		if(pIndicatorElement->next != NULL) pIndicatorElement = pIndicatorElement->next;
+	}
+	
+	//On affiche le fond
+	if(pGauge->imageForeground != NULL)
+	{
+		pGaugeImage = pGauge->imageForeground;
+		cairo_set_source_surface (pSourceContext, pGaugeImage->cairoSurface, 0.0f, 0.0f);
+		cairo_paint (pSourceContext);
+	}
+	
+	if (CAIRO_DOCK_IS_DOCK (pContainer) && CAIRO_DOCK (pContainer)->bUseReflect)
+	{
+		cairo_surface_t *pReflet = pIcon->pReflectionBuffer;
+		pIcon->pReflectionBuffer = NULL;
+		cairo_surface_destroy (pReflet);
+		
+		pIcon->pReflectionBuffer = cairo_dock_create_reflection_surface (pIcon->pIconBuffer,
+			pSourceContext,
+			(pContainer->bIsHorizontal ? pIcon->fWidth : pIcon->fHeight) * fMaxScale,
+			(pContainer->bIsHorizontal ? pIcon->fHeight : pIcon->fWidth) * fMaxScale,
+			pContainer->bIsHorizontal,
+			fMaxScale,
+			pContainer->bDirectionUp);
+	}
+	
+	cairo_dock_redraw_my_icon (pIcon, pContainer);
 }
 
 void draw_cd_Gauge_needle(cairo_t *pSourceContext, Gauge *pGauge, GaugeIndicator *pGaugeIndicator, double dValue)

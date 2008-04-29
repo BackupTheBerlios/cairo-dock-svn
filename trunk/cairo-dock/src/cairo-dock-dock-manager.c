@@ -42,7 +42,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-dock-manager.h"
 
 extern CairoDock *g_pMainDock;
-extern gboolean g_bDirectionUp;
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentThemePath;
 
@@ -155,7 +154,7 @@ static gboolean _cairo_dock_search_icon_in_a_dock (gchar *cDockName, CairoDock *
 {
 	return (g_list_find (pDock->icons, icon) != NULL);
 }
-CairoDockContainer *cairo_dock_search_container_from_icon (Icon *icon)
+CairoContainer *cairo_dock_search_container_from_icon (Icon *icon)
 {
 	g_return_val_if_fail (icon != NULL, NULL);
 	if (CAIRO_DOCK_IS_APPLET (icon))
@@ -307,11 +306,6 @@ void cairo_dock_set_all_views_to_default (void)
 
 
 
-/*void cairo_dock_write_main_docks_posotions (GKeyFile *pKeyFile)
-{
-	g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_write_one_main_dock_position, pKeyFile);
-}*/
-
 void cairo_dock_write_main_dock_gaps (CairoDock *pDock)
 {
 	if (pDock->iRefCount > 0)
@@ -325,51 +319,24 @@ void cairo_dock_write_main_dock_gaps (CairoDock *pDock)
 	{
 		const gchar *cDockName = cairo_dock_search_dock_name (pDock);
 		gchar *cConfFilePath = g_strdup_printf ("%s/%s.conf", g_cCurrentThemePath, cDockName);
-		cairo_dock_update_conf_file_with_position (cDockName, pDock->iGapX, pDock->iGapY);
+		cairo_dock_update_conf_file_with_position (cConfFilePath, pDock->iGapX, pDock->iGapY);
 		g_free (cConfFilePath);
 	}
 }
 
-void cairo_dock_write_main_dock_position (gchar *cDockName, CairoDock *pDock)
-{
-	g_return_if_fail (cDockName != NULL && pDock != NULL);
-	if (pDock->iRefCount > 0)
-		return;
-	
-	gchar *cConfFilePath = (pDock->bIsMainDock ? g_cConfFile : g_strdup_printf ("%s/%s.conf", g_cCurrentThemePath, cDockName));
-	
-	CairoDockPositionType iScreenBorder;
-	if (pDock->bHorizontalDock == CAIRO_DOCK_HORIZONTAL)
-	{
-		if (g_bDirectionUp)
-			iScreenBorder = CAIRO_DOCK_BOTTOM;
-		else
-			iScreenBorder = CAIRO_DOCK_TOP;
-	}
-	else
-	{
-		if (g_bDirectionUp)
-			iScreenBorder = CAIRO_DOCK_RIGHT;
-		else
-			iScreenBorder = CAIRO_DOCK_LEFT;
-	}
-	cairo_dock_update_conf_file (cConfFilePath,
-		G_TYPE_INT, "Position", "screen border", iScreenBorder,
-		G_TYPE_DOUBLE, "Position", "alignment", pDock->fAlign,
-		G_TYPE_INT, "Position", "x gap", pDock->iGapX,
-		G_TYPE_INT, "Position", "y gap", pDock->iGapY,
-		G_TYPE_INVALID);
-	if (! pDock->bIsMainDock)
-		g_free (cConfFilePath);
-}
-
-void cairo_dock_get_main_dock_position (gchar *cDockName, CairoDock *pDock)
+void cairo_dock_get_main_dock_position (const gchar *cDockName, CairoDock *pDock)
 {
 	g_return_if_fail (cDockName != NULL && pDock != NULL);
 	if (pDock->iRefCount > 0 || pDock->bIsMainDock)
 		return;
 	
 	gchar *cConfFilePath = (pDock->bIsMainDock ? g_cConfFile : g_strdup_printf ("%s/%s.conf", g_cCurrentThemePath, cDockName));
+	if (! g_file_test (cConfFilePath, G_FILE_TEST_EXISTS))
+	{
+		if (! pDock->bIsMainDock)
+			g_free (cConfFilePath);
+		return ;
+	}
 	
 	GKeyFile *pKeyFile = g_key_file_new ();
 	GError *erreur = NULL;
@@ -396,23 +363,35 @@ void cairo_dock_get_main_dock_position (gchar *cDockName, CairoDock *pDock)
 		{
 			case CAIRO_DOCK_BOTTOM :
 				pDock->bHorizontalDock = CAIRO_DOCK_HORIZONTAL;
-				g_bDirectionUp = TRUE;
+				pDock->bDirectionUp = TRUE;
 			break;
 			case CAIRO_DOCK_TOP :
 				pDock->bHorizontalDock = CAIRO_DOCK_HORIZONTAL;
-				g_bDirectionUp = FALSE;
+				pDock->bDirectionUp = FALSE;
 			break;
 			case CAIRO_DOCK_LEFT :
 				pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
-				g_bDirectionUp = FALSE;
+				pDock->bDirectionUp = FALSE;
 			break;
 			case CAIRO_DOCK_RIGHT :
 				pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
-				g_bDirectionUp = TRUE;
+				pDock->bDirectionUp = TRUE;
 			break;
 		}
+		
+		g_key_file_free (pKeyFile);
 	}
 	
 	if (! pDock->bIsMainDock)
 		g_free (cConfFilePath);
+}
+
+void cairo_dock_remove_main_dock_config (const gchar *cDockName)
+{
+	gchar *cConfFilePath = g_strdup_printf ("%s/%s.conf", g_cCurrentThemePath, cDockName);
+	if (g_file_test (cConfFilePath, G_FILE_TEST_EXISTS))
+	{
+		g_remove (cConfFilePath);
+	}
+	g_free (cConfFilePath);
 }

@@ -154,7 +154,6 @@ int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS] = {17, 20, 20, 12, 20, 20, 0};
 int g_iVisibleZoneWidth = 0;  // dimensions de la zone ou on place le curseur pour faire apparaitre le dock.
 int g_iVisibleZoneHeight = 0;
 
-gboolean g_bDirectionUp;  // la direction dans laquelle les icones grossissent. Vers le haut ou vers le bas.
 gboolean g_bSameHorizontality;  // dit si les sous-docks ont la meme horizontalite que les docks racines.
 double g_fSubDockSizeRatio;  // ratio de la taille des icones des sous-docks par rapport a celles du dock principal.
 gboolean g_bAnimateSubDock;
@@ -248,7 +247,7 @@ static gboolean random_dialog (gpointer user_data)
 	Icon *icon = g_list_nth_data (g_pMainDock->icons, num_icone);
 	if (CAIRO_DOCK_IS_SEPARATOR (icon))
 		return random_dialog (user_data);
-	cairo_dock_show_temporary_dialog (icon->acName, icon, CAIRO_DOCK_CONTAINER (g_pMainDock), 7000);
+	cairo_dock_show_temporary_dialog (icon->acName, icon, CAIRO_CONTAINER (g_pMainDock), 7000);
 	return TRUE;
 }
 
@@ -577,7 +576,7 @@ main (int argc, char** argv)
 			else
 			{
 				Icon *pFirstIcon = cairo_dock_get_first_icon (g_pMainDock->icons);
-				cairo_dock_show_temporary_dialog_with_default_icon (gettext (cChangeLogMessage), pFirstIcon, CAIRO_DOCK_CONTAINER (g_pMainDock), 0);
+				cairo_dock_show_temporary_dialog_with_default_icon (gettext (cChangeLogMessage), pFirstIcon, CAIRO_CONTAINER (g_pMainDock), 0);
 			}
 			g_free (cChangeLogMessage);
 		}

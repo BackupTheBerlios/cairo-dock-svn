@@ -395,13 +395,14 @@ Icon * cairo_dock_create_icon_from_desktop_file (const gchar *cDesktopFileName, 
 		pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_DOCK, icon->cParentDockName, NULL);
 	}
 
-	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pParentDock->bHorizontalDock, TRUE);
-
+	/**cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pParentDock->bHorizontalDock, TRUE, pParentDock->bDirectionUp);
 	cairo_dock_fill_one_text_buffer (icon,
 		pSourceContext,
 		g_iLabelSize,
 		g_cLabelPolice,
-		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pParentDock->bHorizontalDock));
+		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pParentDock->bHorizontalDock),
+		pParentDock->bDirectionUp);*/
+	cairo_dock_fill_icon_buffers_for_dock (icon, pSourceContext, pParentDock)
 	
 	cd_message ("+ %s/%s", icon->acName, icon->cClass);
 	if (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon) && icon->acCommand != NULL && icon->cClass != NULL)  // pas un lanceur de sous-dock.

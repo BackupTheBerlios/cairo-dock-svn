@@ -770,7 +770,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 								{
 									icon->fAlpha = 1;  // on triche un peu.
 									if (pParentDock != NULL)
-										cairo_dock_redraw_my_icon (icon, CAIRO_DOCK_CONTAINER (pParentDock));
+										cairo_dock_redraw_my_icon (icon, CAIRO_CONTAINER (pParentDock));
 								}
 							}
 						}
@@ -952,7 +952,7 @@ void cairo_dock_update_applis_list (CairoDock *pDock, double fTime)
 		if (! bAppliAlreadyRegistered)
 		{
 			cd_message (" cette fenetre (%ld) de la pile n'est pas dans la liste", Xid);
-			cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
+			cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 			if (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS)
 				icon = cairo_dock_create_icon_from_xwindow (pCairoContext, Xid, pDock);
 			if (icon != NULL)
@@ -1000,7 +1000,7 @@ void cairo_dock_start_application_manager (CairoDock *pDock)
 	gulong i, iNbWindows = 0;
 	Window *pXWindowsList = cairo_dock_get_windows_list (&iNbWindows);
 
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 
 	//\__________________ On cree les icones de toutes ces applis.

@@ -77,7 +77,6 @@ extern gboolean g_bAutoHide;
 extern gchar *g_cConfFile;
 
 extern int g_iVisibleZoneHeight, g_iVisibleZoneWidth;
-extern gboolean g_bDirectionUp;
 
 extern double g_fRefreshInterval;
 
@@ -611,7 +610,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	int iNewWidth, iNewHeight;
 	cairo_dock_get_window_position_and_geometry_at_balance (pDock, CAIRO_DOCK_MAX_SIZE, &iNewWidth, &iNewHeight);
 	if ((g_bAutoHide && pDock->iRefCount == 0) && pDock->bAtBottom)
-		pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - g_iVisibleZoneHeight - pDock->iGapY : g_iVisibleZoneHeight + pDock->iGapY - pDock->iMaxDockHeight);
+		pDock->iWindowPositionY = (pDock->bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - g_iVisibleZoneHeight - pDock->iGapY : g_iVisibleZoneHeight + pDock->iGapY - pDock->iMaxDockHeight);
 
 	if (pDock->bHorizontalDock)
 		gdk_window_move_resize (pWidget->window,
@@ -684,7 +683,7 @@ static int _move_up_by_arrow (int iMoveByArrow, CairoDock *pDock)
 	if (iEffectiveMove > 0)
 	{
 		pDock->iWindowPositionY -= iEffectiveMove;
-		pDock->iGapY += (g_bDirectionUp ? iEffectiveMove : -iEffectiveMove);
+		pDock->iGapY += (pDock->bDirectionUp ? iEffectiveMove : -iEffectiveMove);
 	}
 	return iEffectiveMove;
 }
@@ -696,7 +695,7 @@ static int _move_down_by_arrow (int iMoveByArrow, CairoDock *pDock)
 	if (iEffectiveMove > 0)
 	{
 		pDock->iWindowPositionY += iEffectiveMove;
-		pDock->iGapY += (g_bDirectionUp ? -iEffectiveMove : iEffectiveMove);
+		pDock->iGapY += (pDock->bDirectionUp ? -iEffectiveMove : iEffectiveMove);
 	}
 	return iEffectiveMove;
 }
@@ -857,7 +856,7 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 		}
 		if (icon->iVolumeID > 0 && ! bIsMounted)
 		{
-			int answer =cairo_dock_ask_question_and_wait (_("Do you want to mount this point ?"), icon, CAIRO_DOCK_CONTAINER (pDock));
+			int answer =cairo_dock_ask_question_and_wait (_("Do you want to mount this point ?"), icon, CAIRO_CONTAINER (pDock));
 			if (answer != GTK_RESPONSE_YES)
 			{
 				icon->iCount = 0;
@@ -978,7 +977,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 					else if (s_pIconClicked != NULL && icon != NULL && icon != s_pIconClicked)  //  && icon->iType == s_pIconClicked->iType
 					{
 						cd_message ("deplacement de %s", s_pIconClicked->acName);
-						CairoDock *pOriginDock = CAIRO_DOCK_DOCK (cairo_dock_search_container_from_icon (s_pIconClicked));
+						CairoDock *pOriginDock = CAIRO_DOCK (cairo_dock_search_container_from_icon (s_pIconClicked));
 						if (pOriginDock != NULL && pDock != pOriginDock)
 						{
 							cairo_dock_detach_icon_from_dock (s_pIconClicked, pOriginDock, TRUE);  // plutot que 'cairo_dock_remove_icon_from_dock', afin de ne pas la fermer.
@@ -990,8 +989,8 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 							cairo_dock_update_icon_s_container_name (s_pIconClicked, icon->cParentDockName);
 							if (pOriginDock->iRefCount > 0 && ! g_bSameHorizontality)
 							{
-								cairo_t* pSourceContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
-								cairo_dock_fill_one_text_buffer (s_pIconClicked, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : g_pMainDock->bHorizontalDock));
+								cairo_t* pSourceContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
+								cairo_dock_fill_one_text_buffer (s_pIconClicked, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : g_pMainDock->bHorizontalDock), g_pMainDock->bDirectionUp);
 								cairo_destroy (pSourceContext);
 							}
 
@@ -1057,7 +1056,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 	else if (pButton->button == 3 && pButton->type == GDK_BUTTON_PRESS)  // clique droit.
 	{
 		pDock->bMenuVisible = TRUE;
-		GtkWidget *menu = cairo_dock_build_menu (icon, CAIRO_DOCK_CONTAINER (pDock));  // genere un CAIRO_DOCK_BUILD_MENU.
+		GtkWidget *menu = cairo_dock_build_menu (icon, CAIRO_CONTAINER (pDock));  // genere un CAIRO_DOCK_BUILD_MENU.
 
 		gtk_widget_show_all (menu);
 
@@ -1365,7 +1364,7 @@ void on_drag_data_received (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint
 		}
 	}
 	
-	cairo_dock_notify_drop_data (cReceivedData, pPointedIcon, fOrder, CAIRO_DOCK_CONTAINER (pDock));
+	cairo_dock_notify_drop_data (cReceivedData, pPointedIcon, fOrder, CAIRO_CONTAINER (pDock));
 }
 
 gboolean cairo_dock_notification_drop_data (gpointer *data)
@@ -1373,12 +1372,12 @@ gboolean cairo_dock_notification_drop_data (gpointer *data)
 	const gchar *cReceivedData = data[0];
 	Icon *icon = data[1];
 	double fOrder = *((double *) data[2]);
-	CairoDockContainer *pContainer = data[3];
+	CairoContainer *pContainer = data[3];
 	
 	if (! CAIRO_DOCK_IS_DOCK (pContainer))
 		return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 	
-	CairoDock *pDock = CAIRO_DOCK_DOCK (pContainer);
+	CairoDock *pDock = CAIRO_DOCK (pContainer);
 	if (icon == NULL || CAIRO_DOCK_IS_LAUNCHER (icon) || CAIRO_DOCK_IS_SEPARATOR (icon))
 	{
 		CairoDock *pReceivingDock = pDock;
@@ -1457,7 +1456,7 @@ gboolean cairo_dock_notification_drop_data (gpointer *data)
 		{
 			cairo_dock_mark_theme_as_modified (TRUE);
 
-			cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pReceivingDock));
+			cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pReceivingDock));
 			Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cNewDesktopFileName, pCairoContext);
 			g_free (cNewDesktopFileName);
 			cairo_destroy (pCairoContext);
@@ -1526,7 +1525,7 @@ gboolean on_delete (GtkWidget *pWidget, GdkEvent *event, CairoDock *pDock)
 	if (pIcon == NULL)
 		pIcon = cairo_dock_get_dialogless_icon ();
 	
-	int answer = cairo_dock_ask_question_and_wait (_("Quit Cairo-Dock ?"), pIcon, CAIRO_DOCK_CONTAINER (g_pMainDock));
+	int answer = cairo_dock_ask_question_and_wait (_("Quit Cairo-Dock ?"), pIcon, CAIRO_CONTAINER (g_pMainDock));
 	if (answer == GTK_RESPONSE_YES)
 		gtk_main_quit ();
 	return FALSE;
@@ -1626,7 +1625,7 @@ void cairo_dock_raise_from_keyboard (const char *cKeyShortcut, gpointer data)
 		//g_print (" %d;%d\n", iMouseX, iMouseY);
 		
 		g_pMainDock->iGapX = g_pMainDock->iWindowPositionX + iMouseX - g_iScreenWidth[g_pMainDock->bHorizontalDock] * g_pMainDock->fAlign;
-		g_pMainDock->iGapY = (g_bDirectionUp ? g_iScreenHeight[g_pMainDock->bHorizontalDock] - (g_pMainDock->iWindowPositionY + iMouseY) : g_pMainDock->iWindowPositionY + iMouseY);
+		g_pMainDock->iGapY = (g_pMainDock->bDirectionUp ? g_iScreenHeight[g_pMainDock->bHorizontalDock] - (g_pMainDock->iWindowPositionY + iMouseY) : g_pMainDock->iWindowPositionY + iMouseY);
 		//g_print (" => %d;%d\n", g_pMainDock->iGapX, g_pMainDock->iGapY);
 		
 		cairo_dock_set_window_position_at_balance (g_pMainDock, g_pMainDock->iCurrentWidth, g_pMainDock->iCurrentHeight);

@@ -22,7 +22,6 @@ extern int g_tIconAuthorizedHeight[CAIRO_DOCK_NB_TYPES];
 extern double g_fAmplitude;
 extern double g_fReflectSize;
 extern double g_fAlbedo;
-extern gboolean g_bDirectionUp;
 
 extern int g_iLabelWeight;
 extern int g_iLabelStyle;
@@ -427,7 +426,7 @@ cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t 
 }
 
 
-static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale)
+static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale, gboolean bDirectionUp)
 {
 	g_return_val_if_fail (pSurface != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 
@@ -447,7 +446,7 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_
 	cairo_translate (pCairoContext, 0, fImageHeight);
 	cairo_scale (pCairoContext, 1., -1.);
 
-	cairo_set_source_surface (pCairoContext, pSurface, 0, (g_bDirectionUp ? 0 : fImageHeight - fReflectHeight));
+	cairo_set_source_surface (pCairoContext, pSurface, 0, (bDirectionUp ? 0 : fImageHeight - fReflectHeight));
 	cairo_paint (pCairoContext);
 	cairo_destroy (pCairoContext);
 
@@ -472,13 +471,13 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_
 		0.,
 		0.,
 		0.,
-		(g_bDirectionUp ? g_fAlbedo : 0.));
+		(bDirectionUp ? g_fAlbedo : 0.));
 	cairo_pattern_add_color_stop_rgba (pGradationPattern,
 		1.,
 		0.,
 		0.,
 		0.,
-		(g_bDirectionUp ? 0 : g_fAlbedo));
+		(bDirectionUp ? 0 : g_fAlbedo));
 
 	cairo_translate (pCairoContext, 0, 0);
 	cairo_mask (pCairoContext, pGradationPattern);
@@ -489,7 +488,7 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_
 	return pNewSurfaceGradated;
 }
 
-static cairo_surface_t * cairo_dock_create_reflection_surface_vertical (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale)
+static cairo_surface_t * cairo_dock_create_reflection_surface_vertical (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale, gboolean bDirectionUp)
 {
 	g_return_val_if_fail (pSurface != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 
@@ -509,7 +508,7 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_vertical (cairo_su
 	cairo_translate (pCairoContext, fImageWidth, 0);
 	cairo_scale (pCairoContext, -1., 1.);
 
-	cairo_set_source_surface (pCairoContext, pSurface, (g_bDirectionUp ? 0. : fImageHeight - fReflectWidth), 0.);
+	cairo_set_source_surface (pCairoContext, pSurface, (bDirectionUp ? 0. : fImageHeight - fReflectWidth), 0.);
 	cairo_paint (pCairoContext);
 	cairo_destroy (pCairoContext);
 
@@ -533,13 +532,13 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_vertical (cairo_su
 		0.,
 		0.,
 		0.,
-		(g_bDirectionUp ? g_fAlbedo : 0.));
+		(bDirectionUp ? g_fAlbedo : 0.));
 	cairo_pattern_add_color_stop_rgba (pGradationPattern,
 		1.,
 		0.,
 		0.,
 		0.,
-		(g_bDirectionUp ? 0. : g_fAlbedo));
+		(bDirectionUp ? 0. : g_fAlbedo));
 
 	cairo_translate (pCairoContext, 0, 0);
 	cairo_mask (pCairoContext, pGradationPattern);
@@ -550,16 +549,16 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_vertical (cairo_su
 	return pNewSurfaceGradated;
 }
 
-cairo_surface_t * cairo_dock_create_reflection_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, gboolean bHorizontalDock, double fMaxScale)
+cairo_surface_t * cairo_dock_create_reflection_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, gboolean bHorizontalDock, double fMaxScale, gboolean bDirectionUp)
 {
 	if (bHorizontalDock)
-		return cairo_dock_create_reflection_surface_horizontal (pSurface, pSourceContext, fImageWidth, fImageHeight,fMaxScale);
+		return cairo_dock_create_reflection_surface_horizontal (pSurface, pSourceContext, fImageWidth, fImageHeight, fMaxScale, bDirectionUp);
 	else
-		return cairo_dock_create_reflection_surface_vertical (pSurface, pSourceContext, fImageWidth, fImageHeight, fMaxScale);
+		return cairo_dock_create_reflection_surface_vertical (pSurface, pSourceContext, fImageWidth, fImageHeight, fMaxScale, bDirectionUp);
 }
 
 
-cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_horizontal (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale)
+cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_horizontal (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale, gboolean bDirectionUp)
 {
 	g_return_val_if_fail (pIconSurface != NULL && pReflectionSurface!= NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 
@@ -574,19 +573,19 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_horizontal (cai
 	cairo_t *pCairoContext = cairo_create (pNewSurface);
 
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
-	cairo_set_source_surface (pCairoContext, pIconSurface, 0, (g_bDirectionUp ? 0. : fReflectHeight));
+	cairo_set_source_surface (pCairoContext, pIconSurface, 0, (bDirectionUp ? 0. : fReflectHeight));
 	cairo_paint (pCairoContext);
 
 	if (pReflectionSurface != NULL)
 	{
-		cairo_set_source_surface (pCairoContext, pReflectionSurface, 0, (g_bDirectionUp ? fImageHeight : 0));
+		cairo_set_source_surface (pCairoContext, pReflectionSurface, 0, (bDirectionUp ? fImageHeight : 0));
 		cairo_paint (pCairoContext);
 	}
 
 	cairo_destroy (pCairoContext);
 	return pNewSurface;
 }
-cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_vertical (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale)
+cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_vertical (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale, gboolean bDirectionUp)
 {
 	g_return_val_if_fail (pIconSurface != NULL && pReflectionSurface!= NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 
@@ -601,12 +600,12 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_vertical (cairo
 	cairo_t *pCairoContext = cairo_create (pNewSurface);
 
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
-	cairo_set_source_surface (pCairoContext, pIconSurface, (g_bDirectionUp ? 0. : fReflectWidth), 0);
+	cairo_set_source_surface (pCairoContext, pIconSurface, (bDirectionUp ? 0. : fReflectWidth), 0);
 	cairo_paint (pCairoContext);
 
 	if (pReflectionSurface != NULL)
 	{
-		cairo_set_source_surface (pCairoContext, pReflectionSurface, (g_bDirectionUp ? fImageWidth : 0), 0);
+		cairo_set_source_surface (pCairoContext, pReflectionSurface, (bDirectionUp ? fImageWidth : 0), 0);
 		cairo_paint (pCairoContext);
 	}
 
@@ -614,12 +613,12 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_vertical (cairo
 	return pNewSurface;
 }
 
-cairo_surface_t * cairo_dock_create_icon_surface_with_reflection (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, gboolean bHorizontalDock, double fMaxScale)
+cairo_surface_t * cairo_dock_create_icon_surface_with_reflection (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, gboolean bHorizontalDock, double fMaxScale, gboolean bDirectionUp)
 {
 	if (bHorizontalDock)
-		return cairo_dock_create_icon_surface_with_reflection_horizontal (pIconSurface, pReflectionSurface, pSourceContext, fImageWidth, fImageHeight, fMaxScale);
+		return cairo_dock_create_icon_surface_with_reflection_horizontal (pIconSurface, pReflectionSurface, pSourceContext, fImageWidth, fImageHeight, fMaxScale, bDirectionUp);
 	else
-		return cairo_dock_create_icon_surface_with_reflection_vertical (pIconSurface, pReflectionSurface, pSourceContext, fImageWidth, fImageHeight, fMaxScale);
+		return cairo_dock_create_icon_surface_with_reflection_vertical (pIconSurface, pReflectionSurface, pSourceContext, fImageWidth, fImageHeight, fMaxScale, bDirectionUp);
 }
 
 

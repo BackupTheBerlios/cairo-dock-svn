@@ -430,15 +430,14 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	icon->iType = CAIRO_DOCK_APPLI;
 	icon->bIsHidden = bIsHidden;
 
-	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
-	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
+	///cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
+	///cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
+	cairo_dock_fill_icon_buffers_for_dock (icon, pSourceContext, pDock);
 
 	if (g_bUniquePid)
 		g_hash_table_insert (s_hAppliTable, pPidBuffer, icon);
 	cairo_dock_register_appli (icon);
 	XFree (pNameBuffer);
-
-	///cairo_dock_manage_appli_class (icon, pDock);
 
 	cairo_dock_set_window_mask (Xid, PropertyChangeMask | StructureNotifyMask);
 
@@ -471,8 +470,8 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 				icon->acName = g_strdup ((gchar *)pNameBuffer);
 				XFree (pNameBuffer);
 
-				pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
-				cairo_dock_fill_one_text_buffer (icon, pCairoContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock));
+				pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
+				cairo_dock_fill_one_text_buffer (icon, pCairoContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
 				cairo_destroy (pCairoContext);
 			}
 		}
@@ -482,14 +481,14 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 		//g_print ("%s change son icone\n", icon->acName);
 		if (cairo_dock_class_is_using_xicon (icon->cClass) || ! g_bOverWriteXIcons)
 		{
-			pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
+			pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 			icon->fWidth /= pDock->fRatio;
 			icon->fHeight /= pDock->fRatio;
-			cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
+			cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE, pDock->bDirectionUp);
 			icon->fWidth *= pDock->fRatio;
 			icon->fHeight *= pDock->fRatio;
 			cairo_destroy (pCairoContext);
-			cairo_dock_redraw_my_icon (icon, CAIRO_DOCK_CONTAINER (pDock));
+			cairo_dock_redraw_my_icon (icon, CAIRO_CONTAINER (pDock));
 		}
 	}
 	else if (aProperty == s_aWmHints)
@@ -503,7 +502,7 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 				{
 					cd_message ("%s vous interpelle !", icon->acName);
 					if (g_bDemandsAttentionWithDialog)
-						cairo_dock_show_temporary_dialog (icon->acName, icon, CAIRO_DOCK_CONTAINER (pDock), 2000);
+						cairo_dock_show_temporary_dialog (icon->acName, icon, CAIRO_CONTAINER (pDock), 2000);
 					if (g_bDemandsAttentionWithAnimation)
 					{
 						cairo_dock_arm_animation (icon, -1, 1e6);  // animation sans fin.
@@ -526,14 +525,14 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 				//g_print ("%s change son icone\n", icon->acName);
 				if (cairo_dock_class_is_using_xicon (icon->cClass) || ! g_bOverWriteXIcons)
 				{
-					pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
+					pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 					icon->fWidth /= pDock->fRatio;
 					icon->fHeight /= pDock->fRatio;
-					cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
+					cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE, pDock->bDirectionUp);
 					icon->fWidth *= pDock->fRatio;
 					icon->fHeight *= pDock->fRatio;
 					cairo_destroy (pCairoContext);
-					cairo_dock_redraw_my_icon (icon, CAIRO_DOCK_CONTAINER (pDock));
+					cairo_dock_redraw_my_icon (icon, CAIRO_CONTAINER (pDock));
 				}
 			}
 		}

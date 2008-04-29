@@ -60,7 +60,7 @@ void cairo_dock_remove_renderer (gchar *cRendererName)
 }
 
 
-CairoDockDeskletRenderer *cairo_dock_get_desklet_renderer (gchar *cRendererName)
+CairoDeskletRenderer *cairo_dock_get_desklet_renderer (gchar *cRendererName)
 {
 	if (cRendererName != NULL)
 		return g_hash_table_lookup (s_hDeskletRendererTable, cRendererName);
@@ -68,7 +68,7 @@ CairoDockDeskletRenderer *cairo_dock_get_desklet_renderer (gchar *cRendererName)
 		return NULL;
 }
 
-void cairo_dock_register_desklet_renderer (gchar *cRendererName, CairoDockDeskletRenderer *pRenderer)
+void cairo_dock_register_desklet_renderer (gchar *cRendererName, CairoDeskletRenderer *pRenderer)
 {
 	cd_message ("%s (%s)", __func__, cRendererName);
 	g_hash_table_insert (s_hDeskletRendererTable, g_strdup (cRendererName), pRenderer);
@@ -123,7 +123,7 @@ void cairo_dock_set_default_renderer (CairoDock *pDock)
 }
 
 
-void cairo_dock_set_desklet_renderer (CairoDockDesklet *pDesklet, CairoDockDeskletRenderer *pRenderer, cairo_t *pSourceContext, gboolean bLoadIcons, gpointer *pConfig)
+void cairo_dock_set_desklet_renderer (CairoDesklet *pDesklet, CairoDeskletRenderer *pRenderer, cairo_t *pSourceContext, gboolean bLoadIcons, gpointer *pConfig)
 {
 	g_return_if_fail (pDesklet != NULL);
 	cd_message ("%s (%x)", __func__, pRenderer);
@@ -138,7 +138,7 @@ void cairo_dock_set_desklet_renderer (CairoDockDesklet *pDesklet, CairoDockDeskl
 	
 	if (pRenderer != NULL)
 	{
-		cairo_t *pCairoContext = (pSourceContext != NULL ? pSourceContext : cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDesklet)));
+		cairo_t *pCairoContext = (pSourceContext != NULL ? pSourceContext : cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDesklet)));
 		
 		if (pRenderer->configure != NULL)
 			pDesklet->pRendererData = pRenderer->configure (pDesklet, pCairoContext, pConfig);
@@ -154,12 +154,12 @@ void cairo_dock_set_desklet_renderer (CairoDockDesklet *pDesklet, CairoDockDeskl
 	}
 }
 
-void cairo_dock_set_desklet_renderer_by_name (CairoDockDesklet *pDesklet, gchar *cRendererName, cairo_t *pSourceContext, gboolean bLoadIcons, gpointer *pConfig)
+void cairo_dock_set_desklet_renderer_by_name (CairoDesklet *pDesklet, gchar *cRendererName, cairo_t *pSourceContext, gboolean bLoadIcons, gpointer *pConfig)
 {
 	cd_message ("%s (%s, %d)", __func__, cRendererName, bLoadIcons);
-	CairoDockDeskletRenderer *pRenderer = (cRendererName != NULL ? cairo_dock_get_desklet_renderer (cRendererName) : NULL);
+	CairoDeskletRenderer *pRenderer = (cRendererName != NULL ? cairo_dock_get_desklet_renderer (cRendererName) : NULL);
 	
-	cairo_t *pCairoContext = (pSourceContext != NULL ? pSourceContext : cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDesklet)));
+	cairo_t *pCairoContext = (pSourceContext != NULL ? pSourceContext : cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDesklet)));
 	
 	cairo_dock_set_desklet_renderer (pDesklet, pRenderer, pCairoContext, bLoadIcons, pConfig);
 	

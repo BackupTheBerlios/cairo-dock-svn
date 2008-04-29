@@ -41,7 +41,7 @@ extern double g_fStringColor[4];
 extern double g_fReflectSize;
 
 extern gboolean g_bRoundedBottomCorner;
-extern gboolean g_bDirectionUp;
+extern gboolean bDirectionUp;
 extern double g_fStripesSpeedFactor;
 extern double g_fBackgroundImageWidth, g_fBackgroundImageHeight;
 extern cairo_surface_t *g_pBackgroundSurface[2];
@@ -82,7 +82,7 @@ void cairo_dock_set_colormap_for_window (GtkWidget *pWidget)
 	gtk_widget_set_colormap (pWidget, pColormap);
 }
 
-void cairo_dock_set_colormap (CairoDockContainer *pContainer)
+void cairo_dock_set_colormap (CairoContainer *pContainer)
 {
 	//g_print ("%s f%d)\n", __func__, g_bUseGlitz);
 	GdkColormap* pColormap;
@@ -179,7 +179,7 @@ double cairo_dock_get_current_dock_width_linear (CairoDock *pDock)
 		*fHeight = MAX (pFirstIcon->fY + pFirstIcon->fHeight * pFirstIcon->fScale - pLastIcon->fY, pLastIcon->fHeight * pLastIcon->fScale);
 }*/
 
-cairo_t * cairo_dock_create_context_from_window (CairoDockContainer *pContainer)
+cairo_t * cairo_dock_create_context_from_window (CairoContainer *pContainer)
 {
 #ifdef HAVE_GLITZ
 	if (pContainer->pGlitzDrawable)
@@ -356,17 +356,17 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 
 		if (k > 0)
 		{
-			double fPossibleDeltaY = MIN (100, (g_bDirectionUp ? icon->fDrawY : pDock->iCurrentHeight - (icon->fDrawY + icon->fHeight * icon->fScale)));  // on borne a 100 pixels pour les rendus qui ont des fenetres grandes..
+			double fPossibleDeltaY = MIN (100, (pDock->bDirectionUp ? icon->fDrawY : pDock->iCurrentHeight - (icon->fDrawY + icon->fHeight * icon->fScale)));  // on borne a 100 pixels pour les rendus qui ont des fenetres grandes..
 
-			icon->fDeltaYReflection = (g_bDirectionUp ? -1. : 1.) * k / (n/2) * fPossibleDeltaY * (2 - 1.*k/(n/2));
+			icon->fDeltaYReflection = (pDock->bDirectionUp ? -1. : 1.) * k / (n/2) * fPossibleDeltaY * (2 - 1.*k/(n/2));
 			icon->fDrawY += icon->fDeltaYReflection;
 			icon->fDeltaYReflection *= 1.25;  // le reflet "rebondira" de 25% de la hauteur au sol.
-			//g_print ("%d) + %.2f (%d)\n", icon->iCount, (g_bDirectionUp ? -1. : 1.) * k / (n/2) * fPossibleDeltaY * (2 - 1.*k/(n/2)), k);
+			//g_print ("%d) + %.2f (%d)\n", icon->iCount, (pDock->bDirectionUp ? -1. : 1.) * k / (n/2) * fPossibleDeltaY * (2 - 1.*k/(n/2)), k);
 		}
 		else  // on commence par s'aplatir.
 		{
 			icon->fHeightFactor *= 1.*(2 - 1.5*k) / 10;
-			icon->fDeltaYReflection = (g_bDirectionUp ? 1 : -1) * (1 - icon->fHeightFactor) / 2 * icon->fHeight * icon->fScale;
+			icon->fDeltaYReflection = (pDock->bDirectionUp ? 1 : -1) * (1 - icon->fHeightFactor) / 2 * icon->fHeight * icon->fScale;
 			icon->fDrawY += icon->fDeltaYReflection;
 			//g_print ("%d) * %.2f (%d)\n", icon->iCount, icon->fHeightFactor, k);
 		}
@@ -483,7 +483,7 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 }
 
 
-void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect, gboolean bUseText, int iWidth)
+void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, double fDockMagnitude, gboolean bUseReflect, gboolean bUseText, int iWidth, gboolean bDirectionUp)
 {
 	//\_____________________ On separe 2 cas : dessin avec le tampon complet, et dessin avec le ou les petits tampons.
 	if (CAIRO_DOCK_IS_APPLI (icon) && g_fVisibleAppliAlpha != 0 && ! CAIRO_DOCK_IS_APPLET (icon))
@@ -507,22 +507,22 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			{
 				cairo_translate (pCairoContext,
 					icon->fDrawX + (icon->fWidth - g_fIndicatorWidth * fRatio) * icon->fWidthFactor * icon->fScale / 2,
-					icon->fDrawY + (g_bDirectionUp ? 
+					icon->fDrawY + (bDirectionUp ? 
 						(icon->fHeight - (g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * fRatio) * icon->fScale :
 						(g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * icon->fScale * fRatio));
 				cairo_scale (pCairoContext,
 					fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude),
-					fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude) * (g_bDirectionUp ? 1 : -1));
+					fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude) * (bDirectionUp ? 1 : -1));
 			}
 			else
 			{
 				cairo_translate (pCairoContext,
-					icon->fDrawY + (g_bDirectionUp ? 
+					icon->fDrawY + (bDirectionUp ? 
 						(icon->fHeight - (g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * fRatio) * icon->fScale : 
 						(g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * icon->fScale * fRatio),
 						icon->fDrawX + (icon->fWidth - g_fIndicatorWidth * fRatio) * icon->fWidthFactor * icon->fScale / 2);
 				cairo_scale (pCairoContext,
-					fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude) * (g_bDirectionUp ? 1 : -1),
+					fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude) * (bDirectionUp ? 1 : -1),
 					fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude));
 			}
 		}
@@ -532,14 +532,14 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			{
 				cairo_translate (pCairoContext,
 					icon->fX + (icon->fWidth * icon->fScale - g_fIndicatorWidth * fRatio) / 2,
-					icon->fY + (g_bDirectionUp ? 
+					icon->fY + (bDirectionUp ? 
 						(icon->fHeight * icon->fScale - (g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * fRatio) :
 						(g_fIndicatorHeight * icon->fScale - g_iIndicatorDeltaY) * fRatio));
 			}
 			else
 			{
 				cairo_translate (pCairoContext,
-					icon->fY + (g_bDirectionUp ? 
+					icon->fY + (bDirectionUp ? 
 						(icon->fHeight - (g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * fRatio) * icon->fScale : 
 						(g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * icon->fScale * fRatio),
 						icon->fX + (icon->fWidth * icon->fScale - g_fIndicatorWidth * fRatio) / 2);
@@ -590,11 +590,11 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	{
 		cairo_translate (pCairoContext, icon->fDrawX, icon->fDrawY);
 		cairo_save (pCairoContext);
-		if (bDrawFullBuffer && ! g_bDirectionUp)
+		if (bDrawFullBuffer && ! bDirectionUp)
 			cairo_translate (pCairoContext, 0, - g_fReflectSize * icon->fScale);
 		if (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (icon))
 		{
-			cairo_translate (pCairoContext, 1 * icon->fWidthFactor * icon->fWidth * (icon->fScale - 1) / 2, (g_bDirectionUp ? 1 * icon->fHeightFactor * icon->fHeight * (icon->fScale - 1) : 0));
+			cairo_translate (pCairoContext, 1 * icon->fWidthFactor * icon->fWidth * (icon->fScale - 1) / 2, (bDirectionUp ? 1 * icon->fHeightFactor * icon->fHeight * (icon->fScale - 1) : 0));
 			cairo_scale (pCairoContext, fRatio * icon->fWidthFactor / (1 + g_fAmplitude), fRatio * icon->fHeightFactor / (1 + g_fAmplitude));
 		}
 		else
@@ -608,11 +608,11 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	{
 		cairo_translate (pCairoContext, icon->fDrawY, icon->fDrawX);
 		cairo_save (pCairoContext);
-		if (bDrawFullBuffer && ! g_bDirectionUp)
+		if (bDrawFullBuffer && ! bDirectionUp)
 			cairo_translate (pCairoContext, - g_fReflectSize * icon->fScale, 0);
 		if (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (icon))
 		{
-			cairo_translate (pCairoContext, 1 * icon->fHeightFactor * icon->fHeight * (icon->fScale - 1) / 2, (g_bDirectionUp ? 1 * icon->fWidthFactor * icon->fWidth * (icon->fScale - 1) : 0));
+			cairo_translate (pCairoContext, 1 * icon->fHeightFactor * icon->fHeight * (icon->fScale - 1) / 2, (bDirectionUp ? 1 * icon->fWidthFactor * icon->fWidth * (icon->fScale - 1) : 0));
 			cairo_scale (pCairoContext, fRatio * icon->fHeightFactor / (1 + g_fAmplitude), fRatio * icon->fWidthFactor / (1 + g_fAmplitude));
 		}
 		else
@@ -667,12 +667,12 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			cairo_save (pCairoContext);
 			if (bHorizontalDock)
 			{
-				cairo_translate (pCairoContext, 0, - icon->fDeltaYReflection + (g_bDirectionUp ? icon->fHeight * icon->fScale : - g_fReflectSize * icon->fScale));
+				cairo_translate (pCairoContext, 0, - icon->fDeltaYReflection + (bDirectionUp ? icon->fHeight * icon->fScale : - g_fReflectSize * icon->fScale));
 				cairo_scale (pCairoContext, fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude));
 			}
 			else
 			{
-				cairo_translate (pCairoContext, - icon->fDeltaYReflection + (g_bDirectionUp ? icon->fHeight * icon->fScale : - g_fReflectSize * icon->fScale), 0);
+				cairo_translate (pCairoContext, - icon->fDeltaYReflection + (bDirectionUp ? icon->fHeight * icon->fScale : - g_fReflectSize * icon->fScale), 0);
 				cairo_scale (pCairoContext, fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude));
 			}
 			
@@ -713,13 +713,13 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 						0.,
 						0.,
 						0.,
-						(g_bDirectionUp ? 1. : 1 - (icon->fScale - 1) / g_fAmplitude));  // astuce pour ne pas avoir a re-creer la surface de la reflection.
+						(bDirectionUp ? 1. : 1 - (icon->fScale - 1) / g_fAmplitude));  // astuce pour ne pas avoir a re-creer la surface de la reflection.
 					cairo_pattern_add_color_stop_rgba (pGradationPattern,
 						1.,
 						0.,
 						0.,
 						0.,
-						(g_bDirectionUp ? 1 - (icon->fScale - 1) / g_fAmplitude : 1.));
+						(bDirectionUp ? 1 - (icon->fScale - 1) / g_fAmplitude : 1.));
 				}
 				else  // ca buggue a gauche...
 				{
@@ -735,13 +735,13 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 						0.,
 						0.,
 						0.,
-						(g_bDirectionUp ? 1. : 1 - (icon->fScale - 1) / g_fAmplitude));  // astuce pour ne pas avoir a re-creer la surface de la reflection.
+						(bDirectionUp ? 1. : 1 - (icon->fScale - 1) / g_fAmplitude));  // astuce pour ne pas avoir a re-creer la surface de la reflection.
 					cairo_pattern_add_color_stop_rgba (pGradationPattern,
 						1.,
 						0.,
 						0.,
 						0.,
-						(g_bDirectionUp ? 1 - (icon->fScale - 1) / g_fAmplitude : 1.));
+						(bDirectionUp ? 1 - (icon->fScale - 1) / g_fAmplitude : 1.));
 				}
 				cairo_save (pCairoContext);
 				cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
@@ -802,11 +802,11 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			cairo_set_source_surface (pCairoContext,
 				icon->pTextBuffer,
 				fOffsetX,
-				g_bDirectionUp ? -g_iLabelSize : icon->fHeight * icon->fScale - icon->fTextYOffset);
+				bDirectionUp ? -g_iLabelSize : icon->fHeight * icon->fScale - icon->fTextYOffset);
 		else
 			cairo_set_source_surface (pCairoContext,
 				icon->pTextBuffer,
-				g_bDirectionUp ? -g_iLabelSize : icon->fHeight * icon->fScale - icon->fTextYOffset,
+				bDirectionUp ? -g_iLabelSize : icon->fHeight * icon->fScale - icon->fTextYOffset,
 				fOffsetX);
 		
 		double fMagnitude;
@@ -864,7 +864,7 @@ void cairo_dock_render_one_icon_in_desklet (Icon *icon, cairo_t *pCairoContext, 
 	//g_print ("%s (%.2f;%.2f x %.2f)\n", __func__, icon->fDrawX, icon->fDrawY, icon->fScale);
 	cairo_translate (pCairoContext, icon->fDrawX, icon->fDrawY);
 	cairo_save (pCairoContext);
-	/**if (bDrawFullBuffer&& ! g_bDirectionUp)
+	/**if (bDrawFullBuffer&& ! pDock->bDirectionUp)
 		cairo_translate (pCairoContext, 0, - g_fReflectSize * icon->fScale);*/
 	if (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (icon))
 	{
@@ -1141,7 +1141,7 @@ void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, d
 		icon = ic->data;
 
 		cairo_save (pCairoContext);
-		cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect, TRUE, pDock->iCurrentWidth);
+		cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect, TRUE, pDock->iCurrentWidth, pDock->bDirectionUp);
 		cairo_restore (pCairoContext);
 
 		ic = cairo_dock_get_next_element (ic, pDock->icons);
@@ -1153,7 +1153,7 @@ void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, d
 void cairo_dock_render_background (CairoDock *pDock)
 {
 	//g_print ("%s (%.2f)\n", __func__, g_fVisibleZoneAlpha);
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
@@ -1181,7 +1181,7 @@ void cairo_dock_render_background (CairoDock *pDock)
 void cairo_dock_render_blank (CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_DOCK_CONTAINER (pDock));
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
@@ -1196,17 +1196,18 @@ void cairo_dock_render_blank (CairoDock *pDock)
 }
 
 
-void cairo_dock_redraw_my_icon (Icon *icon, CairoDockContainer *pContainer)
+void cairo_dock_redraw_my_icon (Icon *icon, CairoContainer *pContainer)
 {
 	g_return_if_fail (icon != NULL && pContainer != NULL);
 	double fReflectSize = 0;
-	gboolean bHorizontal = TRUE;
+	gboolean bHorizontal = TRUE, bDirectionUp = TRUE;
 	if (CAIRO_DOCK_IS_DOCK (pContainer))
 	{
-		CairoDock *pDock = CAIRO_DOCK_DOCK (pContainer);
+		CairoDock *pDock = CAIRO_DOCK (pContainer);
 		if (pDock->bUseReflect)
 			fReflectSize = g_fReflectSize;
 		bHorizontal = pDock->bHorizontalDock;
+		bDirectionUp = pDock->bDirectionUp;
 		if (pDock->bAtBottom && (pDock->iRefCount > 0 || g_bAutoHide))  // inutile de redessiner.
 			return ;
 	}
@@ -1214,12 +1215,12 @@ void cairo_dock_redraw_my_icon (Icon *icon, CairoDockContainer *pContainer)
 		return ;
 	
 	GdkRectangle rect = {(int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor)),
-		(int) icon->fDrawY - (! g_bDirectionUp ? fReflectSize : 0),
+		(int) icon->fDrawY - (! bDirectionUp ? fReflectSize : 0),
 		(int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)) - 1,
 		(int) icon->fHeight * icon->fScale + fReflectSize};
 	if (! bHorizontal)
 	{
-		rect.x = (int) icon->fDrawY - (! g_bDirectionUp ? fReflectSize : 0),
+		rect.x = (int) icon->fDrawY - (! bDirectionUp ? fReflectSize : 0),
 		rect.y = (int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor));
 		rect.width = (int) icon->fHeight * icon->fScale + fReflectSize;
 		rect.height = (int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)) - 1;
@@ -1241,7 +1242,7 @@ void cairo_dock_redraw_my_icon (Icon *icon, CairoDockContainer *pContainer)
 void cairo_dock_set_window_position_at_balance (CairoDock *pDock, int iNewWidth, int iNewHeight)
 {
 	pDock->iWindowPositionX = (g_iScreenWidth[pDock->bHorizontalDock] - iNewWidth) * pDock->fAlign + pDock->iGapX;
-	pDock->iWindowPositionY = (g_bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - iNewHeight - pDock->iGapY : pDock->iGapY);
+	pDock->iWindowPositionY = (pDock->bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - iNewHeight - pDock->iGapY : pDock->iGapY);
 	//g_print ("pDock->iGapX : %d => iWindowPositionX <- %d\n", pDock->iGapX, pDock->iWindowPositionX);
 	//g_print ("iNewHeight : %d -> pDock->iWindowPositionY <- %d\n", iNewHeight, pDock->iWindowPositionY);
 
