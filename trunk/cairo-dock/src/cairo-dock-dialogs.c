@@ -1296,7 +1296,7 @@ int cairo_dock_show_dialog_and_wait (const gchar *cText, Icon *pIcon, CairoConta
 		GDK_THREADS_LEAVE ();
 		g_main_loop_run (pBlockingLoop);
 		GDK_THREADS_ENTER ();
-		//g_print ("fin de boucle bloquante -> %s\n", cAnswer);
+		//g_print ("fin de boucle bloquante -> %d\n", iAnswer);
 	}
 
 	g_main_loop_unref (pBlockingLoop);
