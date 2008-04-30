@@ -2,7 +2,6 @@ launchersdir = $(pkgdatadir)/_Wood_/launchers
 
 launchers_DATA = \
 	01brasero.desktop\
-	01file-launcher.desktop\
 	01sound-juicer.desktop\
 	01synaptic.desktop\
 	01nautilus.desktop\
