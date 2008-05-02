@@ -202,7 +202,8 @@ cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo
 	cairo_set_source_surface (pCairoContext, surface_ini, 0, 0);
 	cairo_paint (pCairoContext);
 	cairo_surface_destroy (surface_ini);
-
+	cairo_destroy (pCairoContext);
+	
 	if (pPixbufWithAlpha != pixbuf)
 		g_object_unref (pPixbufWithAlpha);
 	return pNewSurface;
@@ -227,15 +228,16 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 	FILE *fd = fopen (cImagePath, "r");
 	if (fd != NULL)
 	{
-		char buffer[6];
+		char buffer[7];
 		if (fgets (buffer, 5, fd) != NULL)
 		{
-			if (strncmp (buffer+2, "SVG", 3) == 0)
+			if (strncmp (buffer+2, "xml", 3) == 0)
 				bIsSVG = TRUE;
 			else if (strncmp (buffer+1, "PNG", 3) == 0)
 				bIsPNG = TRUE;
-			else if (strncmp (buffer+2, "XPM", 3) == 0)
+			else if (strncmp (buffer+3, "XPM", 3) == 0)
 				bIsXPM = TRUE;
+			cd_debug ("  format : %d;%d;%d\n", bIsSVG, bIsPNG, bIsXPM);
 		}
 		fclose (fd);
 	}
@@ -248,6 +250,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 			bIsPNG = TRUE;
 	}
 	
+	bIsPNG = FALSE;  /// libcairo 1.6 est bugguee !!!...
 	if (bIsSVG)
 	{
 		rsvg_handle = rsvg_handle_new_from_file (cImagePath, &erreur);
@@ -298,7 +301,8 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 	else if (bIsPNG)
 	{
 		surface_ini = cairo_image_surface_create_from_png (cImagePath);
-		if (cairo_surface_status (surface_ini) == CAIRO_STATUS_SUCCESS)
+		pNewSurface = surface_ini;
+		if (cairo_surface_status (surface_ini) != CAIRO_STATUS_SUCCESS)
 		{
 			*fImageWidth = (double) cairo_image_surface_get_width (surface_ini);
 			*fImageHeight = (double) cairo_image_surface_get_height (surface_ini);
@@ -344,7 +348,6 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 			g_error_free (erreur);
 			return NULL;
 		}
-
 		pNewSurface = cairo_dock_create_surface_from_pixbuf (pixbuf,
 			pSourceContext,
 			fMaxScale,
@@ -353,6 +356,8 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 			FALSE,
 			fImageWidth,
 			fImageHeight);
+		g_object_unref (pixbuf);
+		
 	}
 	cairo_destroy (pCairoContext);
 	
