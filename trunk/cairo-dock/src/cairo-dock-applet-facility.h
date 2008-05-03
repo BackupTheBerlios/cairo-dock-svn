@@ -24,7 +24,7 @@ void cairo_dock_free_minimal_config (CairoDockMinimalAppletConfig *pMinimalConfi
 
 /**
 *Applique une surface sur un contexte, en effacant tout au prealable, et en appliquant un facteur de zoom et de transparence.
-*@param pIconContext le contexte du dessin; est modifie par la fonction.
+*@param pIconContext le contexte du dessin; n'est pas altere par la fonction.
 *@param pSurface la surface a appliquer.
 *@param fScale le zoom.
 *@param fAlpha la transparence.
@@ -40,7 +40,7 @@ void cairo_dock_set_icon_surface_full (cairo_t *pIconContext, cairo_surface_t *p
 #define cairo_dock_set_icon_surface(pIconContext, pSurface) cairo_dock_set_icon_surface_full (pIconContext, pSurface, 1, 1, NULL, NULL)
 /**
 *Dessine une barre degradee rouge->vert representant une valeur donnee a la base de l'icone.
-*@param pIconContext le contexte du dessin; est modifie par la fonction.
+*@param pIconContext le contexte du dessin; n'est pas altere par la fonction.
 *@param fValue la valeur representant un pourcentage, <=1.
 *@param pIcon l'icone.
 *@param pContainer le container de l'icone.
@@ -49,7 +49,7 @@ void cairo_dock_draw_bar_on_icon (cairo_t *pIconContext, double fValue, Icon *pI
 
 /**
 *Cree les surfaces de reflection d'une icone.
-*@param pIconContext le contexte de dessin lie a la surface de l'icone; est modifie par la fonction.
+*@param pIconContext le contexte de dessin lie a la surface de l'icone; n'est pas altere par la fonction.
 *@param pIcon l'icone.
 *@param pContainer le container de l'icone.
 */

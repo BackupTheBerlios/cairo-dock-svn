@@ -80,7 +80,7 @@ void cairo_dock_free_minimal_config (CairoDockMinimalAppletConfig *pMinimalConfi
 void cairo_dock_set_icon_surface_full (cairo_t *pIconContext, cairo_surface_t *pSurface, double fScale, double fAlpha, Icon *pIcon, CairoContainer *pContainer)
 {
 	g_return_if_fail (cairo_status (pIconContext) == CAIRO_STATUS_SUCCESS);
-
+	
 	//\________________ On efface l'ancienne image.
 	cairo_set_source_rgba (pIconContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pIconContext, CAIRO_OPERATOR_SOURCE);
@@ -90,9 +90,10 @@ void cairo_dock_set_icon_surface_full (cairo_t *pIconContext, cairo_surface_t *p
 	//\________________ On applique la nouvelle image.
 	if (pSurface != NULL && fScale > 0)
 	{
+		cairo_save (pIconContext);
 		if (fScale != 1 && pIcon != NULL)
 		{
-			double fMaxScale = (CAIRO_DOCK_IS_DOCK (pContainer) ? (1 + g_fAmplitude) / CAIRO_DOCK (pContainer)->fRatio : 1);
+			double fMaxScale = cairo_dock_get_max_scale (pContainer);
 			cairo_translate (pIconContext, pIcon->fWidth * fMaxScale / 2 * (1 - fScale) , pIcon->fHeight * fMaxScale / 2 * (1 - fScale));
 			cairo_scale (pIconContext, fScale, fScale);
 		}
@@ -107,6 +108,7 @@ void cairo_dock_set_icon_surface_full (cairo_t *pIconContext, cairo_surface_t *p
 			cairo_paint_with_alpha (pIconContext, fAlpha);
 		else
 			cairo_paint (pIconContext);
+		cairo_restore (pIconContext);
 	}
 }
 
@@ -187,6 +189,7 @@ void cairo_dock_draw_bar_on_icon (cairo_t *pIconContext, double fValue, Icon *pI
 		0.,
 		1.);
 	
+	cairo_save (pIconContext);
 	cairo_set_operator (pIconContext, CAIRO_OPERATOR_OVER);
 	
 	cairo_set_line_width (pIconContext, 6);
@@ -199,6 +202,7 @@ void cairo_dock_draw_bar_on_icon (cairo_t *pIconContext, double fValue, Icon *pI
 	cairo_stroke (pIconContext);
 	
 	cairo_pattern_destroy (pGradationPattern);
+	cairo_restore (pIconContext);
 }
 
 
