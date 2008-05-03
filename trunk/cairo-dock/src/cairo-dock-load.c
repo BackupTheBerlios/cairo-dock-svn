@@ -395,11 +395,12 @@ void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoContainer *pContai
 
 void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpointer data)
 {
-	cd_message ("%s (%s)", __func__, cDockName);
+	gboolean bReloadAppletsToo = GPOINTER_TO_INT (data);
+	cd_message ("%s (%s, %d)", __func__, cDockName, bReloadAppletsToo);
 	if (pDock->iRefCount > 0)
 		pDock->bHorizontalDock = (g_bSameHorizontality ? g_pMainDock->bHorizontalDock : ! g_pMainDock->bHorizontalDock);
-	else
-		pDock->bHorizontalDock = g_pMainDock->bHorizontalDock;
+	//else
+	//	pDock->bHorizontalDock = g_pMainDock->bHorizontalDock;
 
 	double fFlatDockWidth = - g_iIconGap;
 	pDock->iMaxIconHeight = 0;
@@ -413,18 +414,21 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
-		icon->fWidth /= pDock->fRatio;
-		icon->fHeight /= pDock->fRatio;
 		
-		/*if (CAIRO_DOCK_IS_APPLET (icon))
-			cairo_dock_reload_module (icon->pModule, FALSE);
-		else*/
-		if (! CAIRO_DOCK_IS_APPLET (icon))
+		if (CAIRO_DOCK_IS_APPLET (icon))
+		{
+			if (bReloadAppletsToo)
+				cairo_dock_reload_module (icon->pModule, FALSE);
+		}
+		else
+		{
+			icon->fWidth /= pDock->fRatio;
+			icon->fHeight /= pDock->fRatio;
 			cairo_dock_fill_icon_buffers_for_dock (icon, pCairoContext, pDock);
-			///cairo_dock_fill_icon_buffers (icon, pCairoContext, fMaxScale, pDock->bHorizontalDock, TRUE, pDock->bDirectionUp);
-
-		icon->fWidth *= pDock->fRatio;
-		icon->fHeight *= pDock->fRatio;
+			icon->fWidth *= pDock->fRatio;
+			icon->fHeight *= pDock->fRatio;
+		}
+		
 		//g_print (" =size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
 		fFlatDockWidth += g_iIconGap + icon->fWidth;
 		pDock->iMaxIconHeight = MAX (pDock->iMaxIconHeight, icon->fHeight);

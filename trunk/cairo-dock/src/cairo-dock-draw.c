@@ -23,10 +23,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-callbacks.h"
 #include "cairo-dock-animations.h"
-#include "cairo-dock-draw.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-dock-manager.h"
+#include "cairo-dock-draw.h"
 
-extern gboolean g_bAutoHide;
 extern gboolean g_bTextAlwaysHorizontal;
 
 extern gint g_iScreenWidth[2];
@@ -1208,7 +1208,7 @@ void cairo_dock_redraw_my_icon (Icon *icon, CairoContainer *pContainer)
 			fReflectSize = g_fReflectSize;
 		bHorizontal = pDock->bHorizontalDock;
 		bDirectionUp = pDock->bDirectionUp;
-		if (pDock->bAtBottom && (pDock->iRefCount > 0 || g_bAutoHide))  // inutile de redessiner.
+		if (pDock->bAtBottom && (pDock->iRefCount > 0 || pDock->bAutoHide))  // inutile de redessiner.
 			return ;
 	}
 	else if (! GTK_WIDGET_VISIBLE (pContainer->pWidget))

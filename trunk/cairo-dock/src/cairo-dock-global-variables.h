@@ -47,8 +47,6 @@ extern gboolean g_bLabelForPointedIconOnly;
 
 /// TRUE ssi les coins du bas sont arrondis.
 extern gboolean g_bRoundedBottomCorner;
-/// TRUE si l'auto-hide est active.
-extern gboolean g_bAutoHide;
 
 /// Taille des reflets, en pixels, calcules par rapport a la hauteur max des icones.
 extern double g_fReflectSize;

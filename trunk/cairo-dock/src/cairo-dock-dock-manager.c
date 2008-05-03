@@ -260,7 +260,7 @@ gboolean cairo_dock_hide_child_docks (CairoDock *pDock)
 
 void cairo_dock_reload_buffers_in_all_docks (void)
 {
-	g_hash_table_foreach (s_hDocksTable, (GHFunc) cairo_dock_reload_buffers_in_dock, NULL);
+	g_hash_table_foreach (s_hDocksTable, (GHFunc) cairo_dock_reload_buffers_in_dock, GINT_TO_POINTER (FALSE));
 }
 
 void cairo_dock_rename_dock (const gchar *cDockName, CairoDock *pDock, const gchar *cNewName)
@@ -306,7 +306,7 @@ void cairo_dock_set_all_views_to_default (void)
 
 
 
-void cairo_dock_write_main_dock_gaps (CairoDock *pDock)
+void cairo_dock_write_root_dock_gaps (CairoDock *pDock)
 {
 	if (pDock->iRefCount > 0)
 		return;
@@ -319,20 +319,31 @@ void cairo_dock_write_main_dock_gaps (CairoDock *pDock)
 	{
 		const gchar *cDockName = cairo_dock_search_dock_name (pDock);
 		gchar *cConfFilePath = g_strdup_printf ("%s/%s.conf", g_cCurrentThemePath, cDockName);
+		if (! g_file_test (cConfFilePath, G_FILE_TEST_EXISTS))
+		{
+			gchar *cCommand = g_strdup_printf ("cp %s/%s %s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_MAIN_DOCK_CONF_FILE, cConfFilePath);
+			system (cCommand);
+			g_free (cCommand);
+		}
+		
 		cairo_dock_update_conf_file_with_position (cConfFilePath, pDock->iGapX, pDock->iGapY);
 		g_free (cConfFilePath);
 	}
 }
 
-void cairo_dock_get_main_dock_position (const gchar *cDockName, CairoDock *pDock)
+void cairo_dock_get_root_dock_position (const gchar *cDockName, CairoDock *pDock)
 {
 	g_return_if_fail (cDockName != NULL && pDock != NULL);
-	if (pDock->iRefCount > 0 || pDock->bIsMainDock)
+	if (pDock->iRefCount > 0)
 		return;
 	
 	gchar *cConfFilePath = (pDock->bIsMainDock ? g_cConfFile : g_strdup_printf ("%s/%s.conf", g_cCurrentThemePath, cDockName));
 	if (! g_file_test (cConfFilePath, G_FILE_TEST_EXISTS))
 	{
+		pDock->bHorizontalDock = g_pMainDock->bHorizontalDock;
+		pDock->bDirectionUp = g_pMainDock->bDirectionUp;
+		pDock->fAlign = g_pMainDock->fAlign;
+		
 		if (! pDock->bIsMainDock)
 			g_free (cConfFilePath);
 		return ;
@@ -352,12 +363,10 @@ void cairo_dock_get_main_dock_position (const gchar *cDockName, CairoDock *pDock
 		gboolean bFlushConfFileNeeded = FALSE;
 		pDock->iGapX = cairo_dock_get_integer_key_value (pKeyFile, "Position", "x gap", &bFlushConfFileNeeded, 0, NULL, NULL);
 		pDock->iGapY = cairo_dock_get_integer_key_value (pKeyFile, "Position", "y gap", &bFlushConfFileNeeded, 0, NULL, NULL);
-	
+		
 		CairoDockPositionType iScreenBorder = cairo_dock_get_integer_key_value (pKeyFile, "Position", "screen border", &bFlushConfFileNeeded, 0, NULL, NULL);
 		if (iScreenBorder < 0 || iScreenBorder >= CAIRO_DOCK_NB_POSITIONS)
 			iScreenBorder = 0;
-	
-		pDock->fAlign = cairo_dock_get_double_key_value (pKeyFile, "Position", "alignment", &bFlushConfFileNeeded, 0.5, NULL, NULL);
 		
 		switch (iScreenBorder)
 		{
@@ -379,6 +388,10 @@ void cairo_dock_get_main_dock_position (const gchar *cDockName, CairoDock *pDock
 			break;
 		}
 		
+		pDock->fAlign = cairo_dock_get_double_key_value (pKeyFile, "Position", "alignment", &bFlushConfFileNeeded, 0.5, NULL, NULL);
+		
+		pDock->bAutoHide = cairo_dock_get_boolean_key_value (pKeyFile, "Position", "auto-hide", &bFlushConfFileNeeded, FALSE, "Auto-Hide", "auto-hide");
+		
 		g_key_file_free (pKeyFile);
 	}
 	
@@ -386,7 +399,7 @@ void cairo_dock_get_main_dock_position (const gchar *cDockName, CairoDock *pDock
 		g_free (cConfFilePath);
 }
 
-void cairo_dock_remove_main_dock_config (const gchar *cDockName)
+void cairo_dock_remove_root_dock_config (const gchar *cDockName)
 {
 	gchar *cConfFilePath = g_strdup_printf ("%s/%s.conf", g_cCurrentThemePath, cDockName);
 	if (g_file_test (cConfFilePath, G_FILE_TEST_EXISTS))
@@ -394,4 +407,65 @@ void cairo_dock_remove_main_dock_config (const gchar *cDockName)
 		g_remove (cConfFilePath);
 	}
 	g_free (cConfFilePath);
+}
+
+
+static gboolean s_bTemporaryAutoHide = FALSE;
+static gboolean s_bEntranceDisabled = FALSE;
+
+static void _cairo_dock_quick_hide_one_root_dock (const gchar *cDockName, CairoDock *pDock, gpointer data)
+{
+	if (pDock->iRefCount == 0)
+	{
+		pDock->bAtBottom = FALSE;  // car on a deja quitte le dock lors de la fermeture du menu, donc le "leave-notify" serait ignore.
+		pDock->bAutoHideInitialValue = pDock->bAutoHide;
+		pDock->bAutoHide = TRUE;
+		pDock->bEntranceDisabled = TRUE;
+		cairo_dock_emit_leave_signal (pDock);
+	}
+}
+void cairo_dock_activate_temporary_auto_hide (void)
+{
+	if (! s_bTemporaryAutoHide)
+	{
+		s_bTemporaryAutoHide = TRUE;
+		g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_quick_hide_one_root_dock, NULL);
+	}
+}
+
+static void _cairo_dock_stop_quick_hide_one_root_dock (const gchar *cDockName, CairoDock *pDock, gpointer data)
+{
+	if (pDock->iRefCount == 0)
+	{
+		pDock->bAutoHide = pDock->bAutoHideInitialValue;
+		pDock->bAtBottom = TRUE;
+	}
+}
+void cairo_dock_deactivate_temporary_auto_hide (void)
+{
+	if (s_bTemporaryAutoHide)
+	{
+		s_bTemporaryAutoHide = FALSE;
+		g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_stop_quick_hide_one_root_dock, NULL);
+	}
+}
+
+void cairo_dock_allow_entrance (void)
+{
+	s_bEntranceDisabled = FALSE;
+}
+
+void cairo_dock_disable_entrance (void)
+{
+	s_bEntranceDisabled = TRUE;
+}
+
+gboolean cairo_dock_entrance_is_allowed (void)
+{
+	return (! s_bEntranceDisabled);
+}
+
+gboolean cairo_dock_quick_hide_is_activated (void)
+{
+	return s_bTemporaryAutoHide;
 }

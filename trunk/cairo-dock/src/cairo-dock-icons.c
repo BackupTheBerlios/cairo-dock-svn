@@ -58,7 +58,6 @@ extern double g_fAmplitude;
 extern int g_iSinusoidWidth;
 
 extern double g_fUnfoldAcceleration;
-extern gboolean g_bAutoHide;
 
 extern gboolean g_bUniquePid;
 
@@ -1148,7 +1147,7 @@ void cairo_dock_manage_mouse_position (CairoDock *pDock, CairoDockMousePositionT
 			{
 				cd_debug ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone  ne soit animee");
 				//pDock->bInside = TRUE;
-				if ((pDock->bAtBottom && pDock->iRefCount == 0 && ! g_bAutoHide) || (pDock->iCurrentWidth != pDock->iMaxDockWidth || pDock->iCurrentHeight != pDock->iMaxDockHeight))  // on le fait pas avec l'auto-hide, car un signal d'entree est deja emis a cause des mouvements/redimensionnements de la fenetre, et en rajouter un ici fout le boxon.
+				if ((pDock->bAtBottom && pDock->iRefCount == 0 && ! pDock->bAutoHide) || (pDock->iCurrentWidth != pDock->iMaxDockWidth || pDock->iCurrentHeight != pDock->iMaxDockHeight))  // on le fait pas avec l'auto-hide, car un signal d'entree est deja emis a cause des mouvements/redimensionnements de la fenetre, et en rajouter un ici fout le boxon.
 				{
 					cd_debug ("  on emule une re-rentree (pDock->iMagnitudeIndex:%f)", pDock->iMagnitudeIndex);
 					///cairo_dock_render_blank (pDock);  // utile ?
@@ -1170,7 +1169,7 @@ void cairo_dock_manage_mouse_position (CairoDock *pDock, CairoDockMousePositionT
 					}
 					if (pDock->iSidGrowUp == 0)
 						pDock->iSidGrowUp = g_timeout_add (40, (GSourceFunc) cairo_dock_grow_up, pDock);
-					if (g_bAutoHide && pDock->iRefCount == 0 && pDock->iSidMoveUp == 0)
+					if (pDock->bAutoHide && pDock->iRefCount == 0 && pDock->iSidMoveUp == 0)
 						pDock->iSidMoveUp = g_timeout_add (40, (GSourceFunc) cairo_dock_move_up, pDock);
 				}
 			}

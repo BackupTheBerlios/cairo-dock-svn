@@ -61,7 +61,6 @@ extern double g_fAlbedo;
 extern gboolean g_bDynamicReflection;
 extern double g_fAlphaAtRest;
 
-extern gboolean g_bAutoHide;
 extern double g_fVisibleZoneAlpha;
 extern gboolean g_bSameHorizontality;
 extern double g_fSubDockSizeRatio;
@@ -638,8 +637,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_bReserveSpace = cairo_dock_get_boolean_key_value (pKeyFile, "Position", "reserve space", &bFlushConfFileNeeded, FALSE, NULL, NULL);
 
 	cairo_dock_deactivate_temporary_auto_hide ();
-	g_bAutoHide = cairo_dock_get_boolean_key_value (pKeyFile, "Position", "auto-hide", &bFlushConfFileNeeded, FALSE, "Auto-Hide", "auto-hide");
-
+	pDock->bAutoHide = cairo_dock_get_boolean_key_value (pKeyFile, "Position", "auto-hide", &bFlushConfFileNeeded, FALSE, "Auto-Hide", "auto-hide");
 
 	//\___________________ On recupere les parametres de la zone visible.
 	gchar *cVisibleZoneImageFile = cairo_dock_get_string_key_value (pKeyFile, "Background", "callback image", &bFlushConfFileNeeded, NULL, "Auto-Hide", "background image");
@@ -1180,7 +1178,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		cairo_dock_build_docks_tree_with_desktop_files (pDock, g_cCurrentLaunchersPath);
 	}
 	else
-		cairo_dock_reload_buffers_in_all_docks ();
+		cairo_dock_reload_buffers_in_all_docks ();  // tout sauf les applets, qui seront rechargees en bloc juste apres.
 
 
 	if (! cairo_dock_application_manager_is_running () && g_bShowAppli)  // maintenant on veut voir les applis !
@@ -1220,7 +1218,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 
 	if (pDock->bAtBottom)
 	{
-		cairo_dock_place_main_dock (pDock);
+		///cairo_dock_place_root_dock (pDock);
 	}
 
 	//\___________________ On ecrit si necessaire.

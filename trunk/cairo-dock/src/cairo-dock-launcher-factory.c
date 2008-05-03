@@ -310,6 +310,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		{
 			cairo_dock_reference_dock (pChildDock);
 			icon->pSubDock = pChildDock;
+			g_print ("bHorizontalDock : %d ; bDirectionUp : %d\n", pChildDock->bHorizontalDock, pChildDock->bDirectionUp);
 		}
 		if (cRendererName != NULL && icon->pSubDock != NULL)
 			cairo_dock_set_renderer (icon->pSubDock, cRendererName);
@@ -383,25 +384,18 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 Icon * cairo_dock_create_icon_from_desktop_file (const gchar *cDesktopFileName, cairo_t *pSourceContext)
 {
 	//g_print ("%s (%s)\n", __func__, cDesktopFileName);
-
+	
 	Icon *icon = g_new0 (Icon, 1);
 	cairo_dock_load_icon_info_from_desktop_file (cDesktopFileName, icon);
 	g_return_val_if_fail (icon->acDesktopFileName != NULL, NULL);
-
+	
 	CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 	if (pParentDock == NULL)
 	{
 		cd_message ("le dock parent (%s) n'existe pas, on le cree", icon->cParentDockName);
 		pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_DOCK, icon->cParentDockName, NULL);
 	}
-
-	/**cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pParentDock->bHorizontalDock, TRUE, pParentDock->bDirectionUp);
-	cairo_dock_fill_one_text_buffer (icon,
-		pSourceContext,
-		g_iLabelSize,
-		g_cLabelPolice,
-		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pParentDock->bHorizontalDock),
-		pParentDock->bDirectionUp);*/
+	
 	cairo_dock_fill_icon_buffers_for_dock (icon, pSourceContext, pParentDock)
 	
 	cd_message ("+ %s/%s", icon->acName, icon->cClass);

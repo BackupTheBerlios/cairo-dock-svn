@@ -49,7 +49,6 @@ extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
 
 extern gboolean g_bUseSeparator;
-extern gboolean g_bAutoHide;
 extern gchar *g_cConfFile;
 extern gchar *g_cEasyConfFile;
 extern gchar *g_cCurrentLaunchersPath;
@@ -171,7 +170,7 @@ static void _cairo_dock_quick_hide (GtkMenuItem *menu_item, gpointer *data)
 	CairoDock *pDock = data[1];
 	//g_print ("%s ()\n", __func__);
 	pDock->bMenuVisible = FALSE;
-	cairo_dock_activate_temporary_auto_hide (g_pMainDock);
+	cairo_dock_activate_temporary_auto_hide ();
 }
 
 static void _cairo_dock_quit (GtkMenuItem *menu_item, gpointer *data)
@@ -411,6 +410,8 @@ static void _cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	if (config_ok)
 	{
 		GError *erreur = NULL;
+		gchar *cPrevDockName = icon->cParentDockName;
+		icon->cParentDockName = NULL;  // astuce.
 		cairo_dock_detach_icon_from_dock (icon, pDock, TRUE);  // il va falloir la recreer, car tous ses parametres peuvent avoir change; neanmoins, on ne souhaite pas detruire son .desktop.
 
 		//\_____________ On recree l'icone de zero.
@@ -456,7 +457,7 @@ static void _cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 				cairo_dock_update_dock_size (pNewIcon->pSubDock);
 		}
 
-		cairo_dock_free_icon (icon);  // on ne le fait que maintenant pour plus de surete.
+		
 		cairo_destroy (pCairoContext);
 		pDock->calculate_icons (pDock);
 		gtk_widget_queue_draw (pDock->pWidget);
@@ -464,7 +465,15 @@ static void _cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 		{
 			pNewContainer->calculate_icons (pNewContainer);
 			gtk_widget_queue_draw (pNewContainer->pWidget);
+			
+			if (pDock->icons == NULL)
+			{
+				cd_message ("dock %s vide => a la poubelle", cPrevDockName);
+				cairo_dock_destroy_dock (pDock, cPrevDockName, NULL, NULL);
+			}
 		}
+		cairo_dock_free_icon (icon);
+		g_free (cPrevDockName);
 		cairo_dock_mark_theme_as_modified (TRUE);
 	}
 }
@@ -893,7 +902,7 @@ static void _cairo_dock_keep_on_widget_layer (GtkMenuItem *menu_item, gpointer *
 
 
 
-static void _cairo_dock_configure_main_dock_position (GtkMenuItem *menu_item, gpointer *data)
+static void _cairo_dock_configure_root_dock_position (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
 	CairoDock* pDock = data[1];
@@ -901,7 +910,7 @@ static void _cairo_dock_configure_main_dock_position (GtkMenuItem *menu_item, gp
 	
 	const gchar *cDockName = cairo_dock_search_dock_name (pDock);
 	g_return_if_fail (cDockName != NULL);
-	g_print ("%s (%s)\n", __func__, cDockName);
+	cd_message ("%s (%s)", __func__, cDockName);
 	
 	gchar *cConfFilePath = g_strdup_printf ("%s/%s.conf", g_cCurrentThemePath, cDockName);
 	if (! g_file_test (cConfFilePath, G_FILE_TEST_EXISTS))
@@ -917,8 +926,15 @@ static void _cairo_dock_configure_main_dock_position (GtkMenuItem *menu_item, gp
 	
 	if (config_ok)
 	{
-		cairo_dock_get_main_dock_position (cDockName, pDock);
-		cairo_dock_place_main_dock (pDock);
+		cairo_dock_get_root_dock_position (cDockName, pDock);
+		
+		cairo_dock_load_buffers_in_one_dock (pDock);  // recharge les icones et les applets.
+		
+		cairo_dock_update_dock_size (pDock);
+		pDock->calculate_icons (pDock);
+		
+		cairo_dock_place_root_dock (pDock);
+		gtk_widget_queue_draw (pDock->pWidget);
 	}
 	
 	g_free (cConfFilePath);
@@ -984,7 +1000,7 @@ GtkWidget *cairo_dock_build_menu (Icon *icon, CairoContainer *pContainer)
 
 	if (CAIRO_DOCK_IS_DOCK (pContainer) && ! CAIRO_DOCK (pContainer)->bIsMainDock && CAIRO_DOCK (pContainer)->iRefCount == 0)
 	{
-		_add_entry_in_menu (_("Set up position"), GTK_STOCK_EXECUTE, _cairo_dock_configure_main_dock_position, pSubMenu);
+		_add_entry_in_menu (_("Set up position"), GTK_STOCK_EXECUTE, _cairo_dock_configure_root_dock_position, pSubMenu);
 	}
 	_add_entry_in_menu (_("Manage themes"), GTK_STOCK_EXECUTE, _cairo_dock_initiate_theme_management, pSubMenu);
 
@@ -994,7 +1010,7 @@ GtkWidget *cairo_dock_build_menu (Icon *icon, CairoContainer *pContainer)
 
 	_add_entry_in_menu (_("Help"), GTK_STOCK_HELP, _cairo_dock_help, pSubMenu);
 
-	if (! g_bAutoHide)
+	if (CAIRO_DOCK_IS_DOCK (pContainer) && ! CAIRO_DOCK (pContainer)->bAutoHide)
 	{
 		_add_entry_in_menu (_("Quick-Hide"), GTK_STOCK_GOTO_BOTTOM, _cairo_dock_quick_hide, pSubMenu);
 	}

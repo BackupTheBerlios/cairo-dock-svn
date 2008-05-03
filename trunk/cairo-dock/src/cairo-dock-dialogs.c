@@ -26,7 +26,6 @@ extern CairoDock *g_pMainDock;
 extern gint g_iScreenWidth[2], g_iScreenHeight[2];
 extern gboolean g_bSticky;
 extern gboolean g_bKeepAbove;
-extern gboolean g_bAutoHide;
 extern int g_iVisibleZoneWidth, g_iVisibleZoneHeight;
 
 extern int g_iDockLineWidth;
@@ -900,7 +899,7 @@ void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoContainer *pCont
 				*iY = (! (*bRight) ? pDock->iWindowPositionY : pDock->iWindowPositionY + pDock->iCurrentHeight);
 			}
 	
-			if (g_bAutoHide)
+			if (pDock->bAutoHide)
 			{
 				*iX = pDock->iWindowPositionX + (pIcon->fXAtRest + pIcon->fWidth * (*bRight ? .7 : .3)) / pDock->fFlatDockWidth * g_iVisibleZoneWidth;
 				cd_debug ("placement sur un dock cache -> %d", *iX);

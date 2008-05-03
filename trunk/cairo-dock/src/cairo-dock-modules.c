@@ -477,7 +477,7 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 				if (pDock == NULL)
 				{
 					pDock = cairo_dock_create_new_dock (g_iWmHint, cDockName, NULL);
-					cairo_dock_place_main_dock (pDock);
+					cairo_dock_place_root_dock (pDock);
 				}
 				pContainer = CAIRO_CONTAINER (pDock);
 			}
@@ -620,7 +620,7 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 					if (pDock == NULL)  // c'est un nouveau dock.
 					{
 						pDock = cairo_dock_create_new_dock (g_iWmHint, cDockName, NULL);
-						cairo_dock_place_main_dock (pDock);
+						cairo_dock_place_root_dock (pDock);
 					}
 					
 					if (CAIRO_DOCK_IS_DESKLET (pActualContainer))  // elle etait dans un desklet.

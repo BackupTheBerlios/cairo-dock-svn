@@ -228,8 +228,8 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 	FILE *fd = fopen (cImagePath, "r");
 	if (fd != NULL)
 	{
-		char buffer[7];
-		if (fgets (buffer, 5, fd) != NULL)
+		char buffer[8];
+		if (fgets (buffer, 7, fd) != NULL)
 		{
 			if (strncmp (buffer+2, "xml", 3) == 0)
 				bIsSVG = TRUE;
@@ -237,7 +237,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 				bIsPNG = TRUE;
 			else if (strncmp (buffer+3, "XPM", 3) == 0)
 				bIsXPM = TRUE;
-			cd_debug ("  format : %d;%d;%d\n", bIsSVG, bIsPNG, bIsXPM);
+			cd_debug ("  format : %d;%d;%d", bIsSVG, bIsPNG, bIsXPM);
 		}
 		fclose (fd);
 	}

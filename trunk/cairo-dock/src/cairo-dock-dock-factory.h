@@ -24,7 +24,7 @@
 * @param pContainer le container.
 * @return le facteur d'echelle max.
 */
-#define cairo_dock_get_max_scale(pContainer) (CAIRO_DOCK_IS_DOCK (pContainer) ? (1 + g_fAmplitude) / CAIRO_DOCK (pContainer)->fRatio : 1)
+#define cairo_dock_get_max_scale(pContainer) (CAIRO_DOCK_IS_DOCK (pContainer) ? (1 + g_fAmplitude) : 1)
 
 /**
 * Cree un nouveau dock principal.
@@ -121,7 +121,7 @@ void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve);
 * Met un dock principal a sa taille et a sa place initiale.
 * @param pDock le dock.
 */
-void cairo_dock_place_main_dock (CairoDock *pDock);
+void cairo_dock_place_root_dock (CairoDock *pDock);
 /**
 * Borne la position d'un dock a l'intetieur de l'ecran.
 * @param pDock le dock.

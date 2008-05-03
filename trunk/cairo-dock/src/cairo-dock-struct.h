@@ -148,6 +148,8 @@ struct _CairoDock {
 	gint iGapY;
 	/// alignement, entre 0 et 1, du dock sur le bord de l'ecran.
 	gdouble fAlign;
+	/// TRUE ssi le dock doit se cacher automatiquement.
+	gboolean bAutoHide;
 	
 	/// magnitude maximale de la vague.
 	gdouble fMagnitudeMax;
@@ -203,7 +205,11 @@ struct _CairoDock {
 	gboolean bMenuVisible;
 	/// Est-on en train de survoler le dock avec quelque chose dans la souris ?
 	gboolean bIsDragging;
-
+	/// Valeur de l'auto-hide avant le cachage-rapide.
+	gboolean bAutoHideInitialValue;
+	/// TRUE ssi on ne peut plus entrer dans un dock.
+	gboolean bEntranceDisabled;
+	
 	//\_______________ Les ID des threads en cours sur le dock.
 	/// serial ID du thread de descente de la fenetre.
 	gint iSidMoveDown;

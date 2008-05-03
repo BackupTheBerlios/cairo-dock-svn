@@ -43,7 +43,7 @@ void cairo_dock_start_animation (Icon *icon, CairoDock *pDock);
 *Definit s'il est utile de lancer l'animation d'un dock (il est inutile de la lancer s'il est manifestement invisible).
 *@param pDock le dock a animer.
 */
-#define cairo_dock_animation_will_be_visible(pDock) ((pDock)->bInside || (! g_bAutoHide && (pDock)->iRefCount == 0) || ! (pDock)->bAtBottom)
+#define cairo_dock_animation_will_be_visible(pDock) ((pDock)->bInside || (! (pDock)->bAutoHide && (pDock)->iRefCount == 0) || ! (pDock)->bAtBottom)
 
 
 #endif

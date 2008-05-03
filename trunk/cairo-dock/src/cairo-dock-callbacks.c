@@ -72,7 +72,6 @@ extern gboolean g_bTextAlwaysHorizontal;
 
 extern int g_iDockRadius;
 extern int g_iDockLineWidth;
-extern gboolean g_bAutoHide;
 
 extern gchar *g_cConfFile;
 
@@ -104,7 +103,7 @@ gboolean on_expose (GtkWidget *pWidget,
 	//g_print ("%s ((%d;%d) %dx%d) (%d)\n", __func__, pExpose->area.x, pExpose->area.y, pExpose->area.width, pExpose->area.height, pDock->bAtBottom);
 	if (pExpose->area.x + pExpose->area.y != 0)  // x et y sont >= 0.
 	{
-		if (! (g_bAutoHide && pDock->iRefCount == 0) || ! pDock->bAtBottom)
+		if (! (pDock->bAutoHide && pDock->iRefCount == 0) || ! pDock->bAtBottom)
 		{
 			if (pDock->render_optimized != NULL)
 				pDock->render_optimized (pDock, &pExpose->area);
@@ -120,7 +119,7 @@ gboolean on_expose (GtkWidget *pWidget,
 	}
 	else
 	{
-		if (g_bAutoHide && pDock->iRefCount == 0)
+		if (pDock->bAutoHide && pDock->iRefCount == 0)
 		{
 			if (pDock->bInside)
 			{
@@ -144,10 +143,19 @@ static void cairo_dock_show_subdock (Icon *pPointedIcon, gboolean bUpdate, Cairo
 	CairoDock *pSubDock = pPointedIcon->pSubDock;
 	g_return_if_fail (pSubDock != NULL);
 	
-	if (GTK_WIDGET_VISIBLE (pSubDock->pWidget))
+	if (GTK_WIDGET_VISIBLE (pSubDock->pWidget))  // il est deja visible.
+	{
+		if (pSubDock->iSidShrinkDown != 0)  // il est en cours de diminution, on renverse le processus.
+		{
+			g_source_remove (pSubDock->iSidShrinkDown);
+			pSubDock->iSidShrinkDown = 0;
+			if (pSubDock->iSidGrowUp == 0)  // on commence a faire grossir les icones.  //  && pDock->iSidShrinkDown == 0
+				pSubDock->iSidGrowUp = g_timeout_add (40, (GSourceFunc) cairo_dock_grow_up, (gpointer) pSubDock);
+		}
 		return ;
+	}
 	
-	if (pSubDock->iSidShrinkDown != 0)
+	if (pSubDock->iSidShrinkDown != 0)  // precaution sans doute superflue.
 	{
 		g_source_remove (pSubDock->iSidShrinkDown);
 		pSubDock->iSidShrinkDown = 0;
@@ -233,16 +241,75 @@ static gboolean _cairo_dock_show_xwindow_for_drop (Icon *pIcon)
 	cairo_dock_show_xwindow (pIcon->Xid);
 	return FALSE;
 }
+void cairo_dock_on_change_icon (Icon *pLastPointedIcon, Icon *pPointedIcon, CairoDock *pDock)
+{
+	cd_debug ("on change d'icone (-> %s)\n", (pPointedIcon != NULL ? pPointedIcon->acName : "rien"));
+	if (s_iSidShowSubDockDemand != 0)
+	{
+		cd_debug ("on annule la demande de montrage de sous-dock");
+		g_source_remove (s_iSidShowSubDockDemand);
+		s_iSidShowSubDockDemand = 0;
+	}
+	if (pDock->bIsDragging && s_iSidShowAppliForDrop != 0)
+	{
+		cd_debug ("on annule la demande de montrage d'appli");
+		g_source_remove (s_iSidShowAppliForDrop);
+		s_iSidShowAppliForDrop = 0;
+	}
+	cairo_dock_replace_all_dialogs ();
+	if (pDock->bIsDragging && CAIRO_DOCK_IS_APPLI (pPointedIcon))
+	{
+		s_iSidShowAppliForDrop = g_timeout_add (500, (GSourceFunc) _cairo_dock_show_xwindow_for_drop, (gpointer) pPointedIcon);
+	}
+	if ((pDock == s_pLastPointedDock || s_pLastPointedDock == NULL) && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
+	{
+		CairoDock *pSubDock = pLastPointedIcon->pSubDock;
+		if (GTK_WIDGET_VISIBLE (pSubDock->pWidget))
+		{
+			//g_print ("on cache %s en changeant d'icône\n", pLastPointedIcon->acName);
+			if (pLastPointedIcon->pSubDock->iSidLeaveDemand == 0)
+			{
+				//g_print ("  on retarde le cachage du dock de %dms\n", MAX (g_iLeaveSubDockDelay, 330));
+				pLastPointedIcon->pSubDock->iSidLeaveDemand = g_timeout_add (MAX (g_iLeaveSubDockDelay, 330), (GSourceFunc) cairo_dock_emit_leave_signal, (gpointer) pLastPointedIcon->pSubDock);
+			}
+		}
+		//else
+		//	cd_message ("pas encore visible !\n");
+	}
+	if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL && pPointedIcon->pSubDock != s_pLastPointedDock && (! bShowSubDockOnClick || CAIRO_DOCK_IS_APPLI (pPointedIcon)))
+	{
+		cd_debug ("il faut montrer un sous-dock");
+		if (pPointedIcon->pSubDock->iSidLeaveDemand != 0)
+		{
+			g_source_remove (pPointedIcon->pSubDock->iSidLeaveDemand);
+			pPointedIcon->pSubDock->iSidLeaveDemand = 0;
+		}
+		if (g_iShowSubDockDelay > 0)
+		{
+			//pDock->iMouseX = iX;
+			s_iSidShowSubDockDemand = g_timeout_add (g_iShowSubDockDelay, (GSourceFunc) _cairo_dock_show_sub_dock_delayed, pDock);
+			//cd_debug ("s_iSidShowSubDockDemand <- %d\n", s_iSidShowSubDockDemand);
+		}
+		else
+			cairo_dock_show_subdock (pPointedIcon, FALSE, pDock);
+		s_pLastPointedDock = pDock;
+	}
+	pLastPointedIcon = pPointedIcon;
+	if (s_pLastPointedDock == NULL)
+	{
+		//g_print ("pLastPointedDock n'est plus null\n");
+		s_pLastPointedDock = pDock;
+	}
+}
 gboolean on_motion_notify2 (GtkWidget* pWidget,
 	GdkEventMotion* pMotion,
 	CairoDock *pDock)
 {
 	static double fLastTime = 0;
-	Icon *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
+	Icon *pPointedIcon, *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
 	int iLastMouseX = pDock->iMouseX;
 	
 	//\_______________ On elague le flux des MotionNotify, sinon X en envoie autant que le permet le CPU !
-	Icon *pPointedIcon;
 	if (pMotion != NULL)
 	{
 		//g_print ("%s (%d,%d) (%d, %.2fms, bAtBottom:%d; iSidShrinkDown:%d)\n", __func__, (int) pMotion->x, (int) pMotion->y, pMotion->is_hint, pMotion->time - fLastTime, pDock->bAtBottom, pDock->iSidShrinkDown);
@@ -353,79 +420,10 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			}
 		}
 	}
-
+	
 	if (pPointedIcon != pLastPointedIcon || s_pLastPointedDock == NULL)
 	{
-		//cd_debug ("on change d'icone (-> %s)\n", (pPointedIcon != NULL ? pPointedIcon->acName : "rien"));
-		if (s_iSidShowSubDockDemand != 0)
-		{
-			cd_debug ("on annule la demande de montrage de sous-dock");
-			g_source_remove (s_iSidShowSubDockDemand);
-			s_iSidShowSubDockDemand = 0;
-		}
-		if (pMotion == NULL && s_iSidShowAppliForDrop != 0)
-		{
-			cd_debug ("on annule la demande de montrage d'appli");
-			g_source_remove (s_iSidShowAppliForDrop);
-			s_iSidShowAppliForDrop = 0;
-		}
-		cairo_dock_replace_all_dialogs ();
-		if (pMotion == NULL && CAIRO_DOCK_IS_APPLI (pPointedIcon))
-		{
-			s_iSidShowAppliForDrop = g_timeout_add (500, (GSourceFunc) _cairo_dock_show_xwindow_for_drop, (gpointer) pPointedIcon);
-		}
-		if ((pDock == s_pLastPointedDock || s_pLastPointedDock == NULL) && pLastPointedIcon != NULL && pLastPointedIcon->pSubDock != NULL)
-		{
-			CairoDock *pSubDock = pLastPointedIcon->pSubDock;
-			if (GTK_WIDGET_VISIBLE (pSubDock->pWidget))
-			{
-				//g_print ("on cache %s en changeant d'icône\n", pLastPointedIcon->acName);
-				/**if (pSubDock->iSidGrowUp != 0)
-				{
-					g_source_remove (pSubDock->iSidGrowUp);
-					pSubDock->iSidGrowUp = 0;
-				}
-				if (pSubDock->iSidShrinkDown != 0)
-				{
-					g_source_remove (pSubDock->iSidShrinkDown);
-					pSubDock->iSidShrinkDown = 0;
-				}
-				pSubDock->iScrollOffset = 0;
-				pSubDock->fFoldingFactor = 0;
-				gtk_widget_hide (pSubDock->pWidget);*/
-				if (pLastPointedIcon->pSubDock->iSidLeaveDemand == 0)
-				{
-					//g_print ("  on retarde le cachage du dock de %dms\n", MAX (g_iLeaveSubDockDelay, 330));
-					pLastPointedIcon->pSubDock->iSidLeaveDemand = g_timeout_add (MAX (g_iLeaveSubDockDelay, 330), (GSourceFunc) cairo_dock_emit_leave_signal, (gpointer) pLastPointedIcon->pSubDock);
-				}
-			}
-			//else
-			//	cd_message ("pas encore visible !\n");
-		}
-		if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL && pPointedIcon->pSubDock != s_pLastPointedDock && (! bShowSubDockOnClick || CAIRO_DOCK_IS_APPLI (pPointedIcon)))
-		{
-			cd_debug ("il faut montrer un sous-dock");
-			if (pPointedIcon->pSubDock->iSidLeaveDemand != 0)
-			{
-				g_source_remove (pPointedIcon->pSubDock->iSidLeaveDemand);
-				pPointedIcon->pSubDock->iSidLeaveDemand = 0;
-			}
-			if (g_iShowSubDockDelay > 0)
-			{
-				//pDock->iMouseX = iX;
-				s_iSidShowSubDockDemand = g_timeout_add (g_iShowSubDockDelay, (GSourceFunc) _cairo_dock_show_sub_dock_delayed, pDock);
-				//cd_debug ("s_iSidShowSubDockDemand <- %d\n", s_iSidShowSubDockDemand);
-			}
-			else
-				cairo_dock_show_subdock (pPointedIcon, FALSE, pDock);
-			s_pLastPointedDock = pDock;
-		}
-		pLastPointedIcon = pPointedIcon;
-		if (s_pLastPointedDock == NULL)
-		{
-			//g_print ("pLastPointedDock n'est plus null\n");
-			s_pLastPointedDock = pDock;
-		}
+		cairo_dock_on_change_icon (pLastPointedIcon, pPointedIcon, pDock);
 	}
 
 	return FALSE;
@@ -472,7 +470,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 
 	if (pDock->iRefCount == 0)
 	{
-		if (g_bAutoHide)
+		if (pDock->bAutoHide)
 		{
 			pDock->fFoldingFactor = (g_bAnimateOnAutoHide && g_fUnfoldAcceleration != 0. ? 0.03 : 0.);
 			if (pDock->iSidMoveDown == 0)  // on commence a descendre.
@@ -575,7 +573,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	//g_print ("%s (bIsMainDock : %d; bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bIsMainDock, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
 	s_pLastPointedDock = NULL;  // ajoute le 04/10/07 pour permettre aux sous-docks d'apparaitre si on entre en pointant tout de suite sur l'icone.
         cd_debug("");
-	if (! s_bEntranceAllowed)
+	if (! cairo_dock_entrance_is_allowed ())
 	{
 		cd_message ("* entree non autorisee");
 		return FALSE;
@@ -593,7 +591,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 		//g_print ("  %d;%d;%d\n", pDock->bAtTop,  pDock->bInside, pDock->iSidMoveDown);
 		return FALSE;
 	}
-	//g_print ("%s (main dock : %d)\n", __func__, pDock->bIsMainDock);
+	//g_print ("%s (main dock : %d ; %d)\n", __func__, pDock->bIsMainDock, pDock->bHorizontalDock);
 
 	pDock->fDecorationsOffsetX = 0;
 	if (! pDock->bIsMainDock)
@@ -609,7 +607,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 
 	int iNewWidth, iNewHeight;
 	cairo_dock_get_window_position_and_geometry_at_balance (pDock, CAIRO_DOCK_MAX_SIZE, &iNewWidth, &iNewHeight);
-	if ((g_bAutoHide && pDock->iRefCount == 0) && pDock->bAtBottom)
+	if ((pDock->bAutoHide && pDock->iRefCount == 0) && pDock->bAtBottom)
 		pDock->iWindowPositionY = (pDock->bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - g_iVisibleZoneHeight - pDock->iGapY : g_iVisibleZoneHeight + pDock->iGapY - pDock->iMaxDockHeight);
 
 	if (pDock->bHorizontalDock)
@@ -638,7 +636,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	}*/
 
 
-	if (g_bAutoHide && pDock->iRefCount == 0)
+	if (pDock->bAutoHide && pDock->iRefCount == 0)
 	{
 		//g_print ("  on commence a monter\n");
 		if (pDock->iSidMoveUp == 0)  // on commence a monter.
@@ -669,7 +667,7 @@ gboolean on_key_release (GtkWidget *pWidget,
 	if (pKey->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK))  // On relache la touche ALT, typiquement apres avoir fait un ALT + clique gauche + deplacement.
 	{
 		if (pDock->iRefCount == 0)
-			cairo_dock_write_main_dock_gaps (pDock);
+			cairo_dock_write_root_dock_gaps (pDock);
 	}
 	return FALSE;
 }
@@ -1030,7 +1028,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 				else
 				{
 					if (pDock->iRefCount == 0)
-						cairo_dock_write_main_dock_gaps (pDock);
+						cairo_dock_write_root_dock_gaps (pDock);
 				}
 				s_pIconClicked = NULL;
 			break ;
@@ -1534,7 +1532,7 @@ gboolean on_delete (GtkWidget *pWidget, GdkEvent *event, CairoDock *pDock)
 
 
 
-void cairo_dock_activate_temporary_auto_hide (CairoDock *pDock)
+/*void cairo_dock_activate_temporary_auto_hide (CairoDock *pDock)
 {
 	if (! s_bTemporaryAutoHide)
 	{
@@ -1575,7 +1573,7 @@ gboolean cairo_dock_entrance_is_allowed (void)
 gboolean cairo_dock_quick_hide_is_activated (void)
 {
 	return s_bTemporaryAutoHide;
-}
+}*/
 
 
 // Tests sur les selections.

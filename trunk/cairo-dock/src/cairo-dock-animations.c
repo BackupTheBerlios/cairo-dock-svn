@@ -33,8 +33,6 @@ extern gboolean g_bResetScrollOnLeave;
 
 extern int g_iScreenHeight[2];
 
-extern gboolean g_bAutoHide;
-
 extern int g_iVisibleZoneHeight;
 
 extern gboolean g_bAnimateOnAutoHide;
@@ -112,7 +110,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 				iNewHeight,
 				iNewWidth);
 
-		if (g_bAutoHide && pDock->iRefCount == 0)
+		if (pDock->bAutoHide && pDock->iRefCount == 0)
 		{
 			//g_print ("on arrete les animations\n");
 			Icon *pBouncingIcon = cairo_dock_get_bouncing_icon (pDock->icons);
@@ -177,15 +175,18 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 		gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseX, &pDock->iMouseY, NULL);
 	else
 		gdk_window_get_pointer (pDock->pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);
-
-	pDock->calculate_icons (pDock);
+	
+	Icon *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
+	Icon *pPointedIcon = pDock->calculate_icons (pDock);
 	gtk_widget_queue_draw (pDock->pWidget);
+	if (pLastPointedIcon != pPointedIcon)
+		cairo_dock_on_change_icon (pLastPointedIcon, pPointedIcon, pDock);
 
 	if (pDock->iMagnitudeIndex == CAIRO_DOCK_NB_MAX_ITERATIONS && pDock->fFoldingFactor == 0)
 	{
 		pDock->iMagnitudeIndex = CAIRO_DOCK_NB_MAX_ITERATIONS;
 		pDock->iSidGrowUp = 0;
-		if (pDock->iRefCount == 0 && g_bAutoHide)  // on arrive en fin de l'animation qui montre le dock, les icones sont bien placees a partir de maintenant.
+		if (pDock->iRefCount == 0 && pDock->bAutoHide)  // on arrive en fin de l'animation qui montre le dock, les icones sont bien placees a partir de maintenant.
 		{
 			cairo_dock_set_icons_geometry_for_window_manager (pDock);
 			cairo_dock_replace_all_dialogs ();
@@ -249,7 +250,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 
 		if (pBouncingIcon == NULL && pRemovingIcon == NULL && (! g_bResetScrollOnLeave || pDock->iScrollOffset == 0))  // plus aucune animation en cours.
 		{
-			if (! (g_bAutoHide && pDock->iRefCount == 0) && ! pDock->bInside)
+			if (! (pDock->bAutoHide && pDock->iRefCount == 0) && ! pDock->bInside)
 			{
 				int iNewWidth, iNewHeight;
 				cairo_dock_get_window_position_and_geometry_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);

@@ -36,7 +36,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #define CAIRO_DOCK_TASKBAR_CHECK_INTERVAL 250
 
 extern CairoDock *g_pMainDock;
-extern gboolean g_bAutoHide;
 extern double g_fAmplitude;
 extern gboolean g_bUseSeparator;
 
@@ -118,7 +117,9 @@ void cairo_dock_unregister_appli (Icon *icon)
 {
 	if (CAIRO_DOCK_IS_APPLI (icon))
 	{
-		g_hash_table_remove (s_hXWindowTable, &icon->Xid);
+		cd_message ("%s (%s)\n", __func__, icon->acName);
+		if (icon->fLastCheckTime != -1)
+			g_hash_table_remove (s_hXWindowTable, &icon->Xid);
 		
 		cairo_dock_unregister_pid (icon);  // on n'efface pas sa classe ici car on peut en avoir besoin encore.
 		
@@ -144,7 +145,8 @@ static gboolean _cairo_dock_delete_one_appli (Window *pXid, Icon *pIcon, gpointe
 			cairo_dock_update_dock_size (pDock);
 	}
 	
-	cairo_dock_free_icon_buffers (pIcon);  // pour ne pas passer dans le 'unregister'.
+	cairo_dock_free_icon_buffers (pIcon);  // on ne veut pas passer dans le 'unregister' ni la gestion de la classe.
+	cairo_dock_unregister_pid (pIcon);
 	g_free (pIcon);
 	return TRUE;
 }
@@ -732,7 +734,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 					if (g_bAutoHideOnFullScreen && bIsFullScreen && ! cairo_dock_quick_hide_is_activated ())
 					{
 						cd_message (" => devient plein ecran");
-						cairo_dock_activate_temporary_auto_hide (g_pMainDock);
+						cairo_dock_activate_temporary_auto_hide ();
 					}
 					else
 					{
@@ -904,8 +906,9 @@ CairoDock *cairo_dock_insert_appli_in_dock (Icon *icon, CairoDock *pMainDock, gb
 	return pParentDock;
 }
 
-static void _cairo_dock_remove_old_applis (Window *Xid, Icon *icon, double *fTime)
+static gboolean _cairo_dock_remove_old_applis (Window *Xid, Icon *icon, double *fTime)
 {
+	gboolean bToBeRemoved = FALSE;
 	if (icon != NULL)
 	{
 		//g_print ("%s (%s, %f / %f)\n", __func__, icon->acName, icon->fLastCheckTime, *fTime);
@@ -915,21 +918,24 @@ static void _cairo_dock_remove_old_applis (Window *Xid, Icon *icon, double *fTim
 			CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 			if (pParentDock != NULL)
 			{
-				if (! pParentDock->bInside && (g_bAutoHide || pParentDock->iRefCount != 0) && pParentDock->bAtBottom)
+				if (! pParentDock->bInside && (pParentDock->bAutoHide || pParentDock->iRefCount != 0) && pParentDock->bAtBottom)
 					icon->fPersonnalScale = 0.05;
 				else
 					icon->fPersonnalScale = 1.0;
 				//g_print ("icon->fPersonnalScale <- %.2f\n", icon->fPersonnalScale);
-
+				
 				cairo_dock_start_animation (icon, pParentDock);
 			}
 			else
 			{
 				cd_message ("  pas dans un container, on la detruit donc immediatement");
+				icon->fLastCheckTime = -1;  // pour ne pas la desenregistrer de la HashTable lors du 'free'.
 				cairo_dock_free_icon (icon);
+				bToBeRemoved = TRUE;
 			}
 		}
 	}
+	return bToBeRemoved;
 }
 void cairo_dock_update_applis_list (CairoDock *pDock, double fTime)
 {
@@ -980,7 +986,7 @@ void cairo_dock_update_applis_list (CairoDock *pDock, double fTime)
 		}
 	}
 
-	g_hash_table_foreach (s_hXWindowTable, (GHFunc) _cairo_dock_remove_old_applis, &fTime);
+	g_hash_table_foreach_remove (s_hXWindowTable, (GHRFunc) _cairo_dock_remove_old_applis, &fTime);
 	
 	if (bUpdateMainDockSize)
 		cairo_dock_update_dock_size (pDock);
@@ -1061,7 +1067,7 @@ void cairo_dock_stop_application_manager (void)
 	
 	cairo_dock_remove_all_applis_from_class_table ();  // enleve aussi les indicateurs.
 	
-	cairo_dock_reset_appli_table ();
+	cairo_dock_reset_appli_table ();  // libere les icones des applis.
 }
 
 gboolean cairo_dock_application_manager_is_running (void)

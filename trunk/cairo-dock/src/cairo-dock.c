@@ -111,7 +111,6 @@ gchar *g_cEasyConfFile = NULL;  // le chemin du fichier de conf pour les noobs ;
 gpointer *g_pDefaultIconDirectory = NULL;  // les repertoires/themes ou on va chercher les icones.
 gchar *g_cCairoDockDataDir = NULL;  // le repertoire ou on va chercher les .desktop.
 
-gboolean g_bAutoHide;
 double g_fAmplitude;  // amplitude de la siunsoide.
 int g_iSinusoidWidth;  // largeur de la sinusoide en pixels. On va de 0 a pi en la parcourant, en etant a pi/2 au niveau du curseur; en dehors de cet intervalle, la sinusoide est plate.
 int g_iNbAnimationRounds;
