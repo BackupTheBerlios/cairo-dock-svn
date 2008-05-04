@@ -56,19 +56,21 @@ void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDoc
 /**
 * Incremente de 1 la reference d'un dock, c'est-a-dire le nombre d'icones pointant sur ce dock. Si le dock etait auparavant un dock principal, il devient un sous-dock, prenant du meme coup les parametres propres aux sous-docks.
 * @param pDock un dock.
+* @param pParentDock son dock parent, si sa reference passse a 1, sinon peu etre NULL.
 */
-void cairo_dock_reference_dock (CairoDock *pDock);
+void cairo_dock_reference_dock (CairoDock *pDock, CairoDock *pParentDock);
 
 /**
 * Cree un nouveau dock de type "sous-dock", et y insere la liste des icones fournie. La liste est appropriee par le dock, et ne doit donc _pas_ etre liberee apres cela. Chaque icone est chargee, et a donc juste besoin d'avoir un nom et un fichier d'image.
 * @param pIconList une liste d'icones qui seront entierement chargees et inserees dans le dock.
 * @param cDockName le nom desire pour le dock.
 * @param iWindowTypeHint indicateur du type de fenetre pour le WM.
+* @param pParentDock le dock parent du sous-dock cree.
 * @return le dock nouvellement alloue.
 */
-CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, gchar *cDockName, GdkWindowTypeHint iWindowTypeHint);
-#define cairo_dock_create_subdock_from_scratch(pIconList, cDockName) cairo_dock_create_subdock_from_scratch_with_type (pIconList, cDockName, GDK_WINDOW_TYPE_HINT_DOCK)
-#define cairo_dock_create_subdock_for_class_appli(cClassName) cairo_dock_create_subdock_from_scratch_with_type (NULL, cClassName, GDK_WINDOW_TYPE_HINT_DOCK)
+CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, gchar *cDockName, GdkWindowTypeHint iWindowTypeHint, CairoDock *pParentDock);
+#define cairo_dock_create_subdock_from_scratch(pIconList, cDockName, pParentDock) cairo_dock_create_subdock_from_scratch_with_type (pIconList, cDockName, GDK_WINDOW_TYPE_HINT_DOCK, pParentDock)
+#define cairo_dock_create_subdock_for_class_appli(cClassName, pParentDock) cairo_dock_create_subdock_from_scratch_with_type (NULL, cClassName, GDK_WINDOW_TYPE_HINT_DOCK, pParentDock)
 
 /**
 * Charge un ensemble de fichiers .desktop definissant des icones, et construit l'arborescence des docks.

@@ -47,7 +47,7 @@ gboolean cairo_dock_fm_setup_time (void);
 
 Icon *cairo_dock_fm_create_icon_from_URI (const gchar *cURI, CairoDock *pDock);
 
-void cairo_dock_fm_create_dock_from_directory (Icon *pIcon);
+void cairo_dock_fm_create_dock_from_directory (Icon *pIcon, CairoDock *pParentDock);
 
 
 void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const gchar *cURI, Icon *pIcon, CairoDockIconType iTypeOnCreation);

@@ -1097,6 +1097,7 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data);
 #define CD_APPLET_LOAD_SURFACE_FOR_MY_APPLET(cImagePath) \
 	cairo_dock_create_surface_for_icon (cImagePath, myDrawContext, myIcon->fWidth * (myDock ? (1 + g_fAmplitude) / myDock->fRatio : 1), myIcon->fHeight* (myDock ? (1 + g_fAmplitude) / myDock->fRatio : 1));
 
+//\_________________________________ AUTRE
 
 /**
 *Definit le moteur de rendu de l'applet en mode desklet et le contexte de dessin associe a l'icone. A appeler a l'init mais ausi au reload pour prendre en compte les redimensionnements.
@@ -1111,6 +1112,29 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data);
 *@param cRendererName nom du rendu.
 */
 #define CD_APPLET_SET_DESKLET_RENDERER(cRendererName) CD_APPLET_SET_DESKLET_RENDERER_WITH_DATA (cRendererName, NULL)
+
+/**
+*Cree et charge entierement un sous-dock pour notre icone.
+*@param pIconsList la liste (eventuellement NULL) des icones du sous-dock; celles-ci seront chargees en dans la foulee.
+*/
+#define CD_APPLET_CREATE_MY_SUBDOCK(pIconsList, cRenderer) \
+	myIcon->pSubDock = cairo_dock_create_subdock_from_scratch (pIconsList, myIcon->acName, myDock); \
+	cairo_dock_set_renderer (myIcon->pSubDock, cRenderer); \
+	cairo_dock_update_dock_size (myIcon->pSubDock);
+/**
+*Detruit notre sous-dock et les icones contenues dedans s'il y'en a.
+*/
+#define CD_APPLET_DESTROY_MY_SUBDOCK \
+	cairo_dock_destroy_dock (myIcon->pSubDock, myIcon->acName, NULL, NULL); \
+	myIcon->pSubDock = NULL;
+/**
+*Charge entierement une liste d'icones dans le sous-dock de notre icone.
+*@param pIconsList la liste (eventuellement NULL) des icones du sous-dock; celles-ci seront chargees en dans la foulee.
+*/
+#define CD_APPLET_LOAD_ICONS_IN_MY_SUBDOCK(pIconsList) \
+	myIcon->pSubDock->icons = pIconsList; \
+	cairo_dock_load_buffers_in_one_dock (myIcon->pSubDock); \
+	cairo_dock_update_dock_size (myIcon->pSubDock);
 
 //\_________________________________ INCLUDE
 /**

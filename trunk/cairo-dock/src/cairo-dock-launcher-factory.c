@@ -285,7 +285,30 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		gboolean bIsDirectory;  // on n'ecrase pas le fait que ce soit un container ou pas, car c'est l'utilisateur qui l'a decide.
 		cairo_dock_fm_get_file_info (icon->cBaseURI, &icon->acName, &icon->acCommand, &icon->acFileName, &bIsDirectory, &icon->iVolumeID, &icon->fOrder, g_iFileSortType);
 	}
-
+	
+	
+	g_free (icon->cParentDockName);
+	icon->cParentDockName = g_key_file_get_string (keyfile, "Desktop Entry", "Container", &erreur);
+	if (erreur != NULL)
+	{
+		cd_warning ("Attention : while trying to load %s : %s", cDesktopFileName, erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		icon->cParentDockName = NULL;
+	}
+	if (icon->cParentDockName == NULL || *icon->cParentDockName == '\0')
+	{
+		g_free (icon->cParentDockName);
+		icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
+	}
+	
+	CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+	if (pParentDock == NULL)
+	{
+		cd_message ("le dock parent (%s) n'existe pas, on le cree", icon->cParentDockName);
+		pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_DOCK, icon->cParentDockName, NULL);
+	}
+	
 	gboolean bIsContainer = g_key_file_get_boolean (keyfile, "Desktop Entry", "Is container", &erreur);
 	if (erreur != NULL)
 	{
@@ -302,15 +325,15 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		{
 			cd_message ("le dock fils (%s) n'existe pas, on le cree avec la vue %s", icon->acName, cRendererName);
 			if (icon->cBaseURI == NULL)
-				icon->pSubDock = cairo_dock_create_subdock_from_scratch (NULL, icon->acName);
+				icon->pSubDock = cairo_dock_create_subdock_from_scratch (NULL, icon->acName, pParentDock);
 			else
-				cairo_dock_fm_create_dock_from_directory (icon);
+				cairo_dock_fm_create_dock_from_directory (icon, pParentDock);
 		}
 		else
 		{
-			cairo_dock_reference_dock (pChildDock);
+			cairo_dock_reference_dock (pChildDock, pParentDock);
 			icon->pSubDock = pChildDock;
-			g_print ("bHorizontalDock : %d ; bDirectionUp : %d\n", pChildDock->bHorizontalDock, pChildDock->bDirectionUp);
+			cd_message ("le dock devient un dock fils (%d, %d)", pChildDock->bHorizontalDock, pChildDock->bDirectionUp);
 		}
 		if (cRendererName != NULL && icon->pSubDock != NULL)
 			cairo_dock_set_renderer (icon->pSubDock, cRendererName);
@@ -318,20 +341,6 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 		g_free (cRendererName);
 	}
 
-	g_free (icon->cParentDockName);
-	icon->cParentDockName = g_key_file_get_string (keyfile, "Desktop Entry", "Container", &erreur);
-	if (erreur != NULL)
-	{
-		cd_warning ("Attention : while trying to load %s : %s", cDesktopFileName, erreur->message);
-		g_error_free (erreur);
-		erreur = NULL;
-		icon->cParentDockName = NULL;
-	}
-	if (icon->cParentDockName == NULL || *icon->cParentDockName == '\0')
-	{
-		g_free (icon->cParentDockName);
-		icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
-	}
 	
 	gboolean bPreventFromInhibating = g_key_file_get_boolean (keyfile, "Desktop Entry", "prevent inhibate", NULL);  // FALSE si la cle n'existe pas.
 	
@@ -390,12 +399,6 @@ Icon * cairo_dock_create_icon_from_desktop_file (const gchar *cDesktopFileName, 
 	g_return_val_if_fail (icon->acDesktopFileName != NULL, NULL);
 	
 	CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
-	if (pParentDock == NULL)
-	{
-		cd_message ("le dock parent (%s) n'existe pas, on le cree", icon->cParentDockName);
-		pParentDock = cairo_dock_create_new_dock (GDK_WINDOW_TYPE_HINT_DOCK, icon->cParentDockName, NULL);
-	}
-	
 	cairo_dock_fill_icon_buffers_for_dock (icon, pSourceContext, pParentDock)
 	
 	cd_message ("+ %s/%s", icon->acName, icon->cClass);

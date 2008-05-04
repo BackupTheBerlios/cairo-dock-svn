@@ -99,12 +99,6 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	pDock->fRatio = 1.;
 	pDock->iAvoidingMouseIconType = -1;
 	pDock->fFlatDockWidth = - g_iIconGap;
-	/*if (! pDock->bIsMainDock)
-	{
-		pDock->bHorizontalDock = g_pMainDock->bHorizontalDock;
-		pDock->bDirectionUp = g_pMainDock->bDirectionUp;
-		pDock->fAlign = g_pMainDock->fAlign;
-	}*/
 	pDock->iMouseX = -1; // utile ?
 	pDock->iMouseY = -1;
 	pDock->fMagnitudeMax = 1.;
@@ -437,13 +431,41 @@ void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDoc
 	g_free (pDock);
 }
 
-void cairo_dock_reference_dock (CairoDock *pDock)
+static void _cairo_dock_reload_reflects_in_dock (CairoDock *pDock)
+{
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
+	double fMaxScale = cairo_dock_get_max_scale (CAIRO_CONTAINER (pDock));
+	Icon *icon;
+	GList *ic;
+	for (ic = pDock->icons; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (icon->pReflectionBuffer != NULL || icon->pFullIconBuffer != NULL)
+		{
+			cairo_surface_destroy (icon->pReflectionBuffer);
+			icon->pReflectionBuffer = NULL;
+			cairo_surface_destroy (icon->pFullIconBuffer);
+			icon->pFullIconBuffer = NULL;
+			cairo_dock_load_reflect_on_icon (icon, pCairoContext, fMaxScale, pDock->bHorizontalDock, pDock->bDirectionUp);
+		}
+	}
+	cairo_destroy (pCairoContext);
+}
+void cairo_dock_reference_dock (CairoDock *pDock, CairoDock *pParentDock)
 {
 	pDock->iRefCount ++;  // peut-etre qu'il faudrait en faire une operation atomique...
 	if (pDock->iRefCount == 1)  // il devient un sous-dock.
 	{
-		pDock->bHorizontalDock = (g_bSameHorizontality ? g_pMainDock->bHorizontalDock : ! g_pMainDock->bHorizontalDock);
-		pDock->bDirectionUp = g_pMainDock->bDirectionUp;
+		if (pParentDock == NULL)
+			pParentDock = g_pMainDock;
+		CairoDockPositionType iScreenBorder = ((! pDock->bHorizontalDock) << 1) | (! pDock->bDirectionUp);
+		pDock->bHorizontalDock = (g_bSameHorizontality ? pParentDock->bHorizontalDock : ! pParentDock->bHorizontalDock);
+		pDock->bDirectionUp = pParentDock->bDirectionUp;
+		if (iScreenBorder != (((! pDock->bHorizontalDock) << 1) | (! pDock->bDirectionUp)))
+		{
+			g_print ("changement de position\n");
+			_cairo_dock_reload_reflects_in_dock (pDock);
+		}
 		pDock->bAutoHide = FALSE;
 		double fPrevRatio = pDock->fRatio;
 		pDock->fRatio = MIN (pDock->fRatio, g_fSubDockSizeRatio);
@@ -477,10 +499,10 @@ void cairo_dock_reference_dock (CairoDock *pDock)
 	}
 }
 
-CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, gchar *cDockName, GdkWindowTypeHint iWindowTypeHint)
+CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, gchar *cDockName, GdkWindowTypeHint iWindowTypeHint, CairoDock *pParentDock)
 {
 	CairoDock *pSubDock = cairo_dock_create_new_dock (iWindowTypeHint, cDockName, NULL);
-	cairo_dock_reference_dock (pSubDock);  // on le fait tout de suite pour avoir la bonne reference avant le 'load'.
+	cairo_dock_reference_dock (pSubDock, pParentDock);  // on le fait tout de suite pour avoir la bonne reference avant le 'load'.
 
 	pSubDock->icons = pIconList;
 	if (pIconList != NULL)

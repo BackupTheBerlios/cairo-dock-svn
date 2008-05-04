@@ -269,14 +269,14 @@ Icon *cairo_dock_fm_create_icon_from_URI (const gchar *cURI, CairoDock *pDock)
 	return pNewIcon;
 }
 
-void cairo_dock_fm_create_dock_from_directory (Icon *pIcon)
+void cairo_dock_fm_create_dock_from_directory (Icon *pIcon, CairoDock *pParentDock)
 {
 	if (s_pVFSBackend == NULL)
 		return;
 	cd_message ("");
 	g_free (pIcon->acCommand);
 	GList *pIconList = cairo_dock_fm_list_directory (pIcon->cBaseURI, g_iFileSortType, CAIRO_DOCK_LAUNCHER, g_bShowHiddenFiles, &pIcon->acCommand);
-	pIcon->pSubDock = cairo_dock_create_subdock_from_scratch (pIconList, pIcon->acName);
+	pIcon->pSubDock = cairo_dock_create_subdock_from_scratch (pIconList, pIcon->acName, pParentDock);
 
 	cairo_dock_update_dock_size (pIcon->pSubDock);  // le 'load_buffer' ne le fait pas.
 

@@ -922,7 +922,7 @@ static void _cairo_dock_configure_root_dock_position (GtkMenuItem *menu_item, gp
 	
 	gchar *cTitle = g_strdup_printf (_("Set position for the dock '%s'"), cDockName);
 	gboolean config_ok = cairo_dock_edit_conf_file (GTK_WINDOW (pDock->pWidget), cConfFilePath, cTitle, CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, 0, NULL, NULL, NULL, NULL, NULL);
-	g_free (cTitle);
+	g_free (cTitle);  // c'est OK de le liberer tout de suite puisqu'on bloque dans l'edition.
 	
 	if (config_ok)
 	{

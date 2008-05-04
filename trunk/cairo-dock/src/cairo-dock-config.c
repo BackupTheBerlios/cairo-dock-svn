@@ -1089,13 +1089,13 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 			pDock->bHorizontalDock = CAIRO_DOCK_HORIZONTAL;
 			pDock->bDirectionUp = FALSE;
 		break;
-		case CAIRO_DOCK_LEFT :
-			pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
-			pDock->bDirectionUp = FALSE;
-		break;
 		case CAIRO_DOCK_RIGHT :
 			pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
 			pDock->bDirectionUp = TRUE;
+		break;
+		case CAIRO_DOCK_LEFT :
+			pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
+			pDock->bDirectionUp = FALSE;
 		break;
 	}
 
@@ -1216,9 +1216,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	pDock->calculate_icons (pDock);
 	gtk_widget_queue_draw (pDock->pWidget);  // le 'gdk_window_move_resize' ci-dessous ne provoquera pas le redessin si la taille n'a pas change.
 
-	if (pDock->bAtBottom)
+	if (pDock->bAtBottom && pDock->bAutoHide)
 	{
-		///cairo_dock_place_root_dock (pDock);
+		cairo_dock_place_root_dock (pDock);  // semble necessaire dans le cas de l'auto-hide.
 	}
 
 	//\___________________ On ecrit si necessaire.
@@ -1257,7 +1257,7 @@ gboolean cairo_dock_is_loading (void)
 
 static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, gpointer *user_data);  // declaree en amont, car les 2 s'appellent mutuellement.
 
-static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert, gchar *cGettextDomain)
+static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConfFilePath, const gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert, gchar *cGettextDomain)
 {
 	cd_message ("%s (%s; %s)", __func__, cConfFilePath, cConfFilePath2);
 	GSList *pWidgetList = NULL;
@@ -1362,7 +1362,7 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConf
 		g_ptr_array_free (pDataGarbage, TRUE);
 		g_free (cConfFilePath);
 		g_free (cConfFilePath2);
-		g_free (cTitle);
+		///g_free (cTitle);
 		g_free (cButtonConvert);
 		g_free (cButtonRevert);
 		return config_ok;
@@ -1469,7 +1469,7 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 *@param cGettextDomain
 @Returns TRUE si l'utilisateur a ferme le panneau de conf en appuyant sur OK, FALSE sinon.
 */
-gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePath, gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert, gchar *cGettextDomain)
+gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePath, const gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert, gchar *cGettextDomain)
 {
 	return cairo_dock_edit_conf_file_core (pWindow, g_strdup (cConfFilePath), g_strdup (cTitle), iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc, pConfigFunc2, g_strdup (cConfFilePath2), g_strdup (cButtonConvert), g_strdup (cButtonRevert), cGettextDomain);
 }

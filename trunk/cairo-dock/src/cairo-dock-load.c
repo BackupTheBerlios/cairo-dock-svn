@@ -180,6 +180,29 @@ cairo_surface_t *cairo_dock_load_image_for_icon (cairo_t *pSourceContext, gchar 
 }
 
 
+void cairo_dock_load_reflect_on_icon (Icon *icon, cairo_t *pSourceContext, gdouble fMaxScale, gboolean bHorizontalDock, gboolean bDirectionUp)
+{
+	if (g_fAlbedo > 0 && icon->pIconBuffer != NULL && ! (CAIRO_DOCK_IS_APPLET (icon) && icon->acFileName == NULL))
+	{
+		icon->pReflectionBuffer = cairo_dock_create_reflection_surface (icon->pIconBuffer,
+			pSourceContext,
+			(bHorizontalDock ? icon->fWidth : icon->fHeight) * fMaxScale,
+			(bHorizontalDock ? icon->fHeight : icon->fWidth) * fMaxScale,
+			bHorizontalDock,
+			fMaxScale,
+			bDirectionUp);
+
+		icon->pFullIconBuffer = cairo_dock_create_icon_surface_with_reflection (icon->pIconBuffer,
+			icon->pReflectionBuffer,
+			pSourceContext,
+			(bHorizontalDock ? icon->fWidth : icon->fHeight) * fMaxScale,
+			(bHorizontalDock ? icon->fHeight : icon->fWidth) * fMaxScale,
+			bHorizontalDock,
+			fMaxScale,
+			bDirectionUp);
+	}
+}
+
 void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdouble fMaxScale, gboolean bHorizontalDock, gboolean bApplySizeRestriction, gboolean bDirectionUp)
 {
 	//g_print ("%s (%d, %.2f, %s)\n", __func__, icon->iType, fMaxScale, icon->acFileName);
