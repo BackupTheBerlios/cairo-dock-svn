@@ -1077,7 +1077,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	}
 	g_cRaiseDockShortcut = cairo_dock_get_string_key_value (pKeyFile, "Position", "raise shortcut", &bFlushConfFileNeeded, NULL, NULL, NULL);
 	
-	gchar *cDropIndicatorImage = cairo_dock_get_string_key_value (pKeyFile, "Icons", "insertion image", &bFlushConfFileNeeded, NULL, NULL, NULL);
+	gchar *cDropIndicatorImage = cairo_dock_get_string_key_value (pKeyFile, "Icons", "drop indicator", &bFlushConfFileNeeded, NULL, NULL, NULL);
 	if (cDropIndicatorImage == NULL)
 	{
 		cDropIndicatorImage = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_DEFAULT_DROP_INDICATOR_NAME);
