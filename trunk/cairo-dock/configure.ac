@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([cairo-dock], [1.5.6-beta0], [Fabrice Rey (fabounet@users.berlios.de)])
+AC_INIT([cairo-dock], [1.5.5.4], [Fabrice Rey (fabounet@users.berlios.de)])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
 
@@ -37,7 +37,7 @@ AM_CONDITIONAL(COMPIL_VERBOSE, test x$enable_verbose = xyes)
 AM_CONDITIONAL(COMPIL_WITH_GLITZ, test x$enable_glitz = xyes)
 
 
-PKG_CHECK_MODULES(PACKAGE, "gtk+-2.0 gthread-2.0 cairo librsvg-2.0 glitz dbus-1 dbus-glib-1 libxml-2.0")
+PKG_CHECK_MODULES(PACKAGE, "gtk+-2.0 gthread-2.0 cairo librsvg-2.0 glitz dbus-1 dbus-glib-1 libxml-2.0 xtst")
 PKG_CHECK_MODULES(GLITZ, "glitz-glx")
 
 AC_CONFIG_FILES([Makefile

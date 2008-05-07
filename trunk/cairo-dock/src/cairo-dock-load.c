@@ -78,6 +78,9 @@ extern int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconAuthorizedHeight[CAIRO_DOCK_NB_TYPES];
 extern gboolean g_bOverWriteXIcons;
 
+extern cairo_surface_t *g_pDropIndicatorSurface;
+extern double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
+
 extern gboolean g_bUseGlitz;
 
 
@@ -612,9 +615,9 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 					
 				g_pBackgroundSurfaceFull[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL], pCairoContext, g_fBackgroundImageWidth, g_fBackgroundImageHeight, (pDock->bDirectionUp ? -G_PI/2 : G_PI/2));
 			}
-			else if (g_fBackgroundImageWidth == 0 || g_fBackgroundImageHeight == 0)
+			else/** if (g_fBackgroundImageWidth == 0 || g_fBackgroundImageHeight == 0)*/
 			{
-				g_fBackgroundImageWidth = 0;
+				g_fBackgroundImageWidth = MAX (g_fBackgroundImageWidth, iNewDecorationsWidth);  /// 0
 				g_fBackgroundImageHeight = MAX (g_fBackgroundImageHeight, iNewDecorationsHeight);
 				g_pBackgroundSurface[CAIRO_DOCK_HORIZONTAL] = cairo_dock_load_image (pCairoContext,
 					g_cBackgroundImageFile,
@@ -650,4 +653,18 @@ void cairo_dock_load_background_decorations (CairoDock *pDock)
 	g_fBackgroundImageWidth = 0;
 	g_fBackgroundImageHeight = 0;
 	cairo_dock_update_background_decorations_if_necessary (pDock, iWidth, iHeight);
+}
+
+
+void cairo_dock_load_drop_indicator (gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale)
+{
+	if (g_pDropIndicatorSurface != NULL)
+		cairo_surface_destroy (g_pDropIndicatorSurface);
+	g_pDropIndicatorSurface = cairo_dock_create_surface_from_image (cImagePath,
+		pSourceContext,
+		1.,
+		g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] * fMaxScale,
+		g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] * fMaxScale / 2,
+		&g_fDropIndicatorWidth, &g_fDropIndicatorHeight,
+		TRUE);
 }

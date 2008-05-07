@@ -333,7 +333,7 @@ void cairo_dock_deactivate_one_dock (CairoDock *pDock)
 	g_list_foreach (pDock->icons, (GFunc) _cairo_dock_fm_remove_monitor_on_one_icon, NULL);
 
 	Icon *pPointedIcon;
-	while ((pPointedIcon = cairo_dock_search_icon_pointing_on_dock (pDock, NULL)) != NULL)
+	if ((pPointedIcon = cairo_dock_search_icon_pointing_on_dock (pDock, NULL)) != NULL)
 	{
 		pPointedIcon->pSubDock = NULL;
 	}
@@ -357,11 +357,11 @@ void cairo_dock_free_dock (CairoDock *pDock)
 
 void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDock *pReceivingDock, gchar *cpReceivingDockName)
 {
-	//g_print ("%s (%s, %d)\n", __func__, cDockName, pDock->iRefCount);
+	g_print ("%s (%s, %d)\n", __func__, cDockName, pDock->iRefCount);
 	g_return_if_fail (pDock != NULL && cDockName != NULL);
 	if (pDock->bIsMainDock)  // utiliser cairo_dock_free_all_docks ().
 		return;
-	pDock->iRefCount --;  // peut-etre qu'il faudrait en faire une operation atomique...
+	pDock->iRefCount --;
 	if (pDock->iRefCount > 0)
 		return ;
 
@@ -407,10 +407,14 @@ void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDoc
 				icon->fWidth /= pDock->fRatio;  /// g_fSubDockSizeRatio
 				icon->fHeight /= pDock->fRatio;
 			}
+			cd_debug (" on re-attribue %s au dock %s", icon->acName, icon->cParentDockName);
 			cairo_dock_insert_icon_in_dock (icon, pReceivingDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
 			
-			icon->pModule->pContainer = CAIRO_CONTAINER (pReceivingDock);  // astuce pour ne pas avoir a recharger le fichier de conf ^_^
-			cairo_dock_reload_module (icon->pModule, FALSE);
+			if (CAIRO_DOCK_IS_APPLET (icon))
+			{
+				icon->pModule->pContainer = CAIRO_CONTAINER (pReceivingDock);  // astuce pour ne pas avoir a recharger le fichier de conf ^_^
+				cairo_dock_reload_module (icon->pModule, FALSE);
+			}
 		}
 	}
 	if (pReceivingDock != NULL)
@@ -423,10 +427,8 @@ void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDoc
 	if (bModuleWasRemoved)
 		cairo_dock_update_conf_file_with_active_modules2 (NULL, g_cConfFile);
 	
-	if (! pDock->bIsMainDock)
-	{
+	if (pDock->iRefCount == -1)  // c'etait un dock racine.
 		cairo_dock_remove_root_dock_config (cDockName);
-	}
 	
 	g_free (pDock);
 }
@@ -583,7 +585,6 @@ void cairo_dock_free_all_docks (void)
 
 void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et fFlatDockWidth doivent avoir ete mis a jour au prealable.
 {
-	//g_print ("%s (bInside : %d ; iSidShrinkDown : %d)\n", __func__, pDock->bInside, pDock->iSidShrinkDown);
 	pDock->calculate_max_dock_size (pDock);
 	
 	int n = 0;

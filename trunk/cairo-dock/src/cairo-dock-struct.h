@@ -221,6 +221,8 @@ struct _CairoDock {
 	gint iSidShrinkDown;
 	/// serial ID du thread qui enverra le signal de sortie retarde.
 	gint iSidLeaveDemand;
+	/// serial ID du thread qui signale qu'on peut inserer un element dans le dock a cet endroit.
+	gint iSidDropIndicator;
 
 	//\_______________ Les fonctions de dessin du dock.
 	/// nom de la vue, utile pour charger les fonctions de rendu posterieurement a la creation du dock.
@@ -237,6 +239,8 @@ struct _CairoDock {
 	CairoDockSetSubDockPositionFunc set_subdock_position;
 	/// dit si la vue courante utilise les reflets ou pas (utile pour les plug-ins).
 	gboolean bUseReflect;
+	/// decalage du signal d'insertion pou rson animation.
+	gint iDropIndicatorOffset;
 };
 
 
@@ -516,6 +520,8 @@ struct _Icon {
 	gdouble fDrawX;
 	/// Ordonnee du bord haut de l'image de l'icone.
 	gdouble fDrawY;
+	/// Position de l'icone hors animation.
+	gdouble fDrawXAtRest, fDrawYAtRest;
 	/// Facteur de zoom sur la largeur de l'icone.
 	gdouble fWidthFactor;
 	/// Facteur de zoom sur la hauteur de l'icone.

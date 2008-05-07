@@ -301,6 +301,11 @@ void cairo_dock_render_optimized_linear (CairoDock *pDock, GdkRectangle *pArea)
 					icon->fAlpha = .25;
 				}
 				
+				if (icon->iAnimationType == CAIRO_DOCK_AVOID_MOUSE)
+				{
+					icon->fAlpha = 0.4;
+				}
+				
 				cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect, TRUE, pDock->iCurrentWidth, pDock->bDirectionUp);
 				cairo_restore (pCairoContext);
 			}

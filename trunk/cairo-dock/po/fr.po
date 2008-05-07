@@ -1927,7 +1927,7 @@ msgstr ""
 " - 3 thèmes supplémentaires pour l'applet Weather."
 
 msgid ""
-"v1.5.5.2 :\n"
+"v1.5.5.4 :\n"
 " - Huge enhancements in the TaskBar :\n"
 "  launchers and applets can now behave as applications.\n"
 "  windows can show up during drag and drop if mouse stay on them\n"
@@ -1936,10 +1936,11 @@ msgid ""
 " - Control Cairo-Dock from an external program thanks to the Dbus plug-in.\n"
 " - Added a 'ShowDesktop' applet for convenience.\n"
 " - Some fix in PowerManager (now ok !)\n"
+" - The ability to have many docks for a single instance of Cairo-Dock.\n"
 " - Cairo-Dock is not yet well integrated into Gnome 2.22, but it will come "
 "soon ;-)"
 msgstr ""
-"v1.5.5.2 :\n"
+"v1.5.5.4 :\n"
 " - Grosses améliorations dans la barre des taches :\n"
 "  lanceurs et applets peuvent maintenant se comporter comme des applis.\n"
 "  les fenetres peuvent apparaître durant un drag'n'drop si la souris reste "
@@ -1951,6 +1952,8 @@ msgstr ""
 "Dbus.\n"
 " - Une applet 'ShowDesktop' a ete ajoutée.\n"
 " - Corrections de problèmes dans PowerManager (qui maintenant marche !)\n"
+" - La possibilité d'avoir plusieurs docks pour une seule instance de Cairo-"
+"Dock.\n"
 " - Cairo-Dock n'est pas encore bien integré a Gnome 2.22, mais cela va venir "
 "bientôt ;-)"
 
@@ -1963,7 +1966,7 @@ msgstr ""
 #: ../src/cairo-dock-callbacks.c:861 ../src/cairo-dock-callbacks.c:884
 #: ../src/cairo-dock-callbacks.c:871 ../src/cairo-dock-callbacks.c:883
 #: ../src/cairo-dock-callbacks.c:860 ../src/cairo-dock-callbacks.c:859
-#: ../src/cairo-dock-callbacks.c:857
+#: ../src/cairo-dock-callbacks.c:857 ../src/cairo-dock-callbacks.c:877
 msgid "Do you want to mount this point ?"
 msgstr "Voulez-vous monter ce point ?"
 
@@ -2178,7 +2181,7 @@ msgstr "Ajouter un séparateur"
 #: ../src/cairo-dock-callbacks.c:1522 ../src/cairo-dock-callbacks.c:1537
 #: ../src/cairo-dock-callbacks.c:1549 ../src/cairo-dock-callbacks.c:1552
 #: ../src/cairo-dock-callbacks.c:1529 ../src/cairo-dock-callbacks.c:1528
-#: ../src/cairo-dock-callbacks.c:1526
+#: ../src/cairo-dock-callbacks.c:1526 ../src/cairo-dock-callbacks.c:1564
 msgid "Quit Cairo-Dock ?"
 msgstr "Quitter Cairo-Dock ?"
 
@@ -2626,6 +2629,7 @@ msgstr "Mode avancé"
 
 #: ../src/cairo-dock.c:511 ../src/cairo-dock.c:512 ../src/cairo-dock.c:513
 #: ../src/cairo-dock.c:507 ../src/cairo-dock.c:506 ../src/cairo-dock.c:505
+#: ../src/cairo-dock.c:508
 msgid "< Maintenance mode >"
 msgstr "< Mode Maintenance >"
 

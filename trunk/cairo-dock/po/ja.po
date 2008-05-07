@@ -1916,6 +1916,7 @@ msgstr ""
 #: ../src/cairo-dock-callbacks.c:824 ../src/cairo-dock-callbacks.c:871
 #: ../src/cairo-dock-callbacks.c:883 ../src/cairo-dock-callbacks.c:860
 #: ../src/cairo-dock-callbacks.c:859 ../src/cairo-dock-callbacks.c:857
+#: ../src/cairo-dock-callbacks.c:877
 msgid "Do you want to mount this point ?"
 msgstr "このポイントにマウントしますか？"
 
@@ -2221,7 +2222,7 @@ msgstr "Compiz Fusion ウィジェット"
 #: ../src/cairo-dock-callbacks.c:1519 ../src/cairo-dock-callbacks.c:1522
 #: ../src/cairo-dock-callbacks.c:1549 ../src/cairo-dock-callbacks.c:1552
 #: ../src/cairo-dock-callbacks.c:1529 ../src/cairo-dock-callbacks.c:1528
-#: ../src/cairo-dock-callbacks.c:1526
+#: ../src/cairo-dock-callbacks.c:1526 ../src/cairo-dock-callbacks.c:1564
 msgid "Quit Cairo-Dock ?"
 msgstr "Cairo-Dock 終了？"
 
@@ -2543,7 +2544,7 @@ msgstr ""
 "ださい。"
 
 #: ../src/cairo-dock.c:511 ../src/cairo-dock.c:512 ../src/cairo-dock.c:507
-#: ../src/cairo-dock.c:506 ../src/cairo-dock.c:505
+#: ../src/cairo-dock.c:506 ../src/cairo-dock.c:505 ../src/cairo-dock.c:508
 msgid "< Maintenance mode >"
 msgstr "< メンテナンスモード >"
 

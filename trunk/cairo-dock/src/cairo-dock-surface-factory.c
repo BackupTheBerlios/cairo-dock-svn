@@ -381,7 +381,7 @@ cairo_surface_t *cairo_dock_create_surface_for_icon (gchar *cImagePath, cairo_t*
 
 cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fRotationAngle)
 {
-	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
+	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS && pSurface != NULL, NULL);
 	if (fRotationAngle != 0)
 	{
 		cairo_surface_t *pNewSurfaceRotated;

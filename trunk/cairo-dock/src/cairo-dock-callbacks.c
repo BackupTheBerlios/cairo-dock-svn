@@ -40,6 +40,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-file-manager.h"
 #include "cairo-dock-log.h"
 #include "cairo-dock-dock-manager.h"
+#include "cairo-dock-keybinder.h"
 #include "cairo-dock-callbacks.h"
 
 static Icon *s_pIconClicked = NULL;  // pour savoir quand on deplace une icone a la souris. Dangereux si l'icone se fait effacer en cours ...
@@ -109,6 +110,23 @@ gboolean on_expose (GtkWidget *pWidget,
 				pDock->render_optimized (pDock, &pExpose->area);
 			else
 				pDock->render (pDock);
+			
+			if (pDock->iSidDropIndicator != 0)
+			{
+				cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
+				g_return_val_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS, FALSE);
+				
+				cairo_rectangle (pCairoContext,
+					pExpose->area.x,
+					pExpose->area.y,
+					pExpose->area.width,
+					pExpose->area.height);
+				cairo_clip (pCairoContext);
+				
+				cairo_dock_draw_insertion_signal (pDock, pCairoContext);
+				
+				cairo_destroy (pCairoContext);
+			}
 		}
 		return FALSE;
 	}
@@ -854,7 +872,7 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 		}
 		if (icon->iVolumeID > 0 && ! bIsMounted)
 		{
-			int answer =cairo_dock_ask_question_and_wait (_("Do you want to mount this point ?"), icon, CAIRO_CONTAINER (pDock));
+			int answer = cairo_dock_ask_question_and_wait (_("Do you want to mount this point ?"), icon, CAIRO_CONTAINER (pDock));
 			if (answer != GTK_RESPONSE_YES)
 			{
 				icon->iCount = 0;
@@ -880,10 +898,23 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 	{
 		if (icon->acCommand != NULL)
 		{
-			if (cairo_dock_launch_command_full (icon->acCommand, icon->cWorkingDirectory))
+			gboolean bSuccess = FALSE;
+			if (*icon->acCommand == '<')
+			{
+				bSuccess = cairo_dock_simulate_key_sequence (icon->acCommand);
+				if (!bSuccess)
+					bSuccess = cairo_dock_launch_command_full (icon->acCommand, icon->cWorkingDirectory);
+			}
+			else
+			{
+				bSuccess = cairo_dock_launch_command_full (icon->acCommand, icon->cWorkingDirectory);
+				if (! bSuccess)
+					bSuccess = cairo_dock_simulate_key_sequence (icon->acCommand);
+			}
+			if (bSuccess)
 			{
 				if (CAIRO_DOCK_IS_APPLI (icon))  // on remet l'animation du lanceur.
-					cairo_dock_arm_animation_by_type (icon, CAIRO_DOCK_LAUNCHER);  // on remet l'animation du lanceur.
+					cairo_dock_arm_animation_by_type (icon, CAIRO_DOCK_LAUNCHER);
 			}
 			else
 				cairo_dock_arm_animation (icon, CAIRO_DOCK_BLINK, 1);  // 1 clignotement si echec.
@@ -1513,6 +1544,11 @@ void on_drag_leave (GtkWidget *pWidget, GdkDragContext *dc, guint time, CairoDoc
 	pDock->bIsDragging = FALSE;
 	cairo_dock_stop_marking_icons (pDock);
 	pDock->iAvoidingMouseIconType = -1;
+	if (pDock->iSidDropIndicator != 0)
+	{
+		g_source_remove (pDock->iSidDropIndicator);
+		pDock->iSidDropIndicator = 0;
+	}
 	cairo_dock_emit_leave_signal (pDock);
 }
 

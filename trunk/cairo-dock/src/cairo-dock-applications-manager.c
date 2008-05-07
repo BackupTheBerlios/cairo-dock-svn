@@ -117,7 +117,7 @@ void cairo_dock_unregister_appli (Icon *icon)
 {
 	if (CAIRO_DOCK_IS_APPLI (icon))
 	{
-		cd_message ("%s (%s)\n", __func__, icon->acName);
+		cd_message ("%s (%s)", __func__, icon->acName);
 		if (icon->fLastCheckTime != -1)
 			g_hash_table_remove (s_hXWindowTable, &icon->Xid);
 		
@@ -138,11 +138,14 @@ static gboolean _cairo_dock_delete_one_appli (Window *pXid, Icon *pIcon, gpointe
 	CairoDock *pDock = cairo_dock_search_dock_from_name (pIcon->cParentDockName);
 	if (pDock != NULL)
 	{
+		gchar *cParentDockName = pIcon->cParentDockName;
+		pIcon->cParentDockName = NULL;  // astuce.
 		cairo_dock_detach_icon_from_dock (pIcon, pDock, g_bUseSeparator);
 		if (pDock->icons == NULL)
-			cairo_dock_destroy_dock (pDock, pIcon->cParentDockName, NULL, NULL);
+			cairo_dock_destroy_dock (pDock, cParentDockName, NULL, NULL);
 		else if (! pDock->bIsMainDock)
 			cairo_dock_update_dock_size (pDock);
+		g_free (cParentDockName);
 	}
 	
 	cairo_dock_free_icon_buffers (pIcon);  // on ne veut pas passer dans le 'unregister' ni la gestion de la classe.

@@ -655,3 +655,132 @@ egg_keymap_get_modmap (GdkKeymap *keymap)
   
   return modmap;
 }
+
+
+
+int *egg_keystring_to_keysyms (gchar *accelerator, int *iNbKeys)
+	{
+		int i = 0, iNbKeyMax = 10;  // on limite a 10, c'est bien assez.
+		gint *pKeySyms = g_new0 (int, iNbKeyMax);
+		gchar *cKeyName;
+		
+		guint keyval;
+	GdkModifierType mods;
+	gint len;
+	gboolean bad_keyval;
+	
+	bad_keyval = FALSE;
+	
+	keyval = 0;
+	mods = 0;
+	len = strlen (accelerator);
+	while (len)
+		{
+		cKeyName = NULL;
+		if (*accelerator == '<')
+		{
+			if (len >= 9 && is_release (accelerator))
+			{
+				accelerator += 9;
+				len -= 9;
+				cKeyName = "Release";
+			}
+			else if (len >= 9 && is_control (accelerator))
+			{
+				accelerator += 9;
+				len -= 9;
+				cKeyName = "Control_L";
+			}
+			else if (len >= 7 && is_shift (accelerator))
+			{
+				accelerator += 7;
+				len -= 7;
+				cKeyName = "Shift_L";
+			}
+			else if (len >= 6 && is_shft (accelerator))
+			{
+				accelerator += 6;
+				len -= 6;
+				cKeyName = "Shift_L";
+			}
+			else if (len >= 6 && is_ctrl (accelerator))
+			{
+				accelerator += 6;
+				len -= 6;
+				cKeyName = "Control_L";
+			}
+			else if (len >= 6 && is_modx (accelerator))
+			{
+				len -= 6;
+				accelerator += 4;
+				cKeyName = NULL;
+				accelerator += 2;
+			}
+			else if (len >= 5 && is_ctl (accelerator))
+			{
+				accelerator += 5;
+				len -= 5;
+				cKeyName = "Control_L";
+			}
+			else if (len >= 5 && is_alt (accelerator))
+			{
+				accelerator += 5;
+				len -= 5;
+				cKeyName = "Alt_L";
+			}
+			else if (len >= 6 && is_meta (accelerator))
+			{
+				accelerator += 6;
+				len -= 6;
+				cKeyName = "Meta_L";
+			}
+			else if (len >= 7 && is_hyper (accelerator))
+			{
+				accelerator += 7;
+				len -= 7;
+				cKeyName = "Hyper_L";  /// ?
+			}
+			else if (len >= 7 && is_super (accelerator))
+			{
+				accelerator += 7;
+				len -= 7;
+				cKeyName = "Super_L";
+			}
+			else
+			{
+				gchar last_ch;
+				
+				last_ch = *accelerator;
+				while (last_ch && last_ch != '>')
+				{
+					last_ch = *accelerator;
+					accelerator += 1;
+					len -= 1;
+				}
+			}
+		}
+		else  // c'est une simple touche.
+		{
+			cKeyName = accelerator;
+			
+			accelerator += len;
+			len -= len;              
+		}
+		
+		if (cKeyName != NULL)
+		{
+			g_print ("cKeyName : %s\n", cKeyName);
+			int keysym = XStringToKeysym (cKeyName);
+			if (keysym == NoSymbol)
+			{
+				fprintf (stderr, "no such key name '%s'", cKeyName);
+			}
+			else
+			{
+				pKeySyms[i++] = keysym;
+			}
+		}
+	}
+	*iNbKeys = i;
+	return pKeySyms;
+}

@@ -30,6 +30,7 @@ cairo_dock_CFLAGS = \
 	-DCAIRO_DOCK_MAIN_DOCK_CONF_FILE=\""main-dock.conf"\"\
 	-DCAIRO_DOCK_DEFAULT_ICON_NAME=\""default-icon.svg"\"\
 	-DCAIRO_DOCK_DEFAULT_INDICATOR_NAME=\""default-indicator.png"\"\
+	-DCAIRO_DOCK_DEFAULT_DROP_INDICATOR_NAME=\""default-drop-indicator.svg"\"\
 	-DCAIRO_DOCK_VERSION=\""$(VERSION)"\"\
 	-DCAIRO_DOCK_LOCALE_DIR=\""$(datadir)/locale"\"\
 	-DCAIRO_DOCK_GETTEXT_PACKAGE=\""$(GETTEXT_PACKAGE)"\"\

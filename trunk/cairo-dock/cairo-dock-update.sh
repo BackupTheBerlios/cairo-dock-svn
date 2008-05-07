@@ -19,7 +19,7 @@
 
 ## Répertoire de travail
 ## Il n'est PAS supprimé à la fin du script (un fichier y reste pour éviter de re-télécharger 2x la même version)
-DIR=`echo /home/$USER/.cairo-dock/upgrade`
+DIR=`echo $HOME/.cairo-dock/upgrade`
 
 ## Commande lancée à la fin du script pour relancer le dock (laisser vide pour ne pas le relancer)
 COMMAND_RESTART_DOCK="/usr/bin/cairo-dock"
@@ -39,6 +39,18 @@ REGEXP_PLUGINS="cairo-dock-plug.+*.deb"
 FILE_MD5SUM_LOCAL="cairo-dock-md5sum"
 FILE_MD5SUM_OLD="cairo-dock-md5sum.old"
 
+echo "***************"
+echo "*** WARNING ***"
+echo "***************"
+echo " You are about to install a release candidate package."
+echo " That means it was created for testing purpose, and can still contain some bugs."
+echo " A repository exists for Ubuntu 7.10 and 8.04, you are encouraged to use it if you're under these OS (It should also work for other debian-based OS).
+read -p "  Continue anyway ? [y/N]" accept_the_risks
+if test ! "$accept_the_risks" = "y" -a ! "$accept_the_risks" = "Y"; then
+	exit 0
+fi
+
+echo "let's go!"
 
 ## Création du repertoire de download s'il n'existe pas
 if [ ! -d $DIR ] ; then
@@ -71,6 +83,7 @@ fi
 
 ## Récupération du fichier md5sum qui permet de connaitre les noms des .deb à télécharger
 wget $HOST/$FILE_MD5SUM_REMOTE -O $FILE_MD5SUM_LOCAL
+if ! test "$?" = "0"; then
 
 ## On compare le fichier md5sum avec l'ancien fichier md5sum pour savoir s'il y a des mises à jour
 NEED_UPGRADE=`diff -q $FILE_MD5SUM_LOCAL $FILE_MD5SUM_OLD`

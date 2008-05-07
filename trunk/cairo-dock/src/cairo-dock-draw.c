@@ -69,6 +69,9 @@ extern double g_fIndicatorWidth, g_fIndicatorHeight;
 extern int g_iIndicatorDeltaY;
 extern gboolean g_bLinkIndicatorWithIcon;
 
+extern cairo_surface_t *g_pDropIndicatorSurface;
+extern double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
+
 extern gboolean g_bUseGlitz;
 
 
@@ -346,6 +349,8 @@ void cairo_dock_render_decorations_in_frame (cairo_t *pCairoContext, CairoDock *
 
 void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 {
+	icon->fDrawXAtRest = icon->fDrawX;
+	icon->fDrawYAtRest = icon->fDrawY;
 	icon->fY = icon->fDrawY;  // on ne peut pas toucher fX, mais fY ca semble ok et suffisant...
 	//\_____________________ On gere l'animation de rebond.
 	if (icon->iAnimationType == CAIRO_DOCK_BOUNCE && icon->iCount > 0)
@@ -531,18 +536,18 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			if (bHorizontalDock)
 			{
 				cairo_translate (pCairoContext,
-					icon->fX + (icon->fWidth * icon->fScale - g_fIndicatorWidth * fRatio) / 2,
-					icon->fY + (bDirectionUp ? 
+					icon->fDrawXAtRest + (icon->fWidth * icon->fScale - g_fIndicatorWidth * fRatio) / 2,
+					icon->fDrawYAtRest + (bDirectionUp ? 
 						(icon->fHeight * icon->fScale - (g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * fRatio) :
 						(g_fIndicatorHeight * icon->fScale - g_iIndicatorDeltaY) * fRatio));
 			}
 			else
 			{
 				cairo_translate (pCairoContext,
-					icon->fY + (bDirectionUp ? 
+					icon->fDrawYAtRest + (bDirectionUp ? 
 						(icon->fHeight - (g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * fRatio) * icon->fScale : 
 						(g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * icon->fScale * fRatio),
-						icon->fX + (icon->fWidth * icon->fScale - g_fIndicatorWidth * fRatio) / 2);
+						icon->fDrawXAtRest + (icon->fWidth * icon->fScale - g_fIndicatorWidth * fRatio) / 2);
 			}
 		}
 		cairo_set_source_surface (pCairoContext, g_pIndicatorSurface[bHorizontalDock], 0.0, 0.0);
@@ -1287,4 +1292,95 @@ double cairo_dock_calculate_extra_width_for_trapeze (double fFrameHeight, double
 	double sina = fInclination * cosa;
 	double fDeltaCornerForLoop = fRadius * cosa + fRadius * (1 + sina) * fInclination;
 	return (2 * (fLineWidth/2 + fDeltaXForLoop + fDeltaCornerForLoop + g_iFrameMargin));
+}
+
+
+
+void cairo_dock_draw_insertion_signal (CairoDock *pDock, cairo_t *pCairoContext)
+{
+	double fX;
+	/*if (pDock->iMouseX < icon->fDrawX + icon->fWidth * icon->fScale * fMargin)  // on est a gauche.
+	{
+		fX = icon->fDrawX - icon->fWidth * icon->fScale / 2;
+	}
+	else if (pDock->iMouseX > icon->fDrawX + icon->fWidth * icon->fScale * (1 - fMargin))  // on est a droite.
+	{
+		fX = icon->fDrawX + icon->fWidth * icon->fScale / 2;
+	}*/
+	fX = pDock->iMouseX - g_fDropIndicatorWidth / 2;
+	
+	//cairo_move_to (pCairoContext, fX, 0);
+	cairo_translate (pCairoContext, fX, 0);
+	double fRotationAngle = (pDock->bHorizontalDock ? (pDock->bDirectionUp ? 0 : G_PI) : (pDock->bDirectionUp ? -G_PI/2 : G_PI/2));
+	cairo_rotate (pCairoContext, fRotationAngle);
+	
+	
+	//cairo_move_to (pCairoContext, fX, pDock->iDropIndicatorOffset);
+	cairo_translate (pCairoContext, 0, pDock->iDropIndicatorOffset);
+	cairo_pattern_t* pPattern = cairo_pattern_create_for_surface (g_pDropIndicatorSurface);
+	cairo_pattern_set_extend (pPattern, CAIRO_EXTEND_REPEAT);
+	cairo_set_source (pCairoContext, pPattern);
+	
+	cairo_translate (pCairoContext, 0, -pDock->iDropIndicatorOffset);
+	cairo_pattern_t *pGradationPattern = cairo_pattern_create_linear (0.,
+		0.,
+		0.,
+		2*g_fDropIndicatorHeight);  // de haut en bas.
+	g_return_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS);
+
+	cairo_pattern_set_extend (pGradationPattern, CAIRO_EXTEND_NONE);
+	cairo_pattern_add_color_stop_rgba (pGradationPattern,
+		0.,
+		0.,
+		0.,
+		0.,
+		0.);
+	cairo_pattern_add_color_stop_rgba (pGradationPattern,
+		0.4,
+		0.,
+		0.,
+		0.,
+		1.);
+	cairo_pattern_add_color_stop_rgba (pGradationPattern,
+		0.5,
+		0.,
+		0.,
+		0.,
+		1.);
+	cairo_pattern_add_color_stop_rgba (pGradationPattern,
+		1.,
+		0.,
+		0.,
+		0.,
+		0.);
+
+	//cairo_translate (pCairoContext, 0, 0);
+	cairo_mask (pCairoContext, pGradationPattern);
+	//cairo_paint (pCairoContext);
+	
+	cairo_pattern_destroy (pPattern);
+	cairo_pattern_destroy (pGradationPattern);
+	
+	pDock->iDropIndicatorOffset += 3;
+	if (pDock->iDropIndicatorOffset > 2*g_fDropIndicatorHeight)
+		pDock->iDropIndicatorOffset = 0;
+}
+
+gboolean cairo_dock_display_insertion_signal (CairoDock *pDock)
+{
+	GdkRectangle rect = {(int) pDock->iMouseX - g_fDropIndicatorWidth/2,
+		(int) 0,
+		(int) g_fDropIndicatorWidth,
+		(int) 2*g_fDropIndicatorHeight};  /// A peaufiner...
+	//g_print ("rect (%d;%d) (%dx%d)\n", rect.x, rect.y, rect.width, rect.height);
+	if (rect.width > 0 && rect.height > 0)
+	{
+#ifdef HAVE_GLITZ
+		if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
+			gtk_widget_queue_draw (pDock->pWidget);
+		else
+#endif
+		gdk_window_invalidate_rect (pDock->pWidget->window, &rect, FALSE);
+	}
+	return TRUE;
 }

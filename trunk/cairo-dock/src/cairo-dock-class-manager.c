@@ -69,7 +69,7 @@ const GList *cairo_dock_list_existing_appli_with_class (const gchar *cClass)
 }
 
 
-Window cairo_dock_detach_appli_of_class (const gchar *cClass)
+static Window cairo_dock_detach_appli_of_class (const gchar *cClass, gboolean bDetachAll)
 {
 	g_return_val_if_fail (cClass != NULL, 0);
 	
@@ -87,14 +87,24 @@ Window cairo_dock_detach_appli_of_class (const gchar *cClass)
 		if (CAIRO_DOCK_IS_DOCK (pContainer))
 		{
 			pParentDock = CAIRO_DOCK (pContainer);
+			gchar *cParentDockName = pIcon->cParentDockName;
+			pIcon->cParentDockName = NULL;  // astuce.
 			bDetached = cairo_dock_detach_icon_from_dock (pIcon, pParentDock, g_bUseSeparator);  // on la garde, elle pourra servir car elle contient l'Xid.
 			if (! pParentDock->bIsMainDock)
-				cairo_dock_update_dock_size (pParentDock);
+			{
+				if (pParentDock->icons == NULL)
+					cairo_dock_destroy_dock (pParentDock, cParentDockName, NULL, NULL);
+				else
+					cairo_dock_update_dock_size (pParentDock);
+			}
 			else
 				bNeedsRedraw |= (bDetached);
+			g_free (cParentDockName);
 			
 			if (XFirstFoundId == 0)
 				XFirstFoundId = pIcon->Xid;
+			if (! bDetachAll)
+				break ;
 		}
 	}
 	if (! cairo_dock_is_loading () && bNeedsRedraw)
@@ -245,7 +255,7 @@ gboolean cairo_dock_inhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
 	g_return_val_if_fail (cClass != NULL, FALSE);
 	cd_message ("%s (%s)", __func__, cClass);
 	
-	Window XFirstFoundId = cairo_dock_detach_appli_of_class (cClass);
+	Window XFirstFoundId = cairo_dock_detach_appli_of_class (cClass, (pInhibatorIcon == NULL));
 	if (pInhibatorIcon != NULL)
 	{
 		pInhibatorIcon->Xid = XFirstFoundId;
@@ -348,8 +358,8 @@ void cairo_dock_deinhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
 	cd_message ("%s (%s)", __func__, cClass);
 	gboolean bStillInhibated = cairo_dock_remove_icon_from_class (pInhibatorIcon);
 	cd_debug ("bStillInhibated : %d", bStillInhibated);
-	if (! bStillInhibated)  // il n'y a plus personne das cette classe.
-		return ;
+	///if (! bStillInhibated)  // il n'y a plus personne dans cette classe.
+	///	return ;
 	
 	if (pInhibatorIcon == NULL || pInhibatorIcon->Xid != 0)
 	{
@@ -419,9 +429,14 @@ void cairo_dock_update_Xid_on_inhibators (Window Xid, const gchar *cClass)
 					{
 						cd_message ("  c'est %s qui va la remplacer", pSameClassIcon->acName);
 						CairoDock *pClassSubDock = cairo_dock_search_dock_from_name (pSameClassIcon->cParentDockName);
-						cairo_dock_detach_icon_from_dock (pSameClassIcon, pClassSubDock, FALSE);  // dans le cas ou elle etait dans le sous-dock de sa classe, detruit ce dernier s'il devient vide.
-						cairo_dock_update_dock_size (pClassSubDock);
-						
+						if (pClassSubDock != NULL)
+						{
+							cairo_dock_detach_icon_from_dock (pSameClassIcon, pClassSubDock, FALSE);
+							if (pClassSubDock->icons == NULL && pClassSubDock == cairo_dock_search_dock_from_name (cClass))  // le sous-dock de la classe devient vide.
+								cairo_dock_destroy_dock (pClassSubDock, cClass, NULL, NULL);
+							else
+								cairo_dock_update_dock_size (pClassSubDock);
+						}
 					}
 				}
 				pIcon->Xid = iNextXid;

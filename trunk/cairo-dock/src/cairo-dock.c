@@ -237,6 +237,9 @@ int g_iIndicatorDeltaY;
 gboolean g_bOverWriteXIcons = TRUE; // il faut le savoir avant.
 gboolean g_bLinkIndicatorWithIcon;
 
+cairo_surface_t *g_pDropIndicatorSurface = NULL;
+double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
+
 static gboolean random_dialog (gpointer user_data)
 {
 	g_return_val_if_fail (g_pMainDock != NULL && g_pMainDock->icons != NULL, TRUE);
@@ -566,7 +569,9 @@ main (int argc, char** argv)
 		}
 		else
 		{
-			gchar *cChangeLogMessage = g_key_file_get_string (pKeyFile, "ChangeLog", CAIRO_DOCK_VERSION, &erreur);
+			gchar *cKeyName = g_strdup_printf ("%d.%d.%d", g_iMajorVersion, g_iMinorVersion, g_iMicroVersion);
+			gchar *cChangeLogMessage = g_key_file_get_string (pKeyFile, "ChangeLog", cKeyName, &erreur);
+			g_free (cKeyName);
 			if (erreur != NULL)
 			{
 				g_error_free (erreur);

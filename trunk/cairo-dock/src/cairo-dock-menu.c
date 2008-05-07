@@ -188,7 +188,7 @@ gboolean cairo_dock_notification_remove_icon (gpointer *data)
 	
 	if (icon->pSubDock != NULL)
 	{
-		gboolean bDestroyIcons = TRUE;
+		gboolean bDestroyIcons = ! CAIRO_DOCK_IS_APPLI (icon);
 		if (! CAIRO_DOCK_IS_URI_LAUNCHER (icon) && ! CAIRO_DOCK_IS_APPLI (icon) && icon->pSubDock->icons != NULL)  // alors on propose de repartir les icones de son sous-dock dans le dock principal.
 		{
 			int answer = cairo_dock_ask_question_and_wait (_("Do you want to re-dispatch the icons contained inside this container into the dock ?\n (otherwise they will be destroyed)"), icon, CAIRO_CONTAINER (pDock));
@@ -196,7 +196,7 @@ gboolean cairo_dock_notification_remove_icon (gpointer *data)
 			if (answer == GTK_RESPONSE_YES)
 				bDestroyIcons = FALSE;
 		}
-		cairo_dock_destroy_dock (icon->pSubDock, icon->acName, (bDestroyIcons ? NULL : g_pMainDock), (bDestroyIcons ? NULL : CAIRO_DOCK_MAIN_DOCK_NAME));
+		cairo_dock_destroy_dock (icon->pSubDock, (CAIRO_DOCK_IS_APPLI (icon) && icon->cClass != NULL ? icon->cClass : icon->acName), (bDestroyIcons ? NULL : g_pMainDock), (bDestroyIcons ? NULL : CAIRO_DOCK_MAIN_DOCK_NAME));
 		icon->pSubDock = NULL;
 	}
 	

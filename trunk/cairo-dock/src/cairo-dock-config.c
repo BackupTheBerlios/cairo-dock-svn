@@ -1077,6 +1077,11 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	}
 	g_cRaiseDockShortcut = cairo_dock_get_string_key_value (pKeyFile, "Position", "raise shortcut", &bFlushConfFileNeeded, NULL, NULL, NULL);
 	
+	gchar *cDropIndicatorImage = cairo_dock_get_string_key_value (pKeyFile, "Icons", "insertion image", &bFlushConfFileNeeded, NULL, NULL, NULL);
+	if (cDropIndicatorImage == NULL)
+	{
+		cDropIndicatorImage = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_DEFAULT_DROP_INDICATOR_NAME);
+	}
 	
 	//\___________________ On (re)charge tout, car n'importe quel parametre peut avoir change.
 	switch (iScreenBorder)
@@ -1128,17 +1133,24 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 			&g_fIndicatorHeight,
 			TRUE);
 		//g_print ("g_pIndicatorSurface : %.2fx%.2f\n", g_fIndicatorWidth, g_fIndicatorHeight);
-		g_pIndicatorSurface[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (
-			g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL],
-			pCairoContext, 
-			g_fIndicatorWidth * fMasxScale,
-			g_fIndicatorHeight * fMasxScale,
-			- G_PI / 2);
-		
+		if (g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL] != NULL)
+			g_pIndicatorSurface[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (
+				g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL],
+				pCairoContext, 
+				g_fIndicatorWidth * fMasxScale,
+				g_fIndicatorHeight * fMasxScale,
+				- G_PI / 2);
+		else
+			cd_warning ("couldn't load image '%s' for indicators", cIndicatorImagePath);
 		cairo_destroy (pCairoContext);
 	}
 	g_free (cIndicatorImagePath);
-
+	
+	cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
+	cairo_dock_load_drop_indicator (cDropIndicatorImage, pCairoContext, cairo_dock_get_max_scale (pDock));
+	cairo_destroy (pCairoContext);
+	g_free (cDropIndicatorImage);
+	
 	g_fReflectSize = 0;
 	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)
 	{
@@ -1198,7 +1210,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	cairo_dock_deactivate_old_modules (fTime);
 	g_strfreev (cActiveModuleList);
 
-	cairo_dock_set_all_views_to_default ();
+	cairo_dock_set_all_views_to_default ();  // met a jour la taille de tous les docks.
 	
 	g_bReserveSpace = g_bReserveSpace && (g_cRaiseDockShortcut == NULL);
 	cairo_dock_reserve_space_for_dock (pDock, g_bReserveSpace);
@@ -1212,7 +1224,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 
 	pDock->iMouseX = 0;  // on se place hors du dock initialement.
 	pDock->iMouseY = 0;
-	pDock->calculate_max_dock_size (pDock);
+	///pDock->calculate_max_dock_size (pDock);
 	pDock->calculate_icons (pDock);
 	gtk_widget_queue_draw (pDock->pWidget);  // le 'gdk_window_move_resize' ci-dessous ne provoquera pas le redessin si la taille n'a pas change.
 

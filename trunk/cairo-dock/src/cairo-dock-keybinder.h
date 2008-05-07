@@ -52,6 +52,8 @@ gboolean cd_keybinder_is_modifier (guint keycode);
 
 guint32 cd_keybinder_get_current_event_time (void);
 
+gboolean cairo_dock_simulate_key_sequence (gchar *cKeyString);
+
 G_END_DECLS
 
 #endif /* __CD_KEY_BINDER_H__ */

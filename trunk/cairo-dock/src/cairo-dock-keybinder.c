@@ -33,10 +33,12 @@
 #include <gdk/gdkwindow.h>
 #include <gdk/gdkx.h>
 #include <X11/Xlib.h>
+#include <X11/extensions/XTest.h>
 
 #include "eggaccelerators.h"
-#include "cairo-dock-keybinder.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-X-utilities.h"
+#include "cairo-dock-keybinder.h"
 
 typedef unsigned int uint;
 typedef struct _Binding {
@@ -366,3 +368,34 @@ cd_keybinder_get_current_event_time (void)
 	else
 		return GDK_CURRENT_TIME;
 }
+
+
+gboolean cairo_dock_simulate_key_sequence (gchar *cKeyString)  // the idea was taken from xdo.
+{
+	g_return_val_if_fail (cKeyString != NULL, FALSE);
+	cd_message ("%s (%s)", __func__, cKeyString);
+	
+	int iNbKeys = 0;
+	int *pKeySyms = egg_keystring_to_keysyms (cKeyString, &iNbKeys);
+
+	int i;
+	int keycode;
+	Display *dpy = cairo_dock_get_Xdisplay ();
+	for (i = 0; i < iNbKeys; i ++)
+	{
+		keycode = XKeysymToKeycode (dpy, pKeySyms[i]);
+		XTestFakeKeyEvent (dpy, keycode, TRUE, CurrentTime);  // TRUE <=> presse.
+	}
+	
+	for (i = iNbKeys-1; i >=0; i --)
+	{
+		keycode = XKeysymToKeycode (dpy, pKeySyms[i]);
+		XTestFakeKeyEvent (dpy, keycode, FALSE, CurrentTime);  // TRUE <=> presse.
+	}
+	
+	XFlush (dpy);
+	
+	return TRUE;
+}
+
+

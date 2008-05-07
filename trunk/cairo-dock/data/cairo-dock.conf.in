@@ -253,7 +253,7 @@ modules_2 =
 #F+[Callback zone;gtk-goto-bottom]
 frame1 =
 
-#i[1;1024]+ Size of the callback zone (width x height, in pixels) :
+#i+[1;1024] Size of the callback zone (width x height, in pixels) :
 #{Place the mouse into this zone will make the dock re-appear.}
 zone width = 200
 #i+ ...
@@ -424,13 +424,20 @@ indicator image =
 #{The ratio between indicator's size and icon's size. The bigger, the bigger the indicators are.}
 indicator ratio = 1.
 
-#b Link the indicator with its icon ?
+#b+ Link the indicator with its icon ?
 #{It will then be resized like the icon, move like the icon, etc. Otherwise it will be drawn directly on the dock.}
 link indicator = TRUE
 
-#i[-10;64] Vertical offset :
+#i+[-10;64] Vertical offset :
 #{i pixels. You can use this parameter to adjust the indicator's vertical position.}
 indicator deltaY = 2
+
+#v+
+sep_ic = 
+
+#S+ Image for the insertion animation :
+#{Typically an arrow, that will be displayed when you try to drop a new launcher into the dock.}
+insertion image =
 
 #X+[Applications]
 frame_appli =
@@ -491,6 +498,7 @@ frame_sep_ =
 
 #T+3[launchers;applications;applets] Order of the different types of icons :
 icon's type order = launchers;applications;applets
+
 
 #[gtk-zoom-fit]
 [Views]

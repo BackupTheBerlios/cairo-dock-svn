@@ -81,6 +81,8 @@ void     egg_keymap_virtualize_modifiers      (GdkKeymap              *keymap,
 gchar* egg_virtual_accelerator_name (guint                  accelerator_key,
                                      EggVirtualModifierType accelerator_mods);
 
+int *egg_keystring_to_keysyms (gchar *accelerator, int *iNbKeys);
+
 G_END_DECLS
 
 
