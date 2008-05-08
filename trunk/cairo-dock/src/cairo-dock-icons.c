@@ -379,6 +379,7 @@ Icon *cairo_dock_get_icon_with_base_uri (GList *pIconList, const gchar *cBaseURI
 	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
+		//cd_message ("  icon->cBaseURI : %s\n", icon->cBaseURI);
 		if (icon->cBaseURI != NULL && strcmp (icon->cBaseURI, cBaseURI) == 0)
 			return icon;
 	}
@@ -393,6 +394,7 @@ Icon *cairo_dock_get_icon_with_name (GList *pIconList, const gchar *cName)
 	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
+		//cd_message ("  icon->acName : %s\n", icon->acName);
 		if (icon->acName != NULL && strcmp (icon->acName, cName) == 0)
 			return icon;
 	}

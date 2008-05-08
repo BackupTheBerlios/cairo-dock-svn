@@ -1309,6 +1309,13 @@ void cairo_dock_draw_insertion_signal (CairoDock *pDock, cairo_t *pCairoContext)
 	}*/
 	fX = pDock->iMouseX - g_fDropIndicatorWidth / 2;
 	
+	cairo_rectangle (pCairoContext,
+		(int) pDock->iMouseX - g_fDropIndicatorWidth/2,
+		(int) 0,
+		(int) g_fDropIndicatorWidth,
+		(int) 2*g_fDropIndicatorHeight);
+	cairo_clip (pCairoContext);
+	
 	//cairo_move_to (pCairoContext, fX, 0);
 	cairo_translate (pCairoContext, fX, 0);
 	double fRotationAngle = (pDock->bHorizontalDock ? (pDock->bDirectionUp ? 0 : G_PI) : (pDock->bDirectionUp ? -G_PI/2 : G_PI/2));

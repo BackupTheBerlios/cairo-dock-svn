@@ -132,10 +132,10 @@ static void _cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 		_("Development"),
 		"<b>Main developer :</b>\n  Fabounet (Fabrice Rey)\n\
 <b>Original idea/first development :</b>\n  Mac Slow\n\
-<b>Applets :</b>\n  Fabounet\n  Necropotame\n  Ctaf\n  ChAnGFu\n  Tofe\n\
+<b>Applets :</b>\n  Fabounet\n  Necropotame\n  Ctaf\n  ChAnGFu\n  Tofe\n  Paradoxxx_Zero\n\
 <b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole\n  Glattering\n  Vilraleur\n  Lord Northam\n\
 <b>Patchs :</b>\n  Ctaf\n  Robrob\n  Tshirtman\n\
-<b>Translations :</b>\n  Fabounet\n  Ppmt \n  Jiro Kawada");
+<b>Translations :</b>\n  Fabounet\n  Ppmt \n  Jiro Kawada\n  Henrry Oswaldo Ortiz Rodriguez");
 	
 	_cairo_dock_add_about_page (pNoteBook,
 		_("Support"),

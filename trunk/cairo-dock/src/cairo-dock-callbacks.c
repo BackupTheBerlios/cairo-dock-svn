@@ -48,6 +48,7 @@ static CairoDock *s_pLastPointedDock = NULL;  // pour savoir quand on passe d'un
 static int s_iSidNonStopScrolling = 0;
 static int s_iSidShowSubDockDemand = 0;
 static int s_iSidShowAppliForDrop = 0;
+static CairoDock *s_pDockShowingSubDock = NULL;  // on n'accede pas a son contenu, seulement l'adresse.
 
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
@@ -247,6 +248,8 @@ static void cairo_dock_show_subdock (Icon *pPointedIcon, gboolean bUpdate, Cairo
 gboolean _cairo_dock_show_sub_dock_delayed (CairoDock *pDock)
 {
 	cd_debug ("");
+	s_iSidShowSubDockDemand = 0;
+	s_pDockShowingSubDock = NULL;
 	Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
 	if (icon != NULL && icon->pSubDock != NULL)
 		cairo_dock_show_subdock (icon, FALSE, pDock);
@@ -261,12 +264,13 @@ static gboolean _cairo_dock_show_xwindow_for_drop (Icon *pIcon)
 }
 void cairo_dock_on_change_icon (Icon *pLastPointedIcon, Icon *pPointedIcon, CairoDock *pDock)
 {
-	cd_debug ("on change d'icone (-> %s)\n", (pPointedIcon != NULL ? pPointedIcon->acName : "rien"));
-	if (s_iSidShowSubDockDemand != 0)
+	cd_debug ("on change d'icone dans %x (-> %s)", pDock, (pPointedIcon != NULL ? pPointedIcon->acName : "rien"));
+	if (s_iSidShowSubDockDemand != 0 && pDock == s_pDockShowingSubDock)
 	{
 		cd_debug ("on annule la demande de montrage de sous-dock");
 		g_source_remove (s_iSidShowSubDockDemand);
 		s_iSidShowSubDockDemand = 0;
+		s_pDockShowingSubDock = NULL;
 	}
 	if (pDock->bIsDragging && s_iSidShowAppliForDrop != 0)
 	{
@@ -306,6 +310,7 @@ void cairo_dock_on_change_icon (Icon *pLastPointedIcon, Icon *pPointedIcon, Cair
 		{
 			//pDock->iMouseX = iX;
 			s_iSidShowSubDockDemand = g_timeout_add (g_iShowSubDockDelay, (GSourceFunc) _cairo_dock_show_sub_dock_delayed, pDock);
+			s_pDockShowingSubDock = pDock;
 			//cd_debug ("s_iSidShowSubDockDemand <- %d\n", s_iSidShowSubDockDemand);
 		}
 		else
@@ -439,6 +444,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		}
 	}
 	
+	//g_print ("%x -> %x\n", pLastPointedIcon, pPointedIcon);
 	if (pPointedIcon != pLastPointedIcon || s_pLastPointedDock == NULL)
 	{
 		cairo_dock_on_change_icon (pLastPointedIcon, pPointedIcon, pDock);
@@ -568,12 +574,6 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	if (pDock->bInside)  // on est re-rentre dedans entre-temps.
 		return TRUE;
 
-	/**if (s_iSidShowSubDockDemand != 0)
-	{
-		cd_debug ("on annule la demande de montrage de sous-dock");
-		g_source_remove (s_iSidShowSubDockDemand);
-		s_iSidShowSubDockDemand = 0;
-	}*/
 	if (! cairo_dock_hide_child_docks (pDock))  // on quitte si on entre dans un sous-dock, pour rester en position "haute".
 		return TRUE;
 
@@ -1191,7 +1191,7 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 				///gdk_window_hide (pLastPointedIcon->pSubDock->pWidget->window);
 				if (pLastPointedIcon->pSubDock->iSidLeaveDemand == 0)
 				{
-					cd_message ("  on retarde le cachage du dock de %dms", MAX (g_iLeaveSubDockDelay, 330));
+					cd_debug ("  on retarde le cachage du dock de %dms", MAX (g_iLeaveSubDockDelay, 330));
 					pLastPointedIcon->pSubDock->iSidLeaveDemand = g_timeout_add (MAX (g_iLeaveSubDockDelay, 330), (GSourceFunc) cairo_dock_emit_leave_signal, (gpointer) pLastPointedIcon->pSubDock);
 				}
 			}
@@ -1207,6 +1207,7 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 			{
 				//pDock->iMouseX = iX;
 				s_iSidShowSubDockDemand = g_timeout_add (g_iShowSubDockDelay, (GSourceFunc) _cairo_dock_show_sub_dock_delayed, pDock);
+				s_pDockShowingSubDock = pDock;
 			}
 			else
 				cairo_dock_show_subdock (pPointedIcon, TRUE, pDock);

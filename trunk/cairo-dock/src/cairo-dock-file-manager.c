@@ -292,7 +292,7 @@ static Icon *cairo_dock_fm_alter_icon_if_necessary (Icon *pIcon, CairoDock *pDoc
 	Icon *pNewIcon = cairo_dock_fm_create_icon_from_URI (pIcon->cBaseURI, pDock);
 	g_return_val_if_fail (pNewIcon != NULL && pNewIcon->acName != NULL, NULL);
 
-	if (strcmp (pIcon->acName, pNewIcon->acName) != 0 || strcmp (pIcon->acFileName, pNewIcon->acFileName) != 0 || pIcon->fOrder != pNewIcon->fOrder)
+	if (strcmp (pIcon->acName, pNewIcon->acName) != 0 || pNewIcon->acFileName == NULL || strcmp (pIcon->acFileName, pNewIcon->acFileName) != 0 || pIcon->fOrder != pNewIcon->fOrder)
 	{
 		cd_message ("  on remplace %s", pIcon->acName);
 		cairo_dock_remove_one_icon_from_dock (pDock, pIcon);
@@ -331,9 +331,11 @@ static Icon *cairo_dock_fm_alter_icon_if_necessary (Icon *pIcon, CairoDock *pDoc
 		return pIcon;
 	}
 }
-void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const gchar *cURI, Icon *pIcon, CairoDockIconType iTypeOnCreation)
+void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const gchar *cBaseURI, Icon *pIcon, CairoDockIconType iTypeOnCreation)
 {
-	g_return_if_fail (cURI != NULL && pIcon != NULL);
+	g_return_if_fail (cBaseURI != NULL && pIcon != NULL);
+	gchar *cURI = (g_strdup (cBaseURI));
+	cairo_dock_remove_html_spaces (cURI);
 	cd_message ("%s (%d sur %s)", __func__, iEventType, cURI);
 
 	switch (iEventType)
@@ -451,6 +453,7 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 		}
 		break ;
 	}
+	g_free (cURI);
 }
 
 void cairo_dock_fm_action_on_file_event (CairoDockFMEventType iEventType, const gchar *cURI, Icon *pIcon)
