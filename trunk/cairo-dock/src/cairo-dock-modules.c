@@ -292,7 +292,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 				if (pIcon != NULL)
 				{
 					if (pIcon->fOrder == CAIRO_DOCK_LAST_ORDER)
-						pIcon->fOrder = iOrder;
+						pIcon->fOrder = g_list_length (pDock->icons);  // pas optimise, mais oblige de leur donner un numero distinct pour chacun, y compris quand on en active seulement 1.
 					iOrder ++;
 					if (CAIRO_DOCK_IS_DOCK (pModule->pContainer))
 						cairo_dock_insert_icon_in_dock (pIcon, CAIRO_DOCK (pModule->pContainer), ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
@@ -410,6 +410,7 @@ GKeyFile *cairo_dock_pre_read_module_config (CairoDockModule *pModule, CairoDock
 		pMinimalConfig->bKeepBelow = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "keep below", NULL, FALSE, NULL, NULL);
 		pMinimalConfig->bKeepAbove = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "keep above", NULL, FALSE, NULL, NULL);
 		pMinimalConfig->bOnWidgetLayer = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "on widget layer", NULL, FALSE, NULL, NULL);
+		pMinimalConfig->bPositionLocked = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "locked", NULL, FALSE, NULL, NULL);
 	}
 	return pKeyFile;
 }

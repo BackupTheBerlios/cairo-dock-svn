@@ -228,7 +228,6 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 		//\_______________________ On cree la surface cairo a afficher.
 		if (cIconPath != NULL && *cIconPath != '\0')
 		{
-			//cairo_surface_t *pSurface =cairo_dock_create_surface_from_image (cIconPath,
 			icon->pIconBuffer = cairo_dock_create_surface_from_image (cIconPath,
 				pSourceContext,
 				fMaxScale,
@@ -237,21 +236,6 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 				(bHorizontalDock ? &icon->fWidth : &icon->fHeight),
 				(bHorizontalDock ? &icon->fHeight : &icon->fWidth),
 				FALSE);
-			//g_print (" => %.2fx%.2f\n", icon->fWidth, icon->fHeight);
-			/*int w = (int) icon->fWidth * (1 + g_fAmplitude), h = (int) icon->fHeight * (1 + g_fAmplitude);
-			guchar *pSurfaceData = g_new0 (guchar, w * h * 4);
-			icon->pIconBuffer = cairo_image_surface_create_for_data (pSurfaceData,
-				CAIRO_FORMAT_ARGB32,
-				w,
-				h,
-				w * 4);
-			cd_message (" + (%dx%d)\n", w, h);
-			
-			cairo_t* pCairoContext = cairo_create (icon->pIconBuffer);
-			cairo_set_source_surface (pCairoContext, pSurface, 0.0, 0.0);
-			cairo_paint (pCairoContext);
-			cairo_destroy (pCairoContext);
-			cairo_surface_destroy (pSurface);*/
 		}
 		
 		g_free (cIconPath);

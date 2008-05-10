@@ -24,6 +24,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <glitz-glx.h>
 #include <cairo-glitz.h>
 #endif
+#include <GL/gl.h>
 
 typedef struct _CairoDockRenderer CairoDockRenderer;
 typedef struct _CairoDeskletRenderer CairoDeskletRenderer;
@@ -337,6 +338,7 @@ struct _CairoDockMinimalAppletConfig {
 	gboolean bKeepBelow;
 	gboolean bKeepAbove;
 	gboolean bOnWidgetLayer;
+	gboolean bPositionLocked;
 };
 
 
@@ -684,6 +686,8 @@ struct _CairoDesklet {
 	gint iGradationCount;
 	/// timer associe.
 	gint iSidGradationOnEnter;
+	/// TRUE ssi on ne peut pas deplacer le widget a l'aide du simple clic gauche.
+	gboolean bPositionLocked;
 };
 
 

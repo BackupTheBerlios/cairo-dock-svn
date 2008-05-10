@@ -1333,7 +1333,7 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, CairoDockIconTyp
 	if (bCanDrop)
 	{
 		if (pDock->bIsDragging && pDock->iSidDropIndicator == 0)
-			pDock->iSidDropIndicator = g_timeout_add (40, (GSourceFunc) cairo_dock_display_insertion_signal, pDock);
+			pDock->iSidDropIndicator = g_timeout_add (40, (GSourceFunc) cairo_dock_display_drop_indicator, pDock);
 	}
 	else
 	{

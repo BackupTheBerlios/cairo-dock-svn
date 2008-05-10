@@ -4,6 +4,8 @@
 
 #include <gtk/gtk.h>
 
+void on_realize (GtkWidget* pWidget,
+	 CairoDock *pDock);
 
 gboolean on_expose (GtkWidget *pWidget,
 			GdkEventExpose *pExpose,

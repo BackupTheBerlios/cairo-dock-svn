@@ -44,7 +44,8 @@ echo "*** WARNING ***"
 echo "***************"
 echo " You are about to install a release candidate package."
 echo " That means it was created for testing purpose, and can still contain some bugs."
-echo " A repository exists for Ubuntu 7.10 and 8.04, you are encouraged to use it if you're under these OS (It should also work for other debian-based OS).
+echo " A repository exists for Ubuntu 7.10 and 8.04, you are encouraged to use it if you're under these OS (It should also work for other debian-based OS)."
+echo "Please visit http://cairo-dock.org for an easy way to install Cairo-Dock."
 read -p "  Continue anyway ? [y/N]" accept_the_risks
 if test ! "$accept_the_risks" = "y" -a ! "$accept_the_risks" = "Y"; then
 	exit 0

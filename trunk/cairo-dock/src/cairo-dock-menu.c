@@ -162,6 +162,7 @@ static void _cairo_dock_help (GtkMenuItem *menu_item, gpointer *data)
 	{
 		cd_warning ("Attention : %s\n  you can consult the wiki at http://www.cairo-dock.org", erreur->message);
 		g_error_free (erreur);
+		cairo_dock_show_general_message ("you can consult the wiki and the forum at http://www.cairo-dock.org", 6000);
 	}
 }
 
@@ -899,7 +900,13 @@ static void _cairo_dock_keep_on_widget_layer (GtkMenuItem *menu_item, gpointer *
 			G_TYPE_INVALID);
 }
 
-
+static void _cairo_dock_lock_position (GtkMenuItem *menu_item, gpointer *data)
+{
+	Icon *icon = data[0];
+	CairoDesklet *pDesklet = data[1];
+	
+	pDesklet->bPositionLocked = ! pDesklet->bPositionLocked;
+}
 
 
 static void _cairo_dock_configure_root_dock_position (GtkMenuItem *menu_item, gpointer *data)
@@ -1278,6 +1285,12 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		if (cairo_dock_window_is_utility (Xid))  // gtk_window_get_type_hint me renvoie toujours 0 !
 			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
 		g_signal_connect(G_OBJECT(menu_item), "toggled", G_CALLBACK(_cairo_dock_keep_on_widget_layer), data);
+		
+		menu_item = gtk_check_menu_item_new_with_label("Lock position");
+		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+		if (CAIRO_DESKLET (pContainer)->bPositionLocked)
+			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
+		g_signal_connect(G_OBJECT(menu_item), "toggled", G_CALLBACK(_cairo_dock_lock_position), data);
 		
 		GtkTooltips *pToolTipsGroup = gtk_tooltips_new ();
 		gtk_tooltips_set_tip (GTK_TOOLTIPS (pToolTipsGroup),

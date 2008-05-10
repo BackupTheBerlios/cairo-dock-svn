@@ -43,6 +43,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-keybinder.h"
 #include "cairo-dock-callbacks.h"
 
+#define FOVY_2 20.0
+#define Z_NEAR 3.0
+
 static Icon *s_pIconClicked = NULL;  // pour savoir quand on deplace une icone a la souris. Dangereux si l'icone se fait effacer en cours ...
 static CairoDock *s_pLastPointedDock = NULL;  // pour savoir quand on passe d'un dock a un autre.
 static int s_iSidNonStopScrolling = 0;
@@ -124,7 +127,7 @@ gboolean on_expose (GtkWidget *pWidget,
 					pExpose->area.height);
 				cairo_clip (pCairoContext);
 				
-				cairo_dock_draw_insertion_signal (pDock, pCairoContext);
+				cairo_dock_draw_drop_indicator (pDock, pCairoContext);
 				
 				cairo_destroy (pCairoContext);
 			}
@@ -1308,6 +1311,7 @@ gboolean on_configure (GtkWidget* pWidget,
 			gdk_window_get_pointer (pWidget->window, &pDock->iMouseY, &pDock->iMouseX, NULL);
 		if (pDock->iMouseX < 0 || pDock->iMouseX > pDock->iCurrentWidth)  // utile ?
 			pDock->iMouseX = 0;
+		
 		
 		pDock->calculate_icons (pDock);
 		gtk_widget_queue_draw (pWidget);  // il semble qu'il soit necessaire d'en rajouter un la pour eviter un "clignotement" a l'entree dans le dock.

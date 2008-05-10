@@ -418,7 +418,7 @@ main (int argc, char** argv)
 		g_print ("%s\n", CAIRO_DOCK_VERSION);
 		return 0;
 	}
-
+	
 	//\___________________ On internationalise l'appli.
 	bindtextdomain (CAIRO_DOCK_GETTEXT_PACKAGE, CAIRO_DOCK_LOCALE_DIR);
 	bind_textdomain_codeset (CAIRO_DOCK_GETTEXT_PACKAGE, "UTF-8");
@@ -506,7 +506,6 @@ main (int argc, char** argv)
 	gboolean config_ok;
 	if (bMaintenance)
 		config_ok = cairo_dock_edit_conf_file (NULL, g_cConfFile, _("< Maintenance mode >"), 800, 600, 0, NULL, NULL, NULL, NULL, NULL);
-		//cairo_dock_edit_conf_file_full (NULL, g_cConfFile, "< Maintenance mode >", 800, 600, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL, cairo_dock_read_easy_conf_file, g_cEasyConfFile, _("Easy Mode"), _("Advanced mode"), NULL);
 	
 	if (! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS) || bSafeMode)
 	{

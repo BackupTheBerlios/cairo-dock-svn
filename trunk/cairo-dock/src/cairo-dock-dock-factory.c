@@ -77,7 +77,6 @@ extern gboolean g_bSticky;
 
 extern gboolean g_bUseGlitz;
 
-
 CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockName, gchar *cRendererName)
 {
 	//static pouet = 0;

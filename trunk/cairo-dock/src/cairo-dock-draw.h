@@ -107,8 +107,8 @@ void cairo_dock_get_window_position_and_geometry_at_balance (CairoDock *pDock, C
 
 double cairo_dock_calculate_extra_width_for_trapeze (double fFrameHeight, double fInclination, double fRadius, double fLineWidth);
 
-gboolean cairo_dock_display_insertion_signal (CairoDock *pDock);
-void cairo_dock_draw_insertion_signal (CairoDock *pDock, cairo_t *pCairoContext);
+gboolean cairo_dock_display_drop_indicator (CairoDock *pDock);
+void cairo_dock_draw_drop_indicator (CairoDock *pDock, cairo_t *pCairoContext);
 
 
 #endif

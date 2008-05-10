@@ -235,7 +235,6 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 		{
 			pDesklet->diff_x = - pButton->x;  // pour le deplacement manuel.
 			pDesklet->diff_y = - pButton->y;
-			///pDesklet->moving = TRUE;  // on ne peut pas le mettre a TRUE ici, sinon au release, on saute toujours le lancement de la notification.
 			cd_debug ("diff : %d;%d", pDesklet->diff_x, pDesklet->diff_y);
 		}
 		else if (pButton->type == GDK_BUTTON_RELEASE)
@@ -301,7 +300,7 @@ static gboolean on_motion_notify_desklet(GtkWidget *pWidget,
 	GdkEventMotion* pMotion,
 	CairoDesklet *pDesklet)
 {
-	if (pMotion->state & GDK_BUTTON1_MASK /**&& pDesklet->moving*/)
+	if (pMotion->state & GDK_BUTTON1_MASK && ! pDesklet->bPositionLocked)
 	{
 		cd_debug ("root : %d;%d", (int) pMotion->x_root, (int) pMotion->y_root);
 		pDesklet->moving = TRUE;
@@ -500,6 +499,8 @@ void cairo_dock_place_desklet (CairoDesklet *pDesklet, CairoDockMinimalAppletCon
 		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_UTILITY");  // le hide-show le fait deconner completement, il perd son skip_task_bar ! au moins sous KDE.
 	else
 		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");
+	
+	pDesklet->bPositionLocked = pMinimalConfig->bPositionLocked;
 }
 
 
