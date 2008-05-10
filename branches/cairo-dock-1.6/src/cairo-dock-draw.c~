@@ -18,7 +18,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <glitz-glx.h>
 #include <cairo-glitz.h>
 #endif
-#include <gtk/gtkgl.h>
 
 #include "cairo-dock-icons.h"
 #include "cairo-dock-dock-factory.h"
@@ -74,8 +73,7 @@ extern cairo_surface_t *g_pDropIndicatorSurface;
 extern double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
 
 extern gboolean g_bUseGlitz;
-extern gboolean g_bUseOpenGL;
-extern CairoDock *g_pMainDock;
+
 
 void cairo_dock_set_colormap_for_window (GtkWidget *pWidget)
 {
@@ -286,7 +284,7 @@ static void cairo_dock_draw_frame_vertical (cairo_t *pCairoContext, double fRadi
 			sens * fRadius * (1 + sina), fRadius * (1 + sina) * fInclination,
 			sens * fRadius * (1 + sina), -fRadius * cosa);
 
-	cairo_rel_line_to (pCairoContext, 0, - fFrameWidth -  2 * fDeltaXForLoop - (g_bRoundedBottomCorner ? 0 : 2 * fRadius * cosa));
+	cairo_rel_line_to (pCairoContext, 0, - fFrameWidth -  2 * fDeltaXForLoop);
 	//\_________________ Coin bas gauche.
 	if (g_bRoundedBottomCorner)
 		cairo_rel_curve_to (pCairoContext,
@@ -562,10 +560,9 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	int x, y;
 	int alpha, red, green, blue;
 	float fAlphaFactor;
-	guchar *p, *pSurfaceData = cairo_image_surface_get_data (icon->pIconBuffer)icon->pSurfaceData, *pSurfaceDataIni = NULL;
-	pSurfaceData = icon->pSurfaceData;
+	guchar *p, *pSurfaceData = cairo_image_surface_get_data (icon->pIconBuffer), *pSurfaceDataIni = NULL;
 	int iNbChannels = 4, iRowstride =  w * sizeof (gint);
-	int delta_lum = sin (icon->fPhase) * 50;
+	int delta_lum = sin (icon->fPhase) * 75;
 	if (pSurfaceData != NULL && delta_lum)  //  && icon->bPointed
 	{
 		pSurfaceDataIni = g_memdup (pSurfaceData, iRowstride * h);
@@ -1141,79 +1138,19 @@ void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, d
 	if (pFirstDrawnElement == NULL)
 		return;
 
-	if (g_bUseOpenGL)
+	double fDockMagnitude = cairo_dock_calculate_magnitude (pDock->iMagnitudeIndex)/** * pDock->fMagnitudeMax*/;
+	Icon *icon;
+	GList *ic = pFirstDrawnElement;
+	do
 	{
-		GdkGLContext* pGlContext = gtk_widget_get_gl_context (pDock->pWidget);
-		GdkGLDrawable* pGlDrawable = gtk_widget_get_gl_drawable (pDock->pWidget);
-		double fAlpha = .8;
-		GLfloat afFrontDiffuseMat[] = {1.0f * fAlpha,
-			1.0f * fAlpha,
-			1.0f * fAlpha,
-			1.0f * fAlpha};
-		GLfloat afBackDiffuseMat[] = {1.0f * fAlpha,
-			1.0f * fAlpha,
-			1.0f * fAlpha,
-			1.0f * fAlpha};
-		
-		if (!gdk_gl_drawable_gl_begin (pGlDrawable, pGlContext))
-			return ;
-	
-		glPushMatrix ();
-		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glMaterialfv (GL_FRONT, GL_DIFFUSE, afFrontDiffuseMat);
-		glMaterialfv (GL_BACK, GL_DIFFUSE, afBackDiffuseMat);
-		glColor4f (0.0f, 0.0f, 0.0f, 0.0f);
-		glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
-		double fDockMagnitude = cairo_dock_calculate_magnitude (pDock->iMagnitudeIndex);
-		Icon *icon;
-		GList *ic = pFirstDrawnElement;
-		do
-		{
-			icon = ic->data;
-	
-			glTranslatef (icon->fDrawX / pDock->iCurrentWidth, 0.0f, 0.0f);
-			glBindTexture (GL_TEXTURE_RECTANGLE_ARB, icon->iColorBuffer);
-			glBegin (GL_QUADS);
-			glNormal3f (0.0f, 1.0f, 0.0f);
-			glTexCoord2f (0.0f, (GLfloat) icon->fHeight);
-			glVertex3f (0.0f, 0.0f, 1.0f);
-			glTexCoord2f (0.0f, 0.0f);
-			glVertex3f (0.0f, 0.0f, 0.0f);
-			glTexCoord2f ((GLfloat) icon->fWidth, 0.0f);
-			glVertex3f (1.0f, 0.0f, 0.0f);
-			glTexCoord2f ((GLfloat) icon->fWidth, (GLfloat) icon->fHeight);
-			glVertex3f (1.0f, 0.0f, 1.0f);
-			glEnd ();
-			
-	
-			ic = cairo_dock_get_next_element (ic, pDock->icons);
-		} while (ic != pFirstDrawnElement);
-		
-		glPopMatrix ();
-		if (gdk_gl_drawable_is_double_buffered (pGlDrawable))
-			gdk_gl_drawable_swap_buffers (pGlDrawable);
-		else
-			glFlush ();
-	
-		/* end drawing to current GL-context */
-		gdk_gl_drawable_gl_end (pGlDrawable);
-	}
-	else
-	{
-		double fDockMagnitude = cairo_dock_calculate_magnitude (pDock->iMagnitudeIndex);  // * pDock->fMagnitudeMax
-		Icon *icon;
-		GList *ic = pFirstDrawnElement;
-		do
-		{
-			icon = ic->data;
-	
-			cairo_save (pCairoContext);
-			cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect, TRUE, pDock->iCurrentWidth, pDock->bDirectionUp);
-			cairo_restore (pCairoContext);
-	
-			ic = cairo_dock_get_next_element (ic, pDock->icons);
-		} while (ic != pFirstDrawnElement);
-	}
+		icon = ic->data;
+
+		cairo_save (pCairoContext);
+		cairo_dock_render_one_icon (icon, pCairoContext, pDock->bHorizontalDock, fRatio, fDockMagnitude, pDock->bUseReflect, TRUE, pDock->iCurrentWidth, pDock->bDirectionUp);
+		cairo_restore (pCairoContext);
+
+		ic = cairo_dock_get_next_element (ic, pDock->icons);
+	} while (ic != pFirstDrawnElement);
 }
 
 
@@ -1288,7 +1225,7 @@ void cairo_dock_redraw_my_icon (Icon *icon, CairoContainer *pContainer)
 		(int) icon->fHeight * icon->fScale + fReflectSize};
 	if (! bHorizontal)
 	{
-		rect.x = (int) icon->fDrawY - (! bDirectionUp ? fReflectSize : 0);
+		rect.x = (int) icon->fDrawY - (! bDirectionUp ? fReflectSize : 0),
 		rect.y = (int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor));
 		rect.width = (int) icon->fHeight * icon->fScale + fReflectSize;
 		rect.height = (int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)) - 1;
@@ -1359,7 +1296,7 @@ double cairo_dock_calculate_extra_width_for_trapeze (double fFrameHeight, double
 
 
 
-void cairo_dock_draw_drop_indicator (CairoDock *pDock, cairo_t *pCairoContext)
+void cairo_dock_draw_insertion_signal (CairoDock *pDock, cairo_t *pCairoContext)
 {
 	double fX;
 	/*if (pDock->iMouseX < icon->fDrawX + icon->fWidth * icon->fScale * fMargin)  // on est a gauche.
@@ -1372,27 +1309,11 @@ void cairo_dock_draw_drop_indicator (CairoDock *pDock, cairo_t *pCairoContext)
 	}*/
 	fX = pDock->iMouseX - g_fDropIndicatorWidth / 2;
 	
-	if (pDock->bHorizontalDock)
-		cairo_rectangle (pCairoContext,
-			(int) pDock->iMouseX - g_fDropIndicatorWidth/2,
-			(int) (pDock->bDirectionUp ? 0 : pDock->iCurrentHeight - 2*g_fDropIndicatorHeight),
-			(int) g_fDropIndicatorWidth,
-			(int) (pDock->bDirectionUp ? 2*g_fDropIndicatorHeight : pDock->iCurrentHeight));
-	else
-		cairo_rectangle (pCairoContext,
-			(int) (pDock->bDirectionUp ? 0 : pDock->iCurrentHeight - 2*g_fDropIndicatorHeight),
-			(int) pDock->iMouseX - g_fDropIndicatorWidth/2,
-			(int) (pDock->bDirectionUp ? 2*g_fDropIndicatorHeight : pDock->iCurrentHeight),
-			(int) g_fDropIndicatorWidth);
-	cairo_clip (pCairoContext);
-	
 	//cairo_move_to (pCairoContext, fX, 0);
-	if (pDock->bHorizontalDock)
-		cairo_translate (pCairoContext, fX, (pDock->bDirectionUp ? 0 : pDock->iCurrentHeight));
-	else
-		cairo_translate (pCairoContext, (pDock->bDirectionUp ? 0 : pDock->iCurrentHeight), fX);
+	cairo_translate (pCairoContext, fX, 0);
 	double fRotationAngle = (pDock->bHorizontalDock ? (pDock->bDirectionUp ? 0 : G_PI) : (pDock->bDirectionUp ? -G_PI/2 : G_PI/2));
 	cairo_rotate (pCairoContext, fRotationAngle);
+	
 	
 	//cairo_move_to (pCairoContext, fX, pDock->iDropIndicatorOffset);
 	cairo_translate (pCairoContext, 0, pDock->iDropIndicatorOffset);
@@ -1445,19 +1366,12 @@ void cairo_dock_draw_drop_indicator (CairoDock *pDock, cairo_t *pCairoContext)
 		pDock->iDropIndicatorOffset = 0;
 }
 
-gboolean cairo_dock_display_drop_indicator (CairoDock *pDock)
+gboolean cairo_dock_display_insertion_signal (CairoDock *pDock)
 {
 	GdkRectangle rect = {(int) pDock->iMouseX - g_fDropIndicatorWidth/2,
-		(int) (pDock->bDirectionUp ? 0 : pDock->iCurrentHeight - 2*g_fDropIndicatorHeight),
+		(int) 0,
 		(int) g_fDropIndicatorWidth,
 		(int) 2*g_fDropIndicatorHeight};  /// A peaufiner...
-	if (! pDock->bHorizontalDock)
-	{
-		rect.x = (int) (pDock->bDirectionUp ? 0 : pDock->iCurrentHeight - 2*g_fDropIndicatorHeight);
-		rect.y = (int) pDock->iMouseX - g_fDropIndicatorWidth/2;
-		rect.width = (int) 2*g_fDropIndicatorHeight;
-		rect.height =(int) g_fDropIndicatorWidth;
-	}
 	//g_print ("rect (%d;%d) (%dx%d)\n", rect.x, rect.y, rect.width, rect.height);
 	if (rect.width > 0 && rect.height > 0)
 	{

@@ -17,7 +17,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <glitz-glx.h>
 #include <cairo-glitz.h>
 #endif
-#include <gtk/gtkgl.h>
 
 #include "cairo-dock-draw.h"
 #include "cairo-dock-icons.h"
@@ -83,7 +82,6 @@ extern cairo_surface_t *g_pDropIndicatorSurface;
 extern double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
 
 extern gboolean g_bUseGlitz;
-extern gboolean g_bUseOpenGL;
 
 
 gchar *cairo_dock_generate_file_path (gchar *cImageFile)
@@ -230,8 +228,8 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 		//\_______________________ On cree la surface cairo a afficher.
 		if (cIconPath != NULL && *cIconPath != '\0')
 		{
-			cairo_surface_t *pSurface =cairo_dock_create_surface_from_image (cIconPath,
-			//icon->pIconBuffer = cairo_dock_create_surface_from_image (cIconPath,
+			//cairo_surface_t *pSurface =cairo_dock_create_surface_from_image (cIconPath,
+			icon->pIconBuffer = cairo_dock_create_surface_from_image (cIconPath,
 				pSourceContext,
 				fMaxScale,
 				(bApplySizeRestriction ? g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] : icon->fWidth),
@@ -240,46 +238,20 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 				(bHorizontalDock ? &icon->fHeight : &icon->fWidth),
 				FALSE);
 			//g_print (" => %.2fx%.2f\n", icon->fWidth, icon->fHeight);
-			int w = (int) icon->fWidth * (1 + g_fAmplitude), h = (int) icon->fHeight * (1 + g_fAmplitude);
-			g_free (icon->pSurfaceData);
-			icon->pSurfaceData = g_new0 (guchar, w * h * 4);
-			icon->pIconBuffer = cairo_image_surface_create_for_data (icon->pSurfaceData,
+			/*int w = (int) icon->fWidth * (1 + g_fAmplitude), h = (int) icon->fHeight * (1 + g_fAmplitude);
+			guchar *pSurfaceData = g_new0 (guchar, w * h * 4);
+			icon->pIconBuffer = cairo_image_surface_create_for_data (pSurfaceData,
 				CAIRO_FORMAT_ARGB32,
 				w,
 				h,
 				w * 4);
 			cd_message (" + (%dx%d)\n", w, h);
 			
-			if (icon->pCairoContext!= NULL)
-				cairo_destroy (icon->pCairoContext);
-			icon->pCairoContext = cairo_create (icon->pIconBuffer);
-			cairo_save (icon->pCairoContext);
-			cairo_set_source_surface (icon->pCairoContext, pSurface, 0.0, 0.0);
-			cairo_paint (icon->pCairoContext);
-			cairo_restore (icon->pCairoContext);
-			cairo_surface_destroy (pSurface);
-			
-			if (g_bUseOpenGL)
-			{
-				GdkGLContext* pGlContext = gtk_widget_get_gl_context (g_pMainDock->pWidget);
-				GdkGLDrawable* pGlDrawable = gtk_widget_get_gl_drawable (g_pMainDock->pWidget);
-				if (!gdk_gl_drawable_gl_begin (pGlDrawable, pGlContext))
-					return ;
-				
-				glGenTextures (1, &icon->iColorBuffer);
-				glBindTexture (GL_TEXTURE_RECTANGLE_ARB, icon->iColorBuffer);  // GL_TEXTURE_2D
-				glTexImage2D (GL_TEXTURE_RECTANGLE_ARB,  // GL_TEXTURE_2D
-					0,
-					GL_RGBA,  // GL_ALPHA
-					w,
-					h,
-					0,
-					GL_BGRA,  // GL_ALPHA
-					GL_UNSIGNED_BYTE,
-					icon->pSurfaceData);
-				
-				gdk_gl_drawable_gl_end (pGlDrawable);
-			}
+			cairo_t* pCairoContext = cairo_create (icon->pIconBuffer);
+			cairo_set_source_surface (pCairoContext, pSurface, 0.0, 0.0);
+			cairo_paint (pCairoContext);
+			cairo_destroy (pCairoContext);
+			cairo_surface_destroy (pSurface);*/
 		}
 		
 		g_free (cIconPath);

@@ -71,8 +71,6 @@
 #include <glitz-glx.h>
 #include <cairo-glitz.h>
 #endif
-#include <gtk/gtkgl.h>
-#include <GL/glut.h>
 
 #include "cairo-dock-icons.h"
 #include "cairo-dock-applications-manager.h"
@@ -225,7 +223,6 @@ gboolean g_bSticky = TRUE;
 
 gboolean g_bUseGlitz = FALSE;
 gboolean g_bVerbose = FALSE;
-gboolean g_bUseOpenGL = FALSE;
 
 int g_iMajorVersion, g_iMinorVersion, g_iMicroVersion;
 CairoDockDesktopEnv g_iDesktopEnv = CAIRO_DOCK_UNKNOWN_ENV;
@@ -240,10 +237,8 @@ int g_iIndicatorDeltaY;
 gboolean g_bOverWriteXIcons = TRUE; // il faut le savoir avant.
 gboolean g_bLinkIndicatorWithIcon;
 
-cairo_surface_t *g_pDropIndicatorSurface = NULL;
-double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
-
-GdkGLConfig* g_pGlConfig = NULL;
+cairo_surface_t *g_pInsertionSignalSurface = NULL;
+double g_fInsertionSignalWidth, g_fInsertionSignalHeight;
 
 static gboolean random_dialog (gpointer user_data)
 {
@@ -288,8 +283,6 @@ main (int argc, char** argv)
         //No log
         cd_log_set_level(0);
 	gtk_init (&argc, &argv);
-	gtk_gl_init (&argc, &argv);
-	glutInit (&argc, argv);
 	GError *erreur = NULL;
 
 	//\___________________ On recupere quelques options.
@@ -303,9 +296,6 @@ main (int argc, char** argv)
 		{"glitz", 'g', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&g_bUseGlitz,
 			"use hardware acceleration through Glitz (needs a glitz-enabled libcairo)", NULL},
-		{"opengl", 'o', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
-			&g_bUseOpenGL,
-			"use OpenGL (very experimental)", NULL},
 		{"keep-above", 'a', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&g_bKeepAbove,
 			"keep the dock above other windows whatever", NULL},
@@ -428,19 +418,7 @@ main (int argc, char** argv)
 		g_print ("%s\n", CAIRO_DOCK_VERSION);
 		return 0;
 	}
-	
-	g_pGlConfig = gdk_gl_config_new_by_mode (GDK_GL_MODE_RGB   |
-		GDK_GL_MODE_ALPHA |
-		GDK_GL_MODE_DEPTH |
-		GDK_GL_MODE_DOUBLE);
-	if (! g_pGlConfig)
-	{
-		cd_warning ("Could not setup GL-context !");
-		g_bUseOpenGL = FALSE;
-	}
-	
-	
-	
+
 	//\___________________ On internationalise l'appli.
 	bindtextdomain (CAIRO_DOCK_GETTEXT_PACKAGE, CAIRO_DOCK_LOCALE_DIR);
 	bind_textdomain_codeset (CAIRO_DOCK_GETTEXT_PACKAGE, "UTF-8");
@@ -528,6 +506,7 @@ main (int argc, char** argv)
 	gboolean config_ok;
 	if (bMaintenance)
 		config_ok = cairo_dock_edit_conf_file (NULL, g_cConfFile, _("< Maintenance mode >"), 800, 600, 0, NULL, NULL, NULL, NULL, NULL);
+		//cairo_dock_edit_conf_file_full (NULL, g_cConfFile, "< Maintenance mode >", 800, 600, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL, cairo_dock_read_easy_conf_file, g_cEasyConfFile, _("Easy Mode"), _("Advanced mode"), NULL);
 	
 	if (! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS) || bSafeMode)
 	{

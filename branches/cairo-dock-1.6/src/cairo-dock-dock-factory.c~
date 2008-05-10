@@ -24,7 +24,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <glitz-glx.h>
 #include <cairo-glitz.h>
 #endif
-#include <gtk/gtkgl.h>
 
 #include "cairo-dock-draw.h"
 #include "cairo-dock-applications-manager.h"
@@ -119,12 +118,6 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	gtk_window_set_type_hint (GTK_WINDOW (pWindow), iWmHint);
 
 	cairo_dock_set_colormap (CAIRO_CONTAINER (pDock));
-	if (g_bUseOpenGL)
-		gtk_widget_set_gl_capability (pWindow,
-			g_pGlConfig,
-			NULL,
-			TRUE,
-			GDK_GL_RGBA_TYPE);
 
 	gtk_widget_set_app_paintable (pWindow, TRUE);
 	gtk_window_set_decorated (GTK_WINDOW (pWindow), FALSE);
@@ -140,10 +133,6 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 		//GDK_STRUCTURE_MASK | GDK_PROPERTY_CHANGE_MASK |
 		GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
 
-	g_signal_connect_after (G_OBJECT (pWindow),
-		"realize",
-		G_CALLBACK (on_realize),
-		pDock);
 	g_signal_connect (G_OBJECT (pWindow),
 		"delete-event",
 		G_CALLBACK (on_delete),

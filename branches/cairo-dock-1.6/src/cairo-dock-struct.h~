@@ -24,7 +24,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <glitz-glx.h>
 #include <cairo-glitz.h>
 #endif
-#include <GL/gl.h>
 
 typedef struct _CairoDockRenderer CairoDockRenderer;
 typedef struct _CairoDeskletRenderer CairoDeskletRenderer;
@@ -338,7 +337,6 @@ struct _CairoDockMinimalAppletConfig {
 	gboolean bKeepBelow;
 	gboolean bKeepAbove;
 	gboolean bOnWidgetLayer;
-	gboolean bPositionLocked;
 };
 
 
@@ -522,8 +520,6 @@ struct _Icon {
 	gdouble fDrawX;
 	/// Ordonnee du bord haut de l'image de l'icone.
 	gdouble fDrawY;
-	/// Position de l'icone hors animation.
-	gdouble fDrawXAtRest, fDrawYAtRest;
 	/// Facteur de zoom sur la largeur de l'icone.
 	gdouble fWidthFactor;
 	/// Facteur de zoom sur la hauteur de l'icone.
@@ -572,10 +568,6 @@ struct _Icon {
 	double fQuickInfoYOffset;
 	/// TRUE ssi l'icone a un indicateur (elle controle une appli).
 	gboolean bHasIndicator;
-	
-	guchar *pSurfaceData;
-	cairo_t *pCairoContext;
-	GLuint iColorBuffer;
 };
 
 
@@ -690,8 +682,6 @@ struct _CairoDesklet {
 	gint iGradationCount;
 	/// timer associe.
 	gint iSidGradationOnEnter;
-	/// TRUE ssi on ne peut pas deplacer le widget a l'aide du simple clic gauche.
-	gboolean bPositionLocked;
 };
 
 
