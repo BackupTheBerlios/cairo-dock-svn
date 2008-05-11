@@ -205,6 +205,47 @@ void cairo_dock_draw_bar_on_icon (cairo_t *pIconContext, double fValue, Icon *pI
 	cairo_restore (pIconContext);
 }
 
+//Fonction proposée par Nécropotame, rédigée par ChAnGFu
+void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIconFile, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType)
+{
+	cd_debug ("%s (%s %d)", __func__, cIconFile, pEmblemType);
+	g_return_if_fail (pIcon != NULL && pContainer != NULL); 
+	
+	if (cIconFile == NULL) 
+		return;
+	
+	cairo_surface_t *pCairoSurface=NULL;
+	double fImgX, fImgY, fImgW, fImgH, emblemW = pIcon->fWidth / 3, emblemH = pIcon->fHeight / 3;
+	pCairoSurface = cairo_dock_create_surface_from_image (cIconFile, pIconContext, cairo_dock_get_max_scale (pContainer), emblemW, emblemH, &fImgW, &fImgH, TRUE);
+
+	switch (pEmblemType) {
+		default:
+		case CAIRO_DOCK_EMBLEM_UPPER_RIGHT :
+			fImgX = pIcon->fWidth - emblemW;
+			fImgY = 1.;
+		break;
+		
+		case CAIRO_DOCK_EMBLEM_MIDDLE :
+			fImgX = (pIcon->fWidth - emblemW) / 2;
+			fImgY = (pIcon->fHeight - emblemH) / 2;
+		break;
+		
+		case CAIRO_DOCK_EMBLEM_MIDDILE_BOTTOM:
+			fImgX = (pIcon->fWidth - emblemW) / 2;
+			fImgY = pIcon->fHeight - emblemH;
+		break;
+		
+		case CAIRO_DOCK_EMBLEM_BACKGROUND :
+			fImgX = (pIcon->fWidth - emblemW) / 2;
+			fImgY = 1.;
+		break;
+	}
+	
+	cairo_save (pIconContext);
+	cairo_set_source_surface (pIconContext, pCairoSurface, fImgX, fImgY);
+	cairo_paint (pIconContext);
+	cairo_restore (pIconContext);
+}
 
 void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, Icon *pIcon, CairoContainer *pContainer)  // fonction proposee par Necropotame.
 {

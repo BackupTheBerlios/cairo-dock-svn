@@ -47,6 +47,24 @@ void cairo_dock_set_icon_surface_full (cairo_t *pIconContext, cairo_surface_t *p
 */
 void cairo_dock_draw_bar_on_icon (cairo_t *pIconContext, double fValue, Icon *pIcon, CairoContainer *pContainer);
 
+//Needed for emblem type
+typedef enum {
+	CAIRO_DOCK_EMBLEM_UPPER_RIGHT = 0,
+	CAIRO_DOCK_EMBLEM_MIDDLE,
+	CAIRO_DOCK_EMBLEM_MIDDILE_BOTTOM,
+	CAIRO_DOCK_EMBLEM_BACKGROUND,
+} CairoDockEmblem;
+
+/**
+*Dessine un emblem sur notre icon.
+*@param pIconContext le contexte du dessin; n'est pas altere par la fonction.
+*@param cIconFile l'emblem a afficher.
+*@param pIcon l'icone.
+*@param pContainer le container de l'icone.
+*@param CairoDockEmblem énumération du type d'emblem
+*/
+void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIconFile, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType);
+
 /**
 *Cree les surfaces de reflection d'une icone.
 *@param pIconContext le contexte de dessin lie a la surface de l'icone; n'est pas altere par la fonction.
