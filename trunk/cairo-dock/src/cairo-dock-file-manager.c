@@ -436,9 +436,9 @@ void cairo_dock_fm_manage_event_on_file (CairoDockFMEventType iEventType, const 
 			
 			Icon *pNewIcon = cairo_dock_fm_alter_icon_if_necessary (pConcernedIcon, pParentDock);
 			
-			if (pNewIcon != NULL && pNewIcon != pConcernedIcon && pNewIcon->iVolumeID > 0)
+			if (pNewIcon != NULL && pNewIcon->iVolumeID > 0)  // && pNewIcon != pConcernedIcon
 			{
-				cd_message ("ce volume a change\n");
+				cd_message ("ce volume a change");
 				gboolean bIsMounted = FALSE;
 				if (s_pVFSBackend->is_mounted != NULL)
 				{
