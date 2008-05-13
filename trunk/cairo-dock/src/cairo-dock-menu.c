@@ -139,8 +139,8 @@ static void _cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 	
 	_cairo_dock_add_about_page (pNoteBook,
 		_("Support"),
-		"<b>Installation scripts and repository :</b>\n  Mav\n\
-<b>Site (cairo-dock.org) :</b>\n  Tdey\n  Necropotame\n\
+		"<b>Installation scripts and repository :</b>\n  Mav (SVN script, Ubuntu repository, web hosting)\n  Anubis (Suse repository)\n\
+<b>Site (cairo-dock.org) :</b>\n  Necropotame\n  Tdey\n\
 <b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Mav\n  Necropotame\n  Nochka85\n  Ppmt\n  Rhinopierroce\n  Sombrero\n  Vilraleur");
 	
 	gtk_widget_show_all (pDialog);
@@ -906,6 +906,10 @@ static void _cairo_dock_lock_position (GtkMenuItem *menu_item, gpointer *data)
 	CairoDesklet *pDesklet = data[1];
 	
 	pDesklet->bPositionLocked = ! pDesklet->bPositionLocked;
+	if (CAIRO_DOCK_IS_APPLET (icon))
+		cairo_dock_update_conf_file (icon->pModule->cConfFilePath,
+			G_TYPE_BOOLEAN, "Desklet", "locked", pDesklet->bPositionLocked,
+			G_TYPE_INVALID);
 }
 
 
@@ -1098,7 +1102,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 				cd_message ("  cActivationURI : %s; bIsMounted : %d\n", cActivationURI, bIsMounted);
 				g_free (cActivationURI);
 
-				menu_item = gtk_menu_item_new_with_label (bIsMounted ? "Unmount" : "Mount");
+				menu_item = gtk_menu_item_new_with_label (bIsMounted ? _("Unmount") : _("Mount"));
 				gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 				g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(_cairo_dock_mount_unmount), data);
 			}

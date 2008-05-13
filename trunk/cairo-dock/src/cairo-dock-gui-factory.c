@@ -871,16 +871,35 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						{
 							iValue =  (k < length ? iValueList[k] : 0);
 							if (pAuthorizedValuesList != NULL && pAuthorizedValuesList[0] != NULL)
-								iMinValue = atoi(pAuthorizedValuesList[0]);
+								iMinValue = g_ascii_strtod (pAuthorizedValuesList[0], NULL);
 							else
 								iMinValue = 0;
 							if (pAuthorizedValuesList != NULL && pAuthorizedValuesList[1] != NULL)
-								iMaxValue = atoi(pAuthorizedValuesList[1]);
+								iMaxValue = g_ascii_strtod (pAuthorizedValuesList[1], NULL);
 							else
 								iMaxValue = 9999;
-							pOneWidget = gtk_spin_button_new_with_range  (iMinValue, iMaxValue, 1);
-							gtk_spin_button_set_digits (GTK_SPIN_BUTTON (pOneWidget), 0);
-							gtk_spin_button_set_value (GTK_SPIN_BUTTON (pOneWidget), iValue);
+
+							GtkObject *pAdjustment = gtk_adjustment_new (iValue,
+								0,
+								1,
+								MAX (1, (iMaxValue - iMinValue) / 100),
+								MAX (1, (iMaxValue - iMinValue) / 20),
+								0);
+
+							if (iElementType == 'I')
+							{
+								pOneWidget = gtk_hscale_new (GTK_ADJUSTMENT (pAdjustment));
+								gtk_scale_set_digits (GTK_SCALE (pOneWidget), 0);
+								gtk_widget_set (pOneWidget, "width-request", 150, NULL);
+							}
+							else
+							{
+								pOneWidget = gtk_spin_button_new (GTK_ADJUSTMENT (pAdjustment),
+									1.,
+									0);
+							}
+							g_object_set (pAdjustment, "lower", (double) iMinValue, "upper", (double) iMaxValue, NULL); // le 'width-request' sur un GtkHScale avec 'fMinValue' non nul plante ! Donc on les met apres...
+							gtk_adjustment_set_value (GTK_ADJUSTMENT (pAdjustment), iValue);
 
 							pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
 							gtk_box_pack_start(GTK_BOX (pHBox),
@@ -890,7 +909,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 								0);
 						}
 						g_free (iValueList);
-						break;
+					break;
 
 					case 'f' :  // float.
 					case 'c' :  // float avec un bouton de choix de couleur.
@@ -1741,7 +1760,8 @@ static void _cairo_dock_get_each_widget_value (gpointer *data, GKeyFile *pKeyFil
 	else if (GTK_IS_SPIN_BUTTON (pOneWidget) || GTK_IS_HSCALE (pOneWidget))
 	{
 		gboolean bIsSpin = GTK_IS_SPIN_BUTTON (pOneWidget);
-		if ( (bIsSpin && gtk_spin_button_get_digits (GTK_SPIN_BUTTON (pOneWidget)) == 0) || (! bIsSpin && gtk_scale_get_digits (GTK_SCALE (pOneWidget)) == 0) )
+		
+		if ((bIsSpin && gtk_spin_button_get_digits (GTK_SPIN_BUTTON (pOneWidget)) == 0) || (! bIsSpin && gtk_scale_get_digits (GTK_SCALE (pOneWidget)) == 0))
 		{
 			int *tIntegerValues = g_new0 (int, iNbElements);
 			for (pList = pSubWidgetList; pList != NULL; pList = pList->next)

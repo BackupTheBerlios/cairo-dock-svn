@@ -20,10 +20,10 @@ alignment = .5
 #F-[Position regarding the chosen screen's edge;gtk-leave-fullscreen]
 frame2 =
 
-#i-[-1024;1024] Lateral gap :
+#I-[-1024;1024] Lateral gap :
 #{Gap from the absolute position on the screen's edge, in pixels. You can also move the dock by holding ALT or CTRL key and left mouse button.}
 x gap = 0
-#i-[-20;2000] Distance to the screen's edge :
+#i-[0;1000] Distance to the screen's edge :
 #{in pixels. You can also move the dock by holding ALT or CTRL key and left mouse button.}
 y gap = 25
 
@@ -129,10 +129,10 @@ frame_mov =
 #{The icons will appear folded on themselves, regarding the alignement point, then will unfold untill they fill the whole dock. Use 0 to not use unfolding, the more it's close to 0, the faster it will be}
 unfold factor = 8
 
-#I-[5;50] Number of steps for icons' resizing (grow up/shrink down) :
+#i-[5;50] Number of steps for icons' resizing (grow up/shrink down) :
 #{The more there are, the slower it will be}
 grow up steps = 10
-#I-[5;50] ...
+#i-[5;50] ...
 shrink down steps = 12
 
 #f-[0.1;0.9] Window's move acceleration (move up/move down) :
@@ -329,7 +329,7 @@ stripes width = 0.03
 #[gtk-about]
 [Icons]
 
-#F+[Wave's shape]
+#F+[Wave's shape;@prefix@/@DATADIRNAME@/@PACKAGE@/icon-wave.svg]
 frame_shape =
 #f+[0;5] Crest of the wave :
 #{the maximum zoom will be 1+C.}
@@ -404,10 +404,10 @@ default icon directory = _ThemeDirectory_
 #X+[Launchers]
 frame_launcher =
 
-#i+ Icon size at rest (width x height) :
+#i[0;128]+ Icon size at rest (width x height) :
 #{Put 0 if you don't want to restrain them}
 launcher width = 0
-#i+ ...
+#i[0;128]+ ...
 launcher height = 0
 
 #r+[bounce;rotate;blink;pulse;upside-down;wobbly;random] Animation type when clicked :
@@ -429,7 +429,7 @@ indicator ratio = 1.
 link indicator = TRUE
 
 #i+[-10;64] Vertical offset :
-#{i pixels. You can use this parameter to adjust the indicator's vertical position.}
+#{in pixels. You can use this parameter to adjust the indicator's vertical position.}
 indicator deltaY = 2
 
 #v+
@@ -442,10 +442,10 @@ drop indicator =
 #X+[Applications]
 frame_appli =
 
-#i+ Icon size at rest (width x height) :
+#i[0;128]+ Icon size at rest (width x height) :
 #{Put 0 if you don't want to restrain them}
 appli width = 0
-#i+ ...
+#i[0;128]+ ...
 appli height = 0
 
 #r+[bounce;rotate;blink;pulse;upside-down;wobbly;random] Animation type when clicked :
@@ -458,10 +458,10 @@ appli number of rounds = 4
 #X+[Applets]
 frame_applet =
 
-#i+ Icon size at rest (width x height) :
+#i[0;128]+ Icon size at rest (width x height) :
 #{Put 0 if you don't want to restrain them}
 applet width = 0
-#i+ ...
+#i[0;128]+ ...
 applet height = 0
 
 #r+[bounce;rotate;blink;pulse;upside-down;wobbly;random] Animation type when clicked :
@@ -473,10 +473,10 @@ applet number of rounds = 4
 #X+[Separators]
 frame_sep =
 
-#i+ Icon size at rest (width x height) :
+#i[0;128]+ Icon size at rest (width x height) :
 #{Put 0 if you don't want to restrain them}
 separator width = 0
-#i+ ...
+#i[0;128]+ ...
 separator height = 0
 
 #b Automatically add separators ?

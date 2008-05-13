@@ -34,10 +34,11 @@ cairo_surface_t *cairo_dock_create_applet_surface (gchar *cIconFileName, cairo_t
 	cd_message ("%s (%.2fx%.2f x %.2f / %d)", __func__, *fWidth, *fHeight,fMaxScale, bApplySizeRestriction);
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
-	cairo_dock_calculate_contrainted_size (fWidth,
+	cairo_dock_calculate_size_fill (fWidth,
 		fHeight,
 		(bApplySizeRestriction ? g_tIconAuthorizedWidth[CAIRO_DOCK_APPLET] : 0),
 		(bApplySizeRestriction ? g_tIconAuthorizedHeight[CAIRO_DOCK_APPLET] : 0),
+		FALSE,
 		&fIconWidthSaturationFactor, &fIconHeightSaturationFactor);
 	cd_message (" -> %.2fx%.2f x %.2f", *fWidth, *fHeight,fMaxScale);
 	cairo_surface_t *pNewSurface;
@@ -56,7 +57,7 @@ cairo_surface_t *cairo_dock_create_applet_surface (gchar *cIconFileName, cairo_t
 			*fHeight,
 			fWidth,
 			fHeight,
-			FALSE);
+			CAIRO_DOCK_FILL_SPACE);
 		g_free (cIconPath);
 	}
 	return pNewSurface;

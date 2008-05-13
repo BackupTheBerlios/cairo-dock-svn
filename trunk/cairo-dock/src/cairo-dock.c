@@ -240,18 +240,6 @@ gboolean g_bLinkIndicatorWithIcon;
 cairo_surface_t *g_pDropIndicatorSurface = NULL;
 double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
 
-static gboolean random_dialog (gpointer user_data)
-{
-	g_return_val_if_fail (g_pMainDock != NULL && g_pMainDock->icons != NULL, TRUE);
-
-	int num_icone = g_random_int_range (0, g_list_length (g_pMainDock->icons));
-
-	Icon *icon = g_list_nth_data (g_pMainDock->icons, num_icone);
-	if (CAIRO_DOCK_IS_SEPARATOR (icon))
-		return random_dialog (user_data);
-	cairo_dock_show_temporary_dialog (icon->acName, icon, CAIRO_CONTAINER (g_pMainDock), 7000);
-	return TRUE;
-}
 
 static void _cairo_dock_set_verbosity(gchar *cVerbosity)
 {
@@ -286,7 +274,7 @@ main (int argc, char** argv)
 	GError *erreur = NULL;
 
 	//\___________________ On recupere quelques options.
-	gboolean bDialogTest = FALSE, bSafeMode = FALSE, bMaintenance = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE;
+	gboolean bSafeMode = FALSE, bMaintenance = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE;
 	gchar *cEnvironment = NULL, *cUserDefinedDataDir = NULL, *cVerbosity = 0, *cUserDefinedModuleDir = NULL;
 	GOptionEntry TableDesOptions[] =
 	{
@@ -326,9 +314,6 @@ main (int argc, char** argv)
 		{"safe-mode", 'f', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&bSafeMode,
 			"don't load any plug-ins and show the theme manager on start", NULL},
-		{"dialog", 'D', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
-			&bDialogTest,
-			"for test on dialogs only", NULL},
 		{"capuccino", 'C', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&bCappuccino,
 			"Cairo-Dock makes anything, including coffee !", NULL},
@@ -584,11 +569,6 @@ main (int argc, char** argv)
 			g_free (cChangeLogMessage);
 		}
 	}
-
-
-	if (bDialogTest)
-		g_timeout_add (2000, (GSourceFunc) random_dialog, NULL);  // pour tests seulement.
-
 
 	//\___________________ Message a caractere informatif (ou pas).
 	gchar *cSillyMessageFilePath = g_strdup_printf ("%s/.cairo-dock-silly-question", g_cCairoDockDataDir);

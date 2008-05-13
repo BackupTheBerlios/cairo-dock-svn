@@ -120,7 +120,7 @@ cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFi
 			bReapeatAsPattern ? 0 : iDesiredHeight,  // la taille du motif initialement.
 			fImageWidth,
 			fImageHeight,
-			FALSE);
+			CAIRO_DOCK_FILL_SPACE);
 		
 		if (bReapeatAsPattern)
 		{
@@ -235,7 +235,7 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 				(bApplySizeRestriction ? g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] : icon->fHeight),
 				(bHorizontalDock ? &icon->fWidth : &icon->fHeight),
 				(bHorizontalDock ? &icon->fHeight : &icon->fWidth),
-				FALSE);
+				CAIRO_DOCK_FILL_SPACE);
 		}
 		
 		g_free (cIconPath);
@@ -267,7 +267,7 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 			(bApplySizeRestriction ? g_tIconAuthorizedHeight[icon->iType] : icon->fHeight),
 			(bHorizontalDock ? &icon->fWidth : &icon->fHeight),
 			(bHorizontalDock ? &icon->fHeight : &icon->fWidth),
-			FALSE);
+			CAIRO_DOCK_FILL_SPACE);
 		g_free (cIconPath);
 	}
 	cd_debug ("%s () -> %.2fx%.2f", __func__, icon->fWidth, icon->fHeight);
@@ -650,5 +650,5 @@ void cairo_dock_load_drop_indicator (gchar *cImagePath, cairo_t* pSourceContext,
 		g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] * fMaxScale,
 		g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] * fMaxScale / 2,
 		&g_fDropIndicatorWidth, &g_fDropIndicatorHeight,
-		TRUE);
+		CAIRO_DOCK_KEEP_RATIO);
 }

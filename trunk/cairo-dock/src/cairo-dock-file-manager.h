@@ -39,7 +39,7 @@ gboolean cairo_dock_fm_rename_file (const gchar *cOldURI, const gchar *cNewName)
 
 gboolean cairo_dock_fm_move_file (const gchar *cURI, const gchar *cDirectoryURI);
 
-gchar *cairo_dock_fm_get_trash_path (const gchar *cNearURI, gboolean bCreateIfNecessary);
+gchar *cairo_dock_fm_get_trash_path (const gchar *cNearURI, gchar **cFileInfoPath);
 gchar *cairo_dock_fm_get_desktop_path (void);
 gboolean cairo_dock_fm_logout (void);
 gboolean cairo_dock_fm_setup_time (void);

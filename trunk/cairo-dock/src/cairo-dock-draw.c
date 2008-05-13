@@ -350,7 +350,6 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 {
 	icon->fDrawXAtRest = icon->fDrawX;
 	icon->fDrawYAtRest = icon->fDrawY;
-	icon->fY = icon->fDrawY;  // on ne peut pas toucher fX, mais fY ca semble ok et suffisant...
 	//\_____________________ On gere l'animation de rebond.
 	if (icon->iAnimationType == CAIRO_DOCK_BOUNCE && icon->iCount > 0)
 	{
@@ -1210,7 +1209,7 @@ void cairo_dock_redraw_my_icon (Icon *icon, CairoContainer *pContainer)
 	{
 		CairoDock *pDock = CAIRO_DOCK (pContainer);
 		if (pDock->bUseReflect)
-			fReflectSize = g_fReflectSize;
+			fReflectSize = g_fReflectSize * icon->fScale * fabs (icon->fHeightFactor);
 		bHorizontal = pDock->bHorizontalDock;
 		bDirectionUp = pDock->bDirectionUp;
 		if (pDock->bAtBottom && (pDock->iRefCount > 0 || pDock->bAutoHide))  // inutile de redessiner.

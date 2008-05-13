@@ -56,14 +56,14 @@ typedef enum {
 } CairoDockEmblem;
 
 /**
-*Dessine un emblem sur notre icon.
+*Dessine un embleme sur une icone.
 *@param pIconContext le contexte du dessin; n'est pas altere par la fonction.
-*@param cIconFile l'emblem a afficher.
+*@param cIconFile l'embleme a afficher.
 *@param pIcon l'icone.
 *@param pContainer le container de l'icone.
-*@param CairoDockEmblem énumération du type d'emblem
+*@param iEmblemType énumération du type d'embleme.
 */
-void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIconFile, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType);
+void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIconFile, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem iEmblemType);
 
 /**
 *Cree les surfaces de reflection d'une icone.
@@ -441,15 +441,13 @@ gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoContainer *pNewC
 #define CD_APPLET_GET_CONFIG_BEGIN \
 void read_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath) \
 { \
-	gboolean bFlushConfFileNeeded = FALSE, bNewKeysPresent = FALSE; \
+	gboolean bFlushConfFileNeeded = FALSE; \
 	reset_config ();
 
 /**
 *Fin de la fonction de configuration de l'applet.
 */
 #define CD_APPLET_GET_CONFIG_END \
-	if (bNewKeysPresent) \
-		cairo_dock_write_keys_to_file (pKeyFile, cConfFilePath); \
 	if (! bFlushConfFileNeeded) \
 		bFlushConfFileNeeded = cairo_dock_conf_file_needs_update (pKeyFile, MY_APPLET_VERSION); \
 	if (bFlushConfFileNeeded) \
@@ -1061,7 +1059,7 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data);
 	cairo_dock_set_icon_name (myDrawContext, cIconName, myIcon, myContainer);
 /**
 *Remplace l'etiquette de l'icone de l'applet par une nouvelle.
-*@param cIconName la nouvelle etiquette au format 'printf'.
+*@param cIconNameFormat la nouvelle etiquette au format 'printf'.
 */
 #define CD_APPLET_SET_NAME_FOR_MY_ICON_PRINTF(cIconNameFormat, ...) \
 	cairo_dock_set_icon_name_full (myDrawContext, myIcon, myContainer, cIconNameFormat, ##__VA_ARGS__);
@@ -1093,7 +1091,7 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data);
 	cairo_dock_set_minutes_secondes_as_quick_info (myDrawContext, myIcon, myContainer, iTimeInSeconds);
 /**
 *Ecris une taille en octets en info-rapide sur l'icone de l'applet.
-*@param iSize la taille en octets.
+*@param iSizeInBytes la taille en octets.
 */
 #define CD_APPLET_SET_SIZE_AS_QUICK_INFO(iSizeInBytes) \
 	cairo_dock_set_size_as_quick_info (myDrawContext, myIcon, myContainer, iSizeInBytes);
@@ -1134,6 +1132,7 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data);
 /**
 *Cree et charge entierement un sous-dock pour notre icone.
 *@param pIconsList la liste (eventuellement NULL) des icones du sous-dock; celles-ci seront chargees en dans la foulee.
+*@param cRenderer nom du rendu.
 */
 #define CD_APPLET_CREATE_MY_SUBDOCK(pIconsList, cRenderer) \
 	myIcon->pSubDock = cairo_dock_create_subdock_from_scratch (pIconsList, myIcon->acName, myDock); \

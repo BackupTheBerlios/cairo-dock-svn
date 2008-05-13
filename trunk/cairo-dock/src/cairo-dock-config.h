@@ -170,7 +170,7 @@ void cairo_dock_mark_prefered_conf_file (gchar *cConfFilePath);
 *@param cVersionString la version representee par une chaine.
 *@param iMajorVersion numero de version majeure renvoyee.
 *@param iMinorVersion numero de version mineure renvoyee.
-*@param iMicroVersionnumero de version micro renvoyee.
+*@param iMicroVersion numero de version micro renvoyee.
 */
 void cairo_dock_get_version_from_string (gchar *cVersionString, int *iMajorVersion, int *iMinorVersion, int *iMicroVersion);
 

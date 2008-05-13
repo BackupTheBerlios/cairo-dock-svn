@@ -69,7 +69,7 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 			g_tIconAuthorizedHeight[CAIRO_DOCK_SEPARATOR12],
 			fWidth,
 			fHeight,
-			FALSE);
+			CAIRO_DOCK_FILL_SPACE);
 		if (fRotationAngle != 0)
 		{
 			cairo_surface_t *pNewSurfaceRotated = cairo_dock_rotate_surface (pNewSurface, pSourceContext, *fWidth * fMaxScale, *fHeight * fMaxScale, fRotationAngle);
@@ -81,11 +81,13 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 	else
 	{
 		double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
-		cairo_dock_calculate_contrainted_size (fWidth,
+		cairo_dock_calculate_size_fill (fWidth,
 			fHeight,
 			g_tIconAuthorizedWidth[CAIRO_DOCK_SEPARATOR12],
 			g_tIconAuthorizedHeight[CAIRO_DOCK_SEPARATOR12],
-			&fIconWidthSaturationFactor, &fIconHeightSaturationFactor);
+			FALSE,
+			&fIconWidthSaturationFactor,
+			&fIconHeightSaturationFactor);
 
 		pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 			CAIRO_CONTENT_COLOR_ALPHA,

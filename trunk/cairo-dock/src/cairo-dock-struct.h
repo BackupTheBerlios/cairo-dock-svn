@@ -608,7 +608,7 @@ typedef gboolean (*CairoDockFMDeleteFileFunc) (const gchar *cURI);
 typedef gboolean (*CairoDockFMRenameFileFunc) (const gchar *cOldURI, const gchar *cNewName);
 typedef gboolean (*CairoDockFMMoveFileFunc) (const gchar *cURI, const gchar *cDirectoryURI);
 
-typedef gchar * (*CairoDockFMGetTrashFunc) (const gchar *cNearURI, gboolean bCreateIfNecessary);
+typedef gchar * (*CairoDockFMGetTrashFunc) (const gchar *cNearURI, gchar **cFileInfoPath);
 typedef gchar * (*CairoDockFMGetDesktopFunc) (void);
 typedef void (*CairoDockFMUserActionFunc) (void);
 
@@ -765,8 +765,7 @@ typedef enum {
 	CAIRO_DOCK_NO_DESKTOP
 	} CairoDockDesktopEnv;
 
-typedef enum
-{
+typedef enum {
 	CAIRO_DOCK_BOTTOM = 0,
 	CAIRO_DOCK_TOP,
 	CAIRO_DOCK_RIGHT,
@@ -774,12 +773,18 @@ typedef enum
 	CAIRO_DOCK_NB_POSITIONS
 	} CairoDockPositionType;
 
-typedef enum
-{
+typedef enum {
 	CAIRO_DOCK_LAUNCHER_FROM_DESKTOP_FILE = 0,
 	CAIRO_DOCK_LAUNCHER_FOR_CONTAINER,
 	CAIRO_DOCK_LAUNCHER_FOR_SEPARATOR,
 	CAIRO_DOCK_NB_NEW_LAUNCHER_TYPE
 	} CairoDockNewLauncherType;
+
+typedef enum {
+	CAIRO_DOCK_FILL_SPACE 		= 0,
+	CAIRO_DOCK_KEEP_RATIO 		= 1<<0,
+	CAIRO_DOCK_DONT_ZOOM_IN 	= 1<<1
+	} CairoDockLoadImageModifier;
+
 
 #endif

@@ -216,7 +216,7 @@ void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIcon
 	
 	cairo_surface_t *pCairoSurface=NULL;
 	double fImgX, fImgY, fImgW, fImgH, emblemW = pIcon->fWidth / 3, emblemH = pIcon->fHeight / 3;
-	pCairoSurface = cairo_dock_create_surface_from_image (cIconFile, pIconContext, cairo_dock_get_max_scale (pContainer), emblemW, emblemH, &fImgW, &fImgH, TRUE);
+	pCairoSurface = cairo_dock_create_surface_from_image (cIconFile, pIconContext, cairo_dock_get_max_scale (pContainer), emblemW, emblemH, &fImgW, &fImgH, CAIRO_DOCK_KEEP_RATIO);
 
 	switch (pEmblemType) {
 		default:

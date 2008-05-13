@@ -162,6 +162,8 @@ void cairo_dock_render_linear (CairoDock *pDock)
 		cairo_set_source_rgba (pCairoContext, g_fLineColor[0], g_fLineColor[1], g_fLineColor[2], g_fLineColor[3]);
 		cairo_stroke (pCairoContext);
 	}
+	else
+		cairo_new_path (pCairoContext);
 	cairo_restore (pCairoContext);
 
 	//\____________________ On dessine la ficelle qui les joint.

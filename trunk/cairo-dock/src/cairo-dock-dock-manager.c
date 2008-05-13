@@ -411,7 +411,6 @@ void cairo_dock_remove_root_dock_config (const gchar *cDockName)
 
 
 static gboolean s_bTemporaryAutoHide = FALSE;
-static gboolean s_bEntranceDisabled = FALSE;
 
 static void _cairo_dock_quick_hide_one_root_dock (const gchar *cDockName, CairoDock *pDock, gpointer data)
 {
@@ -450,19 +449,19 @@ void cairo_dock_deactivate_temporary_auto_hide (void)
 	}
 }
 
-void cairo_dock_allow_entrance (void)
+void cairo_dock_allow_entrance (CairoDock *pDock)
 {
-	s_bEntranceDisabled = FALSE;
+	pDock->bEntranceDisabled = FALSE;
 }
 
-void cairo_dock_disable_entrance (void)
+void cairo_dock_disable_entrance (CairoDock *pDock)
 {
-	s_bEntranceDisabled = TRUE;
+	pDock->bEntranceDisabled = TRUE;
 }
 
-gboolean cairo_dock_entrance_is_allowed (void)
+gboolean cairo_dock_entrance_is_allowed (CairoDock *pDock)
 {
-	return (! s_bEntranceDisabled);
+	return (! pDock->bEntranceDisabled);
 }
 
 gboolean cairo_dock_quick_hide_is_activated (void)

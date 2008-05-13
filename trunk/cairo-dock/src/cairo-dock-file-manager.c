@@ -178,11 +178,11 @@ gboolean cairo_dock_fm_move_file (const gchar *cURI, const gchar *cDirectoryURI)
 }
 
 
-gchar *cairo_dock_fm_get_trash_path (const gchar *cNearURI, gboolean bCreateIfNecessary)
+gchar *cairo_dock_fm_get_trash_path (const gchar *cNearURI, gchar **cFileInfoPath)
 {
 	if (s_pVFSBackend != NULL && s_pVFSBackend->get_trash_path != NULL)
 	{
-		return s_pVFSBackend->get_trash_path (cNearURI, bCreateIfNecessary);
+		return s_pVFSBackend->get_trash_path (cNearURI, cFileInfoPath);
 	}
 	else
 		return NULL;

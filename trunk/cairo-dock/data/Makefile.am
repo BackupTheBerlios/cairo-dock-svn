@@ -28,5 +28,6 @@ essentialdata_DATA = \
 	icon-subdock.png\
 	icon-frame.png\
 	icon-buttons.png\
-	icon-bubble.png
+	icon-bubble.png\
+	icon-wave.svg
 	

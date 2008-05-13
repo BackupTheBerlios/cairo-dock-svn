@@ -41,6 +41,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-log.h"
 #include "cairo-dock-dock-manager.h"
 #include "cairo-dock-keybinder.h"
+#include "cairo-dock-desklet.h"
 #include "cairo-dock-callbacks.h"
 
 #define FOVY_2 20.0
@@ -474,7 +475,7 @@ gboolean cairo_dock_emit_enter_signal (CairoDock *pDock)
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
-	//g_print ("%s (iSidShrinkDown : %d)\n", __func__, pDock->iSidShrinkDown);
+	//g_print ("%s (iSidShrinkDown : %d, %d)\n", __func__, pDock->iSidShrinkDown, pDock->bMenuVisible);
 	pDock->iAvoidingMouseIconType = -1;
 	pDock->fAvoidingMouseMargin = 0;
 	pDock->bInside = FALSE;
@@ -594,7 +595,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	//g_print ("%s (bIsMainDock : %d; bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bIsMainDock, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
 	s_pLastPointedDock = NULL;  // ajoute le 04/10/07 pour permettre aux sous-docks d'apparaitre si on entre en pointant tout de suite sur l'icone.
         cd_debug("");
-	if (! cairo_dock_entrance_is_allowed ())
+	if (! cairo_dock_entrance_is_allowed (pDock))
 	{
 		cd_message ("* entree non autorisee");
 		return FALSE;
@@ -1560,61 +1561,22 @@ void on_drag_leave (GtkWidget *pWidget, GdkDragContext *dc, guint time, CairoDoc
 
 gboolean on_delete (GtkWidget *pWidget, GdkEvent *event, CairoDock *pDock)
 {
-	Icon *pIcon = cairo_dock_get_pointed_icon (g_pMainDock->icons);
-	if (pIcon == NULL)
-		pIcon = cairo_dock_get_dialogless_icon ();
-	
-	int answer = cairo_dock_ask_question_and_wait (_("Quit Cairo-Dock ?"), pIcon, CAIRO_CONTAINER (g_pMainDock));
+	Icon *pIcon = NULL;
+	if (CAIRO_DOCK_IS_DOCK (pDock))
+	{
+		pIcon = cairo_dock_get_pointed_icon (pDock->icons);
+		if (pIcon == NULL)
+			pIcon = cairo_dock_get_dialogless_icon ();
+	}
+	else
+	{
+		pIcon = CAIRO_DESKLET (pDock)->pIcon;
+	}
+	int answer = cairo_dock_ask_question_and_wait (_("Quit Cairo-Dock ?"), pIcon, CAIRO_CONTAINER (pDock));
 	if (answer == GTK_RESPONSE_YES)
 		gtk_main_quit ();
 	return FALSE;
 }
-
-
-
-
-/*void cairo_dock_activate_temporary_auto_hide (CairoDock *pDock)
-{
-	if (! s_bTemporaryAutoHide)
-	{
-		s_bTemporaryAutoHide = TRUE;
-		pDock->bAtBottom = FALSE;  // car on a deja quitte le dock lors de la fermeture du menu, donc le "leave-notify" serait ignore.
-		s_bAutoHideInitialValue = g_bAutoHide;
-		g_bAutoHide = TRUE;
-		s_bEntranceAllowed = FALSE;
-		cairo_dock_emit_leave_signal (pDock);
-	}
-}
-
-void cairo_dock_deactivate_temporary_auto_hide (void)
-{
-	if (s_bTemporaryAutoHide)
-	{
-		s_bTemporaryAutoHide = FALSE;
-		g_bAutoHide = s_bAutoHideInitialValue;
-		g_pMainDock->bAtBottom = TRUE;
-	}
-}
-
-void cairo_dock_allow_entrance (void)
-{
-	s_bEntranceAllowed = TRUE;
-}
-
-void cairo_dock_disable_entrance (void)
-{
-	s_bEntranceAllowed = FALSE;
-}
-
-gboolean cairo_dock_entrance_is_allowed (void)
-{
-	return s_bEntranceAllowed;
-}
-
-gboolean cairo_dock_quick_hide_is_activated (void)
-{
-	return s_bTemporaryAutoHide;
-}*/
 
 
 // Tests sur les selections.

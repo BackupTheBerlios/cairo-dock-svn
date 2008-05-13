@@ -347,7 +347,7 @@ static gboolean on_enter_desklet (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDesklet *pDesklet)
 {
-	cd_debug ("%s (%d)", __func__, pDesklet->bInside);
+	//g_print ("%s (%d)\n", __func__, pDesklet->bInside);
 	if (! pDesklet->bInside)  // avant on etait dehors, on redessine donc.
 	{
 		pDesklet->bInside = TRUE;
@@ -358,15 +358,14 @@ static gboolean on_enter_desklet (GtkWidget* pWidget,
 	}
 	return FALSE;
 }
-
 static gboolean on_leave_desklet (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDesklet *pDesklet)
 {
-	cd_debug ("%s (%d)", __func__, pDesklet->bInside);
+	//g_print ("%s (%d)\n", __func__, pDesklet->bInside);
 	int iMouseX, iMouseY;
 	gdk_window_get_pointer (pWidget->window, &iMouseX, &iMouseY, NULL);
-	if (iMouseX > 0 && iMouseX < pDesklet->iWidth && iMouseY > 0 && iMouseY < pDesklet->iHeight)  // en fait on est dans un widget fils, donc on ne fait rien.
+	if (gtk_bin_get_child (GTK_BIN (pDesklet->pWidget)) != NULL && iMouseX > 0 && iMouseX < pDesklet->iWidth && iMouseY > 0 && iMouseY < pDesklet->iHeight)  // en fait on est dans un widget fils, donc on ne fait rien.
 	{
 		return FALSE;
 	}
