@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([cairo-dock-themes], [1.5.3], [Fabrice Rey (fabounet@users.berlios.de)])
+AC_INIT([cairo-dock-themes], [1.5.4], [Fabrice Rey (fabounet@users.berlios.de)])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
 
@@ -62,5 +62,10 @@ AC_CONFIG_FILES([Makefile
 		_Wood_/plug-ins/logout/Makefile
 		_Wood_/plug-ins/rendering/Makefile
 		_Wood_/plug-ins/weather/Makefile
+		_Neon_/Makefile
+		_Neon_/launchers/Makefile
+		_Neon_/plug-ins/Makefile
+		_Neon_/plug-ins/dustbin/Makefile
+		_Neon_/plug-ins/logout/Makefile
 		])
 AC_OUTPUT
