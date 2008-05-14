@@ -1,0 +1,3 @@
+SUBDIRS = . \
+	dustbin\
+	logout
