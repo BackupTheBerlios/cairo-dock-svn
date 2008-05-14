@@ -7,4 +7,5 @@ theme_DATA = \
 	readme\
 	minidock.svg\
 	separateur.svg\
-	preview
+	preview\
+	drop-indicator-arrow.svg

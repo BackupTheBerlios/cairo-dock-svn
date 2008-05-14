@@ -8,4 +8,5 @@ theme_DATA = \
 	background-cairo-dock.svg\
 	separateur.svg\
 	preview\
-	indicator.svg
+	indicator-spirale.svg\
+	drop-indicator-arrow.svg

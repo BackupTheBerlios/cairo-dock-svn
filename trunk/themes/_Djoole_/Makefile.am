@@ -7,4 +7,6 @@ theme_DATA = \
 	readme \
 	background-cairo-dock.svg \
 	separateur.svg\
-	preview
+	preview\
+	drop-indicator-lightning-arrow.svg\
+	indicator-ellipse.svg

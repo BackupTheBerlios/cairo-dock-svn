@@ -6,4 +6,5 @@ theme_DATA = \
 	cairo-dock.conf\
 	readme\
 	background.jpg\
-	preview
+	preview\
+	indicator-yellow-scroll.svg
