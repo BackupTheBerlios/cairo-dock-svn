@@ -7,4 +7,5 @@ theme_DATA = \
 	readme\
 	background-snow.svg\
 	separateur.svg\
-	preview
+	preview\
+	drop-indicator-rain.svg
