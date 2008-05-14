@@ -1,0 +1,23 @@
+#!en
+
+[Desktop Entry]
+#s Launcher's name :
+Name=Terminal
+#s Command to launch on click :
+Exec=gnome-terminal
+#S Image's name or path :
+Icon=gnome-terminal
+
+#X[Extra parameters]
+frame_extra=
+#f Order you want for this launcher among the others:
+Order=0.75
+#E[_MainDock_;System;Design]  Name of the container it belongs to:
+Container=_MainDock_
+
+Is container=false
+
+Renderer=
+
+Base URI=
+Is mounting point=false

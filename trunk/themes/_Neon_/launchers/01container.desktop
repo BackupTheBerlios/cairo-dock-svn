@@ -1,0 +1,23 @@
+#!en
+
+[Desktop Entry]
+#s Launcher's name :
+Name=System
+
+Exec=
+#S Image's name or path :
+Icon=toolbox
+
+#X[Extra parameters]
+frame_extra=
+#f Order you want for this launcher among the others:
+Order=0.875
+#E[_MainDock_;System]  Name of the container it belongs to:
+Container=_MainDock_
+
+Is container=true
+#R[;none;none;Caroussel;/usr/share/cairo-dock/plug-in/rendering/readme-caroussel-view;/usr/share/cairo-dock/plug-in/rendering/preview-caroussel.png;3D plane;/usr/share/cairo-dock/plug-in/rendering/readme-3D-plane-view;/usr/share/cairo-dock/plug-in/rendering/preview-3D-plane.png;default;/usr/share/cairo-dock/readme-default-view;/usr/share/cairo-dock/preview-default.png;Rainbow;/usr/share/cairo-dock/plug-in/rendering/readme-rainbow-view;/usr/share/cairo-dock/plug-in/rendering/preview-rainbow.png;Parabolic;/usr/share/cairo-dock/plug-in/rendering/readme-parabolic-view;/usr/share/cairo-dock/plug-in/rendering/preview-parabolic.png]  Name of the view used for the sub-dock :/
+Renderer=
+
+Base URI=
+Is mounting point=false

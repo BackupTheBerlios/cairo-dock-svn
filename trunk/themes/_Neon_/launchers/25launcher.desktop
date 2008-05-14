@@ -1,0 +1,23 @@
+#!en
+
+[Desktop Entry]
+#s Launcher's name :
+Name=Amarok
+#s Command to launch on click :
+Exec=amarok
+#S Image's name or path :
+Icon=amarok
+
+#X[Extra parameters]
+frame_extra=
+#f Order you want for this launcher among the others:
+Order=0.5625
+#E[_MainDock_;System;Players;Internet;Design]  Name of the container it belongs to:
+Container=Players
+
+Is container=false
+
+Renderer=
+
+Base URI=
+Is mounting point=false

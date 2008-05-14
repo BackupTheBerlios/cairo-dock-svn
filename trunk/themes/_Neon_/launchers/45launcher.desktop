@@ -1,0 +1,23 @@
+#!en
+
+[Desktop Entry]
+#s Launcher's name :
+Name=Wifi-Radar
+#s Command to launch on click :
+Exec=wifi-radar
+#S Image's name or path :
+Icon=wifi
+
+#X[Extra parameters]
+frame_extra=
+#f Order you want for this launcher among the others:
+Order=0.5
+#E[_MainDock_;Players;Tools;System;Internet;Office;Design]  Name of the container it belongs to:
+Container=System
+
+Is container=false
+
+Renderer=
+
+Base URI=
+Is mounting point=false

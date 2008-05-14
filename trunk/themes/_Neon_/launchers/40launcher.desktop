@@ -1,0 +1,23 @@
+#!en
+
+[Desktop Entry]
+#s Launcher's name :
+Name=Gnome Editor
+#s Command to launch on click :
+Exec=gedit
+#S Image's name or path :
+Icon=gedit
+
+#X[Extra parameters]
+frame_extra=
+#f Order you want for this launcher among the others:
+Order=0.71875
+#E[_MainDock_;System;Players;Tools;Internet;Office;Design]  Name of the container it belongs to:
+Container=Tools
+
+Is container=false
+
+Renderer=
+
+Base URI=
+Is mounting point=false

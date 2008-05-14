@@ -1,0 +1,23 @@
+#!en
+
+[Desktop Entry]
+#s Launcher's name :
+Name=F-Spot
+#s Command to launch on click :
+Exec=f-spot
+#S Image's name or path :
+Icon=f-spot
+
+#X[Extra parameters]
+frame_extra=
+#f Order you want for this launcher among the others:
+Order=0.5
+#E[_MainDock_;System;Design]  Name of the container it belongs to:
+Container=Design
+
+Is container=false
+
+Renderer=
+
+Base URI=
+Is mounting point=false

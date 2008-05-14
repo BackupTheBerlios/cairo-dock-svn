@@ -1,0 +1,23 @@
+#!en
+
+[Desktop Entry]
+#s Launcher's name :
+Name=Applet
+
+Exec=
+#S Image's name or path :
+Icon=cairo-dock
+
+#X[Extra parameters]
+frame_extra=
+#f Order you want for this launcher among the others:
+Order=1
+#E[_MainDock2_;_MainDock_;System;Tools;Players;Office;Internet;Stacks;Applet;Design]  Name of the container it belongs to:
+Container=_MainDock_
+
+Is container=true
+#n Name of the view used for the sub-dock :/
+Renderer=
+
+Base URI=
+Is mounting point=false

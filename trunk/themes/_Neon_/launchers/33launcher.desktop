@@ -1,0 +1,23 @@
+#!en
+
+[Desktop Entry]
+#s Launcher's name :
+Name=OpenOffice-Impress
+#s Command to launch on click :
+Exec=ooimpress
+#S Image's name or path :
+Icon=ooimpress
+
+#X[Extra parameters]
+frame_extra=
+#f Order you want for this launcher among the others:
+Order=3.28125
+#E[_MainDock_;System;Players;Internet;Office;Design]  Name of the container it belongs to:
+Container=Office
+
+Is container=false
+
+Renderer=
+
+Base URI=
+Is mounting point=false
