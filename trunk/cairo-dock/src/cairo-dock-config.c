@@ -168,6 +168,7 @@ extern gboolean g_bOverWriteXIcons;
 extern double g_fIndicatorWidth, g_fIndicatorHeight;
 extern int g_iIndicatorDeltaY;
 extern gboolean g_bLinkIndicatorWithIcon;
+extern gboolean g_bIndicatorAbove;
 
 static gchar **g_cUseXIconAppliList = NULL;
 static gboolean s_bLoading = FALSE;
@@ -935,6 +936,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		cIndicatorImagePath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_DEFAULT_INDICATOR_NAME);
 	}
 	
+	g_bIndicatorAbove = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "indicator above", &bFlushConfFileNeeded, FALSE, NULL, NULL);
+	
 	double fIndicatorRatio = cairo_dock_get_double_key_value (pKeyFile, "Icons", "indicator ratio", &bFlushConfFileNeeded, 1., NULL, NULL);
 	
 	g_bLinkIndicatorWithIcon = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "link indicator", &bFlushConfFileNeeded, TRUE, NULL, NULL);
@@ -1077,10 +1080,16 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	}
 	g_cRaiseDockShortcut = cairo_dock_get_string_key_value (pKeyFile, "Position", "raise shortcut", &bFlushConfFileNeeded, NULL, NULL, NULL);
 	
-	gchar *cDropIndicatorImage = cairo_dock_get_string_key_value (pKeyFile, "Icons", "drop indicator", &bFlushConfFileNeeded, NULL, NULL, NULL);
-	if (cDropIndicatorImage == NULL)
+	gchar *cDropIndicatorImageName = cairo_dock_get_string_key_value (pKeyFile, "Icons", "drop indicator", &bFlushConfFileNeeded, NULL, NULL, NULL);
+	gchar *cDropIndicatorImagePath;
+	if (cDropIndicatorImageName != NULL)
 	{
-		cDropIndicatorImage = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_DEFAULT_DROP_INDICATOR_NAME);
+		cDropIndicatorImagePath = cairo_dock_generate_file_path (cDropIndicatorImageName);
+		g_free (cDropIndicatorImageName);
+	}
+	else
+	{
+		cDropIndicatorImagePath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_DEFAULT_DROP_INDICATOR_NAME);
 	}
 	
 	//\___________________ On (re)charge tout, car n'importe quel parametre peut avoir change.
@@ -1147,9 +1156,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_free (cIndicatorImagePath);
 	
 	cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
-	cairo_dock_load_drop_indicator (cDropIndicatorImage, pCairoContext, cairo_dock_get_max_scale (pDock));
+	cairo_dock_load_drop_indicator (cDropIndicatorImagePath, pCairoContext, cairo_dock_get_max_scale (pDock));
 	cairo_destroy (pCairoContext);
-	g_free (cDropIndicatorImage);
+	g_free (cDropIndicatorImagePath);
 	
 	g_fReflectSize = 0;
 	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)

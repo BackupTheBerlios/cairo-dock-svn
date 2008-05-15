@@ -31,37 +31,85 @@
 #define CD_NB_ITER_FOR_GRADUATION 10
 
 /**
-*Teste si le container est un desklet.
+* Teste si le container est un desklet.
 *@param pContainer le container.
 *@return TRUE ssi le container a ete declare comme un desklet.
 */
 #define CAIRO_DOCK_IS_DESKLET(pContainer) (pContainer != NULL && (pContainer)->iType == CAIRO_DOCK_TYPE_DESKLET)
 /**
-*Caste un container en desklet.
+* Caste un container en desklet.
 *@param pContainer le container.
 *@return le desklet.
 */
 #define CAIRO_DESKLET(pContainer) ((CairoDesklet *)pContainer)
 
+/**
+* Créer un desklet tout simple, sans le placer ni lui définir un moteur de rendu.
+*@param pIcon l'icône principale du desklet (jamais testé avec une icône nulle).
+*@param pInteractiveWidget le widget d'interaction du desklet, ou NULL si aucun.
+*@param bOnWidgetLayer TRUE ssi il faut placer dés maintenant le desklet sur la couche des widgets.
+*@return le desklet nouvellement crée.
+*/
 CairoDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiveWidget, gboolean bOnWidgetLayer);
 
+/**
+* Trouve l'icône cliquée dans un desklet, en cherchant parmi l'icône principale et éventuellement la liste des icônes associées.
+*@param pDesklet le desklet cliqué.
+*@return l'icône cliquée ou NULL si on a cliqué à côté.
+*/
 Icon *cairo_dock_find_clicked_icon_in_desklet (CairoDesklet *pDesklet);
 
+/**
+* Place entièrement un desklet en fonction de ses paramètres de sauvegarde extraits d'un fichier de conf. Le place, le dimensionne, le garde devant/derrière, vérouille sa position, et le place sur la couche des widgets.
+*@param pDesklet le desklet à placer.
+*@param pMinimalConfig la config minimale du desklet, contenant tous les paramètres necessaires.
+*/
 void cairo_dock_place_desklet (CairoDesklet *pDesklet, CairoDockMinimalAppletConfig *pMinimalConfig);
 
+/**
+* Détache un GtkWidget d'un desklet, le rendant libre d'être inséré autre part.
+*@param pDesklet le desklet contenant un widge tinteractif.
+*/
 void cairo_dock_steal_interactive_widget_from_desklet (CairoDesklet *pDesklet);
+/**
+* Détruit un desklet, et libère toutes les ressources allouées. Son widget interactif est épargné et peut être re-inséré autre part après l'opération.
+*@param pDesklet le desklet à détruire.
+*/
 void cairo_dock_free_desklet (CairoDesklet *pDesklet);
 
-
+/**
+* Cache un desklet.
+*@param pDesklet le desklet à cacher.
+*/
 void cairo_dock_hide_desklet (CairoDesklet *pDesklet);
+/**
+* Montre un desklet, lui donnant le focus.
+*@param pDesklet le desklet à montrer.
+*/
 void cairo_dock_show_desklet (CairoDesklet *pDesklet);
 
+/**
+* Ajoute un GtkWidget à la fenêtre du desklet. Ce widget ne doit pas appartenir à un autre container. 1 seul widget par desklet, mais si ce widget est un GtkContainer, on peut en mettre plusieurs autres dedans.
+*@param pInteractiveWidget le widget à ajouter.
+*@param pDesklet le desklet dans lequel le rajouter.
+*/
 void cairo_dock_add_interactive_widget_to_desklet (GtkWidget *pInteractiveWidget, CairoDesklet *pDesklet);
 
-
+/**
+* Rend tous les desklets visibles si ils étaient cachés, et au premier plan s'ils étaient derrière ou sur la widget layer.
+*@param bOnWidgetLayerToo TRUE ssi on veut faire passer tous les desklets de la couche widgets à la couche normale.
+*/
 void cairo_dock_set_all_desklets_visible (gboolean bOnWidgetLayerToo);
+/**
+* Remet les desklets dans la position occupée avant l'appel à la fonction précédente.
+*/
 void cairo_dock_set_desklets_visibility_to_default (void);
 
+/**
+* Renvoie le desklet dont la fenetre correspond à la ressource X donnée.
+*@param Xid ID du point de vue de X.
+*@return le desklet ou NULL si aucun ne correspond.
+*/
 CairoDesklet *cairo_dock_get_desklet_by_Xid (Window Xid);
 
 

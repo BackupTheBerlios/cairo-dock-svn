@@ -147,12 +147,17 @@ gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePat
 *@param iFirstDataType type de la 1ere donnee.
 */
 void cairo_dock_update_conf_file (gchar *cConfFilePath, GType iFirstDataType, ...);
-
+/**
+*Met a jour un fichier de conf de dock racine avec sa position définie par les écarts en x et en y.
+*@param cConfFilePath chemin du fichier de conf.
+*@param x écart latéral.
+*@param y écart vertical.
+*/
 void cairo_dock_update_conf_file_with_position (const gchar *cConfFilePath, int x, int y);
 
 /**
 *Essaye de determiner l'environnement de bureau dela session courante.
-*@return l'environnement de bureau (couramment Gnome et KDE son detectes).
+*@return l'environnement de bureau (couramment Gnome, KDE et XFCE sont detectés).
 */
 CairoDockDesktopEnv cairo_dock_guess_environment (void);
 
@@ -162,7 +167,15 @@ void cairo_dock_copy_to_easy_conf_file (GKeyFile *pMainKeyFile, gchar *cEasyConf
 void cairo_dock_build_easy_conf_file (gchar *cMainConfFilePath, gchar *cEasyConfFilePath);
 void cairo_dock_read_easy_conf_file (gchar *cEasyConfFilePath, gpointer data);
 
+/**
+* Dis si l'on utilise le fichier de conf avancé ou simplifié.
+*@return TRUE ssi on utilise le fichier de conf avancé.
+*/
 gboolean cairo_dock_use_full_conf_file (void);
+/**
+* Sauvegarde le type de configuration utilisée (avancée ou simplifiée).
+*@param cConfFilePath chemin du fichier de conf.
+*/
 void cairo_dock_mark_prefered_conf_file (gchar *cConfFilePath);
 
 /**

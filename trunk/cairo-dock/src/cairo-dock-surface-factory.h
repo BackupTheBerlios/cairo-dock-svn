@@ -59,7 +59,7 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 *@param fMaxScale le zoom maximal de l'icone.
 *@param iWidthConstraint contrainte sur la largeur, ou 0 pour ne pas la contraindre.
 *@param iHeightConstraint contrainte sur la hauteur, ou 0 pour ne pas la contraindre.
-*@param bKeepRatio TRUE ssi on veut conserver le ratio largeur/hauteur du pixbuf.
+*@param iLoadingModifier composition de modificateurs de chargement.
 *@param fImageWidth sera renseigné avec la largeur de l'icone (hors zoom).
 *@param fImageHeight sera renseigné avec la hauteur de l'icone (hors zoom).
 *@returns la surface nouvellement créée.
@@ -75,7 +75,7 @@ cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo
 *@param iHeightConstraint contrainte sur la hauteur, ou 0 pour ne pas la contraindre.
 *@param fImageWidth sera renseigné avec la largeur de l'icone (hors zoom).
 *@param fImageHeight sera renseigné avec la hauteur de l'icone (hors zoom).
-*@param bKeepRatio TRUE ssi on veut conserver le ratio largeur/hauteur du pixbuf.
+*@param iLoadingModifier composition de modificateurs de chargement.
 *@returns la surface nouvellement créée.
 */
 cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, double *fImageWidth, double *fImageHeight, CairoDockLoadImageModifier iLoadingModifier);
@@ -98,15 +98,71 @@ cairo_surface_t *cairo_dock_create_surface_for_icon (gchar *cImagePath, cairo_t*
 #define cairo_dock_create_surface_for_square_icon(cImagePath, pSourceContext, fImageSize) cairo_dock_create_surface_for_icon (cImagePath, pSourceContext, fImageSize, fImageSize)
 
 
-
+/**
+* Cree une surface par rotation d'une autre. N'est couramment utilisée que pour des rotations de quarts de tour.
+*@param pSurface surface à faire tourner.
+*@param pSourceContext un contexte (non modifié par la fonction).
+*@param fImageWidth la largeur de la surface.
+*@param fImageHeight la hauteur de la surface.
+*@param fRotationAngle l'angle de rotation à appliquer.
+*@returns la surface nouvellement créée.
+*/
 cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fRotationAngle);
 
+/**
+* Cree une surface par réflection d'une autre. Applique un dégradé de transparence. La taille du reflet est déterminé par la config du dock, tandis que sa position est fonction de l'orientation de l'icône. Si l'icône change de container, il faut donc recreer le reflet.
+*@param pSurface surface à réfléchir.
+*@param pSourceContext un contexte (non modifié par la fonction).
+*@param fImageWidth la largeur de la surface.
+*@param fImageHeight la hauteur de la surface.
+*@param bHorizontalDock TRUE ssi la surface est à l'horizontal.
+*@param fMaxScale facteur de zoom max qui sera appliqué à la surface.
+*@param bDirectionUp TRUE ssi la surface a la tête en haut.
+*@returns la surface nouvellement créée.
+*/
 cairo_surface_t * cairo_dock_create_reflection_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, gboolean bHorizontalDock, double fMaxScale, gboolean bDirectionUp);
 
+/**
+* Cree une surface contenant une surface accolée à sa réflection. 
+*@param pIconSurface la surface de l'icône.
+*@param pReflectionSurface la surface du reflet.
+*@param pSourceContext un contexte (non modifié par la fonction).
+*@param fImageWidth la largeur de la surface de l'icône.
+*@param fImageHeight la hauteur de la surface de l'icône.
+*@param bHorizontalDock TRUE ssi l'icône est à l'horizontal.
+*@param fMaxScale facteur de zoom max qui sera appliqué à l'icône.
+*@param bDirectionUp TRUE ssi l'icône a la tête en haut.
+*@returns la surface nouvellement créée.
+*/
 cairo_surface_t * cairo_dock_create_icon_surface_with_reflection (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, gboolean bHorizontalDock,double fMaxScale, gboolean bDirectionUp);
 
+/**
+* Cree une surface contenant un texte, avec une couleur de fond optionnel.
+*@param cText le texte.
+*@param pSourceContext un contexte (non modifié par la fonction).
+*@param iLabelSize la hauteur désirée du texte (à peu près la taille de sa police).
+*@param cLabelPolice la police de caracteres à utiliser.
+*@param iLabelWeight le poids de la police (épaisseur des traits).
+*@param fBackgroundColor un tableau de 4 couleurs (r, v, b, a), optionnel.
+*@param fMaxScale facteur de zoom max qui sera appliqué au texte.
+*@param iTextWidth sera renseigne avec la largeur de la surface obtenue.
+*@param iTextHeight sera renseigne avec la hauteur de la surface obtenue.
+*@param fTextXOffset sera renseigne avec le décalage horizontal à appliquer pour centrer le texte horizontalement.
+*@param fTextYOffset sera renseigne avec le décalage vertical à appliquer pour placer le texte verticalament.
+*@returns la surface nouvellement créée.
+*/
 cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t *pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double *fBackgroundColor, double fMaxScale, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset);
 
+/**
+* Cree une surface à l'identique d'une autre, en la redimensionnant eventuellement.
+*@param pSurface surface à dupliquer.
+*@param pSourceContext un contexte (non modifié par la fonction).
+*@param fWidth la largeur de la surface.
+*@param fHeight la hauteur de la surface.
+*@param fDesiredWidth largeur désirée de la copie (0 pour garder la même taille).
+*@param fDesiredHeight hauteur désirée de la copie (0 pour garder la même taille).
+*@returns la surface nouvellement créée.
+*/
 cairo_surface_t * cairo_dock_duplicate_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fWidth, double fHeight, double fDesiredWidth, double fDesiredHeight);
 
 

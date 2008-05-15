@@ -135,7 +135,7 @@ static gboolean _cairo_dock_write_desklet_size (CairoDesklet *pDesklet)
 	if (pDesklet->pIcon != NULL)
 	{
 		cairo_dock_reload_module (pDesklet->pIcon->pModule, FALSE);
-		gtk_widget_queue_draw (pDesklet->pWidget);  // sinon on redessine que l'interieur.
+		gtk_widget_queue_draw (pDesklet->pWidget);  // sinon on ne redessine que l'interieur.
 	}
 	return FALSE;
 }

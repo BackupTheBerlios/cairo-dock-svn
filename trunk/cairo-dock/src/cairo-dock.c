@@ -236,6 +236,7 @@ double g_fIndicatorWidth, g_fIndicatorHeight;
 int g_iIndicatorDeltaY;
 gboolean g_bOverWriteXIcons = TRUE; // il faut le savoir avant.
 gboolean g_bLinkIndicatorWithIcon;
+gboolean g_bIndicatorAbove;
 
 cairo_surface_t *g_pDropIndicatorSurface = NULL;
 double g_fDropIndicatorWidth, g_fDropIndicatorHeight;

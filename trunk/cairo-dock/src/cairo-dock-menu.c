@@ -151,7 +151,8 @@ static void _cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 
 static void _cairo_dock_update (GtkMenuItem *menu_item, gpointer *data)
 {
-	system ("xterm -e cairo-dock-update.sh &");
+	system ("which xdg-open > /dev/null && xdg-open http://www.berlios.de || which firefox > /dev/null && firefox http://www.berlios.de || which konqueror > /dev/null && konqueror http://www.berlios.de || which opera > /dev/null && opera http://www.berlios.de");  /// A ameliorer...
+	//system ("xterm -e cairo-dock-update.sh &");
 }
 
 static void _cairo_dock_help (GtkMenuItem *menu_item, gpointer *data)

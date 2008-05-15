@@ -82,6 +82,10 @@ echo "*********************************"
 if test "$CAIRO_DOCK_CLEAN" = "1"; then
 	rm -f config.* configure configure.lineno intltool-extract intltool-merge intltool-update libtool ltmain.sh Makefile.in Makefile aclocal.m4 install-sh install depcomp missing compile cairo-dock.pc stamp-h1 cairo-dock.conf 
 	rm -rf autom4te.cache src/.deps src/.libs src/Makefile src/Makefile.in po/Makefile po/Makefile.in po/*.gmo src/*.o src/*.lo src/*.la
+	if test "$CAIRO_DOCK_DOC" = "1"; then
+		rm -rf doc/html
+		rm -rf doc/latex
+	fi
 fi
 if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
 	if test -e po; then

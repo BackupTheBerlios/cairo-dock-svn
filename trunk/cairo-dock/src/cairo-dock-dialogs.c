@@ -437,7 +437,6 @@ gboolean cairo_dock_dialog_reference (CairoDialog *pDialog)
 {
 	if (pDialog != NULL)
 	{
-		//g_atomic_int_inc (&pIcon->pDialog->iRefCount);
 		if (g_atomic_int_exchange_and_add (&pDialog->iRefCount, 1) > 0)  // il etait > 0 avant l'incrementation.  // && pDialog->pIcon != NULL
 			return TRUE;  // on peut l'utiliser.
 		else
@@ -1420,10 +1419,9 @@ void cairo_dock_unhide_dialog (CairoDialog *pDialog)
 	if (! cairo_dock_dialog_reference (pDialog))
 		return ;
 	
-	gtk_window_present (GTK_WINDOW (pDialog->pWidget));
-	
 	if (! GTK_WIDGET_VISIBLE (pDialog->pWidget))
 	{
+		gtk_window_present (GTK_WINDOW (pDialog->pWidget));
 		Icon *pIcon = pDialog->pIcon;
 		if (pIcon != NULL)
 		{

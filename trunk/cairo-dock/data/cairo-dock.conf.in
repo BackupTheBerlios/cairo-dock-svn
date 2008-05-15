@@ -420,6 +420,9 @@ launcher number of rounds = 4
 #{Indicators are drawn on launchers icons to show that they have already been launched. Let blank to use the default one.}
 indicator image = 
 
+#b+ Display the indicator above the icon ?
+indicator above = false
+
 #e+[0.1;1.5] Indicator size ratio :
 #{The ratio between indicator's size and icon's size. The bigger, the bigger the indicators are.}
 indicator ratio = 1.
