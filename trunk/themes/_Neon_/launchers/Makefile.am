@@ -178,5 +178,6 @@ launchers_DATA = \
         apple.png\
         internet.png\
         arrow_left.png\
-        irc.png
+        irc.png\
+	firefox-3.0.png
 
