@@ -128,6 +128,7 @@ extern int g_iAppliMaxNameLength;
 extern gboolean g_bMinimizeOnClick;
 extern gboolean g_bCloseAppliOnMiddleClick;
 extern gboolean g_bAutoHideOnFullScreen;
+extern gboolean g_bAutoHideOnMaximized;
 extern gboolean g_bDemandsAttentionWithDialog;
 extern gboolean g_bDemandsAttentionWithAnimation;
 extern gboolean g_bAnimateOnActiveWindow;
@@ -173,15 +174,7 @@ extern gboolean g_bIndicatorAbove;
 static gchar **g_cUseXIconAppliList = NULL;
 static gboolean s_bLoading = FALSE;
 
-/**
-*Recupere une cle booleene d'un fichier de cles.
-*@param pKeyFile le fichier de cles.
-*@param cGroupName le com du groupe.
-*@param cKeyName le nom de la cle.
-*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
-*@param bDefaultValue valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
-@Returns la valeur booleene de la cle.
-*/
+
 gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gboolean bDefaultValue, gchar *cDefaultGroupName, gchar *cDefaultKeyName)
 {
 	GError *erreur = NULL;
@@ -224,15 +217,7 @@ gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 	}
 	return bValue;
 }
-/**
-*Recupere une cle entiere d'un fichier de cles.
-*@param pKeyFile le fichier de cles.
-*@param cGroupName le com du groupe.
-*@param cKeyName le nom de la cle.
-*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
-*@param iDefaultValue valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
-@Returns la valeur entiere de la cle.
-*/
+
 int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, int iDefaultValue, gchar *cDefaultGroupName, gchar *cDefaultKeyName)
 {
 	GError *erreur = NULL;
@@ -275,15 +260,7 @@ int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gch
 	}
 	return iValue;
 }
-/**
-*Recupere une cle flottante d'un fichier de cles.
-*@param pKeyFile le fichier de cles.
-*@param cGroupName le com du groupe.
-*@param cKeyName le nom de la cle.
-*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
-*@param fDefaultValue valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
-@Returns la valeur flottante de la cle.
-*/
+
 double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, double fDefaultValue, gchar *cDefaultGroupName, gchar *cDefaultKeyName)
 {
 	GError *erreur = NULL;
@@ -326,15 +303,7 @@ double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 	}
 	return fValue;
 }
-/**
-*Recupere une cle d'un fichier de cles sous la forme d'une chaine de caractere.
-*@param pKeyFile le fichier de cles.
-*@param cGroupName le com du groupe.
-*@param cKeyName le nom de la cle.
-*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
-*@param cDefaultValue valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
-@Returns la chaine de caractere nouvellement allouee correspondante a la cle.
-*/
+
 gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, const gchar *cDefaultValue, gchar *cDefaultGroupName, gchar *cDefaultKeyName)
 {
 	GError *erreur = NULL;
@@ -382,16 +351,7 @@ gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 	}
 	return cValue;
 }
-/**
-*Recupere une cle d'un fichier de cles sous la forme d'un tableau d'entiers.
-*@param pKeyFile le fichier de cles.
-*@param cGroupName le com du groupe.
-*@param cKeyName le nom de la cle.
-*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
-*@param iValueBuffer tableau qui sera rempli.
-*@param iNbElements nombre d'elements a recuperer; c'est le nombre d'elements du tableau passe en entree.
-*@param iDefaultValues valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
-*/
+
 void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, int *iValueBuffer, int iNbElements, int *iDefaultValues, gchar *cDefaultGroupName, gchar *cDefaultKeyName)
 {
 	GError *erreur = NULL;
@@ -455,16 +415,7 @@ void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cGroupNam
 	}
 	g_free (iValuesList);
 }
-/**
-*Recupere une cle d'un fichier de cles sous la forme d'un tableau de doubles.
-*@param pKeyFile le fichier de cles.
-*@param cGroupName le com du groupe.
-*@param cKeyName le nom de la cle.
-*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
-*@param fValueBuffer tableau qui sera rempli.
-*@param iNbElements nombre d'elements a recuperer; c'est le nombre d'elements du tableau passe en entree.
-*@param fDefaultValues valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
-*/
+
 void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, double *fValueBuffer, int iNbElements, double *fDefaultValues, gchar *cDefaultGroupName, gchar *cDefaultKeyName)
 {
 	GError *erreur = NULL;
@@ -528,16 +479,7 @@ void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 	}
 	g_free (fValuesList);
 }
-/**
-*Recupere une cle d'un fichier de cles sous la forme d'un tableau de chaines de caracteres.
-*@param pKeyFile le fichier de cles.
-*@param cGroupName le com du groupe.
-*@param cKeyName le nom de la cle.
-*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
-*@param length nombre de chaines de caracteres recuperees.
-*@param cDefaultValues valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
-@Returns un tableau de chaines de caracteres; a liberer avec g_strfreev().
-*/
+
 gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gsize *length, gchar *cDefaultValues, gchar *cDefaultGroupName, gchar *cDefaultKeyName)
 {
 	GError *erreur = NULL;
@@ -587,21 +529,24 @@ gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupN
 	}
 	return cValuesList;
 }
-/**
-*Recupere une cle d'un fichier de cles sous la forme d'un tableau de chaines de caracteres.
-*@param pKeyFile le fichier de cles.
-*@param cGroupName le com du groupe.
-*@param cKeyName le nom de la cle.
-*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
-*@param iDefaultAnimation valeur par defaut a utiliser et a inserer dans le fichier de cles au cas ou la cle est manquante.
-*@Returns le type de l'animation correspondante a la cle.
-*/
+
 CairoDockAnimationType cairo_dock_get_animation_type_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, CairoDockAnimationType iDefaultAnimation, gchar *cDefaultGroupName, gchar *cDefaultKeyName)
 {
 	CairoDockAnimationType iAnimationType = cairo_dock_get_integer_key_value (pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, iDefaultAnimation, cDefaultGroupName, cDefaultKeyName);
 	if (iAnimationType < 0 || iAnimationType >= CAIRO_DOCK_NB_ANIMATIONS)
 		iAnimationType = 0;
 	return iAnimationType;
+}
+
+gchar *cairo_dock_get_file_path_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultGroupName, gchar *cDefaultKeyName, gchar *cDefaultDir, gchar *cDefaultFileName)
+{
+	gchar *cFileName = cairo_dock_get_string_key_value (pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, NULL, cDefaultGroupName, cDefaultKeyName);
+	gchar *cFilePath = NULL;
+	if (cFileName != NULL)
+		cFilePath = cairo_dock_generate_file_path (cFileName);
+	else if (cDefaultFileName != NULL && cDefaultDir != NULL)
+		cFilePath = g_strdup_printf ("%s/%s", cDefaultDir, cDefaultFileName);
+	return cFilePath;
 }
 
 
@@ -908,6 +853,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_bCloseAppliOnMiddleClick = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "close on middle click", &bFlushConfFileNeeded, TRUE, "Applications", NULL);
 
 	g_bAutoHideOnFullScreen = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "auto quick hide", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
+	g_bAutoHideOnMaximized = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "auto quick hide on max", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
 
 	g_bDemandsAttentionWithDialog = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "demands attention with dialog", &bFlushConfFileNeeded, TRUE, "Applications", NULL);
 	g_bDemandsAttentionWithAnimation = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "demands attention with animation", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
@@ -1496,7 +1442,7 @@ gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePat
 }
 
 
-void cairo_dock_update_conf_file (gchar *cConfFilePath, GType iFirstDataType, ...)  // type, groupe, nom, valeur, etc. finir par G_TYPE_INVALID.
+void cairo_dock_update_conf_file (const gchar *cConfFilePath, GType iFirstDataType, ...)  // type, groupe, nom, valeur, etc. finir par G_TYPE_INVALID.
 {
 	cd_message ("%s (%s)", __func__, cConfFilePath);
 	va_list args;

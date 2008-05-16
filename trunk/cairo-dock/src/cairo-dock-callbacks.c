@@ -606,8 +606,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 		g_source_remove (pDock->iSidLeaveDemand);
 		pDock->iSidLeaveDemand = 0;
 	}
-	cairo_dock_deactivate_temporary_auto_hide ();
-
+	
 	if (pDock->bAtTop || pDock->bInside || (pDock->iSidMoveDown != 0))  // le 'iSidMoveDown != 0' est la pour empecher le dock de "vibrer" si l'utilisateur sort par en bas avec l'auto-hide active.
 	{
 		//g_print ("  %d;%d;%d\n", pDock->bAtTop,  pDock->bInside, pDock->iSidMoveDown);
@@ -619,6 +618,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	if (! pDock->bIsMainDock)
 		gtk_window_present (GTK_WINDOW (pWidget));
 	pDock->bInside = TRUE;
+	//cairo_dock_deactivate_temporary_auto_hide ();  // se desactive tout seul.
 
 	if (s_pIconClicked != NULL)  // on pourrait le faire a chaque motion aussi.
 	{

@@ -59,6 +59,9 @@ static Atom s_aWmName;
 static Atom s_aString;
 static Atom s_aWmHints;
 static Atom s_aNetWmHidden;
+static Atom s_aNetWmFullScreen;
+static Atom s_aNetWmMaximizedHoriz;
+static Atom s_aNetWmMaximizedVert;
 
 
 void cairo_dock_initialize_application_factory (Display *pXDisplay)
@@ -90,6 +93,10 @@ void cairo_dock_initialize_application_factory (Display *pXDisplay)
 	s_aString = XInternAtom (s_XDisplay, "STRING", False);
 
 	s_aWmHints = XInternAtom (s_XDisplay, "WM_HINTS", False);
+	
+	s_aNetWmFullScreen = XInternAtom (s_XDisplay, "_NET_WM_STATE_FULLSCREEN", False);
+	s_aNetWmMaximizedHoriz = XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+	s_aNetWmMaximizedVert = XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_VERT", False);
 }
 
 void cairo_dock_unregister_pid (Icon *icon)
@@ -294,22 +301,29 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	double fWidth, fHeight;
 
 	//\__________________ On regarde si on doit l'afficher ou la sauter.
-	gboolean bSkip = FALSE, bIsHidden = FALSE;
+	gboolean bSkip = FALSE, bIsHidden = FALSE, bIsFullScreen = FALSE, bIsMaximized = FALSE;
 	gulong *pXStateBuffer = NULL;
 	iBufferNbElements = 0;
 	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmState, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXStateBuffer);
 	if (iBufferNbElements > 0)
 	{
-		int i;
+		int i, iNbMaximizedDimensions = 0;
 		for (i = 0; i < iBufferNbElements && ! bSkip; i ++)
 		{
 			if (pXStateBuffer[i] == s_aNetWmSkipTaskbar)
 				bSkip = TRUE;
 			else if (pXStateBuffer[i] == s_aNetWmHidden)
 				bIsHidden = TRUE;
+			else if (pXStateBuffer[i] == s_aNetWmMaximizedVert)
+				iNbMaximizedDimensions ++;
+			else if (pXStateBuffer[i] == s_aNetWmMaximizedHoriz)
+				iNbMaximizedDimensions ++;
+			else if (pXStateBuffer[i] == s_aNetWmFullScreen)
+				bIsFullScreen = TRUE;
 			//else if (pXStateBuffer[i] == s_aNetWmSkipPager)  // contestable ...
 			//	bSkip = TRUE;
 		}
+		bIsMaximized = (iNbMaximizedDimensions == 2);
 		//g_print (" -------- bSkip : %d\n",  bSkip);
 		XFree (pXStateBuffer);
 	}
@@ -429,9 +443,8 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	icon->fOrder = (pLastAppli != NULL ? pLastAppli->fOrder + 1 : 1);
 	icon->iType = CAIRO_DOCK_APPLI;
 	icon->bIsHidden = bIsHidden;
-
-	///cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
-	///cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
+	icon->bIsMaximized = bIsMaximized;
+	icon->bIsFullScreen = bIsFullScreen;
 	cairo_dock_fill_icon_buffers_for_dock (icon, pSourceContext, pDock);
 
 	if (g_bUniquePid)

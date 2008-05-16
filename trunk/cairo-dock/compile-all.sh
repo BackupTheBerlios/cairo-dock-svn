@@ -276,8 +276,8 @@ if test "$CAIRO_DOCK_INSTALL" = "1"; then
 fi
 
 cd $CAIRO_DOCK_DIR
-echo "number of lines/word/caracters of sources :"
-sed '/^ *$/d' cairo-dock/src/*.c plug-ins/*/src/*.c | sed '/^\t*$/d'  | sed '/^\t*\/\/*/d' | wc
+echo "number of lines/word/caracters of sources (.c only) :"
+sed '/^ *$/d' cairo-dock/src/*.c plug-ins/*/src/*.c | sed '/^\t*$/d'  | sed '/^\t*\/\/*/d' | sed '/\t*\/\*/d' | wc
 
 if test -e compile.log; then
 	echo "\033[8;34mSome errors were encountered :\033[0m"

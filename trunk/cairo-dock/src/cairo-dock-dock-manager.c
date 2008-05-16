@@ -39,6 +39,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-log.h"
 #include "cairo-dock-keyfile-utilities.h"
 #include "cairo-dock-dock-factory.h"
+#include "cairo-dock-draw.h"
 #include "cairo-dock-dock-manager.h"
 
 extern CairoDock *g_pMainDock;
@@ -438,10 +439,32 @@ static void _cairo_dock_stop_quick_hide_one_root_dock (const gchar *cDockName, C
 	{
 		pDock->bAutoHide = pDock->bAutoHideInitialValue;
 		pDock->bAtBottom = TRUE;
+		
+		if (! pDock->bInside && ! pDock->bAutoHide)  // on le fait re-apparaitre.
+		{
+			pDock->fFoldingFactor = 0;
+			
+			int iNewWidth, iNewHeight;
+			cairo_dock_get_window_position_and_geometry_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
+			
+			if (pDock->bHorizontalDock)
+				gdk_window_move_resize (pDock->pWidget->window,
+					pDock->iWindowPositionX,
+					pDock->iWindowPositionY,
+					iNewWidth,
+					iNewHeight);
+			else
+				gdk_window_move_resize (pDock->pWidget->window,
+					pDock->iWindowPositionY,
+					pDock->iWindowPositionX,
+					iNewHeight,
+					iNewWidth);
+		}
 	}
 }
 void cairo_dock_deactivate_temporary_auto_hide (void)
 {
+	g_print ("%s ()\n", __func__);
 	if (s_bTemporaryAutoHide)
 	{
 		s_bTemporaryAutoHide = FALSE;
@@ -467,4 +490,26 @@ gboolean cairo_dock_entrance_is_allowed (CairoDock *pDock)
 gboolean cairo_dock_quick_hide_is_activated (void)
 {
 	return s_bTemporaryAutoHide;
+}
+
+
+gboolean cairo_dock_window_hovers_dock (GtkAllocation *pWindowGeometry, CairoDock *pDock)
+{
+	if (pWindowGeometry->width != 0 && pWindowGeometry->height != 0)
+	{
+		int iDockX = pDock->iWindowPositionX, iDockY = pDock->iWindowPositionY;
+		int iDockWidth = pDock->iCurrentWidth, iDockHeight = pDock->iCurrentHeight;
+		cd_message ("dock : (%d;%d) %dx%d", iDockX, iDockY, iDockWidth, iDockHeight);
+		if ((pWindowGeometry->x <= iDockX + iDockWidth && pWindowGeometry->x + pWindowGeometry->width >= iDockX) || (pWindowGeometry->y >= iDockY + iDockHeight && pWindowGeometry->y + pWindowGeometry->height >= iDockY))
+		{
+			cd_message (" empiete sur le dock");
+			return TRUE;
+		}
+	}
+	else
+	{
+		cd_warning (" on ne peut pas dire ou elle est sur l'ecran, on va supposer qu'elle recouvre le dock");
+		return TRUE;
+	}
+	return FALSE;
 }

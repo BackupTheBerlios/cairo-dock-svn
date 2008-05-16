@@ -13,12 +13,12 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-log.h"
 
 
-void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file)
+void cairo_dock_write_keys_to_file (GKeyFile *pKeyFile, const gchar *cConfFilePath)
 {
-	cd_message ("%s (%s)", __func__, conf_file);
+	cd_message ("%s (%s)", __func__, cConfFilePath);
 	GError *erreur = NULL;
 
-	gchar *cDirectory = g_path_get_dirname (conf_file);
+	gchar *cDirectory = g_path_get_dirname (cConfFilePath);
 	if (! g_file_test (cDirectory, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_EXECUTABLE))
 	{
 		g_mkdir_with_parents (cDirectory, 7*8*8+7*8+5);
@@ -27,7 +27,7 @@ void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file)
 
 
 	gsize length;
-	gchar *new_conf_file = g_key_file_to_data (key_file, &length, &erreur);
+	gchar *cNewConfFilePath = g_key_file_to_data (pKeyFile, &length, &erreur);
 	if (erreur != NULL)
 	{
 		cd_warning ("Error while fetching data : %s", erreur->message);
@@ -35,7 +35,7 @@ void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file)
 		return ;
 	}
 
-	g_file_set_contents (conf_file, new_conf_file, length, &erreur);
+	g_file_set_contents (cConfFilePath, cNewConfFilePath, length, &erreur);
 	if (erreur != NULL)
 	{
 		cd_warning ("Error while writing data : %s", erreur->message);

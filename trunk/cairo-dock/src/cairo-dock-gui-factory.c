@@ -537,6 +537,29 @@ gboolean _cairo_dock_find_iter_from_renderer_name (gchar *cName, GtkTreeIter *it
 	return bFound;
 }
 
+static void _cairo_dock_configure_renderer (GtkButton *button, gpointer *data)
+{
+	GtkTreeView *pCombo = data[0];
+	GtkWindow *pDialog = data[1];
+	/*GtkTreeIter iter;
+	if (! gtk_combo_box_get_active_iter (pCombo, &iter))
+		return;
+	gchar *cRendererName = NULL;
+	GtkTreeModel *model = gtk_combo_box_get_model (pCombo);
+	gtk_tree_model_get (model, &iter, CAIRO_DOCK_MODEL_NAME, &cRendererName, -1);*/
+	CairoDockModule *pModule = cairo_dock_find_module_from_name ("rendering");
+	if (pModule != NULL)
+	{
+		GError *erreur = NULL;
+		cairo_dock_configure_module (pDialog, pModule, &erreur);
+		if (erreur != NULL)
+		{
+			cd_warning ("%s", erreur->message);
+			g_error_free (erreur);
+		}
+	}
+}
+
 #define _allocate_new_buffer\
 	data = g_new (gpointer, 3); \
 	g_ptr_array_add (pDataGarbage, data);
@@ -544,7 +567,7 @@ gboolean _cairo_dock_find_iter_from_renderer_name (gchar *cName, GtkTreeIter *it
 #define _allocate_new_model\
 	modele = gtk_list_store_new (CAIRO_DOCK_MODEL_NB_COLUMNS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_INT, G_TYPE_STRING, GDK_TYPE_PIXBUF);
 
-GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gchar *cTitle, GtkWindow *pParentWindow, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier, gchar *cPresentedGroup, gboolean bSwitchButtonPresent, gchar *cButtonConvert, gchar *cGettextDomain, GPtrArray *pDataGarbage)
+GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, const gchar *cTitle, GtkWindow *pParentWindow, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier, gchar *cPresentedGroup, gboolean bSwitchButtonPresent, gchar *cButtonConvert, gchar *cGettextDomain, GPtrArray *pDataGarbage)
 {
 	g_return_val_if_fail (cairo_dock_is_advanced_keyfile (pKeyFile), NULL);
 	
@@ -572,6 +595,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 	GtkWidget *pFontButton;
 	GtkWidget *pDescriptionLabel;
 	GtkWidget *pPreviewImage;
+	GtkWidget *pButtonConfigRenderer;
 	gchar *cGroupName, *cGroupComment , *cKeyName, *cKeyComment, *cUsefulComment, *cAuthorizedValuesChain, *pTipString, **pAuthorizedValuesList, *cSmallGroupIcon;
 	gpointer *pGroupKeyWidget;
 	int i, j, k, iNbElements;
@@ -1027,6 +1051,20 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 							FALSE,
 							0);
 						g_free (cValue);
+						
+						pButtonConfigRenderer = gtk_button_new_from_stock (GTK_STOCK_PREFERENCES);
+						_allocate_new_buffer;
+						data[0] = pOneWidget;
+						data[1] = pDialog;
+						g_signal_connect (G_OBJECT (pButtonConfigRenderer),
+							"clicked",
+							G_CALLBACK (_cairo_dock_configure_renderer),
+							data);
+						gtk_box_pack_start (GTK_BOX (pHBox),
+							pButtonConfigRenderer,
+							FALSE,
+							FALSE,
+							0);
 					break ;
 					
 					case 's' :  // string
@@ -1130,14 +1168,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, gc
 						else
 						{
 							pOneWidget = gtk_tree_view_new ();
-							if (iElementType == 'n')
-							{
-								modele = s_pRendererListStore;
-							}
-							else
-							{
-								_allocate_new_model
-							}
+							_allocate_new_model
 							gtk_tree_view_set_model (GTK_TREE_VIEW (pOneWidget), GTK_TREE_MODEL (modele));
 							gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (modele), CAIRO_DOCK_MODEL_ORDER, GTK_SORT_ASCENDING);
 							gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (pOneWidget), FALSE);
@@ -1634,7 +1665,7 @@ gboolean cairo_dock_is_advanced_keyfile (GKeyFile *pKeyFile)
 }
 
 
-GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, gchar *cTitle, GtkWindow *pParentWindow, GtkTextBuffer **pTextBuffer, gboolean bApplyButtonPresent, gboolean bSwitchButtonPresent, gchar *cButtonConvert, gchar *cGettextDomain)
+GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, const gchar *cTitle, GtkWindow *pParentWindow, GtkTextBuffer **pTextBuffer, gboolean bApplyButtonPresent, gboolean bSwitchButtonPresent, gchar *cButtonConvert, gchar *cGettextDomain)
 	{
 	gchar *cConfiguration;
 	gboolean read_ok = g_file_get_contents (cConfFilePath, &cConfiguration, NULL, NULL);

@@ -78,7 +78,7 @@ cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo
 *@param iLoadingModifier composition de modificateurs de chargement.
 *@returns la surface nouvellement créée.
 */
-cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, double *fImageWidth, double *fImageHeight, CairoDockLoadImageModifier iLoadingModifier);
+cairo_surface_t *cairo_dock_create_surface_from_image (const gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, double *fImageWidth, double *fImageHeight, CairoDockLoadImageModifier iLoadingModifier);
 /**
 * Cree une surface à partir d'une image au format quelconque, a la taille donnée, sans zoom.
 *@param cImagePath le chemin complet de l'image.
@@ -87,7 +87,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 *@param fImageHeight la hauteur de l'icone.
 *@returns la surface nouvellement créée.
 */
-cairo_surface_t *cairo_dock_create_surface_for_icon (gchar *cImagePath, cairo_t* pSourceContext, double fImageWidth, double fImageHeight);
+cairo_surface_t *cairo_dock_create_surface_for_icon (const gchar *cImagePath, cairo_t* pSourceContext, double fImageWidth, double fImageHeight);
 /**
 * Cree une surface à partir d'une image au format quelconque, a la taille donnée carrée, sans zoom.
 *@param cImagePath le chemin complet de l'image.

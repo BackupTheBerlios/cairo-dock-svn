@@ -187,6 +187,7 @@ int g_iAppliMaxNameLength;  // longueur max de la chaine de caractere du nom des
 gboolean g_bMinimizeOnClick;  // minimiser l'appli lorsqu'on clique sur son icone si elle est deja active.
 gboolean g_bCloseAppliOnMiddleClick;  // utiliser le clique du milieu pour fermer une appli.
 gboolean g_bAutoHideOnFullScreen;  // quick-hide automatique lorsqu'une fenetre passe en plein ecran (pour pas gener).
+gboolean g_bAutoHideOnMaximized;  // quick-hide automatique lorsqu'une fenetre passe en plein ecran ou en mode maximise.
 gboolean g_bDemandsAttentionWithDialog;  // attirer l'attention avec une bulle de dialogue.
 gboolean g_bDemandsAttentionWithAnimation;  // attirer l'attention avec une animation.
 gboolean g_bAnimateOnActiveWindow;  // jouer une breve animation de l'icone lorsque la fenetre correspondante devient active.

@@ -28,7 +28,7 @@ void cairo_dock_move_xwindow_to_nth_desktop (Window Xid, int iDesktopNumber, int
 gboolean cairo_dock_window_is_maximized (Window Xid);
 gboolean cairo_dock_window_is_fullscreen (Window Xid);
 void cairo_dock_window_is_above_or_below (Window Xid, gboolean *bIsAbove, gboolean *bIsBelow);
-void cairo_dock_window_is_fullscreen_or_hidden (Window Xid, gboolean *bIsFullScreen, gboolean *bIsHidden);
+void cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Window Xid, gboolean *bIsFullScreen, gboolean *bIsHidden, gboolean *bIsMaximized);
 Window cairo_dock_get_active_window (void);
 
 int cairo_dock_get_window_desktop (int Xid);

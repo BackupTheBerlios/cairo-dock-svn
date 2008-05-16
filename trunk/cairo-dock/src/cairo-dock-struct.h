@@ -555,6 +555,10 @@ struct _Icon {
 	gboolean bIsHidden;
 	/// Position et taille de la fenetre.
 	GtkAllocation windowGeometry;
+	/// TRUE ssi la fenetre est en mode plein ecran.
+	gboolean bIsFullScreen;
+	///TRUE ssi la fenetre est en mode maximisee.
+	gboolean bIsMaximized;
 	//\____________ Pour les modules.
 	/// Module que represente l'icone.
 	CairoDockModule *pModule;

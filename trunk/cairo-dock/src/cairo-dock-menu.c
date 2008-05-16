@@ -44,6 +44,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #define CAIRO_DOCK_CONF_PANEL_HEIGHT 600
 #define CAIRO_DOCK_LAUNCHER_PANEL_WIDTH 600
 #define CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT 350
+#define CAIRO_DOCK_FILE_HOST_URL "https://developer.berlios.de/project/showfiles.php?group_id=8724"
 
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
@@ -151,7 +152,20 @@ static void _cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 
 static void _cairo_dock_update (GtkMenuItem *menu_item, gpointer *data)
 {
-	system ("which xdg-open > /dev/null && xdg-open http://www.berlios.de || which firefox > /dev/null && firefox http://www.berlios.de || which konqueror > /dev/null && konqueror http://www.berlios.de || which opera > /dev/null && opera http://www.berlios.de");  /// A ameliorer...
+	if  (! cairo_dock_fm_launch_uri (CAIRO_DOCK_FILE_HOST_URL))
+	{
+		gchar *cCommand = g_strdup_printf ("\
+which xdg-open > /dev/null && xdg-open CAIRO_DOCK_FILE_HOST_URL || \
+which firefox > /dev/null && firefox CAIRO_DOCK_FILE_HOST_URL || \
+which konqueror > /dev/null && konqueror CAIRO_DOCK_FILE_HOST_URL || \
+which opera > /dev/null && opera CAIRO_DOCK_FILE_HOST_URL",
+			CAIRO_DOCK_FILE_HOST_URL,
+			CAIRO_DOCK_FILE_HOST_URL,
+			CAIRO_DOCK_FILE_HOST_URL,
+			CAIRO_DOCK_FILE_HOST_URL);  // pas super beau mais efficace ^_^
+		system (cCommand);
+		g_free (cCommand);
+	}
 	//system ("xterm -e cairo-dock-update.sh &");
 }
 

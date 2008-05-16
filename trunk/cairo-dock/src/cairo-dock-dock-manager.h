@@ -132,4 +132,7 @@ void cairo_dock_disable_entrance (CairoDock *pDock);
 gboolean cairo_dock_entrance_is_allowed (CairoDock *pDock);
 gboolean cairo_dock_quick_hide_is_activated (void);
 
+gboolean cairo_dock_window_hovers_dock (GtkAllocation *pWindowGeometry, CairoDock *pDock);
+
+
 #endif

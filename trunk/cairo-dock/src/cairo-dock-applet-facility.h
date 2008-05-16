@@ -196,7 +196,7 @@ typedef struct {
 	GVoidFunc read;
 	/// fonction realisant la mise a jour de l'IHM en fonction des nouveaux resultats.
 	GVoidFunc update;
-	/// intervalle de temps
+	/// intervalle de temps, eventuellement nul pour une mesure unitaire.
 	gint iCheckInterval;
 	/// etat de la frequence des mesures.
 	CairoDockFrequencyState iFrequencyState;
@@ -209,7 +209,7 @@ typedef struct {
 void cairo_dock_launch_measure (CairoDockMeasure *pMeasureTimer);
 /**
 *Cree une mesure periodique.
-*@param iCheckInterval l'intervalle en ms entre 2 mesures.
+*@param iCheckInterval l'intervalle en ms entre 2 mesures, eventuellement nul pour une mesure unitaire.
 *@param acquisition fonction realisant l'acquisition des donnees. N'accede jamais a la structure des resultats.
 *@param read fonction realisant la lecture des donnees precedemment acquises; stocke les resultats dans la structures des resultats.
 *@param update fonction realisant la mise a jour de l'interface en fonction des nouveaux resultats, lus dans la structures des resultats.
@@ -529,6 +529,15 @@ CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT (cGroupName, cKeyName, TRUE)
 *@return une chaine de caracteres nouvellement allouee.
 */
 #define CD_CONFIG_GET_STRING(cGroupName, cKeyName) CD_CONFIG_GET_STRING_WITH_DEFAULT (cGroupName, cKeyName, NULL)
+
+/**
+*Recupere la valeur d'un parametre 'fichier' du fichier de conf, avec NULL comme valeur par defaut. Si le parametre est NULL, un fichier local a l'applet est utilise, mais le fichier de conf n'est pas renseigné avec.
+*@param cGroupName nom du groupe dans le fichier de conf.
+*@param cKeyName nom de la cle dans le fichier de conf.
+*@param cDefaultFileName fichier par defaut si aucun n'est specifie dans la conf.
+*@return une chaine de caracteres nouvellement allouee donnant le chemin complet du fichier.
+*/
+#define CD_CONFIG_GET_FILE_PATH(cGroupName, cKeyName, cDefaultFileName) cairo_dock_get_file_path_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, NULL, NULL, MY_APPLET_SHARE_DATA_DIR, cDefaultFileName)
 
 /**
 *Recupere la valeur d'un parametre 'liste de chaines de caracteres' du fichier de conf.

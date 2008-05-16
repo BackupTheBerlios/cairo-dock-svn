@@ -94,7 +94,7 @@ void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 */
 gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gsize *length, gchar *cDefaultValues, gchar *cDefaultGroupName, gchar *cDefaultKeyName);
 /**
-*Recupere une cle d'un fichier de cles sous la forme d'un tableau de chaines de caracteres.
+*Recupere une cle d'un fichier de cles sous la forme d'un type d'animation.
 *@param pKeyFile le fichier de cles.
 *@param cGroupName le com du groupe.
 *@param cKeyName le nom de la cle.
@@ -105,6 +105,20 @@ gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupN
 *@return le type de l'animation correspondante a la cle.
 */
 CairoDockAnimationType cairo_dock_get_animation_type_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, CairoDockAnimationType iDefaultAnimation, gchar *cDefaultGroupName, gchar *cDefaultKeyName);
+/**
+*Recupere une cle d'un fichier de cles sous la forme d'un chemin de fichier complet. La clé peut soit être un fichier relatif au thème courant, soit un chemin començant par '~', soit un chemin complet, soit vide auquel cas le chemin d'un fichier par defaut est renvoye s'il est specifie.
+*@param pKeyFile le fichier de cles.
+*@param cGroupName le com du groupe.
+*@param cKeyName le nom de la cle.
+*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
+*@param cDefaultGroupName nom de groupe alternatif, ou NULL si aucun autre.
+*@param cDefaultKeyName nom de cle alternative, ou NULL si aucune autre.
+*@param cDefaultDir si la cle est vide, on prendra un fichier par defaut situe dans ce repertoire. (optionnel)
+*@param cDefaultFileName si la cle est vide, on prendra ce fichier par defaut dans le repertoire defini ci-dessus. (optionnel)
+*@return le chemin complet du fichier, a liberer avec g_free().
+*/
+gchar *cairo_dock_get_file_path_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultGroupName, gchar *cDefaultKeyName, gchar *cDefaultDir, gchar *cDefaultFileName);
+
 
 /**
 *Lis le fichier de conf et recharge l'appli en consequence.
@@ -146,7 +160,7 @@ gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePat
 *@param cConfFilePath chemin du fichier de conf.
 *@param iFirstDataType type de la 1ere donnee.
 */
-void cairo_dock_update_conf_file (gchar *cConfFilePath, GType iFirstDataType, ...);
+void cairo_dock_update_conf_file (const gchar *cConfFilePath, GType iFirstDataType, ...);
 /**
 *Met a jour un fichier de conf de dock racine avec sa position définie par les écarts en x et en y.
 *@param cConfFilePath chemin du fichier de conf.

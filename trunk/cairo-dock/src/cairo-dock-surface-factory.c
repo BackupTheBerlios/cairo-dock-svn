@@ -174,29 +174,6 @@ cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo
 			iLoadingModifier,
 			&fIconWidthSaturationFactor,
 			&fIconHeightSaturationFactor);
-	/*gboolean bKeepRatio = iLoadingModifier & CAIRO_DOCK_KEEP_RATIO;
-	gboolean bNoZoomUp = iLoadingModifier & CAIRO_DOCK_DONT_ZOOM_IN;
-	double fIconWidthSaturationFactor = 1., fIconHeightSaturationFactor = 1.;
-	if (bKeepRatio)
-	{
-		cairo_dock_calculate_size_constant_ratio (fImageWidth,
-			fImageHeight,
-			iWidthConstraint,
-			iHeightConstraint,
-			bNoZoomUp,
-			&fIconWidthSaturationFactor);
-		fIconHeightSaturationFactor = fIconWidthSaturationFactor;
-	}
-	else
-	{
-		cairo_dock_calculate_size_fill (fImageWidth,
-			fImageHeight,
-			iWidthConstraint,
-			iHeightConstraint,
-			bNoZoomUp,
-			&fIconWidthSaturationFactor,
-			&fIconHeightSaturationFactor);
-	}*/
 
 	GdkPixbuf *pPixbufWithAlpha = pixbuf;
 	if (! gdk_pixbuf_get_has_alpha (pixbuf))  // on lui rajoute un canal alpha s'il n'en a pas.
@@ -254,9 +231,9 @@ cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo
 }
 
 
-cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, double *fImageWidth, double *fImageHeight, CairoDockLoadImageModifier iLoadingModifier)
+cairo_surface_t *cairo_dock_create_surface_from_image (const gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, double *fImageWidth, double *fImageHeight, CairoDockLoadImageModifier iLoadingModifier)
 {
-	//g_print ("%s (%s, %dx%dx%.2f)\n", __func__, cImagePath, iWidthConstraint, iHeightConstraint, fMaxScale);
+	//g_print ("%s (%s, %dx%dx%.2f, %d)\n", __func__, cImagePath, iWidthConstraint, iHeightConstraint, fMaxScale, iLoadingModifier);
 	g_return_val_if_fail (cImagePath != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	GError *erreur = NULL;
 	RsvgDimensionData rsvg_dimension_data;
@@ -318,24 +295,6 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 				iLoadingModifier,
 				&fIconWidthSaturationFactor,
 				&fIconHeightSaturationFactor);
-			/*if (bKeepRatio)
-			{
-				cairo_dock_calculate_size_constant_ratio (fImageWidth,
-					fImageHeight,
-					iWidthConstraint,
-					iHeightConstraint,
-					&fIconWidthSaturationFactor);
-				fIconHeightSaturationFactor = fIconWidthSaturationFactor;
-			}
-			else
-			{
-				cairo_dock_calculate_size_fill (fImageWidth,
-					fImageHeight,
-					iWidthConstraint,
-					iHeightConstraint,
-					&fIconWidthSaturationFactor,
-					&fIconHeightSaturationFactor);
-			}*/
 			
 			pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 				CAIRO_CONTENT_COLOR_ALPHA,
@@ -352,8 +311,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 	else if (bIsPNG)
 	{
 		surface_ini = cairo_image_surface_create_from_png (cImagePath);
-		pNewSurface = surface_ini;
-		if (cairo_surface_status (surface_ini) != CAIRO_STATUS_SUCCESS)
+		if (cairo_surface_status (surface_ini) == CAIRO_STATUS_SUCCESS)
 		{
 			*fImageWidth = (double) cairo_image_surface_get_width (surface_ini);
 			*fImageHeight = (double) cairo_image_surface_get_height (surface_ini);
@@ -364,24 +322,6 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 				iLoadingModifier,
 				&fIconWidthSaturationFactor,
 				&fIconHeightSaturationFactor);
-			/*if (bKeepRatio)
-			{
-				cairo_dock_calculate_size_constant_ratio (fImageWidth,
-					fImageHeight,
-					iWidthConstraint,
-					iHeightConstraint,
-					&fIconWidthSaturationFactor);
-				fIconHeightSaturationFactor = fIconWidthSaturationFactor;
-			}
-			else
-			{
-				cairo_dock_calculate_size_fill (fImageWidth,
-					fImageHeight,
-					iWidthConstraint,
-					iHeightConstraint,
-					&fIconWidthSaturationFactor,
-					&fIconHeightSaturationFactor);
-			}*/
 			
 			pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 				CAIRO_CONTENT_COLOR_ALPHA,
@@ -393,8 +333,8 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 			
 			cairo_set_source_surface (pCairoContext, surface_ini, 0, 0);
 			cairo_paint (pCairoContext);
-			cairo_surface_destroy (surface_ini);
 		}
+		cairo_surface_destroy (surface_ini);
 	}
 	else  // le code suivant permet de charger tout type d'image, mais en fait c'est un peu idiot d'utiliser des icones n'ayant pas de transparence.
 	{
@@ -410,7 +350,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 			fMaxScale,
 			iWidthConstraint,
 			iHeightConstraint,
-			CAIRO_DOCK_FILL_SPACE,
+			iLoadingModifier,
 			fImageWidth,
 			fImageHeight);
 		g_object_unref (pixbuf);
@@ -421,7 +361,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 	return pNewSurface;
 }
 
-cairo_surface_t *cairo_dock_create_surface_for_icon (gchar *cImagePath, cairo_t* pSourceContext, double fImageWidth, double fImageHeight)
+cairo_surface_t *cairo_dock_create_surface_for_icon (const gchar *cImagePath, cairo_t* pSourceContext, double fImageWidth, double fImageHeight)
 {
 	double fImageWidth_ = fImageWidth, fImageHeight_ = fImageHeight;
 	return cairo_dock_create_surface_from_image (cImagePath,
