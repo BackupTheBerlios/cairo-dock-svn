@@ -305,7 +305,7 @@ void cairo_dock_set_hours_minutes_as_quick_info (cairo_t *pSourceContext, Icon *
 	if (hours != 0)
 		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%dh%02d", hours, abs (minutes));
 	else
-		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%d", minutes);
+		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%dmn", minutes);
 }
 
 void cairo_dock_set_minutes_secondes_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoContainer *pContainer, int iTimeInSeconds)
@@ -315,7 +315,7 @@ void cairo_dock_set_minutes_secondes_as_quick_info (cairo_t *pSourceContext, Ico
 	if (minutes != 0)
 		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%d:%02d", minutes, abs (secondes));
 	else
-		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%d", secondes);
+		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%s0:%d", (secondes < 0 ? "-" : ""), abs (secondes));
 }
 
 void cairo_dock_set_size_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoContainer *pContainer, long long int iSizeInBytes)
@@ -436,7 +436,7 @@ void cairo_dock_launch_measure (CairoDockMeasure *pMeasureTimer)
 		cd_debug (" ==> lancement du thread de calcul");
 		
 		if (pMeasureTimer->iSidTimerRedraw == 0)
-			pMeasureTimer->iSidTimerRedraw = g_timeout_add (MIN (0.2 * pMeasureTimer->iCheckInterval, 333), (GSourceFunc) _cairo_dock_check_for_redraw, pMeasureTimer);
+			pMeasureTimer->iSidTimerRedraw = g_timeout_add (MAX (200, MIN (0.2 * pMeasureTimer->iCheckInterval, 333)), (GSourceFunc) _cairo_dock_check_for_redraw, pMeasureTimer);
 		
 		GError *erreur = NULL;
 		GThread* pThread = g_thread_create ((GThreadFunc) _cairo_dock_threaded_calculation, pMeasureTimer, FALSE, &erreur);

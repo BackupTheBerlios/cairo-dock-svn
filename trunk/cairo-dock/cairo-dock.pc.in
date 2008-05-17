@@ -2,12 +2,12 @@ prefix = @prefix@
 exec_prefix = @exec_prefix@
 libdir = @libdir@
 includedir = @includedir@
-pluginsdir=@datadir@/@PACKAGE@/plug-in
+pluginsdir=@libdir@/@PACKAGE@
 themesdir=@datadir@/@PACKAGE@/themes
 
 Name:cairo-dock
 Description:An eye-candy fully animated and configurable dock.
-Requires: gtk+-2.0 cairo librsvg-2.0
-Libs:-L${libdir} @PACKAGE_LIBS@
-Cflags:-I${includedir}/cairo-dock -I${includedir}/cairo-dock/cairo-dock @PACKAGE_CFLAGS@
+Requires: gtk+-2.0 gthread-2.0 cairo librsvg-2.0 glitz dbus-1 dbus-glib-1 libxml-2.0 xtst glitz-glx
+Libs:-L${libdir}
+Cflags:-I${includedir}/cairo-dock -I${includedir}/cairo-dock/cairo-dock
 Version: @VERSION@

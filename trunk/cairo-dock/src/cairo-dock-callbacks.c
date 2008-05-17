@@ -107,7 +107,7 @@ gboolean on_expose (GtkWidget *pWidget,
 	CairoDock *pDock)
 {
 	//g_print ("%s ((%d;%d) %dx%d) (%d)\n", __func__, pExpose->area.x, pExpose->area.y, pExpose->area.width, pExpose->area.height, pDock->bAtBottom);
-	if (pExpose->area.x + pExpose->area.y != 0)  // x et y sont >= 0.
+	if (pExpose->area.x + pExpose->area.y != 0)  // x et/ou y sont > 0.
 	{
 		if (! (pDock->bAutoHide && pDock->iRefCount == 0) || ! pDock->bAtBottom)
 		{
@@ -135,7 +135,12 @@ gboolean on_expose (GtkWidget *pWidget,
 		}
 		return FALSE;
 	}
-
+	
+	if (cairo_dock_is_loading ())  // && pDock->icons == NULL
+	{
+		cairo_dock_render_blank (pDock);
+	}
+	else
 	if (!pDock->bAtBottom)
 	{
 		pDock->render (pDock);

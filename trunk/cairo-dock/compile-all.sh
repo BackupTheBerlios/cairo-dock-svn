@@ -137,6 +137,7 @@ if test "$CAIRO_DOCK_INSTALL" = "1"; then
 	echo "*  installation of cairo-dock..."
 	sudo rm -f $CAIRO_DOCK_PREFIX/bin/cairo-dock
 	sudo rm -rf $CAIRO_DOCK_PREFIX/share/cairo-dock
+	sudo rm -rf $CAIRO_DOCK_PREFIX/lib/cairo-dock
 	/usr/bin/time -f "  time elapsed : %Us" sudo make install > /dev/null
 	if test ! "$?" = "0"; then
 		echo "  Attention : an error has occured !"
@@ -272,7 +273,7 @@ if test "$CAIRO_DOCK_INSTALL" = "1"; then
 	echo "------------"
 	date +"compil ended at %c"
 	ls -l $CAIRO_DOCK_PREFIX/bin/cairo-dock
-	ls -l $CAIRO_DOCK_PREFIX/share/cairo-dock/plug-in
+	ls -l $CAIRO_DOCK_PREFIX/lib/cairo-dock
 fi
 
 cd $CAIRO_DOCK_DIR

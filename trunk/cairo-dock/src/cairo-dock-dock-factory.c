@@ -196,6 +196,8 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	
 	gtk_window_get_size (GTK_WINDOW (pWindow), &pDock->iCurrentWidth, &pDock->iCurrentHeight);  // ca n'est que la taille initiale allouee par GTK.
 	gtk_widget_show_all (pWindow);
+	while (gtk_events_pending ())  // on force le redessin pour eviter les carre gris.
+		gtk_main_iteration ();
 
 	/*if (!pouet)
 	{

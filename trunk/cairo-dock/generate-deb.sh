@@ -114,7 +114,6 @@ sudo cp /usr/bin/cairo-dock usr/bin
 sudo cp /usr/bin/launch-cairo-dock-after-beryl.sh usr/bin
 sudo cp /usr/bin/cairo-dock-update.sh usr/bin
 sudo cp -rp /usr/share/cairo-dock/ usr/share/
-sudo rm -rf usr/share/cairo-dock/plug-in
 sudo cp ../cairo-dock/data/cairo-dock.svg usr/share/pixmaps
 sudo cp ../cairo-dock/data/cairo-dock usr/share/menu
 sudo cp ../cairo-dock/data/cairo-dock.desktop usr/share/applications
@@ -133,7 +132,9 @@ for lang in `cat ../cairo-dock/po/LINGUAS`; do
 	sudo mkdir -p usr/share/locale/$lang/LC_MESSAGES
 	sudo cp /usr/share/locale/$lang/LC_MESSAGES/cd-*.mo usr/share/locale/$lang/LC_MESSAGES
 done;
-sudo cp -r /usr/share/cairo-dock/plug-in usr/share/cairo-dock
+sudo mkdir -p usr/lib
+sudo cp -r /usr/lib/cairo-dock usr/lib
+sudo rm -f usr/lib/cairo-dock/*.la
 
 cd $CAIRO_DOCK_DIR
 sed "s/^Version:.*/Version: "`cairo-dock --version`"/g" deb-plug-ins/DEBIAN/control > tmp

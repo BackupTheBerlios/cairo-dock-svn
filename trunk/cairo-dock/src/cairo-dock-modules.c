@@ -763,7 +763,7 @@ static void _cairo_dock_configure_module_callback (gchar *cConfFile, gpointer *d
 void cairo_dock_configure_module (GtkWindow *pParentWindow, CairoDockModule *module, GError **erreur)
 {
 	g_return_if_fail (module != NULL);
-	g_print ("%s (%s)\n", __func__, module->cConfFilePath);
+	cd_message ("%s (%s)", __func__, module->cConfFilePath);
 
 	if (module->cConfFilePath == NULL)
 		return;

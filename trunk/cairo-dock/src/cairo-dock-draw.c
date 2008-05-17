@@ -1216,31 +1216,30 @@ void cairo_dock_render_blank (CairoDock *pDock)
 void cairo_dock_redraw_my_icon (Icon *icon, CairoContainer *pContainer)
 {
 	g_return_if_fail (icon != NULL && pContainer != NULL);
+	if (! GTK_WIDGET_VISIBLE (pContainer->pWidget))
+		return ;
+	
 	double fReflectSize = 0;
-	gboolean bHorizontal = TRUE, bDirectionUp = TRUE;
+	gboolean bHorizontal = pContainer->bIsHorizontal, bDirectionUp = pContainer->bDirectionUp;
 	if (CAIRO_DOCK_IS_DOCK (pContainer))
 	{
 		CairoDock *pDock = CAIRO_DOCK (pContainer);
 		if (pDock->bUseReflect)
 			fReflectSize = g_fReflectSize * icon->fScale * fabs (icon->fHeightFactor);
-		bHorizontal = pDock->bHorizontalDock;
-		bDirectionUp = pDock->bDirectionUp;
 		if (pDock->bAtBottom && (pDock->iRefCount > 0 || pDock->bAutoHide))  // inutile de redessiner.
 			return ;
 	}
-	else if (! GTK_WIDGET_VISIBLE (pContainer->pWidget))
-		return ;
 	
-	GdkRectangle rect = {(int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor)),
-		(int) icon->fDrawY - (! bDirectionUp ? fReflectSize : 0),
-		(int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)) - 1,
-		(int) icon->fHeight * icon->fScale + fReflectSize};
+	GdkRectangle rect = {(int) floor (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor)),
+		(int) floor (icon->fDrawY - (! bDirectionUp ? fReflectSize : 0)),
+		(int) ceil (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)) + 1,
+		(int) ceil (icon->fHeight * icon->fScale + fReflectSize)};
 	if (! bHorizontal)
 	{
-		rect.x = (int) icon->fDrawY - (! bDirectionUp ? fReflectSize : 0);
-		rect.y = (int) round (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor));
-		rect.width = (int) icon->fHeight * icon->fScale + fReflectSize;
-		rect.height = (int) round (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor)) - 1;
+		rect.x = (int) floor (icon->fDrawY - (! bDirectionUp ? fReflectSize : 0));
+		rect.y = (int) floor (icon->fDrawX + MIN (0, icon->fWidth * icon->fScale * icon->fWidthFactor));
+		rect.width = (int) ceil (icon->fHeight * icon->fScale + fReflectSize) + 1;
+		rect.height = (int) ceil (icon->fWidth * icon->fScale * fabs (icon->fWidthFactor));
 	}
 	//g_print ("rect (%d;%d) (%dx%d)\n", rect.x, rect.y, rect.width, rect.height);
 	if (rect.width > 0 && rect.height > 0)

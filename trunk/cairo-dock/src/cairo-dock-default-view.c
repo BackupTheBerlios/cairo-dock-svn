@@ -279,20 +279,21 @@ void cairo_dock_render_optimized_linear (CairoDock *pDock, GdkRectangle *pArea)
 		double fRatio = (pDock->iRefCount == 0 ? 1 : g_fSubDockSizeRatio);
 		fRatio = pDock->fRatio;
 		double fXLeft, fXRight;
-
+		
+		//g_print ("redraw [%d -> %d]\n", (int) fXMin, (int) fXMax);
 		Icon *icon;
 		GList *ic = pFirstDrawnElement;
 		do
 		{
 			icon = ic->data;
 
-			fXLeft = icon->fDrawX;
-			fXRight = icon->fDrawX + icon->fWidth * icon->fScale * icon->fWidthFactor;
+			fXLeft = icon->fDrawX + icon->fScale + 1;
+			fXRight = icon->fDrawX + (icon->fWidth - 1) * icon->fScale * icon->fWidthFactor - 1;
 
-			if (fXLeft <= fXMax && floor (fXRight) > fXMin)
+			if (fXLeft < fXMax && fXRight > fXMin)
 			{
 				cairo_save (pCairoContext);
-				//g_print ("dessin optimise de %s\n", icon->acName);
+				//g_print ("dessin optimise de %s [%.2f -> %.2f]\n", icon->acName, fXLeft, fXRight);
 				
 				if (icon->fDrawX >= 0 && icon->fDrawX + icon->fWidth * icon->fScale <= pDock->iCurrentWidth)
 				{

@@ -464,7 +464,7 @@ static void _cairo_dock_stop_quick_hide_one_root_dock (const gchar *cDockName, C
 }
 void cairo_dock_deactivate_temporary_auto_hide (void)
 {
-	g_print ("%s ()\n", __func__);
+	cd_message ("");
 	if (s_bTemporaryAutoHide)
 	{
 		s_bTemporaryAutoHide = FALSE;
