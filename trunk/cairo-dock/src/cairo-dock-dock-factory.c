@@ -434,7 +434,7 @@ void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDoc
 	g_free (pDock);
 }
 
-static void _cairo_dock_reload_reflects_in_dock (CairoDock *pDock)
+void cairo_dock_reload_reflects_in_dock (CairoDock *pDock)
 {
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 	double fMaxScale = cairo_dock_get_max_scale (CAIRO_CONTAINER (pDock));
@@ -467,7 +467,7 @@ void cairo_dock_reference_dock (CairoDock *pDock, CairoDock *pParentDock)
 		if (iScreenBorder != (((! pDock->bHorizontalDock) << 1) | (! pDock->bDirectionUp)))
 		{
 			g_print ("changement de position\n");
-			_cairo_dock_reload_reflects_in_dock (pDock);
+			cairo_dock_reload_reflects_in_dock (pDock);
 		}
 		pDock->bAutoHide = FALSE;
 		double fPrevRatio = pDock->fRatio;

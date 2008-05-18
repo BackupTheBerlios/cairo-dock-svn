@@ -333,7 +333,7 @@ stripes width = 0.03
 #[gtk-about]
 [Icons]
 
-#F+[Wave's shape;@prefix@/@DATADIRNAME@/@PACKAGE@/icon-wave.svg]
+#F+[Wave's shape;@prefix@/@DATADIRNAME@/@PACKAGE@/icon-wave.png]
 frame_shape =
 #f+[0;5] Crest of the wave :
 #{the maximum zoom will be 1+C.}

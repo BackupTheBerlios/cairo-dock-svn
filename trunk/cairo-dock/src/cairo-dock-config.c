@@ -1145,7 +1145,10 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		cairo_dock_build_docks_tree_with_desktop_files (pDock, g_cCurrentLaunchersPath);
 	}
 	else
+	{
+		cairo_dock_synchronize_sub_docks_position (pDock, FALSE);
 		cairo_dock_reload_buffers_in_all_docks ();  // tout sauf les applets, qui seront rechargees en bloc juste apres.
+	}
 
 
 	if (! cairo_dock_application_manager_is_running () && g_bShowAppli)  // maintenant on veut voir les applis !
@@ -1183,10 +1186,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	pDock->calculate_icons (pDock);
 	gtk_widget_queue_draw (pDock->pWidget);  // le 'gdk_window_move_resize' ci-dessous ne provoquera pas le redessin si la taille n'a pas change.
 
-	if (pDock->bAtBottom && pDock->bAutoHide)
-	{
-		cairo_dock_place_root_dock (pDock);  // semble necessaire dans le cas de l'auto-hide.
-	}
+	cairo_dock_place_root_dock (pDock);
 
 	//\___________________ On ecrit si necessaire.
 	if (! bFlushConfFileNeeded)

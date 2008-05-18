@@ -45,6 +45,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 extern CairoDock *g_pMainDock;
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentThemePath;
+extern gboolean g_bSameHorizontality;
 
 static GHashTable *s_hDocksTable = NULL;  // table des docks existant.
 
@@ -263,6 +264,7 @@ void cairo_dock_reload_buffers_in_all_docks (void)
 {
 	g_hash_table_foreach (s_hDocksTable, (GHFunc) cairo_dock_reload_buffers_in_dock, GINT_TO_POINTER (FALSE));
 }
+
 
 void cairo_dock_rename_dock (const gchar *cDockName, CairoDock *pDock, const gchar *cNewName)
 {
@@ -512,4 +514,25 @@ gboolean cairo_dock_window_hovers_dock (GtkAllocation *pWindowGeometry, CairoDoc
 		return TRUE;
 	}
 	return FALSE;
+}
+
+void cairo_dock_synchronize_sub_docks_position (CairoDock *pDock, gboolean bReloadBuffersIfNecessary)
+{
+	GList* ic;
+	Icon *icon;
+	for (ic = pDock->icons; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (icon->pSubDock != NULL)
+		{
+			if (icon->pSubDock->bDirectionUp != pDock->bDirectionUp || (icon->pSubDock->bDirectionUp != ((!g_bSameHorizontality) ^ pDock->bHorizontalDock)))
+			{
+				icon->pSubDock->bDirectionUp = pDock->bDirectionUp;
+				icon->pSubDock->bHorizontalDock = (!g_bSameHorizontality) ^ pDock->bHorizontalDock;
+				if (bReloadBuffersIfNecessary)
+					cairo_dock_reload_reflects_in_dock (icon->pSubDock);
+				cairo_dock_synchronize_sub_docks_position (icon->pSubDock, bReloadBuffersIfNecessary);
+			}
+		}
+	}
 }

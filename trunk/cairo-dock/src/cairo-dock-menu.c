@@ -45,7 +45,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #define CAIRO_DOCK_LAUNCHER_PANEL_WIDTH 600
 #define CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT 350
 #define CAIRO_DOCK_FILE_HOST_URL "https://developer.berlios.de/project/showfiles.php?group_id=8724"
-#define CAIRO_DOCK_HELP_URL "firefox http://www.cairo-dock.org"
+#define CAIRO_DOCK_HELP_URL "http://www.cairo-dock.org"
 
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
@@ -954,6 +954,7 @@ static void _cairo_dock_configure_root_dock_position (GtkMenuItem *menu_item, gp
 		cairo_dock_get_root_dock_position (cDockName, pDock);
 		
 		cairo_dock_load_buffers_in_one_dock (pDock);  // recharge les icones et les applets.
+		cairo_dock_synchronize_sub_docks_position (pDock, TRUE);
 		
 		cairo_dock_update_dock_size (pDock);
 		pDock->calculate_icons (pDock);

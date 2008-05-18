@@ -29,5 +29,5 @@ essentialdata_DATA = \
 	icon-frame.png\
 	icon-buttons.png\
 	icon-bubble.png\
-	icon-wave.svg
+	icon-wave.png
 	
