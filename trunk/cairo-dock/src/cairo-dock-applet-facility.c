@@ -315,7 +315,7 @@ void cairo_dock_set_minutes_secondes_as_quick_info (cairo_t *pSourceContext, Ico
 	if (minutes != 0)
 		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%d:%02d", minutes, abs (secondes));
 	else
-		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%s0:%d", (secondes < 0 ? "-" : ""), abs (secondes));
+		cairo_dock_set_quick_info_full (pSourceContext, pIcon, pContainer, "%s0:%02d", (secondes < 0 ? "-" : ""), abs (secondes));
 }
 
 void cairo_dock_set_size_as_quick_info (cairo_t *pSourceContext, Icon *pIcon, CairoContainer *pContainer, long long int iSizeInBytes)

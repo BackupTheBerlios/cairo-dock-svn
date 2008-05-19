@@ -604,6 +604,15 @@ static void _cairo_dock_mount_unmount (GtkMenuItem *menu_item, gpointer *data)
 		cairo_dock_fm_unmount (icon, pDock);
 }
 
+static void _cairo_dock_eject (GtkMenuItem *menu_item, gpointer *data)
+{
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
+	cd_message ("%s (%s / %s)\n", __func__, icon->acName, icon->acCommand);
+	cairo_dock_fm_eject_drive (icon->acCommand);
+}
+
+
 static void _cairo_dock_delete_file (GtkMenuItem *menu_item, gpointer *data)
 {
 	Icon *icon = data[0];
@@ -1125,6 +1134,13 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 				menu_item = gtk_menu_item_new_with_label (bIsMounted ? _("Unmount") : _("Mount"));
 				gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 				g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(_cairo_dock_mount_unmount), data);
+				
+				if (cairo_dock_fm_can_eject (icon->acCommand))
+				{
+					menu_item = gtk_menu_item_new_with_label (_("Eject"));
+					gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
+					g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(_cairo_dock_eject), data);
+				}
 			}
 			else
 			{

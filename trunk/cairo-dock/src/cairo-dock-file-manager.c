@@ -147,6 +147,23 @@ gchar *cairo_dock_fm_is_mounted (const gchar *cURI, gboolean *bIsMounted)
 		return NULL;
 }
 
+gboolean cairo_dock_fm_can_eject (const gchar *cURI)
+{
+	if (s_pVFSBackend != NULL && s_pVFSBackend->can_eject != NULL)
+		return s_pVFSBackend->can_eject (cURI);
+	else
+		return FALSE;
+}
+
+gboolean cairo_dock_fm_eject_drive (const gchar *cURI)
+{
+	if (s_pVFSBackend != NULL && s_pVFSBackend->eject != NULL)
+		return s_pVFSBackend->eject (cURI);
+	else
+		return FALSE;
+}
+
+
 gboolean cairo_dock_fm_delete_file (const gchar *cURI)
 {
 	if (s_pVFSBackend != NULL && s_pVFSBackend->delete != NULL)

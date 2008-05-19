@@ -33,6 +33,10 @@ gboolean cairo_dock_fm_unmount_full (const gchar *cURI, int iVolumeID, CairoDock
 
 gchar *cairo_dock_fm_is_mounted (const gchar *cURI, gboolean *bIsMounted);
 
+gboolean cairo_dock_fm_can_eject (const gchar *cURI);
+gboolean cairo_dock_fm_eject_drive (const gchar *cURI);
+
+
 gboolean cairo_dock_fm_delete_file (const gchar *cURI);
 
 gboolean cairo_dock_fm_rename_file (const gchar *cOldURI, const gchar *cNewName);

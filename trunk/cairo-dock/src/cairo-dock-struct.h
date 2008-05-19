@@ -600,6 +600,9 @@ typedef GList * (*CairoDockFMListDirectoryFunc) (const gchar *cURI, CairoDockFMS
 typedef void (*CairoDockFMLaunchUriFunc) (const gchar *cURI);
 
 typedef gchar * (*CairoDockFMIsMountedFunc) (const gchar *cURI, gboolean *bIsMounted);
+typedef gboolean (*CairoDockFMCanEjectFunc) (const gchar *cURI);
+typedef gboolean (*CairoDockFMEjectDriveFunc) (const gchar *cURI);
+
 typedef void (*CairoDockFMMountCallback) (gboolean bMounting, gboolean bSuccess, const gchar *cName, Icon *icon, CairoDock *pDock);
 typedef void (*CairoDockFMMountFunc) (const gchar *cURI, int iVolumeID, CairoDockFMMountCallback pCallback, Icon *icon, CairoDock *pDock);
 typedef void (*CairoDockFMUnmountFunc) (const gchar *cURI, int iVolumeID, CairoDockFMMountCallback pCallback, Icon *icon, CairoDock *pDockCairoDock);
@@ -622,6 +625,8 @@ struct _CairoDockVFSBackend {
 	CairoDockFMListDirectoryFunc 	list_directory;
 	CairoDockFMLaunchUriFunc 		launch_uri;
 	CairoDockFMIsMountedFunc 		is_mounted;
+	CairoDockFMCanEjectFunc 		can_eject;
+	CairoDockFMEjectDriveFunc 		eject;
 	CairoDockFMMountFunc 			mount;
 	CairoDockFMUnmountFunc 		unmount;
 	CairoDockFMAddMonitorFunc 		add_monitor;
