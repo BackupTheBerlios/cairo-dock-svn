@@ -216,33 +216,37 @@ void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIcon
 	
 	cairo_surface_t *pCairoSurface=NULL;
 	double fImgX, fImgY, fImgW, fImgH, emblemW = pIcon->fWidth / 3, emblemH = pIcon->fHeight / 3;
-	pCairoSurface = cairo_dock_create_surface_from_image (cIconFile, pIconContext, cairo_dock_get_max_scale (pContainer), emblemW, emblemH, &fImgW, &fImgH, CAIRO_DOCK_KEEP_RATIO);
+	double fMaxScale = (CAIRO_DOCK_IS_DOCK (pContainer) ? (1 + g_fAmplitude) / 1 : 1);
+	pCairoSurface = cairo_dock_create_surface_from_image (cIconFile, pIconContext, fMaxScale, emblemW, emblemH, &fImgW, &fImgH, CAIRO_DOCK_KEEP_RATIO);
 
 	switch (pEmblemType) {
 		default:
 		case CAIRO_DOCK_EMBLEM_UPPER_RIGHT :
-			fImgX = pIcon->fWidth - emblemW;
+			fImgX = (pIcon->fWidth - emblemW - pIcon->fScale) * fMaxScale;
 			fImgY = 1.;
 		break;
 		
 		case CAIRO_DOCK_EMBLEM_MIDDLE :
-			fImgX = (pIcon->fWidth - emblemW) / 2;
-			fImgY = (pIcon->fHeight - emblemH) / 2;
+			fImgX = (pIcon->fWidth - emblemW - pIcon->fScale) * fMaxScale / 2.;
+			fImgY = (pIcon->fHeight - emblemH - pIcon->fScale) * fMaxScale / 2.;
 		break;
 		
-		case CAIRO_DOCK_EMBLEM_MIDDILE_BOTTOM:
-			fImgX = (pIcon->fWidth - emblemW) / 2;
-			fImgY = pIcon->fHeight - emblemH;
+		case CAIRO_DOCK_EMBLEM_MIDDLE_BOTTOM:
+			fImgX = (pIcon->fWidth - emblemW - pIcon->fScale) * fMaxScale / 2.;
+			fImgY = (pIcon->fHeight - emblemH - pIcon->fScale) * fMaxScale;
 		break;
-		
+		//Appliquer un masque de transparance identique a celui des reflets...
 		case CAIRO_DOCK_EMBLEM_BACKGROUND :
-			fImgX = (pIcon->fWidth - emblemW) / 2;
+			fImgX = (pIcon->fWidth - emblemW - pIcon->fScale) * fMaxScale / 2.;
 			fImgY = 1.;
 		break;
 	}
 	
+	//cd_debug ("Emblem: X %.0f Y %.0f W %.0f H %.0f - Icon: W %.0f H %.0f", fImgX, fImgY, emblemW, emblemH, pIcon->fWidth, pIcon->fHeight);
+	
 	cairo_save (pIconContext);
-	cairo_set_source_surface (pIconContext, pCairoSurface, fImgX, fImgY);
+	cairo_translate (pIconContext, fImgX , fImgY);
+	cairo_set_source_surface (pIconContext, pCairoSurface, 0.0, 0.0);
 	cairo_paint (pIconContext);
 	cairo_restore (pIconContext);
 }

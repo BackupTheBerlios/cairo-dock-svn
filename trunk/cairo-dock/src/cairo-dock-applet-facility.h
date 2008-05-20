@@ -51,7 +51,7 @@ void cairo_dock_draw_bar_on_icon (cairo_t *pIconContext, double fValue, Icon *pI
 typedef enum {
 	CAIRO_DOCK_EMBLEM_UPPER_RIGHT = 0,
 	CAIRO_DOCK_EMBLEM_MIDDLE,
-	CAIRO_DOCK_EMBLEM_MIDDILE_BOTTOM,
+	CAIRO_DOCK_EMBLEM_MIDDLE_BOTTOM,
 	CAIRO_DOCK_EMBLEM_BACKGROUND,
 } CairoDockEmblem;
 
