@@ -50,9 +50,11 @@ void cairo_dock_draw_bar_on_icon (cairo_t *pIconContext, double fValue, Icon *pI
 //Needed for emblem type
 typedef enum {
 	CAIRO_DOCK_EMBLEM_UPPER_RIGHT = 0,
+	CAIRO_DOCK_EMBLEM_LOWER_RIGHT,
 	CAIRO_DOCK_EMBLEM_MIDDLE,
 	CAIRO_DOCK_EMBLEM_MIDDLE_BOTTOM,
 	CAIRO_DOCK_EMBLEM_BACKGROUND,
+	CAIRO_DOCK_EMBLEM_TOTAL_NB,
 } CairoDockEmblem;
 
 /**

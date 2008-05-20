@@ -27,6 +27,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 extern gchar *g_cCurrentThemePath;
 
 extern double g_fAmplitude;
+extern double g_fAlbedo;
 extern int g_iLabelSize;
 extern gchar *g_cLabelPolice;
 extern gboolean g_bTextAlwaysHorizontal;
@@ -225,6 +226,11 @@ void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIcon
 			fImgX = (pIcon->fWidth - emblemW - pIcon->fScale) * fMaxScale;
 			fImgY = 1.;
 		break;
+
+		case CAIRO_DOCK_EMBLEM_LOWER_RIGHT :
+			fImgX = (pIcon->fWidth - emblemW - pIcon->fScale) * fMaxScale;
+			fImgY = ((pIcon->fHeight - emblemH - pIcon->fScale) * fMaxScale) + 1.;
+		break;
 		
 		case CAIRO_DOCK_EMBLEM_MIDDLE :
 			fImgX = (pIcon->fWidth - emblemW - pIcon->fScale) * fMaxScale / 2.;
@@ -233,16 +239,33 @@ void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIcon
 		
 		case CAIRO_DOCK_EMBLEM_MIDDLE_BOTTOM:
 			fImgX = (pIcon->fWidth - emblemW - pIcon->fScale) * fMaxScale / 2.;
-			fImgY = (pIcon->fHeight - emblemH - pIcon->fScale) * fMaxScale;
+			fImgY = ((pIcon->fHeight - emblemH - pIcon->fScale) * fMaxScale) + 1.;
 		break;
-		//Appliquer un masque de transparance identique a celui des reflets...
+
 		case CAIRO_DOCK_EMBLEM_BACKGROUND :
 			fImgX = (pIcon->fWidth - emblemW - pIcon->fScale) * fMaxScale / 2.;
-			fImgY = 1.;
+			fImgY = 0.;
+			cairo_surface_t *pNewSurfaceGradated = cairo_surface_create_similar (pCairoSurface, CAIRO_CONTENT_COLOR_ALPHA, emblemW, emblemH);
+			cairo_t *pCairoContext = cairo_create (pNewSurfaceGradated);
+			cairo_set_source_surface (pCairoContext, pCairoSurface, 0, 0);
+
+			cairo_pattern_t *pGradationPattern = cairo_pattern_create_linear (0., 1., 0., (emblemH - 1.));  // de haut en bas.
+			g_return_val_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS, NULL);
+
+			cairo_pattern_set_extend (pGradationPattern, CAIRO_EXTEND_NONE);
+			cairo_pattern_add_color_stop_rgba (pGradationPattern, 1., 0., 0., 0., 0.);
+			cairo_pattern_add_color_stop_rgba (pGradationPattern, 0., 0., 0., 0., emblemH);
+
+			cairo_translate (pCairoContext, 0, 0);
+			cairo_mask (pCairoContext, pGradationPattern);
+
+			cairo_pattern_destroy (pGradationPattern);
+			cairo_destroy (pCairoContext);
+			pCairoSurface = pNewSurfaceGradated;
 		break;
 	}
 	
-	//cd_debug ("Emblem: X %.0f Y %.0f W %.0f H %.0f - Icon: W %.0f H %.0f", fImgX, fImgY, emblemW, emblemH, pIcon->fWidth, pIcon->fHeight);
+	cd_debug ("Emblem: X %.0f Y %.0f W %.0f H %.0f - Icon: W %.0f H %.0f", fImgX, fImgY, emblemW, emblemH, pIcon->fWidth, pIcon->fHeight);
 	
 	cairo_save (pIconContext);
 	cairo_translate (pIconContext, fImgX , fImgY);
