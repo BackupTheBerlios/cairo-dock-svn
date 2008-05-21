@@ -20,7 +20,7 @@ alignment = .5
 #F-[Position regarding the chosen screen's edge;gtk-leave-fullscreen]
 frame2 =
 
-#I-[-1024;1024] Lateral gap :
+#I-[-1000;1000] Lateral gap :
 #{Gap from the absolute position on the screen's edge, in pixels. You can also move the dock by holding ALT or CTRL key and left mouse button.}
 x gap = 0
 #i-[-20;1000] Distance to the screen's edge :

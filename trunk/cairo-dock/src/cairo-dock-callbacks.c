@@ -140,8 +140,7 @@ gboolean on_expose (GtkWidget *pWidget,
 	{
 		cairo_dock_render_blank (pDock);
 	}
-	else
-	if (!pDock->bAtBottom)
+	else if (!pDock->bAtBottom)
 	{
 		pDock->render (pDock);
 	}
@@ -150,9 +149,7 @@ gboolean on_expose (GtkWidget *pWidget,
 		if (pDock->bAutoHide && pDock->iRefCount == 0)
 		{
 			if (pDock->bInside)
-			{
 				cairo_dock_render_blank (pDock);
-			}
 			else
 				cairo_dock_render_background (pDock);
 		}
@@ -340,6 +337,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	static double fLastTime = 0;
 	Icon *pPointedIcon, *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
 	int iLastMouseX = pDock->iMouseX;
+	//g_print ("pDock->fAvoidingMouseMargin : %.2f\n", pDock->fAvoidingMouseMargin);
 	
 	//\_______________ On elague le flux des MotionNotify, sinon X en envoie autant que le permet le CPU !
 	if (pMotion != NULL)
@@ -1054,15 +1052,16 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 						//g_print ("deplacement de %s\n", s_pIconClicked->acName);
 						if (prev_icon != NULL && prev_icon->iType != s_pIconClicked->iType)
 							prev_icon = NULL;
-						s_pIconClicked->iAnimationType = CAIRO_DOCK_BOUNCE;
-						s_pIconClicked->iCount = 2 * g_tNbIterInOneRound[icon->iAnimationType] - 1;  // 2 rebonds.
 						cairo_dock_move_icon_after_icon (pDock, s_pIconClicked, prev_icon);
 
 						pDock->calculate_icons (pDock);
 						gtk_widget_queue_draw (pWidget);
 
-						if (pDock->iSidShrinkDown == 0)  // on lance l'animation.
-							pDock->iSidShrinkDown = g_timeout_add (40, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
+						if (! CAIRO_DOCK_IS_SEPARATOR (icon))
+						{
+							cairo_dock_arm_animation (icon, CAIRO_DOCK_BOUNCE, 2);  // 2 rebonds.
+							cairo_dock_start_animation (icon, pDock);
+						}
 					}
 				}
 				else

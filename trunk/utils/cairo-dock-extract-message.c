@@ -43,7 +43,7 @@ main (int argc, char** argv)
 	
 	gchar *cDirPath = g_path_get_dirname (cConfFilePath);
 	gchar *cMessagesFilePath = g_strconcat (cDirPath, "/messages", NULL);
-	FILE *f = fopen (cMessagesFilePath, "w");
+	FILE *f = fopen (cMessagesFilePath, "a");
 	if (!f)
 		g_error ("impossible d'ouvrir %s", cMessagesFilePath);
 	

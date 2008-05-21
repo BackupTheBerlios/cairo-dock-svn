@@ -135,8 +135,8 @@ static void _cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 		"<b>Main developer :</b>\n  Fabounet (Fabrice Rey)\n\
 <b>Original idea/first development :</b>\n  Mac Slow\n\
 <b>Applets :</b>\n  Fabounet\n  Necropotame\n  Ctaf\n  ChAnGFu\n  Tofe\n  Paradoxxx_Zero\n\
+<b>Patchs :</b>\n  Ctaf\n  Necropotame\n  Robrob\n  Tshirtman\n\
 <b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole\n  Glattering\n  Vilraleur\n  Lord Northam\n\
-<b>Patchs :</b>\n  Ctaf\n  Robrob\n  Tshirtman\n\
 <b>Translations :</b>\n  Fabounet\n  Ppmt \n  Jiro Kawada\n  Henrry Oswaldo Ortiz Rodriguez");
 	
 	_cairo_dock_add_about_page (pNoteBook,
@@ -151,15 +151,15 @@ static void _cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 	gtk_widget_destroy (pDialog);
 }
 
-static _launch_url (const gchar *cURL)
+static void _launch_url (const gchar *cURL)
 {
 	if  (! cairo_dock_fm_launch_uri (cURL))
 	{
 		gchar *cCommand = g_strdup_printf ("\
-which xdg-open > /dev/null && xdg-open CAIRO_DOCK_FILE_HOST_URL || \
-which firefox > /dev/null && firefox CAIRO_DOCK_FILE_HOST_URL || \
-which konqueror > /dev/null && konqueror CAIRO_DOCK_FILE_HOST_URL || \
-which opera > /dev/null && opera CAIRO_DOCK_FILE_HOST_URL",
+which xdg-open > /dev/null && xdg-open %s || \
+which firefox > /dev/null && firefox %s || \
+which konqueror > /dev/null && konqueror %s || \
+which opera > /dev/null && opera %s ",
 			cURL,
 			cURL,
 			cURL,
@@ -233,6 +233,8 @@ static void _cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 	{
 		cairo_dock_notify (CAIRO_DOCK_REMOVE_ICON, data);
 	}
+	else
+		g_print ("ok on la garde\n");
 }
 
 static void _cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data, CairoDockNewLauncherType iLauncherType)
@@ -1035,7 +1037,7 @@ GtkWidget *cairo_dock_build_menu (Icon *icon, CairoContainer *pContainer)
 
 	if (CAIRO_DOCK_IS_DOCK (pContainer) && ! CAIRO_DOCK (pContainer)->bIsMainDock && CAIRO_DOCK (pContainer)->iRefCount == 0)
 	{
-		_add_entry_in_menu (_("Set up position"), GTK_STOCK_EXECUTE, _cairo_dock_configure_root_dock_position, pSubMenu);
+		_add_entry_in_menu (_("Set up this dock"), GTK_STOCK_EXECUTE, _cairo_dock_configure_root_dock_position, pSubMenu);
 	}
 	_add_entry_in_menu (_("Manage themes"), GTK_STOCK_EXECUTE, _cairo_dock_initiate_theme_management, pSubMenu);
 

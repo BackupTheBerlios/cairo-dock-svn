@@ -524,7 +524,8 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2)
 {
 	//g_print ("%s (%s, %.2f)\n", __func__, icon1->acName, icon1->fOrder);
-	if ((icon2 != NULL) && (! ( (CAIRO_DOCK_IS_APPLI (icon1) && CAIRO_DOCK_IS_APPLI (icon2)) || (CAIRO_DOCK_IS_LAUNCHER (icon1) && CAIRO_DOCK_IS_LAUNCHER (icon2)) || (CAIRO_DOCK_IS_APPLET (icon1) && CAIRO_DOCK_IS_APPLET (icon2)) ) ))
+	///if ((icon2 != NULL) && (! ( (CAIRO_DOCK_IS_APPLI (icon1) && CAIRO_DOCK_IS_APPLI (icon2)) || (CAIRO_DOCK_IS_LAUNCHER (icon1) && CAIRO_DOCK_IS_LAUNCHER (icon2)) || (CAIRO_DOCK_IS_APPLET (icon1) && CAIRO_DOCK_IS_APPLET (icon2)) ) ))
+	if ((icon2 != NULL) && fabs (icon1->iType - icon2->iType) > 1)
 		return ;
 
 	//\_________________ On change l'ordre de l'icone.
@@ -546,7 +547,7 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 	}
 
 	//\_________________ On change l'ordre dans le fichier du lanceur 1.
-	if (CAIRO_DOCK_IS_LAUNCHER (icon1) && icon1->acDesktopFileName != NULL)
+	if ((CAIRO_DOCK_IS_LAUNCHER (icon1) || CAIRO_DOCK_IS_SEPARATOR (icon1)) && icon1->acDesktopFileName != NULL)
 	{
 		GError *erreur = NULL;
 		gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon1->acDesktopFileName);
@@ -1121,8 +1122,8 @@ CairoDockMousePositionType cairo_dock_check_if_mouse_inside_linear (CairoDock *p
 
 	if (! bMouseInsideDock)
 	{
-		double fSideMargin = (pDock->fAlign - .5) * (iWidth - pDock->fFlatDockWidth);
-		if (x_abs < fSideMargin || x_abs > pDock->fFlatDockWidth + fSideMargin)
+		double fSideMargin = fabs (pDock->fAlign - .5) * (iWidth - pDock->fFlatDockWidth);
+		if (x_abs < - fSideMargin || x_abs > pDock->fFlatDockWidth + fSideMargin)
 			iMousePositionType = CAIRO_DOCK_MOUSE_OUTSIDE;
 		else
 			iMousePositionType = CAIRO_DOCK_MOUSE_ON_THE_EDGE;

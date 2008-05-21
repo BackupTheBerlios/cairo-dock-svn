@@ -1176,16 +1176,12 @@ void cairo_dock_render_background (CairoDock *pDock)
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 	cairo_paint (pCairoContext);
-
-	if (! cairo_dock_quick_hide_is_activated ())
+	
+	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
+	if (g_pVisibleZoneSurface != NULL)
 	{
-		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
-		cairo_move_to (pCairoContext, 0, 0);
-		if (g_pVisibleZoneSurface != NULL)
-		{
-			cairo_set_source_surface (pCairoContext, g_pVisibleZoneSurface, 0.0, 0.0);
-			cairo_paint_with_alpha (pCairoContext, g_fVisibleZoneAlpha);
-		}
+		cairo_set_source_surface (pCairoContext, g_pVisibleZoneSurface, 0.0, 0.0);
+		cairo_paint_with_alpha (pCairoContext, g_fVisibleZoneAlpha);
 	}
 	cairo_destroy (pCairoContext);
 
@@ -1198,7 +1194,8 @@ void cairo_dock_render_background (CairoDock *pDock)
 void cairo_dock_render_blank (CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
+	cairo_t *pCairoContext = gdk_cairo_create (pDock->pWidget->window);  // il semble que cette fonction fasse planter Glitz au demarrage :-(
+	///cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
@@ -1207,8 +1204,8 @@ void cairo_dock_render_blank (CairoDock *pDock)
 
 	cairo_destroy (pCairoContext);
 #ifdef HAVE_GLITZ
-	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
-		glitz_drawable_swap_buffers (pDock->pGlitzDrawable);
+	///if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
+	///	glitz_drawable_swap_buffers (pDock->pGlitzDrawable);
 #endif
 }
 

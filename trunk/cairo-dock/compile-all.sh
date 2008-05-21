@@ -90,6 +90,7 @@ fi
 if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
 	if test -e po; then
 		if test -x $CAIRO_DOCK_EXTRACT_MESSAGE; then
+			rm -f data/messages
 			for c in data/*.conf.in
 			do
 				$CAIRO_DOCK_EXTRACT_MESSAGE $c
@@ -221,6 +222,7 @@ do
 			if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
 				if test -e po; then
 					if test -x $CAIRO_DOCK_EXTRACT_MESSAGE; then
+						rm -f data/messages
 						for c in data/*.conf.in
 						do
 							$CAIRO_DOCK_EXTRACT_MESSAGE $c
