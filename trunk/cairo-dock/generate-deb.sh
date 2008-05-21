@@ -121,7 +121,7 @@ sudo cp ../cairo-dock/data/cairo-dock.desktop usr/share/applications
 cd $CAIRO_DOCK_DIR
 sed "s/^Version:.*/Version: "`cairo-dock --version`"/g" deb/DEBIAN/control > tmp
 mv tmp deb/DEBIAN/control
-dpkg -b deb "cairo-dock_v`cairo-dock --version`_i686-32bits.deb"
+dpkg -b deb "cairo-dock_v`cairo-dock --version`_`uname --machine`.deb"
 mv .svn-deb deb/.svn
 mv .svn-deb-DEIAN deb/DEBIAN/.svn
 
@@ -139,7 +139,7 @@ sudo rm -f usr/lib/cairo-dock/*.la
 cd $CAIRO_DOCK_DIR
 sed "s/^Version:.*/Version: "`cairo-dock --version`"/g" deb-plug-ins/DEBIAN/control > tmp
 mv tmp deb-plug-ins/DEBIAN/control
-dpkg -b deb-plug-ins "cairo-dock-plug-ins_v`cairo-dock --version`_i686-32bits.deb"
+dpkg -b deb-plug-ins "cairo-dock-plug-ins_v`cairo-dock --version`_`uname --machine`.deb"
 mv .svn-deb-plug-ins deb-plug-ins/.svn
 mv .svn-deb-plug-ins-DEIAN deb-plug-ins/DEBIAN/.svn
 
