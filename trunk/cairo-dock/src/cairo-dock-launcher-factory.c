@@ -407,3 +407,13 @@ Icon * cairo_dock_create_icon_from_desktop_file (const gchar *cDesktopFileName, 
 	
 	return icon;
 }
+
+void cairo_dock_reload_icon_from_desktop_file (const gchar *cDesktopFileName, cairo_t *pSourceContext, Icon *icon)
+{
+	cairo_dock_load_icon_info_from_desktop_file (cDesktopFileName, icon);
+	g_return_if_fail (icon->acDesktopFileName != NULL);
+	
+	CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+	cairo_dock_fill_icon_buffers_for_dock (icon, pSourceContext, pParentDock)
+}
+

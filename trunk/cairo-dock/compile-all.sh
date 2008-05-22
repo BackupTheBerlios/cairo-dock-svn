@@ -10,7 +10,7 @@ export CAIRO_DOCK_INSTALL="0"
 export CAIRO_DOCK_THEMES="0"
 export CAIRO_DOCK_DOC="0"
 export CAIRO_DOCK_EXCLUDE="template"
-export CAIRO_DOCK_EXTRACT_MESSAGE=${CAIRO_DOCK_DIR}/utils/extract-message
+export CAIRO_DOCK_EXTRACT_MESSAGE=${CAIRO_DOCK_DIR}/utils/cairo-dock-extract-message
 export CAIRO_DOCK_GEN_TRANSLATION=${CAIRO_DOCK_DIR}/cairo-dock/po/generate-translation.sh
 
 echo "this script will process : "
@@ -91,7 +91,7 @@ if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
 	if test -e po; then
 		if test -x $CAIRO_DOCK_EXTRACT_MESSAGE; then
 			rm -f data/messages
-			for c in data/*.conf.in
+			for c in data/*.conf
 			do
 				$CAIRO_DOCK_EXTRACT_MESSAGE $c
 			done;
@@ -223,7 +223,7 @@ do
 				if test -e po; then
 					if test -x $CAIRO_DOCK_EXTRACT_MESSAGE; then
 						rm -f data/messages
-						for c in data/*.conf.in
+						for c in data/*.conf
 						do
 							$CAIRO_DOCK_EXTRACT_MESSAGE $c
 						done;

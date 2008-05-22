@@ -815,7 +815,6 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 					gboolean bChangeIntercepted = FALSE;
 					if (g_bAutoHideOnMaximized || g_bAutoHideOnFullScreen)
 					{
-						
 						if ( ((bIsMaximized && g_bAutoHideOnMaximized) || (bIsFullScreen && g_bAutoHideOnFullScreen)) && ! cairo_dock_quick_hide_is_activated ())
 						{
 							icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
@@ -981,6 +980,7 @@ Window *cairo_dock_get_windows_list (gulong *iNbWindows)
 CairoDock *cairo_dock_insert_appli_in_dock (Icon *icon, CairoDock *pMainDock, gboolean bUpdateSize, gboolean bAnimate)
 {
 	//\_________________ On determine dans quel dock l'inserer.
+	g_print ("%s (%s, %d)\n", __func__, icon->acName, icon->Xid);
 	if (g_bMixLauncherAppli && cairo_dock_prevent_inhibated_class (icon))
 		return NULL;
 	
@@ -1013,6 +1013,16 @@ static gboolean _cairo_dock_remove_old_applis (Window *Xid, Icon *icon, double *
 		if (icon->fLastCheckTime > 0 && icon->fLastCheckTime < *fTime && icon->fPersonnalScale <= 0)
 		{
 			cd_message ("cette fenetre (%ld) est trop vieille", *Xid);
+			
+			if (cairo_dock_quick_hide_is_activated () && (g_bAutoHideOnFullScreen || g_bAutoHideOnMaximized))
+			{
+				if (cairo_dock_search_window_on_our_way (g_bAutoHideOnMaximized, g_bAutoHideOnFullScreen) == NULL)
+				{
+					cd_message (" => plus aucune fenetre genante");
+					cairo_dock_deactivate_temporary_auto_hide ();
+				}
+			}
+			
 			CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 			if (pParentDock != NULL)
 			{

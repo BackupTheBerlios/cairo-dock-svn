@@ -409,7 +409,7 @@ static void _cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 
 	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
 
-	cairo_dock_update_launcher_desktop_file (cDesktopFilePath, CAIRO_DOCK_IS_SEPARATOR (icon) ? CAIRO_DOCK_LAUNCHER_FOR_SEPARATOR : icon->pSubDock != NULL ? CAIRO_DOCK_LAUNCHER_FOR_CONTAINER : CAIRO_DOCK_LAUNCHER_FROM_DESKTOP_FILE);
+	cairo_dock_update_launcher_desktop_file (cDesktopFilePath, CAIRO_DOCK_IS_SEPARATOR (icon) ? CAIRO_DOCK_LAUNCHER_FOR_SEPARATOR : (icon->pSubDock != NULL && icon->Xid == 0) ? CAIRO_DOCK_LAUNCHER_FOR_CONTAINER : CAIRO_DOCK_LAUNCHER_FROM_DESKTOP_FILE);
 
 	gboolean config_ok = cairo_dock_edit_conf_file (GTK_WINDOW (pDock->pWidget), cDesktopFilePath, _("Modify this launcher"), CAIRO_DOCK_LAUNCHER_PANEL_WIDTH, CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT, 0, NULL, NULL, NULL, NULL, NULL);
 	g_free (cDesktopFilePath);
@@ -427,16 +427,91 @@ static void _cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	if (config_ok)
 	{
 		GError *erreur = NULL;
+		//\_____________ On detache l'icone.
 		gchar *cPrevDockName = icon->cParentDockName;
 		icon->cParentDockName = NULL;  // astuce.
 		cairo_dock_detach_icon_from_dock (icon, pDock, TRUE);  // il va falloir la recreer, car tous ses parametres peuvent avoir change; neanmoins, on ne souhaite pas detruire son .desktop.
 
-		//\_____________ On recree l'icone de zero.
+		//\_____________ On recharge l'icone.
+		Window Xid = icon->Xid;
+		CairoDock *pSubDock = icon->pSubDock;
+		icon->pSubDock = NULL;
+		gchar *cClass = icon->cClass;
+		icon->cClass = NULL;
+		gchar *cDesktopFileName = icon->acDesktopFileName;
+		icon->acDesktopFileName = NULL;
+		gchar *cName = icon->acName;
+		icon->acName = NULL;
+		gchar *cRendererName = NULL;
+		if (icon->pSubDock != NULL)
+		{
+			cRendererName = icon->pSubDock->cRendererName;
+			icon->pSubDock->cRendererName = NULL;
+		}
 		cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
-		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (icon->acDesktopFileName, pCairoContext);
+		cairo_dock_reload_icon_from_desktop_file (cDesktopFileName, pCairoContext, icon);
+		
+		icon->Xid = Xid;
+		//\_____________ On gere le sous-dock.
+		if (Xid != 0)
+		{
+			if (pSubDock == NULL)
+				icon->pSubDock = pSubDock;
+			else  // ne devrait pas arriver.
+				cairo_dock_destroy_dock (pSubDock, cName, g_pMainDock, CAIRO_DOCK_MAIN_DOCK_NAME);
+		}
+		else
+		{
+			if (pSubDock != icon->pSubDock)  // ca n'est plus le meme container, on transvase.
+			{
+				cairo_dock_destroy_dock (pSubDock, cName, icon->pSubDock, icon->acName);
+			}
+		}
+		
+		if (icon->pSubDock != NULL)
+		{
+			if ((cRendererName != NULL && icon->pSubDock->cRendererName == NULL)
+			 || (cRendererName == NULL && icon->pSubDock->cRendererName != NULL)
+			 || (cRendererName != NULL && icon->pSubDock->cRendererName != NULL && strcmp (cRendererName, icon->pSubDock->cRendererName) != 0))
+				cairo_dock_update_dock_size (icon->pSubDock);
+		}
+		
+		//\_____________ On l'insere dans le dock auquel elle appartient maintenant.
+		CairoDock *pNewContainer = cairo_dock_search_dock_from_name (icon->cParentDockName);
+		g_return_if_fail (pNewContainer != NULL);
+
+		if (pDock != pNewContainer && icon->fOrder > g_list_length (pNewContainer->icons) + 1)
+			icon->fOrder = CAIRO_DOCK_LAST_ORDER;
+
+		cairo_dock_insert_icon_in_dock (icon, pNewContainer, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);  // on n'empeche pas les bouclages.
+
+		if (pDock != pNewContainer)
+			cairo_dock_update_dock_size (pDock);
+		
+		//\_____________ On gere l'inhibition de sa classe.
+		if (icon->cClass == NULL && cClass != NULL)
+			cairo_dock_deinhibate_class (cClass, icon);
+		else if (icon->cClass != NULL && cClass == NULL)
+			cairo_dock_inhibate_class (icon->cClass, icon);
+		
+		//\_____________ On redessine les docks impactes.
+		pDock->calculate_icons (pDock);
+		gtk_widget_queue_draw (pDock->pWidget);
+		if (pNewContainer != pDock)
+		{
+			pNewContainer->calculate_icons (pNewContainer);
+			gtk_widget_queue_draw (pNewContainer->pWidget);
+			
+			if (pDock->icons == NULL)
+			{
+				cd_message ("dock %s vide => a la poubelle", cPrevDockName);
+				cairo_dock_destroy_dock (pDock, cPrevDockName, NULL, NULL);
+			}
+		}
+		/*Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (icon->acDesktopFileName, pCairoContext);
 
 		//\_____________ On redistribue les icones du sous-dock si l'icone n'est plus un container.
-		if (icon->pSubDock != NULL)
+		if (icon->pSubDock != NULL && icon->Xid == 0)
 		{
 			if (pNewIcon->pSubDock == NULL)  // ce n'est plus un container.
 			{
@@ -489,8 +564,15 @@ static void _cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 				cairo_dock_destroy_dock (pDock, cPrevDockName, NULL, NULL);
 			}
 		}
+		
 		cairo_dock_free_icon (icon);
+		*/
 		g_free (cPrevDockName);
+		g_free (cClass);
+		g_free (cDesktopFileName);
+		g_free (cName);
+		g_free (cRendererName);
+		cairo_destroy (pCairoContext);
 		cairo_dock_mark_theme_as_modified (TRUE);
 	}
 }

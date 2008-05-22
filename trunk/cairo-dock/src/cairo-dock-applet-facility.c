@@ -250,7 +250,7 @@ void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIcon
 			cairo_set_source_surface (pCairoContext, pCairoSurface, 0, 0);
 
 			cairo_pattern_t *pGradationPattern = cairo_pattern_create_linear (0., 1., 0., (emblemH - 1.));  // de haut en bas.
-			g_return_val_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS, NULL);
+			g_return_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS);
 
 			cairo_pattern_set_extend (pGradationPattern, CAIRO_EXTEND_NONE);
 			cairo_pattern_add_color_stop_rgba (pGradationPattern, 1., 0., 0., 0., 0.);
@@ -447,7 +447,7 @@ static gboolean _cairo_dock_check_for_redraw (CairoDockMeasure *pMeasureTimer)
 		if (pMeasureTimer->iSidTimer == 0 && pMeasureTimer->iCheckInterval != 0)
 		{
 			pMeasureTimer->iFrequencyState = CAIRO_DOCK_FREQUENCY_NORMAL;
-			pMeasureTimer->iSidTimer = g_timeout_add (pMeasureTimer->iCheckInterval, (GSourceFunc) _cairo_dock_timer, pMeasureTimer);
+			pMeasureTimer->iSidTimer = g_timeout_add_seconds (pMeasureTimer->iCheckInterval, (GSourceFunc) _cairo_dock_timer, pMeasureTimer);
 		}
 		
 		pMeasureTimer->iSidTimerRedraw = 0;
@@ -476,7 +476,7 @@ void cairo_dock_launch_measure (CairoDockMeasure *pMeasureTimer)
 	else if (pMeasureTimer->iSidTimer == 0 && pMeasureTimer->iCheckInterval != 0)
 	{
 		pMeasureTimer->iFrequencyState = CAIRO_DOCK_FREQUENCY_NORMAL;
-		pMeasureTimer->iSidTimer = g_timeout_add (pMeasureTimer->iCheckInterval, (GSourceFunc) _cairo_dock_timer, pMeasureTimer);
+		pMeasureTimer->iSidTimer = g_timeout_add_seconds (pMeasureTimer->iCheckInterval, (GSourceFunc) _cairo_dock_timer, pMeasureTimer);
 	}
 }
 
@@ -532,7 +532,7 @@ static void _cairo_dock_restart_timer_with_frequency (CairoDockMeasure *pMeasure
 	cairo_dock_stop_measure_timer (pMeasureTimer);
 	
 	if (bNeedsRestart && iNewCheckInterval != 0)
-		pMeasureTimer->iSidTimer = g_timeout_add (iNewCheckInterval, (GSourceFunc) _cairo_dock_timer, pMeasureTimer);
+		pMeasureTimer->iSidTimer = g_timeout_add_seconds (iNewCheckInterval, (GSourceFunc) _cairo_dock_timer, pMeasureTimer);
 }
 
 void cairo_dock_change_measure_frequency (CairoDockMeasure *pMeasureTimer, int iNewCheckInterval)

@@ -224,7 +224,7 @@ static void cairo_dock_draw_frame_horizontal (cairo_t *pCairoContext, double fRa
 {
 	if (2*fRadius > fFrameHeight + fLineWidth)
 		fRadius = (fFrameHeight + fLineWidth) / 2 - 1;
-	double fDeltaXForLoop = (fFrameHeight + fLineWidth - 2 * fRadius) * fInclination;
+	double fDeltaXForLoop = fInclination * (fFrameHeight + fLineWidth - (g_bRoundedBottomCorner ? 2 : 1) * fRadius);
 	double cosa = 1. / sqrt (1 + fInclination * fInclination);
 	double sina = cosa * fInclination;
 
@@ -264,7 +264,7 @@ static void cairo_dock_draw_frame_vertical (cairo_t *pCairoContext, double fRadi
 {
 	if (2*fRadius > fFrameHeight + fLineWidth)
 		fRadius = (fFrameHeight + fLineWidth) / 2 - 1;
-	double fDeltaXForLoop = (fFrameHeight + fLineWidth - 2 * fRadius) * fInclination;
+	double fDeltaXForLoop = fInclination * (fFrameHeight + fLineWidth - (g_bRoundedBottomCorner ? 2 : 1) * fRadius);
 	double cosa = 1. / sqrt (1 + fInclination * fInclination);
 	double sina = cosa * fInclination;
 
@@ -1295,10 +1295,12 @@ double cairo_dock_calculate_extra_width_for_trapeze (double fFrameHeight, double
 {
 	if (2 * fRadius > fFrameHeight + fLineWidth)
 		fRadius = (fFrameHeight + fLineWidth) / 2 - 1;
-	double fDeltaXForLoop = fInclination * (fFrameHeight + fLineWidth - 2 * fRadius);
 	double cosa = 1. / sqrt (1 + fInclination * fInclination);
 	double sina = fInclination * cosa;
-	double fDeltaCornerForLoop = fRadius * cosa + fRadius * (1 + sina) * fInclination;
+	
+	double fDeltaXForLoop = fInclination * (fFrameHeight + fLineWidth - (g_bRoundedBottomCorner ? 2 : 1) * fRadius);
+	double fDeltaCornerForLoop = fRadius * cosa + (g_bRoundedBottomCorner ? fRadius * (1 + sina) * fInclination : 0);
+	
 	return (2 * (fLineWidth/2 + fDeltaXForLoop + fDeltaCornerForLoop + g_iFrameMargin));
 }
 
@@ -1306,16 +1308,7 @@ double cairo_dock_calculate_extra_width_for_trapeze (double fFrameHeight, double
 
 void cairo_dock_draw_drop_indicator (CairoDock *pDock, cairo_t *pCairoContext)
 {
-	double fX;
-	/*if (pDock->iMouseX < icon->fDrawX + icon->fWidth * icon->fScale * fMargin)  // on est a gauche.
-	{
-		fX = icon->fDrawX - icon->fWidth * icon->fScale / 2;
-	}
-	else if (pDock->iMouseX > icon->fDrawX + icon->fWidth * icon->fScale * (1 - fMargin))  // on est a droite.
-	{
-		fX = icon->fDrawX + icon->fWidth * icon->fScale / 2;
-	}*/
-	fX = pDock->iMouseX - g_fDropIndicatorWidth / 2;
+	double fX = pDock->iMouseX - g_fDropIndicatorWidth / 2;
 	
 	if (pDock->bHorizontalDock)
 		cairo_rectangle (pCairoContext,

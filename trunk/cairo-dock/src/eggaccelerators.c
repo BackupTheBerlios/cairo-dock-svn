@@ -176,11 +176,6 @@ is_hyper (const gchar *string)
 }
 
 /**
- * egg_accelerator_parse_virtual:
- * @accelerator:      string representing an accelerator
- * @accelerator_key:  return location for accelerator keyval
- * @accelerator_mods: return location for accelerator modifier mask
- *
  * Parses a string representing a virtual accelerator. The format
  * looks like "&lt;Control&gt;a" or "&lt;Shift&gt;&lt;Alt&gt;F1" or
  * "&lt;Release&gt;z" (the last one is for key release).  The parser
@@ -197,8 +192,10 @@ is_hyper (const gchar *string)
  * can represent various keyboard keys (numlock, meta, hyper, etc.),
  * the virtual modifier represents the keyboard key, the concrete
  * modifier the actual Mod2-Mod5 bits in the key press event.
- * 
- * Returns: %TRUE on success.
+ * @param accelerator:      string representing an accelerator
+ * @param accelerator_key:  return location for accelerator keyval
+ * @param accelerator_mods: return location for accelerator modifier mask
+ * @Returns: %TRUE on success.
  */
 gboolean
 egg_accelerator_parse_virtual (const gchar            *accelerator,
@@ -333,17 +330,15 @@ egg_accelerator_parse_virtual (const gchar            *accelerator,
 
 
 /**
- * egg_virtual_accelerator_name:
- * @accelerator_key:  accelerator keyval
- * @accelerator_mods: accelerator modifier mask
- * @returns:          a newly-allocated accelerator name
- * 
  * Converts an accelerator keyval and modifier mask
  * into a string parseable by egg_accelerator_parse_virtual().
  * For example, if you pass in #GDK_q and #EGG_VIRTUAL_CONTROL_MASK,
  * this function returns "&lt;Control&gt;q".
  *
  * The caller of this function must free the returned string.
+ * @param accelerator_key:  accelerator keyval
+ * @param accelerator_mods: accelerator modifier mask
+ * @returns:          a newly-allocated accelerator name
  */
 gchar*
 egg_virtual_accelerator_name (guint                  accelerator_key,

@@ -852,8 +852,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 
 	g_bCloseAppliOnMiddleClick = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "close on middle click", &bFlushConfFileNeeded, TRUE, "Applications", NULL);
 
-	g_bAutoHideOnFullScreen = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "auto quick hide", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
-	g_bAutoHideOnMaximized = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "auto quick hide on max", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
+	g_bAutoHideOnFullScreen = (! pDock->bAutoHide) && cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "auto quick hide", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
+	g_bAutoHideOnMaximized = (! pDock->bAutoHide) && cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "auto quick hide on max", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
 
 	g_bDemandsAttentionWithDialog = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "demands attention with dialog", &bFlushConfFileNeeded, TRUE, "Applications", NULL);
 	g_bDemandsAttentionWithAnimation = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "demands attention with animation", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
@@ -1417,25 +1417,6 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 }
 
 
-/**
-*Lis un fichier de conf, construit l'IHM appropriee, et la presente a l'utilisateur.
-*@param pWidget
-*@param cConfFilePath
-*@param cTitle
-*@param iWindowWidth
-*@param iWindowHeight
-*@param iIdentifier
-*@param cPresentedGroup
-*@param pConfigFunc
-*@param data
-*@param pFreeUserDataFunc
-*@param pConfigFunc2
-*@param cConfFilePath2
-*@param cButtonConvert
-*@param cButtonRevert
-*@param cGettextDomain
-@Returns TRUE si l'utilisateur a ferme le panneau de conf en appuyant sur OK, FALSE sinon.
-*/
 gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePath, const gchar *cTitle, int iWindowWidth, int iWindowHeight, gchar iIdentifier, gchar *cPresentedGroup, CairoDockConfigFunc pConfigFunc, gpointer data, GFunc pFreeUserDataFunc, CairoDockConfigFunc pConfigFunc2, gchar *cConfFilePath2, gchar *cButtonConvert, gchar *cButtonRevert, gchar *cGettextDomain)
 {
 	return cairo_dock_edit_conf_file_core (pWindow, g_strdup (cConfFilePath), g_strdup (cTitle), iWindowWidth, iWindowHeight, iIdentifier, cPresentedGroup, pConfigFunc, data, pFreeUserDataFunc, pConfigFunc2, g_strdup (cConfFilePath2), g_strdup (cButtonConvert), g_strdup (cButtonRevert), cGettextDomain);

@@ -30,6 +30,7 @@ msgstr ""
 #: ../src/cairo-dock-menu.c:996 ../src/cairo-dock-menu.c:1003
 #: ../src/cairo-dock-menu.c:1007 ../src/cairo-dock-menu.c:1021
 #: ../src/cairo-dock-menu.c:1031 ../src/cairo-dock-menu.c:1033
+#: ../src/cairo-dock-menu.c:1035
 msgid "Configure"
 msgstr "設定"
 
@@ -70,6 +71,7 @@ msgstr "モジュール"
 #: ../src/cairo-dock-menu.c:1005 ../src/cairo-dock-menu.c:1012
 #: ../src/cairo-dock-menu.c:1016 ../src/cairo-dock-menu.c:1030
 #: ../src/cairo-dock-menu.c:1040 ../src/cairo-dock-menu.c:1042
+#: ../src/cairo-dock-menu.c:1044
 msgid "Manage themes"
 msgstr "テーマ管理"
 
@@ -105,6 +107,7 @@ msgstr "更新版チェック"
 #: ../src/cairo-dock-menu.c:1009 ../src/cairo-dock-menu.c:1016
 #: ../src/cairo-dock-menu.c:1020 ../src/cairo-dock-menu.c:1032
 #: ../src/cairo-dock-menu.c:1042 ../src/cairo-dock-menu.c:1044
+#: ../src/cairo-dock-menu.c:1046
 msgid "About"
 msgstr "情報"
 
@@ -140,6 +143,7 @@ msgstr "ヘルプ"
 #: ../src/cairo-dock-menu.c:1015 ../src/cairo-dock-menu.c:1022
 #: ../src/cairo-dock-menu.c:1026 ../src/cairo-dock-menu.c:1040
 #: ../src/cairo-dock-menu.c:1050 ../src/cairo-dock-menu.c:1052
+#: ../src/cairo-dock-menu.c:1054
 msgid "Quick-Hide"
 msgstr "一時的に隠す"
 
@@ -158,6 +162,7 @@ msgstr "一時的に隠す"
 #: ../src/cairo-dock-menu.c:1018 ../src/cairo-dock-menu.c:1025
 #: ../src/cairo-dock-menu.c:1029 ../src/cairo-dock-menu.c:1043
 #: ../src/cairo-dock-menu.c:1053 ../src/cairo-dock-menu.c:1055
+#: ../src/cairo-dock-menu.c:1057
 msgid "Quit"
 msgstr "終了"
 
@@ -194,6 +199,7 @@ msgstr "終了"
 #: ../src/cairo-dock-menu.c:1133 ../src/cairo-dock-menu.c:1093
 #: ../src/cairo-dock-menu.c:1152 ../src/cairo-dock-menu.c:1103
 #: ../src/cairo-dock-menu.c:1169 ../src/cairo-dock-menu.c:1171
+#: ../src/cairo-dock-menu.c:1107 ../src/cairo-dock-menu.c:1173
 msgid "Add a launcher"
 msgstr "ランチャーを追加"
 
@@ -213,6 +219,7 @@ msgstr "ランチャーを追加"
 #: ../src/cairo-dock-menu.c:1136 ../src/cairo-dock-menu.c:1143
 #: ../src/cairo-dock-menu.c:1147 ../src/cairo-dock-menu.c:1167
 #: ../src/cairo-dock-menu.c:1184 ../src/cairo-dock-menu.c:1186
+#: ../src/cairo-dock-menu.c:1188
 msgid "Remove this launcher"
 msgstr "このランチャーを削除"
 
@@ -241,6 +248,7 @@ msgstr "このランチャーを削除"
 #: ../src/cairo-dock-menu.c:1149 ../src/cairo-dock-menu.c:412
 #: ../src/cairo-dock-menu.c:1169 ../src/cairo-dock-menu.c:1186
 #: ../src/cairo-dock-menu.c:414 ../src/cairo-dock-menu.c:1188
+#: ../src/cairo-dock-menu.c:1190
 msgid "Modify this launcher"
 msgstr "このランチャーを編集"
 
@@ -260,7 +268,7 @@ msgstr "このランチャーを編集"
 #: ../src/cairo-dock-menu.c:1202 ../src/cairo-dock-menu.c:1218
 #: ../src/cairo-dock-menu.c:1225 ../src/cairo-dock-menu.c:1229
 #: ../src/cairo-dock-menu.c:1249 ../src/cairo-dock-menu.c:1266
-#: ../src/cairo-dock-menu.c:1268
+#: ../src/cairo-dock-menu.c:1268 ../src/cairo-dock-menu.c:1270
 msgid "Close"
 msgstr "閉じる"
 
@@ -281,6 +289,7 @@ msgstr "閉じる"
 #: ../src/cairo-dock-menu.c:1216 ../src/cairo-dock-menu.c:1223
 #: ../src/cairo-dock-menu.c:1227 ../src/cairo-dock-menu.c:1247
 #: ../src/cairo-dock-menu.c:1264 ../src/cairo-dock-menu.c:1266
+#: ../src/cairo-dock-menu.c:1268
 msgid "Minimize"
 msgstr "最小化"
 
@@ -301,6 +310,7 @@ msgstr "最小化"
 #: ../src/cairo-dock-menu.c:1212 ../src/cairo-dock-menu.c:1219
 #: ../src/cairo-dock-menu.c:1223 ../src/cairo-dock-menu.c:1243
 #: ../src/cairo-dock-menu.c:1260 ../src/cairo-dock-menu.c:1262
+#: ../src/cairo-dock-menu.c:1264
 msgid "Unmaximize"
 msgstr "最大化解除"
 
@@ -321,6 +331,7 @@ msgstr "最大化解除"
 #: ../src/cairo-dock-menu.c:1212 ../src/cairo-dock-menu.c:1219
 #: ../src/cairo-dock-menu.c:1223 ../src/cairo-dock-menu.c:1243
 #: ../src/cairo-dock-menu.c:1260 ../src/cairo-dock-menu.c:1262
+#: ../src/cairo-dock-menu.c:1264
 msgid "Maximize"
 msgstr "最大化"
 
@@ -340,7 +351,7 @@ msgstr "最大化"
 #: ../src/cairo-dock-menu.c:1132 ../src/cairo-dock-menu.c:1148
 #: ../src/cairo-dock-menu.c:1155 ../src/cairo-dock-menu.c:1159
 #: ../src/cairo-dock-menu.c:1179 ../src/cairo-dock-menu.c:1196
-#: ../src/cairo-dock-menu.c:1198
+#: ../src/cairo-dock-menu.c:1198 ../src/cairo-dock-menu.c:1200
 msgid "Other actions"
 msgstr "その他のアクション"
 
@@ -360,7 +371,7 @@ msgstr "その他のアクション"
 #: ../src/cairo-dock-menu.c:1138 ../src/cairo-dock-menu.c:1154
 #: ../src/cairo-dock-menu.c:1161 ../src/cairo-dock-menu.c:1165
 #: ../src/cairo-dock-menu.c:1185 ../src/cairo-dock-menu.c:1202
-#: ../src/cairo-dock-menu.c:1204
+#: ../src/cairo-dock-menu.c:1204 ../src/cairo-dock-menu.c:1206
 msgid "Not Fullscreen"
 msgstr "全画面表示解除"
 
@@ -380,7 +391,7 @@ msgstr "全画面表示解除"
 #: ../src/cairo-dock-menu.c:1138 ../src/cairo-dock-menu.c:1154
 #: ../src/cairo-dock-menu.c:1161 ../src/cairo-dock-menu.c:1165
 #: ../src/cairo-dock-menu.c:1185 ../src/cairo-dock-menu.c:1202
-#: ../src/cairo-dock-menu.c:1204
+#: ../src/cairo-dock-menu.c:1204 ../src/cairo-dock-menu.c:1206
 msgid "Fullscreen"
 msgstr "全画面表示"
 
@@ -400,6 +411,7 @@ msgstr "全画面表示"
 #: ../src/cairo-dock-menu.c:1156 ../src/cairo-dock-menu.c:1163
 #: ../src/cairo-dock-menu.c:1167 ../src/cairo-dock-menu.c:1187
 #: ../src/cairo-dock-menu.c:1204 ../src/cairo-dock-menu.c:1206
+#: ../src/cairo-dock-menu.c:1208
 msgid "Move to this desktop"
 msgstr "このデスクトップに移動"
 
@@ -420,7 +432,7 @@ msgstr "このデスクトップに移動"
 #: ../src/cairo-dock-menu.c:1211 ../src/cairo-dock-menu.c:1227
 #: ../src/cairo-dock-menu.c:1234 ../src/cairo-dock-menu.c:1238
 #: ../src/cairo-dock-menu.c:1258 ../src/cairo-dock-menu.c:1275
-#: ../src/cairo-dock-menu.c:1277
+#: ../src/cairo-dock-menu.c:1277 ../src/cairo-dock-menu.c:1279
 msgid "Configure this module"
 msgstr "このモジュールの設定"
 
@@ -441,7 +453,7 @@ msgstr "このモジュールの設定"
 #: ../src/cairo-dock-menu.c:1218 ../src/cairo-dock-menu.c:1234
 #: ../src/cairo-dock-menu.c:1241 ../src/cairo-dock-menu.c:1245
 #: ../src/cairo-dock-menu.c:1265 ../src/cairo-dock-menu.c:1282
-#: ../src/cairo-dock-menu.c:1284
+#: ../src/cairo-dock-menu.c:1284 ../src/cairo-dock-menu.c:1286
 msgid "Remove this module"
 msgstr "このモジュールを削除"
 
@@ -591,7 +603,7 @@ msgstr "このランチャー設定項目を入力"
 #: ../src/cairo-dock-menu.c:687 ../src/cairo-dock-menu.c:676
 #: ../src/cairo-dock-menu.c:677 ../src/cairo-dock-menu.c:686
 #: ../src/cairo-dock-menu.c:701 ../src/cairo-dock-menu.c:710
-#: ../src/cairo-dock-menu.c:712
+#: ../src/cairo-dock-menu.c:712 ../src/cairo-dock-menu.c:714
 #, c-format
 msgid "You're about to remove this module (%s) from the dock. Sure ?"
 msgstr "このモジュール(%s)をドックから削除しようとしています。よろしいですか？"
@@ -2051,7 +2063,7 @@ msgstr "もっと詳細な設定が知りたい？"
 #: ../src/cairo-dock-menu.c:590 ../src/cairo-dock-menu.c:588
 #: ../src/cairo-dock-menu.c:598 ../src/cairo-dock-menu.c:599
 #: ../src/cairo-dock-menu.c:613 ../src/cairo-dock-menu.c:622
-#: ../src/cairo-dock-menu.c:624
+#: ../src/cairo-dock-menu.c:624 ../src/cairo-dock-menu.c:626
 #, c-format
 msgid ""
 "You're about to delete this file\n"
@@ -2070,7 +2082,7 @@ msgstr ""
 #: ../src/cairo-dock-menu.c:599 ../src/cairo-dock-menu.c:597
 #: ../src/cairo-dock-menu.c:607 ../src/cairo-dock-menu.c:608
 #: ../src/cairo-dock-menu.c:622 ../src/cairo-dock-menu.c:631
-#: ../src/cairo-dock-menu.c:633
+#: ../src/cairo-dock-menu.c:633 ../src/cairo-dock-menu.c:635
 msgid ""
 "Attention : couldn't delete this file.\n"
 "Check that you have writing rights on it."
@@ -2086,7 +2098,7 @@ msgstr ""
 #: ../src/cairo-dock-menu.c:623 ../src/cairo-dock-menu.c:621
 #: ../src/cairo-dock-menu.c:631 ../src/cairo-dock-menu.c:632
 #: ../src/cairo-dock-menu.c:646 ../src/cairo-dock-menu.c:655
-#: ../src/cairo-dock-menu.c:657
+#: ../src/cairo-dock-menu.c:657 ../src/cairo-dock-menu.c:659
 msgid "Rename to :"
 msgstr "新しい名前 :"
 
@@ -2098,7 +2110,7 @@ msgstr "新しい名前 :"
 #: ../src/cairo-dock-menu.c:630 ../src/cairo-dock-menu.c:628
 #: ../src/cairo-dock-menu.c:638 ../src/cairo-dock-menu.c:639
 #: ../src/cairo-dock-menu.c:653 ../src/cairo-dock-menu.c:662
-#: ../src/cairo-dock-menu.c:664
+#: ../src/cairo-dock-menu.c:664 ../src/cairo-dock-menu.c:666
 #, c-format
 msgid ""
 "Attention : couldn't rename %s.\n"
@@ -2135,6 +2147,7 @@ msgstr ""
 #: ../src/cairo-dock-menu.c:1100 ../src/cairo-dock-menu.c:1155
 #: ../src/cairo-dock-menu.c:1110 ../src/cairo-dock-menu.c:1172
 #: ../src/cairo-dock-menu.c:1112 ../src/cairo-dock-menu.c:1174
+#: ../src/cairo-dock-menu.c:1114 ../src/cairo-dock-menu.c:1176
 msgid "Add a sub-dock"
 msgstr "サブ・ドックを追加"
 
@@ -2199,7 +2212,8 @@ msgstr "アンマウント済み"
 #: ../src/cairo-dock-menu.c:1139 ../src/cairo-dock-menu.c:1104
 #: ../src/cairo-dock-menu.c:1159 ../src/cairo-dock-menu.c:1114
 #: ../src/cairo-dock-menu.c:1176 ../src/cairo-dock-menu.c:1116
-#: ../src/cairo-dock-menu.c:1178
+#: ../src/cairo-dock-menu.c:1178 ../src/cairo-dock-menu.c:1118
+#: ../src/cairo-dock-menu.c:1180
 msgid "Add a separator"
 msgstr "区切りを追加"
 
@@ -2228,7 +2242,7 @@ msgstr "取得"
 #: ../src/cairo-dock-menu.c:1215 ../src/cairo-dock-menu.c:1231
 #: ../src/cairo-dock-menu.c:1238 ../src/cairo-dock-menu.c:1242
 #: ../src/cairo-dock-menu.c:1262 ../src/cairo-dock-menu.c:1279
-#: ../src/cairo-dock-menu.c:1281
+#: ../src/cairo-dock-menu.c:1281 ../src/cairo-dock-menu.c:1283
 msgid "Detach this module"
 msgstr "このモジュールを分離"
 
@@ -2246,7 +2260,7 @@ msgstr "このモジュールを分離"
 #: ../src/cairo-dock-menu.c:1215 ../src/cairo-dock-menu.c:1231
 #: ../src/cairo-dock-menu.c:1238 ../src/cairo-dock-menu.c:1242
 #: ../src/cairo-dock-menu.c:1262 ../src/cairo-dock-menu.c:1279
-#: ../src/cairo-dock-menu.c:1281
+#: ../src/cairo-dock-menu.c:1281 ../src/cairo-dock-menu.c:1283
 msgid "Return to dock"
 msgstr "ドックに戻す"
 
@@ -2264,6 +2278,7 @@ msgstr "ドックに戻す"
 #: ../src/cairo-dock-menu.c:1252 ../src/cairo-dock-menu.c:1259
 #: ../src/cairo-dock-menu.c:1263 ../src/cairo-dock-menu.c:1283
 #: ../src/cairo-dock-menu.c:1300 ../src/cairo-dock-menu.c:1302
+#: ../src/cairo-dock-menu.c:1304
 msgid "Always on top"
 msgstr "常に最前面に表示"
 
@@ -2281,6 +2296,7 @@ msgstr "常に最前面に表示"
 #: ../src/cairo-dock-menu.c:1259 ../src/cairo-dock-menu.c:1266
 #: ../src/cairo-dock-menu.c:1270 ../src/cairo-dock-menu.c:1290
 #: ../src/cairo-dock-menu.c:1307 ../src/cairo-dock-menu.c:1309
+#: ../src/cairo-dock-menu.c:1311
 msgid "Normal"
 msgstr "普通"
 
@@ -2298,6 +2314,7 @@ msgstr "普通"
 #: ../src/cairo-dock-menu.c:1266 ../src/cairo-dock-menu.c:1273
 #: ../src/cairo-dock-menu.c:1277 ../src/cairo-dock-menu.c:1297
 #: ../src/cairo-dock-menu.c:1314 ../src/cairo-dock-menu.c:1316
+#: ../src/cairo-dock-menu.c:1318
 msgid "Always below"
 msgstr "常に最後面に表示"
 
@@ -2318,6 +2335,7 @@ msgstr "Compiz Fusion ウィジェット"
 #: ../src/cairo-dock-callbacks.c:1563 ../src/cairo-dock-callbacks.c:1644
 #: ../src/cairo-dock-callbacks.c:1567 ../src/cairo-dock-callbacks.c:1575
 #: ../src/cairo-dock-callbacks.c:1580 ../src/cairo-dock-callbacks.c:1578
+#: ../src/cairo-dock-callbacks.c:1579
 msgid "Quit Cairo-Dock ?"
 msgstr "Cairo-Dock 終了？"
 
@@ -2387,6 +2405,7 @@ msgstr ""
 #: ../src/cairo-dock-menu.c:1285 ../src/cairo-dock-menu.c:1298
 #: ../src/cairo-dock-menu.c:1302 ../src/cairo-dock-menu.c:1312
 #: ../src/cairo-dock-menu.c:1329 ../src/cairo-dock-menu.c:1331
+#: ../src/cairo-dock-menu.c:1333
 msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr "Compiz の動作設定での指定法: (name=cairo-dock & type=utility)"
 
@@ -2433,7 +2452,7 @@ msgstr "マウスを置いたときの背景色（赤、緑、青、透明）:"
 #: ../src/cairo-dock-menu.c:1144 ../src/cairo-dock-menu.c:1160
 #: ../src/cairo-dock-menu.c:1167 ../src/cairo-dock-menu.c:1171
 #: ../src/cairo-dock-menu.c:1191 ../src/cairo-dock-menu.c:1208
-#: ../src/cairo-dock-menu.c:1210
+#: ../src/cairo-dock-menu.c:1210 ../src/cairo-dock-menu.c:1212
 msgid "Don't keep above"
 msgstr "最前面表示解除"
 
@@ -2448,7 +2467,7 @@ msgstr "最前面表示解除"
 #: ../src/cairo-dock-menu.c:1144 ../src/cairo-dock-menu.c:1160
 #: ../src/cairo-dock-menu.c:1167 ../src/cairo-dock-menu.c:1171
 #: ../src/cairo-dock-menu.c:1191 ../src/cairo-dock-menu.c:1208
-#: ../src/cairo-dock-menu.c:1210
+#: ../src/cairo-dock-menu.c:1210 ../src/cairo-dock-menu.c:1212
 msgid "Keep above"
 msgstr "最前面に表示"
 
@@ -2463,6 +2482,7 @@ msgstr "最前面に表示"
 #: ../src/cairo-dock-menu.c:1167 ../src/cairo-dock-menu.c:1174
 #: ../src/cairo-dock-menu.c:1178 ../src/cairo-dock-menu.c:1198
 #: ../src/cairo-dock-menu.c:1215 ../src/cairo-dock-menu.c:1217
+#: ../src/cairo-dock-menu.c:1219
 #, c-format
 msgid "Move to desktop %d - face %d"
 msgstr "デスクトップ %d - 面 %d へ移動"
@@ -2478,6 +2498,7 @@ msgstr "デスクトップ %d - 面 %d へ移動"
 #: ../src/cairo-dock-menu.c:1169 ../src/cairo-dock-menu.c:1176
 #: ../src/cairo-dock-menu.c:1180 ../src/cairo-dock-menu.c:1200
 #: ../src/cairo-dock-menu.c:1217 ../src/cairo-dock-menu.c:1219
+#: ../src/cairo-dock-menu.c:1221
 #, c-format
 msgid "Move to desktop %d"
 msgstr "デスクトップ %d へ移動"
@@ -2493,6 +2514,7 @@ msgstr "デスクトップ %d へ移動"
 #: ../src/cairo-dock-menu.c:1171 ../src/cairo-dock-menu.c:1178
 #: ../src/cairo-dock-menu.c:1182 ../src/cairo-dock-menu.c:1202
 #: ../src/cairo-dock-menu.c:1219 ../src/cairo-dock-menu.c:1221
+#: ../src/cairo-dock-menu.c:1223
 #, c-format
 msgid "Move to face %d"
 msgstr "面 %d へ移動"
@@ -2578,6 +2600,7 @@ msgstr "サポート"
 #: ../src/cairo-dock-menu.c:1214 ../src/cairo-dock-menu.c:1221
 #: ../src/cairo-dock-menu.c:1225 ../src/cairo-dock-menu.c:1245
 #: ../src/cairo-dock-menu.c:1262 ../src/cairo-dock-menu.c:1264
+#: ../src/cairo-dock-menu.c:1266
 msgid "Show"
 msgstr "表示"
 
@@ -2624,7 +2647,7 @@ msgstr "詳細設定モード"
 #: ../src/cairo-dock-menu.c:1192 ../src/cairo-dock-menu.c:1208
 #: ../src/cairo-dock-menu.c:1215 ../src/cairo-dock-menu.c:1219
 #: ../src/cairo-dock-menu.c:1239 ../src/cairo-dock-menu.c:1256
-#: ../src/cairo-dock-menu.c:1258
+#: ../src/cairo-dock-menu.c:1258 ../src/cairo-dock-menu.c:1260
 msgid "Launch new"
 msgstr "追加起動"
 
@@ -2724,6 +2747,7 @@ msgstr "標示の大きさの割合 :"
 #: ../src/cairo-dock-menu.c:1202 ../src/cairo-dock-menu.c:1209
 #: ../src/cairo-dock-menu.c:1213 ../src/cairo-dock-menu.c:1233
 #: ../src/cairo-dock-menu.c:1250 ../src/cairo-dock-menu.c:1252
+#: ../src/cairo-dock-menu.c:1254
 msgid "Kill"
 msgstr "強制終了"
 
@@ -2745,6 +2769,7 @@ msgstr "垂直方向のオフセット :"
 #: ../src/cairo-dock-menu.c:1136 ../src/cairo-dock-menu.c:1143
 #: ../src/cairo-dock-menu.c:1147 ../src/cairo-dock-menu.c:1167
 #: ../src/cairo-dock-menu.c:1184 ../src/cairo-dock-menu.c:1186
+#: ../src/cairo-dock-menu.c:1188
 msgid "Remove this separator"
 msgstr "この区切りを削除"
 
@@ -2754,6 +2779,7 @@ msgstr "この区切りを削除"
 #: ../src/cairo-dock-menu.c:1138 ../src/cairo-dock-menu.c:1145
 #: ../src/cairo-dock-menu.c:1149 ../src/cairo-dock-menu.c:1169
 #: ../src/cairo-dock-menu.c:1186 ../src/cairo-dock-menu.c:1188
+#: ../src/cairo-dock-menu.c:1190
 msgid "Modify this separator"
 msgstr "この区切りを編集"
 
@@ -2772,7 +2798,7 @@ msgstr "標示をアイコンと結合？"
 #: ../src/cairo-dock-menu.c:914 ../src/cairo-dock-menu.c:923
 #: ../src/cairo-dock-menu.c:930 ../src/cairo-dock-menu.c:934
 #: ../src/cairo-dock-menu.c:948 ../src/cairo-dock-menu.c:957
-#: ../src/cairo-dock-menu.c:959
+#: ../src/cairo-dock-menu.c:959 ../src/cairo-dock-menu.c:961
 #, c-format
 msgid "Set position for the dock '%s'"
 msgstr "ドック '%s' の配置位置の設定"
@@ -2780,39 +2806,41 @@ msgstr "ドック '%s' の配置位置の設定"
 #: ../src/cairo-dock-menu.c:987 ../src/cairo-dock-menu.c:1003
 #: ../src/cairo-dock-menu.c:1010 ../src/cairo-dock-menu.c:1014
 #: ../src/cairo-dock-menu.c:1028 ../src/cairo-dock-menu.c:1038
-#: ../src/cairo-dock-menu.c:1040
+#: ../src/cairo-dock-menu.c:1040 ../src/cairo-dock-menu.c:1042
 msgid "Set up this dock"
 msgstr "このドックの設定"
 
 #: ../src/cairo-dock-menu.c:1101 ../src/cairo-dock-menu.c:1105
 #: ../src/cairo-dock-menu.c:1124 ../src/cairo-dock-menu.c:1134
-#: ../src/cairo-dock-menu.c:1136
+#: ../src/cairo-dock-menu.c:1136 ../src/cairo-dock-menu.c:1138
 msgid "Unmount"
 msgstr "アンマウント"
 
 #: ../src/cairo-dock-menu.c:1101 ../src/cairo-dock-menu.c:1105
 #: ../src/cairo-dock-menu.c:1124 ../src/cairo-dock-menu.c:1134
-#: ../src/cairo-dock-menu.c:1136
+#: ../src/cairo-dock-menu.c:1136 ../src/cairo-dock-menu.c:1138
 msgid "Mount"
 msgstr "マウント"
 
 #: ../src/cairo-dock-menu.c:1034 ../src/cairo-dock-menu.c:1044
-#: ../src/cairo-dock-menu.c:1046
+#: ../src/cairo-dock-menu.c:1046 ../src/cairo-dock-menu.c:1048
 msgid "Development's site"
 msgstr ""
 
 #: ../src/cairo-dock-menu.c:1036 ../src/cairo-dock-menu.c:1046
-#: ../src/cairo-dock-menu.c:1048
+#: ../src/cairo-dock-menu.c:1048 ../src/cairo-dock-menu.c:1050
 msgid "Community's site"
 msgstr ""
 
 #: ../src/cairo-dock-menu.c:1094 ../src/cairo-dock-menu.c:1153
 #: ../src/cairo-dock-menu.c:1104 ../src/cairo-dock-menu.c:1170
 #: ../src/cairo-dock-menu.c:1106 ../src/cairo-dock-menu.c:1172
+#: ../src/cairo-dock-menu.c:1108 ../src/cairo-dock-menu.c:1174
 msgid ""
 "Don't forget you can drag a launcher from the menu and drop it in the dock !"
 msgstr ""
 
 #: ../src/cairo-dock-menu.c:1140 ../src/cairo-dock-menu.c:1142
+#: ../src/cairo-dock-menu.c:1144
 msgid "Eject"
 msgstr ""

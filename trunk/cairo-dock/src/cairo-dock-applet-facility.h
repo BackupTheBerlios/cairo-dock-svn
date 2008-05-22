@@ -198,7 +198,7 @@ typedef struct {
 	GVoidFunc read;
 	/// fonction realisant la mise a jour de l'IHM en fonction des nouveaux resultats.
 	GVoidFunc update;
-	/// intervalle de temps, eventuellement nul pour une mesure unitaire.
+	/// intervalle de temps en secondes, eventuellement nul pour une mesure unitaire.
 	gint iCheckInterval;
 	/// etat de la frequence des mesures.
 	CairoDockFrequencyState iFrequencyState;
@@ -211,7 +211,7 @@ typedef struct {
 void cairo_dock_launch_measure (CairoDockMeasure *pMeasureTimer);
 /**
 *Cree une mesure periodique.
-*@param iCheckInterval l'intervalle en ms entre 2 mesures, eventuellement nul pour une mesure unitaire.
+*@param iCheckInterval l'intervalle en s entre 2 mesures, eventuellement nul pour une mesure unitaire.
 *@param acquisition fonction realisant l'acquisition des donnees. N'accede jamais a la structure des resultats.
 *@param read fonction realisant la lecture des donnees precedemment acquises; stocke les resultats dans la structures des resultats.
 *@param update fonction realisant la mise a jour de l'interface en fonction des nouveaux resultats, lus dans la structures des resultats.
@@ -237,13 +237,13 @@ gboolean cairo_dock_measure_is_active (CairoDockMeasure *pMeasureTimer);
 /**
 *Change la frequence des mesures. La prochaine mesure aura lien dans 1 iteration si elle etait deja active.
 *@param pMeasureTimer la mesure periodique.
-*@param iNewCheckInterval le nouvel intervalle entre 2 mesures, en ms.
+*@param iNewCheckInterval le nouvel intervalle entre 2 mesures, en s.
 */
 void cairo_dock_change_measure_frequency (CairoDockMeasure *pMeasureTimer, int iNewCheckInterval);
 /**
 *Change la frequence des mesures et les relance immediatement. La prochaine mesure est donc tout de suite.
 *@param pMeasureTimer la mesure periodique.
-*@param iNewCheckInterval le nouvel intervalle entre 2 mesures, en ms.
+*@param iNewCheckInterval le nouvel intervalle entre 2 mesures, en s.
 */
 void cairo_dock_relaunch_measure_immediately (CairoDockMeasure *pMeasureTimer, int iNewCheckInterval);
 

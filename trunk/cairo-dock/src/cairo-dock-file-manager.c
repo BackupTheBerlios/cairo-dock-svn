@@ -264,7 +264,7 @@ Icon *cairo_dock_fm_create_icon_from_URI (const gchar *cURI, CairoDock *pDock)
 		for (ic = pDock->icons; ic != NULL; ic = ic->next)
 		{
 			icon = ic->data;
-			if (strcmp (pNewIcon->acName, icon->acName) < 0)
+			if (icon->acName != NULL && strcmp (pNewIcon->acName, icon->acName) < 0)
 			{
 				if (ic->prev != NULL)
 				{
@@ -306,10 +306,12 @@ static Icon *cairo_dock_fm_alter_icon_if_necessary (Icon *pIcon, CairoDock *pDoc
 {
 	if (s_pVFSBackend == NULL)
 		return NULL;
+	cd_debug ("%s (%s)", __func__, pIcon->cBaseURI);
 	Icon *pNewIcon = cairo_dock_fm_create_icon_from_URI (pIcon->cBaseURI, pDock);
 	g_return_val_if_fail (pNewIcon != NULL && pNewIcon->acName != NULL, NULL);
 
-	if (strcmp (pIcon->acName, pNewIcon->acName) != 0 || pNewIcon->acFileName == NULL || strcmp (pIcon->acFileName, pNewIcon->acFileName) != 0 || pIcon->fOrder != pNewIcon->fOrder)
+	//g_print ("%s <-> %s (%s <-> <%s)\n", pIcon->acName, pNewIcon->acName, pIcon->acFileName, pNewIcon->acFileName);
+	if (pIcon->acName == NULL || strcmp (pIcon->acName, pNewIcon->acName) != 0 || pNewIcon->acFileName == NULL || strcmp (pIcon->acFileName, pNewIcon->acFileName) != 0 || pIcon->fOrder != pNewIcon->fOrder)
 	{
 		cd_message ("  on remplace %s", pIcon->acName);
 		cairo_dock_remove_one_icon_from_dock (pDock, pIcon);

@@ -1057,10 +1057,10 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 						pDock->calculate_icons (pDock);
 						gtk_widget_queue_draw (pWidget);
 
-						if (! CAIRO_DOCK_IS_SEPARATOR (icon))
+						if (! CAIRO_DOCK_IS_SEPARATOR (s_pIconClicked))
 						{
-							cairo_dock_arm_animation (icon, CAIRO_DOCK_BOUNCE, 2);  // 2 rebonds.
-							cairo_dock_start_animation (icon, pDock);
+							cairo_dock_arm_animation (s_pIconClicked, CAIRO_DOCK_BOUNCE, 2);  // 2 rebonds.
+							cairo_dock_start_animation (s_pIconClicked, pDock);
 						}
 					}
 				}

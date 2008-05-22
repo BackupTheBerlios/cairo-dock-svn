@@ -117,7 +117,7 @@ static GdkPixbuf *_cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bA
 	XGetGeometry (s_XDisplay,
 		XPixmapID, &root, &x, &y,
 		&iWidth, &iHeight, &border_width, &iDepth);
-	cd_message ("%s (%d) : %dx%dx%d pixels (%d;%d)\n", __func__, XPixmapID, iWidth, iHeight, iDepth, x, y);
+	cd_message ("%s (%d) : %dx%dx%d pixels (%d;%d)", __func__, XPixmapID, iWidth, iHeight, iDepth, x, y);
 
 	//\__________________ On recupere le drawable associe.
 	GdkDrawable *pGdkDrawable = gdk_xid_table_lookup (XPixmapID);
@@ -132,6 +132,7 @@ static GdkPixbuf *_cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bA
 	{
 		GdkScreen* pScreen = gdk_drawable_get_screen (GDK_DRAWABLE (pGdkDrawable));
 		pColormap = gdk_screen_get_system_colormap (pScreen);  // au pire on a un colormap nul.
+		cd_debug ("  pColormap : %x", pColormap);
 	}
 
 	//\__________________ On recupere le buffer dans un GdkPixbuf.
@@ -150,6 +151,7 @@ static GdkPixbuf *_cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bA
 	//\__________________ On lui ajoute un canal alpha si necessaire.
 	if (! gdk_pixbuf_get_has_alpha (pIconPixbuf) && bAddAlpha)
 	{
+		cd_debug ("  on lui ajoute de la transparence");
 		GdkPixbuf *tmp_pixbuf = gdk_pixbuf_add_alpha (pIconPixbuf, TRUE, 255, 255, 255);
 		g_object_unref (pIconPixbuf);
 		pIconPixbuf = tmp_pixbuf;
@@ -185,8 +187,8 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 		GdkPixbuf *pIconPixbuf = NULL;
 		if (pWMHints->flags & IconWindowHint)
 		{
-			cd_debug ("  pas de _NET_WM_ICON, mais une fenetre");
 			Window XIconID = pWMHints->icon_window;
+			cd_debug ("  pas de _NET_WM_ICON, mais une fenetre (ID:%d)", XIconID);
 			pIconPixbuf = _cairo_dock_get_pixbuf_from_pixmap (XIconID, TRUE);  // pas teste.
 		}
 		else if (pWMHints->flags & IconPixmapHint)
@@ -257,11 +259,17 @@ CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
 	g_free (icon->cParentDockName);
 	if (CAIRO_DOCK_IS_APPLI (icon) && g_bGroupAppliByClass && icon->cClass != NULL)
 	{
-		Icon *pSameClassIcon = cairo_dock_get_icon_with_class (pMainDock->icons, icon->cClass);
-		if (pSameClassIcon == NULL || pSameClassIcon == icon)
+		Icon *pSameClassIcon = cairo_dock_get_classmate (icon);
+		if (pSameClassIcon != NULL)
+			g_print ("class-mate : %s (%s)\n", pSameClassIcon->acName, pSameClassIcon->cParentDockName);
+		//pSameClassIcon = cairo_dock_get_icon_with_class (pMainDock->icons, icon->cClass);
+		if (pSameClassIcon == NULL || pSameClassIcon == icon || pSameClassIcon->cParentDockName == NULL)
 		{
 			cd_message ("  classe %s encore vide", icon->cClass);
 			icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
+			CairoDock *pClassDock = cairo_dock_search_dock_from_name (icon->cClass);
+			if (pClassDock != NULL)
+				icon->pSubDock = pClassDock;
 		}
 		else
 		{
