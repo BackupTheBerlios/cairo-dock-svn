@@ -96,9 +96,10 @@ static Window cairo_dock_detach_appli_of_class (const gchar *cClass, gboolean bD
 				XFirstFoundId = pIcon->Xid;
 			else
 			{
-				cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pContainer));
+				/**cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pContainer));
+				cd_messge ("  on recharge l'icone de l'appli detachee %s", pIcon->acName);
 				cairo_dock_fill_one_icon_buffer (pIcon, pCairoContext, 1 + g_fAmplitude, pParentDock->bHorizontalDock, TRUE, pParentDock->bDirectionUp);
-				cairo_destroy (pCairoContext);
+				cairo_destroy (pCairoContext);*/
 				bNeedsRedraw |= pParentDock->bIsMainDock;
 			}
 		}
@@ -310,7 +311,10 @@ gboolean cairo_dock_prevent_inhibated_class (Icon *pIcon)
 		{
 			pInhibatorIcon = pElement->data;
 			if (pInhibatorIcon == NULL)  // cette appli est inhibee par Dieu.
+			{
+				cd_debug ("cette appli est inhibee par Dieu");
 				bToBeInhibited = TRUE;
+			}
 			else
 			{
 				if (pInhibatorIcon->Xid == 0)  // cette icone inhibe cette classe mais ne controle encore aucune appli, on s'y asservit.
@@ -368,12 +372,13 @@ void cairo_dock_deinhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
 {
 	cd_message ("%s (%s)", __func__, cClass);
 	gboolean bStillInhibated = cairo_dock_remove_icon_from_class (pInhibatorIcon);
-	cd_debug ("bStillInhibated : %d", bStillInhibated);
+	cd_debug (" bStillInhibated : %d", bStillInhibated);
 	///if (! bStillInhibated)  // il n'y a plus personne dans cette classe.
 	///	return ;
 	
 	if (pInhibatorIcon == NULL || pInhibatorIcon->Xid != 0)
 	{
+		cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (g_pMainDock));
 		const GList *pList = cairo_dock_list_existing_appli_with_class (cClass);
 		Icon *pIcon;
 		gboolean bNeedsRedraw = FALSE;
@@ -389,10 +394,17 @@ void cairo_dock_deinhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
 				pIcon->fScale = 1.;
 				pParentDock = cairo_dock_insert_appli_in_dock (pIcon, g_pMainDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON);
 				bNeedsRedraw = (pParentDock != NULL && pParentDock->bIsMainDock);
-				if (pInhibatorIcon != NULL)
-					break ;
+				//if (pInhibatorIcon != NULL)
+				//	break ;
+			}
+			pParentDock = cairo_dock_search_dock_from_name (pIcon->cParentDockName);
+			if (pParentDock != NULL)
+			{
+				cd_message ("on recharge l'icone de l'appli %s", pIcon->acName);
+				cairo_dock_fill_one_icon_buffer (pIcon, pCairoContext, 1 + g_fAmplitude, pParentDock->bHorizontalDock, TRUE, pParentDock->bDirectionUp);
 			}
 		}
+		cairo_destroy (pCairoContext);
 		if (bNeedsRedraw)
 			gtk_widget_queue_draw (g_pMainDock->pWidget);  /// pDock->calculate_icons (pDock); ?...
 	}
@@ -400,6 +412,7 @@ void cairo_dock_deinhibate_class (const gchar *cClass, Icon *pInhibatorIcon)
 	{
 		cd_message (" l'inhibiteur a perdu toute sa mana");
 		pInhibatorIcon->Xid = 0;
+		pInhibatorIcon->bHasIndicator = FALSE;
 		g_free (pInhibatorIcon->cClass);
 		pInhibatorIcon->cClass = NULL;
 	}
@@ -586,7 +599,7 @@ void cairo_dock_update_activity_on_inhibators (gchar *cClass, Window Xid)
 
 Icon *cairo_dock_get_classmate (Icon *pIcon)
 {
-	g_print ("%s (%s)\n", __func__, pIcon->cClass);
+	cd_debug ("%s (%s)", __func__, pIcon->cClass);
 	Icon *pClassMate = NULL;
 	CairoDockClassAppli *pClassAppli = cairo_dock_get_class (pIcon->cClass);
 	if (pClassAppli != NULL)

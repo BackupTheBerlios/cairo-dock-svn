@@ -5,7 +5,7 @@ export FAST_COMPIL="0"
 export BUILD_TAR="0"
 
 echo "packaging options : "
-while getopts "dfT" flag
+while getopts "dfTh" flag
 do
 	echo " option $flag" $OPTIND $OPTARG
 	case "$flag" in
@@ -22,8 +22,8 @@ do
 		export BUILD_TAR="1"
 		;;
 	h)
-		echo "-d ref : build in the folder 'rep'"
-		echo "-f : fast compil (no cleaning of sources before)"
+		echo "-d rep : build in the folder 'rep'"
+		echo "-f : fast compil (don't clean the sources before (use it with caution))"
 		echo "-T : build the sources tarball"
 		exit 0
 		;;

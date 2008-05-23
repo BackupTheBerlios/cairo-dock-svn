@@ -270,17 +270,17 @@ static gboolean _cairo_dock_show_xwindow_for_drop (Icon *pIcon)
 }
 void cairo_dock_on_change_icon (Icon *pLastPointedIcon, Icon *pPointedIcon, CairoDock *pDock)
 {
-	cd_debug ("on change d'icone dans %x (-> %s)", pDock, (pPointedIcon != NULL ? pPointedIcon->acName : "rien"));
+	//cd_debug ("on change d'icone dans %x (-> %s)", pDock, (pPointedIcon != NULL ? pPointedIcon->acName : "rien"));
 	if (s_iSidShowSubDockDemand != 0 && pDock == s_pDockShowingSubDock)
 	{
-		cd_debug ("on annule la demande de montrage de sous-dock");
+		//cd_debug ("on annule la demande de montrage de sous-dock");
 		g_source_remove (s_iSidShowSubDockDemand);
 		s_iSidShowSubDockDemand = 0;
 		s_pDockShowingSubDock = NULL;
 	}
 	if (pDock->bIsDragging && s_iSidShowAppliForDrop != 0)
 	{
-		cd_debug ("on annule la demande de montrage d'appli");
+		//cd_debug ("on annule la demande de montrage d'appli");
 		g_source_remove (s_iSidShowAppliForDrop);
 		s_iSidShowAppliForDrop = 0;
 	}
@@ -302,11 +302,11 @@ void cairo_dock_on_change_icon (Icon *pLastPointedIcon, Icon *pPointedIcon, Cair
 			}
 		}
 		//else
-		//	cd_message ("pas encore visible !\n");
+		//	cd_debug ("pas encore visible !\n");
 	}
 	if (pPointedIcon != NULL && pPointedIcon->pSubDock != NULL && pPointedIcon->pSubDock != s_pLastPointedDock && (! bShowSubDockOnClick || CAIRO_DOCK_IS_APPLI (pPointedIcon)))
 	{
-		cd_debug ("il faut montrer un sous-dock");
+		//cd_debug ("il faut montrer un sous-dock");
 		if (pPointedIcon->pSubDock->iSidLeaveDemand != 0)
 		{
 			g_source_remove (pPointedIcon->pSubDock->iSidLeaveDemand);
@@ -528,8 +528,6 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-        cd_debug ("");
-
 	//g_print ("%s (bInside:%d; bAtBottom:%d; iRefCount:%d)\n", __func__, pDock->bInside, pDock->bAtBottom, pDock->iRefCount);
 	/**if (pDock->bAtBottom)  // || ! pDock->bInside  // mis en commentaire pour la 1.5.4
 	{
@@ -597,7 +595,6 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 {
 	//g_print ("%s (bIsMainDock : %d; bAtTop:%d; bInside:%d; iSidMoveDown:%d; iMagnitudeIndex:%d)\n", __func__, pDock->bIsMainDock, pDock->bAtTop, pDock->bInside, pDock->iSidMoveDown, pDock->iMagnitudeIndex);
 	s_pLastPointedDock = NULL;  // ajoute le 04/10/07 pour permettre aux sous-docks d'apparaitre si on entre en pointant tout de suite sur l'icone.
-        cd_debug("");
 	if (! cairo_dock_entrance_is_allowed (pDock))
 	{
 		cd_message ("* entree non autorisee");
@@ -822,6 +819,7 @@ gboolean cairo_dock_launch_command_full (const gchar *cCommandFormat, gchar *cWo
 	va_list args;
 	va_start (args, cWorkingDirectory);
 	gchar *cCommand = g_strdup_vprintf (cCommandFormat, args);
+	cd_debug ("%s (%s , %s)", __func__, cCommand, cWorkingDirectory);
 	
 	GError *erreur = NULL;
 	int argc;
@@ -1199,7 +1197,7 @@ static gboolean _cairo_dock_autoscroll (gpointer *data)
 				///gdk_window_hide (pLastPointedIcon->pSubDock->pWidget->window);
 				if (pLastPointedIcon->pSubDock->iSidLeaveDemand == 0)
 				{
-					cd_debug ("  on retarde le cachage du dock de %dms", MAX (g_iLeaveSubDockDelay, 330));
+					//cd_debug ("  on retarde le cachage du dock de %dms", MAX (g_iLeaveSubDockDelay, 330));
 					pLastPointedIcon->pSubDock->iSidLeaveDemand = g_timeout_add (MAX (g_iLeaveSubDockDelay, 330), (GSourceFunc) cairo_dock_emit_leave_signal, (gpointer) pLastPointedIcon->pSubDock);
 				}
 			}
@@ -1306,7 +1304,7 @@ gboolean on_configure (GtkWidget* pWidget,
 
 	if (iNewWidth != pDock->iCurrentWidth || iNewHeight != pDock->iCurrentHeight)
 	{
-		cd_debug ("-> %dx%d", iNewWidth, iNewHeight);
+		//cd_debug ("-> %dx%d", iNewWidth, iNewHeight);
 		pDock->iCurrentWidth = iNewWidth;
 		pDock->iCurrentHeight = iNewHeight;
 
@@ -1524,7 +1522,7 @@ void on_drag_motion (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, gui
 	//\_________________ On simule les evenements souris habituels.
 	if (! pDock->bIsDragging)
 	{
-		g_print ("start dragging\n");
+		cd_message ("start dragging");
 		
 		/*GdkAtom gdkAtom = gdk_drag_get_selection (dc);
 		Atom xAtom = gdk_x11_atom_to_xatom (gdkAtom);
@@ -1550,7 +1548,7 @@ void on_drag_motion (GtkWidget *pWidget, GdkDragContext *dc, gint x, gint y, gui
 
 void on_drag_leave (GtkWidget *pWidget, GdkDragContext *dc, guint time, CairoDock *pDock)
 {
-	g_print ("stop dragging\n");
+	cd_message ("stop dragging");
 	pDock->bIsDragging = FALSE;
 	cairo_dock_stop_marking_icons (pDock);
 	pDock->iAvoidingMouseIconType = -1;

@@ -124,7 +124,10 @@ static GdkPixbuf *_cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bA
 	if (pGdkDrawable)
 		g_object_ref (G_OBJECT (pGdkDrawable));
 	else
+	{
+		cd_message ("pas d'objet GDK present, on en alloue un nouveau");
 		pGdkDrawable = gdk_pixmap_foreign_new (XPixmapID);
+	}
 
 	//\__________________ On recupere la colormap.
 	GdkColormap* pColormap = gdk_drawable_get_colormap (pGdkDrawable);
@@ -269,7 +272,15 @@ CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
 			icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
 			CairoDock *pClassDock = cairo_dock_search_dock_from_name (icon->cClass);
 			if (pClassDock != NULL)
-				icon->pSubDock = pClassDock;
+			{
+				if (icon->pSubDock == NULL)
+				{
+					///icon->pSubDock = pClassDock;
+					///cd_warning ("on lie de force le sous-dock de la classe %s a l'icone %s", icon->cClass, icon->acName);
+				}
+				else
+					cd_warning ("le sous-dock de la classe %s est orphelin  (%s a deja un sous-dock) !", icon->cClass, icon->acName);
+			}
 		}
 		else
 		{
@@ -280,14 +291,18 @@ CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
 			{
 				cd_message ("  creation du dock pour la classe %s", icon->cClass);
 				pParentDock = cairo_dock_create_subdock_for_class_appli (icon->cClass, pMainDock);
-				pSameClassIcon->pSubDock = pParentDock;
 			}
 			else
 			{
 				cd_message ("  sous-dock de la classe %s existant", icon->cClass);
-				if (pSameClassIcon->pSubDock == NULL)
-					pSameClassIcon->pSubDock = pParentDock;
 			}
+			if (pSameClassIcon->pSubDock != NULL && pSameClassIcon->pSubDock != pParentDock)
+			{
+				cd_warning ("Attention : this appli (%s) already has a subdock, but it is not the class's subdock => we'll add its classmate in the main dock");
+				
+			}
+			else if (pSameClassIcon->pSubDock == NULL)
+				pSameClassIcon->pSubDock = pParentDock;
 		}
 	}
 	else

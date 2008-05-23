@@ -980,16 +980,18 @@ Window *cairo_dock_get_windows_list (gulong *iNbWindows)
 CairoDock *cairo_dock_insert_appli_in_dock (Icon *icon, CairoDock *pMainDock, gboolean bUpdateSize, gboolean bAnimate)
 {
 	//\_________________ On determine dans quel dock l'inserer.
-	g_print ("%s (%s, %d)\n", __func__, icon->acName, icon->Xid);
+	cd_message ("%s (%s, %d)", __func__, icon->acName, icon->Xid);
 	if (g_bMixLauncherAppli && cairo_dock_prevent_inhibated_class (icon))
+	{
+		cd_message (" -> se fait inhiber");
 		return NULL;
-	
+	}
 	CairoDock *pParentDock = cairo_dock_manage_appli_class (icon, pMainDock);  // renseigne cParentDockName.
 	g_return_val_if_fail (pParentDock != NULL, NULL);
 
 	//\_________________ On l'insere dans son dock parent en animant ce dernier eventuellement.
 	cairo_dock_insert_icon_in_dock (icon, pParentDock, bUpdateSize, bAnimate, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
-	cd_message (" insertion de %s complete (%.2f %.2fx%.2f)", icon->acName, icon->fPersonnalScale, icon->fWidth, icon->fHeight);
+	cd_message (" insertion de %s complete (%.2f %.2fx%.2f) dans %s", icon->acName, icon->fPersonnalScale, icon->fWidth, icon->fHeight, icon->cParentDockName);
 
 	if (bAnimate && cairo_dock_animation_will_be_visible (pParentDock))
 	{

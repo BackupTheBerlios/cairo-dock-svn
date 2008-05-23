@@ -38,6 +38,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-applet-facility.h"
 #include "cairo-dock-X-utilities.h"
 #include "cairo-dock-dock-manager.h"
+#include "cairo-dock-class-manager.h"
 #include "cairo-dock-menu.h"
 
 #define CAIRO_DOCK_CONF_PANEL_WIDTH 800
@@ -143,7 +144,7 @@ static void _cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 		_("Support"),
 		"<b>Installation scripts and repository :</b>\n  Mav (SVN script, Ubuntu repository, web hosting)\n  Anubis (Suse repository)\n\
 <b>Site (cairo-dock.org) :</b>\n  Necropotame\n  Tdey\n\
-<b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Mav\n  Necropotame\n  Nochka85\n  Ppmt\n  Rhinopierroce\n  Sombrero\n  Vilraleur");
+<b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Mav\n  Necropotame\n  Nochka85\n  Ppmt\n  RavanH\n  Rhinopierroce\n  Sombrero\n  Vilraleur");
 	
 	gtk_widget_show_all (pDialog);
 	gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER_ALWAYS);  // un GTK_WIN_POS_CENTER simple ne marche pas, probablement parceque la fenetre n'est pas encore realisee. le 'always' ne pose pas de probleme, puisqu'on ne peut pas redimensionner le dialogue.
@@ -443,10 +444,10 @@ static void _cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 		gchar *cName = icon->acName;
 		icon->acName = NULL;
 		gchar *cRendererName = NULL;
-		if (icon->pSubDock != NULL)
+		if (pSubDock != NULL)
 		{
-			cRendererName = icon->pSubDock->cRendererName;
-			icon->pSubDock->cRendererName = NULL;
+			cRendererName = pSubDock->cRendererName;
+			pSubDock->cRendererName = NULL;
 		}
 		cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 		cairo_dock_reload_icon_from_desktop_file (cDesktopFileName, pCairoContext, icon);
@@ -455,20 +456,20 @@ static void _cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 		//\_____________ On gere le sous-dock.
 		if (Xid != 0)
 		{
-			if (pSubDock == NULL)
+			if (icon->pSubDock == NULL)
 				icon->pSubDock = pSubDock;
-			else  // ne devrait pas arriver.
+			else  // ne devrait pas arriver (une icone de container n'est pas un lanceur pouvant prendre un Xid).
 				cairo_dock_destroy_dock (pSubDock, cName, g_pMainDock, CAIRO_DOCK_MAIN_DOCK_NAME);
 		}
 		else
 		{
-			if (pSubDock != icon->pSubDock)  // ca n'est plus le meme container, on transvase.
+			if (pSubDock != icon->pSubDock)  // ca n'est plus le meme container, on transvase ou on detruit.
 			{
 				cairo_dock_destroy_dock (pSubDock, cName, icon->pSubDock, icon->acName);
 			}
 		}
 		
-		if (icon->pSubDock != NULL)
+		if (icon->pSubDock != NULL && pSubDock == icon->pSubDock)  // c'est le meme sous-dock, son rendu a pu change.
 		{
 			if ((cRendererName != NULL && icon->pSubDock->cRendererName == NULL)
 			 || (cRendererName == NULL && icon->pSubDock->cRendererName != NULL)
@@ -484,13 +485,17 @@ static void _cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 			icon->fOrder = CAIRO_DOCK_LAST_ORDER;
 
 		cairo_dock_insert_icon_in_dock (icon, pNewContainer, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);  // on n'empeche pas les bouclages.
-
+		
 		if (pDock != pNewContainer)
 			cairo_dock_update_dock_size (pDock);
 		
 		//\_____________ On gere l'inhibition de sa classe.
 		if (icon->cClass == NULL && cClass != NULL)
-			cairo_dock_deinhibate_class (cClass, icon);
+		{
+			icon->cClass = cClass;
+			cClass = NULL;
+			cairo_dock_deinhibate_class (icon->cClass, icon);
+		}
 		else if (icon->cClass != NULL && cClass == NULL)
 			cairo_dock_inhibate_class (icon->cClass, icon);
 		
