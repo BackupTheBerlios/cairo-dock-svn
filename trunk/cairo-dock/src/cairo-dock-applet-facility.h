@@ -210,6 +210,12 @@ typedef struct {
 */
 void cairo_dock_launch_measure (CairoDockMeasure *pMeasureTimer);
 /**
+*Idem que ci-dessus mais après un délai.
+*@param pMeasureTimer la mesure periodique.
+*@param fDelay délai en ms.
+*/
+void cairo_dock_launch_measure_delayed (CairoDockMeasure *pMeasureTimer, double fDelay);
+/**
 *Cree une mesure periodique.
 *@param iCheckInterval l'intervalle en s entre 2 mesures, eventuellement nul pour une mesure unitaire.
 *@param acquisition fonction realisant l'acquisition des donnees. N'accede jamais a la structure des resultats.

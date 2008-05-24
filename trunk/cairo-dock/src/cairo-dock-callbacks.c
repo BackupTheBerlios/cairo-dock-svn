@@ -1318,6 +1318,9 @@ gboolean on_configure (GtkWidget* pWidget,
 		
 		pDock->calculate_icons (pDock);
 		gtk_widget_queue_draw (pWidget);  // il semble qu'il soit necessaire d'en rajouter un la pour eviter un "clignotement" a l'entree dans le dock.
+		if (pDock->iRefCount > 0 || pDock->bAutoHide)
+			while (gtk_events_pending ())  // on force un redessin immediat sinon on a quand meme un "flash".
+				gtk_main_iteration ();
 #ifdef HAVE_GLITZ
 		if (pDock->pGlitzDrawable)
 		{
