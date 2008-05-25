@@ -8,6 +8,7 @@ theme_DATA = \
         readme\
         cairo-dock.conf\
         cairo-dock-ok\
+	cairo-dock-indicator\
         background-cairo-dock\
         cairo-dock_easy.conf\
         default\
