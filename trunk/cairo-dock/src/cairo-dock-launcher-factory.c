@@ -45,13 +45,8 @@ extern gchar *g_cConfFile;
 extern gchar *g_cCurrentLaunchersPath;
 extern gpointer *g_pDefaultIconDirectory;
 
-extern gboolean g_bDirectionUp;
 extern gboolean g_bSameHorizontality;
 
-extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
-extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
-
-extern gboolean g_bUseGlitz;
 extern CairoDockFMSortType g_iFileSortType;
 
 

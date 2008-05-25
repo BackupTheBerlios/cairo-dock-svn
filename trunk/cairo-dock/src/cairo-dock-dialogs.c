@@ -217,7 +217,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	double fRadius = pDialog->fRadius;
 
 	cairo_t *pCairoContext = gdk_cairo_create (pWidget->window);
-	if (cairo_status (pCairoContext) != CAIRO_STATUS_SUCCESS, FALSE)
+	if (cairo_status (pCairoContext) != CAIRO_STATUS_SUCCESS)
 	{
 		cairo_destroy (pCairoContext);
 		cairo_dock_dialog_unreference (pDialog);

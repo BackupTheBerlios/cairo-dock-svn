@@ -260,11 +260,12 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	if (icon->pIconBuffer == NULL)
 	{
 		gchar *cIconPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_DEFAULT_ICON_NAME);
+		CairoDockIconType iType = cairo_dock_get_icon_type  (icon);
 		icon->pIconBuffer = cairo_dock_create_surface_from_image (cIconPath,
 			pSourceContext,
 			fMaxScale,
-			(bApplySizeRestriction ? g_tIconAuthorizedWidth[icon->iType] : icon->fWidth),
-			(bApplySizeRestriction ? g_tIconAuthorizedHeight[icon->iType] : icon->fHeight),
+			(bApplySizeRestriction ? g_tIconAuthorizedWidth[iType] : icon->fWidth),
+			(bApplySizeRestriction ? g_tIconAuthorizedHeight[iType] : icon->fHeight),
 			(bHorizontalDock ? &icon->fWidth : &icon->fHeight),
 			(bHorizontalDock ? &icon->fHeight : &icon->fWidth),
 			CAIRO_DOCK_FILL_SPACE);

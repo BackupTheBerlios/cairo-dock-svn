@@ -110,4 +110,9 @@ extern double g_fDeskletColor[4];
 /// Couleur du fond des desklets lorsque la souris est dedans..
 extern double g_fDeskletColorInside[4];
 
+extern int g_iDialogMessageSize;
+extern gchar *g_cDialogMessagePolice;
+extern int g_iDialogMessageWeight;
+extern int g_iDialogMessageStyle;
+
 #endif
