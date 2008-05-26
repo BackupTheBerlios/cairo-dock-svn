@@ -223,6 +223,25 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 		cairo_dock_dialog_unreference (pDialog);
 		return FALSE;
 	}
+	
+	if (pExpose->area.y > pDialog->iMessageHeight)  // redessin du widget interactif.
+	{
+		cairo_rectangle (pCairoContext,
+			pExpose->area.x,
+			pExpose->area.y,
+			pExpose->area.width,
+			pExpose->area.height);
+		cairo_clip (pCairoContext);
+		
+		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
+		cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], g_fDialogColor[3]);
+		cairo_paint (pCairoContext);
+		
+		cairo_destroy (pCairoContext);
+		cairo_dock_dialog_unreference (pDialog);
+		return FALSE;
+	}
+	
 	cairo_set_source_rgba (pCairoContext, 0., 0., 0., 0.);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 	cairo_paint (pCairoContext);
@@ -235,7 +254,6 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 		cairo_dock_dialog_unreference (pDialog);
 		return FALSE;
 	}
-
 
 	cairo_save (pCairoContext);
 	double fOffsetX = fRadius + fLineWidth / 2;
@@ -316,7 +334,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 
 	///cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 	fOffsetX = pDialog->iMargin;
-	fOffsetY = (pDialog->bDirectionUp ? pDialog->iMargin : pDialog->iHeight - pDialog->iMargin - pDialog->iBubbleHeight);
+	fOffsetY = (pDialog->bDirectionUp ? pDialog->iMargin : pDialog->iHeight - 2*pDialog->iMargin - pDialog->iBubbleHeight);
 	cairo_move_to (pCairoContext, fOffsetX, fOffsetY);
 	if (pDialog->pTextBuffer != NULL)
 	{
@@ -380,7 +398,10 @@ static gboolean on_configure_dialog (GtkWidget* pWidget,
 		if (pDialog->pIcon != NULL)
 		{
 			CairoContainer *pContainer = cairo_dock_search_container_from_icon (pDialog->pIcon);
+			gboolean bInside = pDialog->bInside;
+			pDialog->bInside = FALSE;
 			cairo_dock_place_dialog (pDialog, pContainer);
+			pDialog->bInside = bInside;
 		}
 	}
 	gtk_widget_queue_draw (pDialog->pWidget);  // les widgets internes peuvent avoir changer de taille sans que le dialogue n'en ait change, il faut donc redessiner tout le temps.

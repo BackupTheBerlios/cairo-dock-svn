@@ -131,7 +131,7 @@ void cairo_dock_set_colormap (CairoContainer *pContainer)
 
 		if (! pContainer->pDrawFormat)
 		{
-			cd_message ("Attention : no double buffered GLX visual\n");
+			cd_warning ("Attention : no double buffered GLX visual");
 		}
 		else
 		{
@@ -1194,8 +1194,7 @@ void cairo_dock_render_background (CairoDock *pDock)
 void cairo_dock_render_blank (CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
-	cairo_t *pCairoContext = gdk_cairo_create (pDock->pWidget->window);  // il semble que cette fonction fasse planter Glitz au demarrage :-(
-	///cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
@@ -1204,8 +1203,8 @@ void cairo_dock_render_blank (CairoDock *pDock)
 
 	cairo_destroy (pCairoContext);
 #ifdef HAVE_GLITZ
-	///if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
-	///	glitz_drawable_swap_buffers (pDock->pGlitzDrawable);
+	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
+		glitz_drawable_swap_buffers (pDock->pGlitzDrawable);
 #endif
 }
 
