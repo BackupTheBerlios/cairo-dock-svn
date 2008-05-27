@@ -160,15 +160,11 @@ int g_iLeaveSubDockDelay;
 int g_iShowSubDockDelay;
 gboolean bShowSubDockOnClick;  // TRUE <=> ne montrer les sous-docks qu'au clique, sinon au survol.
 
-int g_iLabelSize = 0;  // taille de la police des etiquettes.
-gchar *g_cLabelPolice = NULL;  // police de caracteres des etiquettes.
-int g_iLabelWeight;  // epaisseur des traits.
-int g_iLabelStyle;  // italique ou droit.
 gboolean g_bLabelForPointedIconOnly;  // n'afficher les etiquettes que pour l'icone pointee.
 double g_fLabelAlphaThreshold;  // seuil de visibilité de etiquettes.
 gboolean g_bTextAlwaysHorizontal;  // true <=> etiquettes horizontales meme pour les docks verticaux.
-double g_fLabelBackgroundColor[4];  // couleur des etiquettes, alpha=0 pour utiliser des contours epais.
-gboolean g_bUseBackgroundForLabel;
+CairoDockLabelDescription g_iconTextDescription;
+CairoDockLabelDescription g_quickInfoTextDescription;
 
 double g_fAlphaAtRest;
 
@@ -206,11 +202,7 @@ int g_iDialogButtonWidth = 48;
 int g_iDialogButtonHeight = 48;
 double g_fDialogColor[4];
 int g_iDialogIconSize;
-int g_iDialogMessageSize;  // taille de la police des messagez.
-gchar *g_cDialogMessagePolice = NULL;  // police de caracteres des etiquettes.
-int g_iDialogMessageWeight;  // epaisseur des traits.
-int g_iDialogMessageStyle;  // italique ou droit.
-double g_fDialogTextColor[4];
+CairoDockLabelDescription g_dialogTextDescription;
 
 double g_fDeskletColor[4];
 double g_fDeskletColorInside[4];
@@ -588,8 +580,9 @@ main (int argc, char** argv)
 	//const gchar *cSillyMessage = "C'est les soldes !\n Pour tout sous-dock acheté, un sous-dock offert !";
 	//const gchar *cSillyMessage = "J-2 avant la 1.5, la tension monte !";
 	//const gchar *cSillyMessage = "Cairo-Dock : sans danger si l'on se conforme au mode d'emploi.";
-	const gchar *cSillyMessage = "Nochka, ton home a disparu !";
-	const gchar *cNumSilllyMessage = "17";
+	//const gchar *cSillyMessage = "Nochka, ton home a disparu !";
+	const gchar *cSillyMessage = "La nouvelle sauce Cairo-Dock rehaussera le goût de tous vos plats !";
+	const gchar *cNumSilllyMessage = "18";
 	gboolean bWriteSillyMessage;
 	if (! g_file_test (cSillyMessageFilePath, G_FILE_TEST_EXISTS))
 	{

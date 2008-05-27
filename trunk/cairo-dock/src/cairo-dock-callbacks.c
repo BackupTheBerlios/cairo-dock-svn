@@ -72,9 +72,8 @@ extern gboolean g_bDecorationsFollowMouse;
 extern cairo_surface_t *g_pBackgroundSurfaceFull[2];
 
 extern gboolean g_bSameHorizontality;
-extern int g_iLabelSize;
-extern gchar *g_cLabelPolice;
 extern gboolean g_bTextAlwaysHorizontal;
+extern CairoDockLabelDescription g_iconTextDescription;
 
 extern int g_iDockRadius;
 extern int g_iDockLineWidth;
@@ -1024,7 +1023,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 							if (pOriginDock->iRefCount > 0 && ! g_bSameHorizontality)
 							{
 								cairo_t* pSourceContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
-								cairo_dock_fill_one_text_buffer (s_pIconClicked, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : g_pMainDock->bHorizontalDock), g_pMainDock->bDirectionUp);
+								cairo_dock_fill_one_text_buffer (s_pIconClicked, pSourceContext, &g_iconTextDescription, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : g_pMainDock->bHorizontalDock), g_pMainDock->bDirectionUp);
 								cairo_destroy (pSourceContext);
 							}
 
@@ -1318,7 +1317,7 @@ gboolean on_configure (GtkWidget* pWidget,
 		
 		pDock->calculate_icons (pDock);
 		gtk_widget_queue_draw (pWidget);  // il semble qu'il soit necessaire d'en rajouter un la pour eviter un "clignotement" a l'entree dans le dock.
-		if (pDock->iRefCount > 0 || pDock->bAutoHide)
+		//if (pDock->iRefCount > 0 || pDock->bAutoHide)
 			while (gtk_events_pending ())  // on force un redessin immediat sinon on a quand meme un "flash".
 				gtk_main_iteration ();
 #ifdef HAVE_GLITZ

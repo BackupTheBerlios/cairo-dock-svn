@@ -21,9 +21,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-applet-factory.h"
 
 extern double g_fAmplitude;
-extern int g_iLabelSize;
-extern gchar *g_cLabelPolice;
-extern gboolean g_bTextAlwaysHorizontal;
 
 extern int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconAuthorizedHeight[CAIRO_DOCK_NB_TYPES];
@@ -55,9 +52,10 @@ cairo_surface_t *cairo_dock_create_applet_surface (gchar *cIconFileName, cairo_t
 			fMaxScale,
 			*fWidth,
 			*fHeight,
+			CAIRO_DOCK_FILL_SPACE,
 			fWidth,
 			fHeight,
-			CAIRO_DOCK_FILL_SPACE);
+			NULL, NULL);
 		g_free (cIconPath);
 	}
 	return pNewSurface;
@@ -84,8 +82,6 @@ Icon *cairo_dock_create_icon_for_applet (CairoContainer *pContainer, int iWidth,
 	if (CAIRO_DOCK_IS_DOCK (pContainer))
 	{
 		CairoDock *pDock = CAIRO_DOCK (pContainer);
-		///cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE, pDock->bDirectionUp);
-		///cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
 		cairo_dock_fill_icon_buffers_for_dock (icon, pSourceContext, pDock);
 	}
 	else

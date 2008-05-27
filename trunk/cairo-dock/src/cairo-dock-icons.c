@@ -47,7 +47,6 @@ extern int g_iLeaveSubDockDelay;
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
 extern gint g_iFrameMargin;
-extern int g_iLabelSize;
 extern int g_iIconGap;
 extern double g_fSubDockSizeRatio;
 extern int g_iMaxAuthorizedWidth;

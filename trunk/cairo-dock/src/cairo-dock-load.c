@@ -47,13 +47,9 @@ extern double g_fAlbedo;
 extern cairo_surface_t *g_pVisibleZoneSurface;
 extern gboolean g_bReverseVisibleImage;
 
-extern int g_iLabelWeight;
-extern int g_iLabelStyle;
-extern int g_iLabelSize;
-extern gchar *g_cLabelPolice;
+extern CairoDockLabelDescription g_iconTextDescription;
+extern CairoDockLabelDescription g_quickInfoTextDescription;
 extern gboolean g_bTextAlwaysHorizontal;
-extern double g_fLabelBackgroundColor[4];
-extern gboolean g_bUseBackgroundForLabel;
 
 extern gchar *g_cCurrentThemePath;
 
@@ -80,9 +76,26 @@ extern gboolean g_bOverWriteXIcons;
 
 extern cairo_surface_t *g_pDropIndicatorSurface;
 extern double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
+extern cairo_surface_t *g_pIndicatorSurface[2];
+extern gboolean g_bLinkIndicatorWithIcon;
+extern double g_fIndicatorWidth, g_fIndicatorHeight;
 
-extern gboolean g_bUseGlitz;
 
+void cairo_dock_free_label_description (CairoDockLabelDescription *pTextDescription)
+{
+	if (pTextDescription == NULL)
+		return ;
+	g_free (pTextDescription->cFont);
+	g_free (pTextDescription);
+}
+
+CairoDockLabelDescription *cairo_dock_duplicate_label_description (CairoDockLabelDescription *pOrigTextDescription)
+{
+	g_return_val_if_fail (pOrigTextDescription != NULL, NULL);
+	CairoDockLabelDescription *pTextDescription = g_memdup (pOrigTextDescription, sizeof (CairoDockLabelDescription));
+	pTextDescription->cFont = g_strdup (pOrigTextDescription->cFont);
+	return pTextDescription;
+}
 
 gchar *cairo_dock_generate_file_path (gchar *cImageFile)
 {
@@ -118,9 +131,10 @@ cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFi
 			1.,
 			bReapeatAsPattern ? 0 : iDesiredWidth,  // pas de contrainte sur
 			bReapeatAsPattern ? 0 : iDesiredHeight,  // la taille du motif initialement.
+			CAIRO_DOCK_FILL_SPACE,
 			fImageWidth,
 			fImageHeight,
-			CAIRO_DOCK_FILL_SPACE);
+			NULL, NULL);
 		
 		if (bReapeatAsPattern)
 		{
@@ -233,9 +247,10 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 				fMaxScale,
 				(bApplySizeRestriction ? g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] : icon->fWidth),
 				(bApplySizeRestriction ? g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] : icon->fHeight),
+				CAIRO_DOCK_FILL_SPACE,
 				(bHorizontalDock ? &icon->fWidth : &icon->fHeight),
 				(bHorizontalDock ? &icon->fHeight : &icon->fWidth),
-				CAIRO_DOCK_FILL_SPACE);
+				NULL, NULL);
 		}
 		
 		g_free (cIconPath);
@@ -266,9 +281,10 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 			fMaxScale,
 			(bApplySizeRestriction ? g_tIconAuthorizedWidth[iType] : icon->fWidth),
 			(bApplySizeRestriction ? g_tIconAuthorizedHeight[iType] : icon->fHeight),
+			CAIRO_DOCK_FILL_SPACE,
 			(bHorizontalDock ? &icon->fWidth : &icon->fHeight),
 			(bHorizontalDock ? &icon->fHeight : &icon->fWidth),
-			CAIRO_DOCK_FILL_SPACE);
+			NULL, NULL);
 		g_free (cIconPath);
 	}
 	cd_debug ("%s () -> %.2fx%.2f", __func__, icon->fWidth, icon->fHeight);
@@ -294,12 +310,12 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	}
 }
 
-void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, gboolean bHorizontalDock, gboolean bDirectionUp)
+void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, CairoDockLabelDescription *pTextDescription, gboolean bHorizontalDock, gboolean bDirectionUp)
 {
 	//g_print ("%s (%s, %d)\n", __func__, cLabelPolice, iLabelSize);
 	cairo_surface_destroy (icon->pTextBuffer);
 	icon->pTextBuffer = NULL;
-	if (icon->acName == NULL || (iLabelSize == 0))
+	if (icon->acName == NULL || (pTextDescription->iSize == 0))
 		return ;
 
 	gchar *cTruncatedName = NULL;
@@ -352,7 +368,11 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 		//g_print (" -> etiquette : %s\n", cTruncatedName);
 	}
 
-	cairo_surface_t* pNewSurface = cairo_dock_create_surface_from_text ((cTruncatedName != NULL ? cTruncatedName : icon->acName), pSourceContext, iLabelSize, cLabelPolice, g_iLabelWeight, (g_bUseBackgroundForLabel ? g_fLabelBackgroundColor : NULL), 1., &icon->iTextWidth, &icon->iTextHeight, &icon->fTextXOffset, &icon->fTextYOffset);
+	cairo_surface_t* pNewSurface = cairo_dock_create_surface_from_text ((cTruncatedName != NULL ? cTruncatedName : icon->acName),
+		pSourceContext,
+		pTextDescription,
+		1.,
+		&icon->iTextWidth, &icon->iTextHeight, &icon->fTextXOffset, &icon->fTextYOffset);
 	g_free (cTruncatedName);
 	//g_print (" -> %s : (%.2f;%.2f) %dx%d\n", icon->acName, icon->fTextXOffset, icon->fTextYOffset, icon->iTextWidth, icon->iTextHeight);
 
@@ -367,14 +387,18 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int i
 	icon->pTextBuffer = pNewSurface;
 }
 
-void cairo_dock_fill_one_quick_info_buffer (Icon *icon, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double fMaxScale)
+void cairo_dock_fill_one_quick_info_buffer (Icon *icon, cairo_t* pSourceContext, CairoDockLabelDescription *pTextDescription, double fMaxScale)
 {
 	cairo_surface_destroy (icon->pQuickInfoBuffer);
 	icon->pQuickInfoBuffer = NULL;
 	if (icon->cQuickInfo == NULL)
 		return ;
 
-	icon->pQuickInfoBuffer = cairo_dock_create_surface_from_text (icon->cQuickInfo, pSourceContext, iLabelSize, cLabelPolice, iLabelWeight, g_fLabelBackgroundColor, fMaxScale, &icon->iQuickInfoWidth, &icon->iQuickInfoHeight, &icon->fQuickInfoXOffset, &icon->fQuickInfoYOffset);
+	icon->pQuickInfoBuffer = cairo_dock_create_surface_from_text (icon->cQuickInfo,
+		pSourceContext,
+		pTextDescription,
+		fMaxScale,
+		&icon->iQuickInfoWidth, &icon->iQuickInfoHeight, &icon->fQuickInfoXOffset, &icon->fQuickInfoYOffset);
 }
 
 
@@ -383,9 +407,9 @@ void cairo_dock_fill_icon_buffers (Icon *icon, cairo_t *pSourceContext, double f
 {
 	cairo_dock_fill_one_icon_buffer (icon, pSourceContext, fMaxScale, bHorizontalDock, bApplySizeRestriction, bDirectionUp);
 
-	cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : bHorizontalDock), bDirectionUp);
+	cairo_dock_fill_one_text_buffer (icon, pSourceContext, &g_iconTextDescription, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : bHorizontalDock), bDirectionUp);
 
-	cairo_dock_fill_one_quick_info_buffer (icon, pSourceContext, 12, g_cLabelPolice, PANGO_WEIGHT_HEAVY, fMaxScale);
+	cairo_dock_fill_one_quick_info_buffer (icon, pSourceContext, &g_quickInfoTextDescription, fMaxScale);
 }
 
 void cairo_dock_load_one_icon_from_scratch (Icon *pIcon, CairoContainer *pContainer)
@@ -650,6 +674,46 @@ void cairo_dock_load_drop_indicator (gchar *cImagePath, cairo_t* pSourceContext,
 		1.,
 		g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] * fMaxScale,
 		g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] * fMaxScale / 2,
+		CAIRO_DOCK_KEEP_RATIO,
 		&g_fDropIndicatorWidth, &g_fDropIndicatorHeight,
-		CAIRO_DOCK_KEEP_RATIO);
+		NULL, NULL);
+}
+
+
+void cairo_dock_load_task_indicator (const gchar *cIndicatorImagePath, double fIndicatorRatio, CairoContainer *pSomeContainer)
+{
+	cairo_surface_destroy (g_pIndicatorSurface[0]);
+	cairo_surface_destroy (g_pIndicatorSurface[1]);
+	g_pIndicatorSurface[0] = NULL;
+	g_pIndicatorSurface[1] = NULL;
+	if (cIndicatorImagePath != NULL)
+	{
+		double fLauncherWidth = (g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] != 0 ? g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] : 48);
+		double fLauncherHeight = (g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] != 0 ? g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] : 48);
+		
+		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pSomeContainer);
+		
+		double fMasxScale = (g_bLinkIndicatorWithIcon ? 1 + g_fAmplitude : 1);
+		g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL] = cairo_dock_create_surface_from_image (
+			cIndicatorImagePath,
+			pCairoContext,
+			fMasxScale,
+			fLauncherWidth * fIndicatorRatio,
+			fLauncherHeight * fIndicatorRatio,
+			CAIRO_DOCK_KEEP_RATIO,
+			&g_fIndicatorWidth,
+			&g_fIndicatorHeight,
+			NULL, NULL);
+		//g_print ("g_pIndicatorSurface : %.2fx%.2f\n", g_fIndicatorWidth, g_fIndicatorHeight);
+		if (g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL] != NULL)
+			g_pIndicatorSurface[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (
+				g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL],
+				pCairoContext, 
+				g_fIndicatorWidth * fMasxScale,
+				g_fIndicatorHeight * fMasxScale,
+				- G_PI / 2);
+		else
+			cd_warning ("couldn't load image '%s' for indicators", cIndicatorImagePath);
+		cairo_destroy (pCairoContext);
+	}
 }

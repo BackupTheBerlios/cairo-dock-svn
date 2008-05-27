@@ -7,6 +7,9 @@
 #include "cairo-dock-struct.h"
 
 
+void cairo_dock_free_label_description (CairoDockLabelDescription *pTextDescription);
+CairoDockLabelDescription *cairo_dock_duplicate_label_description (CairoDockLabelDescription *pOrigTextDescription);
+
 gchar *cairo_dock_generate_file_path (gchar *cImageFile);
 
 cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFile, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern);
@@ -16,9 +19,9 @@ cairo_surface_t *cairo_dock_load_image_for_icon (cairo_t *pSourceContext, gchar 
 void cairo_dock_load_reflect_on_icon (Icon *icon, cairo_t *pSourceContext, gdouble fMaxScale, gboolean bHorizontalDock, gboolean bDirectionUp);
 void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdouble fMaxScale, gboolean bHorizontalDock, gboolean bApplySizeRestriction, gboolean bDirectionUp);
 
-void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, gboolean bHorizontalDock, gboolean bDirectionUp);
+void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, CairoDockLabelDescription *pTextDescription, gboolean bHorizontalDock, gboolean bDirectionUp);
 
-void cairo_dock_fill_one_quick_info_buffer (Icon *icon, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double fMaxScale);
+void cairo_dock_fill_one_quick_info_buffer (Icon *icon, cairo_t* pSourceContext, CairoDockLabelDescription *pTextDescription, double fMaxScale);
 
 
 void cairo_dock_fill_icon_buffers (Icon *icon, cairo_t *pSourceContext, double fMaxScale, gboolean bHorizontalDock, gboolean bApplySizeRestriction, gboolean bDirectionUp);
@@ -40,5 +43,7 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 void cairo_dock_load_background_decorations (CairoDock *pDock);
 
 void cairo_dock_load_drop_indicator (gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale);
+
+void cairo_dock_load_task_indicator (const gchar *cIndicatorImagePath, double fIndicatorRatio, CairoContainer *pSomeContainer);
 
 #endif

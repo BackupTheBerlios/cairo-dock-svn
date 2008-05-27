@@ -69,15 +69,9 @@ extern int g_iLeaveSubDockDelay;
 extern int g_iShowSubDockDelay;
 extern gboolean bShowSubDockOnClick;
 
-extern int g_iLabelSize;
-extern gchar *g_cLabelPolice;
-extern int g_iLabelWeight;
-extern int g_iLabelStyle;
 extern gboolean g_bLabelForPointedIconOnly;
 extern double g_fLabelAlphaThreshold;
 extern gboolean g_bTextAlwaysHorizontal;
-extern double g_fLabelBackgroundColor[4];
-extern gboolean g_bUseBackgroundForLabel;
 
 extern gpointer *g_pDefaultIconDirectory;
 static gboolean s_bUserTheme = FALSE;
@@ -146,6 +140,10 @@ extern gboolean g_bUseSeparator;
 extern gchar *g_cSeparatorImage;
 extern gboolean g_bRevolveSeparator;
 extern gboolean g_bConstantSeparatorSize;
+
+extern CairoDockLabelDescription g_iconTextDescription;
+extern CairoDockLabelDescription g_quickInfoTextDescription;
+extern CairoDockLabelDescription g_dialogTextDescription;
 
 extern int g_iDialogButtonWidth;
 extern int g_iDialogButtonHeight;
@@ -605,36 +603,51 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 
 	g_bTextAlwaysHorizontal = cairo_dock_get_boolean_key_value (pKeyFile, "System", "always horizontal", &bFlushConfFileNeeded, FALSE, "Labels", NULL);
 
+	g_free (g_iconTextDescription.cFont);
+	g_iconTextDescription.cFont = cairo_dock_get_string_key_value (pKeyFile, "Icons", "police", &bFlushConfFileNeeded, "sans", "Labels", NULL);
 
-	g_free (g_cLabelPolice);
-	g_cLabelPolice = cairo_dock_get_string_key_value (pKeyFile, "Icons", "police", &bFlushConfFileNeeded, "sans", "Labels", NULL);
-
-	g_iLabelSize = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "size", &bFlushConfFileNeeded, 14, "Labels", NULL);
-
-	g_iLabelWeight = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "weight", &bFlushConfFileNeeded, 5, "Labels", NULL);
-	g_iLabelWeight = ((PANGO_WEIGHT_HEAVY - PANGO_WEIGHT_ULTRALIGHT) * g_iLabelWeight + 9 * PANGO_WEIGHT_ULTRALIGHT - PANGO_WEIGHT_HEAVY) / 8;  // on se ramene aux intervalles definit par Pango.
-
+	g_iconTextDescription.iSize = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "size", &bFlushConfFileNeeded, 14, "Labels", NULL);
+	
+	int iLabelWeight = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "weight", &bFlushConfFileNeeded, 5, "Labels", NULL);
+	g_iconTextDescription.iWeight = ((PANGO_WEIGHT_HEAVY - PANGO_WEIGHT_ULTRALIGHT) * iLabelWeight + 9 * PANGO_WEIGHT_ULTRALIGHT - PANGO_WEIGHT_HEAVY) / 8;  // on se ramene aux intervalles definit par Pango.
+	
 	gboolean bLabelStyleItalic = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "italic", &bFlushConfFileNeeded, FALSE, "Labels", NULL);
 	if (bLabelStyleItalic)
-		g_iLabelStyle = PANGO_STYLE_ITALIC;
+		g_iconTextDescription.iStyle  = PANGO_STYLE_ITALIC;
 	else
-		g_iLabelStyle = PANGO_STYLE_NORMAL;
+		g_iconTextDescription.iStyle  = PANGO_STYLE_NORMAL;
+	
 
+	if (g_iconTextDescription.cFont == NULL)
+		g_iconTextDescription.iSize = 0;
 
-	if (g_cLabelPolice == NULL)
-		g_iLabelSize = 0;
-
-	if (g_iLabelSize == 0)
+	if (g_iconTextDescription.iSize == 0)
 	{
-		g_free (g_cLabelPolice);
-		g_cLabelPolice = NULL;
+		g_free (g_iconTextDescription.cFont);
+		g_iconTextDescription.cFont = NULL;
 	}
+	
+	double couleur_label[3] = {1., 1., 1.};
+	cairo_dock_get_double_list_key_value (pKeyFile, "Icons", "text color start", &bFlushConfFileNeeded, g_iconTextDescription.fColorStart, 3, couleur_label, NULL, NULL);
+	
+	cairo_dock_get_double_list_key_value (pKeyFile, "Icons", "text color stop", &bFlushConfFileNeeded, g_iconTextDescription.fColorStop, 3, couleur_label, NULL, NULL);
+	
+	g_iconTextDescription.bVerticalPattern = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "vertical label pattern", &bFlushConfFileNeeded, TRUE, NULL, NULL);
 
-	double couleur_label[4] = {0., 0., 0., 0.5};
-	cairo_dock_get_double_list_key_value (pKeyFile, "Icons", "text background color", &bFlushConfFileNeeded, g_fLabelBackgroundColor, 4, couleur_label, NULL, NULL);
-
-	g_bUseBackgroundForLabel = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "background for label", &bFlushConfFileNeeded, FALSE, NULL, NULL);
-
+	double couleur_backlabel[4] = {0., 0., 0., 0.5};
+	cairo_dock_get_double_list_key_value (pKeyFile, "Icons", "text background color", &bFlushConfFileNeeded, g_iconTextDescription.fBackgroundColor, 4, couleur_backlabel, NULL, NULL);
+	
+	g_free (g_quickInfoTextDescription.cFont);
+	memcpy (&g_quickInfoTextDescription, &g_iconTextDescription, sizeof (CairoDockLabelDescription));
+	g_quickInfoTextDescription.cFont = g_strdup (g_iconTextDescription.cFont);
+	g_quickInfoTextDescription.iSize = 12;
+	g_quickInfoTextDescription.iWeight = PANGO_WEIGHT_HEAVY;
+	g_quickInfoTextDescription.iStyle = PANGO_STYLE_NORMAL;
+	
+	gboolean bUseBackgroundForLabel = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "background for label", &bFlushConfFileNeeded, FALSE, NULL, NULL);
+	if (! bUseBackgroundForLabel)
+		g_iconTextDescription.fBackgroundColor[3] = 0;  // ne sera pas pris en compte.
+	
 
 	//\___________________ On recupere les parametres du dock en lui-meme.
 	gchar **cIconsTypesList = cairo_dock_get_string_list_key_value (pKeyFile, "Icons", "icon's type order", &bFlushConfFileNeeded, &length, NULL, "Cairo Dock", NULL);
@@ -988,28 +1001,29 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 
 	g_iDialogIconSize = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "icon size", &bFlushConfFileNeeded, 48, NULL, NULL);
 
-	g_free (g_cDialogMessagePolice);
+	g_free (g_dialogTextDescription.cFont);
 	if (cairo_dock_get_boolean_key_value (pKeyFile, "Dialogs", "homogeneous text", &bFlushConfFileNeeded, TRUE, NULL, NULL))
 	{
-		g_iDialogMessageSize = g_iLabelSize;
-		g_cDialogMessagePolice = g_strdup (g_cLabelPolice);
-		g_iDialogMessageWeight = g_iLabelWeight;
-		g_iDialogMessageStyle = g_iLabelStyle;
+		g_dialogTextDescription.iSize = g_iconTextDescription.iSize;
+		g_dialogTextDescription.cFont = g_strdup (g_iconTextDescription.cFont);
+		g_dialogTextDescription.iWeight = g_iconTextDescription.iWeight;
+		g_dialogTextDescription.iStyle = g_iconTextDescription.iStyle;
 	}
 	else
 	{
-		g_cDialogMessagePolice = cairo_dock_get_string_key_value (pKeyFile, "Dialogs", "message police", &bFlushConfFileNeeded, "sans", NULL, NULL);
-		g_iDialogMessageSize = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "message size", &bFlushConfFileNeeded, 14, NULL, NULL);
-		g_iDialogMessageWeight = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "message weight", &bFlushConfFileNeeded, 5, NULL, NULL);
-		g_iDialogMessageWeight = ((PANGO_WEIGHT_HEAVY - PANGO_WEIGHT_ULTRALIGHT) * g_iLabelWeight + 9 * PANGO_WEIGHT_ULTRALIGHT - PANGO_WEIGHT_HEAVY) / 8;  // on se ramene aux intervalles definit par Pango.
+		g_dialogTextDescription.cFont = cairo_dock_get_string_key_value (pKeyFile, "Dialogs", "message police", &bFlushConfFileNeeded, "sans", NULL, NULL);
+		g_dialogTextDescription.iSize = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "message size", &bFlushConfFileNeeded, 14, NULL, NULL);
+		int iLabelWeight = cairo_dock_get_integer_key_value (pKeyFile, "Dialogs", "message weight", &bFlushConfFileNeeded, 5, NULL, NULL);
+		g_dialogTextDescription.iWeight = ((PANGO_WEIGHT_HEAVY - PANGO_WEIGHT_ULTRALIGHT) * iLabelWeight + 9 * PANGO_WEIGHT_ULTRALIGHT - PANGO_WEIGHT_HEAVY) / 8;  // on se ramene aux intervalles definit par Pango.
 		if (cairo_dock_get_boolean_key_value (pKeyFile, "Dialogs", "message italic", &bFlushConfFileNeeded, FALSE, NULL, NULL))
-			g_iDialogMessageStyle = PANGO_STYLE_ITALIC;
+			g_dialogTextDescription.iStyle = PANGO_STYLE_ITALIC;
 		else
-			g_iDialogMessageStyle = PANGO_STYLE_NORMAL;
+			g_dialogTextDescription.iStyle = PANGO_STYLE_NORMAL;
 	}
 	
 	double couleur_dtext[4] = {0., 0., 0., 1.};
-	cairo_dock_get_double_list_key_value (pKeyFile, "Dialogs", "text color", &bFlushConfFileNeeded, g_fDialogTextColor, 4, couleur_dtext, NULL, NULL);
+	cairo_dock_get_double_list_key_value (pKeyFile, "Dialogs", "text color", &bFlushConfFileNeeded, g_dialogTextDescription.fColorStart, 3, couleur_dtext, NULL, NULL);
+	memcpy (&g_dialogTextDescription.fColorStop, &g_dialogTextDescription.fColorStart, 3*sizeof (double));
 	
 	double couleur_desklett[4] = {1.0, 1.0, 1.0, 0.2};
 	cairo_dock_get_double_list_key_value (pKeyFile, "Desklets", "background color", &bFlushConfFileNeeded, g_fDeskletColor, 4, couleur_desklett, NULL, NULL);
@@ -1066,39 +1080,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_free (cButtonOkImage);
 	g_free (cButtonCancelImage);
 	
-	cairo_surface_destroy (g_pIndicatorSurface[0]);
-	cairo_surface_destroy (g_pIndicatorSurface[1]);
-	g_pIndicatorSurface[0] = NULL;
-	g_pIndicatorSurface[1] = NULL;
-	if (g_bShowAppli)
-	{
-		double fLauncherWidth = (g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] != 0 ? g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] : 48);
-		double fLauncherHeight = (g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] != 0 ? g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER] : 48);
-		
-		cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
-		
-		double fMasxScale = (g_bLinkIndicatorWithIcon ? (1 + g_fAmplitude) : 1 + 0);
-		g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL] = cairo_dock_create_surface_from_image (
-			cIndicatorImagePath,
-			pCairoContext,
-			fMasxScale,
-			fLauncherWidth * fIndicatorRatio,
-			fLauncherHeight * fIndicatorRatio,
-			&g_fIndicatorWidth,
-			&g_fIndicatorHeight,
-			TRUE);
-		//g_print ("g_pIndicatorSurface : %.2fx%.2f\n", g_fIndicatorWidth, g_fIndicatorHeight);
-		if (g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL] != NULL)
-			g_pIndicatorSurface[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (
-				g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL],
-				pCairoContext, 
-				g_fIndicatorWidth * fMasxScale,
-				g_fIndicatorHeight * fMasxScale,
-				- G_PI / 2);
-		else
-			cd_warning ("couldn't load image '%s' for indicators", cIndicatorImagePath);
-		cairo_destroy (pCairoContext);
-	}
+	cairo_dock_load_task_indicator (g_bShowAppli && g_bMixLauncherAppli ? cIndicatorImagePath : NULL, fIndicatorRatio, CAIRO_CONTAINER (pDock));
 	g_free (cIndicatorImagePath);
 	
 	cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));

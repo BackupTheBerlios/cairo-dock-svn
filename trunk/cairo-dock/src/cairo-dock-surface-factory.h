@@ -62,9 +62,11 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 *@param iLoadingModifier composition de modificateurs de chargement.
 *@param fImageWidth sera renseigné avec la largeur de l'icone (hors zoom).
 *@param fImageHeight sera renseigné avec la hauteur de l'icone (hors zoom).
+*@param fZoomX si non NULL, sera renseigné avec le zoom horizontal qui a ete appliqué à l'image originale.
+*@param fZoomY si non NULL, sera renseigné avec le zoom vertical qui a ete appliqué à l'image originale.
 *@returns la surface nouvellement créée.
 */
-cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo_t *pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, CairoDockLoadImageModifier iLoadingModifier, double *fImageWidth, double *fImageHeight);
+cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo_t *pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, CairoDockLoadImageModifier iLoadingModifier, double *fImageWidth, double *fImageHeight, double *fZoomX, double *fZoomY);
 
 /**
 * Cree une surface à partir d'une image au format quelconque.
@@ -73,12 +75,14 @@ cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo
 *@param fMaxScale le zoom maximal de l'icone.
 *@param iWidthConstraint contrainte sur la largeur, ou 0 pour ne pas la contraindre.
 *@param iHeightConstraint contrainte sur la hauteur, ou 0 pour ne pas la contraindre.
+*@param iLoadingModifier composition de modificateurs de chargement.
 *@param fImageWidth sera renseigné avec la largeur de l'icone (hors zoom).
 *@param fImageHeight sera renseigné avec la hauteur de l'icone (hors zoom).
-*@param iLoadingModifier composition de modificateurs de chargement.
+*@param fZoomX si non NULL, sera renseigné avec le zoom horizontal qui a ete appliqué à l'image originale.
+*@param fZoomY si non NULL, sera renseigné avec le zoom vertical qui a ete appliqué à l'image originale.
 *@returns la surface nouvellement créée.
 */
-cairo_surface_t *cairo_dock_create_surface_from_image (const gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, double *fImageWidth, double *fImageHeight, CairoDockLoadImageModifier iLoadingModifier);
+cairo_surface_t *cairo_dock_create_surface_from_image (const gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, CairoDockLoadImageModifier iLoadingModifier, double *fImageWidth, double *fImageHeight, double *fZoomX, double *fZoomY);
 /**
 * Cree une surface à partir d'une image au format quelconque, a la taille donnée, sans zoom.
 *@param cImagePath le chemin complet de l'image.
@@ -140,10 +144,7 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection (cairo_surface_
 * Cree une surface contenant un texte, avec une couleur de fond optionnel.
 *@param cText le texte.
 *@param pSourceContext un contexte (non modifié par la fonction).
-*@param iLabelSize la hauteur désirée du texte (à peu près la taille de sa police).
-*@param cLabelPolice la police de caracteres à utiliser.
-*@param iLabelWeight le poids de la police (épaisseur des traits).
-*@param fBackgroundColor un tableau de 4 couleurs (r, v, b, a), optionnel.
+*@param pLabelDescription la description du texte.
 *@param fMaxScale facteur de zoom max qui sera appliqué au texte.
 *@param iTextWidth sera renseigne avec la largeur de la surface obtenue.
 *@param iTextHeight sera renseigne avec la hauteur de la surface obtenue.
@@ -151,7 +152,7 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection (cairo_surface_
 *@param fTextYOffset sera renseigne avec le décalage vertical à appliquer pour placer le texte verticalament.
 *@returns la surface nouvellement créée.
 */
-cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t *pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double *fBackgroundColor, double fMaxScale, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset);
+cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t *pSourceContext, CairoDockLabelDescription *pLabelDescription, double fMaxScale, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset);
 
 /**
 * Cree une surface à l'identique d'une autre, en la redimensionnant eventuellement.

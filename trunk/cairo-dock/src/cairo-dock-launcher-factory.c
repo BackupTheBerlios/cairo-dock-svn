@@ -37,10 +37,6 @@ extern double g_fSubDockSizeRatio;
 extern double g_fAmplitude;
 extern int g_iIconGap;
 
-extern int g_iLabelSize;
-extern gboolean g_bTextAlwaysHorizontal;
-extern gchar *g_cLabelPolice;
-
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentLaunchersPath;
 extern gpointer *g_pDefaultIconDirectory;

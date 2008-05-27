@@ -379,9 +379,21 @@ italic = false
 #i+[1;9] Weight (between 1 and 9, the bigger, the heavier):
 weight = 5
 
+#c+3[0;1] Start color :
+#{It's the first color of the gradation.}
+text color start = 1;1;1
+
+#c+3[0;1] Stop color :
+#{It's the second color of the gradation. Set it to the same value as the first if you just don't want to have a gradation.}
+text color stop = 1;1;1
+
+#b Pattenr should be vertical ?
+#{If checked, the pattern will go from top to bottom, otherwise from left to right.}
+vertical label pattern = false
+
 #c+4[0;1] Color of the label's background :
 #{If you set it to fully transparent, there will be no background for the text, but the letters' outline will be thicker.}
-text background color =0;0;0;0
+text background color =0;0;0;.5
 
 #b+ Use background color for labels ?
 #{If false, only the quick-info will have this background color.}
@@ -565,8 +577,8 @@ icon size = 48
 #F+[Text;gtk-select-font]
 frame_text =
 
-#c+4[0;1] Text color (r,v,b,a) :
-text color = 0.0; 0.0; 0.0; 1.0
+#c+3[0;1] Text color (r,v,b) :
+text color = 0.0; 0.0; 0.0
 
 #b+ Homogeneous with icons' label ?
 #{The messages will have the same style as the icons' labels. The beneath parameters are then unused.}

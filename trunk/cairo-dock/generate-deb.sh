@@ -69,7 +69,7 @@ fi
 if test "$BUILD_TAR" = "1"; then
 	cd /tmp
 	echo "* building tarball ..."
-	tar cf `date +"cairo-dock-sources-%Y%m%d.tar"` $CAIRO_DOCK_DIR/cairo-dock $CAIRO_DOCK_DIR/plug-ins $CAIRO_DOCK_DIR/themes > /dev/null
+	tar cf `date +"cairo-dock-sources-%Y%m%d.tar"` $CAIRO_DOCK_DIR/cairo-dock $CAIRO_DOCK_DIR/plug-ins $CAIRO_DOCK_DIR/themes $CAIRO_DOCK_DIR/deb $CAIRO_DOCK_DIR/deb-plug-ins > /dev/null
 	if test ! "$?" = "0"; then
 		echo "  Attention : an error has occured !"
 		echo "Error while building tarball" >> $CAIRO_DOCK_DIR/compile.log

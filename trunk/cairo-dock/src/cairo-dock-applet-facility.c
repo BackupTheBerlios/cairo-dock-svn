@@ -28,8 +28,8 @@ extern gchar *g_cCurrentThemePath;
 
 extern double g_fAmplitude;
 extern double g_fAlbedo;
-extern int g_iLabelSize;
-extern gchar *g_cLabelPolice;
+
+extern CairoDockLabelDescription g_quickInfoTextDescription;
 extern gboolean g_bTextAlwaysHorizontal;
 
 gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShareDataDir, gchar *cConfFileName)
@@ -218,7 +218,7 @@ void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIcon
 	cairo_surface_t *pCairoSurface=NULL;
 	double fImgX, fImgY, fImgW, fImgH, emblemW = pIcon->fWidth / 3, emblemH = pIcon->fHeight / 3;
 	double fMaxScale = (CAIRO_DOCK_IS_DOCK (pContainer) ? (1 + g_fAmplitude) / 1 : 1);
-	pCairoSurface = cairo_dock_create_surface_from_image (cIconFile, pIconContext, fMaxScale, emblemW, emblemH, &fImgW, &fImgH, CAIRO_DOCK_KEEP_RATIO);
+	pCairoSurface = cairo_dock_create_surface_from_image (cIconFile, pIconContext, fMaxScale, emblemW, emblemH, CAIRO_DOCK_KEEP_RATIO, &fImgW, &fImgH, NULL, NULL);
 
 	switch (pEmblemType) {
 		default:
@@ -284,8 +284,7 @@ void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, 
 	cairo_dock_fill_one_text_buffer(
 		pIcon,
 		pSourceContext,
-		g_iLabelSize,
-		g_cLabelPolice,
+		&g_quickInfoTextDescription,
 		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pContainer->bIsHorizontal),
 		pContainer->bDirectionUp);
 }
@@ -308,9 +307,7 @@ void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo
 	
 	cairo_dock_fill_one_quick_info_buffer (pIcon,
 		pSourceContext,
-		12,
-		g_cLabelPolice,
-		PANGO_WEIGHT_HEAVY,
+		&g_quickInfoTextDescription,
 		fMaxScale);
 	cd_debug (" cQuickInfo <- '%s' (%dx%d)", pIcon->cQuickInfo, pIcon->iQuickInfoWidth, pIcon->iQuickInfoHeight);
 }
@@ -531,6 +528,10 @@ void cairo_dock_stop_measure_timer (CairoDockMeasure *pMeasureTimer)
 		g_source_remove (pMeasureTimer->iSidTimer);
 		pMeasureTimer->iSidTimer= 0;
 	}
+	
+	cd_message ("on attend que le thread termine...");
+	while (g_atomic_int_get (&pMeasureTimer->iThreadIsRunning));
+	cd_message ("temine.");
 }
 
 void cairo_dock_free_measure_timer (CairoDockMeasure *pMeasureTimer)
@@ -539,11 +540,8 @@ void cairo_dock_free_measure_timer (CairoDockMeasure *pMeasureTimer)
 		return ;
 	cairo_dock_stop_measure_timer (pMeasureTimer);
 	
-	cd_message ("on attend que le thread termine...");
-	while (g_atomic_int_get (&pMeasureTimer->iThreadIsRunning));
-	cd_message ("temine.");
-	
-	g_mutex_free (pMeasureTimer->pMutexData);
+	if (pMeasureTimer->pMutexData != NULL)
+		g_mutex_free (pMeasureTimer->pMutexData);
 	g_free (pMeasureTimer);
 }
 

@@ -162,7 +162,7 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 }
 
 
-cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo_t *pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, CairoDockLoadImageModifier iLoadingModifier, double *fImageWidth, double *fImageHeight)
+cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo_t *pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, CairoDockLoadImageModifier iLoadingModifier, double *fImageWidth, double *fImageHeight, double *fZoomX, double *fZoomY)
 {
 	*fImageWidth = gdk_pixbuf_get_width (pixbuf);
 	*fImageHeight = gdk_pixbuf_get_height (pixbuf);
@@ -227,11 +227,17 @@ cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo
 	
 	if (pPixbufWithAlpha != pixbuf)
 		g_object_unref (pPixbufWithAlpha);
+	
+	if (fZoomX != NULL)
+		*fZoomX = fIconWidthSaturationFactor;
+	if (fZoomY != NULL)
+		*fZoomY = fIconHeightSaturationFactor;
+	
 	return pNewSurface;
 }
 
 
-cairo_surface_t *cairo_dock_create_surface_from_image (const gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, double *fImageWidth, double *fImageHeight, CairoDockLoadImageModifier iLoadingModifier)
+cairo_surface_t *cairo_dock_create_surface_from_image (const gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, CairoDockLoadImageModifier iLoadingModifier, double *fImageWidth, double *fImageHeight, double *fZoomX, double *fZoomY)
 {
 	//g_print ("%s (%s, %dx%dx%.2f, %d)\n", __func__, cImagePath, iWidthConstraint, iHeightConstraint, fMaxScale, iLoadingModifier);
 	g_return_val_if_fail (cImagePath != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
@@ -352,11 +358,18 @@ cairo_surface_t *cairo_dock_create_surface_from_image (const gchar *cImagePath, 
 			iHeightConstraint,
 			iLoadingModifier,
 			fImageWidth,
-			fImageHeight);
+			fImageHeight,
+			&fIconWidthSaturationFactor,
+			&fIconHeightSaturationFactor);
 		g_object_unref (pixbuf);
 		
 	}
 	cairo_destroy (pCairoContext);
+	
+	if (fZoomX != NULL)
+		*fZoomX = fIconWidthSaturationFactor;
+	if (fZoomY != NULL)
+		*fZoomY = fIconHeightSaturationFactor;
 	
 	return pNewSurface;
 }
@@ -369,9 +382,11 @@ cairo_surface_t *cairo_dock_create_surface_for_icon (const gchar *cImagePath, ca
 		1.,
 		fImageWidth,
 		fImageHeight,
+		CAIRO_DOCK_FILL_SPACE,
 		&fImageWidth_,
 		&fImageHeight_,
-		CAIRO_DOCK_FILL_SPACE);
+		NULL,
+		NULL);
 }
 
 
@@ -624,37 +639,37 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection (cairo_surface_
 }
 
 
-cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double *fBackgroundColor, double fMaxScale, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset)
+cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSourceContext, CairoDockLabelDescription *pLabelDescription, double fMaxScale, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset)
 {
-	g_return_val_if_fail (cText != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
+	g_return_val_if_fail (cText != NULL && pLabelDescription != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	
 	//\_________________ On ecrit le texte dans un calque Pango.
 	PangoLayout *pLayout = pango_cairo_create_layout (pSourceContext);
 	
 	PangoFontDescription *pDesc = pango_font_description_new ();
-	pango_font_description_set_absolute_size (pDesc, fMaxScale * iLabelSize * PANGO_SCALE);
-	pango_font_description_set_family_static (pDesc, cLabelPolice);
-	pango_font_description_set_weight (pDesc, iLabelWeight);
-	pango_font_description_set_style (pDesc, g_iLabelStyle);
+	pango_font_description_set_absolute_size (pDesc, fMaxScale * pLabelDescription->iSize * PANGO_SCALE);
+	pango_font_description_set_family_static (pDesc, pLabelDescription->cFont);
+	pango_font_description_set_weight (pDesc, pLabelDescription->iWeight);
+	pango_font_description_set_style (pDesc, pLabelDescription->iStyle);
 	pango_layout_set_font_description (pLayout, pDesc);
 	pango_font_description_free (pDesc);
 	
 	pango_layout_set_text (pLayout, cText, -1);
 	
-	//\_________________ On recupere la taille effective du calque.
+	//\_________________ On cree une surface aux dimensions du texte.
 	PangoRectangle ink, log;
 	pango_layout_get_pixel_extents (pLayout, &ink, &log);
 	
 	*iTextWidth = ink.width + 2;
 	*iTextHeight = ink.height + 2 + 1;  // +1 car certaines polices "debordent".
 	
-	//\_________________ On dessine le calque dans une surface cairo.
 	cairo_surface_t* pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 		CAIRO_CONTENT_COLOR_ALPHA,
 		*iTextWidth, *iTextHeight);
 	cairo_t* pCairoContext = cairo_create (pNewSurface);
 	
-	if (fBackgroundColor != NULL && fBackgroundColor[3] > 0)  // non transparent.
+	//\_________________ On dessine le fond.
+	if (pLabelDescription->fBackgroundColor != NULL && pLabelDescription->fBackgroundColor[3] > 0)  // non transparent.
 	{
 		cairo_save (pCairoContext);
 		double fRadius = fMaxScale * MIN (.5 * g_iDockRadius, 5.);  // bon compromis.
@@ -664,13 +679,15 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 		double fDockOffsetX = fRadius + fLineWidth/2;
 		double fDockOffsetY = 0.;
 		cairo_dock_draw_frame (pCairoContext, fRadius, fLineWidth, fFrameWidth, fFrameHeight, fDockOffsetX, fDockOffsetY, 1, 0., CAIRO_DOCK_HORIZONTAL);
-		cairo_set_source_rgba (pCairoContext, fBackgroundColor[0], fBackgroundColor[1], fBackgroundColor[2], fBackgroundColor[3]);
+		cairo_set_source_rgba (pCairoContext, pLabelDescription->fBackgroundColor[0], pLabelDescription->fBackgroundColor[1], pLabelDescription->fBackgroundColor[2], pLabelDescription->fBackgroundColor[3]);
 		cairo_fill_preserve (pCairoContext);
 		cairo_restore(pCairoContext);
 	}
 	
 	cairo_translate (pCairoContext, -ink.x, -ink.y+1);  // meme remarque.
 	
+	//\_________________ On dessine les contours.
+	cairo_save (pCairoContext);
 	cairo_push_group (pCairoContext);
 	cairo_set_source_rgb (pCairoContext, 0.2, 0.2, 0.2);
 	int i;
@@ -681,10 +698,43 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 	}
 	cairo_pop_group_to_source (pCairoContext);
 	cairo_paint_with_alpha (pCairoContext, .75);
+	cairo_restore(pCairoContext);
 	
-	cairo_set_source_rgb (pCairoContext, 1., 1., 1.);
+	//\_________________ On remplit l'interieur du texte.
+	cairo_pattern_t *pGradationPattern = NULL;
+	if (pLabelDescription->fColorStart != pLabelDescription->fColorStop)
+	{
+		if (pLabelDescription->bVerticalPattern)
+			pGradationPattern = cairo_pattern_create_linear (0.,
+				ink.y-1.,
+				0.,
+				*iTextHeight+ink.y-1);
+		else
+			pGradationPattern = cairo_pattern_create_linear (ink.x,
+				0.,
+				*iTextWidth + ink.x,
+				0.);
+		g_return_val_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS, NULL);
+		cairo_pattern_set_extend (pGradationPattern, CAIRO_EXTEND_NONE);
+		cairo_pattern_add_color_stop_rgba (pGradationPattern,
+			0.,
+			pLabelDescription->fColorStart[0],
+			pLabelDescription->fColorStart[1],
+			pLabelDescription->fColorStart[2],
+			1.);
+		cairo_pattern_add_color_stop_rgba (pGradationPattern,
+			1.,
+			pLabelDescription->fColorStop[0],
+			pLabelDescription->fColorStop[1],
+			pLabelDescription->fColorStop[2],
+			1.);
+		cairo_set_source (pCairoContext, pGradationPattern);
+	}
+	else
+		cairo_set_source_rgb (pCairoContext, pLabelDescription->fColorStart[0], pLabelDescription->fColorStart[1], pLabelDescription->fColorStart[2]);
 	cairo_move_to (pCairoContext, 1., 1.);
 	pango_cairo_show_layout (pCairoContext, pLayout);
+	cairo_pattern_destroy (pGradationPattern);
 	
 	cairo_destroy (pCairoContext);
 	
@@ -693,7 +743,7 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 					 log.width / 2. - ink.x,
 					 log.height     - ink.y);*/
 	*fTextXOffset = (log.width / 2. - ink.x) / fMaxScale;
-	*fTextYOffset = - (iLabelSize - (log.height - ink.y)) / fMaxScale ;  // en tenant compte de l'ecart du bas du texte.
+	*fTextYOffset = - (pLabelDescription->iSize - (log.height - ink.y)) / fMaxScale ;  // en tenant compte de l'ecart du bas du texte.
 	//*fTextYOffset = - (ink.y) / fMaxScale;  // pour tenir compte de l'ecart du bas du texte.
 	
 	*iTextWidth = *iTextWidth / fMaxScale;

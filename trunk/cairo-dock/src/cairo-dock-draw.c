@@ -53,7 +53,8 @@ extern cairo_surface_t *g_pVisibleZoneSurface;
 extern double g_fVisibleZoneAlpha;
 extern double g_fAmplitude;
 
-extern int g_iLabelSize;
+extern CairoDockLabelDescription g_iconTextDescription;
+extern CairoDockLabelDescription g_quickInfoTextDescription;
 extern gboolean g_bLabelForPointedIconOnly;
 extern double g_fLabelAlphaThreshold;
 
@@ -276,7 +277,7 @@ static void cairo_dock_draw_frame_vertical (cairo_t *pCairoContext, double fRadi
 		0, 0,
 		0, fRadius * (1. / cosa - fInclination),
 		sens * fRadius * (1 - sina), fRadius * cosa);
-	cairo_rel_line_to (pCairoContext, sens * (fFrameHeight + fLineWidth - fRadius * (g_bRoundedBottomCorner ? 2 : 1)), fDeltaXForLoop);
+	cairo_rel_line_to (pCairoContext, sens * (fFrameHeight + fLineWidth - fRadius * (g_bRoundedBottomCorner ? 2 : 1 - sina)), fDeltaXForLoop);
 	//\_________________ Coin bas droit.
 	if (g_bRoundedBottomCorner)
 		cairo_rel_curve_to (pCairoContext,
@@ -489,6 +490,8 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 static void _cairo_dock_draw_appli_indicator (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, gboolean bDirectionUp)
 {
 	cairo_save (pCairoContext);
+	if (icon->fOrientation != 0)
+		cairo_rotate (pCairoContext, icon->fOrientation);
 	if (g_bLinkIndicatorWithIcon)
 	{
 		if (bHorizontalDock)
@@ -519,20 +522,21 @@ static void _cairo_dock_draw_appli_indicator (Icon *icon, cairo_t *pCairoContext
 		if (bHorizontalDock)
 		{
 			cairo_translate (pCairoContext,
-				icon->fDrawXAtRest + (icon->fWidth * icon->fScale - g_fIndicatorWidth * fRatio) / 2,
-				icon->fDrawYAtRest + (bDirectionUp ? 
+				icon->fDrawXAtRest - icon->fDrawX + (icon->fWidth * icon->fScale - g_fIndicatorWidth * fRatio) / 2,
+				icon->fDrawYAtRest - icon->fDrawY + (bDirectionUp ? 
 					(icon->fHeight * icon->fScale - (g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * fRatio) :
 					(g_fIndicatorHeight * icon->fScale - g_iIndicatorDeltaY) * fRatio));
 		}
 		else
 		{
 			cairo_translate (pCairoContext,
-				icon->fDrawYAtRest + (bDirectionUp ? 
+				icon->fDrawYAtRest - icon->fDrawY + (bDirectionUp ? 
 					(icon->fHeight - (g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * fRatio) * icon->fScale : 
 					(g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * icon->fScale * fRatio),
-					icon->fDrawXAtRest + (icon->fWidth * icon->fScale - g_fIndicatorWidth * fRatio) / 2);
+				icon->fDrawXAtRest - icon->fDrawX + (icon->fWidth * icon->fScale - g_fIndicatorWidth * fRatio) / 2);
 		}
 	}
+	
 	cairo_set_source_surface (pCairoContext, g_pIndicatorSurface[bHorizontalDock], 0.0, 0.0);
 	cairo_paint (pCairoContext);
 	cairo_restore (pCairoContext);
@@ -819,11 +823,11 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			cairo_set_source_surface (pCairoContext,
 				icon->pTextBuffer,
 				fOffsetX,
-				bDirectionUp ? -g_iLabelSize : icon->fHeight * icon->fScale - icon->fTextYOffset);
+				bDirectionUp ? -g_iconTextDescription.iSize : icon->fHeight * icon->fScale - icon->fTextYOffset);
 		else
 			cairo_set_source_surface (pCairoContext,
 				icon->pTextBuffer,
-				bDirectionUp ? -g_iLabelSize : icon->fHeight * icon->fScale - icon->fTextYOffset,
+				bDirectionUp ? -g_iconTextDescription.iSize : icon->fHeight * icon->fScale - icon->fTextYOffset,
 				fOffsetX);
 		
 		double fMagnitude;
@@ -1025,7 +1029,7 @@ void cairo_dock_render_one_icon_in_desklet (Icon *icon, cairo_t *pCairoContext, 
 		cairo_set_source_surface (pCairoContext,
 			icon->pTextBuffer,
 			fOffsetX,
-			-g_iLabelSize);
+			-g_iconTextDescription.iSize);
 		cairo_paint (pCairoContext);
 	}
 	

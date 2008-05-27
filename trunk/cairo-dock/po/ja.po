@@ -867,7 +867,7 @@ msgid ""
 "Choose the screen border regarding to which the dock will place itself :"
 msgstr "ドックを配置する画面端の選択 :"
 
-#: ../data/messages:5 ../data/messages:699
+#: ../data/messages:5 ../data/messages:699 ../data/messages:531
 msgid ""
 "The icons will scroll according to the chosen placement type. Of course the "
 "dock can be placed anywhere on the screen, here we specify regarding to what."
@@ -932,7 +932,7 @@ msgid "Activate auto-hide ?"
 msgstr "自動で隠す？"
 
 #: ../data/messages:35 ../data/messages:39 ../data/messages:31
-#: ../data/messages:725
+#: ../data/messages:725 ../data/messages:545
 msgid ""
 "The dock will automatically hide itself outside of the scren when the mouse "
 "leaves it and will show a callback zone instead. Place the mouse into this "
@@ -952,6 +952,7 @@ msgid "Show the current applications in the dock ?"
 msgstr "ドック上に現在のアプリケーションを表示？"
 
 #: ../data/messages:43 ../data/messages:47 ../data/messages:51
+#: ../data/messages:551
 msgid ""
 "Cairo-Dock will then replace your taskbar. It is recommanded to remove any "
 "other taskbar, and to not force the dock's type to normal."
@@ -2841,7 +2842,7 @@ msgstr ""
 
 #: ../src/cairo-dock.c:511 ../src/cairo-dock.c:512 ../src/cairo-dock.c:507
 #: ../src/cairo-dock.c:506 ../src/cairo-dock.c:505 ../src/cairo-dock.c:508
-#: ../src/cairo-dock.c:493 ../src/cairo-dock.c:495
+#: ../src/cairo-dock.c:493 ../src/cairo-dock.c:495 ../src/cairo-dock.c:487
 msgid "< Maintenance mode >"
 msgstr "< メンテナンスモード >"
 
@@ -3037,7 +3038,6 @@ msgstr ""
 msgid "Prevent this launcher from stealing appli from taskbar ?"
 msgstr ""
 
-
 #: ../data/messages:89
 msgid "Automatically quick-hide the dock when a window becomes maximized ?"
 msgstr ""
@@ -3056,7 +3056,7 @@ msgstr ""
 msgid "Image for the insertion animation :"
 msgstr ""
 
-#: ../data/messages:461
+#: ../data/messages:461 ../data/messages:577
 msgid "Choose the default view for root docks :"
 msgstr ""
 
@@ -3099,4 +3099,10 @@ msgstr ""
 
 #: ../data/messages:387
 msgid "Image for the drag'n'drop animation :"
+msgstr ""
+
+#: ../data/messages:87
+msgid ""
+"This is only usefull if don't already use the auto-hide, and if you don't "
+"want to reserve the space for your dock."
 msgstr ""

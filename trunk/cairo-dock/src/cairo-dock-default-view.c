@@ -42,7 +42,7 @@ extern gint g_iStringLineWidth;
 extern double g_fStringColor[4];
 
 extern double g_fAmplitude;
-extern int g_iLabelSize;
+extern CairoDockLabelDescription g_iconTextDescription;
 
 
 void cairo_dock_set_subdock_position_linear (Icon *pPointedIcon, CairoDock *pDock)
@@ -83,7 +83,7 @@ void cairo_dock_calculate_max_dock_size_linear (CairoDock *pDock)
 	pDock->iMaxDockWidth = ceil (cairo_dock_calculate_max_dock_width (pDock, pDock->pFirstDrawnElement, pDock->fFlatDockWidth, 1., fExtraWidth));
 	///pDock->iMaxDockWidth = MIN (pDock->iMaxDockWidth, g_iMaxAuthorizedWidth);
 
-	pDock->iMaxDockHeight = (int) ((1 + g_fAmplitude) * pDock->iMaxIconHeight) + g_iLabelSize + g_iDockLineWidth + g_iFrameMargin;
+	pDock->iMaxDockHeight = (int) ((1 + g_fAmplitude) * pDock->iMaxIconHeight) + g_iconTextDescription.iSize + g_iDockLineWidth + g_iFrameMargin;
 
 	pDock->iDecorationsWidth = pDock->iMaxDockWidth;
 

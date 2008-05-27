@@ -8,4 +8,5 @@ theme_DATA = \
 	background-snow.svg\
 	separateur.svg\
 	preview\
-	drop-indicator-rain.svg
+	drop-indicator-rain.svg\
+	indicator-evergreen.svg

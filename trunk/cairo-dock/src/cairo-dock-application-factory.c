@@ -1,3 +1,4 @@
+
 /******************************************************************************
 
 This file is a part of the cairo-dock program,
@@ -30,8 +31,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-application-factory.h"
 
 extern double g_fAmplitude;
-extern int g_iLabelSize;
-extern gchar *g_cLabelPolice;
+extern CairoDockLabelDescription g_iconTextDescription;
 extern gboolean g_bTextAlwaysHorizontal;
 
 extern int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];
@@ -245,7 +245,8 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 				g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI],
 				FALSE,
 				fWidth,
-				fHeight);
+				fHeight,
+				NULL, NULL);
 
 			g_object_unref (pIconPixbuf);
 			return pNewSurface;
@@ -507,7 +508,7 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 				XFree (pNameBuffer);
 
 				pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
-				cairo_dock_fill_one_text_buffer (icon, pCairoContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
+				cairo_dock_fill_one_text_buffer (icon, pCairoContext, &g_iconTextDescription, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
 				cairo_destroy (pCairoContext);
 			}
 		}

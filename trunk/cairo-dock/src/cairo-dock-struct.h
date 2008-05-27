@@ -41,6 +41,7 @@ typedef struct _CairoDockVisitCard CairoDockVisitCard;
 typedef struct _CairoDockMinimalAppletConfig CairoDockMinimalAppletConfig;
 typedef struct _CairoDockVFSBackend CairoDockVFSBackend;
 typedef struct _CairoDockClassAppli CairoDockClassAppli;
+typedef struct _CairoDockLabelDescription CairoDockLabelDescription;
 
 
 typedef void (*CairoDockCalculateMaxDockSizeFunc) (CairoDock *pDock);
@@ -646,12 +647,18 @@ typedef gpointer (* CairoDeskletConfigureRendererFunc) (CairoDesklet *pDesklet, 
 typedef gpointer (* CairoDeskletLoadRendererFunc) (CairoDesklet *pDesklet, cairo_t *pSourceContext);
 typedef void (* CairoDeskletFreeRendererDataFunc) (CairoDesklet *pDesklet);
 typedef void (* CairoDeskletLoadIconsFunc) (CairoDesklet *pDesklet, cairo_t *pSourceContext);
+typedef struct gpointer CairoDeskletRendererConfig;
+typedef struct {
+	gchar *cName;
+	CairoDeskletRendererConfig *pConfig;
+} CairoDeskletRendererPreDefinedConfig;
 struct _CairoDeskletRenderer {
 	CairoDeskletRenderFunc render;
 	CairoDeskletConfigureRendererFunc configure;
 	CairoDeskletLoadRendererFunc load_data;
 	CairoDeskletFreeRendererDataFunc free_data;
 	CairoDeskletLoadIconsFunc load_icons;
+	GList *pPreDefinedConfigList;
 };
 
 struct _CairoDesklet {
@@ -720,6 +727,25 @@ struct _CairoDockClassAppli {
 	GList *pIconsOfClass;
 	/// Liste des icones d'appli de cette classe.
 	GList *pAppliOfClass;
+};
+
+struct _CairoDockLabelDescription {
+	/// Taille de la police (et hauteur du texte en pixels).
+	gint iSize;
+	/// Police de caracteres.
+	gchar *cFont;
+	/// Epaisseur des traits.
+	PangoWeight iWeight;
+	/// Style du trace (italique ou droit).
+	PangoStyle iStyle;
+	/// Couleur de debut du dégradé.
+	gdouble fColorStart[3];
+	/// Couleur de fin du dégradé.
+	gdouble fColorStop[3];
+	/// TRUE ssi le dégradé est du haut vers le bas.
+	gboolean bVerticalPattern;
+	/// Couleur du fond.
+	gdouble fBackgroundColor[4];
 };
 
 

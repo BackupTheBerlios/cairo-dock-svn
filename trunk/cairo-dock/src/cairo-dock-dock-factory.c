@@ -58,8 +58,7 @@ extern gint g_iDockLineWidth;
 extern int g_iIconGap;
 extern double g_fAmplitude;
 
-extern int g_iLabelSize;
-extern gchar *g_cLabelPolice;
+extern CairoDockLabelDescription g_iconTextDescription;
 extern gboolean g_bTextAlwaysHorizontal;
 
 extern gboolean g_bUseSeparator;
@@ -488,7 +487,7 @@ void cairo_dock_reference_dock (CairoDock *pDock, CairoDock *pParentDock)
 			if (! g_bSameHorizontality)
 			{
 				cairo_t* pSourceContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
-				cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
+				cairo_dock_fill_one_text_buffer (icon, pSourceContext, &g_iconTextDescription, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
 				cairo_destroy (pSourceContext);
 			}
 		}
@@ -714,7 +713,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 	if (! g_bSameHorizontality)
 	{
 		cairo_t* pSourceContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
-		cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
+		cairo_dock_fill_one_text_buffer (icon, pSourceContext, &g_iconTextDescription, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
 		cairo_destroy (pSourceContext);
 	}
 

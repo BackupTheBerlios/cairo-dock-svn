@@ -30,14 +30,13 @@ gint g_iFrameMargin;
 extern double g_fLineColor[4];
 /// Ecart en pixels entre les icones.
 extern int g_iIconGap;
-/// Taille de la police des etiquettes.
-extern int g_iLabelSize;
-/// Police de caracteres des etiquettes.
-extern gchar *g_cLabelPolice;
-/// Epaisseur des traits.
-extern int g_iLabelWeight;
-/// Italique ou droit.
-extern int g_iLabelStyle;
+/// Description des etiquettes des icones.
+extern CairoDockLabelDescription g_iconTextDescription;
+/// Description des infos-rapides.
+extern CairoDockLabelDescription g_quickInfoTextDescription;
+/// Description des titres des dialogues.
+extern CairoDockLabelDescription g_dialogTextDescription;
+
 /// facteur de visibilite des etiquettes adjacentes a l'icone pointee.
 extern double g_fLabelAlphaThreshold;
 /// le texte est-il toujours horizontal ?

@@ -67,9 +67,10 @@ cairo_surface_t *cairo_dock_create_separator_surface (cairo_t *pSourceContext, d
 			fMaxScale,
 			g_tIconAuthorizedWidth[CAIRO_DOCK_SEPARATOR12],
 			g_tIconAuthorizedHeight[CAIRO_DOCK_SEPARATOR12],
+			CAIRO_DOCK_FILL_SPACE,
 			fWidth,
 			fHeight,
-			CAIRO_DOCK_FILL_SPACE);
+			NULL, NULL);
 		if (fRotationAngle != 0)
 		{
 			cairo_surface_t *pNewSurfaceRotated = cairo_dock_rotate_surface (pNewSurface, pSourceContext, *fWidth * fMaxScale, *fHeight * fMaxScale, fRotationAngle);
