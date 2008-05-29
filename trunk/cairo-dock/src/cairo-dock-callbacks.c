@@ -44,9 +44,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-desklet.h"
 #include "cairo-dock-callbacks.h"
 
-#define FOVY_2 20.0
-#define Z_NEAR 3.0
-
 static Icon *s_pIconClicked = NULL;  // pour savoir quand on deplace une icone a la souris. Dangereux si l'icone se fait effacer en cours ...
 static CairoDock *s_pLastPointedDock = NULL;  // pour savoir quand on passe d'un dock a un autre.
 static int s_iSidNonStopScrolling = 0;

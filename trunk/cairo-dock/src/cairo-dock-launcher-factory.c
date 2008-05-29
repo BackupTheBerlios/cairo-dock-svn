@@ -336,7 +336,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 	gboolean bPreventFromInhibating = g_key_file_get_boolean (keyfile, "Desktop Entry", "prevent inhibate", NULL);  // FALSE si la cle n'existe pas.
 	
 	g_free (icon->cClass);
-	if (! bPreventFromInhibating && icon->acCommand != NULL && icon->cBaseURI == NULL)
+	if (icon->acCommand != NULL && icon->cBaseURI == NULL)  /// ! bPreventFromInhibating && 
 	{
 		gchar *cStartupWMClass = g_key_file_get_string (keyfile, "Desktop Entry", "StartupWMClass", NULL);
 		if (cStartupWMClass == NULL || *cStartupWMClass == '\0')
@@ -374,6 +374,13 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 	}
 	else
 		icon->cClass = NULL;
+	
+	if (bPreventFromInhibating && icon->cClass != NULL)
+	{
+		cairo_dock_set_class_use_xicon (icon->cClass, TRUE);
+		g_free (icon->cClass);
+		icon->cClass = NULL;
+	}
 	
 	g_free (cDesktopFilePath);
 	g_key_file_free (keyfile);

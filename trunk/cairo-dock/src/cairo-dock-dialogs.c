@@ -66,7 +66,7 @@ gboolean on_enter_dialog (GtkWidget* pWidget,
 {
 	if (! cairo_dock_dialog_reference (pDialog))
 		return FALSE;
-	cd_message ("");
+	cd_debug ("");
 	pDialog->bInside = TRUE;
 	cairo_dock_dialog_unreference (pDialog);
 	return FALSE;
@@ -79,7 +79,7 @@ static gboolean on_leave_dialog (GtkWidget* pWidget,
 	if (! cairo_dock_dialog_reference (pDialog))
 		return FALSE;
 
-	cd_message ("%s (%d/%d)", __func__, pDialog->iButtonOkOffset, pDialog->iButtonCancelOffset);
+	cd_debug ("%s (%d/%d)", __func__, pDialog->iButtonOkOffset, pDialog->iButtonCancelOffset);
 
 	/*while (gtk_events_pending ())
 		gtk_main_iteration ();
@@ -88,7 +88,7 @@ static gboolean on_leave_dialog (GtkWidget* pWidget,
 	gdk_window_get_pointer (pWidget->window, &iMouseX, &iMouseY, NULL);
 	if (iMouseX > 0 && iMouseX < pDialog->iWidth && iMouseY > 0 && iMouseY < pDialog->iHeight)
 	{
-		cd_message ("en fait on est dedans");
+		cd_debug ("en fait on est dedans");
 		cairo_dock_dialog_unreference (pDialog);
 		return FALSE;
 	}
@@ -391,13 +391,13 @@ static gboolean on_configure_dialog (GtkWidget* pWidget,
 		pDialog->iWidth = pEvent->width;
 		pDialog->iHeight = pEvent->height;
 
-		if (pDialog->pIcon != NULL)
+		if (pDialog->pIcon != NULL && ! pDialog->bInside)
 		{
 			CairoContainer *pContainer = cairo_dock_search_container_from_icon (pDialog->pIcon);
-			gboolean bInside = pDialog->bInside;
-			pDialog->bInside = FALSE;
+			///gboolean bInside = pDialog->bInside;
+			///pDialog->bInside = FALSE;
 			cairo_dock_place_dialog (pDialog, pContainer);
-			pDialog->bInside = bInside;
+			///pDialog->bInside = bInside;
 		}
 	}
 	gtk_widget_queue_draw (pDialog->pWidget);  // les widgets internes peuvent avoir changer de taille sans que le dialogue n'en ait change, il faut donc redessiner tout le temps.
@@ -628,7 +628,7 @@ GtkWidget *cairo_dock_build_common_interactive_widget_for_dialog (const gchar *c
 		gtk_widget_set (pWidget, "height-request", ink.height+2, NULL);
 
 		iBoxWidth = MAX (iBoxWidth, iEntryWidth);
-		cd_message ("iEntryWidth : %d\n", iEntryWidth);
+		cd_debug ("iEntryWidth : %d\n", iEntryWidth);
 		iBoxHeight += ink.height;
 
 		gtk_entry_set_text (GTK_ENTRY (pWidget), cInitialAnswer);
@@ -833,7 +833,7 @@ CairoDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, CairoCont
 			FALSE,
 			0);
 	}
-	cd_message ("=> iBubbleWidth: %d , iBubbleHeight : %d", pDialog->iBubbleWidth, pDialog->iBubbleHeight);
+	cd_debug ("=> iBubbleWidth: %d , iBubbleHeight : %d", pDialog->iBubbleWidth, pDialog->iBubbleHeight);
 
 	//\________________ On definit la geometrie et la position de la fenetre globale.
 	double fLineWidth = g_iDockLineWidth;
@@ -1469,10 +1469,10 @@ GtkWidget *cairo_dock_steal_widget_from_its_container (GtkWidget *pWidget)
 		gtk_widget_unparent (pWidget);
 		gtk_object_unref (GTK_OBJECT (pWidget));
 		cd_message ("unparent -> ref = %d\n", pWidget->object.parent_instance.ref_count);*/
-		cd_message (" ref : %d", pWidget->object.parent_instance.ref_count);
+		cd_debug (" ref : %d", pWidget->object.parent_instance.ref_count);
 		gtk_object_ref (GTK_OBJECT (pWidget));
 		gtk_container_remove (GTK_CONTAINER (pContainer), pWidget);
-		cd_message (" -> %d", pWidget->object.parent_instance.ref_count);
+		cd_debug (" -> %d", pWidget->object.parent_instance.ref_count);
 	}
 	return pWidget;
 }

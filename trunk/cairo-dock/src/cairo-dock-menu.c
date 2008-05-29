@@ -490,14 +490,15 @@ static void _cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 			cairo_dock_update_dock_size (pDock);
 		
 		//\_____________ On gere l'inhibition de sa classe.
-		if (icon->cClass == NULL && cClass != NULL)
+		gchar *cNowClass = icon->cClass;
+		if (cClass != NULL && (cNowClass == NULL || strcmp (cNowClass, cClass) != 0))
 		{
 			icon->cClass = cClass;
-			cClass = NULL;
-			cairo_dock_deinhibate_class (icon->cClass, icon);
+			cairo_dock_deinhibate_class (cClass, icon);
+			icon->cClass = cNowClass;
 		}
-		else if (icon->cClass != NULL && cClass == NULL)
-			cairo_dock_inhibate_class (icon->cClass, icon);
+		if (cNowClass != NULL && (cClass == NULL || strcmp (cNowClass, cClass) != 0))
+			cairo_dock_inhibate_class (cNowClass, icon);
 		
 		//\_____________ On redessine les docks impactes.
 		pDock->calculate_icons (pDock);

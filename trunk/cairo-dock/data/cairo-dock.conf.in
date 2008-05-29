@@ -387,7 +387,7 @@ text color start = 1;1;1
 #{It's the second color of the gradation. Set it to the same value as the first if you just don't want to have a gradation.}
 text color stop = 1;1;1
 
-#b Pattenr should be vertical ?
+#b Pattern should be vertical ?
 #{If checked, the pattern will go from top to bottom, otherwise from left to right.}
 vertical label pattern = false
 
@@ -577,7 +577,7 @@ icon size = 48
 #F+[Text;gtk-select-font]
 frame_text =
 
-#c+3[0;1] Text color (r,v,b) :
+#c+3[0;1] Text color (r,g,b) :
 text color = 0.0; 0.0; 0.0
 
 #b+ Homogeneous with icons' label ?

@@ -22,6 +22,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-applications-manager.h"
 #include "cairo-dock-draw.h"
 #include "cairo-dock-load.h"
+#include "cairo-dock-launcher-factory.h"
 #include "cairo-dock-class-manager.h"
 
 extern gboolean g_bUseSeparator;
@@ -293,7 +294,7 @@ gboolean cairo_dock_class_is_inhibated (const gchar *cClass)
 gboolean cairo_dock_class_is_using_xicon (const gchar *cClass)
 {
 	CairoDockClassAppli *pClassAppli = cairo_dock_find_class_appli (cClass);
-	return (pClassAppli == NULL || pClassAppli->bUseXIcon);  // si pClassAppli == NULL, il n'y a donc pas de lanceur pouvant lui filer son icone.
+	return (pClassAppli != NULL && pClassAppli->bUseXIcon);  // si pClassAppli == NULL, il n'y a pas de lanceur pouvant lui filer son icone, mais on peut en trouver une dans le theme d'icones systeme.
 }
 
 gboolean cairo_dock_prevent_inhibated_class (Icon *pIcon)
@@ -544,6 +545,25 @@ cairo_surface_t *cairo_dock_create_surface_from_class (gchar *cClass, cairo_t *p
 			}
 		}
 	}
+	
+	gchar *cIconFilePath = cairo_dock_search_icon_s_path (cClass);
+	if (cIconFilePath != NULL)
+	{
+		cd_debug ("on remplace l'icone X par %s", cIconFilePath);
+		cairo_surface_t *pSurface = cairo_dock_create_surface_from_image (cIconFilePath,
+			pSourceContext,
+			1 + g_fAmplitude,
+			g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI],
+			g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI],
+			CAIRO_DOCK_FILL_SPACE,
+			fWidth, fHeight,
+			NULL, NULL);
+		g_free (cIconFilePath);
+		return pSurface;
+	}
+	
+	cd_debug ("classe %s prend l'icone X", cClass);
+	
 	return NULL;
 }
 
