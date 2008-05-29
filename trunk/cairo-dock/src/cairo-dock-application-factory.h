@@ -23,4 +23,6 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, CairoDock *pDock);
 
 
+GdkPixbuf *cairo_dock_get_background_pixbuf (void);
+
 #endif

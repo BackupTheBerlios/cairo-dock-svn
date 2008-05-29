@@ -134,6 +134,7 @@ gboolean cairo_dock_quick_hide_is_activated (void);
 
 gboolean cairo_dock_window_hovers_dock (GtkAllocation *pWindowGeometry, CairoDock *pDock);
 
+void cairo_dock_synchronize_one_sub_dock_position (Icon *icon, CairoDock *pDock, gboolean bReloadBuffersIfNecessary);
 void cairo_dock_synchronize_sub_docks_position (CairoDock *pDock, gboolean bReloadBuffersIfNecessary);
 
 

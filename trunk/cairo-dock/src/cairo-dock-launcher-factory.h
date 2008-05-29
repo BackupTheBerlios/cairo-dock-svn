@@ -7,7 +7,7 @@
 #include "cairo-dock-struct.h"
 
 
-gchar *cairo_dock_search_icon_s_path (gchar *cFileName);
+gchar *cairo_dock_search_icon_s_path (const gchar *cFileName);
 
 
 void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName, Icon *icon);

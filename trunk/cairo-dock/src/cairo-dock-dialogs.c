@@ -9,6 +9,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <gdk/gdkkeysyms.h>
 
 #include "cairo-dock-icons.h"
 #include "cairo-dock-dock-factory.h"
@@ -200,7 +201,37 @@ static gboolean on_button_press_dialog (GtkWidget* pWidget,
 	cairo_dock_dialog_unreference (pDialog);
 	return FALSE;
 }
-
+gboolean on_key_press_dialog (GtkWidget *pWidget,
+	GdkEventKey *pKey,
+	CairoDialog *pDialog)
+{
+	g_print ("key pressed\n");
+	if (! cairo_dock_dialog_reference (pDialog))
+		return FALSE;
+	if (pDialog->iButtonsType == GTK_BUTTONS_NONE)
+	{
+		cairo_dock_dialog_unreference (pDialog);
+		return FALSE;
+	}
+	if (pKey->type == GDK_KEY_PRESS)
+	{
+		GdkEventScroll dummyScroll;
+		int iX, iY;
+		switch (pKey->keyval)
+		{
+			case GDK_Return :
+				pDialog->action_on_answer (GTK_RESPONSE_OK, pDialog->pInteractiveWidget, pDialog->pUserData);
+				cairo_dock_dialog_unreference (pDialog);
+			break ;
+			case GDK_Escape :
+				pDialog->action_on_answer (GTK_RESPONSE_CANCEL, pDialog->pInteractiveWidget, pDialog->pUserData);
+				cairo_dock_dialog_unreference (pDialog);
+			break ;
+		}
+	}
+	cairo_dock_dialog_unreference (pDialog);
+	return FALSE;
+}
 static gboolean on_expose_dialog (GtkWidget *pWidget,
 	GdkEventExpose *pExpose,
 	CairoDialog *pDialog)
@@ -871,6 +902,10 @@ CairoDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, CairoCont
 	g_signal_connect (G_OBJECT (pWindow),
 		"button-release-event",
 		G_CALLBACK (on_button_press_dialog),
+		pDialog);
+	g_signal_connect (G_OBJECT (pWindow),
+		"key-press-event",
+		G_CALLBACK (on_key_press_dialog),
 		pDialog);
 	if (pIcon != NULL)  // on inhibe le deplacement du dialogue lorsque l'utilisateur est dedans.
 	{

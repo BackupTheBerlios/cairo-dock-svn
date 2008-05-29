@@ -684,6 +684,11 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 		
 		bModuleReloaded = module->reloadModule (pKeyFile, module->cConfFilePath, pNewContainer);
 		
+		if (pNewContainer != pActualContainer && CAIRO_DOCK_IS_DOCK (pNewContainer) && CAIRO_DOCK_IS_DOCK (pActualContainer) && pIcon != NULL)
+		{
+			cairo_dock_synchronize_one_sub_dock_position (pIcon, CAIRO_DOCK (pNewContainer), TRUE);
+		}
+		
 		cairo_dock_free_minimal_config (pMinimalConfig);
 		if (pKeyFile != NULL)
 			g_key_file_free (pKeyFile);

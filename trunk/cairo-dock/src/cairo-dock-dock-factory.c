@@ -120,7 +120,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	gtk_window_set_decorated (GTK_WINDOW (pWindow), FALSE);
 	gtk_window_set_resizable (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_title (GTK_WINDOW (pWindow), "cairo-dock");  // GTK renseigne la classe avec la meme valeur.
-
+	
 	cairo_dock_set_renderer (pDock, cRendererName);
 
 	//\__________________ On connecte les evenements a la fenetre.
@@ -195,6 +195,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	
 	gtk_window_get_size (GTK_WINDOW (pWindow), &pDock->iCurrentWidth, &pDock->iCurrentHeight);  // ca n'est que la taille initiale allouee par GTK.
 	gtk_widget_show_all (pWindow);
+	gdk_window_set_back_pixmap (pWindow->window, NULL, FALSE);  // utile ?
 	
 	/*if (!pouet)
 	{

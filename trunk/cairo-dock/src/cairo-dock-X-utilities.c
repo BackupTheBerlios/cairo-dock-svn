@@ -33,6 +33,8 @@ static Atom s_aNetWmWindowTypeUtility;
 static Atom s_aNetCurrentDesktop;
 static Atom s_aNetDesktopViewport;
 static Atom s_aNetDesktopGeometry;
+static Atom s_aNetDesktopGeometry;
+static Atom s_aRootMapID;
 
 static int _cairo_dock_xerror_handler (Display * pDisplay, XErrorEvent *pXError)
 {
@@ -52,6 +54,7 @@ void cairo_dock_initialize_X_support (void)
 	s_aNetCurrentDesktop = XInternAtom (s_XDisplay, "_NET_CURRENT_DESKTOP", False);
 	s_aNetDesktopViewport = XInternAtom (s_XDisplay, "_NET_DESKTOP_VIEWPORT", False);
 	s_aNetDesktopGeometry = XInternAtom (s_XDisplay, "_NET_DESKTOP_GEOMETRY", False);
+	s_aRootMapID = XInternAtom (s_XDisplay, "_XROOTPMAP_ID", False);
 	
 	cairo_dock_update_screen_geometry ();
 	
@@ -453,4 +456,27 @@ void cairo_dock_set_current_desktop (int iDesktopNumber)
 		False,
 		SubstructureRedirectMask | SubstructureNotifyMask,
 		&xClientMessage);
+}
+
+Pixmap cairo_dock_get_window_background_pixmap (Window Xid)
+{
+	g_return_val_if_fail (Xid > 0, None);
+	
+	Pixmap iPixmapID;
+	Atom aReturnedType = 0;
+	int aReturnedFormat = 0;
+	unsigned long iLeftBytes, iBufferNbElements;
+	Pixmap *pPixmapIdBuffer = NULL;
+	Pixmap iBgPixmapID;
+	XGetWindowProperty (s_XDisplay, Xid, s_aRootMapID, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pPixmapIdBuffer);
+	if (iBufferNbElements != 0)
+	{
+		g_print ("RootMapID existe\n");
+		iBgPixmapID = pPixmapIdBuffer;
+		XFree (pPixmapIdBuffer);
+	}
+	else
+		iBgPixmapID = None;
+	g_print ("rootmapid : %d\n", iBgPixmapID);
+	return iBgPixmapID;
 }

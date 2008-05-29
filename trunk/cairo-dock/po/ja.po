@@ -665,7 +665,7 @@ msgstr ""
 #: ../src/cairo-dock-modules.c:734 ../src/cairo-dock-modules.c:733
 #: ../src/cairo-dock-modules.c:742 ../src/cairo-dock-modules.c:744
 #: ../src/cairo-dock-modules.c:782 ../src/cairo-dock-modules.c:783
-#: ../src/cairo-dock-modules.c:772
+#: ../src/cairo-dock-modules.c:772 ../src/cairo-dock-modules.c:777
 #, c-format
 msgid "Configuration of %s"
 msgstr "%s の設定"
@@ -2930,6 +2930,7 @@ msgstr ""
 #: ../src/cairo-dock.c:511 ../src/cairo-dock.c:512 ../src/cairo-dock.c:507
 #: ../src/cairo-dock.c:506 ../src/cairo-dock.c:505 ../src/cairo-dock.c:508
 #: ../src/cairo-dock.c:493 ../src/cairo-dock.c:495 ../src/cairo-dock.c:487
+#: ../src/cairo-dock.c:494
 msgid "< Maintenance mode >"
 msgstr "< メンテナンスモード >"
 
@@ -3247,4 +3248,12 @@ msgstr ""
 
 #: ../data/messages:709
 msgid "Class of the program :"
+msgstr ""
+
+#: ../data/messages:333
+msgid "Pattern should be vertical ?"
+msgstr ""
+
+#: ../data/messages:515
+msgid "Text color (r,g,b) :"
 msgstr ""

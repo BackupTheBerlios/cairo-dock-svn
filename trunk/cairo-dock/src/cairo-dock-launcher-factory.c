@@ -46,7 +46,7 @@ extern gboolean g_bSameHorizontality;
 extern CairoDockFMSortType g_iFileSortType;
 
 
-gchar *cairo_dock_search_icon_s_path (gchar *cFileName)
+gchar *cairo_dock_search_icon_s_path (const gchar *cFileName)
 {
 	g_return_val_if_fail (cFileName != NULL, NULL);
 	GString *sIconPath = g_string_new ("");

@@ -11,6 +11,7 @@ gboolean on_expose (GtkWidget *pWidget,
 			GdkEventExpose *pExpose,
 			CairoDock *pDock);
 
+void cairo_dock_show_subdock (Icon *pPointedIcon, gboolean bUpdate, CairoDock *pDock);
 void cairo_dock_on_change_icon (Icon *pLastPointedIcon, Icon *pPointedIcon, CairoDock *pDock);
 gboolean on_motion_notify2 (GtkWidget* pWidget,
 					GdkEventMotion* pMotion,
@@ -78,6 +79,7 @@ gboolean on_selection_request_event (GtkWidget *pWidget, GdkEventSelection *even
 gboolean on_selection_notify_event (GtkWidget *pWidget, GdkEventSelection *event, gpointer user_data);*/
 
 
+void cairo_dock_show_dock_at_mouse (CairoDock *pDock);
 void cairo_dock_raise_from_keyboard (const char *cKeyShortcut, gpointer data);
 
 gboolean cairo_dock_hide_dock_like_a_menu (void);

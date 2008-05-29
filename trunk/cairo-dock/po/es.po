@@ -507,7 +507,7 @@ msgstr ""
 #: ../src/cairo-dock-modules.c:692 ../src/cairo-dock-modules.c:734
 #: ../src/cairo-dock-modules.c:733 ../src/cairo-dock-modules.c:742
 #: ../src/cairo-dock-modules.c:782 ../src/cairo-dock-modules.c:783
-#: ../src/cairo-dock-modules.c:772
+#: ../src/cairo-dock-modules.c:772 ../src/cairo-dock-modules.c:777
 #, c-format
 msgid "Configuration of %s"
 msgstr "Configuración de %s"
@@ -3294,4 +3294,12 @@ msgstr ""
 
 #: ../data/messages:709
 msgid "Class of the program :"
+msgstr ""
+
+#: ../data/messages:333
+msgid "Pattern should be vertical ?"
+msgstr ""
+
+#: ../data/messages:515
+msgid "Text color (r,g,b) :"
 msgstr ""

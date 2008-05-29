@@ -192,7 +192,8 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 		{
 			Window XIconID = pWMHints->icon_window;
 			cd_debug ("  pas de _NET_WM_ICON, mais une fenetre (ID:%d)", XIconID);
-			pIconPixbuf = _cairo_dock_get_pixbuf_from_pixmap (XIconID, TRUE);  // pas teste.
+			Pixmap iPixmap = cairo_dock_get_window_background_pixmap (XIconID);
+			pIconPixbuf = _cairo_dock_get_pixbuf_from_pixmap (iPixmap, TRUE);  /// A valider ...
 		}
 		else if (pWMHints->flags & IconPixmapHint)
 		{
@@ -577,23 +578,9 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 }
 
 
-gchar *cairo_dock_get_property_name_on_xwindow (Window Xid, Atom xPropertyAtom)
+
+GdkPixbuf *cairo_dock_get_background_pixbuf (void)
 {
-	guchar *pNameBuffer = NULL;
-	Atom aReturnedType = 0;
-	int aReturnedFormat = 0;
-	unsigned long iLeftBytes, iBufferNbElements;
-	
-	XGetWindowProperty (s_XDisplay, Xid, xPropertyAtom, 0, G_MAXULONG, False, s_aUtf8String, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
-	if (iBufferNbElements == 0)
-	{
-		XGetWindowProperty (s_XDisplay, Xid, xPropertyAtom, 0, G_MAXULONG, False, s_aString, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
-	}
-	g_print ("iBufferNbElements : %d\n", iBufferNbElements);
-	if (iBufferNbElements == 0)
-	{
-		g_print ("dommage !\n");
-		return NULL;
-	}
-	else return pNameBuffer;
+	Pixmap iRootPixmapID = cairo_dock_get_window_background_pixmap (cairo_dock_get_root_id ());
+	return _cairo_dock_get_pixbuf_from_pixmap (iRootPixmapID, FALSE);
 }

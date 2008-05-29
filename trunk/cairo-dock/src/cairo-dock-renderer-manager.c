@@ -7,6 +7,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 
 ******************************************************************************/
 #include <stdlib.h>
+#include <string.h>
 
 #include "cairo-dock-draw.h"
 #include "cairo-dock-icons.h"

@@ -642,16 +642,16 @@ struct _CairoDockVFSBackend {
 };
 
 
-typedef void (* CairoDeskletRenderFunc) (cairo_t *pCairoContext, CairoDesklet *pDesklet, gboolean bRenderOptimized);
-typedef gpointer (* CairoDeskletConfigureRendererFunc) (CairoDesklet *pDesklet, cairo_t *pSourceContext, gpointer *pConfig);
-typedef gpointer (* CairoDeskletLoadRendererFunc) (CairoDesklet *pDesklet, cairo_t *pSourceContext);
-typedef void (* CairoDeskletFreeRendererDataFunc) (CairoDesklet *pDesklet);
-typedef void (* CairoDeskletLoadIconsFunc) (CairoDesklet *pDesklet, cairo_t *pSourceContext);
 typedef struct gpointer CairoDeskletRendererConfig;
 typedef struct {
 	gchar *cName;
 	CairoDeskletRendererConfig *pConfig;
 } CairoDeskletRendererPreDefinedConfig;
+typedef void (* CairoDeskletRenderFunc) (cairo_t *pCairoContext, CairoDesklet *pDesklet, gboolean bRenderOptimized);
+typedef gpointer (* CairoDeskletConfigureRendererFunc) (CairoDesklet *pDesklet, cairo_t *pSourceContext, CairoDeskletRendererConfig *pConfig);
+typedef gpointer (* CairoDeskletLoadRendererFunc) (CairoDesklet *pDesklet, cairo_t *pSourceContext);
+typedef void (* CairoDeskletFreeRendererDataFunc) (CairoDesklet *pDesklet);
+typedef void (* CairoDeskletLoadIconsFunc) (CairoDesklet *pDesklet, cairo_t *pSourceContext);
 struct _CairoDeskletRenderer {
 	CairoDeskletRenderFunc render;
 	CairoDeskletConfigureRendererFunc configure;

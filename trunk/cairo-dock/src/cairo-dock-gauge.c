@@ -255,9 +255,13 @@ void make_cd_Gauge_multiValue(cairo_t *pSourceContext, CairoContainer *pContaine
 	
 	if (CAIRO_DOCK_IS_DOCK (pContainer) && CAIRO_DOCK (pContainer)->bUseReflect)
 	{
-		cairo_surface_t *pReflet = pIcon->pReflectionBuffer;
+		cairo_surface_destroy (pIcon->pReflectionBuffer);  // pour aller plus vite on decide de ne creer que le minimum.
 		pIcon->pReflectionBuffer = NULL;
-		cairo_surface_destroy (pReflet);
+		if (pIcon->pFullIconBuffer != NULL)
+		{
+			cairo_surface_destroy (pIcon->pFullIconBuffer);
+			pIcon->pFullIconBuffer = NULL;
+		}
 		
 		pIcon->pReflectionBuffer = cairo_dock_create_reflection_surface (pIcon->pIconBuffer,
 			pSourceContext,
