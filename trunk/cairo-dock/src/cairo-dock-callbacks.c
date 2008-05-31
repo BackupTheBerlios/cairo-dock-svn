@@ -879,7 +879,7 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 				icon->iCount = 0;
 				return CAIRO_DOCK_LET_PASS_NOTIFICATION;
 			}
-			cairo_dock_fm_mount (icon, pDock);
+			cairo_dock_fm_mount (icon, CAIRO_CONTAINER (pDock));
 		}
 		else
 			cairo_dock_fm_launch_uri (icon->acCommand);
@@ -1437,7 +1437,7 @@ gboolean cairo_dock_notification_drop_data (gpointer *data)
 					{
 						if (icon->pSubDock != NULL || icon->iVolumeID != 0)  // on le lache sur un repertoire ou un point de montage.
 						{
-							cairo_dock_fm_move_into_directory (cReceivedData, icon, pDock);
+							cairo_dock_fm_move_into_directory (cReceivedData, icon, pContainer);
 							return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
 						}
 						else  // on le lache sur un fichier.
@@ -1469,7 +1469,7 @@ gboolean cairo_dock_notification_drop_data (gpointer *data)
 				Icon *pPointingIcon = cairo_dock_search_icon_pointing_on_dock (pDock, NULL);
 				if (CAIRO_DOCK_IS_URI_LAUNCHER (pPointingIcon))  // on a lache dans un dock qui est un repertoire, on copie donc le fichier dedans.
 				{
-					cairo_dock_fm_move_into_directory (cReceivedData, icon, pDock);
+					cairo_dock_fm_move_into_directory (cReceivedData, icon, pContainer);
 					return CAIRO_DOCK_INTERCEPT_NOTIFICATION;
 				}
 			}

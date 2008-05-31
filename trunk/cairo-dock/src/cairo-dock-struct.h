@@ -44,33 +44,6 @@ typedef struct _CairoDockClassAppli CairoDockClassAppli;
 typedef struct _CairoDockLabelDescription CairoDockLabelDescription;
 
 
-typedef void (*CairoDockCalculateMaxDockSizeFunc) (CairoDock *pDock);
-typedef Icon * (*CairoDockCalculateIconsFunc) (CairoDock *pDock);
-typedef void (*CairoDockRenderFunc) (CairoDock *pDock);
-typedef void (*CairoDockRenderOptimizedFunc) (CairoDock *pDock, GdkRectangle *pArea);
-typedef void (*CairoDockSetSubDockPositionFunc) (Icon *pPointedIcon, CairoDock *pParentDock);
-
-struct _CairoDockRenderer {
-	/// chemin d'un fichier readme destine a presenter de maniere succinte la vue.
-	gchar *cReadmeFilePath;
-	/// fonction calculant la taille max d'un dock.
-	CairoDockCalculateMaxDockSizeFunc calculate_max_dock_size;
-	/// fonction calculant l'ensemble des parametres des icones.
-	CairoDockCalculateIconsFunc calculate_icons;
-	/// fonction de rendu.
-	CairoDockRenderFunc render;
-	/// fonction de rendu optimise, ne dessinant qu'une seule icone.
-	CairoDockRenderOptimizedFunc render_optimized;
-	/// fonction calculant la position d'un sous-dock.
-	CairoDockSetSubDockPositionFunc set_subdock_position;
-	/// TRUE ssi cette vue utilise les reflets.
-	gboolean bUseReflect;
-	/// chemin d'une image de previsualisation.
-	gchar *cPreviewFilePath;
-	};
-
-
-
 typedef enum {
 	CAIRO_DOCK_VERTICAL = 0,
 	CAIRO_DOCK_HORIZONTAL
@@ -108,6 +81,31 @@ struct _CairoContainer {
 
 #define CAIRO_CONTAINER(p) ((CairoContainer *) (p))
 
+
+typedef void (*CairoDockCalculateMaxDockSizeFunc) (CairoDock *pDock);
+typedef Icon * (*CairoDockCalculateIconsFunc) (CairoDock *pDock);
+typedef void (*CairoDockRenderFunc) (CairoDock *pDock);
+typedef void (*CairoDockRenderOptimizedFunc) (CairoDock *pDock, GdkRectangle *pArea);
+typedef void (*CairoDockSetSubDockPositionFunc) (Icon *pPointedIcon, CairoDock *pParentDock);
+
+struct _CairoDockRenderer {
+	/// chemin d'un fichier readme destine a presenter de maniere succinte la vue.
+	gchar *cReadmeFilePath;
+	/// fonction calculant la taille max d'un dock.
+	CairoDockCalculateMaxDockSizeFunc calculate_max_dock_size;
+	/// fonction calculant l'ensemble des parametres des icones.
+	CairoDockCalculateIconsFunc calculate_icons;
+	/// fonction de rendu.
+	CairoDockRenderFunc render;
+	/// fonction de rendu optimise, ne dessinant qu'une seule icone.
+	CairoDockRenderOptimizedFunc render_optimized;
+	/// fonction calculant la position d'un sous-dock.
+	CairoDockSetSubDockPositionFunc set_subdock_position;
+	/// TRUE ssi cette vue utilise les reflets.
+	gboolean bUseReflect;
+	/// chemin d'une image de previsualisation.
+	gchar *cPreviewFilePath;
+};
 
 struct _CairoDock {
 	/// type "dock".
@@ -344,13 +342,21 @@ struct _CairoDockMinimalAppletConfig {
 
 
 typedef void (* CairoDockActionOnAnswerFunc) (int iAnswer, GtkWidget *pWidget, gpointer data);
-typedef void (* CairoDialogRenderFunc) (cairo_t *pCairoContext, CairoDialog *pDialog, gboolean bRenderOptimized);
-typedef gpointer (* CairoDialogLoadRendererFunc) (CairoDialog *pDialog, cairo_t *pSourceContext, gpointer *pConfig);
-typedef void (* CairoDialogFreeRendererDataFunc) (CairoDialog *pDesklet);
+
+typedef struct gpointer CairoDialogRendererDataParameter;
+typedef struct CairoDialogRendererDataParameter * CairoDialogRendererDataPtr;
+typedef struct gpointer CairoDialogRendererConfigParameter;
+typedef struct CairoDialogRendererConfigParameter * CairoDialogRendererConfigPtr;
+
+typedef void (* CairoDialogRenderFunc) (cairo_t *pCairoContext, CairoDialog *pDialog);
+typedef gpointer (* CairoDialogConfigureRendererFunc) (CairoDialog *pDialog, cairo_t *pSourceContext, CairoDialogRendererConfigPtr pConfig);
+typedef void (* CairoDialogUpdateRendererDataFunc) (CairoDialog *pDialog, CairoDialogRendererDataPtr pNewData);
+typedef void (* CairoDialogFreeRendererDataFunc) (CairoDialog *pDialog);
 struct _CairoDialogRenderer {
-	CairoDialogRenderFunc render;
-	CairoDialogLoadRendererFunc load_data;
-	CairoDialogFreeRendererDataFunc free_data;
+	CairoDialogRenderFunc 				render;
+	CairoDialogConfigureRendererFunc 	configure;
+	CairoDialogFreeRendererDataFunc 	free_data;
+	CairoDialogUpdateRendererDataFunc 	update;
 };
 
 struct _CairoDialog {
@@ -393,8 +399,10 @@ struct _CairoDialog {
 	double fRadius;
 	/// hauteur de la pointe, sans la partie "aiguisee".
 	double fTipHeight;
-	/// surface representant le message + l'icone dans la marge a gauche du texte.
+	/// surface representant le message du dialogue.
 	cairo_surface_t* pTextBuffer;
+	/// surface representant l'icone dans la marge a gauche du texte.
+	cairo_surface_t* pIconBuffer;
 	/// dimensions de la bulle (message + widget utilisateur + boutons).
 	int iBubbleWidth, iBubbleHeight;
 	/// dimensions du message en comptant la marge du texte + vgap en bas si necessaire.
@@ -421,7 +429,7 @@ struct _CairoDialog {
 	int iSidTimer;
 	/// reference atomique.
 	int iRefCount;
-	/// le widget d'interaction utilisateur (GtkEntry, GtkHScale, etc).
+	/// le widget d'interaction utilisateur (GtkEntry, GtkHScale, zone de dessin, etc).
 	GtkWidget *pInteractiveWidget;
 	/// le type des boutons (GTK_BUTTONS_NONE, GTK_BUTTONS_OK_CANCEL ou GTK_BUTTONS_YES_NO).
 	int iButtonsType;
@@ -604,9 +612,9 @@ typedef gchar * (*CairoDockFMIsMountedFunc) (const gchar *cURI, gboolean *bIsMou
 typedef gboolean (*CairoDockFMCanEjectFunc) (const gchar *cURI);
 typedef gboolean (*CairoDockFMEjectDriveFunc) (const gchar *cURI);
 
-typedef void (*CairoDockFMMountCallback) (gboolean bMounting, gboolean bSuccess, const gchar *cName, Icon *icon, CairoDock *pDock);
-typedef void (*CairoDockFMMountFunc) (const gchar *cURI, int iVolumeID, CairoDockFMMountCallback pCallback, Icon *icon, CairoDock *pDock);
-typedef void (*CairoDockFMUnmountFunc) (const gchar *cURI, int iVolumeID, CairoDockFMMountCallback pCallback, Icon *icon, CairoDock *pDockCairoDock);
+typedef void (*CairoDockFMMountCallback) (gboolean bMounting, gboolean bSuccess, const gchar *cName, Icon *icon, CairoContainer *pContainer);
+typedef void (*CairoDockFMMountFunc) (const gchar *cURI, int iVolumeID, CairoDockFMMountCallback pCallback, Icon *icon, CairoContainer *pContainer);
+typedef void (*CairoDockFMUnmountFunc) (const gchar *cURI, int iVolumeID, CairoDockFMMountCallback pCallback, Icon *icon, CairoContainer *pContainer);
 
 typedef void (*CairoDockFMMonitorCallback) (CairoDockFMEventType iEventType, const gchar *cURI, gpointer data);
 typedef void (*CairoDockFMAddMonitorFunc) (const gchar *cURI, gboolean bDirectory, CairoDockFMMonitorCallback pCallback, gpointer data);
@@ -630,10 +638,10 @@ struct _CairoDockVFSBackend {
 	CairoDockFMEjectDriveFunc 		eject;
 	CairoDockFMMountFunc 			mount;
 	CairoDockFMUnmountFunc 		unmount;
-	CairoDockFMAddMonitorFunc 		add_monitor;
+	CairoDockFMAddMonitorFunc 	add_monitor;
 	CairoDockFMRemoveMonitorFunc 	remove_monitor;
 	CairoDockFMDeleteFileFunc 		delete;
-	CairoDockFMRenameFileFunc 		rename;
+	CairoDockFMRenameFileFunc 	rename;
 	CairoDockFMMoveFileFunc 		move;
 	CairoDockFMGetTrashFunc 		get_trash_path;
 	CairoDockFMGetDesktopFunc 	get_desktop_path;
@@ -642,22 +650,27 @@ struct _CairoDockVFSBackend {
 };
 
 
-typedef struct gpointer CairoDeskletRendererConfig;
+typedef struct gpointer CairoDeskletRendererDataParameter;
+typedef struct CairoDeskletRendererDataParameter * CairoDeskletRendererDataPtr;
+typedef struct gpointer CairoDeskletRendererConfigParameter;
+typedef struct CairoDeskletRendererConfigParameter * CairoDeskletRendererConfigPtr;
 typedef struct {
 	gchar *cName;
-	CairoDeskletRendererConfig *pConfig;
+	CairoDeskletRendererConfigPtr pConfig;
 } CairoDeskletRendererPreDefinedConfig;
 typedef void (* CairoDeskletRenderFunc) (cairo_t *pCairoContext, CairoDesklet *pDesklet, gboolean bRenderOptimized);
-typedef gpointer (* CairoDeskletConfigureRendererFunc) (CairoDesklet *pDesklet, cairo_t *pSourceContext, CairoDeskletRendererConfig *pConfig);
-typedef gpointer (* CairoDeskletLoadRendererFunc) (CairoDesklet *pDesklet, cairo_t *pSourceContext);
+typedef gpointer (* CairoDeskletConfigureRendererFunc) (CairoDesklet *pDesklet, cairo_t *pSourceContext, CairoDeskletRendererConfigPtr pConfig);
+typedef void (* CairoDeskletLoadRendererDataFunc) (CairoDesklet *pDesklet, cairo_t *pSourceContext);
+typedef void (* CairoDeskletUpdateRendererDataFunc) (CairoDesklet *pDesklet, CairoDeskletRendererDataPtr pNewData);
 typedef void (* CairoDeskletFreeRendererDataFunc) (CairoDesklet *pDesklet);
 typedef void (* CairoDeskletLoadIconsFunc) (CairoDesklet *pDesklet, cairo_t *pSourceContext);
 struct _CairoDeskletRenderer {
-	CairoDeskletRenderFunc render;
-	CairoDeskletConfigureRendererFunc configure;
-	CairoDeskletLoadRendererFunc load_data;
-	CairoDeskletFreeRendererDataFunc free_data;
-	CairoDeskletLoadIconsFunc load_icons;
+	CairoDeskletRenderFunc 			render;
+	CairoDeskletConfigureRendererFunc 	configure;
+	CairoDeskletLoadRendererDataFunc 	load_data;
+	CairoDeskletFreeRendererDataFunc 	free_data;
+	CairoDeskletLoadIconsFunc 			load_icons;
+	CairoDeskletUpdateRendererDataFunc 	update;
 	GList *pPreDefinedConfigList;
 };
 

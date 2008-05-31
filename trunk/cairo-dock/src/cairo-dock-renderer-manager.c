@@ -24,8 +24,11 @@ extern GHashTable *g_hDocksTable;
 extern gchar *g_cMainDockDefaultRendererName;
 extern gchar *g_cSubDockDefaultRendererName;
 
+extern int g_iDockRadius;
+
 static GHashTable *s_hRendererTable = NULL;  // table des fonctions de rendus de dock.
 static GHashTable *s_hDeskletRendererTable = NULL;  // table des fonctions de rendus des desklets.
+static GHashTable *s_hDialogRendererTable = NULL;  // table des fonctions de rendus des dialogues.
 
 
 CairoDockRenderer *cairo_dock_get_renderer (const gchar *cRendererName, gboolean bForMainDock)
@@ -80,7 +83,7 @@ void cairo_dock_remove_desklet_renderer (const gchar *cRendererName)
 	g_hash_table_remove (s_hDeskletRendererTable, cRendererName);
 }
 
-void cairo_dock_predefine_desklet_renderer_config (CairoDeskletRenderer *pRenderer, const gchar *cConfigName, CairoDeskletRendererConfig *pConfig)
+void cairo_dock_predefine_desklet_renderer_config (CairoDeskletRenderer *pRenderer, const gchar *cConfigName, CairoDeskletRendererConfigPtr pConfig)
 {
 	g_return_if_fail (cConfigName != NULL && pConfig != NULL);
 	CairoDeskletRendererPreDefinedConfig *pPreDefinedConfig = g_new (CairoDeskletRendererPreDefinedConfig, 1);
@@ -89,7 +92,7 @@ void cairo_dock_predefine_desklet_renderer_config (CairoDeskletRenderer *pRender
 	pRenderer->pPreDefinedConfigList = g_list_prepend (pRenderer->pPreDefinedConfigList, pPreDefinedConfig);
 }
 
-CairoDeskletRendererConfig *cairo_dock_get_desklet_renderer_predefined_config (const gchar *cRendererName, const gchar *cConfigName)
+CairoDeskletRendererConfigPtr cairo_dock_get_desklet_renderer_predefined_config (const gchar *cRendererName, const gchar *cConfigName)
 {
 	CairoDeskletRenderer *pRenderer = cairo_dock_get_desklet_renderer (cRendererName);
 	g_return_val_if_fail (pRenderer != NULL && cConfigName != NULL, NULL);
@@ -106,6 +109,26 @@ CairoDeskletRendererConfig *cairo_dock_get_desklet_renderer_predefined_config (c
 }
 
 
+CairoDialogRenderer *cairo_dock_get_dialog_renderer (const gchar *cRendererName)
+{
+	if (cRendererName != NULL)
+		return g_hash_table_lookup (s_hDialogRendererTable, cRendererName);
+	else
+		return NULL;
+}
+
+void cairo_dock_register_dialog_renderer (const gchar *cRendererName, CairoDialogRenderer *pRenderer)
+{
+	cd_message ("%s (%s)", __func__, cRendererName);
+	g_hash_table_insert (s_hDialogRendererTable, g_strdup (cRendererName), pRenderer);
+}
+
+void cairo_dock_remove_dialog_renderer (const gchar *cRendererName)
+{
+	g_hash_table_remove (s_hDialogRendererTable, cRendererName);
+}
+
+
 void cairo_dock_initialize_renderer_manager (void)
 {
 	g_return_if_fail (s_hRendererTable == NULL);
@@ -117,6 +140,11 @@ void cairo_dock_initialize_renderer_manager (void)
 		g_free);
 	
 	s_hDeskletRendererTable = g_hash_table_new_full (g_str_hash,
+		g_str_equal,
+		g_free,
+		g_free);
+	
+	s_hDialogRendererTable = g_hash_table_new_full (g_str_hash,
 		g_str_equal,
 		g_free,
 		g_free);
@@ -148,7 +176,7 @@ void cairo_dock_set_default_renderer (CairoDock *pDock)
 }
 
 
-void cairo_dock_set_desklet_renderer (CairoDesklet *pDesklet, CairoDeskletRenderer *pRenderer, cairo_t *pSourceContext, gboolean bLoadIcons, CairoDeskletRendererConfig *pConfig)
+void cairo_dock_set_desklet_renderer (CairoDesklet *pDesklet, CairoDeskletRenderer *pRenderer, cairo_t *pSourceContext, gboolean bLoadIcons, CairoDeskletRendererConfigPtr pConfig)
 {
 	g_return_if_fail (pDesklet != NULL);
 	cd_debug ("%s (%x)", __func__, pRenderer);
@@ -179,17 +207,76 @@ void cairo_dock_set_desklet_renderer (CairoDesklet *pDesklet, CairoDeskletRender
 	}
 }
 
-void cairo_dock_set_desklet_renderer_by_name (CairoDesklet *pDesklet, const gchar *cRendererName, cairo_t *pSourceContext, gboolean bLoadIcons, CairoDeskletRendererConfig *pConfig)
+void cairo_dock_set_desklet_renderer_by_name (CairoDesklet *pDesklet, const gchar *cRendererName, cairo_t *pSourceContext, gboolean bLoadIcons, CairoDeskletRendererConfigPtr pConfig)
 {
 	cd_message ("%s (%s, %d)", __func__, cRendererName, bLoadIcons);
 	CairoDeskletRenderer *pRenderer = (cRendererName != NULL ? cairo_dock_get_desklet_renderer (cRendererName) : NULL);
 	
-	cairo_t *pCairoContext = (pSourceContext != NULL ? pSourceContext : cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDesklet)));
+	cairo_dock_set_desklet_renderer (pDesklet, pRenderer, pSourceContext, bLoadIcons, pConfig);
+}
+
+
+void cairo_dock_set_dialog_renderer (CairoDialog *pDialog, CairoDialogRenderer *pRenderer, cairo_t *pSourceContext, CairoDialogRendererConfigPtr pConfig)
+{
+	g_return_if_fail (pDialog != NULL);
+	cd_debug ("%s (%x)", __func__, pRenderer);
 	
-	cairo_dock_set_desklet_renderer (pDesklet, pRenderer, pCairoContext, bLoadIcons, pConfig);
+	if (pDialog->pRenderer != NULL && pDialog->pRenderer->free_data != NULL)
+	{
+		pDialog->pRenderer->free_data (pDialog);
+		pDialog->pRendererData = NULL;
+	}
 	
-	if (pSourceContext == NULL)
-		cairo_destroy (pCairoContext);
+	pDialog->pRenderer = pRenderer;
+	
+	if (pRenderer != NULL)
+	{
+		cairo_t *pCairoContext = (pSourceContext != NULL ? pSourceContext : cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDialog)));
+		
+		if (pRenderer->configure != NULL)
+			pDialog->pRendererData = pRenderer->configure (pDialog, pCairoContext, pConfig);
+		
+		if (pSourceContext == NULL)
+			cairo_destroy (pCairoContext);
+	}
+}
+
+void cairo_dock_set_dialog_renderer_by_name (CairoDialog *pDialog, const gchar *cRendererName, cairo_t *pSourceContext, CairoDialogRendererConfigPtr pConfig)
+{
+	cd_message ("%s (%s)", __func__, cRendererName);
+	CairoDialogRenderer *pRenderer = (cRendererName != NULL ? cairo_dock_get_dialog_renderer (cRendererName) : NULL);
+	
+	cairo_dock_set_dialog_renderer (pDialog, pRenderer, pSourceContext, pConfig);
+}
+
+
+void cairo_dock_render_desklet_with_new_data (CairoDesklet *pDesklet, CairoDeskletRendererDataPtr pNewData)
+{
+	if (pDesklet->pRenderer != NULL && pDesklet->pRenderer->update != NULL)
+		pDesklet->pRenderer->update (pDesklet, pNewData);
+	
+	gtk_widget_queue_draw_area (pDesklet->pWidget,
+		.5*g_iDockRadius,
+		.5*g_iDockRadius,
+		pDesklet->iWidth - g_iDockRadius,
+		pDesklet->iHeight- g_iDockRadius);  // marche avec glitz ?...
+}
+
+void cairo_dock_render_dialog_with_new_data (CairoDialog *pDialog, CairoDialogRendererDataPtr pNewData)
+{
+	if (pDialog->pRenderer != NULL && pDialog->pRenderer->update != NULL)
+		pDialog->pRenderer->update (pDialog, pNewData);
+	
+	if (pDialog->pInteractiveWidget != NULL)
+		gtk_widget_queue_draw_area (pDialog->pWidget,
+			pDialog->iMargin,
+			(pDialog->bDirectionUp ?
+				pDialog->iMargin + pDialog->iMessageHeight :
+				pDialog->iHeight - pDialog->iMargin - pDialog->iInteractiveHeight),
+			pDialog->iInteractiveWidth,
+			pDialog->iInteractiveHeight);  // marche avec glitz ?...
+	else
+		gtk_widget_queue_draw (pDialog->pWidget);
 }
 
 

@@ -65,23 +65,6 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
     cairo_destroy (pCairoContext);
     return FALSE;
   }
-
-	gboolean bRenderOptimized = (pExpose->area.x > 0 || pExpose->area.y > 0);
-	if (bRenderOptimized)
-	{
-		cairo_rectangle (pCairoContext,
-		pExpose->area.x,
-		pExpose->area.y,
-		pExpose->area.width,
-		pExpose->area.height);
-		cairo_clip (pCairoContext);
-	}
-
-  //erase the background
-  cairo_set_source_rgba (pCairoContext, 0., 0., 0., 0.);
-  cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
-  cairo_paint (pCairoContext);
-  cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 	
 	//set the color
 	double fColor[4];
@@ -92,25 +75,50 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 	}
 	 if (gtk_window_is_active (GTK_WINDOW (pDesklet->pWidget)))
 		fColor[3] = MIN (1., fColor[3] * 1.25);
-	if (fColor[3] != 0)
+	
+	
+	gboolean bRenderOptimized = (pExpose->area.x > 0 || pExpose->area.y > 0);
+	if (bRenderOptimized)
 	{
-		cairo_save (pCairoContext);
-		cairo_set_source_rgba (pCairoContext, fColor[0], fColor[1], fColor[2], fColor[3]);
-		cairo_set_line_width (pCairoContext, g_iDockRadius);
-		cairo_set_line_join (pCairoContext, CAIRO_LINE_JOIN_ROUND);
-		//draw a rounded square
-		w = pDesklet->iWidth;
-		h = pDesklet->iHeight;
-		cairo_move_to (pCairoContext, g_iDockRadius>>1, g_iDockRadius>>1);
-		cairo_rel_line_to (pCairoContext, w - (g_iDockRadius), 0);
-		cairo_rel_line_to (pCairoContext, 0, h - (g_iDockRadius));
-		cairo_rel_line_to (pCairoContext, -(w - (g_iDockRadius)) , 0);
-		cairo_close_path (pCairoContext);
-		cairo_stroke (pCairoContext);
+		cairo_rectangle (pCairoContext,
+			pExpose->area.x,
+			pExpose->area.y,
+			pExpose->area.width,
+			pExpose->area.height);
+		cairo_clip (pCairoContext);
 		
-		cairo_rectangle(pCairoContext, g_iDockRadius, g_iDockRadius, (w - (g_iDockRadius << 1)), (h - (g_iDockRadius << 1)));
-		cairo_fill(pCairoContext);
-		cairo_restore (pCairoContext);  // retour au debut.
+		cairo_set_source_rgba (pCairoContext, fColor[0], fColor[1], fColor[2], fColor[3]);
+		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
+		cairo_paint (pCairoContext);
+	}
+	else
+	{
+		//erase the background
+		cairo_set_source_rgba (pCairoContext, 0., 0., 0., 0.);
+		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
+		cairo_paint (pCairoContext);
+		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
+		
+		if (fColor[3] != 0)
+		{
+			cairo_save (pCairoContext);
+			cairo_set_source_rgba (pCairoContext, fColor[0], fColor[1], fColor[2], fColor[3]);
+			cairo_set_line_width (pCairoContext, g_iDockRadius);
+			cairo_set_line_join (pCairoContext, CAIRO_LINE_JOIN_ROUND);
+			//draw a rounded square
+			w = pDesklet->iWidth;
+			h = pDesklet->iHeight;
+			cairo_move_to (pCairoContext, g_iDockRadius>>1, g_iDockRadius>>1);
+			cairo_rel_line_to (pCairoContext, w - (g_iDockRadius), 0);
+			cairo_rel_line_to (pCairoContext, 0, h - (g_iDockRadius));
+			cairo_rel_line_to (pCairoContext, -(w - (g_iDockRadius)) , 0);
+			cairo_close_path (pCairoContext);
+			cairo_stroke (pCairoContext);
+			
+			cairo_rectangle(pCairoContext, g_iDockRadius, g_iDockRadius, (w - (g_iDockRadius << 1)), (h - (g_iDockRadius << 1)));
+			cairo_fill(pCairoContext);
+			cairo_restore (pCairoContext);  // retour au debut.
+		}
 	}
 	
 	if (pDesklet->pRenderer != NULL)  // un moteur de rendu specifique a ete fourni.

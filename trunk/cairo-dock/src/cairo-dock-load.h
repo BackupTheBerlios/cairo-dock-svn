@@ -8,6 +8,7 @@
 
 
 void cairo_dock_free_label_description (CairoDockLabelDescription *pTextDescription);
+void cairo_dock_copy_label_description (CairoDockLabelDescription *pDestTextDescription, CairoDockLabelDescription *pOrigTextDescription);
 CairoDockLabelDescription *cairo_dock_duplicate_label_description (CairoDockLabelDescription *pOrigTextDescription);
 
 gchar *cairo_dock_generate_file_path (gchar *cImageFile);

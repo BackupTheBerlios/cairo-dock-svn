@@ -89,6 +89,13 @@ void cairo_dock_free_label_description (CairoDockLabelDescription *pTextDescript
 	g_free (pTextDescription);
 }
 
+void cairo_dock_copy_label_description (CairoDockLabelDescription *pDestTextDescription, CairoDockLabelDescription *pOrigTextDescription)
+{
+	g_return_if_fail (pOrigTextDescription != NULL && pDestTextDescription != NULL);
+	memcpy (pDestTextDescription, pOrigTextDescription, sizeof (CairoDockLabelDescription));
+	pDestTextDescription->cFont = g_strdup (pOrigTextDescription->cFont);
+}
+
 CairoDockLabelDescription *cairo_dock_duplicate_label_description (CairoDockLabelDescription *pOrigTextDescription)
 {
 	g_return_val_if_fail (pOrigTextDescription != NULL, NULL);

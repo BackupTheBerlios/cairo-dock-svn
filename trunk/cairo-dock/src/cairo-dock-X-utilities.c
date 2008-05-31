@@ -461,6 +461,7 @@ void cairo_dock_set_current_desktop (int iDesktopNumber)
 Pixmap cairo_dock_get_window_background_pixmap (Window Xid)
 {
 	g_return_val_if_fail (Xid > 0, None);
+	g_print ("%s (%d)\n", __func__, Xid);
 	
 	Pixmap iPixmapID;
 	Atom aReturnedType = 0;
@@ -472,7 +473,7 @@ Pixmap cairo_dock_get_window_background_pixmap (Window Xid)
 	if (iBufferNbElements != 0)
 	{
 		g_print ("RootMapID existe\n");
-		iBgPixmapID = pPixmapIdBuffer;
+		iBgPixmapID = *pPixmapIdBuffer;
 		XFree (pPixmapIdBuffer);
 	}
 	else

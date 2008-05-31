@@ -48,6 +48,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #define CAIRO_DOCK_FILE_HOST_URL "https://developer.berlios.de/project/showfiles.php?group_id=8724"
 #define CAIRO_DOCK_HELP_URL "http://www.cairo-dock.org"
 
+extern struct tm *localtime_r (time_t *timer, struct tm *tp);
+
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
 
@@ -688,10 +690,10 @@ static void _cairo_dock_mount_unmount (GtkMenuItem *menu_item, gpointer *data)
 
 	if (! bIsMounted)
 	{
-		cairo_dock_fm_mount (icon, pDock);
+		cairo_dock_fm_mount (icon, CAIRO_CONTAINER (pDock));
 	}
 	else
-		cairo_dock_fm_unmount (icon, pDock);
+		cairo_dock_fm_unmount (icon, CAIRO_CONTAINER (pDock));
 }
 
 static void _cairo_dock_eject (GtkMenuItem *menu_item, gpointer *data)

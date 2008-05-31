@@ -35,6 +35,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 
 #define CAIRO_DOCK_TASKBAR_CHECK_INTERVAL 250
 
+extern int kill (__pid_t pid, int sig);
+
 extern CairoDock *g_pMainDock;
 extern double g_fAmplitude;
 extern gboolean g_bUseSeparator;
