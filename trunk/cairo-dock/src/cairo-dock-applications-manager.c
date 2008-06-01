@@ -507,7 +507,7 @@ void cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Window Xid, gboolea
 			{
 				cd_message (  "s_aNetWmHidden");
 				*bIsHidden = TRUE;
-				break ;
+				//break ;
 			}
 			else if (pXStateBuffer[i] == s_aNetWmMaximizedVert)
 			{
@@ -515,7 +515,7 @@ void cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Window Xid, gboolea
 				if (iNbMaximizedDimensions == 2)
 				{
 					*bIsMaximized = TRUE;
-					break;
+					//break;
 				}
 			}
 			else if (pXStateBuffer[i] == s_aNetWmMaximizedHoriz)
@@ -524,7 +524,7 @@ void cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Window Xid, gboolea
 				if (iNbMaximizedDimensions == 2)
 				{
 					*bIsMaximized = TRUE;
-					break;
+					//break;
 				}
 			}
 		}
@@ -647,7 +647,7 @@ static gboolean _cairo_dock_window_is_on_our_way (Window *Xid, Icon *icon, int *
 	{
 		gboolean bIsFullScreen, bIsHidden, bIsMaximized;
 		cairo_dock_window_is_fullscreen_or_hidden_or_maximized (*Xid, &bIsFullScreen, &bIsHidden, &bIsMaximized);
-		if ((data[1] && bIsMaximized) || (data[2] && bIsFullScreen))
+		if ((data[1] && bIsMaximized & ! bIsHidden) || (data[2] && bIsFullScreen))
 		{
 			cd_message ("%s est genante (%d, %d) (%d;%d %dx%d)", icon->acName, bIsMaximized, bIsFullScreen, icon->windowGeometry.x, icon->windowGeometry.y, icon->windowGeometry.width, icon->windowGeometry.height);
 			if (cairo_dock_window_hovers_dock (&icon->windowGeometry, g_pMainDock))
@@ -817,21 +817,21 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 					gboolean bChangeIntercepted = FALSE;
 					if (g_bAutoHideOnMaximized || g_bAutoHideOnFullScreen)
 					{
-						if ( ((bIsMaximized && g_bAutoHideOnMaximized) || (bIsFullScreen && g_bAutoHideOnFullScreen)) && ! cairo_dock_quick_hide_is_activated ())
+						if ( ((bIsMaximized && ! bIsHidden && g_bAutoHideOnMaximized) || (bIsFullScreen && g_bAutoHideOnFullScreen)) && ! cairo_dock_quick_hide_is_activated ())
 						{
 							icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
 							cd_message (" => %s devient genante", icon != NULL ? icon->acName : "une fenetre");
 							if (icon != NULL && cairo_dock_window_hovers_dock (&icon->windowGeometry, g_pMainDock))
 								cairo_dock_activate_temporary_auto_hide ();
-							bChangeIntercepted = TRUE;
+							//bChangeIntercepted = TRUE;
 						}
-						else if ((! bIsMaximized || ! g_bAutoHideOnMaximized) && (! bIsFullScreen || ! g_bAutoHideOnFullScreen) && cairo_dock_quick_hide_is_activated ())
+						else if ((! bIsMaximized || ! g_bAutoHideOnMaximized || bIsHidden) && (! bIsFullScreen || ! g_bAutoHideOnFullScreen) && cairo_dock_quick_hide_is_activated ())
 						{
 							if (cairo_dock_search_window_on_our_way (g_bAutoHideOnMaximized, g_bAutoHideOnFullScreen) == NULL)
 							{
 								cd_message (" => plus aucune fenetre genante");
 								cairo_dock_deactivate_temporary_auto_hide ();
-								bChangeIntercepted = TRUE;
+								//bChangeIntercepted = TRUE;
 							}
 						}
 					}
@@ -849,6 +849,12 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 								cd_message ("  changement de visibilite -> %d", bIsHidden);
 								icon->bIsHidden = bIsHidden;
 								cairo_dock_update_visibility_on_inhibators (icon->cClass, icon->Xid, icon->bIsHidden);
+								
+								/*if (cairo_dock_quick_hide_is_activated ())
+								{
+									if (cairo_dock_search_window_on_our_way (g_bAutoHideOnMaximized, g_bAutoHideOnFullScreen) == NULL)
+										cairo_dock_deactivate_temporary_auto_hide ();
+								}*/
 								
 								if (g_bHideVisibleApplis && pParentDock != NULL)
 								{

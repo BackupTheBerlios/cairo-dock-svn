@@ -29,6 +29,7 @@ extern gchar *g_cCurrentThemePath;
 extern double g_fAmplitude;
 extern double g_fAlbedo;
 
+extern CairoDockLabelDescription g_iconTextDescription;
 extern CairoDockLabelDescription g_quickInfoTextDescription;
 extern gboolean g_bTextAlwaysHorizontal;
 
@@ -284,7 +285,7 @@ void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, 
 	cairo_dock_fill_one_text_buffer(
 		pIcon,
 		pSourceContext,
-		&g_quickInfoTextDescription,
+		&g_iconTextDescription,
 		(g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pContainer->bIsHorizontal),
 		pContainer->bDirectionUp);
 }
