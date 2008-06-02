@@ -235,6 +235,7 @@ gboolean g_bIndicatorAbove;
 cairo_surface_t *g_pDropIndicatorSurface = NULL;
 double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
 
+cairo_surface_t *g_pDesktopBgSurface = NULL;  // image en fond d'ecran.
 
 static void _cairo_dock_set_verbosity(gchar *cVerbosity)
 {
@@ -447,18 +448,8 @@ main (int argc, char** argv)
 	//\___________________ On initialise le support de X.
 	cairo_dock_initialize_X_support ();
 	
-	GdkPixbuf *pixbuf = cairo_dock_get_background_pixbuf ();  /// pour tests ...
-	if (pixbuf != NULL)
-	{
-		g_print ("bg : %dx%d\n", gdk_pixbuf_get_width (pixbuf), gdk_pixbuf_get_height (pixbuf));
-	}
-	
 	//\___________________ initialise the keybinder
 	cd_keybinder_init();
-	
-	//\___________________ On initialise le support de DBus.
-	///if (! bSafeMode)
-	///	cairo_dock_initialize_dbus_manager ();
 	
 	//\___________________ On detecte l'environnement de bureau (apres les applis et avant les modules).
 	if (g_iDesktopEnv == CAIRO_DOCK_UNKNOWN_ENV)
@@ -512,6 +503,7 @@ main (int argc, char** argv)
 	}
 
 	cairo_dock_load_theme (g_cCurrentThemePath);
+	cairo_dock_load_desktop_background_surface ();
 
 	//\___________________ On affiche le changelog en cas de nouvelle version.
 	gchar *cLastVersionFilePath = g_strdup_printf ("%s/.cairo-dock-last-version", g_cCairoDockDataDir);

@@ -60,7 +60,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
   if (!pDesklet)
     return FALSE;
 
-  cairo_t *pCairoContext = gdk_cairo_create (pWidget->window);
+  cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDesklet));
   if (cairo_status(pCairoContext) != CAIRO_STATUS_SUCCESS) {
     cairo_destroy (pCairoContext);
     return FALSE;
@@ -90,6 +90,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 		cairo_set_source_rgba (pCairoContext, fColor[0], fColor[1], fColor[2], fColor[3]);
 		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 		cairo_paint (pCairoContext);
+		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 	}
 	else
 	{

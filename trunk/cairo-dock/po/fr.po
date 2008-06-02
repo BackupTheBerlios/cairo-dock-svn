@@ -3197,7 +3197,7 @@ msgstr "Mode avancé"
 #: ../src/cairo-dock.c:511 ../src/cairo-dock.c:512 ../src/cairo-dock.c:513
 #: ../src/cairo-dock.c:507 ../src/cairo-dock.c:506 ../src/cairo-dock.c:505
 #: ../src/cairo-dock.c:508 ../src/cairo-dock.c:493 ../src/cairo-dock.c:494
-#: ../src/cairo-dock.c:495 ../src/cairo-dock.c:487
+#: ../src/cairo-dock.c:495 ../src/cairo-dock.c:487 ../src/cairo-dock.c:485
 msgid "< Maintenance mode >"
 msgstr "< Mode Maintenance >"
 
@@ -3471,8 +3471,17 @@ msgid ""
 "launcher by hands. If you dropped it into the dock from the menu, it is "
 "nearly sure that you shouldn't touch it. It defines the class of the "
 "program, which is useful to link the appli with its launcher."
-msgstr "La seule raison pour laquelle vous pouvez vouloir modifier de paramètre est si vous avez fait ce lanceur à la main. Si vous l'avez glissé-déposé à partir du menu, il est presque sûr que vous ne devriez pas y toucher. Il définit la classe du programme, ce qui est utile pour lier l'appli avec son lanceur."
+msgstr ""
+"La seule raison pour laquelle vous pouvez vouloir modifier de paramètre est "
+"si vous avez fait ce lanceur à la main. Si vous l'avez glissé-déposé à "
+"partir du menu, il est presque sûr que vous ne devriez pas y toucher. Il "
+"définit la classe du programme, ce qui est utile pour lier l'appli avec son "
+"lanceur."
 
 #: ../data/messages:709
 msgid "Class of the program :"
 msgstr "Classe du programme :"
+
+#: ../data/messages:515
+msgid "Text color (r,g,b) :"
+msgstr ""

@@ -183,6 +183,7 @@ typedef enum {
 	CAIRO_DOCK_NB_FREQUENCIES
 } CairoDockFrequencyState;
 
+typedef gboolean (* CairoDockUpdateTimerFunc ) (void);
 typedef struct {
 	/// Sid du timer des mesures.
 	gint iSidTimer;
@@ -196,8 +197,8 @@ typedef struct {
 	GVoidFunc acquisition;
 	/// fonction realisant la lecture des donnees precedemment acquises; stocke les resultats dans la structures des resultats.
 	GVoidFunc read;
-	/// fonction realisant la mise a jour de l'IHM en fonction des nouveaux resultats.
-	GVoidFunc update;
+	/// fonction realisant la mise a jour de l'IHM en fonction des nouveaux resultats. Renvoie TRUE pour continuer, FALSE pour arreter.
+	CairoDockUpdateTimerFunc update;
 	/// intervalle de temps en secondes, eventuellement nul pour une mesure unitaire.
 	gint iCheckInterval;
 	/// etat de la frequence des mesures.
@@ -223,9 +224,9 @@ void cairo_dock_launch_measure_delayed (CairoDockMeasure *pMeasureTimer, double 
 *@param update fonction realisant la mise a jour de l'interface en fonction des nouveaux resultats, lus dans la structures des resultats.
 *@return la mesure nouvellement allouee. A liberer avec #cairo_dock_free_measure_timer.
 */
-CairoDockMeasure *cairo_dock_new_measure_timer (int iCheckInterval, GVoidFunc acquisition, GVoidFunc read, GVoidFunc update);
+CairoDockMeasure *cairo_dock_new_measure_timer (int iCheckInterval, GVoidFunc acquisition, GVoidFunc read, CairoDockUpdateTimerFunc update);
 /**
-*Stoppe les mesures. Si une mesure est en cours, le thread d'acquisition/lecture se terminera tout seul plus tard, et la mesure sera ignoree. On peut reprendre les mesures par un simple #cairo_dock_launch_measure.
+*Stoppe les mesures. Si une mesure est en cours, le thread d'acquisition/lecture se terminera tout seul plus tard, et la mesure sera ignoree. On peut reprendre les mesures par un simple #cairo_dock_launch_measure. Ne doit _pas_ etre appelée durant la fonction 'read' ou 'update'; utiliser la sortie de 'update' pour cela.
 *@param pMeasureTimer la mesure periodique.
 */
 void cairo_dock_stop_measure_timer (CairoDockMeasure *pMeasureTimer);

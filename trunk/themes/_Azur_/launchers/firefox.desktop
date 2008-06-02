@@ -1,28 +1,38 @@
-#!fr
+#!en
 
 [Desktop Entry]
-#s Nom de ce lanceur :
+#s Launcher's name :
 Name=Firefox Web Browser
-#s Commande à exécuter lors du clique :
+#s Command to launch on click :
+#{Exemple : nautilus --no-desktop, gedit, etc. You can even enter a keyboard shortcut, for exemple <Alt>F1 for the Applications Menu, <Ctrl>c or <Ctrl>v to copy or paste, etc}
 Exec=firefox 
-#S Nom ou chemin de l'image :
-Icon=firefox
-#f Ordre que vous souhaitez affecter à ce lanceur parmis les autres :
-Order=1
-#E[_MainDock_;Web;System]  Nom du container auquel il appartient :
+#S Image's name or path :
+Icon=firefox-3.0
+
+#X[Extra parameters]
+frame_extra=
+#f Order you want for this launcher among the others:
+Order=1.5
+#E[_MainDock_;Web;Compiz Icon;System]  Name of the container it belongs to:
 Container=Web
-#b Cette icône est-elle un container ?
+#b Prevent this launcher from stealing appli from taskbar ?
+#{Use this option for exemple if the launcher launches a script in a terminal but you don't want it to steal normal terminal's icons from the TaskBar, or if you explicitely want to use the original icon of the TaskBar because it provides some info, for exemple Pidgin's icons represent the avatar of the contact.}
+prevent inhibate=false
+
+
 Is container=false
+
+Renderer=
 
 Base URI=
 Is mounting point=false
-Encoding=UTF-8
+Version=1.0
 Name[ca]=Navegador web Firefox
 Name[cs]=Firefox Webový prohlížeč
 Name[es]=Navegador web Firefox
 Name[fa]=مرورگر اینترنتی Firefox
 Name[fi]=Firefox-selain
-Name[fr]=Firefox
+Name[fr]=Navigateur Web Firefox
 Name[hu]=Firefox webböngésző
 Name[it]=Firefox Browser Web
 Name[ja]=Firefox ウェブ・ブラウザ
@@ -80,8 +90,7 @@ GenericName[sv]=Webbläsare
 Terminal=false
 X-MultipleArgs=false
 Type=Application
-Categories=Application;Network;
-MimeType=text/html;text/xml;application/xhtml+xml;application/xml;application/vnd.mozilla.xul+xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png
-StartupWMClass=Firefox-bin
+Categories=GTK;Network;
+MimeType=text/html;text/xml;application/xhtml+xml;application/xml;application/vnd.mozilla.xul+xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png;
+StartupWMClass=Firefox
 StartupNotify=true
-Is URI=false

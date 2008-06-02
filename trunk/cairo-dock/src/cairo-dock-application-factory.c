@@ -108,60 +108,6 @@ void cairo_dock_unregister_pid (Icon *icon)
 }
 
 
-static GdkPixbuf *_cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bAddAlpha)  // cette fonction est inspiree par celle de libwnck.
-{
-	Window root;  // inutile.
-	int x, y;  // inutile.
-	guint border_width;  // inutile.
-	guint iWidth, iHeight, iDepth;
-	XGetGeometry (s_XDisplay,
-		XPixmapID, &root, &x, &y,
-		&iWidth, &iHeight, &border_width, &iDepth);
-	cd_message ("%s (%d) : %dx%dx%d pixels (%d;%d)", __func__, XPixmapID, iWidth, iHeight, iDepth, x, y);
-
-	//\__________________ On recupere le drawable associe.
-	GdkDrawable *pGdkDrawable = gdk_xid_table_lookup (XPixmapID);
-	if (pGdkDrawable)
-		g_object_ref (G_OBJECT (pGdkDrawable));
-	else
-	{
-		cd_message ("pas d'objet GDK present, on en alloue un nouveau");
-		pGdkDrawable = gdk_pixmap_foreign_new (XPixmapID);
-	}
-
-	//\__________________ On recupere la colormap.
-	GdkColormap* pColormap = gdk_drawable_get_colormap (pGdkDrawable);
-	if (pColormap == NULL && gdk_drawable_get_depth (pGdkDrawable) > 1)  // pour les bitmaps, on laisse la colormap a NULL, ils n'en ont pas besoin.
-	{
-		GdkScreen* pScreen = gdk_drawable_get_screen (GDK_DRAWABLE (pGdkDrawable));
-		pColormap = gdk_screen_get_system_colormap (pScreen);  // au pire on a un colormap nul.
-		cd_debug ("  pColormap : %x", pColormap);
-	}
-
-	//\__________________ On recupere le buffer dans un GdkPixbuf.
-	GdkPixbuf *pIconPixbuf = gdk_pixbuf_get_from_drawable (NULL,
-		pGdkDrawable,
-		pColormap,
-		0,
-		0,
-		0,
-		0,
-		iWidth,
-		iHeight);
-	g_object_unref (G_OBJECT (pGdkDrawable));
-	g_return_val_if_fail (pIconPixbuf != NULL, NULL);
-
-	//\__________________ On lui ajoute un canal alpha si necessaire.
-	if (! gdk_pixbuf_get_has_alpha (pIconPixbuf) && bAddAlpha)
-	{
-		cd_debug ("  on lui ajoute de la transparence");
-		GdkPixbuf *tmp_pixbuf = gdk_pixbuf_add_alpha (pIconPixbuf, TRUE, 255, 255, 255);
-		g_object_unref (pIconPixbuf);
-		pIconPixbuf = tmp_pixbuf;
-	}
-	return pIconPixbuf;
-}
-
 cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
 {
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
@@ -575,12 +521,4 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 			}
 		}
 	}
-}
-
-
-
-GdkPixbuf *cairo_dock_get_background_pixbuf (void)
-{
-	Pixmap iRootPixmapID = cairo_dock_get_window_background_pixmap (cairo_dock_get_root_id ());
-	return _cairo_dock_get_pixbuf_from_pixmap (iRootPixmapID, FALSE);
 }

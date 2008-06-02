@@ -63,7 +63,7 @@ struct _CairoContainer {
 	/// Taille de la fenetre. La surface allouee a l'applet s'en deduit.
 	gint iWidth, iHeight;
 	/// Position de la fenetre.
-	int iWindowPositionX, iWindowPositionY;
+	gint iWindowPositionX, iWindowPositionY;
 	/// Vrai ssi le pointeur est dans le desklet (widgets fils inclus).
 	gboolean bInside;
 	/// TRUE ssi le container est horizontal.
@@ -318,7 +318,7 @@ struct _CairoDockModule {
 	/// le container dans lequel va se charger le module, ou NULL.
 	CairoContainer *pContainer;
 	/// Heure de derniere (re)activation du module.
-	double fLastLoadingTime;
+	gdouble fLastLoadingTime;
 };
 
 struct _CairoDockMinimalAppletConfig {
@@ -365,13 +365,13 @@ struct _CairoDialog {
 	/// la fenetre GTK du dialogue.
 	GtkWidget *pWidget;
 	/// largeur de la fenetre GTK du dialogue (pointe comprise).
-	int iWidth;
+	gint iWidth;
 	/// hauteur de la fenetre GTK du dialogue (pointe comprise).
-	int iHeight;
+	gint iHeight;
 	/// position en X du coin haut gauche de la fenetre GTK du dialogue.
-	int iPositionX;
+	gint iPositionX;
 	/// position en Y du coin haut gauche de la fenetre GTK du dialogue.
-	int iPositionY;
+	gint iPositionY;
 	/// vrai ssi la souris est dans le dialogue, auquel cas on le garde immobile.
 	gboolean bInside;
 	/// FALSE ssi le dialogue est perpendiculaire au dock.
@@ -390,35 +390,39 @@ struct _CairoDialog {
 	/// donnees pouvant etre utilisees par le moteur de rendu.
 	gpointer pRendererData;
 	/// position en X visee par la pointe dans le référentiel de l'écran.
-	int iAimedX;
+	gint iAimedX;
 	/// position en Y visee par la pointe dans le référentiel de l'écran.
-	int iAimedY;
+	gint iAimedY;
 	/// TRUE ssi le dialogue est a droite de l'écran; dialogue a droite <=> pointe a gauche.
 	gboolean bRight;
 	/// rayon des coins.
-	double fRadius;
+	gdouble fRadius;
 	/// hauteur de la pointe, sans la partie "aiguisee".
-	double fTipHeight;
+	gdouble fTipHeight;
 	/// surface representant le message du dialogue.
 	cairo_surface_t* pTextBuffer;
 	/// surface representant l'icone dans la marge a gauche du texte.
 	cairo_surface_t* pIconBuffer;
+	/// dimension de l'icone, sans les marges (0 si aucune icone).
+	gint iIconSize;
+	/// hauteur du texte, sans les marges.
+	gint iTextHeight;
 	/// dimensions de la bulle (message + widget utilisateur + boutons).
-	int iBubbleWidth, iBubbleHeight;
+	gint iBubbleWidth, iBubbleHeight;
 	/// dimensions du message en comptant la marge du texte + vgap en bas si necessaire.
-	int iMessageWidth, iMessageHeight;
+	gint iMessageWidth, iMessageHeight;
 	/// dimensions des boutons + vgap en haut.
-	int iButtonsWidth, iButtonsHeight;
+	gint iButtonsWidth, iButtonsHeight;
 	/// dimensions du widget interactif.
-	int iInteractiveWidth, iInteractiveHeight;
+	gint iInteractiveWidth, iInteractiveHeight;
 	/// distance de la bulle au dock, donc hauteur totale de la pointe.
-	int iDistanceToDock;
+	gint iDistanceToDock;
 	/// Marge due au rayon.
-	int iMargin;
+	gint iMargin;
 	/// decalage pour l'effet de clique sur le bouton Ok.
-	int iButtonOkOffset;
+	gint iButtonOkOffset;
 	/// decalage pour l'effet de clique sur le bouton Annuler.
-	int iButtonCancelOffset;
+	gint iButtonCancelOffset;
 	/// le widget de remplissage ou l'on dessine le message.
 	GtkWidget *pMessageWidget;
 	/// le widget de remplissage ou l'on dessine les boutons.
@@ -426,13 +430,13 @@ struct _CairoDialog {
 	/// le widget de remplissage ou l'on dessine la pointe.
 	GtkWidget *pTipWidget;
 	/// le timer pour la destruction automatique du dialogue.
-	int iSidTimer;
+	gint iSidTimer;
 	/// reference atomique.
-	int iRefCount;
+	gint iRefCount;
 	/// le widget d'interaction utilisateur (GtkEntry, GtkHScale, zone de dessin, etc).
 	GtkWidget *pInteractiveWidget;
 	/// le type des boutons (GTK_BUTTONS_NONE, GTK_BUTTONS_OK_CANCEL ou GTK_BUTTONS_YES_NO).
-	int iButtonsType;
+	gint iButtonsType;
 	/// fonction appelee au clique sur l'un des 2 boutons.
 	CairoDockActionOnAnswerFunc action_on_answer;
 	/// donnees transmises a la fonction.
@@ -504,9 +508,9 @@ struct _Icon {
 	/// Surface cairo de l'image et de son reflet.
 	cairo_surface_t* pFullIconBuffer;
 	/// Largeur de l'etiquette.
-	int iTextWidth;
+	gint iTextWidth;
 	/// Hauteur de l'etiquette.
-	int iTextHeight;
+	gint iTextHeight;
 	/// Decalage en X de l'etiquette.
 	gdouble fTextXOffset;
 	/// Decalage en Y de l'etiquette.
@@ -559,7 +563,7 @@ struct _Icon {
 	/// Classe de l'application correspondante (ou NULL si aucune).
 	gchar *cClass;
 	/// Heure de derniere verification de la presence de l'application dans la barre des taches.
-	double fLastCheckTime;
+	gdouble fLastCheckTime;
 	/// TRUE ssi la fenetre de l'application correspondante est minimisee.
 	gboolean bIsHidden;
 	/// Position et taille de la fenetre.
@@ -576,13 +580,13 @@ struct _Icon {
 	/// Surface cairo de l'info rapide.
 	cairo_surface_t* pQuickInfoBuffer;
 	/// Largeur de l'info rapide.
-	int iQuickInfoWidth;
+	gint iQuickInfoWidth;
 	/// Heuteur de l'info rapide.
-	int iQuickInfoHeight;
+	gint iQuickInfoHeight;
 	/// Decalage en X de la surface de l'info rapide.
-	double fQuickInfoXOffset;
+	gdouble fQuickInfoXOffset;
 	/// Decalage en Y de la surface de l'info rapide.
-	double fQuickInfoYOffset;
+	gdouble fQuickInfoYOffset;
 	/// TRUE ssi l'icone a un indicateur (elle controle une appli).
 	gboolean bHasIndicator;
 };
@@ -682,7 +686,7 @@ struct _CairoDesklet {
 	/// Taille de la fenetre. La surface allouee a l'applet s'en deduit.
 	gint iWidth, iHeight;
 	/// Position de la fenetre.
-	int iWindowPositionX, iWindowPositionY;
+	gint iWindowPositionX, iWindowPositionY;
 	/// Vrai ssi le pointeur est dans le desklet (widgets fils inclus).
 	gboolean bInside;
 	/// Toujours vrai pour un desklet.

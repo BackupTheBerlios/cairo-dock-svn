@@ -1005,6 +1005,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	if (cairo_dock_get_boolean_key_value (pKeyFile, "Dialogs", "homogeneous text", &bFlushConfFileNeeded, TRUE, NULL, NULL))
 	{
 		g_dialogTextDescription.iSize = g_iconTextDescription.iSize;
+		if (g_dialogTextDescription.iSize == 0)
+			g_dialogTextDescription.iSize = 14;
 		g_dialogTextDescription.cFont = g_strdup (g_iconTextDescription.cFont);
 		g_dialogTextDescription.iWeight = g_iconTextDescription.iWeight;
 		g_dialogTextDescription.iStyle = g_iconTextDescription.iStyle;

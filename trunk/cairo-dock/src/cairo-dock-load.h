@@ -11,10 +11,10 @@ void cairo_dock_free_label_description (CairoDockLabelDescription *pTextDescript
 void cairo_dock_copy_label_description (CairoDockLabelDescription *pDestTextDescription, CairoDockLabelDescription *pOrigTextDescription);
 CairoDockLabelDescription *cairo_dock_duplicate_label_description (CairoDockLabelDescription *pOrigTextDescription);
 
-gchar *cairo_dock_generate_file_path (gchar *cImageFile);
+gchar *cairo_dock_generate_file_path (const gchar *cImageFile);
 
-cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFile, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern);
-cairo_surface_t *cairo_dock_load_image_for_icon (cairo_t *pSourceContext, gchar *cImageFile, double fImageWidth, double fImageHeight);
+cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, const gchar *cImageFile, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern);
+cairo_surface_t *cairo_dock_load_image_for_icon (cairo_t *pSourceContext, const gchar *cImageFile, double fImageWidth, double fImageHeight);
 #define cairo_dock_load_image_for_square_icon(pSourceContext, cImageFile, fImageSize) cairo_dock_load_image_for_icon (pSourceContext, cImageFile, fImageSize, fImageSize)
 
 void cairo_dock_load_reflect_on_icon (Icon *icon, cairo_t *pSourceContext, gdouble fMaxScale, gboolean bHorizontalDock, gboolean bDirectionUp);
@@ -46,5 +46,8 @@ void cairo_dock_load_background_decorations (CairoDock *pDock);
 void cairo_dock_load_drop_indicator (gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale);
 
 void cairo_dock_load_task_indicator (const gchar *cIndicatorImagePath, double fIndicatorRatio, CairoContainer *pSomeContainer);
+
+void cairo_dock_load_desktop_background_surface (void);
+
 
 #endif

@@ -3042,6 +3042,7 @@ msgstr "Modo avanzado"
 #: ../src/cairo-dock.c:511 ../src/cairo-dock.c:512 ../src/cairo-dock.c:506
 #: ../src/cairo-dock.c:505 ../src/cairo-dock.c:508 ../src/cairo-dock.c:493
 #: ../src/cairo-dock.c:494 ../src/cairo-dock.c:495 ../src/cairo-dock.c:487
+#: ../src/cairo-dock.c:485
 msgid "< Maintenance mode >"
 msgstr "< Modo de Mantenimiento >"
 

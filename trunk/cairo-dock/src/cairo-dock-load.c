@@ -30,11 +30,15 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-log.h"
 #include "cairo-dock-dock-manager.h"
 #include "cairo-dock-class-manager.h"
+#include "cairo-dock-X-utilities.h"
 #include "cairo-dock-load.h"
 
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
 extern gboolean g_bSameHorizontality;
+
+extern gint g_iScreenWidth[2];
+extern gint g_iScreenHeight[2];
 
 extern int g_iSinusoidWidth;
 extern gint g_iDockLineWidth;
@@ -80,6 +84,7 @@ extern cairo_surface_t *g_pIndicatorSurface[2];
 extern gboolean g_bLinkIndicatorWithIcon;
 extern double g_fIndicatorWidth, g_fIndicatorHeight;
 
+extern cairo_surface_t *g_pDesktopBgSurface;
 
 void cairo_dock_free_label_description (CairoDockLabelDescription *pTextDescription)
 {
@@ -104,7 +109,7 @@ CairoDockLabelDescription *cairo_dock_duplicate_label_description (CairoDockLabe
 	return pTextDescription;
 }
 
-gchar *cairo_dock_generate_file_path (gchar *cImageFile)
+gchar *cairo_dock_generate_file_path (const gchar *cImageFile)
 {
 	g_return_val_if_fail (cImageFile != NULL, NULL);
 	gchar *cImagePath;
@@ -123,7 +128,7 @@ gchar *cairo_dock_generate_file_path (gchar *cImageFile)
 	return cImagePath;
 }
 
-cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFile, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern)
+cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, const gchar *cImageFile, double *fImageWidth, double *fImageHeight, double fRotationAngle, double fAlpha, gboolean bReapeatAsPattern)
 {
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	cairo_surface_t *pNewSurface = NULL;
@@ -197,7 +202,7 @@ cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, gchar *cImageFi
 	return pNewSurface;
 }
 
-cairo_surface_t *cairo_dock_load_image_for_icon (cairo_t *pSourceContext, gchar *cImageFile, double fImageWidth, double fImageHeight)
+cairo_surface_t *cairo_dock_load_image_for_icon (cairo_t *pSourceContext, const gchar *cImageFile, double fImageWidth, double fImageHeight)
 {
 	double fImageWidth_ = fImageWidth, fImageHeight_ = fImageHeight;
 	return cairo_dock_load_image (pSourceContext, cImageFile, &fImageWidth_, &fImageHeight_, 0., 1., FALSE);
@@ -722,5 +727,86 @@ void cairo_dock_load_task_indicator (const gchar *cIndicatorImagePath, double fI
 		else
 			cd_warning ("couldn't load image '%s' for indicators", cIndicatorImagePath);
 		cairo_destroy (pCairoContext);
+	}
+}
+
+
+void cairo_dock_load_desktop_background_surface (void)  // attention : fonction lourde.
+{
+	cairo_surface_destroy (g_pDesktopBgSurface);
+	g_pDesktopBgSurface = NULL;
+	
+	Pixmap iRootPixmapID = cairo_dock_get_window_background_pixmap (cairo_dock_get_root_id ());
+	g_return_if_fail (iRootPixmapID != 0);
+	
+	GdkPixbuf *pBgPixbuf = _cairo_dock_get_pixbuf_from_pixmap (iRootPixmapID, FALSE);  // on n'y ajoute pas de transparence.
+	if (pBgPixbuf != NULL)
+	{
+		cairo_t *pSourceContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (g_pMainDock));
+		
+		if (gdk_pixbuf_get_height (pBgPixbuf) == 1 && gdk_pixbuf_get_width(pBgPixbuf) == 1)  // couleur unie.
+		{
+			guchar *pixels = gdk_pixbuf_get_pixels (pBgPixbuf);
+			g_print ("c'est une couleur unie (%.2f, %.2f, %.2f)\n", (double) pixels[0] / 255, (double) pixels[1] / 255, (double) pixels[2] / 255);
+			
+			g_pDesktopBgSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+				CAIRO_CONTENT_COLOR_ALPHA,
+				g_iScreenWidth[CAIRO_DOCK_HORIZONTAL],
+				g_iScreenHeight[CAIRO_DOCK_HORIZONTAL]);
+			
+			cairo_t *pCairoContext = cairo_create (g_pDesktopBgSurface);
+			cairo_set_source_rgb (pCairoContext,
+				(double) pixels[0] / 255,
+				(double) pixels[1] / 255,
+				(double) pixels[2] / 255);
+			cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
+			cairo_paint (pCairoContext);
+			cairo_destroy (pCairoContext);
+		}
+		else
+		{
+			cairo_t *pSourceContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (g_pMainDock));
+			double fWidth, fHeight;
+			cairo_surface_t *pBgSurface = cairo_dock_create_surface_from_pixbuf (pBgPixbuf,
+				pSourceContext,
+				1,
+				0,
+				0,
+				FALSE,
+				&fWidth,
+				&fHeight,
+				NULL, NULL);
+			
+			if (fWidth < g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] || fHeight < g_iScreenHeight[CAIRO_DOCK_HORIZONTAL])
+			{
+				g_print ("c'est un degrade ou un motif (%dx%d)\n", (int) fWidth, (int) fHeight);
+				g_pDesktopBgSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+					CAIRO_CONTENT_COLOR_ALPHA,
+					g_iScreenWidth[CAIRO_DOCK_HORIZONTAL],
+					g_iScreenHeight[CAIRO_DOCK_HORIZONTAL]);
+				
+				cairo_t *pCairoContext = cairo_create (g_pDesktopBgSurface);
+				
+				cairo_pattern_t *pPattern = cairo_pattern_create_for_surface (pBgSurface);
+				g_return_if_fail (cairo_pattern_status (pPattern) == CAIRO_STATUS_SUCCESS);
+				cairo_pattern_set_extend (pPattern, CAIRO_EXTEND_REPEAT);
+				
+				cairo_set_source (pCairoContext, pPattern);
+				cairo_paint (pCairoContext);
+				
+				cairo_destroy (pCairoContext);
+				cairo_pattern_destroy (pPattern);
+				cairo_surface_destroy (pBgSurface);
+			}
+			else
+			{
+				g_print ("c'est un fond d'ecran de taille %dx%d\n", (int) fWidth, (int) fHeight);
+				g_pDesktopBgSurface = pBgSurface;
+			}
+			
+			g_object_unref (pBgPixbuf);
+		}
+		
+		cairo_destroy (pSourceContext);
 	}
 }

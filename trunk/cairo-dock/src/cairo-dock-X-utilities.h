@@ -40,5 +40,7 @@ void cairo_dock_set_current_desktop (int iDesktopNumber);
 
 Pixmap cairo_dock_get_window_background_pixmap (Window Xid);
 
+GdkPixbuf *_cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bAddAlpha);
+
 
 #endif
