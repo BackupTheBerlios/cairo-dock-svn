@@ -634,3 +634,34 @@ void cairo_dock_set_normal_frequency_state (CairoDockMeasure *pMeasureTimer)
 		_cairo_dock_restart_timer_with_frequency (pMeasureTimer, pMeasureTimer->iCheckInterval);
 	}
 }
+
+//Utile pour jouer des fichiers wav depuis le dock.
+void cairo_dock_play_sound (gchar *cSoundPath)
+{
+	cd_debug ("%s (%s)", __func__, cSoundPath);
+	if (cSoundPath == NULL)
+	{
+		cd_warning ("No sound to play, halt.");
+		return;
+	}
+	
+	GError *erreur = NULL;
+	gchar *cSoundCommand = NULL;
+	if (g_file_test ("/usr/bin/aplay", G_FILE_TEST_EXISTS))
+		cSoundCommand = g_strdup_printf("aplay \"%s\"", cSoundPath);
+		
+	else if (g_file_test ("/usr/bin/play", G_FILE_TEST_EXISTS))
+		cSoundCommand = g_strdup_printf("play \"%s\"", cSoundPath);
+	
+	else if (g_file_test ("/usr/bin/paplay", G_FILE_TEST_EXISTS))
+		cSoundCommand = g_strdup_printf("paplay \"%s\"", cSoundPath);
+	
+	g_spawn_command_line_async (cSoundCommand, &erreur); //cairo launch command?
+	
+	if (erreur != NULL) {
+		cd_warning ("Attention : when trying to execute '%s' : %s", cSoundCommand, erreur->message);
+		g_error_free (erreur);
+	}
+	
+	g_free (cSoundCommand);
+}

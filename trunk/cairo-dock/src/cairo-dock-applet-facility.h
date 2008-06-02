@@ -57,6 +57,8 @@ typedef enum {
 	CAIRO_DOCK_EMBLEM_TOTAL_NB,
 } CairoDockEmblem;
 
+#define cairo_dock_make_emblem_from_file(cIconFile, iEmblemType) cairo_dock_draw_emblem_on_my_icon(myDrawContext, cIconFile, myIcon, myContainer, iEmblemType);
+
 /**
 *Dessine un embleme sur une icone.
 *@param pIconContext le contexte du dessin; n'est pas altere par la fonction.
@@ -264,6 +266,13 @@ void cairo_dock_downgrade_frequency_state (CairoDockMeasure *pMeasureTimer);
 *@param pMeasureTimer la mesure periodique.
 */
 void cairo_dock_set_normal_frequency_state (CairoDockMeasure *pMeasureTimer);
+
+
+/**
+*Joue un son par l'intermédiaire de pulseaudio ou alsa (en priorité).
+*@param cSoundPath le chemin vers le fichier WAV a jouer.
+*/
+void cairo_dock_play_sound (gchar *cSoundPath);
 
 
 
