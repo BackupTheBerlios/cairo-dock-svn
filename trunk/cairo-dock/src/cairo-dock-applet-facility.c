@@ -647,11 +647,11 @@ void cairo_dock_play_sound (gchar *cSoundPath)
 	
 	GError *erreur = NULL;
 	gchar *cSoundCommand = NULL;
-	if (g_file_test ("/usr/bin/aplay", G_FILE_TEST_EXISTS))
-		cSoundCommand = g_strdup_printf("aplay \"%s\"", cSoundPath);
-		
-	else if (g_file_test ("/usr/bin/play", G_FILE_TEST_EXISTS))
+	if (g_file_test ("/usr/bin/play", G_FILE_TEST_EXISTS))
 		cSoundCommand = g_strdup_printf("play \"%s\"", cSoundPath);
+		
+	else if (g_file_test ("/usr/bin/aplay", G_FILE_TEST_EXISTS))
+		cSoundCommand = g_strdup_printf("aplay \"%s\"", cSoundPath);
 	
 	else if (g_file_test ("/usr/bin/paplay", G_FILE_TEST_EXISTS))
 		cSoundCommand = g_strdup_printf("paplay \"%s\"", cSoundPath);
