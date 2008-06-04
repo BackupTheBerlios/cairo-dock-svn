@@ -92,6 +92,9 @@ extern gboolean g_bUseGlitz;
 extern CairoDockFMSortType g_iFileSortType;
 extern gchar *g_cRaiseDockShortcut;
 
+extern cairo_surface_t *g_pDesktopBgSurface;
+extern gboolean g_bUseFakeTransparency;
+
 static gboolean s_bTemporaryAutoHide = FALSE;
 static gboolean s_bEntranceAllowed = TRUE;
 static gboolean s_bAutoHideInitialValue;
@@ -107,14 +110,18 @@ gboolean on_expose (GtkWidget *pWidget,
 	{
 		if (! (pDock->bAutoHide && pDock->iRefCount == 0) || ! pDock->bAtBottom)
 		{
+			cairo_t *pCairoContext = cairo_dock_create_drawing_context_on_area (CAIRO_CONTAINER (pDock), &pExpose->area, NULL);
+			if (pDock->iSidDropIndicator != 0)
+				cairo_save (pCairoContext);
+			
 			if (pDock->render_optimized != NULL)
-				pDock->render_optimized (pDock, &pExpose->area);
+				pDock->render_optimized (pCairoContext, pDock, &pExpose->area);
 			else
-				pDock->render (pDock);
+				pDock->render (pCairoContext, pDock);
 			
 			if (pDock->iSidDropIndicator != 0)
 			{
-				cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
+				/*cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 				g_return_val_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS, FALSE);
 				
 				cairo_rectangle (pCairoContext,
@@ -122,37 +129,46 @@ gboolean on_expose (GtkWidget *pWidget,
 					pExpose->area.y,
 					pExpose->area.width,
 					pExpose->area.height);
-				cairo_clip (pCairoContext);
+				cairo_clip (pCairoContext);*/
 				
+				cairo_restore (pCairoContext);
 				cairo_dock_draw_drop_indicator (pDock, pCairoContext);
-				
-				cairo_destroy (pCairoContext);
 			}
+			cairo_destroy (pCairoContext);
 		}
 		return FALSE;
 	}
 	
-	if (cairo_dock_is_loading ())  // && pDock->icons == NULL
+	
+	cairo_t *pCairoContext = cairo_dock_create_drawing_context (CAIRO_CONTAINER (pDock));
+	
+	if (cairo_dock_is_loading ())
 	{
-		cairo_dock_render_blank (pDock);
+		//cairo_dock_render_blank (pDock);
 	}
 	else if (!pDock->bAtBottom)
 	{
-		pDock->render (pDock);
+		pDock->render (pCairoContext, pDock);
 	}
 	else
 	{
 		if (pDock->bAutoHide && pDock->iRefCount == 0)
 		{
-			if (pDock->bInside)
-				cairo_dock_render_blank (pDock);
-			else
-				cairo_dock_render_background (pDock);
+			if (! pDock->bInside)
+				cairo_dock_render_background (pCairoContext, pDock);
+			//else  // ne devrait pas arriver.
+			//	cairo_dock_render_blank (pDock);
 		}
 		else
-			pDock->render (pDock);
+			pDock->render (pCairoContext, pDock);
 	}
-
+	
+	cairo_destroy (pCairoContext);
+	
+#ifdef HAVE_GLITZ
+	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
+		glitz_drawable_swap_buffers (pDock->pGlitzDrawable);
+#endif
 	return FALSE;
 }
 

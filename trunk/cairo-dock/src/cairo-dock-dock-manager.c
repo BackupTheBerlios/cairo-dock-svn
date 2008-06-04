@@ -171,6 +171,7 @@ CairoContainer *cairo_dock_search_container_from_icon (Icon *icon)
 
 void cairo_dock_update_conf_file_with_containers_full (GKeyFile *pKeyFile, gchar *cDesktopFilePath, gchar *cGroupName, gchar *cKeyName)
 {
+	g_print ("%s (%s; %s)\n", __func__, cGroupName, cKeyName);
 	cairo_dock_update_conf_file_with_hash_table (pKeyFile, cDesktopFilePath, s_hDocksTable, cGroupName, cKeyName, NULL, (GHFunc)cairo_dock_write_one_name, FALSE, FALSE);
 }
 
@@ -215,7 +216,7 @@ static gboolean _cairo_dock_hide_dock_if_parent (gchar *cDockName, CairoDock *pD
 				pDock->iMouseX = pDock->iCurrentWidth / 2;  // utile ?
 				pDock->iMouseY = 0;
 				pDock->calculate_icons (pDock);
-				pDock->render (pDock);  // peut-etre qu'il faudrait faire un redraw.
+				///pDock->render (pDock);  // peut-etre qu'il faudrait faire un redraw...
 			}
 
 			cd_message ("on cache %s par parente", cDockName);

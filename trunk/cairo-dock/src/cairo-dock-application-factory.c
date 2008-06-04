@@ -28,6 +28,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-log.h"
 #include "cairo-dock-dock-manager.h"
 #include "cairo-dock-class-manager.h"
+#include "cairo-dock-X-utilities.h"
 #include "cairo-dock-application-factory.h"
 
 extern double g_fAmplitude;

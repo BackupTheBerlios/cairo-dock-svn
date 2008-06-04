@@ -551,7 +551,7 @@ static void _cairo_dock_configure_renderer (GtkButton *button, gpointer *data)
 	if (pModule != NULL)
 	{
 		GError *erreur = NULL;
-		cairo_dock_configure_module (pDialog, pModule, &erreur);
+		cairo_dock_configure_module (NULL, pModule, &erreur);
 		if (erreur != NULL)
 		{
 			cd_warning ("%s", erreur->message);
@@ -641,7 +641,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 	{
 		pDialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
 			(pParentWindow != NULL ? GTK_WINDOW (pParentWindow) : NULL),
-			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_DIALOG_DESTROY_WITH_PARENT,  // GTK_DIALOG_MODAL | 
 			GTK_STOCK_OK,
 			GTK_RESPONSE_ACCEPT,
 			GTK_STOCK_QUIT,
@@ -1055,7 +1055,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 						pButtonConfigRenderer = gtk_button_new_from_stock (GTK_STOCK_PREFERENCES);
 						_allocate_new_buffer;
 						data[0] = pOneWidget;
-						data[1] = pDialog;
+						data[1] = pParentWindow;
 						g_signal_connect (G_OBJECT (pButtonConfigRenderer),
 							"clicked",
 							G_CALLBACK (_cairo_dock_configure_renderer),

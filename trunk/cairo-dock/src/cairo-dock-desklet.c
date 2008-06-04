@@ -60,12 +60,12 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
   if (!pDesklet)
     return FALSE;
 
-  cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDesklet));
+  /*cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDesklet));
   if (cairo_status(pCairoContext) != CAIRO_STATUS_SUCCESS) {
     cairo_destroy (pCairoContext);
     return FALSE;
-  }
-	
+  }*/
+	cairo_t *pCairoContext;
 	//set the color
 	double fColor[4];
 	int i;
@@ -80,7 +80,8 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 	gboolean bRenderOptimized = (pExpose->area.x > 0 || pExpose->area.y > 0);
 	if (bRenderOptimized)
 	{
-		cairo_rectangle (pCairoContext,
+		pCairoContext = cairo_dock_create_drawing_context_on_area (CAIRO_CONTAINER (pDesklet), &pExpose->area, fColor);
+		/*cairo_rectangle (pCairoContext,
 			pExpose->area.x,
 			pExpose->area.y,
 			pExpose->area.width,
@@ -90,15 +91,16 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 		cairo_set_source_rgba (pCairoContext, fColor[0], fColor[1], fColor[2], fColor[3]);
 		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 		cairo_paint (pCairoContext);
-		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
+		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);*/
 	}
 	else
 	{
-		//erase the background
+		pCairoContext = cairo_dock_create_drawing_context (CAIRO_CONTAINER (pDesklet));
+		/*//erase the background
 		cairo_set_source_rgba (pCairoContext, 0., 0., 0., 0.);
 		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 		cairo_paint (pCairoContext);
-		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
+		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);*/
 		
 		if (fColor[3] != 0)
 		{

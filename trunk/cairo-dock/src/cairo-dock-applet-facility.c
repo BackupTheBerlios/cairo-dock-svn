@@ -22,6 +22,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-applet-factory.h"
 #include "cairo-dock-log.h"
 #include "cairo-dock-dock-factory.h"
+#include "cairo-dock-callbacks.h"
 #include "cairo-dock-applet-facility.h"
 
 extern gchar *g_cCurrentThemePath;
@@ -635,7 +636,7 @@ void cairo_dock_set_normal_frequency_state (CairoDockMeasure *pMeasureTimer)
 	}
 }
 
-//Utile pour jouer des fichiers wav depuis le dock.
+//Utile pour jouer des fichiers son depuis le dock.
 void cairo_dock_play_sound (gchar *cSoundPath)
 {
 	cd_debug ("%s (%s)", __func__, cSoundPath);
@@ -656,12 +657,7 @@ void cairo_dock_play_sound (gchar *cSoundPath)
 	else if (g_file_test ("/usr/bin/paplay", G_FILE_TEST_EXISTS))
 		cSoundCommand = g_strdup_printf("paplay \"%s\"", cSoundPath);
 	
-	g_spawn_command_line_async (cSoundCommand, &erreur); //cairo launch command?
-	
-	if (erreur != NULL) {
-		cd_warning ("Attention : when trying to execute '%s' : %s", cSoundCommand, erreur->message);
-		g_error_free (erreur);
-	}
+	cairo_dock_launch_command (cSoundCommand);
 	
 	g_free (cSoundCommand);
 }

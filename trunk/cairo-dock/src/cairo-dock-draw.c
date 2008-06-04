@@ -74,6 +74,8 @@ extern cairo_surface_t *g_pDropIndicatorSurface;
 extern double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
 extern gboolean g_bIndicatorAbove;
 
+extern gboolean g_bUseFakeTransparency;
+extern cairo_surface_t *g_pDesktopBgSurface;
 extern gboolean g_bUseGlitz;
 
 void cairo_dock_set_colormap_for_window (GtkWidget *pWidget)
@@ -1065,6 +1067,7 @@ void cairo_dock_draw_string (cairo_t *pCairoContext, CairoDock *pDock, double fS
 		return ;
 
 	cairo_save (pCairoContext);
+	cairo_set_tolerance (pCairoContext, 0.5);
 	Icon *prev_icon = NULL, *next_icon, *icon;
 	double x, y, fCurvature = 0.3;
 	if (bIsLoop)
@@ -1171,34 +1174,34 @@ void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, d
 
 
 
-void cairo_dock_render_background (CairoDock *pDock)
+void cairo_dock_render_background (cairo_t *pCairoContext, CairoDock *pDock)
 {
 	//g_print ("%s (%.2f)\n", __func__, g_fVisibleZoneAlpha);
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
+	/*cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 	cairo_paint (pCairoContext);
 	
-	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
+	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);*/
 	if (g_pVisibleZoneSurface != NULL)
 	{
 		cairo_set_source_surface (pCairoContext, g_pVisibleZoneSurface, 0.0, 0.0);
 		cairo_paint_with_alpha (pCairoContext, g_fVisibleZoneAlpha);
 	}
-	cairo_destroy (pCairoContext);
+	/*cairo_destroy (pCairoContext);
 
 #ifdef HAVE_GLITZ
 	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
 		glitz_drawable_swap_buffers (pDock->pGlitzDrawable);
-#endif
+#endif*/
 }
 
-void cairo_dock_render_blank (CairoDock *pDock)
+void cairo_dock_render_blank (cairo_t *pCairoContext, CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
+	/*cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
@@ -1209,7 +1212,7 @@ void cairo_dock_render_blank (CairoDock *pDock)
 #ifdef HAVE_GLITZ
 	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
 		glitz_drawable_swap_buffers (pDock->pGlitzDrawable);
-#endif
+#endif*/
 }
 
 
@@ -1410,4 +1413,55 @@ gboolean cairo_dock_display_drop_indicator (CairoDock *pDock)
 		gdk_window_invalidate_rect (pDock->pWidget->window, &rect, FALSE);
 	}
 	return TRUE;
+}
+
+
+inline cairo_t *cairo_dock_create_drawing_context (CairoContainer *pContainer)
+{
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pContainer);
+	g_return_val_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS, FALSE);
+	
+	if (g_bUseFakeTransparency)
+		if (g_pDesktopBgSurface != NULL)
+			cairo_set_source_surface (pCairoContext, g_pDesktopBgSurface, - pContainer->iWindowPositionX, - pContainer->iWindowPositionY);
+		else
+			cairo_set_source_rgba (pCairoContext, 0.8, 0.8, 0.8, 0.0);
+	else
+		cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
+	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
+	cairo_paint (pCairoContext);
+	
+	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
+	return pCairoContext;
+}
+
+inline cairo_t *cairo_dock_create_drawing_context_on_area (CairoContainer *pContainer, GdkRectangle *pArea, double *fBgColor)
+{
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pContainer);
+	g_return_val_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS, pCairoContext);
+	
+	if (pArea != NULL && (pArea->x > 0 || pArea->y > 0))
+	{
+		cairo_rectangle (pCairoContext,
+			pArea->x,
+			pArea->y,
+			pArea->width,
+			pArea->height);
+		cairo_clip (pCairoContext);
+	}
+	
+	if (g_bUseFakeTransparency)
+		if (g_pDesktopBgSurface != NULL)
+			cairo_set_source_surface (pCairoContext, g_pDesktopBgSurface, - pContainer->iWindowPositionX, - pContainer->iWindowPositionY);
+		else
+			cairo_set_source_rgba (pCairoContext, 0.8, 0.8, 0.8, 0.0);
+	else if (fBgColor != NULL)
+		cairo_set_source_rgba (pCairoContext, fBgColor[0], fBgColor[1], fBgColor[2], fBgColor[3]);
+	else
+		cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
+	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
+	cairo_paint (pCairoContext);
+	
+	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
+	return pCairoContext;
 }

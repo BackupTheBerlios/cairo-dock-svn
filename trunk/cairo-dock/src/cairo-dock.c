@@ -89,6 +89,7 @@
 #include "cairo-dock-log.h"
 #include "cairo-dock-X-utilities.h"
 #include "cairo-dock-dbus.h"
+#include "cairo-dock-load.h"
 
 CairoDock *g_pMainDock;  // pointeur sur le dock principal.
 int g_iWmHint = GDK_WINDOW_TYPE_HINT_DOCK;  // hint pour la fenetre du dock principal.
@@ -236,6 +237,7 @@ cairo_surface_t *g_pDropIndicatorSurface = NULL;
 double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
 
 cairo_surface_t *g_pDesktopBgSurface = NULL;  // image en fond d'ecran.
+gboolean g_bUseFakeTransparency = FALSE;
 
 static void _cairo_dock_set_verbosity(gchar *cVerbosity)
 {
@@ -325,6 +327,9 @@ main (int argc, char** argv)
 		{"modules-dir", 'M', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
 			&cUserDefinedModuleDir,
 			"ask the dock to load additionnal modules contained in this directory (Though it is unsafe for your dock to load unnofficial modules).", NULL},
+		{"fake-transparency", 'F', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&g_bUseFakeTransparency,
+			"emulate composition with fake transparency. Only use this if you don't run a compositor like Compiz, xcompmgr, etc and have a black background around your dock.", NULL},
 		{NULL}
 	};
 
@@ -503,7 +508,9 @@ main (int argc, char** argv)
 	}
 
 	cairo_dock_load_theme (g_cCurrentThemePath);
-	cairo_dock_load_desktop_background_surface ();
+	
+	if (g_bUseFakeTransparency)
+		cairo_dock_load_desktop_background_surface ();
 
 	//\___________________ On affiche le changelog en cas de nouvelle version.
 	gchar *cLastVersionFilePath = g_strdup_printf ("%s/.cairo-dock-last-version", g_cCairoDockDataDir);

@@ -237,19 +237,19 @@ void cairo_dock_update_conf_file_with_list (GKeyFile *pOpenedKeyFile, gchar *cCo
 		{
 			cd_warning ("Attention : %s", erreur->message);
 			g_error_free (erreur);
+			g_key_file_free (pKeyFile);
 			return ;
 		}
 	}
 	
 	gchar *cUsefullComment;
-	gchar *cOldComment = g_key_file_get_comment (pKeyFile, cGroupName, cKeyName, &erreur);
-	if (erreur != NULL)
+	gchar *cOldComment = g_key_file_get_comment (pKeyFile, cGroupName, cKeyName, NULL);
+	if (cOldComment == NULL)
 	{
-		cd_warning ("Attention : %s", erreur->message);
-		g_error_free (erreur);
-		erreur = NULL;
+		if (pOpenedKeyFile == NULL)
+			g_key_file_free (pKeyFile);
+		return ;
 	}
-	g_return_if_fail (cOldComment != NULL);
 	cOldComment[strlen (cOldComment) - 1] = '\0';
 
 	gchar *cPrefix= cOldComment;

@@ -245,7 +245,8 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	double fLineWidth = g_iDockLineWidth;
 	double fRadius = pDialog->fRadius;
 
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDialog));
+	cairo_t *pCairoContext;
+	/*cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDialog));
 	if (cairo_status (pCairoContext) != CAIRO_STATUS_SUCCESS)
 	{
 		cairo_destroy (pCairoContext);
@@ -261,15 +262,16 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 			pExpose->area.width,
 			pExpose->area.height);
 		cairo_clip (pCairoContext);
-	}
+	}*/
 	
 	if (pExpose->area.x >= pDialog->iMargin + CAIRO_DIALOG_TEXT_MARGIN && pExpose->area.y >= pDialog->iMargin + CAIRO_DIALOG_TEXT_MARGIN && pExpose->area.width <= pDialog->iIconSize && pExpose->area.height <= pDialog->iIconSize)  // redessin de l'icone.
 	{
-		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
+		pCairoContext = cairo_dock_create_drawing_context_on_area (CAIRO_CONTAINER (pDialog), &pExpose->area, g_fDialogColor);
+		/*cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 		cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], g_fDialogColor[3]);
 		cairo_paint (pCairoContext);
 		
-		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
+		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);*/
 		cairo_set_source_surface (pCairoContext, pDialog->pIconBuffer,
 			pDialog->iMargin + CAIRO_DIALOG_TEXT_MARGIN,
 			pDialog->iMargin + CAIRO_DIALOG_TEXT_MARGIN);
@@ -277,11 +279,12 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	}
 	else if (pExpose->area.x >= pDialog->iMargin + pDialog->iIconSize + CAIRO_DIALOG_TEXT_MARGIN && pExpose->area.y <= pDialog->iMessageHeight && pExpose->area.width <= pDialog->iMessageWidth && pExpose->area.height <= pDialog->iMessageHeight)  // redessin du texte.
 	{
-		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
+		pCairoContext = cairo_dock_create_drawing_context_on_area (CAIRO_CONTAINER (pDialog), &pExpose->area, g_fDialogColor);
+		/*cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 		cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], g_fDialogColor[3]);
 		cairo_paint (pCairoContext);
 		
-		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
+		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);*/
 		cairo_set_source_surface (pCairoContext, pDialog->pTextBuffer,
 			pDialog->iMargin + pDialog->iIconSize + CAIRO_DIALOG_TEXT_MARGIN,
 			pDialog->iMargin + CAIRO_DIALOG_TEXT_MARGIN + (pDialog->iIconSize > pDialog->iTextHeight ? (pDialog->iIconSize - pDialog->iTextHeight) / 2: 0));
@@ -291,17 +294,22 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	{
 		if (pExpose->area.y >= pDialog->iMessageHeight)  // redessin du widget interactif.
 		{
-			cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
+			pCairoContext = cairo_dock_create_drawing_context_on_area (CAIRO_CONTAINER (pDialog), &pExpose->area, g_fDialogColor);
+			/*cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 			cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], g_fDialogColor[3]);
-			cairo_paint (pCairoContext);
+			cairo_paint (pCairoContext);*/
 		}
 		else
 		{
-			cairo_set_source_rgba (pCairoContext, 0., 0., 0., 0.);
+			if (pExpose->area.x > 0 || pExpose->area.y > 0)
+				pCairoContext = cairo_dock_create_drawing_context_on_area (CAIRO_CONTAINER (pDialog), &pExpose->area, NULL);
+			else
+				pCairoContext = cairo_dock_create_drawing_context (CAIRO_CONTAINER (pDialog));
+			/*cairo_set_source_rgba (pCairoContext, 0., 0., 0., 0.);
 			cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 			cairo_paint (pCairoContext);
-			cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
-		
+			cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);*/
+			
 			if (pDialog->iWidth == 20 && pDialog->iHeight == 20)
 			{
 				//cd_debug ("dialogue incomplet");
@@ -433,7 +441,6 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 				pDialog->pRenderer->render (pCairoContext, pDialog);
 		}
 	}
-	
 	
 	
 	cairo_destroy (pCairoContext);

@@ -2347,7 +2347,8 @@ msgstr ""
 #: ../src/cairo-dock-callbacks.c:875 ../src/cairo-dock-callbacks.c:937
 #: ../src/cairo-dock-callbacks.c:878 ../src/cairo-dock-callbacks.c:879
 #: ../src/cairo-dock-callbacks.c:882 ../src/cairo-dock-callbacks.c:880
-#: ../src/cairo-dock-callbacks.c:876
+#: ../src/cairo-dock-callbacks.c:876 ../src/cairo-dock-callbacks.c:904
+#: ../src/cairo-dock-callbacks.c:892
 msgid "Do you want to mount this point ?"
 msgstr "Voulez-vous monter ce point ?"
 
@@ -2630,7 +2631,8 @@ msgstr "Ajouter un séparateur"
 #: ../src/cairo-dock-callbacks.c:1567 ../src/cairo-dock-callbacks.c:1575
 #: ../src/cairo-dock-callbacks.c:1580 ../src/cairo-dock-callbacks.c:1578
 #: ../src/cairo-dock-callbacks.c:1579 ../src/cairo-dock-callbacks.c:1577
-#: ../src/cairo-dock-callbacks.c:1576
+#: ../src/cairo-dock-callbacks.c:1576 ../src/cairo-dock-callbacks.c:1604
+#: ../src/cairo-dock-callbacks.c:1592
 msgid "Quit Cairo-Dock ?"
 msgstr "Quitter Cairo-Dock ?"
 
@@ -2850,7 +2852,7 @@ msgstr "Desklets"
 #: ../data/messages:513 ../data/messages:517 ../data/messages:523
 #: ../data/messages:535
 msgid "Background color (r,v,b,a) :"
-msgstr "Couleur de fonc (r,v,b,a) :"
+msgstr "Couleur de fond (r,v,b,a) :"
 
 #: ../data/messages:475 ../data/messages:491 ../data/messages:495
 #: ../data/messages:499 ../data/messages:507 ../data/messages:511
@@ -3198,6 +3200,7 @@ msgstr "Mode avancé"
 #: ../src/cairo-dock.c:507 ../src/cairo-dock.c:506 ../src/cairo-dock.c:505
 #: ../src/cairo-dock.c:508 ../src/cairo-dock.c:493 ../src/cairo-dock.c:494
 #: ../src/cairo-dock.c:495 ../src/cairo-dock.c:487 ../src/cairo-dock.c:485
+#: ../src/cairo-dock.c:489 ../src/cairo-dock.c:490
 msgid "< Maintenance mode >"
 msgstr "< Mode Maintenance >"
 

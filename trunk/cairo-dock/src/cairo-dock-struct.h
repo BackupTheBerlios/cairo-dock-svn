@@ -84,8 +84,8 @@ struct _CairoContainer {
 
 typedef void (*CairoDockCalculateMaxDockSizeFunc) (CairoDock *pDock);
 typedef Icon * (*CairoDockCalculateIconsFunc) (CairoDock *pDock);
-typedef void (*CairoDockRenderFunc) (CairoDock *pDock);
-typedef void (*CairoDockRenderOptimizedFunc) (CairoDock *pDock, GdkRectangle *pArea);
+typedef void (*CairoDockRenderFunc) (cairo_t *pCairoContext, CairoDock *pDock);
+typedef void (*CairoDockRenderOptimizedFunc) (cairo_t *pCairoContext, CairoDock *pDock, GdkRectangle *pArea);
 typedef void (*CairoDockSetSubDockPositionFunc) (Icon *pPointedIcon, CairoDock *pParentDock);
 
 struct _CairoDockRenderer {

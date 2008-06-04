@@ -810,3 +810,10 @@ void cairo_dock_load_desktop_background_surface (void)  // attention : fonction 
 		cairo_destroy (pSourceContext);
 	}
 }
+
+cairo_surface_t *cairo_dock_get_desktop_bg_surface (void)
+{
+	if (g_pDesktopBgSurface == NULL)
+		cairo_dock_load_desktop_background_surface ();
+	return g_pDesktopBgSurface;
+}

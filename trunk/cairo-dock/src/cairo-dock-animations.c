@@ -88,6 +88,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 		else
 			gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionY, pDock->iWindowPositionX);
 		pDock->bAtTop = FALSE;
+		gtk_widget_queue_draw (pDock->pWidget);
 		return TRUE;
 	}
 	else  // on se fixe en bas, et on montre la zone visible.
