@@ -14,10 +14,10 @@ do
 			if test -e web-browser.$suff; then
 				echo "    vers web-browser.$suff"
 				ln -s web-browser.$suff firefox.$suff
-				ln -s web-browser.$suff firefox-3.0.$suff
 				ln -s web-browser.$suff opera.$suff
 				ln -s web-browser.$suff epiphany.$suff
 			fi
+			ln -s firefox.$suff firefox-3.0.$suff
 			if test -e file-browser.$suff; then
 				echo "    vers file-browser.$suff"
 				ln -s file-browser.$suff nautilus.$suff

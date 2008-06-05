@@ -9,4 +9,5 @@ theme_DATA = \
 	separateur.svg\
 	preview\
 	indicator-spirale.svg\
-	drop-indicator-arrow.svg
+	drop-indicator-arrow.svg\
+	dialog-ok.svg

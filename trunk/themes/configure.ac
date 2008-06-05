@@ -62,10 +62,21 @@ AC_CONFIG_FILES([Makefile
 		_Wood_/plug-ins/logout/Makefile
 		_Wood_/plug-ins/rendering/Makefile
 		_Wood_/plug-ins/weather/Makefile
+		_Clear_/Makefile
+		_Clear_/launchers/Makefile
+		_Clear_/plug-ins/Makefile
+		_Clear_/plug-ins/logout/Makefile
+		_Clear_/plug-ins/weather/Makefile
+		_Clear_/plug-ins/clock/Makefile
+		_Clear_/plug-ins/cpusage/Makefile
+		_Clear_/plug-ins/rendering/Makefile
+		_Clear_/plug-ins/compiz-icon/Makefile
+		_Clear_/plug-ins/AlsaMixer/Makefile
+		_Clear_/plug-ins/shortcuts/Makefile
 		])
-#		_Neon_/Makefile
-#		_Neon_/launchers/Makefile
-#		_Neon_/plug-ins/Makefile
-#		_Neon_/plug-ins/dustbin/Makefile
-#		_Neon_/plug-ins/logout/Makefile
+#		_Neon2_/Makefile
+#		_Neon2_/launchers/Makefile
+#		_Neon2_/plug-ins/Makefile
+#		_Neon2_/plug-ins/dustbin/Makefile
+#		_Neon2_/plug-ins/logout/Makefile
 AC_OUTPUT

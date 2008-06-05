@@ -8,5 +8,5 @@ SUBDIRS = \
 	_TapisVert_\
 	_MacOSX_\
 	_I_Cairo_\
-	_Wood_
-#	_Neon_
+	_Wood_\
+	_Clear_
