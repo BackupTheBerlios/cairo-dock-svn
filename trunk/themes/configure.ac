@@ -73,10 +73,10 @@ AC_CONFIG_FILES([Makefile
 		_Clear_/plug-ins/compiz-icon/Makefile
 		_Clear_/plug-ins/AlsaMixer/Makefile
 		_Clear_/plug-ins/shortcuts/Makefile
+		_Neon2_/Makefile
+		_Neon2_/launchers/Makefile
+		_Neon2_/plug-ins/Makefile
+		_Neon2_/plug-ins/dustbin/Makefile
+		_Neon2_/plug-ins/logout/Makefile
 		])
-#		_Neon2_/Makefile
-#		_Neon2_/launchers/Makefile
-#		_Neon2_/plug-ins/Makefile
-#		_Neon2_/plug-ins/dustbin/Makefile
-#		_Neon2_/plug-ins/logout/Makefile
 AC_OUTPUT

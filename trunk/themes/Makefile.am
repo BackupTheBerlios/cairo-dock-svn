@@ -9,4 +9,5 @@ SUBDIRS = \
 	_MacOSX_\
 	_I_Cairo_\
 	_Wood_\
-	_Clear_
+	_Clear_\
+	_Neon2_

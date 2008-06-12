@@ -1,0 +1,81 @@
+#!en
+
+[Desktop Entry]
+#s Launcher's name :
+Name=Inkscape
+#s Command to launch on click :
+#{Exemple : nautilus --no-desktop, gedit, etc. You can even enter a keyboard shortcut, for exemple <Alt>F1 for the Applications Menu, <Ctrl>c or <Ctrl>v to copy or paste, etc}
+Exec=inkscape 
+#S Image's name or path :
+Icon=inkscape
+
+#X[Extra parameters]
+frame_extra=
+#f Order you want for this launcher among the others:
+Order=0.234375
+#E[_MainDock_;glade-2;glade;System;Players;Tools;Internet;Office;Applet;Design]  Name of the container it belongs to:
+Container=Design
+#b Prevent this launcher from stealing appli from taskbar ?
+#{Use this option for exemple if the launcher launches a script in a terminal but you don't want it to steal normal terminal's icons from the TaskBar, or if you explicitely want to use the original icon of the TaskBar because it provides some info, for exemple Pidgin's icons represent the avatar of the contact.}
+prevent inhibate=false
+
+#s Class of the program :
+#{The only reason you may want to modify this parameter is if you made this launcher by hands. If you dropped it into the dock from the menu, it is nearly sure that you shouldn't touch it. It defines the class of the program, which is useful to link the appli with its launcher.}
+StartupWMClass=
+
+Is container=false
+
+Renderer=
+
+Base URI=
+Is mounting point=false
+Comment=Create and edit Scalable Vector Graphics images
+Comment[bg]=Създаване и редакция на изображения Scalable Vector Graphics
+Comment[ca]=Creeu i editeu imatges de gràfics de vectors escalables
+Comment[cs]=Vytvářejte a upravujte vektorovou grafiku (SVG)
+Comment[da]=Opret og redigér SVG-billeder
+Comment[de]=Skalierbare Vektorgrafiken (SVG) erzeugen und bearbeiten
+Comment[dz]=ཆ་ཚད་འཇལ་བཏུབ་པའི་མཉམ་ཐིག་ཚད་རིས་ཀྱི་གཟུགས་བརྙན་ཚུ་གསར་བསྐྲུན་དང་ཞུན་དག་འབད།
+Comment[el]=Δημιουργήστε και τροποποιήστε διανυσματικές εικόνες τύπου Scalable Vector Graphics
+Comment[en_GB]=Create and edit Scalable Vector Graphics images
+Comment[en_US@piglatin]=Eatecray andway editway Alablescay Ectorvay Aphicsgray imagesway
+Comment[eo]=Kreu kaj redaktu bildoj en formato SVG (Scalable Vector Graphics)
+Comment[es]=Cree y edite Gráficos Vectoriales Escalables (SVG)
+Comment[fi]=Luo ja muokkaa Scalable Vector Graphics -kuvia
+Comment[fr]=Créer et éditer des images Scalable Vector Graphics
+Comment[gl]=Cree e edite imaxes Scalable Vector Graphics
+Comment[hu]=Scalable Vector Graphics (méretezhető vektorgrafika, SVG) képek létrehozása és szerkesztése
+Comment[it]=Crea e modifica immagini Scalable Vector Graphics
+Comment[ja]=スケーラブル ベクター グラフィックス イメージの作成と編集を行います
+Comment[km]=បង្កើត និង កែសម្រួល​​​រូបភាព​ក្រាហ្វិក​វ៉ិចទ័រ​ដែល​អាច​ធ្វើមាត្រដ្ឋាន​បាន
+Comment[ko]=SVG(크기 조정 가능한 벡터 그래픽) 이미지  생성
+Comment[lt]=Kurti ir redaguoti SVG iliustraciją
+Comment[nb]=Lag og rediger Skalerbar VektorGrafikk-bilder
+Comment[ne]=स्केलेबुल भेक्टर ग्राफिक्स छविहरू सिर्जना गर्नुहोस् र सम्पादन गर्नुहोस्
+Comment[nl]='Scalable Vector Graphics (SVG) '-tekeningen maken en bewerken
+Comment[nn]=Lag og rediger skalerbare vektorbilete (SVG)
+Comment[pa]=ਸਕੇਲੇਬਲ ਵੈਕਟਰ ਗਰਾਫਿਕਸ ਚਿੱਤਰ ਬਣਾਓ ਅਤੇ ਸੋਧੋ
+Comment[pl]=Utwórz i edytuj rysunki wektorowe SVG
+Comment[pt]=Criar e editar Vectores Gráficos Escaláveis (SVG)
+Comment[pt_BR]=Crie e edite imagens escaláveis SVG (Scalable Vector Graphics)
+Comment[ru]=Создание и правка изображений в формате SVG
+Comment[sk]=Vytvoriť a upravovať obrázky Scalable Vector Graphics
+Comment[sl]=Ustvarjajte in urejajte vektorske slike SVG
+Comment[sr]=Прављење и уређивање SVG векторских слика
+Comment[sr@Latn]=Pravljenje i uređivanje SVG vektorskih slika
+Comment[sv]=Skapa och redigera SVG-bilder (Scalable Vector Graphics)
+Comment[th]=สร้างและแก้ไขภาพ Scalable Vector Graphics
+Comment[tr]=Ölçeklenebilir Vektör İmgeleri oluşturur ve düzenler
+Comment[uk]=Створення та редагування векторних графічних зображень
+Comment[vi]=Tạo và hiệu chỉnh ảnh kiểu đồ hóa véc-tơ có khả năng co giãn (SVG)
+Comment[zh_CN]=创建并编辑可缩放矢量图形图像
+Comment[zh_TW]=建立並編輯「可伸縮向量繪圖(SVG)」圖形
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Categories=Application;Graphics;VectorGraphics;GTK;
+MimeType=image/svg+xml
+FilePattern=inkscape
+TryExec=inkscape
+Terminal=false
+StartupNotify=true

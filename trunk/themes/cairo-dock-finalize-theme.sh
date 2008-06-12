@@ -17,7 +17,9 @@ do
 				ln -s web-browser.$suff opera.$suff
 				ln -s web-browser.$suff epiphany.$suff
 			fi
-			ln -s firefox.$suff firefox-3.0.$suff
+			if test -e firefox.$suff; then
+				ln -s firefox.$suff firefox-3.0.$suff
+			fi
 			if test -e file-browser.$suff; then
 				echo "    vers file-browser.$suff"
 				ln -s file-browser.$suff nautilus.$suff

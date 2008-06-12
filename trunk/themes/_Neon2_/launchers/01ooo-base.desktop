@@ -1,0 +1,172 @@
+#!en
+
+[Desktop Entry]
+#s Launcher's name :
+Name=OpenOffice.org Database
+#s Command to launch on click :
+#{Exemple : nautilus --no-desktop, gedit, etc. You can even enter a keyboard shortcut, for exemple <Alt>F1 for the Applications Menu, <Ctrl>c or <Ctrl>v to copy or paste, etc}
+Exec=ooffice -base 
+#S Image's name or path :
+Icon=ooo-base
+
+#X[Extra parameters]
+frame_extra=
+#f Order you want for this launcher among the others:
+Order=0.09375
+#E[_MainDock_;firefox;Tools;Players;System;Internet;Office;Applet;Design]  Name of the container it belongs to:
+Container=Office
+#b Prevent this launcher from stealing appli from taskbar ?
+#{Use this option for exemple if the launcher launches a script in a terminal but you don't want it to steal normal terminal's icons from the TaskBar, or if you explicitely want to use the original icon of the TaskBar because it provides some info, for exemple Pidgin's icons represent the avatar of the contact.}
+prevent inhibate=false
+
+#s Class of the program :
+#{The only reason you may want to modify this parameter is if you made this launcher by hands. If you dropped it into the dock from the menu, it is nearly sure that you shouldn't touch it. It defines the class of the program, which is useful to link the appli with its launcher.}
+StartupWMClass=
+
+Is container=false
+
+Renderer=
+
+Base URI=
+Is mounting point=false
+Version=1.0
+Terminal=false
+Type=Application
+Categories=Application;Office;Database;
+StartupNotify=false
+MimeType=application/vnd.oasis.opendocument.database;application/vnd.sun.xml.base;
+Name[am]=ኦፕንኦፊስ.ኦርግ ዳታባንክ
+Name[bn]=ওপেনঅফিস.অর্গ ডেটাবেইজ
+Name[ca]=Base de dades de l'OpenOffice.org
+Name[cs]=OpenOffice.org Databáze
+Name[de]=OpenOffice.org Datenbank
+Name[el]=Βάση Δεδομένων OpenOffice.org
+Name[en_GB]=OpenOffice.org Database
+Name[eo]=OpenOffice.org Datumbazo
+Name[es]=OpenOffice.org Bases de datos
+Name[et]=OpenOffice.org Andmebaas
+Name[fi]=OpenOffice.org-tietokanta
+Name[fil]=Database sa OpenOffice.org
+Name[fr]=Base de données OpenOffice.org
+Name[gl]=Base de datos de OpenOffice.org
+Name[he]=OpenOffice.org מסד נתונים
+Name[hr]=OpenOffice.org baze podataka
+Name[hu]=OpenOffice.org adatbázis
+Name[it]=OpenOffice.org - Database
+Name[ja]=OpenOffice.org Database
+Name[ka]=OpenOffice.org მონაცემთა ბაზა
+Name[kn]=OpenOffice.org ಧಾಕಲೆ ಭಂಡಾರ
+Name[ko]=오픈오피스 데이터베이스
+Name[ku]=Danegeha OpenOffice.org
+Name[lt]=OpenOffice.org duombazių sistema
+Name[nl]=OpenOffice.org Gegevensbank
+Name[oc]=Basa de donadas OpenOffice.org
+Name[pl]=Baza danych OpenOffice.org
+Name[pt]=Base de Dados OpenOffice.org
+Name[pt_BR]=OpenOffice.org Banco de Dados
+Name[ru]=OpenOffice: Базы данных
+Name[sk]=Databáza Openoffice.org
+Name[sv]=OpenOffice.org Databas
+Name[tl]=Database sa OpenOffice.org
+Name[tr]=OpenOffice.org Veritabanı
+Name[uk]=OpenOffice.org Database
+Name[vi]=Xử lý CSDL với OpenOffice.org
+Name[zh_CN]=OpenOffice.org数据库
+Name[zh_TW]=OpenOffice.org 資料庫
+GenericName=Database
+GenericName[af]=Databasis
+GenericName[am]=ዳታባንክ
+GenericName[ar]=قاعدة بيانات
+GenericName[be@latin]=Baza źviestak
+GenericName[bg]=Бази от данни
+GenericName[bn]=ডেটাবেইজ
+GenericName[ca]=Base de dades
+GenericName[cs]=Databáze
+GenericName[de]=Datenbank
+GenericName[dz]=གནད་སྡུད་གཞི་རྟེན།
+GenericName[el]=Βάση δεδομένων
+GenericName[en_CA]=Database
+GenericName[en_GB]=Database
+GenericName[en_ZA]=Database
+GenericName[eo]=Datumbazo
+GenericName[es]=Base de datos
+GenericName[et]=Andmebaas
+GenericName[eu]=Datu-basea
+GenericName[fi]=Tietokanta
+GenericName[fil]=Database
+GenericName[fr]=Base de données
+GenericName[gl]=Base de datos
+GenericName[he]=מסד נתונים
+GenericName[hr]=Baza podataka
+GenericName[hu]=Adatbázis
+GenericName[it]=Database
+GenericName[ja]=データベース
+GenericName[ka]=მონაცემთა ბაზა
+GenericName[kn]=ಧಾಕಲೆ ಭಂಡಾರ
+GenericName[ko]=데이터베이스
+GenericName[ku]=Danegeh
+GenericName[lt]=Duomenų bazės
+GenericName[mk]=Бази за податоци
+GenericName[nb]=Database
+GenericName[ne]=डाटाबेस
+GenericName[nl]=Gegevensbank
+GenericName[nr]=Ibulungelo lekhompyutha
+GenericName[nso]=Datapeisi
+GenericName[oc]=Basa de donadas
+GenericName[pl]=Baza danych
+GenericName[pt]=Base de dados
+GenericName[pt_BR]=Banco de dados
+GenericName[ru]=База данных
+GenericName[rw]=Ububikoshingiro
+GenericName[sk]=Databáza
+GenericName[sl]=Podatkovna zbirka
+GenericName[sq]=Databazë
+GenericName[st]=Datapeisi
+GenericName[sv]=Databas
+GenericName[tl]=Database
+GenericName[tr]=Veritabanı
+GenericName[ts]=Vuhlayisela-rungula
+GenericName[uk]=База даних
+GenericName[vi]=Cơ sở dữ liệu
+GenericName[wa]=Båze di dnêyes
+GenericName[xh]=Isiseko seenkcukacha
+GenericName[zh_CN]=数据库
+GenericName[zh_TW]=資料庫
+GenericName[zu]=Idatabheyzi
+Comment=Manage databases, create queries and reports to track and manage your information.
+Comment[am]=ዳታባንክ፣ መጠይቆችንና ሪፖርቶችን በመፍጠር በማረም መረጃዎን ያስተዳድሩ
+Comment[ar]=ادر قواعد البيانات ، انشئ استعلامات و تقارير
+Comment[bn]=আপনার তথ্য ট্র্যাক করতে এবং ব্যবস্থা করতে ডাটাবেইজ ব্যবস্থাপনা, কোয়েরি এবং রিপোর্ট তৈরি করতে।
+Comment[ca]=Gestioneu bases de dades i creeu consultes i informes per a gestionar la vostra informació i fer-ne un seguiment.
+Comment[cs]=Spravovat databáze, vytvářet dotazy a hlášení pro zkvalitnění správy informací.
+Comment[de]=Datenbanken verwalten, Abfragen und Berichte erstellen
+Comment[el]=Διαχείριση Βάσεων Δεδομένων, δημιουργία ερωτημάτων και αναφορών για παρακολούθηση και διαχείριση των πληροφοριών σας
+Comment[en_GB]=Manage databases, create queries and reports to track and manage your information.
+Comment[eo]=Mastrumi datumbazojn, krei informpetojn kaj raportojn por spuri kaj mastrumi viajn informojn.
+Comment[es]=Gestionar bases de datos, crear consultas e informes para controlar y gestionar su información.
+Comment[et]=Halda andmebaase, loo päringuid ja raporteid jälgimaks ja haldamaks oma informatsiooni.
+Comment[fi]=Hallitse tietokantoja sekä tee hakuja ja raportteja seurataksesi ja käsitelläksesi tietoja.
+Comment[fil]=Mangasiwa ng mga database, lumikha ng mga tanong at mga ulat upang masundan at pangasiwaan ang iyong impormasyon.
+Comment[fr]=Gérer les bases de données, créer des requêtes et des rapports pour suivre et gérer vos propres informations.
+Comment[gl]=Xestiona bases de datos, crear consultas e informes para xestionar a súa información.
+Comment[he]=נהלו מסדי נתונים, צרו שאילתות ודו"חות כדי לעקוב ולנהל את המידע שלכם.
+Comment[hr]=Uredite baze podataka, izradite upite i izvještaje; pratite svoje informacije.
+Comment[hu]=Adatbázisok kezelése, lekérdezések és jelentések készítése információk követéséhez és kezeléséhez.
+Comment[it]=Gestisce database, crea interrogazioni e rapporti per tracciare e gestire le proprie informazioni.
+Comment[ja]=情報の追跡・管理のため、データベース管理、クエリーとレポートの作成を行います。
+Comment[ka]=მონაცემთა ბაზების მართვა, მოთხოვნებისა და ანგარიშების შექმნა თქვენი ინფორმაციის თვალყურის დევნებისა და მართვისთვის.
+Comment[ko]=데이터베이스 관리하고, 검색 쿼리와 보고서를 만들어 정보를 관리합니다.
+Comment[ku]=Danegiran bi rê ve bibe, ji bo şopandina agahiyan û rêveberina wan lêpirsînan bike û raporan çêbike.
+Comment[lt]=Tvarkykite duombazes, kurkite užklausas bei ataskaitas informacijos kaupimui bei tvarkymui
+Comment[nl]=Gegevensbanken beheren, opzoekingen doen en rapporten maken om uw informatie op te volgen en te beheren.
+Comment[pl]=Zarządzanie bazami danych, tworzenie zapytań i raportów aby śledzić i zarządzać informacjami.
+Comment[pt]=Gerir bases de dados, criar consultas e relatórios de modo a controlar e gerir a sua informação.
+Comment[pt_BR]=Gerencie bancos de dados, cria consultas e relatórios para rastrear e gerenciar suas informações.
+Comment[ru]=Управление базами данными, создание запросов и отчетов для ведения и управления вашей информацией.
+Comment[sk]=Spravujte databázy, vytvárajte dotazy a správy pre vyhľadanie a organizáciu vašich informácií.
+Comment[sv]=Hantera databaser, skapa frågor och rapporter för att ha kontroll på och hantera din information.
+Comment[tl]=Mangasiwa ng mga database, lumikha ng mga tanong at mga ulat upang masundan at pangasiwaan ang iyong impormasyon.
+Comment[tr]=Veritabanlarını yönetin, bilgilerinizi takip etmek ve yönetmek için sorgular ve raporlar oluşturun.
+Comment[vi]=Quản trị CSDL, tạo truy vấn và báo cáo để nắm bắt và xử lý thông tin bạn có.
+Comment[zh_CN]=管理数据库、创建查询、制作信息管理跟踪的报表
+Comment[zh_TW]=管理資料庫、建立查詢及報告來追蹤、管理您的資訊。
