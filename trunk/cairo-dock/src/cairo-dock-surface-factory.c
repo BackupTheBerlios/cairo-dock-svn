@@ -311,6 +311,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (const gchar *cImagePath, 
 			cairo_scale (pCairoContext, fMaxScale * fIconWidthSaturationFactor, fMaxScale * fIconHeightSaturationFactor);
 
 			rsvg_handle_render_cairo (rsvg_handle, pCairoContext);
+			cairo_destroy (pCairoContext);
 			g_object_unref (rsvg_handle);
 		}
 	}
@@ -339,6 +340,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (const gchar *cImagePath, 
 			
 			cairo_set_source_surface (pCairoContext, surface_ini, 0, 0);
 			cairo_paint (pCairoContext);
+			cairo_destroy (pCairoContext);
 		}
 		cairo_surface_destroy (surface_ini);
 	}
@@ -364,7 +366,6 @@ cairo_surface_t *cairo_dock_create_surface_from_image (const gchar *cImagePath, 
 		g_object_unref (pixbuf);
 		
 	}
-	cairo_destroy (pCairoContext);
 	
 	if (fZoomX != NULL)
 		*fZoomX = fIconWidthSaturationFactor;

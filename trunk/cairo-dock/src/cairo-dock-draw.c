@@ -487,6 +487,8 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 		icon->fHeightFactor = -0.05;
 
 	icon->fDrawY += (1 - icon->fHeightFactor) / 2 * icon->fHeight * icon->fScale;
+	
+	cairo_dock_update_removing_inserting_icon (icon);
 }
 
 static void _cairo_dock_draw_appli_indicator (Icon *icon, cairo_t *pCairoContext, gboolean bHorizontalDock, double fRatio, gboolean bDirectionUp)
@@ -1416,7 +1418,7 @@ gboolean cairo_dock_display_drop_indicator (CairoDock *pDock)
 }
 
 
-inline cairo_t *cairo_dock_create_drawing_context (CairoContainer *pContainer)
+cairo_t *cairo_dock_create_drawing_context (CairoContainer *pContainer)
 {
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pContainer);
 	g_return_val_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS, FALSE);
@@ -1435,7 +1437,7 @@ inline cairo_t *cairo_dock_create_drawing_context (CairoContainer *pContainer)
 	return pCairoContext;
 }
 
-inline cairo_t *cairo_dock_create_drawing_context_on_area (CairoContainer *pContainer, GdkRectangle *pArea, double *fBgColor)
+cairo_t *cairo_dock_create_drawing_context_on_area (CairoContainer *pContainer, GdkRectangle *pArea, double *fBgColor)
 {
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pContainer);
 	g_return_val_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS, pCairoContext);

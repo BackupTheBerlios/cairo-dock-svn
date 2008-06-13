@@ -152,7 +152,7 @@ void cairo_dock_add_reflection_to_icon (cairo_t *pIconContext, Icon *pIcon, Cair
 void cairo_dock_set_icon_surface_with_reflect (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoContainer *pContainer)
 {
 	cairo_dock_set_icon_surface (pIconContext, pSurface);
-
+	
 	cairo_dock_add_reflection_to_icon (pIconContext, pIcon, pContainer);
 }
 

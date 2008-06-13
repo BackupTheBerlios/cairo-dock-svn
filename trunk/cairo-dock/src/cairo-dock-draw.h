@@ -110,8 +110,8 @@ double cairo_dock_calculate_extra_width_for_trapeze (double fFrameHeight, double
 gboolean cairo_dock_display_drop_indicator (CairoDock *pDock);
 void cairo_dock_draw_drop_indicator (CairoDock *pDock, cairo_t *pCairoContext);
 
-inline cairo_t *cairo_dock_create_drawing_context (CairoContainer *pContainer);
-inline cairo_t *cairo_dock_create_drawing_context_on_area (CairoContainer *pContainer, GdkRectangle *pArea, double *fBgColor);
+cairo_t *cairo_dock_create_drawing_context (CairoContainer *pContainer);
+cairo_t *cairo_dock_create_drawing_context_on_area (CairoContainer *pContainer, GdkRectangle *pArea, double *fBgColor);
 
 
 #endif

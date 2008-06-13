@@ -929,6 +929,22 @@ GList *cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, do
 	return pFirstDrawnElement;
 }
 
+void cairo_dock_update_removing_inserting_icon (Icon *icon)
+{
+	if (icon->fPersonnalScale > 0)
+	{
+		icon->fPersonnalScale *= .85;
+		if (icon->fPersonnalScale < 0.05)
+			icon->fPersonnalScale = 0.05;
+	}
+	else if (icon->fPersonnalScale < 0)
+	{
+		icon->fPersonnalScale *= .85;
+		if (icon->fPersonnalScale > -0.05)
+			icon->fPersonnalScale = -0.05;
+	}
+}
+
 Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, double fFlatDockWidth, int iWidth, int iHeight, double fAlign, double fFoldingFactor, gboolean bDirectionUp)
 {
 	//g_print (">>>>>%s (%d/%.2f, %dx%d, %.2f, %.2f)\n", __func__, x_abs, fFlatDockWidth, iWidth, iHeight, fAlign, fFoldingFactor);
@@ -965,20 +981,22 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 		
 		//\_______________ On en deduit l'amplitude de la sinusoide au niveau de cette icone, et donc son echelle.
 		icon->fScale = 1 + fMagnitude * g_fAmplitude * sin (icon->fPhase);
-		if (icon->fPersonnalScale > 0 && iWidth > 0)
-		{
-			icon->fPersonnalScale *= .85;
-			icon->fScale *= icon->fPersonnalScale;
-			if (icon->fPersonnalScale < 0.05)
-				icon->fPersonnalScale = 0.05;
-		}
-		else if (icon->fPersonnalScale < 0 && iWidth > 0)
-		{
-			icon->fPersonnalScale *= .85;
+		if (iWidth > 0 && icon->fPersonnalScale != 0)
 			icon->fScale *= (1 + icon->fPersonnalScale);
-			if (icon->fPersonnalScale > -0.05)
-				icon->fPersonnalScale = -0.05;
-		}
+// 		if (icon->fPersonnalScale > 0 && iWidth > 0)
+// 		{
+// 			icon->fPersonnalScale *= .85;
+// 			icon->fScale *= icon->fPersonnalScale;
+// 			if (icon->fPersonnalScale < 0.05)
+// 				icon->fPersonnalScale = 0.05;
+// 		}
+// 		else if (icon->fPersonnalScale < 0 && iWidth > 0)
+// 		{
+// 			icon->fPersonnalScale *= .85;
+// 			icon->fScale *= (1 + icon->fPersonnalScale);
+// 			if (icon->fPersonnalScale > -0.05)
+// 				icon->fPersonnalScale = -0.05;
+// 		}
 		icon->fY = (bDirectionUp ? iHeight - g_iDockLineWidth - g_iFrameMargin - icon->fScale * icon->fHeight : g_iDockLineWidth + g_iFrameMargin);
 		
 		//\_______________ Si on avait deja defini l'icone pointee, on peut placer l'icone courante par rapport a la precedente.

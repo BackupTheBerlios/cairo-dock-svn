@@ -784,14 +784,15 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 				else if (event.xproperty.atom == s_aNetDesktopGeometry)
 				{
 					cd_message ("geometrie du bureau alteree");
+					g_iNbDesktops = cairo_dock_get_nb_desktops ();
+					cairo_dock_get_nb_viewports (&g_iNbViewportX, &g_iNbViewportY);
+					
 					if (cairo_dock_update_screen_geometry ())  // modification largeur et/ou hauteur.
 					{
 						cairo_dock_set_window_position_at_balance (pDock, pDock->iCurrentWidth, pDock->iCurrentHeight);
 						gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);
-						cairo_dock_notify (CAIRO_DOCK_SCREEN_GEOMETRY_ALTERED, NULL);
 					}
-					g_iNbDesktops = cairo_dock_get_nb_desktops ();
-					cairo_dock_get_nb_viewports (&g_iNbViewportX, &g_iNbViewportY);
+					cairo_dock_notify (CAIRO_DOCK_SCREEN_GEOMETRY_ALTERED, NULL);
 				}
 			}
 			else

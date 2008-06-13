@@ -362,6 +362,6 @@ void cairo_dock_start_animation (Icon *icon, CairoDock *pDock)
 			pDock->iSidGrowUp = 0;
 		}
 		if (pDock->iSidShrinkDown == 0)
-			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);  // fera diminuer de taille les icones, et rebondir/tourner/clignoter celle sui est animee.
+			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);  // fera diminuer de taille les icones, et rebondir/tourner/clignoter celle qui est animee.
 	}
 }

@@ -11,6 +11,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <gdk/gdkx.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
@@ -33,7 +34,7 @@ static Atom s_aNetWmWindowTypeUtility;
 static Atom s_aNetCurrentDesktop;
 static Atom s_aNetDesktopViewport;
 static Atom s_aNetDesktopGeometry;
-static Atom s_aNetDesktopGeometry;
+static Atom s_aNetNbDesktops;
 static Atom s_aRootMapID;
 
 static int _cairo_dock_xerror_handler (Display * pDisplay, XErrorEvent *pXError)
@@ -54,6 +55,7 @@ void cairo_dock_initialize_X_support (void)
 	s_aNetCurrentDesktop = XInternAtom (s_XDisplay, "_NET_CURRENT_DESKTOP", False);
 	s_aNetDesktopViewport = XInternAtom (s_XDisplay, "_NET_DESKTOP_VIEWPORT", False);
 	s_aNetDesktopGeometry = XInternAtom (s_XDisplay, "_NET_DESKTOP_GEOMETRY", False);
+	s_aNetNbDesktops = XInternAtom (s_XDisplay, "_NET_NUMBER_OF_DESKTOPS", False);
 	s_aRootMapID = XInternAtom (s_XDisplay, "_XROOTPMAP_ID", False);
 	
 	cairo_dock_update_screen_geometry ();
@@ -331,7 +333,7 @@ int cairo_dock_get_nb_desktops (void)
 	int aReturnedFormat = 0;
 	unsigned long iLeftBytes, iBufferNbElements = 0;
 	gulong *pXDesktopNumberBuffer = NULL;
-	XGetWindowProperty (s_XDisplay, root, XInternAtom (s_XDisplay, "_NET_NUMBER_OF_DESKTOPS", False), 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXDesktopNumberBuffer);
+	XGetWindowProperty (s_XDisplay, root, s_aNetNbDesktops, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXDesktopNumberBuffer);
 	
 	int iNumberOfDesktops;
 	if (iBufferNbElements > 0)
@@ -533,4 +535,55 @@ GdkPixbuf *_cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bAddAlpha
 		pIconPixbuf = tmp_pixbuf;
 	}
 	return pIconPixbuf;
+}
+
+
+void cairo_dock_set_nb_viewports (int iNbViewportX, int iNbViewportY)
+{
+	XEvent xClientMessage;
+	Window root = DefaultRootWindow (s_XDisplay);
+	
+	xClientMessage.xclient.type = ClientMessage;
+	xClientMessage.xclient.serial = 0;
+	xClientMessage.xclient.send_event = True;
+	xClientMessage.xclient.display = s_XDisplay;
+	xClientMessage.xclient.window = root;
+	xClientMessage.xclient.message_type = s_aNetDesktopGeometry;
+	xClientMessage.xclient.format = 32;
+	xClientMessage.xclient.data.l[0] = iNbViewportX * g_iScreenWidth[CAIRO_DOCK_HORIZONTAL];
+	xClientMessage.xclient.data.l[1] = iNbViewportY * g_iScreenHeight[CAIRO_DOCK_HORIZONTAL];
+	xClientMessage.xclient.data.l[2] = 0;
+	xClientMessage.xclient.data.l[3] = 2;
+	xClientMessage.xclient.data.l[4] = 0;
+
+	XSendEvent (s_XDisplay,
+		root,
+		False,
+		SubstructureRedirectMask | SubstructureNotifyMask,
+		&xClientMessage);
+}
+
+void cairo_dock_set_nb_desktops (gulong iNbDesktops)
+{
+	XEvent xClientMessage;
+	Window root = DefaultRootWindow (s_XDisplay);
+	
+	xClientMessage.xclient.type = ClientMessage;
+	xClientMessage.xclient.serial = 0;
+	xClientMessage.xclient.send_event = True;
+	xClientMessage.xclient.display = s_XDisplay;
+	xClientMessage.xclient.window = root;
+	xClientMessage.xclient.message_type = s_aNetNbDesktops;
+	xClientMessage.xclient.format = 32;
+	xClientMessage.xclient.data.l[0] = iNbDesktops;
+	xClientMessage.xclient.data.l[1] = 0;
+	xClientMessage.xclient.data.l[2] = 0;
+	xClientMessage.xclient.data.l[3] = 2;
+	xClientMessage.xclient.data.l[4] = 0;
+
+	XSendEvent (s_XDisplay,
+		root,
+		False,
+		SubstructureRedirectMask | SubstructureNotifyMask,
+		&xClientMessage);
 }

@@ -6,11 +6,11 @@ released under the terms of the GNU General Public License.
 Written by Adrien Pilleboue (for any bug report, please mail me to adrien.pilleboue@gmail.com)
 
 ******************************************************************************/
+#include <string.h>
 #include <glib.h>
 #include <dbus/dbus-glib.h>
 #include <dbus/dbus-glib-bindings.h>
-#include "cairo-dock.h"
-//#include "cairo-dock-dbus-spec.h"
+#include "cairo-dock-log.h"
 #include "cairo-dock-dbus.h"
 
 static DBusGConnection *s_pSessionConnexion = NULL;

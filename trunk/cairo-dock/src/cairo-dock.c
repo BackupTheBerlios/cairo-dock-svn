@@ -377,6 +377,7 @@ main (int argc, char** argv)
 		g_free (cEnvironment);
 	}
 #ifndef HAVE_GLITZ
+	g_print ("Compiled with Glitz (hardware acceleration support)\n");
 	if (g_bUseGlitz)
 	{
 		cd_warning ("Attention : Cairo-Dock was not compiled with glitz");

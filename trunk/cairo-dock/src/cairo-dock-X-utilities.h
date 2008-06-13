@@ -42,5 +42,8 @@ Pixmap cairo_dock_get_window_background_pixmap (Window Xid);
 
 GdkPixbuf *_cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bAddAlpha);
 
+void cairo_dock_set_nb_viewports (int iNbViewportX, int iNbViewportY);
+void cairo_dock_set_nb_desktops (gulong iNbDesktops);
+
 
 #endif
