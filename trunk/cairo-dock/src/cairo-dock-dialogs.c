@@ -28,6 +28,7 @@ extern CairoDock *g_pMainDock;
 extern gint g_iScreenWidth[2], g_iScreenHeight[2];
 extern gboolean g_bSticky;
 extern gboolean g_bKeepAbove;
+extern gboolean g_bKeepBelow;
 extern int g_iVisibleZoneWidth, g_iVisibleZoneHeight;
 
 extern int g_iDockLineWidth;
@@ -741,7 +742,7 @@ CairoDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, CairoCont
 	//\________________ On cree un dialogue qu'on insere immediatement dans la liste.
 	CairoDialog *pDialog = g_new0 (CairoDialog, 1);
 	pDialog->iType = CAIRO_DOCK_TYPE_DIALOG;
-	pDialog->iRefCount = 2;
+	pDialog->iRefCount = 2;  // on l'enleve a la fin.
 	pDialog->pIcon = pIcon;
 	g_static_rw_lock_writer_lock (&s_mDialogsMutex);
 	s_pDialogList = g_slist_prepend (s_pDialogList, pDialog);
@@ -756,7 +757,7 @@ CairoDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, CairoCont
 
 	if (g_bSticky)
 		gtk_window_stick (GTK_WINDOW (pWindow));
-	gtk_window_set_keep_above (GTK_WINDOW (pWindow), g_bKeepAbove);
+	gtk_window_set_keep_above (GTK_WINDOW (pWindow), g_bKeepAbove || g_bKeepBelow);
 	gtk_window_set_skip_pager_hint (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_skip_taskbar_hint (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_gravity (GTK_WINDOW (pWindow), GDK_GRAVITY_STATIC);

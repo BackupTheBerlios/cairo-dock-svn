@@ -60,6 +60,9 @@ extern int g_iLeaveSubDockDelay;
 extern int g_iShowSubDockDelay;
 extern gboolean bShowSubDockOnClick;
 extern gboolean g_bUseSeparator;
+extern gboolean g_bKeepAbove;
+extern gboolean g_bKeepBelow;
+extern gboolean g_bPopUp;
 
 extern gint g_iScreenWidth[2];
 extern gint g_iScreenHeight[2];
@@ -217,6 +220,7 @@ void cairo_dock_show_subdock (Icon *pPointedIcon, gboolean bUpdate, CairoDock *p
 		pSubDock->bAtBottom = TRUE;  // bAtBottom ajoute pour la 1.5.4
 
 		gtk_window_present (GTK_WINDOW (pSubDock->pWidget));
+
 		if (pSubDock->bHorizontalDock)
 			gdk_window_move_resize (pSubDock->pWidget->window,
 				pSubDock->iWindowPositionX,
@@ -262,6 +266,9 @@ void cairo_dock_show_subdock (Icon *pPointedIcon, gboolean bUpdate, CairoDock *p
 			pSubDock->iSidGrowUp = g_timeout_add (40, (GSourceFunc) cairo_dock_grow_up, (gpointer) pSubDock);
 	}
 	//g_print ("  -> Gap %d;%d -> W(%d;%d) (%d)\n", pSubDock->iGapX, pSubDock->iGapY, pSubDock->iWindowPositionX, pSubDock->iWindowPositionY, pSubDock->bHorizontalDock);
+	
+	///gtk_window_set_keep_below (GTK_WINDOW (pSubDock->pWidget), g_bKeepBelow);  // pas les sous-docks.
+	gtk_window_set_keep_above (GTK_WINDOW (pSubDock->pWidget), g_bKeepBelow && g_bPopUp);
 }
 static gboolean _cairo_dock_show_sub_dock_delayed (CairoDock *pDock)
 {
@@ -271,6 +278,7 @@ static gboolean _cairo_dock_show_sub_dock_delayed (CairoDock *pDock)
 	Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
 	if (icon != NULL && icon->pSubDock != NULL)
 		cairo_dock_show_subdock (icon, FALSE, pDock);
+
 	return FALSE;
 }
 
@@ -495,16 +503,28 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	pDock->fAvoidingMouseMargin = 0;
 	pDock->bInside = FALSE;
 	pDock->bAtTop = FALSE;
+	
 	if (pDock->bMenuVisible)
 	{
 		return ;
 	}
-	if (pDock->iSidMoveUp > 0)  // si on est en train de monter, on arrete.
+	/**if (g_bKeepBelow && g_bPopUp && pDock->bIsMainDock)
+	{
+		//the mouse has exited the dock window, cancel any pop up event, and trigger a pop down event.
+		*if (pDock->iSidPopUp != 0)
+		{
+			g_source_remove(pDock->iSidPopUp);
+			pDock->iSidPopUp = 0;
+		}
+		if (pDock->iSidPopDown == 0)
+			pDock->iSidPopDown = g_timeout_add (500, (GSourceFunc) cairo_dock_pop_down, (gpointer) pDock);
+	}*/
+	if (pDock->iSidMoveUp != 0)  // si on est en train de monter, on arrete.
 	{
 		g_source_remove (pDock->iSidMoveUp);
 		pDock->iSidMoveUp = 0;
 	}
-	if (pDock->iSidGrowUp > 0)  // si on est en train de faire grossir les icones, on arrete.
+	if (pDock->iSidGrowUp != 0)  // si on est en train de faire grossir les icones, on arrete.
 	{
 		pDock->fFoldingFactor = 0;
 		g_source_remove (pDock->iSidGrowUp);
@@ -599,7 +619,61 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	return TRUE;
 }
 
-
+/// This function checks for the mouse cursor's position. If the mouse
+/// cursor touches the edge of the screen upon which the dock is resting,
+/// then the dock will pop up over other windows...
+gboolean cairo_dock_poll_screen_edge (CairoDock *pDock)
+{
+	static int iPrevPointerX = -1, iPrevPointerY = -1;
+	gint iMousePos[2];
+	///static gint iSidPopUp = 0;
+	
+	if (pDock->iSidPopUp == 0 && !pDock->bPopped)
+	{
+		gdk_display_get_pointer(gdk_display_get_default(), NULL, &iMousePos[0], &iMousePos[1], NULL);
+		if (iPrevPointerX == iMousePos[0] && iPrevPointerY == iMousePos[1])
+			return g_bPopUp && g_bKeepBelow;
+		
+		iPrevPointerX = iMousePos[0];
+		iPrevPointerY = iMousePos[1];
+		if (!pDock->bDirectionUp)
+		{
+			if (iMousePos[pDock->bHorizontalDock] == 0)
+			{
+				cairo_dock_pop_up (pDock);
+				/**pDock->iSidPopUp = g_timeout_add (500, (GSourceFunc) cairo_dock_pop_up, (gpointer) pDock);
+				iSidPopUp = pDock->iSidPopUp;*/
+				if (pDock->iSidPopDown == 0)
+					pDock->iSidPopDown = g_timeout_add (2500, (GSourceFunc) cairo_dock_pop_down, (gpointer) pDock);  // au cas ou on serait pas dedans.
+			}
+			/**else if (iSidPopUp)
+			{
+				g_source_remove(iSidPopUp);
+				if (iSidPopUp == pDock->iSidPopUp) pDock->iSidPopUp = 0;
+				iSidPopUp = 0;
+			}*/
+		}
+		else
+		{
+			if (iMousePos[pDock->bHorizontalDock] +1 == g_iScreenHeight[pDock->bHorizontalDock])
+			{
+				cairo_dock_pop_up (pDock);
+				/**pDock->iSidPopUp = g_timeout_add (500, (GSourceFunc) cairo_dock_pop_up, (gpointer) pDock);
+				iSidPopUp = pDock->iSidPopUp;*/
+				if (pDock->iSidPopDown == 0)
+					pDock->iSidPopDown = g_timeout_add (2500, (GSourceFunc) cairo_dock_pop_down, (gpointer) pDock);
+			}
+			/**else if (iSidPopUp)
+			{
+				g_source_remove(iSidPopUp);
+				if (iSidPopUp == pDock->iSidPopUp) pDock->iSidPopUp = 0;
+				iSidPopUp = 0;
+			}*/
+		}
+	}
+	
+	return g_bPopUp && g_bKeepBelow;
+}
 
 gboolean on_enter_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
@@ -618,7 +692,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 		g_source_remove (pDock->iSidLeaveDemand);
 		pDock->iSidLeaveDemand = 0;
 	}
-	
+
 	if (pDock->bAtTop || pDock->bInside || (pDock->iSidMoveDown != 0))  // le 'iSidMoveDown != 0' est la pour empecher le dock de "vibrer" si l'utilisateur sort par en bas avec l'auto-hide active.
 	{
 		//g_print ("  %d;%d;%d\n", pDock->bAtTop,  pDock->bInside, pDock->iSidMoveDown);
@@ -628,7 +702,9 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 
 	pDock->fDecorationsOffsetX = 0;
 	if (! pDock->bIsMainDock)
+	{
 		gtk_window_present (GTK_WINDOW (pWidget));
+	}
 	pDock->bInside = TRUE;
 	//cairo_dock_deactivate_temporary_auto_hide ();  // se desactive tout seul.
 
@@ -637,7 +713,6 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 		pDock->iAvoidingMouseIconType = s_pIconClicked->iType;
 		pDock->fAvoidingMouseMargin = .5;
 	}
-
 
 	int iNewWidth, iNewHeight;
 	cairo_dock_get_window_position_and_geometry_at_balance (pDock, CAIRO_DOCK_MAX_SIZE, &iNewWidth, &iNewHeight);
@@ -656,7 +731,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 			pDock->iWindowPositionX,
 			iNewHeight,
 			iNewWidth);
-
+	
 	if (pDock->iSidMoveDown > 0)  // si on est en train de descendre, on arrete.
 	{
 		//g_print ("  on est en train de descendre, on arrete\n");
@@ -668,8 +743,22 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 		g_source_remove (g_iSidShrinkDown);
 		g_iSidShrinkDown = 0;
 	}*/
-
-
+	
+	if (g_bKeepBelow && g_bPopUp && pDock->iRefCount == 0)
+	{
+		//This code will trigger a pop up...
+		/**if (pDock->iSidPopUp == 0)
+			pDock->iSidPopUp = g_timeout_add (500, (GSourceFunc) cairo_dock_pop_up, (gpointer) pDock);*/
+		cairo_dock_pop_up (pDock);
+		//If the dock window is entered, and there is a pending
+		//drop below event then it should be cancelled
+		if (pDock->iSidPopDown != 0)
+		{
+			g_source_remove(pDock->iSidPopDown);
+			pDock->iSidPopDown = 0;
+		}
+	}
+	
 	if (pDock->bAutoHide && pDock->iRefCount == 0)
 	{
 		//g_print ("  on commence a monter\n");

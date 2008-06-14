@@ -138,18 +138,19 @@ static void _cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 		"<b>Main developer :</b>\n  Fabounet (Fabrice Rey)\n\
 <b>Original idea/first development :</b>\n  Mac Slow\n\
 <b>Applets :</b>\n  Fabounet\n  Necropotame\n  Ctaf\n  ChAnGFu\n  Tofe\n  Paradoxxx_Zero\n\
-<b>Patchs :</b>\n  Ctaf\n  Necropotame\n  Robrob\n  Tshirtman\n\
+<b>Patchs :</b>\n  Ctaf\n  M.Tasaka\n  Necropotame\n  Robrob\n  Smidgey\n  Tshirtman\n\
 <b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole\n  Glattering\n  Vilraleur\n  Lord Northam\n\
 <b>Translations :</b>\n  Fabounet\n  Ppmt \n  Jiro Kawada\n  Henrry Oswaldo Ortiz Rodriguez");
 	
 	_cairo_dock_add_about_page (pNoteBook,
 		_("Support"),
-		"<b>Installation scripts and repository :</b>\n  Mav (SVN script, Ubuntu repository, web hosting)\n  Anubis (Suse repository)\n\
+		"<b>Installation script and web hosting :</b>\n  Mav\n\
 <b>Site (cairo-dock.org) :</b>\n  Necropotame\n  Tdey\n\
 <b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Mav\n  Necropotame\n  Nochka85\n  Ppmt\n  RavanH\n  Rhinopierroce\n  Sombrero\n  Vilraleur");
 	
 	gtk_widget_show_all (pDialog);
 	gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER_ALWAYS);  // un GTK_WIN_POS_CENTER simple ne marche pas, probablement parceque la fenetre n'est pas encore realisee. le 'always' ne pose pas de probleme, puisqu'on ne peut pas redimensionner le dialogue.
+	gtk_window_set_keep_above (GTK_WINDOW (pDialog), TRUE);
 	gtk_dialog_run (GTK_DIALOG (pDialog));
 	gtk_widget_destroy (pDialog);
 }

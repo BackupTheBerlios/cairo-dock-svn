@@ -48,7 +48,7 @@ void cairo_dock_xml_open_file (gchar *filePath, const gchar *mainNodeName,xmlDoc
 	*myXmlNode = node;
 }
 
-Gauge *init_cd_Gauge(cairo_t *pSourceContext, gchar *cThemePath, int iWidth, int iHeight)
+Gauge *cairo_dock_load_gauge(cairo_t *pSourceContext, gchar *cThemePath, int iWidth, int iHeight)
 {
 	g_print ("%s (%dx%d)\n", __func__, iWidth, iHeight);
 	g_return_val_if_fail (cThemePath != NULL, NULL);
@@ -162,7 +162,7 @@ Gauge *init_cd_Gauge(cairo_t *pSourceContext, gchar *cThemePath, int iWidth, int
 
 GaugeImage *cairo_dock_init_gauge_image (gchar *cImagePath)
 {
-	cd_debug("gauge : Image(%s)", cImagePath);
+	cd_debug ("%s (%s)", __func__, cImagePath);
 	GaugeImage *pGaugeImage = g_new0 (GaugeImage, 1);
 	
 	pGaugeImage->svgNeedle = rsvg_handle_new_from_file (cImagePath, NULL);
@@ -178,7 +178,7 @@ GaugeImage *cairo_dock_init_gauge_image (gchar *cImagePath)
 
 void cairo_dock_load_gauge_image (cairo_t *pSourceContext, GaugeImage *pGaugeImage, int iWidth, int iHeight)
 {
-	g_print ("%s (%dx%d)\n", __func__, iWidth, iHeight);
+	cd_message ("%s (%dx%d)", __func__, iWidth, iHeight);
 	if (pGaugeImage->cairoSurface != NULL)
 		cairo_surface_destroy (pGaugeImage->cairoSurface);
 	
@@ -200,17 +200,17 @@ void cairo_dock_load_gauge_image (cairo_t *pSourceContext, GaugeImage *pGaugeIma
 }
 
 
-void make_cd_Gauge(cairo_t *pSourceContext, CairoContainer *pContainer, Icon *pIcon, Gauge *pGauge, double fValue)
+void cairo_dock_render_gauge(cairo_t *pSourceContext, CairoContainer *pContainer, Icon *pIcon, Gauge *pGauge, double fValue)
 {
 	GList *pList = NULL;
 	pList = g_list_prepend (pList, &fValue);
 	
-	make_cd_Gauge_multiValue(pSourceContext,pContainer,pIcon,pGauge,pList);
+	cairo_dock_render_gauge_multi_value(pSourceContext,pContainer,pIcon,pGauge,pList);
 	
 	g_list_free (pList);
 }
 
-void make_cd_Gauge_multiValue(cairo_t *pSourceContext, CairoContainer *pContainer, Icon *pIcon, Gauge *pGauge, GList *valueList)
+void cairo_dock_render_gauge_multi_value(cairo_t *pSourceContext, CairoContainer *pContainer, Icon *pIcon, Gauge *pGauge, GList *valueList)
 {
 	g_return_if_fail (pGauge != NULL && pGauge->indicatorList != NULL && pContainer != NULL && pSourceContext != NULL);
 	//cd_debug("gauge : %s ()",__func__);
@@ -401,18 +401,22 @@ void cairo_dock_reload_gauge (cairo_t *pSourceContext, Gauge *pGauge, int iWidth
 		cairo_dock_load_gauge_image (pSourceContext, pGauge->imageForeground, iWidth, iHeight);
 	}
 	
+	GaugeIndicator *pGaugeIndicator;
 	GaugeImage *pGaugeImage;
-	GList *pElement;
+	GList *pElement, *pElement2;
 	for (pElement = pGauge->indicatorList; pElement != NULL; pElement = pElement->next)
 	{
-		pGaugeImage = pElement->data;
-		if (pGaugeImage->cairoSurface != NULL)  // si c'est une image on la recharge, pour une aiguille SVG c'est inutile.
-			cairo_dock_load_gauge_image (pSourceContext, pGaugeImage, iWidth, iHeight);
+		pGaugeIndicator = pElement->data;
+		for (pElement2 = pGaugeIndicator->imageList; pElement2 != NULL; pElement2 = pElement2->next)
+		{
+			pGaugeImage = pElement2->data;
+			cairo_dock_load_gauge_image (pSourceContext, pGaugeImage, iWidth, iHeight);  // si c'est une image on la recharge, pour une aiguille SVG c'est inutile.
+		}
 	}
 }
 
 
-void free_cd_GaugeImage(GaugeImage *pGaugeImage)
+static void cairo_dock_free_gauge_image(GaugeImage *pGaugeImage)
 {
 	cd_debug("");
 	if (pGaugeImage == NULL)
@@ -430,7 +434,7 @@ void free_cd_GaugeImage(GaugeImage *pGaugeImage)
 	g_free (pGaugeImage);
 }
 
-void free_cd_GaugeIndicator(GaugeIndicator *pGaugeIndicator)
+static void cairo_dock_free_gauge_indicator(GaugeIndicator *pGaugeIndicator)
 {
 	cd_debug("");
 	if (pGaugeIndicator == NULL)
@@ -439,20 +443,20 @@ void free_cd_GaugeIndicator(GaugeIndicator *pGaugeIndicator)
 	GList *pElement;
 	for (pElement = pGaugeIndicator->imageList; pElement != NULL; pElement = pElement->next)
 	{
-		free_cd_GaugeImage(pElement->data);
+		cairo_dock_free_gauge_image(pElement->data);
 	}
 	g_list_free (pGaugeIndicator->imageList);
 	
 	for (pElement = pGaugeIndicator->imageNeedle; pElement != NULL; pElement = pElement->next)
 	{
-		free_cd_GaugeImage(pElement->data);
+		cairo_dock_free_gauge_image(pElement->data);
 	}
 	g_list_free (pGaugeIndicator->imageNeedle);
 	
 	g_free (pGaugeIndicator);
 }
 
-void free_cd_Gauge(Gauge *pGauge)
+void cairo_dock_free_gauge(Gauge *pGauge)
 {
 	cd_debug("");
 	
@@ -460,13 +464,13 @@ void free_cd_Gauge(Gauge *pGauge)
 	{
 		if(pGauge->themeName != NULL) g_free(pGauge->themeName);
 		
-		if(pGauge->imageBackground != NULL) free_cd_GaugeImage(pGauge->imageBackground);
-		if(pGauge->imageForeground != NULL) free_cd_GaugeImage(pGauge->imageForeground);
+		if(pGauge->imageBackground != NULL) cairo_dock_free_gauge_image(pGauge->imageBackground);
+		if(pGauge->imageForeground != NULL) cairo_dock_free_gauge_image(pGauge->imageForeground);
 		
 		GList *pElement;
 		for (pElement = pGauge->indicatorList; pElement != NULL; pElement = pElement->next)
 		{
-			free_cd_GaugeIndicator(pElement->data);
+			cairo_dock_free_gauge_indicator(pElement->data);
 		}
 		g_list_free (pGauge->indicatorList);
 		

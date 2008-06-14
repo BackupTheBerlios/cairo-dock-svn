@@ -1,4 +1,4 @@
-/*********************************************************************************
+ /*********************************************************************************
 
 This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
@@ -70,6 +70,7 @@ extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 extern gchar *g_cConfFile;
 
 extern gboolean g_bKeepAbove;
+extern gboolean g_bKeepBelow;
 extern gboolean g_bSkipPager;
 extern gboolean g_bSkipTaskbar;
 extern gboolean g_bSticky;
@@ -93,6 +94,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	}
 	
 	pDock->bAtBottom = TRUE;
+    pDock->bPopped = FALSE;
 	pDock->iRefCount = 0;  // c'est un dock racine par defaut.
 	pDock->fRatio = 1.;
 	pDock->iAvoidingMouseIconType = -1;
@@ -108,6 +110,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	if (g_bSticky)
 		gtk_window_stick (GTK_WINDOW (pWindow));
 	gtk_window_set_keep_above (GTK_WINDOW (pWindow), g_bKeepAbove);
+	gtk_window_set_keep_below (GTK_WINDOW (pWindow), g_bKeepBelow);
 	gtk_window_set_skip_pager_hint (GTK_WINDOW (pWindow), g_bSkipPager);
 	gtk_window_set_skip_taskbar_hint (GTK_WINDOW (pWindow), g_bSkipTaskbar);
 	gtk_window_set_gravity (GTK_WINDOW (pWindow), GDK_GRAVITY_STATIC);
@@ -322,6 +325,10 @@ void cairo_dock_deactivate_one_dock (CairoDock *pDock)
 		g_source_remove (pDock->iSidMoveDown);
 	if (pDock->iSidMoveUp != 0)
 		g_source_remove (pDock->iSidMoveUp);
+	if (pDock->iSidPopDown != 0)
+		g_source_remove (pDock->iSidPopDown);
+	if (pDock->iSidPopUp != 0)
+		g_source_remove (pDock->iSidPopUp);
 	if (pDock->iSidGrowUp != 0)
 		g_source_remove (pDock->iSidGrowUp);
 	if (pDock->iSidShrinkDown != 0)
@@ -471,6 +478,9 @@ void cairo_dock_reference_dock (CairoDock *pDock, CairoDock *pParentDock)
 			g_print ("changement de position\n");
 			cairo_dock_reload_reflects_in_dock (pDock);
 		}
+		gtk_window_set_keep_above (GTK_WINDOW (pDock->pWidget), FALSE);
+		gtk_window_set_keep_below (GTK_WINDOW (pDock->pWidget), FALSE);
+		
 		pDock->bAutoHide = FALSE;
 		double fPrevRatio = pDock->fRatio;
 		pDock->fRatio = MIN (pDock->fRatio, g_fSubDockSizeRatio);
@@ -580,6 +590,7 @@ void cairo_dock_free_all_docks (void)
 	
 	cairo_dock_reset_class_table ();  // enleve aussi les inhibiteurs.
 	cairo_dock_stop_application_manager ();
+	cairo_dock_stop_polling_screen_edge ();
 
 	cairo_dock_reset_docks_table ();
 }

@@ -38,7 +38,7 @@
 **    great deal by sending me additional tweaked and optimized versions. I've
 **    now merged all that with my recent additions.
 **
-*********************** VERSION 1.x.x (2007-20008)*********************
+*********************** VERSION 0.1.0 and above (2007-20008)*********************
 **
 ** author(s) :
 **     Fabrice Rey <fabounet@users.berlios.de>
@@ -60,17 +60,13 @@
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
+#include <signal.h> 
+#include <unistd.h>
 
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
-
-#ifdef HAVE_GLITZ
-#include <gdk/gdkx.h>
-#include <glitz-glx.h>
-#include <cairo-glitz.h>
-#endif
 
 #include "cairo-dock-icons.h"
 #include "cairo-dock-applications-manager.h"
@@ -211,6 +207,8 @@ double g_fDeskletColorInside[4];
 gchar *g_cRaiseDockShortcut = NULL;
 
 gboolean g_bKeepAbove = FALSE;
+gboolean g_bKeepBelow = FALSE;
+gboolean g_bPopUp = FALSE;
 gboolean g_bSkipPager = TRUE;
 gboolean g_bSkipTaskbar = TRUE;
 gboolean g_bSticky = TRUE;
@@ -238,6 +236,7 @@ double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
 
 cairo_surface_t *g_pDesktopBgSurface = NULL;  // image en fond d'ecran.
 gboolean g_bUseFakeTransparency = FALSE;
+static gchar *cLaunchCommand = NULL;
 
 static void _cairo_dock_set_verbosity(gchar *cVerbosity)
 {
@@ -259,10 +258,38 @@ static void _cairo_dock_set_verbosity(gchar *cVerbosity)
 	}
 }
 
-int
-main (int argc, char** argv)
+static gboolean _cairo_dock_successful_launch (gpointer data)
 {
-	gint i;
+	cLaunchCommand[strlen (cLaunchCommand)-3] = '\0';  // on enleve le mode maintenance.
+	return FALSE;
+}
+static void _cairo_dock_intercept_signal (int signal)
+{
+	cd_warning ("Attention : Cairo-Dock has crashed (sig %d).\nIt will be restarted now.\nFeel free to report this bug on cairo-dock.org to help improving the dock !", signal);
+	execl ("/bin/sh", "/bin/sh", "-c", cLaunchCommand, NULL);  // on ne revient pas de cette fonction.
+	cd_warning ("Sorry, couldn't restart the dock");
+}
+static void _cairo_dock_set_signal_interception (void)
+{
+	signal (SIGSEGV, _cairo_dock_intercept_signal);  // Segmentation violation
+	signal (SIGFPE, _cairo_dock_intercept_signal);  // Floating-point exception
+	signal (SIGILL, _cairo_dock_intercept_signal);  // Illegal instruction
+	signal (SIGABRT, _cairo_dock_intercept_signal);  // Abort
+}
+
+
+int main (int argc, char** argv)
+{
+	int i;
+	GString *sCommandString = g_string_new (argv[0]);
+	for (i = 1; i < argc; i ++)
+	{
+		g_string_append_printf (sCommandString, " %s", argv[i]);
+	}
+	g_string_append (sCommandString, " -m");  // on relance avec le mode maintenance.
+	cLaunchCommand = sCommandString->str;
+	g_string_free (sCommandString, FALSE);
+	
 	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)
 		g_tIconTypeOrder[i] = i;
 	cd_log_init(FALSE);
@@ -270,7 +297,7 @@ main (int argc, char** argv)
         cd_log_set_level(0);
 	gtk_init (&argc, &argv);
 	GError *erreur = NULL;
-
+	
 	//\___________________ On recupere quelques options.
 	gboolean bSafeMode = FALSE, bMaintenance = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE;
 	gchar *cEnvironment = NULL, *cUserDefinedDataDir = NULL, *cVerbosity = 0, *cUserDefinedModuleDir = NULL;
@@ -285,6 +312,12 @@ main (int argc, char** argv)
 		{"keep-above", 'a', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&g_bKeepAbove,
 			"keep the dock above other windows whatever", NULL},
+		{"keep-below", 'B', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&g_bKeepBelow,
+			"keep the dock below other windows whatever", NULL},			
+		{"pop-up", 'P', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&g_bPopUp,
+			"when used with --keep-below, dock will pop-up when hovered over", NULL},
 		{"no-skip-pager", 'p', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&bNoSkipPager,
 			"show the dock in pager", NULL},
@@ -376,8 +409,9 @@ main (int argc, char** argv)
 			cd_warning ("Attention : unknown environnment '%s'", cEnvironment);
 		g_free (cEnvironment);
 	}
-#ifndef HAVE_GLITZ
+#ifdef HAVE_GLITZ
 	g_print ("Compiled with Glitz (hardware acceleration support)\n");
+#else
 	if (g_bUseGlitz)
 	{
 		cd_warning ("Attention : Cairo-Dock was not compiled with glitz");
@@ -437,7 +471,7 @@ main (int argc, char** argv)
 		if (g_mkdir (g_cCurrentLaunchersPath, 7*8*8+7*8+5) != 0)
 			cd_warning ("Attention : couldn't create directory %s", g_cCurrentLaunchersPath);
 	}
-
+	
 	//\___________________ On initialise les numeros de version.
 	cairo_dock_get_version_from_string (CAIRO_DOCK_VERSION, &g_iMajorVersion, &g_iMinorVersion, &g_iMicroVersion);
 
@@ -482,6 +516,9 @@ main (int argc, char** argv)
 	cairo_dock_register_notification (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) cairo_dock_notification_middle_click_icon, CAIRO_DOCK_RUN_AFTER);
 	cairo_dock_register_notification (CAIRO_DOCK_REMOVE_ICON, (CairoDockNotificationFunc) cairo_dock_notification_remove_icon, CAIRO_DOCK_RUN_AFTER);
 	
+	//\___________________ On initialise la gestion des crash.
+	_cairo_dock_set_signal_interception ();
+	
 	//\___________________ On charge le dernier theme ou on demande a l'utilisateur d'en choisir un.
 	g_cConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
 	g_cEasyConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_EASY_CONF_FILE);
@@ -499,15 +536,8 @@ main (int argc, char** argv)
 			cairo_dock_manage_themes (NULL, bSafeMode);
 		}
 		while (g_pMainDock == NULL);
-		/**int r;
-		while ((r = cairo_dock_ask_initial_theme ()) == 0);
-		if (r == -1)
-		{
-			g_print ("mata ne !\n");
-			exit (0);
-		}*/
 	}
-
+	
 	cairo_dock_load_theme (g_cCurrentThemePath);
 	
 	if (g_bUseFakeTransparency)
@@ -637,6 +667,8 @@ main (int argc, char** argv)
 		/*double fAnswer = cairo_dock_show_value_and_wait ("Test :", cairo_dock_get_first_appli (g_pMainDock->icons), g_pMainDock, .7);
 		cd_message (" ==> %.2f\n", fAnswer);*/
 	}
+	
+	g_timeout_add_seconds (5, _cairo_dock_successful_launch, NULL);
 	
 	gtk_main ();
 

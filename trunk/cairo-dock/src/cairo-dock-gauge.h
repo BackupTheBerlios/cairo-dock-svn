@@ -34,19 +34,17 @@ typedef struct
 
 void cairo_dock_xml_open_file (gchar *filePath, const gchar *mainNodeName,xmlDocPtr *xmlDoc,xmlNodePtr *node);
 
-Gauge *init_cd_Gauge(cairo_t *pSourceContext, gchar *themeName, int iWidth, int iHeight);
+Gauge *cairo_dock_load_gauge(cairo_t *pSourceContext, gchar *themeName, int iWidth, int iHeight);
 GaugeImage *cairo_dock_init_gauge_image (gchar *cImagePath);
 void cairo_dock_load_gauge_image (cairo_t *pSourceContext, GaugeImage *pGaugeImage, int iWidth, int iHeight);
 
-void make_cd_Gauge(cairo_t *pSourceContext, CairoContainer *pContainer, Icon *pIcon, Gauge *pGauge, double fValue);
-void make_cd_Gauge_multiValue(cairo_t *pSourceContext, CairoContainer *pContainer, Icon *pIcon, Gauge *pGauge, GList *valueList);
+void cairo_dock_render_gauge(cairo_t *pSourceContext, CairoContainer *pContainer, Icon *pIcon, Gauge *pGauge, double fValue);
+void cairo_dock_render_gauge_multi_value(cairo_t *pSourceContext, CairoContainer *pContainer, Icon *pIcon, Gauge *pGauge, GList *valueList);
 void draw_cd_Gauge_needle(cairo_t *pSourceContext, Gauge *pGauge, GaugeIndicator *pGaugeIndicator, double fValue);
 void draw_cd_Gauge_image(cairo_t *pSourceContext, GaugeIndicator *pGaugeIndicator, double fValue);
 
 void cairo_dock_reload_gauge (cairo_t *pSourceContext, Gauge *pGauge, int iWidth, int iHeight);
 
-void free_cd_GaugeImage(GaugeImage *pGaugeImage);
-void free_cd_GaugeIndicator(GaugeIndicator *pGaugeIndicator);
-void free_cd_Gauge(Gauge *pGauge);
+void cairo_dock_free_gauge(Gauge *pGauge);
 
 gchar *cairo_dock_get_gauge_key_value(gchar *cAppletConfFilePath, GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultThemeName);

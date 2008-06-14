@@ -46,6 +46,9 @@ extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS];
 
+extern gboolean g_bKeepBelow;
+extern gboolean g_bPopUp;
+
 extern CairoDock *g_pMainDock;
 
 gboolean cairo_dock_move_up (CairoDock *pDock)
@@ -70,6 +73,28 @@ gboolean cairo_dock_move_up (CairoDock *pDock)
 		pDock->iSidMoveUp = 0;
 		return FALSE;
 	}
+}
+
+gboolean cairo_dock_pop_up (CairoDock *pDock)
+{
+	if (! pDock->bPopped && g_bKeepBelow && g_bPopUp)
+		gtk_window_set_keep_above (GTK_WINDOW (pDock->pWidget), TRUE);
+	
+	pDock->iSidPopUp = 0;
+	pDock->bPopped = TRUE;
+	return FALSE;
+}
+
+
+gboolean cairo_dock_pop_down (CairoDock *pDock)
+{
+	g_print ("%s (%d)\n", __func__, pDock->bPopped);
+	if (pDock->bPopped && g_bKeepBelow && g_bPopUp)
+		gtk_window_set_keep_below (GTK_WINDOW (pDock->pWidget), TRUE);
+	
+	pDock->iSidPopDown = 0;
+	pDock->bPopped = FALSE;
+	return FALSE;
 }
 
 gboolean cairo_dock_move_down (CairoDock *pDock)
@@ -249,6 +274,9 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 
 	if (pDock->iMagnitudeIndex == 0)
 	{
+		if (pDock->bPopped)
+			cairo_dock_pop_down (pDock);
+		
 		Icon *pBouncingIcon = cairo_dock_get_bouncing_icon (pDock->icons);
 		Icon *pRemovingIcon = cairo_dock_get_removing_or_inserting_icon (pDock->icons);
 

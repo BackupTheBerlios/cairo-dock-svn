@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([cairo-dock], [1.6.0-beta2], [Fabrice Rey (fabounet@users.berlios.de)])
+AC_INIT([cairo-dock], [1.6.0-rc1], [Fabrice Rey (fabounet@users.berlios.de)])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
 
@@ -32,13 +32,27 @@ AC_CHECK_HEADERS([math.h stdlib.h])
 # Checks for library functions.
 # AC_CHECK_FUNCS([sscanf])
 
-
-AM_CONDITIONAL(COMPIL_VERBOSE, test x$enable_verbose = xyes)
-AM_CONDITIONAL(COMPIL_WITH_GLITZ, test x$enable_glitz = xyes)
-
-
 PKG_CHECK_MODULES(PACKAGE, "gtk+-2.0 gthread-2.0 cairo librsvg-2.0 glitz dbus-1 dbus-glib-1 libxml-2.0 xtst")
-PKG_CHECK_MODULES(GLITZ, "glitz-glx")
+
+
+AC_ARG_ENABLE(glitz,
+	[  --enable-glitz  :  Turn on hardware acceleration],
+	[case "${enableval}" in
+		yes) useglitz=true ;;
+		no)  useglitz=false ;;
+		*) echo "bad value ${enableval} for --enable-glitz" ;;
+	esac],[useglitz=false])
+
+if test "$useglitz" = "true" ; then
+	PKG_CHECK_MODULES(GLITZ,glitz-glx, [glitz_detected=true], [ glitz_detected=false; AC_MSG_WARN(Could not find glitz-glx; Cairo-Dock won't be built with hardware acceleration.) ])
+	AC_SUBST(GLITZ_CFLAGS)
+	AC_SUBST(GLITZ_LIBS)
+	
+	if test "$glitz_detected" = "true" ; then
+		AC_DEFINE(HAVE_GLITZ,1,[Defined if we can use glitz.])
+	fi
+fi
+
 
 AC_CONFIG_FILES([Makefile
 		cairo-dock.pc

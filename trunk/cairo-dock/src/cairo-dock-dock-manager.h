@@ -137,5 +137,8 @@ gboolean cairo_dock_window_hovers_dock (GtkAllocation *pWindowGeometry, CairoDoc
 void cairo_dock_synchronize_one_sub_dock_position (Icon *icon, CairoDock *pDock, gboolean bReloadBuffersIfNecessary);
 void cairo_dock_synchronize_sub_docks_position (CairoDock *pDock, gboolean bReloadBuffersIfNecessary);
 
+void cairo_dock_start_polling_screen_edge (CairoDock *pMainDock);
+void cairo_dock_stop_polling_screen_edge (void);
+
 
 #endif

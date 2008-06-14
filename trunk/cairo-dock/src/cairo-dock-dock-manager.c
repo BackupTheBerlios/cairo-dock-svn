@@ -46,8 +46,11 @@ extern CairoDock *g_pMainDock;
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentThemePath;
 extern gboolean g_bSameHorizontality;
+extern gboolean g_bKeepBelow;
+extern gboolean g_bPopUp;
 
 static GHashTable *s_hDocksTable = NULL;  // table des docks existant.
+static int s_iSidPollScreenEdge = 0;
 
 
 void cairo_dock_initialize_dock_manager (void)
@@ -74,6 +77,8 @@ CairoDock *cairo_dock_register_dock (const gchar *cDockName, CairoDock *pDock)
 	{
 		pDock->bIsMainDock = TRUE;
 		g_pMainDock = pDock;
+		if (g_bKeepBelow && g_bPopUp)
+			cairo_dock_start_polling_screen_edge (pDock);
 	}
 	
 	g_hash_table_insert (s_hDocksTable, g_strdup (cDockName), pDock);
@@ -144,7 +149,7 @@ static gboolean _cairo_dock_search_icon_from_subdock (gchar *cDockName, CairoDoc
 }
 Icon *cairo_dock_search_icon_pointing_on_dock (CairoDock *pDock, CairoDock **pParentDock)  // pParentDock peut etre NULL.
 {
-	if (pDock->bIsMainDock)  // par definition. On n'utilise pas iRefCount, car si on est en train de detruire un dock, sa reference est deja decrementee. note pour moi-meme : pas terrible ca...
+	if (pDock->bIsMainDock)  // par definition. On n'utilise pas iRefCount, car si on est en train de detruire un dock, sa reference est deja decrementee. C'est dommage mais c'est comme ca.
 		return NULL;
 	Icon *pPointingIcon = NULL;
 	gpointer data[3] = {pDock, &pPointingIcon, pParentDock};
@@ -542,5 +547,20 @@ void cairo_dock_synchronize_sub_docks_position (CairoDock *pDock, gboolean bRelo
 	{
 		icon = ic->data;
 		cairo_dock_synchronize_one_sub_dock_position (icon, pDock, bReloadBuffersIfNecessary);
+	}
+}
+
+
+void cairo_dock_start_polling_screen_edge (CairoDock *pMainDock)
+{
+	if (s_iSidPollScreenEdge == 0)
+		s_iSidPollScreenEdge = g_timeout_add (500, (GSourceFunc) cairo_dock_poll_screen_edge, (gpointer) pMainDock);
+}
+void cairo_dock_stop_polling_screen_edge (void)
+{
+	if (s_iSidPollScreenEdge != 0)
+	{
+		g_source_remove (s_iSidPollScreenEdge);
+		s_iSidPollScreenEdge = 0;
 	}
 }

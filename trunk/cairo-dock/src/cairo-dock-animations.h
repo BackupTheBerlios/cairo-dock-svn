@@ -11,6 +11,10 @@ gboolean cairo_dock_move_up (CairoDock *pDock);
 
 gboolean cairo_dock_move_down (CairoDock *pDock);
 
+gboolean cairo_dock_pop_up (CairoDock *pDock);
+
+gboolean cairo_dock_pop_down (CairoDock *pDock);
+
 
 gfloat cairo_dock_calculate_magnitude (gint iMagnitudeIndex);
 

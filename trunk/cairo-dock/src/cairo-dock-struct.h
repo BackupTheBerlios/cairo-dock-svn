@@ -201,6 +201,8 @@ struct _CairoDock {
 	gboolean bAtBottom;
 	/// le dock est en haut pret a etre utilise.
 	gboolean bAtTop;
+	/// Whether the dock is in a popped up state or not
+	gboolean bPopped;
 	/// lorsque le menu du clique droit est visible.
 	gboolean bMenuVisible;
 	/// Est-on en train de survoler le dock avec quelque chose dans la souris ?
@@ -215,6 +217,10 @@ struct _CairoDock {
 	gint iSidMoveDown;
 	/// serial ID du thread de montee de la fenetre.
 	gint iSidMoveUp;
+	/// serial ID for window popping up to the top layer event.
+  gint iSidPopUp;
+	/// serial ID for window popping down to the bottom layer.
+	gint iSidPopDown;
 	/// serial ID du thread de grossisement des icones.
 	gint iSidGrowUp;
 	/// serial ID du thread de diminution des icones.
