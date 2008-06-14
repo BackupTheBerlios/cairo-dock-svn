@@ -13,6 +13,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-modules.h"
 #include "cairo-dock-gui-factory.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-applet-facility.h"
 
 #define CAIRO_DOCK_GUI_MARGIN 4
 #define CAIRO_DOCK_ICON_MARGIN 6
@@ -342,6 +343,14 @@ static void _cairo_dock_pick_a_file (GtkButton *button, gpointer *data)
 	gtk_widget_destroy (pFileChooserDialog);
 }
 
+//Sound Callback
+static void _cairo_dock_play_a_sound (GtkButton *button, gpointer *data)
+{
+	GtkWidget *pEntry = data[0];
+	gchar *cSoundPath = gtk_entry_get_text (GTK_ENTRY (pEntry));
+	cairo_dock_play_sound (cSoundPath);
+}
+
 static void _cairo_dock_key_grab_cb (GtkWidget *wizard_window, GdkEventKey *event, GtkEntry *pEntry)
 {
 	gchar *key;
@@ -588,7 +597,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 	GtkWidget *pTable;
 	GtkWidget *pButtonAdd, *pButtonRemove;
 	GtkWidget *pButtonDown, *pButtonUp, *pButtonConfig;
-	GtkWidget *pButtonFileChooser;
+	GtkWidget *pButtonFileChooser, *pButtonPlay;
 	GtkWidget *pFrame, *pFrameVBox;
 	GtkWidget *pScrolledWindow;
 	GtkWidget *pColorButton;
@@ -1069,6 +1078,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 					
 					case 's' :  // string
 					case 'S' :  // string avec un selecteur de fichier a cote du GtkEntry.
+					case 'u' :  // string avec un selecteur de fichier a cote du GtkEntry et un boutton play.
 					case 'D' :  // string avec un selecteur de repertoire a cote du GtkEntry.
 					case 'T' :  // string, mais sans pouvoir decochez les cases.
 					case 'E' :  // string, mais avec un GtkComboBoxEntry pour le choix unique.
@@ -1401,13 +1411,13 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 							}
 						}
 
-						if (iElementType == 'S' || iElementType == 'D')
+						if (iElementType == 'S' || iElementType == 'D' || iElementType == 'u')
 						{
 							if (pEntry != NULL)
 							{
 								_allocate_new_buffer;
 								data[0] = pEntry;
-								data[1] = GINT_TO_POINTER (iElementType == 'S' ? 0 : 1);
+								data[1] = GINT_TO_POINTER (iElementType != 'u' ? (iElementType == 'S' ? 0 : 1) : 0);
 								data[2] = GTK_WINDOW (pDialog);
 								pButtonFileChooser = gtk_button_new_from_stock (GTK_STOCK_OPEN);
 								g_signal_connect (G_OBJECT (pButtonFileChooser),
@@ -1419,6 +1429,19 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 									FALSE,
 									FALSE,
 									0);
+								if (iElementType == 'u') //Sound Play Button
+								{
+									pButtonPlay = gtk_button_new_from_stock (GTK_STOCK_MEDIA_PLAY); //Outch
+									g_signal_connect (G_OBJECT (pButtonPlay),
+										"clicked",
+										G_CALLBACK (_cairo_dock_play_a_sound),
+										data);
+									gtk_box_pack_start (GTK_BOX (pHBox),
+										pButtonPlay,
+										FALSE,
+										FALSE,
+										0);
+								}
 							}
 						}
 						else if (iElementType == 'R' || iElementType == 'M')
