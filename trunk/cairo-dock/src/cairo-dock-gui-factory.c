@@ -347,7 +347,7 @@ static void _cairo_dock_pick_a_file (GtkButton *button, gpointer *data)
 static void _cairo_dock_play_a_sound (GtkButton *button, gpointer *data)
 {
 	GtkWidget *pEntry = data[0];
-	gchar *cSoundPath = gtk_entry_get_text (GTK_ENTRY (pEntry));
+	const gchar *cSoundPath = gtk_entry_get_text (GTK_ENTRY (pEntry));
 	cairo_dock_play_sound (cSoundPath);
 }
 

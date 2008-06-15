@@ -5,8 +5,14 @@ bin_PROGRAMS = \
 	cairo-dock
 
 
+if WITH_GLITZ
+have_glitz=-DHAVE_GLITZ="1"
+endif
+
 cairo_dock_CFLAGS = \
 	$(PACKAGE_CFLAGS) \
+	$(GLITZ_CFLAGS) \
+	$(have_glitz)\
 	-DCAIRO_DOCK_SHARE_DATA_DIR=\""$(pkgdatadir)"\"\
 	-DCAIRO_DOCK_SHARE_THEMES_DIR=\""$(pkgdatadir)/themes"\"\
 	-DCAIRO_DOCK_MODULES_DIR=\""$(libdir)/$(PACKAGE)"\"\
@@ -35,7 +41,7 @@ cairo_dock_LDFLAGS = \
 	-Wl,--export-dynamic
 
 cairo_dock_LDADD = \
-	$(glitz_libs) \
+	$(GLITZ_LIBS) \
 	$(PACKAGE_LIBS)
 
 cairo_dock_SOURCES = \

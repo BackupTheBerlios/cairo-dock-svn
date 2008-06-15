@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-06-14 06:04+0200\n"
+"POT-Creation-Date: 2008-06-14 22:10+0200\n"
 "PO-Revision-Date: 2008-05-30 13:35-0500\n"
 "Last-Translator: biAji <biaji.cn@gmail.com>\n"
 "Language-Team: \n"
@@ -48,7 +48,7 @@ msgstr "挂载"
 msgid "unmount"
 msgstr "卸载"
 
-#: ../src/cairo-dock-gui-factory.c:1462
+#: ../src/cairo-dock-gui-factory.c:1485
 msgid "grab"
 msgstr "捕捉"
 

@@ -48,10 +48,11 @@ if test "$useglitz" = "true" ; then
 	AC_SUBST(GLITZ_CFLAGS)
 	AC_SUBST(GLITZ_LIBS)
 	
-	if test "$glitz_detected" = "true" ; then
-		AC_DEFINE(HAVE_GLITZ,1,[Defined if we can use glitz.])
+	if test ! "$glitz_detected" = "false" ; then
+		AC_DEFINE(HAVE_GLITZ,"1",[Defined if we can use glitz.])
 	fi
 fi
+AM_CONDITIONAL( [WITH_GLITZ], [test "$useglitz" = "true"] )
 
 
 AC_CONFIG_FILES([Makefile

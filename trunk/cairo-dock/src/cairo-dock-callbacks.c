@@ -622,7 +622,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 /// This function checks for the mouse cursor's position. If the mouse
 /// cursor touches the edge of the screen upon which the dock is resting,
 /// then the dock will pop up over other windows...
-gboolean cairo_dock_poll_screen_edge (CairoDock *pDock)
+gboolean cairo_dock_poll_screen_edge (CairoDock *pDock)  // thanks to Smidgey for the pop-up patch !
 {
 	static int iPrevPointerX = -1, iPrevPointerY = -1;
 	gint iMousePos[2];

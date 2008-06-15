@@ -5,7 +5,7 @@ export FAST_COMPIL="0"
 export BUILD_TAR="0"
 
 echo "packaging options : "
-while getopts "dfTh" flag
+while getopts "d:fTh" flag
 do
 	echo " option $flag" $OPTIND $OPTARG
 	case "$flag" in
@@ -36,11 +36,16 @@ done
 
 
 #\_____________ On nettoie tout et on fait une archive des sources.
+read -p "Use folder '$CAIRO_DOCK_DIR' ? [Y/n]" clean
+if test "$clean" = "n" -o  "$clean" = "N"; then
+	exit 0
+fi
 cd $CAIRO_DOCK_DIR
 find . -name "*~" -delete
 find . -name "core*" -delete
 find . -name ".#*" -delete
-rm -f cairo-dock-sources*.tar.bz2 *.deb
+rm -rf plug-ins/conf*[0-9]
+rm -f cairo-dock*.tar.bz2 *.deb
 
 if ! test  -d cairo-dock -o ! -d themes -o ! -d plug-ins -o ! -d deb -o ! -d deb-plug-ins; then
 	echo "Attention : folder missing in $CAIRO_DOCK_DIR !"
