@@ -811,6 +811,15 @@ void cairo_dock_load_desktop_background_surface (void)  // attention : fonction 
 	}
 }
 
+void cairo_dock_invalidate_desktop_bg_surface (void)
+{
+	if (g_pDesktopBgSurface != NULL)
+	{
+		cairo_surface_destroy (g_pDesktopBgSurface);
+		g_pDesktopBgSurface = NULL;
+	}
+}
+
 cairo_surface_t *cairo_dock_get_desktop_bg_surface (void)
 {
 	if (g_pDesktopBgSurface == NULL)

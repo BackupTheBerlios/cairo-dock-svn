@@ -54,6 +54,7 @@ extern gboolean g_bGroupAppliByClass;
 extern int g_iNbDesktops;
 extern int g_iNbViewportX,g_iNbViewportY ;
 extern gboolean g_bMixLauncherAppli;
+extern gboolean g_bUseFakeTransparency;
 
 static GHashTable *s_hXWindowTable = NULL;  // table des fenetres X affichees dans le dock.
 static Display *s_XDisplay = NULL;
@@ -71,7 +72,8 @@ static Atom s_aNetWmHidden;
 static Atom s_aNetWmDesktop;
 static Atom s_aNetWmMaximizedHoriz;
 static Atom s_aNetWmMaximizedVert;
-
+static Atom s_aRootMapID;
+static Atom s_aNetNbDesktops;
 
 void cairo_dock_initialize_application_manager (Display *pDisplay)
 {
@@ -95,6 +97,8 @@ void cairo_dock_initialize_application_manager (Display *pDisplay)
 	s_aNetWmDesktop = XInternAtom (s_XDisplay, "_NET_WM_DESKTOP", False);
 	s_aNetWmMaximizedHoriz = XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
 	s_aNetWmMaximizedVert = XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_VERT", False);
+	s_aRootMapID = XInternAtom (s_XDisplay, "_XROOTPMAP_ID", False);
+	s_aNetNbDesktops = XInternAtom (s_XDisplay, "_NET_NUMBER_OF_DESKTOPS", False);
 }
 
 
@@ -724,6 +728,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 			//g_print ("  type : %d; atom : %s; window : %d\n", event.xproperty.type, gdk_x11_get_xatom_name (event.xproperty.atom), Xid);
 			if (Xid == root)
 			{
+				g_print ("  type : %d; atom : %s; window : %d\n", event.xproperty.type, gdk_x11_get_xatom_name (event.xproperty.atom), Xid);
 				if (event.xproperty.atom == s_aNetClientList)
 				{
 					GTimeVal time_val;
@@ -781,17 +786,32 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 					}
 					cairo_dock_notify (CAIRO_DOCK_DESKTOP_CHANGED, NULL);
 				}
+				else if (event.xproperty.atom == s_aNetNbDesktops)
+				{
+					cd_message ("changementdu nombre de bureaux virtuels");
+					g_iNbDesktops = cairo_dock_get_nb_desktops ();
+					cairo_dock_notify (CAIRO_DOCK_SCREEN_GEOMETRY_ALTERED, NULL);
+				}
 				else if (event.xproperty.atom == s_aNetDesktopGeometry)
 				{
 					cd_message ("geometrie du bureau alteree");
-					g_iNbDesktops = cairo_dock_get_nb_desktops ();
+					
 					cairo_dock_get_nb_viewports (&g_iNbViewportX, &g_iNbViewportY);
 					
-					if (cairo_dock_update_screen_geometry ())  // modification largeur et/ou hauteur.
+					if (cairo_dock_update_screen_geometry ())  // modification de la resolution.
 					{
 						cairo_dock_set_window_position_at_balance (pDock, pDock->iCurrentWidth, pDock->iCurrentHeight);
 						gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);
 					}
+					cairo_dock_notify (CAIRO_DOCK_SCREEN_GEOMETRY_ALTERED, NULL);
+				}
+				else if (event.xproperty.atom == s_aRootMapID)
+				{
+					cd_message ("changement du fond d'ecran");
+					if (g_bUseFakeTransparency)
+						cairo_dock_load_desktop_background_surface ();
+					else
+						cairo_dock_invalidate_desktop_bg_surface ();
 					cairo_dock_notify (CAIRO_DOCK_SCREEN_GEOMETRY_ALTERED, NULL);
 				}
 			}

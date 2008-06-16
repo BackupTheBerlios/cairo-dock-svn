@@ -48,6 +48,7 @@ void cairo_dock_load_drop_indicator (gchar *cImagePath, cairo_t* pSourceContext,
 void cairo_dock_load_task_indicator (const gchar *cIndicatorImagePath, double fIndicatorRatio, CairoContainer *pSomeContainer);
 
 void cairo_dock_load_desktop_background_surface (void);
+void cairo_dock_invalidate_desktop_bg_surface (void);
 cairo_surface_t *cairo_dock_get_desktop_bg_surface (void);
 
 

@@ -58,7 +58,11 @@ void cairo_dock_initialize_X_support (void)
 	s_aNetNbDesktops = XInternAtom (s_XDisplay, "_NET_NUMBER_OF_DESKTOPS", False);
 	s_aRootMapID = XInternAtom (s_XDisplay, "_XROOTPMAP_ID", False);
 	
-	cairo_dock_update_screen_geometry ();
+	Screen *XScreen = XDefaultScreenOfDisplay (s_XDisplay);
+	g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] = WidthOfScreen (XScreen);
+	g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] = HeightOfScreen (XScreen);
+	g_iScreenWidth[CAIRO_DOCK_VERTICAL] = g_iScreenHeight[CAIRO_DOCK_HORIZONTAL];
+	g_iScreenHeight[CAIRO_DOCK_VERTICAL] = g_iScreenWidth[CAIRO_DOCK_HORIZONTAL];
 	
 	g_iNbDesktops = cairo_dock_get_nb_desktops ();
 	cairo_dock_get_nb_viewports (&g_iNbViewportX, &g_iNbViewportY);
@@ -234,12 +238,19 @@ void cairo_dock_set_xicon_geometry (int Xid, int iX, int iY, int iWidth, int iHe
 
 gboolean cairo_dock_update_screen_geometry (void)
 {
-	Screen *XScreen = XDefaultScreenOfDisplay (s_XDisplay);
-	//g_print ("screen : %dx%d ; root : %dx%d\n", WidthOfScreen (XScreen), HeightOfScreen (XScreen), width_return, height_return);
-	if (WidthOfScreen (XScreen) != g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] || HeightOfScreen (XScreen) != g_iScreenHeight[CAIRO_DOCK_HORIZONTAL])
+	Window root = DefaultRootWindow (s_XDisplay);
+	Window root_return;
+	int x_return=1, y_return=1;
+	unsigned int width_return, height_return, border_width_return, depth_return;
+	XGetGeometry (s_XDisplay, root,
+		&root_return,
+		&x_return, &y_return,
+		&width_return, &height_return,
+		&border_width_return, &depth_return);
+	if (width_return != g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] || height_return != g_iScreenHeight[CAIRO_DOCK_HORIZONTAL])  // on n'utilise pas WidthOfScreen() et HeightOfScreen() car leurs valeurs ne sont pas mises a jour immediatement apres les changements de resolution.
 	{
-		g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] = WidthOfScreen (XScreen);
-		g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] = HeightOfScreen (XScreen);
+		g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] = width_return;
+		g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] = height_return;
 		g_iScreenWidth[CAIRO_DOCK_VERTICAL] = g_iScreenHeight[CAIRO_DOCK_HORIZONTAL];
 		g_iScreenHeight[CAIRO_DOCK_VERTICAL] = g_iScreenWidth[CAIRO_DOCK_HORIZONTAL];
 		return TRUE;
@@ -258,6 +269,7 @@ gboolean cairo_dock_update_screen_geometry (void)
 	XFree (pXWorkArea);*/
 }
 
+
 gboolean cairo_dock_property_is_present_on_root (gchar *cPropertyName)
 {
 	g_return_val_if_fail (s_XDisplay != NULL, FALSE);
@@ -274,7 +286,6 @@ gboolean cairo_dock_property_is_present_on_root (gchar *cPropertyName)
 	XFree (pAtomList);
 	return (i != iNbProperties);
 }
-
 
 
 int cairo_dock_get_current_desktop (void)
@@ -346,9 +357,6 @@ int cairo_dock_get_nb_desktops (void)
 
 void cairo_dock_get_nb_viewports (int *iNbViewportX, int *iNbViewportY)
 {
-	Screen *XScreen = XDefaultScreenOfDisplay (s_XDisplay);
-	//g_print ("screen : %dx%d ; root : %dx%d\n", WidthOfScreen (XScreen), HeightOfScreen (XScreen), width_return, height_return);
-	
 	Window root = DefaultRootWindow (s_XDisplay);
 	Atom aReturnedType = 0;
 	int aReturnedFormat = 0;
@@ -358,8 +366,8 @@ void cairo_dock_get_nb_viewports (int *iNbViewportX, int *iNbViewportY)
 	if (iBufferNbElements > 0)
 	{
 		cd_debug ("pVirtualScreenSizeBuffer : %dx%d", pVirtualScreenSizeBuffer[0], pVirtualScreenSizeBuffer[1]);
-		*iNbViewportX = pVirtualScreenSizeBuffer[0] / WidthOfScreen (XScreen);
-		*iNbViewportY = pVirtualScreenSizeBuffer[1] / HeightOfScreen (XScreen);
+		*iNbViewportX = pVirtualScreenSizeBuffer[0] / g_iScreenWidth[CAIRO_DOCK_HORIZONTAL];
+		*iNbViewportY = pVirtualScreenSizeBuffer[1] / g_iScreenHeight[CAIRO_DOCK_HORIZONTAL];
 		XFree (pVirtualScreenSizeBuffer);
 	}
 }

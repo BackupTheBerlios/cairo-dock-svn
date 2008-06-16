@@ -10,8 +10,6 @@ export CAIRO_DOCK_INSTALL="0"
 export CAIRO_DOCK_THEMES="0"
 export CAIRO_DOCK_DOC="0"
 export CAIRO_DOCK_EXCLUDE="template"
-export CAIRO_DOCK_EXTRACT_MESSAGE=${CAIRO_DOCK_DIR}/utils/cairo-dock-extract-message
-export CAIRO_DOCK_GEN_TRANSLATION=${CAIRO_DOCK_DIR}/cairo-dock/po/generate-translation.sh
 
 echo "this script will process : "
 while getopts "acCituhd:D" flag
@@ -66,6 +64,9 @@ do
 		;;
 	esac
 done
+export CAIRO_DOCK_EXTRACT_MESSAGE=${CAIRO_DOCK_DIR}/utils/cairo-dock-extract-message
+export CAIRO_DOCK_GEN_TRANSLATION=${CAIRO_DOCK_DIR}/cairo-dock/po/generate-translation.sh
+
 echo ""
 
 rm -f $CAIRO_DOCK_DIR/compile.log
