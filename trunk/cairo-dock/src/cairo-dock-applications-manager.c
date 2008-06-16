@@ -10,12 +10,13 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include <cairo.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
-#include <signal.h>
+#include <X11/extensions/Xcomposite.h>
 
 #include "cairo-dock-icons.h"
 #include "cairo-dock-draw.h"
@@ -54,6 +55,7 @@ extern gboolean g_bGroupAppliByClass;
 extern int g_iNbDesktops;
 extern int g_iNbViewportX,g_iNbViewportY ;
 extern gboolean g_bMixLauncherAppli;
+extern gboolean g_bShowThumbnail;
 extern gboolean g_bUseFakeTransparency;
 
 static GHashTable *s_hXWindowTable = NULL;  // table des fenetres X affichees dans le dock.
@@ -133,6 +135,9 @@ void cairo_dock_unregister_appli (Icon *icon)
 			g_hash_table_remove (s_hXWindowTable, &icon->Xid);
 		
 		cairo_dock_unregister_pid (icon);  // on n'efface pas sa classe ici car on peut en avoir besoin encore.
+		
+		if (icon->iBackingPixmap != 0)
+			XFreePixmap (s_XDisplay, icon->iBackingPixmap);
 		
 		cairo_dock_remove_appli_from_class (icon);
 		cairo_dock_update_Xid_on_inhibators (icon->Xid, icon->cClass);
@@ -728,7 +733,6 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 			//g_print ("  type : %d; atom : %s; window : %d\n", event.xproperty.type, gdk_x11_get_xatom_name (event.xproperty.atom), Xid);
 			if (Xid == root)
 			{
-				g_print ("  type : %d; atom : %s; window : %d\n", event.xproperty.type, gdk_x11_get_xatom_name (event.xproperty.atom), Xid);
 				if (event.xproperty.atom == s_aNetClientList)
 				{
 					GTimeVal time_val;
@@ -877,27 +881,37 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 										cairo_dock_deactivate_temporary_auto_hide ();
 								}*/
 								
-								if (g_bHideVisibleApplis && pParentDock != NULL)
+								if (g_bHideVisibleApplis)
 								{
-									if (bIsHidden)
-									{
-										cd_message (" => se cache");
-										if (! g_bAppliOnCurrentDesktopOnly || cairo_dock_window_is_on_current_desktop (Xid))
-											pParentDock = cairo_dock_insert_appli_in_dock (icon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON);
-									}
-									else
-									{
-										cd_message (" => re-apparait");
-										cairo_dock_detach_icon_from_dock (icon, pParentDock, TRUE);
-										cairo_dock_update_dock_size (pParentDock);
-									}
 									if (pParentDock != NULL)
+									{
+										if (bIsHidden)
+										{
+											cd_message (" => se cache");
+											if (! g_bAppliOnCurrentDesktopOnly || cairo_dock_window_is_on_current_desktop (Xid))
+												pParentDock = cairo_dock_insert_appli_in_dock (icon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON);
+										}
+										else
+										{
+											cd_message (" => re-apparait");
+											cairo_dock_detach_icon_from_dock (icon, pParentDock, TRUE);
+											cairo_dock_update_dock_size (pParentDock);
+										}
 										gtk_widget_queue_draw (pParentDock->pWidget);
+									}
+								}
+								else if (g_bShowThumbnail && pParentDock != NULL)
+								{
+									cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pParentDock));
+									cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE, pDock->bDirectionUp);
+									cairo_destroy (pCairoContext);
+									if (pParentDock->iSidShrinkDown == 0)
+										cairo_dock_redraw_my_icon (icon, CAIRO_CONTAINER (pParentDock));
 								}
 								else if (g_fVisibleAppliAlpha != 0)
 								{
 									icon->fAlpha = 1;  // on triche un peu.
-									if (pParentDock != NULL)
+									if (pParentDock != NULL && pParentDock->iSidShrinkDown == 0)
 										cairo_dock_redraw_my_icon (icon, CAIRO_CONTAINER (pParentDock));
 								}
 							}
@@ -935,6 +949,14 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 			icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
 			if (icon != NULL)
 			{
+				if (event.xconfigure.width != icon->windowGeometry.width || event.xconfigure.height != icon->windowGeometry.height)
+				{
+					if (icon->iBackingPixmap != 0)
+						XFreePixmap (s_XDisplay, icon->iBackingPixmap);
+					if (g_bShowThumbnail)
+						icon->iBackingPixmap = XCompositeNameWindowPixmap (s_XDisplay, Xid);
+					g_print ("new backing pixmap : %d\n", icon->iBackingPixmap);
+				}
 				memcpy (&icon->windowGeometry, &event.xconfigure.x, sizeof (GtkAllocation));
 			}
 			

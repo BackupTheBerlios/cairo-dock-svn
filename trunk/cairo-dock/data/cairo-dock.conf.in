@@ -45,8 +45,12 @@ separator_ =
 #{The dock will automatically hide itself outside of the scren when the mouse leaves it and will show a callback zone instead. Place the mouse into this zone will make the dock re-appear.}
 auto-hide = false
 
+#b- Keep the dock below other windows ?
+#{The dock will pop-up on the foreground when you place the mouse on its screen border. This option is only useful if you don't want to reserve space for the dock, nor to activate auto-hide.}
+pop-up = false
+
 #k- Keyboard shortcut to show/hide the dock :
-#{When you press the shortcut, the dock will hide or show itself at the potition of your mouse, thus acting like a menu.}
+#{When you press the shortcut, the dock will show itself at the potition of your mouse. The rest of the time, it stays invisible, thus acting like a menu.}
 raise shortcut = 
 
 #[gtk-dnd-multiple]
@@ -83,6 +87,10 @@ mix launcher appli = true
 #{If not set, will use the icon provided by X for each appli. If set, the same icon as the corresponding launcher will be used for each appli.}
 overwrite xicon = true
 
+#b Show a window thumbnail when it's not minimized ?
+#{You need a composite manager for it.}
+window thumbnail = true
+
 #F-[Interaction]
 frame2 =
 
@@ -95,11 +103,11 @@ minimize on click = true
 close on middle click = true
 
 #b- Automatically quick-hide the dock when a window becomes fullscreen ?
-#{This is only usefull if don't already use the auto-hide, and if your WM let the dock in front of fullscreen windows (rare).}
+#{This is only usefull if you don't already use the auto-hide, and if your WM let the dock in front of fullscreen windows (which is rare).}
 auto quick hide = false
 
 #b- Automatically quick-hide the dock when a window becomes maximized ?
-#{This is only usefull if don't already use the auto-hide, and if you don't want to reserve the space for your dock.}
+#{This is only usefull if don't already use the auto-hide, and if you don't want to reserve the space for your dock nor let it below the other windows.}
 auto quick hide on max = false
 
 #b- Signal the applications demanding your attention with a dialog tip ?

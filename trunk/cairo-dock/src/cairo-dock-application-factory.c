@@ -16,6 +16,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 #include <gdk/gdkx.h>
+#include <X11/extensions/Xcomposite.h>
 
 #include "cairo-dock-load.h"
 #include "cairo-dock-icons.h"
@@ -108,6 +109,22 @@ void cairo_dock_unregister_pid (Icon *icon)
 	}
 }
 
+cairo_surface_t *cairo_dock_create_surface_from_xpixmap (Pixmap Xid, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
+{
+	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS && Xid > 0, NULL);
+	GdkPixbuf *pPixbuf = cairo_dock_get_pixbuf_from_pixmap (Xid, FALSE);
+	g_print ("window pixmap : %dx%d\n", gdk_pixbuf_get_width (pPixbuf), gdk_pixbuf_get_height (pPixbuf));
+	g_return_val_if_fail (pPixbuf != NULL, NULL);
+	return cairo_dock_create_surface_from_pixbuf (pPixbuf,
+		pSourceContext,
+		fMaxScale,
+		g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI],
+		g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI],
+		FALSE,
+		fWidth,
+		fHeight,
+		NULL, NULL);
+}
 
 cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
 {
@@ -140,19 +157,19 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 			Window XIconID = pWMHints->icon_window;
 			cd_debug ("  pas de _NET_WM_ICON, mais une fenetre (ID:%d)", XIconID);
 			Pixmap iPixmap = cairo_dock_get_window_background_pixmap (XIconID);
-			pIconPixbuf = _cairo_dock_get_pixbuf_from_pixmap (iPixmap, TRUE);  /// A valider ...
+			pIconPixbuf = cairo_dock_get_pixbuf_from_pixmap (iPixmap, TRUE);  /// A valider ...
 		}
 		else if (pWMHints->flags & IconPixmapHint)
 		{
 			cd_debug ("  pas de _NET_WM_ICON, mais un pixmap");
 			Pixmap XPixmapID = pWMHints->icon_pixmap;
-			pIconPixbuf = _cairo_dock_get_pixbuf_from_pixmap (XPixmapID, TRUE);
+			pIconPixbuf = cairo_dock_get_pixbuf_from_pixmap (XPixmapID, TRUE);
 
 			//\____________________ On lui applique le masque de transparence s'il existe.
 			if (pWMHints->flags & IconMaskHint)
 			{
 				Pixmap XPixmapMaskID = pWMHints->icon_mask;
-				GdkPixbuf *pMaskPixbuf = _cairo_dock_get_pixbuf_from_pixmap (XPixmapMaskID, FALSE);
+				GdkPixbuf *pMaskPixbuf = cairo_dock_get_pixbuf_from_pixmap (XPixmapMaskID, FALSE);
 
 				int iNbChannels = gdk_pixbuf_get_n_channels (pIconPixbuf);
 				int iRowstride = gdk_pixbuf_get_rowstride (pIconPixbuf);
@@ -417,6 +434,9 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	icon->bIsHidden = bIsHidden;
 	icon->bIsMaximized = bIsMaximized;
 	icon->bIsFullScreen = bIsFullScreen;
+	icon->iBackingPixmap = XCompositeNameWindowPixmap (s_XDisplay, Xid);
+	g_print ("backing pixmap : %d\n", icon->iBackingPixmap);
+	
 	cairo_dock_fill_icon_buffers_for_dock (icon, pSourceContext, pDock);
 
 	if (g_bUniquePid)

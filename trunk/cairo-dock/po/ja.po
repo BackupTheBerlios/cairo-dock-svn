@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4.5\n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-06-14 22:10+0200\n"
+"POT-Creation-Date: 2008-06-16 11:44+0200\n"
 "PO-Revision-Date: 2008-05-31 20:43+0900\n"
 "Last-Translator: jiro kawada <jiro.kawada@gmail.com>\n"
 "Language-Team: Japanese <LL@li.org>\n"
@@ -15,11 +15,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/cairo-dock-callbacks.c:981
+#: ../src/cairo-dock-callbacks.c:979
 msgid "Do you want to mount this point ?"
 msgstr "このポイントにマウントしますか？"
 
-#: ../src/cairo-dock-callbacks.c:1681
+#: ../src/cairo-dock-callbacks.c:1679
 msgid "Quit Cairo-Dock ?"
 msgstr "Cairo-Dock 終了？"
 
@@ -375,7 +375,7 @@ msgstr ""
 msgid "Are you sure you want to overwrite theme %s ?"
 msgstr "本当に %s テーマを上書きしますか？"
 
-#: ../src/cairo-dock.c:528
+#: ../src/cairo-dock.c:522
 msgid "< Maintenance mode >"
 msgstr "< メンテナンスモード >"
 

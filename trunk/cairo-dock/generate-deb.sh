@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export CAIRO_DOCK_DIR="/opt/cairo-dock/trunk"
+export CAIRO_DOCK_DIR=`pwd`/..
 export FAST_COMPIL="0"
 export BUILD_TAR="0"
 

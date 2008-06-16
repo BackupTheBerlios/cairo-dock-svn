@@ -28,7 +28,7 @@ extern CairoDock *g_pMainDock;
 extern gint g_iScreenWidth[2], g_iScreenHeight[2];
 extern gboolean g_bSticky;
 extern gboolean g_bKeepAbove;
-extern gboolean g_bKeepBelow;
+extern gboolean g_bPopUp;
 extern int g_iVisibleZoneWidth, g_iVisibleZoneHeight;
 
 extern int g_iDockLineWidth;
@@ -757,7 +757,7 @@ CairoDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, CairoCont
 
 	if (g_bSticky)
 		gtk_window_stick (GTK_WINDOW (pWindow));
-	gtk_window_set_keep_above (GTK_WINDOW (pWindow), g_bKeepAbove || g_bKeepBelow);
+	gtk_window_set_keep_above (GTK_WINDOW (pWindow), g_bKeepAbove || g_bPopUp);
 	gtk_window_set_skip_pager_hint (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_skip_taskbar_hint (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_gravity (GTK_WINDOW (pWindow), GDK_GRAVITY_STATIC);

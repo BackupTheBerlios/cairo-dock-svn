@@ -164,10 +164,13 @@ extern gchar *g_cRaiseDockShortcut;
 extern cairo_surface_t *g_pIndicatorSurface[2];
 extern gboolean g_bMixLauncherAppli;
 extern gboolean g_bOverWriteXIcons;
+extern gboolean g_bShowThumbnail;
 extern double g_fIndicatorWidth, g_fIndicatorHeight;
 extern int g_iIndicatorDeltaY;
 extern gboolean g_bLinkIndicatorWithIcon;
 extern gboolean g_bIndicatorAbove;
+
+extern gboolean g_bPopUp;
 
 static gchar **g_cUseXIconAppliList = NULL;
 static gboolean s_bLoading = FALSE;
@@ -582,7 +585,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 
 	cairo_dock_deactivate_temporary_auto_hide ();
 	pDock->bAutoHide = cairo_dock_get_boolean_key_value (pKeyFile, "Position", "auto-hide", &bFlushConfFileNeeded, FALSE, "Auto-Hide", "auto-hide");
-
+	
+	g_bPopUp = cairo_dock_get_boolean_key_value (pKeyFile, "Position", "pop-up", &bFlushConfFileNeeded, FALSE, NULL, NULL);
+	
 	//\___________________ On recupere les parametres de la zone visible.
 	gchar *cVisibleZoneImageFile = cairo_dock_get_string_key_value (pKeyFile, "Background", "callback image", &bFlushConfFileNeeded, NULL, "Auto-Hide", "background image");
 
@@ -938,6 +943,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	gboolean bOverWriteXIconsOld = g_bOverWriteXIcons;
 	g_bOverWriteXIcons = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "overwrite xicon", &bFlushConfFileNeeded, TRUE, NULL, NULL);
 	
+	gboolean bShowThumbnailOld = g_bShowThumbnail;
+	g_bShowThumbnail = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "window thumbnail", &bFlushConfFileNeeded, TRUE, NULL, NULL);
 	
 	//\___________________ On recupere les parametres des applets.
 	g_tIconAuthorizedWidth[CAIRO_DOCK_APPLET] = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "applet width", &bFlushConfFileNeeded, 48, "Applets", "max icon size");
@@ -1111,7 +1118,16 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_fReflectSize *= fFieldDepth;
 	cd_debug ("  g_fReflectSize : %.2f pixels\n", g_fReflectSize);
 	
-	if (bUniquePidOld != g_bUniquePid || bGroupAppliByClassOld != g_bGroupAppliByClass || bHideVisibleApplisOld != g_bHideVisibleApplis || bAppliOnCurrentDesktopOnlyOld != g_bAppliOnCurrentDesktopOnly || (bMixLauncherAppliOld != g_bMixLauncherAppli) || (bOverWriteXIconsOld != g_bOverWriteXIcons) || (cairo_dock_application_manager_is_running () && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
+	if (g_bShowThumbnail && ! bShowThumbnailOld)  // on verifie que cette option est acceptable.
+	{
+		if (! cairo_dock_support_X_extension ())
+		{
+			cd_warning ("Sorry but your X server does not support the extension.\n You can't have window thumbnails in the dock");
+			g_bShowThumbnail = FALSE;
+		}
+		
+	}
+	if (bUniquePidOld != g_bUniquePid || bGroupAppliByClassOld != g_bGroupAppliByClass || bHideVisibleApplisOld != g_bHideVisibleApplis || bAppliOnCurrentDesktopOnlyOld != g_bAppliOnCurrentDesktopOnly || (bMixLauncherAppliOld != g_bMixLauncherAppli) || (bOverWriteXIconsOld != g_bOverWriteXIcons) || (g_bShowThumbnail != bShowThumbnailOld) || (cairo_dock_application_manager_is_running () && ! g_bShowAppli))  // on ne veut plus voir les applis, il faut donc les enlever.
 	{
 		cairo_dock_stop_application_manager ();
 	}
@@ -1188,7 +1204,18 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	cairo_dock_update_renderer_list_for_gui ();
 	
 	if (g_cRaiseDockShortcut != NULL)
-		cd_keybinder_bind (g_cRaiseDockShortcut, (CDBindkeyHandler) cairo_dock_raise_from_keyboard, (gpointer)NULL);
+	{
+		if (! cd_keybinder_bind (g_cRaiseDockShortcut, (CDBindkeyHandler) cairo_dock_raise_from_keyboard, NULL))
+		{
+			g_free (g_cRaiseDockShortcut);
+			g_cRaiseDockShortcut = NULL;
+		}
+	}
+	
+	if (g_bPopUp)
+		cairo_dock_start_polling_screen_edge (pDock);
+	else
+		cairo_dock_stop_polling_screen_edge ();
 	
 	//\___________________ On applique les modifs au fichier de conf easy.
 	cairo_dock_copy_to_easy_conf_file (pKeyFile, g_cEasyConfFile);

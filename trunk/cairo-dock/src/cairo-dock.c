@@ -207,8 +207,7 @@ double g_fDeskletColorInside[4];
 gchar *g_cRaiseDockShortcut = NULL;
 
 gboolean g_bKeepAbove = FALSE;
-gboolean g_bKeepBelow = FALSE;
-gboolean g_bPopUp = FALSE;
+gboolean g_bPopUp;
 gboolean g_bSkipPager = TRUE;
 gboolean g_bSkipTaskbar = TRUE;
 gboolean g_bSticky = TRUE;
@@ -230,6 +229,7 @@ double g_fIndicatorWidth, g_fIndicatorHeight;
 int g_iIndicatorDeltaY;
 gboolean g_bLinkIndicatorWithIcon;
 gboolean g_bIndicatorAbove;
+gboolean g_bShowThumbnail = FALSE;
 
 cairo_surface_t *g_pDropIndicatorSurface = NULL;
 double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
@@ -312,12 +312,6 @@ int main (int argc, char** argv)
 		{"keep-above", 'a', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&g_bKeepAbove,
 			"keep the dock above other windows whatever", NULL},
-		{"keep-below", 'B', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
-			&g_bKeepBelow,
-			"keep the dock below other windows whatever", NULL},			
-		{"pop-up", 'P', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
-			&g_bPopUp,
-			"when used with --keep-below, dock will pop-up when hovered over", NULL},
 		{"no-skip-pager", 'p', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&bNoSkipPager,
 			"show the dock in pager", NULL},
@@ -335,7 +329,7 @@ int main (int argc, char** argv)
 			"force the window manager to consider cairo-dock as a normal appli instead of a dock", NULL},
 		{"env", 'e', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
 			&cEnvironment,
-			"force the dock to consider this environnement - it may crush the dock if not set properly.", NULL},
+			"force the dock to consider this environnement - it may crash the dock if not set properly.", NULL},
 		{"dir", 'd', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
 			&cUserDefinedDataDir,
 			"force the dock to load this directory, instead of ~/.cairo-dock.", NULL},
@@ -359,7 +353,7 @@ int main (int argc, char** argv)
 			"print version and quit.", NULL},
 		{"modules-dir", 'M', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
 			&cUserDefinedModuleDir,
-			"ask the dock to load additionnal modules contained in this directory (Though it is unsafe for your dock to load unnofficial modules).", NULL},
+			"ask the dock to load additionnal modules contained in this directory (though it is unsafe for your dock to load unnofficial modules).", NULL},
 		{"fake-transparency", 'F', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&g_bUseFakeTransparency,
 			"emulate composition with fake transparency. Only use this if you don't run a compositor like Compiz, xcompmgr, etc and have a black background around your dock.", NULL},
@@ -384,6 +378,12 @@ int main (int argc, char** argv)
 		cVerbosity = NULL;
 	}
 #endif */
+	if (bPrintVersion)
+	{
+		g_print ("%s\n", CAIRO_DOCK_VERSION);
+		return 0;
+	}
+	
 	_cairo_dock_set_verbosity(cVerbosity);
 	g_free (cVerbosity);
 
@@ -410,7 +410,7 @@ int main (int argc, char** argv)
 		g_free (cEnvironment);
 	}
 #ifdef HAVE_GLITZ
-	g_print ("Compiled with Glitz (hardware acceleration support)\n");
+	cd_message ("Compiled with Glitz (hardware acceleration support)\n");
 #else
 	if (g_bUseGlitz)
 	{
@@ -432,11 +432,6 @@ int main (int argc, char** argv)
 	if (bCafeLatte)
 	{
 		g_print ("Honestly, you trust someone who includes such options in his code ?\n");
-		return 0;
-	}
-	if (bPrintVersion)
-	{
-		g_print ("%s\n", CAIRO_DOCK_VERSION);
 		return 0;
 	}
 	

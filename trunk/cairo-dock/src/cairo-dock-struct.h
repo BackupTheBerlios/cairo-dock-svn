@@ -595,6 +595,8 @@ struct _Icon {
 	gdouble fQuickInfoYOffset;
 	/// TRUE ssi l'icone a un indicateur (elle controle une appli).
 	gboolean bHasIndicator;
+	/// ID du pixmap de sauvegarde de la fenetre pour quand elle est cachee.
+	Pixmap iBackingPixmap;
 };
 
 

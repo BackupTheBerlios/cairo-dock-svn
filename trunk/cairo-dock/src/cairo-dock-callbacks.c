@@ -61,7 +61,6 @@ extern int g_iShowSubDockDelay;
 extern gboolean bShowSubDockOnClick;
 extern gboolean g_bUseSeparator;
 extern gboolean g_bKeepAbove;
-extern gboolean g_bKeepBelow;
 extern gboolean g_bPopUp;
 
 extern gint g_iScreenWidth[2];
@@ -267,8 +266,7 @@ void cairo_dock_show_subdock (Icon *pPointedIcon, gboolean bUpdate, CairoDock *p
 	}
 	//g_print ("  -> Gap %d;%d -> W(%d;%d) (%d)\n", pSubDock->iGapX, pSubDock->iGapY, pSubDock->iWindowPositionX, pSubDock->iWindowPositionY, pSubDock->bHorizontalDock);
 	
-	///gtk_window_set_keep_below (GTK_WINDOW (pSubDock->pWidget), g_bKeepBelow);  // pas les sous-docks.
-	gtk_window_set_keep_above (GTK_WINDOW (pSubDock->pWidget), g_bKeepBelow && g_bPopUp);
+	gtk_window_set_keep_above (GTK_WINDOW (pSubDock->pWidget), g_bPopUp);
 }
 static gboolean _cairo_dock_show_sub_dock_delayed (CairoDock *pDock)
 {
@@ -508,7 +506,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	{
 		return ;
 	}
-	/**if (g_bKeepBelow && g_bPopUp && pDock->bIsMainDock)
+	/**if (g_bPopUp && pDock->bIsMainDock)
 	{
 		//the mouse has exited the dock window, cancel any pop up event, and trigger a pop down event.
 		*if (pDock->iSidPopUp != 0)
@@ -625,54 +623,33 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 gboolean cairo_dock_poll_screen_edge (CairoDock *pDock)  // thanks to Smidgey for the pop-up patch !
 {
 	static int iPrevPointerX = -1, iPrevPointerY = -1;
-	gint iMousePos[2];
+	gint iMousePosX, iMousePosY;
 	///static gint iSidPopUp = 0;
 	
 	if (pDock->iSidPopUp == 0 && !pDock->bPopped)
 	{
-		gdk_display_get_pointer(gdk_display_get_default(), NULL, &iMousePos[0], &iMousePos[1], NULL);
-		if (iPrevPointerX == iMousePos[0] && iPrevPointerY == iMousePos[1])
-			return g_bPopUp && g_bKeepBelow;
+		gdk_display_get_pointer(gdk_display_get_default(), NULL, &iMousePosX, &iMousePosY, NULL);
+		if (iPrevPointerX == iMousePosX && iPrevPointerY == iMousePosY)
+			return g_bPopUp;
 		
-		iPrevPointerX = iMousePos[0];
-		iPrevPointerY = iMousePos[1];
-		if (!pDock->bDirectionUp)
-		{
-			if (iMousePos[pDock->bHorizontalDock] == 0)
-			{
-				cairo_dock_pop_up (pDock);
-				/**pDock->iSidPopUp = g_timeout_add (500, (GSourceFunc) cairo_dock_pop_up, (gpointer) pDock);
-				iSidPopUp = pDock->iSidPopUp;*/
-				if (pDock->iSidPopDown == 0)
-					pDock->iSidPopDown = g_timeout_add (2500, (GSourceFunc) cairo_dock_pop_down, (gpointer) pDock);  // au cas ou on serait pas dedans.
-			}
-			/**else if (iSidPopUp)
-			{
-				g_source_remove(iSidPopUp);
-				if (iSidPopUp == pDock->iSidPopUp) pDock->iSidPopUp = 0;
-				iSidPopUp = 0;
-			}*/
-		}
+		iPrevPointerX = iMousePosX;
+		iPrevPointerY = iMousePosY;
+		
+		CairoDockPositionType iScreenBorder = 0;
+		if (iMousePosY == 0)
+			iScreenBorder = CAIRO_DOCK_TOP;
+		else if (iMousePosY + 1 == g_iScreenHeight[CAIRO_DOCK_HORIZONTAL])
+			iScreenBorder = CAIRO_DOCK_BOTTOM;
+		else if (iMousePosX == 0)
+			iScreenBorder = CAIRO_DOCK_LEFT;
+		else if (iMousePosX + 1 == g_iScreenWidth[CAIRO_DOCK_HORIZONTAL])
+			iScreenBorder = CAIRO_DOCK_RIGHT;
 		else
-		{
-			if (iMousePos[pDock->bHorizontalDock] +1 == g_iScreenHeight[pDock->bHorizontalDock])
-			{
-				cairo_dock_pop_up (pDock);
-				/**pDock->iSidPopUp = g_timeout_add (500, (GSourceFunc) cairo_dock_pop_up, (gpointer) pDock);
-				iSidPopUp = pDock->iSidPopUp;*/
-				if (pDock->iSidPopDown == 0)
-					pDock->iSidPopDown = g_timeout_add (2500, (GSourceFunc) cairo_dock_pop_down, (gpointer) pDock);
-			}
-			/**else if (iSidPopUp)
-			{
-				g_source_remove(iSidPopUp);
-				if (iSidPopUp == pDock->iSidPopUp) pDock->iSidPopUp = 0;
-				iSidPopUp = 0;
-			}*/
-		}
+			return g_bPopUp;
+		cairo_dock_pop_up_root_docks_on_screen_edge (iScreenBorder);
 	}
 	
-	return g_bPopUp && g_bKeepBelow;
+	return g_bPopUp;
 }
 
 gboolean on_enter_notify2 (GtkWidget* pWidget,
@@ -744,7 +721,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 		g_iSidShrinkDown = 0;
 	}*/
 	
-	if (g_bKeepBelow && g_bPopUp && pDock->iRefCount == 0)
+	if (g_bPopUp && pDock->iRefCount == 0)
 	{
 		//This code will trigger a pop up...
 		/**if (pDock->iSidPopUp == 0)

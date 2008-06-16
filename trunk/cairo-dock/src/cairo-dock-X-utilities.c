@@ -491,7 +491,7 @@ Pixmap cairo_dock_get_window_background_pixmap (Window Xid)
 	return iBgPixmapID;
 }
 
-GdkPixbuf *_cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bAddAlpha)  // cette fonction est inspiree par celle de libwnck.
+GdkPixbuf *cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bAddAlpha)  // cette fonction est inspiree par celle de libwnck.
 {
 	Window root;  // inutile.
 	int x, y;  // inutile.
@@ -594,4 +594,17 @@ void cairo_dock_set_nb_desktops (gulong iNbDesktops)
 		False,
 		SubstructureRedirectMask | SubstructureNotifyMask,
 		&xClientMessage);
+}
+
+gboolean cairo_dock_support_X_extension (void)
+{
+	int event_base, error_base;
+	if (XCompositeQueryExtension (s_XDisplay, &event_base, &error_base))  // on regarde si le serveur X supporte l'extension.
+	{
+		int major = 0, minor = 2;  // La version minimale requise pour avoir XCompositeNameWindowPixmap().
+		XCompositeQueryVersion (s_XDisplay, &major, &minor);  // on regarde si on est au moins dans cette version.
+		if (major > 0 || minor >= 2)
+			return TRUE;
+	}
+	return FALSE;
 }

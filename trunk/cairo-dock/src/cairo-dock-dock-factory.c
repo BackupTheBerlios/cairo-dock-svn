@@ -70,7 +70,7 @@ extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 extern gchar *g_cConfFile;
 
 extern gboolean g_bKeepAbove;
-extern gboolean g_bKeepBelow;
+extern gboolean g_bPopUp;
 extern gboolean g_bSkipPager;
 extern gboolean g_bSkipTaskbar;
 extern gboolean g_bSticky;
@@ -94,7 +94,6 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	}
 	
 	pDock->bAtBottom = TRUE;
-    pDock->bPopped = FALSE;
 	pDock->iRefCount = 0;  // c'est un dock racine par defaut.
 	pDock->fRatio = 1.;
 	pDock->iAvoidingMouseIconType = -1;
@@ -110,7 +109,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	if (g_bSticky)
 		gtk_window_stick (GTK_WINDOW (pWindow));
 	gtk_window_set_keep_above (GTK_WINDOW (pWindow), g_bKeepAbove);
-	gtk_window_set_keep_below (GTK_WINDOW (pWindow), g_bKeepBelow);
+	gtk_window_set_keep_below (GTK_WINDOW (pWindow), g_bPopUp);
 	gtk_window_set_skip_pager_hint (GTK_WINDOW (pWindow), g_bSkipPager);
 	gtk_window_set_skip_taskbar_hint (GTK_WINDOW (pWindow), g_bSkipTaskbar);
 	gtk_window_set_gravity (GTK_WINDOW (pWindow), GDK_GRAVITY_STATIC);

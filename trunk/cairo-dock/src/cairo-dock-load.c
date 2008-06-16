@@ -77,6 +77,7 @@ extern unsigned int g_iAppliMaxNameLength;
 extern int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconAuthorizedHeight[CAIRO_DOCK_NB_TYPES];
 extern gboolean g_bOverWriteXIcons;
+extern gboolean g_bShowThumbnail;
 
 extern cairo_surface_t *g_pDropIndicatorSurface;
 extern double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
@@ -274,8 +275,10 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	}
 	else if (CAIRO_DOCK_IS_APPLI (icon))  // c'est l'icône d'une appli valide. Dans cet ordre on n'a pas besoin de verifier que c'est NORMAL_APPLI.
 	{
-		if (g_bOverWriteXIcons && ! cairo_dock_class_is_using_xicon (icon->cClass))
+		if (g_bOverWriteXIcons && ! cairo_dock_class_is_using_xicon (icon->cClass) && ! (g_bShowThumbnail && icon->bIsHidden))
 			icon->pIconBuffer = cairo_dock_create_surface_from_class (icon->cClass, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight);
+		if (icon->pIconBuffer == NULL && g_bShowThumbnail && icon->bIsHidden && icon->iBackingPixmap != 0)
+			icon->pIconBuffer = cairo_dock_create_surface_from_xpixmap (icon->iBackingPixmap, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight);
 		if (icon->pIconBuffer == NULL)
 			icon->pIconBuffer = cairo_dock_create_surface_from_xwindow (icon->Xid, pSourceContext, fMaxScale, &icon->fWidth, &icon->fHeight);
 	}
@@ -739,7 +742,7 @@ void cairo_dock_load_desktop_background_surface (void)  // attention : fonction 
 	Pixmap iRootPixmapID = cairo_dock_get_window_background_pixmap (cairo_dock_get_root_id ());
 	g_return_if_fail (iRootPixmapID != 0);
 	
-	GdkPixbuf *pBgPixbuf = _cairo_dock_get_pixbuf_from_pixmap (iRootPixmapID, FALSE);  // on n'y ajoute pas de transparence.
+	GdkPixbuf *pBgPixbuf = cairo_dock_get_pixbuf_from_pixmap (iRootPixmapID, FALSE);  // on n'y ajoute pas de transparence.
 	if (pBgPixbuf != NULL)
 	{
 		cairo_t *pSourceContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (g_pMainDock));

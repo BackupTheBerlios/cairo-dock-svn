@@ -139,6 +139,6 @@ void cairo_dock_synchronize_sub_docks_position (CairoDock *pDock, gboolean bRelo
 
 void cairo_dock_start_polling_screen_edge (CairoDock *pMainDock);
 void cairo_dock_stop_polling_screen_edge (void);
-
+void cairo_dock_pop_up_root_docks_on_screen_edge (CairoDockPositionType iScreenBorder);
 
 #endif

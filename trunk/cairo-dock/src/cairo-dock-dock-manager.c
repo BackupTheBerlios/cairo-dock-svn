@@ -40,13 +40,13 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-keyfile-utilities.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-draw.h"
+#include "cairo-dock-animations.h"
 #include "cairo-dock-dock-manager.h"
 
 extern CairoDock *g_pMainDock;
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentThemePath;
 extern gboolean g_bSameHorizontality;
-extern gboolean g_bKeepBelow;
 extern gboolean g_bPopUp;
 
 static GHashTable *s_hDocksTable = NULL;  // table des docks existant.
@@ -77,8 +77,6 @@ CairoDock *cairo_dock_register_dock (const gchar *cDockName, CairoDock *pDock)
 	{
 		pDock->bIsMainDock = TRUE;
 		g_pMainDock = pDock;
-		if (g_bKeepBelow && g_bPopUp)
-			cairo_dock_start_polling_screen_edge (pDock);
 	}
 	
 	g_hash_table_insert (s_hDocksTable, g_strdup (cDockName), pDock);
@@ -387,13 +385,13 @@ void cairo_dock_get_root_dock_position (const gchar *cDockName, CairoDock *pDock
 				pDock->bHorizontalDock = CAIRO_DOCK_HORIZONTAL;
 				pDock->bDirectionUp = FALSE;
 			break;
-			case CAIRO_DOCK_LEFT :
-				pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
-				pDock->bDirectionUp = FALSE;
-			break;
 			case CAIRO_DOCK_RIGHT :
 				pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
 				pDock->bDirectionUp = TRUE;
+			break;
+			case CAIRO_DOCK_LEFT :
+				pDock->bHorizontalDock = CAIRO_DOCK_VERTICAL;
+				pDock->bDirectionUp = FALSE;
 			break;
 		}
 		
@@ -563,4 +561,25 @@ void cairo_dock_stop_polling_screen_edge (void)
 		g_source_remove (s_iSidPollScreenEdge);
 		s_iSidPollScreenEdge = 0;
 	}
+}
+
+
+static void _cairo_dock_pop_up_one_root_dock (gchar *cDockName, CairoDock *pDock, gpointer data)
+{
+	if (pDock->iRefCount > 0)
+		return ;
+	CairoDockPositionType iScreenBorder = GPOINTER_TO_INT (data);
+	
+	CairoDockPositionType iDockScreenBorder = (((! pDock->bHorizontalDock) << 1) | (! pDock->bDirectionUp));
+	if (iDockScreenBorder == iScreenBorder)
+	{
+		cd_message ("%s passe en avant-plan", cDockName);
+		cairo_dock_pop_up (pDock);
+		if (pDock->iSidPopDown == 0)
+			pDock->iSidPopDown = g_timeout_add (2000, (GSourceFunc) cairo_dock_pop_down, (gpointer) pDock);  // au cas ou on serait pas dedans.
+	}
+}
+void cairo_dock_pop_up_root_docks_on_screen_edge (CairoDockPositionType iScreenBorder)
+{
+	g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_pop_up_one_root_dock, GINT_TO_POINTER (iScreenBorder));
 }
