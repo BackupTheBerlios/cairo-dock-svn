@@ -57,7 +57,7 @@ typedef enum {
 	CAIRO_DOCK_EMBLEM_TOTAL_NB,
 } CairoDockEmblem;
 
-#define cairo_dock_make_emblem_from_file(cIconFile, iEmblemType) cairo_dock_draw_emblem_on_my_icon(myDrawContext, cIconFile, myIcon, myContainer, iEmblemType);
+#define cairo_dock_make_emblem_from_file(cIconFile, pEmblemType) cairo_dock_draw_emblem_on_my_icon(myDrawContext, cIconFile, myIcon, myContainer, pEmblemType);
 
 /**
 *Dessine un embleme sur une icone.
@@ -65,9 +65,33 @@ typedef enum {
 *@param cIconFile l'embleme a afficher.
 *@param pIcon l'icone.
 *@param pContainer le container de l'icone.
-*@param iEmblemType énumération du type d'embleme.
+*@param pEmblemType énumération du type d'embleme.
 */
-void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIconFile, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem iEmblemType);
+void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIconFile, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType);
+
+//Needed for emblem classic type
+typedef enum {
+	CAIRO_DOCK_EMBLEM_BLANK = 0,
+	CAIRO_DOCK_EMBLEM_CHARGE,
+	CAIRO_DOCK_EMBLEM_DROP_INDICATOR,
+	CAIRO_DOCK_EMBLEM_PLAY,
+	CAIRO_DOCK_EMBLEM_PAUSE,
+	CAIRO_DOCK_EMBLEM_STOP,
+	CAIRO_DOCK_EMBLEM_BROKEN,
+	CAIRO_DOCK_EMBLEM_CLASSIC_NB,
+} CairoDockClassicEmblem;
+
+#define cairo_dock_make_emblem(pEmblemClassic, pEmblemType) cairo_dock_draw_emblem_classic(myDrawContext, myIcon, myContainer, pEmblemClassic, pEmblemType);
+
+/**
+*Dessine un embleme sur une icone avec une banque local.
+*@param pIconContext le contexte du dessin; n'est pas altere par la fonction.
+*@param pIcon l'icone.
+*@param pContainer le container de l'icone.
+*@param pEmblemClassic énumération du type d'embleme classique.
+*@param pEmblemType énumération du type d'embleme.
+*/
+void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoContainer *pContainer, CairoDockClassicEmblem pEmblemClassic, CairoDockEmblem pEmblemType);
 
 /**
 *Cree les surfaces de reflection d'une icone.

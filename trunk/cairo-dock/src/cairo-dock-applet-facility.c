@@ -209,7 +209,7 @@ void cairo_dock_draw_bar_on_icon (cairo_t *pIconContext, double fValue, Icon *pI
 }
 
 //Fonction proposée par Nécropotame, rédigée par ChAnGFu
-void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIconFile, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType)
+void cairo_dock_draw_emblem_on_my_icon (cairo_t *pIconContext, const gchar *cIconFile, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType)
 {
 	cd_debug ("%s (%s %d)", __func__, cIconFile, pEmblemType);
 	g_return_if_fail (pIcon != NULL && pContainer != NULL); 
@@ -274,6 +274,42 @@ void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIcon
 	cairo_set_source_surface (pIconContext, pCairoSurface, 0.0, 0.0);
 	cairo_paint (pIconContext);
 	cairo_restore (pIconContext);
+}
+
+void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoContainer *pContainer, CairoDockClassicEmblem pEmblemClassic, CairoDockEmblem pEmblemType)
+{
+	cd_debug ("%s (%s %d)", __func__, pIcon->acName, pEmblemType);
+	g_return_if_fail (pIcon != NULL); 
+	
+	gchar *cClassicEmblemPath = NULL;
+	switch (pEmblemClassic) {
+		default :
+		case CAIRO_DOCK_EMBLEM_BLANK :
+			cClassicEmblemPath = g_strdup_printf ("%s/emblems/blank.svg", CAIRO_DOCK_SHARE_DATA_DIR);
+		break;
+		case CAIRO_DOCK_EMBLEM_CHARGE:
+			cClassicEmblemPath = g_strdup_printf ("%s/emblems/charge.svg", CAIRO_DOCK_SHARE_DATA_DIR);
+		break;
+		case CAIRO_DOCK_EMBLEM_DROP_INDICATOR:
+			cClassicEmblemPath = g_strdup_printf ("%s/emblems/drop.svg", CAIRO_DOCK_SHARE_DATA_DIR);
+		break;
+		case CAIRO_DOCK_EMBLEM_PLAY:
+			cClassicEmblemPath = g_strdup_printf ("%s/emblems/play.svg", CAIRO_DOCK_SHARE_DATA_DIR);
+		break;
+		case CAIRO_DOCK_EMBLEM_PAUSE:
+			cClassicEmblemPath = g_strdup_printf ("%s/emblems/pause.svg", CAIRO_DOCK_SHARE_DATA_DIR);
+		break;
+		case CAIRO_DOCK_EMBLEM_STOP:
+			cClassicEmblemPath = g_strdup_printf ("%s/emblems/stop.svg", CAIRO_DOCK_SHARE_DATA_DIR);
+		break;
+		case CAIRO_DOCK_EMBLEM_BROKEN:
+			cClassicEmblemPath = g_strdup_printf ("%s/emblems/broken.svg", CAIRO_DOCK_SHARE_DATA_DIR);
+		break;
+		//Il reste play pause stop broken a faire.
+	}
+	
+	cairo_dock_draw_emblem_on_my_icon (pIconContext, cClassicEmblemPath, pIcon, pContainer, pEmblemType);
+	g_free (cClassicEmblemPath);
 }
 
 void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, Icon *pIcon, CairoContainer *pContainer)  // fonction proposee par Necropotame.
@@ -637,6 +673,7 @@ void cairo_dock_set_normal_frequency_state (CairoDockMeasure *pMeasureTimer)
 }
 
 //Utile pour jouer des fichiers son depuis le dock.
+//A utiliser avec l'Objet UI 'u' dans les .conf
 void cairo_dock_play_sound (gchar *cSoundPath)
 {
 	cd_debug ("%s (%s)", __func__, cSoundPath);

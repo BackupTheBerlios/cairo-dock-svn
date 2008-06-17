@@ -73,5 +73,6 @@ AC_CONFIG_FILES([Makefile
 		data/gauges/turbo-night-fuel/Makefile
 		data/gauges/turbo-night-dual/Makefile
 		data/gauges/rainbow/Makefile
-		data/gauges/tomato/Makefile])
+		data/gauges/tomato/Makefile
+		data/emblems/Makefile])
 AC_OUTPUT
