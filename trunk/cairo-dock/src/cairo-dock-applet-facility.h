@@ -296,7 +296,7 @@ void cairo_dock_set_normal_frequency_state (CairoDockMeasure *pMeasureTimer);
 *Joue un son par l'intermédiaire de pulseaudio ou alsa (en priorité).
 *@param cSoundPath le chemin vers le fichier audio a jouer.
 */
-void cairo_dock_play_sound (gchar *cSoundPath);
+void cairo_dock_play_sound (const gchar *cSoundPath);
 
 
 

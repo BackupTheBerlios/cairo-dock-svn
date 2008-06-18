@@ -919,6 +919,8 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 									cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pParentDock));
 									cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE, pDock->bDirectionUp);
 									cairo_destroy (pCairoContext);
+									icon->fWidth *= pParentDock->fRatio;
+									icon->fHeight *= pParentDock->fRatio;
 									if (pParentDock->iSidShrinkDown == 0)
 										cairo_dock_redraw_my_icon (icon, CAIRO_CONTAINER (pParentDock));
 								}

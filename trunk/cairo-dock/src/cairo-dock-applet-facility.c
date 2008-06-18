@@ -674,7 +674,7 @@ void cairo_dock_set_normal_frequency_state (CairoDockMeasure *pMeasureTimer)
 
 //Utile pour jouer des fichiers son depuis le dock.
 //A utiliser avec l'Objet UI 'u' dans les .conf
-void cairo_dock_play_sound (gchar *cSoundPath)
+void cairo_dock_play_sound (const gchar *cSoundPath)
 {
 	cd_debug ("%s (%s)", __func__, cSoundPath);
 	if (cSoundPath == NULL)
