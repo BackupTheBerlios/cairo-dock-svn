@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-06-16 11:44+0200\n"
+"POT-Creation-Date: 2008-06-18 03:01+0200\n"
 "PO-Revision-Date: 2008-05-30 13:35-0500\n"
 "Last-Translator: biAji <biaji.cn@gmail.com>\n"
 "Language-Team: \n"
@@ -10,11 +10,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/cairo-dock-callbacks.c:979
+#: ../src/cairo-dock-callbacks.c:987
 msgid "Do you want to mount this point ?"
 msgstr "您想挂载此点么？"
 
-#: ../src/cairo-dock-callbacks.c:1679
+#: ../src/cairo-dock-callbacks.c:1687
 msgid "Quit Cairo-Dock ?"
 msgstr "退出Cairo-Dock？"
 
@@ -363,22 +363,22 @@ msgstr ""
 msgid "Are you sure you want to overwrite theme %s ?"
 msgstr "您确定要覆写主题 %s 么？"
 
-#: ../src/cairo-dock.c:522
+#: ../src/cairo-dock.c:525
 msgid "< Maintenance mode >"
 msgstr "<维护模式>"
 
 # #################################
 # ########### cairo-dock.conf #############
 # #################################
-#: ../data/messages:1 ../data/messages:711
+#: ../data/messages:1 ../data/messages:719
 msgid "Position"
 msgstr "位置"
 
-#: ../data/messages:3 ../data/messages:541 ../data/messages:713
+#: ../data/messages:3 ../data/messages:549 ../data/messages:721
 msgid "Position on the screen"
 msgstr "在屏幕上的位置"
 
-#: ../data/messages:5 ../data/messages:543 ../data/messages:715
+#: ../data/messages:5 ../data/messages:551 ../data/messages:723
 msgid ""
 "The icons will scroll according to the chosen placement type. Of course the "
 "dock can be placed anywhere on the screen, here we specify regarding to what."
@@ -386,28 +386,28 @@ msgstr ""
 "图标将根据选择的放置类型卷动。当然，我们可以把dock放到屏幕的任何地方。 但我们"
 "只定义了这几个。"
 
-#: ../data/messages:7 ../data/messages:545 ../data/messages:717
+#: ../data/messages:7 ../data/messages:553 ../data/messages:725
 msgid ""
 "Choose the screen border regarding to which the dock will place itself :"
 msgstr "选择dock放置的屏幕边："
 
-#: ../data/messages:9 ../data/messages:547 ../data/messages:719
+#: ../data/messages:9 ../data/messages:555 ../data/messages:727
 msgid "bottom"
 msgstr "底部"
 
-#: ../data/messages:11 ../data/messages:549 ../data/messages:721
+#: ../data/messages:11 ../data/messages:557 ../data/messages:729
 msgid "top"
 msgstr "顶部"
 
-#: ../data/messages:13 ../data/messages:551 ../data/messages:723
+#: ../data/messages:13 ../data/messages:559 ../data/messages:731
 msgid "right"
 msgstr "右边"
 
-#: ../data/messages:15 ../data/messages:553 ../data/messages:725
+#: ../data/messages:15 ../data/messages:561 ../data/messages:733
 msgid "left"
 msgstr "左边"
 
-#: ../data/messages:17 ../data/messages:727
+#: ../data/messages:17 ../data/messages:735
 msgid ""
 "At 0, the dock will place itself regarding the left corner if horizontal and "
 "the top corner if vertical, at 1 regarding the right corner if horizontal "
@@ -417,15 +417,15 @@ msgstr ""
 "取值0时，dock水平位于左角，垂直位于上角；1时，水平位于右角，垂直位于下角；0.5"
 "时，相对屏幕正中定位。"
 
-#: ../data/messages:19 ../data/messages:729
+#: ../data/messages:19 ../data/messages:737
 msgid "Relative alignment :"
 msgstr "相对排列："
 
-#: ../data/messages:21 ../data/messages:731
+#: ../data/messages:21 ../data/messages:739
 msgid "Position regarding the chosen screen's edge"
 msgstr "依据选择的屏幕边定位："
 
-#: ../data/messages:23 ../data/messages:733
+#: ../data/messages:23 ../data/messages:741
 msgid ""
 "Gap from the absolute position on the screen's edge, in pixels. You can also "
 "move the dock by holding ALT or CTRL key and left mouse button."
@@ -433,17 +433,17 @@ msgstr ""
 "距离屏幕边的绝对位置的间隔。以点为单位。你也可以按下ALT或CTRL，以及鼠标左键来"
 "移动dock。"
 
-#: ../data/messages:25 ../data/messages:735
+#: ../data/messages:25 ../data/messages:743
 msgid "Lateral gap :"
 msgstr "侧间隔："
 
-#: ../data/messages:27 ../data/messages:737
+#: ../data/messages:27 ../data/messages:745
 msgid ""
 "in pixels. You can also move the dock by holding ALT or CTRL key and left "
 "mouse button."
 msgstr "以点为单位。你也可以按下ALT或CTRL，以及鼠标左键来移动dock。"
 
-#: ../data/messages:29 ../data/messages:739
+#: ../data/messages:29 ../data/messages:747
 msgid "Distance to the screen's edge :"
 msgstr "距离屏幕边的距离："
 
@@ -470,7 +470,7 @@ msgstr ""
 msgid "Reserve space at the edge of the screen for the dock ?"
 msgstr "为dock保留屏幕边的空间么？"
 
-#: ../data/messages:39 ../data/messages:557 ../data/messages:741
+#: ../data/messages:39 ../data/messages:565 ../data/messages:749
 msgid ""
 "The dock will automatically hide itself outside of the scren when the mouse "
 "leaves it and will show a callback zone instead. Place the mouse into this "
@@ -479,29 +479,42 @@ msgstr ""
 "dock将在你的鼠标离开它后自动隐藏到屏幕外，而留下一个唤回区作为替代。将鼠标移"
 "到此区将重现dock"
 
-#: ../data/messages:41 ../data/messages:559 ../data/messages:743
+#: ../data/messages:41 ../data/messages:567 ../data/messages:751
 msgid "Activate auto-hide ?"
 msgstr "启用自动隐藏？"
 
 #: ../data/messages:43
 msgid ""
-"When you press the shortcut, the dock will hide or show itself at the "
-"potition of your mouse, thus acting like a menu."
-msgstr "按下快捷键时，dock将象菜单一样在您鼠标的位置隐藏或显现。"
+"The dock will pop-up on the foreground when you place the mouse on its "
+"screen border. This option is only useful if you don't want to reserve space "
+"for the dock, nor to activate auto-hide."
+msgstr ""
 
 #: ../data/messages:45
+msgid "Keep the dock below other windows ?"
+msgstr ""
+
+#: ../data/messages:47
+#, fuzzy
+msgid ""
+"When you press the shortcut, the dock will show itself at the potition of "
+"your mouse. The rest of the time, it stays invisible, thus acting like a "
+"menu."
+msgstr "按下快捷键时，dock将象菜单一样在您鼠标的位置隐藏或显现。"
+
+#: ../data/messages:49
 msgid "Keyboard shortcut to show/hide the dock :"
 msgstr "键盘快捷键显示/隐藏dock："
 
-#: ../data/messages:47 ../data/messages:561
+#: ../data/messages:51 ../data/messages:569
 msgid "TaskBar"
 msgstr "任务栏"
 
-#: ../data/messages:49
+#: ../data/messages:53
 msgid "Behaviour"
 msgstr "行为"
 
-#: ../data/messages:51 ../data/messages:563
+#: ../data/messages:55 ../data/messages:571
 msgid ""
 "Cairo-Dock will then replace your taskbar. It is recommanded to remove any "
 "other taskbar, and to not force the dock's type to normal."
@@ -509,15 +522,15 @@ msgstr ""
 "Cairo-Dock可以取代你的任务栏。建议你去掉其它的任务栏，并且不要强制把dock的类"
 "型设置为普通"
 
-#: ../data/messages:53 ../data/messages:565
+#: ../data/messages:57 ../data/messages:573
 msgid "Show the current applications in the dock ?"
 msgstr "在dock上显示当前应用程序么？"
 
-#: ../data/messages:55
+#: ../data/messages:59
 msgid "Should the applications with same PID be displayed only once ?"
 msgstr "拥有同样PID的应用程序只显示一次么？"
 
-#: ../data/messages:57
+#: ../data/messages:61
 msgid ""
 "This allows to group windows in some soft like Gimp, and to have only 1 icon "
 "in the main dock.The 1st window will appear in the main dock, and the others "
@@ -526,30 +539,30 @@ msgstr ""
 "这将使类似Gimp这样拥有一组窗口的软件只在主dock上显示一个图标。第一个窗口显示"
 "在主dock上，而其余的将以第一个图标为容器放入。"
 
-#: ../data/messages:59
+#: ../data/messages:63
 msgid "Should the applications with same class be grouped in a sub-dock ?"
 msgstr "同类的应用程序组织成子dock的方式显示么？"
 
-#: ../data/messages:61
+#: ../data/messages:65
 msgid "Only show icons whose window is minimized ?"
 msgstr "仅显示最小化窗口的图标"
 
-#: ../data/messages:63
+#: ../data/messages:67
 msgid "Only show applis on current desktop ?"
 msgstr "仅显示当前桌面的应用程序"
 
-#: ../data/messages:65
+#: ../data/messages:69
 msgid ""
 "Allows launchers to act as applis when their program is running, and "
 "displays an indicator on their icon to signal it. You can launch other "
 "occurences of the program with SHIFT+click."
 msgstr ""
 
-#: ../data/messages:67
+#: ../data/messages:71
 msgid "Mix launchers and applis ?"
 msgstr "混合启动器和应用程序？"
 
-#: ../data/messages:69
+#: ../data/messages:73
 msgid ""
 "If not set, will use the icon provided by X for each appli. If set, the same "
 "icon as the corresponding launcher will be used for each appli."
@@ -557,79 +570,89 @@ msgstr ""
 "如果不设置，则会为每个应用程序使用由X提供的图标。如果设置，则为每个应用程序使"
 "用启动器对应的图标"
 
-#: ../data/messages:71
+#: ../data/messages:75
 msgid "Overwrite X icons with launchers' one ?"
 msgstr "用启动器的图标覆盖X的？"
 
-#: ../data/messages:73
+#: ../data/messages:77
+msgid "You need a composite manager for it."
+msgstr ""
+
+#: ../data/messages:79
+msgid "Show a window thumbnail when it's not minimized ?"
+msgstr ""
+
+#: ../data/messages:81
 msgid "Interaction"
 msgstr "交互"
 
-#: ../data/messages:75
+#: ../data/messages:83
 msgid "It is the default behaviour of most of taskbars."
 msgstr "这是大多数任务栏的默认行为。"
 
-#: ../data/messages:77
+#: ../data/messages:85
 msgid ""
 "Minimize the window when its icon is clicked, if it was already the active "
 "window ?"
 msgstr "当点击当前窗口的图标时，最小化它么？"
 
-#: ../data/messages:79
+#: ../data/messages:87
 msgid "In a Firefox's tabs manner."
 msgstr "象Firefox的tab一样。"
 
-#: ../data/messages:81
+#: ../data/messages:89
 msgid "Middle click on an icon closes its relative application ?"
 msgstr "中键点击图标关闭其相应应用程序。"
 
-#: ../data/messages:83
+#: ../data/messages:91
+#, fuzzy
 msgid ""
-"This is only usefull if don't already use the auto-hide, and if your WM let "
-"the dock in front of fullscreen windows (rare)."
+"This is only usefull if you don't already use the auto-hide, and if your WM "
+"let the dock in front of fullscreen windows (which is rare)."
 msgstr ""
 "此选项仅用于你没启用自动隐藏，而且你的窗口管理器把dock置于全屏窗口之前（罕"
 "见）"
 
-#: ../data/messages:85
+#: ../data/messages:93
 msgid "Automatically quick-hide the dock when a window becomes fullscreen ?"
 msgstr "当一个窗口变为全屏时，自动快速隐藏dock？"
 
-#: ../data/messages:87
+#: ../data/messages:95
+#, fuzzy
 msgid ""
 "This is only usefull if don't already use the auto-hide, and if you don't "
-"want to reserve the space for your dock."
+"want to reserve the space for your dock nor let it below the other windows."
 msgstr "仅当你没有启用自动隐藏"
 
-#: ../data/messages:89
+#: ../data/messages:97
 msgid "Automatically quick-hide the dock when a window becomes maximized ?"
 msgstr "当一个窗口最大化时自动快速隐藏dock"
 
-#: ../data/messages:91
+#: ../data/messages:99
 msgid "Signal the applications demanding your attention with a dialog tip ?"
 msgstr "应用程序将以对话框形式引起你的关注？"
 
-#: ../data/messages:93
+#: ../data/messages:101
 msgid "Signal the applications demanding your attention with an animation ?"
 msgstr "应用程序将以动画形式引起你的关注？"
 
-#: ../data/messages:95
+#: ../data/messages:103
 msgid "Play a short animation of the icon when its window becomes active ?"
 msgstr "当窗口获得焦点时，其对应图标将播放一小段动画？"
 
-#: ../data/messages:97
+#: ../data/messages:105
 msgid "Representation"
 msgstr "表现法"
 
-#: ../data/messages:99
+#: ../data/messages:107
 msgid "\"...\" will be added at the end if the name is too long."
 msgstr "如果名字过长将在末尾加上\"...\"。"
 
-#: ../data/messages:101
+#: ../data/messages:109
 msgid "Maximum number of caracters in application's name :"
 msgstr "应用程序名称使用的最大字符数："
 
-#: ../data/messages:103
+#: ../data/messages:111
 msgid ""
 "To the right, you can control the transparency of minimized windows, to the "
 "left the transparency of visible windows. The more you go aside, the more "
@@ -639,19 +662,19 @@ msgstr ""
 "向右控制最小化窗口的透明度，向左控制可视窗口的透明度。越靠向一边，对应图标将"
 "变的更透明；位于中间时，图标将保持正常"
 
-#: ../data/messages:105
+#: ../data/messages:113
 msgid "Transparency of icons whose window is or isn't minimized :"
 msgstr "依据图标对应的窗口是否最小化，改变图标的半透明度："
 
-#: ../data/messages:107 ../data/messages:539
+#: ../data/messages:115 ../data/messages:547
 msgid "System"
 msgstr "系统"
 
-#: ../data/messages:109
+#: ../data/messages:117
 msgid "Movement parameters"
 msgstr "移动参数"
 
-#: ../data/messages:111
+#: ../data/messages:119
 msgid ""
 "The icons will appear folded on themselves, regarding the alignement point, "
 "then will unfold untill they fill the whole dock. Use 0 to not use "
@@ -660,239 +683,239 @@ msgstr ""
 "依据正中点，图标出现时将叠在一起，然后展开直到恢复整个dock的大小。取值0时，不"
 "使用展开，取值越趋向于0，展开越快。"
 
-#: ../data/messages:113
+#: ../data/messages:121
 msgid "Icons' lateral unfolding acceleration :"
 msgstr "图标侧向展开加速："
 
-#: ../data/messages:115
+#: ../data/messages:123
 msgid "The more there are, the slower it will be"
 msgstr "步数越多，变化越慢"
 
-#: ../data/messages:117
+#: ../data/messages:125
 msgid "Number of steps for icons' resizing (grow up/shrink down) :"
 msgstr "图标改变大小的步数（变大/缩小）："
 
-#: ../data/messages:119
+#: ../data/messages:127
 msgid ""
 "in percentage of the distance it can move at each step . After n steps, the "
 "remaining distance will be reduced by (1-s)^n."
 msgstr "每步移动的距离百分比。在n步之后，剩下的距离将减少(1-s)^n"
 
-#: ../data/messages:121
+#: ../data/messages:129
 msgid "Window's move acceleration (move up/move down) :"
 msgstr "窗口移动加速（上移/下移）："
 
-#: ../data/messages:123
+#: ../data/messages:131
 msgid ""
 "The dock will unfold when it hides/shows itself. No effect if auto-hide is "
 "not activated or unfold acceleration is nul."
 msgstr ""
 "dock将在隐藏/显示的时候展开。如果没设置自动隐藏或展开加速度，则无此效果。"
 
-#: ../data/messages:125
+#: ../data/messages:133
 msgid "Animate the dock when auto-hiding ?"
 msgstr "自动隐藏时使用动画？"
 
-#: ../data/messages:127
+#: ../data/messages:135
 msgid "Mouse"
 msgstr "鼠标"
 
-#: ../data/messages:129
+#: ../data/messages:137
 msgid ""
 "The smaller, the lower the decorations will move along with the cursor. At 0 "
 "they will be static."
 msgstr "取值越小，装饰随指针移动的距离越短。取值为0时静止。"
 
-#: ../data/messages:131
+#: ../data/messages:139
 msgid "Scroll speed factor for background decorations :"
 msgstr "背景装饰的卷动速度："
 
-#: ../data/messages:133
+#: ../data/messages:141
 msgid ""
 "Otherwise the amount of movement of the decorations will only depend on the "
 "direction of the cursor's movement, as if the decorations were \"gliding\"."
 msgstr "否则，装饰的移动将仅与指针移动方向相关。好似装饰在“滑动”。"
 
-#: ../data/messages:135
+#: ../data/messages:143
 msgid "Should the decorations be enslaved to the cursor ?"
 msgstr "装饰的移动紧随指针？"
 
-#: ../data/messages:137
+#: ../data/messages:145
 msgid "If you put 0, this will make them scroll of exactly one icon each time."
 msgstr "如果取值为0,则每次恰好卷动一个图标。"
 
-#: ../data/messages:139
+#: ../data/messages:147
 msgid "Amount of pixels the icons will scroll at each wheel scroll :"
 msgstr "每次滚轮旋转时，图标卷动的点数："
 
-#: ../data/messages:141
+#: ../data/messages:149
 msgid "Re-center the dock on leaving if it has been scrolled ?"
 msgstr "如果经过卷动，离开dock时复位？"
 
-#: ../data/messages:143
+#: ../data/messages:151
 msgid "The more it's close to 0, the faster the scroll will be."
 msgstr "越接近0,卷动的越快。"
 
-#: ../data/messages:145
+#: ../data/messages:153
 msgid "If so, you can specify the scrolling acceleration :"
 msgstr "卷动加速："
 
-#: ../data/messages:147
+#: ../data/messages:155
 msgid "Sub-docks"
 msgstr "子Dock"
 
-#: ../data/messages:149
+#: ../data/messages:157
 msgid "in ms."
 msgstr "以毫秒为单位。"
 
-#: ../data/messages:151
+#: ../data/messages:159
 msgid "Delay before you effectively leave from a sub-dock or to a sub-dock :"
 msgstr "离开或进入子dock时的反应延时："
 
-#: ../data/messages:153
+#: ../data/messages:161
 msgid "in ms. Unused if you set up to click to show sub-docks."
 msgstr "以毫秒为单位。当设置点击显示子dock时，此设置无效。"
 
-#: ../data/messages:155
+#: ../data/messages:163
 msgid "Delay before displaying a sub-dock :"
 msgstr "显示一个子dock时的延时："
 
-#: ../data/messages:157
+#: ../data/messages:165
 msgid ""
 "Otherwise they will appear when you linger over the icon pointing on it."
 msgstr "否则它们会在鼠标掠过图标时显示。"
 
-#: ../data/messages:159
+#: ../data/messages:167
 msgid "Click to show sub-docks ?"
 msgstr "点击显示子dock？"
 
-#: ../data/messages:161
+#: ../data/messages:169
 msgid "Always true if sub-docks appear with mouse click."
 msgstr "当鼠标点击显示时总会以动画显示。"
 
-#: ../data/messages:163
+#: ../data/messages:171
 msgid "Animate sub-docks when they appear ?"
 msgstr "以动画展现子dock的出现？"
 
-#: ../data/messages:165
+#: ../data/messages:173
 msgid "CPU"
 msgstr "CPU"
 
-#: ../data/messages:167
+#: ../data/messages:175
 msgid "in Hz. This is to adjust regarding your CPU power."
 msgstr "以Hz为单位。依据你的CPU骠悍度调整此值。"
 
-#: ../data/messages:169
+#: ../data/messages:177
 msgid "Refresh frequency when mouving cursor into the dock :"
 msgstr "指针在dock上时的刷新频率："
 
-#: ../data/messages:171
+#: ../data/messages:179
 msgid ""
 "The transparency gradation pattern will then be re-calculated in real time. "
 "May needs more CPU power."
 msgstr "实时计算透明渐变纹理。消耗更多CPU。"
 
-#: ../data/messages:173
+#: ../data/messages:181
 msgid "Reflections should be calculated in real-time ?"
 msgstr "实时计算反应？"
 
-#: ../data/messages:175 ../data/messages:657
+#: ../data/messages:183 ../data/messages:665
 msgid "Labels"
 msgstr "标签"
 
-#: ../data/messages:177
+#: ../data/messages:185
 msgid "Show label of the currently pointed icon only ?"
 msgstr "仅显示当前所指的图标的标签？"
 
-#: ../data/messages:179
+#: ../data/messages:187
 msgid "Should the labels be always horizontal, even when dock is vertical ?"
 msgstr "即便dock为垂直的时候，仍水平显示标签？"
 
-#: ../data/messages:181
+#: ../data/messages:189
 msgid ""
 "the bigger, the more the labels next to the pointed icon will be transparent."
 msgstr "取值越大，紧邻当前所指图标的标签越接近透明。"
 
-#: ../data/messages:183
+#: ../data/messages:191
 msgid "label's visibility threshold :"
 msgstr "标签可见度阈值："
 
-#: ../data/messages:185
+#: ../data/messages:193
 msgid "Files"
 msgstr "文件"
 
-#: ../data/messages:187
+#: ../data/messages:195
 msgid "Sort files by :"
 msgstr "排序依据："
 
-#: ../data/messages:189
+#: ../data/messages:197
 msgid "Name"
 msgstr "名称"
 
-#: ../data/messages:191
+#: ../data/messages:199
 msgid "Size"
 msgstr "大小"
 
-#: ../data/messages:193
+#: ../data/messages:201
 msgid "Date"
 msgstr "日期"
 
-#: ../data/messages:195
+#: ../data/messages:203
 msgid "Show hidden files ?"
 msgstr "显示隐藏文件？"
 
-#: ../data/messages:197 ../data/messages:425
+#: ../data/messages:205 ../data/messages:433
 msgid "Applets"
 msgstr "小应用程序"
 
-#: ../data/messages:199 ../data/messages:567
+#: ../data/messages:207 ../data/messages:575
 msgid "Choose some useful accessories for your dock !"
 msgstr "为您的dock选择一些有用的附件！"
 
-#: ../data/messages:201 ../data/messages:207 ../data/messages:213
-#: ../data/messages:569 ../data/messages:575 ../data/messages:581
+#: ../data/messages:209 ../data/messages:215 ../data/messages:221
+#: ../data/messages:577 ../data/messages:583 ../data/messages:589
 msgid ""
 "Just check the box to activate a plug-in, or uncheck to deactivate it. Once "
 "activated, you can use it and configure it."
 msgstr "选中此框则启用插件，否则将禁用。启用后，您可以对其进行配置和使用。"
 
-#: ../data/messages:203 ../data/messages:571
+#: ../data/messages:211 ../data/messages:579
 msgid "List of available accessories :"
 msgstr "可用的附件列表："
 
-#: ../data/messages:205 ../data/messages:573
+#: ../data/messages:213 ../data/messages:581
 msgid "Add fonctionnalities to your dock !"
 msgstr "为你的dock添加更多功能！"
 
-#: ../data/messages:209 ../data/messages:577
+#: ../data/messages:217 ../data/messages:585
 msgid "List of available desktop enhancements :"
 msgstr "可用的桌面增强组件的列表："
 
-#: ../data/messages:211 ../data/messages:579
+#: ../data/messages:219 ../data/messages:587
 msgid "Control your PC from your dock !"
 msgstr "经由您的dock控制您的PC！"
 
-#: ../data/messages:215 ../data/messages:583
+#: ../data/messages:223 ../data/messages:591
 msgid "List of available controlers :"
 msgstr "可用的控制器列表："
 
-#: ../data/messages:217
+#: ../data/messages:225
 msgid "Background"
 msgstr "背景"
 
-#: ../data/messages:219
+#: ../data/messages:227
 msgid "Callback zone"
 msgstr "唤回区"
 
-#: ../data/messages:221
+#: ../data/messages:229
 msgid "Place the mouse into this zone will make the dock re-appear."
 msgstr "将鼠标置于区域内将使dock再次显现。"
 
-#: ../data/messages:223
+#: ../data/messages:231
 msgid "Size of the callback zone (width x height, in pixels) :"
 msgstr "唤回区大小（宽x高，以点为单位）： "
 
-#: ../data/messages:225 ../data/messages:599
+#: ../data/messages:233 ../data/messages:607
 msgid ""
 "Any format allowed; let this field empty to have an invisible callback zone. "
 "The callback zone is what you see when the dock hides itselfs."
@@ -900,142 +923,142 @@ msgstr ""
 "可使用任意格式。如果想使用不可见的唤回区则保持空白。唤回区在dock自隐藏时你看"
 "到的地方。"
 
-#: ../data/messages:227 ../data/messages:601
+#: ../data/messages:235 ../data/messages:609
 msgid "Filename of an image to put on the callback zone :"
 msgstr "置于唤回区的图像文件："
 
-#: ../data/messages:229
+#: ../data/messages:237
 msgid "Transparency of the callback zone :"
 msgstr "唤回区透明度："
 
-#: ../data/messages:231
+#: ../data/messages:239
 msgid ""
 "Use it when the image is an arrow pointing to the center of the screen for "
 "exemple."
 msgstr "比如说，当使用指向屏幕中央的箭头图像时可以使用这个功能。"
 
-#: ../data/messages:233
+#: ../data/messages:241
 msgid "Rotate the callback zone's image when the dock is on top/left/right ?"
 msgstr "当dock位于顶/左/右时旋转唤回区图片？"
 
-#: ../data/messages:235
+#: ../data/messages:243
 msgid "Extern Frame"
 msgstr "外框"
 
-#: ../data/messages:237 ../data/messages:241 ../data/messages:245
-#: ../data/messages:291 ../data/messages:493
+#: ../data/messages:245 ../data/messages:249 ../data/messages:253
+#: ../data/messages:299 ../data/messages:501
 msgid "in pixels."
 msgstr "以点为单位。"
 
-#: ../data/messages:239
+#: ../data/messages:247
 msgid "Corner radius :"
 msgstr "角半径："
 
-#: ../data/messages:243
+#: ../data/messages:251
 msgid "Linewidth of the extern line :"
 msgstr "外框线宽："
 
-#: ../data/messages:247
+#: ../data/messages:255
 msgid "Margin between the frame and the icons or their reflects :"
 msgstr "框架距离图标或它们映射的间隔："
 
-#: ../data/messages:249
+#: ../data/messages:257
 msgid "Color of the extern line (r,v,b,a) :"
 msgstr "框线颜色 (红,绿,蓝,alpha) :"
 
-#: ../data/messages:251
+#: ../data/messages:259
 msgid "Are the bottom left and right corners rounded ?"
 msgstr "左右下角使用圆角么？"
 
-#: ../data/messages:253
+#: ../data/messages:261
 msgid "Background image..."
 msgstr "背景图片..."
 
-#: ../data/messages:255 ../data/messages:595
+#: ../data/messages:263 ../data/messages:603
 msgid ""
 "Any format allowed; let this field empty if you don't want to use an image "
 "as background."
 msgstr "可用任何格式，如果不想使用桌面背景，请留空"
 
-#: ../data/messages:257 ../data/messages:597
+#: ../data/messages:265 ../data/messages:605
 msgid "Image's filename to use as a background :"
 msgstr "作为背景使用的图片名称："
 
-#: ../data/messages:259
+#: ../data/messages:267
 msgid "Image's transparency :"
 msgstr "图片透明度："
 
-#: ../data/messages:261
+#: ../data/messages:269
 msgid "Repeat image as a pattern to fill background ?"
 msgstr "以图片作纹理填充背景？"
 
-#: ../data/messages:263
+#: ../data/messages:271
 msgid "...or Gradation"
 msgstr "...或采用渐变"
 
-#: ../data/messages:265
+#: ../data/messages:273
 msgid "Bright color (red, green, blue, alpha) :"
 msgstr "亮色(红, 绿, 蓝, alpha)："
 
-#: ../data/messages:267
+#: ../data/messages:275
 msgid "Dark color (red, green, blue, alpha) :"
 msgstr "暗色(红, 绿, 蓝, alpha)："
 
-#: ../data/messages:269
+#: ../data/messages:277
 msgid ""
 "Angle of the stripes / gradation, in relation to the vertical (in degree) :"
 msgstr "条纹/渐变方向，相对于垂直（以角度为单位）"
 
-#: ../data/messages:271
+#: ../data/messages:279
 msgid ""
 "The bigger, the more the stripes are close to each other; with 0 stripes, "
 "the background will be filled with a single gradation."
 msgstr "取值越大，条纹之间越接近；取值为0时，背景将为一个渐变填充。"
 
-#: ../data/messages:273
+#: ../data/messages:281
 msgid "Number of stripes, in each pattern, to draw in the background :"
 msgstr "在背景上绘出的每种图样的条纹数量："
 
-#: ../data/messages:275
+#: ../data/messages:283
 msgid ""
 "1 pattern contains N stripes, so the width can be less or equal than 1/N."
 msgstr "一个图样包含N个条纹时，宽度将小于等于 1/N。"
 
-#: ../data/messages:277
+#: ../data/messages:285
 msgid "Width of the stripes, in percentage of the pattern size :"
 msgstr "以图样尺寸百分比为单位的条纹宽度："
 
-#: ../data/messages:279
+#: ../data/messages:287
 msgid "Icons"
 msgstr "图标"
 
-#: ../data/messages:281
+#: ../data/messages:289
 msgid "Wave's shape"
 msgstr "波浪形状"
 
-#: ../data/messages:283
+#: ../data/messages:291
 msgid "the maximum zoom will be 1+C."
 msgstr "缩放最大值为1+C。"
 
-#: ../data/messages:285
+#: ../data/messages:293
 msgid "Crest of the wave :"
 msgstr "波峰："
 
-#: ../data/messages:287
+#: ../data/messages:295
 msgid ""
 "in pixels. Outside of this interval (centered on the mouse), the wave is "
 "flat."
 msgstr "以点为单位。此间隔以外（以鼠标为中心），波浪变平。"
 
-#: ../data/messages:289
+#: ../data/messages:297
 msgid "Width of the interval in which the wave will be effective :"
 msgstr "为使波浪更有型采用的间隔宽度："
 
-#: ../data/messages:293
+#: ../data/messages:301
 msgid "Space between icons :"
 msgstr "图标间隔："
 
-#: ../data/messages:295
+#: ../data/messages:303
 msgid ""
 "It is their transparency when the wave is flat; they will \"materialize\" "
 "progressively as the dock grows up. The closer to 0, the more transparent "
@@ -1043,25 +1066,25 @@ msgid ""
 msgstr ""
 "平时图标的透明度，以达到在获得焦点时产生”实质化“的效果。越接近0，越透明。"
 
-#: ../data/messages:297
+#: ../data/messages:305
 msgid "Icons' transparency at rest :"
 msgstr "静止时图标的透明度："
 
-#: ../data/messages:299
+#: ../data/messages:307
 msgid "Reflections"
 msgstr "反射"
 
-#: ../data/messages:301
+#: ../data/messages:309
 msgid ""
 "It is its albedo; at 1 the icons reflect to the maximum, at 0 reflects are "
 "not used."
 msgstr "反照率。取值1时反射最强；0时无反射。"
 
-#: ../data/messages:303
+#: ../data/messages:311
 msgid "Reflecting power of the plane :"
 msgstr "板面的反射能力："
 
-#: ../data/messages:305
+#: ../data/messages:313
 #, no-c-format
 msgid ""
 "More precisely, it is the fraction of the max icon height that will be used "
@@ -1073,103 +1096,103 @@ msgstr ""
 "图标将被反射到地面上。而图标将被放在举例框架前边缘的适当位置以使其倒映能显示"
 "完全。"
 
-#: ../data/messages:307
+#: ../data/messages:315
 msgid "Field depth of the view:"
 msgstr "视觉深度："
 
-#: ../data/messages:309
+#: ../data/messages:317
 msgid "Style of the icons' labels"
 msgstr "图标标签风格"
 
-#: ../data/messages:311 ../data/messages:521 ../data/messages:663
+#: ../data/messages:319 ../data/messages:529 ../data/messages:671
 msgid "approximately size in pixels, put 0 to not display labels"
 msgstr "以点为单位的大约大小，设为0时不显示标签。"
 
-#: ../data/messages:313 ../data/messages:523 ../data/messages:665
+#: ../data/messages:321 ../data/messages:531 ../data/messages:673
 msgid "Size of the font :"
 msgstr "字体大小："
 
-#: ../data/messages:315 ../data/messages:525 ../data/messages:659
+#: ../data/messages:323 ../data/messages:533 ../data/messages:667
 msgid ""
 "for exemple Monospace, Purisa, ... Just write the font name wihtout any "
 "number or so."
 msgstr "比如说：Monospace, Purisa…… 仅写下不包括任何数字之类修饰的字体名。"
 
-#: ../data/messages:317 ../data/messages:527 ../data/messages:661
+#: ../data/messages:325 ../data/messages:535 ../data/messages:669
 msgid "Family of the font used for labels :"
 msgstr "标签使用的字体族："
 
-#: ../data/messages:319 ../data/messages:531
+#: ../data/messages:327 ../data/messages:539
 msgid "Should be italic ?"
 msgstr "使用斜体么？"
 
-#: ../data/messages:321 ../data/messages:529
+#: ../data/messages:329 ../data/messages:537
 msgid "Weight (between 1 and 9, the bigger, the heavier):"
 msgstr "粗细（取值1到9,越大越粗）："
 
-#: ../data/messages:323
+#: ../data/messages:331
 msgid "It's the first color of the gradation."
 msgstr "这是渐变的第一个颜色。"
 
-#: ../data/messages:325
+#: ../data/messages:333
 msgid "Start color :"
 msgstr "起始颜色："
 
-#: ../data/messages:327
+#: ../data/messages:335
 msgid ""
 "It's the second color of the gradation. Set it to the same value as the "
 "first if you just don't want to have a gradation."
 msgstr "这是渐变的第二种颜色。如与第一种颜色相同则不产生渐变。"
 
-#: ../data/messages:329
+#: ../data/messages:337
 msgid "Stop color :"
 msgstr "结束颜色："
 
-#: ../data/messages:331
+#: ../data/messages:339
 msgid ""
 "If checked, the pattern will go from top to bottom, otherwise from left to "
 "right."
 msgstr "选中时，图样由顶至底排列，否则为由左至右。"
 
-#: ../data/messages:333
+#: ../data/messages:341
 msgid "Pattern should be vertical ?"
 msgstr ""
 
-#: ../data/messages:335
+#: ../data/messages:343
 msgid ""
 "If you set it to fully transparent, there will be no background for the "
 "text, but the letters' outline will be thicker."
 msgstr "如设为全透明，则无文字背景，但字符勾线将更粗。"
 
-#: ../data/messages:337
+#: ../data/messages:345
 msgid "Color of the label's background :"
 msgstr "标签背景颜色："
 
-#: ../data/messages:339
+#: ../data/messages:347
 msgid "If false, only the quick-info will have this background color."
 msgstr "如果为否，仅快速信息有背景颜色。"
 
-#: ../data/messages:341
+#: ../data/messages:349
 msgid "Use background color for labels ?"
 msgstr "对标签使用背景颜色么？"
 
-#: ../data/messages:343
+#: ../data/messages:351
 msgid "Link the icons with a string"
 msgstr "用绳子链接图标"
 
-#: ../data/messages:345
+#: ../data/messages:353
 msgid "Linewidth of the string, in pixels (0 to not use string) :"
 msgstr "绳索的宽度，以点为单位（0则不使用绳索）："
 
-#: ../data/messages:347
+#: ../data/messages:355
 msgid "Color of the string (red, blue, green, alpha) :"
 msgstr "绳索颜色（红，蓝，绿，alpha）："
 
-#: ../data/messages:349
+#: ../data/messages:357
 msgid "Icons' themes"
 msgstr "图标主题"
 
-#: ../data/messages:351
+#: ../data/messages:359
 msgid ""
 "Directories or themes where to search icons. Put some directories where you "
 "have icons you wish to see in the dock, or put some theme's name you've "
@@ -1181,130 +1204,130 @@ msgstr ""
 "的主题名称。（已经考虑了顺序问题）关键词：_ThemeDirectory_指的是目录~/.cairo-"
 "dock/current_theme/launchers"
 
-#: ../data/messages:353
+#: ../data/messages:361
 msgid "List of icons themes or directories :"
 msgstr "图标主题或目录的列表："
 
-#: ../data/messages:355
+#: ../data/messages:363
 msgid "Launchers"
 msgstr "启动器"
 
-#: ../data/messages:357 ../data/messages:403 ../data/messages:427
-#: ../data/messages:451
+#: ../data/messages:365 ../data/messages:411 ../data/messages:435
+#: ../data/messages:459
 msgid "Put 0 if you don't want to restrain them"
 msgstr "如果不想进行干扰，则输入0."
 
-#: ../data/messages:359 ../data/messages:405 ../data/messages:429
-#: ../data/messages:453
+#: ../data/messages:367 ../data/messages:413 ../data/messages:437
+#: ../data/messages:461
 msgid "Icon size at rest (width x height) :"
 msgstr "静止时图标的大小（宽x高）："
 
-#: ../data/messages:361 ../data/messages:407 ../data/messages:431
+#: ../data/messages:369 ../data/messages:415 ../data/messages:439
 msgid "Animation type when clicked :"
 msgstr "点击时的动画类型："
 
-#: ../data/messages:363 ../data/messages:409 ../data/messages:433
-#: ../data/messages:621 ../data/messages:637
+#: ../data/messages:371 ../data/messages:417 ../data/messages:441
+#: ../data/messages:629 ../data/messages:645
 msgid "bounce"
 msgstr "弹跳"
 
-#: ../data/messages:365 ../data/messages:411 ../data/messages:435
-#: ../data/messages:623 ../data/messages:639
+#: ../data/messages:373 ../data/messages:419 ../data/messages:443
+#: ../data/messages:631 ../data/messages:647
 msgid "rotate"
 msgstr "旋转"
 
-#: ../data/messages:367 ../data/messages:413 ../data/messages:437
-#: ../data/messages:625 ../data/messages:641
+#: ../data/messages:375 ../data/messages:421 ../data/messages:445
+#: ../data/messages:633 ../data/messages:649
 msgid "blink"
 msgstr "闪烁"
 
-#: ../data/messages:369 ../data/messages:415 ../data/messages:439
-#: ../data/messages:627 ../data/messages:643
+#: ../data/messages:377 ../data/messages:423 ../data/messages:447
+#: ../data/messages:635 ../data/messages:651
 msgid "pulse"
 msgstr "脉冲"
 
-#: ../data/messages:371 ../data/messages:417 ../data/messages:441
-#: ../data/messages:629 ../data/messages:645
+#: ../data/messages:379 ../data/messages:425 ../data/messages:449
+#: ../data/messages:637 ../data/messages:653
 msgid "upside-down"
 msgstr "翻转"
 
-#: ../data/messages:373 ../data/messages:419 ../data/messages:443
-#: ../data/messages:631 ../data/messages:647
+#: ../data/messages:381 ../data/messages:427 ../data/messages:451
+#: ../data/messages:639 ../data/messages:655
 msgid "wobbly"
 msgstr "摆动"
 
-#: ../data/messages:375 ../data/messages:421 ../data/messages:445
-#: ../data/messages:633 ../data/messages:649
+#: ../data/messages:383 ../data/messages:429 ../data/messages:453
+#: ../data/messages:641 ../data/messages:657
 msgid "random"
 msgstr "随机"
 
-#: ../data/messages:377 ../data/messages:423 ../data/messages:447
+#: ../data/messages:385 ../data/messages:431 ../data/messages:455
 msgid "Number of times the icon will bounce/rotate/blink/etc when clicked :"
 msgstr "点击时动画循环次数："
 
-#: ../data/messages:379
+#: ../data/messages:387
 msgid ""
 "Indicators are drawn on launchers icons to show that they have already been "
 "launched. Let blank to use the default one."
 msgstr "在已经启动的启动器上添加指示器。留空以使用默认的"
 
-#: ../data/messages:381
+#: ../data/messages:389
 msgid "Filename of an image to use for indicators :"
 msgstr "用做指示器的图片文件名："
 
-#: ../data/messages:383
+#: ../data/messages:391
 msgid "Display the indicator above the icon ?"
 msgstr "在图标上显示指示器么？"
 
-#: ../data/messages:385
+#: ../data/messages:393
 msgid ""
 "The ratio between indicator's size and icon's size. The bigger, the bigger "
 "the indicators are."
 msgstr "指示器大小和图标大小的比率。越大，指示器越大。"
 
-#: ../data/messages:387
+#: ../data/messages:395
 msgid "Indicator size ratio :"
 msgstr "指示器大小比率："
 
-#: ../data/messages:389
+#: ../data/messages:397
 msgid ""
 "It will then be resized like the icon, move like the icon, etc. Otherwise it "
 "will be drawn directly on the dock."
 msgstr "它如图标般改变大小，如图标般移动等，但它是直接在dock上画出来的"
 
-#: ../data/messages:391
+#: ../data/messages:399
 msgid "Link the indicator with its icon ?"
 msgstr "将指示器与其图标关联？"
 
-#: ../data/messages:393
+#: ../data/messages:401
 msgid ""
 "in pixels. You can use this parameter to adjust the indicator's vertical "
 "position."
 msgstr "以点为单位。您可以用此参数调整指示器的垂直位置。"
 
-#: ../data/messages:395
+#: ../data/messages:403
 msgid "Vertical offset :"
 msgstr "垂直偏移："
 
-#: ../data/messages:397
+#: ../data/messages:405
 msgid ""
 "Typically an arrow, that will be displayed when you try to drop a new "
 "launcher into the dock."
 msgstr "通常是一个箭头，出现于你将一个启动器放入dock的时候。"
 
-#: ../data/messages:399
+#: ../data/messages:407
 msgid "Image for the drag'n'drop animation :"
 msgstr "用于拖曳动画的图片："
 
-#: ../data/messages:401
+#: ../data/messages:409
 msgid "Applications"
 msgstr "应用程序"
 
-#: ../data/messages:449
+#: ../data/messages:457
 msgid "Separators"
 msgstr "分隔"
 
-#: ../data/messages:455
+#: ../data/messages:463
 msgid ""
 "Separators are icons used to make a separation between different types of "
 "icons. Cairo-dock can automatically add them between launchers, applis, and "
@@ -1313,243 +1336,243 @@ msgstr ""
 "分隔是用于分隔不同类型图标的图标。Cairo-dock在启动器，应用程序，小应用程序之"
 "间自动加入它们。"
 
-#: ../data/messages:457
+#: ../data/messages:465
 msgid "Automatically add separators ?"
 msgstr "自动加入分隔？"
 
-#: ../data/messages:459 ../data/messages:603
+#: ../data/messages:467 ../data/messages:611
 msgid "If you don't provide one, blanks will be used."
 msgstr "如果不指定，将使用空白分隔。"
 
-#: ../data/messages:461 ../data/messages:605
+#: ../data/messages:469 ../data/messages:613
 msgid "Filename of an image to use for separators :"
 msgstr "用做分隔的图片文件名："
 
-#: ../data/messages:463
+#: ../data/messages:471
 msgid ""
 "Make the separator's image revolve when dock is on top/on the left/on the "
 "right ?"
 msgstr "在dock位于顶部/左边/右边时，对分隔图片进行旋转？"
 
-#: ../data/messages:465
+#: ../data/messages:473
 msgid "Force separator's image size to stay constant ?"
 msgstr "强制分隔图片固定大小？"
 
-#: ../data/messages:467
+#: ../data/messages:475
 msgid "Order of the different types of icons :"
 msgstr "对不同类型的图标排序："
 
-#: ../data/messages:469 ../data/messages:587
+#: ../data/messages:477 ../data/messages:595
 msgid "Views"
 msgstr "视图"
 
-#: ../data/messages:471
+#: ../data/messages:479
 msgid "Main Dock"
 msgstr "主Dock"
 
-#: ../data/messages:473 ../data/messages:589
+#: ../data/messages:481 ../data/messages:597
 msgid "Choose the default view for root docks :"
 msgstr "为根dock选择默认的视图："
 
-#: ../data/messages:475
+#: ../data/messages:483
 msgid "Sub-Docks"
 msgstr "子Dock"
 
-#: ../data/messages:477
+#: ../data/messages:485
 msgid "You can overwrite this parameter for each sub-dock."
 msgstr "你可以在每个子dock里覆盖此设置。"
 
-#: ../data/messages:479 ../data/messages:591
+#: ../data/messages:487 ../data/messages:599
 msgid "Choose the default view for sub-docks :"
 msgstr "选择子dock的默认视图："
 
-#: ../data/messages:481
+#: ../data/messages:489
 msgid "otherwise they will be perpendicular"
 msgstr "否则它们将保持垂直"
 
-#: ../data/messages:483
+#: ../data/messages:491
 msgid "Are the sub-docks parallel to main docks ?"
 msgstr "子dock与主dock并行么？"
 
-#: ../data/messages:485
+#: ../data/messages:493
 msgid ""
 "You can specify a ratio for the size of the sub-docks' icons, regarding the "
 "main docks' icons size"
 msgstr "你可以为子dock图标设置一个相对于主dock图标大小的比率。"
 
-#: ../data/messages:487
+#: ../data/messages:495
 msgid "Ratio for the size of the sub-docks' icons :"
 msgstr "子dock图标的尺寸比例："
 
-#: ../data/messages:489
+#: ../data/messages:497
 msgid "Dialogs"
 msgstr "对话框"
 
-#: ../data/messages:491
+#: ../data/messages:499
 msgid "Buttons"
 msgstr "按钮"
 
-#: ../data/messages:495
+#: ../data/messages:503
 msgid "Size of buttons in the info-bubbles (width x height) :"
 msgstr "消息泡泡上的按钮大小（宽x高）："
 
-#: ../data/messages:497 ../data/messages:501
+#: ../data/messages:505 ../data/messages:509
 msgid "If you don't provide any, a default image will be used."
 msgstr "如果不指定，将使用默认图片。"
 
-#: ../data/messages:499
+#: ../data/messages:507
 msgid "Name of an image to use for the yes/ok button :"
 msgstr "用于是/确定按钮的图片名称："
 
-#: ../data/messages:503
+#: ../data/messages:511
 msgid "Name of an image to use for the no/cancel button :"
 msgstr "用于不/取消按钮的图片名称："
 
-#: ../data/messages:505
+#: ../data/messages:513
 msgid "Bubble"
 msgstr "泡泡"
 
-#: ../data/messages:507
+#: ../data/messages:515
 msgid "Background color of the bubble (r,v,b,a) :"
 msgstr "泡泡的背景色（红，绿，蓝，alhpa）："
 
-#: ../data/messages:509
+#: ../data/messages:517
 msgid "Put 0 to let the size adapt itself to the text."
 msgstr "填入0以使大小对文本自适应。"
 
-#: ../data/messages:511
+#: ../data/messages:519
 msgid "Size of the icon displayed next to the text :"
 msgstr "显示于文字旁边的图标大小："
 
-#: ../data/messages:513
+#: ../data/messages:521
 msgid "Text"
 msgstr "文本"
 
-#: ../data/messages:515
+#: ../data/messages:523
 msgid "Text color (r,g,b) :"
 msgstr "文本颜色（r,g,b）："
 
-#: ../data/messages:517
+#: ../data/messages:525
 msgid ""
 "The messages will have the same style as the icons' labels. The beneath "
 "parameters are then unused."
 msgstr "信息风格将与图标标签保持一致，乃至下面的设置无效"
 
-#: ../data/messages:519
+#: ../data/messages:527
 msgid "Homogeneous with icons' label ?"
 msgstr "与图标标签保持一致？"
 
-#: ../data/messages:533 ../data/messages:667
+#: ../data/messages:541 ../data/messages:675
 msgid "Desklets"
 msgstr "桌面小工具"
 
-#: ../data/messages:535
+#: ../data/messages:543
 msgid "Background color (r,v,b,a) :"
 msgstr "背景色（红，绿，蓝，alhpa）："
 
-#: ../data/messages:537
+#: ../data/messages:545
 msgid "Background color when mouse hovers it (r,v,b,a) :"
 msgstr "鼠标掠过时的背景色（红，绿，蓝，alpha）："
 
-#: ../data/messages:555
+#: ../data/messages:563
 msgid "Auto-Hide"
 msgstr "自动隐藏"
 
 # #################################
 # ########### cairo-dock-easy.conf #############
 # #################################
-#: ../data/messages:585
+#: ../data/messages:593
 msgid "Personnalisation"
 msgstr "个性化"
 
-#: ../data/messages:593
+#: ../data/messages:601
 msgid "Images"
 msgstr "图片"
 
-#: ../data/messages:607
+#: ../data/messages:615
 msgid "Icons' size"
 msgstr "图标大小"
 
-#: ../data/messages:609
+#: ../data/messages:617
 msgid "or 0 if you don't want to constraint them."
 msgstr "如果不想指定，则设为0"
 
-#: ../data/messages:611
+#: ../data/messages:619
 msgid "Size of the icons at rest :"
 msgstr "重置时的图标大小："
 
-#: ../data/messages:613
+#: ../data/messages:621
 msgid "Maximum zoom :"
 msgstr "最大缩放："
 
-#: ../data/messages:615
+#: ../data/messages:623
 msgid "Space between icons (in pixels) :"
 msgstr "图标间隔（以点为单位）："
 
-#: ../data/messages:617
+#: ../data/messages:625
 msgid "Animations"
 msgstr "动画"
 
-#: ../data/messages:619
+#: ../data/messages:627
 msgid "Animation type for launchers :"
 msgstr "启动器的动画类型："
 
-#: ../data/messages:635
+#: ../data/messages:643
 msgid "Animation type for applis :"
 msgstr "小应用程序的动画类型："
 
-#: ../data/messages:651
+#: ../data/messages:659
 msgid "Extern frame"
 msgstr "外框"
 
-#: ../data/messages:653
+#: ../data/messages:661
 msgid "Corner radius, in pixels:"
 msgstr "圆角半径，以点为单位："
 
-#: ../data/messages:655
+#: ../data/messages:663
 msgid "Color of the extern line (red, blue, green, alpha):"
 msgstr "描边颜色 (红，蓝，绿，alpha)："
 
-#: ../data/messages:669
+#: ../data/messages:677
 msgid "Desklet's background color :"
 msgstr "桌面小程序的背景色："
 
-#: ../data/messages:671
+#: ../data/messages:679
 msgid "Desklet's background color when mouse hovers it :"
 msgstr "当鼠标掠过时桌面小程序的背景色："
 
-#: ../data/messages:673 ../data/messages:687 ../data/messages:745
+#: ../data/messages:681 ../data/messages:695 ../data/messages:753
 msgid "Desktop Entry"
 msgstr "桌面项"
 
 # #################################
 # ########### launcher.conf #############
 # #################################
-#: ../data/messages:675 ../data/messages:689
+#: ../data/messages:683 ../data/messages:697
 msgid "Launcher's name :"
 msgstr "启动器的名称："
 
-#: ../data/messages:677 ../data/messages:695 ../data/messages:747
+#: ../data/messages:685 ../data/messages:703 ../data/messages:755
 msgid "Image's name or path :"
 msgstr "图片的名称或路径："
 
-#: ../data/messages:679 ../data/messages:697 ../data/messages:749
+#: ../data/messages:687 ../data/messages:705 ../data/messages:757
 msgid "Extra parameters"
 msgstr "附加参数"
 
-#: ../data/messages:681 ../data/messages:699 ../data/messages:751
+#: ../data/messages:689 ../data/messages:707 ../data/messages:759
 msgid "Order you want for this launcher among the others:"
 msgstr "此启动器的次序："
 
-#: ../data/messages:683 ../data/messages:701 ../data/messages:753
+#: ../data/messages:691 ../data/messages:709 ../data/messages:761
 msgid "Name of the container it belongs to:"
 msgstr "它归属的容器名称："
 
-#: ../data/messages:685
+#: ../data/messages:693
 msgid "Name of the view used for the sub-dock :"
 msgstr "子dock使用的视图名称："
 
-#: ../data/messages:691
+#: ../data/messages:699
 msgid ""
 "Exemple : nautilus --no-desktop, gedit, etc. You can even enter a keyboard "
 "shortcut, for exemple <Alt>F1 for the Applications Menu, <Ctrl>c or <Ctrl>v "
@@ -1558,11 +1581,11 @@ msgstr ""
 "诸如：nautilus --no-desktop, gedit等。您甚至可以输入一个键盘快捷键，比如"
 "<Alt>F1用做应用程序菜单，或者<Ctrl>c和<Ctrl>v用于拷贝、粘贴等。"
 
-#: ../data/messages:693
+#: ../data/messages:701
 msgid "Command to launch on click :"
 msgstr "点击时启用的命令："
 
-#: ../data/messages:703
+#: ../data/messages:711
 msgid ""
 "Use this option for exemple if the launcher launches a script in a terminal "
 "but you don't want it to steal normal terminal's icons from the TaskBar, or "
@@ -1574,11 +1597,11 @@ msgstr ""
 "的图标；或者您确实想使用任务栏图标，因为它们能提供更多信息，比如说Pidgin的图"
 "标体现了联系人的头像。此时，您启用此选项。"
 
-#: ../data/messages:705
+#: ../data/messages:713
 msgid "Prevent this launcher from stealing appli from taskbar ?"
 msgstr "阻止此启动器由任务栏上偷取应用程序"
 
-#: ../data/messages:707
+#: ../data/messages:715
 msgid ""
 "The only reason you may want to modify this parameter is if you made this "
 "launcher by hands. If you dropped it into the dock from the menu, it is "
@@ -1588,36 +1611,36 @@ msgstr ""
 "您改动此参数的唯一原因是您自己手动创建了此启动器。如果您是从菜单上拖出此启动"
 "器的，那么您应该不必对此进行改动。它定义了用于联系应用程序及其启动器的类。"
 
-#: ../data/messages:709
+#: ../data/messages:717
 msgid "Class of the program :"
 msgstr "程序的类："
 
 # #################################
 # ########### themes.conf #############
 # #################################
-#: ../data/messages:755
+#: ../data/messages:763
 msgid "Themes"
 msgstr "主题"
 
-#: ../data/messages:757
+#: ../data/messages:765
 msgid "Choose a theme"
 msgstr "选择一个主题"
 
-#: ../data/messages:759
+#: ../data/messages:767
 msgid "List of themes :"
 msgstr "主题列表："
 
-#: ../data/messages:761
+#: ../data/messages:769
 msgid ""
 "Otherwise the current behaviour will be kept. It's all about the dock's "
 "position, behaviour parameters such as auto-hide, using taskbar or not, etc."
 msgstr "否则，将保持当前的行为。诸如dock的位置，自动隐藏，是否使用任务栏等"
 
-#: ../data/messages:763
+#: ../data/messages:771
 msgid "Use the new theme's behaviour ?"
 msgstr "使用新主题的行为？"
 
-#: ../data/messages:765
+#: ../data/messages:773
 msgid ""
 "So if you check this box, your launchers will be deleted and replaced by the "
 "ones provided in the new theme. Otherwise the current launchers will be "
@@ -1626,45 +1649,227 @@ msgstr ""
 "如果你勾选此项，你的启动器将被新主题提供的取代。否则，将保留你当前的启动器，"
 "仅替换其图标。"
 
-#: ../data/messages:767
+#: ../data/messages:775
 msgid "Use the new theme's launchers ?"
 msgstr "使用新主题的启动器么？"
 
-#: ../data/messages:769
+#: ../data/messages:777
 msgid "Save"
 msgstr "保存"
 
-#: ../data/messages:771
+#: ../data/messages:779
 msgid "Save current theme"
 msgstr "保存当前主题"
 
-#: ../data/messages:773
+#: ../data/messages:781
 msgid "You will then be able to re-open it at any time."
 msgstr "您将可以在任何时候重新打开它。"
 
-#: ../data/messages:775
+#: ../data/messages:783
 msgid "Save as :"
 msgstr "另存为："
 
-#: ../data/messages:777
+#: ../data/messages:785
 msgid "Save current behaviour too ?"
 msgstr "同时保存当前行为？"
 
-#: ../data/messages:779
+#: ../data/messages:787
 msgid "Save current launchers too ?"
 msgstr "同时保存当前启动器？"
 
-#: ../data/messages:781
+#: ../data/messages:789
 msgid "Delete"
 msgstr "删除"
 
-#: ../data/messages:783
+#: ../data/messages:791
 msgid "List of your personnal themes"
 msgstr "您的个人主题列表"
 
-#: ../data/messages:785
+#: ../data/messages:793
 msgid "Uncheck from the list themes you don't want anymore :"
 msgstr "勾去列表中您不想保留的主题："
+
+#: ../data/messages:795
+#, fuzzy
+msgid "pouet"
+msgstr "挂载"
+
+#: ../data/messages:797 ../data/messages:799 ../data/messages:801
+#: ../data/messages:803
+msgid ""
+"v1.4.6.3 :\n"
+"Just to say :\n"
+"*** Happy new Year 2008 ! ***\n"
+"  the Cairo-Dock's team."
+msgstr ""
+
+# #################################
+# ########### ChangeLog #############
+# #################################
+#: ../data/messages:805
+msgid ""
+"v1.5.0 : it's been 1 month since previous release, and we worked hardly to "
+"bring you :\n"
+" - A parabolic view : perfect for sub-docks with a dozen of icons.\n"
+" - A big pack of new applets :\n"
+"   Cairo-Dock has now its own terminal.\n"
+"   It can handle your systray instead of your panel,\n"
+"   monitor your laptop's battery,\n"
+"   and change your screen's luminosity through the dock\n"
+"   The integration into the GNOME desktop is provided by the 'gnome-"
+"integration' plug-in.\n"
+"    Wanted : a KDE user who could do the same for KDE !\n"
+" - Dustbin v2 can now handle drag'n'drops and display nice info.\n"
+" - Manual separators, better sub-dock accessibility, 64bits works smoothly, "
+"etc\n"
+" - And cherry on the cake, a new theme (I, Cairo) !\n"
+"  Now, why not try to make an applet for Cairo-Dock ? ;-)"
+msgstr ""
+"v1.5.0 : cela fait 1 mois depuis la derniÃ¨re version, et on a travaillÃ© "
+"dur pour vous offrir :\n"
+" - Une vue parabolique : parfaite pour des sous-docks d'une douzaine d'icÃ"
+"´nes.\n"
+" - Un gros paquet de nouvelles applets :\n"
+"   Cairo-Dock a dÃ©sormais son propre terminal.\n"
+"   Il peut gÃ©rer le systray Ã  la place de votre panel,\n"
+"   surveiller la batterie de votre portable.\n"
+"   et changer la luminositÃ© de votre Ã©cran.\n"
+"   L'intÃ©gration au bureau GNOME est fournie par le plug-in 'gnome-"
+"integration'.\n"
+"    Wanted : un utilisateur de KDE qui pourrait faire de mÃªme pour KDE !\n"
+" - Dustbin v2 gÃ¨re dÃ©sormais le drag'n'drop et affiche des infos "
+"pertinentes.\n"
+" - SÃ©paraters manuels, meilleure accessibilitÃ© des sous-docks, le 64bits "
+"marche au poil, etc\n"
+" - Et cerise sur le gateau, un nouveau thÃ¨me (I, Cairo) !\n"
+"  Maintenant, pourquoi ne pas essayer d'Ã©crire une applet pour Cairo-"
+"Dock ? ;-)"
+
+#: ../data/messages:807
+msgid ""
+"v1.5.1 :\n"
+" - The 1.5 branch is still young, so this version brings a lot of bug fixes\n"
+" - Cairo-Dock is now translated in Japanese, thanks to Jiro Kawada for his "
+"work !\n"
+" - A new view has appeared : Rainbow\n"
+" - Cairo-Dock has become a desklet manager !\n"
+"  most of applets can now detached themselves from the dock\n"
+" and behave as real desklets."
+msgstr ""
+"v1.5.1 :\n"
+" - La branche 1.5 encore jeune, cette version apporte donc de nombreuses "
+"corrections\n"
+" - Cairo-Dock est maintenant traduit en japonais, merci Ã  Jiro Kawada pour "
+"son travail !\n"
+" - Une nouvelle vue fait son apparition : Rainbow\n"
+" - Cairo-Dock devient un gestionnaire de desklets !\n"
+"  La plupart des applets peuvent se dÃ©tacher du dock\n"
+"  et se comporter comme de vrais desklets."
+
+#: ../data/messages:809
+msgid ""
+"v1.5.2.1 :\n"
+" - a lot of bug fixes, especially on desklets.\n"
+" - New applet : weather !\n"
+" - Cairo-Dock is now fully translated in Japanese, thanks to Jiro Kawada !"
+msgstr ""
+"v1.5.2.1 :\n"
+" - de nombreux bugs Ã©liminÃ©s, surtout sur les desklets.\n"
+" - Nouvelle applet : weather !\n"
+" - Cairo-Dock est maintenant complÃ¨tement traduit en Japonais, grÃ¢ce Ã  "
+"Jiro Kawada !"
+
+#: ../data/messages:811
+msgid ""
+"v1.5.3.2 :\n"
+" - Themes have been deeply reviewed\n"
+" to switch from one to another completely.\n"
+" - New applet : alsaMixer !\n"
+" - Desklets improvment with the 'showDesklets' applet.\n"
+" - The 'Shortcuts' applet can now detached itself from the dock.\n"
+" - The dock can now behave like a menu 'on-the-mouse'\n"
+" - Updates in translations and the usual bug fixes. ^_^\n"
+"  By the way, we are still searching someone\n"
+"  who could help cairo-dock to be well-integrated into KDE ;-)"
+msgstr ""
+
+#: ../data/messages:813
+msgid ""
+"v1.5.4.2 : a huge release !\n"
+" - add a cute pinguin in your dock with the new applet Cairo-Penguin\n"
+" - monitor your wifi connection with the Wifi applet\n"
+" - control xmms, audacious, banshee and exaile with the Xmms applet\n"
+" - Cairo-Dock is now fully integrated into XFCE environment !\n"
+" - better detection of battery in the Powermanager applet\n"
+" - lot of improvments in the Terminal applet.\n"
+" - the dock can auto-resize when it grows too large\n"
+" - refresh your dock with the new theme : Wood\n"
+" - 3 more themes in Weather"
+msgstr ""
+"v1.5.4.2 : une Ã©norme mise Ã  jour !\n"
+" - ajoutez un pingouin trognon dans votre dock avec la nouvelle applet Cairo-"
+"Penguin\n"
+" - surveillez votre connexion wifi avec l'applet Wifi\n"
+" - contrÃ´lez xmms, audacious, banshee et exaile avec l'applet Xmms\n"
+" - Cairo-Dock est dÃ©sormais totalement intÃ©grÃ© Ã  l'environnement XFCE !\n"
+" - de nombreuses amÃ©liorations dans l'applet Terminal\n"
+" - meilleure dÃ©tection de la batterie dans l'applet Powermanager\n"
+" - le dock se redimensionne lorsqu'il devient trop large\n"
+" - rafraÃ®chissez votre dock avec le nouveau thÃ¨me Wood\n"
+" - 3 thÃ¨mes supplÃ©mentaires pour l'applet Weather."
+
+#: ../data/messages:815
+msgid ""
+"v1.5.5.4 :\n"
+" - Huge enhancements in the TaskBar :\n"
+"  launchers and applets can now behave as applications.\n"
+"  windows can show up during drag and drop if mouse stay on them\n"
+" - hiqh quality launchers' icons can be used instead of X ones\n"
+" - Quickly manage Compiz with the 'Compiz-Icon' applet\n"
+" - Control Cairo-Dock from an external program thanks to the Dbus plug-in.\n"
+" - Added a 'ShowDesktop' applet for convenience.\n"
+" - Some fix in PowerManager (now ok !)\n"
+" - The ability to have many docks for a single instance of Cairo-Dock.\n"
+" - Cairo-Dock is not yet well integrated into Gnome 2.22, but it will come "
+"soon ;-)"
+msgstr ""
+
+#: ../data/messages:817
+msgid ""
+"v1.5.6 :\n"
+" - Integration into the last Gnome 2.22 (Ubuntu8.04, Fedora9, ...) - still "
+"experimental\n"
+" - You can now have many docks in 1 instance of Cairo-Dock.\n"
+" Just place a launcher or an applet in a dock, giving this dock a name that "
+"doesn't exist yet\n"
+" a new one will be created.\n"
+" - SHIFT+mouse wheel on AlsaMixer, Xmms, Rhythmbox, etc.\n"
+" - Launchers can now launch keyboard shortcuts.\n"
+" - The dock can now auto-hide itself when a window is maximized.\n"
+" - Improvment in drag and drop with animated indicator.\n"
+" - Physical separator in 3D-plane view.\n"
+" - Bug fixes in XGamma/Weather.\n"
+" - Any help would be welcome to integrate the dock into KDE !"
+msgstr ""
+
+#: ../data/messages:819
+msgid ""
+"v1.6.0 :\n"
+" - A new view has appeared : Diapositive !\n"
+" - A huge stock of new applets :\n"
+"   cpusage\n"
+"   ram-meter\n"
+"   netspeed\n"
+"   tomboy\n"
+"   nVidia\n"
+" - 2 new themes : Neon & Clear\n"
+" - A new cute character for Cairo-Penguin : Wanda the Cairo-Fish ^_^\n"
+" - Cairo-Dock can now run without composite manager, with fake "
+"transparency.\n"
+" - The dock can now stay below windows and be popped up on demand.\n"
+" - Auto-reload on crash.\n"
+" - Real window thumbnail when minimized."
+msgstr ""
 
 #~ msgid "All"
 #~ msgstr "所有"
@@ -1731,106 +1936,6 @@ msgstr "勾去列表中您不想保留的主题："
 
 #~ msgid "Text color (r,v,b,a) :"
 #~ msgstr "文本颜色（红，绿，蓝，alpha）："
-
-# #################################
-# ########### ChangeLog #############
-# #################################
-#~ msgid ""
-#~ "v1.5.0 : it's been 1 month since previous release, and we worked hardly "
-#~ "to bring you :\n"
-#~ " - A parabolic view : perfect for sub-docks with a dozen of icons.\n"
-#~ " - A big pack of new applets :\n"
-#~ "   Cairo-Dock has now its own terminal.\n"
-#~ "   It can handle your systray instead of your panel,\n"
-#~ "   monitor your laptop's battery,\n"
-#~ "   and change your screen's luminosity through the dock\n"
-#~ "   The integration into the GNOME desktop is provided by the 'gnome-"
-#~ "integration' plug-in.\n"
-#~ "    Wanted : a KDE user who could do the same for KDE !\n"
-#~ " - Dustbin v2 can now handle drag'n'drops and display nice info.\n"
-#~ " - Manual separators, better sub-dock accessibility, 64bits works "
-#~ "smoothly, etc\n"
-#~ " - And cherry on the cake, a new theme (I, Cairo) !\n"
-#~ "  Now, why not try to make an applet for Cairo-Dock ? ;-)"
-#~ msgstr ""
-#~ "v1.5.0 : cela fait 1 mois depuis la derniÃ¨re version, et on a travaillÃ© "
-#~ "dur pour vous offrir :\n"
-#~ " - Une vue parabolique : parfaite pour des sous-docks d'une douzaine d'icÃ"
-#~ "´nes.\n"
-#~ " - Un gros paquet de nouvelles applets :\n"
-#~ "   Cairo-Dock a dÃ©sormais son propre terminal.\n"
-#~ "   Il peut gÃ©rer le systray Ã  la place de votre panel,\n"
-#~ "   surveiller la batterie de votre portable.\n"
-#~ "   et changer la luminositÃ© de votre Ã©cran.\n"
-#~ "   L'intÃ©gration au bureau GNOME est fournie par le plug-in 'gnome-"
-#~ "integration'.\n"
-#~ "    Wanted : un utilisateur de KDE qui pourrait faire de mÃªme pour "
-#~ "KDE !\n"
-#~ " - Dustbin v2 gÃ¨re dÃ©sormais le drag'n'drop et affiche des infos "
-#~ "pertinentes.\n"
-#~ " - SÃ©paraters manuels, meilleure accessibilitÃ© des sous-docks, le "
-#~ "64bits marche au poil, etc\n"
-#~ " - Et cerise sur le gateau, un nouveau thÃ¨me (I, Cairo) !\n"
-#~ "  Maintenant, pourquoi ne pas essayer d'Ã©crire une applet pour Cairo-"
-#~ "Dock ? ;-)"
-
-#~ msgid ""
-#~ "v1.5.1 :\n"
-#~ " - The 1.5 branch is still young, so this version brings a lot of bug "
-#~ "fixes\n"
-#~ " - Cairo-Dock is now translated in Japanese, thanks to Jiro Kawada for "
-#~ "his work !\n"
-#~ " - A new view has appeared : Rainbow\n"
-#~ " - Cairo-Dock has become a desklet manager !\n"
-#~ "  most of applets can now detached themselves from the dock\n"
-#~ " and behave as real desklets."
-#~ msgstr ""
-#~ "v1.5.1 :\n"
-#~ " - La branche 1.5 encore jeune, cette version apporte donc de nombreuses "
-#~ "corrections\n"
-#~ " - Cairo-Dock est maintenant traduit en japonais, merci Ã  Jiro Kawada "
-#~ "pour son travail !\n"
-#~ " - Une nouvelle vue fait son apparition : Rainbow\n"
-#~ " - Cairo-Dock devient un gestionnaire de desklets !\n"
-#~ "  La plupart des applets peuvent se dÃ©tacher du dock\n"
-#~ "  et se comporter comme de vrais desklets."
-
-#~ msgid ""
-#~ "v1.5.2.1 :\n"
-#~ " - a lot of bug fixes, especially on desklets.\n"
-#~ " - New applet : weather !\n"
-#~ " - Cairo-Dock is now fully translated in Japanese, thanks to Jiro Kawada !"
-#~ msgstr ""
-#~ "v1.5.2.1 :\n"
-#~ " - de nombreux bugs Ã©liminÃ©s, surtout sur les desklets.\n"
-#~ " - Nouvelle applet : weather !\n"
-#~ " - Cairo-Dock est maintenant complÃ¨tement traduit en Japonais, grÃ¢ce Ã  "
-#~ "Jiro Kawada !"
-
-#~ msgid ""
-#~ "v1.5.4.2 : a huge release !\n"
-#~ " - add a cute pinguin in your dock with the new applet Cairo-Penguin\n"
-#~ " - monitor your wifi connection with the Wifi applet\n"
-#~ " - control xmms, audacious, banshee and exaile with the Xmms applet\n"
-#~ " - Cairo-Dock is now fully integrated into XFCE environment !\n"
-#~ " - better detection of battery in the Powermanager applet\n"
-#~ " - lot of improvments in the Terminal applet.\n"
-#~ " - the dock can auto-resize when it grows too large\n"
-#~ " - refresh your dock with the new theme : Wood\n"
-#~ " - 3 more themes in Weather"
-#~ msgstr ""
-#~ "v1.5.4.2 : une Ã©norme mise Ã  jour !\n"
-#~ " - ajoutez un pingouin trognon dans votre dock avec la nouvelle applet "
-#~ "Cairo-Penguin\n"
-#~ " - surveillez votre connexion wifi avec l'applet Wifi\n"
-#~ " - contrÃ´lez xmms, audacious, banshee et exaile avec l'applet Xmms\n"
-#~ " - Cairo-Dock est dÃ©sormais totalement intÃ©grÃ© Ã  l'environnement "
-#~ "XFCE !\n"
-#~ " - de nombreuses amÃ©liorations dans l'applet Terminal\n"
-#~ " - meilleure dÃ©tection de la batterie dans l'applet Powermanager\n"
-#~ " - le dock se redimensionne lorsqu'il devient trop large\n"
-#~ " - rafraÃ®chissez votre dock avec le nouveau thÃ¨me Wood\n"
-#~ " - 3 thÃ¨mes supplÃ©mentaires pour l'applet Weather."
 
 #~ msgid "Well, maybe not ..."
 #~ msgstr "呃，不要吧……"

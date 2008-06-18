@@ -17,6 +17,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <X11/Xutil.h>
 #include <gdk/gdkx.h>
 #include <X11/extensions/Xcomposite.h>
+//#include <X11/extensions/Xdamage.h>
 
 #include "cairo-dock-load.h"
 #include "cairo-dock-icons.h"
@@ -44,6 +45,7 @@ extern gboolean g_bGroupAppliByClass;
 extern gboolean g_bDemandsAttentionWithDialog;
 extern gboolean g_bDemandsAttentionWithAnimation;
 extern gboolean g_bOverWriteXIcons;
+extern gboolean g_bShowThumbnail;
 
 static GHashTable *s_hAppliTable = NULL;  // table des PID connus de cairo-dock (affichees ou non dans le dock).
 static Display *s_XDisplay = NULL;
@@ -112,10 +114,14 @@ void cairo_dock_unregister_pid (Icon *icon)
 cairo_surface_t *cairo_dock_create_surface_from_xpixmap (Pixmap Xid, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
 {
 	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS && Xid > 0, NULL);
-	GdkPixbuf *pPixbuf = cairo_dock_get_pixbuf_from_pixmap (Xid, FALSE);
+	GdkPixbuf *pPixbuf = cairo_dock_get_pixbuf_from_pixmap (Xid, TRUE);
+	if (pPixbuf == NULL)
+	{
+		cd_warning ("This pixmap is undefined. It can happen for exemple for a window that is in a minimized state when the dock is launching.");
+		return NULL;
+	}
 	g_print ("window pixmap : %dx%d\n", gdk_pixbuf_get_width (pPixbuf), gdk_pixbuf_get_height (pPixbuf));
-	g_return_val_if_fail (pPixbuf != NULL, NULL);
-	return cairo_dock_create_surface_from_pixbuf (pPixbuf,
+	cairo_surface_t *pSurface = cairo_dock_create_surface_from_pixbuf (pPixbuf,
 		pSourceContext,
 		fMaxScale,
 		g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI],
@@ -124,6 +130,8 @@ cairo_surface_t *cairo_dock_create_surface_from_xpixmap (Pixmap Xid, cairo_t *pS
 		fWidth,
 		fHeight,
 		NULL, NULL);
+	g_object_unref (pPixbuf);
+	return pSurface;
 }
 
 cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
@@ -434,16 +442,26 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	icon->bIsHidden = bIsHidden;
 	icon->bIsMaximized = bIsMaximized;
 	icon->bIsFullScreen = bIsFullScreen;
-	icon->iBackingPixmap = XCompositeNameWindowPixmap (s_XDisplay, Xid);
-	g_print ("backing pixmap : %d\n", icon->iBackingPixmap);
+	
+	cairo_dock_get_window_geometry (Xid,
+		&icon->windowGeometry.x,
+		&icon->windowGeometry.y,
+		&icon->windowGeometry.width,
+		&icon->windowGeometry.height);
+	if (g_bShowThumbnail)
+	{
+		icon->iBackingPixmap = XCompositeNameWindowPixmap (s_XDisplay, Xid);
+		/*icon->iDamageHandle = XDamageCreate (s_XDisplay, Xid, XDamageReportNonEmpty);  // XDamageReportRawRectangles
+		g_print ("backing pixmap : %d ; iDamageHandle : %d\n", icon->iBackingPixmap, icon->iDamageHandle);*/
+	}
 	
 	cairo_dock_fill_icon_buffers_for_dock (icon, pSourceContext, pDock);
-
+	
 	if (g_bUniquePid)
 		g_hash_table_insert (s_hAppliTable, pPidBuffer, icon);
 	cairo_dock_register_appli (icon);
 	XFree (pNameBuffer);
-
+	
 	cairo_dock_set_window_mask (Xid, PropertyChangeMask | StructureNotifyMask);
 
 	return icon;

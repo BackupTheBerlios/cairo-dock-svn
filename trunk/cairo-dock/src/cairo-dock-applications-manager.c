@@ -17,6 +17,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/Xcomposite.h>
+//#include <X11/extensions/Xdamage.h>
 
 #include "cairo-dock-icons.h"
 #include "cairo-dock-draw.h"
@@ -57,6 +58,7 @@ extern int g_iNbViewportX,g_iNbViewportY ;
 extern gboolean g_bMixLauncherAppli;
 extern gboolean g_bShowThumbnail;
 extern gboolean g_bUseFakeTransparency;
+//extern int g_iDamageEvent;
 
 static GHashTable *s_hXWindowTable = NULL;  // table des fenetres X affichees dans le dock.
 static Display *s_XDisplay = NULL;
@@ -137,7 +139,10 @@ void cairo_dock_unregister_appli (Icon *icon)
 		cairo_dock_unregister_pid (icon);  // on n'efface pas sa classe ici car on peut en avoir besoin encore.
 		
 		if (icon->iBackingPixmap != 0)
+		{
 			XFreePixmap (s_XDisplay, icon->iBackingPixmap);
+			icon->iBackingPixmap = 0;
+		}
 		
 		cairo_dock_remove_appli_from_class (icon);
 		cairo_dock_update_Xid_on_inhibators (icon->Xid, icon->cClass);
@@ -726,8 +731,9 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 	{
 		icon = NULL;
 		Xid = event.xany.window;
+		//g_print ("  type : %d; atom : %s; window : %d\n", event.type, gdk_x11_get_xatom_name (event.xproperty.atom), Xid);
 		//if (event.type == ClientMessage)
-		//	cd_message ("\n\n\n >>>>>>>>>>>< event.type : %d\n\n", event.type);
+		//cd_message ("\n\n\n >>>>>>>>>>>< event.type : %d\n\n", event.type);
 		if (event.type == PropertyNotify)
 		{
 			//g_print ("  type : %d; atom : %s; window : %d\n", event.xproperty.type, gdk_x11_get_xatom_name (event.xproperty.atom), Xid);
@@ -902,6 +908,14 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 								}
 								else if (g_bShowThumbnail && pParentDock != NULL)
 								{
+									if (! icon->bIsHidden)
+									{
+										if (icon->iBackingPixmap != 0)
+											XFreePixmap (s_XDisplay, icon->iBackingPixmap);
+										if (g_bShowThumbnail)
+											icon->iBackingPixmap = XCompositeNameWindowPixmap (s_XDisplay, Xid);
+										g_print ("new backing pixmap (bis) : %d\n", icon->iBackingPixmap);
+									}
 									cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pParentDock));
 									cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE, pDock->bDirectionUp);
 									cairo_destroy (pCairoContext);
@@ -995,8 +1009,20 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 			}
 			cairo_dock_notify (CAIRO_DOCK_WINDOW_CONFIGURED, &event.xconfigure);
 		}
-		//else
-		//	cd_message ("  type : %d; window : %d\n", event.xany.type, Xid);
+		/*else if (event.type == g_iDamageEvent + XDamageNotify)
+		{
+			XDamageNotifyEvent *e = (XDamageNotifyEvent *) &event;
+			g_print ("window %s has been damaged (%d;%d %dx%d)\n", e->drawable, e->area.x, e->area.y, e->area.width, e->area.height);
+			// e->drawable is the window ID of the damaged window
+			// e->geometry is the geometry of the damaged window	
+			// e->area     is the bounding rect for the damaged area	
+			// e->damage   is the damage handle returned by XDamageCreate()
+	
+			// Subtract all the damage, repairing the window.
+			XDamageSubtract (s_XDisplay, e->damage, None, None);
+		}
+		else
+			g_print ("  type : %d (%d); window : %d\n", event.type, XDamageNotify, Xid);*/
 	}
 	if (XEventsQueued (s_XDisplay, QueuedAlready) != 0)
 		XSync (s_XDisplay, True);  // True <=> discard.

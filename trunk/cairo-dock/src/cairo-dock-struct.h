@@ -18,6 +18,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <librsvg/rsvg.h>
 #include <librsvg/rsvg-cairo.h>
 #include <glib/gi18n.h>
+//#include <X11/extensions/Xdamage.h>
 
 #ifdef HAVE_GLITZ
 #include <gdk/gdkx.h>
@@ -597,6 +598,7 @@ struct _Icon {
 	gboolean bHasIndicator;
 	/// ID du pixmap de sauvegarde de la fenetre pour quand elle est cachee.
 	Pixmap iBackingPixmap;
+	//Damage iDamageHandle;
 };
 
 

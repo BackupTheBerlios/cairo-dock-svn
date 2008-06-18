@@ -10,12 +10,14 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include <gdk/gdkx.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
-#include <signal.h>
+#include <X11/extensions/Xcomposite.h>
+//#include <X11/extensions/Xdamage.h>
 
 #include "cairo-dock-applications-manager.h"
 #include "cairo-dock-application-factory.h"
@@ -26,6 +28,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 extern int g_iNbDesktops;
 extern int g_iNbViewportX,g_iNbViewportY ;
 extern int g_iScreenWidth[2], g_iScreenHeight[2];
+//extern int g_iDamageEvent;
 
 static Display *s_XDisplay = NULL;
 static Atom s_aNetWmWindowType;
@@ -471,7 +474,7 @@ void cairo_dock_set_current_desktop (int iDesktopNumber)
 Pixmap cairo_dock_get_window_background_pixmap (Window Xid)
 {
 	g_return_val_if_fail (Xid > 0, None);
-	g_print ("%s (%d)\n", __func__, Xid);
+	cd_debug ("%s (%d)", __func__, Xid);
 	
 	Pixmap iPixmapID;
 	Atom aReturnedType = 0;
@@ -487,20 +490,22 @@ Pixmap cairo_dock_get_window_background_pixmap (Window Xid)
 	}
 	else
 		iBgPixmapID = None;
-	g_print (" => rootmapid : %d\n", iBgPixmapID);
+	cd_debug (" => rootmapid : %d", iBgPixmapID);
 	return iBgPixmapID;
 }
 
 GdkPixbuf *cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bAddAlpha)  // cette fonction est inspiree par celle de libwnck.
 {
+	//\__________________ On recupere la taille telle qu'elle est actuellement sur le serveur X.
 	Window root;  // inutile.
 	int x, y;  // inutile.
 	guint border_width;  // inutile.
 	guint iWidth, iHeight, iDepth;
-	XGetGeometry (s_XDisplay,
+	if (! XGetGeometry (s_XDisplay,
 		XPixmapID, &root, &x, &y,
-		&iWidth, &iHeight, &border_width, &iDepth);
-	cd_message ("%s (%d) : %dx%dx%d pixels (%d;%d)", __func__, XPixmapID, iWidth, iHeight, iDepth, x, y);
+		&iWidth, &iHeight, &border_width, &iDepth))
+		return NULL;
+	cd_debug ("%s (%d) : %ux%ux%u (%d;%d)", __func__, XPixmapID, iWidth, iHeight, iDepth, x, y);
 
 	//\__________________ On recupere le drawable associe.
 	GdkDrawable *pGdkDrawable = gdk_xid_table_lookup (XPixmapID);
@@ -508,17 +513,21 @@ GdkPixbuf *cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bAddAlpha)
 		g_object_ref (G_OBJECT (pGdkDrawable));
 	else
 	{
-		cd_message ("pas d'objet GDK present, on en alloue un nouveau");
-		pGdkDrawable = gdk_pixmap_foreign_new (XPixmapID);
+		cd_debug ("pas d'objet GDK present, on en alloue un nouveau");
+		GdkScreen* pScreen = gdk_screen_get_default ();
+		pGdkDrawable = gdk_pixmap_foreign_new_for_screen (pScreen, XPixmapID, iWidth, iHeight, iDepth);
 	}
 
 	//\__________________ On recupere la colormap.
 	GdkColormap* pColormap = gdk_drawable_get_colormap (pGdkDrawable);
 	if (pColormap == NULL && gdk_drawable_get_depth (pGdkDrawable) > 1)  // pour les bitmaps, on laisse la colormap a NULL, ils n'en ont pas besoin.
 	{
-		GdkScreen* pScreen = gdk_drawable_get_screen (GDK_DRAWABLE (pGdkDrawable));
-		pColormap = gdk_screen_get_system_colormap (pScreen);  // au pire on a un colormap nul.
-		cd_debug ("  pColormap : %x", pColormap);
+		GdkScreen *pScreen = gdk_drawable_get_screen (GDK_DRAWABLE (pGdkDrawable));
+		if (gdk_drawable_get_depth (pGdkDrawable) == 32)
+			pColormap = gdk_screen_get_rgba_colormap (pScreen);
+		else
+			pColormap = gdk_screen_get_rgb_colormap (pScreen);  // au pire on a un colormap nul.
+		cd_debug ("  pColormap : %x  (pScreen:%x)", pColormap, pScreen);
 	}
 
 	//\__________________ On recupere le buffer dans un GdkPixbuf.
@@ -538,7 +547,7 @@ GdkPixbuf *cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bAddAlpha)
 	if (! gdk_pixbuf_get_has_alpha (pIconPixbuf) && bAddAlpha)
 	{
 		cd_debug ("  on lui ajoute de la transparence");
-		GdkPixbuf *tmp_pixbuf = gdk_pixbuf_add_alpha (pIconPixbuf, TRUE, 255, 255, 255);
+		GdkPixbuf *tmp_pixbuf = gdk_pixbuf_add_alpha (pIconPixbuf, FALSE, 255, 255, 255);
 		g_object_unref (pIconPixbuf);
 		pIconPixbuf = tmp_pixbuf;
 	}
@@ -596,6 +605,7 @@ void cairo_dock_set_nb_desktops (gulong iNbDesktops)
 		&xClientMessage);
 }
 
+
 gboolean cairo_dock_support_X_extension (void)
 {
 	int event_base, error_base;
@@ -603,8 +613,21 @@ gboolean cairo_dock_support_X_extension (void)
 	{
 		int major = 0, minor = 2;  // La version minimale requise pour avoir XCompositeNameWindowPixmap().
 		XCompositeQueryVersion (s_XDisplay, &major, &minor);  // on regarde si on est au moins dans cette version.
-		if (major > 0 || minor >= 2)
-			return TRUE;
+		if (! (major > 0 || minor >= 2))
+		{
+			cd_warning ("XComposite extension too old");
+			return FALSE;
+		}
 	}
-	return FALSE;
+	else
+		return FALSE;
+	
+	/*int iDamageError=0;
+	if (! XDamageQueryExtension (s_XDisplay, &g_iDamageEvent, &iDamageError))
+	{
+		cd_warning ("XDamage extension not supported");
+		return FALSE;
+	}*/
+	
+	return TRUE;
 }

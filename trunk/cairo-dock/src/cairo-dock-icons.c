@@ -982,7 +982,12 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 		//\_______________ On en deduit l'amplitude de la sinusoide au niveau de cette icone, et donc son echelle.
 		icon->fScale = 1 + fMagnitude * g_fAmplitude * sin (icon->fPhase);
 		if (iWidth > 0 && icon->fPersonnalScale != 0)
-			icon->fScale *= (1 + icon->fPersonnalScale);
+		{
+			if (icon->fPersonnalScale > 0)
+				icon->fScale *= icon->fPersonnalScale;
+			else
+				icon->fScale *= (1 + icon->fPersonnalScale);
+		}
 // 		if (icon->fPersonnalScale > 0 && iWidth > 0)
 // 		{
 // 			icon->fPersonnalScale *= .85;

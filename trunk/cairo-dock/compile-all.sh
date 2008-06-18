@@ -96,6 +96,7 @@ if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
 			do
 				$CAIRO_DOCK_EXTRACT_MESSAGE $c
 			done;
+			$CAIRO_DOCK_EXTRACT_MESSAGE data/ChangeLog.txt
 		fi
 		cd po
 		$CAIRO_DOCK_GEN_TRANSLATION
