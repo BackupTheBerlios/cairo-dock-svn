@@ -108,8 +108,10 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 
 	if (g_bSticky)
 		gtk_window_stick (GTK_WINDOW (pWindow));
-	gtk_window_set_keep_above (GTK_WINDOW (pWindow), g_bKeepAbove);
-	gtk_window_set_keep_below (GTK_WINDOW (pWindow), g_bPopUp);
+	if (g_bKeepAbove)
+		gtk_window_set_keep_above (GTK_WINDOW (pWindow), g_bKeepAbove);
+	if (g_bPopUp)
+		gtk_window_set_keep_below (GTK_WINDOW (pWindow), g_bPopUp);
 	gtk_window_set_skip_pager_hint (GTK_WINDOW (pWindow), g_bSkipPager);
 	gtk_window_set_skip_taskbar_hint (GTK_WINDOW (pWindow), g_bSkipTaskbar);
 	gtk_window_set_gravity (GTK_WINDOW (pWindow), GDK_GRAVITY_STATIC);
@@ -464,21 +466,24 @@ void cairo_dock_reload_reflects_in_dock (CairoDock *pDock)
 }
 void cairo_dock_reference_dock (CairoDock *pDock, CairoDock *pParentDock)
 {
-	pDock->iRefCount ++;  // peut-etre qu'il faudrait en faire une operation atomique...
+	pDock->iRefCount ++;
 	if (pDock->iRefCount == 1)  // il devient un sous-dock.
 	{
 		if (pParentDock == NULL)
 			pParentDock = g_pMainDock;
 		CairoDockPositionType iScreenBorder = ((! pDock->bHorizontalDock) << 1) | (! pDock->bDirectionUp);
+		cd_message ("position : %d/%d", pDock->bHorizontalDock, pDock->bDirectionUp);
 		pDock->bHorizontalDock = (g_bSameHorizontality ? pParentDock->bHorizontalDock : ! pParentDock->bHorizontalDock);
 		pDock->bDirectionUp = pParentDock->bDirectionUp;
 		if (iScreenBorder != (((! pDock->bHorizontalDock) << 1) | (! pDock->bDirectionUp)))
 		{
-			g_print ("changement de position\n");
+			cd_message ("changement de position -> %d/%d", pDock->bHorizontalDock, pDock->bDirectionUp);
 			cairo_dock_reload_reflects_in_dock (pDock);
 		}
-		gtk_window_set_keep_above (GTK_WINDOW (pDock->pWidget), FALSE);
-		gtk_window_set_keep_below (GTK_WINDOW (pDock->pWidget), FALSE);
+		if (g_bKeepAbove)
+			gtk_window_set_keep_above (GTK_WINDOW (pDock->pWidget), FALSE);
+		if (g_bPopUp)
+			gtk_window_set_keep_below (GTK_WINDOW (pDock->pWidget), FALSE);
 		
 		pDock->bAutoHide = FALSE;
 		double fPrevRatio = pDock->fRatio;
@@ -716,7 +721,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 
 	if (bApplyRatio)
 	{
-		icon->fWidth *= pDock->fRatio;  /// g_fSubDockSizeRatio
+		icon->fWidth *= pDock->fRatio;
 		icon->fHeight *= pDock->fRatio;
 	}
 	//g_print (" +size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);

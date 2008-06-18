@@ -712,6 +712,22 @@ static void _cairo_dock_hide_show_windows_on_other_desktops (Window *Xid, Icon *
 			gtk_widget_queue_draw (pParentDock->pWidget);
 	}
 }
+static void _cairo_dock_fill_icon_buffer_with_thumbnail (Icon *icon, CairoDock *pParentDock)
+{
+	if (! icon->bIsHidden)  // elle vient d'apparaitre => nouveau backing pixmap.
+	{
+		if (icon->iBackingPixmap != 0)
+			XFreePixmap (s_XDisplay, icon->iBackingPixmap);
+		if (g_bShowThumbnail)
+			icon->iBackingPixmap = XCompositeNameWindowPixmap (s_XDisplay, icon->Xid);
+		g_print ("new backing pixmap (bis) : %d\n", icon->iBackingPixmap);
+	}
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pParentDock));
+	cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pParentDock->bHorizontalDock, TRUE, pParentDock->bDirectionUp);
+	cairo_destroy (pCairoContext);
+	icon->fWidth *= pParentDock->fRatio;
+	icon->fHeight *= pParentDock->fRatio;
+}
 gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 {
 	static XEvent event;
@@ -887,26 +903,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 										cairo_dock_deactivate_temporary_auto_hide ();
 								}*/
 								
-								if (g_bHideVisibleApplis)
-								{
-									if (pParentDock != NULL)
-									{
-										if (bIsHidden)
-										{
-											cd_message (" => se cache");
-											if (! g_bAppliOnCurrentDesktopOnly || cairo_dock_window_is_on_current_desktop (Xid))
-												pParentDock = cairo_dock_insert_appli_in_dock (icon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON);
-										}
-										else
-										{
-											cd_message (" => re-apparait");
-											cairo_dock_detach_icon_from_dock (icon, pParentDock, TRUE);
-											cairo_dock_update_dock_size (pParentDock);
-										}
-										gtk_widget_queue_draw (pParentDock->pWidget);
-									}
-								}
-								else if (g_bShowThumbnail && pParentDock != NULL)
+								if (g_bShowThumbnail && pParentDock != NULL)
 								{
 									if (! icon->bIsHidden)
 									{
@@ -914,13 +911,39 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 											XFreePixmap (s_XDisplay, icon->iBackingPixmap);
 										if (g_bShowThumbnail)
 											icon->iBackingPixmap = XCompositeNameWindowPixmap (s_XDisplay, Xid);
-										g_print ("new backing pixmap (bis) : %d\n", icon->iBackingPixmap);
+										cd_message ("new backing pixmap (bis) : %d", icon->iBackingPixmap);
 									}
 									cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pParentDock));
 									cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE, pDock->bDirectionUp);
 									cairo_destroy (pCairoContext);
 									icon->fWidth *= pParentDock->fRatio;
 									icon->fHeight *= pParentDock->fRatio;
+								}
+								
+								if (g_bHideVisibleApplis)
+								{
+									if (bIsHidden)
+									{
+										cd_message (" => se cache");
+										if (! g_bAppliOnCurrentDesktopOnly || cairo_dock_window_is_on_current_desktop (Xid))
+										{
+											pParentDock = cairo_dock_insert_appli_in_dock (icon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON);
+											if (pParentDock != NULL)
+												_cairo_dock_fill_icon_buffer_with_thumbnail (icon, pParentDock);
+										}
+									}
+									else
+									{
+										cd_message (" => re-apparait");
+										cairo_dock_detach_icon_from_dock (icon, pParentDock, TRUE);
+										cairo_dock_update_dock_size (pParentDock);
+									}
+									if (pParentDock != NULL)
+										gtk_widget_queue_draw (pParentDock->pWidget);
+								}
+								else if (g_bShowThumbnail && pParentDock != NULL)
+								{
+									_cairo_dock_fill_icon_buffer_with_thumbnail (icon, pParentDock);
 									if (pParentDock->iSidShrinkDown == 0)
 										cairo_dock_redraw_my_icon (icon, CAIRO_CONTAINER (pParentDock));
 								}
@@ -971,7 +994,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 						XFreePixmap (s_XDisplay, icon->iBackingPixmap);
 					if (g_bShowThumbnail)
 						icon->iBackingPixmap = XCompositeNameWindowPixmap (s_XDisplay, Xid);
-					g_print ("new backing pixmap : %d\n", icon->iBackingPixmap);
+					cd_message ("new backing pixmap : %d", icon->iBackingPixmap);
 				}
 				memcpy (&icon->windowGeometry, &event.xconfigure.x, sizeof (GtkAllocation));
 			}
@@ -980,7 +1003,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 			{
 				if (icon != NULL && icon->fPersonnalScale <= 0)  // pour une icone en cours de supression, on ne fait rien.
 				{
-					if (event.xconfigure.x + event.xconfigure.width < 0 || event.xconfigure.x > g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] || event.xconfigure.y + event.xconfigure.height < 0 || event.xconfigure.y > g_iScreenHeight[CAIRO_DOCK_HORIZONTAL])  // en fait il faudrait faire ca modulo le nombre de viewports * la largeur d'un bureau, car avec une fenetre a droite, elle peut revenir sur le bureau par la gauche si elle est tres large...
+					if (event.xconfigure.x + event.xconfigure.width <= 0 || event.xconfigure.x >= g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] || event.xconfigure.y + event.xconfigure.height <= 0 || event.xconfigure.y >= g_iScreenHeight[CAIRO_DOCK_HORIZONTAL])  // en fait il faudrait faire ca modulo le nombre de viewports * la largeur d'un bureau, car avec une fenetre a droite, elle peut revenir sur le bureau par la gauche si elle est tres large...
 					{
 						CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 						if (pParentDock == NULL)
@@ -991,6 +1014,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 					}
 					else  // elle est sur le bureau.
 					{
+						g_print ("cette fenetre s'est deplacee sur le bureau courant (%d;%d)\n", event.xconfigure.x, event.xconfigure.y);
 						gboolean bInsideDock;
 						if (g_list_find (pDock->icons, icon) == NULL)
 						{

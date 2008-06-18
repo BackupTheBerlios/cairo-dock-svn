@@ -48,6 +48,22 @@ main (int argc, char** argv)
 		g_error ("impossible d'ouvrir %s", cMessagesFilePath);
 	
 	i = 0;
+	cGroupName = pGroupList[0];
+	if (cGroupName != NULL && strcmp (cGroupName, "ChangeLog") == 0)
+	{
+		pKeyList = g_key_file_get_keys (pKeyFile, cGroupName, NULL, NULL);
+		j = 0;
+		while (pKeyList[j] != NULL)
+		{
+			cKeyName = pKeyList[j];
+			cValue = g_key_file_get_string (pKeyFile, cGroupName, cKeyName, NULL);
+			write_message (cValue);
+			g_free (cValue);
+			j ++;
+		}
+		g_strfreev (pKeyList);
+	}
+	else
 	while (pGroupList[i] != NULL)
 	{
 		cGroupName = pGroupList[i];
@@ -169,6 +185,7 @@ main (int argc, char** argv)
 
 					case 's' :  // string
 					case 'S' :  // string avec un selecteur de fichier a cote du GtkEntry.
+					case 'u' :  // string avec un selecteur de fichier a cote du GtkEntry et un boutton play.
 					case 'D' :  // string avec un selecteur de repertoire a cote du GtkEntry.
 					case 'T' :  // string, mais sans pouvoir decochez les cases.
 					case 'E' :  // string, mais avec un GtkComboBoxEntry pour le choix unique.
@@ -258,7 +275,7 @@ main (int argc, char** argv)
 
 			j ++;
 		}
-		g_free (pKeyList);  // on libere juste la liste de chaines, pas les chaines a l'interieur.
+		g_strfreev (pKeyList);
 
 		i ++;
 	}

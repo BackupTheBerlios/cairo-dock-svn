@@ -447,8 +447,8 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 {
 	gboolean bReloadAppletsToo = GPOINTER_TO_INT (data);
 	cd_message ("%s (%s, %d)", __func__, cDockName, bReloadAppletsToo);
-	if (pDock->iRefCount > 0)
-		pDock->bHorizontalDock = (g_bSameHorizontality ? g_pMainDock->bHorizontalDock : ! g_pMainDock->bHorizontalDock);
+	///if (pDock->iRefCount > 0)
+	///	pDock->bHorizontalDock = (g_bSameHorizontality ? g_pMainDock->bHorizontalDock : ! g_pMainDock->bHorizontalDock);
 	//else
 	//	pDock->bHorizontalDock = g_pMainDock->bHorizontalDock;
 

@@ -207,7 +207,7 @@ double g_fDeskletColorInside[4];
 gchar *g_cRaiseDockShortcut = NULL;
 
 gboolean g_bKeepAbove = FALSE;
-gboolean g_bPopUp;
+gboolean g_bPopUp = FALSE;
 gboolean g_bSkipPager = TRUE;
 gboolean g_bSkipTaskbar = TRUE;
 gboolean g_bSticky = TRUE;

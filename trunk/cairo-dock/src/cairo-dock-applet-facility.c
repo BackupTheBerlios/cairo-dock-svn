@@ -465,13 +465,13 @@ static gpointer _cairo_dock_threaded_calculation (CairoDockMeasure *pMeasureTime
 	g_mutex_unlock (pMeasureTimer->pMutexData);
 	
 	g_atomic_int_set (&pMeasureTimer->iThreadIsRunning, 0);
-	cd_debug ("*** fin du thread");
+	//cd_debug ("*** fin du thread");
 	return NULL;
 }
 static gboolean _cairo_dock_check_for_redraw (CairoDockMeasure *pMeasureTimer)
 {
 	int iThreadIsRunning = g_atomic_int_get (&pMeasureTimer->iThreadIsRunning);
-	cd_debug ("%s (%d)", __func__, iThreadIsRunning);
+	//cd_debug ("%s (%d)", __func__, iThreadIsRunning);
 	if (! iThreadIsRunning)
 	{
 		//\_______________________ On recharge ce qu'il faut avec ces nouvelles donnees.
@@ -526,7 +526,7 @@ void cairo_dock_launch_measure (CairoDockMeasure *pMeasureTimer)
 	}
 	else if (g_atomic_int_compare_and_exchange (&pMeasureTimer->iThreadIsRunning, 0, 1))  // il etait egal a 0, on lui met 1 et on lance le thread.
 	{
-		cd_debug (" ==> lancement du thread de calcul");
+		//cd_debug (" ==> lancement du thread de calcul");
 		
 		if (pMeasureTimer->iSidTimerRedraw == 0) 
 			pMeasureTimer->iSidTimerRedraw = g_timeout_add (MAX (150, MIN (0.15 * pMeasureTimer->iCheckInterval, 333)), (GSourceFunc) _cairo_dock_check_for_redraw, pMeasureTimer);

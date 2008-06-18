@@ -237,8 +237,8 @@ CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
 	if (CAIRO_DOCK_IS_APPLI (icon) && g_bGroupAppliByClass && icon->cClass != NULL)
 	{
 		Icon *pSameClassIcon = cairo_dock_get_classmate (icon);
-		if (pSameClassIcon != NULL)
-			g_print ("class-mate : %s (%s)\n", pSameClassIcon->acName, pSameClassIcon->cParentDockName);
+		//if (pSameClassIcon != NULL)
+		//	g_print ("class-mate : %s (%s)\n", pSameClassIcon->acName, pSameClassIcon->cParentDockName);
 		//pSameClassIcon = cairo_dock_get_icon_with_class (pMainDock->icons, icon->cClass);
 		if (pSameClassIcon == NULL || pSameClassIcon == icon || pSameClassIcon->cParentDockName == NULL)
 		{

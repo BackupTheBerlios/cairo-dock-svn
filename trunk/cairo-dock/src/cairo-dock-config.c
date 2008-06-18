@@ -586,7 +586,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	cairo_dock_deactivate_temporary_auto_hide ();
 	pDock->bAutoHide = cairo_dock_get_boolean_key_value (pKeyFile, "Position", "auto-hide", &bFlushConfFileNeeded, FALSE, "Auto-Hide", "auto-hide");
 	
+	gboolean bPopUpOld = g_bPopUp;
 	g_bPopUp = cairo_dock_get_boolean_key_value (pKeyFile, "Position", "pop-up", &bFlushConfFileNeeded, FALSE, NULL, NULL);
+	
 	
 	//\___________________ On recupere les parametres de la zone visible.
 	gchar *cVisibleZoneImageFile = cairo_dock_get_string_key_value (pKeyFile, "Background", "callback image", &bFlushConfFileNeeded, NULL, "Auto-Hide", "background image");
@@ -1216,6 +1218,10 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		cairo_dock_start_polling_screen_edge (pDock);
 	else
 		cairo_dock_stop_polling_screen_edge ();
+	if (! g_bPopUp && bPopUpOld)
+	{
+		cairo_dock_set_root_docks_on_top_layer ();
+	}
 	
 	//\___________________ On applique les modifs au fichier de conf easy.
 	cairo_dock_copy_to_easy_conf_file (pKeyFile, g_cEasyConfFile);
