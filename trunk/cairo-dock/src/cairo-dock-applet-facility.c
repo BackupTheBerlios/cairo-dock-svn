@@ -267,13 +267,14 @@ void cairo_dock_draw_emblem_on_my_icon (cairo_t *pIconContext, const gchar *cIco
 		break;
 	}
 	
-	cd_debug ("Emblem: X %.0f Y %.0f W %.0f H %.0f - Icon: W %.0f H %.0f", fImgX, fImgY, emblemW, emblemH, pIcon->fWidth, pIcon->fHeight);
+	//cd_debug ("Emblem: X %.0f Y %.0f W %.0f H %.0f - Icon: W %.0f H %.0f", fImgX, fImgY, emblemW, emblemH, pIcon->fWidth, pIcon->fHeight);
 	
 	cairo_save (pIconContext);
 	cairo_translate (pIconContext, fImgX , fImgY);
 	cairo_set_source_surface (pIconContext, pCairoSurface, 0.0, 0.0);
 	cairo_paint (pIconContext);
 	cairo_restore (pIconContext);
+	cairo_surface_destroy (pCairoSurface);
 }
 
 void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoContainer *pContainer, CairoDockClassicEmblem pEmblemClassic, CairoDockEmblem pEmblemType)

@@ -152,6 +152,7 @@ gboolean on_expose (GtkWidget *pWidget,
 	else if (!pDock->bAtBottom)
 	{
 		pDock->render (pCairoContext, pDock);
+
 	}
 	else
 	{
@@ -164,6 +165,17 @@ gboolean on_expose (GtkWidget *pWidget,
 		}
 		else
 			pDock->render (pCairoContext, pDock);
+	}
+	
+	//Indicateur de drop, ca prend un petit peu de ressources, je me demande si ce serai pas mieux de mettre en cache les emblèmes classiques
+	//Pour gagner en rapidité, parce que du coup on charge la surface à chaques mouvements dans le dock.
+	Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
+	//Icon *pPointedIcon = pDock->calculate_icons (pDock);
+	if (pDock->bIsDragging && pPointedIcon != NULL)
+	{
+		cairo_translate (pCairoContext, pPointedIcon->fDrawX, pPointedIcon->fDrawY);
+		cairo_dock_draw_emblem_classic (pCairoContext, pPointedIcon, (CairoContainer *) pDock, CAIRO_DOCK_EMBLEM_DROP_INDICATOR, CAIRO_DOCK_EMBLEM_UPPER_RIGHT);
+		//cairo_translate (pCairoContext, 0., 0.); //Utile de le recentrer?
 	}
 	
 	cairo_destroy (pCairoContext);
@@ -297,33 +309,6 @@ void cairo_dock_on_change_icon (Icon *pLastPointedIcon, Icon *pPointedIcon, Cair
 		s_iSidShowSubDockDemand = 0;
 		s_pDockShowingSubDock = NULL;
 	}
-	
-	/*/Indicateur de drop
-	if (pDock->bIsDragging && pPointedIcon != NULL)
-	{
-		//C'est moche, mais je vois pas comment faire autrement ^^
-		CairoContainer *pContainer1 = NULL;
-		cairo_t *pContext1 = NULL;
-		CairoContainer *pContainer2 = NULL;
-		cairo_t *pContext2 = NULL;
-	
-		if (pLastPointedIcon != NULL)
-		{
-			pContainer2 = cairo_dock_search_container_from_icon (pLastPointedIcon);
-			pContext2 = cairo_create (pLastPointedIcon->pIconBuffer); 
-			//On vire l'indicateur de l'ancienne icone
-			cairo_dock_draw_emblem_classic (pContext2, pLastPointedIcon, pContainer2, CAIRO_DOCK_EMBLEM_BLANK, CAIRO_DOCK_EMBLEM_UPPER_RIGHT);
-		}
-	
-		if (pPointedIcon != NULL) 
-		{
-			pContainer1 = cairo_dock_search_container_from_icon (pPointedIcon);
-			pContext1 = cairo_create (pPointedIcon->pIconBuffer); 
-			//On affiche l'indicateur
-			cairo_dock_draw_emblem_classic (pContext1, pLastPointedIcon, pContainer1, CAIRO_DOCK_EMBLEM_DROP_INDICATOR, CAIRO_DOCK_EMBLEM_UPPER_RIGHT);
-		}
-	}
-	*/
 	
 	if (pDock->bIsDragging && s_iSidShowAppliForDrop != 0)
 	{
