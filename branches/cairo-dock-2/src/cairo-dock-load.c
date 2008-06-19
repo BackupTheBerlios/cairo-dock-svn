@@ -267,14 +267,17 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 					return ;
 				
 				glGenTextures (1, &icon->iColorBuffer);
-				glBindTexture (GL_TEXTURE_RECTANGLE_ARB, icon->iColorBuffer);  // GL_TEXTURE_2D
-				glTexImage2D (GL_TEXTURE_RECTANGLE_ARB,  // GL_TEXTURE_2D
+				g_print ("texture %d generee\n", icon->iColorBuffer);
+				glBindTexture (GL_TEXTURE_2D, icon->iColorBuffer);  // GL_TEXTURE_2D / GL_TEXTURE_RECTANGLE_ARB
+				glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); // scale linearly when image bigger than texture
+				glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); // scale linearly when image smalled than texture
+				glTexImage2D (GL_TEXTURE_2D,  // GL_TEXTURE_2D / GL_TEXTURE_RECTANGLE_ARB
 					0,
-					GL_RGBA,  // GL_ALPHA
+					4,  // GL_ALPHA / GL_RGBA
 					w,
 					h,
 					0,
-					GL_BGRA,  // GL_ALPHA
+					GL_RGBA,  // GL_ALPHA / GL_BGRA
 					GL_UNSIGNED_BYTE,
 					icon->pSurfaceData);
 				

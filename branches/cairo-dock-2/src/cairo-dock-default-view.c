@@ -20,6 +20,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <glitz-glx.h>
 #include <cairo-glitz.h>
 #endif
+#include <gtk/gtkgl.h>
+#include <GL/glu.h>
 
 #include "cairo-dock-animations.h"
 #include "cairo-dock-icons.h"
@@ -112,8 +114,143 @@ void cairo_dock_calculate_construction_parameters_generic (Icon *icon, int iCurr
 
 void cairo_dock_render_linear (CairoDock *pDock)
 {
+	cairo_t *pCairoContext;
+	
+	GdkGLContext* pGlContext = gtk_widget_get_gl_context (pDock->pWidget);
+	GdkGLDrawable* pGlDrawable = gtk_widget_get_gl_drawable (pDock->pWidget);
+
+	/* make GL-context "current" */
+	if (!gdk_gl_drawable_gl_begin (pGlDrawable, pGlContext))
+		return;
+	
+	static float alpha = 0;
+	
+	glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
+	glClear (GL_COLOR_BUFFER_BIT); 
+	
+	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ZERO, GL_ZERO);
+	glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
+	glFlush ();
+	gdk_gl_drawable_swap_buffers (pGlDrawable);
+	
+	
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearDepth(1.0f);
+	glEnable(GL_DEPTH_TEST);
+	
+	glEnable (GL_TEXTURE_2D);
+	
+	
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  /* Clear the buffer, clear the matrix */
+  glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glLoadIdentity();
+
+  /* A step backward, then spin the cube */
+   //glTranslatef (0, 0, -12);
+   //glRotatef (alpha, 1, 0, 0);
+
+/*    glBegin(GL_TRIANGLES);
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glVertex3f(0.0f, 1.0f, 0.0f);
+        glColor3f(0.0f, 1.0f, 0.0f);
+        glVertex3f(-1.0f, -1.0f, 0.0f);
+        glColor3f(0.0f, 0.0f, 1.0f);
+        glVertex3f(1.0f, -1.0f, 0.0f);
+    glEnd();
+    glTranslatef(3.0f, 0.0f, 0.0f);*/
+    //glColor3f(0.5f, 0.5f, 1.0f);
+    //glBegin(GL_QUADS);
+//         glVertex3f(-1.0f, 1.0f, 0.0f);
+//         glVertex3f(1.0f, 1.0f, 0.0f);
+//         glVertex3f(1.0f, -1.0f, 0.0f);
+//         glVertex3f(-1.0f, -1.0f, 0.0f);
+// glEnd();
+
+  /* Rotate a bit more */
+  alpha = alpha + 3;
+	
+	GList *pFirstDrawnElement = (pDock->pFirstDrawnElement != NULL ? pDock->pFirstDrawnElement : pDock->icons);
+	if (pFirstDrawnElement != NULL)
+	{
+		Icon *icon;
+		GList *ic = pFirstDrawnElement;
+		do
+		{
+			icon = ic->data;
+
+			glBindTexture (GL_TEXTURE_2D, icon->iColorBuffer);
+			
+			
+			glPushMatrix ();
+			
+			
+			glTranslatef (25. * (icon->fDrawX - pDock->iCurrentWidth / 2) / pDock->iCurrentWidth, 0., -20.);  // pDock->iCurrentWidth / 2 - icon->fDrawX
+			glRotatef (alpha, 1, 0, 0);
+			//glColor3f(0.5f, 0.5f, 1.0f);
+			glColor3f(1.0f, 1.0f, 1.0f);
+			
+			glBegin(GL_QUADS);
+			// Front Face (note that the texture's corners have to match the quad's corners)
+			glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);  // Bottom Left Of The Texture and Quad
+			glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
+			glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);  // Top Right Of The Texture and Quad
+			glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,  1.0f,  1.0f);  // Top Left Of The Texture and Quad
+			
+			// Back Face 
+			glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);  // Bottom Right Of The Texture and Quad
+			glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);  // Top Right Of The Texture and Quad
+			glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);  // Top Left Of The Texture and Quad
+			glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);  // Bottom Left Of The Texture and Quad
+			
+			// Top Face
+			glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);  // Top Left Of The Texture and Quad
+			glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,  1.0f,  1.0f);  // Bottom Left Of The Texture and Quad
+			glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,  1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
+			glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);  // Top Right Of The Texture and Quad
+			
+			// Bottom Face
+			glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f, -1.0f, -1.0f);  // Top Right Of The Texture and Quad
+			glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f, -1.0f, -1.0f);  // Top Left Of The Texture and Quad
+			glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);  // Bottom Left Of The Texture and Quad
+			glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
+			
+			// Right face
+			glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);  // Bottom Right Of The Texture and Quad
+			glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);  // Top Right Of The Texture and Quad
+			glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);  // Top Left Of The Texture and Quad
+			glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);  // Bottom Left Of The Texture and Quad
+			
+			// Left Face
+			glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);  // Bottom Left Of The Texture and Quad
+			glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
+			glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);  // Top Right Of The Texture and Quad
+			glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);  // Top Left Of The Texture and Quad
+			glEnd();
+			
+			glPopMatrix ();
+			
+			ic = cairo_dock_get_next_element (ic, pDock->icons);
+		} while (ic != pFirstDrawnElement);
+	}
+	
+	
+	
+	glFlush ();
+	
+	glDisable(GL_BLEND);
+	gdk_gl_drawable_swap_buffers (pGlDrawable);
+	
+	gdk_gl_drawable_gl_end (pGlDrawable);
+	return ;
+	
+	
+	
 	//\____________________ On cree le contexte du dessin.
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
+	pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 
 	cairo_set_tolerance (pCairoContext, 0.5);  // avec moins que 0.5 on ne voit pas la difference.
@@ -121,7 +258,11 @@ void cairo_dock_render_linear (CairoDock *pDock)
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 	cairo_paint (pCairoContext);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
-
+	
+	
+	
+	
+	return ;
 	//\____________________ On trace le cadre.
 	double fChangeAxes = 0.5 * (pDock->iCurrentWidth - pDock->iMaxDockWidth);
 	double fLineWidth = g_iDockLineWidth;

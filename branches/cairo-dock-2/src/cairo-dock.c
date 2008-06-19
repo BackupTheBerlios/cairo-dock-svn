@@ -289,7 +289,7 @@ main (int argc, char** argv)
         cd_log_set_level(0);
 	gtk_init (&argc, &argv);
 	gtk_gl_init (&argc, &argv);
-	glutInit (&argc, argv);
+	//glutInit (&argc, argv);
 	GError *erreur = NULL;
 
 	//\___________________ On recupere quelques options.

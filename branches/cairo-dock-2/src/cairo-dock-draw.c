@@ -1145,6 +1145,32 @@ void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, d
 	{
 		GdkGLContext* pGlContext = gtk_widget_get_gl_context (pDock->pWidget);
 		GdkGLDrawable* pGlDrawable = gtk_widget_get_gl_drawable (pDock->pWidget);
+		if (!gdk_gl_drawable_gl_begin (pGlDrawable, pGlContext))
+			return ;
+		
+  glClear (GL_COLOR_BUFFER_BIT);
+                       
+/* draw white polygon (
+                       
+ * (0.25, 0.25, 0.0) an
+                       
+ */
+                       
+  glBegin(GL_POLYGON);
+                       
+  glColor3f (1.0, 1.0, 1.0);
+                       
+    glVertex3f (0.25, 0.25, 0.0);
+                       
+    glVertex3f (0.75, 0.25, 0.0);
+                       
+    glVertex3f (0.75, 0.75, 0.0);
+                       
+    glVertex3f (0.25, 0.75, 0.0);
+                       
+  gdk_gl_drawable_gl_end (pGlDrawable);
+		
+		/*
 		double fAlpha = .8;
 		GLfloat afFrontDiffuseMat[] = {1.0f * fAlpha,
 			1.0f * fAlpha,
@@ -1162,8 +1188,8 @@ void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, d
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glMaterialfv (GL_FRONT, GL_DIFFUSE, afFrontDiffuseMat);
 		glMaterialfv (GL_BACK, GL_DIFFUSE, afBackDiffuseMat);
-		glColor4f (0.0f, 0.0f, 0.0f, 0.0f);
-		glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
+		glColor4f (0.0f, 0.0f, 1.0f, 0.5f);
+		glClearColor (0.0f, 0.0f, 1.0f, 0.5f);
 		double fDockMagnitude = cairo_dock_calculate_magnitude (pDock->iMagnitudeIndex);
 		Icon *icon;
 		GList *ic = pFirstDrawnElement;
@@ -1175,13 +1201,13 @@ void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, d
 			glBindTexture (GL_TEXTURE_RECTANGLE_ARB, icon->iColorBuffer);
 			glBegin (GL_QUADS);
 			glNormal3f (0.0f, 1.0f, 0.0f);
-			glTexCoord2f (0.0f, (GLfloat) icon->fHeight);
+			glTexCoord2f (0.0f, (GLfloat) icon->fHeight / pDock->iCurrentHeight);
 			glVertex3f (0.0f, 0.0f, 1.0f);
 			glTexCoord2f (0.0f, 0.0f);
 			glVertex3f (0.0f, 0.0f, 0.0f);
-			glTexCoord2f ((GLfloat) icon->fWidth, 0.0f);
+			glTexCoord2f ((GLfloat) icon->fWidth/ pDock->iCurrentWidth, 0.0f);
 			glVertex3f (1.0f, 0.0f, 0.0f);
-			glTexCoord2f ((GLfloat) icon->fWidth, (GLfloat) icon->fHeight);
+			glTexCoord2f ((GLfloat) icon->fWidth / pDock->iCurrentWidth, (GLfloat) icon->fHeight / pDock->iCurrentHeight);
 			glVertex3f (1.0f, 0.0f, 1.0f);
 			glEnd ();
 			
@@ -1195,8 +1221,8 @@ void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, d
 		else
 			glFlush ();
 	
-		/* end drawing to current GL-context */
-		gdk_gl_drawable_gl_end (pGlDrawable);
+		// end drawing to current GL-context 
+		gdk_gl_drawable_gl_end (pGlDrawable);*/
 	}
 	else
 	{

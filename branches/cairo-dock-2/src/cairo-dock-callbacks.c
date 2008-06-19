@@ -113,7 +113,7 @@ void on_realize (GtkWidget* pWidget,
 		return ;
 	g_print ("%s ()\n", __func__);
 	
-	GLfloat afLightDiffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
+	GLfloat afLightDiffuse[] = {1.0f, 1.0f, 1.0f, 0.0f};
 	GdkGLContext* pGlContext = gtk_widget_get_gl_context (pWidget);
 	GdkGLDrawable* pGlDrawable = gtk_widget_get_gl_drawable (pWidget);
 
@@ -127,21 +127,21 @@ void on_realize (GtkWidget* pWidget,
 	glDisable (GL_DEPTH_TEST);
 	glEnable (GL_NORMALIZE);
 	glEnable (GL_BLEND);
-	glBlendFunc (GL_ONE, GL_ONE);  // glBlendFunc (GL_SRC_ALPHA, GL_ONE);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE);  // glBlendFunc (GL_SRC_ALPHA, GL_ONE);
 	glShadeModel (GL_FLAT);
-	glEnable (GL_TEXTURE_RECTANGLE_ARB);  // glEnable (GL_TEXTURE_2D);
+	glEnable (GL_TEXTURE_2D);  // glEnable (GL_TEXTURE_RECTANGLE_ARB);
 	glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
 	glDisable (GL_CULL_FACE);
-	glLightModelf (GL_LIGHT_MODEL_TWO_SIDE, 0.0f);
+	/*glLightModelf (GL_LIGHT_MODEL_TWO_SIDE, 0.0f);
 	glEnable (GL_LIGHTING);
 	glEnable (GL_LIGHT0);
-	glLightfv (GL_LIGHT0, GL_DIFFUSE, afLightDiffuse);
+	glLightfv (GL_LIGHT0, GL_DIFFUSE, afLightDiffuse);*/
 
 	g_print ("OpenGL version: %s\n", glGetString (GL_VERSION));
 	g_print ("OpenGL vendor: %s\n", glGetString (GL_VENDOR));
 	g_print ("OpenGL renderer: %s\n", glGetString (GL_RENDERER));
 
-	glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);  // GL_MODULATE / GL_DECAL /  GL_BLEND
 	glTexParameteri (GL_TEXTURE_RECTANGLE_ARB,
 			 GL_TEXTURE_MIN_FILTER,
 			 GL_LINEAR_MIPMAP_LINEAR);
@@ -1360,7 +1360,7 @@ gboolean on_configure (GtkWidget* pWidget,
 
 	if (iNewWidth != pDock->iCurrentWidth || iNewHeight != pDock->iCurrentHeight)
 	{
-		cd_debug ("-> %dx%d", iNewWidth, iNewHeight);
+		//g_print ("-> %dx%d\n", iNewWidth, iNewHeight);
 		pDock->iCurrentWidth = iNewWidth;
 		pDock->iCurrentHeight = iNewHeight;
 
@@ -1380,12 +1380,29 @@ gboolean on_configure (GtkWidget* pWidget,
 			GLsizei h = pEvent->height;
 			if (!gdk_gl_drawable_gl_begin (pGlDrawable, pGlContext))
 				return FALSE;
-			glViewport (0, 0, w, h);
+			
+			glViewport(0, 0, w, h);
+			
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			gluPerspective(10.0, 1.0*(GLfloat)w/(GLfloat)h, 1.0, 30.0);
+			
+			glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity();
+			glTranslatef(0.0, 0.0, -3.6);
+			
+			
+			/*glViewport (0, 0, w, h);
+			glMatrixMode(GL_MODELVIEW);  // GL_MODELVIEW / GL_PROJECTION
+			glLoadIdentity ();
+			gluPerspective (20, w / (float) h, .1, 50);*/
+	
+			/*glViewport (0, 0, w, h);
 			glMatrixMode (GL_PROJECTION);
 			glLoadIdentity ();
-			gluPerspective (2.0f * FOVY_2, (GLfloat) w / (GLfloat) h, 0.1f, 50.0f);
-		
-			glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			gluPerspective (2.0f * FOVY_2, (GLfloat) w / (GLfloat) h, 0.1f, 50.0f);*/
+			
+			//glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			gdk_gl_drawable_gl_end (pGlDrawable);
 		}
 		
