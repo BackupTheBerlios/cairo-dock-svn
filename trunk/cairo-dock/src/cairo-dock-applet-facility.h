@@ -62,12 +62,24 @@ typedef enum {
 /**
 *Dessine un embleme sur une icone.
 *@param pIconContext le contexte du dessin; n'est pas altere par la fonction.
-*@param cIconFile l'embleme a afficher.
+*@param cIconFile le fichier image a afficher comme embleme.
 *@param pIcon l'icone.
 *@param pContainer le container de l'icone.
 *@param pEmblemType énumération du type d'embleme.
 */
 void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIconFile, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType);
+
+#define cairo_dock_make_emblem_from_surface(pSurface, pEmblemType) cairo_dock_draw_emblem_on_my_icon(myDrawContext, pSurface, myIcon, myContainer, pEmblemType);
+
+/**
+*Dessine un embleme sur une icone a partir d'une surface.
+*@param pIconContext le contexte du dessin; n'est pas altere par la fonction.
+*@param pSurface la surface a utiliser comme embleme.
+*@param pIcon l'icone.
+*@param pContainer le container de l'icone.
+*@param pEmblemType énumération du type d'embleme.
+*/
+void cairo_dock_draw_emblem_from_surface (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType);
 
 //Needed for emblem classic type
 typedef enum {

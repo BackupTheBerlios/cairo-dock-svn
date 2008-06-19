@@ -208,7 +208,7 @@ void cairo_dock_draw_bar_on_icon (cairo_t *pIconContext, double fValue, Icon *pI
 	cairo_restore (pIconContext);
 }
 
-//Fonction proposée par Nécropotame, rédigée par ChAnGFu
+//Fonctions proposée par Nécropotame, rédigée par ChAnGFu
 void cairo_dock_draw_emblem_on_my_icon (cairo_t *pIconContext, const gchar *cIconFile, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType)
 {
 	cd_debug ("%s (%s %d)", __func__, cIconFile, pEmblemType);
@@ -221,6 +221,24 @@ void cairo_dock_draw_emblem_on_my_icon (cairo_t *pIconContext, const gchar *cIco
 	double fImgX, fImgY, fImgW, fImgH, emblemW = pIcon->fWidth / 3, emblemH = pIcon->fHeight / 3;
 	double fMaxScale = (CAIRO_DOCK_IS_DOCK (pContainer) ? (1 + g_fAmplitude) / 1 : 1);
 	pCairoSurface = cairo_dock_create_surface_from_image (cIconFile, pIconContext, fMaxScale, emblemW, emblemH, CAIRO_DOCK_KEEP_RATIO, &fImgW, &fImgH, NULL, NULL);
+
+	cairo_dock_draw_emblem_from_surface (pIconContext, pCairoSurface, pIcon, pContainer, pEmblemType);
+
+	cairo_surface_destroy (pCairoSurface);
+}
+
+void cairo_dock_draw_emblem_from_surface (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType)
+{
+	cd_debug ("%s (%d)", __func__, pEmblemType);
+	g_return_if_fail (pIcon != NULL && pContainer != NULL); 
+	
+	if (pSurface == NULL) 
+		return;
+	
+	cairo_surface_t *pCairoSurface=NULL;
+	double fImgX, fImgY, fImgW, fImgH, emblemW = pIcon->fWidth / 3, emblemH = pIcon->fHeight / 3;
+	double fMaxScale = (CAIRO_DOCK_IS_DOCK (pContainer) ? (1 + g_fAmplitude) / 1 : 1);
+	pCairoSurface = cairo_surface_create_similar (pSurface, CAIRO_CONTENT_COLOR_ALPHA, emblemW, emblemH);
 
 	switch (pEmblemType) {
 		default:
@@ -306,7 +324,7 @@ void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoCo
 		case CAIRO_DOCK_EMBLEM_BROKEN:
 			cClassicEmblemPath = g_strdup_printf ("%s/emblems/broken.svg", CAIRO_DOCK_SHARE_DATA_DIR);
 		break;
-		//Il reste play pause stop broken a faire.
+		//Il reste les svg de play pause stop broken a faire.
 	}
 	
 	cairo_dock_draw_emblem_on_my_icon (pIconContext, cClassicEmblemPath, pIcon, pContainer, pEmblemType);
