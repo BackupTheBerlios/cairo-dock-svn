@@ -57,7 +57,8 @@ typedef enum {
 	CAIRO_DOCK_EMBLEM_TOTAL_NB,
 } CairoDockEmblem;
 
-#define cairo_dock_make_emblem_from_file(cIconFile, pEmblemType) cairo_dock_draw_emblem_on_my_icon(myDrawContext, cIconFile, myIcon, myContainer, pEmblemType);
+#define cairo_dock_make_emblem_from_file(cIconFile, pEmblemType, bPersistent) cairo_dock_draw_emblem_on_my_icon(myDrawContext, cIconFile, myIcon, myContainer, pEmblemType, bPersistent);
+#define CD_APPLET_DRAW_EMBLEM_FROM_FILE(cIconFile, pEmblemType) cairo_dock_draw_emblem_on_my_icon(myDrawContext, cIconFile, myIcon, myContainer, pEmblemType, TRUE);
 
 /**
 *Dessine un embleme sur une icone.
@@ -67,9 +68,10 @@ typedef enum {
 *@param pContainer le container de l'icone.
 *@param pEmblemType énumération du type d'embleme.
 */
-void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIconFile, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType);
+void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIconFile, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType, gboolean bPersistent);
 
-#define cairo_dock_make_emblem_from_surface(pSurface, pEmblemType) cairo_dock_draw_emblem_on_my_icon(myDrawContext, pSurface, myIcon, myContainer, pEmblemType);
+#define cairo_dock_make_emblem_from_surface(pSurface, pEmblemType, bPersistent) cairo_dock_draw_emblem_on_my_icon(myDrawContext, pSurface, myIcon, myContainer, pEmblemType, bPersistent);
+#define CD_APPLET_DRAW_EMBLEM_FROM_SURFACE(pSurface, pEmblemType) cairo_dock_draw_emblem_on_my_icon(myDrawContext, pSurface, myIcon, myContainer, pEmblemType, TRUE);
 
 /**
 *Dessine un embleme sur une icone a partir d'une surface.
@@ -79,7 +81,7 @@ void cairo_dock_draw_emblem_on_my_icon(cairo_t *pIconContext, const gchar *cIcon
 *@param pContainer le container de l'icone.
 *@param pEmblemType énumération du type d'embleme.
 */
-void cairo_dock_draw_emblem_from_surface (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType);
+void cairo_dock_draw_emblem_from_surface (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType, gboolean bPersistent);
 
 //Needed for emblem classic type
 typedef enum {
@@ -93,7 +95,8 @@ typedef enum {
 	CAIRO_DOCK_EMBLEM_CLASSIC_NB,
 } CairoDockClassicEmblem;
 
-#define cairo_dock_make_emblem(pEmblemClassic, pEmblemType) cairo_dock_draw_emblem_classic(myDrawContext, myIcon, myContainer, pEmblemClassic, pEmblemType);
+#define cairo_dock_make_emblem(pEmblemClassic, pEmblemType, bPersistent) cairo_dock_draw_emblem_classic(myDrawContext, myIcon, myContainer, pEmblemClassic, pEmblemType, bPersistent);
+#define CD_APPLET_DRAW_EMBLEM(pEmblemClassic, pEmblemType) cairo_dock_draw_emblem_classic(myDrawContext, myIcon, myContainer, pEmblemClassic, pEmblemType, TRUE);
 
 /**
 *Dessine un embleme sur une icone avec une banque local.
@@ -103,7 +106,7 @@ typedef enum {
 *@param pEmblemClassic énumération du type d'embleme classique.
 *@param pEmblemType énumération du type d'embleme.
 */
-void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoContainer *pContainer, CairoDockClassicEmblem pEmblemClassic, CairoDockEmblem pEmblemType);
+void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoContainer *pContainer, CairoDockClassicEmblem pEmblemClassic, CairoDockEmblem pEmblemType, gboolean bPersistent);
 
 /**
 *Cree les surfaces de reflection d'une icone.

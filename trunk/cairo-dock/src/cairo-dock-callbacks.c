@@ -174,7 +174,7 @@ gboolean on_expose (GtkWidget *pWidget,
 	if (pDock->bIsDragging && pPointedIcon != NULL)
 	{
 		cairo_translate (pCairoContext, pPointedIcon->fDrawX, pPointedIcon->fDrawY);
-		cairo_dock_draw_emblem_classic (pCairoContext, pPointedIcon, (CairoContainer *) pDock, CAIRO_DOCK_EMBLEM_DROP_INDICATOR, CAIRO_DOCK_EMBLEM_UPPER_RIGHT);
+		cairo_dock_draw_emblem_classic (pCairoContext, pPointedIcon, (CairoContainer *) pDock, CAIRO_DOCK_EMBLEM_DROP_INDICATOR, CAIRO_DOCK_EMBLEM_UPPER_RIGHT, FALSE);
 		//cairo_translate (pCairoContext, 0., 0.); //Utile de le recentrer?
 	}
 	

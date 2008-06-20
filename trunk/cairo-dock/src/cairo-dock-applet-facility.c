@@ -209,7 +209,7 @@ void cairo_dock_draw_bar_on_icon (cairo_t *pIconContext, double fValue, Icon *pI
 }
 
 //Fonctions proposée par Nécropotame, rédigée par ChAnGFu
-void cairo_dock_draw_emblem_on_my_icon (cairo_t *pIconContext, const gchar *cIconFile, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType)
+void cairo_dock_draw_emblem_on_my_icon (cairo_t *pIconContext, const gchar *cIconFile, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType, gboolean bPersistent)
 {
 	cd_debug ("%s (%s %d)", __func__, cIconFile, pEmblemType);
 	g_return_if_fail (pIcon != NULL && pContainer != NULL); 
@@ -221,25 +221,22 @@ void cairo_dock_draw_emblem_on_my_icon (cairo_t *pIconContext, const gchar *cIco
 	double fImgX, fImgY, fImgW, fImgH, emblemW = pIcon->fWidth / 3, emblemH = pIcon->fHeight / 3;
 	double fMaxScale = (CAIRO_DOCK_IS_DOCK (pContainer) ? (1 + g_fAmplitude) / 1 : 1);
 	pCairoSurface = cairo_dock_create_surface_from_image (cIconFile, pIconContext, fMaxScale, emblemW, emblemH, CAIRO_DOCK_KEEP_RATIO, &fImgW, &fImgH, NULL, NULL);
-
-	cairo_dock_draw_emblem_from_surface (pIconContext, pCairoSurface, pIcon, pContainer, pEmblemType);
+	cairo_dock_draw_emblem_from_surface (pIconContext, pCairoSurface, pIcon, pContainer, pEmblemType, bPersistent);
 
 	cairo_surface_destroy (pCairoSurface);
 }
 
-void cairo_dock_draw_emblem_from_surface (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType)
+void cairo_dock_draw_emblem_from_surface (cairo_t *pIconContext, cairo_surface_t *pSurface, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType, gboolean bPersistent)
 {
-	cd_debug ("%s (%d)", __func__, pEmblemType);
+	cd_debug ("%s (%d %d)", __func__, pEmblemType, bPersistent);
 	g_return_if_fail (pIcon != NULL && pContainer != NULL); 
 	
 	if (pSurface == NULL) 
 		return;
 	
-	cairo_surface_t *pCairoSurface=NULL;
-	double fImgX, fImgY, fImgW, fImgH, emblemW = pIcon->fWidth / 3, emblemH = pIcon->fHeight / 3;
+	double fImgX, fImgY, emblemW = pIcon->fWidth / 3, emblemH = pIcon->fHeight / 3;
 	double fMaxScale = (CAIRO_DOCK_IS_DOCK (pContainer) ? (1 + g_fAmplitude) / 1 : 1);
-	pCairoSurface = cairo_surface_create_similar (pSurface, CAIRO_CONTENT_COLOR_ALPHA, emblemW, emblemH);
-
+	
 	switch (pEmblemType) {
 		default:
 		case CAIRO_DOCK_EMBLEM_UPPER_RIGHT :
@@ -265,9 +262,9 @@ void cairo_dock_draw_emblem_from_surface (cairo_t *pIconContext, cairo_surface_t
 		case CAIRO_DOCK_EMBLEM_BACKGROUND :
 			fImgX = (pIcon->fWidth - emblemW - pIcon->fScale) * fMaxScale / 2.;
 			fImgY = 0.;
-			cairo_surface_t *pNewSurfaceGradated = cairo_surface_create_similar (pCairoSurface, CAIRO_CONTENT_COLOR_ALPHA, emblemW, emblemH);
+			cairo_surface_t *pNewSurfaceGradated = cairo_surface_create_similar (pSurface, CAIRO_CONTENT_COLOR_ALPHA, emblemW, emblemH);
 			cairo_t *pCairoContext = cairo_create (pNewSurfaceGradated);
-			cairo_set_source_surface (pCairoContext, pCairoSurface, 0, 0);
+			cairo_set_source_surface (pCairoContext, pSurface, 0, 0);
 
 			cairo_pattern_t *pGradationPattern = cairo_pattern_create_linear (0., 1., 0., (emblemH - 1.));  // de haut en bas.
 			g_return_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS);
@@ -281,21 +278,28 @@ void cairo_dock_draw_emblem_from_surface (cairo_t *pIconContext, cairo_surface_t
 
 			cairo_pattern_destroy (pGradationPattern);
 			cairo_destroy (pCairoContext);
-			pCairoSurface = pNewSurfaceGradated;
+			pSurface = pNewSurfaceGradated;
 		break;
 	}
 	
 	//cd_debug ("Emblem: X %.0f Y %.0f W %.0f H %.0f - Icon: W %.0f H %.0f", fImgX, fImgY, emblemW, emblemH, pIcon->fWidth, pIcon->fHeight);
 	
-	cairo_save (pIconContext);
-	cairo_translate (pIconContext, fImgX , fImgY);
-	cairo_set_source_surface (pIconContext, pCairoSurface, 0.0, 0.0);
+	if (!bPersistent)
+		cairo_save (pIconContext);
+		
+	cairo_set_source_surface (pIconContext, pSurface, fImgX, fImgY);
 	cairo_paint (pIconContext);
-	cairo_restore (pIconContext);
-	cairo_surface_destroy (pCairoSurface);
+	
+	if (!bPersistent)
+		cairo_restore (pIconContext);
 }
 
-void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoContainer *pContainer, CairoDockClassicEmblem pEmblemClassic, CairoDockEmblem pEmblemType)
+//Necessaire pour ne pas avoir a rechagrer tout le temps les surfaces
+cairo_surface_t *pEmblemSurface[CAIRO_DOCK_EMBLEM_CLASSIC_NB];
+double fEmblemW[CAIRO_DOCK_EMBLEM_CLASSIC_NB];
+double fEmblemH[CAIRO_DOCK_EMBLEM_CLASSIC_NB];
+
+void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoContainer *pContainer, CairoDockClassicEmblem pEmblemClassic, CairoDockEmblem pEmblemType, gboolean bPersistent)
 {
 	cd_debug ("%s (%s %d)", __func__, pIcon->acName, pEmblemType);
 	g_return_if_fail (pIcon != NULL); 
@@ -327,7 +331,19 @@ void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoCo
 		//Il reste les svg de play pause stop broken a faire.
 	}
 	
-	cairo_dock_draw_emblem_on_my_icon (pIconContext, cClassicEmblemPath, pIcon, pContainer, pEmblemType);
+	//On évite de recharger les surfaces
+	double fImgX, fImgY, fImgW, fImgH, emblemW = pIcon->fWidth / 3, emblemH = pIcon->fHeight / 3;
+	double fMaxScale = (CAIRO_DOCK_IS_DOCK (pContainer) ? (1 + g_fAmplitude) / 1 : 1);
+	if (pEmblemSurface[pEmblemClassic] == NULL || (fEmblemW[pEmblemClassic] != emblemW || fEmblemH[pEmblemClassic] != emblemH)) {
+		if (pEmblemSurface[pEmblemClassic] != NULL)
+			cairo_surface_destroy (pEmblemSurface[pEmblemClassic]); //On sauvegarde au maximum de mémoire
+			
+		pEmblemSurface[pEmblemClassic] = cairo_dock_create_surface_from_image (cClassicEmblemPath, pIconContext, fMaxScale, emblemW, emblemH, CAIRO_DOCK_KEEP_RATIO, &fImgW, &fImgH, NULL, NULL);
+		fEmblemW[pEmblemClassic] = emblemW;
+		fEmblemH[pEmblemClassic] = emblemH;
+	} //On (re)charge uniquement si la surface n'existe pas ou si les emblems on changés de tailles (en particulier les desklets)
+	
+	cairo_dock_draw_emblem_from_surface (pIconContext, pEmblemSurface[pEmblemClassic], pIcon, pContainer, pEmblemType, bPersistent);
 	g_free (cClassicEmblemPath);
 }
 
