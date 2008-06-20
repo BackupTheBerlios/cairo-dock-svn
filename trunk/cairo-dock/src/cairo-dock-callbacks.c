@@ -43,7 +43,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-keybinder.h"
 #include "cairo-dock-desklet.h"
 #include "cairo-dock-callbacks.h"
-#include "cairo-dock-applet-facility.h" //Drop Indicator
+#include "cairo-dock-emblem.h" //Drop Indicator
 
 static Icon *s_pIconClicked = NULL;  // pour savoir quand on deplace une icone a la souris. Dangereux si l'icone se fait effacer en cours ...
 static CairoDock *s_pLastPointedDock = NULL;  // pour savoir quand on passe d'un dock a un autre.
