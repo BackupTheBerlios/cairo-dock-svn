@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4.5\n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-06-18 09:46+0200\n"
+"POT-Creation-Date: 2008-06-19 02:12+0200\n"
 "PO-Revision-Date: 2008-05-23 08:33+0100\n"
 "Last-Translator: Yann SLADEK <mav@cairo-dock.org>\n"
 "Language-Team: Cairo-Dock <po@cairo-dock.org>\n"
@@ -17,11 +17,11 @@ msgstr ""
 "X-Poedit-Language: French\n"
 "X-Poedit-Country: France\n"
 
-#: ../src/cairo-dock-callbacks.c:987
+#: ../src/cairo-dock-callbacks.c:971
 msgid "Do you want to mount this point ?"
 msgstr "Voulez-vous monter ce point ?"
 
-#: ../src/cairo-dock-callbacks.c:1687
+#: ../src/cairo-dock-callbacks.c:1671
 msgid "Quit Cairo-Dock ?"
 msgstr "Quitter Cairo-Dock ?"
 
@@ -55,7 +55,7 @@ msgstr "monter"
 msgid "unmount"
 msgstr "démonter"
 
-#: ../src/cairo-dock-gui-factory.c:1485
+#: ../src/cairo-dock-gui-factory.c:1487
 msgid "grab"
 msgstr "récupérer"
 
@@ -616,11 +616,11 @@ msgstr "Ecraser les icônes X avec celles des lanceurs ?"
 
 #: ../data/messages:77
 msgid "You need a composite manager for it."
-msgstr ""
+msgstr "Nécessite la présence d'un gestionnaire de composite."
 
 #: ../data/messages:79
-msgid "Show a window thumbnail when it's not minimized ?"
-msgstr ""
+msgid "Show a window thumbnail when it's minimized ?"
+msgstr "Montrer une miniature de la fenêtre lorsqu'elle est minimisée ?"
 
 #: ../data/messages:81
 msgid "Interaction"

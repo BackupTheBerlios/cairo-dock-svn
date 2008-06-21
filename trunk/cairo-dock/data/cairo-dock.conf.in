@@ -87,7 +87,7 @@ mix launcher appli = true
 #{If not set, will use the icon provided by X for each appli. If set, the same icon as the corresponding launcher will be used for each appli.}
 overwrite xicon = true
 
-#b Show a window thumbnail when it's not minimized ?
+#b Show a window thumbnail when it's minimized ?
 #{You need a composite manager for it.}
 window thumbnail = true
 
@@ -617,36 +617,36 @@ background color = 1.0; 1.0; 1.0; 0.2
 background color inside = 1.0; 1.0; 1.0; 0.6
 
 
-#[gtk-dialog-info]
-[Emblems]
-#F+[Options]
-frame_ops =
-#b+ Display a drop indicator on icon while drag'n'drop ?
-drop indiicator = true
+##[gtk-dialog-info]
+#[Emblems]
+##F+[Options]
+#frame_ops =
+##b+ Display a drop indicator on icon while drag'n'drop ?
+#drop indiicator = true
 
-#F+[Images]
-frame_img =
-#S+ Name of an image to use for the charge emblem :
-#{If you don't provide any, a default image will be used.}
-emblem_1 = 
-#S+ Name of an image to use for the drop indicator emblem :
-#{If you don't provide any, a default image will be used.}
-emblem_2 = 
-#S+ Name of an image to use for the play emblem :
-#{If you don't provide any, a default image will be used.}
-emblem_3 = 
-#S+ Name of an image to use for the pause emblem :
-#{If you don't provide any, a default image will be used.}
-emblem_4 = 
-#S+ Name of an image to use for the stop emblem :
-#{If you don't provide any, a default image will be used.}
-emblem_5 = 
-#S+ Name of an image to use for the broken emblem :
-#{If you don't provide any, a default image will be used.}
-emblem_6 = 
-#S+ Name of an image to use for the error emblem :
-#{If you don't provide any, a default image will be used.}
-emblem_7 = 
-#S+ Name of an image to use for the warning emblem :
-#{If you don't provide any, a default image will be used.}
-emblem_8 = 
+##F+[Images]
+#frame_img =
+##S+ Name of an image to use for the charge emblem :
+##{If you don't provide any, a default image will be used.}
+#emblem_1 = 
+##S+ Name of an image to use for the drop indicator emblem :
+##{If you don't provide any, a default image will be used.}
+#emblem_2 = 
+##S+ Name of an image to use for the play emblem :
+##{If you don't provide any, a default image will be used.}
+#emblem_3 = 
+##S+ Name of an image to use for the pause emblem :
+##{If you don't provide any, a default image will be used.}
+#emblem_4 = 
+##S+ Name of an image to use for the stop emblem :
+##{If you don't provide any, a default image will be used.}
+#emblem_5 = 
+##S+ Name of an image to use for the broken emblem :
+##{If you don't provide any, a default image will be used.}
+#emblem_6 = 
+##S+ Name of an image to use for the error emblem :
+##{If you don't provide any, a default image will be used.}
+#emblem_7 = 
+##S+ Name of an image to use for the warning emblem :
+##{If you don't provide any, a default image will be used.}
+#emblem_8 = 

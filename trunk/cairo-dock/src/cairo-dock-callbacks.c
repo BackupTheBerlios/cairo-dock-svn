@@ -169,14 +169,13 @@ gboolean on_expose (GtkWidget *pWidget,
 	
 	//Indicateur de drop, ca prend un petit peu de ressources, je me demande si ce serai pas mieux de mettre en cache les emblèmes classiques
 	//Pour gagner en rapidité, parce que du coup on charge la surface à chaques mouvements dans le dock.
-	Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
-	//Icon *pPointedIcon = pDock->calculate_icons (pDock);
+	/**Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
 	if (pDock->bIsDragging && pPointedIcon != NULL)
 	{
 		cairo_translate (pCairoContext, pPointedIcon->fDrawX, pPointedIcon->fDrawY);
 		cairo_dock_draw_emblem_classic (pCairoContext, pPointedIcon, (CairoContainer *) pDock, CAIRO_DOCK_EMBLEM_DROP_INDICATOR, CAIRO_DOCK_EMBLEM_UPPER_RIGHT, FALSE);
-		//cairo_translate (pCairoContext, 0., 0.); //Utile de le recentrer?
-	}
+	}*/
+	/// je mets en commentaire pour la 1.6.0 car ca manque de tests.
 	
 	cairo_destroy (pCairoContext);
 	

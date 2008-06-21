@@ -1237,15 +1237,15 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 			}
 			else
 			{
-				menu_item = gtk_menu_item_new_with_label ("Delete this file");
+				menu_item = gtk_menu_item_new_with_label (_("Delete this file"));
 				gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 				g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(_cairo_dock_delete_file), data);
 
-				menu_item = gtk_menu_item_new_with_label ("Rename this file");
+				menu_item = gtk_menu_item_new_with_label (_("Rename this file"));
 				gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 				g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(_cairo_dock_rename_file), data);
 
-				menu_item = gtk_menu_item_new_with_label ("Properties");
+				menu_item = gtk_menu_item_new_with_label (_("Properties"));
 				gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 				g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(_cairo_dock_show_file_properties), data);
 			}
