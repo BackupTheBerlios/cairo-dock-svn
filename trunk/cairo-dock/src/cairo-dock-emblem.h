@@ -3,6 +3,15 @@
 
 #include "cairo-dock-struct.h"
 
+typedef struct _CairoDockFullEmblem CairoDockFullEmblem;
+
+struct _CairoDockFullEmblem {
+	cairo_surface_t *pSurface;
+	double fEmblemW;
+	double fEmblemH;
+	gchar *cImagePath;
+};
+
 //Needed for emblem type
 typedef enum {
 	CAIRO_DOCK_EMBLEM_UPPER_RIGHT = 0,

@@ -18,9 +18,7 @@ Written by ChAnGFu (for any bug report, please mail me to changfu@cairo-dock.org
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-emblem.h"
 
-cairo_surface_t *pEmblemSurface[CAIRO_DOCK_EMBLEM_CLASSIC_NB];
-double fEmblemW[CAIRO_DOCK_EMBLEM_CLASSIC_NB];
-double fEmblemH[CAIRO_DOCK_EMBLEM_CLASSIC_NB];
+CairoDockFullEmblem pFullEmblems[CAIRO_DOCK_EMBLEM_CLASSIC_NB];
 gchar *cEmblemConfPath[CAIRO_DOCK_EMBLEM_CLASSIC_NB];
 extern gchar *g_cConfFile;
 extern double g_fAmplitude;
@@ -141,7 +139,6 @@ void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoCo
 			case CAIRO_DOCK_EMBLEM_BROKEN:
 				cClassicEmblemPath = g_strdup_printf ("%s/emblems/broken.svg", CAIRO_DOCK_SHARE_DATA_DIR);
 			break;
-			//Il reste les svg de play pause stop broken a faire.
 		}
 	}
 	else
@@ -150,17 +147,21 @@ void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoCo
 	//On évite de recharger les surfaces
 	double fImgX, fImgY, fImgW, fImgH, emblemW = pIcon->fWidth / 3, emblemH = pIcon->fHeight / 3;
 	double fMaxScale = (CAIRO_DOCK_IS_DOCK (pContainer) ? (1 + g_fAmplitude) / 1 : 1);
-	if (pEmblemSurface[pEmblemClassic] == NULL || (fEmblemW[pEmblemClassic] != emblemW || fEmblemH[pEmblemClassic] != emblemH))
+	if (pFullEmblems[pEmblemClassic].pSurface == NULL || (pFullEmblems[pEmblemClassic].fEmblemW != emblemW || pFullEmblems[pEmblemClassic].fEmblemH != emblemH) || strcmp (pFullEmblems[pEmblemClassic].cImagePath, cClassicEmblemPath) != 0)
 	{
-		if (pEmblemSurface[pEmblemClassic] != NULL)
-			cairo_surface_destroy (pEmblemSurface[pEmblemClassic]); //On sauvegarde au maximum de mémoire
+		if (pFullEmblems[pEmblemClassic].pSurface != NULL)
+			cairo_surface_destroy (pFullEmblems[pEmblemClassic].pSurface); //On sauvegarde au maximum de mémoire
 			
-		pEmblemSurface[pEmblemClassic] = cairo_dock_create_surface_from_image (cClassicEmblemPath, pIconContext, fMaxScale, emblemW, emblemH, CAIRO_DOCK_KEEP_RATIO, &fImgW, &fImgH, NULL, NULL);
-		fEmblemW[pEmblemClassic] = emblemW;
-		fEmblemH[pEmblemClassic] = emblemH;
-	} //On (re)charge uniquement si la surface n'existe pas ou si les emblemes on changés de tailles (en particulier les desklets)
+		pFullEmblems[pEmblemClassic].pSurface = cairo_dock_create_surface_from_image (cClassicEmblemPath, pIconContext, fMaxScale, emblemW, emblemH, CAIRO_DOCK_KEEP_RATIO, &fImgW, &fImgH, NULL, NULL);
+		pFullEmblems[pEmblemClassic].fEmblemW = emblemW;
+		pFullEmblems[pEmblemClassic].fEmblemH = emblemH;
+		
+		if (pFullEmblems[pEmblemClassic].cImagePath != NULL)
+			g_free (pFullEmblems[pEmblemClassic].cImagePath);
+		pFullEmblems[pEmblemClassic].cImagePath = g_strdup (cClassicEmblemPath);
+	} //On (re)charge uniquement si la surface n'existe pas, si le fichier image est différent ou si les emblemes on changés de tailles (en particulier pour les desklets)
 	
-	cairo_dock_draw_emblem_from_surface (pIconContext, pEmblemSurface[pEmblemClassic], pIcon, pContainer, pEmblemType, bPersistent);
+	cairo_dock_draw_emblem_from_surface (pIconContext, pFullEmblems[pEmblemClassic].pSurface, pIcon, pContainer, pEmblemType, bPersistent);
 	g_free (cClassicEmblemPath);
 }
 
@@ -198,8 +199,10 @@ void cairo_dock_free_emblem (void)
 		g_free(cEmblemConfPath[i]);
 		
 	for (i = 0; i <= CAIRO_DOCK_EMBLEM_CLASSIC_NB; i++) {
-		if (pEmblemSurface[i] != NULL)
-			cairo_surface_destroy(pEmblemSurface[i]);
+		if (pFullEmblems[i].pSurface != NULL)
+			cairo_surface_destroy(pFullEmblems[i].pSurface);
+		if (pFullEmblems[i].cImagePath != NULL)
+			g_free (pFullEmblems[i].cImagePath);
 	}
 }
 
