@@ -109,30 +109,26 @@ void on_realize (GtkWidget* pWidget,
 {
 	if (! g_bUseOpenGL)
 		return ;
-	if (! pDock->bIsMainDock)
-		return ;
 	g_print ("%s ()\n", __func__);
 	
-	GLfloat afLightDiffuse[] = {1.0f, 1.0f, 1.0f, 0.0f};
 	GdkGLContext* pGlContext = gtk_widget_get_gl_context (pWidget);
 	GdkGLDrawable* pGlDrawable = gtk_widget_get_gl_drawable (pWidget);
-
-	/* make GL-context "current" */
 	if (!gdk_gl_drawable_gl_begin (pGlDrawable, pGlContext))
 		return;
 
-	glColor4f (0.0f, 0.0f, 0.0f, 0.0f);
 	glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
 	glClearDepth (1.0f);
 	glDisable (GL_DEPTH_TEST);
-	glEnable (GL_NORMALIZE);
+	glEnable(GL_DEPTH_TEST);
+	glEnable (GL_NORMALIZE);  // couteux ...
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE);  // glBlendFunc (GL_SRC_ALPHA, GL_ONE);
 	glShadeModel (GL_FLAT);
 	glEnable (GL_TEXTURE_2D);  // glEnable (GL_TEXTURE_RECTANGLE_ARB);
-	glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+	glPolygonMode (GL_FRONT, GL_FILL);
 	glDisable (GL_CULL_FACE);
-	/*glLightModelf (GL_LIGHT_MODEL_TWO_SIDE, 0.0f);
+	/*GLfloat afLightDiffuse[] = {1.0f, 1.0f, 1.0f, 0.0f};
+	glLightModelf (GL_LIGHT_MODEL_TWO_SIDE, 0.0f);
 	glEnable (GL_LIGHTING);
 	glEnable (GL_LIGHT0);
 	glLightfv (GL_LIGHT0, GL_DIFFUSE, afLightDiffuse);*/
@@ -142,21 +138,13 @@ void on_realize (GtkWidget* pWidget,
 	g_print ("OpenGL renderer: %s\n", glGetString (GL_RENDERER));
 
 	glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);  // GL_MODULATE / GL_DECAL /  GL_BLEND
-	glTexParameteri (GL_TEXTURE_RECTANGLE_ARB,
+	glTexParameteri (GL_TEXTURE_2D,
 			 GL_TEXTURE_MIN_FILTER,
 			 GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri (GL_TEXTURE_RECTANGLE_ARB,
+	glTexParameteri (GL_TEXTURE_2D,
 			 GL_TEXTURE_MAG_FILTER,
 			 GL_LINEAR);
 
-	glMatrixMode (GL_MODELVIEW);
-	glLoadIdentity ();
-	gluLookAt (0.0f, 0.0f, Z_NEAR,
-		   0.0f, 0.0f, 0.0f,
-		   0.0f, 1.0f, 0.0f);
-	glTranslatef (0.0f, 0.0f, -Z_NEAR);
-
-	/* end drawing to current GL-context */
 	gdk_gl_drawable_gl_end (pGlDrawable);
 }
 
@@ -433,7 +421,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			pDock->iMouseY = (int) pMotion->x;
 		}
 
-		if (pDock->iSidShrinkDown > 0 || pMotion->time - fLastTime < g_fRefreshInterval)  // si les icones sont en train de diminuer de taille (suite a un clic) on on laisse l'animation se finir, sinon elle va trop vite.  // || ! pDock->bInside || pDock->bAtBottom
+		if (pDock->iSidShrinkDown > 0 || (! g_bUseOpenGL && pMotion->time - fLastTime < g_fRefreshInterval))  // si les icones sont en train de diminuer de taille (suite a un clic) on on laisse l'animation se finir, sinon elle va trop vite.  // || ! pDock->bInside || pDock->bAtBottom
 		{
 			gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);
 			return FALSE;
@@ -1383,26 +1371,20 @@ gboolean on_configure (GtkWidget* pWidget,
 			
 			glViewport(0, 0, w, h);
 			
+			
+			
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-			gluPerspective(10.0, 1.0*(GLfloat)w/(GLfloat)h, 1.0, 30.0);
+			glOrtho(0, w, 0, h, 0.0, 500.0);
+			//gluPerspective(30.0, 1.0*(GLfloat)w/(GLfloat)h, 1.0, 500.0);
 			
-			glMatrixMode(GL_MODELVIEW);
-			glLoadIdentity();
-			glTranslatef(0.0, 0.0, -3.6);
-			
-			
-			/*glViewport (0, 0, w, h);
-			glMatrixMode(GL_MODELVIEW);  // GL_MODELVIEW / GL_PROJECTION
+			glMatrixMode (GL_MODELVIEW);
 			glLoadIdentity ();
-			gluPerspective (20, w / (float) h, .1, 50);*/
-	
-			/*glViewport (0, 0, w, h);
-			glMatrixMode (GL_PROJECTION);
-			glLoadIdentity ();
-			gluPerspective (2.0f * FOVY_2, (GLfloat) w / (GLfloat) h, 0.1f, 50.0f);*/
+			gluLookAt (w/2, h/2, Z_NEAR,
+				w/2, h/2, 0.,
+				0.0f, 1.0f, 0.0f);
+			glTranslatef (0.0f, 0.0f, -Z_NEAR);
 			
-			//glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			gdk_gl_drawable_gl_end (pGlDrawable);
 		}
 		

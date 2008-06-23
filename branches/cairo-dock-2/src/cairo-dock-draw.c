@@ -19,6 +19,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <cairo-glitz.h>
 #endif
 #include <gtk/gtkgl.h>
+#include <X11/extensions/Xrender.h> 
+#include <GL/gl.h> 
+#include <GL/glu.h> 
+#include <GL/glx.h> 
 
 #include "cairo-dock-icons.h"
 #include "cairo-dock-dock-factory.h"
@@ -119,6 +123,7 @@ void cairo_dock_set_colormap (CairoContainer *pContainer)
 				vinfo = glitz_glx_get_visual_info_from_format (xdisplay,
 					screen,
 					format);
+				g_print ("vinfo->depth : %d\n", vinfo->depth);
 				if (vinfo->depth == 32)
 				{
 					pContainer->pDrawFormat = format;
@@ -149,9 +154,176 @@ void cairo_dock_set_colormap (CairoContainer *pContainer)
 			return ;
 		}
 	}
+	else
 #endif
 	
-	cairo_dock_set_colormap_for_window (pContainer->pWidget);
+	if (g_bUseOpenGL)
+	{
+		/*int i;
+		GdkDisplay	   *gdkdisplay;
+		Display	   *XDisplay;
+		Window	   xid;
+		GdkVisual		    *visual;
+
+		gdkdisplay = gdk_display_get_default ();
+		XDisplay   = gdk_x11_display_get_xdisplay (gdkdisplay);
+		xid = gdk_x11_drawable_get_xid (GDK_DRAWABLE (pContainer->pWidget->window));
+		Window root = XRootWindow(XDisplay, 0);
+		
+		XWindowAttributes attrib;
+		XVisualInfo templ;
+		XVisualInfo *visinfo;
+		int nvisinfo, defaultDepth, value;
+		
+		
+		GLXFBConfig*	     pFBConfigs; 
+		XRenderPictFormat*   pPictFormat = NULL; 
+		int doubleBufferAttributes[] = { 
+	GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT, 
+	GLX_RENDER_TYPE,   GLX_RGBA_BIT, 
+	GLX_DOUBLEBUFFER,  True, 
+	GLX_RED_SIZE,      1, 
+	GLX_GREEN_SIZE,    1, 
+	GLX_BLUE_SIZE,     1, 
+	GLX_ALPHA_SIZE,    1, 
+	GLX_DEPTH_SIZE,    1, 
+	None 
+}; 
+		
+		int iNumOfFBConfigs;
+		pFBConfigs = glXChooseFBConfig (XDisplay, 
+ 					DefaultScreen (XDisplay), 
+ 					doubleBufferAttributes, 
+ 					&iNumOfFBConfigs); 
+		
+		if (pFBConfigs == NULL) 
+		{ 
+			fprintf (stderr, "Argl, we could not get an ARGB-visual!\n"); 
+			return ; 
+		} 
+		
+		gboolean bKeepGoing=FALSE;
+		GLXFBConfig	     renderFBConfig; 
+		XVisualInfo*	     pVisInfo; 
+		for (i = 0; i < iNumOfFBConfigs; i++) 
+		{ 
+			pVisInfo = glXGetVisualFromFBConfig (XDisplay, pFBConfigs[i]); 
+			if (!pVisInfo) 
+				continue; 
+	
+			pPictFormat = XRenderFindVisualFormat (XDisplay, 
+							pVisInfo->visual); 
+			if (!pPictFormat) 
+				continue; 
+	
+			if (pPictFormat->direct.alphaMask > 0) 
+			{ 
+				fprintf (stderr, "Strike, found a GLX visual with"); 
+				fprintf (stderr, " alpha-support!\n"); 
+				pVisInfo = glXGetVisualFromFBConfig (XDisplay, 
+								pFBConfigs[i]); 
+				renderFBConfig = pFBConfigs[i]; 
+				bKeepGoing = True; 
+				break; 
+			} 
+	
+			XFree (pVisInfo); 
+		} 
+		
+		visual = gdkx_visual_get (pVisInfo->visualid);
+		pColormap = gdk_colormap_new (visual, TRUE);
+		gtk_widget_set_colormap (pContainer->pWidget, pColormap);
+		gtk_widget_set_double_buffered (pContainer->pWidget, FALSE);
+		return ;
+		
+		
+		if (!XGetWindowAttributes(XDisplay, root, &attrib))
+		{
+			fprintf(stderr, "Unable to get window attributes\n");
+			return ;
+		}
+	
+		//templ.visualid = XVisualIDFromVisual(attrib.visual);
+		templ.depth = 32;
+		visinfo = XGetVisualInfo(XDisplay, VisualDepthMask, &templ, &nvisinfo);
+		if (!nvisinfo)
+		{
+			fprintf(stderr,"  Couldn't get visual info for default visual\n");
+			return ;
+		}
+		g_print ("depth : %d ; nvisinfo:%d\n", visinfo->depth, nvisinfo);
+		
+		for (i = 0; i < nvisinfo; i ++)
+		{
+			g_print ("visinfo[i].visualid : %d\n", visinfo[i].visualid);
+		}
+		
+		visual = gdkx_visual_get (visinfo[1].visualid);
+		
+		pColormap = gdk_colormap_new (visual, TRUE);
+
+			gtk_widget_set_colormap (pContainer->pWidget, pColormap);
+			gtk_widget_set_double_buffered (pContainer->pWidget, FALSE);*/
+			
+		glitz_drawable_format_t templ, *format;
+		unsigned long	    mask = GLITZ_FORMAT_DOUBLEBUFFER_MASK;
+		XVisualInfo		    *vinfo = NULL;
+		int			    screen = 0;
+		GdkVisual		    *visual;
+		GdkDisplay		    *gdkdisplay;
+		Display		    *xdisplay;
+
+		templ.doublebuffer = 1;
+		gdkdisplay = gtk_widget_get_display (pContainer->pWidget);
+		xdisplay   = gdk_x11_display_get_xdisplay (gdkdisplay);
+
+		int i = 0;
+		do
+		{
+			format = glitz_glx_find_window_format (xdisplay,
+				screen,
+				mask,
+				&templ,
+				i++);
+			if (format)
+			{
+				vinfo = glitz_glx_get_visual_info_from_format (xdisplay,
+					screen,
+					format);
+				g_print ("vinfo->depth : %d\n", vinfo->depth);
+				if (vinfo->depth == 32)
+				{
+					pContainer->pDrawFormat = format;
+					break;
+				}
+				else if (!pContainer->pDrawFormat)
+				{
+					pContainer->pDrawFormat = format;
+				}
+			}
+		} while (format);
+
+		if (! pContainer->pDrawFormat)
+		{
+			cd_message ("Attention : no double buffered GLX visual\n");
+		}
+		else
+		{
+			g_print ("colormap ok\n");
+			vinfo = glitz_glx_get_visual_info_from_format (xdisplay,
+				screen,
+				pContainer->pDrawFormat);
+
+			visual = gdkx_visual_get (vinfo->visualid);
+			pColormap = gdk_colormap_new (visual, TRUE);
+
+			gtk_widget_set_colormap (pContainer->pWidget, pColormap);
+			gtk_widget_set_double_buffered (pContainer->pWidget, FALSE);
+			return ;
+		}
+	}
+	else
+		cairo_dock_set_colormap_for_window (pContainer->pWidget);
 }
 
 

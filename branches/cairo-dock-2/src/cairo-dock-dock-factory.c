@@ -120,12 +120,14 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 
 	cairo_dock_set_colormap (CAIRO_CONTAINER (pDock));
 	if (g_bUseOpenGL)
+	{
 		gtk_widget_set_gl_capability (pWindow,
 			g_pGlConfig,
 			NULL,
 			TRUE,  // direct connection to the graphics system.
 			GDK_GL_RGBA_TYPE);
-
+	}
+	
 	gtk_widget_set_app_paintable (pWindow, TRUE);
 	gtk_window_set_decorated (GTK_WINDOW (pWindow), FALSE);
 	gtk_window_set_resizable (GTK_WINDOW (pWindow), TRUE);
@@ -316,23 +318,6 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	
 	if (! pDock->bIsMainDock)
 		cairo_dock_get_root_dock_position (cDockName, pDock);
-	
-	
-	GdkGLContext* pGlContext = gtk_widget_get_gl_context (pDock->pWidget);
-	GdkGLDrawable* pGlDrawable = gtk_widget_get_gl_drawable (pDock->pWidget);
-	if (!gdk_gl_drawable_gl_begin (pGlDrawable, pGlContext))
-		return pDock;
-	
-	/* select clearing color */
-	glClearColor (0.0, 0.0, 0.0, 0.0);
-	
-	/* initialize viewing values */
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-	
-	gdk_gl_drawable_gl_end (pGlDrawable);
 	
 	return pDock;
 }

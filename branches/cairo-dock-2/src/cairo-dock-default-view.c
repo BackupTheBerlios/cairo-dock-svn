@@ -45,6 +45,7 @@ extern double g_fStringColor[4];
 
 extern double g_fAmplitude;
 extern int g_iLabelSize;
+extern gboolean g_bUseOpenGL;
 
 
 void cairo_dock_set_subdock_position_linear (Icon *pPointedIcon, CairoDock *pDock)
@@ -112,141 +113,261 @@ void cairo_dock_calculate_construction_parameters_generic (Icon *icon, int iCurr
 	}
 }
 
+
+
 void cairo_dock_render_linear (CairoDock *pDock)
 {
 	cairo_t *pCairoContext;
 	
-	GdkGLContext* pGlContext = gtk_widget_get_gl_context (pDock->pWidget);
-	GdkGLDrawable* pGlDrawable = gtk_widget_get_gl_drawable (pDock->pWidget);
-
-	/* make GL-context "current" */
-	if (!gdk_gl_drawable_gl_begin (pGlDrawable, pGlContext))
-		return;
-	
-	static float alpha = 0;
-	
-	glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
-	glClear (GL_COLOR_BUFFER_BIT); 
-	
-	
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_ZERO, GL_ZERO);
-	glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
-	glFlush ();
-	gdk_gl_drawable_swap_buffers (pGlDrawable);
-	
-	
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClearDepth(1.0f);
-	glEnable(GL_DEPTH_TEST);
-	
-	glEnable (GL_TEXTURE_2D);
-	
-	
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-  /* Clear the buffer, clear the matrix */
-  glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glLoadIdentity();
-
-  /* A step backward, then spin the cube */
-   //glTranslatef (0, 0, -12);
-   //glRotatef (alpha, 1, 0, 0);
-
-/*    glBegin(GL_TRIANGLES);
-        glColor3f(1.0f, 0.0f, 0.0f);
-        glVertex3f(0.0f, 1.0f, 0.0f);
-        glColor3f(0.0f, 1.0f, 0.0f);
-        glVertex3f(-1.0f, -1.0f, 0.0f);
-        glColor3f(0.0f, 0.0f, 1.0f);
-        glVertex3f(1.0f, -1.0f, 0.0f);
-    glEnd();
-    glTranslatef(3.0f, 0.0f, 0.0f);*/
-    //glColor3f(0.5f, 0.5f, 1.0f);
-    //glBegin(GL_QUADS);
-//         glVertex3f(-1.0f, 1.0f, 0.0f);
-//         glVertex3f(1.0f, 1.0f, 0.0f);
-//         glVertex3f(1.0f, -1.0f, 0.0f);
-//         glVertex3f(-1.0f, -1.0f, 0.0f);
-// glEnd();
-
-  /* Rotate a bit more */
-  alpha = alpha + 3;
-	
-	GList *pFirstDrawnElement = (pDock->pFirstDrawnElement != NULL ? pDock->pFirstDrawnElement : pDock->icons);
-	if (pFirstDrawnElement != NULL)
+#ifdef HAVE_GLITZ
+	if (pDock->pDrawFormat && pDock->pGlitzDrawable)
 	{
-		Icon *icon;
-		GList *ic = pFirstDrawnElement;
-		do
-		{
-			icon = ic->data;
-
-			glBindTexture (GL_TEXTURE_2D, icon->iColorBuffer);
-			
-			
-			glPushMatrix ();
-			
-			
-			glTranslatef (25. * (icon->fDrawX - pDock->iCurrentWidth / 2) / pDock->iCurrentWidth, 0., -20.);  // pDock->iCurrentWidth / 2 - icon->fDrawX
-			glRotatef (alpha, 1, 0, 0);
-			//glColor3f(0.5f, 0.5f, 1.0f);
-			glColor3f(1.0f, 1.0f, 1.0f);
-			
-			glBegin(GL_QUADS);
+		glitz_context_t *ctx = glitz_context_create (pDock->pGlitzDrawable, pDock->pDrawFormat);
+		g_print ("ctx:%d\n", ctx);
+		
+		glitz_context_make_current (ctx, pDock->pGlitzDrawable);
+		
+		GLsizei w = pDock->iCurrentWidth;
+		GLsizei h = pDock->iCurrentHeight;
+		glViewport(0, 0, w, h);
+		
+// 		glMatrixMode(GL_PROJECTION);
+// 		glLoadIdentity();
+// 		glOrtho(0, w, 0, h, 0.0, 500.0);
+		
+		glMatrixMode (GL_MODELVIEW);
+		glLoadIdentity ();
+		gluLookAt (w/2, h/2, 3,
+			w/2, h/2, 0.,
+			0.0f, 1.0f, 0.0f);
+		glTranslatef (0.0f, 0.0f, -10);
+		
+		
+		static float alpha = 0;
+		glBlendFunc(GL_ZERO, GL_ZERO);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearDepth(1.0f);
+		glFlush ();
+		
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glLoadIdentity();
+		glColor4f(0.0f, 0.0f, 0.0f, .5);
+		
+		Icon *icon = pDock->icons->data;
+		glBindTexture (GL_TEXTURE_2D, icon->iColorBuffer);
+		glBegin(GL_QUADS);
 			// Front Face (note that the texture's corners have to match the quad's corners)
 			glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);  // Bottom Left Of The Texture and Quad
 			glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
 			glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);  // Top Right Of The Texture and Quad
 			glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,  1.0f,  1.0f);  // Top Left Of The Texture and Quad
-			
-			// Back Face 
-			glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);  // Bottom Right Of The Texture and Quad
-			glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);  // Top Right Of The Texture and Quad
-			glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);  // Top Left Of The Texture and Quad
-			glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);  // Bottom Left Of The Texture and Quad
-			
-			// Top Face
-			glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);  // Top Left Of The Texture and Quad
-			glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,  1.0f,  1.0f);  // Bottom Left Of The Texture and Quad
-			glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,  1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
-			glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);  // Top Right Of The Texture and Quad
-			
-			// Bottom Face
-			glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f, -1.0f, -1.0f);  // Top Right Of The Texture and Quad
-			glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f, -1.0f, -1.0f);  // Top Left Of The Texture and Quad
-			glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);  // Bottom Left Of The Texture and Quad
-			glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
-			
-			// Right face
-			glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);  // Bottom Right Of The Texture and Quad
-			glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);  // Top Right Of The Texture and Quad
-			glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);  // Top Left Of The Texture and Quad
-			glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);  // Bottom Left Of The Texture and Quad
-			
-			// Left Face
-			glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);  // Bottom Left Of The Texture and Quad
-			glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
-			glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);  // Top Right Of The Texture and Quad
-			glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);  // Top Left Of The Texture and Quad
-			glEnd();
-			
-			glPopMatrix ();
-			
-			ic = cairo_dock_get_next_element (ic, pDock->icons);
-		} while (ic != pFirstDrawnElement);
+		glEnd ();
+		glFlush ();
+		
+		/*glPushMatrix ();
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glLoadIdentity();
+		glTranslatef (0, 0, -10);
+		glColor3f(1.0f, 1.0f, 1.0f);
+				
+				glBegin(GL_QUADS);
+				// Front Face (note that the texture's corners have to match the quad's corners)
+				glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);  // Bottom Left Of The Texture and Quad
+				glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
+				glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);  // Top Right Of The Texture and Quad
+				glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,  1.0f,  1.0f);  // Top Left Of The Texture and Quad
+				
+				// Back Face 
+				glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);  // Bottom Right Of The Texture and Quad
+				glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);  // Top Right Of The Texture and Quad
+				glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);  // Top Left Of The Texture and Quad
+				glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);  // Bottom Left Of The Texture and Quad
+				
+				// Top Face
+				glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);  // Top Left Of The Texture and Quad
+				glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,  1.0f,  1.0f);  // Bottom Left Of The Texture and Quad
+				glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,  1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
+				glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);  // Top Right Of The Texture and Quad
+				
+				// Bottom Face
+				glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f, -1.0f, -1.0f);  // Top Right Of The Texture and Quad
+				glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f, -1.0f, -1.0f);  // Top Left Of The Texture and Quad
+				glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);  // Bottom Left Of The Texture and Quad
+				glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
+				
+				// Right face
+				glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);  // Bottom Right Of The Texture and Quad
+				glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);  // Top Right Of The Texture and Quad
+				glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);  // Top Left Of The Texture and Quad
+				glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);  // Bottom Left Of The Texture and Quad
+				
+				// Left Face
+				glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);  // Bottom Left Of The Texture and Quad
+				glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
+				glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);  // Top Right Of The Texture and Quad
+				glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);  // Top Left Of The Texture and Quad
+				glEnd();
+		
+		glPopMatrix ();
+		
+		
+		glFlush ();
+		*/
+		glitz_context_destroy (ctx);
+		if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
+			glitz_drawable_swap_buffers (pDock->pGlitzDrawable);
+		return ;
 	}
-	
-	
-	
-	glFlush ();
-	
-	glDisable(GL_BLEND);
-	gdk_gl_drawable_swap_buffers (pGlDrawable);
-	
-	gdk_gl_drawable_gl_end (pGlDrawable);
-	return ;
-	
+#endif
+	if (g_bUseOpenGL)
+	{
+		GdkGLContext *pGlContext = gtk_widget_get_gl_context (pDock->pWidget);
+		GdkGLDrawable *pGlDrawable = gtk_widget_get_gl_drawable (pDock->pWidget);
+		if (!gdk_gl_drawable_gl_begin (pGlDrawable, pGlContext))
+			return;
+		
+		static float alpha = 0;
+		GLsizei w = pDock->iCurrentWidth;
+		GLsizei h = pDock->iCurrentHeight;
+		
+		glBlendFunc(GL_ZERO, GL_ZERO);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearDepth(1.0f);
+		glFlush ();
+		
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glLoadIdentity();
+		glTranslatef (0, 0, -pDock->iMaxIconHeight * (1 + g_fAmplitude) + 1);
+		glColor4f(1.0f, 0.0f, 0.0f, 1.0);
+		glFlush ();
+		
+		/*glLineWidth (2.0);
+		w -= 4;
+		h -= 4;
+		glTranslatef (2, 2, 0);
+		glDisable (GL_TEXTURE_2D);
+		GLfloat pFrameCtrlPts[4][4][3] = {
+			{ {10, 0, 0}, {10, 0, 0}, {w-10, 0, 0}, {w-10, 0, 0} },
+			{ {0, 10, 0}, {0, 10, 0}, {w, 10, 0}, {w, 10, 0} },
+			{ {0, h-10, 0}, {0, h-10, 0}, {w, h-10, 0}, {w, h-10, 0} },
+			{ {10, h, 0}, {10, h, 0}, {w-10, h, 0}, {w-10, h, 0} } };
+		
+		glMap2f (GL_MAP2_VERTEX_3,
+			0, 1.,
+			3,
+			4,
+			0, 1.,
+			12,
+			4,
+			&pFrameCtrlPts[0][0][0]);
+		glEnable(GL_MAP2_VERTEX_3);
+		glEnable(GL_AUTO_NORMAL);
+		glEnable(GL_NORMALIZE);
+		glMapGrid2f (2,
+			0.0, 1.,
+			2,
+			0.0, 1.);
+		
+		glPushMatrix ();
+		glEvalMesh2(GL_LINE, 0, 2, 0, 2);
+		double t[4] = {0., 10./h, 1-10./h, 1.};
+		int Nx=4, Ny=4;
+		int i, j;
+		for( j = 0 ; j <= Ny ; j++ )
+		{
+			glBegin(GL_LINE_STRIP);
+			for( i = 0 ; i <= Nx ; i++ )
+				glEvalCoord2f((float)i/Nx, t[j]);
+			glEnd();
+			glBegin(GL_LINE_STRIP);
+			for(i = 0; i <= Nx; i++)
+				glEvalCoord2f((float)t[j], (float)i/Nx);
+			glEnd();
+		}	
+		
+		
+		glPopMatrix ();
+		glFlush ();
+		glEnable (GL_TEXTURE_2D);*/
+		
+		
+		
+		
+		
+		GList *pFirstDrawnElement = (pDock->pFirstDrawnElement != NULL ? pDock->pFirstDrawnElement : pDock->icons);
+		if (pFirstDrawnElement != NULL)
+		{
+			Icon *icon;
+			GList *ic = pFirstDrawnElement;
+			do
+			{
+				icon = ic->data;
+				glBindTexture (GL_TEXTURE_2D, icon->iColorBuffer);
+				
+				glPushMatrix ();
+				
+				glTranslatef (icon->fDrawX, pDock->iCurrentHeight - icon->fDrawY - icon->fScale * icon->fHeight/2, 0.);
+				glRotatef (alpha, 1, 0, 0);
+				glScalef (icon->fScale * icon->fWidth/sqrt(2.), icon->fScale * icon->fHeight/2/sqrt(2.), icon->fScale * icon->fHeight/2/sqrt(2.));
+				//glColor3f(0.5f, 0.5f, 1.0f);
+				glColor3f(1.0f, 1.0f, 1.0f);
+				
+				glBegin(GL_QUADS);
+				// Front Face (note that the texture's corners have to match the quad's corners)
+				glTexCoord2f(0.0f, 0.0f); glVertex3f(0.0f, 1,  1.0f);  // Bottom Left Of The Texture and Quad
+				glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, 1,  1.0f);  // Bottom Right Of The Texture and Quad
+				glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1,  1.0f);  // Top Right Of The Texture and Quad
+				glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0f,  -1,  1.0f);  // Top Left Of The Texture and Quad
+				
+				// Back Face 
+				glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0f, -1, -1.0f);  // Bottom Right Of The Texture and Quad
+				glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0f,  1, -1.0f);  // Top Right Of The Texture and Quad
+				glTexCoord2f(0.0f, 1.0f); glVertex3f( 0.0f, 1, -1.0f);  // Top Left Of The Texture and Quad
+				glTexCoord2f(0.0f, 0.0f); glVertex3f( 0.0f, -1, -1.0f);  // Bottom Left Of The Texture and Quad
+				
+				// Top Face
+				glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0f,  1, 1.0f);  // Top Left Of The Texture and Quad
+				glTexCoord2f(0.0f, 0.0f); glVertex3f(0.0f,  1,  -1.0f);  // Bottom Left Of The Texture and Quad
+				glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,  1,  -1.0f);  // Bottom Right Of The Texture and Quad
+				glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1, 1.0f);  // Top Right Of The Texture and Quad
+				
+				// Bottom Face
+				glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0f, -1, -1.0f);  // Top Right Of The Texture and Quad
+				glTexCoord2f(0.0f, 1.0f); glVertex3f( 0.0f, -1, -1.0f);  // Top Left Of The Texture and Quad
+				glTexCoord2f(0.0f, 0.0f); glVertex3f( 0.0f, -1,  1.0f);  // Bottom Left Of The Texture and Quad
+				glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1,  1.0f);  // Bottom Right Of The Texture and Quad
+				
+				// Right face
+				glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1, -1.0f);  // Bottom Right Of The Texture and Quad
+				glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);  // Top Right Of The Texture and Quad
+				glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);  // Top Left Of The Texture and Quad
+				glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);  // Bottom Left Of The Texture and Quad
+				
+				// Left Face
+				glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.0f, -1.0f, -1.0f);  // Bottom Left Of The Texture and Quad
+				glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.0f, -1.0f,  1.0f);  // Bottom Right Of The Texture and Quad
+				glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.0f,  1.0f,  1.0f);  // Top Right Of The Texture and Quad
+				glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.0f, 1.0f, -1.0f);  // Top Left Of The Texture and Quad
+				glEnd();
+				
+				glPopMatrix ();
+				
+				ic = cairo_dock_get_next_element (ic, pDock->icons);
+			} while (ic != pFirstDrawnElement);
+		}
+		
+		glFlush ();
+		
+		alpha = alpha + 2;
+		
+		gdk_gl_drawable_swap_buffers (pGlDrawable);
+		gdk_gl_drawable_gl_end (pGlDrawable);
+		return ;
+	}
 	
 	
 	//\____________________ On cree le contexte du dessin.
@@ -259,10 +380,6 @@ void cairo_dock_render_linear (CairoDock *pDock)
 	cairo_paint (pCairoContext);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 	
-	
-	
-	
-	return ;
 	//\____________________ On trace le cadre.
 	double fChangeAxes = 0.5 * (pDock->iCurrentWidth - pDock->iMaxDockWidth);
 	double fLineWidth = g_iDockLineWidth;
