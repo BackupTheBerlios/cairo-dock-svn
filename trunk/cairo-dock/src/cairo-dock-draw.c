@@ -722,9 +722,9 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 				if (bHorizontalDock)
 				{
 					pGradationPattern = cairo_pattern_create_linear (0.,
+						(bDirectionUp ? 0. : g_fReflectSize / fRatio * (1 + g_fAmplitude)),
 						0.,
-						0.,
-						g_fReflectSize / fRatio * (1 + g_fAmplitude) / icon->fScale);  // de haut en bas.
+						(bDirectionUp ? g_fReflectSize / fRatio * (1 + g_fAmplitude) / icon->fScale : g_fReflectSize / fRatio * (1 + g_fAmplitude) * (1. - 1./ icon->fScale)));  // de haut en bas.
 					g_return_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS);
 					
 					cairo_pattern_set_extend (pGradationPattern, CAIRO_EXTEND_NONE);
@@ -733,19 +733,19 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 						0.,
 						0.,
 						0.,
-						(bDirectionUp ? 1. : 1 - (icon->fScale - 1) / g_fAmplitude));  // astuce pour ne pas avoir a re-creer la surface de la reflection.
+						1.);
 					cairo_pattern_add_color_stop_rgba (pGradationPattern,
 						1.,
 						0.,
 						0.,
 						0.,
-						(bDirectionUp ? 1 - (icon->fScale - 1) / g_fAmplitude : 1.));
+						1 - (icon->fScale - 1) / g_fAmplitude);  // astuce pour ne pas avoir a re-creer la surface de la reflection.
 				}
-				else  // ca buggue a gauche...
+				else
 				{
-					pGradationPattern = cairo_pattern_create_linear (0.,
+					pGradationPattern = cairo_pattern_create_linear ((bDirectionUp ? 0. : g_fReflectSize / fRatio * (1 + g_fAmplitude)),
 						0.,
-						g_fReflectSize / fRatio * (1 + g_fAmplitude) / icon->fScale,
+						(bDirectionUp ? g_fReflectSize / fRatio * (1 + g_fAmplitude) / icon->fScale : g_fReflectSize / fRatio * (1 + g_fAmplitude) * (1. - 1./ icon->fScale)),
 						0.);
 					g_return_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS);
 					
@@ -755,13 +755,13 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 						0.,
 						0.,
 						0.,
-						(bDirectionUp ? 1. : 1 - (icon->fScale - 1) / g_fAmplitude));  // astuce pour ne pas avoir a re-creer la surface de la reflection.
+						1.);
 					cairo_pattern_add_color_stop_rgba (pGradationPattern,
 						1.,
 						0.,
 						0.,
 						0.,
-						(bDirectionUp ? 1 - (icon->fScale - 1) / g_fAmplitude : 1.));
+						1. - (icon->fScale - 1) / g_fAmplitude);  // astuce pour ne pas avoir a re-creer la surface de la reflection.
 				}
 				cairo_save (pCairoContext);
 				cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);

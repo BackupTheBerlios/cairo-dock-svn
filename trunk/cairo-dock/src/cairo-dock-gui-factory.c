@@ -917,7 +917,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 							GtkObject *pAdjustment = gtk_adjustment_new (iValue,
 								0,
 								1,
-								MAX (1, (iMaxValue - iMinValue) / 100),
+								1,
 								MAX (1, (iMaxValue - iMinValue) / 20),
 								0);
 

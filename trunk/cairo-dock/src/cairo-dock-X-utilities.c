@@ -622,10 +622,6 @@ gboolean cairo_dock_support_X_extension (void)
 	else
 		return FALSE;
 	
-	int i;
-	for ( int i = 0; i < ScreenCount (s_XDisplay); i++ )
-		XCompositeRedirectSubwindows (s_XDisplay, RootWindow (s_XDisplay, i), CompositeRedirectAutomatic );  // ne fait rien si un gestionnaire de composite l'a deja fait auparavant, et est automatiquement annule a la fin du programme.
-	
 	/*int iDamageError=0;
 	if (! XDamageQueryExtension (s_XDisplay, &g_iDamageEvent, &iDamageError))
 	{

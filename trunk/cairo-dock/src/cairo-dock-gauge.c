@@ -19,7 +19,7 @@ Written by Necropotame (for any bug report, please mail me to fabounet@users.ber
 #include <cairo-dock-dock-factory.h>
 #include <cairo-dock-gauge.h>
 
-extern int g_fAmplitude;
+extern double g_fAmplitude;
 
 
 void cairo_dock_xml_open_file (gchar *filePath, const gchar *mainNodeName,xmlDocPtr *myXmlDoc,xmlNodePtr *myXmlNode)

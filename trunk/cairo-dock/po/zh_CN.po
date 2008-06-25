@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-06-19 02:12+0200\n"
+"POT-Creation-Date: 2008-06-25 09:27+0200\n"
 "PO-Revision-Date: 2008-05-30 13:35-0500\n"
 "Last-Translator: biAji <biaji.cn@gmail.com>\n"
 "Language-Team: \n"
@@ -200,6 +200,20 @@ msgstr "挂载"
 #: ../src/cairo-dock-menu.c:1233
 msgid "Eject"
 msgstr "弹出"
+
+#: ../src/cairo-dock-menu.c:1240
+#, fuzzy
+msgid "Delete this file"
+msgstr "卸载此模块"
+
+#: ../src/cairo-dock-menu.c:1244
+#, fuzzy
+msgid "Rename this file"
+msgstr "移除此模块"
+
+#: ../src/cairo-dock-menu.c:1248
+msgid "Properties"
+msgstr ""
 
 #: ../src/cairo-dock-menu.c:1277
 msgid "Remove this launcher"
@@ -579,8 +593,9 @@ msgid "You need a composite manager for it."
 msgstr ""
 
 #: ../data/messages:79
-msgid "Show a window thumbnail when it's not minimized ?"
-msgstr ""
+#, fuzzy
+msgid "Show a window thumbnail when it's minimized ?"
+msgstr "仅显示最小化窗口的图标"
 
 #: ../data/messages:81
 msgid "Interaction"

@@ -87,7 +87,7 @@ mix launcher appli = true
 #{If not set, will use the icon provided by X for each appli. If set, the same icon as the corresponding launcher will be used for each appli.}
 overwrite xicon = true
 
-#b Show a window thumbnail when it's minimized ?
+#b- Show a window thumbnail when it's minimized ?
 #{You need a composite manager for it.}
 window thumbnail = true
 
@@ -128,7 +128,7 @@ max name length = 15
 
 #e-[-1;1] Transparency of icons whose window is or isn't minimized :
 #{To the right, you can control the transparency of minimized windows, to the left the transparency of visible windows. The more you go aside, the more the concerned icons will be transparent; on the middle, icons are always plain.}
-visibility alpha = 0.3
+visibility alpha = 0.25
 
 
 #[gtk-preferences]
@@ -359,7 +359,7 @@ icon gap = 0
 #{It is their transparency when the wave is flat; they will "materialize" progressively as the dock grows up. The closer to 0, the more transparent they will be.}
 alpha at rest = 1
 
-#F[Reflections]
+#F+[Reflections]
 frame_refl =
 
 #e+[0;1] Reflecting power of the plane :
@@ -395,7 +395,7 @@ text color start = 1;1;1
 #{It's the second color of the gradation. Set it to the same value as the first if you just don't want to have a gradation.}
 text color stop = 1;1;1
 
-#b Pattern should be vertical ?
+#b+ Pattern should be vertical ?
 #{If checked, the pattern will go from top to bottom, otherwise from left to right.}
 vertical label pattern = false
 
@@ -506,7 +506,7 @@ separator width = 0
 #i+[0;128] ...
 separator height = 0
 
-#b Automatically add separators ?
+#b+ Automatically add separators ?
 #{Separators are icons used to make a separation between different types of icons. Cairo-dock can automatically add them between launchers, applis, and applets.}
 use separator = true
 
@@ -530,13 +530,13 @@ icon's type order = launchers;applications;applets
 #[gtk-zoom-fit]
 [Views]
 
-#F[Main Dock]
+#F+[Main Dock]
 frame_main =
 
 #n+ Choose the default view for root docks :/
 main dock view = default
 
-#F[Sub-Docks]
+#F+[Sub-Docks]
 frame_sub =
 
 #n+ Choose the default view for sub-docks :
