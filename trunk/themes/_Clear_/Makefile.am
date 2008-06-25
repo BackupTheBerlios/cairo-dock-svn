@@ -9,7 +9,7 @@ theme_DATA = \
 	cairo-dock-cancel.svg\
 	cairo-dock-ok.svg\
 	task-indicator-blue.svg\
-	drop-indicator.png\
+	drop-indicator-starfall.png\
 	alsamixer.svg\
 	alsamixer-mute.svg\
 	fusion.svg\

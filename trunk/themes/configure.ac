@@ -78,5 +78,23 @@ AC_CONFIG_FILES([Makefile
 		_Neon2_/plug-ins/Makefile
 		_Neon2_/plug-ins/dustbin/Makefile
 		_Neon2_/plug-ins/logout/Makefile
+		_Brit_/Makefile
+		_Brit_/launchers/Makefile
+		_Brit_/plug-ins/Makefile
+		_Brit_/plug-ins/AlsaMixer/Makefile
+		_Brit_/plug-ins/Cairo-Penguin/Makefile
+		_Brit_/plug-ins/clock/Makefile
+		_Brit_/plug-ins/compiz-icon/Makefile
+		_Brit_/plug-ins/cpusage/Makefile
+		_Brit_/plug-ins/dustbin/Makefile
+		_Brit_/plug-ins/logout/Makefile
+		_Brit_/plug-ins/mail/Makefile
+		_Brit_/plug-ins/rendering/Makefile
+		_Brit_/plug-ins/shortcuts/Makefile
+		_Brit_/plug-ins/showDesktop/Makefile
+		_Brit_/plug-ins/stacks/Makefile
+		_Brit_/plug-ins/switcher/Makefile
+		_Brit_/plug-ins/terminal/Makefile
+		_Brit_/plug-ins/Xgamma/Makefile
 		])
 AC_OUTPUT

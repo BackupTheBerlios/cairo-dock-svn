@@ -10,4 +10,5 @@ SUBDIRS = \
 	_I_Cairo_\
 	_Wood_\
 	_Clear_\
-	_Neon2_
+	_Neon2_\
+	_Brit_
