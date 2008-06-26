@@ -30,6 +30,12 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-default-view.h"
 #include "cairo-dock-log.h"
 
+#define        RADIAN    (G_PI / 180.0)    // Conversion Radian/Degres 
+typedef struct 
+{ 
+    GLfloat x, y, z; 
+} sVertex;
+
 extern double g_fSubDockSizeRatio;
 
 extern gint g_iScreenWidth[2];
@@ -46,7 +52,7 @@ extern double g_fStringColor[4];
 extern double g_fAmplitude;
 extern int g_iLabelSize;
 extern gboolean g_bUseOpenGL;
-
+extern int g_iBackgroundTexture;
 
 void cairo_dock_set_subdock_position_linear (Icon *pPointedIcon, CairoDock *pDock)
 {
@@ -115,9 +121,134 @@ void cairo_dock_calculate_construction_parameters_generic (Icon *icon, int iCurr
 
 
 
+
+
+
+
+// du polygone de base avec les cotes arrondis
+
+void    GenerateVertex(sVertex *Temp, double ellipse, double fLongueurCadre, double fHauteurCadre, double fRayonY) 
+{ 
+    int i=0, t; 
+
+    //Temp = TableauVertex; 
+    int iPrecision=10;
+    double fRayonX=g_iDockRadius;
+
+    for (t = 0;t <= 90;t += iPrecision, i++) // Le cote haut droit 
+    { 
+        Temp[i].x = (fRayonX+ellipse) * sin(t*RADIAN) + (fLongueurCadre-ellipse)/2+(1.0f-fRayonX); 
+        Temp[i].y = (fRayonY+ellipse/2) * cos(t*RADIAN) + (fHauteurCadre-ellipse/2)/2+(1.0f-fRayonY); 
+        Temp[i].z = 0.0f; 
+
+    } 
+    for (t = 90;t <= 180;t += iPrecision, i++) // Bas droit 
+    { 
+        Temp[i].x = fRayonX * sin(t*RADIAN) + fLongueurCadre/2+(1.0f-fRayonX); 
+        Temp[i].y = fRayonY * cos(t*RADIAN) - fHauteurCadre/2-(1.0f-fRayonY); 
+        Temp[i].z = 0.0f; 
+    } 
+    for (t = 180;t <= 270;t += iPrecision, i++) // Bas gauche 
+    { 
+        Temp[i].x = fRayonX * sin(t*RADIAN) - fLongueurCadre/2-(1.0f-fRayonX); 
+        Temp[i].y = fRayonY * cos(t*RADIAN) - fHauteurCadre/2-(1.0f-fRayonY); 
+        Temp[i].z = 0.0f; 
+    } 
+    for (t = 270;t <= 360;t += iPrecision, i++) // Haut gauche 
+    { 
+        Temp[i].x = (fRayonX+ellipse) * sin(t*RADIAN) - (fLongueurCadre-ellipse)/2-(1.0f-fRayonX); 
+        Temp[i].y = (fRayonY+ellipse/2) * cos(t*RADIAN) + (fHauteurCadre-ellipse/2)/2+(1.0f-fRayonY); 
+        Temp[i].z = 0.0f; 
+    } 
+    Temp[i].x = (fRayonX+ellipse) * sin(0*RADIAN) + (fLongueurCadre-ellipse)/2+(1.0f-fRayonX ); // On rajoute ca pour boucler le polygone 
+    Temp[i].y = (fRayonY+ellipse/2) * cos(0*RADIAN) + (fHauteurCadre-ellipse/2)/2+(1.0f-fRayonY); 
+    Temp[i].z = 0.0f; 
+}
+
+
+// La fonction pour changer les formes
+
+gboolean ChangeShape(sVertex *Temp, char forme, double ellipse, double fLongueurCadre, double fHauteurCadre, double *_fInclinaisonCadre, double fRayonY)
+{ 
+    float                    fStepMorph        = 1000.0f; // Ca c'est pour la vitesse de transformation des shapes 
+    float    StepEllipse = fLongueurCadre / 2 / fStepMorph; 
+    float    StepInclinaison = 75.0f / fStepMorph; 
+    float    StepRayon = g_iDockRadius / fStepMorph; 
+float fInclinaisonCadre = *_fInclinaisonCadre;
+    if(forme == 0) // Passage en mode Curve 
+    { 
+
+        ellipse += StepEllipse; 
+        fInclinaisonCadre += StepInclinaison; 
+        if (fInclinaisonCadre >= 0.0f) 
+            fInclinaisonCadre = 0.0f; 
+        if (ellipse >= fLongueurCadre / 2) 
+        { 
+            ellipse = fLongueurCadre / 2; 
+            GenerateVertex(Temp, ellipse, fLongueurCadre, fHauteurCadre, fRayonY);
+           // if (fInclinaisonCadre == 0.0f) 
+            //    return FALSE; 
+           // else 
+            //    return TRUE; 
+        } 
+        else 
+        { 
+            GenerateVertex(Temp, ellipse, fLongueurCadre, fHauteurCadre, fRayonY); 
+            //return    TRUE; 
+        } 
+    } 
+    else if (forme == 1) // Passage au mode barre de face 
+    { 
+        ellipse -= StepEllipse; 
+        fInclinaisonCadre += StepInclinaison; 
+        if (fInclinaisonCadre >= 0.0f) 
+            fInclinaisonCadre = 0.0f; 
+        if (ellipse <= 0.0f) 
+        { 
+            ellipse = 0.0f; 
+            GenerateVertex(Temp, ellipse, fLongueurCadre, fHauteurCadre, fRayonY); 
+            //if (fInclinaisonCadre == 0.0f) 
+               // return FALSE; 
+           // else 
+               // return TRUE; 
+        } 
+        else 
+        { 
+            GenerateVertex(Temp, ellipse, fLongueurCadre, fHauteurCadre, fRayonY); 
+            //return TRUE; 
+        } 
+    } 
+    else if (forme == 2) // Passage en mode trapeze 
+    { 
+        ellipse -= StepEllipse; 
+        if (ellipse <= 0.0) 
+            ellipse = 0.0f; 
+        fInclinaisonCadre -= StepInclinaison; 
+        if (fInclinaisonCadre <= -75.0f) 
+        { 
+            ellipse = 0.0f; 
+            fInclinaisonCadre = -75.0f; 
+            GenerateVertex(Temp, ellipse, fLongueurCadre, fHauteurCadre, fRayonY); 
+           // return FALSE; 
+        } 
+        else 
+        { 
+            GenerateVertex(Temp, ellipse, fLongueurCadre, fHauteurCadre, fRayonY); 
+            //return TRUE; 
+        } 
+    } 
+    *_fInclinaisonCadre = fInclinaisonCadre;
+} 
+
 void cairo_dock_render_linear (CairoDock *pDock)
 {
 	cairo_t *pCairoContext;
+	double fLineWidth = g_iDockLineWidth;
+	double fMargin = g_iFrameMargin;
+	double fRadius = (pDock->iDecorationsHeight + fLineWidth - 2 * g_iDockRadius > 0 ? g_iDockRadius : (pDock->iDecorationsHeight + fLineWidth) / 2 - 1);
+	double fDockWidth = cairo_dock_get_current_dock_width_linear (pDock);
+	GList *pFirstDrawnElement = (pDock->pFirstDrawnElement != NULL ? pDock->pFirstDrawnElement : pDock->icons);
+	Icon *pFirstIcon = pFirstDrawnElement->data;
 	
 #ifdef HAVE_GLITZ
 	if (pDock->pDrawFormat && pDock->pGlitzDrawable)
@@ -234,16 +365,186 @@ void cairo_dock_render_linear (CairoDock *pDock)
 		GLsizei h = pDock->iCurrentHeight;
 		
 		glBlendFunc(GL_ZERO, GL_ZERO);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClearDepth(1.0f);
+		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glFlush ();
 		
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+		
+		/*float            fRayonX = fRadius; // Ton rayon X de tes rebords 
+		float            fRayonY = fRayonX; // Et le Y tu verras pourquoi j ai fait ca au lieu d'u seul 
+		float                    fLongueurCadre    = fDockWidth; // La longueur de ton rectangle 
+		float                    fHauteurCadre    = pDock->iMaxIconHeight; // La hauteur 
+		static float                    fInclinaisonCadre = 45.0f; // Petite variable pour l'incliner et donner l'effet trapeze 
+		float                    ellipse            = 0.0f; // Une petite variable pour la forme elliptique 
+		int                iPrecision        = 10; // Precision c'est le nombre de points pour les rebords  ----> le pas en degres.
+		gboolean                bGenerate = TRUE; // ca c'est pour savoir si on va generer ou pas une nouvelle figure 
+		char                cShape=0; // pour les differentes formes 0=ellipse 1=trapeze 2=rectangle 
+		
+		sVertex TableauVertex [360/iPrecision * sizeof(sVertex) + 50];
+		
+		int t;
+		
+		glDisable(GL_DEPTH_TEST);// On desactive le tampon de profondeur 
+		
+		///glLoadIdentity(); // Matrice d'identite please 
+		///glTranslatef(0.0f, -3.0f, -10.0f); // Petite translation pour tout voir 
+		glRotatef(fInclinaisonCadre, 1.0f, 0.0f, 0.0); // Rotation ou pas selon trapeze ou autre 
+		glEnable(GL_TEXTURE_2D); // Je veux de la texture 
+		
+		glBindTexture(GL_TEXTURE_2D, g_iBackgroundTexture); // allez on bind la texture 
+		glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR ); // ok la on selectionne le type de generation des coordonnees de la texture 
+		glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR ); 
+		glEnable(GL_TEXTURE_GEN_S); // oui je veux une generation en S 
+		glEnable(GL_TEXTURE_GEN_T); // Et en T aussi 
+		
+		glColor3f(1.0f, 1.0f, 1.0f); // Couleur a fond 
+		
+		if (bGenerate) // Est ce que je dois regenerer mon polygone 
+		{ 
+			// Vertex *Temp, char forme, double ellipse, double fLongueurCadre, double fHauteurCadre, double fInclinaisonCadre, double fRayonY
+			bGenerate = ChangeShape(TableauVertex, cShape, ellipse, fLongueurCadre, fHauteurCadre, &fInclinaisonCadre, fRayonY); // Si oui bein go 
+		} 
+		
+		sVertex *Temp = TableauVertex; // Hop je pointe sur mon tableau de vertex 
+		
+		for (t = 0;t <= 360/iPrecision+3;t++) // La on affiche un polygone plein texture 
+		{ 
+			Temp = &TableauVertex[t];
+			glBegin(GL_POLYGON); 
+			glVertex3fv(Temp); 
+			
+			Temp = &TableauVertex[t+1];
+			glVertex3f(fLongueurCadre/2, fHauteurCadre/2, 0.0f); 
+			glVertex3fv(Temp); 
+			glEnd(); 
+		} 
+		glDisable(GL_TEXTURE_2D); // Plus de texture merci 
+		glDisable(GL_TEXTURE); 
+		
+		
+		glLineWidth(fLineWidth); // Ici on choisi l'epaisseur du contour du polygone 
+		glColor3f(g_fLineColor[0], g_fLineColor[1], g_fLineColor[2]); // Et sa couleur 
+		Temp = TableauVertex; // Je pointe sur mon tableau de vertex 
+		for (t = 0;t <= 360/iPrecision+3;t ++) // Et on affiche le contour 
+		{
+			Temp = &TableauVertex[t];
+			glBegin(GL_LINE_LOOP);
+			glVertex3fv(Temp);
+			
+			Temp = &TableauVertex[t+1];
+			glVertex3fv(Temp);
+			glEnd();
+		}*/
+		
+		
+		//\_____________ On definit notre rectangle.
+		double fLineWidth = g_iDockLineWidth;
+		double fMargin = g_iFrameMargin;
+		double fRadius = (pDock->iDecorationsHeight + fLineWidth - 2 * g_iDockRadius > 0 ? g_iDockRadius : (pDock->iDecorationsHeight + fLineWidth) / 2 - 1);
+		double fDockWidth = cairo_dock_get_current_dock_width_linear (pDock);
+		
+		int sens;
+		double fDockOffsetX, fDockOffsetY;  // Offset du coin haut gauche du cadre.
+		//Icon *pFirstIcon = cairo_dock_get_first_drawn_icon (pDock);
+		fDockOffsetX = (pFirstIcon != NULL ? pFirstIcon->fX + 0 - fMargin : fRadius + fLineWidth / 2);
+		if (fDockOffsetX - (fRadius + fLineWidth / 2) < 0)
+			fDockOffsetX = fRadius + fLineWidth / 2;
+		if (fDockOffsetX + fDockWidth + (fRadius + fLineWidth / 2) > pDock->iCurrentWidth)
+			fDockWidth = pDock->iCurrentWidth - fDockOffsetX - (fRadius + fLineWidth / 2);
+		if (pDock->bDirectionUp)
+		{
+			sens = 1;
+			fDockOffsetY = pDock->iCurrentHeight - pDock->iDecorationsHeight - 1.5 * fLineWidth;
+		}
+		else
+		{
+			sens = -1;
+			fDockOffsetY = pDock->iDecorationsHeight + 1.5 * fLineWidth;
+		}
+		
+		//\_____________ On genere les coordonnees du contour.
+		GLfloat pVertexTab[((90/10+1)*4+1)*3];
+		int iNbVertex = (90/10+1)*4;
+		memset (pVertexTab, 0, (90/10+1)*4*3*sizeof (GLfloat));
+		int i=0, t;
+		int iPrecision = 10;
+		double fInclinaisonCadre = 0.;
+		for (t = 0;t <= 90;t += iPrecision, i++) // Le cote haut droit 
+		{ 
+			pVertexTab[3*i] = fDockWidth/2 + fRadius * cos (t*RADIAN);
+			pVertexTab[3*i+1] = pDock->iDecorationsHeight/2 + fRadius * sin (t*RADIAN);
+		} 
+		for (t = 90;t <= 180;t += iPrecision, i++) // Bas droit 
+		{ 
+			pVertexTab[3*i] = -fDockWidth/2 + fRadius * cos (t*RADIAN);
+			pVertexTab[3*i+1] = pDock->iDecorationsHeight/2 + fRadius * sin (t*RADIAN);
+		} 
+		for (t = 180;t <= 270;t += iPrecision, i++) // Bas gauche 
+		{ 
+			pVertexTab[3*i] = -fDockWidth/2 + fRadius * cos (t*RADIAN);
+			pVertexTab[3*i+1] = -pDock->iDecorationsHeight/2 + fRadius * sin (t*RADIAN);
+		} 
+		for (t = 270;t <= 360;t += iPrecision, i++) // Haut gauche 
+		{ 
+			pVertexTab[3*i] = fDockWidth/2 + fRadius * cos (t*RADIAN);
+			pVertexTab[3*i+1] = -pDock->iDecorationsHeight/2 + fRadius * sin (t*RADIAN);
+		}
+		pVertexTab[3*i] = fDockWidth/2 + fRadius;  // on boucle.
+		pVertexTab[3*i+1] = pDock->iDecorationsHeight/2;
+		
+		//\_____________ On definit l'etat courant.
+		glDisable(GL_DEPTH_TEST);// On desactive le tampon de profondeur 
+		
+		glRotatef (fInclinaisonCadre, 1.0f, 0.0f, 0.0); // Rotation ou pas selon trapeze ou autre 
+		glEnable(GL_TEXTURE_2D); // Je veux de la texture 
+		
+		glBindTexture(GL_TEXTURE_2D, g_iBackgroundTexture); // allez on bind la texture 
+		glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR ); // ok la on selectionne le type de generation des coordonnees de la texture 
+		glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR ); 
+		glEnable(GL_TEXTURE_GEN_S); // oui je veux une generation en S 
+		glEnable(GL_TEXTURE_GEN_T); // Et en T aussi 
+		
+		glColor3f(1.0f, 1.0f, 1.0f); // Couleur a fond 
+		
 		glLoadIdentity();
-		glTranslatef (0, 0, -pDock->iMaxIconHeight * (1 + g_fAmplitude) + 1);
-		glColor4f(1.0f, 0.0f, 0.0f, 1.0);
-		glFlush ();
+		glTranslatef (pDock->iCurrentWidth/2, pDock->iMaxIconHeight/2, -pDock->iMaxIconHeight * (1 + g_fAmplitude) + 1);
+		
+		//\_____________ On trace en texturant par des triangles.
+		for (i = 0; i <= iNbVertex; i++) // La on affiche un polygone plein texture
+		{
+			glBegin (GL_POLYGON);
+			glVertex3fv (&pVertexTab[3*i]);
+			
+			glVertex3f(0., 0., 0.0f);
+			
+			glVertex3fv(&pVertexTab[3*(i+1)]);
+			glEnd();
+		}
+		glDisable(GL_TEXTURE_2D); // Plus de texture merci 
+		glDisable(GL_TEXTURE); 
+		
+		
+		glLineWidth(fLineWidth); // Ici on choisi l'epaisseur du contour du polygone 
+		glColor3f(g_fLineColor[0], g_fLineColor[1], g_fLineColor[2]); // Et sa couleur 
+		for (i = 0; i <= iNbVertex; i++) // Et on affiche le contour 
+		{
+			glBegin(GL_LINE_LOOP);
+			glVertex3fv (&pVertexTab[3*i]);
+			
+			glVertex3fv (&pVertexTab[3*(i+1)]);
+			glEnd();
+		}
+		
+		
+		
+		
+		
+		
+		glDisable(GL_TEXTURE_GEN_S);
+		glDisable(GL_TEXTURE_GEN_T);
 		
 		/*glLineWidth (2.0);
 		w -= 4;
@@ -295,10 +596,10 @@ void cairo_dock_render_linear (CairoDock *pDock)
 		glEnable (GL_TEXTURE_2D);*/
 		
 		
-		
-		
-		
-		GList *pFirstDrawnElement = (pDock->pFirstDrawnElement != NULL ? pDock->pFirstDrawnElement : pDock->icons);
+		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_DEPTH_TEST);
+		glLoadIdentity();
+		glTranslatef (0, 0, -pDock->iMaxIconHeight * (1 + g_fAmplitude) + 1);
 		if (pFirstDrawnElement != NULL)
 		{
 			Icon *icon;
@@ -381,16 +682,11 @@ void cairo_dock_render_linear (CairoDock *pDock)
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 	
 	//\____________________ On trace le cadre.
-	double fChangeAxes = 0.5 * (pDock->iCurrentWidth - pDock->iMaxDockWidth);
-	double fLineWidth = g_iDockLineWidth;
-	double fMargin = g_iFrameMargin;
-	double fRadius = (pDock->iDecorationsHeight + fLineWidth - 2 * g_iDockRadius > 0 ? g_iDockRadius : (pDock->iDecorationsHeight + fLineWidth) / 2 - 1);
-	double fDockWidth = cairo_dock_get_current_dock_width_linear (pDock);
 
 	int sens;
 	double fDockOffsetX, fDockOffsetY;  // Offset du coin haut gauche du cadre.
-	Icon *pFirstIcon = cairo_dock_get_first_drawn_icon (pDock);
-	fDockOffsetX = (pFirstIcon != NULL ? pFirstIcon->fX + 0 - fMargin : fRadius + fLineWidth / 2);  // fChangeAxes
+	//Icon *pFirstIcon = cairo_dock_get_first_drawn_icon (pDock);
+	fDockOffsetX = (pFirstIcon != NULL ? pFirstIcon->fX + 0 - fMargin : fRadius + fLineWidth / 2);
 	if (fDockOffsetX - (fRadius + fLineWidth / 2) < 0)
 		fDockOffsetX = fRadius + fLineWidth / 2;
 	if (fDockOffsetX + fDockWidth + (fRadius + fLineWidth / 2) > pDock->iCurrentWidth)

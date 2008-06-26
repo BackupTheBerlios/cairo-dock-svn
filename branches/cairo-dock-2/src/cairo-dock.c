@@ -143,6 +143,7 @@ double g_fBackgroundImageAlpha;  // transparence de l'image de fond.
 cairo_surface_t *g_pBackgroundSurface[2] = {NULL, NULL};  // surface associee a l'image du fond, de la taille de l'image du fond.
 cairo_surface_t *g_pBackgroundSurfaceFull[2] = {NULL, NULL};  // surface associee aux decorations, de 2 fois la taille de la fenetre.
 gboolean g_bDecorationsFollowMouse;  // dis si les decorations sont asservies au curseur, ou si le delta de deplacement ne depend que de la direction de celui-ci.
+int g_iBackgroundTexture=0;
 
 int g_iIconGap;  // ecart en pixels entre les icones.
 int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];  // les tailles min et max pour chaque type d'icone.

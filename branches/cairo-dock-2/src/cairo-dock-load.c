@@ -84,7 +84,7 @@ extern double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
 
 extern gboolean g_bUseGlitz;
 extern gboolean g_bUseOpenGL;
-
+extern int g_iBackgroundTexture;
 
 gchar *cairo_dock_generate_file_path (gchar *cImageFile)
 {
@@ -694,6 +694,32 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 			
 			g_pBackgroundSurfaceFull[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL], pCairoContext, g_fBackgroundImageWidth, g_fBackgroundImageHeight, (pDock->bDirectionUp ? -G_PI/2 : G_PI/2));
 		}
+		
+		if (g_bUseOpenGL)
+		{
+			GdkGLContext* pGlContext = gtk_widget_get_gl_context (g_pMainDock->pWidget);
+			GdkGLDrawable* pGlDrawable = gtk_widget_get_gl_drawable (g_pMainDock->pWidget);
+			if (!gdk_gl_drawable_gl_begin (pGlDrawable, pGlContext))
+				return ;
+			
+			glGenTextures (1, &g_iBackgroundTexture);
+			glBindTexture (GL_TEXTURE_2D, g_iBackgroundTexture);  // GL_TEXTURE_2D / GL_TEXTURE_RECTANGLE_ARB
+			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); // scale linearly when image bigger than texture
+			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); // scale linearly when image smalled than texture
+			glTexImage2D (GL_TEXTURE_2D,  // GL_TEXTURE_2D / GL_TEXTURE_RECTANGLE_ARB
+				0,
+				4,  // GL_ALPHA / GL_RGBA
+				g_fBackgroundImageWidth,
+				g_fBackgroundImageHeight,
+				0,
+				GL_RGBA,  // GL_ALPHA / GL_BGRA
+				GL_UNSIGNED_BYTE,
+				g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL] != NULL ? g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL] : g_pBackgroundSurface[CAIRO_DOCK_HORIZONTAL]);
+			g_print ("texture du fond %d generee\n", g_iBackgroundTexture);
+			
+			gdk_gl_drawable_gl_end (pGlDrawable);
+		}
+		
 		
 		cairo_destroy (pCairoContext);
 		cd_debug ("  MaJ des decorations du fond -> %.2fx%.2f", g_fBackgroundImageWidth, g_fBackgroundImageHeight);
