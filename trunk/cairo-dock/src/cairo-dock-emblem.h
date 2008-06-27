@@ -24,6 +24,8 @@ struct _CairoDockTempEmblem {
 typedef enum {
 	CAIRO_DOCK_EMBLEM_UPPER_RIGHT = 0,
 	CAIRO_DOCK_EMBLEM_LOWER_RIGHT,
+	CAIRO_DOCK_EMBLEM_UPPER_LEFT,
+	CAIRO_DOCK_EMBLEM_LOWER_LEFT,
 	CAIRO_DOCK_EMBLEM_MIDDLE,
 	CAIRO_DOCK_EMBLEM_MIDDLE_BOTTOM,
 	CAIRO_DOCK_EMBLEM_BACKGROUND,
@@ -88,8 +90,8 @@ typedef enum {
 void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoContainer *pContainer, CairoDockClassicEmblem pEmblemClassic, CairoDockEmblem pEmblemType, gboolean bPersistent);
 
 #define cairo_dock_make_temporary_emblem(cIconFile, pEmblemClassic, pEmblemType, fTimeLength) cairo_dock_draw_temporary_emblem_on_my_icon(myDrawContext, myIcon, myContainer, cIconFile, pEmblemClassic, pEmblemType, fTimeLength);
-#define CAIRO_DOCK_MAKE_TEMPORARY_EMBLEM_WITH_FILE(cIconFile, pEmblemType, fTimeLength) cairo_dock_draw_temporary_emblem_on_my_icon(myDrawContext, myIcon, myContainer, cIconFile, NULL, pEmblemType, fTimeLength);
-#define CAIRO_DOCK_MAKE_TEMPORARY_EMBLEM_CLASSIC(pEmblemClassic, pEmblemType, fTimeLength) cairo_dock_draw_temporary_emblem_on_my_icon(myDrawContext, myIcon, myContainer, NULL, pEmblemClassic, pEmblemType, fTimeLength);
+#define CD_APPLET_MAKE_TEMPORARY_EMBLEM_WITH_FILE(cIconFile, pEmblemType, fTimeLength) cairo_dock_draw_temporary_emblem_on_my_icon(myDrawContext, myIcon, myContainer, cIconFile, NULL, pEmblemType, fTimeLength);
+#define CD_APPLET_MAKE_TEMPORARY_EMBLEM_CLASSIC(pEmblemClassic, pEmblemType, fTimeLength) cairo_dock_draw_temporary_emblem_on_my_icon(myDrawContext, myIcon, myContainer, NULL, pEmblemClassic, pEmblemType, fTimeLength);
 
 /**
 *Dessine un embleme sur une icone avec une banque local.

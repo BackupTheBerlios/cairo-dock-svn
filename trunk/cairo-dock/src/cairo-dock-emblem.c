@@ -64,6 +64,16 @@ void cairo_dock_draw_emblem_from_surface (cairo_t *pIconContext, cairo_surface_t
 			fImgY = ((pIcon->fHeight - emblemH - pIcon->fScale) * fMaxScale) + 1.;
 		break;
 		
+		case CAIRO_DOCK_EMBLEM_UPPER_LEFT :
+			fImgX = 1.;
+			fImgY = 1.;
+		break;
+		
+		case CAIRO_DOCK_EMBLEM_LOWER_LEFT :
+			fImgX = 1.;
+			fImgY = ((pIcon->fHeight - emblemH - pIcon->fScale) * fMaxScale) + 1.;
+		break;
+		
 		case CAIRO_DOCK_EMBLEM_MIDDLE :
 			fImgX = (pIcon->fWidth - emblemW - pIcon->fScale) * fMaxScale / 2.;
 			fImgY = (pIcon->fHeight - emblemH - pIcon->fScale) * fMaxScale / 2.;
@@ -111,7 +121,7 @@ void cairo_dock_draw_emblem_from_surface (cairo_t *pIconContext, cairo_surface_t
 
 void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoContainer *pContainer, CairoDockClassicEmblem pEmblemClassic, CairoDockEmblem pEmblemType, gboolean bPersistent)
 {
-	cd_debug ("%s (%s %d)", __func__, pIcon->acName, pEmblemType);
+	cd_debug ("%s (%s %d %d)", __func__, pIcon->acName, pEmblemClassic, pEmblemType);
 	g_return_if_fail (pIcon != NULL); 
 	
 	gchar *cClassicEmblemPath = NULL;
@@ -179,6 +189,7 @@ gboolean _cairo_dock_erase_temporary_emblem (CairoDockTempEmblem *pEmblem)
 	if (pEmblem != NULL) {
 		pEmblem->iSidTimer = 0;
 		cairo_dock_draw_emblem_classic (pEmblem->pIconContext, pEmblem->pIcon, pEmblem->pContainer, CAIRO_DOCK_EMBLEM_BLANK, CAIRO_DOCK_EMBLEM_MIDDLE, FALSE);
+		cairo_dock_redraw_my_icon (pEmblem->pIcon, pEmblem->pContainer);
 	}
 	g_free (pEmblem);
 	return FALSE;
@@ -186,6 +197,7 @@ gboolean _cairo_dock_erase_temporary_emblem (CairoDockTempEmblem *pEmblem)
 
 void cairo_dock_draw_temporary_emblem_on_my_icon (cairo_t *pIconContext, Icon *pIcon, CairoContainer *pContainer, const gchar *cIconFile, CairoDockClassicEmblem pEmblemClassic, CairoDockEmblem pEmblemType, double fTimeLength)
 {
+	cd_debug ("%s (%s %d %d %.0f)", __func__, cIconFile, pEmblemClassic, pEmblemType, fTimeLength);
 	if (cIconFile == NULL && (pEmblemClassic < 0 || pEmblemClassic > CAIRO_DOCK_EMBLEM_CLASSIC_NB))
 		return;
 	
