@@ -13,8 +13,10 @@ extern gint g_iScreenWidth[2];
 extern gint g_iScreenHeight[2];
 /// Nombre de bureaux virtuels.
 extern int g_iNbDesktops;
+extern int g_iNbViewportX;
+extern int g_iNbViewportY;
 /// Nombre de "faces" du cube en largeur et en hauteur.
-extern int g_iNbFacesForViewportX,g_iNbFacesForViewportY ;
+//extern int g_iNbViewportX, g_iNbViewportY ;
 /// Chemin du fichier de conf de l'appli.
 extern gchar *g_cConfFile;
 /// doublets de repertoires d'icones (pair) et de themes d'icones GTK (impair).
@@ -30,14 +32,13 @@ gint g_iFrameMargin;
 extern double g_fLineColor[4];
 /// Ecart en pixels entre les icones.
 extern int g_iIconGap;
-/// Taille de la police des etiquettes.
-extern int g_iLabelSize;
-/// Police de caracteres des etiquettes.
-extern gchar *g_cLabelPolice;
-/// Epaisseur des traits.
-extern int g_iLabelWeight;
-/// Italique ou droit.
-extern int g_iLabelStyle;
+/// Description des etiquettes des icones.
+extern CairoDockLabelDescription g_iconTextDescription;
+/// Description des infos-rapides.
+extern CairoDockLabelDescription g_quickInfoTextDescription;
+/// Description des titres des dialogues.
+extern CairoDockLabelDescription g_dialogTextDescription;
+
 /// facteur de visibilite des etiquettes adjacentes a l'icone pointee.
 extern double g_fLabelAlphaThreshold;
 /// le texte est-il toujours horizontal ?
@@ -109,5 +110,12 @@ extern gboolean g_bShowHiddenFiles;
 extern double g_fDeskletColor[4];
 /// Couleur du fond des desklets lorsque la souris est dedans..
 extern double g_fDeskletColorInside[4];
+
+extern int g_iDialogMessageSize;
+extern gchar *g_cDialogMessagePolice;
+extern int g_iDialogMessageWeight;
+extern int g_iDialogMessageStyle;
+
+extern int g_iBackgroundTexture;
 
 #endif

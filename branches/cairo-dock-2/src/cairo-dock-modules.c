@@ -596,7 +596,7 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 					CairoDesklet *pDesklet;
 					if (CAIRO_DOCK_IS_DOCK (pActualContainer))  // elle etait dans un dock.
 					{
-						g_print ("le container a change (%s -> desklet)\n", pIcon->cParentDockName);
+						cd_message ("le container a change (%s -> desklet)", pIcon->cParentDockName);
 						gchar *cOldDockName = g_strdup (pIcon->cParentDockName);
 						cairo_dock_detach_icon_from_dock (pIcon, CAIRO_DOCK (pActualContainer), g_bUseSeparator);
 						if (CAIRO_DOCK (pActualContainer)->icons == NULL)
@@ -637,7 +637,7 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 					{
 						if (pActualContainer != CAIRO_CONTAINER (pDock))  // le dock a change.
 						{
-							g_print ("le dock a change (%s -> %s)\n", pIcon->cParentDockName, cDockName);
+							cd_message ("le dock a change (%s -> %s)", pIcon->cParentDockName, cDockName);
 							gchar *cOldDockName = g_strdup (pIcon->cParentDockName);
 							cairo_dock_detach_icon_from_dock (pIcon, CAIRO_DOCK (pActualContainer), g_bUseSeparator);
 							if (CAIRO_DOCK (pActualContainer)->icons == NULL)
@@ -680,20 +680,14 @@ void cairo_dock_reload_module (CairoDockModule *module, gboolean bReloadAppletCo
 				if (bReloadAppletConf)
 					cairo_dock_update_dock_size (CAIRO_DOCK (pNewContainer));
 			}
-			/*CairoDock *pDock = CAIRO_DOCK (pActualContainer);
-			pIcon->fWidth /= pDock->fRatio;
-			pIcon->fHeight /= pDock->fRatio;*/
 		}
 		
 		bModuleReloaded = module->reloadModule (pKeyFile, module->cConfFilePath, pNewContainer);
 		
-		/*if (CAIRO_DOCK_IS_DOCK (pNewContainer))
+		if (pNewContainer != pActualContainer && CAIRO_DOCK_IS_DOCK (pNewContainer) && CAIRO_DOCK_IS_DOCK (pActualContainer) && pIcon != NULL)
 		{
-			CairoDock *pDock = CAIRO_DOCK (pActualContainer);
-			pIcon->fWidth *= pDock->fRatio;
-			pIcon->fHeight *= pDock->fRatio;
-		}*/
-		//g_print ("apres reload : %.2f\n", pIcon->fWidth);
+			cairo_dock_synchronize_one_sub_dock_position (pIcon, CAIRO_DOCK (pNewContainer), TRUE);
+		}
 		
 		cairo_dock_free_minimal_config (pMinimalConfig);
 		if (pKeyFile != NULL)
@@ -774,7 +768,7 @@ static void _cairo_dock_configure_module_callback (gchar *cConfFile, gpointer *d
 void cairo_dock_configure_module (GtkWindow *pParentWindow, CairoDockModule *module, GError **erreur)
 {
 	g_return_if_fail (module != NULL);
-	//g_print ("%s (%s)\n", __func__, module->cConfFilePath);
+	cd_message ("%s (%s)", __func__, module->cConfFilePath);
 
 	if (module->cConfFilePath == NULL)
 		return;

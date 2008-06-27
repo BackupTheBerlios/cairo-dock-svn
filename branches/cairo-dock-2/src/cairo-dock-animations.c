@@ -46,6 +46,8 @@ extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS];
 
+extern gboolean g_bPopUp;
+
 extern CairoDock *g_pMainDock;
 
 gboolean cairo_dock_move_up (CairoDock *pDock)
@@ -72,6 +74,28 @@ gboolean cairo_dock_move_up (CairoDock *pDock)
 	}
 }
 
+gboolean cairo_dock_pop_up (CairoDock *pDock)
+{
+	if (! pDock->bPopped && g_bPopUp)
+		gtk_window_set_keep_above (GTK_WINDOW (pDock->pWidget), TRUE);
+	
+	pDock->iSidPopUp = 0;
+	pDock->bPopped = TRUE;
+	return FALSE;
+}
+
+
+gboolean cairo_dock_pop_down (CairoDock *pDock)
+{
+	g_print ("%s (%d)\n", __func__, pDock->bPopped);
+	if (pDock->bPopped && g_bPopUp)
+		gtk_window_set_keep_below (GTK_WINDOW (pDock->pWidget), TRUE);
+	
+	pDock->iSidPopDown = 0;
+	pDock->bPopped = FALSE;
+	return FALSE;
+}
+
 gboolean cairo_dock_move_down (CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
@@ -88,6 +112,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 		else
 			gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionY, pDock->iWindowPositionX);
 		pDock->bAtTop = FALSE;
+		gtk_widget_queue_draw (pDock->pWidget);
 		return TRUE;
 	}
 	else  // on se fixe en bas, et on montre la zone visible.
@@ -121,7 +146,10 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 			Icon *pRemovingIcon = cairo_dock_get_removing_or_inserting_icon (pDock->icons);
 			if (pRemovingIcon != NULL)  // idem.
 			{
-				pRemovingIcon->fPersonnalScale = -0.05;
+				if (pRemovingIcon->fPersonnalScale > 0)
+					pRemovingIcon->fPersonnalScale = 0.05;
+				else
+					pRemovingIcon->fPersonnalScale = - 0.05;
 				//g_print ("fPersonnalScale <- %f\n", pRemovingIcon->fPersonnalScale);
 			}
 			pDock->iScrollOffset = 0;
@@ -129,7 +157,7 @@ gboolean cairo_dock_move_down (CairoDock *pDock)
 			pDock->calculate_max_dock_size (pDock);
 			pDock->fFoldingFactor = (g_bAnimateOnAutoHide ? g_fUnfoldAcceleration : 0);
 
-			cairo_dock_allow_entrance ();
+			cairo_dock_allow_entrance (pDock);
 		}
 
 		gtk_widget_queue_draw (pDock->pWidget);
@@ -245,6 +273,9 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 
 	if (pDock->iMagnitudeIndex == 0)
 	{
+		if (pDock->bPopped && ! pDock->bInside)
+			cairo_dock_pop_down (pDock);
+		
 		Icon *pBouncingIcon = cairo_dock_get_bouncing_icon (pDock->icons);
 		Icon *pRemovingIcon = cairo_dock_get_removing_or_inserting_icon (pDock->icons);
 
@@ -358,6 +389,6 @@ void cairo_dock_start_animation (Icon *icon, CairoDock *pDock)
 			pDock->iSidGrowUp = 0;
 		}
 		if (pDock->iSidShrinkDown == 0)
-			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);  // fera diminuer de taille les icones, et rebondir/tourner/clignoter celle sui est animee.
+			pDock->iSidShrinkDown = g_timeout_add (50, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);  // fera diminuer de taille les icones, et rebondir/tourner/clignoter celle qui est animee.
 	}
 }

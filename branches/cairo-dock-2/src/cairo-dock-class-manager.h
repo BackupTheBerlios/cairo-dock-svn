@@ -119,5 +119,6 @@ void cairo_dock_update_visibility_on_inhibators (gchar *cClass, Window Xid, gboo
 */
 void cairo_dock_update_activity_on_inhibators (gchar *cClass, Window Xid);
 
+Icon *cairo_dock_get_classmate (Icon *pIcon);
 
 #endif

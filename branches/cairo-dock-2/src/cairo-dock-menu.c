@@ -38,12 +38,17 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-applet-facility.h"
 #include "cairo-dock-X-utilities.h"
 #include "cairo-dock-dock-manager.h"
+#include "cairo-dock-class-manager.h"
 #include "cairo-dock-menu.h"
 
 #define CAIRO_DOCK_CONF_PANEL_WIDTH 800
 #define CAIRO_DOCK_CONF_PANEL_HEIGHT 600
 #define CAIRO_DOCK_LAUNCHER_PANEL_WIDTH 600
 #define CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT 350
+#define CAIRO_DOCK_FILE_HOST_URL "https://developer.berlios.de/project/showfiles.php?group_id=8724"
+#define CAIRO_DOCK_HELP_URL "http://www.cairo-dock.org"
+
+extern struct tm *localtime_r (time_t *timer, struct tm *tp);
 
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
@@ -133,37 +138,50 @@ static void _cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 		"<b>Main developer :</b>\n  Fabounet (Fabrice Rey)\n\
 <b>Original idea/first development :</b>\n  Mac Slow\n\
 <b>Applets :</b>\n  Fabounet\n  Necropotame\n  Ctaf\n  ChAnGFu\n  Tofe\n  Paradoxxx_Zero\n\
-<b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole\n  Glattering\n  Vilraleur\n  Lord Northam\n\
-<b>Patchs :</b>\n  Ctaf\n  Robrob\n  Tshirtman\n\
-<b>Translations :</b>\n  Fabounet\n  Ppmt \n  Jiro Kawada\n  Henrry Oswaldo Ortiz Rodriguez");
+<b>Patchs :</b>\n  Ctaf\n  M.Tasaka\n  Necropotame\n  Robrob\n  Smidgey\n  Tshirtman\n\
+<b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole\n  Glattering\n  Vilraleur\n  Lord Northam\n  Paradoxxx_Zero\n  Coz\n\
+<b>Translations :</b>\n  Fabounet\n  Ppmt \n  Jiro Kawada\n  BiAji");
 	
 	_cairo_dock_add_about_page (pNoteBook,
 		_("Support"),
-		"<b>Installation scripts and repository :</b>\n  Mav\n\
-<b>Site (cairo-dock.org) :</b>\n  Tdey\n  Necropotame\n\
-<b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Mav\n  Necropotame\n  Nochka85\n  Ppmt\n  Rhinopierroce\n  Sombrero\n  Vilraleur");
+		"<b>Installation script and web hosting :</b>\n  Mav\n\
+<b>Site (cairo-dock.org) :</b>\n  Necropotame\n  Tdey\n\
+<b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Mav\n  Necropotame\n  Nochka85\n  Ppmt\n  RavanH\n  Rhinopierroce\n  Sombrero\n  Vilraleur");
 	
 	gtk_widget_show_all (pDialog);
 	gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER_ALWAYS);  // un GTK_WIN_POS_CENTER simple ne marche pas, probablement parceque la fenetre n'est pas encore realisee. le 'always' ne pose pas de probleme, puisqu'on ne peut pas redimensionner le dialogue.
+	gtk_window_set_keep_above (GTK_WINDOW (pDialog), TRUE);
 	gtk_dialog_run (GTK_DIALOG (pDialog));
 	gtk_widget_destroy (pDialog);
 }
 
-static void _cairo_dock_update (GtkMenuItem *menu_item, gpointer *data)
+static void _launch_url (const gchar *cURL)
 {
-	system ("xterm -e cairo-dock-update.sh &");
+	if  (! cairo_dock_fm_launch_uri (cURL))
+	{
+		gchar *cCommand = g_strdup_printf ("\
+which xdg-open > /dev/null && xdg-open %s || \
+which firefox > /dev/null && firefox %s || \
+which konqueror > /dev/null && konqueror %s || \
+which opera > /dev/null && opera %s ",
+			cURL,
+			cURL,
+			cURL,
+			cURL);  // pas super beau mais efficace ^_^
+		system (cCommand);
+		g_free (cCommand);
+	}
+}
+
+static void _cairo_dock_check_for_updates (GtkMenuItem *menu_item, gpointer *data)
+{
+	_launch_url (CAIRO_DOCK_FILE_HOST_URL);
+	//system ("xterm -e cairo-dock-update.sh &");
 }
 
 static void _cairo_dock_help (GtkMenuItem *menu_item, gpointer *data)
 {
-	GError *erreur = NULL;
-	g_spawn_command_line_async ("firefox http://www.cairo-dock.org", &erreur);
-	if (erreur != NULL)
-	{
-		cd_warning ("Attention : %s\n  you can consult the wiki at http://www.cairo-dock.org", erreur->message);
-		g_error_free (erreur);
-		cairo_dock_show_general_message ("you can consult the wiki and the forum at http://www.cairo-dock.org", 6000);
-	}
+	_launch_url (CAIRO_DOCK_HELP_URL);
 }
 
 static void _cairo_dock_quick_hide (GtkMenuItem *menu_item, gpointer *data)
@@ -219,6 +237,8 @@ static void _cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 	{
 		cairo_dock_notify (CAIRO_DOCK_REMOVE_ICON, data);
 	}
+	else
+		g_print ("ok on la garde\n");
 }
 
 static void _cairo_dock_create_launcher (GtkMenuItem *menu_item, gpointer *data, CairoDockNewLauncherType iLauncherType)
@@ -393,7 +413,7 @@ static void _cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 
 	gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
 
-	cairo_dock_update_launcher_desktop_file (cDesktopFilePath, CAIRO_DOCK_IS_SEPARATOR (icon) ? CAIRO_DOCK_LAUNCHER_FOR_SEPARATOR : icon->pSubDock != NULL ? CAIRO_DOCK_LAUNCHER_FOR_CONTAINER : CAIRO_DOCK_LAUNCHER_FROM_DESKTOP_FILE);
+	cairo_dock_update_launcher_desktop_file (cDesktopFilePath, CAIRO_DOCK_IS_SEPARATOR (icon) ? CAIRO_DOCK_LAUNCHER_FOR_SEPARATOR : (icon->pSubDock != NULL && icon->Xid == 0) ? CAIRO_DOCK_LAUNCHER_FOR_CONTAINER : CAIRO_DOCK_LAUNCHER_FROM_DESKTOP_FILE);
 
 	gboolean config_ok = cairo_dock_edit_conf_file (GTK_WINDOW (pDock->pWidget), cDesktopFilePath, _("Modify this launcher"), CAIRO_DOCK_LAUNCHER_PANEL_WIDTH, CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT, 0, NULL, NULL, NULL, NULL, NULL);
 	g_free (cDesktopFilePath);
@@ -411,16 +431,96 @@ static void _cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 	if (config_ok)
 	{
 		GError *erreur = NULL;
+		//\_____________ On detache l'icone.
 		gchar *cPrevDockName = icon->cParentDockName;
 		icon->cParentDockName = NULL;  // astuce.
 		cairo_dock_detach_icon_from_dock (icon, pDock, TRUE);  // il va falloir la recreer, car tous ses parametres peuvent avoir change; neanmoins, on ne souhaite pas detruire son .desktop.
 
-		//\_____________ On recree l'icone de zero.
+		//\_____________ On recharge l'icone.
+		Window Xid = icon->Xid;
+		CairoDock *pSubDock = icon->pSubDock;
+		icon->pSubDock = NULL;
+		gchar *cClass = icon->cClass;
+		icon->cClass = NULL;
+		gchar *cDesktopFileName = icon->acDesktopFileName;
+		icon->acDesktopFileName = NULL;
+		gchar *cName = icon->acName;
+		icon->acName = NULL;
+		gchar *cRendererName = NULL;
+		if (pSubDock != NULL)
+		{
+			cRendererName = pSubDock->cRendererName;
+			pSubDock->cRendererName = NULL;
+		}
 		cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
-		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (icon->acDesktopFileName, pCairoContext);
+		cairo_dock_reload_icon_from_desktop_file (cDesktopFileName, pCairoContext, icon);
+		
+		icon->Xid = Xid;
+		//\_____________ On gere le sous-dock.
+		if (Xid != 0)
+		{
+			if (icon->pSubDock == NULL)
+				icon->pSubDock = pSubDock;
+			else  // ne devrait pas arriver (une icone de container n'est pas un lanceur pouvant prendre un Xid).
+				cairo_dock_destroy_dock (pSubDock, cName, g_pMainDock, CAIRO_DOCK_MAIN_DOCK_NAME);
+		}
+		else
+		{
+			if (pSubDock != icon->pSubDock)  // ca n'est plus le meme container, on transvase ou on detruit.
+			{
+				cairo_dock_destroy_dock (pSubDock, cName, icon->pSubDock, icon->acName);
+			}
+		}
+		
+		if (icon->pSubDock != NULL && pSubDock == icon->pSubDock)  // c'est le meme sous-dock, son rendu a pu change.
+		{
+			if ((cRendererName != NULL && icon->pSubDock->cRendererName == NULL)
+			 || (cRendererName == NULL && icon->pSubDock->cRendererName != NULL)
+			 || (cRendererName != NULL && icon->pSubDock->cRendererName != NULL && strcmp (cRendererName, icon->pSubDock->cRendererName) != 0))
+				cairo_dock_update_dock_size (icon->pSubDock);
+		}
+		
+		//\_____________ On l'insere dans le dock auquel elle appartient maintenant.
+		CairoDock *pNewContainer = cairo_dock_search_dock_from_name (icon->cParentDockName);
+		g_return_if_fail (pNewContainer != NULL);
+
+		if (pDock != pNewContainer && icon->fOrder > g_list_length (pNewContainer->icons) + 1)
+			icon->fOrder = CAIRO_DOCK_LAST_ORDER;
+
+		cairo_dock_insert_icon_in_dock (icon, pNewContainer, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);  // on n'empeche pas les bouclages.
+		
+		if (pDock != pNewContainer)
+			cairo_dock_update_dock_size (pDock);
+		
+		//\_____________ On gere l'inhibition de sa classe.
+		gchar *cNowClass = icon->cClass;
+		if (cClass != NULL && (cNowClass == NULL || strcmp (cNowClass, cClass) != 0))
+		{
+			icon->cClass = cClass;
+			cairo_dock_deinhibate_class (cClass, icon);
+			icon->cClass = cNowClass;
+		}
+		if (cNowClass != NULL && (cClass == NULL || strcmp (cNowClass, cClass) != 0))
+			cairo_dock_inhibate_class (cNowClass, icon);
+		
+		//\_____________ On redessine les docks impactes.
+		pDock->calculate_icons (pDock);
+		gtk_widget_queue_draw (pDock->pWidget);
+		if (pNewContainer != pDock)
+		{
+			pNewContainer->calculate_icons (pNewContainer);
+			gtk_widget_queue_draw (pNewContainer->pWidget);
+			
+			if (pDock->icons == NULL)
+			{
+				cd_message ("dock %s vide => a la poubelle", cPrevDockName);
+				cairo_dock_destroy_dock (pDock, cPrevDockName, NULL, NULL);
+			}
+		}
+		/*Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (icon->acDesktopFileName, pCairoContext);
 
 		//\_____________ On redistribue les icones du sous-dock si l'icone n'est plus un container.
-		if (icon->pSubDock != NULL)
+		if (icon->pSubDock != NULL && icon->Xid == 0)
 		{
 			if (pNewIcon->pSubDock == NULL)  // ce n'est plus un container.
 			{
@@ -473,8 +573,15 @@ static void _cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 				cairo_dock_destroy_dock (pDock, cPrevDockName, NULL, NULL);
 			}
 		}
+		
 		cairo_dock_free_icon (icon);
+		*/
 		g_free (cPrevDockName);
+		g_free (cClass);
+		g_free (cDesktopFileName);
+		g_free (cName);
+		g_free (cRendererName);
+		cairo_destroy (pCairoContext);
 		cairo_dock_mark_theme_as_modified (TRUE);
 	}
 }
@@ -584,11 +691,20 @@ static void _cairo_dock_mount_unmount (GtkMenuItem *menu_item, gpointer *data)
 
 	if (! bIsMounted)
 	{
-		cairo_dock_fm_mount (icon, pDock);
+		cairo_dock_fm_mount (icon, CAIRO_CONTAINER (pDock));
 	}
 	else
-		cairo_dock_fm_unmount (icon, pDock);
+		cairo_dock_fm_unmount (icon, CAIRO_CONTAINER (pDock));
 }
+
+static void _cairo_dock_eject (GtkMenuItem *menu_item, gpointer *data)
+{
+	Icon *icon = data[0];
+	CairoDock *pDock = data[1];
+	cd_message ("%s (%s / %s)\n", __func__, icon->acName, icon->acCommand);
+	cairo_dock_fm_eject_drive (icon->acCommand);
+}
+
 
 static void _cairo_dock_delete_file (GtkMenuItem *menu_item, gpointer *data)
 {
@@ -906,6 +1022,10 @@ static void _cairo_dock_lock_position (GtkMenuItem *menu_item, gpointer *data)
 	CairoDesklet *pDesklet = data[1];
 	
 	pDesklet->bPositionLocked = ! pDesklet->bPositionLocked;
+	if (CAIRO_DOCK_IS_APPLET (icon))
+		cairo_dock_update_conf_file (icon->pModule->cConfFilePath,
+			G_TYPE_BOOLEAN, "Desklet", "locked", pDesklet->bPositionLocked,
+			G_TYPE_INVALID);
 }
 
 
@@ -936,6 +1056,7 @@ static void _cairo_dock_configure_root_dock_position (GtkMenuItem *menu_item, gp
 		cairo_dock_get_root_dock_position (cDockName, pDock);
 		
 		cairo_dock_load_buffers_in_one_dock (pDock);  // recharge les icones et les applets.
+		cairo_dock_synchronize_sub_docks_position (pDock, TRUE);
 		
 		cairo_dock_update_dock_size (pDock);
 		pDock->calculate_icons (pDock);
@@ -1007,15 +1128,15 @@ GtkWidget *cairo_dock_build_menu (Icon *icon, CairoContainer *pContainer)
 
 	if (CAIRO_DOCK_IS_DOCK (pContainer) && ! CAIRO_DOCK (pContainer)->bIsMainDock && CAIRO_DOCK (pContainer)->iRefCount == 0)
 	{
-		_add_entry_in_menu (_("Set up position"), GTK_STOCK_EXECUTE, _cairo_dock_configure_root_dock_position, pSubMenu);
+		_add_entry_in_menu (_("Set up this dock"), GTK_STOCK_EXECUTE, _cairo_dock_configure_root_dock_position, pSubMenu);
 	}
 	_add_entry_in_menu (_("Manage themes"), GTK_STOCK_EXECUTE, _cairo_dock_initiate_theme_management, pSubMenu);
 
-	_add_entry_in_menu (_("Check updates"), GTK_STOCK_REFRESH, _cairo_dock_update, pSubMenu);
-
 	_add_entry_in_menu (_("About"), GTK_STOCK_ABOUT, _cairo_dock_about, pSubMenu);
 
-	_add_entry_in_menu (_("Help"), GTK_STOCK_HELP, _cairo_dock_help, pSubMenu);
+	_add_entry_in_menu (_("Development's site"), GTK_STOCK_REFRESH, _cairo_dock_check_for_updates, pSubMenu);
+
+	_add_entry_in_menu (_("Community's site"), GTK_STOCK_HELP, _cairo_dock_help, pSubMenu);
 
 	if (CAIRO_DOCK_IS_DOCK (pContainer) && ! CAIRO_DOCK (pContainer)->bAutoHide)
 	{
@@ -1038,7 +1159,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	GtkWidget *menu = data[2];
 	GtkWidget *menu_item, *image;
 	static gpointer *pDesktopData = NULL;
-	
+	//GtkTooltips *pToolTipsGroup = gtk_tooltips_new ();
 	
 	//\_________________________ On construit un sous-menu pour deplacer l'icone.
 	/*if (CAIRO_DOCK_IS_DOCK (pContainer) && icon != NULL && ! CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon))
@@ -1073,6 +1194,11 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 		
 		_add_entry_in_menu (_("Add a launcher"), GTK_STOCK_ADD, cairo_dock_add_launcher, menu);
+		gtk_widget_set_tooltip_text (menu_item, _("Don't forget you can drag a launcher from the menu and drop it in the dock !"));
+		/*gtk_tooltips_set_tip (GTK_TOOLTIPS (pToolTipsGroup),
+			menu_item,
+			_("Don't forget you can drag a launcher from the menu and drop it in the dock !"),
+			"pouet");*/
 		
 		_add_entry_in_menu (_("Add a sub-dock"), GTK_STOCK_ADD, cairo_dock_add_container, menu);
 		
@@ -1098,21 +1224,28 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 				cd_message ("  cActivationURI : %s; bIsMounted : %d\n", cActivationURI, bIsMounted);
 				g_free (cActivationURI);
 
-				menu_item = gtk_menu_item_new_with_label (bIsMounted ? "Unmount" : "Mount");
+				menu_item = gtk_menu_item_new_with_label (bIsMounted ? _("Unmount") : _("Mount"));
 				gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 				g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(_cairo_dock_mount_unmount), data);
+				
+				if (cairo_dock_fm_can_eject (icon->acCommand))
+				{
+					menu_item = gtk_menu_item_new_with_label (_("Eject"));
+					gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
+					g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(_cairo_dock_eject), data);
+				}
 			}
 			else
 			{
-				menu_item = gtk_menu_item_new_with_label ("Delete this file");
+				menu_item = gtk_menu_item_new_with_label (_("Delete this file"));
 				gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 				g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(_cairo_dock_delete_file), data);
 
-				menu_item = gtk_menu_item_new_with_label ("Rename this file");
+				menu_item = gtk_menu_item_new_with_label (_("Rename this file"));
 				gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 				g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(_cairo_dock_rename_file), data);
 
-				menu_item = gtk_menu_item_new_with_label ("Properties");
+				menu_item = gtk_menu_item_new_with_label (_("Properties"));
 				gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 				g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(_cairo_dock_show_file_properties), data);
 			}
@@ -1127,6 +1260,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 			gtk_menu_shell_append  (GTK_MENU_SHELL (menu), menu_item);
 			
 			_add_entry_in_menu (_("Add a launcher"), GTK_STOCK_ADD, cairo_dock_add_launcher, menu);
+			gtk_widget_set_tooltip_text (menu_item, _("Don't forget you can drag a launcher from the menu and drop it in the dock !"));
 	
 			_add_entry_in_menu (_("Add a sub-dock"), GTK_STOCK_ADD, cairo_dock_add_container, menu);
 			
@@ -1285,18 +1419,13 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		if (cairo_dock_window_is_utility (Xid))  // gtk_window_get_type_hint me renvoie toujours 0 !
 			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
 		g_signal_connect(G_OBJECT(menu_item), "toggled", G_CALLBACK(_cairo_dock_keep_on_widget_layer), data);
+		gtk_widget_set_tooltip_text (menu_item, _("set behaviour in Compiz to: (name=cairo-dock & type=utility)"));
 		
 		menu_item = gtk_check_menu_item_new_with_label("Lock position");
 		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 		if (CAIRO_DESKLET (pContainer)->bPositionLocked)
 			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item), TRUE);
 		g_signal_connect(G_OBJECT(menu_item), "toggled", G_CALLBACK(_cairo_dock_lock_position), data);
-		
-		GtkTooltips *pToolTipsGroup = gtk_tooltips_new ();
-		gtk_tooltips_set_tip (GTK_TOOLTIPS (pToolTipsGroup),
-			menu_item,
-			_("set behaviour in Compiz to: (name=cairo-dock & type=utility)"),
-			"pouet");
 	}
 
 	return CAIRO_DOCK_LET_PASS_NOTIFICATION;

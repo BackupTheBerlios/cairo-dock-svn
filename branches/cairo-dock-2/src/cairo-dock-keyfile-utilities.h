@@ -6,7 +6,7 @@
 #include <cairo-dock-struct.h>
 
 
-void cairo_dock_write_keys_to_file (GKeyFile *key_file, gchar *conf_file);
+void cairo_dock_write_keys_to_file (GKeyFile *pKeyFile, const gchar *cConfFilePath);
 void cairo_dock_flush_conf_file_full (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath, gboolean bUseFileKeys, gchar *cTemplateFileName);
 void cairo_dock_flush_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath);
 

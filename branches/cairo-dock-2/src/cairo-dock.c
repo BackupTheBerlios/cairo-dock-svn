@@ -38,7 +38,7 @@
 **    great deal by sending me additional tweaked and optimized versions. I've
 **    now merged all that with my recent additions.
 **
-*********************** VERSION 1.x.x (2007-20008)*********************
+*********************** VERSION 0.1.0 and above (2007-20008)*********************
 **
 ** author(s) :
 **     Fabrice Rey <fabounet@users.berlios.de>
@@ -60,19 +60,15 @@
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
+#include <signal.h> 
+#include <unistd.h>
 
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
-#ifdef HAVE_GLITZ
-#include <gdk/gdkx.h>
-#include <glitz-glx.h>
-#include <cairo-glitz.h>
-#endif
 #include <gtk/gtkgl.h>
-#include <GL/glut.h>
 
 #include "cairo-dock-icons.h"
 #include "cairo-dock-applications-manager.h"
@@ -91,6 +87,7 @@
 #include "cairo-dock-log.h"
 #include "cairo-dock-X-utilities.h"
 #include "cairo-dock-dbus.h"
+#include "cairo-dock-load.h"
 
 CairoDock *g_pMainDock;  // pointeur sur le dock principal.
 int g_iWmHint = GDK_WINDOW_TYPE_HINT_DOCK;  // hint pour la fenetre du dock principal.
@@ -143,7 +140,6 @@ double g_fBackgroundImageAlpha;  // transparence de l'image de fond.
 cairo_surface_t *g_pBackgroundSurface[2] = {NULL, NULL};  // surface associee a l'image du fond, de la taille de l'image du fond.
 cairo_surface_t *g_pBackgroundSurfaceFull[2] = {NULL, NULL};  // surface associee aux decorations, de 2 fois la taille de la fenetre.
 gboolean g_bDecorationsFollowMouse;  // dis si les decorations sont asservies au curseur, ou si le delta de deplacement ne depend que de la direction de celui-ci.
-int g_iBackgroundTexture=0;
 
 int g_iIconGap;  // ecart en pixels entre les icones.
 int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];  // les tailles min et max pour chaque type d'icone.
@@ -163,15 +159,11 @@ int g_iLeaveSubDockDelay;
 int g_iShowSubDockDelay;
 gboolean bShowSubDockOnClick;  // TRUE <=> ne montrer les sous-docks qu'au clique, sinon au survol.
 
-int g_iLabelSize = 0;  // taille de la police des etiquettes.
-gchar *g_cLabelPolice = NULL;  // police de caracteres des etiquettes.
-int g_iLabelWeight;  // epaisseur des traits.
-int g_iLabelStyle;  // italique ou droit.
 gboolean g_bLabelForPointedIconOnly;  // n'afficher les etiquettes que pour l'icone pointee.
 double g_fLabelAlphaThreshold;  // seuil de visibilité de etiquettes.
 gboolean g_bTextAlwaysHorizontal;  // true <=> etiquettes horizontales meme pour les docks verticaux.
-double g_fLabelBackgroundColor[4];  // couleur des etiquettes, alpha=0 pour utiliser des contours epais.
-gboolean g_bUseBackgroundForLabel;
+CairoDockLabelDescription g_iconTextDescription;
+CairoDockLabelDescription g_quickInfoTextDescription;
 
 double g_fAlphaAtRest;
 
@@ -190,6 +182,7 @@ int g_iAppliMaxNameLength;  // longueur max de la chaine de caractere du nom des
 gboolean g_bMinimizeOnClick;  // minimiser l'appli lorsqu'on clique sur son icone si elle est deja active.
 gboolean g_bCloseAppliOnMiddleClick;  // utiliser le clique du milieu pour fermer une appli.
 gboolean g_bAutoHideOnFullScreen;  // quick-hide automatique lorsqu'une fenetre passe en plein ecran (pour pas gener).
+gboolean g_bAutoHideOnMaximized;  // quick-hide automatique lorsqu'une fenetre passe en plein ecran ou en mode maximise.
 gboolean g_bDemandsAttentionWithDialog;  // attirer l'attention avec une bulle de dialogue.
 gboolean g_bDemandsAttentionWithAnimation;  // attirer l'attention avec une animation.
 gboolean g_bAnimateOnActiveWindow;  // jouer une breve animation de l'icone lorsque la fenetre correspondante devient active.
@@ -208,11 +201,7 @@ int g_iDialogButtonWidth = 48;
 int g_iDialogButtonHeight = 48;
 double g_fDialogColor[4];
 int g_iDialogIconSize;
-int g_iDialogMessageSize;  // taille de la police des messagez.
-gchar *g_cDialogMessagePolice = NULL;  // police de caracteres des etiquettes.
-int g_iDialogMessageWeight;  // epaisseur des traits.
-int g_iDialogMessageStyle;  // italique ou droit.
-double g_fDialogTextColor[4];
+CairoDockLabelDescription g_dialogTextDescription;
 
 double g_fDeskletColor[4];
 double g_fDeskletColorInside[4];
@@ -220,13 +209,13 @@ double g_fDeskletColorInside[4];
 gchar *g_cRaiseDockShortcut = NULL;
 
 gboolean g_bKeepAbove = FALSE;
+gboolean g_bPopUp = FALSE;
 gboolean g_bSkipPager = TRUE;
 gboolean g_bSkipTaskbar = TRUE;
 gboolean g_bSticky = TRUE;
 
 gboolean g_bUseGlitz = FALSE;
 gboolean g_bVerbose = FALSE;
-gboolean g_bUseOpenGL = FALSE;
 
 int g_iMajorVersion, g_iMinorVersion, g_iMicroVersion;
 CairoDockDesktopEnv g_iDesktopEnv = CAIRO_DOCK_UNKNOWN_ENV;
@@ -234,30 +223,30 @@ CairoDockDesktopEnv g_iDesktopEnv = CAIRO_DOCK_UNKNOWN_ENV;
 CairoDockFMSortType g_iFileSortType;
 gboolean g_bShowHiddenFiles;
 
+gboolean g_bOverWriteXIcons = TRUE; // il faut le savoir avant.
+
 cairo_surface_t *g_pIndicatorSurface[2] = {NULL, NULL};
 gboolean g_bMixLauncherAppli = FALSE;
 double g_fIndicatorWidth, g_fIndicatorHeight;
 int g_iIndicatorDeltaY;
-gboolean g_bOverWriteXIcons = TRUE; // il faut le savoir avant.
 gboolean g_bLinkIndicatorWithIcon;
+gboolean g_bIndicatorAbove;
+gboolean g_bShowThumbnail = FALSE;
 
 cairo_surface_t *g_pDropIndicatorSurface = NULL;
 double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
 
+cairo_surface_t *g_pDesktopBgSurface = NULL;  // image en fond d'ecran.
+gboolean g_bUseFakeTransparency = FALSE;
+//int g_iDamageEvent = 0;
+
+static gchar *cLaunchCommand = NULL;
+
+
+gboolean g_bUseOpenGL = FALSE;
 GdkGLConfig* g_pGlConfig = NULL;
+int g_iBackgroundTexture=0;
 
-static gboolean random_dialog (gpointer user_data)
-{
-	g_return_val_if_fail (g_pMainDock != NULL && g_pMainDock->icons != NULL, TRUE);
-
-	int num_icone = g_random_int_range (0, g_list_length (g_pMainDock->icons));
-
-	Icon *icon = g_list_nth_data (g_pMainDock->icons, num_icone);
-	if (CAIRO_DOCK_IS_SEPARATOR (icon))
-		return random_dialog (user_data);
-	cairo_dock_show_temporary_dialog (icon->acName, icon, CAIRO_CONTAINER (g_pMainDock), 7000);
-	return TRUE;
-}
 
 static void _cairo_dock_set_verbosity(gchar *cVerbosity)
 {
@@ -279,22 +268,48 @@ static void _cairo_dock_set_verbosity(gchar *cVerbosity)
 	}
 }
 
-int
-main (int argc, char** argv)
+static gboolean _cairo_dock_successful_launch (gpointer data)
 {
-	gint i;
+	cLaunchCommand[strlen (cLaunchCommand)-3] = '\0';  // on enleve le mode maintenance.
+	return FALSE;
+}
+static void _cairo_dock_intercept_signal (int signal)
+{
+	cd_warning ("Attention : Cairo-Dock has crashed (sig %d).\nIt will be restarted now.\nFeel free to report this bug on cairo-dock.org to help improving the dock !", signal);
+	execl ("/bin/sh", "/bin/sh", "-c", cLaunchCommand, NULL);  // on ne revient pas de cette fonction.
+	cd_warning ("Sorry, couldn't restart the dock");
+}
+static void _cairo_dock_set_signal_interception (void)
+{
+	signal (SIGSEGV, _cairo_dock_intercept_signal);  // Segmentation violation
+	signal (SIGFPE, _cairo_dock_intercept_signal);  // Floating-point exception
+	signal (SIGILL, _cairo_dock_intercept_signal);  // Illegal instruction
+	signal (SIGABRT, _cairo_dock_intercept_signal);  // Abort
+}
+
+
+int main (int argc, char** argv)
+{
+	int i;
+	GString *sCommandString = g_string_new (argv[0]);
+	for (i = 1; i < argc; i ++)
+	{
+		g_string_append_printf (sCommandString, " %s", argv[i]);
+	}
+	g_string_append (sCommandString, " -m");  // on relance avec le mode maintenance.
+	cLaunchCommand = sCommandString->str;
+	g_string_free (sCommandString, FALSE);
+	
 	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)
 		g_tIconTypeOrder[i] = i;
 	cd_log_init(FALSE);
         //No log
         cd_log_set_level(0);
 	gtk_init (&argc, &argv);
-	gtk_gl_init (&argc, &argv);
-	//glutInit (&argc, argv);
 	GError *erreur = NULL;
-
+	
 	//\___________________ On recupere quelques options.
-	gboolean bDialogTest = FALSE, bSafeMode = FALSE, bMaintenance = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE;
+	gboolean bSafeMode = FALSE, bMaintenance = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE;
 	gchar *cEnvironment = NULL, *cUserDefinedDataDir = NULL, *cVerbosity = 0, *cUserDefinedModuleDir = NULL;
 	GOptionEntry TableDesOptions[] =
 	{
@@ -327,7 +342,7 @@ main (int argc, char** argv)
 			"force the window manager to consider cairo-dock as a normal appli instead of a dock", NULL},
 		{"env", 'e', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
 			&cEnvironment,
-			"force the dock to consider this environnement - it may crush the dock if not set properly.", NULL},
+			"force the dock to consider this environnement - it may crash the dock if not set properly.", NULL},
 		{"dir", 'd', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
 			&cUserDefinedDataDir,
 			"force the dock to load this directory, instead of ~/.cairo-dock.", NULL},
@@ -337,9 +352,6 @@ main (int argc, char** argv)
 		{"safe-mode", 'f', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&bSafeMode,
 			"don't load any plug-ins and show the theme manager on start", NULL},
-		{"dialog", 'D', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
-			&bDialogTest,
-			"for test on dialogs only", NULL},
 		{"capuccino", 'C', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&bCappuccino,
 			"Cairo-Dock makes anything, including coffee !", NULL},
@@ -354,7 +366,10 @@ main (int argc, char** argv)
 			"print version and quit.", NULL},
 		{"modules-dir", 'M', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
 			&cUserDefinedModuleDir,
-			"ask the dock to load additionnal modules contained in this directory (Though it is unsafe for your dock to load unnofficial modules).", NULL},
+			"ask the dock to load additionnal modules contained in this directory (though it is unsafe for your dock to load unnofficial modules).", NULL},
+		{"fake-transparency", 'F', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&g_bUseFakeTransparency,
+			"emulate composition with fake transparency. Only use this if you don't run a compositor like Compiz, xcompmgr, etc and have a black background around your dock.", NULL},
 		{NULL}
 	};
 
@@ -376,6 +391,12 @@ main (int argc, char** argv)
 		cVerbosity = NULL;
 	}
 #endif */
+	if (bPrintVersion)
+	{
+		g_print ("%s\n", CAIRO_DOCK_VERSION);
+		return 0;
+	}
+	
 	_cairo_dock_set_verbosity(cVerbosity);
 	g_free (cVerbosity);
 
@@ -401,14 +422,16 @@ main (int argc, char** argv)
 			cd_warning ("Attention : unknown environnment '%s'", cEnvironment);
 		g_free (cEnvironment);
 	}
-#ifndef HAVE_GLITZ
+#ifdef HAVE_GLITZ
+	cd_message ("Compiled with Glitz (hardware acceleration support)\n");
+#else
 	if (g_bUseGlitz)
 	{
 		cd_warning ("Attention : Cairo-Dock was not compiled with glitz");
 		g_bUseGlitz = FALSE;
 	}
 #endif
-
+	
 	if (bCappuccino)
 	{
 		g_print ("Please insert one coin into your PC.\n");
@@ -424,23 +447,6 @@ main (int argc, char** argv)
 		g_print ("Honestly, you trust someone who includes such options in his code ?\n");
 		return 0;
 	}
-	if (bPrintVersion)
-	{
-		g_print ("%s\n", CAIRO_DOCK_VERSION);
-		return 0;
-	}
-	
-	g_pGlConfig = gdk_gl_config_new_by_mode (GDK_GL_MODE_RGB   |
-		GDK_GL_MODE_ALPHA |
-		GDK_GL_MODE_DEPTH |
-		GDK_GL_MODE_DOUBLE);
-	if (! g_pGlConfig)
-	{
-		cd_warning ("Could not setup GL-context !");
-		g_bUseOpenGL = FALSE;
-	}
-	
-	
 	
 	//\___________________ On internationalise l'appli.
 	bindtextdomain (CAIRO_DOCK_GETTEXT_PACKAGE, CAIRO_DOCK_LOCALE_DIR);
@@ -473,7 +479,7 @@ main (int argc, char** argv)
 		if (g_mkdir (g_cCurrentLaunchersPath, 7*8*8+7*8+5) != 0)
 			cd_warning ("Attention : couldn't create directory %s", g_cCurrentLaunchersPath);
 	}
-
+	
 	//\___________________ On initialise les numeros de version.
 	cairo_dock_get_version_from_string (CAIRO_DOCK_VERSION, &g_iMajorVersion, &g_iMinorVersion, &g_iMicroVersion);
 
@@ -492,10 +498,6 @@ main (int argc, char** argv)
 	
 	//\___________________ initialise the keybinder
 	cd_keybinder_init();
-	
-	//\___________________ On initialise le support de DBus.
-	///if (! bSafeMode)
-	///	cairo_dock_initialize_dbus_manager ();
 	
 	//\___________________ On detecte l'environnement de bureau (apres les applis et avant les modules).
 	if (g_iDesktopEnv == CAIRO_DOCK_UNKNOWN_ENV)
@@ -522,6 +524,9 @@ main (int argc, char** argv)
 	cairo_dock_register_notification (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) cairo_dock_notification_middle_click_icon, CAIRO_DOCK_RUN_AFTER);
 	cairo_dock_register_notification (CAIRO_DOCK_REMOVE_ICON, (CairoDockNotificationFunc) cairo_dock_notification_remove_icon, CAIRO_DOCK_RUN_AFTER);
 	
+	//\___________________ On initialise la gestion des crash.
+	_cairo_dock_set_signal_interception ();
+	
 	//\___________________ On charge le dernier theme ou on demande a l'utilisateur d'en choisir un.
 	g_cConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
 	g_cEasyConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_EASY_CONF_FILE);
@@ -539,16 +544,12 @@ main (int argc, char** argv)
 			cairo_dock_manage_themes (NULL, bSafeMode);
 		}
 		while (g_pMainDock == NULL);
-		/**int r;
-		while ((r = cairo_dock_ask_initial_theme ()) == 0);
-		if (r == -1)
-		{
-			g_print ("mata ne !\n");
-			exit (0);
-		}*/
 	}
-
+	
 	cairo_dock_load_theme (g_cCurrentThemePath);
+	
+	if (g_bUseFakeTransparency)
+		cairo_dock_load_desktop_background_surface ();
 
 	//\___________________ On affiche le changelog en cas de nouvelle version.
 	gchar *cLastVersionFilePath = g_strdup_printf ("%s/.cairo-dock-last-version", g_cCairoDockDataDir);
@@ -608,11 +609,6 @@ main (int argc, char** argv)
 		}
 	}
 
-
-	if (bDialogTest)
-		g_timeout_add (2000, (GSourceFunc) random_dialog, NULL);  // pour tests seulement.
-
-
 	//\___________________ Message a caractere informatif (ou pas).
 	gchar *cSillyMessageFilePath = g_strdup_printf ("%s/.cairo-dock-silly-question", g_cCairoDockDataDir);
 	//const gchar *cSillyMessage = "Le saviez-vous ?\nUtiliser cairo-dock vous rendra beau et intelligent !";
@@ -628,8 +624,10 @@ main (int argc, char** argv)
 	//const gchar *cSillyMessage = "Sondage :\nVoulez-vous voir plus de filles nues dans Cairo-Dock ?";
 	//const gchar *cSillyMessage = "C'est les soldes !\n Pour tout sous-dock acheté, un sous-dock offert !";
 	//const gchar *cSillyMessage = "J-2 avant la 1.5, la tension monte !";
-	const gchar *cSillyMessage = "Cairo-Dock : sans danger si l'on se conforme au mode d'emploi.";
-	const gchar *cNumSilllyMessage = "16";
+	//const gchar *cSillyMessage = "Cairo-Dock : sans danger si l'on se conforme au mode d'emploi.";
+	//const gchar *cSillyMessage = "Nochka, ton home a disparu !";
+	const gchar *cSillyMessage = "La nouvelle sauce Cairo-Dock rehaussera le goût de tous vos plats !";
+	const gchar *cNumSilllyMessage = "18";
 	gboolean bWriteSillyMessage;
 	if (! g_file_test (cSillyMessageFilePath, G_FILE_TEST_EXISTS))
 	{
@@ -677,6 +675,8 @@ main (int argc, char** argv)
 		/*double fAnswer = cairo_dock_show_value_and_wait ("Test :", cairo_dock_get_first_appli (g_pMainDock->icons), g_pMainDock, .7);
 		cd_message (" ==> %.2f\n", fAnswer);*/
 	}
+	
+	g_timeout_add_seconds (5, _cairo_dock_successful_launch, NULL);
 	
 	gtk_main ();
 

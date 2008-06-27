@@ -58,6 +58,10 @@ GtkWidget *cairo_dock_build_common_interactive_widget_for_dialog (const gchar *c
 
 CairoDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, CairoContainer *pContainer, gchar *cImageFilePath, GtkWidget *pInteractiveWidget, GtkButtonsType iButtonsType, CairoDockActionOnAnswerFunc pActionFunc, gpointer data, GFreeFunc pFreeDataFunc);
 
+void cairo_dock_set_dialog_message (CairoDialog *pDialog, const gchar *cMessage);
+
+void cairo_dock_set_dialog_icon (CairoDialog *pDialog, const gchar *cImageFilePath);
+
 
 void cairo_dock_dialog_calculate_aimed_point (Icon *pIcon, CairoContainer *pContainer, int *iX, int *iY, gboolean *bRight, CairoDockTypeHorizontality *bIsHorizontal, gboolean *bDirectionUp);
 

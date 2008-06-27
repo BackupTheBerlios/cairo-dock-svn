@@ -26,13 +26,16 @@ extern double g_fAlbedo;
 extern int g_iLabelWeight;
 extern int g_iLabelStyle;
 extern int g_iDockRadius;
+extern gboolean g_bUseOpenGL;
 
 
-void cairo_dock_calculate_contrainted_size (double *fImageWidth, double *fImageHeight, int iWidthConstraint, int iHeightConstraint, double *fZoomWidth, double *fZoomHeight)
+void cairo_dock_calculate_size_fill (double *fImageWidth, double *fImageHeight, int iWidthConstraint, int iHeightConstraint, gboolean bNoZoomUp, double *fZoomWidth, double *fZoomHeight)
 {
 	if (iWidthConstraint != 0)
 	{
 		*fZoomWidth = 1. * iWidthConstraint / (*fImageWidth);
+		if (bNoZoomUp && *fZoomWidth > 1)
+			*fZoomWidth = 1;
 		*fImageWidth = (double) iWidthConstraint;
 	}
 	else
@@ -40,13 +43,15 @@ void cairo_dock_calculate_contrainted_size (double *fImageWidth, double *fImageH
 	if (iHeightConstraint != 0)
 	{
 		*fZoomHeight = 1. * iHeightConstraint / (*fImageHeight);
+		if (bNoZoomUp && *fZoomHeight > 1)
+			*fZoomHeight = 1;
 		*fImageHeight = (double) iHeightConstraint;
 	}
 	else
 		*fZoomHeight = 1.;
 }
 
-void cairo_dock_calculate_size_constant_ratio (double *fImageWidth, double *fImageHeight, int iWidthConstraint, int iHeightConstraint, double *fZoom)
+void cairo_dock_calculate_size_constant_ratio (double *fImageWidth, double *fImageHeight, int iWidthConstraint, int iHeightConstraint, gboolean bNoZoomUp, double *fZoom)
 {
 	if (iWidthConstraint != 0 && iHeightConstraint != 0)
 		*fZoom = MIN (iWidthConstraint / (*fImageWidth), iHeightConstraint / (*fImageHeight));
@@ -56,10 +61,50 @@ void cairo_dock_calculate_size_constant_ratio (double *fImageWidth, double *fIma
 		*fZoom = iHeightConstraint / (*fImageHeight);
 	else
 		*fZoom = 1.;
+	if (bNoZoomUp && *fZoom > 1)
+		*fZoom = 1.;
 	*fImageWidth = (*fImageWidth) * (*fZoom);
 	*fImageHeight = (*fImageHeight) * (*fZoom);
 }
 
+void cairo_dock_calculate_constrainted_size (double *fImageWidth, double *fImageHeight, int iWidthConstraint, int iHeightConstraint, CairoDockLoadImageModifier iLoadingModifier, double *fZoomWidth, double *fZoomHeight)
+{
+	gboolean bKeepRatio = iLoadingModifier & CAIRO_DOCK_KEEP_RATIO;
+	gboolean bNoZoomUp = iLoadingModifier & CAIRO_DOCK_DONT_ZOOM_IN;
+	if (bKeepRatio)
+	{
+		cairo_dock_calculate_size_constant_ratio (fImageWidth,
+			fImageHeight,
+			iWidthConstraint,
+			iHeightConstraint,
+			bNoZoomUp,
+			fZoomWidth);
+		*fZoomHeight = *fZoomWidth;
+	}
+	else
+	{
+		cairo_dock_calculate_size_fill (fImageWidth,
+			fImageHeight,
+			iWidthConstraint,
+			iHeightConstraint,
+			bNoZoomUp,
+			fZoomWidth,
+			fZoomHeight);
+	}
+}
+
+inline cairo_surface_t *_cairo_dock_create_blank_surface (cairo_t *pSourceContext, int iWidth, int iHeight)
+{
+	if (pSourceContext != NULL && ! g_bUseOpenGL)
+		return cairo_surface_create_similar (cairo_get_target (pSourceContext),
+			CAIRO_CONTENT_COLOR_ALPHA,
+			iWidth,
+			iHeight);
+	else
+		return cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
+			iWidth,
+			iHeight);
+}
 
 cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuffer, int iBufferNbElements, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
 {
@@ -105,15 +150,15 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 		(int) iStride);
 
 	double fIconWidthSaturationFactor, fIconHeightSaturationFactor;
-	cairo_dock_calculate_contrainted_size (fWidth,
+	cairo_dock_calculate_size_fill (fWidth,
 		fHeight,
 		g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI],
 		g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI],
+		FALSE,
 		&fIconWidthSaturationFactor,
 		&fIconHeightSaturationFactor);
 
-	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-		CAIRO_CONTENT_COLOR_ALPHA,
+	cairo_surface_t *pNewSurface = _cairo_dock_create_blank_surface (pSourceContext,
 		ceil (*fWidth * fMaxScale),
 		ceil (*fHeight * fMaxScale));
 	cairo_t *pCairoContext = cairo_create (pNewSurface);
@@ -129,36 +174,24 @@ cairo_surface_t *cairo_dock_create_surface_from_xicon_buffer (gulong *pXIconBuff
 }
 
 
-cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo_t *pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, gboolean bKeepRatio, double *fImageWidth, double *fImageHeight)
+cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo_t *pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, CairoDockLoadImageModifier iLoadingModifier, double *fImageWidth, double *fImageHeight, double *fZoomX, double *fZoomY)
 {
 	*fImageWidth = gdk_pixbuf_get_width (pixbuf);
 	*fImageHeight = gdk_pixbuf_get_height (pixbuf);
-
 	double fIconWidthSaturationFactor = 1., fIconHeightSaturationFactor = 1.;
-	if (bKeepRatio)
-	{
-		cairo_dock_calculate_size_constant_ratio (fImageWidth,
+	cairo_dock_calculate_constrainted_size (fImageWidth,
 			fImageHeight,
 			iWidthConstraint,
 			iHeightConstraint,
-			&fIconWidthSaturationFactor);
-		fIconHeightSaturationFactor = fIconWidthSaturationFactor;
-	}
-	else
-	{
-		cairo_dock_calculate_contrainted_size (fImageWidth,
-			fImageHeight,
-			iWidthConstraint,
-			iHeightConstraint,
+			iLoadingModifier,
 			&fIconWidthSaturationFactor,
 			&fIconHeightSaturationFactor);
-	}
 
 	GdkPixbuf *pPixbufWithAlpha = pixbuf;
 	if (! gdk_pixbuf_get_has_alpha (pixbuf))  // on lui rajoute un canal alpha s'il n'en a pas.
 	{
 		//g_print ("  ajout d'un canal alpha\n");
-		pPixbufWithAlpha = gdk_pixbuf_add_alpha (pixbuf, TRUE, 255, 255, 255);  // TRUE <=> les pixels blancs deviennent transparents.
+		pPixbufWithAlpha = gdk_pixbuf_add_alpha (pixbuf, FALSE, 255, 255, 255);  // TRUE <=> les pixels blancs deviennent transparents.
 	}
 
 	//\____________________ On pre-multiplie chaque composante par le alpha (necessaire pour libcairo).
@@ -192,8 +225,7 @@ cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo
 		gdk_pixbuf_get_height (pPixbufWithAlpha),
 		gdk_pixbuf_get_rowstride (pPixbufWithAlpha));
 
-	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-		CAIRO_CONTENT_COLOR_ALPHA,
+	cairo_surface_t *pNewSurface = _cairo_dock_create_blank_surface (pSourceContext,
 		ceil ((*fImageWidth) * fMaxScale),
 		ceil ((*fImageHeight) * fMaxScale));
 	cairo_t *pCairoContext = cairo_create (pNewSurface);
@@ -206,13 +238,19 @@ cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo
 	
 	if (pPixbufWithAlpha != pixbuf)
 		g_object_unref (pPixbufWithAlpha);
+	
+	if (fZoomX != NULL)
+		*fZoomX = fIconWidthSaturationFactor;
+	if (fZoomY != NULL)
+		*fZoomY = fIconHeightSaturationFactor;
+	
 	return pNewSurface;
 }
 
 
-cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, double *fImageWidth, double *fImageHeight, gboolean bKeepRatio)
+cairo_surface_t *cairo_dock_create_surface_from_image (const gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, CairoDockLoadImageModifier iLoadingModifier, double *fImageWidth, double *fImageHeight, double *fZoomX, double *fZoomY)
 {
-	//g_print ("%s (%s, %dx%dx%.2f)\n", __func__, cImagePath, iWidthConstraint, iHeightConstraint, fMaxScale);
+	//g_print ("%s (%s, %dx%dx%.2f, %d)\n", __func__, cImagePath, iWidthConstraint, iHeightConstraint, fMaxScale, iLoadingModifier);
 	g_return_val_if_fail (cImagePath != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	GError *erreur = NULL;
 	RsvgDimensionData rsvg_dimension_data;
@@ -267,27 +305,15 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 			*fImageWidth = (gdouble) rsvg_dimension_data.width;
 			*fImageHeight = (gdouble) rsvg_dimension_data.height;
 			//g_print ("%.2fx%.2f\n", *fImageWidth, *fImageHeight);
-			if (bKeepRatio)
-			{
-				cairo_dock_calculate_size_constant_ratio (fImageWidth,
-					fImageHeight,
-					iWidthConstraint,
-					iHeightConstraint,
-					&fIconWidthSaturationFactor);
-				fIconHeightSaturationFactor = fIconWidthSaturationFactor;
-			}
-			else
-			{
-				cairo_dock_calculate_contrainted_size (fImageWidth,
-					fImageHeight,
-					iWidthConstraint,
-					iHeightConstraint,
-					&fIconWidthSaturationFactor,
-					&fIconHeightSaturationFactor);
-			}
+			cairo_dock_calculate_constrainted_size (fImageWidth,
+				fImageHeight,
+				iWidthConstraint,
+				iHeightConstraint,
+				iLoadingModifier,
+				&fIconWidthSaturationFactor,
+				&fIconHeightSaturationFactor);
 			
-			pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-				CAIRO_CONTENT_COLOR_ALPHA,
+			pNewSurface = _cairo_dock_create_blank_surface (pSourceContext,
 				ceil ((*fImageWidth) * fMaxScale),
 				ceil ((*fImageHeight) * fMaxScale));
 
@@ -295,39 +321,26 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 			cairo_scale (pCairoContext, fMaxScale * fIconWidthSaturationFactor, fMaxScale * fIconHeightSaturationFactor);
 
 			rsvg_handle_render_cairo (rsvg_handle, pCairoContext);
+			cairo_destroy (pCairoContext);
 			g_object_unref (rsvg_handle);
 		}
 	}
 	else if (bIsPNG)
 	{
 		surface_ini = cairo_image_surface_create_from_png (cImagePath);
-		pNewSurface = surface_ini;
-		if (cairo_surface_status (surface_ini) != CAIRO_STATUS_SUCCESS)
+		if (cairo_surface_status (surface_ini) == CAIRO_STATUS_SUCCESS)
 		{
 			*fImageWidth = (double) cairo_image_surface_get_width (surface_ini);
 			*fImageHeight = (double) cairo_image_surface_get_height (surface_ini);
+			cairo_dock_calculate_constrainted_size (fImageWidth,
+				fImageHeight,
+				iWidthConstraint,
+				iHeightConstraint,
+				iLoadingModifier,
+				&fIconWidthSaturationFactor,
+				&fIconHeightSaturationFactor);
 			
-			if (bKeepRatio)
-			{
-				cairo_dock_calculate_size_constant_ratio (fImageWidth,
-					fImageHeight,
-					iWidthConstraint,
-					iHeightConstraint,
-					&fIconWidthSaturationFactor);
-				fIconHeightSaturationFactor = fIconWidthSaturationFactor;
-			}
-			else
-			{
-				cairo_dock_calculate_contrainted_size (fImageWidth,
-					fImageHeight,
-					iWidthConstraint,
-					iHeightConstraint,
-					&fIconWidthSaturationFactor,
-					&fIconHeightSaturationFactor);
-			}
-			
-			pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-				CAIRO_CONTENT_COLOR_ALPHA,
+			pNewSurface = _cairo_dock_create_blank_surface (pSourceContext,
 				ceil ((*fImageWidth) * fMaxScale),
 				ceil ((*fImageHeight) * fMaxScale));
 			pCairoContext = cairo_create (pNewSurface);
@@ -336,8 +349,9 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 			
 			cairo_set_source_surface (pCairoContext, surface_ini, 0, 0);
 			cairo_paint (pCairoContext);
-			cairo_surface_destroy (surface_ini);
+			cairo_destroy (pCairoContext);
 		}
+		cairo_surface_destroy (surface_ini);
 	}
 	else  // le code suivant permet de charger tout type d'image, mais en fait c'est un peu idiot d'utiliser des icones n'ayant pas de transparence.
 	{
@@ -353,18 +367,24 @@ cairo_surface_t *cairo_dock_create_surface_from_image (gchar *cImagePath, cairo_
 			fMaxScale,
 			iWidthConstraint,
 			iHeightConstraint,
-			FALSE,
+			iLoadingModifier,
 			fImageWidth,
-			fImageHeight);
+			fImageHeight,
+			&fIconWidthSaturationFactor,
+			&fIconHeightSaturationFactor);
 		g_object_unref (pixbuf);
 		
 	}
-	cairo_destroy (pCairoContext);
+	
+	if (fZoomX != NULL)
+		*fZoomX = fIconWidthSaturationFactor;
+	if (fZoomY != NULL)
+		*fZoomY = fIconHeightSaturationFactor;
 	
 	return pNewSurface;
 }
 
-cairo_surface_t *cairo_dock_create_surface_for_icon (gchar *cImagePath, cairo_t* pSourceContext, double fImageWidth, double fImageHeight)
+cairo_surface_t *cairo_dock_create_surface_for_icon (const gchar *cImagePath, cairo_t* pSourceContext, double fImageWidth, double fImageHeight)
 {
 	double fImageWidth_ = fImageWidth, fImageHeight_ = fImageHeight;
 	return cairo_dock_create_surface_from_image (cImagePath,
@@ -372,9 +392,11 @@ cairo_surface_t *cairo_dock_create_surface_for_icon (gchar *cImagePath, cairo_t*
 		1.,
 		fImageWidth,
 		fImageHeight,
+		CAIRO_DOCK_FILL_SPACE,
 		&fImageWidth_,
 		&fImageHeight_,
-		FALSE);
+		NULL,
+		NULL);
 }
 
 
@@ -388,8 +410,7 @@ cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t 
 		cairo_t *pCairoContext;
 		if (fabs (fRotationAngle) > G_PI / 2)
 		{
-			pNewSurfaceRotated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-				CAIRO_CONTENT_COLOR_ALPHA,
+			pNewSurfaceRotated = _cairo_dock_create_blank_surface (pSourceContext,
 				fImageWidth,
 				fImageHeight);
 			pCairoContext = cairo_create (pNewSurfaceRotated);
@@ -399,8 +420,7 @@ cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t 
 		}
 		else
 		{
-			pNewSurfaceRotated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-				CAIRO_CONTENT_COLOR_ALPHA,
+			pNewSurfaceRotated = _cairo_dock_create_blank_surface (pSourceContext,
 				fImageHeight,
 				fImageWidth);
 			pCairoContext = cairo_create (pNewSurfaceRotated);
@@ -439,33 +459,22 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_
 	double fReflectHeight = g_fReflectSize * fMaxScale;
 	if (fReflectHeight == 0 || g_fAlbedo == 0)
 		return NULL;
-	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-		CAIRO_CONTENT_COLOR_ALPHA,
+	cairo_surface_t *pNewSurface = _cairo_dock_create_blank_surface (pSourceContext,
 		fImageWidth,
 		fReflectHeight);
 	cairo_t *pCairoContext = cairo_create (pNewSurface);
-
-	//\_______________ On dessine l'image originale inversee.
+	
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
-	cairo_save (pCairoContext);
+	cairo_set_source_rgba (pCairoContext, 0., 0., 0., 0.);
+	
+	//\_______________ On dessine l'image originale inversee.
 	cairo_translate (pCairoContext, 0, fImageHeight);
 	cairo_scale (pCairoContext, 1., -1.);
-
 	cairo_set_source_surface (pCairoContext, pSurface, 0, (bDirectionUp ? 0 : fImageHeight - fReflectHeight));
-	cairo_paint (pCairoContext);
-	cairo_destroy (pCairoContext);
-
-
-	//\_______________ On re-dessine avec un degrade en transparence.
-	cairo_surface_t *pNewSurfaceGradated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-		CAIRO_CONTENT_COLOR_ALPHA,
-		fImageWidth,
-		fReflectHeight);
-	pCairoContext = cairo_create (pNewSurfaceGradated);
-	cairo_set_source_surface (pCairoContext, pNewSurface, 0, 0);
-
+	
+	//\_______________ On applique un degrade en transparence.
 	cairo_pattern_t *pGradationPattern = cairo_pattern_create_linear (0.,
-		0.,
+		2*fReflectHeight,
 		0.,
 		fReflectHeight);  // de haut en bas.
 	g_return_val_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS, NULL);
@@ -484,13 +493,11 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_
 		0.,
 		(bDirectionUp ? 0 : g_fAlbedo));
 
-	cairo_translate (pCairoContext, 0, 0);
 	cairo_mask (pCairoContext, pGradationPattern);
 
 	cairo_pattern_destroy (pGradationPattern);
 	cairo_destroy (pCairoContext);
-	cairo_surface_destroy (pNewSurface);
-	return pNewSurfaceGradated;
+	return pNewSurface;
 }
 
 static cairo_surface_t * cairo_dock_create_reflection_surface_vertical (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale, gboolean bDirectionUp)
@@ -501,31 +508,21 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_vertical (cairo_su
 	double fReflectWidth = g_fReflectSize * fMaxScale;
 	if (fReflectWidth == 0 || g_fAlbedo == 0)
 		return NULL;
-	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-		CAIRO_CONTENT_COLOR_ALPHA,
+	cairo_surface_t *pNewSurface = _cairo_dock_create_blank_surface (pSourceContext,
 		fReflectWidth,
 		fImageHeight);
 	cairo_t *pCairoContext = cairo_create (pNewSurface);
 
-	//\_______________ On dessine l'image originale inversee.
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
-	cairo_save (pCairoContext);
+	cairo_set_source_rgba (pCairoContext, 0., 0., 0., 0.);
+	
+	//\_______________ On dessine l'image originale inversee.
 	cairo_translate (pCairoContext, fImageWidth, 0);
 	cairo_scale (pCairoContext, -1., 1.);
-
 	cairo_set_source_surface (pCairoContext, pSurface, (bDirectionUp ? 0. : fImageHeight - fReflectWidth), 0.);
-	cairo_paint (pCairoContext);
-	cairo_destroy (pCairoContext);
-
-	//\_______________ On re-dessine avec un degrade en transparence.
-	cairo_surface_t *pNewSurfaceGradated = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-		CAIRO_CONTENT_COLOR_ALPHA,
-		fReflectWidth,
-		fImageHeight);
-	pCairoContext = cairo_create (pNewSurfaceGradated);
-	cairo_set_source_surface (pCairoContext, pNewSurface, 0, 0);
-
-	cairo_pattern_t *pGradationPattern = cairo_pattern_create_linear (0.,
+	
+	//\_______________ On applique un degrade en transparence.
+	cairo_pattern_t *pGradationPattern = cairo_pattern_create_linear (2*fReflectWidth,
 		0.,
 		fReflectWidth,
 		0.);  // de gauche a droite.
@@ -545,13 +542,11 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_vertical (cairo_su
 		0.,
 		(bDirectionUp ? 0. : g_fAlbedo));
 
-	cairo_translate (pCairoContext, 0, 0);
 	cairo_mask (pCairoContext, pGradationPattern);
 
 	cairo_pattern_destroy (pGradationPattern);
 	cairo_destroy (pCairoContext);
-	cairo_surface_destroy (pNewSurface);
-	return pNewSurfaceGradated;
+	return pNewSurface;
 }
 
 cairo_surface_t * cairo_dock_create_reflection_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, gboolean bHorizontalDock, double fMaxScale, gboolean bDirectionUp)
@@ -571,8 +566,7 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_horizontal (cai
 	double fReflectHeight = g_fReflectSize * fMaxScale;
 	if (fReflectHeight == 0 || g_fAlbedo == 0)
 		return NULL;
-	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-		CAIRO_CONTENT_COLOR_ALPHA,
+	cairo_surface_t *pNewSurface = _cairo_dock_create_blank_surface (pSourceContext,
 		fImageWidth,
 		fImageHeight + fReflectHeight);
 	cairo_t *pCairoContext = cairo_create (pNewSurface);
@@ -598,8 +592,7 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_vertical (cairo
 	double fReflectWidth = g_fReflectSize * fMaxScale;
 	if (fReflectWidth == 0 || g_fAlbedo == 0)
 		return NULL;
-	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-		CAIRO_CONTENT_COLOR_ALPHA,
+	cairo_surface_t *pNewSurface = _cairo_dock_create_blank_surface (pSourceContext,
 		fImageWidth + fReflectWidth,
 		fImageHeight);
 	cairo_t *pCairoContext = cairo_create (pNewSurface);
@@ -627,37 +620,36 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection (cairo_surface_
 }
 
 
-cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSourceContext, int iLabelSize, gchar *cLabelPolice, int iLabelWeight, double *fBackgroundColor, double fMaxScale, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset)
+cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSourceContext, CairoDockLabelDescription *pLabelDescription, double fMaxScale, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset)
 {
-	g_return_val_if_fail (cText != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
+	g_return_val_if_fail (cText != NULL && pLabelDescription != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	
 	//\_________________ On ecrit le texte dans un calque Pango.
 	PangoLayout *pLayout = pango_cairo_create_layout (pSourceContext);
 	
 	PangoFontDescription *pDesc = pango_font_description_new ();
-	pango_font_description_set_absolute_size (pDesc, fMaxScale * iLabelSize * PANGO_SCALE);
-	pango_font_description_set_family_static (pDesc, cLabelPolice);
-	pango_font_description_set_weight (pDesc, iLabelWeight);
-	pango_font_description_set_style (pDesc, g_iLabelStyle);
+	pango_font_description_set_absolute_size (pDesc, fMaxScale * pLabelDescription->iSize * PANGO_SCALE);
+	pango_font_description_set_family_static (pDesc, pLabelDescription->cFont);
+	pango_font_description_set_weight (pDesc, pLabelDescription->iWeight);
+	pango_font_description_set_style (pDesc, pLabelDescription->iStyle);
 	pango_layout_set_font_description (pLayout, pDesc);
 	pango_font_description_free (pDesc);
 	
 	pango_layout_set_text (pLayout, cText, -1);
 	
-	//\_________________ On recupere la taille effective du calque.
+	//\_________________ On cree une surface aux dimensions du texte.
 	PangoRectangle ink, log;
 	pango_layout_get_pixel_extents (pLayout, &ink, &log);
 	
 	*iTextWidth = ink.width + 2;
 	*iTextHeight = ink.height + 2 + 1;  // +1 car certaines polices "debordent".
 	
-	//\_________________ On dessine le calque dans une surface cairo.
-	cairo_surface_t* pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-		CAIRO_CONTENT_COLOR_ALPHA,
+	cairo_surface_t* pNewSurface = _cairo_dock_create_blank_surface (pSourceContext,
 		*iTextWidth, *iTextHeight);
 	cairo_t* pCairoContext = cairo_create (pNewSurface);
 	
-	if (fBackgroundColor != NULL && fBackgroundColor[3] > 0)  // non transparent.
+	//\_________________ On dessine le fond.
+	if (pLabelDescription->fBackgroundColor != NULL && pLabelDescription->fBackgroundColor[3] > 0)  // non transparent.
 	{
 		cairo_save (pCairoContext);
 		double fRadius = fMaxScale * MIN (.5 * g_iDockRadius, 5.);  // bon compromis.
@@ -667,13 +659,15 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 		double fDockOffsetX = fRadius + fLineWidth/2;
 		double fDockOffsetY = 0.;
 		cairo_dock_draw_frame (pCairoContext, fRadius, fLineWidth, fFrameWidth, fFrameHeight, fDockOffsetX, fDockOffsetY, 1, 0., CAIRO_DOCK_HORIZONTAL);
-		cairo_set_source_rgba (pCairoContext, fBackgroundColor[0], fBackgroundColor[1], fBackgroundColor[2], fBackgroundColor[3]);
+		cairo_set_source_rgba (pCairoContext, pLabelDescription->fBackgroundColor[0], pLabelDescription->fBackgroundColor[1], pLabelDescription->fBackgroundColor[2], pLabelDescription->fBackgroundColor[3]);
 		cairo_fill_preserve (pCairoContext);
 		cairo_restore(pCairoContext);
 	}
 	
 	cairo_translate (pCairoContext, -ink.x, -ink.y+1);  // meme remarque.
 	
+	//\_________________ On dessine les contours.
+	cairo_save (pCairoContext);
 	cairo_push_group (pCairoContext);
 	cairo_set_source_rgb (pCairoContext, 0.2, 0.2, 0.2);
 	int i;
@@ -684,10 +678,43 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 	}
 	cairo_pop_group_to_source (pCairoContext);
 	cairo_paint_with_alpha (pCairoContext, .75);
+	cairo_restore(pCairoContext);
 	
-	cairo_set_source_rgb (pCairoContext, 1., 1., 1.);
+	//\_________________ On remplit l'interieur du texte.
+	cairo_pattern_t *pGradationPattern = NULL;
+	if (pLabelDescription->fColorStart != pLabelDescription->fColorStop)
+	{
+		if (pLabelDescription->bVerticalPattern)
+			pGradationPattern = cairo_pattern_create_linear (0.,
+				ink.y-1.,
+				0.,
+				*iTextHeight+ink.y-1);
+		else
+			pGradationPattern = cairo_pattern_create_linear (ink.x,
+				0.,
+				*iTextWidth + ink.x,
+				0.);
+		g_return_val_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS, NULL);
+		cairo_pattern_set_extend (pGradationPattern, CAIRO_EXTEND_NONE);
+		cairo_pattern_add_color_stop_rgba (pGradationPattern,
+			0.,
+			pLabelDescription->fColorStart[0],
+			pLabelDescription->fColorStart[1],
+			pLabelDescription->fColorStart[2],
+			1.);
+		cairo_pattern_add_color_stop_rgba (pGradationPattern,
+			1.,
+			pLabelDescription->fColorStop[0],
+			pLabelDescription->fColorStop[1],
+			pLabelDescription->fColorStop[2],
+			1.);
+		cairo_set_source (pCairoContext, pGradationPattern);
+	}
+	else
+		cairo_set_source_rgb (pCairoContext, pLabelDescription->fColorStart[0], pLabelDescription->fColorStart[1], pLabelDescription->fColorStart[2]);
 	cairo_move_to (pCairoContext, 1., 1.);
 	pango_cairo_show_layout (pCairoContext, pLayout);
+	cairo_pattern_destroy (pGradationPattern);
 	
 	cairo_destroy (pCairoContext);
 	
@@ -696,7 +723,7 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 					 log.width / 2. - ink.x,
 					 log.height     - ink.y);*/
 	*fTextXOffset = (log.width / 2. - ink.x) / fMaxScale;
-	*fTextYOffset = - (iLabelSize - (log.height - ink.y)) / fMaxScale ;  // en tenant compte de l'ecart du bas du texte.
+	*fTextYOffset = - (pLabelDescription->iSize - (log.height - ink.y)) / fMaxScale ;  // en tenant compte de l'ecart du bas du texte.
 	//*fTextYOffset = - (ink.y) / fMaxScale;  // pour tenir compte de l'ecart du bas du texte.
 	
 	*iTextWidth = *iTextWidth / fMaxScale;
@@ -717,8 +744,7 @@ cairo_surface_t * cairo_dock_duplicate_surface (cairo_surface_t *pSurface, cairo
 	if (fDesiredHeight == 0)
 		fDesiredHeight = fHeight;
 	
-	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-		CAIRO_CONTENT_COLOR_ALPHA,
+	cairo_surface_t *pNewSurface = _cairo_dock_create_blank_surface (pSourceContext,
 		fDesiredWidth,
 		fDesiredHeight);
 	cairo_t *pCairoContext = cairo_create (pNewSurface);

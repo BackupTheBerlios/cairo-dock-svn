@@ -60,29 +60,12 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
   if (!pDesklet)
     return FALSE;
 
-  cairo_t *pCairoContext = gdk_cairo_create (pWidget->window);
+  /*cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDesklet));
   if (cairo_status(pCairoContext) != CAIRO_STATUS_SUCCESS) {
     cairo_destroy (pCairoContext);
     return FALSE;
-  }
-
-	gboolean bRenderOptimized = (pExpose->area.x > 0 || pExpose->area.y > 0);
-	if (bRenderOptimized)
-	{
-		cairo_rectangle (pCairoContext,
-		pExpose->area.x,
-		pExpose->area.y,
-		pExpose->area.width,
-		pExpose->area.height);
-		cairo_clip (pCairoContext);
-	}
-
-  //erase the background
-  cairo_set_source_rgba (pCairoContext, 0., 0., 0., 0.);
-  cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
-  cairo_paint (pCairoContext);
-  cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
-	
+  }*/
+	cairo_t *pCairoContext;
 	//set the color
 	double fColor[4];
 	int i;
@@ -92,25 +75,37 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 	}
 	 if (gtk_window_is_active (GTK_WINDOW (pDesklet->pWidget)))
 		fColor[3] = MIN (1., fColor[3] * 1.25);
-	if (fColor[3] != 0)
+	
+	
+	gboolean bRenderOptimized = (pExpose->area.x > 0 || pExpose->area.y > 0);
+	if (bRenderOptimized)
 	{
-		cairo_save (pCairoContext);
-		cairo_set_source_rgba (pCairoContext, fColor[0], fColor[1], fColor[2], fColor[3]);
-		cairo_set_line_width (pCairoContext, g_iDockRadius);
-		cairo_set_line_join (pCairoContext, CAIRO_LINE_JOIN_ROUND);
-		//draw a rounded square
-		w = pDesklet->iWidth;
-		h = pDesklet->iHeight;
-		cairo_move_to (pCairoContext, g_iDockRadius>>1, g_iDockRadius>>1);
-		cairo_rel_line_to (pCairoContext, w - (g_iDockRadius), 0);
-		cairo_rel_line_to (pCairoContext, 0, h - (g_iDockRadius));
-		cairo_rel_line_to (pCairoContext, -(w - (g_iDockRadius)) , 0);
-		cairo_close_path (pCairoContext);
-		cairo_stroke (pCairoContext);
+		pCairoContext = cairo_dock_create_drawing_context_on_area (CAIRO_CONTAINER (pDesklet), &pExpose->area, fColor);
+	}
+	else
+	{
+		pCairoContext = cairo_dock_create_drawing_context (CAIRO_CONTAINER (pDesklet));
 		
-		cairo_rectangle(pCairoContext, g_iDockRadius, g_iDockRadius, (w - (g_iDockRadius << 1)), (h - (g_iDockRadius << 1)));
-		cairo_fill(pCairoContext);
-		cairo_restore (pCairoContext);  // retour au debut.
+		if (fColor[3] != 0)
+		{
+			cairo_save (pCairoContext);
+			cairo_set_source_rgba (pCairoContext, fColor[0], fColor[1], fColor[2], fColor[3]);
+			cairo_set_line_width (pCairoContext, g_iDockRadius);
+			cairo_set_line_join (pCairoContext, CAIRO_LINE_JOIN_ROUND);
+			//draw a rounded square
+			w = pDesklet->iWidth;
+			h = pDesklet->iHeight;
+			cairo_move_to (pCairoContext, .5*g_iDockRadius, .5*g_iDockRadius);
+			cairo_rel_line_to (pCairoContext, w - (g_iDockRadius), 0);
+			cairo_rel_line_to (pCairoContext, 0, h - (g_iDockRadius));
+			cairo_rel_line_to (pCairoContext, -(w - (g_iDockRadius)) , 0);
+			cairo_close_path (pCairoContext);
+			cairo_stroke (pCairoContext);
+			
+			cairo_rectangle(pCairoContext, g_iDockRadius, g_iDockRadius, (w - 2*g_iDockRadius), (h - 2*g_iDockRadius));
+			cairo_fill(pCairoContext);
+			cairo_restore (pCairoContext);  // retour au debut.
+		}
 	}
 	
 	if (pDesklet->pRenderer != NULL)  // un moteur de rendu specifique a ete fourni.
@@ -135,7 +130,7 @@ static gboolean _cairo_dock_write_desklet_size (CairoDesklet *pDesklet)
 	if (pDesklet->pIcon != NULL)
 	{
 		cairo_dock_reload_module (pDesklet->pIcon->pModule, FALSE);
-		gtk_widget_queue_draw (pDesklet->pWidget);  // sinon on redessine que l'interieur.
+		gtk_widget_queue_draw (pDesklet->pWidget);  // sinon on ne redessine que l'interieur.
 	}
 	return FALSE;
 }
@@ -347,7 +342,7 @@ static gboolean on_enter_desklet (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDesklet *pDesklet)
 {
-	cd_debug ("%s (%d)", __func__, pDesklet->bInside);
+	//g_print ("%s (%d)\n", __func__, pDesklet->bInside);
 	if (! pDesklet->bInside)  // avant on etait dehors, on redessine donc.
 	{
 		pDesklet->bInside = TRUE;
@@ -358,15 +353,14 @@ static gboolean on_enter_desklet (GtkWidget* pWidget,
 	}
 	return FALSE;
 }
-
 static gboolean on_leave_desklet (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDesklet *pDesklet)
 {
-	cd_debug ("%s (%d)", __func__, pDesklet->bInside);
+	//g_print ("%s (%d)\n", __func__, pDesklet->bInside);
 	int iMouseX, iMouseY;
 	gdk_window_get_pointer (pWidget->window, &iMouseX, &iMouseY, NULL);
-	if (iMouseX > 0 && iMouseX < pDesklet->iWidth && iMouseY > 0 && iMouseY < pDesklet->iHeight)  // en fait on est dans un widget fils, donc on ne fait rien.
+	if (gtk_bin_get_child (GTK_BIN (pDesklet->pWidget)) != NULL && iMouseX > 0 && iMouseX < pDesklet->iWidth && iMouseY > 0 && iMouseY < pDesklet->iHeight)  // en fait on est dans un widget fils, donc on ne fait rien.
 	{
 		return FALSE;
 	}

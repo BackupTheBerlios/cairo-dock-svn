@@ -11,6 +11,7 @@ gboolean on_expose (GtkWidget *pWidget,
 			GdkEventExpose *pExpose,
 			CairoDock *pDock);
 
+void cairo_dock_show_subdock (Icon *pPointedIcon, gboolean bUpdate, CairoDock *pDock);
 void cairo_dock_on_change_icon (Icon *pLastPointedIcon, Icon *pPointedIcon, CairoDock *pDock);
 gboolean on_motion_notify2 (GtkWidget* pWidget,
 					GdkEventMotion* pMotion,
@@ -20,6 +21,8 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 gboolean cairo_dock_emit_signal_on_dock (CairoDock *pDock, const gchar *cSignal);
 gboolean cairo_dock_emit_leave_signal (CairoDock *pDock);
 gboolean cairo_dock_emit_enter_signal (CairoDock *pDock);
+
+gboolean cairo_dock_poll_screen_edge (CairoDock *pDock);
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock);
 gboolean on_leave_notify2 (GtkWidget* pWidget,
@@ -67,14 +70,6 @@ void on_drag_leave (GtkWidget *pWidget, GdkDragContext *dc, guint time, CairoDoc
 gboolean on_delete (GtkWidget *pWidget, GdkEvent *event, CairoDock *pDock);
 
 
-/*void cairo_dock_activate_temporary_auto_hide (CairoDock *pDock);
-void cairo_dock_deactivate_temporary_auto_hide (void);
-void cairo_dock_allow_entrance (void);
-void cairo_dock_disable_entrance (void);
-gboolean cairo_dock_entrance_is_allowed (void);
-gboolean cairo_dock_quick_hide_is_activated (void);*/
-
-
 /*void on_selection_get (GtkWidget *pWidget, GtkSelectionData *data, guint info, guint time, gpointer user_data);
 
 void on_selection_received (GtkWidget *pWidget, GtkSelectionData *data, guint time, gpointer user_data);
@@ -86,6 +81,7 @@ gboolean on_selection_request_event (GtkWidget *pWidget, GdkEventSelection *even
 gboolean on_selection_notify_event (GtkWidget *pWidget, GdkEventSelection *event, gpointer user_data);*/
 
 
+void cairo_dock_show_dock_at_mouse (CairoDock *pDock);
 void cairo_dock_raise_from_keyboard (const char *cKeyShortcut, gpointer data);
 
 gboolean cairo_dock_hide_dock_like_a_menu (void);

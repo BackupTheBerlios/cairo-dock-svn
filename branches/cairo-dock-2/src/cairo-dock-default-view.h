@@ -15,10 +15,13 @@ void cairo_dock_calculate_max_dock_size_linear (CairoDock *pDock);
 
 void cairo_dock_calculate_construction_parameters_generic (Icon *icon, int iCurrentWidth, int iCurrentHeight, int iMaxDockWidth);
 
-void cairo_dock_render_linear (CairoDock *pDock);
+void cairo_dock_render_linear (cairo_t *pCairoContext, CairoDock *pDock);
 
 
-void cairo_dock_render_optimized_linear (CairoDock *pDock, GdkRectangle *pArea);
+void cairo_dock_render_optimized_linear (cairo_t *pCairoContext, CairoDock *pDock, GdkRectangle *pArea);
+
+
+void cairo_dock_render_opengl_linear (CairoDock *pDock);
 
 
 Icon *cairo_dock_calculate_icons_linear (CairoDock *pDock);

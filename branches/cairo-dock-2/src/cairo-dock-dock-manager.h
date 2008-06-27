@@ -108,28 +108,38 @@ void cairo_dock_set_all_views_to_default (void);
 
 
 /**
-* Ecrit les ecarts en x et en y d'un dock principal dans son fichier de conf.
+* Ecrit les ecarts en x et en y d'un dock racine dans son fichier de conf.
 *@param pDock le dock.
 */
 void cairo_dock_write_root_dock_gaps (CairoDock *pDock);
 /**
-* Recupere le positionnement complet d'un dock principal a partir de son fichier de conf.
+* Recupere le positionnement complet d'un dock racine a partir de son fichier de conf.
 *@param cDockName nom du dock.
 *@param pDock le dock.
 */
 void cairo_dock_get_root_dock_position (const gchar *cDockName, CairoDock *pDock);
 /**
-* Supprime le fichier de conf d'un dock principal.
-*@param pDock le dock.
+* Supprime le fichier de conf d'un dock racine.
+*@param cDockName le nom du dock.
 */
 void cairo_dock_remove_root_dock_config (const gchar *cDockName);
 
 
 void cairo_dock_activate_temporary_auto_hide (void);
 void cairo_dock_deactivate_temporary_auto_hide (void);
-void cairo_dock_allow_entrance (void);
-void cairo_dock_disable_entrance (void);
-gboolean cairo_dock_entrance_is_allowed (void);
+void cairo_dock_allow_entrance (CairoDock *pDock);
+void cairo_dock_disable_entrance (CairoDock *pDock);
+gboolean cairo_dock_entrance_is_allowed (CairoDock *pDock);
 gboolean cairo_dock_quick_hide_is_activated (void);
+
+gboolean cairo_dock_window_hovers_dock (GtkAllocation *pWindowGeometry, CairoDock *pDock);
+
+void cairo_dock_synchronize_one_sub_dock_position (Icon *icon, CairoDock *pDock, gboolean bReloadBuffersIfNecessary);
+void cairo_dock_synchronize_sub_docks_position (CairoDock *pDock, gboolean bReloadBuffersIfNecessary);
+
+void cairo_dock_start_polling_screen_edge (CairoDock *pMainDock);
+void cairo_dock_stop_polling_screen_edge (void);
+void cairo_dock_pop_up_root_docks_on_screen_edge (CairoDockPositionType iScreenBorder);
+void cairo_dock_set_root_docks_on_top_layer (void);
 
 #endif

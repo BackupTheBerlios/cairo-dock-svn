@@ -1,3 +1,4 @@
+
 /******************************************************************************
 
 This file is a part of the cairo-dock program,
@@ -15,6 +16,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 #include <gdk/gdkx.h>
+#include <X11/extensions/Xcomposite.h>
+//#include <X11/extensions/Xdamage.h>
 
 #include "cairo-dock-load.h"
 #include "cairo-dock-icons.h"
@@ -27,11 +30,11 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include "cairo-dock-log.h"
 #include "cairo-dock-dock-manager.h"
 #include "cairo-dock-class-manager.h"
+#include "cairo-dock-X-utilities.h"
 #include "cairo-dock-application-factory.h"
 
 extern double g_fAmplitude;
-extern int g_iLabelSize;
-extern gchar *g_cLabelPolice;
+extern CairoDockLabelDescription g_iconTextDescription;
 extern gboolean g_bTextAlwaysHorizontal;
 
 extern int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];
@@ -42,6 +45,7 @@ extern gboolean g_bGroupAppliByClass;
 extern gboolean g_bDemandsAttentionWithDialog;
 extern gboolean g_bDemandsAttentionWithAnimation;
 extern gboolean g_bOverWriteXIcons;
+extern gboolean g_bShowThumbnail;
 
 static GHashTable *s_hAppliTable = NULL;  // table des PID connus de cairo-dock (affichees ou non dans le dock).
 static Display *s_XDisplay = NULL;
@@ -59,6 +63,9 @@ static Atom s_aWmName;
 static Atom s_aString;
 static Atom s_aWmHints;
 static Atom s_aNetWmHidden;
+static Atom s_aNetWmFullScreen;
+static Atom s_aNetWmMaximizedHoriz;
+static Atom s_aNetWmMaximizedVert;
 
 
 void cairo_dock_initialize_application_factory (Display *pXDisplay)
@@ -90,6 +97,10 @@ void cairo_dock_initialize_application_factory (Display *pXDisplay)
 	s_aString = XInternAtom (s_XDisplay, "STRING", False);
 
 	s_aWmHints = XInternAtom (s_XDisplay, "WM_HINTS", False);
+	
+	s_aNetWmFullScreen = XInternAtom (s_XDisplay, "_NET_WM_STATE_FULLSCREEN", False);
+	s_aNetWmMaximizedHoriz = XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+	s_aNetWmMaximizedVert = XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_VERT", False);
 }
 
 void cairo_dock_unregister_pid (Icon *icon)
@@ -100,54 +111,27 @@ void cairo_dock_unregister_pid (Icon *icon)
 	}
 }
 
-
-static GdkPixbuf *_cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bAddAlpha)  // cette fonction est inspiree par celle de libwnck.
+cairo_surface_t *cairo_dock_create_surface_from_xpixmap (Pixmap Xid, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
 {
-	Window root;  // inutile.
-	int x, y;  // inutile.
-	guint border_width;  // inutile.
-	guint iWidth, iHeight, iDepth;
-	XGetGeometry (s_XDisplay,
-		XPixmapID, &root, &x, &y,
-		&iWidth, &iHeight, &border_width, &iDepth);
-	cd_message ("%s (%d) : %dx%dx%d pixels (%d;%d)\n", __func__, XPixmapID, iWidth, iHeight, iDepth, x, y);
-
-	//\__________________ On recupere le drawable associe.
-	GdkDrawable *pGdkDrawable = gdk_xid_table_lookup (XPixmapID);
-	if (pGdkDrawable)
-		g_object_ref (G_OBJECT (pGdkDrawable));
-	else
-		pGdkDrawable = gdk_pixmap_foreign_new (XPixmapID);
-
-	//\__________________ On recupere la colormap.
-	GdkColormap* pColormap = gdk_drawable_get_colormap (pGdkDrawable);
-	if (pColormap == NULL && gdk_drawable_get_depth (pGdkDrawable) > 1)  // pour les bitmaps, on laisse la colormap a NULL, ils n'en ont pas besoin.
+	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS && Xid > 0, NULL);
+	GdkPixbuf *pPixbuf = cairo_dock_get_pixbuf_from_pixmap (Xid, TRUE);
+	if (pPixbuf == NULL)
 	{
-		GdkScreen* pScreen = gdk_drawable_get_screen (GDK_DRAWABLE (pGdkDrawable));
-		pColormap = gdk_screen_get_system_colormap (pScreen);  // au pire on a un colormap nul.
+		cd_warning ("This pixmap is undefined. It can happen for exemple for a window that is in a minimized state when the dock is launching.");
+		return NULL;
 	}
-
-	//\__________________ On recupere le buffer dans un GdkPixbuf.
-	GdkPixbuf *pIconPixbuf = gdk_pixbuf_get_from_drawable (NULL,
-		pGdkDrawable,
-		pColormap,
-		0,
-		0,
-		0,
-		0,
-		iWidth,
-		iHeight);
-	g_object_unref (G_OBJECT (pGdkDrawable));
-	g_return_val_if_fail (pIconPixbuf != NULL, NULL);
-
-	//\__________________ On lui ajoute un canal alpha si necessaire.
-	if (! gdk_pixbuf_get_has_alpha (pIconPixbuf) && bAddAlpha)
-	{
-		GdkPixbuf *tmp_pixbuf = gdk_pixbuf_add_alpha (pIconPixbuf, TRUE, 255, 255, 255);
-		g_object_unref (pIconPixbuf);
-		pIconPixbuf = tmp_pixbuf;
-	}
-	return pIconPixbuf;
+	g_print ("window pixmap : %dx%d\n", gdk_pixbuf_get_width (pPixbuf), gdk_pixbuf_get_height (pPixbuf));
+	cairo_surface_t *pSurface = cairo_dock_create_surface_from_pixbuf (pPixbuf,
+		pSourceContext,
+		fMaxScale,
+		g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI],
+		g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI],
+		FALSE,
+		fWidth,
+		fHeight,
+		NULL, NULL);
+	g_object_unref (pPixbuf);
+	return pSurface;
 }
 
 cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pSourceContext, double fMaxScale, double *fWidth, double *fHeight)
@@ -178,21 +162,22 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 		GdkPixbuf *pIconPixbuf = NULL;
 		if (pWMHints->flags & IconWindowHint)
 		{
-			cd_debug ("  pas de _NET_WM_ICON, mais une fenetre");
 			Window XIconID = pWMHints->icon_window;
-			pIconPixbuf = _cairo_dock_get_pixbuf_from_pixmap (XIconID, TRUE);  // pas teste.
+			cd_debug ("  pas de _NET_WM_ICON, mais une fenetre (ID:%d)", XIconID);
+			Pixmap iPixmap = cairo_dock_get_window_background_pixmap (XIconID);
+			pIconPixbuf = cairo_dock_get_pixbuf_from_pixmap (iPixmap, TRUE);  /// A valider ...
 		}
 		else if (pWMHints->flags & IconPixmapHint)
 		{
 			cd_debug ("  pas de _NET_WM_ICON, mais un pixmap");
 			Pixmap XPixmapID = pWMHints->icon_pixmap;
-			pIconPixbuf = _cairo_dock_get_pixbuf_from_pixmap (XPixmapID, TRUE);
+			pIconPixbuf = cairo_dock_get_pixbuf_from_pixmap (XPixmapID, TRUE);
 
 			//\____________________ On lui applique le masque de transparence s'il existe.
 			if (pWMHints->flags & IconMaskHint)
 			{
 				Pixmap XPixmapMaskID = pWMHints->icon_mask;
-				GdkPixbuf *pMaskPixbuf = _cairo_dock_get_pixbuf_from_pixmap (XPixmapMaskID, FALSE);
+				GdkPixbuf *pMaskPixbuf = cairo_dock_get_pixbuf_from_pixmap (XPixmapMaskID, FALSE);
 
 				int iNbChannels = gdk_pixbuf_get_n_channels (pIconPixbuf);
 				int iRowstride = gdk_pixbuf_get_rowstride (pIconPixbuf);
@@ -233,7 +218,8 @@ cairo_surface_t *cairo_dock_create_surface_from_xwindow (Window Xid, cairo_t *pS
 				g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI],
 				FALSE,
 				fWidth,
-				fHeight);
+				fHeight,
+				NULL, NULL);
 
 			g_object_unref (pIconPixbuf);
 			return pNewSurface;
@@ -250,11 +236,25 @@ CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
 	g_free (icon->cParentDockName);
 	if (CAIRO_DOCK_IS_APPLI (icon) && g_bGroupAppliByClass && icon->cClass != NULL)
 	{
-		Icon *pSameClassIcon = cairo_dock_get_icon_with_class (pMainDock->icons, icon->cClass);
-		if (pSameClassIcon == NULL || pSameClassIcon == icon)
+		Icon *pSameClassIcon = cairo_dock_get_classmate (icon);
+		//if (pSameClassIcon != NULL)
+		//	g_print ("class-mate : %s (%s)\n", pSameClassIcon->acName, pSameClassIcon->cParentDockName);
+		//pSameClassIcon = cairo_dock_get_icon_with_class (pMainDock->icons, icon->cClass);
+		if (pSameClassIcon == NULL || pSameClassIcon == icon || pSameClassIcon->cParentDockName == NULL)
 		{
 			cd_message ("  classe %s encore vide", icon->cClass);
 			icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
+			CairoDock *pClassDock = cairo_dock_search_dock_from_name (icon->cClass);
+			if (pClassDock != NULL)
+			{
+				if (icon->pSubDock == NULL)
+				{
+					///icon->pSubDock = pClassDock;
+					///cd_warning ("on lie de force le sous-dock de la classe %s a l'icone %s", icon->cClass, icon->acName);
+				}
+				else
+					cd_warning ("le sous-dock de la classe %s est orphelin  (%s a deja un sous-dock) !", icon->cClass, icon->acName);
+			}
 		}
 		else
 		{
@@ -265,14 +265,18 @@ CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
 			{
 				cd_message ("  creation du dock pour la classe %s", icon->cClass);
 				pParentDock = cairo_dock_create_subdock_for_class_appli (icon->cClass, pMainDock);
-				pSameClassIcon->pSubDock = pParentDock;
 			}
 			else
 			{
 				cd_message ("  sous-dock de la classe %s existant", icon->cClass);
-				if (pSameClassIcon->pSubDock == NULL)
-					pSameClassIcon->pSubDock = pParentDock;
 			}
+			if (pSameClassIcon->pSubDock != NULL && pSameClassIcon->pSubDock != pParentDock)
+			{
+				cd_warning ("Attention : this appli (%s) already has a subdock, but it is not the class's subdock => we'll add its classmate in the main dock");
+				
+			}
+			else if (pSameClassIcon->pSubDock == NULL)
+				pSameClassIcon->pSubDock = pParentDock;
 		}
 	}
 	else
@@ -294,22 +298,29 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	double fWidth, fHeight;
 
 	//\__________________ On regarde si on doit l'afficher ou la sauter.
-	gboolean bSkip = FALSE, bIsHidden = FALSE;
+	gboolean bSkip = FALSE, bIsHidden = FALSE, bIsFullScreen = FALSE, bIsMaximized = FALSE;
 	gulong *pXStateBuffer = NULL;
 	iBufferNbElements = 0;
 	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmState, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXStateBuffer);
 	if (iBufferNbElements > 0)
 	{
-		int i;
+		int i, iNbMaximizedDimensions = 0;
 		for (i = 0; i < iBufferNbElements && ! bSkip; i ++)
 		{
 			if (pXStateBuffer[i] == s_aNetWmSkipTaskbar)
 				bSkip = TRUE;
 			else if (pXStateBuffer[i] == s_aNetWmHidden)
 				bIsHidden = TRUE;
+			else if (pXStateBuffer[i] == s_aNetWmMaximizedVert)
+				iNbMaximizedDimensions ++;
+			else if (pXStateBuffer[i] == s_aNetWmMaximizedHoriz)
+				iNbMaximizedDimensions ++;
+			else if (pXStateBuffer[i] == s_aNetWmFullScreen)
+				bIsFullScreen = TRUE;
 			//else if (pXStateBuffer[i] == s_aNetWmSkipPager)  // contestable ...
 			//	bSkip = TRUE;
 		}
+		bIsMaximized = (iNbMaximizedDimensions == 2);
 		//g_print (" -------- bSkip : %d\n",  bSkip);
 		XFree (pXStateBuffer);
 	}
@@ -429,16 +440,28 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	icon->fOrder = (pLastAppli != NULL ? pLastAppli->fOrder + 1 : 1);
 	icon->iType = CAIRO_DOCK_APPLI;
 	icon->bIsHidden = bIsHidden;
-
-	///cairo_dock_fill_one_icon_buffer (icon, pSourceContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE);
-	///cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
+	icon->bIsMaximized = bIsMaximized;
+	icon->bIsFullScreen = bIsFullScreen;
+	
+	cairo_dock_get_window_geometry (Xid,
+		&icon->windowGeometry.x,
+		&icon->windowGeometry.y,
+		&icon->windowGeometry.width,
+		&icon->windowGeometry.height);
+	if (g_bShowThumbnail)
+	{
+		icon->iBackingPixmap = XCompositeNameWindowPixmap (s_XDisplay, Xid);
+		/*icon->iDamageHandle = XDamageCreate (s_XDisplay, Xid, XDamageReportNonEmpty);  // XDamageReportRawRectangles
+		g_print ("backing pixmap : %d ; iDamageHandle : %d\n", icon->iBackingPixmap, icon->iDamageHandle);*/
+	}
+	
 	cairo_dock_fill_icon_buffers_for_dock (icon, pSourceContext, pDock);
-
+	
 	if (g_bUniquePid)
 		g_hash_table_insert (s_hAppliTable, pPidBuffer, icon);
 	cairo_dock_register_appli (icon);
 	XFree (pNameBuffer);
-
+	
 	cairo_dock_set_window_mask (Xid, PropertyChangeMask | StructureNotifyMask);
 
 	return icon;
@@ -471,7 +494,7 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 				XFree (pNameBuffer);
 
 				pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
-				cairo_dock_fill_one_text_buffer (icon, pCairoContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
+				cairo_dock_fill_one_text_buffer (icon, pCairoContext, &g_iconTextDescription, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
 				cairo_destroy (pCairoContext);
 			}
 		}
@@ -537,26 +560,4 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 			}
 		}
 	}
-}
-
-
-gchar *cairo_dock_get_property_name_on_xwindow (Window Xid, Atom xPropertyAtom)
-{
-	guchar *pNameBuffer = NULL;
-	Atom aReturnedType = 0;
-	int aReturnedFormat = 0;
-	unsigned long iLeftBytes, iBufferNbElements;
-	
-	XGetWindowProperty (s_XDisplay, Xid, xPropertyAtom, 0, G_MAXULONG, False, s_aUtf8String, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
-	if (iBufferNbElements == 0)
-	{
-		XGetWindowProperty (s_XDisplay, Xid, xPropertyAtom, 0, G_MAXULONG, False, s_aString, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, &pNameBuffer);
-	}
-	g_print ("iBufferNbElements : %d\n", iBufferNbElements);
-	if (iBufferNbElements == 0)
-	{
-		g_print ("dommage !\n");
-		return NULL;
-	}
-	else return pNameBuffer;
 }

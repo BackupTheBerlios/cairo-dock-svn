@@ -89,9 +89,9 @@ void cairo_dock_render_one_icon_in_desklet (Icon *icon, cairo_t *pCairoContext, 
 void cairo_dock_draw_string (cairo_t *pCairoContext, CairoDock *pDock, double fStringLineWidth, gboolean bIsLoop, gboolean bForceConstantSeparator);
 
 
-void cairo_dock_render_background (CairoDock *pDock);
+void cairo_dock_render_background (cairo_t *pCairoContext, CairoDock *pDock);
 
-void cairo_dock_render_blank (CairoDock *pDock);
+void cairo_dock_render_blank (cairo_t *pCairoContext, CairoDock *pDock);
 
 
 /**
@@ -109,6 +109,9 @@ double cairo_dock_calculate_extra_width_for_trapeze (double fFrameHeight, double
 
 gboolean cairo_dock_display_drop_indicator (CairoDock *pDock);
 void cairo_dock_draw_drop_indicator (CairoDock *pDock, cairo_t *pCairoContext);
+
+cairo_t *cairo_dock_create_drawing_context (CairoContainer *pContainer);
+cairo_t *cairo_dock_create_drawing_context_on_area (CairoContainer *pContainer, GdkRectangle *pArea, double *fBgColor);
 
 
 #endif

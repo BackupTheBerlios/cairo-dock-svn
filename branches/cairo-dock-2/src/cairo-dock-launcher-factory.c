@@ -37,25 +37,16 @@ extern double g_fSubDockSizeRatio;
 extern double g_fAmplitude;
 extern int g_iIconGap;
 
-extern int g_iLabelSize;
-extern gboolean g_bTextAlwaysHorizontal;
-extern gchar *g_cLabelPolice;
-
 extern gchar *g_cConfFile;
 extern gchar *g_cCurrentLaunchersPath;
 extern gpointer *g_pDefaultIconDirectory;
 
-extern gboolean g_bDirectionUp;
 extern gboolean g_bSameHorizontality;
 
-extern int g_tMinIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
-extern int g_tMaxIconAuthorizedSize[CAIRO_DOCK_NB_TYPES];
-
-extern gboolean g_bUseGlitz;
 extern CairoDockFMSortType g_iFileSortType;
 
 
-gchar *cairo_dock_search_icon_s_path (gchar *cFileName)
+gchar *cairo_dock_search_icon_s_path (const gchar *cFileName)
 {
 	g_return_val_if_fail (cFileName != NULL, NULL);
 	GString *sIconPath = g_string_new ("");
@@ -345,7 +336,7 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 	gboolean bPreventFromInhibating = g_key_file_get_boolean (keyfile, "Desktop Entry", "prevent inhibate", NULL);  // FALSE si la cle n'existe pas.
 	
 	g_free (icon->cClass);
-	if (! bPreventFromInhibating && icon->acCommand != NULL && icon->cBaseURI == NULL)
+	if (icon->acCommand != NULL && icon->cBaseURI == NULL)  /// ! bPreventFromInhibating && 
 	{
 		gchar *cStartupWMClass = g_key_file_get_string (keyfile, "Desktop Entry", "StartupWMClass", NULL);
 		if (cStartupWMClass == NULL || *cStartupWMClass == '\0')
@@ -384,6 +375,13 @@ void cairo_dock_load_icon_info_from_desktop_file (const gchar *cDesktopFileName,
 	else
 		icon->cClass = NULL;
 	
+	if (bPreventFromInhibating && icon->cClass != NULL)
+	{
+		cairo_dock_set_class_use_xicon (icon->cClass, TRUE);
+		g_free (icon->cClass);
+		icon->cClass = NULL;
+	}
+	
 	g_free (cDesktopFilePath);
 	g_key_file_free (keyfile);
 }
@@ -407,3 +405,13 @@ Icon * cairo_dock_create_icon_from_desktop_file (const gchar *cDesktopFileName, 
 	
 	return icon;
 }
+
+void cairo_dock_reload_icon_from_desktop_file (const gchar *cDesktopFileName, cairo_t *pSourceContext, Icon *icon)
+{
+	cairo_dock_load_icon_info_from_desktop_file (cDesktopFileName, icon);
+	g_return_if_fail (icon->acDesktopFileName != NULL);
+	
+	CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+	cairo_dock_fill_icon_buffers_for_dock (icon, pSourceContext, pParentDock)
+}
+

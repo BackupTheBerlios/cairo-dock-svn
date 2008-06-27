@@ -1,4 +1,4 @@
-/*********************************************************************************
+ /*********************************************************************************
 
 This file is a part of the cairo-dock program,
 released under the terms of the GNU General Public License.
@@ -24,7 +24,14 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <glitz-glx.h>
 #include <cairo-glitz.h>
 #endif
+
 #include <gtk/gtkgl.h>
+#include <X11/extensions/Xrender.h> 
+#include <GL/gl.h> 
+#include <GL/glu.h> 
+#include <GL/glx.h> 
+#include <gdk/x11/gdkglx.h>
+
 
 #include "cairo-dock-draw.h"
 #include "cairo-dock-applications-manager.h"
@@ -59,8 +66,7 @@ extern gint g_iDockLineWidth;
 extern int g_iIconGap;
 extern double g_fAmplitude;
 
-extern int g_iLabelSize;
-extern gchar *g_cLabelPolice;
+extern CairoDockLabelDescription g_iconTextDescription;
 extern gboolean g_bTextAlwaysHorizontal;
 
 extern gboolean g_bUseSeparator;
@@ -72,6 +78,7 @@ extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 extern gchar *g_cConfFile;
 
 extern gboolean g_bKeepAbove;
+extern gboolean g_bPopUp;
 extern gboolean g_bSkipPager;
 extern gboolean g_bSkipTaskbar;
 extern gboolean g_bSticky;
@@ -111,28 +118,120 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 
 	if (g_bSticky)
 		gtk_window_stick (GTK_WINDOW (pWindow));
-	gtk_window_set_keep_above (GTK_WINDOW (pWindow), g_bKeepAbove);
+	if (g_bKeepAbove)
+		gtk_window_set_keep_above (GTK_WINDOW (pWindow), g_bKeepAbove);
+	if (g_bPopUp)
+		gtk_window_set_keep_below (GTK_WINDOW (pWindow), g_bPopUp);
 	gtk_window_set_skip_pager_hint (GTK_WINDOW (pWindow), g_bSkipPager);
 	gtk_window_set_skip_taskbar_hint (GTK_WINDOW (pWindow), g_bSkipTaskbar);
 	gtk_window_set_gravity (GTK_WINDOW (pWindow), GDK_GRAVITY_STATIC);
 
 	gtk_window_set_type_hint (GTK_WINDOW (pWindow), iWmHint);
 
-	cairo_dock_set_colormap (CAIRO_CONTAINER (pDock));
-	if (g_bUseOpenGL)
+	
+	if (g_bUseOpenGL && g_pGlConfig == NULL)  // taken from a MacSlow's exemple.
 	{
-		gtk_widget_set_gl_capability (pWindow,
-			g_pGlConfig,
-			NULL,
-			TRUE,  // direct connection to the graphics system.
-			GDK_GL_RGBA_TYPE);
+		VisualID xvisualid;
+	
+		GdkDisplay	   *gdkdisplay;
+		Display	   *XDisplay;
+		Window	   xid;
+		GdkVisual		    *visual;
+
+		gdkdisplay = gdk_display_get_default ();
+		XDisplay   = gdk_x11_display_get_xdisplay (gdkdisplay);
+		xid = gdk_x11_drawable_get_xid (GDK_DRAWABLE (pDock->pWidget->window));
+		Window root = XRootWindow(XDisplay, 0);
+		
+		XWindowAttributes attrib;
+		XVisualInfo templ;
+		XVisualInfo *visinfo;
+		int nvisinfo, defaultDepth, value;
+		
+		
+		GLXFBConfig*	     pFBConfigs; 
+		XRenderPictFormat*   pPictFormat = NULL; 
+		int doubleBufferAttributes[] = { 
+			GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT, 
+			GLX_RENDER_TYPE,   GLX_RGBA_BIT, 
+			GLX_DOUBLEBUFFER,  True, 
+			GLX_RED_SIZE,      1, 
+			GLX_GREEN_SIZE,    1, 
+			GLX_BLUE_SIZE,     1, 
+			GLX_ALPHA_SIZE,    1, 
+			GLX_DEPTH_SIZE,    1, 
+			None}; 
+		
+		int i, iNumOfFBConfigs = 0;
+		pFBConfigs = glXChooseFBConfig (XDisplay, 
+			DefaultScreen (XDisplay), 
+			doubleBufferAttributes, 
+			&iNumOfFBConfigs); 
+		
+		if (pFBConfigs == NULL)
+		{
+			cd_warning ("Argl, we could not get an ARGB-visual!");
+		}
+		
+		gboolean bKeepGoing=FALSE;
+		//GLXFBConfig	     renderFBConfig; 
+		XVisualInfo*	     pVisInfo = NULL; 
+		for (i = 0; i < iNumOfFBConfigs; i++) 
+		{ 
+			pVisInfo = glXGetVisualFromFBConfig (XDisplay, pFBConfigs[i]); 
+			if (!pVisInfo) 
+				continue; 
+	
+			pPictFormat = XRenderFindVisualFormat (XDisplay, pVisInfo->visual); 
+			if (!pPictFormat)
+			{
+				XFree (pVisInfo);
+				continue; 
+			}
+			
+			if (pPictFormat->direct.alphaMask > 0) 
+			{ 
+				cd_message ("Strike, found a GLX visual with alpha-support!");
+				//pVisInfo = glXGetVisualFromFBConfig (XDisplay, pFBConfigs[i]); 
+				//renderFBConfig = pFBConfigs[i]; 
+				bKeepGoing = True; 
+				break; 
+			} 
+	
+			XFree (pVisInfo); 
+		} 
+		
+		if (bKeepGoing)
+		{
+			//visual = gdkx_visual_get (pVisInfo->visualid);
+			//pColormap = gdk_colormap_new (visual, TRUE);
+			g_pGlConfig = gdk_x11_gl_config_new_from_visualid (pVisInfo->visualid);
+			XFree (pVisInfo);
+		}
 	}
 	
+	cairo_dock_set_colormap (CAIRO_CONTAINER (pDock));
+	
+	if (g_bUseOpenGL)
+	{
+		GdkGLContext *pMainGlContext = (pDock->bIsMainDock ? NULL : gtk_widget_get_gl_context (g_pMainDock->pWidget));
+		gtk_widget_set_gl_capability (pWindow,
+			g_pGlConfig,
+			pMainGlContext,  // on partage les ressources entre les contextes.
+			TRUE,  // direct connection to the graphics system.
+			GDK_GL_RGBA_TYPE);
+		
+		g_signal_connect_after (G_OBJECT (pWindow),
+			"realize",
+			G_CALLBACK (on_realize),
+			pDock);
+	}
+
 	gtk_widget_set_app_paintable (pWindow, TRUE);
 	gtk_window_set_decorated (GTK_WINDOW (pWindow), FALSE);
 	gtk_window_set_resizable (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_title (GTK_WINDOW (pWindow), "cairo-dock");  // GTK renseigne la classe avec la meme valeur.
-
+	
 	cairo_dock_set_renderer (pDock, cRendererName);
 
 	//\__________________ On connecte les evenements a la fenetre.
@@ -141,11 +240,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 		GDK_KEY_PRESS_MASK |
 		//GDK_STRUCTURE_MASK | GDK_PROPERTY_CHANGE_MASK |
 		GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
-
-	g_signal_connect_after (G_OBJECT (pWindow),
-		"realize",
-		G_CALLBACK (on_realize),
-		pDock);
+	
 	g_signal_connect (G_OBJECT (pWindow),
 		"delete-event",
 		G_CALLBACK (on_delete),
@@ -211,7 +306,8 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	
 	gtk_window_get_size (GTK_WINDOW (pWindow), &pDock->iCurrentWidth, &pDock->iCurrentHeight);  // ca n'est que la taille initiale allouee par GTK.
 	gtk_widget_show_all (pWindow);
-
+	gdk_window_set_back_pixmap (pWindow->window, NULL, FALSE);  // utile ?
+	
 	/*if (!pouet)
 	{
 		pouet = 1;
@@ -319,6 +415,10 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	if (! pDock->bIsMainDock)
 		cairo_dock_get_root_dock_position (cDockName, pDock);
 	
+	//if (! g_bUseGlitz)
+		while (gtk_events_pending ())  // on force le redessin pour eviter les carre gris.
+			gtk_main_iteration ();
+	
 	return pDock;
 }
 
@@ -333,6 +433,10 @@ void cairo_dock_deactivate_one_dock (CairoDock *pDock)
 		g_source_remove (pDock->iSidMoveDown);
 	if (pDock->iSidMoveUp != 0)
 		g_source_remove (pDock->iSidMoveUp);
+	if (pDock->iSidPopDown != 0)
+		g_source_remove (pDock->iSidPopDown);
+	if (pDock->iSidPopUp != 0)
+		g_source_remove (pDock->iSidPopUp);
 	if (pDock->iSidGrowUp != 0)
 		g_source_remove (pDock->iSidGrowUp);
 	if (pDock->iSidShrinkDown != 0)
@@ -447,7 +551,7 @@ void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDoc
 	g_free (pDock);
 }
 
-static void _cairo_dock_reload_reflects_in_dock (CairoDock *pDock)
+void cairo_dock_reload_reflects_in_dock (CairoDock *pDock)
 {
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 	double fMaxScale = cairo_dock_get_max_scale (CAIRO_CONTAINER (pDock));
@@ -469,19 +573,25 @@ static void _cairo_dock_reload_reflects_in_dock (CairoDock *pDock)
 }
 void cairo_dock_reference_dock (CairoDock *pDock, CairoDock *pParentDock)
 {
-	pDock->iRefCount ++;  // peut-etre qu'il faudrait en faire une operation atomique...
+	pDock->iRefCount ++;
 	if (pDock->iRefCount == 1)  // il devient un sous-dock.
 	{
 		if (pParentDock == NULL)
 			pParentDock = g_pMainDock;
 		CairoDockPositionType iScreenBorder = ((! pDock->bHorizontalDock) << 1) | (! pDock->bDirectionUp);
+		cd_message ("position : %d/%d", pDock->bHorizontalDock, pDock->bDirectionUp);
 		pDock->bHorizontalDock = (g_bSameHorizontality ? pParentDock->bHorizontalDock : ! pParentDock->bHorizontalDock);
 		pDock->bDirectionUp = pParentDock->bDirectionUp;
 		if (iScreenBorder != (((! pDock->bHorizontalDock) << 1) | (! pDock->bDirectionUp)))
 		{
-			g_print ("changement de position\n");
-			_cairo_dock_reload_reflects_in_dock (pDock);
+			cd_message ("changement de position -> %d/%d", pDock->bHorizontalDock, pDock->bDirectionUp);
+			cairo_dock_reload_reflects_in_dock (pDock);
 		}
+		if (g_bKeepAbove)
+			gtk_window_set_keep_above (GTK_WINDOW (pDock->pWidget), FALSE);
+		if (g_bPopUp)
+			gtk_window_set_keep_below (GTK_WINDOW (pDock->pWidget), FALSE);
+		
 		pDock->bAutoHide = FALSE;
 		double fPrevRatio = pDock->fRatio;
 		pDock->fRatio = MIN (pDock->fRatio, g_fSubDockSizeRatio);
@@ -499,7 +609,7 @@ void cairo_dock_reference_dock (CairoDock *pDock, CairoDock *pParentDock)
 			if (! g_bSameHorizontality)
 			{
 				cairo_t* pSourceContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
-				cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
+				cairo_dock_fill_one_text_buffer (icon, pSourceContext, &g_iconTextDescription, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
 				cairo_destroy (pSourceContext);
 			}
 		}
@@ -591,6 +701,7 @@ void cairo_dock_free_all_docks (void)
 	
 	cairo_dock_reset_class_table ();  // enleve aussi les inhibiteurs.
 	cairo_dock_stop_application_manager ();
+	cairo_dock_stop_polling_screen_edge ();
 
 	cairo_dock_reset_docks_table ();
 }
@@ -717,7 +828,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 
 	if (bApplyRatio)
 	{
-		icon->fWidth *= pDock->fRatio;  /// g_fSubDockSizeRatio
+		icon->fWidth *= pDock->fRatio;
 		icon->fHeight *= pDock->fRatio;
 	}
 	//g_print (" +size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);
@@ -725,7 +836,7 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 	if (! g_bSameHorizontality)
 	{
 		cairo_t* pSourceContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
-		cairo_dock_fill_one_text_buffer (icon, pSourceContext, g_iLabelSize, g_cLabelPolice, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
+		cairo_dock_fill_one_text_buffer (icon, pSourceContext, &g_iconTextDescription, (g_bTextAlwaysHorizontal ? CAIRO_DOCK_HORIZONTAL : pDock->bHorizontalDock), pDock->bDirectionUp);
 		cairo_destroy (pSourceContext);
 	}
 

@@ -10,12 +10,14 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include <cairo.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
-#include <signal.h>
+#include <X11/extensions/Xcomposite.h>
+//#include <X11/extensions/Xdamage.h>
 
 #include "cairo-dock-icons.h"
 #include "cairo-dock-draw.h"
@@ -35,6 +37,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 
 #define CAIRO_DOCK_TASKBAR_CHECK_INTERVAL 250
 
+extern int kill (__pid_t pid, int sig);
+
 extern CairoDock *g_pMainDock;
 extern double g_fAmplitude;
 extern gboolean g_bUseSeparator;
@@ -44,6 +48,7 @@ extern int g_iScreenWidth[2], g_iScreenHeight[2];
 extern gboolean g_bUniquePid;
 extern gboolean g_bAnimateOnActiveWindow;
 extern gboolean g_bAutoHideOnFullScreen;
+extern gboolean g_bAutoHideOnMaximized;
 extern gboolean g_bHideVisibleApplis;
 extern double g_fVisibleAppliAlpha;
 extern gboolean g_bAppliOnCurrentDesktopOnly;
@@ -51,6 +56,9 @@ extern gboolean g_bGroupAppliByClass;
 extern int g_iNbDesktops;
 extern int g_iNbViewportX,g_iNbViewportY ;
 extern gboolean g_bMixLauncherAppli;
+extern gboolean g_bShowThumbnail;
+extern gboolean g_bUseFakeTransparency;
+//extern int g_iDamageEvent;
 
 static GHashTable *s_hXWindowTable = NULL;  // table des fenetres X affichees dans le dock.
 static Display *s_XDisplay = NULL;
@@ -66,7 +74,10 @@ static Atom s_aNetWmAbove;
 static Atom s_aNetWmBelow;
 static Atom s_aNetWmHidden;
 static Atom s_aNetWmDesktop;
-
+static Atom s_aNetWmMaximizedHoriz;
+static Atom s_aNetWmMaximizedVert;
+static Atom s_aRootMapID;
+static Atom s_aNetNbDesktops;
 
 void cairo_dock_initialize_application_manager (Display *pDisplay)
 {
@@ -88,6 +99,10 @@ void cairo_dock_initialize_application_manager (Display *pDisplay)
 	s_aNetWmBelow = XInternAtom (s_XDisplay, "_NET_WM_STATE_BELOW", False);
 	s_aNetWmHidden = XInternAtom (s_XDisplay, "_NET_WM_STATE_HIDDEN", False);
 	s_aNetWmDesktop = XInternAtom (s_XDisplay, "_NET_WM_DESKTOP", False);
+	s_aNetWmMaximizedHoriz = XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+	s_aNetWmMaximizedVert = XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_VERT", False);
+	s_aRootMapID = XInternAtom (s_XDisplay, "_XROOTPMAP_ID", False);
+	s_aNetNbDesktops = XInternAtom (s_XDisplay, "_NET_NUMBER_OF_DESKTOPS", False);
 }
 
 
@@ -122,6 +137,12 @@ void cairo_dock_unregister_appli (Icon *icon)
 			g_hash_table_remove (s_hXWindowTable, &icon->Xid);
 		
 		cairo_dock_unregister_pid (icon);  // on n'efface pas sa classe ici car on peut en avoir besoin encore.
+		
+		if (icon->iBackingPixmap != 0)
+		{
+			XFreePixmap (s_XDisplay, icon->iBackingPixmap);
+			icon->iBackingPixmap = 0;
+		}
 		
 		cairo_dock_remove_appli_from_class (icon);
 		cairo_dock_update_Xid_on_inhibators (icon->Xid, icon->cClass);
@@ -318,7 +339,7 @@ static void _cairo_dock_change_window_state (Window Xid, gulong iNewValue, Atom 
 }
 void cairo_dock_maximize_xwindow (Window Xid, gboolean bMaximize)
 {
-	_cairo_dock_change_window_state (Xid, bMaximize, XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_VERT", False), XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_HORZ", False));
+	_cairo_dock_change_window_state (Xid, bMaximize, s_aNetWmMaximizedVert, s_aNetWmMaximizedHoriz);
 }
 
 void cairo_dock_set_xwindow_fullscreen (Window Xid, gboolean bFullScreen)
@@ -395,13 +416,11 @@ gboolean cairo_dock_window_is_maximized (Window Xid)
 	if (iBufferNbElements > 0)
 	{
 		int i;
-		Atom aNetWmMaximizedVertically = XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_VERT", False);
-		Atom aNetWmMaximizedHorizontally = XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
 		for (i = 0; i < iBufferNbElements && iIsMaximized < 2; i ++)
 		{
-			if (pXStateBuffer[i] == aNetWmMaximizedVertically)
+			if (pXStateBuffer[i] == s_aNetWmMaximizedVert)
 				iIsMaximized ++;
-			if (pXStateBuffer[i] == aNetWmMaximizedHorizontally)
+			if (pXStateBuffer[i] == s_aNetWmMaximizedHoriz)
 				iIsMaximized ++;
 		}
 	}
@@ -475,7 +494,7 @@ void cairo_dock_window_is_above_or_below (Window Xid, gboolean *bIsAbove, gboole
 	XFree (pXStateBuffer);
 }
 
-void cairo_dock_window_is_fullscreen_or_hidden (Window Xid, gboolean *bIsFullScreen, gboolean *bIsHidden)
+void cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Window Xid, gboolean *bIsFullScreen, gboolean *bIsHidden, gboolean *bIsMaximized)
 {
 	g_return_if_fail (Xid > 0);
 	Atom aReturnedType = 0;
@@ -486,9 +505,10 @@ void cairo_dock_window_is_fullscreen_or_hidden (Window Xid, gboolean *bIsFullScr
 
 	*bIsFullScreen = FALSE;
 	*bIsHidden = FALSE;
+	*bIsMaximized = FALSE;
 	if (iBufferNbElements > 0)
 	{
-		int i;
+		int i, iNbMaximizedDimensions = 0;
 		for (i = 0; i < iBufferNbElements; i ++)
 		{
 			if (pXStateBuffer[i] == s_aNetWmFullScreen)
@@ -501,11 +521,29 @@ void cairo_dock_window_is_fullscreen_or_hidden (Window Xid, gboolean *bIsFullScr
 			{
 				cd_message (  "s_aNetWmHidden");
 				*bIsHidden = TRUE;
-				break ;
+				//break ;
+			}
+			else if (pXStateBuffer[i] == s_aNetWmMaximizedVert)
+			{
+				iNbMaximizedDimensions ++;
+				if (iNbMaximizedDimensions == 2)
+				{
+					*bIsMaximized = TRUE;
+					//break;
+				}
+			}
+			else if (pXStateBuffer[i] == s_aNetWmMaximizedHoriz)
+			{
+				iNbMaximizedDimensions ++;
+				if (iNbMaximizedDimensions == 2)
+				{
+					*bIsMaximized = TRUE;
+					//break;
+				}
 			}
 		}
 	}
-
+	
 	XFree (pXStateBuffer);
 }
 
@@ -617,6 +655,34 @@ void cairo_dock_animate_icon_on_active (Icon *icon, CairoDock *pParentDock)
 	}
 }
 
+static gboolean _cairo_dock_window_is_on_our_way (Window *Xid, Icon *icon, int *data)
+{
+	if (icon != NULL && cairo_dock_window_is_on_this_desktop (*Xid, data[0]))
+	{
+		gboolean bIsFullScreen, bIsHidden, bIsMaximized;
+		cairo_dock_window_is_fullscreen_or_hidden_or_maximized (*Xid, &bIsFullScreen, &bIsHidden, &bIsMaximized);
+		if ((data[1] && bIsMaximized & ! bIsHidden) || (data[2] && bIsFullScreen))
+		{
+			cd_message ("%s est genante (%d, %d) (%d;%d %dx%d)", icon->acName, bIsMaximized, bIsFullScreen, icon->windowGeometry.x, icon->windowGeometry.y, icon->windowGeometry.width, icon->windowGeometry.height);
+			if (cairo_dock_window_hovers_dock (&icon->windowGeometry, g_pMainDock))
+			{
+				cd_message (" et en plus elle empiete sur notre dock");
+				return TRUE;
+			}
+		}
+	}
+	return FALSE;
+}
+Icon * cairo_dock_search_window_on_our_way (gboolean bMaximizedWindow, gboolean bFullScreenWindow)
+{
+	cd_message ("%s (%d, %d)", __func__, bMaximizedWindow, bFullScreenWindow);
+	if (! bMaximizedWindow && ! bFullScreenWindow)
+		return NULL;
+	int iDesktopNumber;
+	iDesktopNumber = cairo_dock_get_current_desktop ();
+	int data[3] = {iDesktopNumber, bMaximizedWindow, bFullScreenWindow};
+	return g_hash_table_find (s_hXWindowTable, (GHRFunc) _cairo_dock_window_is_on_our_way, data);
+}
 static void _cairo_dock_hide_show_windows_on_other_desktops (Window *Xid, Icon *icon, int *pCurrentDesktop)
 {
 	g_return_if_fail (Xid != NULL && pCurrentDesktop != NULL);
@@ -646,6 +712,22 @@ static void _cairo_dock_hide_show_windows_on_other_desktops (Window *Xid, Icon *
 			gtk_widget_queue_draw (pParentDock->pWidget);
 	}
 }
+static void _cairo_dock_fill_icon_buffer_with_thumbnail (Icon *icon, CairoDock *pParentDock)
+{
+	if (! icon->bIsHidden)  // elle vient d'apparaitre => nouveau backing pixmap.
+	{
+		if (icon->iBackingPixmap != 0)
+			XFreePixmap (s_XDisplay, icon->iBackingPixmap);
+		if (g_bShowThumbnail)
+			icon->iBackingPixmap = XCompositeNameWindowPixmap (s_XDisplay, icon->Xid);
+		g_print ("new backing pixmap (bis) : %d\n", icon->iBackingPixmap);
+	}
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pParentDock));
+	cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pParentDock->bHorizontalDock, TRUE, pParentDock->bDirectionUp);
+	cairo_destroy (pCairoContext);
+	icon->fWidth *= pParentDock->fRatio;
+	icon->fHeight *= pParentDock->fRatio;
+}
 gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 {
 	static XEvent event;
@@ -665,8 +747,9 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 	{
 		icon = NULL;
 		Xid = event.xany.window;
+		//g_print ("  type : %d; atom : %s; window : %d\n", event.type, gdk_x11_get_xatom_name (event.xproperty.atom), Xid);
 		//if (event.type == ClientMessage)
-		//	cd_message ("\n\n\n >>>>>>>>>>>< event.type : %d\n\n", event.type);
+		//cd_message ("\n\n\n >>>>>>>>>>>< event.type : %d\n\n", event.type);
 		if (event.type == PropertyNotify)
 		{
 			//g_print ("  type : %d; atom : %s; window : %d\n", event.xproperty.type, gdk_x11_get_xatom_name (event.xproperty.atom), Xid);
@@ -698,7 +781,6 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 							{
 								cairo_dock_animate_icon_on_active (icon, pParentDock);
 							}
-							
 						}
 						cairo_dock_notify (CAIRO_DOCK_WINDOW_ACTIVATED, &XActiveWindow);
 					}
@@ -712,34 +794,95 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 						int data[2] = {iDesktopNumber, GPOINTER_TO_INT (pDock)};
 						g_hash_table_foreach (s_hXWindowTable, (GHFunc) _cairo_dock_hide_show_windows_on_other_desktops, data);
 					}
+					if (cairo_dock_quick_hide_is_activated () && (g_bAutoHideOnFullScreen || g_bAutoHideOnMaximized))
+					{
+						if (cairo_dock_search_window_on_our_way (g_bAutoHideOnMaximized, g_bAutoHideOnFullScreen) == NULL)
+						{
+							cd_message (" => plus aucune fenetre genante");
+							cairo_dock_deactivate_temporary_auto_hide ();
+						}
+					}
+					else if (! cairo_dock_quick_hide_is_activated () && (g_bAutoHideOnFullScreen || g_bAutoHideOnMaximized))
+					{
+						if (cairo_dock_search_window_on_our_way (g_bAutoHideOnMaximized, g_bAutoHideOnFullScreen) != NULL)
+						{
+							cd_message (" => une fenetre est genante");
+							cairo_dock_activate_temporary_auto_hide ();
+						}
+					}
 					cairo_dock_notify (CAIRO_DOCK_DESKTOP_CHANGED, NULL);
+				}
+				else if (event.xproperty.atom == s_aNetNbDesktops)
+				{
+					cd_message ("changementdu nombre de bureaux virtuels");
+					g_iNbDesktops = cairo_dock_get_nb_desktops ();
+					cairo_dock_notify (CAIRO_DOCK_SCREEN_GEOMETRY_ALTERED, NULL);
 				}
 				else if (event.xproperty.atom == s_aNetDesktopGeometry)
 				{
 					cd_message ("geometrie du bureau alteree");
-					if (cairo_dock_update_screen_geometry ())  // modification largeur et/ou hauteur.
+					
+					cairo_dock_get_nb_viewports (&g_iNbViewportX, &g_iNbViewportY);
+					
+					if (cairo_dock_update_screen_geometry ())  // modification de la resolution.
 					{
 						cairo_dock_set_window_position_at_balance (pDock, pDock->iCurrentWidth, pDock->iCurrentHeight);
 						gtk_window_move (GTK_WINDOW (pDock->pWidget), pDock->iWindowPositionX, pDock->iWindowPositionY);
-						cairo_dock_notify (CAIRO_DOCK_SCREEN_GEOMETRY_ALTERED, NULL);
 					}
-					g_iNbDesktops = cairo_dock_get_nb_desktops ();
-					cairo_dock_get_nb_viewports (&g_iNbViewportX, &g_iNbViewportY);
+					cairo_dock_notify (CAIRO_DOCK_SCREEN_GEOMETRY_ALTERED, NULL);
+				}
+				else if (event.xproperty.atom == s_aRootMapID)
+				{
+					cd_message ("changement du fond d'ecran");
+					if (g_bUseFakeTransparency)
+						cairo_dock_load_desktop_background_surface ();
+					else
+						cairo_dock_invalidate_desktop_bg_surface ();
+					cairo_dock_notify (CAIRO_DOCK_SCREEN_GEOMETRY_ALTERED, NULL);
 				}
 			}
 			else
 			{
 				if (event.xproperty.atom == s_aNetWmState || event.xproperty.atom == XInternAtom (s_XDisplay, "_KDE_WM_WINDOW_OPACITY", False))
 				{
-					gboolean bIsFullScreen, bIsHidden;
-					cairo_dock_window_is_fullscreen_or_hidden (Xid, &bIsFullScreen, &bIsHidden);
-					cd_message ("changement d'etat de %d => {%d ; %d}", Xid, bIsFullScreen, bIsHidden);
-					if (g_bAutoHideOnFullScreen && bIsFullScreen && ! cairo_dock_quick_hide_is_activated ())
+					gboolean bIsFullScreen, bIsHidden, bIsMaximized;
+					cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Xid, &bIsFullScreen, &bIsHidden, &bIsMaximized);
+					cd_message ("changement d'etat de %d => {%d ; %d ; %d}", Xid, bIsFullScreen, bIsHidden, bIsMaximized);
+					/*if (g_bAutoHideOnFullScreen)
 					{
-						cd_message (" => devient plein ecran");
-						cairo_dock_activate_temporary_auto_hide ();
+						if (bIsFullScreen && ! cairo_dock_quick_hide_is_activated ())
+						{
+							cd_message (" => devient plein ecran");
+							cairo_dock_activate_temporary_auto_hide ();
+						}
+						else if (! bIsFullScreen && cairo_dock_quick_hide_is_activated ())
+						{
+							if (cairo_dock_search_fullscreen_window_on_current_desktop () == NULL)
+								cairo_dock_deactivate_temporary_auto_hide ();
+						}
+					}*/
+					gboolean bChangeIntercepted = FALSE;
+					if (g_bAutoHideOnMaximized || g_bAutoHideOnFullScreen)
+					{
+						if ( ((bIsMaximized && ! bIsHidden && g_bAutoHideOnMaximized) || (bIsFullScreen && g_bAutoHideOnFullScreen)) && ! cairo_dock_quick_hide_is_activated ())
+						{
+							icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
+							cd_message (" => %s devient genante", icon != NULL ? icon->acName : "une fenetre");
+							if (icon != NULL && cairo_dock_window_hovers_dock (&icon->windowGeometry, g_pMainDock))
+								cairo_dock_activate_temporary_auto_hide ();
+							//bChangeIntercepted = TRUE;
+						}
+						else if ((! bIsMaximized || ! g_bAutoHideOnMaximized || bIsHidden) && (! bIsFullScreen || ! g_bAutoHideOnFullScreen) && cairo_dock_quick_hide_is_activated ())
+						{
+							if (cairo_dock_search_window_on_our_way (g_bAutoHideOnMaximized, g_bAutoHideOnFullScreen) == NULL)
+							{
+								cd_message (" => plus aucune fenetre genante");
+								cairo_dock_deactivate_temporary_auto_hide ();
+								//bChangeIntercepted = TRUE;
+							}
+						}
 					}
-					else
+					if (! bChangeIntercepted)
 					{
 						icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
 						if (icon != NULL && icon->fPersonnalScale <= 0)  // pour une icône en cours de supression, on ne fait rien.
@@ -754,13 +897,40 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 								icon->bIsHidden = bIsHidden;
 								cairo_dock_update_visibility_on_inhibators (icon->cClass, icon->Xid, icon->bIsHidden);
 								
-								if (g_bHideVisibleApplis && pParentDock != NULL)
+								/*if (cairo_dock_quick_hide_is_activated ())
+								{
+									if (cairo_dock_search_window_on_our_way (g_bAutoHideOnMaximized, g_bAutoHideOnFullScreen) == NULL)
+										cairo_dock_deactivate_temporary_auto_hide ();
+								}*/
+								
+								if (g_bShowThumbnail && pParentDock != NULL)
+								{
+									if (! icon->bIsHidden)
+									{
+										if (icon->iBackingPixmap != 0)
+											XFreePixmap (s_XDisplay, icon->iBackingPixmap);
+										if (g_bShowThumbnail)
+											icon->iBackingPixmap = XCompositeNameWindowPixmap (s_XDisplay, Xid);
+										cd_message ("new backing pixmap (bis) : %d", icon->iBackingPixmap);
+									}
+									cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pParentDock));
+									cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE, pDock->bDirectionUp);
+									cairo_destroy (pCairoContext);
+									icon->fWidth *= pParentDock->fRatio;
+									icon->fHeight *= pParentDock->fRatio;
+								}
+								
+								if (g_bHideVisibleApplis)
 								{
 									if (bIsHidden)
 									{
 										cd_message (" => se cache");
 										if (! g_bAppliOnCurrentDesktopOnly || cairo_dock_window_is_on_current_desktop (Xid))
+										{
 											pParentDock = cairo_dock_insert_appli_in_dock (icon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON);
+											if (pParentDock != NULL)
+												_cairo_dock_fill_icon_buffer_with_thumbnail (icon, pParentDock);
+										}
 									}
 									else
 									{
@@ -771,10 +941,16 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 									if (pParentDock != NULL)
 										gtk_widget_queue_draw (pParentDock->pWidget);
 								}
+								else if (g_bShowThumbnail && pParentDock != NULL)
+								{
+									_cairo_dock_fill_icon_buffer_with_thumbnail (icon, pParentDock);
+									if (pParentDock->iSidShrinkDown == 0)
+										cairo_dock_redraw_my_icon (icon, CAIRO_CONTAINER (pParentDock));
+								}
 								else if (g_fVisibleAppliAlpha != 0)
 								{
 									icon->fAlpha = 1;  // on triche un peu.
-									if (pParentDock != NULL)
+									if (pParentDock != NULL && pParentDock->iSidShrinkDown == 0)
 										cairo_dock_redraw_my_icon (icon, CAIRO_CONTAINER (pParentDock));
 								}
 							}
@@ -812,6 +988,14 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 			icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
 			if (icon != NULL)
 			{
+				if (event.xconfigure.width != icon->windowGeometry.width || event.xconfigure.height != icon->windowGeometry.height)
+				{
+					if (icon->iBackingPixmap != 0)
+						XFreePixmap (s_XDisplay, icon->iBackingPixmap);
+					if (g_bShowThumbnail)
+						icon->iBackingPixmap = XCompositeNameWindowPixmap (s_XDisplay, Xid);
+					cd_message ("new backing pixmap : %d", icon->iBackingPixmap);
+				}
 				memcpy (&icon->windowGeometry, &event.xconfigure.x, sizeof (GtkAllocation));
 			}
 			
@@ -819,7 +1003,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 			{
 				if (icon != NULL && icon->fPersonnalScale <= 0)  // pour une icone en cours de supression, on ne fait rien.
 				{
-					if (event.xconfigure.x + event.xconfigure.width < 0 || event.xconfigure.x > g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] || event.xconfigure.y + event.xconfigure.height < 0 || event.xconfigure.y > g_iScreenHeight[CAIRO_DOCK_HORIZONTAL])  // en fait il faudrait faire ca modulo le nombre de viewports * la largeur d'un bureau, car avec une fenetre a droite, elle peut revenir sur le bureau par la gauche si elle est tres large...
+					if (event.xconfigure.x + event.xconfigure.width <= 0 || event.xconfigure.x >= g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] || event.xconfigure.y + event.xconfigure.height <= 0 || event.xconfigure.y >= g_iScreenHeight[CAIRO_DOCK_HORIZONTAL])  // en fait il faudrait faire ca modulo le nombre de viewports * la largeur d'un bureau, car avec une fenetre a droite, elle peut revenir sur le bureau par la gauche si elle est tres large...
 					{
 						CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 						if (pParentDock == NULL)
@@ -830,6 +1014,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 					}
 					else  // elle est sur le bureau.
 					{
+						g_print ("cette fenetre s'est deplacee sur le bureau courant (%d;%d)\n", event.xconfigure.x, event.xconfigure.y);
 						gboolean bInsideDock;
 						if (g_list_find (pDock->icons, icon) == NULL)
 						{
@@ -850,8 +1035,20 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 			}
 			cairo_dock_notify (CAIRO_DOCK_WINDOW_CONFIGURED, &event.xconfigure);
 		}
-		//else
-		//	cd_message ("  type : %d; window : %d\n", event.xany.type, Xid);
+		/*else if (event.type == g_iDamageEvent + XDamageNotify)
+		{
+			XDamageNotifyEvent *e = (XDamageNotifyEvent *) &event;
+			g_print ("window %s has been damaged (%d;%d %dx%d)\n", e->drawable, e->area.x, e->area.y, e->area.width, e->area.height);
+			// e->drawable is the window ID of the damaged window
+			// e->geometry is the geometry of the damaged window	
+			// e->area     is the bounding rect for the damaged area	
+			// e->damage   is the damage handle returned by XDamageCreate()
+	
+			// Subtract all the damage, repairing the window.
+			XDamageSubtract (s_XDisplay, e->damage, None, None);
+		}
+		else
+			g_print ("  type : %d (%d); window : %d\n", event.type, XDamageNotify, Xid);*/
 	}
 	if (XEventsQueued (s_XDisplay, QueuedAlready) != 0)
 		XSync (s_XDisplay, True);  // True <=> discard.
@@ -886,15 +1083,18 @@ Window *cairo_dock_get_windows_list (gulong *iNbWindows)
 CairoDock *cairo_dock_insert_appli_in_dock (Icon *icon, CairoDock *pMainDock, gboolean bUpdateSize, gboolean bAnimate)
 {
 	//\_________________ On determine dans quel dock l'inserer.
+	cd_message ("%s (%s, %d)", __func__, icon->acName, icon->Xid);
 	if (g_bMixLauncherAppli && cairo_dock_prevent_inhibated_class (icon))
+	{
+		cd_message (" -> se fait inhiber");
 		return NULL;
-	
+	}
 	CairoDock *pParentDock = cairo_dock_manage_appli_class (icon, pMainDock);  // renseigne cParentDockName.
 	g_return_val_if_fail (pParentDock != NULL, NULL);
 
 	//\_________________ On l'insere dans son dock parent en animant ce dernier eventuellement.
 	cairo_dock_insert_icon_in_dock (icon, pParentDock, bUpdateSize, bAnimate, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
-	cd_message (" insertion de %s complete (%.2f %.2fx%.2f)", icon->acName, icon->fPersonnalScale, icon->fWidth, icon->fHeight);
+	cd_message (" insertion de %s complete (%.2f %.2fx%.2f) dans %s", icon->acName, icon->fPersonnalScale, icon->fWidth, icon->fHeight, icon->cParentDockName);
 
 	if (bAnimate && cairo_dock_animation_will_be_visible (pParentDock))
 	{
@@ -918,6 +1118,16 @@ static gboolean _cairo_dock_remove_old_applis (Window *Xid, Icon *icon, double *
 		if (icon->fLastCheckTime > 0 && icon->fLastCheckTime < *fTime && icon->fPersonnalScale <= 0)
 		{
 			cd_message ("cette fenetre (%ld) est trop vieille", *Xid);
+			
+			if (cairo_dock_quick_hide_is_activated () && (g_bAutoHideOnFullScreen || g_bAutoHideOnMaximized))
+			{
+				if (cairo_dock_search_window_on_our_way (g_bAutoHideOnMaximized, g_bAutoHideOnFullScreen) == NULL)
+				{
+					cd_message (" => plus aucune fenetre genante");
+					cairo_dock_deactivate_temporary_auto_hide ();
+				}
+			}
+			
 			CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 			if (pParentDock != NULL)
 			{
@@ -1012,6 +1222,8 @@ void cairo_dock_start_application_manager (CairoDock *pDock)
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
 
+	int iDesktopNumber = cairo_dock_get_current_desktop ();
+	
 	//\__________________ On cree les icones de toutes ces applis.
 	CairoDock *pParentDock;
 	gboolean bUpdateMainDockSize = FALSE;
@@ -1034,6 +1246,17 @@ void cairo_dock_start_application_manager (CairoDock *pDock)
 						bUpdateMainDockSize = TRUE;
 					else
 						cairo_dock_update_dock_size (pParentDock);
+				}
+			}
+			if ((g_bAutoHideOnMaximized && pIcon->bIsMaximized) || (g_bAutoHideOnFullScreen && pIcon->bIsFullScreen))
+			{
+				if (! cairo_dock_quick_hide_is_activated () && cairo_dock_window_is_on_this_desktop (pIcon->Xid, iDesktopNumber))
+				{
+					if (cairo_dock_window_hovers_dock (&pIcon->windowGeometry, pDock))
+					{
+						cd_message (" elle empiete sur notre dock");
+						cairo_dock_activate_temporary_auto_hide ();
+					}
 				}
 			}
 		}

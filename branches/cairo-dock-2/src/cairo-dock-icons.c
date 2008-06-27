@@ -47,7 +47,6 @@ extern int g_iLeaveSubDockDelay;
 extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
 extern gint g_iFrameMargin;
-extern int g_iLabelSize;
 extern int g_iIconGap;
 extern double g_fSubDockSizeRatio;
 extern int g_iMaxAuthorizedWidth;
@@ -65,10 +64,6 @@ extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 extern gchar *g_cConfFile;
 
 
-/**
-*Libere toutes les ressources liees a une icone, ainsi que cette derniere. Le sous-dock pointee par elle n'est pas dereference, cela doit etre fait au prealable.
-*@param icon l'icone a liberer.
-*/
 void cairo_dock_free_icon (Icon *icon)
 {
 	if (icon == NULL)
@@ -121,12 +116,7 @@ CairoDockIconType cairo_dock_get_icon_type (Icon *icon)
 		return CAIRO_DOCK_LAUNCHER;
 }
 
-/**
-*Compare 2 icones grace a la relation d'ordre sur le couple (position du type , ordre).
-*@param icon1 une icone.
-*@param icon2 une autre icone.
-*@Returns -1 si icone1 < icone2, 1 si icone1 > icone2, 0 si icone1 = icone2 (au sens de la relation d'ordre).
-*/
+
 int cairo_dock_compare_icons_order (Icon *icon1, Icon *icon2)
 {
 	int iOrder1 = cairo_dock_get_group_order (icon1);
@@ -158,20 +148,12 @@ static int cairo_dock_compare_icons_name (Icon *icon1, Icon *icon2)
 	g_free (cURI_2);
 	return iOrder;
 }
-/**
-*Trie une liste en se basant sur la relation d'ordre sur le couple (position du type , ordre).
-*@param pIconList la liste d'icones.
-*@Returns la liste triee. Les elements sont les memes que ceux de la liste initiale, seul leur ordre a change.
-*/
+
 GList *cairo_dock_sort_icons_by_order (GList *pIconList)
 {
 	return g_list_sort (pIconList, (GCompareFunc) cairo_dock_compare_icons_order);
 }
-/**
-*Trie une liste en se basant sur la relation d'ordre alphanumerique sur le nom des icones.
-*@param pIconList la liste d'icones.
-*@Returns la liste triee. Les elements sont les memes que ceux de la liste initiale, seul leur ordre a change. Les ordres des icones sont mis a jour pour refleter le nouvel ordre global.
-*/
+
 GList *cairo_dock_sort_icons_by_name (GList *pIconList)
 {
 	GList *pSortedIconList = g_list_sort (pIconList, (GCompareFunc) cairo_dock_compare_icons_name);
@@ -187,31 +169,19 @@ GList *cairo_dock_sort_icons_by_name (GList *pIconList)
 }
 
 
-/**
-*Renvoie la 1ere icone d'une liste d'icones.
-*@param pIconList la liste d'icones.
-*@Returns la 1ere icone, ou NULL si la liste est vide.
-*/
+
 Icon* cairo_dock_get_first_icon (GList *pIconList)
 {
 	GList *pListHead = g_list_first(pIconList);
 	return (pListHead != NULL ? pListHead->data : NULL);
 }
-/**
-*Renvoie la derniere icone d'une liste d'icones.
-*@param pIconList la liste d'icones.
-*@Returns la derniere icone, ou NULL si la liste est vide.
-*/
+
 Icon* cairo_dock_get_last_icon (GList *pIconList)
 {
 	GList *pListTail = g_list_last(pIconList);
 	return (pListTail != NULL ? pListTail->data : NULL);
 }
-/**
-*Renvoie la 1ere icone a etre dessinee d'une liste d'icones (qui n'est pas forcement la 1ere icone de la liste, si l'utilisateur a scrolle).
-*@param pIconList la liste d'icones.
-*@Returns la 1ere icone a etre dessinee, ou NULL si la liste est vide.
-*/
+
 Icon *cairo_dock_get_first_drawn_icon (CairoDock *pDock)
 {
 	if (pDock->pFirstDrawnElement != NULL)
@@ -219,11 +189,7 @@ Icon *cairo_dock_get_first_drawn_icon (CairoDock *pDock)
 	else
 		return cairo_dock_get_first_icon (pDock->icons);
 }
-/**
-*Renvoie la derniere icone a etre dessinee d'une liste d'icones (qui n'est pas forcement la derniere icone de la liste, si l'utilisateur a scrolle).
-*@param pIconList la liste d'icones.
-*@Returns la derniere icone a etre dessinee, ou NULL si la liste est vide.
-*/
+
 Icon *cairo_dock_get_last_drawn_icon (CairoDock *pDock)
 {
 	if (pDock->pFirstDrawnElement != NULL)
@@ -236,12 +202,7 @@ Icon *cairo_dock_get_last_drawn_icon (CairoDock *pDock)
 	else
 		return cairo_dock_get_last_icon (pDock->icons);;
 }
-/**
-*Renvoie la 1ere icone du type donne.
-*@param pIconList la liste d'icones.
-*@param iType le type d'icone recherche.
-*@Returns la 1ere icone trouvee ayant ce type, ou NULL si aucune icone n'est trouvee.
-*/
+
 Icon* cairo_dock_get_first_icon_of_type (GList *pIconList, CairoDockIconType iType)
 {
 	GList* ic;
@@ -524,7 +485,8 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2)
 {
 	//g_print ("%s (%s, %.2f)\n", __func__, icon1->acName, icon1->fOrder);
-	if ((icon2 != NULL) && (! ( (CAIRO_DOCK_IS_APPLI (icon1) && CAIRO_DOCK_IS_APPLI (icon2)) || (CAIRO_DOCK_IS_LAUNCHER (icon1) && CAIRO_DOCK_IS_LAUNCHER (icon2)) || (CAIRO_DOCK_IS_APPLET (icon1) && CAIRO_DOCK_IS_APPLET (icon2)) ) ))
+	///if ((icon2 != NULL) && (! ( (CAIRO_DOCK_IS_APPLI (icon1) && CAIRO_DOCK_IS_APPLI (icon2)) || (CAIRO_DOCK_IS_LAUNCHER (icon1) && CAIRO_DOCK_IS_LAUNCHER (icon2)) || (CAIRO_DOCK_IS_APPLET (icon1) && CAIRO_DOCK_IS_APPLET (icon2)) ) ))
+	if ((icon2 != NULL) && fabs (icon1->iType - icon2->iType) > 1)
 		return ;
 
 	//\_________________ On change l'ordre de l'icone.
@@ -546,7 +508,7 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 	}
 
 	//\_________________ On change l'ordre dans le fichier du lanceur 1.
-	if (CAIRO_DOCK_IS_LAUNCHER (icon1) && icon1->acDesktopFileName != NULL)
+	if ((CAIRO_DOCK_IS_LAUNCHER (icon1) || CAIRO_DOCK_IS_SEPARATOR (icon1)) && icon1->acDesktopFileName != NULL)
 	{
 		GError *erreur = NULL;
 		gchar *cDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, icon1->acDesktopFileName);
@@ -700,6 +662,7 @@ gboolean cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolea
 			}
 		}
 	}
+	return TRUE;
 }
 static void _cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon, gboolean bCheckUnusedSeparator)
 {
@@ -966,6 +929,22 @@ GList *cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, do
 	return pFirstDrawnElement;
 }
 
+void cairo_dock_update_removing_inserting_icon (Icon *icon)
+{
+	if (icon->fPersonnalScale > 0)
+	{
+		icon->fPersonnalScale *= .85;
+		if (icon->fPersonnalScale < 0.05)
+			icon->fPersonnalScale = 0.05;
+	}
+	else if (icon->fPersonnalScale < 0)
+	{
+		icon->fPersonnalScale *= .85;
+		if (icon->fPersonnalScale > -0.05)
+			icon->fPersonnalScale = -0.05;
+	}
+}
+
 Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *pFirstDrawnElementGiven, int x_abs, gdouble fMagnitude, double fFlatDockWidth, int iWidth, int iHeight, double fAlign, double fFoldingFactor, gboolean bDirectionUp)
 {
 	//g_print (">>>>>%s (%d/%.2f, %dx%d, %.2f, %.2f)\n", __func__, x_abs, fFlatDockWidth, iWidth, iHeight, fAlign, fFoldingFactor);
@@ -1002,20 +981,27 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 		
 		//\_______________ On en deduit l'amplitude de la sinusoide au niveau de cette icone, et donc son echelle.
 		icon->fScale = 1 + fMagnitude * g_fAmplitude * sin (icon->fPhase);
-		if (icon->fPersonnalScale > 0 && iWidth > 0)
+		if (iWidth > 0 && icon->fPersonnalScale != 0)
 		{
-			icon->fPersonnalScale *= .85;
-			icon->fScale *= icon->fPersonnalScale;
-			if (icon->fPersonnalScale < 0.05)
-				icon->fPersonnalScale = 0.05;
+			if (icon->fPersonnalScale > 0)
+				icon->fScale *= icon->fPersonnalScale;
+			else
+				icon->fScale *= (1 + icon->fPersonnalScale);
 		}
-		else if (icon->fPersonnalScale < 0 && iWidth > 0)
-		{
-			icon->fPersonnalScale *= .85;
-			icon->fScale *= (1 + icon->fPersonnalScale);
-			if (icon->fPersonnalScale > -0.05)
-				icon->fPersonnalScale = -0.05;
-		}
+// 		if (icon->fPersonnalScale > 0 && iWidth > 0)
+// 		{
+// 			icon->fPersonnalScale *= .85;
+// 			icon->fScale *= icon->fPersonnalScale;
+// 			if (icon->fPersonnalScale < 0.05)
+// 				icon->fPersonnalScale = 0.05;
+// 		}
+// 		else if (icon->fPersonnalScale < 0 && iWidth > 0)
+// 		{
+// 			icon->fPersonnalScale *= .85;
+// 			icon->fScale *= (1 + icon->fPersonnalScale);
+// 			if (icon->fPersonnalScale > -0.05)
+// 				icon->fPersonnalScale = -0.05;
+// 		}
 		icon->fY = (bDirectionUp ? iHeight - g_iDockLineWidth - g_iFrameMargin - icon->fScale * icon->fHeight : g_iDockLineWidth + g_iFrameMargin);
 		
 		//\_______________ Si on avait deja defini l'icone pointee, on peut placer l'icone courante par rapport a la precedente.
@@ -1121,8 +1107,8 @@ CairoDockMousePositionType cairo_dock_check_if_mouse_inside_linear (CairoDock *p
 
 	if (! bMouseInsideDock)
 	{
-		double fSideMargin = (pDock->fAlign - .5) * (iWidth - pDock->fFlatDockWidth);
-		if (x_abs < fSideMargin || x_abs > pDock->fFlatDockWidth + fSideMargin)
+		double fSideMargin = fabs (pDock->fAlign - .5) * (iWidth - pDock->fFlatDockWidth);
+		if (x_abs < - fSideMargin || x_abs > pDock->fFlatDockWidth + fSideMargin)
 			iMousePositionType = CAIRO_DOCK_MOUSE_OUTSIDE;
 		else
 			iMousePositionType = CAIRO_DOCK_MOUSE_ON_THE_EDGE;
@@ -1146,7 +1132,7 @@ void cairo_dock_manage_mouse_position (CairoDock *pDock, CairoDockMousePositionT
 	{
 		case CAIRO_DOCK_MOUSE_INSIDE :
 			//g_print ("INSIDE\n");
-			if (cairo_dock_entrance_is_allowed () && pDock->iMagnitudeIndex < CAIRO_DOCK_NB_MAX_ITERATIONS && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons))  // on est dedans et la taille des icones est non maximale bien qu'aucune icone ne soit animee.  ///  && pDock->iSidMoveDown == 0
+			if (cairo_dock_entrance_is_allowed (pDock) && pDock->iMagnitudeIndex < CAIRO_DOCK_NB_MAX_ITERATIONS && pDock->iSidGrowUp == 0 && cairo_dock_none_animated (pDock->icons))  // on est dedans et la taille des icones est non maximale bien qu'aucune icone ne soit animee.  ///  && pDock->iSidMoveDown == 0
 			{
 				cd_debug ("on est dedans en x et en y et la taille des icones est non maximale bien qu'aucune icone  ne soit animee");
 				//pDock->bInside = TRUE;

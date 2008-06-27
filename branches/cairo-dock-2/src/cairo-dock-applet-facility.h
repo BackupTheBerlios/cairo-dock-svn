@@ -163,6 +163,7 @@ typedef enum {
 	CAIRO_DOCK_NB_FREQUENCIES
 } CairoDockFrequencyState;
 
+typedef gboolean (* CairoDockUpdateTimerFunc ) (void);
 typedef struct {
 	/// Sid du timer des mesures.
 	gint iSidTimer;
@@ -176,9 +177,9 @@ typedef struct {
 	GVoidFunc acquisition;
 	/// fonction realisant la lecture des donnees precedemment acquises; stocke les resultats dans la structures des resultats.
 	GVoidFunc read;
-	/// fonction realisant la mise a jour de l'IHM en fonction des nouveaux resultats.
-	GVoidFunc update;
-	/// intervalle de temps
+	/// fonction realisant la mise a jour de l'IHM en fonction des nouveaux resultats. Renvoie TRUE pour continuer, FALSE pour arreter.
+	CairoDockUpdateTimerFunc update;
+	/// intervalle de temps en secondes, eventuellement nul pour une mesure unitaire.
 	gint iCheckInterval;
 	/// etat de la frequence des mesures.
 	CairoDockFrequencyState iFrequencyState;
@@ -190,16 +191,22 @@ typedef struct {
 */
 void cairo_dock_launch_measure (CairoDockMeasure *pMeasureTimer);
 /**
+*Idem que ci-dessus mais après un délai.
+*@param pMeasureTimer la mesure periodique.
+*@param fDelay délai en ms.
+*/
+void cairo_dock_launch_measure_delayed (CairoDockMeasure *pMeasureTimer, double fDelay);
+/**
 *Cree une mesure periodique.
-*@param iCheckInterval l'intervalle en ms entre 2 mesures.
+*@param iCheckInterval l'intervalle en s entre 2 mesures, eventuellement nul pour une mesure unitaire.
 *@param acquisition fonction realisant l'acquisition des donnees. N'accede jamais a la structure des resultats.
 *@param read fonction realisant la lecture des donnees precedemment acquises; stocke les resultats dans la structures des resultats.
 *@param update fonction realisant la mise a jour de l'interface en fonction des nouveaux resultats, lus dans la structures des resultats.
 *@return la mesure nouvellement allouee. A liberer avec #cairo_dock_free_measure_timer.
 */
-CairoDockMeasure *cairo_dock_new_measure_timer (int iCheckInterval, GVoidFunc acquisition, GVoidFunc read, GVoidFunc update);
+CairoDockMeasure *cairo_dock_new_measure_timer (int iCheckInterval, GVoidFunc acquisition, GVoidFunc read, CairoDockUpdateTimerFunc update);
 /**
-*Stoppe les mesures. Si une mesure est en cours, le thread d'acquisition/lecture se terminera tout seul plus tard, et la mesure sera ignoree. On peut reprendre les mesures par un simple #cairo_dock_launch_measure.
+*Stoppe les mesures. Si une mesure est en cours, le thread d'acquisition/lecture se terminera tout seul plus tard, et la mesure sera ignoree. On peut reprendre les mesures par un simple #cairo_dock_launch_measure. Ne doit _pas_ etre appelée durant la fonction 'read' ou 'update'; utiliser la sortie de 'update' pour cela.
 *@param pMeasureTimer la mesure periodique.
 */
 void cairo_dock_stop_measure_timer (CairoDockMeasure *pMeasureTimer);
@@ -217,13 +224,13 @@ gboolean cairo_dock_measure_is_active (CairoDockMeasure *pMeasureTimer);
 /**
 *Change la frequence des mesures. La prochaine mesure aura lien dans 1 iteration si elle etait deja active.
 *@param pMeasureTimer la mesure periodique.
-*@param iNewCheckInterval le nouvel intervalle entre 2 mesures, en ms.
+*@param iNewCheckInterval le nouvel intervalle entre 2 mesures, en s.
 */
 void cairo_dock_change_measure_frequency (CairoDockMeasure *pMeasureTimer, int iNewCheckInterval);
 /**
 *Change la frequence des mesures et les relance immediatement. La prochaine mesure est donc tout de suite.
 *@param pMeasureTimer la mesure periodique.
-*@param iNewCheckInterval le nouvel intervalle entre 2 mesures, en ms.
+*@param iNewCheckInterval le nouvel intervalle entre 2 mesures, en s.
 */
 void cairo_dock_relaunch_measure_immediately (CairoDockMeasure *pMeasureTimer, int iNewCheckInterval);
 
@@ -237,6 +244,13 @@ void cairo_dock_downgrade_frequency_state (CairoDockMeasure *pMeasureTimer);
 *@param pMeasureTimer la mesure periodique.
 */
 void cairo_dock_set_normal_frequency_state (CairoDockMeasure *pMeasureTimer);
+
+
+/**
+*Joue un son par l'intermédiaire de pulseaudio ou alsa (en priorité).
+*@param cSoundPath le chemin vers le fichier audio a jouer.
+*/
+void cairo_dock_play_sound (const gchar *cSoundPath);
 
 
 
@@ -423,15 +437,13 @@ gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoContainer *pNewC
 #define CD_APPLET_GET_CONFIG_BEGIN \
 void read_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath) \
 { \
-	gboolean bFlushConfFileNeeded = FALSE, bNewKeysPresent = FALSE; \
+	gboolean bFlushConfFileNeeded = FALSE; \
 	reset_config ();
 
 /**
 *Fin de la fonction de configuration de l'applet.
 */
 #define CD_APPLET_GET_CONFIG_END \
-	if (bNewKeysPresent) \
-		cairo_dock_write_keys_to_file (pKeyFile, cConfFilePath); \
 	if (! bFlushConfFileNeeded) \
 		bFlushConfFileNeeded = cairo_dock_conf_file_needs_update (pKeyFile, MY_APPLET_VERSION); \
 	if (bFlushConfFileNeeded) \
@@ -513,6 +525,15 @@ CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT (cGroupName, cKeyName, TRUE)
 *@return une chaine de caracteres nouvellement allouee.
 */
 #define CD_CONFIG_GET_STRING(cGroupName, cKeyName) CD_CONFIG_GET_STRING_WITH_DEFAULT (cGroupName, cKeyName, NULL)
+
+/**
+*Recupere la valeur d'un parametre 'fichier' du fichier de conf, avec NULL comme valeur par defaut. Si le parametre est NULL, un fichier local a l'applet est utilise, mais le fichier de conf n'est pas renseigné avec.
+*@param cGroupName nom du groupe dans le fichier de conf.
+*@param cKeyName nom de la cle dans le fichier de conf.
+*@param cDefaultFileName fichier par defaut si aucun n'est specifie dans la conf.
+*@return une chaine de caracteres nouvellement allouee donnant le chemin complet du fichier.
+*/
+#define CD_CONFIG_GET_FILE_PATH(cGroupName, cKeyName, cDefaultFileName) cairo_dock_get_file_path_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, NULL, NULL, MY_APPLET_SHARE_DATA_DIR, cDefaultFileName)
 
 /**
 *Recupere la valeur d'un parametre 'liste de chaines de caracteres' du fichier de conf.
@@ -1043,7 +1064,7 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data);
 	cairo_dock_set_icon_name (myDrawContext, cIconName, myIcon, myContainer);
 /**
 *Remplace l'etiquette de l'icone de l'applet par une nouvelle.
-*@param cIconName la nouvelle etiquette au format 'printf'.
+*@param cIconNameFormat la nouvelle etiquette au format 'printf'.
 */
 #define CD_APPLET_SET_NAME_FOR_MY_ICON_PRINTF(cIconNameFormat, ...) \
 	cairo_dock_set_icon_name_full (myDrawContext, myIcon, myContainer, cIconNameFormat, ##__VA_ARGS__);
@@ -1075,7 +1096,7 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data);
 	cairo_dock_set_minutes_secondes_as_quick_info (myDrawContext, myIcon, myContainer, iTimeInSeconds);
 /**
 *Ecris une taille en octets en info-rapide sur l'icone de l'applet.
-*@param iSize la taille en octets.
+*@param iSizeInBytes la taille en octets.
 */
 #define CD_APPLET_SET_SIZE_AS_QUICK_INFO(iSizeInBytes) \
 	cairo_dock_set_size_as_quick_info (myDrawContext, myIcon, myContainer, iSizeInBytes);
@@ -1105,7 +1126,7 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data);
 *@param pConfig donnees de configuration du rendu.
 */
 #define CD_APPLET_SET_DESKLET_RENDERER_WITH_DATA(cRendererName, pConfig) \
-	cairo_dock_set_desklet_renderer_by_name (myDesklet, cRendererName, NULL, CAIRO_DOCK_LOAD_ICONS_FOR_DESKLET, pConfig); \
+	cairo_dock_set_desklet_renderer_by_name (myDesklet, cRendererName, NULL, CAIRO_DOCK_LOAD_ICONS_FOR_DESKLET, (CairoDeskletRendererConfigPtr) pConfig); \
 	myDrawContext = cairo_create (myIcon->pIconBuffer);
 /**
 *Definit le moteur de rendu de l'applet en mode desklet et le contexte de dessin associe a l'icone. A appeler a l'init mais ausi au reload pour prendre en compte les redimensionnements.
@@ -1116,6 +1137,7 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data);
 /**
 *Cree et charge entierement un sous-dock pour notre icone.
 *@param pIconsList la liste (eventuellement NULL) des icones du sous-dock; celles-ci seront chargees en dans la foulee.
+*@param cRenderer nom du rendu.
 */
 #define CD_APPLET_CREATE_MY_SUBDOCK(pIconsList, cRenderer) \
 	myIcon->pSubDock = cairo_dock_create_subdock_from_scratch (pIconsList, myIcon->acName, myDock); \

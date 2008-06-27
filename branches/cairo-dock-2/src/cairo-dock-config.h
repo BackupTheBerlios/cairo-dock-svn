@@ -94,7 +94,7 @@ void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 */
 gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gsize *length, gchar *cDefaultValues, gchar *cDefaultGroupName, gchar *cDefaultKeyName);
 /**
-*Recupere une cle d'un fichier de cles sous la forme d'un tableau de chaines de caracteres.
+*Recupere une cle d'un fichier de cles sous la forme d'un type d'animation.
 *@param pKeyFile le fichier de cles.
 *@param cGroupName le com du groupe.
 *@param cKeyName le nom de la cle.
@@ -105,6 +105,20 @@ gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupN
 *@return le type de l'animation correspondante a la cle.
 */
 CairoDockAnimationType cairo_dock_get_animation_type_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, CairoDockAnimationType iDefaultAnimation, gchar *cDefaultGroupName, gchar *cDefaultKeyName);
+/**
+*Recupere une cle d'un fichier de cles sous la forme d'un chemin de fichier complet. La clé peut soit être un fichier relatif au thème courant, soit un chemin començant par '~', soit un chemin complet, soit vide auquel cas le chemin d'un fichier par defaut est renvoye s'il est specifie.
+*@param pKeyFile le fichier de cles.
+*@param cGroupName le com du groupe.
+*@param cKeyName le nom de la cle.
+*@param bFlushConfFileNeeded est mis a TRUE si la cle est manquante.
+*@param cDefaultGroupName nom de groupe alternatif, ou NULL si aucun autre.
+*@param cDefaultKeyName nom de cle alternative, ou NULL si aucune autre.
+*@param cDefaultDir si la cle est vide, on prendra un fichier par defaut situe dans ce repertoire. (optionnel)
+*@param cDefaultFileName si la cle est vide, on prendra ce fichier par defaut dans le repertoire defini ci-dessus. (optionnel)
+*@return le chemin complet du fichier, a liberer avec g_free().
+*/
+gchar *cairo_dock_get_file_path_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultGroupName, gchar *cDefaultKeyName, gchar *cDefaultDir, gchar *cDefaultFileName);
+
 
 /**
 *Lis le fichier de conf et recharge l'appli en consequence.
@@ -146,13 +160,18 @@ gboolean cairo_dock_edit_conf_file_full (GtkWindow *pWindow, gchar *cConfFilePat
 *@param cConfFilePath chemin du fichier de conf.
 *@param iFirstDataType type de la 1ere donnee.
 */
-void cairo_dock_update_conf_file (gchar *cConfFilePath, GType iFirstDataType, ...);
-
+void cairo_dock_update_conf_file (const gchar *cConfFilePath, GType iFirstDataType, ...);
+/**
+*Met a jour un fichier de conf de dock racine avec sa position définie par les écarts en x et en y.
+*@param cConfFilePath chemin du fichier de conf.
+*@param x écart latéral.
+*@param y écart vertical.
+*/
 void cairo_dock_update_conf_file_with_position (const gchar *cConfFilePath, int x, int y);
 
 /**
 *Essaye de determiner l'environnement de bureau dela session courante.
-*@return l'environnement de bureau (couramment Gnome et KDE son detectes).
+*@return l'environnement de bureau (couramment Gnome, KDE et XFCE sont detectés).
 */
 CairoDockDesktopEnv cairo_dock_guess_environment (void);
 
@@ -162,7 +181,15 @@ void cairo_dock_copy_to_easy_conf_file (GKeyFile *pMainKeyFile, gchar *cEasyConf
 void cairo_dock_build_easy_conf_file (gchar *cMainConfFilePath, gchar *cEasyConfFilePath);
 void cairo_dock_read_easy_conf_file (gchar *cEasyConfFilePath, gpointer data);
 
+/**
+* Dis si l'on utilise le fichier de conf avancé ou simplifié.
+*@return TRUE ssi on utilise le fichier de conf avancé.
+*/
 gboolean cairo_dock_use_full_conf_file (void);
+/**
+* Sauvegarde le type de configuration utilisée (avancée ou simplifiée).
+*@param cConfFilePath chemin du fichier de conf.
+*/
 void cairo_dock_mark_prefered_conf_file (gchar *cConfFilePath);
 
 /**
@@ -170,7 +197,7 @@ void cairo_dock_mark_prefered_conf_file (gchar *cConfFilePath);
 *@param cVersionString la version representee par une chaine.
 *@param iMajorVersion numero de version majeure renvoyee.
 *@param iMinorVersion numero de version mineure renvoyee.
-*@param iMicroVersionnumero de version micro renvoyee.
+*@param iMicroVersion numero de version micro renvoyee.
 */
 void cairo_dock_get_version_from_string (gchar *cVersionString, int *iMajorVersion, int *iMinorVersion, int *iMicroVersion);
 

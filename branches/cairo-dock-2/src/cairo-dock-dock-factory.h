@@ -54,6 +54,12 @@ void cairo_dock_free_dock (CairoDock *pDock);
 void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDock *ReceivingDock, gchar *cReceivingDockName);
 
 /**
+* Recharge les reflets d'un dock. Utile si le dock a changé de position.
+* @param pDock un dock.
+*/
+void cairo_dock_reload_reflects_in_dock (CairoDock *pDock);
+
+/**
 * Incremente de 1 la reference d'un dock, c'est-a-dire le nombre d'icones pointant sur ce dock. Si le dock etait auparavant un dock principal, il devient un sous-dock, prenant du meme coup les parametres propres aux sous-docks.
 * @param pDock un dock.
 * @param pParentDock son dock parent, si sa reference passse a 1, sinon peu etre NULL.

@@ -10,11 +10,14 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
+#include <gdk/gdkx.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
-#include <signal.h>
+#include <X11/extensions/Xcomposite.h>
+//#include <X11/extensions/Xdamage.h>
 
 #include "cairo-dock-applications-manager.h"
 #include "cairo-dock-application-factory.h"
@@ -25,6 +28,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 extern int g_iNbDesktops;
 extern int g_iNbViewportX,g_iNbViewportY ;
 extern int g_iScreenWidth[2], g_iScreenHeight[2];
+//extern int g_iDamageEvent;
 
 static Display *s_XDisplay = NULL;
 static Atom s_aNetWmWindowType;
@@ -33,6 +37,8 @@ static Atom s_aNetWmWindowTypeUtility;
 static Atom s_aNetCurrentDesktop;
 static Atom s_aNetDesktopViewport;
 static Atom s_aNetDesktopGeometry;
+static Atom s_aNetNbDesktops;
+static Atom s_aRootMapID;
 
 static int _cairo_dock_xerror_handler (Display * pDisplay, XErrorEvent *pXError)
 {
@@ -52,8 +58,14 @@ void cairo_dock_initialize_X_support (void)
 	s_aNetCurrentDesktop = XInternAtom (s_XDisplay, "_NET_CURRENT_DESKTOP", False);
 	s_aNetDesktopViewport = XInternAtom (s_XDisplay, "_NET_DESKTOP_VIEWPORT", False);
 	s_aNetDesktopGeometry = XInternAtom (s_XDisplay, "_NET_DESKTOP_GEOMETRY", False);
+	s_aNetNbDesktops = XInternAtom (s_XDisplay, "_NET_NUMBER_OF_DESKTOPS", False);
+	s_aRootMapID = XInternAtom (s_XDisplay, "_XROOTPMAP_ID", False);
 	
-	cairo_dock_update_screen_geometry ();
+	Screen *XScreen = XDefaultScreenOfDisplay (s_XDisplay);
+	g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] = WidthOfScreen (XScreen);
+	g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] = HeightOfScreen (XScreen);
+	g_iScreenWidth[CAIRO_DOCK_VERTICAL] = g_iScreenHeight[CAIRO_DOCK_HORIZONTAL];
+	g_iScreenHeight[CAIRO_DOCK_VERTICAL] = g_iScreenWidth[CAIRO_DOCK_HORIZONTAL];
 	
 	g_iNbDesktops = cairo_dock_get_nb_desktops ();
 	cairo_dock_get_nb_viewports (&g_iNbViewportX, &g_iNbViewportY);
@@ -229,12 +241,19 @@ void cairo_dock_set_xicon_geometry (int Xid, int iX, int iY, int iWidth, int iHe
 
 gboolean cairo_dock_update_screen_geometry (void)
 {
-	Screen *XScreen = XDefaultScreenOfDisplay (s_XDisplay);
-	//g_print ("screen : %dx%d ; root : %dx%d\n", WidthOfScreen (XScreen), HeightOfScreen (XScreen), width_return, height_return);
-	if (WidthOfScreen (XScreen) != g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] || HeightOfScreen (XScreen) != g_iScreenHeight[CAIRO_DOCK_HORIZONTAL])
+	Window root = DefaultRootWindow (s_XDisplay);
+	Window root_return;
+	int x_return=1, y_return=1;
+	unsigned int width_return, height_return, border_width_return, depth_return;
+	XGetGeometry (s_XDisplay, root,
+		&root_return,
+		&x_return, &y_return,
+		&width_return, &height_return,
+		&border_width_return, &depth_return);
+	if (width_return != g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] || height_return != g_iScreenHeight[CAIRO_DOCK_HORIZONTAL])  // on n'utilise pas WidthOfScreen() et HeightOfScreen() car leurs valeurs ne sont pas mises a jour immediatement apres les changements de resolution.
 	{
-		g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] = WidthOfScreen (XScreen);
-		g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] = HeightOfScreen (XScreen);
+		g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] = width_return;
+		g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] = height_return;
 		g_iScreenWidth[CAIRO_DOCK_VERTICAL] = g_iScreenHeight[CAIRO_DOCK_HORIZONTAL];
 		g_iScreenHeight[CAIRO_DOCK_VERTICAL] = g_iScreenWidth[CAIRO_DOCK_HORIZONTAL];
 		return TRUE;
@@ -253,6 +272,7 @@ gboolean cairo_dock_update_screen_geometry (void)
 	XFree (pXWorkArea);*/
 }
 
+
 gboolean cairo_dock_property_is_present_on_root (gchar *cPropertyName)
 {
 	g_return_val_if_fail (s_XDisplay != NULL, FALSE);
@@ -269,7 +289,6 @@ gboolean cairo_dock_property_is_present_on_root (gchar *cPropertyName)
 	XFree (pAtomList);
 	return (i != iNbProperties);
 }
-
 
 
 int cairo_dock_get_current_desktop (void)
@@ -328,7 +347,7 @@ int cairo_dock_get_nb_desktops (void)
 	int aReturnedFormat = 0;
 	unsigned long iLeftBytes, iBufferNbElements = 0;
 	gulong *pXDesktopNumberBuffer = NULL;
-	XGetWindowProperty (s_XDisplay, root, XInternAtom (s_XDisplay, "_NET_NUMBER_OF_DESKTOPS", False), 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXDesktopNumberBuffer);
+	XGetWindowProperty (s_XDisplay, root, s_aNetNbDesktops, 0, G_MAXULONG, False, XA_CARDINAL, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXDesktopNumberBuffer);
 	
 	int iNumberOfDesktops;
 	if (iBufferNbElements > 0)
@@ -341,9 +360,6 @@ int cairo_dock_get_nb_desktops (void)
 
 void cairo_dock_get_nb_viewports (int *iNbViewportX, int *iNbViewportY)
 {
-	Screen *XScreen = XDefaultScreenOfDisplay (s_XDisplay);
-	//g_print ("screen : %dx%d ; root : %dx%d\n", WidthOfScreen (XScreen), HeightOfScreen (XScreen), width_return, height_return);
-	
 	Window root = DefaultRootWindow (s_XDisplay);
 	Atom aReturnedType = 0;
 	int aReturnedFormat = 0;
@@ -353,8 +369,8 @@ void cairo_dock_get_nb_viewports (int *iNbViewportX, int *iNbViewportY)
 	if (iBufferNbElements > 0)
 	{
 		cd_debug ("pVirtualScreenSizeBuffer : %dx%d", pVirtualScreenSizeBuffer[0], pVirtualScreenSizeBuffer[1]);
-		*iNbViewportX = pVirtualScreenSizeBuffer[0] / WidthOfScreen (XScreen);
-		*iNbViewportY = pVirtualScreenSizeBuffer[1] / HeightOfScreen (XScreen);
+		*iNbViewportX = pVirtualScreenSizeBuffer[0] / g_iScreenWidth[CAIRO_DOCK_HORIZONTAL];
+		*iNbViewportY = pVirtualScreenSizeBuffer[1] / g_iScreenHeight[CAIRO_DOCK_HORIZONTAL];
 		XFree (pVirtualScreenSizeBuffer);
 	}
 }
@@ -453,4 +469,165 @@ void cairo_dock_set_current_desktop (int iDesktopNumber)
 		False,
 		SubstructureRedirectMask | SubstructureNotifyMask,
 		&xClientMessage);
+}
+
+Pixmap cairo_dock_get_window_background_pixmap (Window Xid)
+{
+	g_return_val_if_fail (Xid > 0, None);
+	cd_debug ("%s (%d)", __func__, Xid);
+	
+	Pixmap iPixmapID;
+	Atom aReturnedType = 0;
+	int aReturnedFormat = 0;
+	unsigned long iLeftBytes, iBufferNbElements;
+	Pixmap *pPixmapIdBuffer = NULL;
+	Pixmap iBgPixmapID = 0;
+	XGetWindowProperty (s_XDisplay, Xid, s_aRootMapID, 0, G_MAXULONG, False, XA_PIXMAP, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pPixmapIdBuffer);
+	if (iBufferNbElements != 0)
+	{
+		iBgPixmapID = *pPixmapIdBuffer;
+		XFree (pPixmapIdBuffer);
+	}
+	else
+		iBgPixmapID = None;
+	cd_debug (" => rootmapid : %d", iBgPixmapID);
+	return iBgPixmapID;
+}
+
+GdkPixbuf *cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bAddAlpha)  // cette fonction est inspiree par celle de libwnck.
+{
+	//\__________________ On recupere la taille telle qu'elle est actuellement sur le serveur X.
+	Window root;  // inutile.
+	int x, y;  // inutile.
+	guint border_width;  // inutile.
+	guint iWidth, iHeight, iDepth;
+	if (! XGetGeometry (s_XDisplay,
+		XPixmapID, &root, &x, &y,
+		&iWidth, &iHeight, &border_width, &iDepth))
+		return NULL;
+	cd_debug ("%s (%d) : %ux%ux%u (%d;%d)", __func__, XPixmapID, iWidth, iHeight, iDepth, x, y);
+
+	//\__________________ On recupere le drawable associe.
+	GdkDrawable *pGdkDrawable = gdk_xid_table_lookup (XPixmapID);
+	if (pGdkDrawable)
+		g_object_ref (G_OBJECT (pGdkDrawable));
+	else
+	{
+		cd_debug ("pas d'objet GDK present, on en alloue un nouveau");
+		GdkScreen* pScreen = gdk_screen_get_default ();
+		pGdkDrawable = gdk_pixmap_foreign_new_for_screen (pScreen, XPixmapID, iWidth, iHeight, iDepth);
+	}
+
+	//\__________________ On recupere la colormap.
+	GdkColormap* pColormap = gdk_drawable_get_colormap (pGdkDrawable);
+	if (pColormap == NULL && gdk_drawable_get_depth (pGdkDrawable) > 1)  // pour les bitmaps, on laisse la colormap a NULL, ils n'en ont pas besoin.
+	{
+		GdkScreen *pScreen = gdk_drawable_get_screen (GDK_DRAWABLE (pGdkDrawable));
+		if (gdk_drawable_get_depth (pGdkDrawable) == 32)
+			pColormap = gdk_screen_get_rgba_colormap (pScreen);
+		else
+			pColormap = gdk_screen_get_rgb_colormap (pScreen);  // au pire on a un colormap nul.
+		cd_debug ("  pColormap : %x  (pScreen:%x)", pColormap, pScreen);
+	}
+
+	//\__________________ On recupere le buffer dans un GdkPixbuf.
+	GdkPixbuf *pIconPixbuf = gdk_pixbuf_get_from_drawable (NULL,
+		pGdkDrawable,
+		pColormap,
+		0,
+		0,
+		0,
+		0,
+		iWidth,
+		iHeight);
+	g_object_unref (G_OBJECT (pGdkDrawable));
+	g_return_val_if_fail (pIconPixbuf != NULL, NULL);
+
+	//\__________________ On lui ajoute un canal alpha si necessaire.
+	if (! gdk_pixbuf_get_has_alpha (pIconPixbuf) && bAddAlpha)
+	{
+		cd_debug ("  on lui ajoute de la transparence");
+		GdkPixbuf *tmp_pixbuf = gdk_pixbuf_add_alpha (pIconPixbuf, FALSE, 255, 255, 255);
+		g_object_unref (pIconPixbuf);
+		pIconPixbuf = tmp_pixbuf;
+	}
+	return pIconPixbuf;
+}
+
+
+void cairo_dock_set_nb_viewports (int iNbViewportX, int iNbViewportY)
+{
+	XEvent xClientMessage;
+	Window root = DefaultRootWindow (s_XDisplay);
+	
+	xClientMessage.xclient.type = ClientMessage;
+	xClientMessage.xclient.serial = 0;
+	xClientMessage.xclient.send_event = True;
+	xClientMessage.xclient.display = s_XDisplay;
+	xClientMessage.xclient.window = root;
+	xClientMessage.xclient.message_type = s_aNetDesktopGeometry;
+	xClientMessage.xclient.format = 32;
+	xClientMessage.xclient.data.l[0] = iNbViewportX * g_iScreenWidth[CAIRO_DOCK_HORIZONTAL];
+	xClientMessage.xclient.data.l[1] = iNbViewportY * g_iScreenHeight[CAIRO_DOCK_HORIZONTAL];
+	xClientMessage.xclient.data.l[2] = 0;
+	xClientMessage.xclient.data.l[3] = 2;
+	xClientMessage.xclient.data.l[4] = 0;
+
+	XSendEvent (s_XDisplay,
+		root,
+		False,
+		SubstructureRedirectMask | SubstructureNotifyMask,
+		&xClientMessage);
+}
+
+void cairo_dock_set_nb_desktops (gulong iNbDesktops)
+{
+	XEvent xClientMessage;
+	Window root = DefaultRootWindow (s_XDisplay);
+	
+	xClientMessage.xclient.type = ClientMessage;
+	xClientMessage.xclient.serial = 0;
+	xClientMessage.xclient.send_event = True;
+	xClientMessage.xclient.display = s_XDisplay;
+	xClientMessage.xclient.window = root;
+	xClientMessage.xclient.message_type = s_aNetNbDesktops;
+	xClientMessage.xclient.format = 32;
+	xClientMessage.xclient.data.l[0] = iNbDesktops;
+	xClientMessage.xclient.data.l[1] = 0;
+	xClientMessage.xclient.data.l[2] = 0;
+	xClientMessage.xclient.data.l[3] = 2;
+	xClientMessage.xclient.data.l[4] = 0;
+
+	XSendEvent (s_XDisplay,
+		root,
+		False,
+		SubstructureRedirectMask | SubstructureNotifyMask,
+		&xClientMessage);
+}
+
+
+gboolean cairo_dock_support_X_extension (void)
+{
+	int event_base, error_base;
+	if (XCompositeQueryExtension (s_XDisplay, &event_base, &error_base))  // on regarde si le serveur X supporte l'extension.
+	{
+		int major = 0, minor = 2;  // La version minimale requise pour avoir XCompositeNameWindowPixmap().
+		XCompositeQueryVersion (s_XDisplay, &major, &minor);  // on regarde si on est au moins dans cette version.
+		if (! (major > 0 || minor >= 2))
+		{
+			cd_warning ("XComposite extension too old");
+			return FALSE;
+		}
+	}
+	else
+		return FALSE;
+	
+	/*int iDamageError=0;
+	if (! XDamageQueryExtension (s_XDisplay, &g_iDamageEvent, &iDamageError))
+	{
+		cd_warning ("XDamage extension not supported");
+		return FALSE;
+	}*/
+	
+	return TRUE;
 }

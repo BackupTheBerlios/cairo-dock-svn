@@ -38,5 +38,13 @@ void cairo_dock_show_hide_desktop (gboolean bShow);
 void cairo_dock_set_current_viewport (int iViewportNumberX, int iViewportNumberY);
 void cairo_dock_set_current_desktop (int iDesktopNumber);
 
+Pixmap cairo_dock_get_window_background_pixmap (Window Xid);
+
+GdkPixbuf *cairo_dock_get_pixbuf_from_pixmap (int XPixmapID, gboolean bAddAlpha);
+
+void cairo_dock_set_nb_viewports (int iNbViewportX, int iNbViewportY);
+void cairo_dock_set_nb_desktops (gulong iNbDesktops);
+
+gboolean cairo_dock_support_X_extension (void);
 
 #endif
