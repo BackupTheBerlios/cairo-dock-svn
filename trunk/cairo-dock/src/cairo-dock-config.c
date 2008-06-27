@@ -33,6 +33,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-dock-manager.h"
 #include "cairo-dock-surface-factory.h"
 #include "cairo-dock-class-manager.h"
+#include "cairo-dock-emblem.h"
 #include "cairo-dock-config.h"
 
 #define CAIRO_DOCK_TYPE_CONF_FILE_FILE ".cairo-dock-conf-file"
@@ -1229,6 +1230,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_key_file_free (pKeyFile);
 
 	cairo_dock_mark_theme_as_modified (TRUE);
+	
+	cairo_dock_updated_emblem_conf_file (cConfFilePath);
 	
 	s_bLoading = FALSE;
 }

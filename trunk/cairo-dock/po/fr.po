@@ -1615,6 +1615,40 @@ msgstr "Couleur de fond lorsque la souris le survole (r,v,b,a) :"
 msgid "Auto-Hide"
 msgstr "Masquage automatique"
 
+msgid "Emblems"
+msgstr "Emblèmes"
+
+msgid "Display a drop indicator on icon while drag'n'drop ?"
+msgstr "Afficher un indicateur pendant le glisser-déposer ?"
+
+msgid "Name of an image to use for the charge emblem :"
+msgstr "Nom d'une image pour l'emblem de charge :"
+
+msgid "Name of an image to use for the drop indicator emblem :"
+msgstr "Nom d'une image pour l'emblem de l'indicateur de dépot :"
+
+msgid "Name of an image to use for the play emblem :"
+msgstr "Nom d'une image pour l'emblem 'jouer' :"
+
+msgid "Name of an image to use for the pause emblem :"
+msgstr "Nom d'une image pour l'emblem 'pause' :"
+
+msgid "Name of an image to use for the stop emblem :"
+msgstr "Nom d'une image pour l'emblem 'stop' :"
+
+msgid "Name of an image to use for the broken emblem :"
+msgstr "Nom d'une image pour l'emblem 'cassé/pas de signal' :"
+
+msgid "Name of an image to use for the error emblem :"
+msgstr "Nom d'une image pour l'emblem 'erreur' :"
+
+msgid "Name of an image to use for the warning emblem :"
+msgstr "Nom d'une image pour l'emblem 'attention' :"
+
+msgid "Name of an image to use for the locked emblem :"
+msgstr "Nom d'une image pour l'emblem 'verrouillé' :"
+
+
 # #################################
 # ########### cairo-dock-easy.conf #############
 # #################################

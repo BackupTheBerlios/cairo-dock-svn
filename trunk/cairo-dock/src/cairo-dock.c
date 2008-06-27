@@ -238,6 +238,8 @@ cairo_surface_t *g_pDesktopBgSurface = NULL;  // image en fond d'ecran.
 gboolean g_bUseFakeTransparency = FALSE;
 //int g_iDamageEvent = 0;
 
+gboolean g_bDisplayDropEmblem = FALSE; // indicateur de drop
+
 static gchar *cLaunchCommand = NULL;
 
 static void _cairo_dock_set_verbosity(gchar *cVerbosity)

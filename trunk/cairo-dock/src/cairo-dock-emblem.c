@@ -20,8 +20,8 @@ Written by ChAnGFu (for any bug report, please mail me to changfu@cairo-dock.org
 
 CairoDockFullEmblem pFullEmblems[CAIRO_DOCK_EMBLEM_CLASSIC_NB];
 gchar *cEmblemConfPath[CAIRO_DOCK_EMBLEM_CLASSIC_NB];
-extern gchar *g_cConfFile;
 extern double g_fAmplitude;
+extern gboolean g_bDisplayDropEmblem;
 
 //Fonctions proposée par Nécropotame, rédigée par ChAnGFu
 void cairo_dock_draw_emblem_on_my_icon (cairo_t *pIconContext, const gchar *cIconFile, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem pEmblemType, gboolean bPersistent)
@@ -139,6 +139,15 @@ void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoCo
 			case CAIRO_DOCK_EMBLEM_BROKEN:
 				cClassicEmblemPath = g_strdup_printf ("%s/emblems/broken.svg", CAIRO_DOCK_SHARE_DATA_DIR);
 			break;
+			case CAIRO_DOCK_EMBLEM_ERROR:
+				cClassicEmblemPath = g_strdup_printf ("%s/emblems/error.svg", CAIRO_DOCK_SHARE_DATA_DIR);
+			break;
+			case CAIRO_DOCK_EMBLEM_WARNING:
+				cClassicEmblemPath = g_strdup_printf ("%s/emblems/warning.svg", CAIRO_DOCK_SHARE_DATA_DIR);
+			break;
+			case CAIRO_DOCK_EMBLEM_LOCKED:
+				cClassicEmblemPath = g_strdup_printf ("%s/emblems/locked.svg", CAIRO_DOCK_SHARE_DATA_DIR);
+			break;
 		}
 	}
 	else
@@ -150,7 +159,7 @@ void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoCo
 	if (pFullEmblems[pEmblemClassic].pSurface == NULL || (pFullEmblems[pEmblemClassic].fEmblemW != emblemW || pFullEmblems[pEmblemClassic].fEmblemH != emblemH) || strcmp (pFullEmblems[pEmblemClassic].cImagePath, cClassicEmblemPath) != 0)
 	{
 		if (pFullEmblems[pEmblemClassic].pSurface != NULL)
-			cairo_surface_destroy (pFullEmblems[pEmblemClassic].pSurface); //On sauvegarde au maximum de mémoire
+			cairo_surface_destroy (pFullEmblems[pEmblemClassic].pSurface); //On sauvegarde un maximum de mémoire
 			
 		pFullEmblems[pEmblemClassic].pSurface = cairo_dock_create_surface_from_image (cClassicEmblemPath, pIconContext, fMaxScale, emblemW, emblemH, CAIRO_DOCK_KEEP_RATIO, &fImgW, &fImgH, NULL, NULL);
 		pFullEmblems[pEmblemClassic].fEmblemW = emblemW;
@@ -165,13 +174,50 @@ void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoCo
 	g_free (cClassicEmblemPath);
 }
 
-//A lancer a l'init du thèmes
-void cairo_dock_get_emblem_path (void)
+gboolean _cairo_dock_erase_temporary_emblem (CairoDockTempEmblem *pEmblem)
 {
+	if (pEmblem != NULL) 
+		pEmblem->iSidTimer = 0;
+	
+	g_free (pEmblem);
+	return FALSE;
+}
+
+void cairo_dock_draw_temporary_emblem_on_my_icon (cairo_t *pIconContext, Icon *pIcon, CairoContainer *pContainer, const gchar *cIconFile, CairoDockClassicEmblem pEmblemClassic, CairoDockEmblem pEmblemType, gboolean bPersistent, double fTimeLength)
+{
+	if (cIconFile == NULL && (pEmblemClassic < 0 || pEmblemClassic > CAIRO_DOCK_EMBLEM_CLASSIC_NB))
+		return;
+	
+	if (pEmblemType < 0 || pEmblemType > CAIRO_DOCK_EMBLEM_TOTAL_NB)
+		return;
+	
+	if (cIconFile != NULL)
+		cairo_dock_draw_emblem_on_my_icon (pIconContext, cIconFile, pIcon, pContainer, pEmblemType, bPersistent);
+	else
+		cairo_dock_draw_emblem_classic (pIconContext, pIcon, pContainer, pEmblemClassic, pEmblemType, bPersistent);
+	
+	CairoDockTempEmblem *pEmblem = g_new0 (CairoDockTempEmblem, 1);
+	pEmblem->pIcon = pIcon;
+	pEmblem->pContainer = pContainer;
+	pEmblem->pIconContext = pIconContext;
+	pEmblem->iSidTimer = 0;
+	
+	if (fTimeLength > 0)
+		pEmblem->iSidTimer = g_timeout_add (fTimeLength, (GSourceFunc) _cairo_dock_erase_temporary_emblem, (gpointer) pEmblem);
+}
+
+//A lancer a l'init du thèmes
+void cairo_dock_get_emblem_path (gchar *cConfFilePath)
+{
+	cd_debug ("%s (%s)", __func__, cConfFilePath);
+	
+	if (cConfFilePath == NULL)
+		return;
+	
 	gboolean bFlushConfFileNeeded = FALSE;
 	GError *erreur = NULL;
 	GKeyFile *pKeyFile = g_key_file_new ();
-	g_key_file_load_from_file (pKeyFile, g_cConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+	g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
 		cd_warning ("Attention : %s", erreur->message);
@@ -179,6 +225,8 @@ void cairo_dock_get_emblem_path (void)
 		erreur = NULL;
 		return ;
 	}
+	
+	g_bDisplayDropEmblem = cairo_dock_get_boolean_key_value (pKeyFile, "Emblems", "drop indicator", &bFlushConfFileNeeded, NULL, NULL, NULL);
 	
 	gint i;
 	gchar *cKeyName = NULL;
@@ -195,20 +243,25 @@ void cairo_dock_free_emblem (void)
 {
 	gint i;
 	
-	for (i = 1; i <= CAIRO_DOCK_EMBLEM_CLASSIC_NB; i++)
-		g_free(cEmblemConfPath[i]);
-		
+	for (i = 1; i <= CAIRO_DOCK_EMBLEM_CLASSIC_NB; i++) {
+		g_free (cEmblemConfPath[i]);
+		cEmblemConfPath[i] = NULL;
+	}
 	for (i = 0; i <= CAIRO_DOCK_EMBLEM_CLASSIC_NB; i++) {
-		if (pFullEmblems[i].pSurface != NULL)
-			cairo_surface_destroy(pFullEmblems[i].pSurface);
-		if (pFullEmblems[i].cImagePath != NULL)
+		if (pFullEmblems[i].pSurface != NULL) {
+			cairo_surface_destroy (pFullEmblems[i].pSurface);
+			pFullEmblems[i].pSurface = NULL;
+		}
+		if (pFullEmblems[i].cImagePath != NULL) {
 			g_free (pFullEmblems[i].cImagePath);
+			pFullEmblems[i].cImagePath = NULL;
+		}
 	}
 }
 
 //A lancer quand la configuration est mise a jour
-void cairo_dock_updated_emblem_conf_file (void)
+void cairo_dock_updated_emblem_conf_file (gchar *cConfFilePath)
 {
 	cairo_dock_free_emblem ();
-	cairo_dock_get_emblem_path ();
+	cairo_dock_get_emblem_path (cConfFilePath);
 }

@@ -98,6 +98,8 @@ extern gchar *g_cRaiseDockShortcut;
 extern cairo_surface_t *g_pDesktopBgSurface;
 extern gboolean g_bUseFakeTransparency;
 
+extern gboolean g_bDisplayDropEmblem;
+
 static gboolean s_bTemporaryAutoHide = FALSE;
 static gboolean s_bEntranceAllowed = TRUE;
 static gboolean s_bAutoHideInitialValue;
@@ -167,15 +169,15 @@ gboolean on_expose (GtkWidget *pWidget,
 			pDock->render (pCairoContext, pDock);
 	}
 	
-	//Indicateur de drop, ca prend un petit peu de ressources, je me demande si ce serai pas mieux de mettre en cache les emblèmes classiques
-	//Pour gagner en rapidité, parce que du coup on charge la surface à chaques mouvements dans le dock.
-	/**Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
-	if (pDock->bIsDragging && pPointedIcon != NULL)
+	//Indicateur de drop, j'ai rajouter le support des surfaces en cache, du coup on ne perd de ressources qu'au dessin.
+	Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
+	if (pDock->bIsDragging && pPointedIcon != NULL && g_bDisplayDropEmblem)
 	{
 		cairo_translate (pCairoContext, pPointedIcon->fDrawX, pPointedIcon->fDrawY);
 		cairo_dock_draw_emblem_classic (pCairoContext, pPointedIcon, (CairoContainer *) pDock, CAIRO_DOCK_EMBLEM_DROP_INDICATOR, CAIRO_DOCK_EMBLEM_UPPER_RIGHT, FALSE);
-	}*/
+	}
 	/// je mets en commentaire pour la 1.6.0 car ca manque de tests.
+	//Testons testons ^^
 	
 	cairo_destroy (pCairoContext);
 	
