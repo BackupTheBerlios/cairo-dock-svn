@@ -87,9 +87,9 @@ typedef enum {
 */
 void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoContainer *pContainer, CairoDockClassicEmblem pEmblemClassic, CairoDockEmblem pEmblemType, gboolean bPersistent);
 
-#define cairo_dock_make_temporary_emblem(cIconFile, pEmblemClassic, pEmblemType, bPersistent, fTimeLength) cairo_dock_draw_temporary_emblem_on_my_icon(myDrawContext, myIcon, myContainer, cIconFile, pEmblemClassic, pEmblemType, bPersistent, fTimeLength);
-#define CAIRO_DOCK_MAKE_TEMPORARY_EMBLEM_WITH_FILE(cIconFile, pEmblemType, fTimeLength) cairo_dock_draw_temporary_emblem_on_my_icon(myDrawContext, myIcon, myContainer, cIconFile, NULL, pEmblemType, TRUE, fTimeLength);
-#define CAIRO_DOCK_MAKE_TEMPORARY_EMBLEM_CLASSIC(pEmblemClassic, pEmblemType, fTimeLength) cairo_dock_draw_temporary_emblem_on_my_icon(myDrawContext, myIcon, myContainer, NULL, pEmblemClassic, pEmblemType, TRUE, fTimeLength);
+#define cairo_dock_make_temporary_emblem(cIconFile, pEmblemClassic, pEmblemType, fTimeLength) cairo_dock_draw_temporary_emblem_on_my_icon(myDrawContext, myIcon, myContainer, cIconFile, pEmblemClassic, pEmblemType, fTimeLength);
+#define CAIRO_DOCK_MAKE_TEMPORARY_EMBLEM_WITH_FILE(cIconFile, pEmblemType, fTimeLength) cairo_dock_draw_temporary_emblem_on_my_icon(myDrawContext, myIcon, myContainer, cIconFile, NULL, pEmblemType, fTimeLength);
+#define CAIRO_DOCK_MAKE_TEMPORARY_EMBLEM_CLASSIC(pEmblemClassic, pEmblemType, fTimeLength) cairo_dock_draw_temporary_emblem_on_my_icon(myDrawContext, myIcon, myContainer, NULL, pEmblemClassic, pEmblemType, fTimeLength);
 
 /**
 *Dessine un embleme sur une icone avec une banque local.
@@ -102,7 +102,7 @@ void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoCo
 *@param bPersistent a TRUE l'emblème est imprimé directement sur l'icône, FALSE l'emblème est sur une couche supérieur et s'éffacera si on touche au CairoContexte de l'icône.
 *@param fTimeLength temps en millisecondes.
 */
-void cairo_dock_draw_temporary_emblem_on_my_icon (cairo_t *pIconContext, Icon *pIcon, CairoContainer *pContainer, const gchar *cIconFile, CairoDockClassicEmblem pEmblemClassic, CairoDockEmblem pEmblemType, gboolean bPersistent, double fTimeLength);
+void cairo_dock_draw_temporary_emblem_on_my_icon (cairo_t *pIconContext, Icon *pIcon, CairoContainer *pContainer, const gchar *cIconFile, CairoDockClassicEmblem pEmblemClassic, CairoDockEmblem pEmblemType, double fTimeLength);
 
 /**
 *Récupère l'emplacement des emblèmes utilisateur dans le fichier de configuration.
