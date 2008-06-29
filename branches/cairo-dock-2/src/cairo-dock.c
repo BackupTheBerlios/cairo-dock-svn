@@ -245,8 +245,9 @@ static gchar *cLaunchCommand = NULL;
 
 gboolean g_bUseOpenGL = FALSE;
 GdkGLConfig* g_pGlConfig = NULL;
-int g_iBackgroundTexture=0;
-
+GLuint g_iBackgroundTexture=0;
+GLuint g_iDropIndicatorTexture=0;
+GLuint g_iIndicatorTexture=0;
 
 static void _cairo_dock_set_verbosity(gchar *cVerbosity)
 {

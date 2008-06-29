@@ -137,7 +137,7 @@ void on_realize (GtkWidget* pWidget,
 	glEnable (GL_LIGHT0);
 	glLightfv (GL_LIGHT0, GL_DIFFUSE, afLightDiffuse);*/
 	
-	glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);  // GL_MODULATE / GL_DECAL /  GL_BLEND
+	///glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);  // GL_MODULATE / GL_DECAL /  GL_BLEND
 	glTexParameteri (GL_TEXTURE_2D,
 			GL_TEXTURE_MIN_FILTER,
 			GL_LINEAR_MIPMAP_LINEAR);

@@ -607,6 +607,8 @@ struct _Icon {
 	GLuint iIconTexture;
 	GLuint iReflectionTexture;
 	GLuint iFullIconTexture;
+	GLuint iLabelTexture;
+	GLuint iQuickInfoTexture;
 };
 
 

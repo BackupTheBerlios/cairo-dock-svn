@@ -102,6 +102,9 @@ void cairo_dock_free_icon_buffers (Icon *icon)
 	cairo_surface_destroy (icon->pFullIconBuffer);
 	cairo_surface_destroy (icon->pTextBuffer);
 	cairo_surface_destroy (icon->pQuickInfoBuffer);
+	
+	GLuint pTextures[5] = {icon->iIconTexture, icon->iReflectionTexture, icon->iFullIconTexture, icon->iLabelTexture, icon->iQuickInfoTexture};
+	glDeleteTextures (5, pTextures);
 }
 
 CairoDockIconType cairo_dock_get_icon_type (Icon *icon)

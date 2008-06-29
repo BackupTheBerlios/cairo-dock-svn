@@ -90,7 +90,9 @@ extern double g_fIndicatorWidth, g_fIndicatorHeight;
 extern cairo_surface_t *g_pDesktopBgSurface;
 
 extern gboolean g_bUseOpenGL;
-extern int g_iBackgroundTexture;
+extern GLuint g_iBackgroundTexture;
+extern GLuint g_iDropIndicatorTexture;
+extern GLuint g_iIndicatorTexture;
 
 void cairo_dock_free_label_description (CairoDockLabelDescription *pTextDescription)
 {
@@ -349,11 +351,11 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); // scale linearly when image smalled than texture
 		glTexImage2D (GL_TEXTURE_2D,
 			0,
-			4,  // GL_ALPHA / GL_RGBA
+			4,  // GL_ALPHA / GL_BGRA
 			w,
 			h,
 			0,
-			GL_RGBA,  // GL_ALPHA / GL_BGRA
+			GL_BGRA,  // GL_ALPHA / GL_BGRA
 			GL_UNSIGNED_BYTE,
 			cairo_image_surface_get_data (icon->pIconBuffer));
 		
@@ -367,11 +369,11 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); // scale linearly when image smalled than texture
 			glTexImage2D (GL_TEXTURE_2D,
 				0,
-				4,  // GL_ALPHA / GL_RGBA
+				4,  // GL_ALPHA / GL_BGRA
 				w,
 				h,
 				0,
-				GL_RGBA,  // GL_ALPHA / GL_BGRA
+				GL_BGRA,  // GL_ALPHA / GL_BGRA
 				GL_UNSIGNED_BYTE,
 				cairo_image_surface_get_data (icon->pReflectionBuffer));
 		}
@@ -386,11 +388,11 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); // scale linearly when image smalled than texture
 			glTexImage2D (GL_TEXTURE_2D,
 				0,
-				4,  // GL_ALPHA / GL_RGBA
+				4,  // GL_ALPHA / GL_BGRA
 				w,
 				h,
 				0,
-				GL_RGBA,  // GL_ALPHA / GL_BGRA
+				GL_BGRA,  // GL_ALPHA / GL_BGRA
 				GL_UNSIGNED_BYTE,
 				cairo_image_surface_get_data (icon->pFullIconBuffer));
 		}
@@ -404,6 +406,8 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, Cairo
 	//g_print ("%s (%s, %d)\n", __func__, cLabelPolice, iLabelSize);
 	cairo_surface_destroy (icon->pTextBuffer);
 	icon->pTextBuffer = NULL;
+	glDeleteTextures (1, &icon->iLabelTexture);
+	icon->iLabelTexture = 0;
 	if (icon->acName == NULL || (pTextDescription->iSize == 0))
 		return ;
 
@@ -474,12 +478,41 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, Cairo
 	}
 
 	icon->pTextBuffer = pNewSurface;
+	
+	if (g_bUseOpenGL && icon->pTextBuffer != NULL)
+	{
+		GdkGLContext* pGlContext = gtk_widget_get_gl_context (g_pMainDock->pWidget);
+		GdkGLDrawable* pGlDrawable = gtk_widget_get_gl_drawable (g_pMainDock->pWidget);
+		if (!gdk_gl_drawable_gl_begin (pGlDrawable, pGlContext))
+			return ;
+		
+		glGenTextures (1, &icon->iLabelTexture);
+		glBindTexture (GL_TEXTURE_2D, icon->iLabelTexture);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); // scale linearly when image bigger than texture
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); // scale linearly when image smalled than texture
+		glTexImage2D (GL_TEXTURE_2D,
+			0,
+			4,  // GL_ALPHA / GL_BGRA
+			icon->iTextWidth,
+			icon->iTextHeight,
+			0,
+			GL_BGRA,  // GL_ALPHA / GL_BGRA
+			GL_UNSIGNED_BYTE,
+			cairo_image_surface_get_data (icon->pTextBuffer));
+		g_print ("texture de l'etiquette %d generee (%x)\n", g_iBackgroundTexture, cairo_image_surface_get_data (icon->pTextBuffer));
+		
+		gdk_gl_drawable_gl_end (pGlDrawable);
+	}
 }
 
 void cairo_dock_fill_one_quick_info_buffer (Icon *icon, cairo_t* pSourceContext, CairoDockLabelDescription *pTextDescription, double fMaxScale)
 {
 	cairo_surface_destroy (icon->pQuickInfoBuffer);
 	icon->pQuickInfoBuffer = NULL;
+	glDeleteTextures (1, &icon->iQuickInfoTexture);
+	icon->iQuickInfoTexture = 0;
+	glDeleteTextures (1, &icon->iQuickInfoTexture);
+	icon->iQuickInfoTexture = 0;
 	if (icon->cQuickInfo == NULL)
 		return ;
 
@@ -488,6 +521,31 @@ void cairo_dock_fill_one_quick_info_buffer (Icon *icon, cairo_t* pSourceContext,
 		pTextDescription,
 		fMaxScale,
 		&icon->iQuickInfoWidth, &icon->iQuickInfoHeight, &icon->fQuickInfoXOffset, &icon->fQuickInfoYOffset);
+	
+	if (g_bUseOpenGL && icon->pQuickInfoBuffer != NULL)
+	{
+		GdkGLContext* pGlContext = gtk_widget_get_gl_context (g_pMainDock->pWidget);
+		GdkGLDrawable* pGlDrawable = gtk_widget_get_gl_drawable (g_pMainDock->pWidget);
+		if (!gdk_gl_drawable_gl_begin (pGlDrawable, pGlContext))
+			return ;
+		
+		glGenTextures (1, &icon->iQuickInfoTexture);
+		glBindTexture (GL_TEXTURE_2D, icon->iQuickInfoTexture);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); // scale linearly when image bigger than texture
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); // scale linearly when image smalled than texture
+		glTexImage2D (GL_TEXTURE_2D,
+			0,
+			4,  // GL_ALPHA / GL_BGRA
+			cairo_image_surface_get_width (icon->pQuickInfoBuffer),
+			cairo_image_surface_get_height (icon->pQuickInfoBuffer),
+			0,
+			GL_BGRA,  // GL_ALPHA / GL_BGRA
+			GL_UNSIGNED_BYTE,
+			cairo_image_surface_get_data (icon->pQuickInfoBuffer));
+		g_print ("texture de l'info-rapide %d generee (%x)\n", g_iBackgroundTexture, cairo_image_surface_get_data (icon->pQuickInfoBuffer));
+		
+		gdk_gl_drawable_gl_end (pGlDrawable);
+	}
 }
 
 
@@ -746,13 +804,13 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 			glBindTexture (GL_TEXTURE_2D, g_iBackgroundTexture);  // GL_TEXTURE_2D / GL_TEXTURE_RECTANGLE_ARB
 			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); // scale linearly when image bigger than texture
 			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); // scale linearly when image smalled than texture
-			glTexImage2D (GL_TEXTURE_2D,  // GL_TEXTURE_2D / GL_TEXTURE_RECTANGLE_ARB
+			glTexImage2D (GL_TEXTURE_2D,
 				0,
-				4,  // GL_ALPHA / GL_RGBA
+				4,  // GL_ALPHA / GL_BGRA
 				g_fBackgroundImageWidth,
 				g_fBackgroundImageHeight,
 				0,
-				GL_RGBA,  // GL_ALPHA / GL_BGRA
+				GL_BGRA,  // GL_ALPHA / GL_BGRA
 				GL_UNSIGNED_BYTE,
 				cairo_image_surface_get_data (g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL] != NULL ? g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL] : g_pBackgroundSurface[CAIRO_DOCK_HORIZONTAL]));
 			g_print ("texture du fond %d generee (%x)\n", g_iBackgroundTexture, cairo_image_surface_get_data (g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL] != NULL ? g_pBackgroundSurfaceFull[CAIRO_DOCK_HORIZONTAL] : g_pBackgroundSurface[CAIRO_DOCK_HORIZONTAL]));
@@ -781,6 +839,8 @@ void cairo_dock_load_drop_indicator (gchar *cImagePath, cairo_t* pSourceContext,
 {
 	if (g_pDropIndicatorSurface != NULL)
 		cairo_surface_destroy (g_pDropIndicatorSurface);
+	glDeleteTextures (1, &g_iDropIndicatorTexture);
+	g_iDropIndicatorTexture = 0;
 	g_pDropIndicatorSurface = cairo_dock_create_surface_from_image (cImagePath,
 		pSourceContext,
 		1.,
@@ -789,6 +849,30 @@ void cairo_dock_load_drop_indicator (gchar *cImagePath, cairo_t* pSourceContext,
 		CAIRO_DOCK_KEEP_RATIO,
 		&g_fDropIndicatorWidth, &g_fDropIndicatorHeight,
 		NULL, NULL);
+	if (g_bUseOpenGL && g_pDropIndicatorSurface != NULL)
+	{
+		GdkGLContext* pGlContext = gtk_widget_get_gl_context (g_pMainDock->pWidget);
+		GdkGLDrawable* pGlDrawable = gtk_widget_get_gl_drawable (g_pMainDock->pWidget);
+		if (!gdk_gl_drawable_gl_begin (pGlDrawable, pGlContext))
+			return ;
+		
+		glGenTextures (1, &g_iDropIndicatorTexture);
+		glBindTexture (GL_TEXTURE_2D, g_iDropIndicatorTexture);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); // scale linearly when image bigger than texture
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); // scale linearly when image smalled than texture
+		glTexImage2D (GL_TEXTURE_2D,  // GL_TEXTURE_2D / GL_TEXTURE_RECTANGLE_ARB
+			0,
+			4,  // GL_ALPHA / GL_BGRA
+			g_fDropIndicatorWidth,
+			g_fDropIndicatorHeight,
+			0,
+			GL_BGRA,  // GL_ALPHA / GL_BGRA
+			GL_UNSIGNED_BYTE,
+			cairo_image_surface_get_data (g_pDropIndicatorSurface));
+		g_print ("texture de l'indicateur de drop %d generee (%x)\n", g_iBackgroundTexture, cairo_image_surface_get_data (g_pDropIndicatorSurface));
+		
+		gdk_gl_drawable_gl_end (pGlDrawable);
+	}
 }
 
 
@@ -798,6 +882,10 @@ void cairo_dock_load_task_indicator (const gchar *cIndicatorImagePath, double fI
 	cairo_surface_destroy (g_pIndicatorSurface[1]);
 	g_pIndicatorSurface[0] = NULL;
 	g_pIndicatorSurface[1] = NULL;
+	glDeleteTextures (1, &g_iIndicatorTexture);
+	g_iIndicatorTexture = 0;
+	
+	double fMaxScale = (g_bLinkIndicatorWithIcon ? 1 + g_fAmplitude : 1);
 	if (cIndicatorImagePath != NULL)
 	{
 		double fLauncherWidth = (g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] != 0 ? g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER] : 48);
@@ -805,11 +893,10 @@ void cairo_dock_load_task_indicator (const gchar *cIndicatorImagePath, double fI
 		
 		cairo_t* pCairoContext = cairo_dock_create_context_from_window (pSomeContainer);
 		
-		double fMasxScale = (g_bLinkIndicatorWithIcon ? 1 + g_fAmplitude : 1);
 		g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL] = cairo_dock_create_surface_from_image (
 			cIndicatorImagePath,
 			pCairoContext,
-			fMasxScale,
+			fMaxScale,
 			fLauncherWidth * fIndicatorRatio,
 			fLauncherHeight * fIndicatorRatio,
 			CAIRO_DOCK_KEEP_RATIO,
@@ -821,12 +908,37 @@ void cairo_dock_load_task_indicator (const gchar *cIndicatorImagePath, double fI
 			g_pIndicatorSurface[CAIRO_DOCK_VERTICAL] = cairo_dock_rotate_surface (
 				g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL],
 				pCairoContext, 
-				g_fIndicatorWidth * fMasxScale,
-				g_fIndicatorHeight * fMasxScale,
+				g_fIndicatorWidth * fMaxScale,
+				g_fIndicatorHeight * fMaxScale,
 				- G_PI / 2);
 		else
 			cd_warning ("couldn't load image '%s' for indicators", cIndicatorImagePath);
 		cairo_destroy (pCairoContext);
+	}
+	
+	if (g_bUseOpenGL && g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL] != NULL)
+	{
+		GdkGLContext* pGlContext = gtk_widget_get_gl_context (g_pMainDock->pWidget);
+		GdkGLDrawable* pGlDrawable = gtk_widget_get_gl_drawable (g_pMainDock->pWidget);
+		if (!gdk_gl_drawable_gl_begin (pGlDrawable, pGlContext))
+			return ;
+		
+		glGenTextures (1, &g_iIndicatorTexture);
+		glBindTexture (GL_TEXTURE_2D, g_iIndicatorTexture);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); // scale linearly when image bigger than texture
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); // scale linearly when image smalled than texture
+		glTexImage2D (GL_TEXTURE_2D,  // GL_TEXTURE_2D / GL_TEXTURE_RECTANGLE_ARB
+			0,
+			4,  // GL_ALPHA / GL_BGRA
+			g_fIndicatorWidth * fMaxScale,
+			g_fIndicatorHeight * fMaxScale,
+			0,
+			GL_BGRA,  // GL_ALPHA / GL_BGRA
+			GL_UNSIGNED_BYTE,
+			cairo_image_surface_get_data (g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL]));
+		g_print ("texture de l'indicateur de drop %d generee (%x)\n", g_iBackgroundTexture, cairo_image_surface_get_data (g_pIndicatorSurface[CAIRO_DOCK_HORIZONTAL]));
+		
+		gdk_gl_drawable_gl_end (pGlDrawable);
 	}
 }
 

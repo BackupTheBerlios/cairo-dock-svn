@@ -571,38 +571,6 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		_cairo_dock_draw_appli_indicator (icon, pCairoContext, bHorizontalDock, fRatio, bDirectionUp);
 	}
 	
-	/*int w = round (icon->fWidth / fRatio * (1 + g_fAmplitude));
-	int h = round (icon->fHeight / fRatio * (1 + g_fAmplitude));
-	int x, y;
-	int alpha, red, green, blue;
-	float fAlphaFactor;
-	guchar *p, *pSurfaceData = cairo_image_surface_get_data (icon->pIconBuffer)icon->pSurfaceData, *pSurfaceDataIni = NULL;
-	pSurfaceData = icon->pSurfaceData;
-	int iNbChannels = 4, iRowstride =  w * sizeof (gint);
-	int delta_lum = sin (icon->fPhase) * 50;
-	if (pSurfaceData != NULL && delta_lum)  //  && icon->bPointed
-	{
-		pSurfaceDataIni = g_memdup (pSurfaceData, iRowstride * h);
-		p = pSurfaceData;
-		cd_message (" %dx%d (%d)\n", w, h, delta_lum);
-		for (y = 0; y < h; y ++)
-		{
-			for (x = 0; x < w; x ++)
-			{
-				if (p[3])
-				{
-					blue = MIN (p[0] + delta_lum, 255);
-					green = MIN (p[1] + delta_lum, 255);
-					red = MIN (p[2] + delta_lum, 255);
-					p[0] = blue;
-					p[1] = green;
-					p[2] = red;
-				}
-				p += 4;
-			}
-		}
-	}*/
-
 	gboolean bDrawFullBuffer  = (bUseReflect && icon->pFullIconBuffer != NULL && (! g_bDynamicReflection || icon->fScale == 1) && (icon->iCount == 0 || icon->iAnimationType == CAIRO_DOCK_ROTATE || icon->iAnimationType == CAIRO_DOCK_BLINK));
 	int iCurrentWidth= 1;
 	//\_____________________ On dessine l'icone en fonction de son placement, son angle, et sa transparence.
@@ -812,10 +780,6 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		{
 			cairo_rotate (pCairoContext, icon->fOrientation);
 		}
-		/*if (fRatio < 1)  // bof, finalement spa top de reduire le texte.
-			cairo_scale (pCairoContext,
-				fRatio,
-				fRatio);*/
 		if (! bHorizontalDock && g_bTextAlwaysHorizontal)
 		{
 			cairo_set_source_surface (pCairoContext,
@@ -871,11 +835,6 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		else
 			cairo_paint_with_alpha (pCairoContext, fAlpha);
 	}
-	/*if (pSurfaceDataIni != NULL)
-	{
-		memcpy (pSurfaceData, pSurfaceDataIni, iRowstride * h);
-		g_free (pSurfaceDataIni);
-	}*/
 }
 
 
