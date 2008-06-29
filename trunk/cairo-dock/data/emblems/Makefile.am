@@ -9,6 +9,9 @@ emblems_DATA = \
 	play.svg\
 	pause.svg\
 	stop.svg\
-	broken.svg
+	broken.svg\
+	error.svg\
+	warning.svg\
+	locked.svg
 	
 EXTRA_DIST = $(theme_DATA)
