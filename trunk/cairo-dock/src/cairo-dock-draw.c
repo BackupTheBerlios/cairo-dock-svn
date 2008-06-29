@@ -571,46 +571,12 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		_cairo_dock_draw_appli_indicator (icon, pCairoContext, bHorizontalDock, fRatio, bDirectionUp);
 	}
 	
-	/*int w = round (icon->fWidth / fRatio * (1 + g_fAmplitude));
-	int h = round (icon->fHeight / fRatio * (1 + g_fAmplitude));
-	int x, y;
-	int alpha, red, green, blue;
-	float fAlphaFactor;
-	guchar *p, *pSurfaceData = cairo_image_surface_get_data (icon->pIconBuffer)icon->pSurfaceData, *pSurfaceDataIni = NULL;
-	pSurfaceData = icon->pSurfaceData;
-	int iNbChannels = 4, iRowstride =  w * sizeof (gint);
-	int delta_lum = sin (icon->fPhase) * 50;
-	if (pSurfaceData != NULL && delta_lum)  //  && icon->bPointed
-	{
-		pSurfaceDataIni = g_memdup (pSurfaceData, iRowstride * h);
-		p = pSurfaceData;
-		cd_message (" %dx%d (%d)\n", w, h, delta_lum);
-		for (y = 0; y < h; y ++)
-		{
-			for (x = 0; x < w; x ++)
-			{
-				if (p[3])
-				{
-					blue = MIN (p[0] + delta_lum, 255);
-					green = MIN (p[1] + delta_lum, 255);
-					red = MIN (p[2] + delta_lum, 255);
-					p[0] = blue;
-					p[1] = green;
-					p[2] = red;
-				}
-				p += 4;
-			}
-		}
-	}*/
-
 	gboolean bDrawFullBuffer  = (bUseReflect && icon->pFullIconBuffer != NULL && (! g_bDynamicReflection || icon->fScale == 1) && (icon->iCount == 0 || icon->iAnimationType == CAIRO_DOCK_ROTATE || icon->iAnimationType == CAIRO_DOCK_BLINK));
 	int iCurrentWidth= 1;
 	//\_____________________ On dessine l'icone en fonction de son placement, son angle, et sa transparence.
-	//cairo_push_group (pCairoContext);
-	//g_print ("%s (%.2f;%.2f)\n", __func__, icon->fDrawX, icon->fDrawY);
+	cairo_save (pCairoContext);
 	if (bHorizontalDock)
 	{
-		cairo_save (pCairoContext);
 		if (bDrawFullBuffer && ! bDirectionUp)
 			cairo_translate (pCairoContext, 0, - g_fReflectSize * icon->fScale);
 		if (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (icon))
@@ -627,7 +593,6 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	}
 	else
 	{
-		cairo_save (pCairoContext);
 		if (bDrawFullBuffer && ! bDirectionUp)
 			cairo_translate (pCairoContext, - g_fReflectSize * icon->fScale, 0);
 		if (g_bConstantSeparatorSize && CAIRO_DOCK_IS_SEPARATOR (icon))
@@ -789,7 +754,6 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		else
 			cairo_paint_with_alpha (pCairoContext, fAlpha);
 	}
-	//cairo_pop_group (pCairoContext);
 	
 	cairo_restore (pCairoContext);  // retour juste apres la translation (fDrawX, fDrawY).
 	
@@ -798,11 +762,10 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		_cairo_dock_draw_appli_indicator (icon, pCairoContext, bHorizontalDock, fRatio, bDirectionUp);
 	}
 	
-	cairo_save (pCairoContext);
-	
 	//\_____________________ On dessine les etiquettes, avec un alpha proportionnel au facteur d'echelle de leur icone.
 	if (bUseText && icon->pTextBuffer != NULL && icon->fScale > 1.01 && (! g_bLabelForPointedIconOnly || icon->bPointed) && icon->iCount == 0)  // 1.01 car sin(pi) = 1+epsilon :-/
 	{
+		cairo_save (pCairoContext);
 		double fOffsetX = -icon->fTextXOffset + icon->fWidthFactor * icon->fWidth * icon->fScale / 2;
 		if (fOffsetX < - icon->fDrawX)
 			fOffsetX = - icon->fDrawX;
@@ -849,9 +812,9 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	}
 	
 	//\_____________________ On dessine les infos additionnelles.
-	cairo_restore (pCairoContext);  // retour juste apres la translation (fDrawX, fDrawY).
 	if (icon->pQuickInfoBuffer != NULL)
 	{
+		cairo_restore (pCairoContext);  // retour juste apres la translation (fDrawX, fDrawY).
 		cairo_translate (pCairoContext,
 			//-icon->fQuickInfoXOffset + icon->fWidth / 2,
 			//icon->fHeight - icon->fQuickInfoYOffset);
@@ -871,11 +834,6 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		else
 			cairo_paint_with_alpha (pCairoContext, fAlpha);
 	}
-	/*if (pSurfaceDataIni != NULL)
-	{
-		memcpy (pSurfaceData, pSurfaceDataIni, iRowstride * h);
-		g_free (pSurfaceDataIni);
-	}*/
 }
 
 

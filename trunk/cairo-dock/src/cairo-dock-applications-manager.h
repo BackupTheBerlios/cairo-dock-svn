@@ -54,5 +54,6 @@ void cairo_dock_stop_application_manager (void);
 
 gboolean cairo_dock_application_manager_is_running (void);
 
+GList *cairo_dock_get_current_applis_list (void);
 
 #endif

@@ -1300,3 +1300,10 @@ gboolean cairo_dock_application_manager_is_running (void)
 {
 	return (s_iSidUpdateAppliList != 0);
 }
+
+
+GList *cairo_dock_get_current_applis_list (void)
+{
+	return g_hash_table_get_values (s_hXWindowTable);
+}
+
