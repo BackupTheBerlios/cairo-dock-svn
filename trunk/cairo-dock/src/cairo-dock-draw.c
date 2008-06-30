@@ -809,12 +809,12 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		}
 		if (fMagnitude > .1)
 			cairo_paint_with_alpha (pCairoContext, fMagnitude);
+		cairo_restore (pCairoContext);  // retour juste apres la translation (fDrawX, fDrawY).
 	}
 	
 	//\_____________________ On dessine les infos additionnelles.
 	if (icon->pQuickInfoBuffer != NULL)
 	{
-		cairo_restore (pCairoContext);  // retour juste apres la translation (fDrawX, fDrawY).
 		cairo_translate (pCairoContext,
 			//-icon->fQuickInfoXOffset + icon->fWidth / 2,
 			//icon->fHeight - icon->fQuickInfoYOffset);
