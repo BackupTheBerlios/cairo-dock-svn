@@ -935,8 +935,11 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 									else
 									{
 										cd_message (" => re-apparait");
-										cairo_dock_detach_icon_from_dock (icon, pParentDock, TRUE);
-										cairo_dock_update_dock_size (pParentDock);
+										if (pParentDock != NULL)
+										{
+											cairo_dock_detach_icon_from_dock (icon, pParentDock, TRUE);
+											cairo_dock_update_dock_size (pParentDock);
+										}
 									}
 									if (pParentDock != NULL)
 										gtk_widget_queue_draw (pParentDock->pWidget);
@@ -1007,14 +1010,14 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 					{
 						CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 						if (pParentDock == NULL)
-							pParentDock = pDock;
+							pParentDock = pDock;  /// pertinent ?...
 						cairo_dock_detach_icon_from_dock (icon, pParentDock, TRUE);
 						cairo_dock_update_dock_size (pParentDock);
 						gtk_widget_queue_draw (pParentDock->pWidget);
 					}
 					else  // elle est sur le bureau.
 					{
-						g_print ("cette fenetre s'est deplacee sur le bureau courant (%d;%d)\n", event.xconfigure.x, event.xconfigure.y);
+						cd_message ("cette fenetre s'est deplacee sur le bureau courant (%d;%d)", event.xconfigure.x, event.xconfigure.y);
 						gboolean bInsideDock;
 						if (g_list_find (pDock->icons, icon) == NULL)
 						{
@@ -1187,6 +1190,18 @@ void cairo_dock_update_applis_list (CairoDock *pDock, double fTime)
 							bUpdateMainDockSize = TRUE;
 						else
 							cairo_dock_update_dock_size (pParentDock);
+					}
+				}
+				if ((g_bAutoHideOnMaximized && icon->bIsMaximized) || (g_bAutoHideOnFullScreen && icon->bIsFullScreen))
+				{
+					if (! cairo_dock_quick_hide_is_activated ())
+					{
+						int iDesktopNumber = cairo_dock_get_current_desktop ();
+						if (cairo_dock_window_is_on_this_desktop (Xid, iDesktopNumber) && cairo_dock_window_hovers_dock (&icon->windowGeometry, pDock))
+						{
+							cd_message (" cette nouvelle fenetre empiete sur notre dock");
+							cairo_dock_activate_temporary_auto_hide ();
+						}
 					}
 				}
 			}

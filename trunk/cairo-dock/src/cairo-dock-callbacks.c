@@ -86,6 +86,8 @@ extern double g_fRefreshInterval;
 
 extern gboolean g_bMinimizeOnClick;
 extern gboolean g_bCloseAppliOnMiddleClick;
+extern gboolean g_bAutoHideOnFullScreen;
+extern gboolean g_bAutoHideOnMaximized;
 
 extern int g_tAnimationType[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
@@ -126,16 +128,6 @@ gboolean on_expose (GtkWidget *pWidget,
 			
 			if (pDock->iSidDropIndicator != 0)
 			{
-				/*cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
-				g_return_val_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS, FALSE);
-				
-				cairo_rectangle (pCairoContext,
-					pExpose->area.x,
-					pExpose->area.y,
-					pExpose->area.width,
-					pExpose->area.height);
-				cairo_clip (pCairoContext);*/
-				
 				cairo_restore (pCairoContext);
 				cairo_dock_draw_drop_indicator (pDock, pCairoContext);
 			}
@@ -170,14 +162,15 @@ gboolean on_expose (GtkWidget *pWidget,
 	}
 	
 	//Indicateur de drop, j'ai rajouter le support des surfaces en cache, du coup on ne perd de ressources qu'au dessin.
-	Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
-	if (pDock->bIsDragging && pPointedIcon != NULL && g_bDisplayDropEmblem)
+	if (pDock->bIsDragging && g_bDisplayDropEmblem)
 	{
-		cairo_translate (pCairoContext, pPointedIcon->fDrawX, pPointedIcon->fDrawY);
-		cairo_dock_draw_emblem_classic (pCairoContext, pPointedIcon, (CairoContainer *) pDock, CAIRO_DOCK_EMBLEM_DROP_INDICATOR, CAIRO_DOCK_EMBLEM_UPPER_RIGHT, FALSE);
+		Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
+		if (pPointedIcon != NULL && pPointedIcon->iAnimationType != CAIRO_DOCK_AVOID_MOUSE)
+		{
+			cairo_translate (pCairoContext, pPointedIcon->fDrawX, pPointedIcon->fDrawY);
+			cairo_dock_draw_emblem_classic (pCairoContext, pPointedIcon, CAIRO_CONTAINER (pDock), CAIRO_DOCK_EMBLEM_DROP_INDICATOR, CAIRO_DOCK_EMBLEM_UPPER_RIGHT, FALSE);
+		}
 	}
-	/// je mets en commentaire pour la 1.6.0 car ca manque de tests.
-	//Testons testons ^^
 	
 	cairo_destroy (pCairoContext);
 	
@@ -698,7 +691,9 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 		gtk_window_present (GTK_WINDOW (pWidget));
 	}
 	pDock->bInside = TRUE;
-	//cairo_dock_deactivate_temporary_auto_hide ();  // se desactive tout seul.
+	
+	if (cairo_dock_quick_hide_is_activated () && ! g_bAutoHideOnFullScreen && ! g_bAutoHideOnMaximized)  // cachage rapide active par l'utilisateur, different du cachage rapide du aux fenetres.
+		cairo_dock_deactivate_temporary_auto_hide ();
 
 	if (s_pIconClicked != NULL)  // on pourrait le faire a chaque motion aussi.
 	{
@@ -1325,7 +1320,7 @@ gboolean on_scroll (GtkWidget* pWidget,
 	static int iNbSimultaneousScroll = 0;
 	static GdkEventScroll scrollBuffer;
 	static gpointer data[3] = {&scrollBuffer, NULL, NULL};
-	if (pDock->icons == NULL)
+	if (pDock->icons == NULL || g_iScrollAmount < 0)
 		return FALSE;
 	
 	if (pScroll->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK))

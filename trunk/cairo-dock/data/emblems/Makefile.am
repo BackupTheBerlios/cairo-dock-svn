@@ -3,7 +3,6 @@ SUBDIRS = .
 emblemsdir = $(pkgdatadir)/emblems
 
 emblems_DATA = \
-	blank.svg\
 	charge.svg\
 	drop.svg\
 	play.svg\

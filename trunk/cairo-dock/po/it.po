@@ -1,13 +1,13 @@
+# SOME DESCRIPTIVE TITLE.
 # Copyright (C) 2007 Cairo-Dock project
 # This file is distributed under the same license as the Cairo-Dock package.
+# Fabrice Rey <fabounet@users.berlios.de>, 2007.
 #
-# Based on version SVN of cairo-dock (rev. 1128)
-
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.4.5\n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-06-19 02:12+0200\n"
+"POT-Creation-Date: 2008-06-30 18:41+0200\n"
 "PO-Revision-Date: 2008-06-24 14:23+0200\n"
 "Last-Translator: Mattia Tavernini <maathias@interfree.it>\n"
 "Language-Team: Cairo-Dock <po@cairo-dock.org>\n"
@@ -15,11 +15,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/cairo-dock-callbacks.c:971
+#: ../src/cairo-dock-callbacks.c:968
 msgid "Do you want to mount this point ?"
 msgstr "Volete montare questo punto ?"
 
-#: ../src/cairo-dock-callbacks.c:1671
+#: ../src/cairo-dock-callbacks.c:1668
 msgid "Quit Cairo-Dock ?"
 msgstr "Abbandonare Cairo-Dock ?"
 
@@ -206,6 +206,20 @@ msgstr "Montare"
 msgid "Eject"
 msgstr "Espellere"
 
+#: ../src/cairo-dock-menu.c:1240
+#, fuzzy
+msgid "Delete this file"
+msgstr "Staccare questo modulo"
+
+#: ../src/cairo-dock-menu.c:1244
+#, fuzzy
+msgid "Rename this file"
+msgstr "Rimuovere questo modulo"
+
+#: ../src/cairo-dock-menu.c:1248
+msgid "Properties"
+msgstr ""
+
 #: ../src/cairo-dock-menu.c:1277
 msgid "Remove this launcher"
 msgstr "Rimuovere questo lanciatore"
@@ -315,7 +329,8 @@ msgstr "Sempre al di sotto"
 
 #: ../src/cairo-dock-menu.c:1422
 msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
-msgstr "Regolate il comportamento di Compiz in : (name=cairo-dock & type=utility)"
+msgstr ""
+"Regolate il comportamento di Compiz in : (name=cairo-dock & type=utility)"
 
 #: ../src/cairo-dock-modules.c:777
 #, c-format
@@ -344,14 +359,13 @@ msgid ""
 "Then, activate plug-ins one by one to guess which one is wrong."
 msgstr ""
 "State eseguendo Cairo-dock in safe mode.\n"
-"Perché ? Probabilmente a causa di un plug-in che crea problemi "
-"alla barra,\n"
+"Perché ? Probabilmente a causa di un plug-in che crea problemi alla barra,\n"
 " o può essere che il vostro tema sia corrotto.\n"
 "Perciò nessun plug-in sarà disponibile, e voi potete salvare il vostro tema "
 "corrente se lo volete,\n"
 " prima di utilizzare la barra.\n"
-"Poi provate col votro tema e se funziona significa che è un "
-"plug-in che causa conflitti.\n"
+"Poi provate col votro tema e se funziona significa che è un plug-in che "
+"causa conflitti.\n"
 "Altrimenti utilizzate un altro tema.\n"
 "Salvate una configurazine della barra funzionante, e rilanciate la barra in "
 "modo normale.\n"
@@ -369,15 +383,15 @@ msgid ""
 "anyway ?"
 msgstr ""
 "Avete modificato alcune impostazioni del tema corrente.\n"
-"Le perderete se non si salva il tema prima di seglierne uno nuovo. Continuare "
-"ugualmente ?"
+"Le perderete se non si salva il tema prima di seglierne uno nuovo. "
+"Continuare ugualmente ?"
 
 #: ../src/cairo-dock-themes-manager.c:451
 #, c-format
 msgid "Are you sure you want to overwrite theme %s ?"
 msgstr "Siete sicuri di voler sovrascrivere il tema %s ?"
 
-#: ../src/cairo-dock.c:525
+#: ../src/cairo-dock.c:527
 msgid "< Maintenance mode >"
 msgstr "< Maintenace mode >"
 
@@ -397,14 +411,15 @@ msgid ""
 "The icons will scroll according to the chosen placement type. Of course the "
 "dock can be placed anywhere on the screen, here we specify regarding to what."
 msgstr ""
-"Le icone si svilupperanno in armonia con il tipo di posizionamento scelto. La "
-"barra si può posizionare ovunque, qui si tratta di precisare in rapporto a "
-"cosa."
+"Le icone si svilupperanno in armonia con il tipo di posizionamento scelto. "
+"La barra si può posizionare ovunque, qui si tratta di precisare in rapporto "
+"a cosa."
 
 #: ../data/messages:7 ../data/messages:553 ../data/messages:725
 msgid ""
 "Choose the screen border regarding to which the dock will place itself :"
-msgstr "Scegliere il bordo dello schermo in rapporto al quale la barra verrà "
+msgstr ""
+"Scegliere il bordo dello schermo in rapporto al quale la barra verrà "
 "piazzata:"
 
 #: ../data/messages:9 ../data/messages:555 ../data/messages:727
@@ -430,9 +445,10 @@ msgid ""
 "and the bottom corner if vertical, and at 0.5, regarding the middle of the "
 "screen's edge."
 msgstr ""
-"A 0, la barra si piazzerà relativamente all'angolo a sinistra in orizzontale " 
-"(angolo alto in verticale), a 1 relativamente all'angolo a destra in orizzontale "
-"(angolo basso in verticale), e a 0.5 in mezzo alla parte bassa dello schermo."
+"A 0, la barra si piazzerà relativamente all'angolo a sinistra in orizzontale "
+"(angolo alto in verticale), a 1 relativamente all'angolo a destra in "
+"orizzontale (angolo basso in verticale), e a 0.5 in mezzo alla parte bassa "
+"dello schermo."
 
 #: ../data/messages:19 ../data/messages:737
 msgid "Relative alignment :"
@@ -448,7 +464,8 @@ msgid ""
 "move the dock by holding ALT or CTRL key and left mouse button."
 msgstr ""
 "Scarto a partire dalla posizione assoluta sul bordo dello schermo, in pixel. "
-"Potete anche muovere la barra premendo ALT o CTRL e il tasto sinistro del mouse"
+"Potete anche muovere la barra premendo ALT o CTRL e il tasto sinistro del "
+"mouse"
 
 #: ../data/messages:25 ../data/messages:743
 msgid "Lateral gap :"
@@ -459,7 +476,7 @@ msgid ""
 "in pixels. You can also move the dock by holding ALT or CTRL key and left "
 "mouse button."
 msgstr ""
-"in pixel. Potete anche muovere la barra premendo ALT o CTRL e il tasto " 
+"in pixel. Potete anche muovere la barra premendo ALT o CTRL e il tasto "
 "sinistro del mouse."
 
 #: ../data/messages:29 ../data/messages:747
@@ -499,8 +516,8 @@ msgid ""
 "zone will make the dock re-appear."
 msgstr ""
 "La barra si nasconderà automaticamente sotto lo schermo quando il mouse la "
-"lascerà, e mostrerà una zona per ricordarla al suo posto. Posizionare il mouse "
-"in quella zona farà riapparire la barra."
+"lascerà, e mostrerà una zona per ricordarla al suo posto. Posizionare il "
+"mouse in quella zona farà riapparire la barra."
 
 #: ../data/messages:41 ../data/messages:567 ../data/messages:751
 msgid "Activate auto-hide ?"
@@ -513,8 +530,8 @@ msgid ""
 "for the dock, nor to activate auto-hide."
 msgstr ""
 "La barra apparirà in primo piano appena posizionerete il mouse sul suo bordo "
-"dello schermo. Questa opzione è soltanto utile se non volete lasciare lo spazio " 
-"riservato alla barra, e non attivate l'opzione di auto-nascondimento."
+"dello schermo. Questa opzione è soltanto utile se non volete lasciare lo "
+"spazio riservato alla barra, e non attivate l'opzione di auto-nascondimento."
 
 #: ../data/messages:45
 msgid "Keep the dock below other windows ?"
@@ -547,8 +564,8 @@ msgid ""
 "Cairo-Dock will then replace your taskbar. It is recommanded to remove any "
 "other taskbar, and to not force the dock's type to normal."
 msgstr ""
-"Cairo-Dock rimpiazzerà allora la vostra taskbar. E' raccomandato di rimuovere "
-"le altre taskbar e di non forzare il tipo di barra a 'normale'."
+"Cairo-Dock rimpiazzerà allora la vostra taskbar. E' raccomandato di "
+"rimuovere le altre taskbar e di non forzare il tipo di barra a 'normale'."
 
 #: ../data/messages:57 ../data/messages:573
 msgid "Show the current applications in the dock ?"
@@ -556,8 +573,7 @@ msgstr "Mostrare le correnti applicazioni aperte sulla barra ?"
 
 #: ../data/messages:59
 msgid "Should the applications with same PID be displayed only once ?"
-msgstr ""
-"Mostrare le applicazioni con lo stesso PID una sola volta ?"
+msgstr "Mostrare le applicazioni con lo stesso PID una sola volta ?"
 
 #: ../data/messages:61
 msgid ""
@@ -565,15 +581,14 @@ msgid ""
 "in the main dock.The 1st window will appear in the main dock, and the others "
 "will be placed in a container associated with this 1st icon."
 msgstr ""
-"Questo permette di raggruppare Le finestre di applicazioni come Gimp e di avere "
-"per esse una sola icona sulla barra principale. La prima finestra sarà nella barra "
-"principale, mentre le altre saranno in un contenitore associato a questa prima "
-"icona."
+"Questo permette di raggruppare Le finestre di applicazioni come Gimp e di "
+"avere per esse una sola icona sulla barra principale. La prima finestra sarà "
+"nella barra principale, mentre le altre saranno in un contenitore associato "
+"a questa prima icona."
 
 #: ../data/messages:63
 msgid "Should the applications with same class be grouped in a sub-dock ?"
-msgstr ""
-"Raggruppare le applicazioni con la stessa classe in una sub-dock ?"
+msgstr "Raggruppare le applicazioni con la stessa classe in una sub-dock ?"
 
 #: ../data/messages:65
 msgid "Only show icons whose window is minimized ?"
@@ -602,9 +617,9 @@ msgid ""
 "If not set, will use the icon provided by X for each appli. If set, the same "
 "icon as the corresponding launcher will be used for each appli."
 msgstr ""
-"Se non è scelto si utilizzerà le icone fornite da X per ciascuna applicazione. "
-"Se scelto si utilizzerà la stessa icona corrispondente a quella del lanciatore "
-"per ciascuna applicazione dello stesso programma."
+"Se non è scelto si utilizzerà le icone fornite da X per ciascuna "
+"applicazione. Se scelto si utilizzerà la stessa icona corrispondente a "
+"quella del lanciatore per ciascuna applicazione dello stesso programma."
 
 #: ../data/messages:75
 msgid "Overwrite X icons with launchers' one ?"
@@ -640,8 +655,9 @@ msgstr "Alla maniera dei tabs di Firefox."
 
 #: ../data/messages:89
 msgid "Middle click on an icon closes its relative application ?"
-msgstr "Click del tasto centale del mouse su di un'icona per chiudere le "
-"sue relative applicazioni aperte ?"
+msgstr ""
+"Click del tasto centale del mouse su di un'icona per chiudere le sue "
+"relative applicazioni aperte ?"
 
 #: ../data/messages:91
 #, fuzzy
@@ -664,8 +680,8 @@ msgid ""
 "This is only usefull if don't already use the auto-hide, and if you don't "
 "want to reserve the space for your dock nor let it below the other windows."
 msgstr ""
-"Questo è soltanto utile se non si utilizza già l'auto-nascondimento e se "
-"non volete riservare lo spazio sullo schermo alla barra."
+"Questo è soltanto utile se non si utilizza già l'auto-nascondimento e se non "
+"volete riservare lo spazio sullo schermo alla barra."
 
 #: ../data/messages:97
 msgid "Automatically quick-hide the dock when a window becomes maximized ?"
@@ -681,7 +697,8 @@ msgstr ""
 
 #: ../data/messages:101
 msgid "Signal the applications demanding your attention with an animation ?"
-msgstr "Segnalare le applicazioni domandando la vostra attenzione con un' "
+msgstr ""
+"Segnalare le applicazioni domandando la vostra attenzione con un' "
 "animazione ?"
 
 #: ../data/messages:103
@@ -746,8 +763,7 @@ msgstr "Più ce ne saranno, più sarà lento"
 
 #: ../data/messages:125
 msgid "Number of steps for icons' resizing (grow up/shrink down) :"
-msgstr ""
-"Numero di tappe nel ridimensionamento delle icone (crescita/ritiro) :"
+msgstr "Numero di tappe nel ridimensionamento delle icone (crescita/ritiro) :"
 
 #: ../data/messages:127
 msgid ""
@@ -755,13 +771,14 @@ msgid ""
 "remaining distance will be reduced by (1-s)^n."
 msgstr ""
 "in percentuale della distanza che può essere percorsa ad ogni passo "
-"(crescente,discendente). Dopo n passi, la distanza restante sara ridotta "
-"per (1-a)^n"
+"(crescente,discendente). Dopo n passi, la distanza restante sara ridotta per "
+"(1-a)^n"
 
 #: ../data/messages:129
 msgid "Window's move acceleration (move up/move down) :"
-msgstr "Accelerazione del movimento delle finestre al momento dell' "
-"auto-nascondimento :"
+msgstr ""
+"Accelerazione del movimento delle finestre al momento dell' auto-"
+"nascondimento :"
 
 #: ../data/messages:131
 msgid ""
@@ -769,8 +786,7 @@ msgid ""
 "not activated or unfold acceleration is nul."
 msgstr ""
 "La barra si svolgerà quando essa si nasconde/mostra. Nessun effetto se l' "
-"auto-nascondimento non è attivo o se l'accelerazione del dipanamento è "
-"nulla."
+"auto-nascondimento non è attivo o se l'accelerazione del dipanamento è nulla."
 
 #: ../data/messages:133
 msgid "Animate the dock when auto-hiding ?"
@@ -785,26 +801,24 @@ msgid ""
 "The smaller, the lower the decorations will move along with the cursor. At 0 "
 "they will be static."
 msgstr ""
-"Più si avvicina a 0, più le decorazioni si svolgeranno lentamente con il " 
+"Più si avvicina a 0, più le decorazioni si svolgeranno lentamente con il "
 "cursore. A 0 saranno immobili."
 
 #: ../data/messages:139
 msgid "Scroll speed factor for background decorations :"
-msgstr "Fattore di velocità dello scroll per le decorazioni dello " 
-"sfondo" 
+msgstr "Fattore di velocità dello scroll per le decorazioni dello sfondo"
 
 #: ../data/messages:141
 msgid ""
 "Otherwise the amount of movement of the decorations will only depend on the "
 "direction of the cursor's movement, as if the decorations were \"gliding\"."
 msgstr ""
-"tuttavia il delta di svolgimento delle decorazioni non dipenderà che "
-"dalla direzione del movimento del cursore, come se le decorazioni "
-"\"scivolassero\"."
+"tuttavia il delta di svolgimento delle decorazioni non dipenderà che dalla "
+"direzione del movimento del cursore, come se le decorazioni \"scivolassero\"."
 
 #: ../data/messages:143
 msgid "Should the decorations be enslaved to the cursor ?"
-msgstr "Le decorazioni devono essere asservite al cursore ?" 
+msgstr "Le decorazioni devono essere asservite al cursore ?"
 
 #: ../data/messages:145
 msgid "If you put 0, this will make them scroll of exactly one icon each time."
@@ -813,8 +827,7 @@ msgstr ""
 
 #: ../data/messages:147
 msgid "Amount of pixels the icons will scroll at each wheel scroll :"
-msgstr ""
-"Di quanti pixel le icone si defileranno ad ogni colpo di scroll :"
+msgstr "Di quanti pixel le icone si defileranno ad ogni colpo di scroll :"
 
 #: ../data/messages:149
 msgid "Re-center the dock on leaving if it has been scrolled ?"
@@ -826,8 +839,7 @@ msgstr "Più si avvicina a 0 più lo svolgimento sarà rapido."
 
 #: ../data/messages:153
 msgid "If so, you can specify the scrolling acceleration :"
-msgstr "Se affermativo potete specificare l'accelerazione dello "
-"svolgimento :" 
+msgstr "Se affermativo potete specificare l'accelerazione dello svolgimento :"
 
 #: ../data/messages:155
 msgid "Sub-docks"
@@ -852,8 +864,7 @@ msgstr "Ritardo prima di mostrare una sub-dock :"
 #: ../data/messages:165
 msgid ""
 "Otherwise they will appear when you linger over the icon pointing on it."
-msgstr ""
-"Altrimenti appariranno quando si sorvolerà sopra l'icona puntandola."
+msgstr "Altrimenti appariranno quando si sorvolerà sopra l'icona puntandola."
 
 #: ../data/messages:167
 msgid "Click to show sub-docks ?"
@@ -873,21 +884,19 @@ msgstr "CPU"
 
 #: ../data/messages:175
 msgid "in Hz. This is to adjust regarding your CPU power."
-msgstr "in Hz. Questo è da aggiustare in base alla potenza della "
-"propria CPU."
+msgstr "in Hz. Questo è da aggiustare in base alla potenza della propria CPU."
 
 #: ../data/messages:177
 msgid "Refresh frequency when mouving cursor into the dock :"
-msgstr ""
-"Frequenza di refresh quando si muove il cursore nella barra :" 
+msgstr "Frequenza di refresh quando si muove il cursore nella barra :"
 
 #: ../data/messages:179
 msgid ""
 "The transparency gradation pattern will then be re-calculated in real time. "
 "May needs more CPU power."
 msgstr ""
-"Il pattern della gradazione della trasparenza sarà ricalcolato in tempo reale. "
-"Questo può occupare CPU aggiuntiva."
+"Il pattern della gradazione della trasparenza sarà ricalcolato in tempo "
+"reale. Questo può occupare CPU aggiuntiva."
 
 #: ../data/messages:181
 msgid "Reflections should be calculated in real-time ?"
@@ -956,8 +965,8 @@ msgid ""
 "Just check the box to activate a plug-in, or uncheck to deactivate it. Once "
 "activated, you can use it and configure it."
 msgstr ""
-"Spuntare semplicemente la casella per attivare il plug-in corrispondente, "
-"o togliete la spunta per disattivarlo. Una volta attivato potrete usarlo e "
+"Spuntare semplicemente la casella per attivare il plug-in corrispondente, o "
+"togliete la spunta per disattivarlo. Una volta attivato potrete usarlo e "
 "configurarlo."
 
 #: ../data/messages:211 ../data/messages:579
@@ -1002,8 +1011,8 @@ msgid ""
 "The callback zone is what you see when the dock hides itselfs."
 msgstr ""
 "Tutti i formati sono accettati; lasciare questo campo vuoto per avere una "
-"zona di richiamo invisibile. La zona di richiamo è ciò che si vede quando "
-"la barra si nasconde."
+"zona di richiamo invisibile. La zona di richiamo è ciò che si vede quando la "
+"barra si nasconde."
 
 #: ../data/messages:235 ../data/messages:609
 msgid "Filename of an image to put on the callback zone :"
@@ -1023,8 +1032,9 @@ msgstr ""
 
 #: ../data/messages:241
 msgid "Rotate the callback zone's image when the dock is on top/left/right ?"
-msgstr "Ruotare l'immagine della zona di richiamo quando la barra è in "
-"alto/sinistra/destra ?"
+msgstr ""
+"Ruotare l'immagine della zona di richiamo quando la barra è in alto/sinistra/"
+"destra ?"
 
 #: ../data/messages:243
 msgid "Extern Frame"
@@ -1119,8 +1129,7 @@ msgstr ""
 
 #: ../data/messages:285
 msgid "Width of the stripes, in percentage of the pattern size :"
-msgstr "Larghezza delle striscie, in percentuale sulla dimensione "
-"del motivo :"
+msgstr "Larghezza delle striscie, in percentuale sulla dimensione del motivo :"
 
 #: ../data/messages:287
 msgid "Icons"
@@ -1143,8 +1152,7 @@ msgid ""
 "in pixels. Outside of this interval (centered on the mouse), the wave is "
 "flat."
 msgstr ""
-"in pixels. Fuori da quest'intervallo (centrato dal mouse), l'onda è "
-"piatta."
+"in pixels. Fuori da quest'intervallo (centrato dal mouse), l'onda è piatta."
 
 #: ../data/messages:297
 msgid "Width of the interval in which the wave will be effective :"
@@ -1160,9 +1168,9 @@ msgid ""
 "progressively as the dock grows up. The closer to 0, the more transparent "
 "they will be."
 msgstr ""
-"E' la loro trasparenza quando l'onda è piatta; loro si "
-"\"materializzeranno\" progressivamente quando la barra cresce. Più "
-"si avvicina a 0, più sarano trasparenti."
+"E' la loro trasparenza quando l'onda è piatta; loro si \"materializzeranno\" "
+"progressivamente quando la barra cresce. Più si avvicina a 0, più sarano "
+"trasparenti."
 
 #: ../data/messages:305
 msgid "Icons' transparency at rest :"
@@ -1177,8 +1185,8 @@ msgid ""
 "It is its albedo; at 1 the icons reflect to the maximum, at 0 reflects are "
 "not used."
 msgstr ""
-"E' la loro albedo; a 1 le icone riflettono al massimo, a 0 il riflesso non "
-"è usato."
+"E' la loro albedo; a 1 le icone riflettono al massimo, a 0 il riflesso non è "
+"usato."
 
 #: ../data/messages:311
 msgid "Reflecting power of the plane :"
@@ -1193,8 +1201,8 @@ msgid ""
 "from the front border of the frame so that the reflect is fully visible."
 msgstr ""
 "Precisamente è la frazione di altezza massima delle icone che sarà "
-"utilizzata per disegnare il riflesso. Dunque mettere 0.33 significa che il"
-"33% dell'icona si rifletterà sul piano, e le icone si piazzeranno "
+"utilizzata per disegnare il riflesso. Dunque mettere 0.33 significa che "
+"il33% dell'icona si rifletterà sul piano, e le icone si piazzeranno "
 "correttamente dal bordo inferiore della cornice per permettere al riflesso "
 "di essere interamente visibile."
 
@@ -1249,8 +1257,8 @@ msgid ""
 "It's the second color of the gradation. Set it to the same value as the "
 "first if you just don't want to have a gradation."
 msgstr ""
-"E' il secondo colore della gradazione. Mettete lo stesso valore del primo "
-"se volete alcuna gradazione."
+"E' il secondo colore della gradazione. Mettete lo stesso valore del primo se "
+"volete alcuna gradazione."
 
 #: ../data/messages:337
 msgid "Stop color :"
@@ -1260,8 +1268,9 @@ msgstr "Colore finale :"
 msgid ""
 "If checked, the pattern will go from top to bottom, otherwise from left to "
 "right."
-msgstr "Se scelto il motivo andrà dall'alto in basso, altrimenti da sinistra "
-"a destra."
+msgstr ""
+"Se scelto il motivo andrà dall'alto in basso, altrimenti da sinistra a "
+"destra."
 
 #: ../data/messages:341
 msgid "Pattern should be vertical ?"
@@ -1272,8 +1281,8 @@ msgid ""
 "If you set it to fully transparent, there will be no background for the "
 "text, but the letters' outline will be thicker."
 msgstr ""
-"Se lo rendete completamente trasparente, non ci sarà sfondo per il testo, "
-"ma il contorno delle lettere sarà più spesso." 
+"Se lo rendete completamente trasparente, non ci sarà sfondo per il testo, ma "
+"il contorno delle lettere sarà più spesso."
 
 #: ../data/messages:345
 msgid "Color of the label's background :"
@@ -1435,8 +1444,8 @@ msgid ""
 "Typically an arrow, that will be displayed when you try to drop a new "
 "launcher into the dock."
 msgstr ""
-"Tipicamente una freccia, che sarà mostrata quando proverete a incollare "
-"un nuovo lanciatore sulla barra."
+"Tipicamente una freccia, che sarà mostrata quando proverete a incollare un "
+"nuovo lanciatore sulla barra."
 
 #: ../data/messages:407
 msgid "Image for the drag'n'drop animation :"
@@ -1457,8 +1466,8 @@ msgid ""
 "applets."
 msgstr ""
 "I separatori sono delle icone utilizzate per creare una divisione tra i "
-"differenti tipi di icone. Cairo-dock può automaticamente aggiungerne tra "
-"i lanciatori, le applicazioni e le applets."
+"differenti tipi di icone. Cairo-dock può automaticamente aggiungerne tra i "
+"lanciatori, le applicazioni e le applets."
 
 #: ../data/messages:465
 msgid "Automatically add separators ?"
@@ -1587,8 +1596,8 @@ msgid ""
 "The messages will have the same style as the icons' labels. The beneath "
 "parameters are then unused."
 msgstr ""
-"I messaggi avranno lo stesso stile che le etichette delle icone. I "
-"parametri successivi non saranno perciò utilizzati."
+"I messaggi avranno lo stesso stile che le etichette delle icone. I parametri "
+"successivi non saranno perciò utilizzati."
 
 #: ../data/messages:527
 msgid "Homogeneous with icons' label ?"
@@ -1734,8 +1743,7 @@ msgstr ""
 
 #: ../data/messages:713
 msgid "Prevent this launcher from stealing appli from taskbar ?"
-msgstr "Impedire a questo lanciatore di rubare l'applicazione nella "
-"TaskBar ?"
+msgstr "Impedire a questo lanciatore di rubare l'applicazione nella TaskBar ?"
 
 #: ../data/messages:715
 msgid ""
@@ -1745,10 +1753,9 @@ msgid ""
 "program, which is useful to link the appli with its launcher."
 msgstr ""
 "La sola ragione per la quale potreste voler modificare dei parametri è che "
-"voi abbiate creato questo lanciatore. Se l'avete copiato/incollato a "
-"partire dal menu, è quasi certo che non serva metterci mano. Definisce la "
-"classe del programma, ciò che risulta utile per legare l'applicazione al "
-"suo lanciatore."
+"voi abbiate creato questo lanciatore. Se l'avete copiato/incollato a partire "
+"dal menu, è quasi certo che non serva metterci mano. Definisce la classe del "
+"programma, ciò che risulta utile per legare l'applicazione al suo lanciatore."
 
 #: ../data/messages:717
 msgid "Class of the program :"
@@ -1775,8 +1782,8 @@ msgid ""
 "position, behaviour parameters such as auto-hide, using taskbar or not, etc."
 msgstr ""
 "Altrimenti il comportamento attuale sarà conservato. E' tutto ciò che "
-"riguarda la posizione della barra, i parametri di comportamento come "
-"l'auto-nascondimento, l'utilizzo della TaskBar, etc..."
+"riguarda la posizione della barra, i parametri di comportamento come l'auto-"
+"nascondimento, l'utilizzo della TaskBar, etc..."
 
 #: ../data/messages:771
 msgid "Use the new theme's behaviour ?"
@@ -1788,8 +1795,8 @@ msgid ""
 "ones provided in the new theme. Otherwise the current launchers will be "
 "kept, only icons will be replaced."
 msgstr ""
-"Perciò se scegliete questo campo , i vostri lanciatori saranno cancellati "
-"e rimpiazzati da quelli forniti dal nuovo tema. Altrimenti i lanciatori "
+"Perciò se scegliete questo campo , i vostri lanciatori saranno cancellati e "
+"rimpiazzati da quelli forniti dal nuovo tema. Altrimenti i lanciatori "
 "attuali saranno mantenuti e cambieranno solo le icone."
 
 #: ../data/messages:775
@@ -2030,6 +2037,3 @@ msgstr ""
 #~ msgid "set behaviour in Compiz to: (name=cairo-dock-desklet & type=utility)"
 #~ msgstr ""
 #~ "Regolate il comportamento di Compiz in : (name=cairo-dock & type=utility)"
-
-
-

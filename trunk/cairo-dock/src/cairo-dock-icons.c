@@ -477,7 +477,6 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 	//\_________________ On met a jour l'ordre des applets dans le fichier de conf.
 	if (CAIRO_DOCK_IS_APPLET (icon1))
 		cairo_dock_update_module_order (icon1->pModule, icon1->fOrder);
-		///cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, pDock->icons);
 	if (CAIRO_DOCK_IS_APPLET (icon2))
 		cairo_dock_update_module_order (icon2->pModule, icon2->fOrder);
 }
@@ -542,14 +541,13 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 	//\_________________ On prend en compte le changement de position pour les applets.
 	if (CAIRO_DOCK_IS_APPLET (icon1))
 		cairo_dock_update_module_order (icon1->pModule, icon1->fOrder);
-		///cairo_dock_update_conf_file_with_active_modules (NULL, g_cConfFile, pDock->icons);
 }
 
 
 
 gboolean cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolean bCheckUnusedSeparator)
 {
-	if (g_list_find (pDock->icons, icon) == NULL)  // elle est deja detachee.
+	if (pDock == NULL || g_list_find (pDock->icons, icon) == NULL)  // elle est deja detachee.
 		return FALSE;
 
 	cd_message ("%s (%s)", __func__, icon->acName);

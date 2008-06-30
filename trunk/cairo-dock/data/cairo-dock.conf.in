@@ -168,8 +168,8 @@ scroll speed factor = 0.5
 #{Otherwise the amount of movement of the decorations will only depend on the direction of the cursor's movement, as if the decorations were "gliding".}
 decorations enslaved = true
 
-#i-[0;99] Amount of pixels the icons will scroll at each wheel scroll :
-#{If you put 0, this will make them scroll of exactly one icon each time.}
+#i-[-1;99] Amount of pixels the icons will scroll at each wheel scroll :
+#{If you put 0, this will make them scroll of exactly one icon each time. If you put -1, the scroll wil be de-activated}
 scroll amount = 0
 
 #b- Re-center the dock on leaving if it has been scrolled ?

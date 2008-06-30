@@ -725,8 +725,8 @@ static void _cairo_dock_delete_file (GtkMenuItem *menu_item, gpointer *data)
 			cairo_dock_show_temporary_dialog_with_default_icon (cMessage, icon, CAIRO_CONTAINER (pDock), 4000);
 			g_free (cMessage);
 		}
-		cairo_dock_remove_icon_from_dock (pDock, icon);
-		cairo_dock_update_dock_size (pDock);
+		///cairo_dock_remove_icon_from_dock (pDock, icon);
+		///cairo_dock_update_dock_size (pDock);
 
 		if (icon->acDesktopFileName != NULL)
 		{
@@ -735,7 +735,7 @@ static void _cairo_dock_delete_file (GtkMenuItem *menu_item, gpointer *data)
 			g_free (icon_path);
 		}
 
-		cairo_dock_free_icon (icon);
+		///cairo_dock_free_icon (icon);
 	}
 }
 

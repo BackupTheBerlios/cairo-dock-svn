@@ -1064,6 +1064,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		cDropIndicatorImagePath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_DEFAULT_DROP_INDICATOR_NAME);
 	}
 	
+	cairo_dock_updated_emblem_conf_file (pKeyFile, &bFlushConfFileNeeded);
+	
 	//\___________________ On (re)charge tout, car n'importe quel parametre peut avoir change.
 	switch (iScreenBorder)
 	{
@@ -1223,6 +1225,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	{
 		cairo_dock_set_root_docks_on_top_layer ();
 	}
+	else if (g_bPopUp && ! bPopUpOld)
+		gtk_window_set_keep_below (GTK_WINDOW (pDock->pWidget), TRUE);  // le main dock ayant ete cree avant, il n'a pas herite de ce parametre.
 	
 	//\___________________ On applique les modifs au fichier de conf easy.
 	cairo_dock_copy_to_easy_conf_file (pKeyFile, g_cEasyConfFile);
@@ -1230,8 +1234,6 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_key_file_free (pKeyFile);
 
 	cairo_dock_mark_theme_as_modified (TRUE);
-	
-	cairo_dock_updated_emblem_conf_file (cConfFilePath);
 	
 	s_bLoading = FALSE;
 }
