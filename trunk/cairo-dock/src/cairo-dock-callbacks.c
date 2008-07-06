@@ -554,7 +554,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 		pDock->bAtBottom = TRUE;  // mis en commentaire le 12/11/07 pour permettre le quick-hide.
 		cd_debug ("on force bAtBottom");
 	}
-
+	
 	///pDock->fDecorationsOffsetX = 0;
 	if (pDock->iSidShrinkDown == 0)  // on commence a faire diminuer la taille des icones.
 		pDock->iSidShrinkDown = g_timeout_add (40, (GSourceFunc) cairo_dock_shrink_down, (gpointer) pDock);
@@ -613,7 +613,7 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 	while (gtk_events_pending ())  // on laisse le temps au signal d'entree dans le sous-dock d'etre traite.
 		gtk_main_iteration ();
 	//cd_debug (" ==> pDock->bInside : %d", pDock->bInside);
-
+	
 	if (pDock->bInside)  // on est re-rentre dedans entre-temps.
 		return TRUE;
 

@@ -450,6 +450,7 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_
 
 	//\_______________ On cree la surface d'une fraction hauteur de l'image originale.
 	double fReflectHeight = g_fReflectSize * fMaxScale;
+	g_print ("fReflectHeight:%.2f\n", fReflectHeight);
 	if (fReflectHeight == 0 || g_fAlbedo == 0)
 		return NULL;
 	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
@@ -467,10 +468,14 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_
 	cairo_set_source_surface (pCairoContext, pSurface, 0, (bDirectionUp ? 0 : fImageHeight - fReflectHeight));
 	
 	//\_______________ On applique un degrade en transparence.
-	cairo_pattern_t *pGradationPattern = cairo_pattern_create_linear (0.,
+	/**cairo_pattern_t *pGradationPattern = cairo_pattern_create_linear (0.,
 		2*fReflectHeight,
 		0.,
-		fReflectHeight);  // de haut en bas.
+		fReflectHeight);  // de haut en bas.*/
+	cairo_pattern_t *pGradationPattern = cairo_pattern_create_linear (0.,
+		fImageHeight,
+		0.,
+		fImageHeight-fReflectHeight);  // de haut en bas.
 	g_return_val_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS, NULL);
 
 	cairo_pattern_set_extend (pGradationPattern, CAIRO_EXTEND_NONE);

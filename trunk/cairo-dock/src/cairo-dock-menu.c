@@ -498,6 +498,7 @@ static void _cairo_dock_modify_launcher (GtkMenuItem *menu_item, gpointer *data)
 		{
 			icon->cClass = cClass;
 			cairo_dock_deinhibate_class (cClass, icon);
+			cClass = NULL;  // libere par la fonction precedente.
 			icon->cClass = cNowClass;
 		}
 		if (cNowClass != NULL && (cClass == NULL || strcmp (cNowClass, cClass) != 0))

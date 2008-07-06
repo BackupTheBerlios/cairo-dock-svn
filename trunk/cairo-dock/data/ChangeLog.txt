@@ -26,4 +26,4 @@
 
 1.6.0 = v1.6.0 :\n - A new view has appeared : Diapositive !\n - A huge stock of new applets :\n   cpusage\n   ram-meter\n   netspeed\n   tomboy\n   nVidia\n - 2 new themes : Neon & Clear\n - A new cute character for Cairo-Penguin : Wanda the Cairo-Fish ^_^\n - Cairo-Dock can now run without composite manager, with fake transparency.\n - The dock can now stay below windows and be popped up on demand.\n - Auto-reload on crash.\n - Real window thumbnail when minimized.
 
-1.6.1 = v1.6.1 :\n - Once again a new view is available : Curve !\n - A long time waited applet : the desktop Switcher.\n - A new and very complete theme : Brit\n - The dock is now translated in italian and partially in chinese.\n - We are still hoping someone would help us integrating the dock into KDE ^_^
+1.6.1 = v1.6.1 :\nCairo-Dock has one year ! To celebrate this event, we are happy to offer you :\n - Once again a new view : Curve !\n - A long time waited applet : the desktop Switcher.\n - A very complete theme : Brit\n - Translation in italian and partially in chinese.\n - And we are still hoping someone would help us writing a kde-integration plug-in ^_^
