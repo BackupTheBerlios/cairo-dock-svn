@@ -450,7 +450,6 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_
 
 	//\_______________ On cree la surface d'une fraction hauteur de l'image originale.
 	double fReflectHeight = g_fReflectSize * fMaxScale;
-	g_print ("fReflectHeight:%.2f\n", fReflectHeight);
 	if (fReflectHeight == 0 || g_fAlbedo == 0)
 		return NULL;
 	cairo_surface_t *pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),

@@ -135,7 +135,7 @@ int cairo_dock_compare_icons_order (Icon *icon1, Icon *icon2)
 			return 0;
 	}
 }
-static int cairo_dock_compare_icons_name (Icon *icon1, Icon *icon2)
+int cairo_dock_compare_icons_name (Icon *icon1, Icon *icon2)
 {
 	if (icon1->acName == NULL)
 		return -1;
