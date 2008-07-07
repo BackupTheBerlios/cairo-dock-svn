@@ -307,7 +307,7 @@ static void _cairo_dock_draw_appli_indicator_opengl (Icon *icon, gboolean bHoriz
 	{
 		if (bHorizontalDock)
 		{
-			glTranslatef (0, - icon->fHeight * icon->fHeightFactor * icon->fScale/2 - g_fIndicatorHeight * fRatio * icon->fScale/2 - g_iIndicatorDeltaY * fRatio, 0);
+			glTranslatef (0, - icon->fHeight * icon->fHeightFactor * icon->fScale/2 - (g_fIndicatorHeight - g_iIndicatorDeltaY*(1 + g_fAmplitude)) * fRatio * icon->fScale/2, 0);
 			glScalef (g_fIndicatorWidth * fRatio * icon->fScale / 2, g_fIndicatorHeight * fRatio * icon->fScale / 2, 1.);
 			/*cairo_translate (pCairoContext,
 				(icon->fWidth - g_fIndicatorWidth * fRatio) * icon->fWidthFactor * icon->fScale / 2,
@@ -336,7 +336,8 @@ static void _cairo_dock_draw_appli_indicator_opengl (Icon *icon, gboolean bHoriz
 	{
 		if (bHorizontalDock)
 		{
-			
+			glTranslatef (0, - icon->fHeight * icon->fHeightFactor * icon->fScale/2 - (g_fIndicatorHeight - g_iIndicatorDeltaY*(1 + g_fAmplitude)) * fRatio * icon->fScale/2, 0);
+			glScalef (g_fIndicatorWidth * fRatio * icon->fScale / 2, g_fIndicatorHeight * fRatio * icon->fScale / 2, 1.);
 			/*cairo_translate (pCairoContext,
 				icon->fDrawXAtRest - icon->fDrawX + (icon->fWidth * icon->fScale - g_fIndicatorWidth * fRatio) / 2,
 				icon->fDrawYAtRest - icon->fDrawY + (bDirectionUp ? 
@@ -352,7 +353,6 @@ static void _cairo_dock_draw_appli_indicator_opengl (Icon *icon, gboolean bHoriz
 					(g_fIndicatorHeight - g_iIndicatorDeltaY / (1 + g_fAmplitude)) * icon->fScale * fRatio),
 				icon->fDrawXAtRest - icon->fDrawX + (icon->fWidth * icon->fScale - g_fIndicatorWidth * fRatio) / 2);*/
 		}
-		glScalef (icon->fWidth, icon->fHeight, 1.);
 	}
 	/*cairo_set_source_surface (pCairoContext, g_pIndicatorSurface[bHorizontalDock], 0.0, 0.0);
 	cairo_paint (pCairoContext);
@@ -588,7 +588,7 @@ void cairo_dock_render_one_icon_opengl (Icon *icon, CairoDock *pDock, double fRa
 		}*/
 	}
 	
-	//\_____________________ On dessine l'indicateur derrieredevant.
+	//\_____________________ On dessine l'indicateur devant.
 	if (icon->bHasIndicator && g_bIndicatorAbove && g_iIndicatorTexture != 0)
 	{
 		_cairo_dock_draw_appli_indicator_opengl (icon, pDock->bHorizontalDock, fRatio, pDock->bDirectionUp);
@@ -596,7 +596,7 @@ void cairo_dock_render_one_icon_opengl (Icon *icon, CairoDock *pDock, double fRa
 	
 	
 	//\_____________________ On dessine les etiquettes, avec un alpha proportionnel au facteur d'echelle de leur icone.
-	if (bUseText && icon->pTextBuffer != NULL && icon->fScale > 1.01 && (! g_bLabelForPointedIconOnly || icon->bPointed) && icon->iCount == 0)  // 1.01 car sin(pi) = 1+epsilon :-/
+	if (bUseText && icon->iLabelTexture != 0 && icon->fScale > 1.01 && (! g_bLabelForPointedIconOnly || icon->bPointed) && icon->iCount == 0)  // 1.01 car sin(pi) = 1+epsilon :-/
 	{
 		glPushMatrix ();
 		
@@ -656,12 +656,13 @@ void cairo_dock_render_one_icon_opengl (Icon *icon, CairoDock *pDock, double fRa
 		glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1,  0.0f);  // Top Right Of The Texture and Quad
 		glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  -1,  0.0f);  // Top Left Of The Texture and Quad
 		glEnd ();
+		glPopMatrix ();
 	}
 	
 	//\_____________________ On dessine les infos additionnelles.
 	if (icon->iQuickInfoTexture != 0)
 	{
-		glPopMatrix ();
+		glPushMatrix ();
 		glTranslatef (0., (- icon->fHeight + icon->iQuickInfoHeight * fRatio) * icon->fScale/2, 0.);
 		glColor4f(1.0f, 1.0f, 1.0f, fAlpha);
 		glBindTexture (GL_TEXTURE_2D, icon->iQuickInfoTexture);
@@ -672,6 +673,7 @@ void cairo_dock_render_one_icon_opengl (Icon *icon, CairoDock *pDock, double fRa
 		glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1,  0.0f);  // Top Right Of The Texture and Quad
 		glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  -1,  0.0f);  // Top Left Of The Texture and Quad
 		glEnd ();
+		glPopMatrix ();
 		/*cairo_translate (pCairoContext,
 			//-icon->fQuickInfoXOffset + icon->fWidth / 2,
 			//icon->fHeight - icon->fQuickInfoYOffset);
@@ -814,9 +816,38 @@ void cairo_dock_render_opengl_linear (CairoDock *pDock)
 	glDisable(GL_POLYGON_OFFSET_FILL);
 	glPolygonMode(GL_FRONT, GL_FILL);
 	
+	//\_____________ On dessine la ficelle.
+	glLoadIdentity();
+	int n = g_list_length (pDock->icons);
+	GLfloat *buffer = g_new (GLfloat, 3*n);
+	GLfloat **pStringCtrlPts = g_new (GLfloat *, n);
+	if (pFirstDrawnElement != NULL)
+	{
+		i=0;
+		Icon *icon;
+		GList *ic = pFirstDrawnElement;
+		do
+		{
+			icon = ic->data;
+			
+			pStringCtrlPts[i] = &buffer[3*i];
+			pStringCtrlPts[i][0] = icon->fDrawX + icon->fWidth * icon->fScale/2;
+			pStringCtrlPts[i][1] = pDock->iCurrentHeight - icon->fDrawY - icon->fHeight * icon->fScale/2;
+			pStringCtrlPts[i][2] = 0.;
+			
+			i ++;
+			ic = cairo_dock_get_next_element (ic, pDock->icons);
+		} while (ic != pFirstDrawnElement);
+	}
+	glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &pStringCtrlPts[0][0]);
+	glEvalMesh1(GL_LINE, 0, 5*n);
+	g_free (pStringCtrlPts);
+	g_free (buffer);
+	
+	
 	//\_____________ On dessine les icones.
 	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 	
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glLoadIdentity();

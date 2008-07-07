@@ -47,7 +47,7 @@ cairo_dock_LDFLAGS = \
 
 cairo_dock_LDADD = \
 	$(glitz_libs) \
-	-lGLU -lglut\
+	-lGLU -ljpeg\
 	$(PACKAGE_LIBS)
 
 cairo_dock_SOURCES = \
@@ -122,7 +122,6 @@ cairo_dock_SOURCES = \
 	cairo-dock-dock-manager.h\
 	cairo-dock-class-manager.c\
 	cairo-dock-class-manager.h
-
 
 
 cairo_dockincludedir =\

@@ -338,12 +338,14 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	
 	if (g_bUseOpenGL && icon->pIconBuffer != NULL)
 	{
-		int w = (int) icon->fWidth * (1 + g_fAmplitude), h = (int) icon->fHeight * (1 + g_fAmplitude);
+		int w, h;
 		GdkGLContext* pGlContext = gtk_widget_get_gl_context (g_pMainDock->pWidget);
 		GdkGLDrawable* pGlDrawable = gtk_widget_get_gl_drawable (g_pMainDock->pWidget);
 		if (!gdk_gl_drawable_gl_begin (pGlDrawable, pGlContext))
 			return ;
 		
+		w = cairo_image_surface_get_width (icon->pIconBuffer);
+		h = cairo_image_surface_get_height (icon->pIconBuffer);
 		glGenTextures (1, &icon->iIconTexture);
 		g_print ("texture %d generee (%x)\n", icon->iIconTexture, cairo_image_surface_get_data (icon->pIconBuffer));
 		glBindTexture (GL_TEXTURE_2D, icon->iIconTexture);
@@ -930,8 +932,8 @@ void cairo_dock_load_task_indicator (const gchar *cIndicatorImagePath, double fI
 		glTexImage2D (GL_TEXTURE_2D,  // GL_TEXTURE_2D / GL_TEXTURE_RECTANGLE_ARB
 			0,
 			4,  // GL_ALPHA / GL_BGRA
-			g_fIndicatorWidth * fMaxScale,
-			g_fIndicatorHeight * fMaxScale,
+			ceil (g_fIndicatorWidth * fMaxScale),
+			ceil (g_fIndicatorHeight * fMaxScale),
 			0,
 			GL_BGRA,  // GL_ALPHA / GL_BGRA
 			GL_UNSIGNED_BYTE,
