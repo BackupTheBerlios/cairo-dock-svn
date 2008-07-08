@@ -63,6 +63,7 @@ extern gboolean g_bUseFakeTransparency;
 static GHashTable *s_hXWindowTable = NULL;  // table des fenetres X affichees dans le dock.
 static Display *s_XDisplay = NULL;
 static int s_iSidUpdateAppliList = 0;
+static Window s_iCurrentActiveWindow = 0;
 static Atom s_aNetClientList;
 static Atom s_aNetActiveWindow;
 static Atom s_aNetCurrentDesktop;
@@ -547,7 +548,7 @@ void cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Window Xid, gboolea
 	XFree (pXStateBuffer);
 }
 
-Window cairo_dock_get_active_window (void)
+Window cairo_dock_get_active_xwindow (void)
 {
 	Atom aReturnedType = 0;
 	int aReturnedFormat = 0;
@@ -730,7 +731,6 @@ static void _cairo_dock_fill_icon_buffer_with_thumbnail (Icon *icon, CairoDock *
 gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 {
 	static XEvent event;
-	static int iLastActiveWindow = 0;
 	static gboolean bInProgress = FALSE;
 	
 	g_return_val_if_fail (pDock != NULL, FALSE);
@@ -763,8 +763,8 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 				}
 				else if (event.xproperty.atom == s_aNetActiveWindow)
 				{
-					Window XActiveWindow = cairo_dock_get_active_window ();
-					if (iLastActiveWindow != XActiveWindow)
+					Window XActiveWindow = cairo_dock_get_active_xwindow ();
+					if (s_iCurrentActiveWindow != XActiveWindow)
 					{
 						icon = g_hash_table_lookup (s_hXWindowTable, &XActiveWindow);
 						CairoDock *pParentDock = NULL;
@@ -780,13 +780,13 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 							{
 								cairo_dock_animate_icon_on_active (icon, pParentDock);
 							}
-							icon->bIsActive = TRUE;
+							///icon->bIsActive = TRUE;
 						}
 						
-						Icon *pLastActiveIcon = g_hash_table_lookup (s_hXWindowTable, &iLastActiveWindow);
+						Icon *pLastActiveIcon = g_hash_table_lookup (s_hXWindowTable, &s_iCurrentActiveWindow);
 						if (pLastActiveIcon != NULL)
 						{
-							pLastActiveIcon->bIsActive = FALSE;
+							///pLastActiveIcon->bIsActive = FALSE;
 							CairoDock *pLastActiveParentDock = cairo_dock_search_dock_from_name (pLastActiveIcon->cParentDockName);
 							if (pLastActiveParentDock != NULL)
 							{
@@ -801,7 +801,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 						
 						cairo_dock_notify (CAIRO_DOCK_WINDOW_ACTIVATED, &XActiveWindow);
 						
-						iLastActiveWindow = XActiveWindow;
+						s_iCurrentActiveWindow = XActiveWindow;
 					}
 				}
 				else if (event.xproperty.atom == s_aNetCurrentDesktop || event.xproperty.atom == s_aNetDesktopViewport)
@@ -1306,6 +1306,9 @@ void cairo_dock_start_application_manager (CairoDock *pDock)
 	
 	//\__________________ On lance le gestionnaire d'evenements X.
 	s_iSidUpdateAppliList = g_timeout_add (CAIRO_DOCK_TASKBAR_CHECK_INTERVAL, (GSourceFunc) cairo_dock_unstack_Xevents, (gpointer) pDock);  // un g_idle_add () consomme 90% de CPU ! :-/
+	
+	if (s_iCurrentActiveWindow == 0)
+		s_iCurrentActiveWindow = cairo_dock_get_active_xwindow ();
 }
 
 void cairo_dock_pause_application_manager (void)
@@ -1342,3 +1345,12 @@ GList *cairo_dock_get_current_applis_list (void)
 	return g_hash_table_get_values (s_hXWindowTable);
 }
 
+Window cairo_dock_get_current_active_window (void)
+{
+	return s_iCurrentActiveWindow;
+}
+
+Icon *cairo_dock_get_current_active_icon (void)
+{
+	return g_hash_table_lookup (s_hXWindowTable, &s_iCurrentActiveWindow);
+}

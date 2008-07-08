@@ -608,7 +608,7 @@ void cairo_dock_update_activity_on_inhibators (gchar *cClass, Window Xid)
 			if (pInhibatorIcon->Xid == Xid)
 			{
 				cd_message (" %s aussi devient active", pInhibatorIcon->acName);
-				pInhibatorIcon->bIsActive = TRUE;
+				///pInhibatorIcon->bIsActive = TRUE;
 				CairoDock *pParentDock = cairo_dock_search_dock_from_name (pInhibatorIcon->cParentDockName);
 				if (pParentDock != NULL)
 					cairo_dock_animate_icon_on_active (pInhibatorIcon, pParentDock);
@@ -631,7 +631,7 @@ void cairo_dock_update_inactivity_on_inhibators (gchar *cClass, Window Xid)
 			if (pInhibatorIcon->Xid == Xid)
 			{
 				cd_message (" %s aussi devient inactive", pInhibatorIcon->acName);
-				pInhibatorIcon->bIsActive = FALSE;
+				///pInhibatorIcon->bIsActive = FALSE;
 				CairoDock *pParentDock = cairo_dock_search_dock_from_name (pInhibatorIcon->cParentDockName);
 				if (pParentDock != NULL && pParentDock->iSidShrinkDown == 0)
 					cairo_dock_redraw_my_icon (pInhibatorIcon, pParentDock);

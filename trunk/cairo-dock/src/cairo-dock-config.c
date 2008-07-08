@@ -896,7 +896,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	g_iActiveLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "active line width", &bFlushConfFileNeeded, 3, NULL, NULL);
 	
-	g_iActiveRadius = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "active radius", &bFlushConfFileNeeded, 30, NULL, NULL);
+	g_iActiveRadius = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "active radius", &bFlushConfFileNeeded, 5, NULL, NULL);
 	
 	gboolean bAppliOnCurrentDesktopOnlyOld = g_bAppliOnCurrentDesktopOnly;
 	g_bAppliOnCurrentDesktopOnly = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "current desktop only", &bFlushConfFileNeeded, FALSE, "Applications", NULL);

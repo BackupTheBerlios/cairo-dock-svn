@@ -25,6 +25,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-animations.h"
 #include "cairo-dock-log.h"
 #include "cairo-dock-dock-manager.h"
+#include "cairo-dock-applications-manager.h"
 #include "cairo-dock-draw.h"
 
 extern gboolean g_bTextAlwaysHorizontal;
@@ -758,13 +759,15 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			cairo_paint_with_alpha (pCairoContext, fAlpha);
 	}
 	
-	if (icon->bIsActive)  // icon->Xid != 0 && icon->Xid == cairo_dock_get_active_window ()
+	if (icon->Xid != 0 && icon->Xid == cairo_dock_get_current_active_window ())
 	{
 		cairo_dock_draw_frame (pCairoContext,
 			g_iActiveRadius,
 			g_iActiveLineWidth,
-			icon->fWidth * (1+g_fAmplitude), icon->fHeight * (1+g_fAmplitude),
-			0., 0.,
+			MAX (1., icon->fWidth * (1+g_fAmplitude) / fRatio - (2 * g_iActiveRadius + g_iActiveLineWidth)),
+			icon->fHeight * (1+g_fAmplitude) / fRatio - 2*g_iActiveLineWidth,
+			g_iActiveRadius + .5*g_iActiveLineWidth,
+			.5*g_iActiveLineWidth * 1,
 			1, 0., CAIRO_DOCK_HORIZONTAL);
 		//cairo_rectangle (pCairoContext, 0., 0., icon->fWidth * (1+g_fAmplitude), icon->fHeight * (1+g_fAmplitude));
 		cairo_set_source_rgba (pCairoContext, g_fActiveColor[0], g_fActiveColor[1], g_fActiveColor[2], g_fActiveColor[3]);

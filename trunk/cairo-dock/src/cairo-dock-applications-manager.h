@@ -29,7 +29,7 @@ gboolean cairo_dock_window_is_maximized (Window Xid);
 gboolean cairo_dock_window_is_fullscreen (Window Xid);
 void cairo_dock_window_is_above_or_below (Window Xid, gboolean *bIsAbove, gboolean *bIsBelow);
 void cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Window Xid, gboolean *bIsFullScreen, gboolean *bIsHidden, gboolean *bIsMaximized);
-Window cairo_dock_get_active_window (void);
+Window cairo_dock_get_active_xwindow (void);
 
 int cairo_dock_get_window_desktop (int Xid);
 void cairo_dock_get_window_geometry (int Xid, int *iGlobalPositionX, int *iGlobalPositionY, int *iWidthExtent, int *iHeightExtent);
@@ -55,5 +55,8 @@ void cairo_dock_stop_application_manager (void);
 gboolean cairo_dock_application_manager_is_running (void);
 
 GList *cairo_dock_get_current_applis_list (void);
+
+Window cairo_dock_get_current_active_window (void);
+Icon *cairo_dock_get_current_active_icon (void);
 
 #endif

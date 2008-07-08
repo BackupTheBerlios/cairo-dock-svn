@@ -980,7 +980,7 @@ gboolean cairo_dock_notification_click_icon (gpointer *data)
 	else if (CAIRO_DOCK_IS_APPLI (icon) && ! ((iButtonState & GDK_SHIFT_MASK) && CAIRO_DOCK_IS_LAUNCHER (icon)))
 	{
 		{
-			if (cairo_dock_get_active_window () == icon->Xid && g_bMinimizeOnClick)  // ne marche que si le dock est une fenêtre de type 'dock', sinon il prend le focus.
+			if (cairo_dock_get_current_active_window () == icon->Xid && g_bMinimizeOnClick)  // ne marche que si le dock est une fenêtre de type 'dock', sinon il prend le focus.
 				cairo_dock_minimize_xwindow (icon->Xid);
 			else
 				cairo_dock_show_xwindow (icon->Xid);

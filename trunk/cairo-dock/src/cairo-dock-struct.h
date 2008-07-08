@@ -599,8 +599,6 @@ struct _Icon {
 	/// ID du pixmap de sauvegarde de la fenetre pour quand elle est cachee.
 	Pixmap iBackingPixmap;
 	//Damage iDamageHandle;
-	/// TRUE ssi la fenetre est active.
-	gboolean bIsActive;
 };
 
 
