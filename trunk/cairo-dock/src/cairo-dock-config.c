@@ -131,7 +131,8 @@ extern double g_fVisibleAppliAlpha;
 extern gboolean g_bHideVisibleApplis;
 extern gboolean g_bAppliOnCurrentDesktopOnly;
 extern double g_fActiveColor[4];
-extern int g_fActiveLineWidth;
+extern int g_iActiveLineWidth;
+extern double g_iActiveRadius;
 
 extern int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconAuthorizedHeight[CAIRO_DOCK_NB_TYPES];
@@ -893,7 +894,9 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	double couleur_active[4] = {0., 0.4, 0.8, 0.25};
 	cairo_dock_get_double_list_key_value (pKeyFile, "Icons", "active color", &bFlushConfFileNeeded, g_fActiveColor, 4, couleur_active, NULL, NULL);
 	
-	g_fActiveLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "active line width", &bFlushConfFileNeeded, 3, NULL, NULL);
+	g_iActiveLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "active line width", &bFlushConfFileNeeded, 3, NULL, NULL);
+	
+	g_iActiveRadius = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "active radius", &bFlushConfFileNeeded, 30, NULL, NULL);
 	
 	gboolean bAppliOnCurrentDesktopOnlyOld = g_bAppliOnCurrentDesktopOnly;
 	g_bAppliOnCurrentDesktopOnly = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "current desktop only", &bFlushConfFileNeeded, FALSE, "Applications", NULL);

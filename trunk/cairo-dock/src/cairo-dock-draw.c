@@ -74,7 +74,8 @@ extern cairo_surface_t *g_pDropIndicatorSurface;
 extern double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
 extern gboolean g_bIndicatorAbove;
 extern double g_fActiveColor[4];
-extern int g_fActiveLineWidth;
+extern int g_iActiveLineWidth;
+extern double g_iActiveRadius;
 
 extern gboolean g_bUseFakeTransparency;
 extern cairo_surface_t *g_pDesktopBgSurface;
@@ -759,11 +760,17 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	
 	if (icon->bIsActive)  // icon->Xid != 0 && icon->Xid == cairo_dock_get_active_window ()
 	{
-		cairo_rectangle (pCairoContext, 0., 0., icon->fWidth * (1+g_fAmplitude), icon->fHeight * (1+g_fAmplitude));
+		cairo_dock_draw_frame (pCairoContext,
+			g_iActiveRadius,
+			g_iActiveLineWidth,
+			icon->fWidth * (1+g_fAmplitude), icon->fHeight * (1+g_fAmplitude),
+			0., 0.,
+			1, 0., CAIRO_DOCK_HORIZONTAL);
+		//cairo_rectangle (pCairoContext, 0., 0., icon->fWidth * (1+g_fAmplitude), icon->fHeight * (1+g_fAmplitude));
 		cairo_set_source_rgba (pCairoContext, g_fActiveColor[0], g_fActiveColor[1], g_fActiveColor[2], g_fActiveColor[3]);
-		if (g_fActiveLineWidth > 0)
+		if (g_iActiveLineWidth > 0)
 		{
-			cairo_set_line_width (pCairoContext, g_fActiveLineWidth);
+			cairo_set_line_width (pCairoContext, g_iActiveLineWidth);
 			cairo_stroke (pCairoContext);
 		}
 		else

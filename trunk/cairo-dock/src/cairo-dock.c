@@ -190,7 +190,8 @@ gboolean g_bAppliOnCurrentDesktopOnly;  // TRUE <=> cacher les applis dont la fe
 int g_iNbDesktops;  // nombre de bureaux.
 int g_iNbViewportX, g_iNbViewportY;  // nombre de "faces du cube".
 double g_fActiveColor[4];
-int g_fActiveLineWidth;
+int g_iActiveLineWidth;
+double g_iActiveRadius;
 
 gboolean g_bUseSeparator = TRUE;  // utiliser les separateurs ou pas.
 gchar *g_cSeparatorImage = NULL;

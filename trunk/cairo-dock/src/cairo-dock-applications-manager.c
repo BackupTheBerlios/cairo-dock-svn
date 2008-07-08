@@ -285,7 +285,7 @@ void cairo_dock_show_xwindow (Window Xid)
 	xClientMessage.xclient.send_event = True;
 	xClientMessage.xclient.display = s_XDisplay;
 	xClientMessage.xclient.window = Xid;
-	xClientMessage.xclient.message_type = XInternAtom (s_XDisplay, "_NET_ACTIVE_WINDOW", False);
+	xClientMessage.xclient.message_type = s_aNetActiveWindow;
 	xClientMessage.xclient.format = 32;
 	xClientMessage.xclient.data.l[0] = 2;  // source indication
 	xClientMessage.xclient.data.l[1] = 0;  // timestamp
@@ -549,13 +549,12 @@ void cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Window Xid, gboolea
 
 Window cairo_dock_get_active_window (void)
 {
-	Atom aNetActiveWindow = XInternAtom (s_XDisplay, "_NET_ACTIVE_WINDOW", False);
 	Atom aReturnedType = 0;
 	int aReturnedFormat = 0;
 	unsigned long iLeftBytes, iBufferNbElements = 0;
 	gulong *pXBuffer = NULL;
 	Window root = DefaultRootWindow (s_XDisplay);
-	XGetWindowProperty (s_XDisplay, root, aNetActiveWindow, 0, G_MAXULONG, False, XA_WINDOW, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXBuffer);
+	XGetWindowProperty (s_XDisplay, root, s_aNetActiveWindow, 0, G_MAXULONG, False, XA_WINDOW, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXBuffer);
 
 	Window xActiveWindow = (iBufferNbElements > 0 && pXBuffer != NULL ? pXBuffer[0] : 0);
 	XFree (pXBuffer);

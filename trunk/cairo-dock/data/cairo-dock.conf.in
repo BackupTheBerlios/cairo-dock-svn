@@ -488,6 +488,10 @@ active color = 0.; 0.4; 0.8; 0.25
 #{Set 0 to fill the icon's foreground.}
 active line width = 3
 
+#i+[0;30] Radius of the frame around the active window :
+active radius = 5
+
+
 #X+[Applets]
 frame_applet =
 
