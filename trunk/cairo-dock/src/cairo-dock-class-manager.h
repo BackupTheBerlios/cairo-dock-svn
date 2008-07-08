@@ -118,6 +118,12 @@ void cairo_dock_update_visibility_on_inhibators (gchar *cClass, Window Xid, gboo
 * @param Xid l'ID de l'appli.
 */
 void cairo_dock_update_activity_on_inhibators (gchar *cClass, Window Xid);
+/**
+* Met a jour les inhibiteurs controlant une appli donnee pour les redessiner en mode normal lors de la perte d'activite de la fenetre.
+* @param cClass la classe.
+* @param Xid l'ID de l'appli.
+*/
+void cairo_dock_update_inactivity_on_inhibators (gchar *cClass, Window Xid);
 
 Icon *cairo_dock_get_classmate (Icon *pIcon);
 

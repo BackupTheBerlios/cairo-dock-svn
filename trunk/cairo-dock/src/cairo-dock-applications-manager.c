@@ -649,7 +649,7 @@ void cairo_dock_animate_icon_on_active (Icon *icon, CairoDock *pParentDock)
 	{
 		if (cairo_dock_animation_will_be_visible (pParentDock) && ! pParentDock->bInside && g_bAnimateOnActiveWindow)
 		{
-			cairo_dock_arm_animation (icon, CAIRO_DOCK_WOBBLY, 1);  // un clignotement. il faut choisir une animation qui ne necessite pas que la fenetre du dock soit de taille maximale.
+			cairo_dock_arm_animation (icon, CAIRO_DOCK_WOBBLY, 1);  // une deformation. il faut choisir une animation qui ne necessite pas que la fenetre du dock soit de taille maximale.
 			cairo_dock_start_animation (icon, pParentDock);
 		}
 	}
@@ -767,12 +767,12 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 					Window XActiveWindow = cairo_dock_get_active_window ();
 					if (iLastActiveWindow != XActiveWindow)
 					{
-						iLastActiveWindow = XActiveWindow;
 						icon = g_hash_table_lookup (s_hXWindowTable, &XActiveWindow);
+						CairoDock *pParentDock = NULL;
 						if (icon != NULL)
 						{
 							cd_message ("%s devient active", icon->acName);
-							CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+							pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 							if (pParentDock == NULL)  // elle est inhibee.
 							{
 								cairo_dock_update_activity_on_inhibators (icon->cClass, icon->Xid);
@@ -781,8 +781,28 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 							{
 								cairo_dock_animate_icon_on_active (icon, pParentDock);
 							}
+							icon->bIsActive = TRUE;
 						}
+						
+						Icon *pLastActiveIcon = g_hash_table_lookup (s_hXWindowTable, &iLastActiveWindow);
+						if (pLastActiveIcon != NULL)
+						{
+							pLastActiveIcon->bIsActive = FALSE;
+							CairoDock *pLastActiveParentDock = cairo_dock_search_dock_from_name (pLastActiveIcon->cParentDockName);
+							if (pLastActiveParentDock != NULL)
+							{
+								if (pLastActiveParentDock->iSidShrinkDown == 0)
+									cairo_dock_redraw_my_icon (pLastActiveIcon, CAIRO_CONTAINER (pLastActiveParentDock));
+							}
+							else
+							{
+								cairo_dock_update_inactivity_on_inhibators (pLastActiveIcon->cClass, pLastActiveIcon->Xid);
+							}
+						}
+						
 						cairo_dock_notify (CAIRO_DOCK_WINDOW_ACTIVATED, &XActiveWindow);
+						
+						iLastActiveWindow = XActiveWindow;
 					}
 				}
 				else if (event.xproperty.atom == s_aNetCurrentDesktop || event.xproperty.atom == s_aNetDesktopViewport)

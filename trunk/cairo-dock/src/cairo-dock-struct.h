@@ -577,7 +577,7 @@ struct _Icon {
 	GtkAllocation windowGeometry;
 	/// TRUE ssi la fenetre est en mode plein ecran.
 	gboolean bIsFullScreen;
-	///TRUE ssi la fenetre est en mode maximisee.
+	/// TRUE ssi la fenetre est en mode maximisee.
 	gboolean bIsMaximized;
 	//\____________ Pour les modules.
 	/// Module que represente l'icone.
@@ -599,6 +599,8 @@ struct _Icon {
 	/// ID du pixmap de sauvegarde de la fenetre pour quand elle est cachee.
 	Pixmap iBackingPixmap;
 	//Damage iDamageHandle;
+	/// TRUE ssi la fenetre est active.
+	gboolean bIsActive;
 };
 
 

@@ -481,6 +481,12 @@ appli animation = bounce
 #i+ Number of times the icon will bounce/rotate/blink/etc when clicked :
 appli number of rounds = 4
 
+#c+4[0;1] Color of the active window (r,v,b,a) :
+active color = 0.; 0.4; 0.8; 0.25
+
+#i+[0;10] Linewidth of the frame around the active window :
+#{Set 0 to fill the icon's foreground.}
+active line width = 3
 
 #X+[Applets]
 frame_applet =

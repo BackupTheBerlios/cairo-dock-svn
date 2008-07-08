@@ -73,6 +73,8 @@ extern gboolean g_bLinkIndicatorWithIcon;
 extern cairo_surface_t *g_pDropIndicatorSurface;
 extern double g_fDropIndicatorWidth, g_fDropIndicatorHeight;
 extern gboolean g_bIndicatorAbove;
+extern double g_fActiveColor[4];
+extern int g_fActiveLineWidth;
 
 extern gboolean g_bUseFakeTransparency;
 extern cairo_surface_t *g_pDesktopBgSurface;
@@ -753,6 +755,21 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			cairo_paint (pCairoContext);
 		else
 			cairo_paint_with_alpha (pCairoContext, fAlpha);
+	}
+	
+	if (icon->bIsActive)  // icon->Xid != 0 && icon->Xid == cairo_dock_get_active_window ()
+	{
+		cairo_rectangle (pCairoContext, 0., 0., icon->fWidth * (1+g_fAmplitude), icon->fHeight * (1+g_fAmplitude));
+		cairo_set_source_rgba (pCairoContext, g_fActiveColor[0], g_fActiveColor[1], g_fActiveColor[2], g_fActiveColor[3]);
+		if (g_fActiveLineWidth > 0)
+		{
+			cairo_set_line_width (pCairoContext, g_fActiveLineWidth);
+			cairo_stroke (pCairoContext);
+		}
+		else
+		{
+			cairo_fill (pCairoContext);
+		}
 	}
 	
 	cairo_restore (pCairoContext);  // retour juste apres la translation (fDrawX, fDrawY).

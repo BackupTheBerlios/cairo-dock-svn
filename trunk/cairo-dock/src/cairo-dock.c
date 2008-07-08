@@ -189,6 +189,8 @@ gboolean g_bHideVisibleApplis;  // TRUE <=> cacher les applis dont la fenetre es
 gboolean g_bAppliOnCurrentDesktopOnly;  // TRUE <=> cacher les applis dont la fenetre n'est pas sur le bureau courant.
 int g_iNbDesktops;  // nombre de bureaux.
 int g_iNbViewportX, g_iNbViewportY;  // nombre de "faces du cube".
+double g_fActiveColor[4];
+int g_fActiveLineWidth;
 
 gboolean g_bUseSeparator = TRUE;  // utiliser les separateurs ou pas.
 gchar *g_cSeparatorImage = NULL;
