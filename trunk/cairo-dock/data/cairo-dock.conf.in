@@ -497,10 +497,6 @@ active width offset = 3
 #i+[0;30] Corner radius of the frame around the active window :
 active corner radius = 5
 
-##Modification de Fabounet.
-##i+[0;30] Radius of the frame around the active window :
-#active radius = 5
-
 #X+[Applets]
 frame_applet =
 
