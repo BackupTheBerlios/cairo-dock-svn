@@ -484,13 +484,22 @@ appli number of rounds = 4
 #c+4[0;1] Color of the active window (r,v,b,a) :
 active color = 0.; 0.4; 0.8; 0.25
 
+#r+[foreground;background] Position of the frame :
+active frame position = 0
+
 #i+[0;10] Linewidth of the frame around the active window :
-#{Set 0 to fill the icon's foreground.}
+#{Set 0 to fill the frame.}
 active line width = 3
 
-#i+[0;30] Radius of the frame around the active window :
-active radius = 5
+#i+[0;10] Width offset of the frame around the active window :
+active width offset = 3
 
+#i+[0;30] Corner radius of the frame around the active window :
+active corner radius = 5
+
+##Modification de Fabounet.
+##i+[0;30] Radius of the frame around the active window :
+#active radius = 5
 
 #X+[Applets]
 frame_applet =

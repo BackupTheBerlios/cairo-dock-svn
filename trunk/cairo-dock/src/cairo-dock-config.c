@@ -133,6 +133,9 @@ extern gboolean g_bAppliOnCurrentDesktopOnly;
 extern double g_fActiveColor[4];
 extern int g_iActiveLineWidth;
 extern double g_iActiveRadius;
+extern int g_fActiveWidthOffset;
+extern int g_fActiveCornerRadius;
+extern int g_iActivePosition;
 
 extern int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconAuthorizedHeight[CAIRO_DOCK_NB_TYPES];
@@ -895,7 +898,10 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	cairo_dock_get_double_list_key_value (pKeyFile, "Icons", "active color", &bFlushConfFileNeeded, g_fActiveColor, 4, couleur_active, NULL, NULL);
 	
 	g_iActiveLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "active line width", &bFlushConfFileNeeded, 3, NULL, NULL);
-	
+	g_fActiveWidthOffset = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "active width offset", &bFlushConfFileNeeded, 3, NULL, NULL);
+	g_fActiveCornerRadius = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "active corner radius", &bFlushConfFileNeeded, 3, NULL, NULL);
+	g_iActivePosition = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "active frame position", &bFlushConfFileNeeded, 0, NULL, NULL);
+
 	g_iActiveRadius = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "active radius", &bFlushConfFileNeeded, 5, NULL, NULL);
 	
 	gboolean bAppliOnCurrentDesktopOnlyOld = g_bAppliOnCurrentDesktopOnly;

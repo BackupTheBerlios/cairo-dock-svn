@@ -192,6 +192,9 @@ int g_iNbViewportX, g_iNbViewportY;  // nombre de "faces du cube".
 double g_fActiveColor[4];
 int g_iActiveLineWidth;
 double g_iActiveRadius;
+int g_fActiveWidthOffset;
+int g_fActiveCornerRadius;
+int g_iActivePosition;
 
 gboolean g_bUseSeparator = TRUE;  // utiliser les separateurs ou pas.
 gchar *g_cSeparatorImage = NULL;
