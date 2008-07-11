@@ -1168,6 +1168,7 @@ static gboolean _cairo_dock_remove_old_applis (Window *Xid, Icon *icon, double *
 				icon->fLastCheckTime = -1;  // pour ne pas la desenregistrer de la HashTable lors du 'free'.
 				cairo_dock_free_icon (icon);
 				bToBeRemoved = TRUE;
+				/// redessiner les inhibiteurs...
 			}
 		}
 	}

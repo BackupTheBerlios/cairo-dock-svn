@@ -440,31 +440,6 @@ launcher animation = bounce
 #i+ Number of times the icon will bounce/rotate/blink/etc when clicked :
 launcher number of rounds = 4
 
-#S+ Filename of an image to use for indicators :
-#{Indicators are drawn on launchers icons to show that they have already been launched. Let blank to use the default one.}
-indicator image = 
-
-#b+ Display the indicator above the icon ?
-indicator above = false
-
-#e+[0.1;1.5] Indicator size ratio :
-#{The ratio between indicator's size and icon's size. The bigger, the bigger the indicators are.}
-indicator ratio = 1.
-
-#b+ Link the indicator with its icon ?
-#{It will then be resized like the icon, move like the icon, etc. Otherwise it will be drawn directly on the dock.}
-link indicator = TRUE
-
-#i+[-10;64] Vertical offset :
-#{in pixels. You can use this parameter to adjust the indicator's vertical position.}
-indicator deltaY = 2
-
-#v+
-sep_ic = 
-
-#S+ Image for the drag'n'drop animation :
-#{Typically an arrow, that will be displayed when you try to drop a new launcher into the dock.}
-drop indicator =
 
 #X+[Applications]
 frame_appli =
@@ -480,22 +455,6 @@ appli animation = bounce
 
 #i+ Number of times the icon will bounce/rotate/blink/etc when clicked :
 appli number of rounds = 4
-
-#c+4[0;1] Color of the active window (r,v,b,a) :
-active color = 0.; 0.4; 0.8; 0.25
-
-#r+[foreground;background] Position of the frame :
-active frame position = 0
-
-#i+[0;10] Linewidth of the frame around the active window :
-#{Set 0 to fill the frame.}
-active line width = 3
-
-#i+[0;10] Width offset of the frame around the active window :
-active width offset = 3
-
-#i+[0;30] Corner radius of the frame around the active window :
-active corner radius = 5
 
 #X+[Applets]
 frame_applet =
@@ -633,20 +592,73 @@ background color inside = 1.0; 1.0; 1.0; 0.6
 
 
 #[gtk-dialog-info]
-[Emblems]
-#F+[Options]
-frame_ops =
-#b+ Display a drop indicator on icon while drag'n'drop ?
-drop indicator = true
+[Indicators]
 
-#F+[Images]
+#F+[Indicator of drag'n'drop on the dock]
+frame_drop1 =
+
+#S+ Image for the drag'n'drop animation :
+#{Typically an arrow, that will be displayed when you try to drop a new launcher into the dock. Let empty to use the default one.}
+drop indicator =
+
+
+#F+[Indicator of drag'n'drop on icons]
+frame_drop2 =
+
+#b+ Display a drop indicator on icon while drag'n'drop ?
+show drop indicator = true
+
+#S+ Image for the indicator :
+#{It's an image that will be displayed on the icon to indicate you can drop on it. Let empty to use the default one.}
+emblem_2 = 
+
+
+#F+[Indicator of the active window]
+frame_activ =
+
+#c+4[0;1] Color of the indicator (r,v,b,a) :
+#{Set transparency to 0 if you don't want to use an indicator.}
+active color = 0.; 0.4; 0.8; 0.25
+
+#b Draw indicator above the icon ?
+active frame position = true
+
+#i+[0;10] Linewidth of the frame around the active window :
+#{Set 0 to fill the frame.}
+active line width = 3
+
+#i+[0;30] Corner radius of the frame around the active window :
+active corner radius = 6
+
+
+#F+[Indicator of active launcher]
+frame_launch =
+
+#S+ Filename of an image to use for indicators :
+#{Indicators are drawn on launchers icons to show that they have already been launched. Let blank to use the default one.}
+indicator image = 
+
+#b+ Display the indicator above the icon ?
+indicator above = false
+
+#e+[0.1;1.5] Indicator size ratio :
+#{You can choose to make the indicator smaller or bigger than the icons. The bigger the value is, the bigger the indicator is. 1 means the indicator will have the same size as the icons.}
+indicator ratio = 1.
+
+#b+ Link the indicator with its icon ?
+#{It will then be resized like the icon, move like the icon, etc. Otherwise it will be drawn directly on the dock.}
+link indicator = TRUE
+
+#i+[-10;64] Vertical offset :
+#{in pixels. You can use this parameter to adjust the indicator's vertical position.}
+indicator deltaY = 2
+
+
+#X+[Misc. Emblems]
 frame_img =
 #S+ Name of an image to use for the charge emblem :
 #{If you don't provide any, a default image will be used.}
 emblem_1 = 
-#S+ Name of an image to use for the drop indicator emblem :
-#{If you don't provide any, a default image will be used.}
-emblem_2 = 
 #S+ Name of an image to use for the play emblem :
 #{If you don't provide any, a default image will be used.}
 emblem_3 = 

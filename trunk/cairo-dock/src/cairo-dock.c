@@ -189,12 +189,9 @@ gboolean g_bHideVisibleApplis;  // TRUE <=> cacher les applis dont la fenetre es
 gboolean g_bAppliOnCurrentDesktopOnly;  // TRUE <=> cacher les applis dont la fenetre n'est pas sur le bureau courant.
 int g_iNbDesktops;  // nombre de bureaux.
 int g_iNbViewportX, g_iNbViewportY;  // nombre de "faces du cube".
-double g_fActiveColor[4];
-int g_iActiveLineWidth;
-double g_iActiveRadius;
-int g_fActiveWidthOffset;
-int g_fActiveCornerRadius;
-int g_iActivePosition;
+gboolean g_bActiveIndicatorAbove;
+cairo_surface_t *g_pActiveIndicatorSurface = NULL;
+double g_fActiveIndicatorWidth, g_fActiveIndicatorHeight;
 
 gboolean g_bUseSeparator = TRUE;  // utiliser les separateurs ou pas.
 gchar *g_cSeparatorImage = NULL;
@@ -303,8 +300,8 @@ int main (int argc, char** argv)
 	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)
 		g_tIconTypeOrder[i] = i;
 	cd_log_init(FALSE);
-        //No log
-        cd_log_set_level(0);
+	//No log
+	cd_log_set_level(0);
 	gtk_init (&argc, &argv);
 	GError *erreur = NULL;
 	
@@ -420,7 +417,7 @@ int main (int argc, char** argv)
 		g_free (cEnvironment);
 	}
 #ifdef HAVE_GLITZ
-	cd_message ("Compiled with Glitz (hardware acceleration support)\n");
+	cd_message ("Compiled with Glitz (hardware acceleration support)n");
 #else
 	if (g_bUseGlitz)
 	{

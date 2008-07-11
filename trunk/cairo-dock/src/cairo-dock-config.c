@@ -130,12 +130,7 @@ extern gboolean g_bAnimateOnActiveWindow;
 extern double g_fVisibleAppliAlpha;
 extern gboolean g_bHideVisibleApplis;
 extern gboolean g_bAppliOnCurrentDesktopOnly;
-extern double g_fActiveColor[4];
-extern int g_iActiveLineWidth;
-extern double g_iActiveRadius;
-extern int g_fActiveWidthOffset;
-extern int g_fActiveCornerRadius;
-extern int g_iActivePosition;
+extern int g_bActiveIndicatorAbove;
 
 extern int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconAuthorizedHeight[CAIRO_DOCK_NB_TYPES];
@@ -894,20 +889,18 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	if (g_bHideVisibleApplis && g_fVisibleAppliAlpha < 0)
 		g_fVisibleAppliAlpha = 0.;  // on inhibe ce parametre, puisqu'il ne sert alors a rien.
 	
-	double couleur_active[4] = {0., 0.4, 0.8, 0.25};
-	cairo_dock_get_double_list_key_value (pKeyFile, "Icons", "active color", &bFlushConfFileNeeded, g_fActiveColor, 4, couleur_active, NULL, NULL);
 	
-	g_iActiveLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "active line width", &bFlushConfFileNeeded, 3, NULL, NULL);
-	g_fActiveWidthOffset = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "active width offset", &bFlushConfFileNeeded, 3, NULL, NULL);
-	g_fActiveCornerRadius = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "active corner radius", &bFlushConfFileNeeded, 3, NULL, NULL);
-	g_iActivePosition = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "active frame position", &bFlushConfFileNeeded, 0, NULL, NULL);
-
-	g_iActiveRadius = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "active radius", &bFlushConfFileNeeded, 5, NULL, NULL);
+	double fActiveColor[4], couleur_active[4] = {0., 0.4, 0.8, 0.25};
+	cairo_dock_get_double_list_key_value (pKeyFile, "Indicators", "active color", &bFlushConfFileNeeded, fActiveColor, 4, couleur_active, "Icons", NULL);
+	
+	int iActiveLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Indicators", "active line width", &bFlushConfFileNeeded, 3, "Icons", NULL);
+	int iActiveCornerRadius = cairo_dock_get_integer_key_value (pKeyFile, "Indicators", "active corner radius", &bFlushConfFileNeeded, 6, "Icons", NULL);
+	g_bActiveIndicatorAbove = cairo_dock_get_boolean_key_value (pKeyFile, "Indicators", "active frame position", &bFlushConfFileNeeded, TRUE, "Icons", NULL);
 	
 	gboolean bAppliOnCurrentDesktopOnlyOld = g_bAppliOnCurrentDesktopOnly;
 	g_bAppliOnCurrentDesktopOnly = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "current desktop only", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
 
-	gchar *cIndicatorImageName = cairo_dock_get_string_key_value (pKeyFile, "Icons", "indicator image", &bFlushConfFileNeeded, NULL, NULL, NULL);
+	gchar *cIndicatorImageName = cairo_dock_get_string_key_value (pKeyFile, "Indicators", "indicator image", &bFlushConfFileNeeded, NULL, "Icons", NULL);
 	gchar *cIndicatorImagePath;
 	if (cIndicatorImageName != NULL)
 	{
@@ -919,45 +912,19 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		cIndicatorImagePath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_DEFAULT_INDICATOR_NAME);
 	}
 	
-	g_bIndicatorAbove = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "indicator above", &bFlushConfFileNeeded, FALSE, NULL, NULL);
+	g_bIndicatorAbove = cairo_dock_get_boolean_key_value (pKeyFile, "Indicators", "indicator above", &bFlushConfFileNeeded, FALSE, "Icons", NULL);
 	
-	double fIndicatorRatio = cairo_dock_get_double_key_value (pKeyFile, "Icons", "indicator ratio", &bFlushConfFileNeeded, 1., NULL, NULL);
+	double fIndicatorRatio = cairo_dock_get_double_key_value (pKeyFile, "Indicators", "indicator ratio", &bFlushConfFileNeeded, 1., "Icons", NULL);
 	
-	g_bLinkIndicatorWithIcon = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "link indicator", &bFlushConfFileNeeded, TRUE, NULL, NULL);
+	g_bLinkIndicatorWithIcon = cairo_dock_get_boolean_key_value (pKeyFile, "Indicators", "link indicator", &bFlushConfFileNeeded, TRUE, "Icons", NULL);
 	
-	g_iIndicatorDeltaY = cairo_dock_get_integer_key_value (pKeyFile, "Icons", "indicator deltaY", &bFlushConfFileNeeded, 2, NULL, NULL);
+	g_iIndicatorDeltaY = cairo_dock_get_integer_key_value (pKeyFile, "Indicators", "indicator deltaY", &bFlushConfFileNeeded, 2, "Icons", NULL);
 	
 	gboolean bMixLauncherAppliOld = g_bMixLauncherAppli;
 	g_bMixLauncherAppli = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "mix launcher appli", &bFlushConfFileNeeded, TRUE, NULL, NULL);
 	
 	length = 0;
 	guint i, j;
-	/**gchar **cUseXIconAppliListNew = cairo_dock_get_string_list_key_value (pKeyFile, "TaskBar", "use xicon", &bFlushConfFileNeeded, &length, NULL, NULL, NULL);
-	if (cUseXIconAppliListNew != NULL)
-	{
-		for (i = 0; cUseXIconAppliListNew[i] != NULL; i ++)
-		{
-			cairo_dock_set_class_use_xicon (cUseXIconAppliListNew[i], TRUE);
-		}
-	}
-	if (g_cUseXIconAppliList != NULL)
-	{
-		for (i = 0; g_cUseXIconAppliList[i] != NULL; i ++)
-		{
-			if (cUseXIconAppliListNew != NULL)
-			{
-				for (j = 0; cUseXIconAppliListNew[j] != NULL; j ++)
-				{
-					if (strcmp (g_cUseXIconAppliList[i], cUseXIconAppliListNew[j]) == 0)
-						break ;
-				}
-			}
-			if (cUseXIconAppliListNew == NULL || cUseXIconAppliListNew[j] == NULL)  // pas trouve.
-				cairo_dock_set_class_use_xicon (g_cUseXIconAppliList[i], FALSE);
-		}
-		g_strfreev (g_cUseXIconAppliList);
-	}
-	g_cUseXIconAppliList = cUseXIconAppliListNew;*/
 	
 	gboolean bOverWriteXIconsOld = g_bOverWriteXIcons;
 	g_bOverWriteXIcons = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "overwrite xicon", &bFlushConfFileNeeded, TRUE, NULL, NULL);
@@ -1068,7 +1035,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	}
 	g_cRaiseDockShortcut = cairo_dock_get_string_key_value (pKeyFile, "Position", "raise shortcut", &bFlushConfFileNeeded, NULL, NULL, NULL);
 	
-	gchar *cDropIndicatorImageName = cairo_dock_get_string_key_value (pKeyFile, "Icons", "drop indicator", &bFlushConfFileNeeded, NULL, NULL, NULL);
+	gchar *cDropIndicatorImageName = cairo_dock_get_string_key_value (pKeyFile, "Indicators", "drop indicator", &bFlushConfFileNeeded, NULL, "Icons", NULL);
 	gchar *cDropIndicatorImagePath;
 	if (cDropIndicatorImageName != NULL)
 	{
@@ -1106,17 +1073,23 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	if (g_iMaxAuthorizedWidth == 0)
 		g_iMaxAuthorizedWidth = g_iScreenWidth[pDock->bHorizontalDock];
 
+	
+	cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
+	double fMaxScale = cairo_dock_get_max_scale (pDock);
+	
 	cairo_dock_load_dialog_buttons (CAIRO_CONTAINER (pDock), cButtonOkImage, cButtonCancelImage);
 	g_free (cButtonOkImage);
 	g_free (cButtonCancelImage);
 	
-	cairo_dock_load_task_indicator (g_bShowAppli && g_bMixLauncherAppli ? cIndicatorImagePath : NULL, fIndicatorRatio, CAIRO_CONTAINER (pDock));
+	cairo_dock_load_task_indicator (g_bShowAppli && g_bMixLauncherAppli ? cIndicatorImagePath : NULL, pCairoContext, fMaxScale, fIndicatorRatio);
+	//cairo_dock_load_task_indicator (g_bShowAppli && g_bMixLauncherAppli ? cIndicatorImagePath : NULL, fIndicatorRatio, CAIRO_CONTAINER (pDock));
 	g_free (cIndicatorImagePath);
 	
-	cairo_t* pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
-	cairo_dock_load_drop_indicator (cDropIndicatorImagePath, pCairoContext, cairo_dock_get_max_scale (pDock));
-	cairo_destroy (pCairoContext);
+	cairo_dock_load_drop_indicator (cDropIndicatorImagePath, pCairoContext, fMaxScale);
 	g_free (cDropIndicatorImagePath);
+	
+	cairo_dock_load_active_window_indicator (pCairoContext, cairo_dock_get_max_scale (pDock), iActiveCornerRadius, iActiveLineWidth, fActiveColor);
+	
 	
 	g_fReflectSize = 0;
 	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)
@@ -1137,7 +1110,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 			g_fReflectSize = 48;
 	}
 	g_fReflectSize *= fFieldDepth;
-	cd_debug ("  g_fReflectSize : %.2f pixels\n", g_fReflectSize);
+	cd_debug ("  g_fReflectSize : %.2f pixels", g_fReflectSize);
 	
 	if (g_bShowThumbnail && ! bShowThumbnailOld)  // on verifie que cette option est acceptable.
 	{
@@ -1247,6 +1220,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	//\___________________ On applique les modifs au fichier de conf easy.
 	cairo_dock_copy_to_easy_conf_file (pKeyFile, g_cEasyConfFile);
 
+	cairo_destroy (pCairoContext);
+	
 	g_key_file_free (pKeyFile);
 
 	cairo_dock_mark_theme_as_modified (TRUE);

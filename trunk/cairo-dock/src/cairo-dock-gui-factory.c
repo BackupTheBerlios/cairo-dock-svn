@@ -657,8 +657,8 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 			GTK_RESPONSE_REJECT,
 			NULL);
 	}
+	gtk_window_set_keep_above(GTK_WINDOW (pDialog), FALSE);
 	gtk_window_set_keep_below (GTK_WINDOW (pDialog), FALSE);
-	gtk_window_set_keep_above(GTK_WINDOW (pDialog), TRUE);
 	gtk_container_set_border_width (GTK_CONTAINER (GTK_DIALOG(pDialog)->vbox), CAIRO_DOCK_GUI_MARGIN);
 	
 	GtkTooltips *pToolTipsGroup = gtk_tooltips_new ();

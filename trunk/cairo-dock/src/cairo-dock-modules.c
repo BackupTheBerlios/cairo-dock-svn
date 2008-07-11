@@ -768,10 +768,15 @@ static void _cairo_dock_configure_module_callback (gchar *cConfFile, gpointer *d
 void cairo_dock_configure_module (GtkWindow *pParentWindow, CairoDockModule *module, GError **erreur)
 {
 	g_return_if_fail (module != NULL);
+	
+	if (module->cConfFilePath == NULL)  // on n'est pas encore passe par la dans le cas ou le plug-in n'a pas ete active; mais on veut pouvoir configurer un plug-in meme lorsqu'il est inactif.
+	{
+		module->cConfFilePath = cairo_dock_check_conf_file_exists (module->pVisitCard->cUserDataDir, module->pVisitCard->cShareDataDir, module->pVisitCard->cConfFileName);
+	}
 	cd_message ("%s (%s)", __func__, module->cConfFilePath);
-
 	if (module->cConfFilePath == NULL)
 		return;
+	
 	cairo_dock_update_applet_conf_file_with_containers(NULL, module->cConfFilePath);
 	
 	gchar *cTitle = g_strdup_printf (_("Configuration of %s"), module->pVisitCard->cModuleName);

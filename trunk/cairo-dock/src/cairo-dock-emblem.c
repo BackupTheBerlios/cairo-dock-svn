@@ -233,13 +233,13 @@ void cairo_dock_get_emblem_path (GKeyFile *pKeyFile, gboolean *bFlushConfFileNee
 	cd_debug ("");
 	g_return_if_fail (pKeyFile != NULL);
 	
-	g_bDisplayDropEmblem = cairo_dock_get_boolean_key_value (pKeyFile, "Emblems", "drop indicator", bFlushConfFileNeeded, TRUE, NULL, NULL);
+	g_bDisplayDropEmblem = cairo_dock_get_boolean_key_value (pKeyFile, "Indicators", "show drop indicator", bFlushConfFileNeeded, TRUE, "Emblems", "drop indicator");
 	
 	gint i;
 	GString *sKeyName = g_string_new ("");
 	for (i = 1; i < CAIRO_DOCK_EMBLEM_CLASSIC_NB; i++) {
 		g_string_printf (sKeyName, "emblem_%d", i);
-		s_cEmblemConfPath[i] = cairo_dock_get_string_key_value (pKeyFile, "Emblems", sKeyName->str, bFlushConfFileNeeded, NULL, NULL, NULL);
+		s_cEmblemConfPath[i] = cairo_dock_get_string_key_value (pKeyFile, "Indicators", sKeyName->str, bFlushConfFileNeeded, NULL, "Emblems", NULL);
 	}
 	g_string_free (sKeyName, TRUE);
 }

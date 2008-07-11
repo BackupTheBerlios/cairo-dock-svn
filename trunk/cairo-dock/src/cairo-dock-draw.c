@@ -77,9 +77,10 @@ extern gboolean g_bIndicatorAbove;
 extern double g_fActiveColor[4];
 extern int g_iActiveLineWidth;
 extern double g_iActiveRadius;
-extern int g_fActiveWidthOffset;
-extern int g_fActiveCornerRadius;
-extern int g_iActivePosition;
+extern int g_bActiveIndicatorAbove;
+
+extern cairo_surface_t *g_pActiveIndicatorSurface;
+extern double g_fActiveIndicatorWidth, g_fActiveIndicatorHeight;
 
 extern gboolean g_bUseFakeTransparency;
 extern cairo_surface_t *g_pDesktopBgSurface;
@@ -634,9 +635,17 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	
 	double fAlpha = icon->fAlpha * (fDockMagnitude + g_fAlphaAtRest * (1 - fDockMagnitude));
 	
-	if (icon->Xid != 0 && icon->Xid == cairo_dock_get_current_active_window () && g_iActivePosition == 1)  
+	if (icon->Xid != 0 && icon->Xid == cairo_dock_get_current_active_window () && ! g_bActiveIndicatorAbove && g_pActiveIndicatorSurface != NULL)
 	{
-		double fRadius = /*fMaxScale*/ icon->fScale * MIN (.5 * g_fActiveCornerRadius, 5.);  // bon compromis.
+		cairo_save (pCairoContext);
+		if (icon->fWidth / fRatio != g_fActiveIndicatorWidth || icon->fHeight / fRatio != g_fActiveIndicatorHeight)
+		{
+			cairo_scale (pCairoContext, icon->fWidth / fRatio / g_fActiveIndicatorWidth, icon->fHeight / fRatio / g_fActiveIndicatorHeight);
+		}
+		cairo_set_source_surface (pCairoContext, g_pActiveIndicatorSurface, 0., 0.);
+		cairo_paint (pCairoContext);
+		cairo_restore (pCairoContext);
+		/*double fRadius = icon->fScale * MIN (.5 * g_fActiveCornerRadius, 5.);  // bon compromis.
 		double fLineWidth = (g_iActiveLineWidth > 0 ? g_iActiveLineWidth : 1.);
 		double fFrameWidth = icon->fWidth * (1+g_fAmplitude) - 2 * fRadius - fLineWidth + g_fActiveWidthOffset;
 		double fFrameHeight = icon->fHeight * (1+g_fAmplitude) - fLineWidth;
@@ -646,16 +655,12 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		cairo_set_source_rgba (pCairoContext, g_fActiveColor[0], g_fActiveColor[1], g_fActiveColor[2], g_fActiveColor[3]);
 		if (g_iActiveLineWidth > 0)
 		{
-			/*cairo_rectangle (pCairoContext, 0., 0., icon->fWidth * (1+g_fAmplitude), icon->fHeight * (1+g_fAmplitude));
-			cairo_set_source_rgba (pCairoContext, g_fActiveColor[0], g_fActiveColor[1], g_fActiveColor[2], g_fActiveColor[3]);
-			cairo_set_line_width (pCairoContext, g_iActiveLineWidth);*/
 			cairo_stroke (pCairoContext);
 		}
 		else
 		{
 			cairo_fill_preserve (pCairoContext);
-			//cairo_fill (pCairoContext);
-		}
+		}*/
 	}
 	
 	if (bUseReflect && icon->pReflectionBuffer != NULL)  // on dessine les reflets.
@@ -785,9 +790,17 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			cairo_paint_with_alpha (pCairoContext, fAlpha);
 	}
 	
-	if (icon->Xid != 0 && icon->Xid == cairo_dock_get_current_active_window () && g_iActivePosition == 0)
+	if (icon->Xid != 0 && icon->Xid == cairo_dock_get_current_active_window () && g_bActiveIndicatorAbove && g_pActiveIndicatorSurface != NULL)
 	{
-		double fRadius = /*fMaxScale*/ icon->fScale * MIN (.5 * g_fActiveCornerRadius, 5.);  // bon compromis.
+		cairo_save (pCairoContext);
+		if (icon->fWidth / fRatio != g_fActiveIndicatorWidth || icon->fHeight / fRatio != g_fActiveIndicatorHeight)
+		{
+			cairo_scale (pCairoContext, icon->fWidth / fRatio / g_fActiveIndicatorWidth, icon->fHeight / fRatio / g_fActiveIndicatorHeight);
+		}
+		cairo_set_source_surface (pCairoContext, g_pActiveIndicatorSurface, 0., 0.);
+		cairo_paint (pCairoContext);
+		cairo_restore (pCairoContext);
+		/*double fRadius = icon->fScale * MIN (.5 * g_fActiveCornerRadius, 5.);  // bon compromis.
 		double fLineWidth = (g_iActiveLineWidth > 0 ? g_iActiveLineWidth : 1.);
 		double fFrameWidth = icon->fWidth * (1+g_fAmplitude) - 2 * fRadius - fLineWidth + g_fActiveWidthOffset;
 		double fFrameHeight = icon->fHeight * (1+g_fAmplitude) - fLineWidth;
@@ -797,16 +810,12 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		cairo_set_source_rgba (pCairoContext, g_fActiveColor[0], g_fActiveColor[1], g_fActiveColor[2], g_fActiveColor[3]);
 		if (g_iActiveLineWidth > 0)
 		{
-			/*cairo_rectangle (pCairoContext, 0., 0., icon->fWidth * (1+g_fAmplitude), icon->fHeight * (1+g_fAmplitude));
-			cairo_set_source_rgba (pCairoContext, g_fActiveColor[0], g_fActiveColor[1], g_fActiveColor[2], g_fActiveColor[3]);
-			cairo_set_line_width (pCairoContext, g_iActiveLineWidth);*/
 			cairo_stroke (pCairoContext);
 		}
 		else
 		{
 			cairo_fill_preserve (pCairoContext);
-			//cairo_fill (pCairoContext);
-		}
+		}*/
 	}
 	
 	/* Voici ton bloque d'origine, j'ai remanier pour adapter a mes modifications
@@ -1215,43 +1224,16 @@ void cairo_dock_render_icons_linear (cairo_t *pCairoContext, CairoDock *pDock, d
 
 void cairo_dock_render_background (cairo_t *pCairoContext, CairoDock *pDock)
 {
-	//g_print ("%s (%.2f)\n", __func__, g_fVisibleZoneAlpha);
-	/*cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
-	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
-
-	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
-	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
-	cairo_paint (pCairoContext);
-	
-	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);*/
 	if (g_pVisibleZoneSurface != NULL)
 	{
 		cairo_set_source_surface (pCairoContext, g_pVisibleZoneSurface, 0.0, 0.0);
 		cairo_paint_with_alpha (pCairoContext, g_fVisibleZoneAlpha);
 	}
-	/*cairo_destroy (pCairoContext);
-
-#ifdef HAVE_GLITZ
-	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
-		glitz_drawable_swap_buffers (pDock->pGlitzDrawable);
-#endif*/
 }
 
 void cairo_dock_render_blank (cairo_t *pCairoContext, CairoDock *pDock)
 {
 	//g_print ("%s ()\n", __func__);
-	/*cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
-	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
-
-	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
-	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
-	cairo_paint (pCairoContext);
-
-	cairo_destroy (pCairoContext);
-#ifdef HAVE_GLITZ
-	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
-		glitz_drawable_swap_buffers (pDock->pGlitzDrawable);
-#endif*/
 }
 
 

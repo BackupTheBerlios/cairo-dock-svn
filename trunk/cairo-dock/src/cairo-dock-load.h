@@ -45,11 +45,12 @@ void cairo_dock_load_background_decorations (CairoDock *pDock);
 
 void cairo_dock_load_drop_indicator (gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale);
 
-void cairo_dock_load_task_indicator (const gchar *cIndicatorImagePath, double fIndicatorRatio, CairoContainer *pSomeContainer);
+void cairo_dock_load_task_indicator (const gchar *cIndicatorImagePath, cairo_t* pSourceContext, double fMaxScale, double fIndicatorRatio);
 
 void cairo_dock_load_desktop_background_surface (void);
 void cairo_dock_invalidate_desktop_bg_surface (void);
 cairo_surface_t *cairo_dock_get_desktop_bg_surface (void);
 
+void cairo_dock_load_active_window_indicator (cairo_t* pSourceContext, double fMaxScale, double fCornerRadius, double fLineWidth, double *fActiveColor);
 
 #endif
