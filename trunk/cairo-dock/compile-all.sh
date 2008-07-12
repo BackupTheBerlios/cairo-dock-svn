@@ -90,6 +90,7 @@ if test "$CAIRO_DOCK_CLEAN" = "1"; then
 fi
 if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
 	if test -e po; then
+		echo "generating translation files ..."
 		if test -x $CAIRO_DOCK_EXTRACT_MESSAGE; then
 			rm -f data/messages
 			for c in data/*.conf
@@ -198,20 +199,93 @@ if test "$CAIRO_DOCK_THEMES" = "1"; then
 	cd ..
 fi
 
-
+### On liste les plug-ins a compiler.
 cd $CAIRO_DOCK_DIR/plug-ins
-if test "$CAIRO_DOCK_UNSTABLE" = "1" -o ! -e "Applets.stable"; then
-	export liste="`ls`"
+export liste_stable="`sed "/^#/d" Applets.stable`"
+export liste_all="`find . -maxdepth 1  -type d`"
+echo "the following applets will be compiled :"
+if test "$CAIRO_DOCK_UNSTABLE" = "1"; then
+	echo "$liste_all"
 else
-	export liste="`sed "/^#/d" Applets.stable`"
+	echo "$liste_stable"
 fi
-if test "$CAIRO_DOCK_COMPIL" = "1" -o "$CAIRO_DOCK_INSTALL" = "1"; then
-	echo "the following applets will be compiled :"
-	echo "$liste"
+echo "*************************************"
+echo "* Compilation of stable modules ... *"
+echo "*************************************"
+
+### on extrait les messages des plug-ins a traduire.
+if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
+	echo "extracting sentences to translate..."
+	for plugin in $liste
+	do
+		if test -d $plugin; then
+			cd $plugin
+			if test -e Makefile.am -a "$plugin" != "$CAIRO_DOCK_EXCLUDE"; then
+				if test -e po; then
+					if test -x $CAIRO_DOCK_EXTRACT_MESSAGE; then
+						rm -f data/messages
+						for c in data/*.conf
+						do
+							$CAIRO_DOCK_EXTRACT_MESSAGE $c
+						done;
+					fi
+					cd po
+					$CAIRO_DOCK_GEN_TRANSLATION
+					cd ..
+				fi
+			fi
+		fi
+	done;
 fi
-for plugin in $liste
+
+### On compile les plug-ins stables en une passe.
+export compil_ok="1"
+if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
+	echo  "* configuring stable plug-ins ..."
+	/usr/bin/time -f "  time elapsed : %Us" autoreconf -isf > /dev/null && ./configure --prefix=$CAIRO_DOCK_PREFIX > /dev/null
+	if test ! "$?" = "0"; then
+		echo "  Attention : an error has occured !"
+		echo "Error while configuring stable plug-ins" >> $CAIRO_DOCK_DIR/compile.log
+		export compil_ok="0"
+	else
+		echo "  -> passed"
+	fi
+fi
+if test "$CAIRO_DOCK_CLEAN" = "1" -a -e Makefile; then
+	make clean > /dev/null
+fi
+if test "$CAIRO_DOCK_COMPIL" = "1"; then
+	echo  "* compiling stable plug-ins ..."
+	/usr/bin/time -f "  time elapsed : %Us" make > /dev/null
+	if test ! "$?" = "0"; then
+		echo "  Attention : an error has occured !"
+		echo "Error while compiling stable plug-ins" >> $CAIRO_DOCK_DIR/compile.log
+		export compil_ok="0"
+	else
+		echo "  -> passed"
+	fi
+fi
+if test "$CAIRO_DOCK_INSTALL" = "1"; then
+	echo "*  installation of stable plug-ins ..."
+	/usr/bin/time -f "  time elapsed : %Us" sudo make install > /dev/null
+	if test ! "$?" = "0"; then
+		echo "  Attention : an error has occured !"
+		echo "Error while installing stable plug-ins" >> $CAIRO_DOCK_DIR/compile.log
+		export compil_ok="0"
+	else
+		echo "  -> passed"
+	fi
+fi
+
+### On les compilera un a un si la compil globale a foirre.
+if test "$compil_ok" = "0"; then
+	export liste_stable=""
+fi
+
+### On compile un a un les plug-ins instables.
+for plugin in $liste_all
 do
-	if test -d $plugin; then
+	if test "`grep $plugin $liste_stable`" = ""; then
 		cd $plugin
 		if test -e Makefile.am -a "$plugin" != "$CAIRO_DOCK_EXCLUDE"; then
 			echo "************************************"

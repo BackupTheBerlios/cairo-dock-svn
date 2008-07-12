@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([cairo-dock], [1.6.1-rc2], [Fabrice Rey (fabounet@users.berlios.de)])
+AC_INIT([cairo-dock], [1.6.1], [Fabrice Rey (fabounet@users.berlios.de)])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
 
@@ -74,5 +74,6 @@ AC_CONFIG_FILES([Makefile
 		data/gauges/turbo-night-dual/Makefile
 		data/gauges/rainbow/Makefile
 		data/gauges/tomato/Makefile
+		data/gauges/Circle/Makefile
 		data/emblems/Makefile])
 AC_OUTPUT

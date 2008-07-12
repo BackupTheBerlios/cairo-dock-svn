@@ -605,7 +605,7 @@ drop indicator =
 #F+[Indicator of drag'n'drop on icons]
 frame_drop2 =
 
-#b+ Display a drop indicator on icon while drag'n'drop ?
+#b+ Display a drop indicator on icon while dragging over them ?
 show drop indicator = true
 
 #S+ Image for the indicator :

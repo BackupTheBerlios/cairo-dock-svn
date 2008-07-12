@@ -5,14 +5,14 @@ find . -type l -delete
 for t in `ls` ../cairo-dock/data/default-theme
 do
 	if test -d $t -a -e $t/Makefile.am; then
-		echo "normalisation du theme $t ..."
+		echo "normalisation of theme $t ..."
 		cd $t/launchers
 		for suff in "svg" "png"
 		do
-			echo "  creation des liens $suff ..."
+			echo "  creation of the $suff links ..."
 			
 			if test -e web-browser.$suff; then
-				echo "    vers web-browser.$suff"
+				echo "    towards web-browser.$suff"
 				ln -s web-browser.$suff firefox.$suff
 				ln -s web-browser.$suff opera.$suff
 				ln -s web-browser.$suff epiphany.$suff
@@ -21,7 +21,7 @@ do
 				ln -s firefox.$suff firefox-3.0.$suff
 			fi
 			if test -e file-browser.$suff; then
-				echo "    vers file-browser.$suff"
+				echo "    towards file-browser.$suff"
 				ln -s file-browser.$suff nautilus.$suff
 				ln -s file-browser.$suff konqueror.$suff
 				ln -s file-browser.$suff thunar.$suff
@@ -29,20 +29,20 @@ do
 			fi
 			
 			if test -e mail-reader.$suff; then
-				echo "    vers mail-reader.$suff"
+				echo "    towards mail-reader.$suff"
 				ln -s mail-reader.$suff mozilla-thunderbird.$suff
 				ln -s mail-reader.$suff kmail.$suff
 				ln -s mail-reader.$suff evolution.$suff
 			fi
 			if test -e image-reader.$suff; then
-				echo "    vers image-reader.$suff"
+				echo "    towards image-reader.$suff"
 				ln -s image-reader.$suff eog.$suff
 				ln -s image-reader.$suff gqview.$suff
 				ln -s image-reader.$suff gwenview.$suff
 				ln -s image-reader.$suff f-spot.$suff
 			fi
 			if test -e audio-player.$suff; then
-				echo "    vers audio-player.$suff"
+				echo "    towards audio-player.$suff"
 				ln -s audio-player.$suff xmms.$suff
 				ln -s audio-player.$suff bmp.$suff
 				ln -s audio-player.$suff beep-media-player.$suff
@@ -50,7 +50,7 @@ do
 				ln -s audio-player.$suff amarok.$suff
 			fi
 			if test -e video-player.$suff; then
-				echo "    vers video-player.$suff"
+				echo "    towards video-player.$suff"
 				ln -s video-player.$suff totem.$suff
 				ln -s video-player.$suff mplayer.$suff
 				ln -s video-player.$suff vlc.$suff
@@ -59,7 +59,7 @@ do
 			fi
 			
 			if test -e writer.$suff; then
-				echo "    vers writer.$suff"
+				echo "    towards writer.$suff"
 				ln -s writer.$suff gedit.$suff
 				ln -s writer.$suff kate.$suff
 				ln -s writer.$suff ooo-writer.$suff
@@ -67,7 +67,7 @@ do
 				ln -s writer.$suff emacs.$suff
 			fi
 			if test -e bittorrent.$suff; then
-				echo "    vers bittorrent.$suff"
+				echo "    towards bittorrent.$suff"
 				ln -s bittorrent.$suff transmission.$suff
 				ln -s bittorrent.$suff deluge.$suff
 				ln -s bittorrent.$suff bittornado.$suff
@@ -75,13 +75,13 @@ do
 				ln -s bittorrent.$suff ktorrent.$suff
 			fi
 			if test -e download.$suff; then
-				echo "    vers download.$suff"
+				echo "    towards download.$suff"
 				ln -s download.$suff amule.$suff
 				ln -s download.$suff emule.$suff
 				ln -s download.$suff filezilla.$suff
 			fi
 			if test -e cd-burner.$suff; then
-				echo "    vers cd-burner.$suff"
+				echo "    towards cd-burner.$suff"
 				ln -s cd-burner.$suff nautilus-cd-burner.$suff
 				ln -s cd-burner.$suff graveman.$suff
 				ln -s cd-burner.$suff gnome-baker.$suff
@@ -89,14 +89,14 @@ do
 				ln -s cd-burner.$suff brasero.$suff
 			fi
 			if test -e image.$suff; then
-				echo "    vers image.$suff"
+				echo "    towards image.$suff"
 				ln -s image.$suff gimp.$suff
 				ln -s image.$suff inkscape.$suff
 				ln -s image.$suff krita.$suff
 			fi
 			
 			if test -e messenger.$suff; then
-				echo "    vers messenger.$suff"
+				echo "    towards messenger.$suff"
 				ln -s messenger.$suff gaim.$suff
 				ln -s messenger.$suff pidgin.$suff
 				ln -s messenger.$suff kopete.$suff
@@ -104,31 +104,31 @@ do
 				ln -s messenger.$suff emessene.$suff
 			fi
 			if test -e irc.$suff; then
-				echo "    vers irc.$suff"
+				echo "    towards irc.$suff"
 				ln -s irc.$suff xchat.$suff
 				ln -s irc.$suff konversation.$suff
 				ln -s irc.$suff kvirc.$suff
 			fi
 			
 			if test -e terminal.$suff; then
-				echo "    vers terminal.$suff"
+				echo "    towards terminal.$suff"
 				ln -s terminal.$suff gnome-terminal.$suff
 				ln -s terminal.$suff konsole.$suff
 				ln -s terminal.$suff xfce4-terminal.$suff
 			fi
 			if test -e packages.$suff; then
-				echo "    vers packages.$suff"
+				echo "    towards packages.$suff"
 				ln -s packages.$suff synaptic.$suff
 				ln -s packages.$suff adept.$suff
 				ln -s packages.$suff pacman-g2.$suff
 			fi
 			if test -e system-monitor.$suff; then
-				echo "    vers system-monitor.$suff"
+				echo "    towards system-monitor.$suff"
 				ln -s system-monitor.$suff ksysguard.$suff
 				ln -s system-monitor.$suff utilities-system-monitor.$suff
 			fi
 			if test -e calculator.$suff; then
-				echo "    vers calculator.$suff"
+				echo "    towards calculator.$suff"
 				ln -s calculator.$suff gnome-calculator.$suff
 				ln -s calculator.$suff crunch.$suff
 			fi
@@ -136,3 +136,5 @@ do
 		cd ../..
 	fi
 done;
+
+echo "all links have been generated."
