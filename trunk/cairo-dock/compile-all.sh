@@ -285,7 +285,7 @@ fi
 ### On compile un a un les plug-ins instables.
 for plugin in $liste_all
 do
-	if test "`grep $plugin $liste_stable`" = ""; then
+	if test "`echo $liste_stable | grep $plugin`" = ""; then
 		cd $plugin
 		if test -e Makefile.am -a "$plugin" != "$CAIRO_DOCK_EXCLUDE"; then
 			echo "************************************"
