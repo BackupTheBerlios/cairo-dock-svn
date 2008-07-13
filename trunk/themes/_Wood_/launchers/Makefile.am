@@ -41,6 +41,5 @@ launchers_DATA = \
 	k3b.svg\
 	brasero.svg
 	
-	
-	
-	
+EXTRA_DIST = $(launchers_DATA)
+

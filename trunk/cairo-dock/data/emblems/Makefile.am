@@ -13,4 +13,4 @@ emblems_DATA = \
 	warning.svg\
 	locked.svg
 	
-EXTRA_DIST = $(theme_DATA)
+EXTRA_DIST = $(emblems_DATA)

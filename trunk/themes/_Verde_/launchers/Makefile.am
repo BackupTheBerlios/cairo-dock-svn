@@ -61,3 +61,5 @@ launchers_DATA = \
 	gnome-terminal.svg\
 	konsole.svg\
 	xfce4-terminal.svg
+
+EXTRA_DIST = $(launchers_DATA)

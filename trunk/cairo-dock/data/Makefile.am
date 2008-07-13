@@ -30,3 +30,5 @@ essentialdata_DATA = \
 	icon-bubble.png\
 	icon-wave.png
 	
+EXTRA_DIST = $(essentialdata_DATA)
+

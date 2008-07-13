@@ -8,3 +8,5 @@ theme_DATA = \
 	background.jpg\
 	preview\
 	indicator-yellow-scroll.svg
+
+EXTRA_DIST = $(theme_DATA)

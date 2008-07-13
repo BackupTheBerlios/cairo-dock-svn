@@ -100,16 +100,16 @@ OBJEXT = o
 PACKAGE = cairo-dock-themes
 PACKAGE_BUGREPORT = Fabrice Rey (fabounet@users.berlios.de)
 PACKAGE_NAME = cairo-dock-themes
-PACKAGE_STRING = cairo-dock-themes 1.6.0
+PACKAGE_STRING = cairo-dock-themes 1.6.1
 PACKAGE_TARNAME = cairo-dock-themes
-PACKAGE_VERSION = 1.6.0
+PACKAGE_VERSION = 1.6.1
 PATH_SEPARATOR = :
 RANLIB = ranlib
 SED = /bin/sed
 SET_MAKE = 
 SHELL = /bin/bash
 STRIP = strip
-VERSION = 1.6.0
+VERSION = 1.6.1
 abs_builddir = /home/fab/CD/trunk/themes/_Brit_/launchers
 abs_srcdir = /home/fab/CD/trunk/themes/_Brit_/launchers
 abs_top_builddir = /home/fab/CD/trunk/themes
@@ -225,7 +225,7 @@ launchers_DATA = \
 	pidgin.svg\
 	rhythmbox.svg\
 	RSS.svg\
-	show-desktop\.svg\
+	show-desktop.svg\
 	Stacks-Empty.svg\
 	Stacks-Full.svg\
 	stacks.svg\
@@ -254,6 +254,7 @@ launchers_DATA = \
 	gnome-fs-client.svg\
 	show-desktop.svg
 
+EXTRA_DIST = $(launchers_DATA)
 all: all-am
 
 .SUFFIXES:

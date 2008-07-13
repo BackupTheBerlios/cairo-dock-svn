@@ -11,3 +11,5 @@ theme_DATA = \
 	indicator-spirale.svg\
 	drop-indicator-arrow.svg\
 	dialog-ok.svg
+
+EXTRA_DIST = $(theme_DATA)

@@ -8,3 +8,5 @@ theme_DATA = \
 	background-ubuntu.png\
 	separateur.svg\
 	preview
+
+EXTRA_DIST = $(theme_DATA)

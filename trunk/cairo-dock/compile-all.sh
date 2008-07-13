@@ -9,7 +9,7 @@ export CAIRO_DOCK_UNSTABLE="0"
 export CAIRO_DOCK_INSTALL="0"
 export CAIRO_DOCK_THEMES="0"
 export CAIRO_DOCK_DOC="0"
-export CAIRO_DOCK_EXCLUDE="template"
+export CAIRO_DOCK_EXCLUDE="template musicplayer"
 
 echo "this script will process : "
 while getopts "acCituhd:D" flag
@@ -202,7 +202,7 @@ fi
 ### On liste les plug-ins a compiler.
 cd $CAIRO_DOCK_DIR/plug-ins
 export liste_stable="`sed "/^#/d" Applets.stable`"
-export liste_all="`find . -maxdepth 1  -type d`"
+export liste_all="`find . -maxdepth 1  -type d | cut -d "/" -f 2 | /bin/grep -v '\.'`"
 echo "the following applets will be compiled :"
 if test "$CAIRO_DOCK_UNSTABLE" = "1"; then
 	echo "$liste_all"
@@ -216,7 +216,7 @@ echo "*************************************"
 ### on extrait les messages des plug-ins a traduire.
 if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
 	echo "extracting sentences to translate..."
-	for plugin in $liste
+	for plugin in $liste_all
 	do
 		if test -d $plugin; then
 			cd $plugin
@@ -234,6 +234,7 @@ if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
 					cd ..
 				fi
 			fi
+			cd ..
 		fi
 	done;
 fi
@@ -283,68 +284,69 @@ if test "$compil_ok" = "0"; then
 fi
 
 ### On compile un a un les plug-ins instables.
-for plugin in $liste_all
-do
-	if test "`echo $liste_stable | grep $plugin`" = ""; then
-		cd $plugin
-		if test -e Makefile.am -a "$plugin" != "$CAIRO_DOCK_EXCLUDE"; then
-			echo "************************************"
-			echo "* Compilation of module $plugin ... *"
-			echo "************************************"
-			if test "$CAIRO_DOCK_CLEAN" = "1"; then
-				rm -f config.* configure configure.lineno intltool-extract intltool-merge intltool-update libtool ltmain.sh Makefile.in Makefile aclocal.m4 missing stamp-h1 depcomp compile install-sh
-				rm -rf autom4te.cache src/.deps src/.libs src/Makefile src/Makefile.in po/Makefile po/Makefile.in po/*.gmo src/*.o src/*.lo src/*.la
-			fi
-			if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
-				if test -e po; then
-					if test -x $CAIRO_DOCK_EXTRACT_MESSAGE; then
-						rm -f data/messages
-						for c in data/*.conf
-						do
-							$CAIRO_DOCK_EXTRACT_MESSAGE $c
-						done;
+if test "$CAIRO_DOCK_UNSTABLE" = "1"; then
+	for plugin in $liste_all
+	do
+		if test "`echo $liste_stable | grep $plugin`" = ""; then
+			cd $plugin
+			if test -e Makefile.am -a "$plugin" != "$CAIRO_DOCK_EXCLUDE"; then
+				echo "************************************"
+				echo "* Compilation of module $plugin ... *"
+				echo "************************************"
+				if test "$CAIRO_DOCK_CLEAN" = "1"; then
+					rm -f config.* configure configure.lineno intltool-extract intltool-merge intltool-update libtool ltmain.sh Makefile.in Makefile aclocal.m4 missing stamp-h1 depcomp compile install-sh
+					rm -rf autom4te.cache src/.deps src/.libs src/Makefile src/Makefile.in po/Makefile po/Makefile.in po/*.gmo src/*.o src/*.lo src/*.la
+				fi
+				if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
+					if test -e po; then
+						if test -x $CAIRO_DOCK_EXTRACT_MESSAGE; then
+							rm -f data/messages
+							for c in data/*.conf
+							do
+								$CAIRO_DOCK_EXTRACT_MESSAGE $c
+							done;
+						fi
+						cd po
+						$CAIRO_DOCK_GEN_TRANSLATION
+						cd ..
 					fi
-					cd po
-					$CAIRO_DOCK_GEN_TRANSLATION
-					cd ..
+					echo  "* configuring ..."
+					/usr/bin/time -f "  time elapsed : %Us" autoreconf -isf > /dev/null && ./configure --prefix=$CAIRO_DOCK_PREFIX --enable-glitz > /dev/null
+					if test ! "$?" = "0"; then
+						echo "  Attention : an error has occured !"
+						echo "Error while configuring $plugin" >> $CAIRO_DOCK_DIR/compile.log
+					else
+						echo "  -> passed"
+					fi
 				fi
-				echo  "* configuring ..."
-				/usr/bin/time -f "  time elapsed : %Us" autoreconf -isf > /dev/null && ./configure --prefix=$CAIRO_DOCK_PREFIX --enable-glitz > /dev/null
-				if test ! "$?" = "0"; then
-					echo "  Attention : an error has occured !"
-					echo "Error while configuring $plugin" >> $CAIRO_DOCK_DIR/compile.log
-				else
-					echo "  -> passed"
+				if test "$CAIRO_DOCK_CLEAN" = "1" -a -e Makefile; then
+					make clean > /dev/null
 				fi
-			fi
-			if test "$CAIRO_DOCK_CLEAN" = "1" -a -e Makefile; then
-				make clean > /dev/null
-			fi
-			if test "$CAIRO_DOCK_COMPIL" = "1"; then
-				echo  "* compiling ..."
-				/usr/bin/time -f "  time elapsed : %Us" make > /dev/null
-				if test ! "$?" = "0"; then
-					echo "  Attention : an error has occured !"
-					echo "Error while compiling $plugin" >> $CAIRO_DOCK_DIR/compile.log
-				else
-					echo "  -> passed"
+				if test "$CAIRO_DOCK_COMPIL" = "1"; then
+					echo  "* compiling ..."
+					/usr/bin/time -f "  time elapsed : %Us" make > /dev/null
+					if test ! "$?" = "0"; then
+						echo "  Attention : an error has occured !"
+						echo "Error while compiling $plugin" >> $CAIRO_DOCK_DIR/compile.log
+					else
+						echo "  -> passed"
+					fi
 				fi
-			fi
-			if test "$CAIRO_DOCK_INSTALL" = "1"; then
-				echo "*  installation of module $plugin..."
-				/usr/bin/time -f "  time elapsed : %Us" sudo make install > /dev/null
-				if test ! "$?" = "0"; then
-					echo "  Attention : an error has occured !"
-					echo "Error while installing $plugin" >> $CAIRO_DOCK_DIR/compile.log
-				else
-					echo "  -> passed"
+				if test "$CAIRO_DOCK_INSTALL" = "1"; then
+					echo "*  installation of module $plugin..."
+					/usr/bin/time -f "  time elapsed : %Us" sudo make install > /dev/null
+					if test ! "$?" = "0"; then
+						echo "  Attention : an error has occured !"
+						echo "Error while installing $plugin" >> $CAIRO_DOCK_DIR/compile.log
+					else
+						echo "  -> passed"
+					fi
 				fi
 			fi
+			cd ..
 		fi
-		cd ..
-	fi
-done;
-
+	done;
+fi
 
 if test "$CAIRO_DOCK_INSTALL" = "1"; then
 	echo "check :"

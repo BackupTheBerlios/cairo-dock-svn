@@ -15,3 +15,5 @@ theme_DATA = \
 	fusion.svg\
 	ccsm.svg\
 	emerald.svg
+
+EXTRA_DIST = $(theme_DATA)

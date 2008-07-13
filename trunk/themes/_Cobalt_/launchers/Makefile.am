@@ -67,3 +67,5 @@ launchers_DATA = \
 	vlc.svg\
 	kopete.svg\
 	totem.svg
+
+EXTRA_DIST = $(launchers_DATA)

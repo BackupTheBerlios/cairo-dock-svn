@@ -127,3 +127,4 @@ launchers_DATA = \
 	electricity.png\
 	cairo-dock.png
 	
+EXTRA_DIST = $(launchers_DATA)

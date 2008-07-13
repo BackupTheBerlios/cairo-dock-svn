@@ -63,7 +63,7 @@ launchers_DATA = \
 	pidgin.svg\
 	rhythmbox.svg\
 	RSS.svg\
-	show-desktop\.svg\
+	show-desktop.svg\
 	Stacks-Empty.svg\
 	Stacks-Full.svg\
 	stacks.svg\
@@ -91,3 +91,5 @@ launchers_DATA = \
 	trashcan_full.svg\
 	gnome-fs-client.svg\
 	show-desktop.svg
+
+EXTRA_DIST = $(launchers_DATA)

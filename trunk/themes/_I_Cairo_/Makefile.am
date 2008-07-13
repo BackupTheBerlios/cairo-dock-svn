@@ -9,3 +9,5 @@ theme_DATA = \
 	background-cairo-dock.svg\
 	cairo-dock.conf\
 	separateur1.svg
+
+EXTRA_DIST = $(theme_DATA)

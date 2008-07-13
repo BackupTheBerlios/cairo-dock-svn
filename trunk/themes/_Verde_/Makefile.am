@@ -9,3 +9,5 @@ theme_DATA = \
 	separateur.svg\
 	preview\
 	drop-indicator-arrow.svg
+
+EXTRA_DIST = $(theme_DATA)

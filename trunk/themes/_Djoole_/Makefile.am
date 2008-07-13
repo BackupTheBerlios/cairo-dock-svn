@@ -10,3 +10,5 @@ theme_DATA = \
 	preview\
 	drop-indicator-lightning-arrow.svg\
 	indicator-ellipse.svg
+
+EXTRA_DIST = $(theme_DATA)

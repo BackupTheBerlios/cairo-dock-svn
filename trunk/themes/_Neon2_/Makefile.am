@@ -14,3 +14,5 @@ theme_DATA = \
 	callback-zone.png\
 	separator.png
 	
+EXTRA_DIST = $(theme_DATA)
+

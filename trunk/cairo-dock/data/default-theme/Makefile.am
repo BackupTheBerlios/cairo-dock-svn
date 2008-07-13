@@ -10,3 +10,6 @@ theme_DATA = \
 	preview\
 	drop-indicator-rain.svg\
 	indicator-evergreen.svg
+
+EXTRA_DIST = $(theme_DATA)
+

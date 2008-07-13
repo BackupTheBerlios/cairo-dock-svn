@@ -68,3 +68,5 @@ launchers_DATA = \
 	xfce4-terminal.svg\
 	xine.svg\
 	xmms.svg
+
+EXTRA_DIST = $(launchers_DATA)

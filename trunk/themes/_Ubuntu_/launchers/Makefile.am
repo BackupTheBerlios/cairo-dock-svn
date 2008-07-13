@@ -15,3 +15,5 @@ launchers_DATA = \
 	gnome-terminal.svg\
 	pidgin.svg\
 	synaptic.svg
+
+EXTRA_DIST = $(launchers_DATA)

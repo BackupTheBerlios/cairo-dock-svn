@@ -186,6 +186,7 @@ theme_DATA = \
 	cairo-dock-ok.svg\
 	drop-indicator-arrow.svg
 
+EXTRA_DIST = $(theme_DATA)
 all: all-recursive
 
 .SUFFIXES:

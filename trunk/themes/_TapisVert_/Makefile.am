@@ -11,3 +11,5 @@ theme_DATA = \
 	separateur3.svg\
 	separateur4.svg\
 	separateur.svg
+
+EXTRA_DIST = $(theme_DATA)

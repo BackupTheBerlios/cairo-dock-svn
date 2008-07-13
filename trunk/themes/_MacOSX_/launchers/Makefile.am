@@ -126,3 +126,5 @@ launchers_DATA = \
 	scribus.svg\
 	tomboy.svg\
 	xchat.svg
+
+EXTRA_DIST = $(launchers_DATA)

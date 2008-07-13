@@ -35,7 +35,7 @@ do
 done
 
 
-#\_____________ On nettoie tout et on fait une archive des sources.
+#\_____________ On nettoie un peu les sources.
 read -p "Use folder '$CAIRO_DOCK_DIR' ? [Y/n]" clean
 if test "$clean" = "n" -o  "$clean" = "N"; then
 	exit 0
@@ -71,39 +71,28 @@ if test -e debian; then
 	mv debian DEBIAN
 fi
 
+#\_____________ On compile de zero.
+cd $CAIRO_DOCK_DIR/cairo-dock
+if test "$FAST_COMPIL" = "0"; then
+	./compile-all.sh -a -C -i -t -d $CAIRO_DOCK_DIR
+fi
+
+#\_____________ On cree les archives.
 if test "$BUILD_TAR" = "1"; then
 	cd /tmp
 	echo "* building tarballs ..."
 	
 	cd $CAIRO_DOCK_DIR/cairo-dock
-	make dist-bzip2
-	mv cairo-dock*.tar.gz ..
+	make dist-bzip2 > /dev/null
+	mv cairo-dock*.tar.bz2 ..
 	
 	cd $CAIRO_DOCK_DIR/themes
-	make dist-bzip2
-	mv cairo-dock*.tar.gz ..
+	make dist-bzip2 > /dev/null
+	mv cairo-dock*.tar.bz2 ..
 	
 	cd $CAIRO_DOCK_DIR/plug-ins
-	make dist-bzip2
-	mv cairo-dock*.tar.gz ..
-#	tar cf `date +"cairo-dock-sources-%Y%m%d.tar"` $CAIRO_DOCK_DIR/cairo-dock $CAIRO_DOCK_DIR/plug-ins $CAIRO_DOCK_DIR/themes $CAIRO_DOCK_DIR/deb $CAIRO_DOCK_DIR/deb-plug-ins > /dev/null
-#	if test ! "$?" = "0"; then
-#		echo "  Attention : an error has occured !"
-#		echo "Error while building tarball" >> $CAIRO_DOCK_DIR/compile.log
-#	else
-#		echo "  -> passed"
-#	fi
-#	
-#	cd $CAIRO_DOCK_DIR
-#	mv `date +"/tmp/cairo-dock-sources-%Y%m%d.tar"` .
-#	bzip2 *.tar
-fi
-
-
-#\_____________ On compile de zero.
-cd $CAIRO_DOCK_DIR/cairo-dock
-if test "$FAST_COMPIL" = "0"; then
-	./compile-all.sh -a -C -i -t -d $CAIRO_DOCK_DIR
+	make dist-bzip2 > /dev/null
+	mv cairo-dock*.tar.bz2 ..
 fi
 
 #\_____________ On cree les paquets.

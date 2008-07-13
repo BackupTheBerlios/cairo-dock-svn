@@ -11,3 +11,9 @@ scriptdir = ${bindir}
 script_DATA = \
 	launch-cairo-dock-after-beryl.sh\
 	cairo-dock-update.sh
+
+EXTRA_DIST = \
+	${script_DATA}\
+	intltool-extract.in\
+	intltool-merge.in\
+	intltool-update.in

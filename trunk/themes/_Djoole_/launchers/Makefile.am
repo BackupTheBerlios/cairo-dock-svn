@@ -39,3 +39,4 @@ launchers_DATA = \
 	gnome-calculator.svg\
 	crunch.svg
 
+EXTRA_DIST = $(launchers_DATA)

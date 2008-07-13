@@ -7,3 +7,5 @@ theme_DATA = \
 	readme\
 	bg.gif\
 	preview
+
+EXTRA_DIST = $(theme_DATA)

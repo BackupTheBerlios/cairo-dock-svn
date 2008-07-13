@@ -12,3 +12,5 @@ theme_DATA = \
 	cairo-dock-cancel.svg\
 	cairo-dock-ok.svg\
 	drop-indicator-arrow.svg
+
+EXTRA_DIST = $(theme_DATA)
