@@ -80,7 +80,7 @@ msgstr ""
 
 #: ../src/cairo-dock-menu.c:233
 #, c-format
-msgid "You're about to remove this icon (%s) from the dock. Sure ?"
+msgid "You're about removing this icon (%s) from the dock. Sure ?"
 msgstr "Estas intentando eliminar el icono (%s) del dock, Estas Seguro ?"
 
 #: ../src/cairo-dock-menu.c:292
@@ -98,7 +98,7 @@ msgstr "Modificar Este Lanzador"
 #: ../src/cairo-dock-menu.c:715
 #, c-format
 msgid ""
-"You're about to delete this file\n"
+"You're about deleting this file\n"
 "  (%s)\n"
 "from your hard-disk. Sure ?"
 msgstr ""
@@ -131,7 +131,7 @@ msgstr ""
 
 #: ../src/cairo-dock-menu.c:803
 #, c-format
-msgid "You're about to remove this module (%s) from the dock. Sure ?"
+msgid "You're about removing this module (%s) from the dock. Sure ?"
 msgstr "Esta intentando eliminar el modulo (%s) del dock. Seguro ?"
 
 #: ../src/cairo-dock-menu.c:1050

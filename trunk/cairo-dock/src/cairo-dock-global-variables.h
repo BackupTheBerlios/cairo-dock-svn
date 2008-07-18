@@ -4,6 +4,7 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <cairo.h>
+#include <cairo-dock-struct.h>
 
 /// Pointeur sur le dock principal.
 extern CairoDock *g_pMainDock;

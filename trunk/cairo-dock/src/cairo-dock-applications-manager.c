@@ -829,7 +829,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 							cairo_dock_activate_temporary_auto_hide ();
 						}
 					}
-					g_print ("bureau change\n");
+					cd_message ("bureau change");
 					cairo_dock_notify (CAIRO_DOCK_DESKTOP_CHANGED, NULL);
 				}
 				else if (event.xproperty.atom == s_aNetNbDesktops)

@@ -48,6 +48,7 @@ extern gchar *g_cConfFile;
 extern gchar *g_cCurrentThemePath;
 extern gboolean g_bSameHorizontality;
 extern gboolean g_bPopUp;
+extern gboolean g_bAutoHideOnMaximized, g_bAutoHideOnFullScreen;
 
 static GHashTable *s_hDocksTable = NULL;  // table des docks existant.
 static int s_iSidPollScreenEdge = 0;
@@ -419,6 +420,7 @@ void cairo_dock_remove_root_dock_config (const gchar *cDockName)
 
 
 static gboolean s_bTemporaryAutoHide = FALSE;
+static gboolean s_bQuickHide = FALSE;
 
 static void _cairo_dock_quick_hide_one_root_dock (const gchar *cDockName, CairoDock *pDock, gpointer data)
 {
@@ -436,6 +438,15 @@ void cairo_dock_activate_temporary_auto_hide (void)
 	if (! s_bTemporaryAutoHide)
 	{
 		s_bTemporaryAutoHide = TRUE;
+		g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_quick_hide_one_root_dock, NULL);
+	}
+}
+void cairo_dock_quick_hide_all_docks (void)
+{
+	if (! s_bTemporaryAutoHide)
+	{
+		s_bTemporaryAutoHide = TRUE;
+		s_bQuickHide = TRUE;
 		g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_quick_hide_one_root_dock, NULL);
 	}
 }
@@ -477,6 +488,16 @@ void cairo_dock_deactivate_temporary_auto_hide (void)
 		s_bTemporaryAutoHide = FALSE;
 		g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_stop_quick_hide_one_root_dock, NULL);
 	}
+}
+void cairo_dock_stop_quick_hide (void)
+{
+	cd_message ("");
+	if (s_bTemporaryAutoHide && s_bQuickHide && cairo_dock_search_window_on_our_way (g_bAutoHideOnMaximized, g_bAutoHideOnFullScreen) == NULL)
+	{
+		s_bTemporaryAutoHide = FALSE;
+		g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_stop_quick_hide_one_root_dock, NULL);
+	}
+	s_bQuickHide = FALSE;
 }
 
 void cairo_dock_allow_entrance (CairoDock *pDock)

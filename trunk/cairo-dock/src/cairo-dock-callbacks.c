@@ -692,8 +692,7 @@ gboolean on_enter_notify2 (GtkWidget* pWidget,
 	}
 	pDock->bInside = TRUE;
 	
-	if (cairo_dock_quick_hide_is_activated () && ! g_bAutoHideOnFullScreen && ! g_bAutoHideOnMaximized)  // cachage rapide active par l'utilisateur, different du cachage rapide du aux fenetres.
-		cairo_dock_deactivate_temporary_auto_hide ();
+	cairo_dock_stop_quick_hide ();
 
 	if (s_pIconClicked != NULL)  // on pourrait le faire a chaque motion aussi.
 	{

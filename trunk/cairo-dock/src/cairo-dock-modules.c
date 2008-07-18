@@ -300,21 +300,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 			}
 			else
 			{
-				/*CairoDock *pMyDock = NULL;
-				Icon *pIcon = NULL;
-				if (CAIRO_DOCK_IS_DOCK (pModule->pContainer))
-				{
-					pIcon = cairo_dock_find_icon_from_module (pModule, pModule->pContainer);
-					pMyDock = CAIRO_DOCK (pModule->pContainer);
-					pIcon->fWidth /= pMyDock->fRatio;
-					pIcon->fHeight /= pMyDock->fRatio;
-				}*/
 				cairo_dock_reload_module (pModule, FALSE);
-				/*if (pMyDock != NULL && pIcon != NULL)
-				{
-					pIcon->fWidth *= pMyDock->fRatio;
-					pIcon->fHeight *= pMyDock->fRatio;
-				}*/
 			}
 		}
 		i ++;

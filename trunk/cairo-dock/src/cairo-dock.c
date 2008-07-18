@@ -306,7 +306,7 @@ int main (int argc, char** argv)
 	GError *erreur = NULL;
 	
 	//\___________________ On recupere quelques options.
-	gboolean bSafeMode = FALSE, bMaintenance = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE;
+	gboolean bSafeMode = FALSE, bMaintenance = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE, bTesting = FALSE;
 	gchar *cEnvironment = NULL, *cUserDefinedDataDir = NULL, *cVerbosity = 0, *cUserDefinedModuleDir = NULL;
 	GOptionEntry TableDesOptions[] =
 	{
@@ -364,6 +364,9 @@ int main (int argc, char** argv)
 		{"fake-transparency", 'F', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&g_bUseFakeTransparency,
 			"emulate composition with fake transparency. Only use this if you don't run a compositor like Compiz, xcompmgr, etc and have a black background around your dock.", NULL},
+		{"testing", 'T', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&bTesting,
+			"for testing purpose only. The crash manager will not be started.", NULL},
 		{NULL}
 	};
 
@@ -519,7 +522,8 @@ int main (int argc, char** argv)
 	cairo_dock_register_notification (CAIRO_DOCK_REMOVE_ICON, (CairoDockNotificationFunc) cairo_dock_notification_remove_icon, CAIRO_DOCK_RUN_AFTER);
 	
 	//\___________________ On initialise la gestion des crash.
-	_cairo_dock_set_signal_interception ();
+	if (! bTesting)
+		_cairo_dock_set_signal_interception ();
 	
 	//\___________________ On charge le dernier theme ou on demande a l'utilisateur d'en choisir un.
 	g_cConfFile = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
@@ -670,7 +674,8 @@ int main (int argc, char** argv)
 		cd_message (" ==> %.2f\n", fAnswer);*/
 	}
 	
-	g_timeout_add_seconds (5, _cairo_dock_successful_launch, NULL);
+	if (! bTesting)
+		g_timeout_add_seconds (5, _cairo_dock_successful_launch, NULL);
 	
 	gtk_main ();
 

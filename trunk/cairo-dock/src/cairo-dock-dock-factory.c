@@ -929,12 +929,62 @@ void cairo_dock_allow_widget_to_receive_data (GtkWidget *pWidget, GCallback pCal
 		data);
 }
 
+gboolean cairo_dock_string_is_adress (const gchar *cString)
+{
+	gchar *protocole = g_strstr_len (cString, -1, "://");
+	if (protocole == NULL || protocole == cString)
+		return FALSE;
+	gchar *str = cString;
+	while (*str == ' ')
+		str ++;
+	while (str < protocole)
+	{
+		if (! g_ascii_isalnum (*str))
+			return FALSE;
+		str ++;
+	}
+	
+	return TRUE;
+}
 void cairo_dock_notify_drop_data (gchar *cReceivedData, Icon *pPointedIcon, double fOrder, CairoContainer *pContainer)
 {
 	g_return_if_fail (cReceivedData != NULL);
 	gpointer data[4] = {NULL, pPointedIcon, &fOrder, pContainer};
-	gchar *str;
-	do
+	
+	gchar **cStringList = g_strsplit (cReceivedData, "\n", -1);
+	GString *sArg = g_string_new ("");
+	int i=0, j;
+	while (cStringList[i] != NULL)
+	{
+		g_string_assign (sArg, cStringList[i]);
+		
+		if (! cairo_dock_string_is_adress (cStringList[i]))
+		{
+			j = i + 1;
+			while (cStringList[j] != NULL)
+			{
+				if (cairo_dock_string_is_adress (cStringList[j]))
+					break ;
+				g_string_append_printf (sArg, "\n%s", cStringList[j]);
+				j ++;
+			}
+			i = j;
+		}
+		else
+		{
+			if (sArg->str[sArg->len-1] == '\r')
+				sArg->str[sArg->len-1] = '\0';
+			i ++;
+		}
+		
+		data[0] = sArg->str;
+		cd_debug (" notification de drop '%s'", data[0]);
+		cairo_dock_notify (CAIRO_DOCK_DROP_DATA, data);
+	}
+	
+	g_strfreev (cStringList);
+	g_string_free (sArg, TRUE);
+	/**do
 	{
 		data[0] = cReceivedData;
 		if (*cReceivedData == '\0')
@@ -952,5 +1002,5 @@ void cairo_dock_notify_drop_data (gchar *cReceivedData, Icon *pPointedIcon, doub
 		cd_debug (" notification de drop '%s'", data[0]);
 		
 		cairo_dock_notify (CAIRO_DOCK_DROP_DATA, data);
-	} while (str != NULL);
+	} while (str != NULL);*/
 }

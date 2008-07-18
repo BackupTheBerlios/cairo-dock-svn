@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-07-13 23:48+0200\n"
+"POT-Creation-Date: 2008-07-17 02:11+0200\n"
 "PO-Revision-Date: 2008-05-30 13:35-0500\n"
 "Last-Translator: biAji <biaji.cn@gmail.com>\n"
 "Language-Team: \n"
@@ -79,7 +79,7 @@ msgstr ""
 
 #: ../src/cairo-dock-menu.c:233
 #, c-format
-msgid "You're about to remove this icon (%s) from the dock. Sure ?"
+msgid "You're about removing this icon (%s) from the dock. Sure ?"
 msgstr "您将要从dock上移除图标 (%s)，确定么？"
 
 #: ../src/cairo-dock-menu.c:292
@@ -97,7 +97,7 @@ msgstr "编辑此启动器"
 #: ../src/cairo-dock-menu.c:716
 #, c-format
 msgid ""
-"You're about to delete this file\n"
+"You're about deleting this file\n"
 "  (%s)\n"
 "from your hard-disk. Sure ?"
 msgstr "您将从磁盘中删除文件(%s)，确认么？"
@@ -127,7 +127,7 @@ msgstr ""
 
 #: ../src/cairo-dock-menu.c:804
 #, c-format
-msgid "You're about to remove this module (%s) from the dock. Sure ?"
+msgid "You're about removing this module (%s) from the dock. Sure ?"
 msgstr "您将要从dock上移除模块(%s)，确定么？"
 
 #: ../src/cairo-dock-menu.c:1051
@@ -326,7 +326,7 @@ msgstr "总在下面"
 msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr "设置Compiz中的行为成：(name=cairo-dock-desklet & type=utility)"
 
-#: ../src/cairo-dock-modules.c:782
+#: ../src/cairo-dock-modules.c:768
 #, c-format
 msgid "Configuration of %s"
 msgstr "%s的配置"
@@ -2014,7 +2014,7 @@ msgid ""
 " - Once again a new view : Curve !\n"
 " - A long time waited applet : the desktop Switcher.\n"
 " - A very complete theme : Brit\n"
-" - Translation in italian and partially in chinese.\n"
+" - Translation in italian and chinese.\n"
 " - And we are still hoping someone would help us writing a kde-integration "
 "plug-in ^_^"
 msgstr ""

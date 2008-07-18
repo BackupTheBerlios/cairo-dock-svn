@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4.5\n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-07-13 23:48+0200\n"
+"POT-Creation-Date: 2008-07-17 02:11+0200\n"
 "PO-Revision-Date: 2008-06-24 14:23+0200\n"
 "Last-Translator: Mattia Tavernini <maathias@interfree.it>\n"
 "Language-Team: Cairo-Dock <po@cairo-dock.org>\n"
@@ -84,7 +84,7 @@ msgstr ""
 
 #: ../src/cairo-dock-menu.c:233
 #, c-format
-msgid "You're about to remove this icon (%s) from the dock. Sure ?"
+msgid "You're about removing this icon (%s) from the dock. Sure ?"
 msgstr "State rimuovendo questa icona (%s) dalla barra. Sicuri ?"
 
 #: ../src/cairo-dock-menu.c:292
@@ -102,7 +102,7 @@ msgstr "Modificare questo lanciatore"
 #: ../src/cairo-dock-menu.c:716
 #, c-format
 msgid ""
-"You're about to delete this file\n"
+"You're about deleting this file\n"
 "  (%s)\n"
 "from your hard-disk. Sure ?"
 msgstr ""
@@ -135,7 +135,7 @@ msgstr ""
 
 #: ../src/cairo-dock-menu.c:804
 #, c-format
-msgid "You're about to remove this module (%s) from the dock. Sure ?"
+msgid "You're about removing this module (%s) from the dock. Sure ?"
 msgstr "State per rimuovere questo modulo (%s) dalla barra. Sicuri ?"
 
 #: ../src/cairo-dock-menu.c:1051
@@ -332,7 +332,7 @@ msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr ""
 "Regolate il comportamento di Compiz in : (name=cairo-dock & type=utility)"
 
-#: ../src/cairo-dock-modules.c:782
+#: ../src/cairo-dock-modules.c:768
 #, c-format
 msgid "Configuration of %s"
 msgstr "Configurazione di %s"
@@ -2103,7 +2103,7 @@ msgid ""
 " - Once again a new view : Curve !\n"
 " - A long time waited applet : the desktop Switcher.\n"
 " - A very complete theme : Brit\n"
-" - Translation in italian and partially in chinese.\n"
+" - Translation in italian and chinese.\n"
 " - And we are still hoping someone would help us writing a kde-integration "
 "plug-in ^_^"
 msgstr ""

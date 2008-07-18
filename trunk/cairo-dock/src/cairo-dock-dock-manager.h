@@ -126,7 +126,9 @@ void cairo_dock_remove_root_dock_config (const gchar *cDockName);
 
 
 void cairo_dock_activate_temporary_auto_hide (void);
+void cairo_dock_quick_hide_all_docks (void);
 void cairo_dock_deactivate_temporary_auto_hide (void);
+void cairo_dock_stop_quick_hide (void);
 void cairo_dock_allow_entrance (CairoDock *pDock);
 void cairo_dock_disable_entrance (CairoDock *pDock);
 gboolean cairo_dock_entrance_is_allowed (CairoDock *pDock);

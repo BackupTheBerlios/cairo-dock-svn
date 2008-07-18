@@ -140,7 +140,7 @@ static void _cairo_dock_about (GtkMenuItem *menu_item, gpointer *data)
 <b>Applets :</b>\n  Fabounet\n  Necropotame\n  Ctaf\n  ChAnGFu\n  Tofe\n  Paradoxxx_Zero\n\
 <b>Patchs :</b>\n  Ctaf\n  M.Tasaka\n  Necropotame\n  Robrob\n  Smidgey\n  Tshirtman\n\
 <b>Themes :</b>\n  Fabounet\n  Chilperik\n  Djoole\n  Glattering\n  Vilraleur\n  Lord Northam\n  Paradoxxx_Zero\n  Coz\n\
-<b>Translations :</b>\n  Fabounet\n  Ppmt \n  Jiro Kawada\n  BiAji");
+<b>Translations :</b>\n  Fabounet\n  Ppmt \n  Jiro Kawada\n  BiAji\n  Maathias");
 	
 	_cairo_dock_add_about_page (pNoteBook,
 		_("Support"),
@@ -175,12 +175,14 @@ which opera > /dev/null && opera %s ",
 
 static void _cairo_dock_check_for_updates (GtkMenuItem *menu_item, gpointer *data)
 {
+	g_print ("launching %s...\n", CAIRO_DOCK_FILE_HOST_URL);
 	_launch_url (CAIRO_DOCK_FILE_HOST_URL);
 	//system ("xterm -e cairo-dock-update.sh &");
 }
 
 static void _cairo_dock_help (GtkMenuItem *menu_item, gpointer *data)
 {
+	g_print ("launching %s...\n", CAIRO_DOCK_HELP_URL);
 	_launch_url (CAIRO_DOCK_HELP_URL);
 }
 
@@ -189,7 +191,7 @@ static void _cairo_dock_quick_hide (GtkMenuItem *menu_item, gpointer *data)
 	CairoDock *pDock = data[1];
 	//g_print ("%s ()\n", __func__);
 	pDock->bMenuVisible = FALSE;
-	cairo_dock_activate_temporary_auto_hide ();
+	cairo_dock_quick_hide_all_docks ();
 }
 
 static void _cairo_dock_quit (GtkMenuItem *menu_item, gpointer *data)
@@ -230,7 +232,7 @@ static void _cairo_dock_remove_launcher (GtkMenuItem *menu_item, gpointer *data)
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
 
-	gchar *question = g_strdup_printf (_("You're about to remove this icon (%s) from the dock. Sure ?"), icon->acName);
+	gchar *question = g_strdup_printf (_("You're about removing this icon (%s) from the dock. Sure ?"), icon->acName);
 	int answer = cairo_dock_ask_question_and_wait (question, icon, CAIRO_CONTAINER (pDock));
 	g_free (question);
 	if (answer == GTK_RESPONSE_YES)
@@ -713,7 +715,7 @@ static void _cairo_dock_delete_file (GtkMenuItem *menu_item, gpointer *data)
 	CairoDock *pDock = data[1];
 	cd_message ("%s (%s)\n", __func__, icon->acName);
 
-	gchar *question = g_strdup_printf (_("You're about to delete this file\n  (%s)\nfrom your hard-disk. Sure ?"), icon->acCommand);
+	gchar *question = g_strdup_printf (_("You're about deleting this file\n  (%s)\nfrom your hard-disk. Sure ?"), icon->acCommand);
 	int answer = cairo_dock_ask_question_and_wait (question, icon, CAIRO_CONTAINER (pDock));
 	g_free (question);
 	if (answer == GTK_RESPONSE_YES)
@@ -801,7 +803,7 @@ static void cairo_dock_remove_module (GtkMenuItem *menu_item, gpointer *data)
 	if (CAIRO_DOCK_IS_DESKLET (pContainer))
 		icon = (CAIRO_DESKLET (pContainer))->pIcon;  // l'icone cliquee du desklet n'est pas forcement celle qui contient le module !
 
-	gchar *question = g_strdup_printf (_("You're about to remove this module (%s) from the dock. Sure ?"), icon->pModule->pVisitCard->cModuleName);
+	gchar *question = g_strdup_printf (_("You're about removing this module (%s) from the dock. Sure ?"), icon->pModule->pVisitCard->cModuleName);
 	int answer = cairo_dock_ask_question_and_wait (question, icon, CAIRO_CONTAINER (pContainer));
 	if (answer == GTK_RESPONSE_YES)
 	{

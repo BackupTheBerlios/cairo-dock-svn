@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4.5\n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-07-13 23:48+0200\n"
+"POT-Creation-Date: 2008-07-17 02:11+0200\n"
 "PO-Revision-Date: 2008-06-18 20:32+0900\n"
 "Last-Translator: jiro kawada <jiro.kawada@gmail.com>\n"
 "Language-Team: Japanese <LL@li.org>\n"
@@ -84,7 +84,7 @@ msgstr ""
 
 #: ../src/cairo-dock-menu.c:233
 #, c-format
-msgid "You're about to remove this icon (%s) from the dock. Sure ?"
+msgid "You're about removing this icon (%s) from the dock. Sure ?"
 msgstr "ドックからこのアイコン(%s)を削除しようとしています。よろしいですか？"
 
 #: ../src/cairo-dock-menu.c:292
@@ -102,7 +102,7 @@ msgstr "このランチャーを編集"
 #: ../src/cairo-dock-menu.c:716
 #, c-format
 msgid ""
-"You're about to delete this file\n"
+"You're about deleting this file\n"
 "  (%s)\n"
 "from your hard-disk. Sure ?"
 msgstr ""
@@ -135,7 +135,7 @@ msgstr ""
 
 #: ../src/cairo-dock-menu.c:804
 #, c-format
-msgid "You're about to remove this module (%s) from the dock. Sure ?"
+msgid "You're about removing this module (%s) from the dock. Sure ?"
 msgstr "このモジュール(%s)をドックから削除しようとしています。よろしいですか？"
 
 #: ../src/cairo-dock-menu.c:1051
@@ -331,7 +331,7 @@ msgstr "常に最後面に表示"
 msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr "Compiz の動作設定での指定法: (name=cairo-dock & type=utility)"
 
-#: ../src/cairo-dock-modules.c:782
+#: ../src/cairo-dock-modules.c:768
 #, c-format
 msgid "Configuration of %s"
 msgstr "%s の設定"
@@ -2061,7 +2061,7 @@ msgid ""
 " - Once again a new view : Curve !\n"
 " - A long time waited applet : the desktop Switcher.\n"
 " - A very complete theme : Brit\n"
-" - Translation in italian and partially in chinese.\n"
+" - Translation in italian and chinese.\n"
 " - And we are still hoping someone would help us writing a kde-integration "
 "plug-in ^_^"
 msgstr ""

@@ -86,6 +86,13 @@ int cairo_dock_compare_icons_order (Icon *icon1, Icon *icon2);
 *@return -1 si icone1 < icone2, 1 si icone1 > icone2, 0 si icone1 = icone2 (au sens de la relation d'ordre).
 */
 int cairo_dock_compare_icons_name (Icon *icon1, Icon *icon2);
+/**
+*Compare 2 icones grace a la relation d'ordre sur l'extension des URIs (ordre alphabetique compte en passant en minuscules).
+*@param icon1 une icone.
+*@param icon2 une autre icone.
+*@return -1 si icone1 < icone2, 1 si icone1 > icone2, 0 si icone1 = icone2 (au sens de la relation d'ordre).
+*/
+int cairo_dock_compare_icons_extension (Icon *icon1, Icon *icon2);
 
 /**
 *Trie une liste en se basant sur la relation d'ordre sur le couple (position du type , ordre).

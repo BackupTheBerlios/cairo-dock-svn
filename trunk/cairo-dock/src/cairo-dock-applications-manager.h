@@ -41,6 +41,7 @@ gboolean cairo_dock_window_is_on_current_desktop (int Xid);
 
 
 void cairo_dock_animate_icon_on_active (Icon *icon, CairoDock *pParentDock);
+Icon * cairo_dock_search_window_on_our_way (gboolean bMaximizedWindow, gboolean bFullScreenWindow);
 gboolean cairo_dock_unstack_Xevents (CairoDock *pDock);
 void cairo_dock_set_window_mask (Window Xid, long iMask);
 Window *cairo_dock_get_windows_list (gulong *iNbWindows);

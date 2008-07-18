@@ -55,12 +55,11 @@ fi
 cd $CAIRO_DOCK_DIR/themes
 ./cairo-dock-finalize-theme.sh
 
-cd $CAIRO_DOCK_DIR/cairo-dock
-./compile-all.sh -ct -d $CAIRO_DOCK_DIR
-
 cd $CAIRO_DOCK_DIR
 sudo rm -rf deb/usr
 sudo rm -rf deb-plug-ins/usr
+mv deb/.svn .svn-deb
+mv deb-plug-ins/.svn .svn-deb-plug-ins
 
 cd $CAIRO_DOCK_DIR/deb
 if test -e debian; then
@@ -72,38 +71,42 @@ if test -e debian; then
 fi
 
 #\_____________ On compile de zero.
-cd $CAIRO_DOCK_DIR/cairo-dock
 if test "$FAST_COMPIL" = "0"; then
-	./compile-all.sh -a -C -i -t -d $CAIRO_DOCK_DIR
+	cd $CAIRO_DOCK_DIR/cairo-dock
+	./compile-all.sh -a -c -C -i -t -d $CAIRO_DOCK_DIR
 fi
 
 #\_____________ On cree les archives.
 if test "$BUILD_TAR" = "1"; then
-	cd /tmp
-	echo "* building tarballs ..."
-	
+	echo "***************************"
+	echo "* Generating tarballs ... *"
+	echo "***************************"
+	echo ""
+	echo "building dock tarball ..."
 	cd $CAIRO_DOCK_DIR/cairo-dock
 	make dist-bzip2 > /dev/null
 	mv cairo-dock*.tar.bz2 ..
 	
+	echo "building themes tarball ..."
 	cd $CAIRO_DOCK_DIR/themes
 	make dist-bzip2 > /dev/null
 	mv cairo-dock*.tar.bz2 ..
 	
+	echo "building plug-ins tarball ..."
 	cd $CAIRO_DOCK_DIR/plug-ins
 	make dist-bzip2 > /dev/null
 	mv cairo-dock*.tar.bz2 ..
 fi
 
 #\_____________ On cree les paquets.
+echo "***************************"
+echo "* Generating packages ... *"
+echo "***************************"
+echo ""
 cd $CAIRO_DOCK_DIR
 sudo chmod -R 755 deb deb-plug-ins
-mv deb/.svn ./.svn-deb
-mv deb-plug-ins/.svn ./.svn-deb-plug-ins
-mv deb/DEBIAN/.svn ./.svn-deb-DEIAN
-mv deb-plug-ins/DEBIAN/.svn ./.svn-deb-plug-ins-DEIAN
 
-
+echo "building dock package ..."
 cd $CAIRO_DOCK_DIR/deb
 sudo mkdir usr
 sudo mkdir usr/bin
@@ -128,10 +131,9 @@ cd $CAIRO_DOCK_DIR
 sed "s/^Version:.*/Version: "`cairo-dock --version`"/g" deb/DEBIAN/control > tmp
 mv tmp deb/DEBIAN/control
 dpkg -b deb "cairo-dock_v`cairo-dock --version`_`uname --machine`.deb"
-mv .svn-deb deb/.svn
-mv .svn-deb-DEIAN deb/DEBIAN/.svn
 
 
+echo "building plug-ins package ..."
 cd $CAIRO_DOCK_DIR/deb-plug-ins
 sudo mkdir -p usr/share/cairo-dock
 for lang in `cat ../cairo-dock/po/LINGUAS`; do
@@ -146,8 +148,9 @@ cd $CAIRO_DOCK_DIR
 sed "s/^Version:.*/Version: "`cairo-dock --version`"/g" deb-plug-ins/DEBIAN/control > tmp
 mv tmp deb-plug-ins/DEBIAN/control
 dpkg -b deb-plug-ins "cairo-dock-plug-ins_v`cairo-dock --version`_`uname --machine`.deb"
+
+mv .svn-deb deb/.svn
 mv .svn-deb-plug-ins deb-plug-ins/.svn
-mv .svn-deb-plug-ins-DEIAN deb-plug-ins/DEBIAN/.svn
 
 
 #\_____________ On liste les sommes de controle des fichiers.

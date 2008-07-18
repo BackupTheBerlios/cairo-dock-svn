@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4.5\n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-07-12 02:04+0200\n"
+"POT-Creation-Date: 2008-07-17 02:11+0200\n"
 "PO-Revision-Date: 2008-05-23 08:33+0100\n"
 "Last-Translator: Yann SLADEK <mav@cairo-dock.org>\n"
 "Language-Team: Cairo-Dock <po@cairo-dock.org>\n"
@@ -87,7 +87,7 @@ msgstr ""
 
 #: ../src/cairo-dock-menu.c:233
 #, c-format
-msgid "You're about to remove this icon (%s) from the dock. Sure ?"
+msgid "You're about removing this icon (%s) from the dock. Sure ?"
 msgstr "Vous êtes sur le point d'enlever cette icône (%s) du dock. Sûr ?"
 
 #: ../src/cairo-dock-menu.c:292
@@ -105,7 +105,7 @@ msgstr "Modifier ce lanceur"
 #: ../src/cairo-dock-menu.c:716
 #, c-format
 msgid ""
-"You're about to delete this file\n"
+"You're about deleting this file\n"
 "  (%s)\n"
 "from your hard-disk. Sure ?"
 msgstr ""
@@ -138,7 +138,7 @@ msgstr ""
 
 #: ../src/cairo-dock-menu.c:804
 #, c-format
-msgid "You're about to remove this module (%s) from the dock. Sure ?"
+msgid "You're about removing this module (%s) from the dock. Sure ?"
 msgstr "Vous êtes sur le point d'enlever ce module (%s) du dock. Sûr ?"
 
 #: ../src/cairo-dock-menu.c:1051
@@ -332,7 +332,7 @@ msgstr "Toujours derrière"
 msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr "Réglez le comportement de Compiz à : (name=cairo-dock & type=utility)"
 
-#: ../src/cairo-dock-modules.c:782
+#: ../src/cairo-dock-modules.c:768
 #, c-format
 msgid "Configuration of %s"
 msgstr "Configuration de %s"
@@ -2172,7 +2172,7 @@ msgid ""
 " - Once again a new view : Curve !\n"
 " - A long time waited applet : the desktop Switcher.\n"
 " - A very complete theme : Brit\n"
-" - Translation in italian and partially in chinese.\n"
+" - Translation in italian and chinese.\n"
 " - And we are still hoping someone would help us writing a kde-integration "
 "plug-in ^_^"
 msgstr ""
@@ -2180,6 +2180,6 @@ msgstr ""
 " - Encore une nouvelle vue : Curve !\n"
 " - Une applet longtemps attendue : le desktop Switcher.\n"
 " - Un thème très complet : Brit\n"
-" - Traduction en italien et partiellement en chinois.\n"
+" - Traduction en italien et en chinois.\n"
 " - Et nous espérons toujours de l'aide pour écrire un plug-in kde-"
 "integration ^_^"

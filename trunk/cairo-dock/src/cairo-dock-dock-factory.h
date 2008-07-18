@@ -143,6 +143,11 @@ void cairo_dock_prevent_dock_from_out_of_screen (CairoDock *pDock);
 * @param data donnees passees en entree de la callback.
 */
 void cairo_dock_allow_widget_to_receive_data (GtkWidget *pWidget, GCallback pCallBack, gpointer data);
+/**
+* Dis si une chaine est une addresse (file://xxx, http://xxx, ftp://xxx, etc).
+* @param cString une chaine de caracteres.
+*/
+gboolean cairo_dock_string_is_adress (const gchar *cString);
 
 void cairo_dock_notify_drop_data (gchar *cReceivedData, Icon *pPointedIcon, double fOrder, CairoContainer *pContainer);
 

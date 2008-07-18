@@ -149,6 +149,29 @@ int cairo_dock_compare_icons_name (Icon *icon1, Icon *icon2)
 	return iOrder;
 }
 
+int cairo_dock_compare_icons_extension (Icon *icon1, Icon *icon2)
+{
+	if (icon1->cBaseURI == NULL)
+		return -1;
+	if (icon2->cBaseURI == NULL)
+		return 1;
+	
+	gchar *ext1 = strrchr (icon1->cBaseURI, '.');
+	gchar *ext2 = strrchr (icon2->cBaseURI, '.');
+	if (ext1 == NULL)
+		return -1;
+	if (ext2 == NULL)
+		return 1;
+	
+	ext1 = g_ascii_strdown (ext1+1, -1);
+	ext2 = g_ascii_strdown (ext2+1, -1);
+	
+	int iOrder = strcmp (ext1, ext2);
+	g_free (ext1);
+	g_free (ext2);
+	return iOrder;
+}
+
 GList *cairo_dock_sort_icons_by_order (GList *pIconList)
 {
 	return g_list_sort (pIconList, (GCompareFunc) cairo_dock_compare_icons_order);
