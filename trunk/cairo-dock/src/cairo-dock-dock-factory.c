@@ -684,7 +684,7 @@ void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et fFlatD
 	cairo_dock_update_background_decorations_if_necessary (pDock, pDock->iDecorationsWidth, pDock->iDecorationsHeight);
 }
 
-void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpdateSize, gboolean bAnimated, gboolean bApplyRatio, gboolean bInsertSeparator)
+void cairo_dock_insert_icon_in_dock_full (Icon *icon, CairoDock *pDock, gboolean bUpdateSize, gboolean bAnimated, gboolean bApplyRatio, gboolean bInsertSeparator, GCompareFunc pCompareFunc)
 {
 	g_return_if_fail (icon != NULL);
 	if (g_list_find (pDock->icons, icon) != NULL)  // elle est deja dans ce dock.
@@ -714,10 +714,12 @@ void cairo_dock_insert_icon_in_dock (Icon *icon, CairoDock *pDock, gboolean bUpd
 		else
 			icon->fOrder = 1;
 	}
-
+	
+	if (pCompareFunc == NULL)
+		pCompareFunc = (GCompareFunc) cairo_dock_compare_icons_order;
 	pDock->icons = g_list_insert_sorted (pDock->icons,
 		icon,
-		(GCompareFunc) cairo_dock_compare_icons_order);
+		pCompareFunc);
 
 	if (bApplyRatio)
 	{
@@ -934,7 +936,7 @@ gboolean cairo_dock_string_is_adress (const gchar *cString)
 	gchar *protocole = g_strstr_len (cString, -1, "://");
 	if (protocole == NULL || protocole == cString)
 		return FALSE;
-	gchar *str = cString;
+	const gchar *str = cString;
 	while (*str == ' ')
 		str ++;
 	while (str < protocole)

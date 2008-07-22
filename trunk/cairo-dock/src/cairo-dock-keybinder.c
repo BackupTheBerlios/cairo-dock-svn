@@ -372,6 +372,7 @@ cd_keybinder_get_current_event_time (void)
 
 gboolean cairo_dock_simulate_key_sequence (gchar *cKeyString)  // the idea was taken from xdo.
 {
+	#ifdef HAVE_XEXTEND
 	g_return_val_if_fail (cKeyString != NULL, FALSE);
 	cd_message ("%s (%s)", __func__, cKeyString);
 	
@@ -396,6 +397,9 @@ gboolean cairo_dock_simulate_key_sequence (gchar *cKeyString)  // the idea was t
 	XFlush (dpy);
 	
 	return TRUE;
+	#else
+	return FALSE;
+	#endif
 }
 
 

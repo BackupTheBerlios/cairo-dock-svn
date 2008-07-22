@@ -17,7 +17,7 @@ void cairo_dock_preload_module_from_directory (gchar *cModuleDirPath, GHashTable
 
 
 
-void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock *pDock, double fTime);
+void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, double fTime);
 
 void cairo_dock_deactivate_old_modules (double fTime);
 
@@ -26,7 +26,7 @@ void cairo_dock_free_module (CairoDockModule *module);
 
 GKeyFile *cairo_dock_pre_read_module_config (CairoDockModule *pModule, CairoDockMinimalAppletConfig *pMinimalConfig);
 
-Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GError **erreur);
+Icon * cairo_dock_activate_module (CairoDockModule *module, GError **erreur);
 
 void cairo_dock_deactivate_module (CairoDockModule *module);
 

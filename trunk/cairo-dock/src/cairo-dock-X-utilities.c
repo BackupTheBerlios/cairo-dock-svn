@@ -16,8 +16,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
+#ifdef HAVE_XEXTEND
 #include <X11/extensions/Xcomposite.h>
 //#include <X11/extensions/Xdamage.h>
+#endif
 
 #include "cairo-dock-applications-manager.h"
 #include "cairo-dock-application-factory.h"
@@ -608,6 +610,7 @@ void cairo_dock_set_nb_desktops (gulong iNbDesktops)
 
 gboolean cairo_dock_support_X_extension (void)
 {
+#ifdef HAVE_XEXTEND
 	int event_base, error_base;
 	if (XCompositeQueryExtension (s_XDisplay, &event_base, &error_base))  // on regarde si le serveur X supporte l'extension.
 	{
@@ -621,13 +624,14 @@ gboolean cairo_dock_support_X_extension (void)
 	}
 	else
 		return FALSE;
-	
 	/*int iDamageError=0;
 	if (! XDamageQueryExtension (s_XDisplay, &g_iDamageEvent, &iDamageError))
 	{
 		cd_warning ("XDamage extension not supported");
 		return FALSE;
 	}*/
-	
 	return TRUE;
+#else
+	return FALSE;
+#endif
 }

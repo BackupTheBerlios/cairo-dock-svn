@@ -40,7 +40,7 @@ extern short g_iMajorVersion, g_iMinorVersion, g_iMicroVersion;
 extern int g_iWmHint;
 
 static GHashTable *s_hModuleTable = NULL;
-
+static int s_iMaxOrder = 0;
 
 void cairo_dock_initialize_module_manager (gchar *cModuleDirPath)
 {
@@ -237,33 +237,33 @@ void cairo_dock_preload_module_from_directory (gchar *cModuleDirPath, GHashTable
 	}
 
 	const gchar *cFileName;
-	gchar *cFilePath;
+	GString *sFilePath = g_string_new ("");
 	CairoDockModule *pModule;
 	do
 	{
 		cFileName = g_dir_read_name (dir);
 		if (cFileName == NULL)
 			break ;
-
-		cFilePath = g_strdup_printf ("%s/%s", cModuleDirPath, cFileName);
-		if (g_str_has_suffix (cFilePath, ".so"))
+		
+		if (g_str_has_suffix (cFileName, ".so"))
 		{
-			pModule = cairo_dock_load_module (cFilePath, pModuleTable, &tmp_erreur);
+			g_string_printf (sFilePath, "%s/%s", cModuleDirPath, cFileName);
+			pModule = cairo_dock_load_module (sFilePath->str, pModuleTable, &tmp_erreur);
 			if (tmp_erreur != NULL)
 			{
 				cd_warning ("Attention : %s", tmp_erreur->message);
 				g_error_free (tmp_erreur);
 				tmp_erreur = NULL;
 			}
-			g_free (cFilePath);
 		}
 	}
 	while (1);
+	g_string_free (sFilePath, TRUE);
 	g_dir_close (dir);
 }
 
 
-void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock *pDock, double fTime)
+void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, double fTime)
 {
 	if (cActiveModuleList == NULL)
 		return ;
@@ -271,7 +271,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 	GError *erreur = NULL;
 	gchar *cModuleName;
 	CairoDockModule *pModule;
-	int i = 0, iOrder = 0;
+	int i = 0;
 	while (cActiveModuleList[i] != NULL)
 	{
 		cModuleName = cActiveModuleList[i];
@@ -282,7 +282,7 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 			pModule->fLastLoadingTime = fTime;
 			if (! pModule->bActive)
 			{
-				Icon *pIcon = cairo_dock_activate_module (pModule, pDock, &erreur);
+				Icon *pIcon = cairo_dock_activate_module (pModule, &erreur);
 				if (erreur != NULL)
 				{
 					cd_warning ("Attention : %s", erreur->message);
@@ -291,9 +291,6 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, CairoDock
 				}
 				if (pIcon != NULL)
 				{
-					if (pIcon->fOrder == CAIRO_DOCK_LAST_ORDER)
-						pIcon->fOrder = g_list_length (pDock->icons);  // pas optimise, mais oblige de leur donner un numero distinct pour chacun, y compris quand on en active seulement 1.
-					iOrder ++;
 					if (CAIRO_DOCK_IS_DOCK (pModule->pContainer))
 						cairo_dock_insert_icon_in_dock (pIcon, CAIRO_DOCK (pModule->pContainer), ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
 				}
@@ -378,6 +375,16 @@ GKeyFile *cairo_dock_pre_read_module_config (CairoDockModule *pModule, CairoDock
 	pMinimalConfig->cLabel = cairo_dock_get_string_key_value (pKeyFile, "Icon", "name", NULL, NULL, NULL, NULL);
 	pMinimalConfig->cIconFileName = cairo_dock_get_string_key_value (pKeyFile, "Icon", "icon", NULL, NULL, NULL, NULL);
 	pMinimalConfig->fOrder = cairo_dock_get_double_key_value (pKeyFile, "Icon", "order", NULL, CAIRO_DOCK_LAST_ORDER, NULL, NULL);
+	if (pMinimalConfig->fOrder == 0 || pMinimalConfig->fOrder == CAIRO_DOCK_LAST_ORDER)
+	{
+		pMinimalConfig->fOrder = ++ s_iMaxOrder;
+		g_key_file_set_double (pKeyFile, "Icon", "order", pMinimalConfig->fOrder);
+		cairo_dock_write_keys_to_file (pKeyFile, pModule->cConfFilePath);
+	}
+	else
+	{
+		s_iMaxOrder = MAX (s_iMaxOrder, pMinimalConfig->fOrder);
+	}
 	pMinimalConfig->cDockName = cairo_dock_get_string_key_value (pKeyFile, "Icon", "dock name", NULL, NULL, NULL, NULL);
 	
 	if (! g_key_file_has_group (pKeyFile, "Desklet"))  // cette applet ne peut pas se detacher.
@@ -401,7 +408,7 @@ GKeyFile *cairo_dock_pre_read_module_config (CairoDockModule *pModule, CairoDock
 	return pKeyFile;
 }
 
-Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GError **erreur)
+Icon * cairo_dock_activate_module (CairoDockModule *module, GError **erreur)
 {
 	cd_message ("%s (%s)", __func__, module->pVisitCard->cModuleName);
 	if (module == NULL)
@@ -425,12 +432,6 @@ Icon * cairo_dock_activate_module (CairoDockModule *module, CairoDock *pDock, GE
 			g_propagate_error (erreur, tmp_erreur);
 			return NULL;
 		}
-	}
-	
-	if (pDock == NULL)
-	{
-		module->bActive = TRUE;
-		return NULL;
 	}
 	
 	//\____________________ On cree le container de l'applet, ainsi que son icone.
@@ -701,7 +702,7 @@ void cairo_dock_activate_module_and_load (gchar *cModuleName)
 	if (g_pMainDock == NULL)
 		return ;
 	gchar *list[2] = {cModuleName, NULL};
-	cairo_dock_activate_modules_from_list (list, g_pMainDock, 0);
+	cairo_dock_activate_modules_from_list (list, 0);
 	
 	CairoDockModule *pModule = cairo_dock_find_module_from_name (cModuleName);
 	if (pModule != NULL && CAIRO_DOCK_IS_DOCK (pModule->pContainer))

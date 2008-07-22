@@ -38,6 +38,7 @@ typedef struct _CairoDesklet CairoDesklet;
 typedef struct _CairoDialog CairoDialog;
 
 typedef struct _CairoDockModule CairoDockModule;
+typedef struct _CairoDockModuleInstance CairoDockModuleInstance;
 typedef struct _CairoDockVisitCard CairoDockVisitCard;
 typedef struct _CairoDockMinimalAppletConfig CairoDockMinimalAppletConfig;
 typedef struct _CairoDockVFSBackend CairoDockVFSBackend;
@@ -326,6 +327,23 @@ struct _CairoDockModule {
 	CairoContainer *pContainer;
 	/// Heure de derniere (re)activation du module.
 	gdouble fLastLoadingTime;
+	/// nombre max de fois ou le plug-in peut etre instancie.
+	gint iNbMaxInstance;
+	/// Nombre de fois ou le plug-in a ete instancie.
+	gint iNbInstance;
+	/// Liste d'instance du plug-in.
+	GList *pInstanceList;
+};
+
+struct _CairoDockModuleInstance {
+	gint iNumInstance;
+	gchar *cConfFilePath;
+	Icon *myIcon;
+	CairoContainer *myContainer;
+	CairoDock *myDock;
+	CairoDesklet *myDesklet;
+	gpointer *myConfig;
+	gpointer *myData;
 };
 
 struct _CairoDockMinimalAppletConfig {

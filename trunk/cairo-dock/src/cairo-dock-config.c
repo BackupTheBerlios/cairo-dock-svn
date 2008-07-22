@@ -1158,7 +1158,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	GTimeVal time_val;
 	g_get_current_time (&time_val);  // on pourrait aussi utiliser un compteur statique a la fonction ...
 	double fTime = time_val.tv_sec + time_val.tv_usec * 1e-6;
-	cairo_dock_activate_modules_from_list (cActiveModuleList, pDock, fTime);
+	cairo_dock_activate_modules_from_list (cActiveModuleList, fTime);
 	cairo_dock_deactivate_old_modules (fTime);
 	g_strfreev (cActiveModuleList);
 

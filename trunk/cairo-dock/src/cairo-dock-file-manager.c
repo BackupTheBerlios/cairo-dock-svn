@@ -69,11 +69,22 @@ gboolean cairo_dock_fm_get_file_properties (const gchar *cURI, guint64 *iSize, t
 		return FALSE;
 }
 
+static gpointer _cairo_dock_fm_launch_uri_threaded (gchar *cURI)
+{
+	s_pVFSBackend->launch_uri (cURI);
+}
 gboolean cairo_dock_fm_launch_uri (const gchar *cURI)
 {
 	if (s_pVFSBackend != NULL && s_pVFSBackend->launch_uri != NULL)
 	{
-		s_pVFSBackend->launch_uri (cURI);
+		//s_pVFSBackend->launch_uri (cURI);
+		GError *erreur = NULL;
+		GThread* pThread = g_thread_create ((GThreadFunc) _cairo_dock_fm_launch_uri_threaded, (gpointer) cURI, FALSE, &erreur);
+		if (erreur != NULL)
+		{
+			cd_warning ("Attention : %s", erreur->message);
+			g_error_free (erreur);
+		}
 		return TRUE;
 	}
 	else

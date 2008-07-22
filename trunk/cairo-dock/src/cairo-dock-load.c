@@ -328,6 +328,56 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	}
 }
 
+gchar *cairo_dock_cut_string (gchar *cString, int iNbCaracters)  // gere l'UTF-8
+{
+	gchar *cTruncatedName = NULL;
+	gsize bytes_read, bytes_written;
+	GError *erreur = NULL;
+	gchar *cUtf8Name = g_locale_to_utf8 (cString,
+		-1,
+		&bytes_read,
+		&bytes_written,
+		&erreur);  // inutile sur Ubuntu, qui est nativement UTF8, mais sur les autres on ne sait pas.
+	if (erreur != NULL)
+	{
+		cd_warning ("Attention : %s", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+	}
+	if (cUtf8Name == NULL)  // une erreur s'est produite, on tente avec la chaine brute.
+		cUtf8Name = g_strdup (cString);
+	
+	const gchar *cEndValidChain = NULL;
+	if (g_utf8_validate (cUtf8Name, -1, &cEndValidChain))
+	{
+		if (g_utf8_strlen (cUtf8Name, -1) > iNbCaracters)
+		{
+			cTruncatedName = g_new0 (gchar, 8 * (iNbCaracters + 4));  // 8 octets par caractere.
+			g_utf8_strncpy (cTruncatedName, cUtf8Name, iNbCaracters);
+
+			gchar *cTruncature = g_utf8_offset_to_pointer (cTruncatedName, iNbCaracters);
+			*cTruncature = '.';
+			*(cTruncature+1) = '.';
+			*(cTruncature+2) = '.';
+		}
+	}
+	else
+	{
+		if (strlen (cString) > iNbCaracters)
+		{
+			cTruncatedName = g_new0 (gchar, iNbCaracters + 4);
+			strncpy (cTruncatedName, cString, iNbCaracters);
+
+			cTruncatedName[iNbCaracters] = '.';
+			cTruncatedName[iNbCaracters+1] = '.';
+			cTruncatedName[iNbCaracters+2] = '.';
+		}
+	}
+	g_free (cUtf8Name);
+	//g_print (" -> etiquette : %s\n", cTruncatedName);
+	return cTruncatedName;
+}
+
 void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, CairoDockLabelDescription *pTextDescription, gboolean bHorizontalDock, gboolean bDirectionUp)
 {
 	//g_print ("%s (%s, %d)\n", __func__, cLabelPolice, iLabelSize);
@@ -339,8 +389,8 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, Cairo
 	gchar *cTruncatedName = NULL;
 	if (CAIRO_DOCK_IS_APPLI (icon) && g_iAppliMaxNameLength > 0)
 	{
-		//g_print ("troncature de %s\n", icon->acName);
-		gsize bytes_read, bytes_written;
+		cTruncatedName = cairo_dock_cut_string (icon->acName, g_iAppliMaxNameLength);
+		/**gsize bytes_read, bytes_written;
 		GError *erreur = NULL;
 		gchar *cUtf8Name = g_locale_to_utf8 (icon->acName,
 			-1,
@@ -383,7 +433,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, Cairo
 			}
 		}
 		g_free (cUtf8Name);
-		//g_print (" -> etiquette : %s\n", cTruncatedName);
+		//g_print (" -> etiquette : %s\n", cTruncatedName);*/
 	}
 
 	cairo_surface_t* pNewSurface = cairo_dock_create_surface_from_text ((cTruncatedName != NULL ? cTruncatedName : icon->acName),

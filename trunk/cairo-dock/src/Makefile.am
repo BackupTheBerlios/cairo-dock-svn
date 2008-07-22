@@ -9,10 +9,16 @@ if WITH_GLITZ
 have_glitz=-DHAVE_GLITZ="1"
 endif
 
+if WITH_XEXTEND
+have_extend=-DHAVE_XEXTEND="1"
+endif
+
 cairo_dock_CFLAGS = \
 	$(PACKAGE_CFLAGS) \
 	$(GLITZ_CFLAGS) \
 	$(have_glitz)\
+	$(XEXTEND_CFLAGS) \
+	$(have_xextend)\
 	-DCAIRO_DOCK_SHARE_DATA_DIR=\""$(pkgdatadir)"\"\
 	-DCAIRO_DOCK_SHARE_THEMES_DIR=\""$(pkgdatadir)/themes"\"\
 	-DCAIRO_DOCK_MODULES_DIR=\""$(libdir)/$(PACKAGE)"\"\
@@ -42,6 +48,7 @@ cairo_dock_LDFLAGS = \
 
 cairo_dock_LDADD = \
 	$(GLITZ_LIBS) \
+	$(XEXTEND_LIBS) \
 	$(PACKAGE_LIBS)
 
 cairo_dock_SOURCES = \

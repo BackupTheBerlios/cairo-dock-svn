@@ -713,7 +713,7 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data) \
 	if (pClickedIcon == myIcon || (myIcon != NULL && pClickedContainer == CAIRO_CONTAINER (myIcon->pSubDock)) || pClickedContainer == CAIRO_CONTAINER (myDesklet)) \
 	{ \
 		GtkWidget *pAppletMenu = data[2]; \
-		GtkWidget *pMenuItem, image; \
+		GtkWidget *pMenuItem, *image; \
 		pMenuItem = gtk_separator_menu_item_new (); \
 		gtk_menu_shell_append(GTK_MENU_SHELL (pAppletMenu), pMenuItem);
 
@@ -808,11 +808,11 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 *@param pData donnees passees en parametre de la fonction.
 */
 #define CD_APPLET_ADD_IN_MENU_WITH_STOCK(cLabel, gtkStock, pFunction, pMenu, pData) \
-	menu_item = gtk_image_menu_item_new_with_label (_(cLabel)); \
+	pMenuItem = gtk_image_menu_item_new_with_label (cLabel); \
 	image = gtk_image_new_from_stock (gtkStock, GTK_ICON_SIZE_MENU); \
-	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), image); \
-	gtk_menu_shell_append  (GTK_MENU_SHELL (pMenu), menu_item); \
-	g_signal_connect (G_OBJECT (menu_item), "activate", G_CALLBACK(pFunction), pData);
+	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (pMenuItem), image); \
+	gtk_menu_shell_append  (GTK_MENU_SHELL (pMenu), pMenuItem); \
+	g_signal_connect (G_OBJECT (pMenuItem), "activate", G_CALLBACK(pFunction), pData);
 
 
 

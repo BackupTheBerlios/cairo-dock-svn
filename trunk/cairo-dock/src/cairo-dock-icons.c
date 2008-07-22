@@ -39,8 +39,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-icons.h"
 
 
-extern gint g_iScreenWidth;
-extern gint g_iScreenHeight;
 extern gboolean g_bReserveSpace;
 extern int g_iLeaveSubDockDelay;
 
@@ -48,20 +46,13 @@ extern gint g_iDockLineWidth;
 extern gint g_iDockRadius;
 extern gint g_iFrameMargin;
 extern int g_iIconGap;
-extern double g_fSubDockSizeRatio;
-extern int g_iMaxAuthorizedWidth;
 
 extern gchar *g_cCurrentLaunchersPath;
 
 extern double g_fAmplitude;
 extern int g_iSinusoidWidth;
 
-extern double g_fUnfoldAcceleration;
-
-extern gboolean g_bUniquePid;
-
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
-extern gchar *g_cConfFile;
 
 
 void cairo_dock_free_icon (Icon *icon)
@@ -654,7 +645,7 @@ gboolean cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolea
 	//\___________________ On la remet a la taille normale en vue d'une reinsertion quelque part.
 	///if (pDock->iRefCount > 0)
 	{
-		icon->fWidth /= pDock->fRatio;  /// g_fSubDockSizeRatio
+		icon->fWidth /= pDock->fRatio;
 		icon->fHeight /= pDock->fRatio;
 	}
 	//g_print (" -size <- %.2fx%.2f\n", icon->fWidth, icon->fHeight);

@@ -18,8 +18,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-modules.h"
 #include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-dialogs.h"
-#include "cairo-dock-themes-manager.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-themes-manager.h"
 
 #define CAIRO_DOCK_MODIFIED_THEME_FILE ".cairo-dock-need-save"
 #define CAIRO_DOCK_THEME_PANEL_WIDTH 750
@@ -406,6 +406,7 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode)
 			system (sCommand->str);
 
 			/// A FAIRE : fusionner les fichiers de conf des plug-ins si deja presents.
+			///find themes/theme_bidon ! -name '*.conf' ! -path 'themes/theme_bidon/launchers*' -print -exec cp -p {} current_theme/ \;
 			g_string_printf (sCommand, "find '%s'/* -prune ! -name '*.conf' ! -name %s -exec /bin/cp -r '{}' '%s' \\;", cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR, g_cCurrentThemePath);  // copie tous les fichiers du nouveau theme sauf les lanceurs et le .conf, dans le repertoire du theme courant. Ecrase les fichiers de memes noms.
 			cd_message ("%s", sCommand->str);
 			system (sCommand->str);
