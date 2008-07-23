@@ -4,23 +4,24 @@ SUBDIRS = .
 bin_PROGRAMS = \
 	cairo-dock
 
-if COMPIL_VERBOSE
-include_verbose = -DCAIRO_DOCK_VERBOSE=TRUE
+
+if WITH_GLITZ
+have_glitz=-DHAVE_GLITZ="1"
 endif
-if COMPIL_WITH_GLITZ
-include_glitz = -DHAVE_GLITZ=TRUE
-glitz_cflags = $(GLITZ_CFLAGS)
-glitz_libs = $(GLITZ_LIBS)
+
+if WITH_XEXTEND
+have_xextend=-DHAVE_XEXTEND="1"
 endif
 
 cairo_dock_CFLAGS = \
 	$(PACKAGE_CFLAGS) \
-	$(glitz_cflags) \
-	$(include_verbose)\
-	$(include_glitz)\
+	$(GLITZ_CFLAGS) \
+	$(have_glitz)\
+	$(XEXTEND_CFLAGS) \
+	$(have_xextend)\
 	-DCAIRO_DOCK_SHARE_DATA_DIR=\""$(pkgdatadir)"\"\
 	-DCAIRO_DOCK_SHARE_THEMES_DIR=\""$(pkgdatadir)/themes"\"\
-	-DCAIRO_DOCK_MODULES_DIR=\""$(pkgdatadir)/plug-in"\"\
+	-DCAIRO_DOCK_MODULES_DIR=\""$(libdir)/$(PACKAGE)"\"\
 	-DCAIRO_DOCK_CONF_FILE=\""cairo-dock.conf"\"\
 	-DCAIRO_DOCK_EASY_CONF_FILE=\""cairo-dock_easy.conf"\"\
 	-DCAIRO_DOCK_LAUNCHER_CONF_FILE=\""launcher.conf"\"\
@@ -46,8 +47,8 @@ cairo_dock_LDFLAGS = \
 	-Wl,--export-dynamic
 
 cairo_dock_LDADD = \
-	$(glitz_libs) \
-	-lGLU -ljpeg\
+	$(GLITZ_LIBS) \
+	$(XEXTEND_LIBS) \
 	$(PACKAGE_LIBS)
 
 cairo_dock_SOURCES = \
@@ -121,7 +122,12 @@ cairo_dock_SOURCES = \
 	cairo-dock-dock-manager.c\
 	cairo-dock-dock-manager.h\
 	cairo-dock-class-manager.c\
-	cairo-dock-class-manager.h
+	cairo-dock-class-manager.h\
+	cairo-dock-emblem.c\
+	cairo-dock-emblem.h\
+	cairo-dock-draw-opengl.c\
+	cairo-dock-draw-opengl.h
+
 
 
 cairo_dockincludedir =\
@@ -168,4 +174,6 @@ cairo_docksubinclude_HEADERS =\
 	cairo-dock-X-utilities.h\
 	cairo-dock-gauge.h\
 	cairo-dock-dock-manager.h\
-	cairo-dock-class-manager.h
+	cairo-dock-class-manager.h\
+	cairo-dock-emblem.h\
+	cairo-dock-draw-opengl.h

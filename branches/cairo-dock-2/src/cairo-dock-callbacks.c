@@ -44,8 +44,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-dock-manager.h"
 #include "cairo-dock-keybinder.h"
 #include "cairo-dock-desklet.h"
-#include "cairo-dock-callbacks.h"
+#include "cairo-dock-draw-opengl.h"
 #include "cairo-dock-emblem.h" //Drop Indicator
+#include "cairo-dock-callbacks.h"
 
 static Icon *s_pIconClicked = NULL;  // pour savoir quand on deplace une icone a la souris. Dangereux si l'icone se fait effacer en cours ...
 static CairoDock *s_pLastPointedDock = NULL;  // pour savoir quand on passe d'un dock a un autre.
@@ -110,6 +111,7 @@ static gboolean s_bHideAfterShortcut = FALSE;
 void on_realize (GtkWidget* pWidget,
 	 CairoDock *pDock)
 {
+	static GLuint s_iChromeTexture = 0;
 	if (! g_bUseOpenGL)
 		return ;
 	GdkGLContext* pGlContext = gtk_widget_get_gl_context (pWidget);
@@ -122,6 +124,15 @@ void on_realize (GtkWidget* pWidget,
 		g_print ("OpenGL version: %s\n", glGetString (GL_VERSION));
 		g_print ("OpenGL vendor: %s\n", glGetString (GL_VENDOR));
 		g_print ("OpenGL renderer: %s\n", glGetString (GL_RENDERER));
+		
+		if (s_iChromeTexture == 0)
+		{
+			cairo_surface_t *pChromeSurface = cairo_dock_load_chrome_surface ();
+			
+			s_iChromeTexture = cairo_dock_create_texture_from_surface (pChromeSurface);
+			
+			cairo_dock_init_capsule_display (s_iChromeTexture);
+		}
 	}
 	
 	glClearColor (0.0f, 0.0f, 0.0f, 0.0f);

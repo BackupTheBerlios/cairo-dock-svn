@@ -609,6 +609,8 @@ struct _Icon {
 	GLuint iFullIconTexture;
 	GLuint iLabelTexture;
 	GLuint iQuickInfoTexture;
+	gint iRotationX;
+	gint iRotationY;
 };
 
 

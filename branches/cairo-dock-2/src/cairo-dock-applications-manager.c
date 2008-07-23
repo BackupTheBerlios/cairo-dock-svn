@@ -16,8 +16,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
+#ifdef HAVE_XEXTEND
 #include <X11/extensions/Xcomposite.h>
 //#include <X11/extensions/Xdamage.h>
+#endif
 
 #include "cairo-dock-icons.h"
 #include "cairo-dock-draw.h"
@@ -714,6 +716,7 @@ static void _cairo_dock_hide_show_windows_on_other_desktops (Window *Xid, Icon *
 }
 static void _cairo_dock_fill_icon_buffer_with_thumbnail (Icon *icon, CairoDock *pParentDock)
 {
+	#ifdef HAVE_XEXTEND
 	if (! icon->bIsHidden)  // elle vient d'apparaitre => nouveau backing pixmap.
 	{
 		if (icon->iBackingPixmap != 0)
@@ -722,6 +725,7 @@ static void _cairo_dock_fill_icon_buffer_with_thumbnail (Icon *icon, CairoDock *
 			icon->iBackingPixmap = XCompositeNameWindowPixmap (s_XDisplay, icon->Xid);
 		g_print ("new backing pixmap (bis) : %d\n", icon->iBackingPixmap);
 	}
+	#endif
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pParentDock));
 	cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pParentDock->bHorizontalDock, TRUE, pParentDock->bDirectionUp);
 	cairo_destroy (pCairoContext);
@@ -905,6 +909,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 								
 								if (g_bShowThumbnail && pParentDock != NULL)
 								{
+									#ifdef HAVE_XEXTEND
 									if (! icon->bIsHidden)
 									{
 										if (icon->iBackingPixmap != 0)
@@ -913,6 +918,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 											icon->iBackingPixmap = XCompositeNameWindowPixmap (s_XDisplay, Xid);
 										cd_message ("new backing pixmap (bis) : %d", icon->iBackingPixmap);
 									}
+									#endif
 									cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pParentDock));
 									cairo_dock_fill_one_icon_buffer (icon, pCairoContext, 1 + g_fAmplitude, pDock->bHorizontalDock, TRUE, pDock->bDirectionUp);
 									cairo_destroy (pCairoContext);
@@ -988,6 +994,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 			icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
 			if (icon != NULL)
 			{
+				#ifdef HAVE_XEXTEND
 				if (event.xconfigure.width != icon->windowGeometry.width || event.xconfigure.height != icon->windowGeometry.height)
 				{
 					if (icon->iBackingPixmap != 0)
@@ -996,6 +1003,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 						icon->iBackingPixmap = XCompositeNameWindowPixmap (s_XDisplay, Xid);
 					cd_message ("new backing pixmap : %d", icon->iBackingPixmap);
 				}
+				#endif
 				memcpy (&icon->windowGeometry, &event.xconfigure.x, sizeof (GtkAllocation));
 			}
 			

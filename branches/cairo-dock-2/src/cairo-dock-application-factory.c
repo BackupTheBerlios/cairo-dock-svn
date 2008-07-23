@@ -16,8 +16,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 #include <gdk/gdkx.h>
+#ifdef HAVE_XEXTEND
 #include <X11/extensions/Xcomposite.h>
 //#include <X11/extensions/Xdamage.h>
+#endif
 
 #include "cairo-dock-load.h"
 #include "cairo-dock-icons.h"
@@ -448,12 +450,14 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 		&icon->windowGeometry.y,
 		&icon->windowGeometry.width,
 		&icon->windowGeometry.height);
+	#ifdef HAVE_XEXTEND
 	if (g_bShowThumbnail)
 	{
 		icon->iBackingPixmap = XCompositeNameWindowPixmap (s_XDisplay, Xid);
 		/*icon->iDamageHandle = XDamageCreate (s_XDisplay, Xid, XDamageReportNonEmpty);  // XDamageReportRawRectangles
 		g_print ("backing pixmap : %d ; iDamageHandle : %d\n", icon->iBackingPixmap, icon->iDamageHandle);*/
 	}
+	#endif
 	
 	cairo_dock_fill_icon_buffers_for_dock (icon, pSourceContext, pDock);
 	
