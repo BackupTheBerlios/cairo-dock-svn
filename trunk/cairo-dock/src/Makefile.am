@@ -10,7 +10,7 @@ have_glitz=-DHAVE_GLITZ="1"
 endif
 
 if WITH_XEXTEND
-have_extend=-DHAVE_XEXTEND="1"
+have_xextend=-DHAVE_XEXTEND="1"
 endif
 
 cairo_dock_CFLAGS = \

@@ -9,7 +9,7 @@ AC_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE([foreign])
 AC_PROG_LIBTOOL
 
-#IT_PROG_INTLTOOL([0.35.0])
+IT_PROG_INTLTOOL([0.35.0])
 AC_SUBST(ALL_LINGUAS)
 AM_GLIB_GNU_GETTEXT
 GETTEXT_PACKAGE=cairo-dock
@@ -51,6 +51,13 @@ if test "$usexextend" = "true" ; then
 		AC_DEFINE(HAVE_XEXTEND,"1",[Defined if we can use X Extensions.])
 	fi
 fi
+if test "$XExt_detected" = "true"; then
+	xextend_required="xtst xrender"
+else
+	xextend_required=""
+fi
+AC_SUBST(xextend_required)
+
 AM_CONDITIONAL( [WITH_XEXTEND], [test "$XExt_detected" = "true"] )
 
 AC_ARG_ENABLE(glitz,
@@ -70,6 +77,14 @@ if test "$useglitz" = "true" ; then
 		AC_DEFINE(HAVE_GLITZ,"1",[Defined if we can use glitz.])
 	fi
 fi
+
+if test "$glitz_detected" = "true"; then
+        glitz_required="glitz-glx"
+else
+        glitz_required=""
+fi
+AC_SUBST(glitz_required)
+
 AM_CONDITIONAL( [WITH_GLITZ], [test "$glitz_detected" = "true"] )
 
 
