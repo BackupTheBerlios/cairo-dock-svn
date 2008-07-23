@@ -61,6 +61,7 @@ gboolean cairo_dock_dbus_detect_application (const gchar *cName);
 *@return la valeur du parametre.
 */
 gboolean cairo_dock_dbus_get_boolean (DBusGProxy *pDbusProxy, const gchar *cParameter);
+
 /**
 * Recupere la valeur d'un parametre entier non signe sur le bus.
 *@param pDbusProxy associe a la connexion.
@@ -68,6 +69,15 @@ gboolean cairo_dock_dbus_get_boolean (DBusGProxy *pDbusProxy, const gchar *cPara
 *@return la valeur du parametre.
 */
 guint cairo_dock_dbus_get_uinteger (DBusGProxy *pDbusProxy, const gchar *cParameter);
+
+/**
+* Recupere la valeur d'un parametre entier sur le bus.
+*@param pDbusProxy associe a la connexion.
+*@param cParameter nom du parametre.
+*@return la valeur du parametre.
+*/
+int cairo_dock_dbus_get_integer (DBusGProxy *pDbusProxy, const gchar *cParameter);
+
 /**
 * Recupere la valeur d'un parametre 'chaine de caracteres' sur le bus.
 *@param pDbusProxy associe a la connexion.
@@ -75,6 +85,15 @@ guint cairo_dock_dbus_get_uinteger (DBusGProxy *pDbusProxy, const gchar *cParame
 *@return la valeur du parametre.
 */
 gchar *cairo_dock_dbus_get_string (DBusGProxy *pDbusProxy, const gchar *cParameter);
+
+/**
+* Recupere la valeur d'un parametre 'caracteres non signe' sur le bus.
+*@param pDbusProxy associe a la connexion.
+*@param cParameter nom du parametre.
+*@return la valeur du parametre.
+*/
+guchar *cairo_dock_dbus_get_uchar (DBusGProxy *pDbusProxy, const gchar *cParameter);
+
 /**
 * Appelle une commande sur le bus.
 *@param pDbusProxy associe a la connexion.

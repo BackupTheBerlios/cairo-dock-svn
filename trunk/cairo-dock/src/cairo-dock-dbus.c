@@ -192,6 +192,22 @@ gboolean cairo_dock_dbus_get_boolean (DBusGProxy *pDbusProxy, const gchar *cPara
 	return bValue;
 }
 
+int cairo_dock_dbus_get_integer (DBusGProxy *pDbusProxy, const gchar *cParameter)
+{
+	GError *erreur = NULL;
+	int iValue = 0;
+	dbus_g_proxy_call (pDbusProxy, cParameter, &erreur,
+		G_TYPE_INVALID,
+		G_TYPE_INT, &iValue,
+		G_TYPE_INVALID);
+	if (erreur != NULL)
+	{
+		cd_warning ("Attention : %s", erreur->message);
+		g_error_free (erreur);
+	}
+	return iValue;
+}
+
 guint cairo_dock_dbus_get_uinteger (DBusGProxy *pDbusProxy, const gchar *cParameter)
 {
 	GError *erreur = NULL;
@@ -222,6 +238,19 @@ gchar *cairo_dock_dbus_get_string (DBusGProxy *pDbusProxy, const gchar *cParamet
 		g_error_free (erreur);
 	}
 	return cValue;
+}
+
+guchar *cairo_dock_dbus_get_uchar (DBusGProxy *pDbusProxy, const gchar *cParameter)
+{
+	GError *erreur = NULL;
+	guchar* uValue = NULL;
+	
+	dbus_g_proxy_call (pDbusProxy, cParameter, &erreur,
+		G_TYPE_INVALID,
+		G_TYPE_UCHAR, &uValue,
+		G_TYPE_INVALID);
+	
+	return uValue;
 }
 
 void cairo_dock_dbus_call (DBusGProxy *pDbusProxy, const gchar *cCommand)
