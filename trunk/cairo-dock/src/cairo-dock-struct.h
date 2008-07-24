@@ -336,7 +336,6 @@ struct _CairoDockModule {
 };
 
 struct _CairoDockModuleInstance {
-	gint iNumInstance;
 	gchar *cConfFilePath;
 	Icon *myIcon;
 	CairoContainer *myContainer;

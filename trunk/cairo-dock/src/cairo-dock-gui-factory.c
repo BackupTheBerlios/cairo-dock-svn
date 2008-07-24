@@ -8,6 +8,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 *********************************************************************************/
 #include <string.h>
 #include <stdlib.h>
+#include <glib/gstdio.h>
 #include <glib/gi18n.h>
 
 #include "cairo-dock-modules.h"
@@ -231,6 +232,28 @@ static void _cairo_dock_selection_changed (GtkTreeModel *model, GtkTreeIter iter
 
 	if (cDescriptionFilePath != NULL)
 	{
+		gboolean bDistant = FALSE;
+		if (strncmp (cDescriptionFilePath, "http://", 7) == 0 || strncmp (cDescriptionFilePath, "ftp://", 6) == 0)
+		{
+			g_print ("fichier readme distant (%s)\n", cDescriptionFilePath);
+			
+			gchar *cTmpFilePath = g_strdup ("/tmp/cairo-dock-net-readme.XXXXXX");
+			int fds = mkstemp (cTmpFilePath);
+			if (fds == -1)
+			{
+				g_free (cTmpFilePath);
+				return ;
+			}
+			
+			gchar *cCommand = g_strdup_printf ("wget \"%s\" -O '%s' -t 2 -w 2", cDescriptionFilePath, cTmpFilePath);
+			system (cCommand);
+			g_free (cCommand);
+			close(fds);
+			
+			g_free (cDescriptionFilePath);
+			cDescriptionFilePath = cTmpFilePath;
+			bDistant = TRUE;
+		}
 		gchar *cDescription = NULL;
 		gsize length = 0;
 		GError *erreur = NULL;
@@ -245,10 +268,37 @@ static void _cairo_dock_selection_changed (GtkTreeModel *model, GtkTreeIter iter
 		}
 		gtk_label_set_markup (pDescriptionLabel, cDescription);
 		g_free (cDescription);
+		if (bDistant)
+		{
+			g_remove (cDescriptionFilePath);
+		}
 	}
 
 	if (cPreviewFilePath != NULL)
 	{
+		gboolean bDistant = FALSE;
+		if (strncmp (cPreviewFilePath, "http://", 7) == 0 || strncmp (cPreviewFilePath, "ftp://", 6) == 0)
+		{
+			g_print ("fichier readme distant (%s)\n", cPreviewFilePath);
+			
+			gchar *cTmpFilePath = g_strdup ("/tmp/cairo-dock-net-readme.XXXXXX");
+			int fds = mkstemp (cTmpFilePath);
+			if (fds == -1)
+			{
+				g_free (cTmpFilePath);
+				return ;
+			}
+			
+			gchar *cCommand = g_strdup_printf ("wget \"%s\" -O '%s' -t 2 -w 2", cPreviewFilePath, cTmpFilePath);
+			system (cCommand);
+			g_free (cCommand);
+			close(fds);
+			
+			g_free (cPreviewFilePath);
+			cPreviewFilePath = cTmpFilePath;
+			bDistant = TRUE;
+		}
+		
 		int iPreviewWidth, iPreviewHeight;
 		GdkPixbuf *pPreviewPixbuf = NULL;
 		if (gdk_pixbuf_get_file_info (cPreviewFilePath, &iPreviewWidth, &iPreviewHeight) != NULL)
@@ -267,6 +317,11 @@ static void _cairo_dock_selection_changed (GtkTreeModel *model, GtkTreeIter iter
 		}
 		gtk_image_set_from_pixbuf (pPreviewImage, pPreviewPixbuf);
 		gdk_pixbuf_unref (pPreviewPixbuf);
+		
+		if (bDistant)
+		{
+			g_remove (cPreviewFilePath);
+		}
 	}
 
 	g_free (cDescriptionFilePath);

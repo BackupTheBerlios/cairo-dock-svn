@@ -14,7 +14,7 @@
 *@return la table de hashage contenant les doublets (nom_du_theme , chemin_du_theme). Si une table avait ete fournie en entree, c'est elle qui est retournee, sinon c'est une nouvelle table, a detruire avec 'g_hash_table_destroy' apres utilisation (tous les elements seront liberes).
 */
 GHashTable *cairo_dock_list_themes (gchar *cThemesDir, GHashTable *hProvidedTable, GError **erreur);
-
+GHashTable *cairo_dock_list_net_themes (gchar *cServerAdress, GHashTable *hProvidedTable, GError **erreur);
 
 gchar *cairo_dock_edit_themes (GHashTable **hThemeTable, gboolean bSafeMode);
 

@@ -242,6 +242,7 @@ gboolean g_bUseFakeTransparency = FALSE;
 //int g_iDamageEvent = 0;
 
 gboolean g_bDisplayDropEmblem = FALSE; // indicateur de drop
+gchar *g_cThemeServerAdress = NULL;
 
 static gchar *cLaunchCommand = NULL;
 
@@ -366,7 +367,10 @@ int main (int argc, char** argv)
 			"emulate composition with fake transparency. Only use this if you don't run a compositor like Compiz, xcompmgr, etc and have a black background around your dock.", NULL},
 		{"testing", 'T', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&bTesting,
-			"for testing purpose only. The crash manager will not be started.", NULL},
+			"for debugging purpose only. The crash manager will not be started.", NULL},
+		{"server", 'S', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
+			&g_cThemeServerAdress,
+			"adress of a server containing additional themes. This will overwrite the default server adress.", NULL},
 		{NULL}
 	};
 
