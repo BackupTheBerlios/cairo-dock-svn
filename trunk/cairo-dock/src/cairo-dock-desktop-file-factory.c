@@ -117,7 +117,7 @@ gchar *cairo_dock_generate_desktop_file_for_launcher (const gchar *cDesktopURI, 
 
 	//\___________________ On ecrit tout ca dans un fichier base sur le template.
 	gchar *cNewDesktopFilePath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, cNewDesktopFileName);
-	cairo_dock_flush_conf_file_full (pKeyFile, cNewDesktopFilePath, CAIRO_DOCK_SHARE_DATA_DIR, FALSE, "launcher.conf");
+	cairo_dock_flush_conf_file_full (pKeyFile, cNewDesktopFilePath, CAIRO_DOCK_SHARE_DATA_DIR, FALSE, CAIRO_DOCK_LAUNCHER_CONF_FILE);
 	
 	g_free (cNewDesktopFilePath);
 	g_key_file_free (pKeyFile);

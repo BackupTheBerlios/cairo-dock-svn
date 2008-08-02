@@ -340,7 +340,7 @@ gchar *cairo_dock_cut_string (gchar *cString, int iNbCaracters)  // gere l'UTF-8
 		&erreur);  // inutile sur Ubuntu, qui est nativement UTF8, mais sur les autres on ne sait pas.
 	if (erreur != NULL)
 	{
-		cd_warning ("Attention : %s", erreur->message);
+		cd_warning ("%s", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
@@ -399,7 +399,7 @@ void cairo_dock_fill_one_text_buffer (Icon *icon, cairo_t* pSourceContext, Cairo
 			&erreur);  // inutile sur Ubuntu, qui est nativement UTF8, mais sur les autres on ne sait pas.
 		if (erreur != NULL)
 		{
-			cd_warning ("Attention : %s", erreur->message);
+			cd_warning ("%s", erreur->message);
 			g_error_free (erreur);
 			erreur = NULL;
 		}
@@ -521,7 +521,7 @@ void cairo_dock_reload_buffers_in_dock (gchar *cDockName, CairoDock *pDock, gpoi
 		if (CAIRO_DOCK_IS_APPLET (icon))
 		{
 			if (bReloadAppletsToo)
-				cairo_dock_reload_module (icon->pModule, FALSE);
+				cairo_dock_reload_module_instance (icon->pModuleInstance, FALSE);
 		}
 		else
 		{
@@ -881,9 +881,10 @@ cairo_surface_t *cairo_dock_get_desktop_bg_surface (void)
 }
 
 
-void cairo_dock_load_active_window_indicator (cairo_t* pSourceContext, double fMaxScale, double fCornerRadius, double fLineWidth, double *fActiveColor)
+void cairo_dock_load_active_window_indicator (cairo_t* pSourceContext, const gchar *cImagePath, double fMaxScale, double fCornerRadius, double fLineWidth, double *fActiveColor)
 {
-	cairo_surface_destroy (g_pActiveIndicatorSurface);
+	if (g_pActiveIndicatorSurface != NULL)
+		cairo_surface_destroy (g_pActiveIndicatorSurface);
 	g_fActiveIndicatorWidth = MAX (g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER], g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI]);
 	g_fActiveIndicatorHeight = MAX (g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI], g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI]);
 	if (g_fActiveIndicatorWidth == 0)
@@ -891,43 +892,42 @@ void cairo_dock_load_active_window_indicator (cairo_t* pSourceContext, double fM
 	if (g_fActiveIndicatorHeight == 0)
 		g_fActiveIndicatorHeight = 48;
 	
-	if (fActiveColor[3] == 0)  // invisible.
+	if (cImagePath != NULL)
+	{
+		g_pActiveIndicatorSurface = cairo_dock_create_surface_for_icon (cImagePath,
+			pSourceContext,
+			g_fActiveIndicatorWidth * fMaxScale,
+			g_fActiveIndicatorHeight * fMaxScale);
+	}
+	else if (fActiveColor[3] > 0)
+	{
+		g_pActiveIndicatorSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+			CAIRO_CONTENT_COLOR_ALPHA,
+			g_fActiveIndicatorWidth * fMaxScale,
+			g_fActiveIndicatorHeight * fMaxScale);
+		cairo_t *pCairoContext = cairo_create (g_pActiveIndicatorSurface);
+		
+		double fFrameWidth = g_fActiveIndicatorWidth * fMaxScale - (2 * fCornerRadius + fLineWidth) + 0;  // g_fActiveWidthOffset
+		double fFrameHeight = g_fActiveIndicatorHeight * fMaxScale - 2 * fLineWidth;
+		double fDockOffsetX = fCornerRadius + fLineWidth/2 - 0;  // g_fActiveWidthOffset/2
+		double fDockOffsetY = fLineWidth/2;
+		cairo_dock_draw_frame (pCairoContext, fCornerRadius, fLineWidth, fFrameWidth, fFrameHeight, fDockOffsetX, fDockOffsetY, 1, 0., CAIRO_DOCK_HORIZONTAL);
+		
+		cairo_set_source_rgba (pCairoContext, fActiveColor[0], fActiveColor[1], fActiveColor[2], fActiveColor[3]);
+		if (fLineWidth > 0)
+		{
+			cairo_set_line_width (pCairoContext, fLineWidth);
+			cairo_stroke (pCairoContext);
+		}
+		else
+		{
+			cairo_fill (pCairoContext);
+		}
+		cairo_destroy (pCairoContext);
+	}
+	else  // invisible.
 	{
 		g_pActiveIndicatorSurface = NULL;
 		return ;
 	}
-	
-	g_pActiveIndicatorSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-		CAIRO_CONTENT_COLOR_ALPHA,
-		g_fActiveIndicatorWidth * fMaxScale,
-		g_fActiveIndicatorHeight * fMaxScale);
-	cairo_t *pCairoContext = cairo_create (g_pActiveIndicatorSurface);
-	
-	/*cairo_dock_draw_frame (pCairoContext,
-		g_iActiveRadius,
-		g_iActiveLineWidth,
-		MAX (1., icon->fWidth * (1+g_fAmplitude) / fRatio - (2 * g_iActiveRadius + g_iActiveLineWidth)),
-		icon->fHeight * (1+g_fAmplitude) / fRatio - 2*g_iActiveLineWidth,
-		g_iActiveRadius + .5*g_iActiveLineWidth,
-		.5*g_iActiveLineWidth * 1,
-		1, 0., CAIRO_DOCK_HORIZONTAL);*/
-	//double fRadius = fCornerRadius;
-	//double fLineWidth = (g_iActiveLineWidth > 0 ? g_iActiveLineWidth : 1.);
-	double fFrameWidth = g_fActiveIndicatorWidth * fMaxScale - (2 * fCornerRadius + fLineWidth) + 0;  // g_fActiveWidthOffset
-	double fFrameHeight = g_fActiveIndicatorHeight * fMaxScale - 2 * fLineWidth;
-	double fDockOffsetX = fCornerRadius + fLineWidth/2 - 0;  // g_fActiveWidthOffset/2
-	double fDockOffsetY = fLineWidth/2;
-	cairo_dock_draw_frame (pCairoContext, fCornerRadius, fLineWidth, fFrameWidth, fFrameHeight, fDockOffsetX, fDockOffsetY, 1, 0., CAIRO_DOCK_HORIZONTAL);
-	
-	cairo_set_source_rgba (pCairoContext, fActiveColor[0], fActiveColor[1], fActiveColor[2], fActiveColor[3]);
-	if (fLineWidth > 0)
-	{
-		cairo_set_line_width (pCairoContext, fLineWidth);
-		cairo_stroke (pCairoContext);
-	}
-	else
-	{
-		cairo_fill (pCairoContext);
-	}
-	cairo_destroy (pCairoContext);
 }

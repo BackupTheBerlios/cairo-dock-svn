@@ -616,12 +616,9 @@ emblem_2 =
 #F+[Indicator of the active window]
 frame_activ =
 
-#c+4[0;1] Color of the indicator (r,v,b,a) :
+#c+4[0;1] Color of the frame (r,v,b,a) :
 #{Set transparency to 0 if you don't want to use an indicator.}
 active color = 0.; 0.4; 0.8; 0.25
-
-#b Draw indicator above the icon ?
-active frame position = true
 
 #i+[0;10] Linewidth of the frame around the active window :
 #{Set 0 to fill the frame.}
@@ -629,6 +626,13 @@ active line width = 3
 
 #i+[0;30] Corner radius of the frame around the active window :
 active corner radius = 6
+
+#S+ Alternatively you can set an image for the indicator :
+#{Let it empty to draw a simple frame.}
+active indicator =
+
+#b Draw indicator above the icon ?
+active frame position = true
 
 
 #F+[Indicator of active launcher]

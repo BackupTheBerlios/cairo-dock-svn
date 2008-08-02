@@ -10,9 +10,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #ifndef __CAIRO_DOCK_STRUCT__
 #define  __CAIRO_DOCK_STRUCT__
 
+#include <X11/Xlib.h>
 #include <glib.h>
 #include <gdk/gdk.h>
-#include <X11/Xlib.h>
 #include <gtk/gtk.h>
 #include <cairo.h>
 #include <librsvg/rsvg.h>
@@ -25,7 +25,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <glitz-glx.h>
 #include <cairo-glitz.h>
 #endif
-#include <GL/gl.h>
 
 typedef struct _CairoDockRenderer CairoDockRenderer;
 typedef struct _CairoDeskletRenderer CairoDeskletRenderer;
@@ -38,6 +37,7 @@ typedef struct _CairoDesklet CairoDesklet;
 typedef struct _CairoDialog CairoDialog;
 
 typedef struct _CairoDockModule CairoDockModule;
+typedef struct _CairoDockModuleInterface CairoDockModuleInterface;
 typedef struct _CairoDockModuleInstance CairoDockModuleInstance;
 typedef struct _CairoDockVisitCard CairoDockVisitCard;
 typedef struct _CairoDockMinimalAppletConfig CairoDockMinimalAppletConfig;
@@ -288,61 +288,71 @@ struct _CairoDockVisitCard {
 	CairoDockPluginCategory iCategory;
 	/// chemin d'une image pour l'icone du module dans le panneau de conf du dock.
 	gchar *cIconFilePath;
+	/// taille de la structure contenant la config du module.
+	gint iSizeOfConfig;
+	/// taille de la structure contenant les donnees du module.
+	gint iSizeOfData;
 	/// octets reserves pour preserver la compatibilite binaire lors de futurs ajouts sur l'interface entre plug-ins et dock.
-	char reserved[40];
+	/// VRAI ssi le plug-in peut etre instancie plusiers fois.
+	gboolean bMultiInstance;
+	char reserved[28];
+};
+
+struct _CairoDockModuleInterface {
+	void (* initModule) (CairoDockModuleInstance *pInstance, GKeyFile *pKeyFile);
+	void (* stopModule) (CairoDockModuleInstance *pInstance);
+	gboolean (* reloadModule) (CairoDockModuleInstance *pInstance, CairoContainer *pOldContainer, GKeyFile *pKeyFile);
+	gboolean (* read_conf_file) (CairoDockModuleInstance *pInstance, GKeyFile *pKeyFile);
+	void (* reset_config) (CairoDockModuleInstance *pInstance);
+	void (* reset_data) (CairoDockModuleInstance *pInstance);
+};
+
+struct _CairoDockModuleInstance {
+	CairoDockModule *pModule;
+	gchar *cConfFilePath;
+	gboolean bCanDetach;
+	Icon *pIcon;
+	CairoContainer *pContainer;
+	CairoDock *pDock;
+	CairoDesklet *pDesklet;
+	cairo_t *pDrawContext;
+	/**gpointer *myConfig;
+	gpointer *myData;*/
 };
 
 /// Construit et renvoie la carte de visite du module.
-typedef CairoDockVisitCard * (* CairoDockModulePreInit) (void);
+typedef void (* CairoDockModulePreInit) (CairoDockVisitCard *pVisitCard, CairoDockModuleInterface *pInterface);
 
 /// Initialise le module, et renvoie son icone si il en a.
-typedef void (*CairoDockModuleInit) (GKeyFile *pKeyFile, Icon *pIcon, CairoContainer *pContainer, gchar *cConfFilePath, GError **erreur);
+/*typedef void (*CairoDockModuleInit) (GKeyFile *pKeyFile, CairoDockModuleInstance *pInstance);
 
 /// Stoppe le module et libere toutes les ressources allouees par lui.
-typedef void (*CairoDockModuleStop) (void);
+typedef void (*CairoDockModuleStop) (CairoDockModuleInstance *pInstance);
 
 /// Recharge le module (optionnel).
-typedef gboolean (*CairoDockModuleReload) (GKeyFile *pKeyFile, gchar *cConfFileToReload, CairoContainer *pContainer);
+typedef gboolean (*CairoDockModuleReload) (GKeyFile *pKeyFile, CairoDockModuleInstance *pInstance, CairoContainer *pOldContainer);*/
 
 struct _CairoDockModule {
 	/// chemin du .so
 	gchar *cSoFilePath;
 	/// structure du module, contenant les pointeurs vers les fonctions du module.
 	GModule *pModule;
-	/// fonction d'initialisation du module.
-	CairoDockModuleInit initModule;
-	/// fonction d'arret du module.
-	CairoDockModuleStop stopModule;
-	/// fonction de configuration du module. Appelee a chaque reconfiguration du module.
-	CairoDockModuleReload reloadModule;
+	/// fonctions d'interface du module.
+	CairoDockModuleInterface *pInterface;
 	/// carte de visite du module.
 	CairoDockVisitCard *pVisitCard;
 	/// chemin du fichier de conf du module.
 	gchar *cConfFilePath;
 	/// TRUE si le module est actif (c'est-a-dire utilise).
-	gboolean bActive;
+	///gboolean bActive;
 	/// VRAI ssi l'appet est prevue pour pouvoir se detacher.
 	gboolean bCanDetach;
 	/// le container dans lequel va se charger le module, ou NULL.
-	CairoContainer *pContainer;
+	///CairoContainer *pContainer;
 	/// Heure de derniere (re)activation du module.
 	gdouble fLastLoadingTime;
-	/// nombre max de fois ou le plug-in peut etre instancie.
-	gint iNbMaxInstance;
-	/// Nombre de fois ou le plug-in a ete instancie.
-	gint iNbInstance;
 	/// Liste d'instance du plug-in.
-	GList *pInstanceList;
-};
-
-struct _CairoDockModuleInstance {
-	gchar *cConfFilePath;
-	Icon *myIcon;
-	CairoContainer *myContainer;
-	CairoDock *myDock;
-	CairoDesklet *myDesklet;
-	gpointer *myConfig;
-	gpointer *myData;
+	GList *pInstancesList;
 };
 
 struct _CairoDockMinimalAppletConfig {
@@ -597,8 +607,8 @@ struct _Icon {
 	/// TRUE ssi la fenetre est en mode maximisee.
 	gboolean bIsMaximized;
 	//\____________ Pour les modules.
-	/// Module que represente l'icone.
-	CairoDockModule *pModule;
+	/// Instance de module que represente l'icone.
+	CairoDockModuleInstance *pModuleInstance;
 	/// Texte de l'info rapide.
 	gchar *cQuickInfo;
 	/// Surface cairo de l'info rapide.
@@ -757,7 +767,7 @@ struct _CairoDesklet {
 #define CAIRO_DOCK_FM_DESKTOP "_desktop_"
 
 
-typedef gboolean (* CairoDockForeachDeskletFunc) (CairoDesklet *pDesklet, CairoDockModule *pModule, gpointer data);
+typedef gboolean (* CairoDockForeachDeskletFunc) (CairoDesklet *pDesklet, CairoDockModuleInstance *pInstance, gpointer data);
 
 typedef void (* CairoDockForeachIconFunc) (Icon *icon, gpointer data);
 

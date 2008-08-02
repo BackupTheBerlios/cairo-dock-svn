@@ -8,6 +8,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 *********************************************************************************/
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
 
@@ -162,17 +163,7 @@ static void _cairo_dock_configure (GtkButton *button, gpointer *data)
 	gchar *cSelectedValue = NULL;
 	gtk_tree_model_get (pModel, &iter, CAIRO_DOCK_MODEL_RESULT, &cSelectedValue, -1);
 
-	CairoDockModule *pModule = cairo_dock_find_module_from_name (cSelectedValue);
-	if (pModule != NULL)
-	{
-		GError *erreur = NULL;
-		cairo_dock_configure_module (pDialog, pModule, &erreur);
-		if (erreur != NULL)
-		{
-			cd_warning ("%s", erreur->message);
-			g_error_free (erreur);
-		}
-	}
+	cairo_dock_configure_module (NULL, cSelectedValue);
 	g_free (cSelectedValue);
 }
 
@@ -605,23 +596,8 @@ static void _cairo_dock_configure_renderer (GtkButton *button, gpointer *data)
 {
 	GtkTreeView *pCombo = data[0];
 	GtkWindow *pDialog = data[1];
-	/*GtkTreeIter iter;
-	if (! gtk_combo_box_get_active_iter (pCombo, &iter))
-		return;
-	gchar *cRendererName = NULL;
-	GtkTreeModel *model = gtk_combo_box_get_model (pCombo);
-	gtk_tree_model_get (model, &iter, CAIRO_DOCK_MODEL_NAME, &cRendererName, -1);*/
-	CairoDockModule *pModule = cairo_dock_find_module_from_name ("rendering");
-	if (pModule != NULL)
-	{
-		GError *erreur = NULL;
-		cairo_dock_configure_module (NULL, pModule, &erreur);
-		if (erreur != NULL)
-		{
-			cd_warning ("%s", erreur->message);
-			g_error_free (erreur);
-		}
-	}
+	 
+	cairo_dock_configure_module (pDialog, "rendering");
 }
 
 #define _allocate_new_buffer\
@@ -1687,7 +1663,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 					break;
 
 					default :
-						cd_warning ("Attention : this conf file seems to be incorrect !");
+						cd_warning ("this conf file seems to be incorrect !");
 					break ;
 				}
 

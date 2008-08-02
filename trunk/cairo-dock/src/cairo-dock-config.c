@@ -896,6 +896,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	int iActiveLineWidth = cairo_dock_get_integer_key_value (pKeyFile, "Indicators", "active line width", &bFlushConfFileNeeded, 3, "Icons", NULL);
 	int iActiveCornerRadius = cairo_dock_get_integer_key_value (pKeyFile, "Indicators", "active corner radius", &bFlushConfFileNeeded, 6, "Icons", NULL);
 	g_bActiveIndicatorAbove = cairo_dock_get_boolean_key_value (pKeyFile, "Indicators", "active frame position", &bFlushConfFileNeeded, TRUE, "Icons", NULL);
+	gchar *cActiveIndicatorImagePath= cairo_dock_get_string_key_value (pKeyFile, "Indicators", "active indicator", &bFlushConfFileNeeded, NULL, NULL, NULL);
 	
 	gboolean bAppliOnCurrentDesktopOnlyOld = g_bAppliOnCurrentDesktopOnly;
 	g_bAppliOnCurrentDesktopOnly = cairo_dock_get_boolean_key_value (pKeyFile, "TaskBar", "current desktop only", &bFlushConfFileNeeded, FALSE, "Applications", NULL);
@@ -1088,7 +1089,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	cairo_dock_load_drop_indicator (cDropIndicatorImagePath, pCairoContext, fMaxScale);
 	g_free (cDropIndicatorImagePath);
 	
-	cairo_dock_load_active_window_indicator (pCairoContext, cairo_dock_get_max_scale (pDock), iActiveCornerRadius, iActiveLineWidth, fActiveColor);
+	cairo_dock_load_active_window_indicator (pCairoContext, cActiveIndicatorImagePath, cairo_dock_get_max_scale (pDock), iActiveCornerRadius, iActiveLineWidth, fActiveColor);
+	g_free (cActiveIndicatorImagePath);
 	
 	
 	g_fReflectSize = 0;
@@ -1187,7 +1189,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		bFlushConfFileNeeded = cairo_dock_conf_file_needs_update (pKeyFile, CAIRO_DOCK_VERSION);
 	if (bFlushConfFileNeeded)
 	{
-		cairo_dock_flush_conf_file (pKeyFile, cConfFilePath, CAIRO_DOCK_SHARE_DATA_DIR);
+		cairo_dock_flush_conf_file (pKeyFile, cConfFilePath, CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_CONF_FILE);
 		g_key_file_free (pKeyFile);
 		pKeyFile = g_key_file_new ();
 		g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);

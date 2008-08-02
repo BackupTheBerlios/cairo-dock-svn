@@ -283,7 +283,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 			pDock->iCurrentHeight);
 		if (! pDock->pGlitzDrawable)
 		{
-			cd_warning ("Attention : failed to create glitz drawable");
+			cd_warning ("failed to create glitz drawable");
 		}
 		else
 		{
@@ -423,8 +423,9 @@ void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDoc
 			
 			if (CAIRO_DOCK_IS_APPLET (icon))
 			{
-				icon->pModule->pContainer = CAIRO_CONTAINER (pReceivingDock);  // astuce pour ne pas avoir a recharger le fichier de conf ^_^
-				cairo_dock_reload_module (icon->pModule, FALSE);
+				icon->pModuleInstance->pContainer = CAIRO_CONTAINER (pReceivingDock);  // astuce pour ne pas avoir a recharger le fichier de conf ^_^
+				icon->pModuleInstance->pDock = pReceivingDock;
+				cairo_dock_reload_module_instance (icon->pModuleInstance, FALSE);
 			}
 		}
 	}

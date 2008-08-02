@@ -66,7 +66,8 @@ void cairo_dock_free_icon (Icon *icon)
 		cairo_dock_unregister_appli (icon);
 	else if (icon->cClass != NULL)  // c'est un inhibiteur.
 		cairo_dock_deinhibate_class (icon->cClass, icon);
-	cairo_dock_deactivate_module (icon->pModule);
+	if (icon->pModuleInstance != NULL)
+		cairo_dock_deinstanciate_module (icon->pModuleInstance);
 	
 	cairo_dock_free_icon_buffers (icon);
 	
@@ -396,7 +397,7 @@ Icon *cairo_dock_get_icon_with_module (GList *pIconList, CairoDockModule *pModul
 	for (ic = pIconList; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
-		if (icon->pModule == pModule)
+		if (icon->pModuleInstance->pModule == pModule)
 			return icon;
 	}
 	return NULL;
@@ -443,7 +444,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 			g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 			if (erreur != NULL)
 			{
-				cd_warning ("Attention : %s", erreur->message);
+				cd_warning ("%s", erreur->message);
 				g_error_free (erreur);
 				return ;
 			}
@@ -461,7 +462,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 			g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 			if (erreur != NULL)
 			{
-				cd_warning ("Attention : %s", erreur->message);
+				cd_warning ("%s", erreur->message);
 				g_error_free (erreur);
 				return ;
 			}
@@ -490,9 +491,9 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 
 	//\_________________ On met a jour l'ordre des applets dans le fichier de conf.
 	if (CAIRO_DOCK_IS_APPLET (icon1))
-		cairo_dock_update_module_order (icon1->pModule, icon1->fOrder);
+		cairo_dock_update_module_instance_order (icon1->pModuleInstance, icon1->fOrder);
 	if (CAIRO_DOCK_IS_APPLET (icon2))
-		cairo_dock_update_module_order (icon2->pModule, icon2->fOrder);
+		cairo_dock_update_module_instance_order (icon2->pModuleInstance, icon2->fOrder);
 }
 
 void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2)
@@ -529,7 +530,7 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 		g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 		if (erreur != NULL)
 		{
-			cd_warning ("Attention : %s", erreur->message);
+			cd_warning ("%s", erreur->message);
 			g_error_free (erreur);
 			erreur = NULL;
 		}
@@ -554,7 +555,7 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 
 	//\_________________ On prend en compte le changement de position pour les applets.
 	if (CAIRO_DOCK_IS_APPLET (icon1))
-		cairo_dock_update_module_order (icon1->pModule, icon1->fOrder);
+		cairo_dock_update_module_instance_order (icon1->pModuleInstance, icon1->fOrder);
 }
 
 
@@ -693,8 +694,8 @@ static void _cairo_dock_remove_one_icon_from_dock (CairoDock *pDock, Icon *icon,
 	}
 	if (CAIRO_DOCK_IS_APPLET (icon))
 	{
-		cairo_dock_deactivate_module (icon->pModule);  // desactive le module mais ne le ferme pas.
-		icon->pModule = NULL;  // pour ne pas le liberer lors du free_icon.
+		cairo_dock_deinstanciate_module (icon->pModuleInstance);  // desactive l'instance du module.
+		icon->pModuleInstance = NULL;  // l'instance n'est plus valide apres ca.
 	}  // rien a faire pour les separateurs automatiques.
 
 	//\___________________ On detache l'icone du dock.
@@ -1385,7 +1386,7 @@ void cairo_dock_update_icon_s_container_name (Icon *icon, const gchar *cNewParen
 		g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 		if (erreur != NULL)
 		{
-			cd_warning ("Attention : %s", erreur->message);
+			cd_warning ("%s", erreur->message);
 			g_error_free (erreur);
 			g_free (cDesktopFilePath);
 			return ;
@@ -1401,15 +1402,15 @@ void cairo_dock_update_icon_s_container_name (Icon *icon, const gchar *cNewParen
 	{
 		GError *erreur = NULL;
 		GKeyFile *pKeyFile = g_key_file_new ();
-		g_key_file_load_from_file (pKeyFile, icon->pModule->cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
+		g_key_file_load_from_file (pKeyFile, icon->pModuleInstance->cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 		if (erreur != NULL)
 		{
-			cd_warning ("Attention : %s", erreur->message);
+			cd_warning ("%s", erreur->message);
 			g_error_free (erreur);
 			return ;
 		}
 		g_key_file_set_string (pKeyFile, "Icon", "dock name", cNewParentDockName);
-		cairo_dock_write_keys_to_file (pKeyFile, icon->pModule->cConfFilePath);
+		cairo_dock_write_keys_to_file (pKeyFile, icon->pModuleInstance->cConfFilePath);
 		g_key_file_free (pKeyFile);
 	}
 }

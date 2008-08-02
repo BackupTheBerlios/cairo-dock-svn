@@ -173,4 +173,6 @@ cairo_docksubinclude_HEADERS =\
 	cairo-dock-gauge.h\
 	cairo-dock-dock-manager.h\
 	cairo-dock-class-manager.h\
-	cairo-dock-emblem.h
+	cairo-dock-emblem.h\
+	cairo-dock-applet-single-instance.h\
+	cairo-dock-applet-multi-instance.h

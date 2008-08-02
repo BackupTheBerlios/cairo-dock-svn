@@ -8,6 +8,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 ************************************************************************************/
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
 
@@ -470,9 +471,6 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode)
 			cd_message ("%s", sCommand->str);
 			system (sCommand->str);
 
-			/// A FAIRE : fusionner les fichiers de conf des plug-ins si deja presents.
-			///find themes/theme_bidon ! -name '*.conf' ! -path 'themes/theme_bidon/launchers*' -print -exec cp -p {} current_theme/ \;
-			
 			if (g_pMainDock == NULL || g_key_file_get_boolean (pKeyFile, "Themes", "use theme behaviour", NULL))
 			{
 				g_string_printf (sCommand, "find '%s'/* -prune ! -name '*.conf' ! -name %s -exec /bin/cp -r '{}' '%s' \\;", cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR, g_cCurrentThemePath);  // copie tous les fichiers du nouveau theme sauf les lanceurs et le .conf, dans le repertoire du theme courant. Ecrase les fichiers de memes noms.
@@ -481,7 +479,7 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode)
 			}
 			else
 			{
-				g_string_printf (sCommand, "find '%s' ! -name '*.conf' ! -path '%s/%s*' -print -exec cp -p {} '%s' \;", cNewThemePath, cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR, g_cCurrentThemePath);  // copie tous les fichiers du nouveau theme sauf les lanceurs/icones et les .conf du dock et des plug-ins.
+				g_string_printf (sCommand, "find '%s' ! -name '*.conf' ! -path '%s/%s*' -print -exec cp -p {} '%s' \\;", cNewThemePath, cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR, g_cCurrentThemePath);  // copie tous les fichiers du nouveau theme sauf les lanceurs/icones et les .conf du dock et des plug-ins.
 				cd_message ("%s", sCommand->str);
 				system (sCommand->str);
 				

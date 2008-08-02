@@ -11,14 +11,6 @@
 * Pour un exemple tres simple, consultez les sources de l'applet 'logout'.
 */
 
-/**
-*Verifie que le fichier de conf d'un plug-in est bien present dans le repertoire utilisateur du plug-in, sinon le copie a partir du fichier de conf fournit lors de l'installation. Cree au besoin le repertoire utilisateur du plug-in.
-*@param cUserDataDirName le nom du repertoire utilisateur du plug-in.
-*@param cShareDataDir le chemin du repertoire d'installation du plug-in.
-*@param cConfFileName : le nom du fichier de conf fournit a l'installation.
-*@return Le chemin du fichier de conf en espace utilisateur, ou NULL si le fichier n'a pu etre ni trouve, ni cree.
-*/
-gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShareDataDir, gchar *cConfFileName);
 
 void cairo_dock_free_minimal_config (CairoDockMinimalAppletConfig *pMinimalConfig);
 
@@ -163,7 +155,9 @@ typedef enum {
 	CAIRO_DOCK_NB_FREQUENCIES
 } CairoDockFrequencyState;
 
-typedef gboolean (* CairoDockUpdateTimerFunc ) (void);
+typedef void (* CairoDockAquisitionTimerFunc ) (gpointer data);
+typedef void (* CairoDockReadTimerFunc ) (gpointer data);
+typedef gboolean (* CairoDockUpdateTimerFunc ) (gpointer data);
 typedef struct {
 	/// Sid du timer des mesures.
 	gint iSidTimer;
@@ -174,15 +168,17 @@ typedef struct {
 	/// mutex d'accessibilite a la structure des resultats.
 	GMutex *pMutexData;
 	/// fonction realisant l'acquisition des donnees. N'accede jamais a la structure des resultats.
-	GVoidFunc acquisition;
+	CairoDockAquisitionTimerFunc acquisition;
 	/// fonction realisant la lecture des donnees precedemment acquises; stocke les resultats dans la structures des resultats.
-	GVoidFunc read;
+	CairoDockReadTimerFunc read;
 	/// fonction realisant la mise a jour de l'IHM en fonction des nouveaux resultats. Renvoie TRUE pour continuer, FALSE pour arreter.
 	CairoDockUpdateTimerFunc update;
 	/// intervalle de temps en secondes, eventuellement nul pour une mesure unitaire.
 	gint iCheckInterval;
 	/// etat de la frequence des mesures.
 	CairoDockFrequencyState iFrequencyState;
+	/// donnees passees en entree de chaque fonction.
+	gpointer pUserData;
 } CairoDockMeasure;
 
 /**
@@ -204,7 +200,7 @@ void cairo_dock_launch_measure_delayed (CairoDockMeasure *pMeasureTimer, double 
 *@param update fonction realisant la mise a jour de l'interface en fonction des nouveaux resultats, lus dans la structures des resultats.
 *@return la mesure nouvellement allouee. A liberer avec #cairo_dock_free_measure_timer.
 */
-CairoDockMeasure *cairo_dock_new_measure_timer (int iCheckInterval, GVoidFunc acquisition, GVoidFunc read, CairoDockUpdateTimerFunc update);
+CairoDockMeasure *cairo_dock_new_measure_timer (int iCheckInterval, CairoDockAquisitionTimerFunc acquisition, CairoDockReadTimerFunc read, CairoDockUpdateTimerFunc update, gpointer pUserData);
 /**
 *Stoppe les mesures. Si une mesure est en cours, le thread d'acquisition/lecture se terminera tout seul plus tard, et la mesure sera ignoree. On peut reprendre les mesures par un simple #cairo_dock_launch_measure. Ne doit _pas_ etre appelée durant la fonction 'read' ou 'update'; utiliser la sortie de 'update' pour cela.
 *@param pMeasureTimer la mesure periodique.
@@ -254,37 +250,32 @@ void cairo_dock_play_sound (const gchar *cSoundPath);
 
 
 
+typedef struct _AppletConfig AppletConfig;
+typedef struct _AppletData AppletData;
+
 //\_________________________________ INIT
 /**
 *Definition des fonctions d'initialisation de l'applet; a inclure dans le .h du fichier d'init de l'applet.
 */
 #define CD_APPLET_H \
-CairoDockVisitCard *pre_init (void); \
-void init (GKeyFile *pKeyFile, Icon *pIcon, CairoContainer *pContainer, gchar *cConfFilePath, GError **erreur); \
-void stop (void); \
-gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoContainer *pNewContainer);
+void pre_init (CairoDockVisitCard *pVisitCard, CairoDockModuleInterface *pInterface); \
+void init (CairoDockModuleInstance *myApplet, GKeyFile *pKeyFile); \
+void stop (CairoDockModuleInstance *myApplet); \
+gboolean reload (CairoDockModuleInstance *myApplet, CairoContainer *pOldContainer, GKeyFile *pKeyFile);
 
 //\______________________ pre_init.
 /**
 *Debut de la fonction de pre-initialisation de l'applet (celle qui est appele a l'enregistrement de tous les plug-ins).
-*Defini egalement les variables globales suivantes : myIcon, myDock, myDesklet, myContainer, et myDrawContext.
+*Definit egalement les variables globales suivantes : myIcon, myDock, myDesklet, myContainer, et myDrawContext.
 *@param cName nom de sous lequel l'applet sera enregistree par Cairo-Dock.
 *@param iMajorVersion version majeure du dock necessaire au bon fonctionnement de l'applet.
 *@param iMinorVersion version mineure du dock necessaire au bon fonctionnement de l'applet.
 *@param iMicroVersion version micro du dock necessaire au bon fonctionnement de l'applet.
 *@param iAppletCategory Catégorie de l'applet (CAIRO_DOCK_CATEGORY_ACCESSORY, CAIRO_DOCK_CATEGORY_DESKTOP, CAIRO_DOCK_CATEGORY_CONTROLER)
 */
-#define CD_APPLET_PRE_INIT_BEGIN(cName, iMajorVersion, iMinorVersion, iMicroVersion, iAppletCategory) \
-Icon *myIcon = NULL; \
-CairoDock *myDock = NULL; \
-CairoDesklet *myDesklet = NULL; \
-CairoContainer *myContainer = NULL; \
-cairo_t *myDrawContext = NULL; \
-AppletConfig myConfig; \
-AppletData myData; \
-CairoDockVisitCard *pre_init (void) \
+#define CD_APPLET_PRE_INIT_ALL_BEGIN(cName, iMajorVersion, iMinorVersion, iMicroVersion, iAppletCategory) \
+void pre_init (CairoDockVisitCard *pVisitCard, CairoDockModuleInterface *pInterface) \
 { \
-	CairoDockVisitCard *pVisitCard = g_new0 (CairoDockVisitCard, 1); \
 	pVisitCard->cModuleName = g_strdup (cName); \
 	pVisitCard->cReadmeFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_README_FILE); \
 	pVisitCard->iMajorVersionNeeded = iMajorVersion; \
@@ -297,22 +288,33 @@ CairoDockVisitCard *pre_init (void) \
 	pVisitCard->cShareDataDir = g_strdup (MY_APPLET_SHARE_DATA_DIR); \
 	pVisitCard->cConfFileName = (MY_APPLET_CONF_FILE != NULL && strcmp (MY_APPLET_CONF_FILE, "none") != 0 ? g_strdup (MY_APPLET_CONF_FILE) : NULL); \
 	pVisitCard->cModuleVersion = g_strdup (MY_APPLET_VERSION);\
-	pVisitCard->iCategory =iAppletCategory ;\
-	pVisitCard->cIconFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_ICON_FILE);
+	pVisitCard->iCategory = iAppletCategory ;\
+	pVisitCard->cIconFilePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, MY_APPLET_ICON_FILE); \
+	pVisitCard->iSizeOfConfig = sizeof (AppletConfig);\
+	pVisitCard->iSizeOfData = sizeof (AppletData);
+
+#define CD_APPLET_DEFINE_COMMON_APPLET_INTERFACE \
+	pInterface->initModule = init;\
+	pInterface->stopModule = stop;\
+	pInterface->reloadModule = reload;\
+	pInterface->reset_config = reset_config;\
+	pInterface->reset_data = reset_data;\
+	pInterface->read_conf_file = read_conf_file;
+
 /**
 *Fin de la fonction de pre-initialisation de l'applet.
 */
 #define CD_APPLET_PRE_INIT_END \
-	return pVisitCard; \
 }
 /**
 *Fonction de pre-initialisation generique. Ne fais que definir l'applet (en appelant les 2 macros precedentes), la plupart du temps cela est suffisant.
 */
 #define CD_APPLET_DEFINITION(cName, iMajorVersion, iMinorVersion, iMicroVersion, iAppletCategory) \
 CD_APPLET_PRE_INIT_BEGIN (cName, iMajorVersion, iMinorVersion, iMicroVersion, iAppletCategory) \
+CD_APPLET_DEFINE_COMMON_APPLET_INTERFACE \
 CD_APPLET_PRE_INIT_END
 
-
+#define CD_APPLET_CAN_DETACH TRUE
 
 //\______________________ init.
 /**
@@ -320,31 +322,15 @@ CD_APPLET_PRE_INIT_END
 *Lis le fichier de conf de l'applet, et cree son icone ainsi que son contexte de dessin.
 *@param erreur une GError, utilisable pour reporter une erreur ayant lieu durant l'initialisation.
 */
-#define CD_APPLET_INIT_BEGIN(erreur) \
-void init (GKeyFile *pKeyFile, Icon *pIcon, CairoContainer *pContainer, gchar *cConfFilePath, GError **erreur) \
+#define CD_APPLET_INIT_ALL_BEGIN \
+void init (CairoDockModuleInstance *myApplet, GKeyFile *pKeyFile) \
 { \
-	g_return_if_fail (pContainer != NULL && pIcon != NULL); \
-	myIcon = pIcon; \
-	myContainer = pContainer; \
-	myDock = (CAIRO_DOCK_IS_DOCK (pContainer) ? CAIRO_DOCK (pContainer) : NULL); \
-	myDesklet = (CAIRO_DOCK_IS_DESKLET (pContainer) ? CAIRO_DESKLET (pContainer) : NULL); \
-	read_conf_file (pKeyFile, cConfFilePath); \
-	if (CAIRO_DOCK_IS_DOCK (myContainer)) \
-	{ \
-		if (myIcon != NULL) \
-		{ \
-			myDrawContext = cairo_create (myIcon->pIconBuffer); \
-			g_return_if_fail (cairo_status (myDrawContext) == CAIRO_STATUS_SUCCESS); \
-		} \
-	} \
-	else \
-		myDrawContext = NULL;
+	cd_message ("%s (%s)\n", __func__, myApplet->cConfFilePath);
 
 /**
 *Fin de la fonction d'initialisation de l'applet.
 */
 #define CD_APPLET_INIT_END \
-	return; \
 }
 
 //\______________________ stop.
@@ -352,49 +338,23 @@ void init (GKeyFile *pKeyFile, Icon *pIcon, CairoContainer *pContainer, gchar *c
 *Debut de la fonction d'arret de l'applet.
 */
 #define CD_APPLET_STOP_BEGIN \
-void stop (void) \
+void stop (CairoDockModuleInstance *myApplet) \
 {
 
 /**
 *Fin de la fonction d'arret de l'applet.
 */
-#define CD_APPLET_STOP_END \
-	reset_data (); \
-	reset_config (); \
-	myDock = NULL; \
-	myDesklet = NULL; \
-	myContainer = NULL; \
-	myIcon = NULL; \
-	if (myDrawContext != NULL) \
-		cairo_destroy (myDrawContext); \
-	myDrawContext = NULL; \
+#define CD_APPLET_STOP_ALL_END \
 }
 
 //\______________________ reload.
 /**
 *Debut de la fonction de rechargement de l'applet.
 */
-#define CD_APPLET_RELOAD_BEGIN \
-gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoContainer *pNewContainer) \
+#define CD_APPLET_RELOAD_ALL_BEGIN \
+gboolean reload (CairoDockModuleInstance *myApplet, CairoContainer *pOldContainer, GKeyFile *pKeyFile) \
 { \
-	cd_message ("%s (%s)\n", __func__, cConfFilePath); \
-	g_return_val_if_fail (pNewContainer != NULL, FALSE); \
-	CairoContainer *pOldContainer = myContainer; \
-	gboolean bContainerTypeChanged = (myContainer == NULL || myContainer->iType != pNewContainer->iType); \
-	myContainer = pNewContainer; \
-	myDock = (CAIRO_DOCK_IS_DOCK (pNewContainer) ? CAIRO_DOCK (pNewContainer) : NULL); \
-	myDesklet = (CAIRO_DOCK_IS_DESKLET (pNewContainer) ? CAIRO_DESKLET (pNewContainer) : NULL); \
-	if (pKeyFile != NULL) \
-		read_conf_file (pKeyFile, cConfFilePath); \
-	if (myDrawContext != NULL) \
-		cairo_destroy (myDrawContext); \
-	if (CAIRO_DOCK_IS_DOCK (myContainer)) \
-	{ \
-		myDrawContext = cairo_create (myIcon->pIconBuffer); \
-		g_return_val_if_fail (cairo_status (myDrawContext) == CAIRO_STATUS_SUCCESS, FALSE); \
-	} \
-	else \
-		myDrawContext = NULL;
+	cd_message ("%s (%s)\n", __func__, myApplet->cConfFilePath);
 
 /**
 *Fin de la fonction de rechargement de l'applet.
@@ -411,7 +371,7 @@ gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoContainer *pNewC
 /**
 *TRUE ssi le type de container a change.
 */
-#define CD_APPLET_MY_CONTAINER_TYPE_CHANGED bContainerTypeChanged
+#define CD_APPLET_MY_CONTAINER_TYPE_CHANGED (myApplet->pContainer == NULL || myApplet->pContainer->iType != pOldContainer->iType)
 
 /**
 *Le conteneur precedent le reload.
@@ -422,7 +382,7 @@ gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoContainer *pNewC
 /**
 *Chemin du fichier de conf de l'applet, appelable durant les fonctions d'init, de config, et de reload.
 */
-#define CD_APPLET_MY_CONF_FILE cConfFilePath
+#define CD_APPLET_MY_CONF_FILE myApplet->cConfFilePath
 /**
 *Fichier de cles de l'applet, appelable durant les fonctions d'init, de config, et de reload.
 */
@@ -434,20 +394,16 @@ gboolean reload (GKeyFile *pKeyFile, gchar *cConfFilePath, CairoContainer *pNewC
 /**
 *Debut de la fonction de configuration de l'applet (celle qui est appelee au debt de l'init).
 */
-#define CD_APPLET_GET_CONFIG_BEGIN \
-void read_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath) \
+#define CD_APPLET_GET_CONFIG_ALL_BEGIN \
+gboolean read_conf_file (CairoDockModuleInstance *myApplet, GKeyFile *pKeyFile) \
 { \
-	gboolean bFlushConfFileNeeded = FALSE; \
-	reset_config ();
+	gboolean bFlushConfFileNeeded = FALSE;
 
 /**
 *Fin de la fonction de configuration de l'applet.
 */
 #define CD_APPLET_GET_CONFIG_END \
-	if (! bFlushConfFileNeeded) \
-		bFlushConfFileNeeded = cairo_dock_conf_file_needs_update (pKeyFile, MY_APPLET_VERSION); \
-	if (bFlushConfFileNeeded) \
-		cairo_dock_flush_conf_file (pKeyFile, cConfFilePath, MY_APPLET_SHARE_DATA_DIR);\
+	return bFlushConfFileNeeded; \
 }
 
 
@@ -455,9 +411,9 @@ void read_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath) \
 *Definition de la fonction de configuration, a inclure dans le .h correspondant.
 */
 #define CD_APPLET_CONFIG_H \
-void read_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath); \
-void reset_config (void); \
-void reset_data (void);
+gboolean read_conf_file (CairoDockModuleInstance *myApplet, GKeyFile *pKeyFile); \
+void reset_config (CairoDockModuleInstance *myApplet); \
+void reset_data (CairoDockModuleInstance *myApplet);
 
 
 /**
@@ -614,21 +570,20 @@ cairo_dock_manage_themes_for_applet (MY_APPLET_SHARE_DATA_DIR, cThemesDirName, C
 /**
 *Debut de la fonction de liberation des donnees de la config.
 */
-#define CD_APPLET_RESET_CONFIG_BEGIN \
-void reset_config (void) \
+#define CD_APPLET_RESET_CONFIG_ALL_BEGIN \
+void reset_config (CairoDockModuleInstance *myApplet) \
 {
 /**
 *Fin de la fonction de liberation des donnees de la config.
 */
 #define CD_APPLET_RESET_CONFIG_END \
-	memset (&myConfig, 0, sizeof (AppletConfig)); \
 }
 
 /**
 *Debut de la fonction de liberation des donnees internes.
 */
 #define CD_APPLET_RESET_DATA_BEGIN \
-void reset_data(void) \
+void reset_data (CairoDockModuleInstance *myApplet) \
 {
 /**
 *Fin de la fonction de liberation des donnees internes.
@@ -644,7 +599,7 @@ void reset_data(void) \
 *@param cMessage message a afficher dans l'info-bulle.
 */
 #define CD_APPLET_ABOUT(cMessage) \
-void about (GtkMenuItem *menu_item, gpointer *data) \
+void about (GtkMenuItem *menu_item, CairoDockModuleInstance *myApplet) \
 { \
 	cairo_dock_show_temporary_dialog (cMessage, myIcon, myContainer, 0); \
 }
@@ -652,24 +607,24 @@ void about (GtkMenuItem *menu_item, gpointer *data) \
 *Definition de la fonction precedente; a inclure dans le .h correspondant.
 */
 #define CD_APPLET_ABOUT_H \
-void about (GtkMenuItem *menu_item, gpointer *data);
+void about (GtkMenuItem *menu_item, CairoDockModuleInstance *myApplet);
 
 //\______________________ notification clique gauche.
 #define CD_APPLET_ON_CLICK action_on_click
 /**
 *Abonne l'applet aux notifications du clic gauche. A effectuer lors de l'init de l'applet.
 */
-#define CD_APPLET_REGISTER_FOR_CLICK_EVENT cairo_dock_register_notification (CAIRO_DOCK_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_CLICK, CAIRO_DOCK_RUN_FIRST);
+#define CD_APPLET_REGISTER_FOR_CLICK_EVENT cairo_dock_register_notification (CAIRO_DOCK_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_CLICK, CAIRO_DOCK_RUN_FIRST, myApplet);
 /**
 *Desabonne l'applet aux notifications du clic gauche. A effectuer lors de l'arret de l'applet.
 */
-#define CD_APPLET_UNREGISTER_FOR_CLICK_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_CLICK);
+#define CD_APPLET_UNREGISTER_FOR_CLICK_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_CLICK, myApplet);
 
 /**
 *Debut de la fonction de notification au clic gauche.
 */
 #define CD_APPLET_ON_CLICK_BEGIN \
-gboolean CD_APPLET_ON_CLICK (gpointer *data) \
+gboolean CD_APPLET_ON_CLICK (gpointer *data, CairoDockModuleInstance *myApplet) \
 { \
 	Icon *pClickedIcon = data[0]; \
 	CairoContainer *pClickedContainer = data[1]; \
@@ -689,24 +644,24 @@ gboolean CD_APPLET_ON_CLICK (gpointer *data) \
 *Definition de la fonction precedente; a inclure dans le .h correspondant.
 */
 #define CD_APPLET_ON_CLICK_H \
-gboolean CD_APPLET_ON_CLICK (gpointer *data);
+gboolean CD_APPLET_ON_CLICK (gpointer *data, CairoDockModuleInstance *myApplet);
 
 //\______________________ notification construction menu.
 #define CD_APPLET_ON_BUILD_MENU applet_on_build_menu
 /**
 *Abonne l'applet aux notifications de construction du menu. A effectuer lors de l'init de l'applet.
 */
-#define CD_APPLET_REGISTER_FOR_BUILD_MENU_EVENT cairo_dock_register_notification (CAIRO_DOCK_BUILD_MENU, (CairoDockNotificationFunc) CD_APPLET_ON_BUILD_MENU, CAIRO_DOCK_RUN_FIRST);
+#define CD_APPLET_REGISTER_FOR_BUILD_MENU_EVENT cairo_dock_register_notification (CAIRO_DOCK_BUILD_MENU, (CairoDockNotificationFunc) CD_APPLET_ON_BUILD_MENU, CAIRO_DOCK_RUN_FIRST, myApplet);
 /**
 *Desabonne l'applet aux notifications de construction du menu. A effectuer lors de l'arret de l'applet.
 */
-#define CD_APPLET_UNREGISTER_FOR_BUILD_MENU_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_BUILD_MENU, (CairoDockNotificationFunc) CD_APPLET_ON_BUILD_MENU);
+#define CD_APPLET_UNREGISTER_FOR_BUILD_MENU_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_BUILD_MENU, (CairoDockNotificationFunc) CD_APPLET_ON_BUILD_MENU, myApplet);
 
 /**
 *Debut de la fonction de notification de construction du menu.
 */
 #define CD_APPLET_ON_BUILD_MENU_BEGIN \
-gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data) \
+gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data, CairoDockModuleInstance *myApplet) \
 { \
 	Icon *pClickedIcon = data[0]; \
 	CairoContainer *pClickedContainer = data[1]; \
@@ -728,7 +683,7 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data) \
 *Definition de la fonction precedente; a inclure dans le .h correspondant.
 */
 #define CD_APPLET_ON_BUILD_MENU_H \
-gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
+gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data, CairoDockModuleInstance *myApplet);
 
 /**
 *Menu principal de l'applet.
@@ -784,7 +739,7 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 *@param cLabel nom du sous-menu, tel qu'il apparaitra dans le menu.
 *@param pFunction fonction appelee lors de la selection de cette entree.
 *@param pMenu GtkWidget du menu auquel on rajoutera le sous-menu.
-*@param pData donnees passees en parametre de la fonction.
+*@param pData donnees passees en parametre de la fonction (doit contenir myApplet).
 */
 #define CD_APPLET_ADD_IN_MENU_WITH_DATA(cLabel, pFunction, pMenu, pData) \
 	pMenuItem = gtk_menu_item_new_with_label (cLabel); \
@@ -797,7 +752,7 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 *@param pFunction fonction appelee lors de la selection de cette entree.
 *@param pMenu GtkWidget du menu auquel on rajoutera l'entree.
 */
-#define CD_APPLET_ADD_IN_MENU(cLabel, pFunction, pMenu) CD_APPLET_ADD_IN_MENU_WITH_DATA(cLabel, pFunction, pMenu, NULL)
+#define CD_APPLET_ADD_IN_MENU(cLabel, pFunction, pMenu) CD_APPLET_ADD_IN_MENU_WITH_DATA(cLabel, pFunction, pMenu, myApplet)
 
 /**
 *Ajoute une entree avec une icone GTK a un menu deja existant.
@@ -805,16 +760,22 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 *@param gtkStock nom d'une icone de GTK.
 *@param pFunction fonction appelee lors de la selection de cette entree.
 *@param pMenu GtkWidget du menu auquel on rajoutera l'entree.
-*@param pData donnees passees en parametre de la fonction.
+*@param pData donnees passees en parametre de la fonction (doit contenir myApplet).
 */
-#define CD_APPLET_ADD_IN_MENU_WITH_STOCK(cLabel, gtkStock, pFunction, pMenu, pData) \
+#define CD_APPLET_ADD_IN_MENU_WITH_STOCK_AND_DATA(cLabel, gtkStock, pFunction, pMenu, pData) \
 	pMenuItem = gtk_image_menu_item_new_with_label (cLabel); \
 	image = gtk_image_new_from_stock (gtkStock, GTK_ICON_SIZE_MENU); \
 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (pMenuItem), image); \
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pMenu), pMenuItem); \
 	g_signal_connect (G_OBJECT (pMenuItem), "activate", G_CALLBACK(pFunction), pData);
 
-
+/**
+*Ajoute une entree avec une icone GTK a un menu deja existant.
+*@param cLabel nom de l'entree, tel qu'il apparaitra dans le menu.
+*@param pFunction fonction appelee lors de la selection de cette entree.
+*@param pMenu GtkWidget du menu auquel on rajoutera l'entree.
+*/
+#define CD_APPLET_ADD_IN_MENU_WITH_STOCK(cLabel, gtkStock, pFunction, pMenu) CD_APPLET_ADD_IN_MENU_WITH_STOCK_AND_DATA(cLabel, gtkStock, pFunction, pMenu, myApplet)
 
 /**
  * Ajoute un separateur dans un menu deja existant
@@ -827,7 +788,7 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 *Ajoute une entree pour la fonction 'A propos'.
 *@param pMenu GtkWidget du menu auquel sera ajoutee l'entree.
 */
-#define CD_APPLET_ADD_ABOUT_IN_MENU(pMenu) CD_APPLET_ADD_IN_MENU (_("About"), about, pMenu)
+#define CD_APPLET_ADD_ABOUT_IN_MENU(pMenu) CD_APPLET_ADD_IN_MENU_WITH_STOCK (_("About"), GTK_STOCK_ABOUT, about, pMenu)
 
 /**
 *Recupere la derniere entree ajoutee dans la fonction.
@@ -840,17 +801,17 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data);
 /**
 *Abonne l'applet aux notifications du clic du milieu. A effectuer lors de l'init de l'applet.
 */
-#define CD_APPLET_REGISTER_FOR_MIDDLE_CLICK_EVENT cairo_dock_register_notification (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_MIDDLE_CLICK, CAIRO_DOCK_RUN_FIRST);
+#define CD_APPLET_REGISTER_FOR_MIDDLE_CLICK_EVENT cairo_dock_register_notification (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_MIDDLE_CLICK, CAIRO_DOCK_RUN_FIRST, myApplet);
 /**
 *Desabonne l'applet aux notifications du clic du milieu. A effectuer lors de l'arret de l'applet.
 */
-#define CD_APPLET_UNREGISTER_FOR_MIDDLE_CLICK_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_MIDDLE_CLICK);
+#define CD_APPLET_UNREGISTER_FOR_MIDDLE_CLICK_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_MIDDLE_CLICK, myApplet);
 
 /**
 *Debut de la fonction de notification du clic du milieu.
 */
 #define CD_APPLET_ON_MIDDLE_CLICK_BEGIN \
-gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data) \
+gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data, CairoDockModuleInstance *myApplet) \
 { \
 	Icon *pClickedIcon = data[0]; \
 	CairoContainer *pClickedContainer = data[1]; \
@@ -868,24 +829,24 @@ gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data) \
 *Definition de la fonction precedente; a inclure dans le .h correspondant.
 */
 #define CD_APPLET_ON_MIDDLE_CLICK_H \
-gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data);
+gboolean CD_APPLET_ON_MIDDLE_CLICK (gpointer *data, CairoDockModuleInstance *myApplet);
 
 //\______________________ notification drag'n'drop.
 #define CD_APPLET_ON_DROP_DATA action_on_drop_data
 /**
 *Abonne l'applet aux notifications du glisse-depose. A effectuer lors de l'init de l'applet.
 */
-#define CD_APPLET_REGISTER_FOR_DROP_DATA_EVENT cairo_dock_register_notification (CAIRO_DOCK_DROP_DATA, (CairoDockNotificationFunc) CD_APPLET_ON_DROP_DATA, CAIRO_DOCK_RUN_FIRST);
+#define CD_APPLET_REGISTER_FOR_DROP_DATA_EVENT cairo_dock_register_notification (CAIRO_DOCK_DROP_DATA, (CairoDockNotificationFunc) CD_APPLET_ON_DROP_DATA, CAIRO_DOCK_RUN_FIRST, myApplet);
 /**
 *Desabonne l'applet aux notifications du glisse-depose. A effectuer lors de l'arret de l'applet.
 */
-#define CD_APPLET_UNREGISTER_FOR_DROP_DATA_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_DROP_DATA, (CairoDockNotificationFunc) CD_APPLET_ON_DROP_DATA);
+#define CD_APPLET_UNREGISTER_FOR_DROP_DATA_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_DROP_DATA, (CairoDockNotificationFunc) CD_APPLET_ON_DROP_DATA, myApplet);
 
 /**
 *Debut de la fonction de notification du glisse-depose.
 */
 #define CD_APPLET_ON_DROP_DATA_BEGIN \
-gboolean CD_APPLET_ON_DROP_DATA (gpointer *data) \
+gboolean CD_APPLET_ON_DROP_DATA (gpointer *data, CairoDockModuleInstance *myApplet) \
 { \
 	Icon *pClickedIcon = data[1]; \
 	CairoContainer *pClickedContainer = data[3]; \
@@ -911,24 +872,24 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data) \
 *Definition de la fonction precedente; a inclure dans le .h correspondant.
 */
 #define CD_APPLET_ON_DROP_DATA_H \
-gboolean CD_APPLET_ON_DROP_DATA (gpointer *data);
+gboolean CD_APPLET_ON_DROP_DATA (gpointer *data, CairoDockModuleInstance *myApplet);
 
 //\______________________ notification de scroll molette.
 #define CD_APPLET_ON_SCROLL action_on_scroll
 /**
 *Abonne l'applet aux notifications du clic gauche. A effectuer lors de l'init de l'applet.
 */
-#define CD_APPLET_REGISTER_FOR_SCROLL_EVENT cairo_dock_register_notification (CAIRO_DOCK_SCROLL_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_SCROLL, CAIRO_DOCK_RUN_FIRST);
+#define CD_APPLET_REGISTER_FOR_SCROLL_EVENT cairo_dock_register_notification (CAIRO_DOCK_SCROLL_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_SCROLL, CAIRO_DOCK_RUN_FIRST, myApplet);
 /**
 *Desabonne l'applet aux notifications du clic gauche. A effectuer lors de l'arret de l'applet.
 */
-#define CD_APPLET_UNREGISTER_FOR_SCROLL_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_SCROLL_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_SCROLL);
+#define CD_APPLET_UNREGISTER_FOR_SCROLL_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_SCROLL_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_SCROLL, myApplet);
 
 /**
 *Debut de la fonction de notification au clic gauche.
 */
 #define CD_APPLET_ON_SCROLL_BEGIN \
-gboolean CD_APPLET_ON_SCROLL (gpointer *data) \
+gboolean CD_APPLET_ON_SCROLL (gpointer *data, CairoDockModuleInstance *myApplet) \
 { \
 	Icon *pClickedIcon = data[0]; \
 	CairoContainer *pClickedContainer = data[1]; \
@@ -948,7 +909,7 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data) \
 *Definition de la fonction precedente; a inclure dans le .h correspondant.
 */
 #define CD_APPLET_ON_SCROLL_H \
-gboolean CD_APPLET_ON_SCROLL (gpointer *data);
+gboolean CD_APPLET_ON_SCROLL (gpointer *data, CairoDockModuleInstance *myApplet);
 
 /**
 *Direction du scroll.
@@ -1162,14 +1123,13 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data);
 /**
 *Exportation des variables globales de l'applet. A inclure dans chaque .c ou elles sont utilisees (directement ou via les macros).
 */
-#define CD_APPLET_INCLUDE_MY_VARS \
-extern Icon *myIcon; \
-extern cairo_t *myDrawContext; \
-extern CairoDock *myDock; \
-extern CairoDesklet *myDesklet; \
-extern CairoContainer *myContainer; \
-extern AppletConfig myConfig; \
-extern AppletData myData;
+#define CD_APPLET_INCLUDE_MY_VARS 
+
+#ifdef CD_APPLET_MULTI_INSTANCE
+#include <cairo-dock-applet-multi-instance.h>
+#else
+#include <cairo-dock-applet-single-instance.h>
+#endif
 
 
 //\_________________________________ INTERNATIONNALISATION

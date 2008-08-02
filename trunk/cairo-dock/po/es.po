@@ -131,7 +131,7 @@ msgstr ""
 
 #: ../src/cairo-dock-menu.c:803
 #, c-format
-msgid "You're about removing this module (%s) from the dock. Sure ?"
+msgid "You're about removing this applet (%s) from the dock. Sure ?"
 msgstr "Esta intentando eliminar el modulo (%s) del dock. Seguro ?"
 
 #: ../src/cairo-dock-menu.c:1050
@@ -285,19 +285,19 @@ msgid "Close"
 msgstr "Cerrar"
 
 #: ../src/cairo-dock-menu.c:1368
-msgid "Configure this module"
+msgid "Configure this applet"
 msgstr "Configurar este modulo"
 
 #: ../src/cairo-dock-menu.c:1372
-msgid "Detach this module"
-msgstr "DÃ©tacher ce module"
+msgid "Detach this applet"
+msgstr "DÃ©tacher ce applet"
 
 #: ../src/cairo-dock-menu.c:1372
 msgid "Return to dock"
 msgstr "Volver al dock"
 
 #: ../src/cairo-dock-menu.c:1375
-msgid "Remove this module"
+msgid "Remove this applet"
 msgstr "Eliminar este modulo"
 
 #: ../src/cairo-dock-menu.c:1393

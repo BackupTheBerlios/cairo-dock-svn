@@ -34,40 +34,6 @@ extern CairoDockLabelDescription g_iconTextDescription;
 extern CairoDockLabelDescription g_quickInfoTextDescription;
 extern gboolean g_bTextAlwaysHorizontal;
 
-gchar *cairo_dock_check_conf_file_exists (gchar *cUserDataDirName, gchar *cShareDataDir, gchar *cConfFileName)
-{
-	if (cConfFileName == NULL)
-		return NULL;
-	
-	gchar *cUserDataDirPath = g_strdup_printf ("%s/plug-ins/%s", g_cCurrentThemePath, cUserDataDirName);
-	if (! g_file_test (cUserDataDirPath, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
-	{
-		cd_message ("directory %s doesn't exist, it will be added.", cUserDataDirPath);
-		
-		gchar *command = g_strdup_printf ("mkdir -p %s", cUserDataDirPath);
-		system (command);
-		g_free (command);
-	}
-	
-	gchar *cConfFilePath = g_strdup_printf ("%s/%s", cUserDataDirPath, cConfFileName);
-	if (! g_file_test (cConfFilePath, G_FILE_TEST_EXISTS))
-	{
-		gchar *command = g_strdup_printf ("cp %s/%s %s", cShareDataDir, cConfFileName, cConfFilePath);
-		system (command);
-		g_free (command);
-	}
-	
-	if (! g_file_test (cConfFilePath, G_FILE_TEST_EXISTS))  // la copie ne s'est pas bien passee.
-	{
-		cd_warning ("Attention : couldn't copy %s/%s in %s; check permissions and file's existence", cShareDataDir, cConfFileName, cUserDataDirPath);
-		g_free (cUserDataDirPath);
-		g_free (cConfFilePath);
-		return NULL;
-	}
-	
-	g_free (cUserDataDirPath);
-	return cConfFilePath;
-}
 
 void cairo_dock_free_minimal_config (CairoDockMinimalAppletConfig *pMinimalConfig)
 {
@@ -212,8 +178,11 @@ void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, 
 {
 	g_return_if_fail (pIcon != NULL && pContainer != NULL);  // le contexte sera verifie plus loin.
 
-	g_free (pIcon->acName);
-	pIcon->acName = g_strdup (cIconName);
+	if (pIcon->acName != cIconName)
+	{
+		g_free (pIcon->acName);
+		pIcon->acName = g_strdup (cIconName);
+	}
 
 	cairo_dock_fill_one_text_buffer(
 		pIcon,
@@ -236,8 +205,11 @@ void cairo_dock_set_quick_info (cairo_t *pSourceContext, const gchar *cQuickInfo
 {
 	g_return_if_fail (pIcon != NULL);  // le contexte sera verifie plus loin.
 
-	g_free (pIcon->cQuickInfo);
-	pIcon->cQuickInfo = g_strdup (cQuickInfo);
+	if (pIcon->cQuickInfo != cQuickInfo)
+	{
+		g_free (pIcon->cQuickInfo);
+		pIcon->cQuickInfo = g_strdup (cQuickInfo);
+	}
 	
 	cairo_dock_fill_one_quick_info_buffer (pIcon,
 		pSourceContext,
@@ -310,7 +282,7 @@ gchar* cairo_dock_manage_themes_for_applet (gchar *cAppletShareDataDir, gchar *c
 	GHashTable *pThemeTable = cairo_dock_list_themes (cThemesDirPath, NULL, &erreur);
 	if (erreur != NULL)
 	{
-		cd_warning ("Attention : %s", erreur->message);
+		cd_warning ("%s", erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
@@ -353,10 +325,10 @@ static gboolean _cairo_dock_timer (CairoDockMeasure *pMeasureTimer)
 static gpointer _cairo_dock_threaded_calculation (CairoDockMeasure *pMeasureTimer)
 {
 	if (pMeasureTimer->acquisition != NULL)
-		pMeasureTimer->acquisition ();
+		pMeasureTimer->acquisition (pMeasureTimer->pUserData);
 	
 	g_mutex_lock (pMeasureTimer->pMutexData);
-	pMeasureTimer->read ();
+	pMeasureTimer->read (pMeasureTimer->pUserData);
 	g_mutex_unlock (pMeasureTimer->pMutexData);
 	
 	g_atomic_int_set (&pMeasureTimer->iThreadIsRunning, 0);
@@ -371,7 +343,7 @@ static gboolean _cairo_dock_check_for_redraw (CairoDockMeasure *pMeasureTimer)
 	{
 		//\_______________________ On recharge ce qu'il faut avec ces nouvelles donnees.
 		g_mutex_lock (pMeasureTimer->pMutexData);
-		gboolean bContinue = pMeasureTimer->update ();
+		gboolean bContinue = pMeasureTimer->update (pMeasureTimer->pUserData);
 		g_mutex_unlock (pMeasureTimer->pMutexData);
 		
 		//\_______________________ On lance/arrete le timer si necessaire.
@@ -400,10 +372,10 @@ void cairo_dock_launch_measure (CairoDockMeasure *pMeasureTimer)
 	if (pMeasureTimer->pMutexData == NULL)
 	{
 		if (pMeasureTimer->acquisition != NULL)
-			pMeasureTimer->acquisition ();
+			pMeasureTimer->acquisition (pMeasureTimer->pUserData);
 		if (pMeasureTimer->read != NULL)
-			pMeasureTimer->read ();
-		gboolean bContinue = pMeasureTimer->update ();
+			pMeasureTimer->read (pMeasureTimer->pUserData);
+		gboolean bContinue = pMeasureTimer->update (pMeasureTimer->pUserData);
 		
 		if (! bContinue)
 		{
@@ -430,7 +402,7 @@ void cairo_dock_launch_measure (CairoDockMeasure *pMeasureTimer)
 		GThread* pThread = g_thread_create ((GThreadFunc) _cairo_dock_threaded_calculation, pMeasureTimer, FALSE, &erreur);
 		if (erreur != NULL)
 		{
-			cd_warning ("Attention : %s", erreur->message);
+			cd_warning ("%s", erreur->message);
 			g_error_free (erreur);
 		}
 	}
@@ -452,7 +424,7 @@ void cairo_dock_launch_measure_delayed (CairoDockMeasure *pMeasureTimer, double 
 	pMeasureTimer->iSidTimerRedraw = g_timeout_add (fDelay, (GSourceFunc) _cairo_dock_one_shot_timer, pMeasureTimer);
 }
 
-CairoDockMeasure *cairo_dock_new_measure_timer (int iCheckInterval, GVoidFunc acquisition, GVoidFunc read, CairoDockUpdateTimerFunc update)
+CairoDockMeasure *cairo_dock_new_measure_timer (int iCheckInterval, CairoDockAquisitionTimerFunc acquisition, CairoDockReadTimerFunc read, CairoDockUpdateTimerFunc update, gpointer pUserData)
 {
 	CairoDockMeasure *pMeasureTimer = g_new0 (CairoDockMeasure, 1);
 	if (read != NULL || acquisition != NULL)
@@ -461,6 +433,7 @@ CairoDockMeasure *cairo_dock_new_measure_timer (int iCheckInterval, GVoidFunc ac
 	pMeasureTimer->acquisition = acquisition;
 	pMeasureTimer->read = read;
 	pMeasureTimer->update = update;
+	pMeasureTimer->pUserData = pUserData;
 	return pMeasureTimer;
 }
 

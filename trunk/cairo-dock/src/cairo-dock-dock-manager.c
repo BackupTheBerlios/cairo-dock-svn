@@ -164,7 +164,7 @@ CairoContainer *cairo_dock_search_container_from_icon (Icon *icon)
 {
 	g_return_val_if_fail (icon != NULL, NULL);
 	if (CAIRO_DOCK_IS_APPLET (icon))
-		return icon->pModule->pContainer;
+		return icon->pModuleInstance->pContainer;
 	
 	if (icon->cParentDockName != NULL)
 		return g_hash_table_lookup (s_hDocksTable, icon->cParentDockName);
@@ -615,4 +615,22 @@ static void _cairo_dock_set_one_root_dock_on_top_layer (gchar *cDockName, CairoD
 void cairo_dock_set_root_docks_on_top_layer (void)
 {
 	g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_set_one_root_dock_on_top_layer, NULL);
+}
+
+
+gchar *cairo_dock_get_unique_dock_name (const gchar *cPrefix)
+{
+	const gchar *cNamepattern = (cPrefix != NULL && *cPrefix != '\0' ? cPrefix : "dock");
+	GString *sNameString = g_string_new (cNamepattern);
+	
+	int i = 1;
+	while (g_hash_table_lookup (s_hDocksTable, sNameString->str) != NULL)
+	{
+		g_string_printf (sNameString, "%s-%d", cNamepattern, i);
+		i ++;
+	}
+	
+	gchar *cUniqueName = sNameString->str;
+	g_string_free (sNameString, FALSE);
+	return cUniqueName;
 }

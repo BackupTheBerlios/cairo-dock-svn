@@ -64,11 +64,11 @@ void cairo_dock_flush_conf_file_full (GKeyFile *pKeyFile, gchar *cConfFilePath, 
 	}
 	g_free (cTemplateConfFilePath);
 }
-void cairo_dock_flush_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath)
+void cairo_dock_flush_conf_file (GKeyFile *pKeyFile, gchar *cConfFilePath, gchar *cShareDataDirPath, gchar *cTemplateFileName)
 {
-	gchar *cConfFileName = g_path_get_basename (cConfFilePath);
-	cairo_dock_flush_conf_file_full (pKeyFile, cConfFilePath, cShareDataDirPath, TRUE, cConfFileName);
-	g_free (cConfFileName);
+	//gchar *cConfFileName = g_path_get_basename (cConfFilePath);
+	cairo_dock_flush_conf_file_full (pKeyFile, cConfFilePath, cShareDataDirPath, TRUE, cTemplateFileName);
+	//g_free (cConfFileName);
 }
 
 

@@ -9,7 +9,8 @@ export CAIRO_DOCK_UNSTABLE="0"
 export CAIRO_DOCK_INSTALL="0"
 export CAIRO_DOCK_THEMES="0"
 export CAIRO_DOCK_DOC="0"
-export CAIRO_DOCK_EXCLUDE="template musicplayer"
+export CAIRO_DOCK_EXCLUDE="template musicplayer stacks"
+export SUDO=sudo
 
 echo "this script will process : "
 while getopts "acCituhd:D" flag
@@ -139,18 +140,18 @@ if test "$CAIRO_DOCK_DOC" = "1"; then
 fi
 if test "$CAIRO_DOCK_INSTALL" = "1"; then
 	echo "*  installation of cairo-dock..."
-	sudo rm -f $CAIRO_DOCK_PREFIX/bin/cairo-dock
-	sudo rm -rf $CAIRO_DOCK_PREFIX/share/cairo-dock
-	sudo rm -rf $CAIRO_DOCK_PREFIX/lib/cairo-dock
-	/usr/bin/time -f "  time elapsed : %Us" sudo make install > /dev/null
+	$SUDO rm -f $CAIRO_DOCK_PREFIX/bin/cairo-dock
+	$SUDO rm -rf $CAIRO_DOCK_PREFIX/share/cairo-dock
+	$SUDO rm -rf $CAIRO_DOCK_PREFIX/lib/cairo-dock
+	/usr/bin/time -f "  time elapsed : %Us" $SUDO make install > /dev/null
 	if test ! "$?" = "0"; then
 		echo "  Attention : an error has occured !"
 		echo "Error while installing cairo-dock" >> $CAIRO_DOCK_DIR/compile.log
 	else
 		echo "  -> passed"
 	fi
-	sudo chmod +x $CAIRO_DOCK_PREFIX/bin/cairo-dock-update.sh
-	sudo chmod +x $CAIRO_DOCK_PREFIX/bin/launch-cairo-dock-after-beryl.sh
+	$SUDO chmod +x $CAIRO_DOCK_PREFIX/bin/cairo-dock-update.sh
+	$SUDO chmod +x $CAIRO_DOCK_PREFIX/bin/launch-cairo-dock-after-beryl.sh
 fi
 
 
@@ -188,7 +189,7 @@ if test "$CAIRO_DOCK_THEMES" = "1"; then
 	fi
 	if test "$CAIRO_DOCK_INSTALL" = "1"; then
 		echo "*  installation of themes ..."
-		/usr/bin/time -f "  time elapsed : %Us" sudo make install > /dev/null
+		/usr/bin/time -f "  time elapsed : %Us" $SUDO make install > /dev/null
 		if test ! "$?" = "0"; then
 			echo "  Attention : an error has occured !"
 			echo "Error while installing themes" >> $CAIRO_DOCK_DIR/compile.log
@@ -268,7 +269,7 @@ if test "$CAIRO_DOCK_COMPIL" = "1"; then
 fi
 if test "$CAIRO_DOCK_INSTALL" = "1"; then
 	echo "*  installation of stable plug-ins ..."
-	/usr/bin/time -f "  time elapsed : %Us" sudo make install > /dev/null
+	/usr/bin/time -f "  time elapsed : %Us" $SUDO make install > /dev/null
 	if test ! "$?" = "0"; then
 		echo "  Attention : an error has occured !"
 		echo "Error while installing stable plug-ins" >> $CAIRO_DOCK_DIR/compile.log
@@ -280,16 +281,27 @@ fi
 
 ### On les compilera un a un si la compil globale a foirre.
 if test "$compil_ok" = "0"; then
+	if test "$CAIRO_DOCK_UNSTABLE" = "0"; then
+		export liste_all="$liste_stable"
+	fi
 	export liste_stable=""
 fi
 
 ### On compile un a un les plug-ins instables.
-if test "$CAIRO_DOCK_UNSTABLE" = "1"; then
+if test "$CAIRO_DOCK_UNSTABLE" = "1" -o "$compil_ok" = "0"; then
 	for plugin in $liste_all
 	do
 		if test "`echo $liste_stable | grep $plugin`" = ""; then
 			cd $plugin
-			if test -e Makefile.am -a "$plugin" != "$CAIRO_DOCK_EXCLUDE"; then
+			export exluded="0"
+			for e in $CAIRO_DOCK_EXCLUDE
+			do
+				if test "$e" = "$plugin"; then
+					export exluded="1"
+				fi
+			done;
+			if test -e Makefile.am -a "$exluded" != "1"; then
+				
 				echo "************************************"
 				echo "* Compilation of module $plugin ... *"
 				echo "************************************"
@@ -334,7 +346,7 @@ if test "$CAIRO_DOCK_UNSTABLE" = "1"; then
 				fi
 				if test "$CAIRO_DOCK_INSTALL" = "1"; then
 					echo "*  installation of module $plugin..."
-					/usr/bin/time -f "  time elapsed : %Us" sudo make install > /dev/null
+					/usr/bin/time -f "  time elapsed : %Us" $SUDO make install > /dev/null
 					if test ! "$?" = "0"; then
 						echo "  Attention : an error has occured !"
 						echo "Error while installing $plugin" >> $CAIRO_DOCK_DIR/compile.log
@@ -349,11 +361,14 @@ if test "$CAIRO_DOCK_UNSTABLE" = "1"; then
 fi
 
 if test "$CAIRO_DOCK_INSTALL" = "1"; then
+	$SUDO -rm -f $CAIRO_DOCK_PREFIX/lib/cairo-dock/*.la
+	
 	echo "check :"
 	echo "------------"
 	date +"compil ended at %c"
 	ls -l $CAIRO_DOCK_PREFIX/bin/cairo-dock
 	ls -l $CAIRO_DOCK_PREFIX/lib/cairo-dock
+	nb_plugins = "`ls $CAIRO_DOCK_PREFIX/lib/cairo-dock/*.so | wc -w`"
 fi
 
 cd $CAIRO_DOCK_DIR

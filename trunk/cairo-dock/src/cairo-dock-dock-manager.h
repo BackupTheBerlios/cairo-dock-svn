@@ -144,4 +144,8 @@ void cairo_dock_stop_polling_screen_edge (void);
 void cairo_dock_pop_up_root_docks_on_screen_edge (CairoDockPositionType iScreenBorder);
 void cairo_dock_set_root_docks_on_top_layer (void);
 
+
+gchar *cairo_dock_get_unique_dock_name (const gchar *cPrefix);
+
+
 #endif

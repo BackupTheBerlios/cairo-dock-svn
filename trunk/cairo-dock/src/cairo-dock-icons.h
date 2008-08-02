@@ -10,7 +10,7 @@
 *TRUE ssi l'icone est une icone de lanceur.
 *@param icon une icone.
 */
-#define CAIRO_DOCK_IS_LAUNCHER(icon) (icon != NULL && (icon->acCommand != NULL || (icon->pSubDock != NULL && icon->pModule == NULL && icon->Xid == 0)))
+#define CAIRO_DOCK_IS_LAUNCHER(icon) (icon != NULL && (icon->acCommand != NULL || (icon->pSubDock != NULL && icon->pModuleInstance == NULL && icon->Xid == 0)))
 /**
 *TRUE ssi l'icone est une icone d'appli.
 *@param icon une icone.
@@ -20,12 +20,12 @@
 *TRUE ssi l'icone est une icone d'applet.
 *@param icon une icone.
 */
-#define CAIRO_DOCK_IS_APPLET(icon) (icon != NULL && icon->pModule != NULL)
+#define CAIRO_DOCK_IS_APPLET(icon) (icon != NULL && icon->pModuleInstance != NULL)
 /**
 *TRUE ssi l'icone est une icone de separateur.
 *@param icon une icone.
 */
-#define CAIRO_DOCK_IS_SEPARATOR(icon) (icon != NULL && (icon->acName == NULL && icon->pModule == NULL && icon->Xid == 0))  /* (icon->iType & 1) || */
+#define CAIRO_DOCK_IS_SEPARATOR(icon) (icon != NULL && (icon->acName == NULL && icon->pModuleInstance == NULL && icon->Xid == 0))  /* (icon->iType & 1) || */
 
 /**
 *TRUE ssi l'icone est une icone de lanceur defini par un fichier .desktop.
@@ -51,7 +51,7 @@
 *TRUE ssi l'icone est une icone d'appli seulement.
 *@param icon une icone.
 */
-#define CAIRO_DOCK_IS_NORMAL_APPLI(icon) (CAIRO_DOCK_IS_APPLI (icon) && icon->acDesktopFileName == NULL && icon->pModule == NULL)
+#define CAIRO_DOCK_IS_NORMAL_APPLI(icon) (CAIRO_DOCK_IS_APPLI (icon) && icon->acDesktopFileName == NULL && icon->pModuleInstance == NULL)
 
 /**
 * Desactive une icone, et libere tous ses buffers, ainsi qu'elle-meme. Le sous-dock pointee par elle n'est pas dereferencee, cela doit etre fait au prealable. Gere egalement la classe.

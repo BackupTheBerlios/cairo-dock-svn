@@ -62,11 +62,11 @@ cairo_surface_t *cairo_dock_create_applet_surface (gchar *cIconFileName, cairo_t
 }
 
 
-Icon *cairo_dock_create_icon_for_applet (CairoContainer *pContainer, int iWidth, int iHeight, gchar *cName, gchar *cIconFileName, CairoDockModule *pModule)
+Icon *cairo_dock_create_icon_for_applet (CairoContainer *pContainer, int iWidth, int iHeight, gchar *cName, gchar *cIconFileName, CairoDockModuleInstance *pModuleInstance)
 {
 	Icon *icon = g_new0 (Icon, 1);
 	icon->iType = CAIRO_DOCK_APPLET;
-	icon->pModule = pModule;
+	icon->pModuleInstance = pModuleInstance;
 
 	icon->acName = g_strdup (cName);
 	icon->acFileName = g_strdup (cIconFileName);  // NULL si cIconFileName = NULL.

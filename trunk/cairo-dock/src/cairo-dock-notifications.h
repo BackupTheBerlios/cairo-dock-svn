@@ -5,7 +5,12 @@
 #include <glib.h>
 
 
-typedef gboolean (* CairoDockNotificationFunc) (gpointer *data);
+typedef gboolean (* CairoDockNotificationFunc) (gpointer *data, gpointer pUserData);
+
+typedef struct {
+	CairoDockNotificationFunc pFunction;
+	gpointer pUserData;
+	} CairoDockNotificationRecord;
 
 typedef enum {
 	/// notification appellee lorsque l'utilisateur supprime un lanceur via le menu. data : {Icon, CairoDock}
@@ -45,16 +50,16 @@ typedef enum {
 *@param pFunction fonction notifiee.
 *@param bRunFirst CAIRO_DOCK_RUN_FIRST pour etre enregistre en 1er, CAIRO_DOCK_RUN_AFTER pour etre enregistreé en dernier.
 */
-void cairo_dock_register_notification (CairoDockNotificationType iNotifType, CairoDockNotificationFunc pFunction, gboolean bRunFirst);
+void cairo_dock_register_notification (CairoDockNotificationType iNotifType, CairoDockNotificationFunc pFunction, gboolean bRunFirst, gpointer pUserData);
 
 /**
 *Enleve une fonction de la liste des fonctions appelees par une notification donnee.
 *@param iNotifType type de la notification.
 *@param pFunction fonction notifiee.
 */
-void cairo_dock_remove_notification_func (CairoDockNotificationType iNotifType, CairoDockNotificationFunc pFunction);
+void cairo_dock_remove_notification_func (CairoDockNotificationType iNotifType, CairoDockNotificationFunc pFunction, gpointer pUserData);
 /**
-*Enleve une fonction de la liste des fonctions appelees par une notification donnee.
+*Appelle toutes les fonctions enregistrees pour une notification donnee.
 *@param iNotifType type de la notification.
 *@param data donnees passees a la fonction notifiee.
 @return TRUE si la notification a ete utilisee par quelqu'un, FALSE si aucune fonction n'est enregistree pour elle.
@@ -65,13 +70,13 @@ gboolean cairo_dock_notify (CairoDockNotificationType iNotifType, gpointer data)
 /**
 *Enregistre une liste de fonctions devant etre notifiees en premier. La liste est une liste de couples (CairoDockNotificationType, CairoDockNotificationFunc), et doit etre clot par -1.
 *@param iFirstNotifType type de la 1ere notification.
-*@param ... 1ere fonction notifiee, puis couple de (notification, fonction), termine par -1.
+*@param ... 1ere fonction notifiee, puis triplet de (notification, fonction, user_data), termine par -1.
 */
 void cairo_dock_register_first_notifications (int iFirstNotifType, ...);
 /**
 *Enregistre une liste de fonctions devant etre notifiees en dernier. La liste est une liste de couples (CairoDockNotificationType, CairoDockNotificationFunc), et doit etre clot par -1.
 *@param iFirstNotifType type de la 1ere notification.
-*@param ... 1ere fonction notifiee, puis couple de (notification, fonction), termine par -1.
+*@param ... 1ere fonction notifiee, puis triplet de (notification, fonction, user_data), termine par -1.
 */
 void cairo_dock_register_last_notifications (int iFirstNotifType, ...);
 /**

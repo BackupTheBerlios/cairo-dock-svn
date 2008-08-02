@@ -242,7 +242,7 @@ CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
 		//if (pSameClassIcon != NULL)
 		//	g_print ("class-mate : %s (%s)\n", pSameClassIcon->acName, pSameClassIcon->cParentDockName);
 		//pSameClassIcon = cairo_dock_get_icon_with_class (pMainDock->icons, icon->cClass);
-		if (pSameClassIcon == NULL || pSameClassIcon == icon || pSameClassIcon->cParentDockName == NULL)
+		if (pSameClassIcon == NULL/** || pSameClassIcon == icon || pSameClassIcon->cParentDockName == NULL*/)  // aucun classmate => elle va dans le main dock.
 		{
 			cd_message ("  classe %s encore vide", icon->cClass);
 			icon->cParentDockName = g_strdup (CAIRO_DOCK_MAIN_DOCK_NAME);
@@ -254,14 +254,15 @@ CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
 					///icon->pSubDock = pClassDock;
 					///cd_warning ("on lie de force le sous-dock de la classe %s a l'icone %s", icon->cClass, icon->acName);
 				}
-				else
+				else if (pClassDock != icon->pSubDock)
 					cd_warning ("le sous-dock de la classe %s est orphelin  (%s a deja un sous-dock) !", icon->cClass, icon->acName);
 			}
 		}
-		else
+		else  // on la met dans le sous-dock de sa classe.
 		{
 			icon->cParentDockName = g_strdup (icon->cClass);
 
+			//\____________ On cree ce sous-dock si necessaire.
 			pParentDock = cairo_dock_search_dock_from_name (icon->cClass);
 			if (pParentDock == NULL)  // alors il faut creer le sous-dock, et on decide de l'associer a pSameClassIcon.
 			{
@@ -272,6 +273,8 @@ CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
 			{
 				cd_message ("  sous-dock de la classe %s existant", icon->cClass);
 			}
+			
+			//\____________ On l'associe au classmate.
 			if (pSameClassIcon->pSubDock != NULL && pSameClassIcon->pSubDock != pParentDock)
 			{
 				cd_warning ("Attention : this appli (%s) already has a subdock, but it is not the class's subdock => we'll add its classmate in the main dock");
@@ -279,6 +282,25 @@ CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
 			}
 			else if (pSameClassIcon->pSubDock == NULL)
 				pSameClassIcon->pSubDock = pParentDock;
+			
+			/**
+			if (CAIRO_DOCK_IS_LAUNCHER (pSameClassIcon))  // c'est un inhibiteur.
+			{
+				pSameClassIcon->pSubDock = pParentDock;
+			}
+			else  // on duplique le classmate (sauf miniature), et on le deplace dans le sous-dock.
+			{
+				Icon *pClassPointerIcon = g_new0 (Icon, 1);
+				pClassPointerIcon->
+				pClassPointerIcon->
+				pClassPointerIcon->
+				pClassPointerIcon->pSubDock = pParentDock;
+				
+				detach pSameClassIcon
+				insert_in_dock (pSameClassIcon, pParentDock
+			}
+			
+			*/
 		}
 	}
 	else

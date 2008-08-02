@@ -1111,13 +1111,16 @@ Window *cairo_dock_get_windows_list (gulong *iNbWindows)
 
 CairoDock *cairo_dock_insert_appli_in_dock (Icon *icon, CairoDock *pMainDock, gboolean bUpdateSize, gboolean bAnimate)
 {
-	//\_________________ On determine dans quel dock l'inserer.
 	cd_message ("%s (%s, %d)", __func__, icon->acName, icon->Xid);
+	
+	//\_________________ On gere ses eventuels inhibiteurs.
 	if (g_bMixLauncherAppli && cairo_dock_prevent_inhibated_class (icon))
 	{
 		cd_message (" -> se fait inhiber");
 		return NULL;
 	}
+	
+	//\_________________ On determine dans quel dock l'inserer.
 	CairoDock *pParentDock = cairo_dock_manage_appli_class (icon, pMainDock);  // renseigne cParentDockName.
 	g_return_val_if_fail (pParentDock != NULL, NULL);
 
