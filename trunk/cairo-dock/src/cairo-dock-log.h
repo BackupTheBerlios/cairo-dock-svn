@@ -27,6 +27,7 @@
 # define   	CAIRO_DOCK_LOG_H_
 
 # include <gtk/gtk.h>
+G_BEGIN_DECLS
 
 # ifndef _INSIDE_CAIRO_DOCK_LOG_C_
   extern GLogLevelFlags gLogLevel;
@@ -67,4 +68,5 @@ void cd_log_set_level(GLogLevelFlags loglevel);
 #define cd_debug(...)                                                  \
   cd_log_location(G_LOG_LEVEL_DEBUG, __FILE__, __PRETTY_FUNCTION__, __LINE__,__VA_ARGS__)
 
+G_END_DECLS
 #endif 	    /* !CAIRO_DOCK_LOG_H_ */

@@ -3,6 +3,7 @@
 #define  __CAIRO_DOCK_FILE_MANAGER__
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 
 void cairo_dock_fm_register_vfs_backend (CairoDockVFSBackend *pVFSBackend);
@@ -63,4 +64,5 @@ void cairo_dock_fm_action_after_mounting (gboolean bMounting, gboolean bSuccess,
 gboolean cairo_dock_fm_move_into_directory (const gchar *cURI, Icon *icon, CairoContainer *pContainer);
 
 
+G_END_DECLS
 #endif

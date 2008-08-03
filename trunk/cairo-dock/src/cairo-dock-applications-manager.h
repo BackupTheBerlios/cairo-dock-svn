@@ -5,6 +5,7 @@
 #include <X11/Xlib.h>
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 void cairo_dock_initialize_application_manager (Display *pDisplay);
 
@@ -60,4 +61,5 @@ GList *cairo_dock_get_current_applis_list (void);
 Window cairo_dock_get_current_active_window (void);
 Icon *cairo_dock_get_current_active_icon (void);
 
+G_END_DECLS
 #endif

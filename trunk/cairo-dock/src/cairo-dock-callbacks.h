@@ -3,6 +3,7 @@
 #define  __CAIRO_DOCK_CALLBACKS__
 
 #include <gtk/gtk.h>
+G_BEGIN_DECLS
 
 void on_realize (GtkWidget* pWidget,
 	 CairoDock *pDock);
@@ -88,4 +89,5 @@ gboolean cairo_dock_hide_dock_like_a_menu (void);
 void cairo_dock_has_been_hidden_like_a_menu (void);
 
 
+G_END_DECLS
 #endif

@@ -3,6 +3,7 @@
 #define  __CAIRO_DOCK_X_UTILITIES__
 
 #include <X11/Xlib.h>
+G_BEGIN_DECLS
 
 
 void cairo_dock_initialize_X_support (void);
@@ -47,4 +48,5 @@ void cairo_dock_set_nb_desktops (gulong iNbDesktops);
 
 gboolean cairo_dock_support_X_extension (void);
 
+G_END_DECLS
 #endif

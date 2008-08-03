@@ -3,6 +3,7 @@
 #define  __CAIRO_DOCK_NOTIFICATIONS__
 
 #include <glib.h>
+G_BEGIN_DECLS
 
 
 typedef gboolean (* CairoDockNotificationFunc) (gpointer *data, gpointer pUserData);
@@ -87,4 +88,5 @@ void cairo_dock_register_last_notifications (int iFirstNotifType, ...);
 void cairo_dock_remove_notification_funcs (int iFirstNotifType, ...);
 
 
+G_END_DECLS
 #endif

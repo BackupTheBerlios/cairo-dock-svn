@@ -5,6 +5,7 @@
 #include <glib.h>
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 
 void cairo_dock_remove_html_spaces (gchar *cString);
@@ -27,5 +28,6 @@ void cairo_dock_update_launcher_desktop_file (gchar *cDesktopFilePath, CairoDock
 gchar *cairo_dock_get_launcher_template_conf_file (CairoDockNewLauncherType iNewLauncherType);
 
 
+G_END_DECLS
 #endif
 

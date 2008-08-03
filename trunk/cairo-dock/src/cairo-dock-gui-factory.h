@@ -3,6 +3,7 @@
 #define  __CAIRO_DOCK_GUI_FACTORY__
 
 #include <gtk/gtk.h>
+G_BEGIN_DECLS
 
 
 void cairo_dock_build_renderer_list_for_gui (GHashTable *pHashTable);
@@ -20,4 +21,5 @@ void cairo_dock_update_keyfile_from_widget_list (GKeyFile *pKeyFile, GSList *pWi
 void cairo_dock_free_generated_widget_list (GSList *pWidgetList);
 
 
+G_END_DECLS
 #endif

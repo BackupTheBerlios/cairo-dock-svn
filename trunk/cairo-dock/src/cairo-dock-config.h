@@ -5,6 +5,7 @@
 #include <glib.h>
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 /**
 *Recupere une cle booleene d'un fichier de cles.
@@ -201,4 +202,5 @@ void cairo_dock_mark_prefered_conf_file (gchar *cConfFilePath);
 */
 void cairo_dock_get_version_from_string (gchar *cVersionString, int *iMajorVersion, int *iMinorVersion, int *iMicroVersion);
 
+G_END_DECLS
 #endif

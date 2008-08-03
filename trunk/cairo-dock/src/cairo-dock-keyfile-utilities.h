@@ -3,7 +3,8 @@
 #define  __CAIRO_DOCK_KEYFILE_MANAGER__
 
 #include <glib.h>
-#include <cairo-dock-struct.h>
+#include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 
 void cairo_dock_write_keys_to_file (GKeyFile *pKeyFile, const gchar *cConfFilePath);
@@ -28,4 +29,5 @@ void cairo_dock_get_conf_file_version (GKeyFile *pKeyFile, gchar **cConfFileVers
 gboolean cairo_dock_conf_file_needs_update (GKeyFile *pKeyFile, gchar *cVersion);
 
 
+G_END_DECLS
 #endif

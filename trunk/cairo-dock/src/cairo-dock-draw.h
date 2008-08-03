@@ -5,6 +5,7 @@
 #include <glib.h>
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 
 /**
@@ -114,4 +115,5 @@ cairo_t *cairo_dock_create_drawing_context (CairoContainer *pContainer);
 cairo_t *cairo_dock_create_drawing_context_on_area (CairoContainer *pContainer, GdkRectangle *pArea, double *fBgColor);
 
 
+G_END_DECLS
 #endif

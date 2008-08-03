@@ -5,6 +5,7 @@
 #include <X11/Xlib.h>
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 /**
 * Initialise le gestionnaire de classes. Ne fait rien la 2eme fois.
@@ -127,4 +128,5 @@ void cairo_dock_update_inactivity_on_inhibators (gchar *cClass, Window Xid);
 
 Icon *cairo_dock_get_classmate (Icon *pIcon);
 
+G_END_DECLS
 #endif

@@ -4,6 +4,7 @@
 
 #include <glib.h>
 #include <gtk/gtk.h>
+G_BEGIN_DECLS
 
 
 /**
@@ -39,4 +40,5 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode);
 #define cairo_dock_update_conf_file_with_themes(pOpenedKeyFile, cAppletConfFilePath, pThemeTable, cGroupName, cKeyName) cairo_dock_update_conf_file_with_hash_table (pOpenedKeyFile, cAppletConfFilePath, pThemeTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_theme_name, TRUE, FALSE)
 
 
+G_END_DECLS
 #endif

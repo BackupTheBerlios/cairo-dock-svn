@@ -5,6 +5,7 @@
 #include <glib.h>
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 
 gchar *cairo_dock_search_icon_s_path (const gchar *cFileName);
@@ -18,4 +19,5 @@ Icon * cairo_dock_create_icon_from_desktop_file (const gchar *cDesktopFileName, 
 void cairo_dock_reload_icon_from_desktop_file (const gchar *cDesktopFileName, cairo_t *pSourceContext, Icon *icon);
 
 
+G_END_DECLS
 #endif

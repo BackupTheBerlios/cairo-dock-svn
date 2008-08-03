@@ -5,6 +5,7 @@
 #include <glib.h>
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 
 void cairo_dock_initialize_module_manager (gchar *cModuleDirPath);
@@ -82,4 +83,5 @@ void cairo_dock_add_module_instance (CairoDockModule *pModule);
 void cairo_dock_read_module_config (GKeyFile *pKeyFile, CairoDockModuleInstance *pInstance);
 
 
+G_END_DECLS
 #endif

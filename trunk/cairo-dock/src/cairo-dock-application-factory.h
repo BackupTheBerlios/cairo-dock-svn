@@ -6,6 +6,7 @@
 #include <X11/Xlib.h>
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 
 void cairo_dock_initialize_application_factory (Display *pXDisplay);
@@ -23,4 +24,5 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, CairoDock *pDock);
 
 
+G_END_DECLS
 #endif

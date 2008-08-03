@@ -4,7 +4,8 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <cairo.h>
-#include <cairo-dock-struct.h>
+#include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 /// Pointeur sur le dock principal.
 extern CairoDock *g_pMainDock;
@@ -117,4 +118,5 @@ extern gchar *g_cDialogMessagePolice;
 extern int g_iDialogMessageWeight;
 extern int g_iDialogMessageStyle;
 
+G_END_DECLS
 #endif

@@ -10,7 +10,7 @@ Written by Necropotame (for any bug report, please mail me to fabounet@users.ber
 #include <libxml/tree.h>
 #include <libxml/parser.h>
 
-#include "cairo-dock-struct.h"
+//#include <cairo-dock-struct.h>
 #include <cairo-dock-log.h>
 #include <cairo-dock-applet-facility.h>
 #include <cairo-dock-draw.h>

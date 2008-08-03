@@ -2,6 +2,7 @@
 #define  __CAIRO_DOCK_EMBLEM__
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 typedef struct _CairoDockFullEmblem CairoDockFullEmblem;
 typedef struct _CairoDockTempEmblem CairoDockTempEmblem;
@@ -125,4 +126,5 @@ void cairo_dock_free_emblem (void);
 */
 void cairo_dock_updated_emblem_conf_file (GKeyFile *pKeyFile, gboolean *bFlushConfFileNeeded);
 
+G_END_DECLS
 #endif

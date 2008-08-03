@@ -5,6 +5,7 @@
 #include <glib.h>
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 /**
 *TRUE ssi l'icone est une icone de lanceur.
@@ -335,5 +336,6 @@ void cairo_dock_stop_marking_icons (CairoDock *pDock);
 */
 void cairo_dock_update_icon_s_container_name (Icon *icon, const gchar *cNewParentDockName);
 
+G_END_DECLS
 #endif
 

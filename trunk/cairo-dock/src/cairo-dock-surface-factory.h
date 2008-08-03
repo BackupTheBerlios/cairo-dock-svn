@@ -5,6 +5,7 @@
 #include <glib.h>
 #include <gdk/gdk.h>
 #include <cairo.h>
+G_BEGIN_DECLS
 
 
 /**
@@ -167,4 +168,5 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t *pSo
 cairo_surface_t * cairo_dock_duplicate_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fWidth, double fHeight, double fDesiredWidth, double fDesiredHeight);
 
 
+G_END_DECLS
 #endif

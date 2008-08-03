@@ -5,6 +5,7 @@
 #include <glib.h>
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 
 gboolean cairo_dock_move_up (CairoDock *pDock);
@@ -50,4 +51,5 @@ void cairo_dock_start_animation (Icon *icon, CairoDock *pDock);
 #define cairo_dock_animation_will_be_visible(pDock) ((pDock)->bInside || (! (pDock)->bAutoHide && (pDock)->iRefCount == 0) || ! (pDock)->bAtBottom)
 
 
+G_END_DECLS
 #endif

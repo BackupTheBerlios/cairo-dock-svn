@@ -5,6 +5,7 @@
 #include <dbus/dbus-glib.h>
 #include <dbus/dbus-glib-bindings.h>
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 
 /*
@@ -101,4 +102,5 @@ guchar *cairo_dock_dbus_get_uchar (DBusGProxy *pDbusProxy, const gchar *cParamet
 */
 void cairo_dock_dbus_call (DBusGProxy *pDbusProxy, const gchar *cCommand);
 
+G_END_DECLS
 #endif

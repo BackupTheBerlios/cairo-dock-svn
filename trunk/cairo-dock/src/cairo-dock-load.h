@@ -5,6 +5,7 @@
 #include <glib.h>
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 
 void cairo_dock_free_label_description (CairoDockLabelDescription *pTextDescription);
@@ -54,4 +55,5 @@ cairo_surface_t *cairo_dock_get_desktop_bg_surface (void);
 
 void cairo_dock_load_active_window_indicator (cairo_t* pSourceContext, const gchar *cImagePath, double fMaxScale, double fCornerRadius, double fLineWidth, double *fActiveColor);
 
+G_END_DECLS
 #endif

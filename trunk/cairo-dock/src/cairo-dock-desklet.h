@@ -27,6 +27,7 @@
 #define  __CAIRO_DESKLET_H__
 
 #include <cairo-dock-struct.h>
+G_BEGIN_DECLS
 
 #define CD_NB_ITER_FOR_GRADUATION 10
 
@@ -112,5 +113,6 @@ void cairo_dock_set_desklets_visibility_to_default (void);
 */
 CairoDesklet *cairo_dock_get_desklet_by_Xid (Window Xid);
 
+G_END_DECLS
 
 #endif

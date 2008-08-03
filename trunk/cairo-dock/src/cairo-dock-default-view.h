@@ -5,6 +5,7 @@
 #include <glib.h>
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 
 void cairo_dock_set_subdock_position_linear (Icon *pPointedIcon, CairoDock *pParentDock);
@@ -27,4 +28,5 @@ Icon *cairo_dock_calculate_icons_linear (CairoDock *pDock);
 void cairo_dock_register_default_renderer (void);
 
 
+G_END_DECLS
 #endif

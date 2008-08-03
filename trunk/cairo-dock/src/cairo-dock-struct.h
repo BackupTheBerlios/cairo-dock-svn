@@ -7,6 +7,7 @@ released under the terms of the GNU General Public License.
 Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.berlios.de)
 
 *********************************************************************************/
+
 #ifndef __CAIRO_DOCK_STRUCT__
 #define  __CAIRO_DOCK_STRUCT__
 
@@ -25,6 +26,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <glitz-glx.h>
 #include <cairo-glitz.h>
 #endif
+
+//G_BEGIN_DECLS
 
 typedef struct _CairoDockRenderer CairoDockRenderer;
 typedef struct _CairoDeskletRenderer CairoDeskletRenderer;
@@ -377,10 +380,10 @@ struct _CairoDockMinimalAppletConfig {
 
 typedef void (* CairoDockActionOnAnswerFunc) (int iAnswer, GtkWidget *pWidget, gpointer data);
 
-typedef struct gpointer CairoDialogRendererDataParameter;
-typedef struct CairoDialogRendererDataParameter * CairoDialogRendererDataPtr;
-typedef struct gpointer CairoDialogRendererConfigParameter;
-typedef struct CairoDialogRendererConfigParameter * CairoDialogRendererConfigPtr;
+typedef gpointer CairoDialogRendererDataParameter;
+typedef CairoDialogRendererDataParameter* CairoDialogRendererDataPtr;
+typedef gpointer CairoDialogRendererConfigParameter;
+typedef CairoDialogRendererConfigParameter* CairoDialogRendererConfigPtr;
 
 typedef void (* CairoDialogRenderFunc) (cairo_t *pCairoContext, CairoDialog *pDialog);
 typedef gpointer (* CairoDialogConfigureRendererFunc) (CairoDialog *pDialog, cairo_t *pSourceContext, CairoDialogRendererConfigPtr pConfig);
@@ -681,7 +684,7 @@ struct _CairoDockVFSBackend {
 	CairoDockFMUnmountFunc 		unmount;
 	CairoDockFMAddMonitorFunc 	add_monitor;
 	CairoDockFMRemoveMonitorFunc 	remove_monitor;
-	CairoDockFMDeleteFileFunc 		delete;
+	CairoDockFMDeleteFileFunc 		delete_file;
 	CairoDockFMRenameFileFunc 	rename;
 	CairoDockFMMoveFileFunc 		move;
 	CairoDockFMGetTrashFunc 		get_trash_path;
@@ -691,10 +694,10 @@ struct _CairoDockVFSBackend {
 };
 
 
-typedef struct gpointer CairoDeskletRendererDataParameter;
-typedef struct CairoDeskletRendererDataParameter * CairoDeskletRendererDataPtr;
-typedef struct gpointer CairoDeskletRendererConfigParameter;
-typedef struct CairoDeskletRendererConfigParameter * CairoDeskletRendererConfigPtr;
+typedef gpointer CairoDeskletRendererDataParameter;
+typedef CairoDeskletRendererDataParameter* CairoDeskletRendererDataPtr;
+typedef gpointer CairoDeskletRendererConfigParameter;
+typedef CairoDeskletRendererConfigParameter* CairoDeskletRendererConfigPtr;
 typedef struct {
 	gchar *cName;
 	CairoDeskletRendererConfigPtr pConfig;
@@ -875,5 +878,5 @@ typedef enum {
 	CAIRO_DOCK_DONT_ZOOM_IN 	= 1<<1
 	} CairoDockLoadImageModifier;
 
-
+//G_END_DECLS
 #endif

@@ -5,6 +5,7 @@
 #include <glib.h>
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 
 CairoDockRenderer *cairo_dock_get_renderer (const gchar *cRendererName, gboolean bForMainDock);
@@ -41,4 +42,5 @@ void cairo_dock_render_dialog_with_new_data (CairoDialog *pDialog, CairoDialogRe
 void cairo_dock_update_renderer_list_for_gui (void);
 
 
+G_END_DECLS
 #endif

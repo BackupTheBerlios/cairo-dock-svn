@@ -179,9 +179,9 @@ gboolean cairo_dock_fm_eject_drive (const gchar *cURI)
 
 gboolean cairo_dock_fm_delete_file (const gchar *cURI)
 {
-	if (s_pVFSBackend != NULL && s_pVFSBackend->delete != NULL)
+	if (s_pVFSBackend != NULL && s_pVFSBackend->delete_file != NULL)
 	{
-		return s_pVFSBackend->delete (cURI);
+		return s_pVFSBackend->delete_file (cURI);
 	}
 	else
 		return FALSE;

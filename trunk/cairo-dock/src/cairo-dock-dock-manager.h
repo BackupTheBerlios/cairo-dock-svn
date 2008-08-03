@@ -5,6 +5,7 @@
 #include <glib.h>
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 
 /**
@@ -148,4 +149,5 @@ void cairo_dock_set_root_docks_on_top_layer (void);
 gchar *cairo_dock_get_unique_dock_name (const gchar *cPrefix);
 
 
+G_END_DECLS
 #endif

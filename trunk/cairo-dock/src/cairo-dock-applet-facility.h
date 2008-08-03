@@ -4,6 +4,7 @@
 #define  __CAIRO_DOCK_APPLET_FACILITY__
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 /**
 *@file cairo-dock-applet-facility.h Les macros forment un canevas dedie aux applets. Elles permettent un developpement rapide et normalise d'une applet pour Cairo-Dock.
@@ -1139,4 +1140,5 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data, CairoDockModuleInstance *myApplet)
 #define D_(message) dgettext (MY_APPLET_GETTEXT_DOMAIN, message)
 #define _D D_
 
+G_END_DECLS
 #endif

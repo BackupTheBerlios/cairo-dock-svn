@@ -3,6 +3,7 @@
 #define  __CAIRO_DIALOGS__
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 /**
 *Teste si le container est un dialogue.
@@ -247,4 +248,5 @@ void cairo_dock_unhide_dialog (CairoDialog *pDialog);
 */
 GtkWidget *cairo_dock_steal_widget_from_its_container (GtkWidget *pWidget);
 
+G_END_DECLS
 #endif

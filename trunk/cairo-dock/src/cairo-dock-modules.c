@@ -981,7 +981,7 @@ void cairo_dock_update_module_instance_order (CairoDockModuleInstance *pModuleIn
 CairoDockModuleInstance *cairo_dock_instanciate_module (CairoDockModule *pModule, gchar *cConfFilePath)  // prend possession de 'cConfFilePah'.
 {
 	g_return_val_if_fail (pModule != NULL && cConfFilePath != NULL, NULL);
-	g_print ("%s (%s)\n", __func__, cConfFilePath);
+	cd_debug ("%s (%s)", __func__, cConfFilePath);
 	
 	//\____________________ On cree une instance du module.
 	///CairoDockModuleInstance *pInstance = g_new0 (CairoDockModuleInstance, 1);
@@ -1005,7 +1005,6 @@ CairoDockModuleInstance *cairo_dock_instanciate_module (CairoDockModule *pModule
 	
 	if (pMinimalConfig->iDesiredIconWidth > 0)  // le module a une icone, c'est donc une applet.
 	{
-		g_print ("  ce module est une applet\n");
 		pInstance->bCanDetach = pMinimalConfig->iDeskletWidth > 0;
 		pModule->bCanDetach = pInstance->bCanDetach;  // pas encore clair ...
 		gchar *cDockName = (pMinimalConfig->cDockName != NULL ? pMinimalConfig->cDockName : CAIRO_DOCK_MAIN_DOCK_NAME);
@@ -1055,8 +1054,6 @@ CairoDockModuleInstance *cairo_dock_instanciate_module (CairoDockModule *pModule
 		}
 		cairo_dock_free_minimal_config (pMinimalConfig);
 	}
-	else
-		g_print ("  ce module est un plug-in\n");
 
 	//\____________________ On initialise l'instance.
 	if (pDock)

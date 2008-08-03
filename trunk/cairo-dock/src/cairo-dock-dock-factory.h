@@ -5,6 +5,7 @@
 #include <glib.h>
 
 #include "cairo-dock-struct.h"
+G_BEGIN_DECLS
 
 /**
 * Teste si le container est un dock.
@@ -152,6 +153,7 @@ void cairo_dock_allow_widget_to_receive_data (GtkWidget *pWidget, GCallback pCal
 */
 gboolean cairo_dock_string_is_adress (const gchar *cString);
 
+G_END_DECLS
 void cairo_dock_notify_drop_data (gchar *cReceivedData, Icon *pPointedIcon, double fOrder, CairoContainer *pContainer);
 
 

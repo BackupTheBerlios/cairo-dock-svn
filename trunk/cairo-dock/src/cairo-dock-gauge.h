@@ -1,6 +1,11 @@
+
+#ifndef __CAIRO_DOCK_GAUGE__
+#define  __CAIRO_DOCK_GAUGE__
+
 #include "cairo-dock-struct.h"
 #include <libxml/tree.h>
 #include <libxml/parser.h>
+G_BEGIN_DECLS
 
 typedef struct
 {
@@ -48,3 +53,7 @@ void cairo_dock_reload_gauge (cairo_t *pSourceContext, Gauge *pGauge, int iWidth
 void cairo_dock_free_gauge(Gauge *pGauge);
 
 gchar *cairo_dock_get_gauge_key_value(gchar *cAppletConfFilePath, GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultThemeName);
+
+
+G_END_DECLS
+#endif
