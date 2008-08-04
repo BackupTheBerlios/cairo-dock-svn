@@ -419,7 +419,7 @@ GKeyFile *cairo_dock_pre_read_module_instance_config (CairoDockModuleInstance *p
 	{
 		pMinimalConfig->fOrder = ++ s_iMaxOrder;
 		g_key_file_set_double (pKeyFile, "Icon", "order", pMinimalConfig->fOrder);
-		cairo_dock_write_keys_to_file (pKeyFile, pModule->cConfFilePath);
+		cairo_dock_write_keys_to_file (pKeyFile, cInstanceConfFilePath);
 	}
 	else
 	{
@@ -510,11 +510,7 @@ void cairo_dock_activate_module (CairoDockModule *module, GError **erreur)
 void cairo_dock_deactivate_module (CairoDockModule *module)
 {
 	g_return_if_fail (module != NULL);
-	///if (module != NULL && module->bActive)
-	{
-		g_list_foreach (module->pInstancesList, (GFunc) cairo_dock_deinstanciate_module, NULL);
-		///module->bActive = FALSE;
-	}
+	g_list_foreach (module->pInstancesList, (GFunc) cairo_dock_stop_module_instance, NULL);
 }
 
 
@@ -748,16 +744,19 @@ void cairo_dock_activate_module_and_load (gchar *cModuleName)
 
 void cairo_dock_deactivate_module_instance_and_unload (CairoDockModuleInstance *pInstance)
 {
+	g_print ("%s ()\n", __func__);
 	Icon *pIcon = pInstance->pIcon;  // l'instance va etre detruite.
-	if (pInstance->pDock)
+	CairoDock *pDock = pInstance->pDock;
+	if (pDock)
 	{
-		cairo_dock_remove_icon_from_dock (pInstance->pDock, pInstance->pIcon);  // desinstancie le module.
-		cairo_dock_update_dock_size (pInstance->pDock);
-		gtk_widget_queue_draw (pInstance->pDock->pWidget);
+		cairo_dock_remove_icon_from_dock (pDock, pInstance->pIcon);  // desinstancie le module.
+		cairo_dock_update_dock_size (pDock);
+		gtk_widget_queue_draw (pDock->pWidget);
 	}
 	else
 	{
 		cairo_dock_deinstanciate_module (pInstance);
+		pIcon->pModuleInstance = NULL;
 	}
 	cairo_dock_free_icon (pIcon);
 }
@@ -769,12 +768,16 @@ void cairo_dock_deactivate_module_and_unload (gchar *cModuleName)
 	CairoDockModule *pModule = cairo_dock_find_module_from_name (cModuleName);
 	g_return_if_fail (pModule != NULL);
 	
-	GList *pElement;
+	GList *pElement = pModule->pInstancesList, *pNextElement;
 	CairoDockModuleInstance *pInstance;
-	for (pElement = pModule->pInstancesList; pElement != NULL; pElement = pElement->next)
+	g_print ("%d instances a arreter\n", g_list_length (pModule->pInstancesList));
+	//for (pElement = pModule->pInstancesList; pElement != NULL; pElement = pElement->next)
+	while (pElement != NULL)
 	{
 		pInstance = pElement->data;
+		pNextElement = pElement->next;
 		cairo_dock_deactivate_module_instance_and_unload (pInstance);
+		pElement = pNextElement;
 	}
 	
 	///pModule->bActive = FALSE;
@@ -1118,7 +1121,7 @@ void cairo_dock_free_module_instance (CairoDockModuleInstance *pInstance)
 /**
 * Stoppe une instance d'un module.
 */
-void cairo_dock_deinstanciate_module (CairoDockModuleInstance *pInstance)
+void cairo_dock_stop_module_instance (CairoDockModuleInstance *pInstance)
 {
 	if (pInstance->pModule->pInterface->stopModule != NULL)
 		pInstance->pModule->pInterface->stopModule (pInstance);
@@ -1133,8 +1136,16 @@ void cairo_dock_deinstanciate_module (CairoDockModuleInstance *pInstance)
 		cairo_dock_free_desklet (pInstance->pDesklet);
 	if (pInstance->pDrawContext != NULL)
 		cairo_destroy (pInstance->pDrawContext);
+}
+/**
+* Stoppe une instance d'un module, et la detruit.
+*/
+void cairo_dock_deinstanciate_module (CairoDockModuleInstance *pInstance)
+{
+	cairo_dock_stop_module_instance (pInstance);
 	
 	pInstance->pModule->pInstancesList = g_list_remove (pInstance->pModule->pInstancesList, pInstance);
+	
 	cairo_dock_free_module_instance (pInstance);
 }
 
@@ -1162,7 +1173,7 @@ void cairo_dock_remove_module_instance (CairoDockModuleInstance *pInstance)
 	cairo_dock_deactivate_module_instance_and_unload (pInstance);  // pInstance n'est plus.
 	
 	//\_________________ Si c'est pas la derniere instance, la derniere instance prend sa place.
-	int iNbInstances = g_list_length (pModule->pInstancesList);
+	int iNbInstances = g_list_length (pModule->pInstancesList)+1;  // nombre d'instances avant suppression.
 	gchar *str = strrchr (cConfFilePath, '-');
 	if (str == NULL || atoi (str+1) != iNbInstances-1)
 	{
@@ -1204,7 +1215,8 @@ void cairo_dock_add_module_instance (CairoDockModule *pModule)
 	gchar *cInstanceFilePath = g_strdup_printf ("%s-%d", pModule->cConfFilePath, iNbInstances);
 	if (! g_file_test (cInstanceFilePath, G_FILE_TEST_EXISTS))
 	{
-		gchar *cCommand = g_strdup_printf ("cp %s %s", pModule->cConfFilePath, cInstanceFilePath);
+		gchar *cCommand = g_strdup_printf ("cp %s/%s %s", pModule->pVisitCard->cShareDataDir, pModule->pVisitCard->cConfFileName, cInstanceFilePath);
+		g_print ("%s\n", cCommand);
 		system (cCommand);
 		g_free (cCommand);
 	}

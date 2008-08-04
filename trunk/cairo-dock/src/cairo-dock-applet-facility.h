@@ -585,7 +585,7 @@ void reset_config (CairoDockModuleInstance *myApplet) \
 */
 #define CD_APPLET_RESET_DATA_BEGIN \
 void reset_data (CairoDockModuleInstance *myApplet) \
-{
+{ g_print ("myData:%x (%d ; %x)\n", &myData, myApplet->pModule->pVisitCard->bMultiInstance, myApplet);
 /**
 *Fin de la fonction de liberation des donnees internes.
 */

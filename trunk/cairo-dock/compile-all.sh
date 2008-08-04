@@ -9,7 +9,7 @@ export CAIRO_DOCK_UNSTABLE="0"
 export CAIRO_DOCK_INSTALL="0"
 export CAIRO_DOCK_THEMES="0"
 export CAIRO_DOCK_DOC="0"
-export CAIRO_DOCK_EXCLUDE="template musicplayer stacks"
+export CAIRO_DOCK_EXCLUDE="template musicplayer stacks gauge-test"
 export SUDO=sudo
 
 echo "this script will process : "

@@ -9,7 +9,7 @@ theme_DATA = \
 	default-icon.png\
 	dialog-ok.png\
 	dialog-cancel.png\
-	task-indicator.png\
+	task-indicator.svg\
 	drop-indicator.png\
 	callback-zone.png\
 	separator.png
