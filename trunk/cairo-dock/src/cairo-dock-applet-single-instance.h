@@ -40,7 +40,7 @@ myDrawContext = myApplet->pDrawContext; \
 
 
 
-#define CD_APPLET_STOP_END \
+#define CD_APPLET_RESET_DATA_END \
 	myDock = NULL; \
 	myContainer = NULL; \
 	myIcon = NULL; \
@@ -50,7 +50,7 @@ myDrawContext = myApplet->pDrawContext; \
 		myApplet->pDrawContext = myDrawContext; \
 	myDrawContext = NULL; \
 	myDesklet = NULL; \
-	CD_APPLET_STOP_ALL_END
+	CD_APPLET_RESET_DATA_ALL_END
 
 
 #define CD_APPLET_RESET_CONFIG_BEGIN \

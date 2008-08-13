@@ -282,7 +282,7 @@ gchar* cairo_dock_manage_themes_for_applet (gchar *cAppletShareDataDir, gchar *c
 	GHashTable *pThemeTable = cairo_dock_list_themes (cThemesDirPath, NULL, &erreur);
 	if (erreur != NULL)
 	{
-		cd_warning ("%s", erreur->message);
+		cd_warning (erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
@@ -402,7 +402,7 @@ void cairo_dock_launch_measure (CairoDockMeasure *pMeasureTimer)
 		GThread* pThread = g_thread_create ((GThreadFunc) _cairo_dock_threaded_calculation, pMeasureTimer, FALSE, &erreur);
 		if (erreur != NULL)
 		{
-			cd_warning ("%s", erreur->message);
+			cd_warning (erreur->message);
 			g_error_free (erreur);
 		}
 	}

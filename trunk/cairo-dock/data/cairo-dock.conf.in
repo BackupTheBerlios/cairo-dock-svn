@@ -500,6 +500,10 @@ frame_sep_ =
 #T+3[launchers;applications;applets] Order of the different types of icons :
 icon's type order = launchers;applications;applets
 
+#b Allow applets to be placed amongst launchers ?
+#{This parameter will overwrite the previously defined order, to allow you to mix applets and launchers into the dock.}
+mix applets with launchers = false
+
 
 #[gtk-zoom-fit]
 [Views]

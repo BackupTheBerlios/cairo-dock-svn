@@ -47,6 +47,7 @@ extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS];
 
 extern gboolean g_bPopUp;
+extern gboolean g_bTesting;
 
 extern CairoDock *g_pMainDock;
 
@@ -308,11 +309,12 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 			}
 
 			pDock->iSidShrinkDown = 0;
-			if (cairo_dock_hide_dock_like_a_menu () && GTK_WIDGET_VISIBLE (g_pMainDock->pWidget))
+			/**if (cairo_dock_hide_dock_like_a_menu () && GTK_WIDGET_VISIBLE (g_pMainDock->pWidget))
 			{
 				gtk_widget_hide (g_pMainDock->pWidget);
 				cairo_dock_has_been_hidden_like_a_menu ();
-			}
+			}*/
+			cairo_dock_hide_dock_like_a_menu ();
 			return FALSE;
 		}
 
@@ -326,14 +328,63 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 				gboolean bIsAppli = CAIRO_DOCK_IS_NORMAL_APPLI (pRemovingIcon);  // car apres avoir ete enleve du dock elle n'est plus rien.
 				cairo_dock_remove_icon_from_dock (pDock, pRemovingIcon);
 				
-				if (bIsAppli && pRemovingIcon->cClass != NULL && pDock == cairo_dock_search_dock_from_name (pRemovingIcon->cClass) && pDock->icons == NULL)  // il n'y a plus aucune icone de cette classe.
+				if (! g_bTesting)
 				{
-					cd_message ("le sous-dock de la classe %s n'a plus d'element et va etre detruit", pRemovingIcon->cClass);
-					cairo_dock_destroy_dock (pDock, pRemovingIcon->cClass, NULL, NULL);
+					if (bIsAppli && pRemovingIcon->cClass != NULL && pDock == cairo_dock_search_dock_from_name (pRemovingIcon->cClass) && pDock->icons == NULL)  // il n'y a plus aucune icone de cette classe.
+					{
+						cd_message ("le sous-dock de la classe %s n'a plus d'element et va etre detruit", pRemovingIcon->cClass);
+						cairo_dock_destroy_dock (pDock, pRemovingIcon->cClass, NULL, NULL);
+					}
+					else
+					{
+						cairo_dock_update_dock_size (pDock);
+					}
 				}
 				else
 				{
-					cairo_dock_update_dock_size (pDock);
+					if (bIsAppli && pRemovingIcon->cClass != NULL && pDock == cairo_dock_search_dock_from_name (pRemovingIcon->cClass))
+					{
+						if (pDock->icons == NULL)  // ne devrait plus arriver.
+						{
+							cd_message ("le sous-dock de la classe %s n'a plus d'element et va etre detruit", pRemovingIcon->cClass);
+							
+							CairoDock *pFakeParentDock = NULL;
+							Icon *pFakeClassIcon = cairo_dock_search_icon_pointing_on_dock (pDock, &pFakeParentDock);
+							
+							cairo_dock_destroy_dock (pDock, pRemovingIcon->cClass, NULL, NULL);
+							pFakeClassIcon->pSubDock = NULL;
+							
+							cairo_dock_remove_icon_from_dock (pFakeParentDock, pFakeClassIcon);
+							cairo_dock_free_icon (pFakeClassIcon);
+							cairo_dock_update_dock_size (pFakeParentDock);
+						}
+						else if (pDock->icons->next == NULL)
+						{
+							cd_message ("le sous-dock de la classe %s n'a plus que 1 element et va etre vide puis detruit", pRemovingIcon->cClass);
+							
+							CairoDock *pFakeParentDock = NULL;
+							Icon *pFakeClassIcon = cairo_dock_search_icon_pointing_on_dock (pDock, &pFakeParentDock);
+							
+							Icon *pLastClassIcon = pDock->icons->data;
+							pLastClassIcon->fOrder = pFakeClassIcon->fOrder;
+							
+							cairo_dock_destroy_dock (pDock, pRemovingIcon->cClass, pFakeParentDock, pFakeClassIcon->cParentDockName);
+							pFakeClassIcon->pSubDock = NULL;
+							
+							cairo_dock_remove_icon_from_dock (pFakeParentDock, pFakeClassIcon);
+							cairo_dock_free_icon (pFakeClassIcon);
+							
+							cairo_dock_redraw_my_icon (pLastClassIcon, CAIRO_CONTAINER (pFakeParentDock));  // on suppose que les tailles des 2 icones sont identiques.
+						}
+						else
+						{
+							cairo_dock_update_dock_size (pDock);
+						}
+					}
+					else
+					{
+						cairo_dock_update_dock_size (pDock);
+					}
 				}
 				cairo_dock_free_icon (pRemovingIcon);
 			}

@@ -18,9 +18,9 @@
 #define myConfig (* ((AppletConfig *)(((gpointer)myApplet)+sizeof(CairoDockModuleInstance))))
 #define myData (* ((AppletData *)(((gpointer)myApplet)+sizeof(CairoDockModuleInstance)+sizeof(AppletConfig))))
 
-#define CD_APPLET_STOP_END CD_APPLET_STOP_ALL_END
-
 #define CD_APPLET_RELOAD_BEGIN CD_APPLET_RELOAD_ALL_BEGIN
+
+#define CD_APPLET_RESET_DATA_END CD_APPLET_RESET_DATA_ALL_END
 
 #define CD_APPLET_RESET_CONFIG_BEGIN CD_APPLET_RESET_CONFIG_ALL_BEGIN
 

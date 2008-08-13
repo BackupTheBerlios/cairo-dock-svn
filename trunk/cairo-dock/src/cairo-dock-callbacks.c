@@ -495,11 +495,11 @@ gboolean cairo_dock_emit_signal_on_dock (CairoDock *pDock, const gchar *cSignal)
 }
 gboolean cairo_dock_emit_leave_signal (CairoDock *pDock)
 {
-	cairo_dock_emit_signal_on_dock (pDock, "leave-notify-event");
+	return cairo_dock_emit_signal_on_dock (pDock, "leave-notify-event");
 }
 gboolean cairo_dock_emit_enter_signal (CairoDock *pDock)
 {
-	cairo_dock_emit_signal_on_dock (pDock, "enter-notify-event");
+	return cairo_dock_emit_signal_on_dock (pDock, "enter-notify-event");
 }
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
@@ -1737,12 +1737,11 @@ void cairo_dock_raise_from_keyboard (const char *cKeyShortcut, gpointer data)
 	s_bHideAfterShortcut = FALSE;
 }
 
-gboolean cairo_dock_hide_dock_like_a_menu (void)
+void cairo_dock_hide_dock_like_a_menu (void)
 {
-	return s_bHideAfterShortcut;
-}
-
-void cairo_dock_has_been_hidden_like_a_menu (void)
-{
-	s_bHideAfterShortcut = FALSE;
+	if (s_bHideAfterShortcut && GTK_WIDGET_VISIBLE (g_pMainDock->pWidget))
+	{
+		gtk_widget_hide (g_pMainDock->pWidget);
+		s_bHideAfterShortcut = FALSE;
+	}
 }

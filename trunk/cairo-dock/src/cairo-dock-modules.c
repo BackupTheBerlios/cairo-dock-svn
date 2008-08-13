@@ -503,7 +503,6 @@ void cairo_dock_activate_module (CairoDockModule *module, GError **erreur)
 		g_set_error (erreur, 1, 1, "%s () : no instance of module %s could be created", __func__, module->pVisitCard->cModuleName);
 		return ;
 	}
-	///module->bActive = TRUE;
 }
 
 
@@ -511,6 +510,9 @@ void cairo_dock_deactivate_module (CairoDockModule *module)
 {
 	g_return_if_fail (module != NULL);
 	g_list_foreach (module->pInstancesList, (GFunc) cairo_dock_stop_module_instance, NULL);
+	g_list_foreach (module->pInstancesList, (GFunc) cairo_dock_free_module_instance, NULL);
+	g_list_free (module->pInstancesList);
+	module->pInstancesList = NULL;
 }
 
 
@@ -770,7 +772,7 @@ void cairo_dock_deactivate_module_and_unload (gchar *cModuleName)
 	
 	GList *pElement = pModule->pInstancesList, *pNextElement;
 	CairoDockModuleInstance *pInstance;
-	g_print ("%d instances a arreter\n", g_list_length (pModule->pInstancesList));
+	g_print ("%d instance(s) a arreter\n", g_list_length (pModule->pInstancesList));
 	//for (pElement = pModule->pInstancesList; pElement != NULL; pElement = pElement->next)
 	while (pElement != NULL)
 	{
@@ -780,7 +782,6 @@ void cairo_dock_deactivate_module_and_unload (gchar *cModuleName)
 		pElement = pNextElement;
 	}
 	
-	///pModule->bActive = FALSE;
 	cairo_dock_update_conf_file_with_active_modules2 (NULL, g_cConfFile);
 }
 

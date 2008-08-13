@@ -44,6 +44,7 @@
 #include "cairo-dock-desklet.h"
 
 extern CairoDock *g_pMainDock;
+extern int g_iScreenWidth[2], g_iScreenHeight[2];
 extern gchar *g_cConfFile;
 extern int g_iDockRadius;
 extern double g_fDeskletColor[4];
@@ -131,10 +132,14 @@ static gboolean _cairo_dock_write_desklet_size (CairoDesklet *pDesklet)
 static gboolean _cairo_dock_write_desklet_position (CairoDesklet *pDesklet)
 {
 	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModuleInstance != NULL)
+	{
+		int iRelativePositionX = (pDesklet->iWindowPositionX + pDesklet->iWidth/2 <= g_iScreenWidth[CAIRO_DOCK_HORIZONTAL]/2 ? pDesklet->iWindowPositionX : g_iScreenWidth[CAIRO_DOCK_HORIZONTAL]/2 - pDesklet->iWindowPositionX);
+		int iRelativePositionY = (pDesklet->iWindowPositionY + pDesklet->iHeight/2 <= g_iScreenHeight[CAIRO_DOCK_HORIZONTAL]/2 ? pDesklet->iWindowPositionY : g_iScreenHeight[CAIRO_DOCK_HORIZONTAL]/2 - pDesklet->iWindowPositionY);
 		cairo_dock_update_conf_file (pDesklet->pIcon->pModuleInstance->cConfFilePath,
-			G_TYPE_INT, "Desklet", "x position", pDesklet->iWindowPositionX,
-			G_TYPE_INT, "Desklet", "y position", pDesklet->iWindowPositionY,
+			G_TYPE_INT, "Desklet", "x position", iRelativePositionX,
+			G_TYPE_INT, "Desklet", "y position", iRelativePositionY,
 			G_TYPE_INVALID);
+	}
 	pDesklet->iSidWritePosition = 0;
 	return FALSE;
 }
@@ -476,8 +481,12 @@ void cairo_dock_place_desklet (CairoDesklet *pDesklet, CairoDockMinimalAppletCon
 			pMinimalConfig->iDeskletHeight);
 
 	gdk_window_move(pDesklet->pWidget->window,
-		pMinimalConfig->iDeskletPositionX,
-		pMinimalConfig->iDeskletPositionY);
+		(pMinimalConfig->iDeskletPositionX < 0 ?
+			g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] - pMinimalConfig->iDeskletPositionX :
+			pMinimalConfig->iDeskletPositionX),
+		(pMinimalConfig->iDeskletPositionY < 0 ?
+			g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] - pMinimalConfig->iDeskletPositionY :
+			pMinimalConfig->iDeskletPositionY));
 
 	gtk_window_set_keep_below (GTK_WINDOW (pDesklet->pWidget), pMinimalConfig->bKeepBelow);
 	gtk_window_set_keep_above (GTK_WINDOW (pDesklet->pWidget), pMinimalConfig->bKeepAbove);

@@ -17,9 +17,47 @@ Written by Necropotame (for any bug report, please mail me to fabounet@users.ber
 #include <cairo-dock-themes-manager.h>
 #include <cairo-dock-surface-factory.h>
 #include <cairo-dock-dock-factory.h>
+#include <cairo-dock-keyfile-utilities.h>
+#include <cairo-dock-config.h>
 #include <cairo-dock-gauge.h>
 
 extern double g_fAmplitude;
+extern gchar *g_cCairoDockDataDir;
+
+static GHashTable *s_pGaugeTable = NULL;
+
+void cairo_dock_list_available_gauges (void)
+{
+	if (s_pGaugeTable != NULL)
+		return ;
+	
+	GError *erreur = NULL;
+	gchar *cGaugeShareDir = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_GAUGES_DIR);
+	s_pGaugeTable = cairo_dock_list_themes (cGaugeShareDir, s_pGaugeTable, &erreur);
+	if (erreur != NULL)
+	{
+		cd_warning (erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+	}
+	g_free (cGaugeShareDir);
+	
+	gchar *cGaugeUserDir = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_GAUGES_DIR);
+	s_pGaugeTable = cairo_dock_list_themes (cGaugeUserDir, s_pGaugeTable, &erreur);
+	if (erreur != NULL)
+	{
+		cd_warning (erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+	}
+	g_free (cGaugeUserDir);
+}
+
+void cairo_dock_update_conf_file_with_gauges (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cGroupName, gchar *cKeyName)
+{
+	cairo_dock_update_conf_file_with_hash_table (pOpenedKeyFile, cConfFile, s_pGaugeTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_name_description, TRUE, FALSE);
+
+}
 
 
 void cairo_dock_xml_open_file (gchar *filePath, const gchar *mainNodeName,xmlDocPtr *myXmlDoc,xmlNodePtr *myXmlNode)
@@ -48,7 +86,7 @@ void cairo_dock_xml_open_file (gchar *filePath, const gchar *mainNodeName,xmlDoc
 	*myXmlNode = node;
 }
 
-Gauge *cairo_dock_load_gauge(cairo_t *pSourceContext, gchar *cThemePath, int iWidth, int iHeight)
+Gauge *cairo_dock_load_gauge(cairo_t *pSourceContext, const gchar *cThemePath, int iWidth, int iHeight)
 {
 	g_print ("%s (%dx%d)\n", __func__, iWidth, iHeight);
 	g_return_val_if_fail (cThemePath != NULL, NULL);
@@ -478,11 +516,22 @@ void cairo_dock_free_gauge(Gauge *pGauge)
 	}
 }
 
-gchar *cairo_dock_get_gauge_key_value(gchar *cAppletConfFilePath, GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultThemeName)
+const gchar *cairo_dock_get_gauge_key_value(gchar *cAppletConfFilePath, GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultThemeName)
 {
-	gchar *cThemePath = cairo_dock_manage_themes_for_applet (CAIRO_DOCK_SHARE_DATA_DIR, "gauges", cAppletConfFilePath, pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, cDefaultThemeName);
+	if (s_pGaugeTable == NULL)
+		cairo_dock_list_available_gauges ();
+	
+	const gchar *cGaugePath = NULL;
+	gchar *cChosenThemeName = cairo_dock_get_string_key_value (pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, cDefaultThemeName, NULL, NULL);
+	if (cChosenThemeName != NULL)
+		cGaugePath = g_hash_table_lookup (s_pGaugeTable, cChosenThemeName);
+	g_free (cChosenThemeName);
+	
+	cd_debug("Theme de la jauge : %s",cGaugePath);
+	return cGaugePath;
+	/**gchar *cThemePath = cairo_dock_manage_themes_for_applet (CAIRO_DOCK_SHARE_DATA_DIR, "gauges", cAppletConfFilePath, pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, cDefaultThemeName);
 	cd_debug("Clés du theme : [%s] %s",cGroupName,cKeyName);
 	cd_debug("Theme de la jauge : %s",cThemePath);
 	cd_debug("Dossier des jauges : %s/gauges",CAIRO_DOCK_SHARE_DATA_DIR);
-	return cThemePath;
+	return cThemePath;*/
 }

@@ -808,11 +808,13 @@ struct _CairoDockLabelDescription {
 
 /// Nom du repertoire de travail de cairo-dock.
 #define CAIRO_DOCK_DATA_DIR ".cairo-dock"
-/// Nom du repertoire des themes.
+/// Nom du repertoire des themes utilisateur.
 #define CAIRO_DOCK_THEMES_DIR "themes"
+/// Nom du repertoire des gauges utilisateur..
+#define CAIRO_DOCK_GAUGES_DIR "gauges"
 /// Nom du repertoire du theme courant.
 #define CAIRO_DOCK_CURRENT_THEME_NAME "current_theme"
-/// Nom du repertoire des lanceurs et leurs icones.
+/// Nom du repertoire des lanceurs et de leurs icones.
 #define CAIRO_DOCK_LAUNCHERS_DIR "launchers"
 /// Nom du dock principal (le 1er cree).
 #define CAIRO_DOCK_MAIN_DOCK_NAME "_MainDock_"

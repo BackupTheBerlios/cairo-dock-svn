@@ -114,21 +114,6 @@ void cairo_dock_calculate_construction_parameters_generic (Icon *icon, int iCurr
 
 void cairo_dock_render_linear (cairo_t *pCairoContext, CairoDock *pDock)
 {
-	//\____________________ On cree le contexte du dessin.
-	/*cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
-	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
-
-	cairo_set_tolerance (pCairoContext, 0.5);  // avec moins que 0.5 on ne voit pas la difference.
-	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
-	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
-	cairo_paint (pCairoContext);
-	if (g_pDesktopBgSurface != NULL)
-	{
-		cairo_set_source_surface (pCairoContext, g_pDesktopBgSurface, - pDock->iWindowPositionX, - pDock->iWindowPositionY);
-		cairo_paint (pCairoContext);
-	}
-	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);*/
-
 	//\____________________ On trace le cadre.
 	double fChangeAxes = 0.5 * (pDock->iCurrentWidth - pDock->iMaxDockWidth);
 	double fLineWidth = g_iDockLineWidth;
@@ -156,11 +141,11 @@ void cairo_dock_render_linear (cairo_t *pCairoContext, CairoDock *pDock)
 	}
 
 	cairo_save (pCairoContext);
-	cairo_dock_draw_frame (pCairoContext, fRadius, fLineWidth, fDockWidth, pDock->iDecorationsHeight, fDockOffsetX, fDockOffsetY, sens, 0., pDock->bHorizontalDock);
+	double fDeltaXTrapeze = cairo_dock_draw_frame (pCairoContext, fRadius, fLineWidth, fDockWidth, pDock->iDecorationsHeight, fDockOffsetX, fDockOffsetY, sens, 0., pDock->bHorizontalDock);
 
 	//\____________________ On dessine les decorations dedans.
 	fDockOffsetY = (pDock->bDirectionUp ? pDock->iCurrentHeight - pDock->iDecorationsHeight - fLineWidth : fLineWidth);
-	cairo_dock_render_decorations_in_frame (pCairoContext, pDock, fDockOffsetY);
+	cairo_dock_render_decorations_in_frame (pCairoContext, pDock, fDockOffsetY, fDockOffsetX - fDeltaXTrapeze, fDockWidth + 2*fDeltaXTrapeze);
 
 	//\____________________ On dessine le cadre.
 	if (fLineWidth > 0)
@@ -181,12 +166,6 @@ void cairo_dock_render_linear (cairo_t *pCairoContext, CairoDock *pDock)
 	double fRatio = (pDock->iRefCount == 0 ? 1 : g_fSubDockSizeRatio);
 	fRatio = pDock->fRatio;
 	cairo_dock_render_icons_linear (pCairoContext, pDock, fRatio);
-
-	/*cairo_destroy (pCairoContext);
-#ifdef HAVE_GLITZ
-	if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
-		glitz_drawable_swap_buffers (pDock->pGlitzDrawable);
-#endif*/
 }
 
 
@@ -198,21 +177,6 @@ void cairo_dock_render_optimized_linear (cairo_t *pCairoContext, CairoDock *pDoc
 	double fMargin = g_iFrameMargin;
 	int iWidth = pDock->iCurrentWidth;
 	int iHeight = pDock->iCurrentHeight;
-
-	/*cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
-	g_return_if_fail (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS);
-	
-	cairo_rectangle (pCairoContext,
-		pArea->x,
-		pArea->y,
-		pArea->width,
-		pArea->height);
-	cairo_clip (pCairoContext);
-	cairo_set_tolerance (pCairoContext, 0.5);
-	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
-	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
-	cairo_paint (pCairoContext);
-	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);*/
 
 	//\____________________ On dessine les decorations du fond sur la portion de fenetre.
 	cairo_save (pCairoContext);
@@ -236,7 +200,13 @@ void cairo_dock_render_optimized_linear (cairo_t *pCairoContext, CairoDock *pDoc
 		cairo_rectangle (pCairoContext, fDockOffsetX, fDockOffsetY, pDock->iDecorationsHeight, pArea->height);
 
 	fDockOffsetY = (pDock->bDirectionUp ? pDock->iCurrentHeight - pDock->iDecorationsHeight - fLineWidth : fLineWidth);
-	cairo_dock_render_decorations_in_frame (pCairoContext, pDock, fDockOffsetY);
+	
+	double fRadius = MIN (g_iDockRadius, (pDock->iDecorationsHeight + g_iDockLineWidth) / 2 - 1);
+	Icon *pFirstIcon = cairo_dock_get_first_drawn_icon (pDock);
+	double fOffsetX = (pFirstIcon != NULL ? pFirstIcon->fX + 0 - fMargin : fRadius + fLineWidth / 2);
+	double fDockWidth = cairo_dock_get_current_dock_width_linear (pDock);
+	double fDeltaXTrapeze = fRadius;
+	cairo_dock_render_decorations_in_frame (pCairoContext, pDock, fDockOffsetY, fOffsetX - fDeltaXTrapeze, fDockWidth + 2*fDeltaXTrapeze);
 
 
 	//\____________________ On dessine la partie du cadre qui va bien.

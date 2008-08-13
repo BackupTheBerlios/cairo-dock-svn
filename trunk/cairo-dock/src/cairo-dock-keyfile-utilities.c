@@ -52,7 +52,7 @@ void cairo_dock_flush_conf_file_full (GKeyFile *pKeyFile, gchar *cConfFilePath, 
 	
 	if (! g_file_test (cTemplateConfFilePath, G_FILE_TEST_EXISTS))
 	{
-		cd_warning ("Attention : couldn't find any installed conf file");
+		cd_warning ("Couldn't find any installed conf file");
 	}
 	else
 	{
@@ -114,7 +114,7 @@ void cairo_dock_replace_key_values (GKeyFile *pOriginalKeyFile, GKeyFile *pRepla
 			cKeyValue =  g_key_file_get_string (pReplacementKeyFile, cGroupName, cKeyName, &erreur);
 			if (erreur != NULL)
 			{
-				cd_warning ("Attention : %s", erreur->message);
+				cd_warning (erreur->message);
 				g_error_free (erreur);
 				erreur = NULL;
 			}
@@ -235,7 +235,7 @@ void cairo_dock_update_conf_file_with_list (GKeyFile *pOpenedKeyFile, gchar *cCo
 		g_key_file_load_from_file (pKeyFile, cConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 		if (erreur != NULL)
 		{
-			cd_warning ("Attention : %s", erreur->message);
+			cd_warning (erreur->message);
 			g_error_free (erreur);
 			g_key_file_free (pKeyFile);
 			return ;
@@ -295,7 +295,7 @@ void cairo_dock_update_conf_file_with_list (GKeyFile *pOpenedKeyFile, gchar *cCo
 	g_key_file_set_comment (pKeyFile, cGroupName, cKeyName, sComment->str, &erreur);
 	if (erreur != NULL)
 	{
-		cd_warning ("Attention : %s", erreur->message);
+		cd_warning (erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
@@ -317,7 +317,7 @@ void cairo_dock_replace_values_in_conf_file (gchar *cConfFilePath, GKeyFile *pVa
 	g_key_file_load_from_file (pConfKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_warning ("Attention : %s", erreur->message);
+		cd_warning (erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
@@ -337,7 +337,7 @@ void cairo_dock_replace_keys_by_identifier (gchar *cConfFilePath, gchar *cReplac
 	g_key_file_load_from_file (pReplacementKeyFile, cReplacementConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_warning ("Attention : %s", erreur->message);
+		cd_warning (erreur->message);
 		g_error_free (erreur);
 		return ;
 	}

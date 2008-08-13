@@ -1,9 +1,6 @@
 #ifndef __CAIRO_DOCK_GLOBAL_VARIABLES_H__
 #define __CAIRO_DOCK_GLOBAL_VARIABLES_H__
 
-#include <glib.h>
-#include <gtk/gtk.h>
-#include <cairo.h>
 #include "cairo-dock-struct.h"
 G_BEGIN_DECLS
 
@@ -113,10 +110,7 @@ extern double g_fDeskletColor[4];
 /// Couleur du fond des desklets lorsque la souris est dedans..
 extern double g_fDeskletColorInside[4];
 
-extern int g_iDialogMessageSize;
-extern gchar *g_cDialogMessagePolice;
-extern int g_iDialogMessageWeight;
-extern int g_iDialogMessageStyle;
+extern cairo_surface_t *g_pBackgroundSurfaceFull[2];
 
 G_END_DECLS
 #endif

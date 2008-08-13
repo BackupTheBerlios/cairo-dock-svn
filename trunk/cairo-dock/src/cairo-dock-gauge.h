@@ -37,9 +37,11 @@ typedef struct
 	GList *indicatorList;
 } Gauge;
 
-void cairo_dock_xml_open_file (gchar *filePath, const gchar *mainNodeName,xmlDocPtr *xmlDoc,xmlNodePtr *node);
+void cairo_dock_list_available_gauges (void);
+void cairo_dock_update_conf_file_with_gauges (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cGroupName, gchar *cKeyName);
 
-Gauge *cairo_dock_load_gauge(cairo_t *pSourceContext, gchar *themeName, int iWidth, int iHeight);
+void cairo_dock_xml_open_file (gchar *filePath, const gchar *mainNodeName,xmlDocPtr *xmlDoc,xmlNodePtr *node);
+Gauge *cairo_dock_load_gauge(cairo_t *pSourceContext, const gchar *cThemePath, int iWidth, int iHeight);
 GaugeImage *cairo_dock_init_gauge_image (gchar *cImagePath);
 void cairo_dock_load_gauge_image (cairo_t *pSourceContext, GaugeImage *pGaugeImage, int iWidth, int iHeight);
 
@@ -52,7 +54,7 @@ void cairo_dock_reload_gauge (cairo_t *pSourceContext, Gauge *pGauge, int iWidth
 
 void cairo_dock_free_gauge(Gauge *pGauge);
 
-gchar *cairo_dock_get_gauge_key_value(gchar *cAppletConfFilePath, GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultThemeName);
+const gchar *cairo_dock_get_gauge_key_value (gchar *cAppletConfFilePath, GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultThemeName);
 
 
 G_END_DECLS

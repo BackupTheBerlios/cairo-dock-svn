@@ -368,7 +368,7 @@ if test "$CAIRO_DOCK_INSTALL" = "1"; then
 	date +"compil ended at %c"
 	ls -l $CAIRO_DOCK_PREFIX/bin/cairo-dock
 	ls -l $CAIRO_DOCK_PREFIX/lib/cairo-dock
-	nb_plugins = "`ls $CAIRO_DOCK_PREFIX/lib/cairo-dock/*.so | wc -w`"
+#	nb_plugins = "`ls $CAIRO_DOCK_PREFIX/lib/cairo-dock/*.so | wc -w`"
 fi
 
 cd $CAIRO_DOCK_DIR

@@ -340,7 +340,7 @@ gchar *cairo_dock_cut_string (gchar *cString, int iNbCaracters)  // gere l'UTF-8
 		&erreur);  // inutile sur Ubuntu, qui est nativement UTF8, mais sur les autres on ne sait pas.
 	if (erreur != NULL)
 	{
-		cd_warning ("%s", erreur->message);
+		cd_warning (erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
@@ -373,7 +373,10 @@ gchar *cairo_dock_cut_string (gchar *cString, int iNbCaracters)  // gere l'UTF-8
 			cTruncatedName[iNbCaracters+2] = '.';
 		}
 	}
-	g_free (cUtf8Name);
+	if (cTruncatedName == NULL)
+		cTruncatedName = cUtf8Name;
+	else
+		g_free (cUtf8Name);
 	//g_print (" -> etiquette : %s\n", cTruncatedName);
 	return cTruncatedName;
 }

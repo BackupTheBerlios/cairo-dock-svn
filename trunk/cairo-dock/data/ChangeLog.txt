@@ -28,4 +28,4 @@
 
 1.6.1 = v1.6.1 :\nCairo-Dock has one year ! To celebrate this event, we are happy to offer you :\n - Once again a new view : Curve !\n - A long time waited applet : the desktop Switcher.\n - A very complete theme : Brit\n - Translation in italian and chinese.\n - And we are still hoping someone would help us writing a kde-integration plug-in ^_^
 
-1.6.2 = v1.6.2 :\n - Hop, 2 new applets have been released :\n  Slider and Stack. Enjoy !\n - Cairo-Dock is now able to load themes on its server, so feel free to send us your themes ! :-)
+1.6.2 = v1.6.2 : the first version to be integrated in the Ubuntu repositories !\n - 2 new applets have been released :\n  Slider and Stack. Enjoy !\n - Cairo-Dock is now able to load themes on its server, so feel free to send us your themes ! :-)

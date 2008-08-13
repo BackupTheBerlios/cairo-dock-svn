@@ -1954,7 +1954,7 @@ static void _cairo_dock_free_widget_list (gpointer *data, gpointer user_data)
 {
 	//g_print ("%s - %s\n", (gchar *)data[0], (gchar *)data[1]);
 	g_free (data[0]);
-	g_free (data[1]);  // data[2] est le widget, et il se fera liberer lors de la destruction de la fenetre.
+	g_free (data[1]);
 	g_slist_free (data[2]);  // les elements de data[2] sont les widgets, et se feront liberer lors de la destruction de la fenetre.
 }
 

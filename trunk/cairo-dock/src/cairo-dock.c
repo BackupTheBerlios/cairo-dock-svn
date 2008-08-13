@@ -243,6 +243,7 @@ gboolean g_bUseFakeTransparency = FALSE;
 
 gboolean g_bDisplayDropEmblem = FALSE; // indicateur de drop
 gchar *g_cThemeServerAdress = NULL;
+gboolean g_bTesting = FALSE;
 
 static gchar *cLaunchCommand = NULL;
 
@@ -307,7 +308,7 @@ int main (int argc, char** argv)
 	GError *erreur = NULL;
 	
 	//\___________________ On recupere quelques options.
-	gboolean bSafeMode = FALSE, bMaintenance = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE, bTesting = FALSE;
+	gboolean bSafeMode = FALSE, bMaintenance = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE;
 	gchar *cEnvironment = NULL, *cUserDefinedDataDir = NULL, *cVerbosity = 0, *cUserDefinedModuleDir = NULL;
 	GOptionEntry TableDesOptions[] =
 	{
@@ -366,8 +367,8 @@ int main (int argc, char** argv)
 			&g_bUseFakeTransparency,
 			"emulate composition with fake transparency. Only use this if you don't run a compositor like Compiz, xcompmgr, etc and have a black background around your dock.", NULL},
 		{"testing", 'T', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
-			&bTesting,
-			"for debugging purpose only. The crash manager will not be started.", NULL},
+			&g_bTesting,
+			"for debugging purpose only. The crash manager will not be started, and some unstable options may be activated.", NULL},
 		{"server", 'S', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
 			&g_cThemeServerAdress,
 			"adress of a server containing additional themes. This will overwrite the default server adress.", NULL},
@@ -468,6 +469,13 @@ int main (int argc, char** argv)
 			cd_warning ("Attention : couldn't create directory %s", cThemesDir);
 	}
 	g_free (cThemesDir);
+	gchar *cGaugesDir = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_GAUGES_DIR);
+	if (! g_file_test (cGaugesDir, G_FILE_TEST_IS_DIR))
+	{
+		if (g_mkdir (cGaugesDir, 7*8*8+7*8+5) != 0)
+			cd_warning ("Attention : couldn't create directory %s", cGaugesDir);
+	}
+	g_free (cGaugesDir);
 	g_cCurrentThemePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_CURRENT_THEME_NAME);
 	if (! g_file_test (g_cCurrentThemePath, G_FILE_TEST_IS_DIR))
 	{
@@ -526,7 +534,7 @@ int main (int argc, char** argv)
 	cairo_dock_register_notification (CAIRO_DOCK_REMOVE_ICON, (CairoDockNotificationFunc) cairo_dock_notification_remove_icon, CAIRO_DOCK_RUN_AFTER, NULL);
 	
 	//\___________________ On initialise la gestion des crash.
-	if (! bTesting)
+	if (! g_bTesting)
 		_cairo_dock_set_signal_interception ();
 	
 	//\___________________ On charge le dernier theme ou on demande a l'utilisateur d'en choisir un.
@@ -678,7 +686,7 @@ int main (int argc, char** argv)
 		cd_message (" ==> %.2f\n", fAnswer);*/
 	}
 	
-	if (! bTesting)
+	if (! g_bTesting)
 		g_timeout_add_seconds (5, _cairo_dock_successful_launch, NULL);
 	
 	gtk_main ();

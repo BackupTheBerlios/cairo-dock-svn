@@ -345,7 +345,7 @@ void stop (CairoDockModuleInstance *myApplet) \
 /**
 *Fin de la fonction d'arret de l'applet.
 */
-#define CD_APPLET_STOP_ALL_END \
+#define CD_APPLET_STOP_END \
 }
 
 //\______________________ reload.
@@ -585,11 +585,11 @@ void reset_config (CairoDockModuleInstance *myApplet) \
 */
 #define CD_APPLET_RESET_DATA_BEGIN \
 void reset_data (CairoDockModuleInstance *myApplet) \
-{ g_print ("myData:%x (%d ; %x)\n", &myData, myApplet->pModule->pVisitCard->bMultiInstance, myApplet);
+{
 /**
 *Fin de la fonction de liberation des donnees internes.
 */
-#define CD_APPLET_RESET_DATA_END \
+#define CD_APPLET_RESET_DATA_ALL_END \
 	memset (&myData, 0, sizeof (AppletData)); \
 }
 

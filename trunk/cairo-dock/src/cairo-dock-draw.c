@@ -231,7 +231,7 @@ cairo_t * cairo_dock_create_context_from_window (CairoContainer *pContainer)
 	return gdk_cairo_create (pContainer->pWidget->window);
 }
 
-static void cairo_dock_draw_frame_horizontal (cairo_t *pCairoContext, double fRadius, double fLineWidth, double fFrameWidth, double fFrameHeight, double fDockOffsetX, double fDockOffsetY, int sens, double fInclination)  // la largeur est donnee par rapport "au fond".
+static double cairo_dock_draw_frame_horizontal (cairo_t *pCairoContext, double fRadius, double fLineWidth, double fFrameWidth, double fFrameHeight, double fDockOffsetX, double fDockOffsetY, int sens, double fInclination)  // la largeur est donnee par rapport "au fond".
 {
 	if (2*fRadius > fFrameHeight + fLineWidth)
 		fRadius = (fFrameHeight + fLineWidth) / 2 - 1;
@@ -270,8 +270,9 @@ static void cairo_dock_draw_frame_horizontal (cairo_t *pCairoContext, double fRa
 		fRadius * cosa, -sens * fRadius * (1 - sina));
 	if (fRadius < 1)
 		cairo_close_path (pCairoContext);
+	return fDeltaXForLoop + fRadius * cosa;
 }
-static void cairo_dock_draw_frame_vertical (cairo_t *pCairoContext, double fRadius, double fLineWidth, double fFrameWidth, double fFrameHeight, double fDockOffsetX, double fDockOffsetY, int sens, double fInclination)
+static double cairo_dock_draw_frame_vertical (cairo_t *pCairoContext, double fRadius, double fLineWidth, double fFrameWidth, double fFrameHeight, double fDockOffsetX, double fDockOffsetY, int sens, double fInclination)
 {
 	if (2*fRadius > fFrameHeight + fLineWidth)
 		fRadius = (fFrameHeight + fLineWidth) / 2 - 1;
@@ -310,16 +311,17 @@ static void cairo_dock_draw_frame_vertical (cairo_t *pCairoContext, double fRadi
 		-sens * fRadius * (1 - sina), fRadius * cosa);
 	if (fRadius < 1)
 		cairo_close_path (pCairoContext);
+	return fDeltaXForLoop + fRadius * cosa;
 }
-void cairo_dock_draw_frame (cairo_t *pCairoContext, double fRadius, double fLineWidth, double fFrameWidth, double fFrameHeight, double fDockOffsetX, double fDockOffsetY, int sens, double fInclination, gboolean bHorizontal)
+double cairo_dock_draw_frame (cairo_t *pCairoContext, double fRadius, double fLineWidth, double fFrameWidth, double fFrameHeight, double fDockOffsetX, double fDockOffsetY, int sens, double fInclination, gboolean bHorizontal)
 {
 	if (bHorizontal)
-		cairo_dock_draw_frame_horizontal (pCairoContext, fRadius, fLineWidth, fFrameWidth, fFrameHeight, fDockOffsetX, fDockOffsetY, sens, fInclination);
+		return cairo_dock_draw_frame_horizontal (pCairoContext, fRadius, fLineWidth, fFrameWidth, fFrameHeight, fDockOffsetX, fDockOffsetY, sens, fInclination);
 	else
-		cairo_dock_draw_frame_vertical (pCairoContext, fRadius, fLineWidth, fFrameWidth, fFrameHeight, fDockOffsetX, fDockOffsetY, sens, fInclination);
+		return cairo_dock_draw_frame_vertical (pCairoContext, fRadius, fLineWidth, fFrameWidth, fFrameHeight, fDockOffsetX, fDockOffsetY, sens, fInclination);
 }
 
-void cairo_dock_render_decorations_in_frame (cairo_t *pCairoContext, CairoDock *pDock, double fOffsetY)
+void cairo_dock_render_decorations_in_frame (cairo_t *pCairoContext, CairoDock *pDock, double fOffsetY, double fOffsetX, double fWidth)
 {
 	//g_print ("%.2f\n", pDock->fDecorationsOffsetX);
 	if (g_pBackgroundSurfaceFull[pDock->bHorizontalDock] != NULL)
@@ -341,13 +343,13 @@ void cairo_dock_render_decorations_in_frame (cairo_t *pCairoContext, CairoDock *
 		
 		if (pDock->bHorizontalDock)
 		{
-			cairo_translate (pCairoContext, pDock->fDecorationsOffsetX * g_fStripesSpeedFactor, fOffsetY);
-			cairo_scale (pCairoContext, 1. * pDock->iCurrentWidth / g_fBackgroundImageWidth, 1. * pDock->iDecorationsHeight / g_fBackgroundImageHeight);
+			cairo_translate (pCairoContext, pDock->fDecorationsOffsetX * g_fStripesSpeedFactor + fOffsetX, fOffsetY);
+			cairo_scale (pCairoContext, 1. * fWidth / g_fBackgroundImageWidth, 1. * pDock->iDecorationsHeight / g_fBackgroundImageHeight);  // pDock->iCurrentWidth
 		}
 		else
 		{
-			cairo_translate (pCairoContext, fOffsetY, pDock->fDecorationsOffsetX * g_fStripesSpeedFactor);
-			cairo_scale (pCairoContext, 1. * pDock->iDecorationsHeight / g_fBackgroundImageHeight, 1. * pDock->iCurrentWidth / g_fBackgroundImageWidth);
+			cairo_translate (pCairoContext, fOffsetY, pDock->fDecorationsOffsetX * g_fStripesSpeedFactor + fOffsetX);
+			cairo_scale (pCairoContext, 1. * pDock->iDecorationsHeight / g_fBackgroundImageHeight, 1. * fWidth / g_fBackgroundImageWidth);
 		}
 		
 		//g_print ("(%dx%d) / (%dx%d)\n", pDock->iCurrentWidth, pDock->iMaxIconHeight, (int) g_fBackgroundImageWidth, (int) g_fBackgroundImageHeight);
@@ -638,9 +640,9 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	if (icon->Xid != 0 && icon->Xid == cairo_dock_get_current_active_window () && ! g_bActiveIndicatorAbove && g_pActiveIndicatorSurface != NULL)
 	{
 		cairo_save (pCairoContext);
-		if (icon->fWidth * icon->fWidthFactor / fRatio != g_fActiveIndicatorWidth || icon->fHeight * icon->fHeightFactor / fRatio != g_fActiveIndicatorHeight)
+		//if (icon->fWidth * icon->fWidthFactor / fRatio != g_fActiveIndicatorWidth || icon->fHeight * icon->fHeightFactor / fRatio != g_fActiveIndicatorHeight)
 		{
-			cairo_scale (pCairoContext, icon->fWidth * icon->fWidthFactor / fRatio / g_fActiveIndicatorWidth, icon->fHeight * icon->fHeightFactor / fRatio / g_fActiveIndicatorHeight);
+			cairo_scale (pCairoContext, icon->fWidth * icon->fWidthFactor / fRatio / g_fActiveIndicatorWidth / (1+g_fAmplitude), icon->fHeight * icon->fHeightFactor / fRatio / g_fActiveIndicatorHeight / (1+g_fAmplitude));
 		}
 		cairo_set_source_surface (pCairoContext, g_pActiveIndicatorSurface, 0., 0.);
 		cairo_paint (pCairoContext);
@@ -781,7 +783,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		cairo_save (pCairoContext);
 		//if (icon->fWidth / fRatio != g_fActiveIndicatorWidth || icon->fHeight / fRatio != g_fActiveIndicatorHeight)
 		{
-			cairo_scale (pCairoContext, icon->fWidth / fRatio / g_fActiveIndicatorWidth / (1+g_fAmplitude) * icon->fScale, icon->fHeight / fRatio / g_fActiveIndicatorHeight / (1+g_fAmplitude) * icon->fScale);
+			cairo_scale (pCairoContext, icon->fWidth * icon->fWidthFactor / fRatio / g_fActiveIndicatorWidth / (1+g_fAmplitude), icon->fHeight * icon->fHeightFactor / fRatio / g_fActiveIndicatorHeight / (1+g_fAmplitude));
 		}
 		cairo_set_source_surface (pCairoContext, g_pActiveIndicatorSurface, 0., 0.);
 		cairo_paint (pCairoContext);

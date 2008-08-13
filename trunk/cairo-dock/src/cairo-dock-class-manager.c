@@ -438,15 +438,15 @@ void cairo_dock_update_Xid_on_inhibators (Window Xid, const gchar *cClass)
 				if (iNextXid == -1)  // on prend la 1ere appli de meme classe.
 				{
 					GList *pList = pClassAppli->pAppliOfClass;
-					if (pList != NULL)
+					Icon *pOneIcon;
+					GList *ic;
+					for (ic = pList; ic != NULL; ic = ic->next)
 					{
-						pSameClassIcon = pList->data;
-						if (pSameClassIcon->Xid == Xid)  // normalement impossible.
+						pOneIcon = ic->data;
+						if (pOneIcon->fPersonnalScale == 0 && pSameClassIcon->Xid != Xid)  // la 2eme condition est a priori toujours vraie.
 						{
-							if (pList->next != NULL)
-								pSameClassIcon = pList->next->data;
-							else
-								pSameClassIcon = NULL;
+							pSameClassIcon = pOneIcon;
+							break ;
 						}
 					}
 					iNextXid = (pSameClassIcon != NULL ? pSameClassIcon->Xid : 0);

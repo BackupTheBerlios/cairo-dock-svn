@@ -43,7 +43,7 @@ cairo_t * cairo_dock_create_context_from_window (CairoContainer *pContainer);
 *@param fInclination tangente de l'angle d'inclinaison des cotes du trapeze par rapport a la vertical. 0 pour tracer un rectangle.
 *@param bHorizontal CAIRO_DOCK_HORIZONTAL ou CAIRO_DOCK_VERTICAL suivant l'horizontalité du dock.
 */
-void cairo_dock_draw_frame (cairo_t *pCairoContext, double fRadius, double fLineWidth, double fFrameWidth, double fFrameHeight, double fDockOffsetX, double fDockOffsetY, int sens, double fInclination, gboolean bHorizontal);
+double cairo_dock_draw_frame (cairo_t *pCairoContext, double fRadius, double fLineWidth, double fFrameWidth, double fFrameHeight, double fDockOffsetX, double fDockOffsetY, int sens, double fInclination, gboolean bHorizontal);
 
 /**
 *Dessine les decorations d'un dock a l'interieur d'un cadre prealablement trace sur le contexte.
@@ -51,7 +51,7 @@ void cairo_dock_draw_frame (cairo_t *pCairoContext, double fRadius, double fLine
 *@param pDock le dock sur lequel appliquer les decorations.
 *@param fOffsetY un decalage, dans le sens de la hauteur du dock, a partir duquel appliquer les decorations.
 */
-void cairo_dock_render_decorations_in_frame (cairo_t *pCairoContext, CairoDock *pDock, double fOffsetY);
+void cairo_dock_render_decorations_in_frame (cairo_t *pCairoContext, CairoDock *pDock, double fOffsetY, double fOffsetX, double fWidth);
 
 
 /**

@@ -151,11 +151,6 @@ extern int g_iDialogButtonWidth;
 extern int g_iDialogButtonHeight;
 extern double g_fDialogColor[4];
 extern int g_iDialogIconSize;
-extern int g_iDialogMessageSize;
-extern gchar *g_cDialogMessagePolice;
-extern int g_iDialogMessageWeight;
-extern int g_iDialogMessageStyle;
-extern double g_fDialogTextColor[4];
 
 extern double g_fDeskletColor[4];
 extern double g_fDeskletColorInside[4];
@@ -676,6 +671,10 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	}
 	g_strfreev (cIconsTypesList);
 
+	gboolean bMixAppletsAndLaunchers = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "mix applets with launchers", &bFlushConfFileNeeded, FALSE , NULL, NULL);
+	if (bMixAppletsAndLaunchers)
+		g_tIconTypeOrder[CAIRO_DOCK_APPLET] = g_tIconTypeOrder[CAIRO_DOCK_LAUNCHER];
+	
 	g_free (g_cMainDockDefaultRendererName);
 	g_cMainDockDefaultRendererName = cairo_dock_get_string_key_value (pKeyFile, "Views", "main dock view", &bFlushConfFileNeeded, CAIRO_DOCK_DEFAULT_RENDERER_NAME, "Cairo Dock", NULL);
 	if (g_cMainDockDefaultRendererName == NULL)
