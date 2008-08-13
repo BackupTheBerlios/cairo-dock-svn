@@ -567,3 +567,80 @@ void cairo_dock_play_sound (const gchar *cSoundPath)
 	
 	g_free (cSoundCommand);
 }
+
+void cairo_dock_get_gnome_version (int *iMajor, int *iMinor, int *iMicro) {
+	gchar *cContent = NULL;
+	gsize length = 0;
+	GError *erreur = NULL;
+	g_file_get_contents ("/usr/share/gnome-about/gnome-version.xml", &cContent, &length, &erreur);
+	
+	if (erreur != NULL) {
+		cd_warning ("Attention : %s", erreur->message);
+		g_error_free (erreur);
+		erreur = NULL;
+		*iMajor = 0;
+		*iMinor = 0;
+		return;
+	}
+	
+	gchar **cLineList = g_strsplit (cContent, "\n", -1);
+	gchar *cOneLine = NULL, *cMajor = NULL, *cMinor = NULL, *cMicro = NULL;
+	int i, iMaj = 0, iMin = 0, iMic = 0;
+	for (i = 0; cLineList[i] != NULL; i ++) {
+		cOneLine = cLineList[i];
+		if (*cOneLine == '\0')
+			continue;
+		
+		//Seeking for Major
+		cMajor = g_strstr_len (cOneLine, -1, "<platform>");  //<platform>2</platform>
+		if (cMajor != NULL) {
+			cMajor += 10; //On saute <platform>
+			gchar *str = strchr (cMajor, '<');
+			if (str != NULL)
+				*str = '\0'; //On bloque a </platform>
+			iMaj = atoi (cMajor);
+		}
+		else { //Gutsy xml's doesn't have <platform> but <major>
+			cMajor = g_strstr_len (cOneLine, -1, "<major>");  //<major>2</major>
+			if (cMajor != NULL) {
+				cMajor += 7; //On saute <major>
+				gchar *str = strchr (cMajor, '<');
+				if (str != NULL)
+					*str = '\0'; //On bloque a </major>
+				iMaj = atoi (cMajor);
+			}
+		}
+		
+		//Seeking for Minor
+		cMinor = g_strstr_len (cOneLine, -1, "<minor>");  //<minor>22</minor>
+		if (cMinor != NULL) {
+			cMinor += 7; //On saute <minor>
+			gchar *str = strchr (cMinor, '<');
+			if (str != NULL)
+				*str = '\0'; //On bloque a </minor>
+			iMin = atoi (cMinor);
+		}
+		
+		//Seeking for Micro
+		cMicro = g_strstr_len (cOneLine, -1, "<micro>");  //<micro>3</micro>
+		if (cMicro != NULL) {
+			cMicro += 7; //On saute <micro>
+			gchar *str = strchr (cMicro, '<');
+			if (str != NULL)
+				*str = '\0'; //On bloque a </micro>
+			iMic = atoi (cMicro);
+		}
+		
+		if (iMaj != 0 && iMin != 0 && iMic != 0)
+			break; //On s'enfou du reste
+	}
+	
+	cd_debug ("Gnome Version %d.%d.%d", iMaj, iMin, iMic);
+	
+	*iMajor = iMaj;
+	*iMinor = iMin;
+	*iMicro = iMic;
+	
+	g_free (cContent);
+	g_strfreev (cLineList);
+}

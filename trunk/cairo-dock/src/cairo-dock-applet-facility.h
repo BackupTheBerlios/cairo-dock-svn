@@ -250,6 +250,12 @@ void cairo_dock_set_normal_frequency_state (CairoDockMeasure *pMeasureTimer);
 void cairo_dock_play_sound (const gchar *cSoundPath);
 
 
+/**
+*Renvoie la version de gnome.
+*@param Adresse des ints.
+*/
+void cairo_dock_get_gnome_version (int *iMajor, int *iMinor, int *iMicro);
+
 
 typedef struct _AppletConfig AppletConfig;
 typedef struct _AppletData AppletData;
