@@ -133,8 +133,8 @@ static gboolean _cairo_dock_write_desklet_position (CairoDesklet *pDesklet)
 {
 	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModuleInstance != NULL)
 	{
-		int iRelativePositionX = (pDesklet->iWindowPositionX + pDesklet->iWidth/2 <= g_iScreenWidth[CAIRO_DOCK_HORIZONTAL]/2 ? pDesklet->iWindowPositionX : g_iScreenWidth[CAIRO_DOCK_HORIZONTAL]/2 - pDesklet->iWindowPositionX);
-		int iRelativePositionY = (pDesklet->iWindowPositionY + pDesklet->iHeight/2 <= g_iScreenHeight[CAIRO_DOCK_HORIZONTAL]/2 ? pDesklet->iWindowPositionY : g_iScreenHeight[CAIRO_DOCK_HORIZONTAL]/2 - pDesklet->iWindowPositionY);
+		int iRelativePositionX = (pDesklet->iWindowPositionX + pDesklet->iWidth/2 <= g_iScreenWidth[CAIRO_DOCK_HORIZONTAL]/2 ? pDesklet->iWindowPositionX : pDesklet->iWindowPositionX - g_iScreenWidth[CAIRO_DOCK_HORIZONTAL]);
+		int iRelativePositionY = (pDesklet->iWindowPositionY + pDesklet->iHeight/2 <= g_iScreenHeight[CAIRO_DOCK_HORIZONTAL]/2 ? pDesklet->iWindowPositionY : pDesklet->iWindowPositionY - g_iScreenHeight[CAIRO_DOCK_HORIZONTAL]);
 		cairo_dock_update_conf_file (pDesklet->pIcon->pModuleInstance->cConfFilePath,
 			G_TYPE_INT, "Desklet", "x position", iRelativePositionX,
 			G_TYPE_INT, "Desklet", "y position", iRelativePositionY,
@@ -479,13 +479,16 @@ void cairo_dock_place_desklet (CairoDesklet *pDesklet, CairoDockMinimalAppletCon
 		gdk_window_resize (pDesklet->pWidget->window,
 			pMinimalConfig->iDeskletWidth,
 			pMinimalConfig->iDeskletHeight);
-
+	
+	int iAbsolutePositionX = (pMinimalConfig->iDeskletPositionX < 0 ? g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] + pMinimalConfig->iDeskletPositionX : pMinimalConfig->iDeskletPositionX);
+	iAbsolutePositionX = MAX (0, MIN (g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] - pDesklet->iWidth, iAbsolutePositionX));
+	int iAbsolutePositionY = (pMinimalConfig->iDeskletPositionY < 0 ? g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] + pMinimalConfig->iDeskletPositionY : pMinimalConfig->iDeskletPositionY);
+	iAbsolutePositionY = MAX (0, MIN (g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] - pDesklet->iHeight, iAbsolutePositionY));
+	
 	gdk_window_move(pDesklet->pWidget->window,
-		(pMinimalConfig->iDeskletPositionX < 0 ?
-			g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] - pMinimalConfig->iDeskletPositionX :
-			pMinimalConfig->iDeskletPositionX),
+		iAbsolutePositionX,
 		(pMinimalConfig->iDeskletPositionY < 0 ?
-			g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] - pMinimalConfig->iDeskletPositionY :
+			g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] + pMinimalConfig->iDeskletPositionY :
 			pMinimalConfig->iDeskletPositionY));
 
 	gtk_window_set_keep_below (GTK_WINDOW (pDesklet->pWidget), pMinimalConfig->bKeepBelow);

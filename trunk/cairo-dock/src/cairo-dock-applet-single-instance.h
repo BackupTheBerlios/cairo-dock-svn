@@ -45,6 +45,7 @@ myDrawContext = myApplet->pDrawContext; \
 	myContainer = NULL; \
 	myIcon = NULL; \
 	myConfigPtr = NULL; \
+	memset (myDataPtr, 0, sizeof (AppletData)); \
 	myDataPtr = NULL; \
 	if (myDesklet) \
 		myApplet->pDrawContext = myDrawContext; \

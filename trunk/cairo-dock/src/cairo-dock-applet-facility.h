@@ -573,6 +573,13 @@ CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT (cGroupName, cKeyName, TRUE)
 */
 #define CD_CONFIG_GET_THEME_PATH(cGroupName, cKeyName, cThemesDirName, cDefaultThemeName) \
 cairo_dock_manage_themes_for_applet (MY_APPLET_SHARE_DATA_DIR, cThemesDirName, CD_APPLET_MY_CONF_FILE, pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, cDefaultThemeName)
+/**
+*Recupere la valeur d'un theme de gauge, en mettant a jour la liste des jauges disponibles dans le fichier de conf.
+*@param cGroupName nom du groupe (dans le fichier de conf) du parametre correspondant au theme.
+*@param cKeyName nom de la cle (dans le fichier de conf) du parametre correspondant au theme.
+*/
+#define CD_CONFIG_GET_GAUGE_THEME(cGroupName, cKeyName) \
+cairo_dock_get_gauge_key_value(CD_APPLET_MY_CONF_FILE, pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, "turbo-night-fuel")
 
 /**
 *Debut de la fonction de liberation des donnees de la config.
@@ -596,7 +603,6 @@ void reset_data (CairoDockModuleInstance *myApplet) \
 *Fin de la fonction de liberation des donnees internes.
 */
 #define CD_APPLET_RESET_DATA_ALL_END \
-	memset (&myData, 0, sizeof (AppletData)); \
 }
 
 //\_________________________________ NOTIFICATIONS

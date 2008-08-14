@@ -1611,7 +1611,6 @@ msgstr ""
 "Mettez la transparence à 0 si vous ne voulez pas utiliser d'indicateur."
 
 #: ../data/messages:549
-#, fuzzy
 msgid "Color of the frame (r,v,b,a) :"
 msgstr "Couleur de la ligne externe (r,v,b,a) :"
 
@@ -1632,7 +1631,6 @@ msgid "Let it empty to draw a simple frame."
 msgstr "Laisser vide pour dessiner un simple cadre."
 
 #: ../data/messages:559
-#, fuzzy
 msgid "Alternatively you can set an image for the indicator :"
 msgstr "Alternativement vous pouvez utiliser une image :"
 
@@ -2210,9 +2208,5 @@ msgstr ""
 
 #: ../data/messages:893
 msgid ""
-"v1.6.2 : the first version to be integrated in the Ubuntu repositories !\n"
-" - 2 new applets have been released :\n"
-"  Slider and Stack. Enjoy !\n"
-" - Cairo-Dock is now able to load themes on its server, so feel free to send "
-"us your themes ! :-)"
-msgstr ""
+"v1.6.2 : the first version integrated in the Ubuntu repositories !\n - 2 new applets have been released :\n  Slider and Stack. Enjoy !\n - Applets can now be launched many times\n (Clock, Cairo-Penguin, Slider, Stack), each with a different config.\n - Cairo-Dock is now able to load themes on its own server,\n so feel free to send us all your themes, we can distribute them ! :-)\n - And we are still searching someone motivated to write a kde-integration plug-in ^_^"
+msgstr "v1.6.2 : la 1ère version intégrée aux dépôts d'Ubuntu !\n - 2 nouvelles applets sont libérées :\n  Slider et Stack. Amusez-vous bien !\n - Les applets peuvent maintenant être lancées plusieurs fois\n (Clock, Cairo-Penguin, Slider, Stack), chacune avec une config différente.\n - Cairo-Dock peut désormais charger des thèmes sur son propre serveur,\n donc n'hésitez pas à nous envoyer vos thèmes, nous pourront les publier ! :-)\n - Et nous recherchons toujours une personne motivée pour écrire un plugin kde-integration ^_^"

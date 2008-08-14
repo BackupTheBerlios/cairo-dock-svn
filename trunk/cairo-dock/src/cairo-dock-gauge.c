@@ -55,7 +55,7 @@ void cairo_dock_list_available_gauges (void)
 
 void cairo_dock_update_conf_file_with_gauges (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cGroupName, gchar *cKeyName)
 {
-	cairo_dock_update_conf_file_with_hash_table (pOpenedKeyFile, cConfFile, s_pGaugeTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_name_description, TRUE, FALSE);
+	cairo_dock_update_conf_file_with_hash_table (pOpenedKeyFile, cConfFile, s_pGaugeTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_theme_name, TRUE, FALSE);
 
 }
 
@@ -89,6 +89,8 @@ void cairo_dock_xml_open_file (gchar *filePath, const gchar *mainNodeName,xmlDoc
 Gauge *cairo_dock_load_gauge(cairo_t *pSourceContext, const gchar *cThemePath, int iWidth, int iHeight)
 {
 	g_print ("%s (%dx%d)\n", __func__, iWidth, iHeight);
+	if (iWidth == 0 || iHeight == 0)
+		return NULL;
 	g_return_val_if_fail (cThemePath != NULL, NULL);
 	cd_debug("gauge : On cherche le theme : %s", cThemePath);
 	Gauge *pGauge = NULL;
@@ -220,21 +222,24 @@ void cairo_dock_load_gauge_image (cairo_t *pSourceContext, GaugeImage *pGaugeIma
 	if (pGaugeImage->cairoSurface != NULL)
 		cairo_surface_destroy (pGaugeImage->cairoSurface);
 	
-	pGaugeImage->cairoSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
-		CAIRO_CONTENT_COLOR_ALPHA,
-		iWidth,
-		iHeight);
-	
-	cairo_t* pDrawingContext = cairo_create (pGaugeImage->cairoSurface);
-	
-	cairo_scale (pDrawingContext,
-		(double) iWidth / (double) pGaugeImage->sizeX,
-		(double) iHeight / (double) pGaugeImage->sizeY);
-	
 	if (pGaugeImage->svgNeedle != NULL)
+	{
+		pGaugeImage->cairoSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+			CAIRO_CONTENT_COLOR_ALPHA,
+			iWidth,
+			iHeight);
+		
+		cairo_t* pDrawingContext = cairo_create (pGaugeImage->cairoSurface);
+		
+		cairo_scale (pDrawingContext,
+			(double) iWidth / (double) pGaugeImage->sizeX,
+			(double) iHeight / (double) pGaugeImage->sizeY);
+		
 		rsvg_handle_render_cairo (pGaugeImage->svgNeedle, pDrawingContext);
-	
-	cairo_destroy (pDrawingContext);
+		cairo_destroy (pDrawingContext);
+	}
+	else
+		pGaugeImage->cairoSurface = NULL;
 }
 
 
@@ -528,10 +533,41 @@ const gchar *cairo_dock_get_gauge_key_value(gchar *cAppletConfFilePath, GKeyFile
 	g_free (cChosenThemeName);
 	
 	cd_debug("Theme de la jauge : %s",cGaugePath);
+	cairo_dock_update_conf_file_with_gauges (pKeyFile, cAppletConfFilePath, cGroupName, cKeyName);
+	
 	return cGaugePath;
 	/**gchar *cThemePath = cairo_dock_manage_themes_for_applet (CAIRO_DOCK_SHARE_DATA_DIR, "gauges", cAppletConfFilePath, pKeyFile, cGroupName, cKeyName, bFlushConfFileNeeded, cDefaultThemeName);
 	cd_debug("Clés du theme : [%s] %s",cGroupName,cKeyName);
 	cd_debug("Theme de la jauge : %s",cThemePath);
 	cd_debug("Dossier des jauges : %s/gauges",CAIRO_DOCK_SHARE_DATA_DIR);
 	return cThemePath;*/
+}
+
+void cairo_dock_add_filligran_on_gauge (cairo_t *pSourceContext, Gauge *pGauge, gchar *cImagePath, double fAlpha)
+{
+	g_return_if_fail (pGauge != NULL && cImagePath != NULL);
+	
+	cairo_surface_t *pFilligranSurface = cairo_dock_create_surface_for_icon (cImagePath, pSourceContext, pGauge->sizeX/2, pGauge->sizeY/2);
+	
+	if (pGauge->imageBackground == NULL)
+	{
+		pGauge->imageBackground = g_new0 (GaugeImage, 1);
+		pGauge->imageBackground->sizeX = pGauge->sizeX;
+		pGauge->imageBackground->sizeY = pGauge->sizeY;
+		
+		pGauge->imageBackground->cairoSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
+			CAIRO_CONTENT_COLOR_ALPHA,
+			pGauge->sizeX,
+			pGauge->sizeY);
+	}
+	
+	cairo_t *pCairoContext = cairo_create (pGauge->imageBackground->cairoSurface);
+	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
+	
+	cairo_set_source_surface (pCairoContext, pFilligranSurface, pGauge->sizeX/4, pGauge->sizeY/4);
+	cairo_paint_with_alpha (pCairoContext, fAlpha);
+	
+	cairo_destroy (pCairoContext);
+	
+	cairo_surface_destroy (pFilligranSurface);
 }

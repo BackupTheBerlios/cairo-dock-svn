@@ -11,18 +11,18 @@ typedef struct
 {
 	RsvgHandle *svgNeedle;
 	cairo_surface_t *cairoSurface;
-	int sizeX;
-	int sizeY;
+	gint sizeX;
+	gint sizeY;
 } GaugeImage;
 
 typedef struct
 {
-	double posX;
-	double posY;
-	double posStart;
-	double posStop;
-	double direction;
-	int nbImage;
+	gdouble posX;
+	gdouble posY;
+	gdouble posStart;
+	gdouble posStop;
+	gdouble direction;
+	gint nbImage;
 	GList *imageList;
 	GList *imageNeedle;
 } GaugeIndicator;
@@ -30,11 +30,13 @@ typedef struct
 typedef struct
 {
 	gchar *themeName;
-	int sizeX;
-	int sizeY;
+	gint sizeX;
+	gint sizeY;
 	GaugeImage *imageBackground;
 	GaugeImage *imageForeground;
 	GList *indicatorList;
+	gchar *cFilligranPath;
+	gdouble fAlpha;
 } Gauge;
 
 void cairo_dock_list_available_gauges (void);
@@ -55,6 +57,8 @@ void cairo_dock_reload_gauge (cairo_t *pSourceContext, Gauge *pGauge, int iWidth
 void cairo_dock_free_gauge(Gauge *pGauge);
 
 const gchar *cairo_dock_get_gauge_key_value (gchar *cAppletConfFilePath, GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultThemeName);
+
+void cairo_dock_add_filligran_on_gauge (cairo_t *pSourceContext, Gauge *pGauge, gchar *cImagePath, double fAlpha);
 
 
 G_END_DECLS

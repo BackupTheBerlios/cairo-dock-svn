@@ -15,12 +15,16 @@
 #define myDock myApplet->pDock
 #define myDesklet myApplet->pDesklet
 #define myDrawContext myApplet->pDrawContext
-#define myConfig (* ((AppletConfig *)(((gpointer)myApplet)+sizeof(CairoDockModuleInstance))))
-#define myData (* ((AppletData *)(((gpointer)myApplet)+sizeof(CairoDockModuleInstance)+sizeof(AppletConfig))))
+#define myConfigPtr ((AppletConfig *)(((gpointer)myApplet)+sizeof(CairoDockModuleInstance)))
+#define myConfig (*myConfigPtr)
+#define myDataPtr ((AppletData *)(((gpointer)myApplet)+sizeof(CairoDockModuleInstance)+sizeof(AppletConfig)))
+#define myData (*myDataPtr)
 
 #define CD_APPLET_RELOAD_BEGIN CD_APPLET_RELOAD_ALL_BEGIN
 
-#define CD_APPLET_RESET_DATA_END CD_APPLET_RESET_DATA_ALL_END
+#define CD_APPLET_RESET_DATA_END \
+	memset (&myData, 0, sizeof (AppletData)); \
+	CD_APPLET_RESET_DATA_ALL_END
 
 #define CD_APPLET_RESET_CONFIG_BEGIN CD_APPLET_RESET_CONFIG_ALL_BEGIN
 
