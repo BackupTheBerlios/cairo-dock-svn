@@ -10,6 +10,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#define __USE_POSIX
 #include <signal.h>
 
 #include <cairo.h>
@@ -38,8 +39,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-applications-manager.h"
 
 #define CAIRO_DOCK_TASKBAR_CHECK_INTERVAL 250
-
-extern int kill (__pid_t pid, int sig);
 
 extern CairoDock *g_pMainDock;
 extern double g_fAmplitude;
@@ -782,7 +781,10 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 							}
 							else
 							{
-								cairo_dock_animate_icon_on_active (icon, pParentDock);
+								if (g_bAnimateOnActiveWindow)
+									cairo_dock_animate_icon_on_active (icon, pParentDock);
+								else if (pParentDock->iSidShrinkDown == 0)
+									cairo_dock_redraw_my_icon (icon, CAIRO_CONTAINER (pParentDock));
 							}
 							///icon->bIsActive = TRUE;
 						}

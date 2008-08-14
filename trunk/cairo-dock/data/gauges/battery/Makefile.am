@@ -11,6 +11,7 @@ theme_DATA = \
 	battery5.svg\
 	battery6.svg\
 	battery7.svg\
-	theme.xml
+	theme.xml\
+	readme
 
 EXTRA_DIST = $(theme_DATA)

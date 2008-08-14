@@ -640,9 +640,9 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 	if (icon->Xid != 0 && icon->Xid == cairo_dock_get_current_active_window () && ! g_bActiveIndicatorAbove && g_pActiveIndicatorSurface != NULL)
 	{
 		cairo_save (pCairoContext);
-		//if (icon->fWidth * icon->fWidthFactor / fRatio != g_fActiveIndicatorWidth || icon->fHeight * icon->fHeightFactor / fRatio != g_fActiveIndicatorHeight)
+		if (icon->fWidth != g_fActiveIndicatorWidth || icon->fHeight != g_fActiveIndicatorHeight)
 		{
-			cairo_scale (pCairoContext, icon->fWidth * icon->fWidthFactor / fRatio / g_fActiveIndicatorWidth / (1+g_fAmplitude), icon->fHeight * icon->fHeightFactor / fRatio / g_fActiveIndicatorHeight / (1+g_fAmplitude));
+			cairo_scale (pCairoContext, icon->fWidth / g_fActiveIndicatorWidth, icon->fHeight / g_fActiveIndicatorHeight);
 		}
 		cairo_set_source_surface (pCairoContext, g_pActiveIndicatorSurface, 0., 0.);
 		cairo_paint (pCairoContext);
@@ -776,18 +776,16 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			cairo_paint_with_alpha (pCairoContext, fAlpha);
 	}
 	
-	cairo_restore (pCairoContext);  // retour juste apres la translation (fDrawX, fDrawY).
-	
 	if (icon->Xid != 0 && icon->Xid == cairo_dock_get_current_active_window () && g_bActiveIndicatorAbove && g_pActiveIndicatorSurface != NULL)
 	{
-		cairo_save (pCairoContext);
-		//if (icon->fWidth / fRatio != g_fActiveIndicatorWidth || icon->fHeight / fRatio != g_fActiveIndicatorHeight)
+		//cairo_save (pCairoContext);
+		if (icon->fWidth != g_fActiveIndicatorWidth || icon->fHeight != g_fActiveIndicatorHeight)
 		{
-			cairo_scale (pCairoContext, icon->fWidth * icon->fWidthFactor / fRatio / g_fActiveIndicatorWidth / (1+g_fAmplitude), icon->fHeight * icon->fHeightFactor / fRatio / g_fActiveIndicatorHeight / (1+g_fAmplitude));
+			cairo_scale (pCairoContext, icon->fWidth / g_fActiveIndicatorWidth, icon->fHeight / g_fActiveIndicatorHeight);
 		}
 		cairo_set_source_surface (pCairoContext, g_pActiveIndicatorSurface, 0., 0.);
 		cairo_paint (pCairoContext);
-		cairo_restore (pCairoContext);
+		//cairo_restore (pCairoContext);
 	}
 	/* Voici ton bloque d'origine, j'ai remanier pour adapter a mes modifications
 	if (icon->Xid != 0 && icon->Xid == cairo_dock_get_current_active_window ())
@@ -813,6 +811,8 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		}
 	}
 	*/
+	
+	cairo_restore (pCairoContext);  // retour juste apres la translation (fDrawX, fDrawY).
 	
 	if (icon->bHasIndicator && g_bIndicatorAbove && g_pIndicatorSurface[0] != NULL)
 	{

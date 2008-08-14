@@ -199,7 +199,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	
 	gtk_window_get_size (GTK_WINDOW (pWindow), &pDock->iCurrentWidth, &pDock->iCurrentHeight);  // ca n'est que la taille initiale allouee par GTK.
 	gtk_widget_show_all (pWindow);
-	gdk_window_set_back_pixmap (pWindow->window, NULL, FALSE);  // utile ?
+	gdk_window_set_back_pixmap (pWindow->window, NULL, FALSE);  // vraiment plus rapide ?
 	
 	/*if (!pouet)
 	{
@@ -306,8 +306,10 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 #endif
 	
 	if (! pDock->bIsMainDock)
-		cairo_dock_get_root_dock_position (cDockName, pDock);
-	
+	{
+		if (cairo_dock_get_root_dock_position (cDockName, pDock))
+			cairo_dock_place_root_dock (pDock);
+	}
 	//if (! g_bUseGlitz)
 		while (gtk_events_pending ())  // on force le redessin pour eviter les carre gris.
 			gtk_main_iteration ();
@@ -578,7 +580,10 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 			pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 
 			if (pParentDock != NULL)  // a priori toujours vrai.
+			{
 				cairo_dock_insert_icon_in_dock (icon, pParentDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, ! CAIRO_DOCK_INSERT_SEPARATOR);
+				/// synchroniser icon->pSubDock avec pParentDock ?...
+			}
 		}
 	} while (1);
 	g_dir_close (dir);
@@ -860,6 +865,7 @@ void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
 
 void cairo_dock_place_root_dock (CairoDock *pDock)
 {
+	g_print ("%s (%d, %d, %d)\n", __func__, pDock->bAutoHide, pDock->iRefCount, pDock->bIsMainDock);
 	int iNewWidth, iNewHeight;
 	if (pDock->bAutoHide && pDock->iRefCount == 0)
 	{
@@ -871,7 +877,8 @@ void cairo_dock_place_root_dock (CairoDock *pDock)
 		pDock->fFoldingFactor = 0;
 		cairo_dock_get_window_position_and_geometry_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
 	}
-
+	
+	g_print (" move to (%d;%d)\n", pDock->iWindowPositionX, pDock->iWindowPositionY);
 	if (pDock->bHorizontalDock)
 		gdk_window_move_resize (pDock->pWidget->window,
 			pDock->iWindowPositionX,

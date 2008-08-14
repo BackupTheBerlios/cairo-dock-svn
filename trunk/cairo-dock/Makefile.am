@@ -16,4 +16,5 @@ EXTRA_DIST = \
 	${script_DATA}\
 	intltool-extract.in\
 	intltool-merge.in\
-	intltool-update.in
+	intltool-update.in\
+	LICENSE

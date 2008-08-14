@@ -88,11 +88,10 @@ void cairo_dock_xml_open_file (gchar *filePath, const gchar *mainNodeName,xmlDoc
 
 Gauge *cairo_dock_load_gauge(cairo_t *pSourceContext, const gchar *cThemePath, int iWidth, int iHeight)
 {
-	g_print ("%s (%dx%d)\n", __func__, iWidth, iHeight);
+	cd_debug ("%s (%dx%d, %s)", __func__, iWidth, iHeight, cThemePath);
 	if (iWidth == 0 || iHeight == 0)
 		return NULL;
 	g_return_val_if_fail (cThemePath != NULL, NULL);
-	cd_debug("gauge : On cherche le theme : %s", cThemePath);
 	Gauge *pGauge = NULL;
 	
 	GString *sImagePath = g_string_new ("");
@@ -543,11 +542,11 @@ const gchar *cairo_dock_get_gauge_key_value(gchar *cAppletConfFilePath, GKeyFile
 	return cThemePath;*/
 }
 
-void cairo_dock_add_filligran_on_gauge (cairo_t *pSourceContext, Gauge *pGauge, gchar *cImagePath, double fAlpha)
+void cairo_dock_add_watermark_on_gauge (cairo_t *pSourceContext, Gauge *pGauge, gchar *cImagePath, double fAlpha)
 {
 	g_return_if_fail (pGauge != NULL && cImagePath != NULL);
 	
-	cairo_surface_t *pFilligranSurface = cairo_dock_create_surface_for_icon (cImagePath, pSourceContext, pGauge->sizeX/2, pGauge->sizeY/2);
+	cairo_surface_t *pWatermarkSurface = cairo_dock_create_surface_for_icon (cImagePath, pSourceContext, pGauge->sizeX/2, pGauge->sizeY/2);
 	
 	if (pGauge->imageBackground == NULL)
 	{
@@ -564,10 +563,10 @@ void cairo_dock_add_filligran_on_gauge (cairo_t *pSourceContext, Gauge *pGauge, 
 	cairo_t *pCairoContext = cairo_create (pGauge->imageBackground->cairoSurface);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 	
-	cairo_set_source_surface (pCairoContext, pFilligranSurface, pGauge->sizeX/4, pGauge->sizeY/4);
+	cairo_set_source_surface (pCairoContext, pWatermarkSurface, pGauge->sizeX/4, pGauge->sizeY/4);
 	cairo_paint_with_alpha (pCairoContext, fAlpha);
 	
 	cairo_destroy (pCairoContext);
 	
-	cairo_surface_destroy (pFilligranSurface);
+	cairo_surface_destroy (pWatermarkSurface);
 }

@@ -23,6 +23,7 @@ theme_DATA = \
 	tomato90.svg\
 	tomato95.svg\
 	tomato100.svg\
-	theme.xml
+	theme.xml\
+	readme
 
 EXTRA_DIST = $(theme_DATA)

@@ -57,7 +57,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 {
 	//cd_debug ("%s ()", __func__);
 	if (!pDesklet)
-	return FALSE;
+		return FALSE;
 	gint w = 0, h = 0;
 	
 	cairo_t *pCairoContext;
@@ -199,6 +199,7 @@ Icon *cairo_dock_find_clicked_icon_in_desklet (CairoDesklet *pDesklet)
 	cd_debug (" clic en (%d;%d)", iMouseX, iMouseY);
 	
 	Icon *icon = pDesklet->pIcon;
+	g_return_val_if_fail (icon != NULL, NULL);  // peut arriver au tout debut, car on associe l'icone au desklet _apres_ l'avoir cree, et on fait tourner la gtk_main entre-temps (pour le redessiner invisible).
 	if (icon->fDrawX < iMouseX && icon->fDrawX + icon->fWidth * icon->fScale > iMouseX && icon->fDrawY < iMouseY && icon->fDrawY + icon->fHeight * icon->fScale > iMouseY)
 	{
 		return icon;

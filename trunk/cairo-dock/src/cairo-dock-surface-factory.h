@@ -153,7 +153,8 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection (cairo_surface_
 *@param fTextYOffset sera renseigne avec le décalage vertical à appliquer pour placer le texte verticalament.
 *@returns la surface nouvellement créée.
 */
-cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t *pSourceContext, CairoDockLabelDescription *pLabelDescription, double fMaxScale, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset);
+cairo_surface_t *cairo_dock_create_surface_from_text_full (gchar *cText, cairo_t *pSourceContext, CairoDockLabelDescription *pLabelDescription, double fMaxScale, int iMaxWidth, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset);
+#define cairo_dock_create_surface_from_text(cText, pSourceContext, pLabelDescription, fMaxScale, iTextWidth, iTextHeight, fTextXOffset, fTextYOffset) cairo_dock_create_surface_from_text_full (cText, pSourceContext, pLabelDescription, fMaxScale, 0, iTextWidth, iTextHeight, fTextXOffset, fTextYOffset) 
 
 /**
 * Cree une surface à l'identique d'une autre, en la redimensionnant eventuellement.

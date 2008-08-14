@@ -5,6 +5,7 @@ theme_DATA = \
 	foreground.svg\
 	needle.svg\
 	needle2.svg\
-	theme.xml
+	theme.xml\
+	readme
 
 EXTRA_DIST = $(theme_DATA)

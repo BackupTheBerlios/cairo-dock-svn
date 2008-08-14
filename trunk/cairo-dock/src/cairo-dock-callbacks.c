@@ -502,6 +502,69 @@ gboolean cairo_dock_emit_enter_signal (CairoDock *pDock)
 	return cairo_dock_emit_signal_on_dock (pDock, "enter-notify-event");
 }
 
+
+/**typedef struct _CairoFlyingContainer CairoFlyingContainer;
+struct _CairoFlyingContainer {
+        /// type de container.
+        CairoDockTypeContainer iType;
+        /// La fenetre du widget.
+        GtkWidget *pWidget;
+        /// Taille de la fenetre. La surface allouee a l'applet s'en deduit.
+        gint iWidth, iHeight;
+        /// Position de la fenetre.
+        gint iWindowPositionX, iWindowPositionY;
+        /// Vrai ssi le pointeur est dans le desklet (widgets fils inclus).
+        gboolean bInside;
+        /// TRUE ssi le container est horizontal.
+        CairoDockTypeHorizontality bIsHorizontal;
+        /// TRUE ssi le container est oriente vers le haut.
+        gboolean bDirectionUp;
+#ifdef HAVE_GLITZ
+        glitz_drawable_format_t *pDrawFormat;
+        glitz_drawable_t* pGlitzDrawable;
+        glitz_format_t* pGlitzFormat;
+#else
+        gpointer padding[3];
+#endif // HAVE_GLITZ
+	/// pour le deplacement manuel de la fenetre.
+	gint diff_x, diff_y;
+	/// L'icone volante.
+	Icon *pIcon;
+	/// le timer de l'animation.
+	gint iSidFidgetTimer;
+};
+
+
+static gboolean on_expose_flying_icon (GtkWidget *pWidget,
+	GdkEventExpose *pExpose,
+	CairoFlyingContainer *pFlyingContainer)
+{
+	cairo_t *pCairoContext = gdk_cairo_create (pWidget->window);
+	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
+	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
+	cairo_paint (pCairoContext);
+	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
+	
+	/// dessiner une main ...
+	cairo_set_source_surface (pCairoContext, pIcon->pIconBuffer, 0., 0.);
+	cairo_destroy (pCairoContext);
+	return FALSE;
+}
+static gboolean on_motion_notify_flying_icon (GtkWidget *pWidget,
+	GdkEventMotion* pMotion,
+	CairoFlyingContainer *pFlyingContainer)
+{
+	
+	if (pMotion->state & GDK_BUTTON1_MASK)
+	{
+		gtk_window_move (GTK_WINDOW (pWidget),
+		pMotion->x_root + pDesklet->diff_x,
+		pMotion->y_root + pDesklet->diff_y);
+	}
+	gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);  // pour recevoir d'autres MotionNotify.
+        return FALSE;
+}*/
+
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
 	//g_print ("%s (iSidShrinkDown : %d, %d)\n", __func__, pDock->iSidShrinkDown, pDock->bMenuVisible);
@@ -561,6 +624,41 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 
 	//s_pLastPointedDock = NULL;
 	//g_print ("s_pLastPointedDock <- NULL\n");
+	
+	if (s_pIconClicked != NULL)
+	{
+		g_print ("on a sorti %s du dock\n", s_pIconClicked->acName);
+		/**CairoDock *pOriginDock = cairo_dock_search_dock_from_name (s_pIconClicked->acName);
+		g_return_if_fail (pOriginDock != NULL);
+		cairo_dock_detach_icon_from_dock (s_pIconClicked, pOriginDock, TRUE); 
+		s_pIconDetached = s_pIconClicked;
+		s_pIconClicked = NULL;
+		
+		GtkWidget* pWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+		gtk_window_set_skip_pager_hint(GTK_WINDOW(pWindow), TRUE);
+		gtk_window_set_skip_taskbar_hint(GTK_WINDOW(pWindow), TRUE);
+		cairo_dock_set_colormap_for_window(pWindow);
+		gtk_widget_set_app_paintable(pWindow, TRUE);
+		gtk_window_set_decorated(GTK_WINDOW(pWindow), FALSE);
+		gtk_window_set_resizable(GTK_WINDOW(pWindow), TRUE);
+		gtk_widget_add_events(pWindow, GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
+		
+		g_signal_connect (G_OBJECT (pWindow),
+			"expose-event",
+			G_CALLBACK (on_expose_flying_icon),
+			s_pIconDetached);
+		g_signal_connect (G_OBJECT (pWindow),
+			"motion-notify-event",
+			G_CALLBACK (on_motion_notify_flying_icon),
+			s_pIconDetached);
+		g_signal_connect (G_OBJECT (pWindow),
+			"button-release-event",
+			G_CALLBACK (on_button_release_flying_icon),
+			s_pIconDetached);
+		
+		
+		*/
+	}
 }
 gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,

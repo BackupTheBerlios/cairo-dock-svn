@@ -9,6 +9,7 @@ theme_DATA = \
 	3.svg\
 	4.svg\
 	5.svg\
-	6.svg
+	6.svg\
+	readme
 
 EXTRA_DIST = $(theme_DATA)

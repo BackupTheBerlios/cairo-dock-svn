@@ -621,7 +621,7 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection (cairo_surface_
 }
 
 
-cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSourceContext, CairoDockLabelDescription *pLabelDescription, double fMaxScale, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset)
+cairo_surface_t *cairo_dock_create_surface_from_text_full (gchar *cText, cairo_t* pSourceContext, CairoDockLabelDescription *pLabelDescription, double fMaxScale, int iMaxWidth, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset)
 {
 	g_return_val_if_fail (cText != NULL && pLabelDescription != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	
@@ -642,7 +642,9 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 	PangoRectangle ink, log;
 	pango_layout_get_pixel_extents (pLayout, &ink, &log);
 	
-	*iTextWidth = ink.width + 2;
+	double fZoom = ((iMaxWidth != 0 && ink.width + 2 > iMaxWidth) ? 1.*iMaxWidth / (ink.width + 2) : 1.);
+	
+	*iTextWidth = (ink.width + 2) * fZoom;
 	*iTextHeight = ink.height + 2 + 1;  // +1 car certaines polices "debordent".
 	
 	cairo_surface_t* pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
@@ -670,6 +672,8 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 	
 	//\_________________ On dessine les contours.
 	cairo_save (pCairoContext);
+	if (fZoom!= 1)
+		cairo_scale (pCairoContext, fZoom, 1.);
 	cairo_push_group (pCairoContext);
 	cairo_set_source_rgb (pCairoContext, 0.2, 0.2, 0.2);
 	int i;
@@ -715,6 +719,8 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 	else
 		cairo_set_source_rgb (pCairoContext, pLabelDescription->fColorStart[0], pLabelDescription->fColorStart[1], pLabelDescription->fColorStart[2]);
 	cairo_move_to (pCairoContext, 1., 1.);
+	if (fZoom!= 1)
+		cairo_scale (pCairoContext, fZoom, 1.);
 	pango_cairo_show_layout (pCairoContext, pLayout);
 	cairo_pattern_destroy (pGradationPattern);
 	
@@ -724,7 +730,7 @@ cairo_surface_t *cairo_dock_create_surface_from_text (gchar *cText, cairo_t* pSo
 	cairo_surface_set_device_offset (pNewSurface,
 					 log.width / 2. - ink.x,
 					 log.height     - ink.y);*/
-	*fTextXOffset = (log.width / 2. - ink.x) / fMaxScale;
+	*fTextXOffset = (log.width * fZoom / 2. - ink.x) / fMaxScale;
 	*fTextYOffset = - (pLabelDescription->iSize - (log.height - ink.y)) / fMaxScale ;  // en tenant compte de l'ecart du bas du texte.
 	//*fTextYOffset = - (ink.y) / fMaxScale;  // pour tenir compte de l'ecart du bas du texte.
 	

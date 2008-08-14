@@ -7,8 +7,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 
 ************************************************************************************/
 #include <string.h>
-#include <stdlib.h>
 #include <unistd.h>
+#define __USE_XOPEN_EXTENDED
+#include <stdlib.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
 
@@ -26,6 +27,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #define CAIRO_DOCK_THEME_PANEL_WIDTH 750
 #define CAIRO_DOCK_THEME_PANEL_HEIGHT 400
 #define CAIRO_DOCK_THEME_SERVER "http://fabounet03.free.fr/themes"
+#define CAIRO_DOCK_BACKUP_THEME_SERVER "http://themes.cairo-dock.org"
 
 extern gchar *g_cCairoDockDataDir;
 extern gchar *g_cConfFile;
@@ -71,7 +73,7 @@ GHashTable *cairo_dock_list_themes (gchar *cThemesDir, GHashTable *hProvidedTabl
 GHashTable *cairo_dock_list_net_themes (gchar *cServerAdress, GHashTable *hProvidedTable, GError **erreur)
 {
 	g_return_val_if_fail (cServerAdress != NULL && *cServerAdress != '\0', hProvidedTable);
-	g_print ("listing net themes on %s ...\n", cServerAdress);
+	cd_message ("listing net themes on %s ...", cServerAdress);
 	
 	gchar *cTmpFilePath = g_strdup ("/tmp/cairo-dock-net-themes.XXXXXX");
 	int fds = mkstemp (cTmpFilePath);
@@ -92,6 +94,7 @@ GHashTable *cairo_dock_list_net_themes (gchar *cServerAdress, GHashTable *hProvi
 	
 	if (cContent == NULL)
 	{
+		g_set_error (erreur, 1, 1, "couldn't retrieve themes on %s (check that your connection is alive, or retry later)", cServerAdress);
 		g_remove (cTmpFilePath);
 		g_free (cTmpFilePath);
 		return hProvidedTable;
@@ -148,6 +151,14 @@ gchar *cairo_dock_edit_themes (GHashTable **hThemeTable, gboolean bSafeMode)
 		cd_warning (erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
+
+		*hThemeTable = cairo_dock_list_net_themes (g_cThemeServerAdress != NULL ? g_cThemeServerAdress : CAIRO_DOCK_BACKUP_THEME_SERVER, *hThemeTable, &erreur);
+	        if (erreur != NULL)
+	        {
+	                cd_warning (erreur->message);
+	                g_error_free (erreur);
+	                erreur = NULL;
+	        }
 	}
 	
 	cThemesDir = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_THEMES_DIR);  // les themes utilisateurs ecraseront les autres themes.

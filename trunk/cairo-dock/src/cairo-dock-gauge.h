@@ -35,8 +35,6 @@ typedef struct
 	GaugeImage *imageBackground;
 	GaugeImage *imageForeground;
 	GList *indicatorList;
-	gchar *cFilligranPath;
-	gdouble fAlpha;
 } Gauge;
 
 void cairo_dock_list_available_gauges (void);
@@ -58,7 +56,7 @@ void cairo_dock_free_gauge(Gauge *pGauge);
 
 const gchar *cairo_dock_get_gauge_key_value (gchar *cAppletConfFilePath, GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultThemeName);
 
-void cairo_dock_add_filligran_on_gauge (cairo_t *pSourceContext, Gauge *pGauge, gchar *cImagePath, double fAlpha);
+void cairo_dock_add_watermark_on_gauge (cairo_t *pSourceContext, Gauge *pGauge, gchar *cImagePath, double fAlpha);
 
 
 G_END_DECLS

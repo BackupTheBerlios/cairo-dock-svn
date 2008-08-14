@@ -465,10 +465,11 @@ void cairo_dock_fill_one_quick_info_buffer (Icon *icon, cairo_t* pSourceContext,
 	if (icon->cQuickInfo == NULL)
 		return ;
 
-	icon->pQuickInfoBuffer = cairo_dock_create_surface_from_text (icon->cQuickInfo,
+	icon->pQuickInfoBuffer = cairo_dock_create_surface_from_text_full (icon->cQuickInfo,
 		pSourceContext,
 		pTextDescription,
 		fMaxScale,
+		icon->fWidth * fMaxScale,
 		&icon->iQuickInfoWidth, &icon->iQuickInfoHeight, &icon->fQuickInfoXOffset, &icon->fQuickInfoYOffset);
 }
 
@@ -910,9 +911,10 @@ void cairo_dock_load_active_window_indicator (cairo_t* pSourceContext, const gch
 			g_fActiveIndicatorHeight * fMaxScale);
 		cairo_t *pCairoContext = cairo_create (g_pActiveIndicatorSurface);
 		
-		double fFrameWidth = g_fActiveIndicatorWidth * fMaxScale - (2 * fCornerRadius + fLineWidth) + 0;  // g_fActiveWidthOffset
+		fCornerRadius = MIN (fCornerRadius, (g_fActiveIndicatorWidth * fMaxScale - fLineWidth) / 2);
+		double fFrameWidth = g_fActiveIndicatorWidth * fMaxScale - (2 * fCornerRadius + fLineWidth) + 0;
 		double fFrameHeight = g_fActiveIndicatorHeight * fMaxScale - 2 * fLineWidth;
-		double fDockOffsetX = fCornerRadius + fLineWidth/2 - 0;  // g_fActiveWidthOffset/2
+		double fDockOffsetX = fCornerRadius + fLineWidth/2 - 0;
 		double fDockOffsetY = fLineWidth/2;
 		cairo_dock_draw_frame (pCairoContext, fCornerRadius, fLineWidth, fFrameWidth, fFrameHeight, fDockOffsetX, fDockOffsetY, 1, 0., CAIRO_DOCK_HORIZONTAL);
 		

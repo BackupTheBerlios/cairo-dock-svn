@@ -7,8 +7,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 
 *********************************************************************************/
 #include <string.h>
-#include <stdlib.h>
 #include <unistd.h>
+#define __USE_XOPEN_EXTENDED
+#include <stdlib.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
 
@@ -24,6 +25,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #define CAIRO_DOCK_APPLET_ICON_SIZE 32
 #define CAIRO_DOCK_TAB_ICON_SIZE 32
 #define CAIRO_DOCK_FRAME_ICON_SIZE 24
+
+#ifndef mkstemp
+int mkstemp(char *template);
+#endif
 
 typedef enum {
 	CAIRO_DOCK_MODEL_NAME = 0,
@@ -1156,9 +1161,19 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 								if (iElementType == 'r')
 									iSelectedItem = atoi (cValue);
 								gchar *cResult = (iElementType == 'r' ? g_new0 (gchar , 10) : NULL);
-								int iNbElementsByItem = (iElementType == 'R' ? 3 : (iElementType == 'M' ? 4 : 1));
+								int ii, iNbElementsByItem = (iElementType == 'R' ? 3 : (iElementType == 'M' ? 4 : 1));
 								while (pAuthorizedValuesList[k] != NULL)
 								{
+									for (ii=0;ii<iNbElementsByItem;ii++)
+									{
+										if (pAuthorizedValuesList[k+ii] == NULL)
+										{
+											cd_warning ("bad conf file format, you can try to delete it and restart the dock");
+											break;
+										}
+									}
+									if (ii != iNbElementsByItem)
+										break;
 									//g_print ("%d) %s\n", k, pAuthorizedValuesList[k]);
 									GtkTreeIter iter;
 									gtk_list_store_append (GTK_LIST_STORE (modele), &iter);
@@ -1186,6 +1201,11 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 									}
 								}
 								g_free (cResult);
+								if (k == 0)  // rien dans le gtktree => plantage.
+								{
+									j ++;
+									continue;
+								}
 								if (iElementType == 'R' || iElementType == 'M')
 								{
 									pDescriptionLabel = gtk_label_new (NULL);

@@ -339,11 +339,11 @@ void cairo_dock_write_root_dock_gaps (CairoDock *pDock)
 	}
 }
 
-void cairo_dock_get_root_dock_position (const gchar *cDockName, CairoDock *pDock)
+gboolean cairo_dock_get_root_dock_position (const gchar *cDockName, CairoDock *pDock)
 {
 	g_return_if_fail (cDockName != NULL && pDock != NULL);
 	if (pDock->iRefCount > 0)
-		return;
+		return FALSE;
 	
 	//g_print ("%s (%s)\n", __func__, cDockName);
 	gchar *cConfFilePath = (pDock->bIsMainDock ? g_cConfFile : g_strdup_printf ("%s/%s.conf", g_cCurrentThemePath, cDockName));
@@ -355,7 +355,7 @@ void cairo_dock_get_root_dock_position (const gchar *cDockName, CairoDock *pDock
 		
 		if (! pDock->bIsMainDock)
 			g_free (cConfFilePath);
-		return ;
+		return FALSE;
 	}
 	
 	GKeyFile *pKeyFile = g_key_file_new ();
@@ -365,7 +365,7 @@ void cairo_dock_get_root_dock_position (const gchar *cDockName, CairoDock *pDock
 	{
 		cd_warning ("Attention : %s", erreur->message);
 		g_error_free (erreur);
-		return ;
+		return FALSE;
 	}
 	else
 	{
@@ -406,6 +406,7 @@ void cairo_dock_get_root_dock_position (const gchar *cDockName, CairoDock *pDock
 	
 	if (! pDock->bIsMainDock)
 		g_free (cConfFilePath);
+	return TRUE;
 }
 
 void cairo_dock_remove_root_dock_config (const gchar *cDockName)
