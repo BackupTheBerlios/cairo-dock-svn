@@ -336,7 +336,6 @@ void cairo_dock_free_module (CairoDockModule *module)
 
 	cairo_dock_free_visit_card (module->pVisitCard);
 	g_free (module->cSoFilePath);
-	g_free (module->cConfFilePath);
 	g_free (module);
 }
 
@@ -479,6 +478,7 @@ void cairo_dock_activate_module (CairoDockModule *module, GError **erreur)
 void cairo_dock_deactivate_module (CairoDockModule *module)
 {
 	g_return_if_fail (module != NULL);
+	g_print ("%s (%s)\n", __func__, module->cConfFilePath);
 	g_list_foreach (module->pInstancesList, (GFunc) cairo_dock_stop_module_instance, NULL);
 	g_list_foreach (module->pInstancesList, (GFunc) cairo_dock_free_module_instance, NULL);
 	g_list_free (module->pInstancesList);
@@ -1110,6 +1110,9 @@ void cairo_dock_stop_module_instance (CairoDockModuleInstance *pInstance)
 		cairo_dock_free_desklet (pInstance->pDesklet);
 	if (pInstance->pDrawContext != NULL)
 		cairo_destroy (pInstance->pDrawContext);
+	
+	if (pInstance->pIcon != NULL)
+		pInstance->pIcon->pModuleInstance = NULL;
 }
 /**
 * Stoppe une instance d'un module, et la detruit.

@@ -747,7 +747,7 @@ void cairo_dock_insert_icon_in_dock_full (Icon *icon, CairoDock *pDock, gboolean
 	//\______________ On insere un separateur si necessaire.
 	if (bSeparatorNeeded)
 	{
-		int iOrder = cairo_dock_get_group_order (icon);
+		int iOrder = cairo_dock_get_icon_order (icon);
 		if (iOrder + 1 < CAIRO_DOCK_NB_TYPES)
 		{
 			Icon *pNextIcon = cairo_dock_get_next_icon (pDock->icons, icon);

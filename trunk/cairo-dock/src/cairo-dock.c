@@ -555,8 +555,8 @@ int main (int argc, char** argv)
 		}
 		while (g_pMainDock == NULL);
 	}
-	
-	cairo_dock_load_theme (g_cCurrentThemePath);
+	else
+		cairo_dock_load_theme (g_cCurrentThemePath);
 	
 	if (g_bUseFakeTransparency)
 		cairo_dock_load_desktop_background_surface ();

@@ -63,6 +63,7 @@ extern gboolean bShowSubDockOnClick;
 extern gboolean g_bUseSeparator;
 extern gboolean g_bKeepAbove;
 extern gboolean g_bPopUp;
+extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 
 extern gint g_iScreenWidth[2];
 extern gint g_iScreenHeight[2];
@@ -513,7 +514,7 @@ struct _CairoFlyingContainer {
         gint iWidth, iHeight;
         /// Position de la fenetre.
         gint iWindowPositionX, iWindowPositionY;
-        /// Vrai ssi le pointeur est dans le desklet (widgets fils inclus).
+        /// TRUE ssi le pointeur est dedans.
         gboolean bInside;
         /// TRUE ssi le container est horizontal.
         CairoDockTypeHorizontality bIsHorizontal;
@@ -539,7 +540,7 @@ static gboolean on_expose_flying_icon (GtkWidget *pWidget,
 	GdkEventExpose *pExpose,
 	CairoFlyingContainer *pFlyingContainer)
 {
-	cairo_t *pCairoContext = gdk_cairo_create (pWidget->window);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pFlyingContainer);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_paint (pCairoContext);
@@ -554,16 +555,28 @@ static gboolean on_motion_notify_flying_icon (GtkWidget *pWidget,
 	GdkEventMotion* pMotion,
 	CairoFlyingContainer *pFlyingContainer)
 {
-	
 	if (pMotion->state & GDK_BUTTON1_MASK)
 	{
 		gtk_window_move (GTK_WINDOW (pWidget),
-		pMotion->x_root + pDesklet->diff_x,
-		pMotion->y_root + pDesklet->diff_y);
+			pMotion->x_root + pFlyingContainer->iWidth/2,
+			pMotion->y_root + pFlyingContainer->iHeight/2);
 	}
 	gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);  // pour recevoir d'autres MotionNotify.
-        return FALSE;
-}*/
+	return FALSE;
+}
+static gboolean on_button_release_flying_icon (GtkWidget *widget,
+	GdkEventButton *pButton,
+	CairoFlyingContainer *pFlyingContainer)
+{
+	if (pButton->button == 1 && pButton->type == GDK_BUTTON_RELEASE)  // clic gauche.
+	{
+		g_print ("on relache l'icone volante\n");
+		cairo_dock_free_icon (pFlyingContainer->pIcon);
+		gtk_widget_destroy (pFlyingContainer->pWidget);  // enleve les signaux.
+		g_free (pFlyingContainer);
+	}
+}
+*/
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
@@ -1227,13 +1240,13 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 							prev_icon = cairo_dock_get_previous_icon (pDock->icons, icon);
 							next_icon = icon;
 						}
-						if ((prev_icon == NULL || prev_icon->iType != s_pIconClicked->iType) && (next_icon == NULL || next_icon->iType != s_pIconClicked->iType))
+						if ((prev_icon == NULL || cairo_dock_get_icon_order (prev_icon) != cairo_dock_get_icon_order (s_pIconClicked)) && (next_icon == NULL || cairo_dock_get_icon_order (next_icon) != cairo_dock_get_icon_order (s_pIconClicked)))
 						{
 							s_pIconClicked = NULL;
 							return FALSE;
 						}
 						//g_print ("deplacement de %s\n", s_pIconClicked->acName);
-						if (prev_icon != NULL && prev_icon->iType != s_pIconClicked->iType)
+						if (prev_icon != NULL && cairo_dock_get_icon_order (prev_icon) != cairo_dock_get_icon_order (s_pIconClicked))
 							prev_icon = NULL;
 						cairo_dock_move_icon_after_icon (pDock, s_pIconClicked, prev_icon);
 

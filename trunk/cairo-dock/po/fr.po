@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4.5\n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-08-13 01:30+0200\n"
+"POT-Creation-Date: 2008-08-14 23:31+0200\n"
 "PO-Revision-Date: 2008-05-23 08:33+0100\n"
 "Last-Translator: Yann SLADEK <mav@cairo-dock.org>\n"
 "Language-Team: Cairo-Dock <po@cairo-dock.org>\n"
@@ -17,11 +17,11 @@ msgstr ""
 "X-Poedit-Language: French\n"
 "X-Poedit-Country: France\n"
 
-#: ../src/cairo-dock-callbacks.c:967
+#: ../src/cairo-dock-callbacks.c:1065
 msgid "Do you want to mount this point ?"
 msgstr "Voulez-vous monter ce point ?"
 
-#: ../src/cairo-dock-callbacks.c:1667
+#: ../src/cairo-dock-callbacks.c:1765
 msgid "Quit Cairo-Dock ?"
 msgstr "Quitter Cairo-Dock ?"
 
@@ -55,7 +55,7 @@ msgstr "monter"
 msgid "unmount"
 msgstr "démonter"
 
-#: ../src/cairo-dock-gui-factory.c:1518
+#: ../src/cairo-dock-gui-factory.c:1538
 msgid "grab"
 msgstr "récupérer"
 
@@ -336,20 +336,20 @@ msgstr "Toujours derrière"
 msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr "Réglez le comportement de Compiz à : (name=cairo-dock & type=utility)"
 
-#: ../src/cairo-dock-modules.c:804 ../src/cairo-dock-modules.c:827
+#: ../src/cairo-dock-modules.c:777 ../src/cairo-dock-modules.c:800
 #, c-format
 msgid "Configuration of %s"
 msgstr "Configuration de %s"
 
-#: ../src/cairo-dock-themes-manager.c:198
+#: ../src/cairo-dock-themes-manager.c:209
 msgid "< Safe Mode >"
 msgstr "< Mode sûreté >"
 
-#: ../src/cairo-dock-themes-manager.c:198
+#: ../src/cairo-dock-themes-manager.c:209
 msgid "Manage Themes"
 msgstr "Gérer les thèmes"
 
-#: ../src/cairo-dock-themes-manager.c:203
+#: ../src/cairo-dock-themes-manager.c:214
 msgid ""
 "You are running Cairo-Dock in safe mode.\n"
 "Why ? Probably because a plug-in has messed into your dock,\n"
@@ -376,12 +376,12 @@ msgstr ""
 "mode normal.\n"
 "Ensuite, activez les plug-ins un à un pour déterminer lequel pose problème."
 
-#: ../src/cairo-dock-themes-manager.c:335
+#: ../src/cairo-dock-themes-manager.c:346
 #, c-format
 msgid "Are you sure you want to delete theme %s ?"
 msgstr "Etes-vous sûr de vouloir effacer le thème %s ?"
 
-#: ../src/cairo-dock-themes-manager.c:394
+#: ../src/cairo-dock-themes-manager.c:405
 msgid ""
 "You made some modifications in the current theme.\n"
 "You will loose them if you don't save before choosing a new theme. Continue "
@@ -390,7 +390,7 @@ msgstr ""
 "Vous avez fait des modifications dans le thème courant\n"
 "Vous les perdrez si vous ne le sauvez pas d'abord. Continuer malgré tout ?"
 
-#: ../src/cairo-dock-themes-manager.c:572
+#: ../src/cairo-dock-themes-manager.c:583
 #, c-format
 msgid "Are you sure you want to overwrite theme %s ?"
 msgstr "Etes-vous sûr de vouloir écraser le thème %s"
@@ -2208,5 +2208,23 @@ msgstr ""
 
 #: ../data/messages:893
 msgid ""
-"v1.6.2 : the first version integrated in the Ubuntu repositories !\n - 2 new applets have been released :\n  Slider and Stack. Enjoy !\n - Applets can now be launched many times\n (Clock, Cairo-Penguin, Slider, Stack), each with a different config.\n - Cairo-Dock is now able to load themes on its own server,\n so feel free to send us all your themes, we can distribute them ! :-)\n - And we are still searching someone motivated to write a kde-integration plug-in ^_^"
-msgstr "v1.6.2 : la 1ère version intégrée aux dépôts d'Ubuntu !\n - 2 nouvelles applets sont libérées :\n  Slider et Stack. Amusez-vous bien !\n - Les applets peuvent maintenant être lancées plusieurs fois\n (Clock, Cairo-Penguin, Slider, Stack), chacune avec une config différente.\n - Cairo-Dock peut désormais charger des thèmes sur son propre serveur,\n donc n'hésitez pas à nous envoyer vos thèmes, nous pourront les publier ! :-)\n - Et nous recherchons toujours une personne motivée pour écrire un plugin kde-integration ^_^"
+"v1.6.2 : the first version integrated in the Ubuntu repositories !\n"
+" - 2 new applets have been released :\n"
+"  Slider and Stack. Enjoy !\n"
+" - Applets can now be launched many times\n"
+" (Clock, Cairo-Penguin, Slider, Stack), each with a different config.\n"
+" - Cairo-Dock is now able to load themes on its own server,\n"
+" so feel free to send us all your themes, we can distribute them ! :-)\n"
+" - And we are still searching someone motivated to write a kde-integration "
+"plug-in ^_^"
+msgstr ""
+"v1.6.2 : la 1ère version intégrée aux dépôts d'Ubuntu !\n"
+" - 2 nouvelles applets sont libérées :\n"
+"  Slider et Stack. Amusez-vous bien !\n"
+" - Les applets peuvent maintenant être lancées plusieurs fois\n"
+" (Clock, Cairo-Penguin, Slider, Stack), chacune avec une config différente.\n"
+" - Cairo-Dock peut désormais charger des thèmes sur son propre serveur,\n"
+" donc n'hésitez pas à nous envoyer vos thèmes, nous pourront les "
+"publier ! :-)\n"
+" - Et nous recherchons toujours une personne motivée pour écrire un plugin "
+"kde-integration ^_^"

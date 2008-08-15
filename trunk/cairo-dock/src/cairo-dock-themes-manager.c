@@ -523,7 +523,7 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode)
 					}
 					else
 					{
-						cairo_dock_replace_keys_by_identifier (cNewConfFilePath, cConfFilePath, '+');
+						cairo_dock_replace_keys_by_identifier (cConfFilePath, cNewConfFilePath, '+');
 					}
 					
 					g_free (cNewConfFilePath);

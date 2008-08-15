@@ -341,7 +341,7 @@ void cairo_dock_write_root_dock_gaps (CairoDock *pDock)
 
 gboolean cairo_dock_get_root_dock_position (const gchar *cDockName, CairoDock *pDock)
 {
-	g_return_if_fail (cDockName != NULL && pDock != NULL);
+	g_return_val_if_fail (cDockName != NULL && pDock != NULL, FALSE);
 	if (pDock->iRefCount > 0)
 		return FALSE;
 	

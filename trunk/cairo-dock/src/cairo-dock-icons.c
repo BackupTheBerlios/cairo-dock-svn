@@ -111,8 +111,8 @@ CairoDockIconType cairo_dock_get_icon_type (Icon *icon)
 
 int cairo_dock_compare_icons_order (Icon *icon1, Icon *icon2)
 {
-	int iOrder1 = cairo_dock_get_group_order (icon1);
-	int iOrder2 = cairo_dock_get_group_order (icon2);
+	int iOrder1 = cairo_dock_get_icon_order (icon1);
+	int iOrder2 = cairo_dock_get_icon_order (icon2);
 	if (iOrder1 < iOrder2)
 		return -1;
 	else if (iOrder1 > iOrder2)
@@ -498,16 +498,16 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 
 void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2)
 {
-	//g_print ("%s (%s, %.2f)\n", __func__, icon1->acName, icon1->fOrder);
+	g_print ("%s (%s, %.2f)\n", __func__, icon1->acName, icon1->fOrder);
 	///if ((icon2 != NULL) && (! ( (CAIRO_DOCK_IS_APPLI (icon1) && CAIRO_DOCK_IS_APPLI (icon2)) || (CAIRO_DOCK_IS_LAUNCHER (icon1) && CAIRO_DOCK_IS_LAUNCHER (icon2)) || (CAIRO_DOCK_IS_APPLET (icon1) && CAIRO_DOCK_IS_APPLET (icon2)) ) ))
-	if ((icon2 != NULL) && fabs (icon1->iType - icon2->iType) > 1)
+	if ((icon2 != NULL) && fabs (cairo_dock_get_icon_order (icon1) - cairo_dock_get_icon_order (icon2)) > 1)
 		return ;
-
+	g_print ("toto\n");
 	//\_________________ On change l'ordre de l'icone.
 	if (icon2 != NULL)
 	{
 		Icon *pNextIcon = cairo_dock_get_next_icon (pDock->icons, icon2);
-		if (pNextIcon == NULL || pNextIcon->iType != icon2->iType)
+		if (pNextIcon == NULL || cairo_dock_get_icon_order (pNextIcon) != cairo_dock_get_icon_order (icon2))
 			icon1->fOrder = icon2->fOrder + 1;
 		else
 			icon1->fOrder = (pNextIcon->fOrder - icon2->fOrder > 1 ? icon2->fOrder + 1 : (pNextIcon->fOrder + icon2->fOrder) / 2);
@@ -660,7 +660,7 @@ gboolean cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolea
 			Icon *pSameTypeIcon = cairo_dock_get_first_icon_of_type (pDock->icons, icon->iType);
 			if (pSameTypeIcon == NULL)
 			{
-				int iOrder = cairo_dock_get_group_order (icon);
+				int iOrder = cairo_dock_get_icon_order (icon);
 				if (iOrder > 1)  // attention : iType - 1 > 0 si iType = 0, car c'est un unsigned int !
 					pSeparatorIcon = cairo_dock_get_first_icon_of_type (pDock->icons, iOrder - 1);
 				else if (iOrder + 1 < CAIRO_DOCK_NB_TYPES)
@@ -1296,7 +1296,7 @@ void cairo_dock_mark_icons_as_avoiding_mouse (CairoDock *pDock, CairoDockIconTyp
 			if (pDock->iMouseX < icon->fDrawXAtRest + icon->fWidth * icon->fScale * fMargin)  // on est a gauche.
 			{
 				Icon *prev_icon = cairo_dock_get_previous_element (ic, pDock->icons) -> data;
-				if ((icon->iType == iType || prev_icon->iType == iType) && prev_icon->iAnimationType != CAIRO_DOCK_FOLLOW_MOUSE)
+				if ((cairo_dock_get_icon_order (icon) == cairo_dock_get_group_order (iType) || cairo_dock_get_icon_order (prev_icon) == cairo_dock_get_group_order (iType)) && prev_icon->iAnimationType != CAIRO_DOCK_FOLLOW_MOUSE)
 				{
 					icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;
 					prev_icon->iAnimationType = CAIRO_DOCK_AVOID_MOUSE;

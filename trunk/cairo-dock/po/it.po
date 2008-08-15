@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4.5\n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-08-13 01:30+0200\n"
+"POT-Creation-Date: 2008-08-14 23:31+0200\n"
 "PO-Revision-Date: 2008-06-24 14:23+0200\n"
 "Last-Translator: Mattia Tavernini <maathias@interfree.it>\n"
 "Language-Team: Cairo-Dock <po@cairo-dock.org>\n"
@@ -15,11 +15,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/cairo-dock-callbacks.c:967
+#: ../src/cairo-dock-callbacks.c:1065
 msgid "Do you want to mount this point ?"
 msgstr "Volete montare questo punto ?"
 
-#: ../src/cairo-dock-callbacks.c:1667
+#: ../src/cairo-dock-callbacks.c:1765
 msgid "Quit Cairo-Dock ?"
 msgstr "Abbandonare Cairo-Dock ?"
 
@@ -53,7 +53,7 @@ msgstr "montare"
 msgid "unmount"
 msgstr "smontare"
 
-#: ../src/cairo-dock-gui-factory.c:1518
+#: ../src/cairo-dock-gui-factory.c:1538
 msgid "grab"
 msgstr "recuperare"
 
@@ -336,20 +336,20 @@ msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr ""
 "Regolate il comportamento di Compiz in : (name=cairo-dock & type=utility)"
 
-#: ../src/cairo-dock-modules.c:804 ../src/cairo-dock-modules.c:827
+#: ../src/cairo-dock-modules.c:777 ../src/cairo-dock-modules.c:800
 #, c-format
 msgid "Configuration of %s"
 msgstr "Configurazione di %s"
 
-#: ../src/cairo-dock-themes-manager.c:198
+#: ../src/cairo-dock-themes-manager.c:209
 msgid "< Safe Mode >"
 msgstr "< Safe Mode >"
 
-#: ../src/cairo-dock-themes-manager.c:198
+#: ../src/cairo-dock-themes-manager.c:209
 msgid "Manage Themes"
 msgstr "Gestione dei temi"
 
-#: ../src/cairo-dock-themes-manager.c:203
+#: ../src/cairo-dock-themes-manager.c:214
 msgid ""
 "You are running Cairo-Dock in safe mode.\n"
 "Why ? Probably because a plug-in has messed into your dock,\n"
@@ -375,12 +375,12 @@ msgstr ""
 "modo normale.\n"
 "Successivamente attivate uno ad uno i plug-in per capire quale crea problemi."
 
-#: ../src/cairo-dock-themes-manager.c:335
+#: ../src/cairo-dock-themes-manager.c:346
 #, c-format
 msgid "Are you sure you want to delete theme %s ?"
 msgstr "Siete sicuri di voler cancellare il tema %s ?"
 
-#: ../src/cairo-dock-themes-manager.c:394
+#: ../src/cairo-dock-themes-manager.c:405
 msgid ""
 "You made some modifications in the current theme.\n"
 "You will loose them if you don't save before choosing a new theme. Continue "
@@ -390,7 +390,7 @@ msgstr ""
 "Le perderete se non si salva il tema prima di seglierne uno nuovo. "
 "Continuare ugualmente ?"
 
-#: ../src/cairo-dock-themes-manager.c:572
+#: ../src/cairo-dock-themes-manager.c:583
 #, c-format
 msgid "Are you sure you want to overwrite theme %s ?"
 msgstr "Siete sicuri di voler sovrascrivere il tema %s ?"
@@ -2133,11 +2133,15 @@ msgstr ""
 
 #: ../data/messages:893
 msgid ""
-"v1.6.2 : the first version to be integrated in the Ubuntu repositories !\n"
+"v1.6.2 : the first version integrated in the Ubuntu repositories !\n"
 " - 2 new applets have been released :\n"
 "  Slider and Stack. Enjoy !\n"
-" - Cairo-Dock is now able to load themes on its server, so feel free to send "
-"us your themes ! :-)"
+" - Applets can now be launched many times\n"
+" (Clock, Cairo-Penguin, Slider, Stack), each with a different config.\n"
+" - Cairo-Dock is now able to load themes on its own server,\n"
+" so feel free to send us all your themes, we can distribute them ! :-)\n"
+" - And we are still searching someone motivated to write a kde-integration "
+"plug-in ^_^"
 msgstr ""
 
 #, fuzzy
