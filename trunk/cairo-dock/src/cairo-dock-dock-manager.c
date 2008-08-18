@@ -175,7 +175,6 @@ CairoContainer *cairo_dock_search_container_from_icon (Icon *icon)
 
 void cairo_dock_update_conf_file_with_containers_full (GKeyFile *pKeyFile, gchar *cDesktopFilePath, gchar *cGroupName, gchar *cKeyName)
 {
-	g_print ("%s (%s; %s)\n", __func__, cGroupName, cKeyName);
 	cairo_dock_update_conf_file_with_hash_table (pKeyFile, cDesktopFilePath, s_hDocksTable, cGroupName, cKeyName, NULL, (GHFunc)cairo_dock_write_one_name, FALSE, FALSE);
 }
 

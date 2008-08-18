@@ -478,7 +478,7 @@ void cairo_dock_activate_module (CairoDockModule *module, GError **erreur)
 void cairo_dock_deactivate_module (CairoDockModule *module)
 {
 	g_return_if_fail (module != NULL);
-	g_print ("%s (%s)\n", __func__, module->cConfFilePath);
+	cd_debug ("%s (%s)", __func__, module->cConfFilePath);
 	g_list_foreach (module->pInstancesList, (GFunc) cairo_dock_stop_module_instance, NULL);
 	g_list_foreach (module->pInstancesList, (GFunc) cairo_dock_free_module_instance, NULL);
 	g_list_free (module->pInstancesList);
@@ -634,9 +634,13 @@ void cairo_dock_reload_module_instance (CairoDockModuleInstance *pInstance, gboo
 		}
 		gboolean bCanReload = TRUE;
 		if (pInstance->pDrawContext != NULL)
+		{
 			cairo_destroy (pInstance->pDrawContext);
+			//g_print ("on detruit le ctx de %s (%x)\n", pInstance->cConfFilePath, pInstance->pDrawContext);
+		}
 		if (pInstance->pDock)
 		{
+			//g_print ("dans un dock\n");
 			if (pInstance->pIcon->pIconBuffer == NULL)
 			{
 				cd_warning ("invalid applet's icon buffer");
@@ -651,7 +655,10 @@ void cairo_dock_reload_module_instance (CairoDockModuleInstance *pInstance, gboo
 			}
 		}
 		else
+		{
+			//g_print ("dans un desklet\n");
 			pInstance->pDrawContext = NULL;
+		}
 		if (bCanReload)
 			bModuleReloaded = module->pInterface->reloadModule (pInstance, pActualContainer, pKeyFile);
 		
@@ -990,8 +997,8 @@ CairoDockModuleInstance *cairo_dock_instanciate_module (CairoDockModule *pModule
 		{
 			pDesklet = cairo_dock_create_desklet (NULL, NULL, pMinimalConfig->bOnWidgetLayer);
 			cairo_dock_place_desklet (pDesklet, pMinimalConfig);
-			while (gtk_events_pending ())
-				gtk_main_iteration ();
+			///while (gtk_events_pending ())  // pour la transparence initiale, mais induit trop de paradoxes.
+			///	gtk_main_iteration ();
 			pContainer = CAIRO_CONTAINER (pDesklet);
 		}
 		else

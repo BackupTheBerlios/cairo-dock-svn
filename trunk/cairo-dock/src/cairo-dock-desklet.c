@@ -520,6 +520,11 @@ void cairo_dock_free_desklet (CairoDesklet *pDesklet)
 	if (pDesklet == NULL)
 		return;
 
+	if (pDesklet->iSidWriteSize != 0)
+		g_source_remove (pDesklet->iSidWriteSize);
+	if (pDesklet->iSidWritePosition != 0)
+		g_source_remove (pDesklet->iSidWritePosition);
+	
 	cairo_dock_steal_interactive_widget_from_desklet (pDesklet);
 
 	gtk_widget_destroy (pDesklet->pWidget);

@@ -55,6 +55,7 @@ void cairo_dock_list_available_gauges (void)
 
 void cairo_dock_update_conf_file_with_gauges (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cGroupName, gchar *cKeyName)
 {
+	//g_print ("%s (%s, %s, %s)\n", __func__, cConfFile, cGroupName, cKeyName);
 	cairo_dock_update_conf_file_with_hash_table (pOpenedKeyFile, cConfFile, s_pGaugeTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_theme_name, TRUE, FALSE);
 
 }
@@ -254,7 +255,9 @@ void cairo_dock_render_gauge(cairo_t *pSourceContext, CairoContainer *pContainer
 
 void cairo_dock_render_gauge_multi_value(cairo_t *pSourceContext, CairoContainer *pContainer, Icon *pIcon, Gauge *pGauge, GList *valueList)
 {
+	//g_print ("%s (%x; %x)\n", __func__, pSourceContext, pGauge);
 	g_return_if_fail (pGauge != NULL && pGauge->indicatorList != NULL && pContainer != NULL && pSourceContext != NULL);
+	g_return_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS);
 	//cd_debug("gauge : %s ()",__func__);
 	
 	GaugeImage *pGaugeImage;
@@ -427,7 +430,7 @@ void draw_cd_Gauge_image(cairo_t *pSourceContext, GaugeIndicator *pGaugeIndicato
 
 void cairo_dock_reload_gauge (cairo_t *pSourceContext, Gauge *pGauge, int iWidth, int iHeight)
 {
-	g_print ("%s (%dx%d)\n", __func__, iWidth, iHeight);
+	//g_print ("%s (%dx%d)\n", __func__, iWidth, iHeight);
 	g_return_if_fail (pGauge != NULL);
 	
 	pGauge->sizeX = iWidth;

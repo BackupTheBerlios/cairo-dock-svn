@@ -370,7 +370,7 @@ void cairo_dock_free_dock (CairoDock *pDock)
 
 void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDock *pReceivingDock, gchar *cpReceivingDockName)
 {
-	g_print ("%s (%s, %d)\n", __func__, cDockName, pDock->iRefCount);
+	cd_message ("%s (%s, %d)", __func__, cDockName, pDock->iRefCount);
 	g_return_if_fail (pDock != NULL && cDockName != NULL);
 	if (pDock->bIsMainDock)  // utiliser cairo_dock_free_all_docks ().
 		return;
@@ -865,7 +865,7 @@ void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve)
 
 void cairo_dock_place_root_dock (CairoDock *pDock)
 {
-	g_print ("%s (%d, %d, %d)\n", __func__, pDock->bAutoHide, pDock->iRefCount, pDock->bIsMainDock);
+	cd_debug ("%s (%d, %d, %d)", __func__, pDock->bAutoHide, pDock->iRefCount, pDock->bIsMainDock);
 	int iNewWidth, iNewHeight;
 	if (pDock->bAutoHide && pDock->iRefCount == 0)
 	{
@@ -878,7 +878,7 @@ void cairo_dock_place_root_dock (CairoDock *pDock)
 		cairo_dock_get_window_position_and_geometry_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
 	}
 	
-	g_print (" move to (%d;%d)\n", pDock->iWindowPositionX, pDock->iWindowPositionY);
+	cd_debug (" move to (%d;%d)", pDock->iWindowPositionX, pDock->iWindowPositionY);
 	if (pDock->bHorizontalDock)
 		gdk_window_move_resize (pDock->pWidget->window,
 			pDock->iWindowPositionX,

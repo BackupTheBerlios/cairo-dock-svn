@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-08-14 23:31+0200\n"
+"POT-Creation-Date: 2008-08-18 02:40+0200\n"
 "PO-Revision-Date: 2008-05-30 13:35-0500\n"
 "Last-Translator: biAji <biaji.cn@gmail.com>\n"
 "Language-Team: \n"
@@ -10,11 +10,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/cairo-dock-callbacks.c:1065
+#: ../src/cairo-dock-callbacks.c:1081
 msgid "Do you want to mount this point ?"
 msgstr "您想挂载此点么？"
 
-#: ../src/cairo-dock-callbacks.c:1765
+#: ../src/cairo-dock-callbacks.c:1781
 msgid "Quit Cairo-Dock ?"
 msgstr "退出Cairo-Dock？"
 
@@ -330,7 +330,7 @@ msgstr "总在下面"
 msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr "设置Compiz中的行为成：(name=cairo-dock-desklet & type=utility)"
 
-#: ../src/cairo-dock-modules.c:777 ../src/cairo-dock-modules.c:800
+#: ../src/cairo-dock-modules.c:784 ../src/cairo-dock-modules.c:807
 #, c-format
 msgid "Configuration of %s"
 msgstr "%s的配置"

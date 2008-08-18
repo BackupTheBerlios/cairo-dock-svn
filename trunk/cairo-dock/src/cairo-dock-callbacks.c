@@ -504,7 +504,7 @@ gboolean cairo_dock_emit_enter_signal (CairoDock *pDock)
 }
 
 
-/**typedef struct _CairoFlyingContainer CairoFlyingContainer;
+typedef struct _CairoFlyingContainer CairoFlyingContainer;
 struct _CairoFlyingContainer {
         /// type de container.
         CairoDockTypeContainer iType;
@@ -535,19 +535,18 @@ struct _CairoFlyingContainer {
 	gint iSidFidgetTimer;
 };
 
-
 static gboolean on_expose_flying_icon (GtkWidget *pWidget,
 	GdkEventExpose *pExpose,
 	CairoFlyingContainer *pFlyingContainer)
 {
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (pFlyingContainer);
+	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pFlyingContainer));
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_paint (pCairoContext);
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
 	
 	/// dessiner une main ...
-	cairo_set_source_surface (pCairoContext, pIcon->pIconBuffer, 0., 0.);
+	cairo_set_source_surface (pCairoContext, pFlyingContainer->pIcon->pIconBuffer, 0., 0.);
 	cairo_destroy (pCairoContext);
 	return FALSE;
 }
@@ -576,7 +575,7 @@ static gboolean on_button_release_flying_icon (GtkWidget *widget,
 		g_free (pFlyingContainer);
 	}
 }
-*/
+
 
 void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 {
@@ -638,16 +637,20 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	//s_pLastPointedDock = NULL;
 	//g_print ("s_pLastPointedDock <- NULL\n");
 	
-	if (s_pIconClicked != NULL)
+	/*if (s_pIconClicked != NULL && CAIRO_DOCK_IS_LAUNCHER (s_pIconClicked))
 	{
 		g_print ("on a sorti %s du dock\n", s_pIconClicked->acName);
-		/**CairoDock *pOriginDock = cairo_dock_search_dock_from_name (s_pIconClicked->acName);
+		CairoDock *pOriginDock = cairo_dock_search_dock_from_name (s_pIconClicked->cParentDockName);
 		g_return_if_fail (pOriginDock != NULL);
 		cairo_dock_detach_icon_from_dock (s_pIconClicked, pOriginDock, TRUE); 
-		s_pIconDetached = s_pIconClicked;
-		s_pIconClicked = NULL;
 		
+		CairoFlyingContainer *pFlyingContainer = g_new0 (CairoFlyingContainer, 1);
+		pFlyingContainer->iType = 3;
 		GtkWidget* pWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+		pFlyingContainer->pWidget = pWindow;
+		pFlyingContainer->pIcon = s_pIconClicked;
+		pFlyingContainer->bIsHorizontal = TRUE;
+		pFlyingContainer->bDirectionUp = TRUE;
 		gtk_window_set_skip_pager_hint(GTK_WINDOW(pWindow), TRUE);
 		gtk_window_set_skip_taskbar_hint(GTK_WINDOW(pWindow), TRUE);
 		cairo_dock_set_colormap_for_window(pWindow);
@@ -659,19 +662,19 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 		g_signal_connect (G_OBJECT (pWindow),
 			"expose-event",
 			G_CALLBACK (on_expose_flying_icon),
-			s_pIconDetached);
+			pFlyingContainer);
 		g_signal_connect (G_OBJECT (pWindow),
 			"motion-notify-event",
 			G_CALLBACK (on_motion_notify_flying_icon),
-			s_pIconDetached);
+			pFlyingContainer);
 		g_signal_connect (G_OBJECT (pWindow),
 			"button-release-event",
 			G_CALLBACK (on_button_release_flying_icon),
-			s_pIconDetached);
+			pFlyingContainer);
 		
-		
-		*/
-	}
+		/// gtk_window_move
+		s_pIconClicked = NULL;
+	}*/
 }
 gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,

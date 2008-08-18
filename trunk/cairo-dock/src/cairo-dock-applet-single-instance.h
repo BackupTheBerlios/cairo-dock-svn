@@ -34,10 +34,8 @@ myDrawContext = myApplet->pDrawContext; \
 	myDock = myApplet->pDock; \
 	myDesklet = myApplet->pDesklet; \
 	if (CAIRO_DOCK_IS_DESKLET (pOldContainer) && myDrawContext != NULL) { \
-		g_print ("destruction du contexte du desklet\n"); \
 		cairo_destroy (myDrawContext); } \
 	myDrawContext = myApplet->pDrawContext;
-
 
 
 #define CD_APPLET_RESET_DATA_END \
