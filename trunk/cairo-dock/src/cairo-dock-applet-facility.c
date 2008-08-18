@@ -582,6 +582,7 @@ void cairo_dock_get_gnome_version (int *iMajor, int *iMinor, int *iMicro) {
 		erreur = NULL;
 		*iMajor = 0;
 		*iMinor = 0;
+		*iMicro = 0;
 		return;
 	}
 	
