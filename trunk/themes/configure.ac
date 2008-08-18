@@ -23,37 +23,12 @@ AC_CHECK_HEADERS([stdlib.h])
 # Checks for library functions.
 
 AC_CONFIG_FILES([Makefile
-		_Azur_/Makefile
-		_Azur_/launchers/Makefile
-		_Ubuntu_/Makefile
-		_Ubuntu_/launchers/Makefile
-		_Verde_/Makefile
-		_Verde_/launchers/Makefile
-		_Djoole_/Makefile
-		_Djoole_/launchers/Makefile
-		_Cobalt_/Makefile
-		_Cobalt_/launchers/Makefile
-		_Glattering_/Makefile
-		_Glattering_/launchers/Makefile
-		_TapisVert_/Makefile
-		_TapisVert_/launchers/Makefile
-		_TapisVert_/plug-ins/Makefile
-		_TapisVert_/plug-ins/rendering/Makefile
-		_TapisVert_/plug-ins/logout/Makefile
-		_TapisVert_/plug-ins/dustbin/Makefile
 		_MacOSX_/Makefile
 		_MacOSX_/launchers/Makefile
 		_MacOSX_/plug-ins/Makefile
 		_MacOSX_/plug-ins/clock/Makefile
 		_MacOSX_/plug-ins/dustbin/Makefile
 		_MacOSX_/plug-ins/rendering/Makefile
-		_I_Cairo_/Makefile
-		_I_Cairo_/launchers/Makefile
-		_I_Cairo_/plug-ins/Makefile
-		_I_Cairo_/plug-ins/clock/Makefile
-		_I_Cairo_/plug-ins/dustbin/Makefile
-		_I_Cairo_/plug-ins/logout/Makefile
-		_I_Cairo_/plug-ins/rendering/Makefile
 		_Wood_/Makefile
 		_Wood_/launchers/Makefile
 		_Wood_/plug-ins/Makefile

@@ -1,5 +1,0 @@
-SUBDIRS = . \
-	dustbin\
-	logout\
-	rendering
-
