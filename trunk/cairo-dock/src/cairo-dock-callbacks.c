@@ -42,8 +42,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-dock-manager.h"
 #include "cairo-dock-keybinder.h"
 #include "cairo-dock-desklet.h"
-#include "cairo-dock-callbacks.h"
 #include "cairo-dock-emblem.h" //Drop Indicator
+#include "cairo-dock-flying-container.h"
+#include "cairo-dock-callbacks.h"
+
 
 static Icon *s_pIconClicked = NULL;  // pour savoir quand on deplace une icone a la souris. Dangereux si l'icone se fait effacer en cours ...
 static CairoDock *s_pLastPointedDock = NULL;  // pour savoir quand on passe d'un dock a un autre.
@@ -51,6 +53,7 @@ static int s_iSidNonStopScrolling = 0;
 static int s_iSidShowSubDockDemand = 0;
 static int s_iSidShowAppliForDrop = 0;
 static CairoDock *s_pDockShowingSubDock = NULL;  // on n'accede pas a son contenu, seulement l'adresse.
+static CairoFlyingContainer *s_pFlyingContainer = NULL;
 
 extern CairoDock *g_pMainDock;
 extern double g_fSubDockSizeRatio;
@@ -102,6 +105,7 @@ extern cairo_surface_t *g_pDesktopBgSurface;
 extern gboolean g_bUseFakeTransparency;
 
 extern gboolean g_bDisplayDropEmblem;
+extern gboolean g_bTesting;
 
 static gboolean s_bTemporaryAutoHide = FALSE;
 static gboolean s_bEntranceAllowed = TRUE;
@@ -404,7 +408,12 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			pDock->iMouseX = (int) pMotion->y;
 			pDock->iMouseY = (int) pMotion->x;
 		}
-
+		
+		if (s_pFlyingContainer != NULL && ! pDock->bInside)
+		{
+			cairo_dock_drag_flying_container (s_pFlyingContainer, pDock);
+		}
+		
 		if (pDock->iSidShrinkDown > 0 || pMotion->time - fLastTime < g_fRefreshInterval)  // si les icones sont en train de diminuer de taille (suite a un clic) on on laisse l'animation se finir, sinon elle va trop vite.  // || ! pDock->bInside || pDock->bAtBottom
 		{
 			gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);
@@ -447,33 +456,36 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		gtk_widget_queue_draw (pWidget);
 	}
 
-	if (g_bDecorationsFollowMouse)
+	if (pDock->bInside)
 	{
-		pDock->fDecorationsOffsetX = pDock->iMouseX - pDock->iCurrentWidth / 2;
-		//g_print ("fDecorationsOffsetX <- %.2f\n", pDock->fDecorationsOffsetX);
-	}
-	else
-	{
-		if (pDock->iMouseX > iLastMouseX)
+		if (g_bDecorationsFollowMouse)
 		{
-			pDock->fDecorationsOffsetX += 10;
-			if (pDock->fDecorationsOffsetX > pDock->iCurrentWidth / 2)
-			{
-				if (g_pBackgroundSurfaceFull[0] != NULL)
-					pDock->fDecorationsOffsetX -= pDock->iCurrentWidth;
-				else
-					pDock->fDecorationsOffsetX = pDock->iCurrentWidth / 2;
-			}
+			pDock->fDecorationsOffsetX = pDock->iMouseX - pDock->iCurrentWidth / 2;
+			//g_print ("fDecorationsOffsetX <- %.2f\n", pDock->fDecorationsOffsetX);
 		}
 		else
 		{
-			pDock->fDecorationsOffsetX -= 10;
-			if (pDock->fDecorationsOffsetX < - pDock->iCurrentWidth / 2)
+			if (pDock->iMouseX > iLastMouseX)
 			{
-				if (g_pBackgroundSurfaceFull[0] != NULL)
-					pDock->fDecorationsOffsetX += pDock->iCurrentWidth;
-				else
-					pDock->fDecorationsOffsetX = - pDock->iCurrentWidth / 2;
+				pDock->fDecorationsOffsetX += 10;
+				if (pDock->fDecorationsOffsetX > pDock->iCurrentWidth / 2)
+				{
+					if (g_pBackgroundSurfaceFull[0] != NULL)
+						pDock->fDecorationsOffsetX -= pDock->iCurrentWidth;
+					else
+						pDock->fDecorationsOffsetX = pDock->iCurrentWidth / 2;
+				}
+			}
+			else
+			{
+				pDock->fDecorationsOffsetX -= 10;
+				if (pDock->fDecorationsOffsetX < - pDock->iCurrentWidth / 2)
+				{
+					if (g_pBackgroundSurfaceFull[0] != NULL)
+						pDock->fDecorationsOffsetX += pDock->iCurrentWidth;
+					else
+						pDock->fDecorationsOffsetX = - pDock->iCurrentWidth / 2;
+				}
 			}
 		}
 	}
@@ -501,79 +513,6 @@ gboolean cairo_dock_emit_leave_signal (CairoDock *pDock)
 gboolean cairo_dock_emit_enter_signal (CairoDock *pDock)
 {
 	return cairo_dock_emit_signal_on_dock (pDock, "enter-notify-event");
-}
-
-
-typedef struct _CairoFlyingContainer CairoFlyingContainer;
-struct _CairoFlyingContainer {
-        /// type de container.
-        CairoDockTypeContainer iType;
-        /// La fenetre du widget.
-        GtkWidget *pWidget;
-        /// Taille de la fenetre. La surface allouee a l'applet s'en deduit.
-        gint iWidth, iHeight;
-        /// Position de la fenetre.
-        gint iWindowPositionX, iWindowPositionY;
-        /// TRUE ssi le pointeur est dedans.
-        gboolean bInside;
-        /// TRUE ssi le container est horizontal.
-        CairoDockTypeHorizontality bIsHorizontal;
-        /// TRUE ssi le container est oriente vers le haut.
-        gboolean bDirectionUp;
-#ifdef HAVE_GLITZ
-        glitz_drawable_format_t *pDrawFormat;
-        glitz_drawable_t* pGlitzDrawable;
-        glitz_format_t* pGlitzFormat;
-#else
-        gpointer padding[3];
-#endif // HAVE_GLITZ
-	/// pour le deplacement manuel de la fenetre.
-	gint diff_x, diff_y;
-	/// L'icone volante.
-	Icon *pIcon;
-	/// le timer de l'animation.
-	gint iSidFidgetTimer;
-};
-
-static gboolean on_expose_flying_icon (GtkWidget *pWidget,
-	GdkEventExpose *pExpose,
-	CairoFlyingContainer *pFlyingContainer)
-{
-	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pFlyingContainer));
-	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
-	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
-	cairo_paint (pCairoContext);
-	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);
-	
-	/// dessiner une main ...
-	cairo_set_source_surface (pCairoContext, pFlyingContainer->pIcon->pIconBuffer, 0., 0.);
-	cairo_destroy (pCairoContext);
-	return FALSE;
-}
-static gboolean on_motion_notify_flying_icon (GtkWidget *pWidget,
-	GdkEventMotion* pMotion,
-	CairoFlyingContainer *pFlyingContainer)
-{
-	if (pMotion->state & GDK_BUTTON1_MASK)
-	{
-		gtk_window_move (GTK_WINDOW (pWidget),
-			pMotion->x_root + pFlyingContainer->iWidth/2,
-			pMotion->y_root + pFlyingContainer->iHeight/2);
-	}
-	gdk_device_get_state (pMotion->device, pMotion->window, NULL, NULL);  // pour recevoir d'autres MotionNotify.
-	return FALSE;
-}
-static gboolean on_button_release_flying_icon (GtkWidget *widget,
-	GdkEventButton *pButton,
-	CairoFlyingContainer *pFlyingContainer)
-{
-	if (pButton->button == 1 && pButton->type == GDK_BUTTON_RELEASE)  // clic gauche.
-	{
-		g_print ("on relache l'icone volante\n");
-		cairo_dock_free_icon (pFlyingContainer->pIcon);
-		gtk_widget_destroy (pFlyingContainer->pWidget);  // enleve les signaux.
-		g_free (pFlyingContainer);
-	}
 }
 
 
@@ -637,50 +576,22 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	//s_pLastPointedDock = NULL;
 	//g_print ("s_pLastPointedDock <- NULL\n");
 	
-	/*if (s_pIconClicked != NULL && CAIRO_DOCK_IS_LAUNCHER (s_pIconClicked))
+	if (g_bTesting && s_pIconClicked != NULL && (CAIRO_DOCK_IS_LAUNCHER (s_pIconClicked) || CAIRO_DOCK_IS_DETACHABLE_APPLET (s_pIconClicked) || CAIRO_DOCK_IS_USER_SEPARATOR(s_pIconClicked)) && s_pFlyingContainer == NULL)
 	{
 		g_print ("on a sorti %s du dock\n", s_pIconClicked->acName);
 		CairoDock *pOriginDock = cairo_dock_search_dock_from_name (s_pIconClicked->cParentDockName);
 		g_return_if_fail (pOriginDock != NULL);
 		cairo_dock_detach_icon_from_dock (s_pIconClicked, pOriginDock, TRUE); 
 		
-		CairoFlyingContainer *pFlyingContainer = g_new0 (CairoFlyingContainer, 1);
-		pFlyingContainer->iType = 3;
-		GtkWidget* pWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-		pFlyingContainer->pWidget = pWindow;
-		pFlyingContainer->pIcon = s_pIconClicked;
-		pFlyingContainer->bIsHorizontal = TRUE;
-		pFlyingContainer->bDirectionUp = TRUE;
-		gtk_window_set_skip_pager_hint(GTK_WINDOW(pWindow), TRUE);
-		gtk_window_set_skip_taskbar_hint(GTK_WINDOW(pWindow), TRUE);
-		cairo_dock_set_colormap_for_window(pWindow);
-		gtk_widget_set_app_paintable(pWindow, TRUE);
-		gtk_window_set_decorated(GTK_WINDOW(pWindow), FALSE);
-		gtk_window_set_resizable(GTK_WINDOW(pWindow), TRUE);
-		gtk_widget_add_events(pWindow, GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
-		
-		g_signal_connect (G_OBJECT (pWindow),
-			"expose-event",
-			G_CALLBACK (on_expose_flying_icon),
-			pFlyingContainer);
-		g_signal_connect (G_OBJECT (pWindow),
-			"motion-notify-event",
-			G_CALLBACK (on_motion_notify_flying_icon),
-			pFlyingContainer);
-		g_signal_connect (G_OBJECT (pWindow),
-			"button-release-event",
-			G_CALLBACK (on_button_release_flying_icon),
-			pFlyingContainer);
-		
-		/// gtk_window_move
+		s_pFlyingContainer = cairo_dock_create_flying_container (s_pIconClicked, pOriginDock);
 		s_pIconClicked = NULL;
-	}*/
+	}
 }
 gboolean on_leave_notify2 (GtkWidget* pWidget,
 	GdkEventCrossing* pEvent,
 	CairoDock *pDock)
 {
-	//g_print ("%s (bInside:%d; bAtBottom:%d; iRefCount:%d)\n", __func__, pDock->bInside, pDock->bAtBottom, pDock->iRefCount);
+	g_print ("%s (bInside:%d; bAtBottom:%d; iRefCount:%d)\n", __func__, pDock->bInside, pDock->bAtBottom, pDock->iRefCount);
 	/**if (pDock->bAtBottom)  // || ! pDock->bInside  // mis en commentaire pour la 1.5.4
 	{
 		pDock->iSidLeaveDemand = 0;
@@ -1261,6 +1172,13 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 							cairo_dock_arm_animation (s_pIconClicked, CAIRO_DOCK_BOUNCE, 2);  // 2 rebonds.
 							cairo_dock_start_animation (s_pIconClicked, pDock);
 						}
+					}
+					
+					if (s_pFlyingContainer != NULL)
+					{
+						g_print ("on relache l'icone volante\n");
+						cairo_dock_terminate_flying_container (s_pFlyingContainer);
+						s_pFlyingContainer = NULL;
 					}
 				}
 				else

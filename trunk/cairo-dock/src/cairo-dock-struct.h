@@ -27,7 +27,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <cairo-glitz.h>
 #endif
 
-//G_BEGIN_DECLS
 
 typedef struct _CairoDockRenderer CairoDockRenderer;
 typedef struct _CairoDeskletRenderer CairoDeskletRenderer;
@@ -38,6 +37,7 @@ typedef struct _CairoContainer CairoContainer;
 typedef struct _CairoDock CairoDock;
 typedef struct _CairoDesklet CairoDesklet;
 typedef struct _CairoDialog CairoDialog;
+typedef struct _CairoFlyingContainer CairoFlyingContainer;
 
 typedef struct _CairoDockModule CairoDockModule;
 typedef struct _CairoDockModuleInterface CairoDockModuleInterface;
@@ -57,7 +57,8 @@ typedef enum {
 typedef enum {
 	CAIRO_DOCK_TYPE_DOCK = 0,
 	CAIRO_DOCK_TYPE_DESKLET,
-	CAIRO_DOCK_TYPE_DIALOG
+	CAIRO_DOCK_TYPE_DIALOG,
+	CAIRO_DOCK_TYPE_FLYING_CONTAINER
 	} CairoDockTypeContainer;
 
 struct _CairoContainer {
@@ -806,11 +807,43 @@ struct _CairoDockLabelDescription {
 };
 
 
+struct _CairoFlyingContainer {
+        /// type de container.
+        CairoDockTypeContainer iType;
+        /// La fenetre du widget.
+        GtkWidget *pWidget;
+        /// Taille de la fenetre. La surface allouee a l'applet s'en deduit.
+        gint iWidth, iHeight;
+        /// Position de la fenetre.
+        gint iPositionX, iPositionY;
+        /// TRUE ssi le pointeur est dedans.
+        gboolean bInside;
+        /// TRUE ssi le container est horizontal.
+        CairoDockTypeHorizontality bIsHorizontal;
+        /// TRUE ssi le container est oriente vers le haut.
+        gboolean bDirectionUp;
+#ifdef HAVE_GLITZ
+        glitz_drawable_format_t *pDrawFormat;
+        glitz_drawable_t* pGlitzDrawable;
+        glitz_format_t* pGlitzFormat;
+#else
+        gpointer padding[3];
+#endif // HAVE_GLITZ
+	/// L'icone volante.
+	Icon *pIcon;
+	/// le timer de l'animation.
+	gint iSidAnimationTimer;
+	/// compte-a-rebours entre le lacher du container et sa disparition definitive.
+	gint iFinalCountDown;
+	/// compteur pour l'animation lors du drag.
+	gint iAnimationCount;
+};
+
 /// Nom du repertoire de travail de cairo-dock.
 #define CAIRO_DOCK_DATA_DIR ".cairo-dock"
 /// Nom du repertoire des themes utilisateur.
 #define CAIRO_DOCK_THEMES_DIR "themes"
-/// Nom du repertoire des gauges utilisateur..
+/// Nom du repertoire des jauges utilisateur.
 #define CAIRO_DOCK_GAUGES_DIR "gauges"
 /// Nom du repertoire du theme courant.
 #define CAIRO_DOCK_CURRENT_THEME_NAME "current_theme"
@@ -880,5 +913,4 @@ typedef enum {
 	CAIRO_DOCK_DONT_ZOOM_IN 	= 1<<1
 	} CairoDockLoadImageModifier;
 
-//G_END_DECLS
 #endif

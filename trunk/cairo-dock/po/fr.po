@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4.5\n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-08-18 02:40+0200\n"
+"POT-Creation-Date: 2008-08-19 02:26+0200\n"
 "PO-Revision-Date: 2008-05-23 08:33+0100\n"
 "Last-Translator: Yann SLADEK <mav@cairo-dock.org>\n"
 "Language-Team: Cairo-Dock <po@cairo-dock.org>\n"
@@ -17,11 +17,11 @@ msgstr ""
 "X-Poedit-Language: French\n"
 "X-Poedit-Country: France\n"
 
-#: ../src/cairo-dock-callbacks.c:1081
+#: ../src/cairo-dock-callbacks.c:992
 msgid "Do you want to mount this point ?"
 msgstr "Voulez-vous monter ce point ?"
 
-#: ../src/cairo-dock-callbacks.c:1781
+#: ../src/cairo-dock-callbacks.c:1699
 msgid "Quit Cairo-Dock ?"
 msgstr "Quitter Cairo-Dock ?"
 
@@ -336,7 +336,7 @@ msgstr "Toujours derrière"
 msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr "Réglez le comportement de Compiz à : (name=cairo-dock & type=utility)"
 
-#: ../src/cairo-dock-modules.c:784 ../src/cairo-dock-modules.c:807
+#: ../src/cairo-dock-modules.c:785 ../src/cairo-dock-modules.c:808
 #, c-format
 msgid "Configuration of %s"
 msgstr "Configuration de %s"

@@ -103,7 +103,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	pDock->fMagnitudeMax = 1.;
 
 	//\__________________ On cree la fenetre GTK.
-	GtkWidget* pWindow = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+	GtkWidget *pWindow = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 	pDock->pWidget = pWindow;
 
 	if (g_bSticky)
@@ -529,10 +529,6 @@ CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, g
 	pSubDock->icons = pIconList;
 	if (pIconList != NULL)
 		cairo_dock_load_buffers_in_one_dock (pSubDock);
-
-	/*while (gtk_events_pending ())
-		gtk_main_iteration ();
-	gtk_widget_hide (pSubDock->pWidget);*/
 
 	return pSubDock;
 }

@@ -53,6 +53,11 @@ G_BEGIN_DECLS
 *@param icon une icone.
 */
 #define CAIRO_DOCK_IS_NORMAL_APPLI(icon) (CAIRO_DOCK_IS_APPLI (icon) && icon->acDesktopFileName == NULL && icon->pModuleInstance == NULL)
+/**
+*TRUE ssi l'icone est une icone d'applet detachable en desklet.
+*@param icon une icone.
+*/
+#define CAIRO_DOCK_IS_DETACHABLE_APPLET(icon) (CAIRO_DOCK_IS_APPLET (icon) && icon->pModuleInstance->bCanDetach)
 
 /**
 * Desactive une icone, et libere tous ses buffers, ainsi qu'elle-meme. Le sous-dock pointee par elle n'est pas dereferencee, cela doit etre fait au prealable. Gere egalement la classe.

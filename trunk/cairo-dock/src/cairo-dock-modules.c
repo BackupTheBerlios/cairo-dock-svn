@@ -152,6 +152,7 @@ static void cairo_dock_open_module (CairoDockModule *pCairoDockModule, GError **
 		g_set_error (erreur, 1, 1, "while opening module '%s' : (%s)", pCairoDockModule->cSoFilePath, g_module_error ());
 		return ;
 	}
+	pCairoDockModule->pModule = module;
 
 	//\__________________ On identifie le module.
 	gboolean bSymbolFound;
@@ -997,8 +998,8 @@ CairoDockModuleInstance *cairo_dock_instanciate_module (CairoDockModule *pModule
 		{
 			pDesklet = cairo_dock_create_desklet (NULL, NULL, pMinimalConfig->bOnWidgetLayer);
 			cairo_dock_place_desklet (pDesklet, pMinimalConfig);
-			///while (gtk_events_pending ())  // pour la transparence initiale, mais induit trop de paradoxes.
-			///	gtk_main_iteration ();
+			while (gtk_events_pending ())  // pour la transparence initiale, mais induit trop de paradoxes.
+				gtk_main_iteration ();
 			pContainer = CAIRO_CONTAINER (pDesklet);
 		}
 		else

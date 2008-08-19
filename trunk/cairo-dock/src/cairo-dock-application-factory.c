@@ -383,7 +383,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	//	cd_message ("pas d'etat defini, donc on continue\n");
 	if (bSkip)
 	{
-		//g_print ("  cette fenetre est timide\n");
+		cd_debug ("  cette fenetre est timide");
 		return NULL;
 	}
 

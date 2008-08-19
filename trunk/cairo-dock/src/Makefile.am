@@ -124,7 +124,9 @@ cairo_dock_SOURCES = \
 	cairo-dock-class-manager.c\
 	cairo-dock-class-manager.h\
 	cairo-dock-emblem.c\
-	cairo-dock-emblem.h
+	cairo-dock-emblem.h\
+	cairo-dock-flying-container.c\
+	cairo-dock-flying-container.h
 
 
 
@@ -175,4 +177,5 @@ cairo_docksubinclude_HEADERS =\
 	cairo-dock-class-manager.h\
 	cairo-dock-emblem.h\
 	cairo-dock-applet-single-instance.h\
-	cairo-dock-applet-multi-instance.h
+	cairo-dock-applet-multi-instance.h\
+	cairo-dock-flying-container.h

@@ -482,15 +482,14 @@ void cairo_dock_place_desklet (CairoDesklet *pDesklet, CairoDockMinimalAppletCon
 			pMinimalConfig->iDeskletHeight);
 	
 	int iAbsolutePositionX = (pMinimalConfig->iDeskletPositionX < 0 ? g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] + pMinimalConfig->iDeskletPositionX : pMinimalConfig->iDeskletPositionX);
-	iAbsolutePositionX = MAX (0, MIN (g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] - pDesklet->iWidth, iAbsolutePositionX));
+	iAbsolutePositionX = MAX (0, MIN (g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] - pMinimalConfig->iDeskletWidth, iAbsolutePositionX));
 	int iAbsolutePositionY = (pMinimalConfig->iDeskletPositionY < 0 ? g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] + pMinimalConfig->iDeskletPositionY : pMinimalConfig->iDeskletPositionY);
-	iAbsolutePositionY = MAX (0, MIN (g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] - pDesklet->iHeight, iAbsolutePositionY));
+	iAbsolutePositionY = MAX (0, MIN (g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] - pMinimalConfig->iDeskletHeight, iAbsolutePositionY));
 	
 	gdk_window_move(pDesklet->pWidget->window,
 		iAbsolutePositionX,
-		(pMinimalConfig->iDeskletPositionY < 0 ?
-			g_iScreenHeight[CAIRO_DOCK_HORIZONTAL] + pMinimalConfig->iDeskletPositionY :
-			pMinimalConfig->iDeskletPositionY));
+		iAbsolutePositionY);
+	cd_debug (" -> (%d;%d)", iAbsolutePositionX, iAbsolutePositionY);
 
 	gtk_window_set_keep_below (GTK_WINDOW (pDesklet->pWidget), pMinimalConfig->bKeepBelow);
 	gtk_window_set_keep_above (GTK_WINDOW (pDesklet->pWidget), pMinimalConfig->bKeepAbove);

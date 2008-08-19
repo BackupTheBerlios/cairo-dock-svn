@@ -181,7 +181,7 @@ void cairo_dock_set_desklet_renderer (CairoDesklet *pDesklet, CairoDeskletRender
 	g_return_if_fail (pDesklet != NULL);
 	cd_debug ("%s (%x)", __func__, pRenderer);
 	
-	if (pDesklet->pRenderer != NULL && pDesklet->pRenderer->free_data != NULL)
+	if (pDesklet->pRenderer != NULL && pDesklet->pRenderer->free_data != NULL)  // meme si pDesklet->pRendererData == NULL.
 	{
 		pDesklet->pRenderer->free_data (pDesklet);
 		pDesklet->pRendererData = NULL;

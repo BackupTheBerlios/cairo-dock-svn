@@ -199,9 +199,10 @@ static gboolean _cairo_dock_hide_dock_if_parent (gchar *cDockName, CairoDock *pD
 {
 	if (pDock->bInside)
 		return FALSE;
-
-	Icon *pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
-	if (pPointedIcon == NULL || pPointedIcon->pSubDock != pChildDock)
+		
+	Icon *pPointedIcon;
+	///pPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
+	///if (pPointedIcon == NULL || pPointedIcon->pSubDock != pChildDock)
 		pPointedIcon = cairo_dock_get_icon_with_subdock (pDock->icons, pChildDock);
 
 	if (pPointedIcon != NULL)
@@ -232,7 +233,7 @@ static gboolean _cairo_dock_hide_dock_if_parent (gchar *cDockName, CairoDock *pD
 }
 void cairo_dock_hide_parent_dock (CairoDock *pDock)
 {
-	 g_hash_table_find (s_hDocksTable, (GHRFunc)_cairo_dock_hide_dock_if_parent, pDock);
+	g_hash_table_find (s_hDocksTable, (GHRFunc)_cairo_dock_hide_dock_if_parent, pDock);
 }
 
 gboolean cairo_dock_hide_child_docks (CairoDock *pDock)
