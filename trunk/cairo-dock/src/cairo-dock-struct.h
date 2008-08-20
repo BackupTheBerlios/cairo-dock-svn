@@ -762,6 +762,10 @@ struct _CairoDesklet {
 	gint iSidGradationOnEnter;
 	/// TRUE ssi on ne peut pas deplacer le widget a l'aide du simple clic gauche.
 	gboolean bPositionLocked;
+	/// un timer pour faire apparaitre le desklet avec un effet de zoom lors du detachage d'une applet.
+	gint iSidGrowUp;
+	/// le facteur de zoom correspondant.
+	gdouble fZoom;
 };
 
 
@@ -833,9 +837,7 @@ struct _CairoFlyingContainer {
 	Icon *pIcon;
 	/// le timer de l'animation.
 	gint iSidAnimationTimer;
-	/// compte-a-rebours entre le lacher du container et sa disparition definitive.
-	gint iFinalCountDown;
-	/// compteur pour l'animation lors du drag.
+	/// compteur pour l'animation.
 	gint iAnimationCount;
 };
 
@@ -843,7 +845,9 @@ struct _CairoFlyingContainer {
 #define CAIRO_DOCK_DATA_DIR ".cairo-dock"
 /// Nom du repertoire des themes utilisateur.
 #define CAIRO_DOCK_THEMES_DIR "themes"
-/// Nom du repertoire des jauges utilisateur.
+/// Nom du repertoire des extras utilisateur/themes (jauges, clock, etc).
+#define CAIRO_DOCK_EXTRAS_DIR "extras"
+/// Nom du repertoire des jauges utilisateur/themes.
 #define CAIRO_DOCK_GAUGES_DIR "gauges"
 /// Nom du repertoire du theme courant.
 #define CAIRO_DOCK_CURRENT_THEME_NAME "current_theme"

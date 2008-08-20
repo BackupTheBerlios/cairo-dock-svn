@@ -22,6 +22,9 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-file-manager.h"
 #include "cairo-dock-modules.h"
 #include "cairo-dock-config.h"
+#include "cairo-dock-log.h"
+#include "cairo-dock-desklet.h"
+#include "cairo-dock-dock-factory.h"
 #include "cairo-dock-flying-container.h"
 
 #define CAIRO_DOCK_FLYING_WIDTH 72
@@ -54,7 +57,7 @@ static gboolean on_expose_flying_icon (GtkWidget *pWidget,
 	}
 	else
 	{
-		
+		g_print ("compte a rebours : %d\n", pFlyingContainer->iAnimationCount);
 	}
 	cairo_destroy (pCairoContext);
 	return FALSE;
@@ -62,10 +65,10 @@ static gboolean on_expose_flying_icon (GtkWidget *pWidget,
 
 static gboolean _cairo_dock_animate_flying_icon (CairoFlyingContainer *pFlyingContainer)
 {
-	if (pFlyingContainer->iFinalCountDown > 0)
+	if (pFlyingContainer->pIcon == NULL)
 	{
-		pFlyingContainer->iFinalCountDown --;
-		if (pFlyingContainer->iFinalCountDown == 0)
+		pFlyingContainer->iAnimationCount --;
+		if (pFlyingContainer->iAnimationCount == 0)
 		{
 			cairo_dock_free_flying_container (pFlyingContainer);
 			return FALSE;
@@ -75,7 +78,7 @@ static gboolean _cairo_dock_animate_flying_icon (CairoFlyingContainer *pFlyingCo
 	{
 		pFlyingContainer->iAnimationCount ++;
 		
-		cairo_dock_manage_animations (pFlyingContainer->pIcon, pFlyingContainer);
+		cairo_dock_manage_animations (pFlyingContainer->pIcon, CAIRO_DOCK (pFlyingContainer));  // ici c'est un peu hacky, ca passe car en fait on n'utilise pas les champs du dock.
 	}
 	gtk_widget_queue_draw (pFlyingContainer->pWidget);
 	return TRUE;
@@ -125,7 +128,7 @@ CairoFlyingContainer *cairo_dock_create_flying_container (Icon *pFlyingIcon, Cai
 	gtk_window_present (GTK_WINDOW (pWindow));
 	
 	pFlyingContainer->pIcon->iAnimationType = CAIRO_DOCK_PULSE;
-	pFlyingContainer->pIcon->iCount = 1e6;
+	pFlyingContainer->pIcon->iCount = 1e6;  // attention : cette animation s'arretera au bout de 11.5 ans :o)
 	pFlyingContainer->pIcon->fDrawX = 0;
 	pFlyingContainer->pIcon->fDrawY = 0;
 	pFlyingContainer->pIcon->fScale = 1.;
@@ -146,13 +149,18 @@ void cairo_dock_drag_flying_container (CairoFlyingContainer *pFlyingContainer, C
 void cairo_dock_free_flying_container (CairoFlyingContainer *pFlyingContainer)
 {
 	gtk_widget_destroy (pFlyingContainer->pWidget);  // enleve les signaux.
+	if (pFlyingContainer->iSidAnimationTimer != 0)
+		g_source_remove (pFlyingContainer->iSidAnimationTimer);
 	g_free (pFlyingContainer);
 }
 
 void cairo_dock_terminate_flying_container (CairoFlyingContainer *pFlyingContainer)
 {
 	Icon *pIcon = pFlyingContainer->pIcon;
-	if (pIcon->acDesktopFileName != NULL)
+	pFlyingContainer->pIcon = NULL;
+	pFlyingContainer->iAnimationCount = 10;
+	
+	if (pIcon->acDesktopFileName != NULL)  // c'est un lanceur, ou un separateur manuel, ou un sous-dock.
 	{
 		gchar *cIconPath = g_strdup_printf ("%s/%s", g_cCurrentLaunchersPath, pIcon->acDesktopFileName);
 		g_remove (cIconPath);
@@ -166,19 +174,44 @@ void cairo_dock_terminate_flying_container (CairoFlyingContainer *pFlyingContain
 	else if (CAIRO_DOCK_IS_APPLET(pIcon))
 	{
 		g_print ("le module %s devient un desklet\n", pIcon->pModuleInstance->cConfFilePath);
-		cairo_dock_update_conf_file (pIcon->pModuleInstance->cConfFilePath,
-			G_TYPE_BOOLEAN, "Desklet", "initially detached", TRUE,
-			G_TYPE_INT, "Desklet", "x position", pFlyingContainer->iPositionX,
-			G_TYPE_INT, "Desklet", "y position", pFlyingContainer->iPositionY,
-			G_TYPE_INVALID);
 		
-		cairo_dock_reload_module_instance (pIcon->pModuleInstance, TRUE);
+		GError *erreur = NULL;
+		GKeyFile *pKeyFile = g_key_file_new ();
+		g_key_file_load_from_file (pKeyFile, pIcon->pModuleInstance->cConfFilePath, 0, &erreur);
+		if (erreur != NULL)
+		{
+			cd_warning (erreur->message);
+			g_error_free (erreur);
+		}
+		else
+		{
+			//\______________ On centre le desklet sur l'icone volante.
+			int iDeskletWidth = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "width", NULL, 92, NULL, NULL);
+			int iDeskletHeight = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "height", NULL, 92, NULL, NULL);
+			g_key_file_free (pKeyFile);
+			
+			int iDeskletPositionX = pFlyingContainer->iPositionX + (pFlyingContainer->iWidth - iDeskletWidth)/2;
+			int iDeskletPositionY = pFlyingContainer->iPositionY + (pFlyingContainer->iHeight - iDeskletHeight)/2;
+			cairo_dock_update_conf_file (pIcon->pModuleInstance->cConfFilePath,
+				G_TYPE_BOOLEAN, "Desklet", "initially detached", TRUE,
+				G_TYPE_INT, "Desklet", "x position", iDeskletPositionX,
+				G_TYPE_INT, "Desklet", "y position", iDeskletPositionY,
+				G_TYPE_INVALID);
+			
+			//\______________ On detache le module.
+			cairo_dock_reload_module_instance (pIcon->pModuleInstance, TRUE);
+			
+			//\______________ On fait apparaitre le desklet avec un effet de zoom.
+			if (pIcon->pModuleInstance->pDesklet)  // normalement toujours vrai.
+			{
+				while (gtk_events_pending ())
+					gtk_main_iteration ();
+				cairo_dock_zoom_out_desklet (pIcon->pModuleInstance->pDesklet);
+			}
+		}
 	}
-	else
+	else  // ne devrait pas arriver.
 	{
-		cairo_dock_free_icon (pFlyingContainer->pIcon);
+		cairo_dock_free_icon (pIcon);
 	}
-	
-	pFlyingContainer->pIcon = NULL;
-	pFlyingContainer->iFinalCountDown = 10;
 }

@@ -113,6 +113,12 @@ void cairo_dock_set_desklets_visibility_to_default (void);
 */
 CairoDesklet *cairo_dock_get_desklet_by_Xid (Window Xid);
 
+/**
+* Lance une animation de zoom vers l'avant sur un desklet.
+*@param pDesklet le desklet.
+*/
+void cairo_dock_zoom_out_desklet (CairoDesklet *pDesklet);
+
 G_END_DECLS
 
 #endif

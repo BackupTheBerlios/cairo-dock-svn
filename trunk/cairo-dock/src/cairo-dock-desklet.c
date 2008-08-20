@@ -81,6 +81,15 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 	{
 		pCairoContext = cairo_dock_create_drawing_context (CAIRO_CONTAINER (pDesklet));
 		
+		if (pDesklet->fZoom != 1)
+		{
+			//g_print (" desklet zoom : %.2f (%dx%d)\n", pDesklet->fZoom, pDesklet->iWidth, pDesklet->iHeight);
+			cairo_translate (pCairoContext,
+				pDesklet->iWidth * (1 - pDesklet->fZoom)/2,
+				pDesklet->iHeight * (1 - pDesklet->fZoom)/2);
+			cairo_scale (pCairoContext, pDesklet->fZoom, pDesklet->fZoom);
+		}
+		
 		if (fColor[3] != 0)
 		{
 			cairo_save (pCairoContext);
@@ -389,30 +398,31 @@ gboolean on_delete_desklet (GtkWidget *pWidget, GdkEvent *event, CairoDesklet *p
 
 CairoDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiveWidget, gboolean bOnWidgetLayer)
 {
-  cd_message ("%s ()", __func__);
-  CairoDesklet *pDesklet = g_new0(CairoDesklet, 1);
-  pDesklet->iType = CAIRO_DOCK_TYPE_DESKLET;
-  pDesklet->bIsHorizontal = TRUE;
-  pDesklet->bDirectionUp = TRUE;
-  GtkWidget* pWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	cd_message ("%s ()", __func__);
+	CairoDesklet *pDesklet = g_new0(CairoDesklet, 1);
+	pDesklet->iType = CAIRO_DOCK_TYPE_DESKLET;
+	pDesklet->bIsHorizontal = TRUE;
+	pDesklet->bDirectionUp = TRUE;
+	pDesklet->fZoom = 1;
+	GtkWidget* pWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	if (bOnWidgetLayer)
 		gtk_window_set_type_hint (GTK_WINDOW (pWindow), GDK_WINDOW_TYPE_HINT_UTILITY);
-  pDesklet->pWidget = pWindow;
-  pDesklet->pIcon = pIcon;
-
-  if (g_bSticky)
-	  gtk_window_stick(GTK_WINDOW(pWindow));
-  gtk_window_set_skip_pager_hint(GTK_WINDOW(pWindow), TRUE);
-  gtk_window_set_skip_taskbar_hint(GTK_WINDOW(pWindow), TRUE);
-  cairo_dock_set_colormap_for_window(pWindow);
-  gtk_widget_set_app_paintable(pWindow, TRUE);
-  gtk_window_set_decorated(GTK_WINDOW(pWindow), FALSE);
-  gtk_window_set_resizable(GTK_WINDOW(pWindow), TRUE);
-  gtk_window_set_title(GTK_WINDOW(pWindow), "cairo-dock-desklet");  /// distinguer titre et classe ?...
-  gtk_widget_add_events(pWindow, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_FOCUS_CHANGE_MASK);
-  //the border is were cairo paint
-  gtk_container_set_border_width(GTK_CONTAINER(pWindow), g_iDockRadius/2);  /// re-utiliser la formule des dialogues...
-  gtk_window_set_default_size(GTK_WINDOW(pWindow), 2*g_iDockRadius+1, 2*g_iDockRadius+1);
+	pDesklet->pWidget = pWindow;
+	pDesklet->pIcon = pIcon;
+	
+	if (g_bSticky)
+		gtk_window_stick(GTK_WINDOW(pWindow));
+	gtk_window_set_skip_pager_hint(GTK_WINDOW(pWindow), TRUE);
+	gtk_window_set_skip_taskbar_hint(GTK_WINDOW(pWindow), TRUE);
+	cairo_dock_set_colormap_for_window(pWindow);
+	gtk_widget_set_app_paintable(pWindow, TRUE);
+	gtk_window_set_decorated(GTK_WINDOW(pWindow), FALSE);
+	gtk_window_set_resizable(GTK_WINDOW(pWindow), TRUE);
+	gtk_window_set_title(GTK_WINDOW(pWindow), "cairo-dock-desklet");  /// distinguer titre et classe ?...
+	gtk_widget_add_events(pWindow, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_FOCUS_CHANGE_MASK);
+	//the border is were cairo paint
+	gtk_container_set_border_width(GTK_CONTAINER(pWindow), g_iDockRadius/2);  /// re-utiliser la formule des dialogues...
+	gtk_window_set_default_size(GTK_WINDOW(pWindow), 2*g_iDockRadius+1, 2*g_iDockRadius+1);
 
 	g_signal_connect (G_OBJECT (pWindow),
 		"expose-event",
@@ -523,6 +533,8 @@ void cairo_dock_free_desklet (CairoDesklet *pDesklet)
 		g_source_remove (pDesklet->iSidWriteSize);
 	if (pDesklet->iSidWritePosition != 0)
 		g_source_remove (pDesklet->iSidWritePosition);
+	if (pDesklet->iSidGrowUp != 0)
+		g_source_remove (pDesklet->iSidGrowUp);
 	
 	cairo_dock_steal_interactive_widget_from_desklet (pDesklet);
 
@@ -622,4 +634,24 @@ CairoDesklet *cairo_dock_get_desklet_by_Xid (Window Xid)
 {
 	CairoDockModuleInstance *pInstance = cairo_dock_foreach_desklet ((CairoDockForeachDeskletFunc) _cairo_dock_test_one_desklet_Xid, &Xid);
 	return (pInstance != NULL ? pInstance->pDesklet : NULL);
+}
+
+
+static gboolean _cairo_dock_grow_up_desklet (CairoDesklet *pDesklet)
+{
+	pDesklet->fZoom += .1;
+	gtk_widget_queue_draw (pDesklet->pWidget);
+	
+	if (pDesklet->fZoom >= 1.11)  // la derniere est a x1.1
+	{
+		pDesklet->fZoom = 1;
+		pDesklet->iSidGrowUp = 0;
+		return FALSE;
+	}
+	return TRUE;
+}
+void cairo_dock_zoom_out_desklet (CairoDesklet *pDesklet)
+{
+	pDesklet->fZoom = 0;
+	pDesklet->iSidGrowUp = g_timeout_add (50, (GSourceFunc) _cairo_dock_grow_up_desklet, (gpointer) pDesklet);
 }

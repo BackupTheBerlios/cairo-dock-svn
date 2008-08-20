@@ -469,13 +469,13 @@ int main (int argc, char** argv)
 			cd_warning ("Attention : couldn't create directory %s", cThemesDir);
 	}
 	g_free (cThemesDir);
-	gchar *cGaugesDir = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_GAUGES_DIR);
-	if (! g_file_test (cGaugesDir, G_FILE_TEST_IS_DIR))
+	gchar *cExtrasDir = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_EXTRAS_DIR);
+	if (! g_file_test (cExtrasDir, G_FILE_TEST_IS_DIR))
 	{
-		if (g_mkdir (cGaugesDir, 7*8*8+7*8+5) != 0)
-			cd_warning ("Attention : couldn't create directory %s", cGaugesDir);
+		if (g_mkdir (cExtrasDir, 7*8*8+7*8+5) != 0)
+			cd_warning ("Attention : couldn't create directory %s", cExtrasDir);
 	}
-	g_free (cGaugesDir);
+	g_free (cExtrasDir);
 	g_cCurrentThemePath = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_CURRENT_THEME_NAME);
 	if (! g_file_test (g_cCurrentThemePath, G_FILE_TEST_IS_DIR))
 	{

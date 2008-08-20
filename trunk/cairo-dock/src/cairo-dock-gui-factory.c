@@ -275,9 +275,9 @@ static void _cairo_dock_selection_changed (GtkTreeModel *model, GtkTreeIter iter
 		gboolean bDistant = FALSE;
 		if (strncmp (cPreviewFilePath, "http://", 7) == 0 || strncmp (cPreviewFilePath, "ftp://", 6) == 0)
 		{
-			g_print ("fichier readme distant (%s)\n", cPreviewFilePath);
+			g_print ("fichier preview distant (%s)\n", cPreviewFilePath);
 			
-			gchar *cTmpFilePath = g_strdup ("/tmp/cairo-dock-net-readme.XXXXXX");
+			gchar *cTmpFilePath = g_strdup ("/tmp/cairo-dock-net-preview.XXXXXX");
 			int fds = mkstemp (cTmpFilePath);
 			if (fds == -1)
 			{
@@ -305,6 +305,7 @@ static void _cairo_dock_selection_changed (GtkTreeModel *model, GtkTreeIter iter
 		}
 		if (pPreviewPixbuf == NULL)
 		{
+			cd_warning ("pas de prevue disponible\n");
 			pPreviewPixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB,
 				TRUE,
 				8,

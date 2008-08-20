@@ -42,7 +42,7 @@ void cairo_dock_list_available_gauges (void)
 	}
 	g_free (cGaugeShareDir);
 	
-	gchar *cGaugeUserDir = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_GAUGES_DIR);
+	gchar *cGaugeUserDir = g_strdup_printf ("%s/%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_EXTRAS_DIR, CAIRO_DOCK_GAUGES_DIR);
 	s_pGaugeTable = cairo_dock_list_themes (cGaugeUserDir, s_pGaugeTable, &erreur);
 	if (erreur != NULL)
 	{
@@ -57,7 +57,14 @@ void cairo_dock_update_conf_file_with_gauges (GKeyFile *pOpenedKeyFile, gchar *c
 {
 	//g_print ("%s (%s, %s, %s)\n", __func__, cConfFile, cGroupName, cKeyName);
 	cairo_dock_update_conf_file_with_hash_table (pOpenedKeyFile, cConfFile, s_pGaugeTable, cGroupName, cKeyName, NULL, (GHFunc) cairo_dock_write_one_theme_name, TRUE, FALSE);
+}
 
+void cairo_dock_invalidate_gauges_list (void)
+{
+	if (s_pGaugeTable == NULL)
+		return ;
+	g_hash_table_destroy (s_pGaugeTable);
+	s_pGaugeTable = NULL;
 }
 
 

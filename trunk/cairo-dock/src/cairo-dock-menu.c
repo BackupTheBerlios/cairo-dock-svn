@@ -323,7 +323,7 @@ static void cairo_dock_add_launcher (GtkMenuItem *pMenuItem, gpointer *data)
 	Icon *icon = data[0];
 	CairoDock *pDock = data[1];
 
-	GtkWidget *pFileChooserDialog = gtk_file_chooser_dialog_new (_("Choose or Create a launcher"),
+	/**GtkWidget *pFileChooserDialog = gtk_file_chooser_dialog_new (_("Choose or Create a launcher"),
 		GTK_WINDOW (pDock->pWidget),
 		GTK_FILE_CHOOSER_ACTION_OPEN,
 		GTK_STOCK_NEW,
@@ -389,7 +389,8 @@ static void cairo_dock_add_launcher (GtkMenuItem *pMenuItem, gpointer *data)
 	else
 	{
 		gtk_widget_destroy (pFileChooserDialog);
-	}
+	}*/
+	_cairo_dock_create_launcher (pMenuItem, data, CAIRO_DOCK_LAUNCHER_FROM_DESKTOP_FILE);
 }
 
 static void cairo_dock_add_container (GtkMenuItem *pMenuItem, gpointer *data)
@@ -793,6 +794,8 @@ static void _cairo_dock_detach_module (GtkMenuItem *pMenuItem, gpointer *data)
 		G_TYPE_INVALID);
 
 	cairo_dock_reload_module_instance (icon->pModuleInstance, TRUE);
+	if (icon->pModuleInstance->pDesklet)  // toujours vrai normalement.
+		cairo_dock_zoom_out_desklet (icon->pModuleInstance->pDesklet);
 }
 
 static void _cairo_dock_remove_module_instance (GtkMenuItem *pMenuItem, gpointer *data)
@@ -1205,7 +1208,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		pMenuItem = gtk_separator_menu_item_new ();
 		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), pMenuItem);
 		
-		_add_entry_in_menu (_("Add a launcher"), GTK_STOCK_ADD, cairo_dock_add_launcher, menu);
+		_add_entry_in_menu (_("Add a manual launcher"), GTK_STOCK_ADD, cairo_dock_add_launcher, menu);
 		gtk_widget_set_tooltip_text (pMenuItem, _("Don't forget you can drag a launcher from the menu and drop it in the dock !"));
 		
 		_add_entry_in_menu (_("Add a sub-dock"), GTK_STOCK_ADD, cairo_dock_add_container, menu);

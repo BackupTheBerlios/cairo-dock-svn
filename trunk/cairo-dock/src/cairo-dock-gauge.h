@@ -39,6 +39,7 @@ typedef struct
 
 void cairo_dock_list_available_gauges (void);
 void cairo_dock_update_conf_file_with_gauges (GKeyFile *pOpenedKeyFile, gchar *cConfFile, gchar *cGroupName, gchar *cKeyName);
+void cairo_dock_invalidate_gauges_list (void);
 
 void cairo_dock_xml_open_file (gchar *filePath, const gchar *mainNodeName,xmlDocPtr *xmlDoc,xmlNodePtr *node);
 Gauge *cairo_dock_load_gauge(cairo_t *pSourceContext, const gchar *cThemePath, int iWidth, int iHeight);

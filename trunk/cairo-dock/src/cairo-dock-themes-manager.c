@@ -83,7 +83,7 @@ GHashTable *cairo_dock_list_net_themes (gchar *cServerAdress, GHashTable *hProvi
 		return hProvidedTable;
 	}
 	
-	gchar *cCommand = g_strdup_printf ("wget \"%s/liste.txt\" -O '%s' -t 2 -w 2", cServerAdress, cTmpFilePath);
+	gchar *cCommand = g_strdup_printf ("wget \"%s/liste.txt\" -O '%s' -t 2 -T 2", cServerAdress, cTmpFilePath);
 	system (cCommand);
 	g_free (cCommand);
 	close(fds);
@@ -283,6 +283,7 @@ void cairo_dock_load_theme (gchar *cThemePath)
 
 	//\___________________ On libere toute la memoire allouee pour les docks (stoppe aussi tous les timeout).
 	cairo_dock_free_all_docks ();
+	cairo_dock_invalidate_gauges_list ();
 
 	//\___________________ On cree le dock principal.
 	g_pMainDock = cairo_dock_create_new_dock (g_iWmHint, CAIRO_DOCK_MAIN_DOCK_NAME, NULL);  // on ne lui assigne pas de vues, puisque la vue par defaut des docks principaux sera definie plus tard.
@@ -428,7 +429,7 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode)
 				}
 				
 				g_print ("downloading theme from %s ...\n", cNewThemePath);
-				g_string_printf (sCommand, "wget \"%s/%s.tar.gz\" -O '%s' -t 2 -w 2", cNewThemePath, cNewThemeName, cTmpFilePath);
+				g_string_printf (sCommand, "wget \"%s/%s.tar.gz\" -O '%s' -t 2 -T 2", cNewThemePath, cNewThemeName, cTmpFilePath);
 				system (sCommand->str);
 				close(fds);
 				

@@ -581,7 +581,11 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 		g_print ("on a sorti %s du dock\n", s_pIconClicked->acName);
 		CairoDock *pOriginDock = cairo_dock_search_dock_from_name (s_pIconClicked->cParentDockName);
 		g_return_if_fail (pOriginDock != NULL);
+		gchar *cParentDockName = s_pIconClicked->cParentDockName;
+		s_pIconClicked->cParentDockName = NULL;
 		cairo_dock_detach_icon_from_dock (s_pIconClicked, pOriginDock, TRUE); 
+		s_pIconClicked->cParentDockName = cParentDockName;
+		cairo_dock_update_dock_size (pOriginDock);
 		
 		s_pFlyingContainer = cairo_dock_create_flying_container (s_pIconClicked, pOriginDock);
 		s_pIconClicked = NULL;
@@ -1177,8 +1181,21 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 					if (s_pFlyingContainer != NULL)
 					{
 						g_print ("on relache l'icone volante\n");
-						cairo_dock_terminate_flying_container (s_pFlyingContainer);
+						if (pDock->bInside)
+						{
+							g_print ("  on la remet dans son dock d'origine\n");
+							Icon *pFlyingIcon = s_pFlyingContainer->pIcon;
+							cairo_dock_free_flying_container (s_pFlyingContainer);
+							pFlyingIcon->iCount = 0;
+							cairo_dock_insert_icon_in_dock (pFlyingIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
+							cairo_dock_start_animation (pFlyingIcon, pDock);
+						}
+						else
+						{
+							cairo_dock_terminate_flying_container (s_pFlyingContainer);
+						}
 						s_pFlyingContainer = NULL;
+						cairo_dock_stop_marking_icons (pDock);
 					}
 				}
 				else

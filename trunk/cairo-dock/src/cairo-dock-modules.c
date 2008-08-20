@@ -343,7 +343,9 @@ void cairo_dock_free_module (CairoDockModule *module)
 
 GKeyFile *cairo_dock_pre_read_module_instance_config (CairoDockModuleInstance *pInstance, CairoDockMinimalAppletConfig *pMinimalConfig)
 {
-	g_return_val_if_fail (pInstance != NULL && pInstance->cConfFilePath != NULL, NULL);
+	g_return_val_if_fail (pInstance != NULL, NULL);  /// && pInstance->cConfFilePath != NULL
+	if (pInstance->cConfFilePath == NULL)  // peut arriver avec xxx-integration par exemple.
+		return NULL;
 	gchar *cInstanceConfFilePath = pInstance->cConfFilePath;
 	CairoDockModule *pModule = pInstance->pModule;
 	
@@ -427,7 +429,6 @@ void cairo_dock_activate_module (CairoDockModule *module, GError **erreur)
 		return ;
 	}
 
-	///if (module->bActive)
 	if (module->pInstancesList != NULL)
 	{
 		g_set_error (erreur, 1, 1, "%s () : module %s is already active !", __func__, module->pVisitCard->cModuleName);
@@ -457,7 +458,7 @@ void cairo_dock_activate_module (CairoDockModule *module, GError **erreur)
 		else
 			cInstanceFilePath = g_strdup_printf ("%s-%d",  module->cConfFilePath, j);
 		
-		if (! g_file_test (cInstanceFilePath, G_FILE_TEST_EXISTS))
+		if (cInstanceFilePath != NULL && ! g_file_test (cInstanceFilePath, G_FILE_TEST_EXISTS))  // la 1ere condition est pour xxx-integration par exemple .
 		{
 			g_free (cInstanceFilePath);
 			break ;
@@ -613,9 +614,10 @@ void cairo_dock_reload_module_instance (CairoDockModuleInstance *pInstance, gboo
 
 			if (bToBeInserted)
 			{
+				pIcon->iCount = 0;
 				CairoDock *pDock = CAIRO_DOCK (pNewContainer);
 				cairo_dock_insert_icon_in_dock (pIcon, pDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
-				pIcon->cParentDockName = g_strdup (pMinimalConfig->cDockName);
+				pIcon->cParentDockName = g_strdup (pMinimalConfig->cDockName != NULL ? pMinimalConfig->cDockName : CAIRO_DOCK_MAIN_DOCK_NAME);
 				cairo_dock_start_animation (pIcon, pDock);
 			}
 			else
@@ -739,7 +741,8 @@ void cairo_dock_deactivate_module_instance_and_unload (CairoDockModuleInstance *
 	else
 	{
 		cairo_dock_deinstanciate_module (pInstance);
-		pIcon->pModuleInstance = NULL;
+		if (pIcon)
+			pIcon->pModuleInstance = NULL;
 	}
 	cairo_dock_free_icon (pIcon);
 }
@@ -965,11 +968,11 @@ void cairo_dock_update_module_instance_order (CairoDockModuleInstance *pModuleIn
 */
 CairoDockModuleInstance *cairo_dock_instanciate_module (CairoDockModule *pModule, gchar *cConfFilePath)  // prend possession de 'cConfFilePah'.
 {
-	g_return_val_if_fail (pModule != NULL && cConfFilePath != NULL, NULL);
+	g_return_val_if_fail (pModule != NULL, NULL);  ///  && cConfFilePath != NULL
 	cd_message ("%s (%s)", __func__, cConfFilePath);
 	
 	//\____________________ On cree une instance du module.
-	///CairoDockModuleInstance *pInstance = g_new0 (CairoDockModuleInstance, 1);
+	//CairoDockModuleInstance *pInstance = g_new0 (CairoDockModuleInstance, 1);
 	CairoDockModuleInstance *pInstance = calloc (1, sizeof (CairoDockModuleInstance) + pModule->pVisitCard->iSizeOfConfig + pModule->pVisitCard->iSizeOfData);
 	pInstance->pModule = pModule;
 	pInstance->cConfFilePath = cConfFilePath;
