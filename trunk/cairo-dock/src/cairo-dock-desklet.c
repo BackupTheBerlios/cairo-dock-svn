@@ -487,9 +487,13 @@ void cairo_dock_place_desklet (CairoDesklet *pDesklet, CairoDockMinimalAppletCon
 {
 	cd_message ("%s (%dx%d ; (%d,%d) ; %d,%d,%d)", __func__, pMinimalConfig->iDeskletWidth, pMinimalConfig->iDeskletHeight, pMinimalConfig->iDeskletPositionX, pMinimalConfig->iDeskletPositionY, pMinimalConfig->bKeepBelow, pMinimalConfig->bKeepAbove, pMinimalConfig->bOnWidgetLayer);
 	if (pMinimalConfig->bDeskletUseSize)
+	{
+		pDesklet->iDesiredWidth = pMinimalConfig->iDeskletWidth;
+		pDesklet->iDesiredHeight = pMinimalConfig->iDeskletHeight;
 		gdk_window_resize (pDesklet->pWidget->window,
 			pMinimalConfig->iDeskletWidth,
 			pMinimalConfig->iDeskletHeight);
+	}
 	
 	int iAbsolutePositionX = (pMinimalConfig->iDeskletPositionX < 0 ? g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] + pMinimalConfig->iDeskletPositionX : pMinimalConfig->iDeskletPositionX);
 	iAbsolutePositionX = MAX (0, MIN (g_iScreenWidth[CAIRO_DOCK_HORIZONTAL] - pMinimalConfig->iDeskletWidth, iAbsolutePositionX));

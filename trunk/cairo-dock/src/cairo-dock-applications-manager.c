@@ -1366,3 +1366,8 @@ Icon *cairo_dock_get_current_active_icon (void)
 {
 	return g_hash_table_lookup (s_hXWindowTable, &s_iCurrentActiveWindow);
 }
+
+Icon *cairo_dock_get_icon_with_Xid (Window Xid)
+{
+	return g_hash_table_lookup (s_hXWindowTable, &Xid);
+}

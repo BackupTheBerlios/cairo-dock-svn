@@ -137,7 +137,7 @@ void cairo_dock_animate_icon (Icon *pIcon, CairoDock *pDock, CairoDockAnimationT
 *@param cDefaultThemeName nom du theme par defaut au cas ou le precedent n'existerait pas.
 *@return Le chemin du repertoire du theme choisi, dans une chaine nouvellement allouee.
 */
-gchar* cairo_dock_manage_themes_for_applet (gchar *cAppletShareDataDir, gchar *cThemeDirName, gchar *cAppletConfFilePath, GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultThemeName);
+gchar* cairo_dock_manage_themes_for_applet (gchar *cAppletShareDataDir, gchar *cThemeDirName, gchar *cAppletConfFilePath, GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultThemeName, const gchar *cExtraDirName);
 
 /**
 *Cree un sous-menu, et l'ajoute a un menu deja existant.
@@ -572,7 +572,7 @@ CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT (cGroupName, cKeyName, TRUE)
 *@return Le chemin vers le repertoire du theme, dans une chaine nouvellement allouee.
 */
 #define CD_CONFIG_GET_THEME_PATH(cGroupName, cKeyName, cThemesDirName, cDefaultThemeName) \
-cairo_dock_manage_themes_for_applet (MY_APPLET_SHARE_DATA_DIR, cThemesDirName, CD_APPLET_MY_CONF_FILE, pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, cDefaultThemeName)
+cairo_dock_manage_themes_for_applet (MY_APPLET_SHARE_DATA_DIR, cThemesDirName, CD_APPLET_MY_CONF_FILE, pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, cDefaultThemeName, myApplet->pModule->pVisitCard->cModuleName)
 /**
 *Recupere la valeur d'un theme de gauge, en mettant a jour la liste des jauges disponibles dans le fichier de conf.
 *@param cGroupName nom du groupe (dans le fichier de conf) du parametre correspondant au theme.

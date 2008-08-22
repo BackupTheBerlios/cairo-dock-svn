@@ -570,10 +570,11 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			icon->fAlpha *= MIN (g_fVisibleAppliAlpha + 1, 1);*/
 		//g_print ("g_fVisibleAppliAlpha : %.2f & %d => %.2f\n", g_fVisibleAppliAlpha, icon->bIsHidden, icon->fAlpha);
 	}
+	double fGlideScale = -.3*icon->fGlideOffset+1;
 	if (bHorizontalDock)
-		cairo_translate (pCairoContext, icon->fDrawX, icon->fDrawY);
+		cairo_translate (pCairoContext, icon->fDrawX + icon->fGlideOffset * icon->fWidth * icon->fScale, icon->fDrawY + (1-fGlideScale)*icon->fHeight*icon->fScale);
 	else
-		cairo_translate (pCairoContext, icon->fDrawY, icon->fDrawX);
+		cairo_translate (pCairoContext, icon->fDrawY, icon->fDrawX + icon->fGlideOffset * icon->fWidth * icon->fScale);
 	
 	if (icon->bHasIndicator && ! g_bIndicatorAbove && g_pIndicatorSurface[0] != NULL)
 	{
@@ -594,7 +595,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			cairo_scale (pCairoContext, fRatio * icon->fWidthFactor / (1 + g_fAmplitude), fRatio * icon->fHeightFactor / (1 + g_fAmplitude));
 		}
 		else
-			cairo_scale (pCairoContext, fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude), fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude));
+			cairo_scale (pCairoContext, fRatio * icon->fWidthFactor * icon->fScale / (1 + g_fAmplitude)*fGlideScale, fRatio * icon->fHeightFactor * icon->fScale / (1 + g_fAmplitude)*fGlideScale);
 		if (icon->fOrientation != 0)
 		{
 			cairo_rotate (pCairoContext, icon->fOrientation);

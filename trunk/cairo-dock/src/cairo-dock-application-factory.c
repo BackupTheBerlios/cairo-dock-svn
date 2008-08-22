@@ -301,9 +301,15 @@ CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
 					else
 					{
 						pSameClassIcon->pSubDock = pParentDock;
+						Icon *pInhibatedIcon = cairo_dock_get_icon_with_Xid (pSameClassIcon->Xid);
+						pSameClassIcon->Xid = 0;
+						if (pInhibatedIcon != NULL)
+						{
+							cairo_dock_insert_icon_in_dock (pInhibatedIcon, pParentDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, FALSE);
+						}
 					}
 				}
-				else if (pParentDock->icons == NULL)  // le sous-dock de cette classe est nouveau, on deplace le classmate dans le sous-dock, et on met un fake a sa place pou rpointer dessus.
+				else if (pParentDock->icons == NULL)  // le sous-dock de cette classe est nouveau, on deplace le classmate dans le sous-dock, et on met un fake a sa place pour pointer dessus.
 				{
 					g_print ("nouveau sous-dock de la classe %s\n", pSameClassIcon->cClass);
 					Icon *pFakeClassIcon = g_new0 (Icon, 1);

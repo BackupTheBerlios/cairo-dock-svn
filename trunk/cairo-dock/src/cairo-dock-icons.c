@@ -418,6 +418,37 @@ Icon *cairo_dock_get_icon_with_class (GList *pIconList, gchar *cClass)
 }
 
 
+void cairo_dock_normalize_icons_order (GList *pIconList, CairoDockIconType iType)
+{
+	g_print ("%s (%d)\n", __func__, iType);
+	int iOrder = 1;
+	int iGroupOrder = cairo_dock_get_group_order (iType);
+	GString *sDesktopFilePath = g_string_new ("");
+	GList* ic;
+	Icon *icon;
+	for (ic = pIconList; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (cairo_dock_get_icon_order (icon) != iGroupOrder)
+			continue;
+		
+		icon->fOrder = iOrder ++;
+		if (icon->acDesktopFileName != NULL)
+		{
+			g_string_printf (sDesktopFilePath, "%s/%s", g_cCurrentLaunchersPath, icon->acDesktopFileName);
+			cairo_dock_update_conf_file (sDesktopFilePath->str,
+				G_TYPE_DOUBLE, "Icon", "order", icon->fOrder,
+				G_TYPE_INVALID);
+		}
+		else if (CAIRO_DOCK_IS_APPLET (icon))
+		{
+			cairo_dock_update_conf_file (icon->pModuleInstance->cConfFilePath,
+				G_TYPE_DOUBLE, "Icon", "order", icon->fOrder,
+				G_TYPE_INVALID);
+		}
+	}
+	g_string_free (sDesktopFilePath, TRUE);
+}
 
 void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 {
@@ -494,6 +525,10 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 		cairo_dock_update_module_instance_order (icon1->pModuleInstance, icon1->fOrder);
 	if (CAIRO_DOCK_IS_APPLET (icon2))
 		cairo_dock_update_module_instance_order (icon2->pModuleInstance, icon2->fOrder);
+	if (fabs (icon2->fOrder - icon1->fOrder) < 1e-3)
+	{
+		cairo_dock_normalize_icons_order (pDock->icons, icon1->iType);
+	}
 }
 
 void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2)
@@ -510,6 +545,11 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 			icon1->fOrder = icon2->fOrder + 1;
 		else
 			icon1->fOrder = (pNextIcon->fOrder - icon2->fOrder > 1 ? icon2->fOrder + 1 : (pNextIcon->fOrder + icon2->fOrder) / 2);
+		
+		if (fabs (icon2->fOrder - icon1->fOrder) < 1e-3)
+		{
+			cairo_dock_normalize_icons_order (pDock->icons, icon1->iType);
+		}
 	}
 	else
 	{

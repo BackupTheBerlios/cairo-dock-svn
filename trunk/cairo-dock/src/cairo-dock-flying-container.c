@@ -206,6 +206,8 @@ void cairo_dock_terminate_flying_container (CairoFlyingContainer *pFlyingContain
 			{
 				while (gtk_events_pending ())
 					gtk_main_iteration ();
+				while (pIcon->pModuleInstance->pDesklet->iWidth < pIcon->pModuleInstance->pDesklet->iDesiredWidth || pIcon->pModuleInstance->pDesklet->iHeight < pIcon->pModuleInstance->pDesklet->iDesiredHeight)
+					gtk_main_iteration ();
 				cairo_dock_zoom_out_desklet (pIcon->pModuleInstance->pDesklet);
 			}
 		}

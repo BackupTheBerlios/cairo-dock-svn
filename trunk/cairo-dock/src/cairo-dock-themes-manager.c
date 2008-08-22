@@ -21,6 +21,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-renderer-manager.h"
 #include "cairo-dock-dialogs.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-gauge.h"
 #include "cairo-dock-themes-manager.h"
 
 #define CAIRO_DOCK_MODIFIED_THEME_FILE ".cairo-dock-need-save"
@@ -463,6 +464,11 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode)
 			cd_message ("%s", sCommand->str);
 			system (sCommand->str);
 			g_string_printf (sCommand, "find '%s/%s' -mindepth 1 ! -name '*.desktop' -exec /bin/cp -p '{}' '%s' \\;", cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR, g_cCurrentLaunchersPath);
+			cd_message ("%s", sCommand->str);
+			system (sCommand->str);
+			
+			//\___________________ On charge les extras.
+			g_string_printf (sCommand, "cp -r '%s/%s'/* '%s/%s'", cNewThemePath, CAIRO_DOCK_EXTRAS_DIR, g_cCairoDockDataDir, CAIRO_DOCK_EXTRAS_DIR);
 			cd_message ("%s", sCommand->str);
 			system (sCommand->str);
 			

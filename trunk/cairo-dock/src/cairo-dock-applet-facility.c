@@ -26,6 +26,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-applet-facility.h"
 
 extern gchar *g_cCurrentThemePath;
+extern gchar *g_cCairoDockDataDir;
 
 extern double g_fAmplitude;
 extern double g_fAlbedo;
@@ -275,7 +276,7 @@ void cairo_dock_animate_icon (Icon *pIcon, CairoDock *pDock, CairoDockAnimationT
 }
 
 
-gchar* cairo_dock_manage_themes_for_applet (gchar *cAppletShareDataDir, gchar *cThemeDirName, gchar *cAppletConfFilePath, GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultThemeName)
+gchar* cairo_dock_manage_themes_for_applet (gchar *cAppletShareDataDir, gchar *cThemeDirName, gchar *cAppletConfFilePath, GKeyFile *pKeyFile, gchar *cGroupName, gchar *cKeyName, gboolean *bFlushConfFileNeeded, gchar *cDefaultThemeName, const gchar *cExtraDirName)
 {
 	GError *erreur = NULL;
 	gchar *cThemesDirPath = g_strdup_printf ("%s/%s", cAppletShareDataDir, cThemeDirName);
@@ -287,7 +288,14 @@ gchar* cairo_dock_manage_themes_for_applet (gchar *cAppletShareDataDir, gchar *c
 		erreur = NULL;
 	}
 	g_free (cThemesDirPath);
-
+	
+	if (cExtraDirName != NULL)
+	{
+		cThemesDirPath = g_strdup_printf ("%s/%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_EXTRAS_DIR, cExtraDirName);
+		pThemeTable = cairo_dock_list_themes (cThemesDirPath, pThemeTable, NULL);  // le repertoire peut ne pas exister, donc on ignore l'erreur.
+		g_free (cThemesDirPath);
+	}
+	
 	gchar *cThemePath = NULL;
 	if (pThemeTable != NULL)
 	{

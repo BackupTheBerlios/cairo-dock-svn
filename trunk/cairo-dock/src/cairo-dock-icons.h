@@ -254,6 +254,7 @@ Icon *cairo_dock_get_icon_with_class (GList *pIconList, gchar *cClass);
 #define cairo_dock_get_last_appli(pIconList) cairo_dock_get_last_icon_of_type (pIconList, CAIRO_DOCK_APPLI)
 
 
+void cairo_dock_normalize_icons_order (GList *pIconList, CairoDockIconType iType);
 void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2);
 void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2);
 

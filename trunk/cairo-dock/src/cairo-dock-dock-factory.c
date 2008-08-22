@@ -338,6 +338,8 @@ void cairo_dock_deactivate_one_dock (CairoDock *pDock)
 		g_source_remove (pDock->iSidShrinkDown);
 	if (pDock->iSidLeaveDemand != 0)
 		g_source_remove (pDock->iSidLeaveDemand);
+	if (pDock->iSidIconGlide != 0)
+		g_source_remove (pDock->iSidIconGlide);
 	if (pDock->bIsMainDock && cairo_dock_application_manager_is_running ())
 	{
 		cairo_dock_pause_application_manager ();  // precaution au cas ou.
@@ -945,7 +947,7 @@ gboolean cairo_dock_string_is_adress (const gchar *cString)
 		str ++;
 	while (str < protocole)
 	{
-		if (! g_ascii_isalnum (*str))
+		if (! g_ascii_isalnum (*str) && *str != '-')  // x-nautilus-desktop://
 			return FALSE;
 		str ++;
 	}
@@ -978,8 +980,12 @@ void cairo_dock_notify_drop_data (gchar *cReceivedData, Icon *pPointedIcon, doub
 		}
 		else
 		{
+			g_print (" + adresse\n");
 			if (sArg->str[sArg->len-1] == '\r')
+			{
+				g_print ("retour charriot\n");
 				sArg->str[sArg->len-1] = '\0';
+			}
 			i ++;
 		}
 		

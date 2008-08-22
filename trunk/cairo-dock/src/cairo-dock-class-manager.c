@@ -31,6 +31,7 @@ extern int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconAuthorizedHeight[CAIRO_DOCK_NB_TYPES];
 extern double g_fAmplitude;
 extern double g_fVisibleAppliAlpha;
+extern gboolean g_bTesting;
 
 static GHashTable *s_hClassTable = NULL;
 
@@ -318,7 +319,7 @@ gboolean cairo_dock_prevent_inhibated_class (Icon *pIcon)
 			}
 			else
 			{
-				if (pInhibatorIcon->Xid == 0)  // cette icone inhibe cette classe mais ne controle encore aucune appli, on s'y asservit.
+				if (pInhibatorIcon->Xid == 0 && (! g_bTesting || pInhibatorIcon->pSubDock == NULL || pInhibatorIcon->pSubDock != cairo_dock_search_dock_from_name (pIcon->cClass)))  // cette icone inhibe cette classe mais ne controle encore aucune appli, on s'y asservit.
 				{
 					pInhibatorIcon->Xid = pIcon->Xid;
 					pInhibatorIcon->bIsHidden = pIcon->bIsHidden;

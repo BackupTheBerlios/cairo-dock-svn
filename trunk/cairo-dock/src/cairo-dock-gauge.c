@@ -43,13 +43,7 @@ void cairo_dock_list_available_gauges (void)
 	g_free (cGaugeShareDir);
 	
 	gchar *cGaugeUserDir = g_strdup_printf ("%s/%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_EXTRAS_DIR, CAIRO_DOCK_GAUGES_DIR);
-	s_pGaugeTable = cairo_dock_list_themes (cGaugeUserDir, s_pGaugeTable, &erreur);
-	if (erreur != NULL)
-	{
-		cd_warning (erreur->message);
-		g_error_free (erreur);
-		erreur = NULL;
-	}
+	s_pGaugeTable = cairo_dock_list_themes (cGaugeUserDir, s_pGaugeTable, NULL);  // le repertoire peut ne pas exister, donc on ignore l'erreur.
 	g_free (cGaugeUserDir);
 }
 

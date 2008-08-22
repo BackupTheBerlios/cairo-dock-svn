@@ -235,6 +235,8 @@ struct _CairoDock {
 	gint iSidLeaveDemand;
 	/// serial ID du thread qui signale qu'on peut inserer un element dans le dock a cet endroit.
 	gint iSidDropIndicator;
+	/// serial ID du thread qui deplace les icones lateralement lors d'un glisse d'icone interne
+	gint iSidIconGlide;
 
 	//\_______________ Les fonctions de dessin du dock.
 	/// nom de la vue, utile pour charger les fonctions de rendu posterieurement a la creation du dock.
@@ -630,6 +632,10 @@ struct _Icon {
 	/// ID du pixmap de sauvegarde de la fenetre pour quand elle est cachee.
 	Pixmap iBackingPixmap;
 	//Damage iDamageHandle;
+	/// decalage pour le glissement des icones.
+	gdouble fGlideOffset;
+	/// direction dans laquelle glisse l'icone.
+	gint iGlideDirection;
 };
 
 
@@ -766,6 +772,8 @@ struct _CairoDesklet {
 	gint iSidGrowUp;
 	/// le facteur de zoom correspondant.
 	gdouble fZoom;
+	/// taille a atteindre (fixee par l'utilisateur dans le.conf)
+	gint iDesiredWidth, iDesiredHeight;
 };
 
 
