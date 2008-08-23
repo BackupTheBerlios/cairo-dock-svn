@@ -403,6 +403,7 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 		{
 			icon->fWidthFactor *= ((c/(2*n)) & 1 ? 1. : -1.) * ((c%n) - n) / n;
 		}
+		icon->iRotationY = (c/n) * 180;
 		icon->iCount --;
 	}
 
@@ -419,6 +420,7 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 		{
 			icon->fHeightFactor *= ((c/(2*n)) & 1 ? 1. : -1.) * ((c%n) - n) / n;
 		}
+		icon->iRotationX = (c/n) * 180;
 		icon->iCount --;
 	}
 
@@ -570,11 +572,18 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			icon->fAlpha *= MIN (g_fVisibleAppliAlpha + 1, 1);*/
 		//g_print ("g_fVisibleAppliAlpha : %.2f & %d => %.2f\n", g_fVisibleAppliAlpha, icon->bIsHidden, icon->fAlpha);
 	}
-	double fGlideScale = -.3*icon->fGlideOffset+1;
-	if (bHorizontalDock)
-		cairo_translate (pCairoContext, icon->fDrawX + icon->fGlideOffset * icon->fWidth * icon->fScale, icon->fDrawY + (1-fGlideScale)*icon->fHeight*icon->fScale);
+	double fGlideScale;
+	if (icon->fGlideOffset != 0)
+	{
+		fGlideScale = -.5*fabs(icon->fGlideOffset)+1;
+		fGlideScale = MAX (fGlideScale, 1/icon->fScale);
+	}
 	else
-		cairo_translate (pCairoContext, icon->fDrawY, icon->fDrawX + icon->fGlideOffset * icon->fWidth * icon->fScale);
+		fGlideScale = 1;
+	if (bHorizontalDock)
+		cairo_translate (pCairoContext, icon->fDrawX + icon->fGlideOffset * icon->fWidth * icon->fScale * fGlideScale, icon->fDrawY + (1-fGlideScale)*icon->fHeight*icon->fScale);
+	else
+		cairo_translate (pCairoContext, icon->fDrawY, icon->fDrawX + icon->fGlideOffset * icon->fWidth * icon->fScale * fGlideScale);
 	
 	if (icon->bHasIndicator && ! g_bIndicatorAbove && g_pIndicatorSurface[0] != NULL)
 	{

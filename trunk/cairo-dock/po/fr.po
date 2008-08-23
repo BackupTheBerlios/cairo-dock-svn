@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.6.2\n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-08-19 02:26+0200\n"
+"POT-Creation-Date: 2008-08-23 03:44+0200\n"
 "PO-Revision-Date: 2008-05-23\n"
 "Last-Translator: Yann SLADEK <mav@cairo-dock.org>\n"
 "Language-Team: Cairo-Dock <po@cairo-dock.org>\n"
@@ -17,11 +17,11 @@ msgstr ""
 "X-Poedit-Language: French\n"
 "X-Poedit-Country: France\n"
 
-#: ../src/cairo-dock-callbacks.c:992
+#: ../src/cairo-dock-callbacks.c:1144
 msgid "Do you want to mount this point ?"
 msgstr "Voulez-vous monter ce point ?"
 
-#: ../src/cairo-dock-callbacks.c:1699
+#: ../src/cairo-dock-callbacks.c:1867
 msgid "Quit Cairo-Dock ?"
 msgstr "Quitter Cairo-Dock ?"
 
@@ -55,7 +55,7 @@ msgstr "monter"
 msgid "unmount"
 msgstr "démonter"
 
-#: ../src/cairo-dock-gui-factory.c:1538
+#: ../src/cairo-dock-gui-factory.c:1539
 msgid "grab"
 msgstr "récupérer"
 
@@ -94,15 +94,11 @@ msgstr "Vous êtes sur le point d'enlever cette icône (%s) du dock. Sûr ?"
 msgid "Fill this launcher"
 msgstr "Remplissez ce lanceur"
 
-#: ../src/cairo-dock-menu.c:326
-msgid "Choose or Create a launcher"
-msgstr "Choisir ou Créer un lanceur"
-
-#: ../src/cairo-dock-menu.c:420 ../src/cairo-dock-menu.c:1287
+#: ../src/cairo-dock-menu.c:421 ../src/cairo-dock-menu.c:1290
 msgid "Modify this launcher"
 msgstr "Modifier ce lanceur"
 
-#: ../src/cairo-dock-menu.c:718
+#: ../src/cairo-dock-menu.c:719
 #, c-format
 msgid ""
 "You're about deleting this file\n"
@@ -113,7 +109,7 @@ msgstr ""
 "  (%s)\n"
 "de votre disque dur. Sur ?"
 
-#: ../src/cairo-dock-menu.c:727
+#: ../src/cairo-dock-menu.c:728
 msgid ""
 "Attention : couldn't delete this file.\n"
 "Check that you have writing rights on it."
@@ -121,11 +117,11 @@ msgstr ""
 "Attention : échec de suppression du fichier\n"
 " Vérifier les droits en écriture."
 
-#: ../src/cairo-dock-menu.c:751
+#: ../src/cairo-dock-menu.c:752
 msgid "Rename to :"
 msgstr "Renommer en :"
 
-#: ../src/cairo-dock-menu.c:758
+#: ../src/cairo-dock-menu.c:759
 #, c-format
 msgid ""
 "Attention : couldn't rename %s.\n"
@@ -136,220 +132,225 @@ msgstr ""
 "Vérifiez que vous avez les drots en écriture,\n"
 " et que le nouveau nom n'existe pas déjà"
 
-#: ../src/cairo-dock-menu.c:806
+#: ../src/cairo-dock-menu.c:809
 #, c-format
 msgid "You're about removing this applet (%s) from the dock. Sure ?"
 msgstr "Vous êtes sur le point d'enlever cette applet (%s) du dock. Sûr ?"
 
-#: ../src/cairo-dock-menu.c:1063
+#: ../src/cairo-dock-menu.c:1066
 #, c-format
 msgid "Set position for the dock '%s'"
 msgstr "Régler la position pour le dock '%s'"
 
-#: ../src/cairo-dock-menu.c:1137
+#: ../src/cairo-dock-menu.c:1140
 msgid "Configure"
 msgstr "Configurer"
 
-#: ../src/cairo-dock-menu.c:1144
+#: ../src/cairo-dock-menu.c:1147
 msgid "Set up this dock"
 msgstr "Régler ce dock"
 
-#: ../src/cairo-dock-menu.c:1146
+#: ../src/cairo-dock-menu.c:1149
 msgid "Manage themes"
 msgstr "Gestion des thèmes"
 
-#: ../src/cairo-dock-menu.c:1148
+#: ../src/cairo-dock-menu.c:1151
 msgid "About"
 msgstr "A propos"
 
-#: ../src/cairo-dock-menu.c:1150
+#: ../src/cairo-dock-menu.c:1153
 msgid "Development's site"
 msgstr "Site de développement"
 
-#: ../src/cairo-dock-menu.c:1152
+#: ../src/cairo-dock-menu.c:1155
 msgid "Community's site"
 msgstr "Site de la communauté"
 
-#: ../src/cairo-dock-menu.c:1156
+#: ../src/cairo-dock-menu.c:1159
 msgid "Quick-Hide"
 msgstr "Cachage rapide"
 
-#: ../src/cairo-dock-menu.c:1159
+#: ../src/cairo-dock-menu.c:1162
 msgid "Quit"
 msgstr "Quitter"
 
-#: ../src/cairo-dock-menu.c:1208 ../src/cairo-dock-menu.c:1270
+#: ../src/cairo-dock-menu.c:1211
 msgid "Add a manual launcher"
 msgstr "Ajouter un lanceur manuel"
 
-#: ../src/cairo-dock-menu.c:1209 ../src/cairo-dock-menu.c:1271
+#: ../src/cairo-dock-menu.c:1212 ../src/cairo-dock-menu.c:1274
 msgid ""
 "Don't forget you can drag a launcher from the menu and drop it in the dock !"
 msgstr ""
 "N'oubliez pas que vous pouvez glisser un lanceur à partir du menu et le "
 "déposer dans le dock !"
 
-#: ../src/cairo-dock-menu.c:1211 ../src/cairo-dock-menu.c:1273
+#: ../src/cairo-dock-menu.c:1214 ../src/cairo-dock-menu.c:1276
 msgid "Add a sub-dock"
 msgstr "Ajouter un sous-dock"
 
-#: ../src/cairo-dock-menu.c:1215 ../src/cairo-dock-menu.c:1277
+#: ../src/cairo-dock-menu.c:1218 ../src/cairo-dock-menu.c:1280
 msgid "Add a separator"
 msgstr "Ajouter un séparateur"
 
-#: ../src/cairo-dock-menu.c:1235
+#: ../src/cairo-dock-menu.c:1238
 msgid "Unmount"
 msgstr "Démonter"
 
-#: ../src/cairo-dock-menu.c:1235
+#: ../src/cairo-dock-menu.c:1238
 msgid "Mount"
 msgstr "Monter"
 
-#: ../src/cairo-dock-menu.c:1241
+#: ../src/cairo-dock-menu.c:1244
 msgid "Eject"
 msgstr "Ejecter"
 
-#: ../src/cairo-dock-menu.c:1248
+#: ../src/cairo-dock-menu.c:1251
 msgid "Delete this file"
 msgstr "Détacher cette applet"
 
-#: ../src/cairo-dock-menu.c:1252
+#: ../src/cairo-dock-menu.c:1255
 msgid "Rename this file"
 msgstr "Enlever cette applet"
 
-#: ../src/cairo-dock-menu.c:1256
+#: ../src/cairo-dock-menu.c:1259
 msgid "Properties"
 msgstr "Propriétés"
 
-#: ../src/cairo-dock-menu.c:1285
+#: ../src/cairo-dock-menu.c:1273
+#, fuzzy
+msgid "Add a launcher"
+msgstr "Ajouter un lanceur manuel"
+
+#: ../src/cairo-dock-menu.c:1288
 msgid "Remove this launcher"
 msgstr "Supprimer ce lanceur"
 
-#: ../src/cairo-dock-menu.c:1285
+#: ../src/cairo-dock-menu.c:1288
 msgid "Remove this separator"
 msgstr "Enlever ce séparateur"
 
-#: ../src/cairo-dock-menu.c:1287
+#: ../src/cairo-dock-menu.c:1290
 msgid "Modify this separator"
 msgstr "Modifier ce séparateur"
 
-#: ../src/cairo-dock-menu.c:1297
+#: ../src/cairo-dock-menu.c:1300
 msgid "Other actions"
 msgstr "Autres actions"
 
-#: ../src/cairo-dock-menu.c:1303
+#: ../src/cairo-dock-menu.c:1306
 msgid "Not Fullscreen"
 msgstr "Pas plein écran"
 
-#: ../src/cairo-dock-menu.c:1303
+#: ../src/cairo-dock-menu.c:1306
 msgid "Fullscreen"
 msgstr "Plein écran"
 
-#: ../src/cairo-dock-menu.c:1305
+#: ../src/cairo-dock-menu.c:1308
 msgid "Move to this desktop"
 msgstr "Déplacer sur ce bureau"
 
-#: ../src/cairo-dock-menu.c:1309
+#: ../src/cairo-dock-menu.c:1312
 msgid "Don't keep above"
 msgstr "Ne plus garder au-dessus"
 
-#: ../src/cairo-dock-menu.c:1309
+#: ../src/cairo-dock-menu.c:1312
 msgid "Keep above"
 msgstr "Garder au-dessus"
 
-#: ../src/cairo-dock-menu.c:1316
+#: ../src/cairo-dock-menu.c:1319
 #, c-format
 msgid "Move to desktop %d - face %d"
 msgstr "Aller au bureau %d - face %d"
 
-#: ../src/cairo-dock-menu.c:1318
+#: ../src/cairo-dock-menu.c:1321
 #, c-format
 msgid "Move to desktop %d"
 msgstr "Aller au bureau %d"
 
-#: ../src/cairo-dock-menu.c:1320
+#: ../src/cairo-dock-menu.c:1323
 #, c-format
 msgid "Move to face %d"
 msgstr "Aller sur la face %d"
 
-#: ../src/cairo-dock-menu.c:1351
+#: ../src/cairo-dock-menu.c:1354
 msgid "Kill"
 msgstr "Tuer"
 
-#: ../src/cairo-dock-menu.c:1357
+#: ../src/cairo-dock-menu.c:1360
 msgid "Launch new"
 msgstr "Lancer un nouveau"
 
-#: ../src/cairo-dock-menu.c:1361
+#: ../src/cairo-dock-menu.c:1364
 msgid "Unmaximize"
 msgstr "Dé-maximiser"
 
-#: ../src/cairo-dock-menu.c:1361
+#: ../src/cairo-dock-menu.c:1364
 msgid "Maximize"
 msgstr "Maximiser"
 
-#: ../src/cairo-dock-menu.c:1363
+#: ../src/cairo-dock-menu.c:1366
 msgid "Show"
 msgstr "Montrer"
 
-#: ../src/cairo-dock-menu.c:1365
+#: ../src/cairo-dock-menu.c:1368
 msgid "Minimize"
 msgstr "Minimiser"
 
-#: ../src/cairo-dock-menu.c:1367
+#: ../src/cairo-dock-menu.c:1370
 msgid "Close"
 msgstr "Fermer"
 
-#: ../src/cairo-dock-menu.c:1386
+#: ../src/cairo-dock-menu.c:1389
 msgid "Configure this applet"
 msgstr "Configurer cette applet"
 
-#: ../src/cairo-dock-menu.c:1390
+#: ../src/cairo-dock-menu.c:1393
 msgid "Detach this applet"
 msgstr "Détacher cette applet"
 
-#: ../src/cairo-dock-menu.c:1390
+#: ../src/cairo-dock-menu.c:1393
 msgid "Return to dock"
 msgstr "Retourner au dock"
 
-#: ../src/cairo-dock-menu.c:1393
+#: ../src/cairo-dock-menu.c:1396
 msgid "Remove this applet"
 msgstr "Enlever cette applet"
 
-#: ../src/cairo-dock-menu.c:1397
+#: ../src/cairo-dock-menu.c:1400
 msgid "Launch another instance of this applet"
 msgstr "Lancer une nouvelle instance de cette applet"
 
-#: ../src/cairo-dock-menu.c:1416
+#: ../src/cairo-dock-menu.c:1419
 msgid "Always on top"
 msgstr "Toujours devant"
 
-#: ../src/cairo-dock-menu.c:1423
+#: ../src/cairo-dock-menu.c:1426
 msgid "Normal"
 msgstr "Normal"
 
-#: ../src/cairo-dock-menu.c:1430
+#: ../src/cairo-dock-menu.c:1433
 msgid "Always below"
 msgstr "Toujours derrière"
 
-#: ../src/cairo-dock-menu.c:1445
+#: ../src/cairo-dock-menu.c:1448
 msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr "Réglez le comportement de Compiz à : (name=cairo-dock & type=utility)"
 
-#: ../src/cairo-dock-modules.c:785 ../src/cairo-dock-modules.c:808
+#: ../src/cairo-dock-modules.c:788 ../src/cairo-dock-modules.c:811
 #, c-format
 msgid "Configuration of %s"
 msgstr "Configuration de %s"
 
-#: ../src/cairo-dock-themes-manager.c:209
+#: ../src/cairo-dock-themes-manager.c:210
 msgid "< Safe Mode >"
 msgstr "< Mode sûreté >"
 
-#: ../src/cairo-dock-themes-manager.c:209
+#: ../src/cairo-dock-themes-manager.c:210
 msgid "Manage Themes"
 msgstr "Gérer les thèmes"
 
-#: ../src/cairo-dock-themes-manager.c:214
+#: ../src/cairo-dock-themes-manager.c:215
 msgid ""
 "You are running Cairo-Dock in safe mode.\n"
 "Why ? Probably because a plug-in has messed into your dock,\n"
@@ -376,12 +377,12 @@ msgstr ""
 "mode normal.\n"
 "Ensuite, activez les plug-ins un à un pour déterminer lequel pose problème."
 
-#: ../src/cairo-dock-themes-manager.c:346
+#: ../src/cairo-dock-themes-manager.c:348
 #, c-format
 msgid "Are you sure you want to delete theme %s ?"
 msgstr "Etes-vous sûr de vouloir effacer le thème %s ?"
 
-#: ../src/cairo-dock-themes-manager.c:405
+#: ../src/cairo-dock-themes-manager.c:407
 msgid ""
 "You made some modifications in the current theme.\n"
 "You will loose them if you don't save before choosing a new theme. Continue "
@@ -390,7 +391,7 @@ msgstr ""
 "Vous avez fait des modifications dans le thème courant\n"
 "Vous les perdrez si vous ne le sauvez pas d'abord. Continuer malgré tout ?"
 
-#: ../src/cairo-dock-themes-manager.c:583
+#: ../src/cairo-dock-themes-manager.c:590
 #, c-format
 msgid "Are you sure you want to overwrite theme %s ?"
 msgstr "Etes-vous sûr de vouloir écraser le thème %s"
@@ -402,15 +403,15 @@ msgstr "< Mode Maintenance >"
 # #################################
 # ########### cairo-dock.conf #############
 # #################################
-#: ../data/messages:1 ../data/messages:789
+#: ../data/messages:1 ../data/messages:791
 msgid "Position"
 msgstr "Positionnement"
 
-#: ../data/messages:3 ../data/messages:619 ../data/messages:791
+#: ../data/messages:3 ../data/messages:619 ../data/messages:793
 msgid "Position on the screen"
 msgstr "Positionnement sur l'écran"
 
-#: ../data/messages:5 ../data/messages:621 ../data/messages:793
+#: ../data/messages:5 ../data/messages:621 ../data/messages:795
 msgid ""
 "The icons will scroll according to the chosen placement type. Of course the "
 "dock can be placed anywhere on the screen, here we specify regarding to what."
@@ -419,28 +420,28 @@ msgstr ""
 "dock peut bien sûr se placer n'importe où sur l'écran, ici il s'agit de "
 "préciser par rapport à quoi"
 
-#: ../data/messages:7 ../data/messages:623 ../data/messages:795
+#: ../data/messages:7 ../data/messages:623 ../data/messages:797
 msgid ""
 "Choose the screen border regarding to which the dock will place itself :"
 msgstr "Choisissez par rapport à quel bord de l'écran le dock doit se placer :"
 
-#: ../data/messages:9 ../data/messages:625 ../data/messages:797
+#: ../data/messages:9 ../data/messages:625 ../data/messages:799
 msgid "bottom"
 msgstr "bas"
 
-#: ../data/messages:11 ../data/messages:627 ../data/messages:799
+#: ../data/messages:11 ../data/messages:627 ../data/messages:801
 msgid "top"
 msgstr "haut"
 
-#: ../data/messages:13 ../data/messages:629 ../data/messages:801
+#: ../data/messages:13 ../data/messages:629 ../data/messages:803
 msgid "right"
 msgstr "droit"
 
-#: ../data/messages:15 ../data/messages:631 ../data/messages:803
+#: ../data/messages:15 ../data/messages:631 ../data/messages:805
 msgid "left"
 msgstr "gauche"
 
-#: ../data/messages:17 ../data/messages:805
+#: ../data/messages:17 ../data/messages:807
 msgid ""
 "At 0, the dock will place itself regarding the left corner if horizontal and "
 "the top corner if vertical, at 1 regarding the right corner if horizontal "
@@ -451,15 +452,15 @@ msgstr ""
 "haut à la verticale), à 1 relativement au coin droit à l'horizontal (coin "
 "bas à la verticale), et à 0.5 relativement au milieu du bord de l'écran."
 
-#: ../data/messages:19 ../data/messages:807
+#: ../data/messages:19 ../data/messages:809
 msgid "Relative alignment :"
 msgstr "Alignement relatif :"
 
-#: ../data/messages:21 ../data/messages:809
+#: ../data/messages:21 ../data/messages:811
 msgid "Position regarding the chosen screen's edge"
 msgstr "Positionnement par rapport au bord de l'écran choisi"
 
-#: ../data/messages:23 ../data/messages:811
+#: ../data/messages:23 ../data/messages:813
 msgid ""
 "Gap from the absolute position on the screen's edge, in pixels. You can also "
 "move the dock by holding ALT or CTRL key and left mouse button."
@@ -467,11 +468,11 @@ msgstr ""
 "Ecart à partir de la position absolue sur le bord de l'écran, en pixels. "
 "Vous pouvez aussi déplacer le dock en pressant la touche "
 
-#: ../data/messages:25 ../data/messages:813
+#: ../data/messages:25 ../data/messages:815
 msgid "Lateral gap :"
 msgstr "Ecart latéral :"
 
-#: ../data/messages:27 ../data/messages:815
+#: ../data/messages:27 ../data/messages:817
 msgid ""
 "in pixels. You can also move the dock by holding ALT or CTRL key and left "
 "mouse button."
@@ -479,7 +480,7 @@ msgstr ""
 "en pixels. Vous pouvez aussi déplacer le dock en maintenant les touches ALT "
 "ou CTRL enfoncées et en cliquant gauche sur le dock."
 
-#: ../data/messages:29 ../data/messages:817
+#: ../data/messages:29 ../data/messages:819
 msgid "Distance to the screen's edge :"
 msgstr "Distance au bord de l'écran :"
 
@@ -509,7 +510,7 @@ msgstr ""
 msgid "Reserve space at the edge of the screen for the dock ?"
 msgstr "Reserver l'espace au bord de l'écran pour le dock ?"
 
-#: ../data/messages:39 ../data/messages:635 ../data/messages:819
+#: ../data/messages:39 ../data/messages:635 ../data/messages:821
 msgid ""
 "The dock will automatically hide itself outside of the scren when the mouse "
 "leaves it and will show a callback zone instead. Place the mouse into this "
@@ -519,7 +520,7 @@ msgstr ""
 "quittera, et montrera une zone de rappel à sa place. Placer la souris dans "
 "cette zone fera ré-apparaître le dock."
 
-#: ../data/messages:41 ../data/messages:637 ../data/messages:821
+#: ../data/messages:41 ../data/messages:637 ../data/messages:823
 msgid "Activate auto-hide ?"
 msgstr "Activer le masquage automatique"
 
@@ -1799,36 +1800,40 @@ msgstr "Couleur de fond des desklets :"
 msgid "Desklet's background color when mouse hovers it :"
 msgstr "Couleur de fond des desklets au survol de la souris :"
 
-#: ../data/messages:751 ../data/messages:765 ../data/messages:823
+#: ../data/messages:751 ../data/messages:765 ../data/messages:825
 msgid "Desktop Entry"
 msgstr "Icône du menu"
 
-# #################################
-# ########### launcher.conf #############
-# #################################
-#: ../data/messages:753 ../data/messages:767
-msgid "Launcher's name :"
-msgstr "Nom du lanceur :"
+#: ../data/messages:753
+msgid "Sub-dock's name :"
+msgstr "Nom du sous-dock :"
 
-#: ../data/messages:755 ../data/messages:773 ../data/messages:825
+#: ../data/messages:755 ../data/messages:773 ../data/messages:827
 msgid "Image's name or path :"
 msgstr "Chemin ou nom de l'image :"
 
-#: ../data/messages:757 ../data/messages:775 ../data/messages:827
+#: ../data/messages:757 ../data/messages:779 ../data/messages:829
 msgid "Extra parameters"
 msgstr "Autres paramètres"
 
-#: ../data/messages:759 ../data/messages:777 ../data/messages:829
+#: ../data/messages:759 ../data/messages:781 ../data/messages:831
 msgid "Order you want for this launcher among the others:"
 msgstr "Ordre de ce lanceur parmi les autres :"
 
-#: ../data/messages:761 ../data/messages:779 ../data/messages:831
+#: ../data/messages:761 ../data/messages:777 ../data/messages:833
 msgid "Name of the container it belongs to:"
 msgstr "Nom du conteneur auquel il appartient :"
 
 #: ../data/messages:763
 msgid "Name of the view used for the sub-dock :"
 msgstr "Nom de la vue utilisée pour le sous-dock :"
+
+# #################################
+# ########### launcher.conf #############
+# #################################
+#: ../data/messages:767
+msgid "Launcher's name :"
+msgstr "Nom du lanceur :"
 
 #: ../data/messages:769
 msgid ""
@@ -1844,7 +1849,13 @@ msgstr ""
 msgid "Command to launch on click :"
 msgstr "Commande à exécuter au clic :"
 
-#: ../data/messages:781
+#: ../data/messages:775
+msgid ""
+"If you write here a container's name that doesn't exist yet, a new one will "
+"be created, with this icon inside."
+msgstr ""
+
+#: ../data/messages:783
 msgid ""
 "Use this option for exemple if the launcher launches a script in a terminal "
 "but you don't want it to steal normal terminal's icons from the TaskBar, or "
@@ -1858,11 +1869,11 @@ msgstr ""
 "la barre des taches car il fournir des informations spécifiques, par "
 "exemple, les icônes Pidgin représente l'avatar du contact"
 
-#: ../data/messages:783
+#: ../data/messages:785
 msgid "Prevent this launcher from stealing appli from taskbar ?"
 msgstr "Empêcher ce lanceur de voler l'appli de la barre des tâches ?"
 
-#: ../data/messages:785
+#: ../data/messages:787
 msgid ""
 "The only reason you may want to modify this parameter is if you made this "
 "launcher by hands. If you dropped it into the dock from the menu, it is "
@@ -1875,29 +1886,26 @@ msgstr ""
 "définit la classe du programme, ce qui est utile pour lier l'appli avec son "
 "lanceur."
 
-#: ../data/messages:787
+#: ../data/messages:789
 msgid "Class of the program :"
 msgstr "Classe du programme :"
-
-msgid "Sub-dock's name :"
-msgstr "Nom du sous-dock :"
 
 # #################################
 # ########### themes.conf #############
 # #################################
-#: ../data/messages:833
+#: ../data/messages:835
 msgid "Themes"
 msgstr "Thèmes"
 
-#: ../data/messages:835
+#: ../data/messages:837
 msgid "Choose a theme"
 msgstr "Choisissez un thème"
 
-#: ../data/messages:837
+#: ../data/messages:839
 msgid "List of themes :"
 msgstr "Liste des thèmes :"
 
-#: ../data/messages:839
+#: ../data/messages:841
 msgid ""
 "Otherwise the current behaviour will be kept. It's all about the dock's "
 "position, behaviour parameters such as auto-hide, using taskbar or not, etc."
@@ -1906,11 +1914,11 @@ msgstr ""
 "position du dock, les paramètres de comportement tels que l'auto-hide, "
 "l'utilisation de la barre des tâches, etc"
 
-#: ../data/messages:841
+#: ../data/messages:843
 msgid "Use the new theme's behaviour ?"
 msgstr "Utiliser le comportement du nouveau thème ?"
 
-#: ../data/messages:843
+#: ../data/messages:845
 msgid ""
 "So if you check this box, your launchers will be deleted and replaced by the "
 "ones provided in the new theme. Otherwise the current launchers will be "
@@ -1920,52 +1928,52 @@ msgstr ""
 "ceux fournis par le nouveau thème. Sinon les lanceurs actuels seront "
 "utilisés, et seules les icônes seront remplacées."
 
-#: ../data/messages:845
+#: ../data/messages:847
 msgid "Use the new theme's launchers ?"
 msgstr "Utiliser les lanceurs du nouveau thème ?"
 
-#: ../data/messages:847
+#: ../data/messages:849
 msgid "Save"
 msgstr "Enregistrer"
 
-#: ../data/messages:849
+#: ../data/messages:851
 msgid "Save current theme"
 msgstr "Enregistrez le thème actuel"
 
-#: ../data/messages:851
+#: ../data/messages:853
 msgid "You will then be able to re-open it at any time."
 msgstr "Vous pourrez ainsi le rouvrir à tout moment."
 
-#: ../data/messages:853
+#: ../data/messages:855
 msgid "Save as :"
 msgstr "Enregistrez sous :"
 
-#: ../data/messages:855
+#: ../data/messages:857
 msgid "Save current behaviour too ?"
 msgstr "Enregistrer aussi le comportement actuel ?"
 
-#: ../data/messages:857
+#: ../data/messages:859
 msgid "Save current launchers too ?"
 msgstr "Enregistrer aussi les lanceurs actuels ?"
 
-#: ../data/messages:859
+#: ../data/messages:861
 msgid "Delete"
 msgstr "Effacer"
 
-#: ../data/messages:861
+#: ../data/messages:863
 msgid "List of your personnal themes"
 msgstr "Liste de vos thèmes perso"
 
-#: ../data/messages:863
+#: ../data/messages:865
 msgid "Uncheck from the list themes you don't want anymore :"
 msgstr "Décochez de la liste les thèmes indésirables :"
 
-#: ../data/messages:865
+#: ../data/messages:867
 msgid "pouet"
 msgstr ""
 
-#: ../data/messages:867 ../data/messages:869 ../data/messages:871
-#: ../data/messages:873
+#: ../data/messages:869 ../data/messages:871 ../data/messages:873
+#: ../data/messages:875
 msgid ""
 "v1.4.6.3 :\n"
 "Just to say :\n"
@@ -1976,7 +1984,7 @@ msgstr ""
 # #################################
 # ########### ChangeLog #############
 # #################################
-#: ../data/messages:875
+#: ../data/messages:877
 msgid ""
 "v1.5.0 : it's been 1 month since previous release, and we worked hardly to "
 "bring you :\n"
@@ -2015,7 +2023,7 @@ msgstr ""
 "  Maintenant, pourquoi ne pas essayer d'écrire une applet pour Cairo-"
 "Dock ? ;-)"
 
-#: ../data/messages:877
+#: ../data/messages:879
 msgid ""
 "v1.5.1 :\n"
 " - The 1.5 branch is still young, so this version brings a lot of bug fixes\n"
@@ -2036,7 +2044,7 @@ msgstr ""
 "  La plupart des applets peuvent se détacher du dock\n"
 "  et se comporter comme de vrais desklets."
 
-#: ../data/messages:879
+#: ../data/messages:881
 msgid ""
 "v1.5.2.1 :\n"
 " - a lot of bug fixes, especially on desklets.\n"
@@ -2049,7 +2057,7 @@ msgstr ""
 " - Cairo-Dock est maintenant complètement traduit en Japonais, grâce à Jiro "
 "Kawada !"
 
-#: ../data/messages:881
+#: ../data/messages:883
 msgid ""
 "v1.5.3.2 :\n"
 " - Themes have been deeply reviewed\n"
@@ -2063,7 +2071,7 @@ msgid ""
 "  who could help cairo-dock to be well-integrated into KDE ;-)"
 msgstr ""
 
-#: ../data/messages:883
+#: ../data/messages:885
 msgid ""
 "v1.5.4.2 : a huge release !\n"
 " - add a cute pinguin in your dock with the new applet Cairo-Penguin\n"
@@ -2088,7 +2096,7 @@ msgstr ""
 " - rafraîchissez votre dock avec le nouveau thème Wood\n"
 " - 3 thèmes supplémentaires pour l'applet Weather."
 
-#: ../data/messages:885
+#: ../data/messages:887
 msgid ""
 "v1.5.5.4 :\n"
 " - Huge enhancements in the TaskBar :\n"
@@ -2120,7 +2128,7 @@ msgstr ""
 " - Cairo-Dock n'est pas encore bien integré a Gnome 2.22, mais cela va venir "
 "bientôt ;-)"
 
-#: ../data/messages:887
+#: ../data/messages:889
 msgid ""
 "v1.5.6 :\n"
 " - Integration into the last Gnome 2.22 (Ubuntu8.04, Fedora9, ...) - still "
@@ -2154,7 +2162,7 @@ msgstr ""
 " - Corrections dans XGamma/Weather.\n"
 " - Toute aide est la bienvenue pour integrer le dock à KDE !"
 
-#: ../data/messages:889
+#: ../data/messages:891
 msgid ""
 "v1.6.0 :\n"
 " - A new view has appeared : Diapositive !\n"
@@ -2189,7 +2197,7 @@ msgstr ""
 " - Relancement automatique en cas de plantage.\n"
 " - Vraies miniatures des fenêtres minimisées."
 
-#: ../data/messages:891
+#: ../data/messages:893
 msgid ""
 "v1.6.1 :\n"
 "Cairo-Dock has one year ! To celebrate this event, we are happy to offer "
@@ -2209,7 +2217,7 @@ msgstr ""
 " - Et nous espérons toujours de l'aide pour écrire un plug-in kde-"
 "integration ^_^"
 
-#: ../data/messages:893
+#: ../data/messages:895
 msgid ""
 "v1.6.2 : the first version integrated in the Ubuntu repositories !\n"
 " - 2 new applets have been released :\n"
@@ -2231,3 +2239,6 @@ msgstr ""
 "publier ! :-)\n"
 " - Et nous recherchons toujours une personne motivée pour écrire un plugin "
 "kde-integration ^_^"
+
+#~ msgid "Choose or Create a launcher"
+#~ msgstr "Choisir ou Créer un lanceur"

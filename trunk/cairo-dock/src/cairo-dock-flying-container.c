@@ -37,7 +37,7 @@ static gboolean on_expose_flying_icon (GtkWidget *pWidget,
 	GdkEventExpose *pExpose,
 	CairoFlyingContainer *pFlyingContainer)
 {
-	g_print ("%s ()\n", __func__);
+	//g_print ("%s ()\n", __func__);
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pFlyingContainer));
 	cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
 	cairo_set_source_rgba (pCairoContext, 0.0, 0.0, 0.0, 0.0);
@@ -110,21 +110,21 @@ CairoFlyingContainer *cairo_dock_create_flying_container (Icon *pFlyingIcon, Cai
 	pFlyingContainer->iHeight = CAIRO_DOCK_FLYING_HEIGHT;
 	pFlyingContainer->iPositionX = pOriginDock->iWindowPositionX + pOriginDock->iMouseX - pFlyingContainer->iWidth/2;
 	pFlyingContainer->iPositionY = pOriginDock->iWindowPositionY + pOriginDock->iMouseY - pFlyingContainer->iHeight/2;
-	g_print ("(%d;%d) %dx%d\n", pFlyingContainer->iPositionX,
-		pFlyingContainer->iPositionY,
-		pFlyingContainer->iWidth,
-		pFlyingContainer->iHeight);
-	/*gdk_window_move_resize (pWindow->window,
-		pFlyingContainer->iPositionX,
+	/*g_print ("%s (%d;%d %dx%d)\n", __func__ pFlyingContainer->iPositionX,
 		pFlyingContainer->iPositionY,
 		pFlyingContainer->iWidth,
 		pFlyingContainer->iHeight);*/
-	gtk_window_resize (GTK_WINDOW (pWindow), 
+	gdk_window_move_resize (pWindow->window,
+		pFlyingContainer->iPositionX,
+		pFlyingContainer->iPositionY,
 		pFlyingContainer->iWidth,
 		pFlyingContainer->iHeight);
-	gtk_window_move (GTK_WINDOW (pWindow), 
+	/*gtk_window_resize (GTK_WINDOW (pWindow),
+		pFlyingContainer->iWidth,
+		pFlyingContainer->iHeight);
+	gtk_window_move (GTK_WINDOW (pWindow),
 		pFlyingContainer->iPositionX,
-		pFlyingContainer->iPositionY);
+		pFlyingContainer->iPositionY);*/
 	gtk_window_present (GTK_WINDOW (pWindow));
 	
 	pFlyingContainer->pIcon->iAnimationType = CAIRO_DOCK_PULSE;
@@ -140,7 +140,7 @@ void cairo_dock_drag_flying_container (CairoFlyingContainer *pFlyingContainer, C
 {
 	pFlyingContainer->iPositionX = pOriginDock->iWindowPositionX + pOriginDock->iMouseX - pFlyingContainer->iWidth/2;
 	pFlyingContainer->iPositionY = pOriginDock->iWindowPositionY + pOriginDock->iMouseY - pFlyingContainer->iHeight/2;
-	g_print ("  on tire l'icone volante en (%d;%d)\n", pFlyingContainer->iPositionX, pFlyingContainer->iPositionY);
+	//g_print ("  on tire l'icone volante en (%d;%d)\n", pFlyingContainer->iPositionX, pFlyingContainer->iPositionY);
 	gtk_window_move (GTK_WINDOW (pFlyingContainer->pWidget),
 		pFlyingContainer->iPositionX,
 		pFlyingContainer->iPositionY);
@@ -206,8 +206,10 @@ void cairo_dock_terminate_flying_container (CairoFlyingContainer *pFlyingContain
 			{
 				while (gtk_events_pending ())
 					gtk_main_iteration ();
-				while (pIcon->pModuleInstance->pDesklet->iWidth < pIcon->pModuleInstance->pDesklet->iDesiredWidth || pIcon->pModuleInstance->pDesklet->iHeight < pIcon->pModuleInstance->pDesklet->iDesiredHeight)
+				while (pIcon->pModuleInstance->pDesklet->iKnownWidth != pIcon->pModuleInstance->pDesklet->iDesiredWidth || pIcon->pModuleInstance->pDesklet->iKnownHeight != pIcon->pModuleInstance->pDesklet->iDesiredHeight)
+				{
 					gtk_main_iteration ();
+				}
 				cairo_dock_zoom_out_desklet (pIcon->pModuleInstance->pDesklet);
 			}
 		}

@@ -593,8 +593,12 @@ struct _Icon {
 	gdouble fPersonnalScale;
 	/// Decalage en ordonnees de reflet (pour le rebond, >= 0).
 	gdouble fDeltaYReflection;
-	/// Orientation de l'icone (angle par rapport a la verticale).
+	/// Orientation de l'icone (angle par rapport a la verticale Oz).
 	gdouble fOrientation;
+	/// Rotation autour de l'axe Ox (animation upside-down).
+	gint iRotationX;
+	/// Rotation autour de l'axe Oy (animation rotate).
+	gint iRotationY;
 	//\____________ Pour les applis.
 	/// PID de l'application correspondante.
 	gint iPid;
@@ -774,6 +778,8 @@ struct _CairoDesklet {
 	gdouble fZoom;
 	/// taille a atteindre (fixee par l'utilisateur dans le.conf)
 	gint iDesiredWidth, iDesiredHeight;
+	/// taille connue par l'applet associee.
+	gint iKnownWidth, iKnownHeight;
 };
 
 

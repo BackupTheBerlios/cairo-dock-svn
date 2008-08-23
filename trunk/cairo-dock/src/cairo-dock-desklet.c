@@ -90,6 +90,12 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 			cairo_scale (pCairoContext, pDesklet->fZoom, pDesklet->fZoom);
 		}
 		
+		if (pDesklet->iKnownWidth != pDesklet->iDesiredWidth || pDesklet->iKnownHeight != pDesklet->iDesiredHeight)
+		{
+			cairo_destroy (pCairoContext);
+			return FALSE;
+		}
+		
 		if (fColor[3] != 0)
 		{
 			cairo_save (pCairoContext);
@@ -133,6 +139,8 @@ static gboolean _cairo_dock_write_desklet_size (CairoDesklet *pDesklet)
 	pDesklet->iSidWriteSize = 0;
 	if (pDesklet->pIcon != NULL)
 	{
+		pDesklet->iKnownWidth = pDesklet->iWidth;
+		pDesklet->iKnownHeight = pDesklet->iHeight;
 		cairo_dock_reload_module_instance (pDesklet->pIcon->pModuleInstance, FALSE);
 		gtk_widget_queue_draw (pDesklet->pWidget);  // sinon on ne redessine que l'interieur.
 	}

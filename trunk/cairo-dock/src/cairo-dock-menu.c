@@ -1270,7 +1270,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 			pMenuItem = gtk_separator_menu_item_new ();
 			gtk_menu_shell_append  (GTK_MENU_SHELL (menu), pMenuItem);
 			
-			_add_entry_in_menu (_("Add a launcher"), GTK_STOCK_ADD, cairo_dock_add_launcher, menu);
+			_add_entry_in_menu (_("Add a manual launcher"), GTK_STOCK_ADD, cairo_dock_add_launcher, menu);
 			gtk_widget_set_tooltip_text (pMenuItem, _("Don't forget you can drag a launcher from the menu and drop it in the dock !"));
 	
 			_add_entry_in_menu (_("Add a sub-dock"), GTK_STOCK_ADD, cairo_dock_add_container, menu);

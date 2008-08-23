@@ -361,7 +361,7 @@ if test "$CAIRO_DOCK_UNSTABLE" = "1" -o "$compil_ok" = "0"; then
 fi
 
 if test "$CAIRO_DOCK_INSTALL" = "1"; then
-	$SUDO -rm -f $CAIRO_DOCK_PREFIX/lib/cairo-dock/*.la
+	$SUDO rm -f $CAIRO_DOCK_PREFIX/lib/cairo-dock/*.la
 	
 	echo "check :"
 	echo "------------"
