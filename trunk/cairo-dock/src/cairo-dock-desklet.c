@@ -90,11 +90,15 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 			cairo_scale (pCairoContext, pDesklet->fZoom, pDesklet->fZoom);
 		}
 		
-		if (pDesklet->iKnownWidth != pDesklet->iDesiredWidth || pDesklet->iKnownHeight != pDesklet->iDesiredHeight)
+		if (pDesklet->iDesiredWidth != 0 && pDesklet->iDesiredHeight != 0 && (pDesklet->iKnownWidth != pDesklet->iDesiredWidth || pDesklet->iKnownHeight != pDesklet->iDesiredHeight))
 		{
+			//g_print ("on saute le dessin\n");
 			cairo_destroy (pCairoContext);
 			return FALSE;
 		}
+		pDesklet->iDesiredWidth = 0;
+		pDesklet->iDesiredHeight = 0;
+		
 		
 		if (fColor[3] != 0)
 		{
@@ -141,6 +145,11 @@ static gboolean _cairo_dock_write_desklet_size (CairoDesklet *pDesklet)
 	{
 		pDesklet->iKnownWidth = pDesklet->iWidth;
 		pDesklet->iKnownHeight = pDesklet->iHeight;
+		if (pDesklet->iDesiredWidth == pDesklet->iWidth && pDesklet->iDesiredHeight == pDesklet->iHeight)
+		{
+			pDesklet->iDesiredWidth = 0;
+			pDesklet->iDesiredHeight = 0;
+		}
 		cairo_dock_reload_module_instance (pDesklet->pIcon->pModuleInstance, FALSE);
 		gtk_widget_queue_draw (pDesklet->pWidget);  // sinon on ne redessine que l'interieur.
 	}
@@ -664,6 +673,7 @@ static gboolean _cairo_dock_grow_up_desklet (CairoDesklet *pDesklet)
 }
 void cairo_dock_zoom_out_desklet (CairoDesklet *pDesklet)
 {
+	g_return_if_fail (pDesklet != NULL);
 	pDesklet->fZoom = 0;
 	pDesklet->iSidGrowUp = g_timeout_add (50, (GSourceFunc) _cairo_dock_grow_up_desklet, (gpointer) pDesklet);
 }

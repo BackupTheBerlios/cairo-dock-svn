@@ -25,6 +25,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-log.h"
 #include "cairo-dock-desklet.h"
 #include "cairo-dock-dock-factory.h"
+#include "cairo-dock-surface-factory.h"
 #include "cairo-dock-flying-container.h"
 
 #define CAIRO_DOCK_FLYING_WIDTH 72
@@ -58,6 +59,21 @@ static gboolean on_expose_flying_icon (GtkWidget *pWidget,
 	else
 	{
 		g_print ("compte a rebours : %d\n", pFlyingContainer->iAnimationCount);
+		if (pFlyingContainer->iAnimationCount > 0)
+		{
+			gchar *cImagePath = g_strdup_printf ("%s/%d.png", "/home/fab/CD/trunk/cairo-dock/data/explosion", 10+1 - pFlyingContainer->iAnimationCount);
+			cairo_surface_t *pExplosionSurface = cairo_dock_create_surface_for_icon (cImagePath, pCairoContext, CAIRO_DOCK_FLYING_WIDTH, CAIRO_DOCK_FLYING_WIDTH);
+			
+			cairo_translate (pCairoContext, 
+				0.,
+				(pFlyingContainer->iHeight - CAIRO_DOCK_FLYING_WIDTH) / 2);
+			cairo_scale (pCairoContext, 1.*CAIRO_DOCK_FLYING_WIDTH/128, 1.*CAIRO_DOCK_FLYING_WIDTH/128);
+			cairo_set_source_surface (pCairoContext, pExplosionSurface, 0., 0.);
+			cairo_paint (pCairoContext);
+			
+			g_free (cImagePath);
+			cairo_surface_destroy (pExplosionSurface);
+		}
 	}
 	cairo_destroy (pCairoContext);
 	return FALSE;
@@ -68,7 +84,7 @@ static gboolean _cairo_dock_animate_flying_icon (CairoFlyingContainer *pFlyingCo
 	if (pFlyingContainer->pIcon == NULL)
 	{
 		pFlyingContainer->iAnimationCount --;
-		if (pFlyingContainer->iAnimationCount == 0)
+		if (pFlyingContainer->iAnimationCount < 0)
 		{
 			cairo_dock_free_flying_container (pFlyingContainer);
 			return FALSE;
@@ -114,17 +130,17 @@ CairoFlyingContainer *cairo_dock_create_flying_container (Icon *pFlyingIcon, Cai
 		pFlyingContainer->iPositionY,
 		pFlyingContainer->iWidth,
 		pFlyingContainer->iHeight);*/
-	gdk_window_move_resize (pWindow->window,
+	/*gdk_window_move_resize (pWindow->window,
 		pFlyingContainer->iPositionX,
 		pFlyingContainer->iPositionY,
 		pFlyingContainer->iWidth,
-		pFlyingContainer->iHeight);
-	/*gtk_window_resize (GTK_WINDOW (pWindow),
+		pFlyingContainer->iHeight);*/
+	gtk_window_resize (GTK_WINDOW (pWindow),
 		pFlyingContainer->iWidth,
 		pFlyingContainer->iHeight);
 	gtk_window_move (GTK_WINDOW (pWindow),
 		pFlyingContainer->iPositionX,
-		pFlyingContainer->iPositionY);*/
+		pFlyingContainer->iPositionY);
 	gtk_window_present (GTK_WINDOW (pWindow));
 	
 	pFlyingContainer->pIcon->iAnimationType = CAIRO_DOCK_PULSE;
@@ -158,7 +174,7 @@ void cairo_dock_terminate_flying_container (CairoFlyingContainer *pFlyingContain
 {
 	Icon *pIcon = pFlyingContainer->pIcon;
 	pFlyingContainer->pIcon = NULL;
-	pFlyingContainer->iAnimationCount = 10;
+	pFlyingContainer->iAnimationCount = 10+1;
 	
 	if (pIcon->acDesktopFileName != NULL)  // c'est un lanceur, ou un separateur manuel, ou un sous-dock.
 	{
@@ -204,11 +220,11 @@ void cairo_dock_terminate_flying_container (CairoFlyingContainer *pFlyingContain
 			//\______________ On fait apparaitre le desklet avec un effet de zoom.
 			if (pIcon->pModuleInstance->pDesklet)  // normalement toujours vrai.
 			{
-				while (gtk_events_pending ())
-					gtk_main_iteration ();
-				while (pIcon->pModuleInstance->pDesklet->iKnownWidth != pIcon->pModuleInstance->pDesklet->iDesiredWidth || pIcon->pModuleInstance->pDesklet->iKnownHeight != pIcon->pModuleInstance->pDesklet->iDesiredHeight)
+				while (pIcon->pModuleInstance->pDesklet->iDesiredWidth != 0 && pIcon->pModuleInstance->pDesklet->iDesiredHeight != 0 && (pIcon->pModuleInstance->pDesklet->iKnownWidth != pIcon->pModuleInstance->pDesklet->iDesiredWidth || pIcon->pModuleInstance->pDesklet->iKnownHeight != pIcon->pModuleInstance->pDesklet->iDesiredHeight))
 				{
 					gtk_main_iteration ();
+					//if (! pIcon->pModuleInstance->pDesklet)  // ne devrait pas arriver.
+					//	break ;
 				}
 				cairo_dock_zoom_out_desklet (pIcon->pModuleInstance->pDesklet);
 			}

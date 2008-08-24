@@ -1,5 +1,5 @@
 
-SUBDIRS = . default-theme gauges emblems
+SUBDIRS = . default-theme gauges emblems explosion
 
 essentialdatadir = $(pkgdatadir)
 

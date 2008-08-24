@@ -30,6 +30,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 int mkstemp(char *template);
 #endif
 
+extern gboolean g_bPopUp;
+
 typedef enum {
 	CAIRO_DOCK_MODEL_NAME = 0,
 	CAIRO_DOCK_MODEL_RESULT,
@@ -694,8 +696,12 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 			GTK_RESPONSE_REJECT,
 			NULL);
 	}
-	gtk_window_set_keep_above(GTK_WINDOW (pDialog), FALSE);
-	gtk_window_set_keep_below (GTK_WINDOW (pDialog), FALSE);
+	if (g_bPopUp)
+	{
+		gtk_window_set_keep_above (GTK_WINDOW (pDialog), TRUE);
+		gtk_window_set_keep_below (GTK_WINDOW (pDialog), FALSE);
+		gtk_window_present (GTK_WINDOW (pDialog));
+	}
 	gtk_container_set_border_width (GTK_CONTAINER (GTK_DIALOG(pDialog)->vbox), CAIRO_DOCK_GUI_MARGIN);
 	
 	GtkTooltips *pToolTipsGroup = gtk_tooltips_new ();
@@ -1748,7 +1754,7 @@ GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, con
 	gboolean read_ok = g_file_get_contents (cConfFilePath, &cConfiguration, NULL, NULL);
 	if (! read_ok)
 	{
-		cd_message ("file %s does not exist or is not readble\n", cConfFilePath);
+		cd_warning ("file %s does not exist or is not readble", cConfFilePath);
 		return NULL;
 	}
 
