@@ -231,7 +231,9 @@ if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
 						done;
 					fi
 					cd po
-					$CAIRO_DOCK_GEN_TRANSLATION
+					if test -e *.pot; then
+						$CAIRO_DOCK_GEN_TRANSLATION
+					fi
 					cd ..
 				fi
 			fi
@@ -319,7 +321,9 @@ if test "$CAIRO_DOCK_UNSTABLE" = "1" -o "$compil_ok" = "0"; then
 							done;
 						fi
 						cd po
-						$CAIRO_DOCK_GEN_TRANSLATION
+						if test -e *.pot; then
+							$CAIRO_DOCK_GEN_TRANSLATION
+						fi
 						cd ..
 					fi
 					echo  "* configuring ..."

@@ -148,7 +148,7 @@ CairoFlyingContainer *cairo_dock_create_flying_container (Icon *pFlyingIcon, Cai
 	pFlyingContainer->pIcon->fDrawX = 0;
 	pFlyingContainer->pIcon->fDrawY = 0;
 	pFlyingContainer->pIcon->fScale = 1.;
-	pFlyingContainer->iSidAnimationTimer = g_timeout_add (50, (GSourceFunc) _cairo_dock_animate_flying_icon, (gpointer) pFlyingContainer);
+	pFlyingContainer->iSidAnimationTimer = g_timeout_add (60, (GSourceFunc) _cairo_dock_animate_flying_icon, (gpointer) pFlyingContainer);
 	return pFlyingContainer;
 }
 

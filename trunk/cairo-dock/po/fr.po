@@ -7,10 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.6.2\n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-08-23 03:44+0200\n"
-"PO-Revision-Date: 2008-05-23\n"
-"Last-Translator: Yann SLADEK <mav@cairo-dock.org>\n"
-"Language-Team: Cairo-Dock <po@cairo-dock.org>\n"
+"POT-Creation-Date: 2008-08-25 02:37+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -55,7 +52,7 @@ msgstr "monter"
 msgid "unmount"
 msgstr "démonter"
 
-#: ../src/cairo-dock-gui-factory.c:1539
+#: ../src/cairo-dock-gui-factory.c:1545
 msgid "grab"
 msgstr "récupérer"
 
@@ -174,7 +171,7 @@ msgstr "Cachage rapide"
 msgid "Quit"
 msgstr "Quitter"
 
-#: ../src/cairo-dock-menu.c:1211
+#: ../src/cairo-dock-menu.c:1211 ../src/cairo-dock-menu.c:1273
 msgid "Add a manual launcher"
 msgstr "Ajouter un lanceur manuel"
 
@@ -216,11 +213,6 @@ msgstr "Enlever cette applet"
 #: ../src/cairo-dock-menu.c:1259
 msgid "Properties"
 msgstr "Propriétés"
-
-#: ../src/cairo-dock-menu.c:1273
-#, fuzzy
-msgid "Add a launcher"
-msgstr "Ajouter un lanceur manuel"
 
 #: ../src/cairo-dock-menu.c:1288
 msgid "Remove this launcher"
@@ -2239,6 +2231,10 @@ msgstr ""
 "publier ! :-)\n"
 " - Et nous recherchons toujours une personne motivée pour écrire un plugin "
 "kde-integration ^_^"
+
+#, fuzzy
+#~ msgid "Add a launcher"
+#~ msgstr "Ajouter un lanceur manuel"
 
 #~ msgid "Choose or Create a launcher"
 #~ msgstr "Choisir ou Créer un lanceur"
