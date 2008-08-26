@@ -976,7 +976,9 @@ static void _cairo_dock_keep_window_in_state (gpointer *data, gboolean bAbove, g
 {
 	Icon *icon = data[0];
 	CairoDesklet *pDesklet = data[1];
-
+	if (icon == NULL)  // cas de l'applet Terminal par exemple.
+		icon = pDesklet->pIcon;
+	
 	gtk_window_set_keep_below (GTK_WINDOW(pDesklet->pWidget), bBelow);
 	gtk_window_set_keep_above (GTK_WINDOW(pDesklet->pWidget), bAbove);
 	if (CAIRO_DOCK_IS_APPLET (icon))

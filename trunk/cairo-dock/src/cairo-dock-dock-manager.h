@@ -148,6 +148,7 @@ void cairo_dock_set_root_docks_on_top_layer (void);
 
 gchar *cairo_dock_get_unique_dock_name (const gchar *cPrefix);
 
+void cairo_dock_show_hide_container (CairoContainer *pContainer);
 
 G_END_DECLS
 #endif

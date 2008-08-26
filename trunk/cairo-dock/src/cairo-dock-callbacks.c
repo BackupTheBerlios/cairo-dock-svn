@@ -402,7 +402,7 @@ static gboolean _cairo_dock_make_icon_glide (CairoDock *pDock)
 }
 void cairo_dock_stop_icon_glide (CairoDock *pDock)
 {
-	g_print ("%s ()\n", __func__);
+	cd_message ("");
 	Icon *icon;
 	GList *ic;
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)

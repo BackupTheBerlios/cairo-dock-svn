@@ -635,3 +635,14 @@ gchar *cairo_dock_get_unique_dock_name (const gchar *cPrefix)
 	g_string_free (sNameString, FALSE);
 	return cUniqueName;
 }
+
+
+void cairo_dock_show_hide_container (CairoContainer *pContainer)
+{
+	if (pContainer == NULL)
+		return;
+	if (! GTK_WIDGET_VISIBLE (pContainer->pWidget))
+		gtk_window_present (GTK_WINDOW (pContainer->pWidget));
+	else
+		gtk_widget_hide (GTK_WINDOW (pContainer->pWidget));
+}

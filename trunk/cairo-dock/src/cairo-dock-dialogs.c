@@ -906,6 +906,8 @@ CairoDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, CairoCont
 			FALSE,
 			0);
 	}
+	pDialog->iBubbleWidth = MAX (pDialog->iBubbleWidth, 2*g_iDockRadius+g_iDockLineWidth);
+	pDialog->iBubbleHeight = MAX (pDialog->iBubbleHeight, 2*g_iDockRadius+g_iDockLineWidth);
 	cd_debug ("=> iBubbleWidth: %d , iBubbleHeight : %d", pDialog->iBubbleWidth, pDialog->iBubbleHeight);
 
 	//\________________ On definit la geometrie et la position de la fenetre globale.

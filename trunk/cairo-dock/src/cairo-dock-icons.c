@@ -60,7 +60,7 @@ void cairo_dock_free_icon (Icon *icon)
 	if (icon == NULL)
 		return ;
 	cd_message ("%s (%s , %s)", __func__, icon->acName, icon->cClass);
-
+	
 	cairo_dock_remove_dialog_if_any (icon);
 	if (CAIRO_DOCK_IS_NORMAL_APPLI (icon))
 		cairo_dock_unregister_appli (icon);
