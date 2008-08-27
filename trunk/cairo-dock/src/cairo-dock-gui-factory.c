@@ -656,6 +656,8 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 	gchar *cValue, **cValueList, *cSmallIcon;
 	GdkColor gdkColor;
 	GtkListStore *modele;
+	//if (g_bPopUp)
+	//	pParentWindow = NULL;
 	
 	GtkWidget *pDialog;
 	if (bApplyButtonPresent)
@@ -696,12 +698,18 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 			GTK_RESPONSE_REJECT,
 			NULL);
 	}
+	gtk_window_set_modal (GTK_WINDOW (pDialog), FALSE);
+	//gtk_window_set_transient_for (GTK_WINDOW (pDialog), NULL);
 	if (g_bPopUp)
 	{
 		gtk_window_set_keep_above (GTK_WINDOW (pDialog), TRUE);
 		gtk_window_set_keep_below (GTK_WINDOW (pDialog), FALSE);
 		gtk_window_present (GTK_WINDOW (pDialog));
 	}
+	gchar *cIconPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_ICON);
+	gtk_window_set_icon_from_file (GTK_WINDOW (pDialog), cIconPath, NULL);
+	g_free (cIconPath);
+	
 	gtk_container_set_border_width (GTK_CONTAINER (GTK_DIALOG(pDialog)->vbox), CAIRO_DOCK_GUI_MARGIN);
 	
 	GtkTooltips *pToolTipsGroup = gtk_tooltips_new ();
@@ -1825,6 +1833,7 @@ GtkWidget *cairo_dock_generate_basic_ihm_from_keyfile (gchar *cConfFilePath, con
 
 	gtk_widget_show_all (pDialog);
 	*pTextBuffer = buffer;
+	gtk_window_present (GTK_WINDOW (pDialog));
 	return pDialog;
 }
 

@@ -247,32 +247,11 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	double fRadius = pDialog->fRadius;
 
 	cairo_t *pCairoContext;
-	/*cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDialog));
-	if (cairo_status (pCairoContext) != CAIRO_STATUS_SUCCESS)
-	{
-		cairo_destroy (pCairoContext);
-		cairo_dock_dialog_unreference (pDialog);
-		return FALSE;
-	}
-	
-	if (pExpose->area.x > 0 || pExpose->area.y > 0)
-	{
-		cairo_rectangle (pCairoContext,
-			pExpose->area.x,
-			pExpose->area.y,
-			pExpose->area.width,
-			pExpose->area.height);
-		cairo_clip (pCairoContext);
-	}*/
 	
 	if (pExpose->area.x >= pDialog->iMargin + CAIRO_DIALOG_TEXT_MARGIN && pExpose->area.y >= pDialog->iMargin + CAIRO_DIALOG_TEXT_MARGIN && pExpose->area.width <= pDialog->iIconSize && pExpose->area.height <= pDialog->iIconSize)  // redessin de l'icone.
 	{
 		pCairoContext = cairo_dock_create_drawing_context_on_area (CAIRO_CONTAINER (pDialog), &pExpose->area, g_fDialogColor);
-		/*cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
-		cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], g_fDialogColor[3]);
-		cairo_paint (pCairoContext);
 		
-		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);*/
 		cairo_set_source_surface (pCairoContext, pDialog->pIconBuffer,
 			pDialog->iMargin + CAIRO_DIALOG_TEXT_MARGIN,
 			pDialog->iMargin + CAIRO_DIALOG_TEXT_MARGIN);
@@ -281,11 +260,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	else if (pExpose->area.x >= pDialog->iMargin + pDialog->iIconSize + CAIRO_DIALOG_TEXT_MARGIN && pExpose->area.y <= pDialog->iMessageHeight && pExpose->area.width <= pDialog->iMessageWidth && pExpose->area.height <= pDialog->iMessageHeight)  // redessin du texte.
 	{
 		pCairoContext = cairo_dock_create_drawing_context_on_area (CAIRO_CONTAINER (pDialog), &pExpose->area, g_fDialogColor);
-		/*cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
-		cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], g_fDialogColor[3]);
-		cairo_paint (pCairoContext);
 		
-		cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);*/
 		cairo_set_source_surface (pCairoContext, pDialog->pTextBuffer,
 			pDialog->iMargin + pDialog->iIconSize + CAIRO_DIALOG_TEXT_MARGIN,
 			pDialog->iMargin + CAIRO_DIALOG_TEXT_MARGIN + (pDialog->iIconSize > pDialog->iTextHeight ? (pDialog->iIconSize - pDialog->iTextHeight) / 2: 0));
@@ -293,12 +268,9 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 	}
 	else
 	{
-		if (pExpose->area.y >= pDialog->iMessageHeight)  // redessin du widget interactif.
+		if (pDialog->iMessageHeight != 0 && pExpose->area.y >= pDialog->iMessageHeight)  // redessin du widget interactif.
 		{
 			pCairoContext = cairo_dock_create_drawing_context_on_area (CAIRO_CONTAINER (pDialog), &pExpose->area, g_fDialogColor);
-			/*cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
-			cairo_set_source_rgba (pCairoContext, g_fDialogColor[0], g_fDialogColor[1], g_fDialogColor[2], g_fDialogColor[3]);
-			cairo_paint (pCairoContext);*/
 		}
 		else
 		{
@@ -306,10 +278,6 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 				pCairoContext = cairo_dock_create_drawing_context_on_area (CAIRO_CONTAINER (pDialog), &pExpose->area, NULL);
 			else
 				pCairoContext = cairo_dock_create_drawing_context (CAIRO_CONTAINER (pDialog));
-			/*cairo_set_source_rgba (pCairoContext, 0., 0., 0., 0.);
-			cairo_set_operator (pCairoContext, CAIRO_OPERATOR_SOURCE);
-			cairo_paint (pCairoContext);
-			cairo_set_operator (pCairoContext, CAIRO_OPERATOR_OVER);*/
 			
 			if (pDialog->iWidth == 20 && pDialog->iHeight == 20)
 			{
@@ -344,7 +312,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 			if (pDialog->bRight)
 			{
 				fDeltaMargin = MAX (0, pDialog->iAimedX - pDialog->iPositionX - fRadius - fLineWidth / 2);
-				//g_print ("fDeltaMargin : %.2f\n", fDeltaMargin);
+				g_print ("fDeltaMargin : %.2f\n", fDeltaMargin);
 				cairo_rel_line_to (pCairoContext, -iWidth + fDeltaMargin + fLineWidth + 2. * fRadius + CAIRO_DIALOG_TIP_MARGIN + CAIRO_DIALOG_TIP_BASE + CAIRO_DIALOG_TIP_ROUNDING_MARGIN , 0); 
 				cairo_rel_curve_to (pCairoContext,
 					0, 0,
@@ -359,7 +327,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 			else
 			{
 				fDeltaMargin = MAX (0, MIN (- CAIRO_DIALOG_TIP_MARGIN - CAIRO_DIALOG_TIP_ROUNDING_MARGIN - CAIRO_DIALOG_TIP_BASE - fRadius - fLineWidth / 2, pDialog->iPositionX - pDialog->iAimedX - fRadius - fLineWidth / 2) + pDialog->iWidth);
-				//g_print ("fDeltaMargin : %.2f / %d\n", fDeltaMargin, pDialog->iWidth);
+				g_print ("fDeltaMargin : %.2f / %d\n", fDeltaMargin, pDialog->iWidth);
 				cairo_rel_line_to (pCairoContext, - (CAIRO_DIALOG_TIP_MARGIN + fDeltaMargin) + CAIRO_DIALOG_TIP_ROUNDING_MARGIN, 0);
 				cairo_rel_curve_to (pCairoContext,
 					0, 0,
