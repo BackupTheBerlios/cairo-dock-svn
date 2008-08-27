@@ -129,10 +129,13 @@ void on_realize (GtkWidget* pWidget,
 		{
 			cairo_surface_t *pChromeSurface = cairo_dock_load_chrome_surface ();
 			
-			s_iChromeTexture = cairo_dock_create_texture_from_surface (pChromeSurface);
+			if (pChromeSurface != NULL)
+				s_iChromeTexture = cairo_dock_create_texture_from_surface (pChromeSurface);
 			
 			cairo_dock_init_capsule_display (s_iChromeTexture);
 		}
+		cairo_dock_init_square_display ();
+		cairo_dock_init_cube_display ();
 	}
 	
 	glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
@@ -366,11 +369,33 @@ static gboolean _cairo_dock_show_sub_dock_delayed (CairoDock *pDock)
 	Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
 	if (icon != NULL && icon->pSubDock != NULL)
 		cairo_dock_show_subdock (icon, FALSE, pDock);
-
+	
 	return FALSE;
 }
 
-
+static gboolean _cairo_dock_animate_on_mouse_over (CairoDock *pDock)
+{
+	gboolean bContinue = FALSE;
+	Icon *icon;
+	GList *ic;
+	int n = g_tNbIterInOneRound[CAIRO_DOCK_ROTATE] / 2;  // nbre d'iteration pour 1/2 tour.
+	for (ic = pDock->icons; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (icon->iMouseOverAnimationCount > 0)
+		{
+			icon->iMouseOverAnimationCount --;
+			icon->iRotationY = icon->iMouseOverAnimationCount * 180 / n;
+			bContinue |= (icon->iMouseOverAnimationCount != 0);
+		}
+	}
+	gtk_widget_queue_draw (pDock->pWidget);
+	if (! bContinue)
+	{
+		pDock->iSidMouseOver = 0;
+	}
+	return bContinue;
+}
 static gboolean _cairo_dock_show_xwindow_for_drop (Icon *pIcon)
 {
 	cairo_dock_show_xwindow (pIcon->Xid);
@@ -437,6 +462,14 @@ void cairo_dock_on_change_icon (Icon *pLastPointedIcon, Icon *pPointedIcon, Cair
 	{
 		//g_print ("pLastPointedDock n'est plus null\n");
 		s_pLastPointedDock = pDock;
+	}
+	if (pPointedIcon != NULL && pDock->render_opengl != NULL)
+	{
+		if (pDock->iSidMouseOver == 0)
+		{
+			pDock->iSidMouseOver = g_timeout_add (50., (GSourceFunc) _cairo_dock_animate_on_mouse_over, pDock);
+		}
+		pPointedIcon->iMouseOverAnimationCount = g_tNbIterInOneRound[CAIRO_DOCK_ROTATE];
 	}
 }
 gboolean on_motion_notify2 (GtkWidget* pWidget,

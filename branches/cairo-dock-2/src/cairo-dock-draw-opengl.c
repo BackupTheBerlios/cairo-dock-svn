@@ -58,6 +58,7 @@ extern gboolean g_bLinkIndicatorWithIcon;
 extern double g_fIndicatorWidth, g_fIndicatorHeight;
 extern int g_iIndicatorDeltaY;
 extern GLuint g_iIndicatorTexture;
+extern CairoDockIconMesh g_iIconMesh;
 
 static void _cairo_dock_draw_appli_indicator_opengl (Icon *icon, gboolean bHorizontalDock, double fRatio, gboolean bDirectionUp)
 {
@@ -123,16 +124,27 @@ static void _cairo_dock_draw_appli_indicator_opengl (Icon *icon, gboolean bHoriz
 	glBindTexture (GL_TEXTURE_2D, g_iIndicatorTexture);
 	glColor4f(1.0f, 1.0f, 1.0f, 1.);
 	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, 1,  0.0f);  // Bottom Left Of The Texture and Quad
-	glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, 1,  0.0f);  // Bottom Right Of The Texture and Quad
-	glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1,  0.0f);  // Top Right Of The Texture and Quad
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  -1,  0.0f);  // Top Left Of The Texture and Quad
+	glTexCoord2f(0., 0.); glVertex3f(-1.0f, 1,  0.);  // Bottom Left Of The Texture and Quad
+	glTexCoord2f(1.0f, 0.); glVertex3f( 1.0f, 1,  0.);  // Bottom Right Of The Texture and Quad
+	glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1,  0.);  // Top Right Of The Texture and Quad
+	glTexCoord2f(0., 1.0f); glVertex3f(-1.0f,  -1,  0.);  // Top Left Of The Texture and Quad
 	glEnd();
 	glPopMatrix ();
 }
+
+void _cairo_dock_render_icon_simple_opengl (Icon *icon, CairoDock *pDock)
+{
+	glPushMatrix ();
+	glBindTexture (GL_TEXTURE_2D, icon->iIconTexture);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f); // Couleur a fond 
+	glTranslatef (icon->fDrawX + icon->fScale * icon->fWidth/2, pDock->iCurrentHeight - icon->fDrawY - icon->fScale * icon->fHeight/2, 0.);
+	glScalef (icon->fScale * icon->fWidth/2, icon->fScale * icon->fHeight/2, icon->fScale * icon->fHeight/2);  // pour la pastille.
+	glCallList(CAIRO_DOCK_CAPSULE_MESH); // Et hop on affiche la capsule
+	glPopMatrix ();
+}
+
 void cairo_dock_render_one_icon_opengl (Icon *icon, CairoDock *pDock, double fRatio, double fDockMagnitude, gboolean bUseText)
 {
-	icon->iRotationY += 3;
 	//glDisable(GL_DEPTH_TEST);// On desactive le tampon de profondeur
 	glEnable(GL_DEPTH_TEST);// On desactive le tampon de profondeur  
 	if (CAIRO_DOCK_IS_APPLI (icon) && g_fVisibleAppliAlpha != 0 && ! CAIRO_DOCK_IS_APPLET (icon))
@@ -146,9 +158,9 @@ void cairo_dock_render_one_icon_opengl (Icon *icon, CairoDock *pDock, double fRa
 	double fY = pDock->iCurrentHeight - icon->fDrawY - icon->fHeight * icon->fScale * icon->fHeightFactor;  // ordonnee du bas de l'icone.
 	glLoadIdentity ();
 	if (pDock->bHorizontalDock)
-		glTranslatef (icon->fDrawX + icon->fWidth * icon->fWidthFactor * icon->fScale/2, fY + icon->fHeight * icon->fHeightFactor * icon->fScale/2, 0);
+		glTranslatef (icon->fDrawX + icon->fWidth * icon->fWidthFactor * icon->fScale/2, fY + icon->fHeight * icon->fHeightFactor * icon->fScale/2, -icon->fHeight * (1+g_fAmplitude));
 	else
-		glTranslatef (fY + icon->fHeight * icon->fHeightFactor * icon->fScale/2, icon->fDrawX + icon->fWidth * icon->fScale/2, 0.);
+		glTranslatef (fY + icon->fHeight * icon->fHeightFactor * icon->fScale/2, icon->fDrawX + icon->fWidth * icon->fScale/2, -icon->fHeight * (1+g_fAmplitude));
 	glPushMatrix ();
 	
 	//\_____________________ On dessine l'indicateur derriere.
@@ -156,7 +168,6 @@ void cairo_dock_render_one_icon_opengl (Icon *icon, CairoDock *pDock, double fRa
 	{
 		_cairo_dock_draw_appli_indicator_opengl (icon, pDock->bHorizontalDock, fRatio, pDock->bDirectionUp);
 	}
-	
 	
 	glBindTexture (GL_TEXTURE_2D, icon->iIconTexture);
 	
@@ -171,10 +182,10 @@ void cairo_dock_render_one_icon_opengl (Icon *icon, CairoDock *pDock, double fRa
 			glScalef (icon->fWidth * icon->fScale / 2 * fScaleFactor, icon->fHeight * icon->fScale / 2 * fScaleFactor, 1.);
 			glColor4f(1.0f, 1.0f, 1.0f, icon->fAlpha);
 			glBegin(GL_QUADS);
-			glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, 1,  0.0f);  // Bottom Left Of The Texture and Quad
-			glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, 1,  0.0f);  // Bottom Right Of The Texture and Quad
-			glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1,  0.0f);  // Top Right Of The Texture and Quad
-			glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  -1,  0.0f);  // Top Left Of The Texture and Quad
+			glTexCoord2f(0., 0.); glVertex3f(-1.0f, 1,  0.);  // Bottom Left Of The Texture and Quad
+			glTexCoord2f(1.0f, 0.); glVertex3f( 1.0f, 1,  0.);  // Bottom Right Of The Texture and Quad
+			glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1,  0.);  // Top Right Of The Texture and Quad
+			glTexCoord2f(0., 1.0f); glVertex3f(-1.0f,  -1,  0.);  // Top Left Of The Texture and Quad
 			glEnd();
 			glPopMatrix ();
 			/*cairo_save (pCairoContext);
@@ -203,12 +214,14 @@ void cairo_dock_render_one_icon_opengl (Icon *icon, CairoDock *pDock, double fRa
 		}
 		else
 		{
-			glScalef (icon->fWidth * icon->fWidthFactor * icon->fScale / 2, icon->fHeight * icon->fHeightFactor * icon->fScale / 2, 1.);
+			glScalef (icon->fWidth * icon->fWidthFactor * icon->fScale, icon->fHeight * icon->fHeightFactor * icon->fScale, 1.);
 		}
 		if (icon->fOrientation != 0)
-		{
 			glRotatef (icon->fOrientation, 0., 0., 1.);
-		}
+		if (icon->iRotationX != 0)
+			glRotatef (icon->iRotationX, 1., 0., 0.);
+		if (icon->iRotationY != 0)
+			glRotatef (icon->iRotationY, 0., 1., 0.);
 	}
 	else
 	{
@@ -218,16 +231,11 @@ void cairo_dock_render_one_icon_opengl (Icon *icon, CairoDock *pDock, double fRa
 	//\_____________________ On dessine l'icone.
 	double fAlpha = icon->fAlpha * (fDockMagnitude + g_fAlphaAtRest * (1 - fDockMagnitude));
 	glColor4f(1.0f, 1.0f, 1.0f, fAlpha);
-	/*glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, 1,  0.0f);  // Bottom Left Of The Texture and Quad
-	glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, 1,  0.0f);  // Bottom Right Of The Texture and Quad
-	glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1,  0.0f);  // Top Right Of The Texture and Quad
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  -1,  0.0f);  // Top Left Of The Texture and Quad
-	glEnd();*/
-	glRotatef (icon->iRotationY, 0, 1, 0);
-	glCallList(CAIRO_DOCK_CAPSULE_LIST); // Et hop on affiche la capsule
+	//glScalef (icon->fWidth * icon->fWidthFactor * icon->fScale, icon->fHeight * icon->fHeightFactor * icon->fScale, 1.);
+	glCallList(g_iIconMesh); // Et hop on affiche le mesh
 	glPopMatrix ();  // retour juste apres la translation au milieu de l'icone.
 	return ;
+
 	//\_____________________ On dessine les reflets.
 	if (pDock->bUseReflect && icon->iReflectionTexture != 0)  // on dessine les reflets.
 	{
@@ -244,10 +252,10 @@ void cairo_dock_render_one_icon_opengl (Icon *icon, CairoDock *pDock, double fRa
 				glScalef (icon->fWidth * icon->fScale / 2 * fScaleFactor, icon->fHeight * icon->fScale / 2 * fScaleFactor, 1.);
 				glColor4f(1.0f, 1.0f, 1.0f, fPreviousAlpha);
 				glBegin(GL_QUADS);
-				glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, 1,  0.0f);  // Bottom Left Of The Texture and Quad
-				glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, 1,  0.0f);  // Bottom Right Of The Texture and Quad
-				glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1,  0.0f);  // Top Right Of The Texture and Quad
-				glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  -1,  0.0f);  // Top Left Of The Texture and Quad
+				glTexCoord2f(0., 0.); glVertex3f(-1.0f, 1,  0.);  // Bottom Left Of The Texture and Quad
+				glTexCoord2f(1.0f, 0.); glVertex3f( 1.0f, 1,  0.);  // Bottom Right Of The Texture and Quad
+				glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1,  0.);  // Top Right Of The Texture and Quad
+				glTexCoord2f(0., 1.0f); glVertex3f(-1.0f,  -1,  0.);  // Top Left Of The Texture and Quad
 				glEnd ();
 				glPopMatrix ();
 				/*cairo_save (pCairoContext);
@@ -278,10 +286,10 @@ void cairo_dock_render_one_icon_opengl (Icon *icon, CairoDock *pDock, double fRa
 		glColor4f(1.0f, 1.0f, 1.0f, fAlpha);
 		glScalef (icon->fWidth * icon->fScale / 2, g_fReflectSize * icon->fScale / 2, 1.);
 		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, 1,  0.0f);  // Bottom Left Of The Texture and Quad
-		glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, 1,  0.0f);  // Bottom Right Of The Texture and Quad
-		glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1,  0.0f);  // Top Right Of The Texture and Quad
-		glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  -1,  0.0f);  // Top Left Of The Texture and Quad
+		glTexCoord2f(0., 0.); glVertex3f(-1.0f, 1,  0.);  // Bottom Left Of The Texture and Quad
+		glTexCoord2f(1.0f, 0.); glVertex3f( 1.0f, 1,  0.);  // Bottom Right Of The Texture and Quad
+		glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1,  0.);  // Top Right Of The Texture and Quad
+		glTexCoord2f(0., 1.0f); glVertex3f(-1.0f,  -1,  0.);  // Top Left Of The Texture and Quad
 		glEnd();
 		glPopMatrix ();  // retour juste apres la translation (fDrawX, fDrawY).
 		
@@ -406,10 +414,10 @@ void cairo_dock_render_one_icon_opengl (Icon *icon, CairoDock *pDock, double fRa
 		glBindTexture (GL_TEXTURE_2D, icon->iLabelTexture);
 		glScalef (.5*icon->iTextWidth, .5*icon->iTextHeight, 1.);
 		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, 1,  0.0f);  // Bottom Left Of The Texture and Quad
-		glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, 1,  0.0f);  // Bottom Right Of The Texture and Quad
-		glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1,  0.0f);  // Top Right Of The Texture and Quad
-		glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  -1,  0.0f);  // Top Left Of The Texture and Quad
+		glTexCoord2f(0., 0.); glVertex3f(-1.0f, 1,  0.);  // Bottom Left Of The Texture and Quad
+		glTexCoord2f(1.0f, 0.); glVertex3f( 1.0f, 1,  0.);  // Bottom Right Of The Texture and Quad
+		glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1,  0.);  // Top Right Of The Texture and Quad
+		glTexCoord2f(0., 1.0f); glVertex3f(-1.0f,  -1,  0.);  // Top Left Of The Texture and Quad
 		glEnd ();
 		glPopMatrix ();
 	}
@@ -423,10 +431,10 @@ void cairo_dock_render_one_icon_opengl (Icon *icon, CairoDock *pDock, double fRa
 		glBindTexture (GL_TEXTURE_2D, icon->iQuickInfoTexture);
 		glScalef (icon->iQuickInfoWidth * fRatio * icon->fScale/2, icon->iQuickInfoHeight * fRatio * icon->fScale/2, 1.);
 		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, 1,  0.0f);  // Bottom Left Of The Texture and Quad
-		glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, 1,  0.0f);  // Bottom Right Of The Texture and Quad
-		glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1,  0.0f);  // Top Right Of The Texture and Quad
-		glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  -1,  0.0f);  // Top Left Of The Texture and Quad
+		glTexCoord2f(0., 0.); glVertex3f(-1.0f, 1,  0.);  // Bottom Left Of The Texture and Quad
+		glTexCoord2f(1.0f, 0.); glVertex3f( 1.0f, 1,  0.);  // Bottom Right Of The Texture and Quad
+		glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1,  0.);  // Top Right Of The Texture and Quad
+		glTexCoord2f(0., 1.0f); glVertex3f(-1.0f,  -1,  0.);  // Top Left Of The Texture and Quad
 		glEnd ();
 		glPopMatrix ();
 		/*cairo_translate (pCairoContext,
@@ -475,8 +483,8 @@ GLuint cairo_dock_create_texture_from_surface (cairo_surface_t *pImageSurface)
 
 
 
-static float fCapsuleObjectPlaneS[4] = { 0.5f, 0.0f, 0.0f, 0.0f }; // pour un plaquages propre des textures
-static float fCapsuleObjectPlaneT[4] = { 0.0f, 0.5f, 0.0f, 0.0f };
+static float fCapsuleObjectPlaneS[4] = { 0.59f*2, 0., 0., 0. }; // pour un plaquages propre des textures
+static float fCapsuleObjectPlaneT[4] = { 0., 0.59f*2, 0., 0. };
 
 void cairo_dock_init_capsule_display (GLuint iChromeTexture)
 {
@@ -484,14 +492,14 @@ void cairo_dock_init_capsule_display (GLuint iChromeTexture)
 	if (bDone)
 		return ;
 	bDone = TRUE;
-	int        deg, deg2, iter;
-	float        amp, rayon;
+	int        deg, deg2, iter, nb_iter=20;
+	float        amp, rayon, c=2.;
 	
-	rayon        = 1.0f;
-	amp        = 90.0 / 5;
+	rayon        = 1.0f/c;
+	amp        = 90.0 / nb_iter;
 	deg2        = 0;
 	
-	glNewList(CAIRO_DOCK_CAPSULE_LIST, GL_COMPILE); // Go pour la compilation de la display list
+	glNewList(CAIRO_DOCK_CAPSULE_MESH, GL_COMPILE); // Go pour la compilation de la display list
 	
 	glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR ); // ok la on selectionne le type de generation des coordonnees de la texture
 	glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
@@ -500,78 +508,83 @@ void cairo_dock_init_capsule_display (GLuint iChromeTexture)
 	glEnable(GL_TEXTURE_GEN_S);                // oui je veux une generation en S
 	glEnable(GL_TEXTURE_GEN_T);                // Et en T aussi
 	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // pour les bouts de textures qui depassent.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	
 	glMatrixMode(GL_TEXTURE); // On selectionne la matrice des textures
 	glLoadIdentity(); // On la reset
-	glTranslatef(0.5f, 0.5f, 0.0f); // Et on decale la texture pour un affiche propre
-	glRotatef (180, 1, 0, 0);  // sinono les icones sont a l'envers.
+	glTranslatef(0.5f, 0.5f, 0.); // Et on decale la texture pour un affiche propre
+	glRotatef (180, 1, 0, 0);  // sinon les icones sont a l'envers.
 	glMatrixMode(GL_MODELVIEW); // On revient sur la matrice d'affichage
 	
 	// bon la je commente pas on fait juste une demi sphere applatie
-	double a = .3;  // applatissement;
-	for (iter = 0;iter < 5;iter ++)
+	double a = .3/c;  // applatissement;
+	double b = 1./nb_iter;
+	for (iter = 0;iter < nb_iter;iter ++)
 	{
 		for (deg = 0;deg < 360;deg += 10)
 		{
 			glBegin(GL_QUADS);
 			glVertex3f(rayon * sin(deg*RADIAN),
 				rayon * cos(deg*RADIAN),
-				a * sin(deg2*RADIAN) + 0.1f);
-			glVertex3f((rayon-0.2f) * sin(deg*RADIAN),
-				(rayon-0.2f) * cos(deg*RADIAN),
-				a * sin((deg2+amp)*RADIAN) +0.1f);
-			glVertex3f((rayon-0.2f) * sin((deg+10)*RADIAN),    
-				(rayon-0.2f) * cos((deg+10)*RADIAN),
-				a * sin((deg2+amp)*RADIAN) + 0.1f);
+				a * sin(deg2*RADIAN) + 0.1f/c);
+			glVertex3f((rayon-b) * sin(deg*RADIAN),
+				(rayon-b) * cos(deg*RADIAN),
+				a * sin((deg2+amp)*RADIAN) +0.1f/c);
+			glVertex3f((rayon-b) * sin((deg+10)*RADIAN),    
+				(rayon-b) * cos((deg+10)*RADIAN),
+				a * sin((deg2+amp)*RADIAN) + 0.1f/c);
 			glVertex3f(rayon * sin((deg+10)*RADIAN),
 				rayon * cos((deg+10)*RADIAN),
-				a * sin(deg2*RADIAN) + 0.1f);
+				a * sin(deg2*RADIAN) + 0.1f/c);
 		
 			glVertex3f(rayon * sin(deg*RADIAN),                
 				rayon * cos(deg*RADIAN),            
-				a * sin((deg2+180.0f)*RADIAN) - 0.1f);
-			glVertex3f((rayon-0.2f) * sin(deg*RADIAN),        
-				(rayon-0.2f) * cos(deg*RADIAN),        
-				a * sin((deg2+amp+180.0f)*RADIAN) -0.1f);
-			glVertex3f((rayon-0.2f) * sin((deg+10)*RADIAN),    
-				(rayon-0.2f) * cos((deg+10)*RADIAN),
-				a * sin((deg2+amp+180.0f)*RADIAN) - 0.1f);
+				a * sin((deg2+180.)*RADIAN) - 0.1f/c);
+			glVertex3f((rayon-b) * sin(deg*RADIAN),        
+				(rayon-b) * cos(deg*RADIAN),        
+				a * sin((deg2+amp+180.)*RADIAN) -0.1f/c);
+			glVertex3f((rayon-b) * sin((deg+10)*RADIAN),    
+				(rayon-b) * cos((deg+10)*RADIAN),
+				a * sin((deg2+amp+180.)*RADIAN) - 0.1f/c);
 			glVertex3f(rayon * sin((deg+10)*RADIAN),        
 				rayon * cos((deg+10)*RADIAN),        
-				a * sin((deg2+180.0f)*RADIAN) - 0.1f);
+				a * sin((deg2+180.)*RADIAN) - 0.1f/c);
 			glEnd();
 		}
-		rayon    -= 0.2f;
+		rayon    -= b/c;
 		deg2    += amp;
 	}
 
 	// Ici c'est pour faire le cylindre qui relie les demi spheres
 	glEnable(GL_TEXTURE_2D);
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f); // Couleur a fond 
+	//glColor4f(1.0f, 1.0f, 1.0f, 1.0f); // Couleur a fond 
 	g_print ("iChromeTexture : %d\n", iChromeTexture);
 	glBindTexture(GL_TEXTURE_2D, iChromeTexture);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_EXT); // Ici c'est pour le type de combinaison de texturing en cas de multi
-	//glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB_EXT, GL_REPLACE); // pas de multi je remplace donc l'ancienne texture par celle ci
+	glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB_EXT, GL_REPLACE); // pas de multi je remplace donc l'ancienne texture par celle ci
 	
 	glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP); // ok la on selectionne le type de generation des coordonnees de la texture
 	glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP); // Ce sera du sphere mapping pour un petit effet chrome
 	glEnable(GL_TEXTURE_GEN_S); // oui je veux une generation en S
 	glEnable(GL_TEXTURE_GEN_T); // Et en T aussi
 	
-	rayon = 1.0f;
+	
+	rayon = 1.0f/c;
 	
 	//for (iter = 0;iter < 5;iter ++)
 	{
 		for (deg = 0;deg < 360;deg += 10)
 		{
 			glBegin(GL_QUADS);
-			glVertex3f(rayon * sin(deg*RADIAN), rayon * cos(deg*RADIAN), 0.1f);
-			glVertex3f(rayon * sin((deg+10)*RADIAN), rayon * cos((deg+10)*RADIAN), 0.1f);
-			glVertex3f(rayon * sin((deg+10)*RADIAN), rayon * cos((deg+10)*RADIAN), -0.1f);
-			glVertex3f(rayon * sin(deg*RADIAN), rayon * cos(deg*RADIAN), -0.1f);
+			glVertex3f(rayon * sin(deg*RADIAN), rayon * cos(deg*RADIAN), 0.1f/c);
+			glVertex3f(rayon * sin((deg+10)*RADIAN), rayon * cos((deg+10)*RADIAN), 0.1f/c);
+			glVertex3f(rayon * sin((deg+10)*RADIAN), rayon * cos((deg+10)*RADIAN), -0.1f/c);
+			glVertex3f(rayon * sin(deg*RADIAN), rayon * cos(deg*RADIAN), -0.1f/c);
 			glEnd();
 		}
 	
-		rayon -= 0.2f;
+		rayon -= 0.2f/c;
 		deg2 += amp;
 	}
 	
@@ -583,3 +596,103 @@ void cairo_dock_init_capsule_display (GLuint iChromeTexture)
 	glDisable(GL_TEXTURE);
 }
 
+void cairo_dock_init_square_display (void)
+{
+	static gboolean bDone = FALSE;
+	if (bDone)
+		return ;
+	bDone = TRUE;
+	
+	glNewList(CAIRO_DOCK_SQUARE_MESH, GL_COMPILE); // Go pour la compilation de la display list
+	
+	/*glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR ); // ok la on selectionne le type de generation des coordonnees de la texture
+	glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+	glEnable(GL_TEXTURE_GEN_S);                // oui je veux une generation en S
+	glEnable(GL_TEXTURE_GEN_T);                // Et en T aussi
+	
+	glMatrixMode(GL_TEXTURE); // On selectionne la matrice des textures
+	glLoadIdentity(); // On la reset
+	glTranslatef(0.5f, 0.5f, 0.); // Et on decale la texture pour un affiche propre
+	glMatrixMode(GL_MODELVIEW); // On revient sur la matrice d'affichage*/
+	
+	// bon la je commente pas on fait juste un carre.
+	glColor4f(1., 1., 1., 1.);
+	glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+	glDisable(GL_DEPTH_TEST);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0., 0.); glVertex3f(-.5,  .5, 0.);  // Bottom Left Of The Texture and Quad
+	glTexCoord2f(1., 0.); glVertex3f( .5,  .5, 0.);  // Bottom Right Of The Texture and Quad
+	glTexCoord2f(1., 1.); glVertex3f( .5, -.5, 0.);  // Top Right Of The Texture and Quad
+	glTexCoord2f(0., 1.); glVertex3f(-.5, -.5, 0.);  // Top Left Of The Texture and Quad
+	glEnd();
+	
+	glEndList(); // Fini la display list
+	/*
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
+	glDisable(GL_TEXTURE_2D); // Plus de texture merci 
+	glDisable(GL_TEXTURE);*/
+}
+
+void cairo_dock_init_cube_display (void)
+{
+	static gboolean bDone = FALSE;
+	if (bDone)
+		return ;
+	bDone = TRUE;
+	
+	glNewList(CAIRO_DOCK_CUBE_MESH, GL_COMPILE); // Go pour la compilation de la display list
+	
+	/*glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR ); // ok la on selectionne le type de generation des coordonnees de la texture
+	glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+	glEnable(GL_TEXTURE_GEN_S);                // oui je veux une generation en S
+	glEnable(GL_TEXTURE_GEN_T);                // Et en T aussi
+	
+	glMatrixMode(GL_TEXTURE); // On selectionne la matrice des textures
+	glLoadIdentity(); // On la reset
+	glTranslatef(0.5, 0.5, 0.); // Et on decale la texture pour un affiche propre
+	glMatrixMode(GL_MODELVIEW); // On revient sur la matrice d'affichage*/
+	
+	// bon la je commente pas on fait juste un cube.
+	double a = .5 / sqrt (2);
+	glColor4f(1., 1., 1., 1.);
+	glBegin(GL_QUADS);
+	// Front Face (note that the texture's corners have to match the quad's corners)
+	glTexCoord2f(0., 0.); glVertex3f(-a,  a,  a);  // Bottom Left Of The Texture and Quad
+	glTexCoord2f(1., 0.); glVertex3f( a,  a,  a);  // Bottom Right Of The Texture and Quad
+	glTexCoord2f(1., 1.); glVertex3f( a, -a,  a);  // Top Right Of The Texture and Quad
+	glTexCoord2f(0., 1.); glVertex3f(-a, -a,  a);  // Top Left Of The Texture and Quad
+	// Back Face
+	glTexCoord2f(1., 0.); glVertex3f( a,  a, -a);  // Bottom Right Of The Texture and Quad
+	glTexCoord2f(1., 1.); glVertex3f( a, -a, -a);  // Top Right Of The Texture and Quad
+	glTexCoord2f(0., 1.); glVertex3f(-a, -a, -a);  // Top Left Of The Texture and Quad
+	glTexCoord2f(0., 0.); glVertex3f(-a,  a, -a);  // Bottom Left Of The Texture and Quad
+	// Top Face
+	glTexCoord2f(0., 1.); glVertex3f(-a,  a,  a);  // Top Left Of The Texture and Quad
+	glTexCoord2f(0., 0.); glVertex3f(-a,  a, -a);  // Bottom Left Of The Texture and Quad
+	glTexCoord2f(1., 0.); glVertex3f( a,  a, -a);  // Bottom Right Of The Texture and Quad
+	glTexCoord2f(1., 1.); glVertex3f( a,  a,  a);  // Top Right Of The Texture and Quad
+	// Bottom Face
+	glTexCoord2f(1., 1.); glVertex3f( a, -a, -a);  // Top Right Of The Texture and Quad
+	glTexCoord2f(0., 1.); glVertex3f(-a, -a, -a);  // Top Left Of The Texture and Quad
+	glTexCoord2f(0., 0.); glVertex3f(-a, -a,  a);  // Bottom Left Of The Texture and Quad
+	glTexCoord2f(1., 0.); glVertex3f( a, -a,  a);  // Bottom Right Of The Texture and Quad
+	// Right face
+	glTexCoord2f(1., 0.); glVertex3f( a,  a, -a);  // Bottom Right Of The Texture and Quad
+	glTexCoord2f(1., 1.); glVertex3f( a, -a, -a);  // Top Right Of The Texture and Quad
+	glTexCoord2f(0., 1.); glVertex3f( a, -a,  a);  // Top Left Of The Texture and Quad
+	glTexCoord2f(0., 0.); glVertex3f( a,  a,  a);  // Bottom Left Of The Texture and Quad
+	// Left Face
+	glTexCoord2f(0., 0.); glVertex3f(-a,  a, -a);  // Bottom Left Of The Texture and Quad
+	glTexCoord2f(1., 0.); glVertex3f(-a,  a,  a);  // Bottom Right Of The Texture and Quad
+	glTexCoord2f(1., 1.); glVertex3f(-a, -a,  a);  // Top Right Of The Texture and Quad
+	glTexCoord2f(0., 1.); glVertex3f(-a, -a, -a);  // Top Left Of The Texture and Quad
+	glEnd();
+	
+	glEndList(); // Fini la display list
+	/*
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
+	glDisable(GL_TEXTURE_2D); // Plus de texture merci 
+	glDisable(GL_TEXTURE);*/
+}

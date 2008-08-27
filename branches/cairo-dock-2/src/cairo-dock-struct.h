@@ -222,7 +222,7 @@ struct _CairoDock {
 	/// serial ID du thread de montee de la fenetre.
 	gint iSidMoveUp;
 	/// serial ID for window popping up to the top layer event.
-  gint iSidPopUp;
+	gint iSidPopUp;
 	/// serial ID for window popping down to the bottom layer.
 	gint iSidPopDown;
 	/// serial ID du thread de grossisement des icones.
@@ -233,6 +233,8 @@ struct _CairoDock {
 	gint iSidLeaveDemand;
 	/// serial ID du thread qui signale qu'on peut inserer un element dans le dock a cet endroit.
 	gint iSidDropIndicator;
+	/// pour l'animation des icones au survol.
+	gint iSidMouseOver;
 
 	//\_______________ Les fonctions de dessin du dock.
 	/// nom de la vue, utile pour charger les fonctions de rendu posterieurement a la creation du dock.
@@ -611,6 +613,7 @@ struct _Icon {
 	GLuint iQuickInfoTexture;
 	gint iRotationX;
 	gint iRotationY;
+	gint iMouseOverAnimationCount;
 };
 
 
@@ -860,5 +863,11 @@ typedef enum {
 	CAIRO_DOCK_DONT_ZOOM_IN 	= 1<<1
 	} CairoDockLoadImageModifier;
 
+
+typedef enum {
+	CAIRO_DOCK_SQUARE_MESH=1,
+	CAIRO_DOCK_CUBE_MESH,
+	CAIRO_DOCK_CAPSULE_MESH
+	} CairoDockIconMesh;
 
 #endif

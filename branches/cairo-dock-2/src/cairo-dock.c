@@ -242,7 +242,7 @@ gboolean g_bUseFakeTransparency = FALSE;
 
 static gchar *cLaunchCommand = NULL;
 
-
+CairoDockIconMesh g_iIconMesh = CAIRO_DOCK_CAPSULE_MESH;
 gboolean g_bUseOpenGL = FALSE;
 GdkGLConfig* g_pGlConfig = NULL;
 GLuint g_iBackgroundTexture=0;
@@ -506,7 +506,7 @@ int main (int argc, char** argv)
 	cd_message ("environnement de bureau : %d", g_iDesktopEnv);
 	
 	//\___________________ On initialise le gestionnaire de modules et on pre-charge les modules existant.
-	if (g_module_supported () && ! bSafeMode)
+	if (g_module_supported () && ! bSafeMode && ! g_bUseOpenGL)
 	{
 		cairo_dock_initialize_module_manager (CAIRO_DOCK_MODULES_DIR);
 		

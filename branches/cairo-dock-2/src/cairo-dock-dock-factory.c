@@ -443,6 +443,8 @@ void cairo_dock_deactivate_one_dock (CairoDock *pDock)
 		g_source_remove (pDock->iSidShrinkDown);
 	if (pDock->iSidLeaveDemand != 0)
 		g_source_remove (pDock->iSidLeaveDemand);
+	if (pDock->iSidMouseOver != 0)
+		g_source_remove (pDock->iSidMouseOver);
 	if (pDock->bIsMainDock && cairo_dock_application_manager_is_running ())
 	{
 		cairo_dock_pause_application_manager ();  // precaution au cas ou.

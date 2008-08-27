@@ -462,12 +462,12 @@ void cairo_dock_render_opengl_linear (CairoDock *pDock)
 			
 			glPushMatrix ();
 			
-			glBindTexture (GL_TEXTURE_2D, icon->iIconTexture);
+			/**glBindTexture (GL_TEXTURE_2D, icon->iIconTexture);
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f); // Couleur a fond 
 			glTranslatef (icon->fDrawX + icon->fScale * icon->fWidth/2, pDock->iCurrentHeight - icon->fDrawY - icon->fScale * icon->fHeight/2, 0.);
-			glRotatef (alpha, 0, 1, 0);
+			glRotatef (icon->iRotationY, 0, 1, 0);
 			//glScalef (icon->fScale * icon->fWidth/2/sqrt(2.), icon->fScale * icon->fHeight/2/sqrt(2.), icon->fScale * icon->fHeight/2/sqrt(2.));  // pour le cube.
-			glScalef (icon->fScale * icon->fWidth/2, icon->fScale * icon->fHeight/2, icon->fScale * icon->fHeight/2);  // pour la pastille.
+			glScalef (icon->fScale * icon->fWidth, icon->fScale * icon->fHeight, icon->fScale * icon->fHeight);  // pour la pastille.*/
 			
 			
 			/*glBegin(GL_QUADS);
@@ -477,7 +477,7 @@ void cairo_dock_render_opengl_linear (CairoDock *pDock)
 			glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, -1,  1.0f);  // Top Right Of The Texture and Quad
 			glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  -1,  1.0f);  // Top Left Of The Texture and Quad
 			
-			// Back Face 
+			// Back Face
 			glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0f, 1, -1.0f);  // Bottom Right Of The Texture and Quad
 			glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0f,  -1, -1.0f);  // Top Right Of The Texture and Quad
 			glTexCoord2f(0.0f, 1.0f); glVertex3f( -1.0f, -1, -1.0f);  // Top Left Of The Texture and Quad
@@ -508,9 +508,9 @@ void cairo_dock_render_opengl_linear (CairoDock *pDock)
 			glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, -1.0f, -1.0f);  // Top Left Of The Texture and Quad
 			glEnd();*/
 			
-			glCallList(CAIRO_DOCK_CAPSULE_LIST); // Et hop on affiche la capsule
+			///glCallList(CAIRO_DOCK_CAPSULE_MESH); // Et hop on affiche la capsule
 			
-			//cairo_dock_render_one_icon_opengl (icon, pDock, fRatio, fDockMagnitude, TRUE);
+			cairo_dock_render_one_icon_opengl (icon, pDock, fRatio, fDockMagnitude, TRUE);
 			
 			glPopMatrix ();
 			

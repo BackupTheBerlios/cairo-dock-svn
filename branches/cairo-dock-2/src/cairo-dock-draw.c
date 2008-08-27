@@ -393,6 +393,7 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 		{
 			icon->fWidthFactor *= ((c/(2*n)) & 1 ? 1. : -1.) * ((c%n) - n) / n;
 		}
+		icon->iRotationY = (c-1) * 180 / n;
 		icon->iCount --;
 	}
 
@@ -409,6 +410,7 @@ void cairo_dock_manage_animations (Icon *icon, CairoDock *pDock)
 		{
 			icon->fHeightFactor *= ((c/(2*n)) & 1 ? 1. : -1.) * ((c%n) - n) / n;
 		}
+		icon->iRotationX = (c-1) * 180 / n;
 		icon->iCount --;
 	}
 
