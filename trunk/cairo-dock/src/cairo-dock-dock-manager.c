@@ -86,8 +86,8 @@ CairoDock *cairo_dock_register_dock (const gchar *cDockName, CairoDock *pDock)
 
 void cairo_dock_unregister_dock (const gchar *cDockName)
 {
-	g_return_if_fail (cDockName != NULL);
-	g_hash_table_remove (s_hDocksTable, cDockName);
+	if (cDockName != NULL)
+		g_hash_table_remove (s_hDocksTable, cDockName);
 }
 
 static gboolean _cairo_dock_free_one_dock (gchar *cDockName, CairoDock *pDock, gpointer data)
@@ -271,14 +271,28 @@ void cairo_dock_reload_buffers_in_all_docks (void)
 }
 
 
+CairoDock *cairo_dock_alter_dock_name (const gchar *cDockName, CairoDock *pDock, const gchar *cNewName)
+{
+	//g_return_val_if_fail (cDockName != NULL && cNewName != NULL, NULL);
+	if (pDock == NULL)
+	{
+		if (cDockName != NULL)
+			pDock = g_hash_table_lookup (s_hDocksTable, cDockName);
+		g_return_val_if_fail (pDock != NULL, NULL);
+	}
+	
+	if (cDockName != NULL)
+		g_hash_table_remove (s_hDocksTable, cDockName);  // libere la cle, mais pas la valeur puisque la GDestroyFunc est a NULL.
+	if (cNewName != NULL)
+		g_hash_table_insert (s_hDocksTable, g_strdup (cNewName), pDock);
+	
+	return pDock;
+}
+
 void cairo_dock_rename_dock (const gchar *cDockName, CairoDock *pDock, const gchar *cNewName)
 {
-	g_return_if_fail (cDockName != NULL && cNewName != NULL);
-	if (pDock == NULL)
-		pDock = g_hash_table_lookup (s_hDocksTable, cDockName);
-	
-	g_hash_table_remove (s_hDocksTable, cDockName);  // libere la cle, mais pas la valeur puisque la GDestroyFunc est a NULL.
-	g_hash_table_insert (s_hDocksTable, g_strdup (cNewName), pDock);
+	pDock = cairo_dock_alter_dock_name (cDockName, pDock, cNewName);
+	g_return_if_fail (pDock != NULL);
 	
 	GList* ic;
 	Icon *icon;
@@ -287,6 +301,18 @@ void cairo_dock_rename_dock (const gchar *cDockName, CairoDock *pDock, const gch
 		icon = ic->data;
 		g_free (icon->cParentDockName);
 		icon->cParentDockName = g_strdup (cNewName);
+		if (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon))
+		{
+			cairo_dock_update_conf_file (icon->acDesktopFileName,
+				G_TYPE_STRING, "Desktop Entry", "Container", cNewName,
+				G_TYPE_INVALID);
+		}
+		else if (CAIRO_DOCK_IS_APPLET (icon))
+		{
+			cairo_dock_update_conf_file (icon->pModuleInstance->cConfFilePath,
+				G_TYPE_STRING, "Icon", "dock name", cNewName,
+				G_TYPE_INVALID);
+		}
 	}
 }
 
@@ -644,5 +670,5 @@ void cairo_dock_show_hide_container (CairoContainer *pContainer)
 	if (! GTK_WIDGET_VISIBLE (pContainer->pWidget))
 		gtk_window_present (GTK_WINDOW (pContainer->pWidget));
 	else
-		gtk_widget_hide (GTK_WINDOW (pContainer->pWidget));
+		gtk_widget_hide (pContainer->pWidget);
 }

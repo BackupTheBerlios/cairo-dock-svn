@@ -519,6 +519,15 @@ void cairo_dock_reload_module_instance (CairoDockModuleInstance *pInstance, gboo
 			{
 				if (pIcon != NULL)
 				{
+					if (pIcon->acName != NULL && pIcon->pSubDock != NULL)
+					{
+						g_print ("* le sous-dock %s prend le nom '%s'\n", pIcon->acName, pMinimalConfig->cLabel);
+						if (pMinimalConfig->cLabel == NULL)
+							cairo_dock_alter_dock_name (pIcon->acName, pIcon->pSubDock, pMinimalConfig->cLabel);  // on change juste son enregistrement, le nom cParentDockName des icones sera change lorsqu'on mettra un nom a l'icone.
+						else if (strcmp (pIcon->acName, pMinimalConfig->cLabel) != 0)
+							cairo_dock_rename_dock (pIcon->acName, NULL, pMinimalConfig->cLabel);
+					}
+					
 					g_free (pIcon->acName);
 					pIcon->acName = pMinimalConfig->cLabel;
 					pMinimalConfig->cLabel = NULL;  // astuce.

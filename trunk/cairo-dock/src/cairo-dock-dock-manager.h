@@ -97,9 +97,17 @@ gboolean cairo_dock_hide_child_docks (CairoDock *pDock);
 */
 void cairo_dock_reload_buffers_in_all_docks (void);
 /**
+* Renomme un dock dans la table des docks.
+*@param cDockName nom du dock.
+*@param pDock le dock (optionnel).
+*@param cNewName son nouveau nom.
+*@return le dock renomme.
+*/
+CairoDock *cairo_dock_alter_dock_name (const gchar *cDockName, CairoDock *pDock, const gchar *cNewName);
+/**
 * Renomme un dock. Met a jour le nom du container de ses icones.
 *@param cDockName nom du dock.
-*@param pDock le dock.
+*@param pDock le dock (optionnel).
 *@param cNewName son nouveau nom.
 */
 void cairo_dock_rename_dock (const gchar *cDockName, CairoDock *pDock, const gchar *cNewName);

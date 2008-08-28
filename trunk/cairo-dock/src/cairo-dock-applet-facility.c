@@ -23,6 +23,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-log.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-callbacks.h"
+#include "cairo-dock-dock-manager.h"
 #include "cairo-dock-applet-facility.h"
 
 extern gchar *g_cCurrentThemePath;
@@ -178,13 +179,23 @@ void cairo_dock_draw_bar_on_icon (cairo_t *pIconContext, double fValue, Icon *pI
 void cairo_dock_set_icon_name (cairo_t *pSourceContext, const gchar *cIconName, Icon *pIcon, CairoContainer *pContainer)  // fonction proposee par Necropotame.
 {
 	g_return_if_fail (pIcon != NULL && pContainer != NULL);  // le contexte sera verifie plus loin.
-
+	gchar *cUniqueName = NULL;
+	
+	if (pIcon->pSubDock != NULL)
+	{
+		cUniqueName = cairo_dock_get_unique_dock_name (cIconName);
+		cIconName = cUniqueName;
+		cairo_dock_rename_dock (pIcon->acName, pIcon->pSubDock, cUniqueName);
+	}
+	
 	if (pIcon->acName != cIconName)
 	{
 		g_free (pIcon->acName);
 		pIcon->acName = g_strdup (cIconName);
 	}
-
+	
+	g_free (cUniqueName);
+	
 	cairo_dock_fill_one_text_buffer(
 		pIcon,
 		pSourceContext,

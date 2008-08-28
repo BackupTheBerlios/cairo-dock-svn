@@ -1114,6 +1114,8 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data, CairoDockModuleInstance *myApplet)
 *@param cRenderer nom du rendu.
 */
 #define CD_APPLET_CREATE_MY_SUBDOCK(pIconsList, cRenderer) \
+	if (myIcon->acName == NULL) { \
+		CD_APPLET_SET_NAME_FOR_MY_ICON (myIcon->pModuleInstance->pModule->pVisitCard->cModuleName) } \
 	myIcon->pSubDock = cairo_dock_create_subdock_from_scratch (pIconsList, myIcon->acName, myDock); \
 	cairo_dock_set_renderer (myIcon->pSubDock, cRenderer); \
 	cairo_dock_update_dock_size (myIcon->pSubDock);
@@ -1128,6 +1130,8 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data, CairoDockModuleInstance *myApplet)
 *@param pIconsList la liste (eventuellement NULL) des icones du sous-dock; celles-ci seront chargees en dans la foulee.
 */
 #define CD_APPLET_LOAD_ICONS_IN_MY_SUBDOCK(pIconsList) \
+	if (myIcon->acName == NULL) { \
+		CD_APPLET_SET_NAME_FOR_MY_ICON (myIcon->pModuleInstance->pModule->pVisitCard->cModuleName) } \
 	myIcon->pSubDock->icons = pIconsList; \
 	cairo_dock_load_buffers_in_one_dock (myIcon->pSubDock); \
 	cairo_dock_update_dock_size (myIcon->pSubDock);

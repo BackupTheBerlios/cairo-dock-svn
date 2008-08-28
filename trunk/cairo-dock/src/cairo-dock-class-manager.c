@@ -444,7 +444,7 @@ void cairo_dock_update_Xid_on_inhibators (Window Xid, const gchar *cClass)
 					for (ic = pList; ic != NULL; ic = ic->next)
 					{
 						pOneIcon = ic->data;
-						if (pOneIcon->fPersonnalScale == 0 && pSameClassIcon->Xid != Xid)  // la 2eme condition est a priori toujours vraie.
+						if (pOneIcon != NULL && pOneIcon->fPersonnalScale == 0 && pSameClassIcon->Xid != Xid)  // la 2eme condition est a priori toujours vraie.
 						{
 							pSameClassIcon = pOneIcon;
 							break ;

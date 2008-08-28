@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.4.5\n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-08-26 02:33+0200\n"
+"POT-Creation-Date: 2008-08-28 02:09+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -50,7 +50,7 @@ msgstr "マウント"
 msgid "unmount"
 msgstr "アンマウント"
 
-#: ../src/cairo-dock-gui-factory.c:1545
+#: ../src/cairo-dock-gui-factory.c:1554
 msgid "grab"
 msgstr "取得"
 
@@ -329,7 +329,7 @@ msgstr "常に最後面に表示"
 msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr "Compiz の動作設定での指定法: (name=cairo-dock & type=utility)"
 
-#: ../src/cairo-dock-modules.c:788 ../src/cairo-dock-modules.c:811
+#: ../src/cairo-dock-modules.c:797 ../src/cairo-dock-modules.c:820
 #, c-format
 msgid "Configuration of %s"
 msgstr "%s の設定"

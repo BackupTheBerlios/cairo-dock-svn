@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: fabounet@users.berlios.de\n"
-"POT-Creation-Date: 2008-08-26 02:33+0200\n"
+"POT-Creation-Date: 2008-08-28 02:09+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -45,7 +45,7 @@ msgstr "挂载"
 msgid "unmount"
 msgstr "卸载"
 
-#: ../src/cairo-dock-gui-factory.c:1545
+#: ../src/cairo-dock-gui-factory.c:1554
 msgid "grab"
 msgstr "捕捉"
 
@@ -324,7 +324,7 @@ msgstr "总在下面"
 msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr "设置Compiz中的行为成：(name=cairo-dock-desklet & type=utility)"
 
-#: ../src/cairo-dock-modules.c:788 ../src/cairo-dock-modules.c:811
+#: ../src/cairo-dock-modules.c:797 ../src/cairo-dock-modules.c:820
 #, c-format
 msgid "Configuration of %s"
 msgstr "%s的配置"

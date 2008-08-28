@@ -240,7 +240,7 @@ cairo_surface_t *cairo_dock_create_surface_from_pixbuf (GdkPixbuf *pixbuf, cairo
 cairo_surface_t *cairo_dock_create_surface_from_image (const gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale, int iWidthConstraint, int iHeightConstraint, CairoDockLoadImageModifier iLoadingModifier, double *fImageWidth, double *fImageHeight, double *fZoomX, double *fZoomY)
 {
 	//g_print ("%s (%s, %dx%dx%.2f, %d)\n", __func__, cImagePath, iWidthConstraint, iHeightConstraint, fMaxScale, iLoadingModifier);
-	g_return_val_if_fail (cImagePath != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
+	g_return_val_if_fail (cImagePath != NULL && pSourceContext != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	GError *erreur = NULL;
 	RsvgDimensionData rsvg_dimension_data;
 	RsvgHandle *rsvg_handle = NULL;
@@ -394,7 +394,7 @@ cairo_surface_t *cairo_dock_create_surface_for_icon (const gchar *cImagePath, ca
 
 cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fRotationAngle)
 {
-	g_return_val_if_fail (cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS && pSurface != NULL, NULL);
+	g_return_val_if_fail (pSourceContext != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS && pSurface != NULL, NULL);
 	if (fRotationAngle != 0)
 	{
 		cairo_surface_t *pNewSurfaceRotated;
@@ -446,7 +446,7 @@ cairo_surface_t * cairo_dock_rotate_surface (cairo_surface_t *pSurface, cairo_t 
 
 static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale, gboolean bDirectionUp)
 {
-	g_return_val_if_fail (pSurface != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
+	g_return_val_if_fail (pSurface != NULL && pSourceContext != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 
 	//\_______________ On cree la surface d'une fraction hauteur de l'image originale.
 	double fReflectHeight = g_fReflectSize * fMaxScale;
@@ -500,7 +500,7 @@ static cairo_surface_t * cairo_dock_create_reflection_surface_horizontal (cairo_
 
 static cairo_surface_t * cairo_dock_create_reflection_surface_vertical (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale, gboolean bDirectionUp)
 {
-	g_return_val_if_fail (pSurface != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
+	g_return_val_if_fail (pSurface != NULL && pSourceContext != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 
 	//\_______________ On cree la surface d'une fraction hauteur de l'image originale.
 	double fReflectWidth = g_fReflectSize * fMaxScale;
@@ -559,7 +559,7 @@ cairo_surface_t * cairo_dock_create_reflection_surface (cairo_surface_t *pSurfac
 
 cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_horizontal (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale, gboolean bDirectionUp)
 {
-	g_return_val_if_fail (pIconSurface != NULL && pReflectionSurface!= NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
+	g_return_val_if_fail (pIconSurface != NULL && pReflectionSurface!= NULL && pSourceContext != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 
 	//\_______________ On cree la surface de telle facon qu'elle contienne les 2 surfaces.
 	double fReflectHeight = g_fReflectSize * fMaxScale;
@@ -586,7 +586,7 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_horizontal (cai
 }
 cairo_surface_t * cairo_dock_create_icon_surface_with_reflection_vertical (cairo_surface_t *pIconSurface, cairo_surface_t *pReflectionSurface, cairo_t *pSourceContext, double fImageWidth, double fImageHeight, double fMaxScale, gboolean bDirectionUp)
 {
-	g_return_val_if_fail (pIconSurface != NULL && pReflectionSurface!= NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
+	g_return_val_if_fail (pIconSurface != NULL && pReflectionSurface!= NULL && pSourceContext != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 
 	//\_______________ On cree la surface de telle facon qu'elle contienne les 2 surfaces.
 	double fReflectWidth = g_fReflectSize * fMaxScale;
@@ -623,7 +623,7 @@ cairo_surface_t * cairo_dock_create_icon_surface_with_reflection (cairo_surface_
 
 cairo_surface_t *cairo_dock_create_surface_from_text_full (gchar *cText, cairo_t* pSourceContext, CairoDockLabelDescription *pLabelDescription, double fMaxScale, int iMaxWidth, int *iTextWidth, int *iTextHeight, double *fTextXOffset, double *fTextYOffset)
 {
-	g_return_val_if_fail (cText != NULL && pLabelDescription != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
+	g_return_val_if_fail (cText != NULL && pLabelDescription != NULL && pSourceContext != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 	
 	//\_________________ On ecrit le texte dans un calque Pango.
 	PangoLayout *pLayout = pango_cairo_create_layout (pSourceContext);
@@ -744,7 +744,7 @@ cairo_surface_t *cairo_dock_create_surface_from_text_full (gchar *cText, cairo_t
 
 cairo_surface_t * cairo_dock_duplicate_surface (cairo_surface_t *pSurface, cairo_t *pSourceContext, double fWidth, double fHeight, double fDesiredWidth, double fDesiredHeight)
 {
-	g_return_val_if_fail (pSurface != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
+	g_return_val_if_fail (pSurface != NULL && pSourceContext != NULL && cairo_status (pSourceContext) == CAIRO_STATUS_SUCCESS, NULL);
 
 	//\_______________ On cree la surface de la taille desiree.
 	if (fDesiredWidth == 0)

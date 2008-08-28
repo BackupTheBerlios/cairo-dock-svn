@@ -373,7 +373,7 @@ void cairo_dock_free_dock (CairoDock *pDock)
 void cairo_dock_destroy_dock (CairoDock *pDock, const gchar *cDockName, CairoDock *pReceivingDock, gchar *cpReceivingDockName)
 {
 	cd_message ("%s (%s, %d)", __func__, cDockName, pDock->iRefCount);
-	g_return_if_fail (pDock != NULL && cDockName != NULL);
+	g_return_if_fail (pDock != NULL);  // && cDockName != NULL
 	if (pDock->bIsMainDock)  // utiliser cairo_dock_free_all_docks ().
 		return;
 	pDock->iRefCount --;
@@ -526,6 +526,8 @@ void cairo_dock_reference_dock (CairoDock *pDock, CairoDock *pParentDock)
 CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, gchar *cDockName, GdkWindowTypeHint iWindowTypeHint, CairoDock *pParentDock)
 {
 	CairoDock *pSubDock = cairo_dock_create_new_dock (iWindowTypeHint, cDockName, NULL);
+	g_return_val_if_fail (pSubDock != NULL, NULL);
+	
 	cairo_dock_reference_dock (pSubDock, pParentDock);  // on le fait tout de suite pour avoir la bonne reference avant le 'load'.
 
 	pSubDock->icons = pIconList;
@@ -607,6 +609,7 @@ void cairo_dock_free_all_docks (void)
 
 void cairo_dock_update_dock_size (CairoDock *pDock)  // iMaxIconHeight et fFlatDockWidth doivent avoir ete mis a jour au prealable.
 {
+	g_return_if_fail (pDock != NULL);
 	pDock->calculate_max_dock_size (pDock);
 	
 	int n = 0;
