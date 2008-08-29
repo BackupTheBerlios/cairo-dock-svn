@@ -468,9 +468,13 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode)
 			system (sCommand->str);
 			
 			//\___________________ On charge les extras.
-			g_string_printf (sCommand, "cp -r '%s/%s'/* '%s/%s'", cNewThemePath, CAIRO_DOCK_EXTRAS_DIR, g_cCairoDockDataDir, CAIRO_DOCK_EXTRAS_DIR);
-			cd_message ("%s", sCommand->str);
-			system (sCommand->str);
+			g_string_printf (sCommand, "%s/%s", cNewThemePath, CAIRO_DOCK_EXTRAS_DIR);
+			if (g_file_test (sCommand->str, G_FILE_TEST_IS_DIR))
+			{
+				g_string_printf (sCommand, "cp -r '%s/%s'/* '%s/%s'", cNewThemePath, CAIRO_DOCK_EXTRAS_DIR, g_cCairoDockDataDir, CAIRO_DOCK_EXTRAS_DIR);
+				cd_message ("%s", sCommand->str);
+				system (sCommand->str);
+			}
 			
 			//\___________________ On charge les lanceurs si necessaire, en effacant ceux existants.
 			if (g_pMainDock == NULL || g_key_file_get_boolean (pKeyFile, "Themes", "use theme launchers", NULL))
@@ -504,7 +508,7 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode)
 				gchar *cNewPlugInsDir = g_strdup_printf ("%s/%s", cNewThemePath, "plug-ins");
 				GDir *dir = g_dir_open (cNewPlugInsDir, 0, NULL);  // NULL si ce theme n'a pas de repertoire 'plug-ins'.
 				const gchar* cModuleName;
-				gchar *cConfFilePath, *cNewConfFilePath;
+				gchar *cConfFilePath, *cNewConfFilePath, *cUserDataDirPath;
 				do
 				{
 					cModuleName = g_dir_read_name (dir);
@@ -512,29 +516,36 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode)
 						break ;
 					
 					CairoDockModule *pModule =  cairo_dock_find_module_from_name (cModuleName);
-					if (pModule != NULL && pModule->pVisitCard != NULL)
+					if (pModule == NULL || pModule->pVisitCard == NULL)
+						continue;
+
+					cd_debug ("  installing %s's config\n", cModuleName);
+					cUserDataDirPath = g_strdup_printf ("%s/plug-ins/%s", g_cCurrentThemePath, pModule->pVisitCard->cUserDataDir);
+					if (! g_file_test (cUserDataDirPath, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
 					{
-						cNewConfFilePath = g_strdup_printf ("%s/%s/%s", cNewPlugInsDir, cModuleName, pModule->pVisitCard->cConfFileName);
-						cConfFilePath = g_strdup (pModule->cConfFilePath);
+						cd_debug ("    directory %s doesn't exist, it will be created.", cUserDataDirPath);
+						
+						gchar *command = g_strdup_printf ("mkdir -p %s", cUserDataDirPath);
+						system (command);
+						g_free (command);
 					}
-					else
-					{
-						cNewConfFilePath = g_strdup_printf ("%s/%s/%s.conf", cNewPlugInsDir, cModuleName, cModuleName);
-						cConfFilePath = g_strdup_printf ("%s/%s/%s/%s.conf", g_cCurrentThemePath, "plug-ins", cModuleName, cModuleName);
-					}
-					g_print ("%s <- %s\n", cConfFilePath, cNewConfFilePath);
+					cConfFilePath = g_strdup_printf ("%s/%s", cUserDataDirPath, pModule->pVisitCard->cConfFileName);
+					cNewConfFilePath = g_strdup_printf ("%s/%s/%s", cNewPlugInsDir, pModule->pVisitCard->cUserDataDir, pModule->pVisitCard->cConfFileName);
+					
 					if (! g_file_test (cConfFilePath, G_FILE_TEST_EXISTS))
 					{
-						g_string_printf (sCommand, "cp '%s' '%s'", cNewConfFilePath, cConfFilePath);
-						system (sCommand->str);
+						cd_debug ("    no conf file %s, we will take the theme's one", cConfFilePath);
+						gchar *command = g_strdup_printf ("cp '%s' '%s'", cNewConfFilePath, cConfFilePath);
+						system (command);
+						g_free (command);
 					}
 					else
 					{
 						cairo_dock_replace_keys_by_identifier (cConfFilePath, cNewConfFilePath, '+');
 					}
-					
 					g_free (cNewConfFilePath);
 					g_free (cConfFilePath);
+					g_free (cUserDataDirPath);
 				}
 				while (1);
 				g_dir_close (dir);

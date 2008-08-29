@@ -223,6 +223,7 @@ if test "$CAIRO_DOCK_AUTORECONF" = "1"; then
 			cd $plugin
 			if test -e Makefile.am -a "$plugin" != "$CAIRO_DOCK_EXCLUDE"; then
 				if test -e po; then
+					echo "generating translation files for $plugin ..."
 					if test -x $CAIRO_DOCK_EXTRACT_MESSAGE; then
 						rm -f data/messages
 						for c in data/*.conf
