@@ -107,6 +107,7 @@ static gboolean s_bEntranceAllowed = TRUE;
 static gboolean s_bAutoHideInitialValue;
 static gboolean s_bHideAfterShortcut = FALSE;
 
+#define CAIRO_DOCK_IN_MOVMENT(pDock) (pDock->iSidMouseOver || pDock->iSidDropIndicator || pDock->iSidShrinkDown || pDock->iSidGrowUp)
 
 void on_realize (GtkWidget* pWidget,
 	 CairoDock *pDock)
@@ -141,16 +142,22 @@ void on_realize (GtkWidget* pWidget,
 	glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
 	glClearDepth (1.0f);
 	glEnable (GL_BLEND);
-	glShadeModel (GL_FLAT);
+	glShadeModel (GL_SMOOTH);  // par defaut.
 	glEnable (GL_TEXTURE_2D);
 	glPolygonMode (GL_FRONT, GL_FILL);
 	glDisable (GL_CULL_FACE);
-	/*GLfloat afLightDiffuse[] = {1.0f, 1.0f, 1.0f, 0.0f};
-	glLightModelf (GL_LIGHT_MODEL_TWO_SIDE, 0.0f);
-	glEnable (GL_LIGHTING);
-	glEnable (GL_LIGHT0);
-	glLightfv (GL_LIGHT0, GL_DIFFUSE, afLightDiffuse);*/
 	
+	glEnable (GL_LIGHTING);  // pour indiquer a OpenGL qu'il devra prendre en compte l'eclairage.
+	//glLightModelf (GL_LIGHT_MODEL_TWO_SIDE, 0.0f);
+	//glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);  // OpenGL doit considerer pour ses calculs d'eclairage que l'oeil est dans la scene (plus realiste).
+	GLfloat fGlobalAmbientColor[4] = {0., 0., 0., 0.};
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, fGlobalAmbientColor);  // on definit la couleur de la lampe d'ambiance.
+	glEnable (GL_LIGHT0);  // on allume la lampe 0.
+	GLfloat fDiffuseColor[4] = {0., 1., 1., 1.};
+	glLightfv (GL_LIGHT0, GL_DIFFUSE, fDiffuseColor);  // GL_AMBIENT, GL_DIFFUSE, GL_SPECULAR
+	GLfloat fDirection[4] = {0., 1., 1., 0.};  // le dernier 0 <=> direction.
+	glLightfv(GL_LIGHT0, GL_POSITION, fDirection);
+
 	///glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);  // GL_MODULATE / GL_DECAL /  GL_BLEND
 	glTexParameteri (GL_TEXTURE_2D,
 			GL_TEXTURE_MIN_FILTER,
@@ -161,7 +168,7 @@ void on_realize (GtkWidget* pWidget,
 
 	gdk_gl_drawable_gl_end (pGlDrawable);
 }
-
+double a = .85;
 gboolean on_expose (GtkWidget *pWidget,
 	GdkEventExpose *pExpose,
 	CairoDock *pDock)
@@ -175,8 +182,30 @@ gboolean on_expose (GtkWidget *pWidget,
 		if (!gdk_gl_drawable_gl_begin (pGlDrawable, pGlContext))
 			return FALSE;
 		
+		/*int iMouseX = 
+		for (k = n; k >= 0; k --)
+		{
+			
+		}*/
+		
+		if (pDock->iSidBlurFading != 0 || CAIRO_DOCK_IN_MOVMENT (pDock))
+			glAccum(GL_MULT, a);
+		
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		pDock->render_opengl (pDock);
+		
+		if (pDock->iSidBlurFading != 0 || CAIRO_DOCK_IN_MOVMENT (pDock))
+		{
+			glAccum (GL_ACCUM, 1-a);
+			glAccum (GL_RETURN, 1.0);
+		}
+		else
+		{
+			glClearAccum (0., 0., 0., 0.);
+			glClear (GL_ACCUM_BUFFER_BIT);
+			glAccum (GL_ACCUM, 1.);
+		}
+		
 		
 		if (gdk_gl_drawable_is_double_buffered (pGlDrawable))
 			gdk_gl_drawable_swap_buffers (pGlDrawable);
@@ -373,12 +402,14 @@ static gboolean _cairo_dock_show_sub_dock_delayed (CairoDock *pDock)
 	return FALSE;
 }
 
+#define ROTATION_COUNT 40
 static gboolean _cairo_dock_animate_on_mouse_over (CairoDock *pDock)
 {
 	gboolean bContinue = FALSE;
 	Icon *icon;
 	GList *ic;
 	int n = g_tNbIterInOneRound[CAIRO_DOCK_ROTATE] / 2;  // nbre d'iteration pour 1/2 tour.
+	n = ROTATION_COUNT/2;
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
 	{
 		icon = ic->data;
@@ -467,16 +498,47 @@ void cairo_dock_on_change_icon (Icon *pLastPointedIcon, Icon *pPointedIcon, Cair
 	{
 		if (pDock->iSidMouseOver == 0)
 		{
-			pDock->iSidMouseOver = g_timeout_add (50., (GSourceFunc) _cairo_dock_animate_on_mouse_over, pDock);
+			pDock->iSidMouseOver = g_timeout_add (30., (GSourceFunc) _cairo_dock_animate_on_mouse_over, pDock);
 		}
 		pPointedIcon->iMouseOverAnimationCount = g_tNbIterInOneRound[CAIRO_DOCK_ROTATE];
+		pPointedIcon->iMouseOverAnimationCount = ROTATION_COUNT;
 	}
+}
+static gboolean _cairo_dock_blur_fading (CairoDock *pDock)
+{
+	g_print ("%s ()\n", __func__);
+	
+	if (CAIRO_DOCK_IN_MOVMENT (pDock))
+		return TRUE;
+	
+	gtk_widget_queue_draw (pDock->pWidget);
+	pDock->iBlurCount --;
+	g_print ("blur <- %d\n", pDock->iBlurCount);
+	
+	if (pDock->iBlurCount <= 0)
+	{
+		pDock->iBlurCount = 0;
+		pDock->iSidBlurFading = 0;
+		return FALSE;
+	}
+	return TRUE;
 }
 gboolean on_motion_notify2 (GtkWidget* pWidget,
 	GdkEventMotion* pMotion,
 	CairoDock *pDock)
 {
 	static double fLastTime = 0;
+	pDock->iBlurCount = 20;
+	if (pDock->iSidBlurFading != 0)
+	{
+		//g_source_remove (pDock->iSidBlurFading);
+		//pDock->iSidBlurFading = 0;
+	}
+	else
+	{
+		//pDock->iBlurCount = 5;
+		pDock->iSidBlurFading = g_timeout_add (50, _cairo_dock_blur_fading, pDock);
+	}
 	Icon *pPointedIcon, *pLastPointedIcon = cairo_dock_get_pointed_icon (pDock->icons);
 	int iLastMouseX = pDock->iMouseX;
 	//g_print ("pDock->fAvoidingMouseMargin : %.2f\n", pDock->fAvoidingMouseMargin);
@@ -598,7 +660,13 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	{
 		cairo_dock_on_change_icon (pLastPointedIcon, pPointedIcon, pDock);
 	}
-
+	
+	/*if (pDock->iSidBlurFading == 0)
+	{
+		pDock->iBlurCount = 5;
+		pDock->iSidBlurFading = g_timeout_add (35, _cairo_dock_blur_fading, pDock);
+	}*/
+	
 	return FALSE;
 }
 
@@ -1437,6 +1505,9 @@ gboolean on_scroll (GtkWidget* pWidget,
 	if (pDock->icons == NULL)
 		return FALSE;
 	
+	a += .01 * (pScroll->direction == 1 ? 1 : -1);
+	g_print ("a <- %.2f\n", a);
+	return FALSE;
 	if (pScroll->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK))
 	{
 		Icon *icon = cairo_dock_get_pointed_icon (pDock->icons);
@@ -1539,6 +1610,9 @@ gboolean on_configure (GtkWidget* pWidget,
 				w/2, h/2, 0.,
 				0.0f, 1.0f, 0.0f);
 			glTranslatef (0.0f, 0.0f, -3.);
+			
+			glClearAccum (0., 0., 0., 0.);
+			glClear (GL_ACCUM_BUFFER_BIT);
 			
 			gdk_gl_drawable_gl_end (pGlDrawable);
 		}

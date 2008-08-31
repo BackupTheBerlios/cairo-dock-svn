@@ -936,7 +936,7 @@ cairo_surface_t *cairo_dock_load_chrome_surface (void)
 {
 	double fImageWidth=0, fImageHeight=0;
 	cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (g_pMainDock));
-	cairo_surface_t *pChromeSurface = cairo_dock_create_surface_from_image ("/home/fab/.cairo-dock/current_theme/launchers/bmp.svg",
+	cairo_surface_t *pChromeSurface = cairo_dock_create_surface_from_image ("/home/fab/CD/branches/cairo-dock-2/data/capsule-texture.png",
 		pCairoContext,
 		1.,
 		0., 0.,
@@ -944,7 +944,7 @@ cairo_surface_t *cairo_dock_load_chrome_surface (void)
 		&fImageWidth,
 		&fImageHeight,
 		NULL, NULL);
-	g_print ("chrome genere (%x)\n", pChromeSurface);
+	g_print ("chrome genere (%x, %.2fx%.2f)\n", pChromeSurface, fImageWidth, fImageHeight);
 	cairo_destroy (pCairoContext);
 	return pChromeSurface;
 }

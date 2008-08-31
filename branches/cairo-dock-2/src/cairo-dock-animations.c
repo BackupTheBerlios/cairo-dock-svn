@@ -188,6 +188,7 @@ gfloat cairo_dock_calculate_magnitude (gint iMagnitudeIndex)  // merci a Robrob 
 gboolean cairo_dock_grow_up (CairoDock *pDock)
 {
 	//g_print ("%s (%d ; %f ; %d)\n", __func__, pDock->iMagnitudeIndex, pDock->fFoldingFactor, pDock->bInside);
+	pDock->iBlurCount = 20;
 	if (pDock->iSidShrinkDown != 0)
 		return TRUE;  // on se met en attente de fin d'animation.
 
@@ -228,6 +229,7 @@ gboolean cairo_dock_grow_up (CairoDock *pDock)
 gboolean cairo_dock_shrink_down (CairoDock *pDock)
 {
 	//g_print ("%s (%d)\n", __func__, pDock->iMagnitudeIndex);
+	pDock->iBlurCount = 20;
 	pDock->iMagnitudeIndex -= g_iShrinkDownInterval;
 	if (pDock->iMagnitudeIndex < 0)
 		pDock->iMagnitudeIndex = 0;

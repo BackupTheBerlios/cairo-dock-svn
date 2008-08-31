@@ -296,7 +296,6 @@ void cairo_dock_render_optimized_linear (cairo_t *pCairoContext, CairoDock *pDoc
 
 void cairo_dock_render_opengl_linear (CairoDock *pDock)
 {
-	static float alpha = 0;
 	GLsizei w = pDock->iCurrentWidth;
 	GLsizei h = pDock->iCurrentHeight;
 	
@@ -365,13 +364,13 @@ void cairo_dock_render_opengl_linear (CairoDock *pDock)
 	//\_____________ On definit l'etat courant.
 	glDisable(GL_DEPTH_TEST);// On desactive le tampon de profondeur 
 	
-	glEnable(GL_TEXTURE_2D); // Je veux de la texture 
+	glEnable(GL_TEXTURE_2D); // Je veux de la texture
 	
-	glBindTexture(GL_TEXTURE_2D, g_iBackgroundTexture); // allez on bind la texture 
-	glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR ); // ok la on selectionne le type de generation des coordonnees de la texture 
-	glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR ); 
-	glEnable(GL_TEXTURE_GEN_S); // oui je veux une generation en S 
-	glEnable(GL_TEXTURE_GEN_T); // Et en T aussi 
+	glBindTexture(GL_TEXTURE_2D, g_iBackgroundTexture); // allez on bind la texture
+	glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR ); // ok la on selectionne le type de generation des coordonnees de la texture
+	glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+	glEnable(GL_TEXTURE_GEN_S); // oui je veux une generation en S
+	glEnable(GL_TEXTURE_GEN_T); // Et en T aussi
 	
 	glLoadIdentity();
 	
@@ -381,9 +380,9 @@ void cairo_dock_render_opengl_linear (CairoDock *pDock)
 	//\_____________ On trace en texturant par des triangles.
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f); // Couleur a fond
 	
-	glBlendFunc (GL_SRC_ALPHA, 1.); // Transparence avec le canal alpha 
-	glEnable(GL_BLEND); // On active le blend 
-	//glEnable(GL_ALPHA_TEST); // On active l'alpha test 
+	glBlendFunc (GL_SRC_ALPHA, 1.); // Transparence avec le canal alpha
+	glEnable(GL_BLEND); // On active le blend
+	//glEnable(GL_ALPHA_TEST); // On active l'alpha test
 	//glAlphaFunc(GL_GREATER, 0.0f); // on affiche tout les pixels dont l'alpha est superieur a 0 
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset (1., 1.);
@@ -452,6 +451,20 @@ void cairo_dock_render_opengl_linear (CairoDock *pDock)
 	glLoadIdentity();
 	glTranslatef (0, 0, -pDock->iMaxIconHeight * (1 + g_fAmplitude) + 1);
 	
+	glEnable (GL_LIGHTING);  // pour indiquer a OpenGL qu'il devra prendre en compte l'eclairage.
+	glLightModelf (GL_LIGHT_MODEL_TWO_SIDE, 1.0f);
+	//glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);  // OpenGL doit considerer pour ses calculs d'eclairage que l'oeil est dans la scene (plus realiste).
+	GLfloat fGlobalAmbientColor[4] = {0., 0., 0., 0.};
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, fGlobalAmbientColor);  // on definit la couleur de la lampe d'ambiance.
+	glEnable (GL_LIGHT0);  // on allume la lampe 0.
+	GLfloat fDiffuseColor[4] = {0.9, 0.9, 0.9, 1.};
+	glLightfv (GL_LIGHT0, GL_AMBIENT, fDiffuseColor);  // GL_AMBIENT, GL_DIFFUSE, GL_SPECULAR
+	//glLightfv (GL_LIGHT0, GL_DIFFUSE, fDiffuseColor);
+	GLfloat fSpecularColor[4] = {0.5, 0.5, 0.1, 1.};
+	glLightfv (GL_LIGHT0, GL_SPECULAR, fSpecularColor);
+	GLfloat fDirection[4] = {20, 20, -100., 0.};  // le dernier 0 <=> direction.
+	glLightfv(GL_LIGHT0, GL_POSITION, fDirection);
+	
 	if (pFirstDrawnElement != NULL)
 	{
 		Icon *icon;
@@ -517,8 +530,7 @@ void cairo_dock_render_opengl_linear (CairoDock *pDock)
 			ic = cairo_dock_get_next_element (ic, pDock->icons);
 		} while (ic != pFirstDrawnElement);
 	}
-	
-	alpha = alpha + 3;
+	glDisable (GL_LIGHTING);
 }
 
 

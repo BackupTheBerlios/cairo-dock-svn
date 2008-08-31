@@ -255,6 +255,9 @@ struct _CairoDock {
 	gboolean bUseReflect;
 	/// decalage du signal d'insertion pou rson animation.
 	gint iDropIndicatorOffset;
+	
+	gint iSidBlurFading;
+	gint iBlurCount;
 };
 
 
