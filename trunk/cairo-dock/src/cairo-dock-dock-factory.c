@@ -80,7 +80,7 @@ extern gboolean g_bUseGlitz;
 CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockName, gchar *cRendererName)
 {
 	//static pouet = 0;
-	//g_print ("%s ()\n", __func__);
+	cd_message ("%s (%s)", __func__, cDockName);
 	g_return_val_if_fail (cDockName != NULL, NULL);
 	
 	//\__________________ On enregistre un nouveau dock.

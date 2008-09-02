@@ -416,6 +416,7 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode)
 
 			gchar *cNewThemePath = g_hash_table_lookup (hThemeTable, cNewThemeName);
 			gboolean bDistantTheme = FALSE;
+			gchar *cRepToDelete = NULL;
 			
 			//\___________________ On telecharge le theme s'il est distant.
 			if (strncmp (cNewThemePath, "http://", 7) == 0 || strncmp (cNewThemePath, "ftp://", 6) == 0)
@@ -435,15 +436,61 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode)
 				close(fds);
 				
 				g_print ("uncompressing theme %s ...\n", cNewThemeName);
-				g_string_printf (sCommand, "tar xfz \"%s\" -C \"%s/%s\"", cTmpFilePath, g_cCairoDockDataDir, CAIRO_DOCK_THEMES_DIR);
+				
+				cNewThemePath = g_strdup_printf ("%s-data", cTmpFilePath);
+				bDistantTheme = TRUE;
+				
+				if (! g_file_test (cNewThemePath, G_FILE_TEST_EXISTS))
+				{
+					if (g_mkdir (cNewThemePath, 7*8*8+7*8+5) != 0)
+					{
+						cd_warning ("Attention : couldn't create directory %s", cNewThemePath);
+						g_remove (cTmpFilePath);
+						g_free (cTmpFilePath);
+						g_hash_table_destroy (hThemeTable);
+						g_free (cNewThemePath);
+						return FALSE;
+					}
+				}
+				
+				g_string_printf (sCommand, "tar xfz \"%s\" -C \"%s\"", cTmpFilePath, cNewThemePath);
 				system (sCommand->str);
+				
+				//\___________________ On verifie ou les fichiers se sont decompresses.
+				GDir *dir = g_dir_open (cNewThemePath, 0, NULL);
+				const gchar* cFileName;
+				gchar *cPrevFileName = NULL;
+				int iNbFiles = 0;
+				do
+				{
+					cFileName = g_dir_read_name (dir);
+					if (cFileName == NULL)
+						break ;
+					cPrevFileName = g_strdup (cFileName);
+					iNbFiles ++;
+				} while (iNbFiles < 2);
+				g_dir_close (dir);
+				
+				if (iNbFiles == 0)
+				{
+					cd_warning ("Attention : directory %s is empty or unreadable", cNewThemePath);
+					g_remove (cTmpFilePath);
+					g_free (cTmpFilePath);
+					g_hash_table_destroy (hThemeTable);
+					g_free (cNewThemePath);
+					return FALSE;
+				}
+				else if (iNbFiles == 1)
+				{
+					cRepToDelete = cNewThemePath;
+					cNewThemePath = g_strdup_printf ("%s-data/%s", cTmpFilePath, cPrevFileName);
+				}
+				g_free (cPrevFileName);
 				
 				g_remove (cTmpFilePath);
 				g_free (cTmpFilePath);
 				
-				cNewThemePath = g_strdup_printf ("%s/%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_THEMES_DIR, cNewThemeName);
 				g_print ("le theme se trouve temporairement dans %s\n", cNewThemePath);
-				bDistantTheme = TRUE;
 			}
 			
 			//\___________________ On charge les parametres de comportement.
@@ -559,9 +606,10 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode)
 			
 			if (bDistantTheme)
 			{
-				g_string_printf (sCommand, "rm -rf \"%s\"", cNewThemePath);
+				g_string_printf (sCommand, "rm -rf \"%s\"", (cRepToDelete != NULL ? cRepToDelete : cNewThemePath));
 				system (sCommand->str);
 				g_free (cNewThemePath);
+				g_free (cRepToDelete);
 			}
 			
 			g_string_free (sCommand, TRUE);
