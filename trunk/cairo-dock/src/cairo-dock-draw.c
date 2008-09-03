@@ -1383,10 +1383,6 @@ void cairo_dock_draw_drop_indicator (CairoDock *pDock, cairo_t *pCairoContext)
 	
 	cairo_pattern_destroy (pPattern);
 	cairo_pattern_destroy (pGradationPattern);
-	
-	pDock->iDropIndicatorOffset += 3;
-	if (pDock->iDropIndicatorOffset > 2*g_fDropIndicatorHeight)
-		pDock->iDropIndicatorOffset = 0;
 }
 
 gboolean cairo_dock_display_drop_indicator (CairoDock *pDock)
@@ -1405,6 +1401,9 @@ gboolean cairo_dock_display_drop_indicator (CairoDock *pDock)
 	//g_print ("rect (%d;%d) (%dx%d)\n", rect.x, rect.y, rect.width, rect.height);
 	if (rect.width > 0 && rect.height > 0)
 	{
+		pDock->iDropIndicatorOffset += 3;
+		if (pDock->iDropIndicatorOffset > 2*g_fDropIndicatorHeight)
+			pDock->iDropIndicatorOffset = 0;
 #ifdef HAVE_GLITZ
 		if (pDock->pDrawFormat && pDock->pDrawFormat->doublebuffer)
 			gtk_widget_queue_draw (pDock->pWidget);

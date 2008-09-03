@@ -82,7 +82,7 @@ static gboolean on_leave_dialog (GtkWidget* pWidget,
 	if (! cairo_dock_dialog_reference (pDialog))
 		return FALSE;
 
-	cd_debug ("%s (%d/%d)", __func__, pDialog->iButtonOkOffset, pDialog->iButtonCancelOffset);
+	//cd_debug ("%s (%d/%d)", __func__, pDialog->iButtonOkOffset, pDialog->iButtonCancelOffset);
 
 	/*while (gtk_events_pending ())
 		gtk_main_iteration ();
@@ -96,7 +96,7 @@ static gboolean on_leave_dialog (GtkWidget* pWidget,
 		return FALSE;
 	}
 
-	cd_debug ("outside (%d;%d / %dx%d)", iMouseX, iMouseY, pDialog->iWidth, pDialog->iHeight);
+	//cd_debug ("outside (%d;%d / %dx%d)", iMouseX, iMouseY, pDialog->iWidth, pDialog->iHeight);
 	pDialog->bInside = FALSE;
 	Icon *pIcon = pDialog->pIcon;
 	if (pIcon != NULL /*&& (pEvent->state & GDK_BUTTON1_MASK) == 0*/)
@@ -312,7 +312,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 			if (pDialog->bRight)
 			{
 				fDeltaMargin = MAX (0, pDialog->iAimedX - pDialog->iPositionX - fRadius - fLineWidth / 2);
-				g_print ("fDeltaMargin : %.2f\n", fDeltaMargin);
+				//g_print ("fDeltaMargin : %.2f\n", fDeltaMargin);
 				cairo_rel_line_to (pCairoContext, -iWidth + fDeltaMargin + fLineWidth + 2. * fRadius + CAIRO_DIALOG_TIP_MARGIN + CAIRO_DIALOG_TIP_BASE + CAIRO_DIALOG_TIP_ROUNDING_MARGIN , 0); 
 				cairo_rel_curve_to (pCairoContext,
 					0, 0,
@@ -327,7 +327,7 @@ static gboolean on_expose_dialog (GtkWidget *pWidget,
 			else
 			{
 				fDeltaMargin = MAX (0, MIN (- CAIRO_DIALOG_TIP_MARGIN - CAIRO_DIALOG_TIP_ROUNDING_MARGIN - CAIRO_DIALOG_TIP_BASE - fRadius - fLineWidth / 2, pDialog->iPositionX - pDialog->iAimedX - fRadius - fLineWidth / 2) + pDialog->iWidth);
-				g_print ("fDeltaMargin : %.2f / %d\n", fDeltaMargin, pDialog->iWidth);
+				//g_print ("fDeltaMargin : %.2f / %d\n", fDeltaMargin, pDialog->iWidth);
 				cairo_rel_line_to (pCairoContext, - (CAIRO_DIALOG_TIP_MARGIN + fDeltaMargin) + CAIRO_DIALOG_TIP_ROUNDING_MARGIN, 0);
 				cairo_rel_curve_to (pCairoContext,
 					0, 0,
@@ -423,7 +423,7 @@ static gboolean on_configure_dialog (GtkWidget* pWidget,
 	GdkEventConfigure* pEvent,
 	CairoDialog *pDialog)
 {
-	//cd_message ("%s (%dx%d)", __func__, pEvent->width, pEvent->height);
+	//g_print ("%s (%dx%d)\n", __func__, pEvent->width, pEvent->height);
 	if (! cairo_dock_dialog_reference (pDialog))
 		return FALSE;
 
@@ -874,8 +874,12 @@ CairoDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, CairoCont
 			FALSE,
 			0);
 	}
-	pDialog->iBubbleWidth = MAX (pDialog->iBubbleWidth, 2*g_iDockRadius+g_iDockLineWidth);
-	pDialog->iBubbleHeight = MAX (pDialog->iBubbleHeight, 2*g_iDockRadius+g_iDockLineWidth);
+	if (pDialog->iBubbleWidth == 0)
+		pDialog->iBubbleWidth = 2*g_iDockRadius+g_iDockLineWidth;
+	if (pDialog->iBubbleHeight == 0)
+		pDialog->iBubbleHeight = 2*g_iDockRadius+g_iDockLineWidth;
+	//pDialog->iBubbleWidth = MAX (pDialog->iBubbleWidth, 2*g_iDockRadius+g_iDockLineWidth);
+	//pDialog->iBubbleHeight = MAX (pDialog->iBubbleHeight, 2*g_iDockRadius+g_iDockLineWidth);
 	cd_debug ("=> iBubbleWidth: %d , iBubbleHeight : %d", pDialog->iBubbleWidth, pDialog->iBubbleHeight);
 
 	//\________________ On definit la geometrie et la position de la fenetre globale.
