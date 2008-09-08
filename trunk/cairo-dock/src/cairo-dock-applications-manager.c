@@ -702,7 +702,7 @@ static void _cairo_dock_hide_show_windows_on_other_desktops (Window *Xid, Icon *
 		else
 		{
 			cd_message (" => n'est pas sur le bureau actuel.");
-			CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
+			pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 			if (pParentDock != NULL)
 			{
 				cairo_dock_detach_icon_from_dock (icon, pParentDock, TRUE);
