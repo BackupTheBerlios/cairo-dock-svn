@@ -456,11 +456,45 @@ int main (int argc, char** argv)
 	textdomain (CAIRO_DOCK_GETTEXT_PACKAGE);
 
 	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
-	g_cCairoDockDataDir = (cUserDefinedDataDir != NULL ? cUserDefinedDataDir : g_strdup_printf ("%s/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR));
-	if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_IS_DIR))
+	if (cUserDefinedDataDir != NULL)
 	{
-		if (g_mkdir (g_cCairoDockDataDir, 7*8*8+7*8+5) != 0)
-			cd_warning ("Attention : couldn't create directory %s", g_cCairoDockDataDir);
+		g_cCairoDockDataDir = cUserDefinedDataDir;
+		cUserDefinedDataDir = NULL;
+		if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_IS_DIR))
+		{
+			if (g_mkdir (g_cCairoDockDataDir, 7*8*8+7*8+5) != 0)
+				cd_warning ("Attention : couldn't create directory %s", g_cCairoDockDataDir);
+		}
+	}
+	else
+	{
+		g_cCairoDockDataDir = g_strdup_printf ("%s/.config/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR);
+		if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_IS_DIR))
+		{
+			gchar *cOldDataDir = g_strdup_printf ("%s/.cairo-dock", getenv("HOME"));
+			if (g_file_test (cOldDataDir, G_FILE_TEST_IS_DIR))  // l'ancien rep existe, on le deplace.
+			{
+				cd_warning ("Cairo-Dock's data dir is now located in ~/.config, it will be moved there");
+				gchar *cCommand = g_strdup_printf ("mkdir '%s/.config' > /dev/null", getenv("HOME"));
+				system (cCommand);
+				g_free (cCommand);
+					
+				cCommand = g_strdup_printf ("mv '%s' '%s'", cOldDataDir, g_cCairoDockDataDir);
+				system (cCommand);
+				g_free (cCommand);
+				
+				cCommand = g_strdup_printf ("sed -i \"s/~\\/.cairo-dock/~\\/.config\\/%s/g\" '%s/%s/%s'", CAIRO_DOCK_DATA_DIR, g_cCairoDockDataDir, CAIRO_DOCK_CURRENT_THEME_NAME, CAIRO_DOCK_CONF_FILE);
+				g_print ("%s\n", cCommand);
+				system (cCommand);
+				g_free (cCommand);
+			}
+			else
+			{
+				if (g_mkdir (g_cCairoDockDataDir, 7*8*8+7*8+5) != 0)
+					cd_warning ("Attention : couldn't create directory %s", g_cCairoDockDataDir);
+			}
+			g_free (cOldDataDir);
+		}
 	}
 	gchar *cThemesDir = g_strdup_printf ("%s/%s", g_cCairoDockDataDir, CAIRO_DOCK_THEMES_DIR);
 	if (! g_file_test (cThemesDir, G_FILE_TEST_IS_DIR))

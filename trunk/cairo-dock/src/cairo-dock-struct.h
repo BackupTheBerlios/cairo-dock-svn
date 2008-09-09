@@ -856,7 +856,7 @@ struct _CairoFlyingContainer {
 };
 
 /// Nom du repertoire de travail de cairo-dock.
-#define CAIRO_DOCK_DATA_DIR ".cairo-dock"
+#define CAIRO_DOCK_DATA_DIR "cairo-dock"
 /// Nom du repertoire des themes utilisateur.
 #define CAIRO_DOCK_THEMES_DIR "themes"
 /// Nom du repertoire des extras utilisateur/themes (jauges, clock, etc).
