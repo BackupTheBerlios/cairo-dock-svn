@@ -263,6 +263,7 @@ void cairo_dock_render_gauge_multi_value(cairo_t *pSourceContext, CairoContainer
 	
 	GaugeImage *pGaugeImage;
 	
+	cairo_save (pSourceContext);
 	cairo_set_source_rgba (pSourceContext, 0.0, 0.0, 0.0, 0.0);
 	cairo_set_operator (pSourceContext, CAIRO_OPERATOR_SOURCE);
 	cairo_paint (pSourceContext);
@@ -312,6 +313,7 @@ void cairo_dock_render_gauge_multi_value(cairo_t *pSourceContext, CairoContainer
 		cairo_set_source_surface (pSourceContext, pGaugeImage->cairoSurface, 0.0f, 0.0f);
 		cairo_paint (pSourceContext);
 	}
+	cairo_restore (pSourceContext);
 	
 	// On cree le reflet.
 	if (CAIRO_DOCK_IS_DOCK (pContainer) && CAIRO_DOCK (pContainer)->bUseReflect)

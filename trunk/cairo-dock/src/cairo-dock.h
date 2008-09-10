@@ -40,5 +40,6 @@
 #include <cairo-dock/cairo-dock-dock-manager.h>
 #include <cairo-dock/cairo-dock-class-manager.h>
 #include <cairo-dock/cairo-dock-emblem.h>
+#include <cairo-dock/cairo-dock-graph.h>
 
 #endif

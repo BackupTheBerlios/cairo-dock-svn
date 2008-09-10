@@ -5,6 +5,7 @@
 #include <glib.h>
 #include <gdk/gdk.h>
 #include <cairo.h>
+#include "cairo-dock-struct.h"
 G_BEGIN_DECLS
 
 

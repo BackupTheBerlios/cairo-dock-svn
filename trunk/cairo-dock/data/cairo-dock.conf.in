@@ -421,7 +421,7 @@ string color = 0.0; 0.0; 0.8; 0.4
 frame_theme=
 
 #D+99 List of icons themes or directories :
-#{Directories or themes where to search icons. Put some directories where you have icons you wish to see in the dock, or put some theme's name you've installed on your system. (the order is taken into account during the research). The key word _ThemeDirectory_ represents the directory ~/.cairo-dock/current_theme/launchers}/
+#{Directories or themes where to search icons. Put some directories where you have icons you wish to see in the dock, or put some theme's name you've installed on your system. (the order is taken into account during the research). The key word _ThemeDirectory_ represents the directory ~/.config/cairo-dock/current_theme/launchers}/
 default icon directory = _ThemeDirectory_
 
 

@@ -1092,7 +1092,17 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data, CairoDockModuleInstance *myApplet)
 #define CD_APPLET_LOAD_SURFACE_FOR_MY_APPLET(cImagePath) \
 	cairo_dock_create_surface_for_icon (cImagePath, myDrawContext, myIcon->fWidth * (myDock ? (1 + g_fAmplitude) / myDock->fRatio : 1), myIcon->fHeight* (myDock ? (1 + g_fAmplitude) / myDock->fRatio : 1));
 
-//\_________________________________ AUTRE
+
+#define CD_APPLET_RENDER_GAUGE(pGauge, fValue) cairo_dock_render_gauge (myDrawContext, myContainer, myIcon, pGauge, fValue);
+
+#define CD_APPLET_RENDER_GRAPH(pGraph) cairo_dock_render_graph (myDrawContext, myContainer, myIcon, pGraph);
+
+#define CD_APPLET_RENDER_GRAPH_NEW_VALUE(pGraph, fValue) \
+	cairo_dock_update_graph (pGraph, fValue); \
+	CD_APPLET_RENDER_GRAPH (pGraph)
+
+
+//\_________________________________ DESKLETS et SOUS-DOCKS
 
 /**
 *Definit le moteur de rendu de l'applet en mode desklet et le contexte de dessin associe a l'icone. A appeler a l'init mais ausi au reload pour prendre en compte les redimensionnements.
