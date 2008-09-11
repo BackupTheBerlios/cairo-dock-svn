@@ -1070,7 +1070,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		break;
 	}
 
-	if (g_iMaxAuthorizedWidth == 0)
+	if (g_iMaxAuthorizedWidth == 0 || g_iMaxAuthorizedWidth > g_iScreenWidth[pDock->bHorizontalDock])
 		g_iMaxAuthorizedWidth = g_iScreenWidth[pDock->bHorizontalDock];
 
 	
