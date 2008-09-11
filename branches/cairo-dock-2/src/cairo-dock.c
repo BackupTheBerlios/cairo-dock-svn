@@ -244,10 +244,14 @@ static gchar *cLaunchCommand = NULL;
 
 CairoDockIconMesh g_iIconMesh = CAIRO_DOCK_CAPSULE_MESH;
 gboolean g_bUseOpenGL = FALSE;
+gboolean g_bIndirectRendering = FALSE;
 GdkGLConfig* g_pGlConfig = NULL;
 GLuint g_iBackgroundTexture=0;
 GLuint g_iDropIndicatorTexture=0;
+GLuint g_iBilinearGradationTexture=0;
 GLuint g_iIndicatorTexture=0;
+GLuint g_iChromeTexture=0;
+
 
 static void _cairo_dock_set_verbosity(gchar *cVerbosity)
 {
@@ -323,6 +327,9 @@ int main (int argc, char** argv)
 		{"opengl", 'o', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&g_bUseOpenGL,
 			"use OpenGL (very experimental)", NULL},
+		{"Opengl", 'O', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&g_bIndirectRendering,
+			"use OpenGL in Indirect Rendering mode (very experimental)", NULL},
 		{"keep-above", 'a', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&g_bKeepAbove,
 			"keep the dock above other windows whatever", NULL},
@@ -373,7 +380,7 @@ int main (int argc, char** argv)
 			"emulate composition with fake transparency. Only use this if you don't run a compositor like Compiz, xcompmgr, etc and have a black background around your dock.", NULL},
 		{NULL}
 	};
-
+	
 	GOptionContext *context = g_option_context_new ("Cairo-Dock");
 	g_option_context_add_main_entries (context, TableDesOptions, NULL);
 	g_option_context_parse (context, &argc, &argv, &erreur);
@@ -432,6 +439,8 @@ int main (int argc, char** argv)
 		g_bUseGlitz = FALSE;
 	}
 #endif
+	if (g_bIndirectRendering)
+		g_bUseOpenGL = TRUE;
 	
 	if (bCappuccino)
 	{
@@ -455,7 +464,7 @@ int main (int argc, char** argv)
 	textdomain (CAIRO_DOCK_GETTEXT_PACKAGE);
 
 	//\___________________ On teste l'existence du repertoire des donnees .cairo-dock.
-	g_cCairoDockDataDir = (cUserDefinedDataDir != NULL ? cUserDefinedDataDir : g_strdup_printf ("%s/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR));
+	g_cCairoDockDataDir = (cUserDefinedDataDir != NULL ? cUserDefinedDataDir : g_strdup_printf ("%s/.config/%s", getenv("HOME"), CAIRO_DOCK_DATA_DIR));
 	if (! g_file_test (g_cCairoDockDataDir, G_FILE_TEST_IS_DIR))
 	{
 		if (g_mkdir (g_cCairoDockDataDir, 7*8*8+7*8+5) != 0)

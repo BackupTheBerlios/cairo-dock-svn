@@ -85,6 +85,7 @@ extern gboolean g_bSticky;
 
 extern gboolean g_bUseGlitz;
 extern gboolean g_bUseOpenGL;
+extern gboolean g_bIndirectRendering;
 extern GdkGLConfig* g_pGlConfig;
 
 CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockName, gchar *cRendererName)
@@ -218,7 +219,7 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 		gtk_widget_set_gl_capability (pWindow,
 			g_pGlConfig,
 			pMainGlContext,  // on partage les ressources entre les contextes.
-			TRUE,  // direct connection to the graphics system.
+			! g_bIndirectRendering,  // TRUE <=> direct connection to the graphics system.
 			GDK_GL_RGBA_TYPE);
 		
 		g_signal_connect_after (G_OBJECT (pWindow),
