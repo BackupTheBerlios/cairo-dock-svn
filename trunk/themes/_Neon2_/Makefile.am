@@ -1,4 +1,4 @@
-SUBDIRS = . launchers plug-ins
+SUBDIRS = . launchers plug-ins icons
 
 themedir = $(pkgdatadir)/_Neon_
 

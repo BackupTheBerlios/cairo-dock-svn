@@ -6,7 +6,7 @@ for t in `ls` ../cairo-dock/data/default-theme
 do
 	if test -d $t -a -e $t/Makefile.am; then
 		echo "normalisation of theme $t ..."
-		cd $t/launchers
+		cd $t/icons
 		for suff in "svg" "png"
 		do
 			echo "  creation of the $suff links ..."

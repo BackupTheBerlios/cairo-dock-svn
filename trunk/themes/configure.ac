@@ -1,8 +1,9 @@
+
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([cairo-dock-themes], [1.6.2.2], [Fabrice Rey (fabounet@users.berlios.de)])
+AC_INIT([cairo-dock-themes], [1.6.2.3], [Fabrice Rey (fabounet@users.berlios.de)])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
 
@@ -25,12 +26,14 @@ AC_CHECK_HEADERS([stdlib.h])
 AC_CONFIG_FILES([Makefile
 		_MacOSX_/Makefile
 		_MacOSX_/launchers/Makefile
+		_MacOSX_/icons/Makefile
 		_MacOSX_/plug-ins/Makefile
 		_MacOSX_/plug-ins/clock/Makefile
 		_MacOSX_/plug-ins/dustbin/Makefile
 		_MacOSX_/plug-ins/rendering/Makefile
 		_Wood_/Makefile
 		_Wood_/launchers/Makefile
+		_Wood_/icons/Makefile
 		_Wood_/plug-ins/Makefile
 		_Wood_/plug-ins/clock/Makefile
 		_Wood_/plug-ins/dustbin/Makefile
@@ -39,6 +42,7 @@ AC_CONFIG_FILES([Makefile
 		_Wood_/plug-ins/weather/Makefile
 		_Clear_/Makefile
 		_Clear_/launchers/Makefile
+		_Clear_/icons/Makefile
 		_Clear_/plug-ins/Makefile
 		_Clear_/plug-ins/logout/Makefile
 		_Clear_/plug-ins/weather/Makefile
@@ -50,11 +54,13 @@ AC_CONFIG_FILES([Makefile
 		_Clear_/plug-ins/shortcuts/Makefile
 		_Neon2_/Makefile
 		_Neon2_/launchers/Makefile
+		_Neon2_/icons/Makefile
 		_Neon2_/plug-ins/Makefile
 		_Neon2_/plug-ins/dustbin/Makefile
 		_Neon2_/plug-ins/logout/Makefile
 		_Brit_/Makefile
 		_Brit_/launchers/Makefile
+		_Brit_/icons/Makefile
 		_Brit_/plug-ins/Makefile
 		_Brit_/plug-ins/AlsaMixer/Makefile
 		_Brit_/plug-ins/Cairo-Penguin/Makefile
