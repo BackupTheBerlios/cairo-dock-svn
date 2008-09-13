@@ -48,7 +48,7 @@ extern gboolean g_bDemandsAttentionWithDialog;
 extern gboolean g_bDemandsAttentionWithAnimation;
 extern gboolean g_bOverWriteXIcons;
 extern gboolean g_bShowThumbnail;
-extern gboolean g_bTesting;
+extern gboolean g_bEasterEggs;
 
 static GHashTable *s_hAppliTable = NULL;  // table des PID connus de cairo-dock (affichees ou non dans le dock).
 static Display *s_XDisplay = NULL;
@@ -275,7 +275,7 @@ CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
 				cd_message ("  sous-dock de la classe %s existant", icon->cClass);
 			}
 			
-			if (! g_bTesting)
+			if (! g_bEasterEggs)
 			{
 				//\____________ On l'associe au classmate.
 				if (pSameClassIcon->pSubDock != NULL && pSameClassIcon->pSubDock != pParentDock)

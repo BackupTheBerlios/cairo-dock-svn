@@ -97,6 +97,7 @@ AC_CONFIG_FILES([Makefile
 		data/main-dock.conf
 		data/default-theme/Makefile
 		data/default-theme/launchers/Makefile
+		data/default-theme/icons/Makefile
 		data/gauges/Makefile
 		data/gauges/radium/Makefile
 		data/gauges/radium-fuel/Makefile

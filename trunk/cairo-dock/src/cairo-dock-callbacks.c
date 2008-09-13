@@ -107,7 +107,7 @@ extern cairo_surface_t *g_pDesktopBgSurface;
 extern gboolean g_bUseFakeTransparency;
 
 extern gboolean g_bDisplayDropEmblem;
-extern gboolean g_bTesting;
+extern gboolean g_bEasterEggs;
 
 static gboolean s_bTemporaryAutoHide = FALSE;
 static gboolean s_bEntranceAllowed = TRUE;
@@ -485,7 +485,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		if (s_pIconClicked != NULL && pDock->iAvoidingMouseIconType == -1)
 		{
 			s_pIconClicked->iAnimationType = CAIRO_DOCK_FOLLOW_MOUSE;
-			if (! g_bTesting)
+			if (! g_bEasterEggs)
 			{
 				pDock->iAvoidingMouseIconType = s_pIconClicked->iType;  // on pourrait le faire lors du clic aussi.
 				pDock->fAvoidingMouseMargin = .5;
@@ -555,7 +555,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	{
 		cairo_dock_on_change_icon (pLastPointedIcon, pPointedIcon, pDock);
 		
-		if (s_pIconClicked != NULL && g_bTesting)
+		if (s_pIconClicked != NULL && g_bEasterEggs)
 		{
 			/// parcourir les icones et renseigner iGlideDirection.
 			Icon *icon;
@@ -669,7 +669,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	//s_pLastPointedDock = NULL;
 	//g_print ("s_pLastPointedDock <- NULL\n");
 	
-	if (g_bTesting && s_pIconClicked != NULL && (CAIRO_DOCK_IS_LAUNCHER (s_pIconClicked) || CAIRO_DOCK_IS_DETACHABLE_APPLET (s_pIconClicked) || CAIRO_DOCK_IS_USER_SEPARATOR(s_pIconClicked)) && s_pFlyingContainer == NULL)
+	if (g_bEasterEggs && s_pIconClicked != NULL && (CAIRO_DOCK_IS_LAUNCHER (s_pIconClicked) || CAIRO_DOCK_IS_DETACHABLE_APPLET (s_pIconClicked) || CAIRO_DOCK_IS_USER_SEPARATOR(s_pIconClicked)) && s_pFlyingContainer == NULL)
 	{
 		g_print ("on a sorti %s du dock (%d;%d)\n", s_pIconClicked->acName, pDock->iMouseX, pDock->iMouseY);
 		CairoDock *pOriginDock = cairo_dock_search_dock_from_name (s_pIconClicked->cParentDockName);
@@ -693,7 +693,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 			}
 		}
 	}
-	else if (g_bTesting && s_pFlyingContainer != NULL && s_pFlyingContainer->pIcon != NULL && pDock->iRefCount > 0)
+	else if (g_bEasterEggs && s_pFlyingContainer != NULL && s_pFlyingContainer->pIcon != NULL && pDock->iRefCount > 0)
 	{
 		CairoDock *pOriginDock = cairo_dock_search_dock_from_name (s_pFlyingContainer->pIcon->cParentDockName);
 		if (pOriginDock == pDock)

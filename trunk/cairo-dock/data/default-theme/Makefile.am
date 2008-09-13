@@ -1,4 +1,4 @@
-SUBDIRS = . launchers
+SUBDIRS = . launchers icons
 
 themedir = $(pkgdatadir)/themes/_default_
 

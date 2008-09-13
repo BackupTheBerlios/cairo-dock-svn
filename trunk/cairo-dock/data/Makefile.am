@@ -28,7 +28,8 @@ essentialdata_DATA = \
 	icon-frame.png\
 	icon-buttons.png\
 	icon-bubble.png\
-	icon-wave.png
+	icon-wave.png\
+	hand.svg
 	
 EXTRA_DIST = $(essentialdata_DATA)\
 	cairo-dock

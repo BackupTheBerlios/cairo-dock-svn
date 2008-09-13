@@ -865,8 +865,12 @@ struct _CairoFlyingContainer {
 #define CAIRO_DOCK_GAUGES_DIR "gauges"
 /// Nom du repertoire du theme courant.
 #define CAIRO_DOCK_CURRENT_THEME_NAME "current_theme"
-/// Nom du repertoire des lanceurs et de leurs icones.
+/// Nom du repertoire des lanceurs.
 #define CAIRO_DOCK_LAUNCHERS_DIR "launchers"
+/// Nom du repertoire des icones locales.
+#define CAIRO_DOCK_LOCAL_ICONS_DIR "icons"
+/// Mot cle representant le repertoire local des icones.
+#define CAIRO_DOCK_LOCAL_THEME_KEYWORD "_LocalTheme_"
 /// Nom du dock principal (le 1er cree).
 #define CAIRO_DOCK_MAIN_DOCK_NAME "_MainDock_"
 /// Nom de la vue par defaut.

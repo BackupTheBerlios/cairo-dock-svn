@@ -28,8 +28,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-surface-factory.h"
 #include "cairo-dock-flying-container.h"
 
-#define CAIRO_DOCK_FLYING_WIDTH 72
-#define CAIRO_DOCK_FLYING_HEIGHT 122
+#define HAND_WIDTH 76
+#define HAND_HEIGHT 50
 
 extern double g_fAmplitude;
 extern gchar *g_cCurrentLaunchersPath;
@@ -47,27 +47,38 @@ static gboolean on_expose_flying_icon (GtkWidget *pWidget,
 	
 	if (pFlyingContainer->pIcon != NULL)
 	{
-		/// dessiner une main et agiter l'icone ...
+		pFlyingContainer->pIcon->fScale = (1 + g_fAmplitude);
+		cairo_save (pCairoContext);
 		cairo_translate (pCairoContext, 
-			(pFlyingContainer->iWidth - pFlyingContainer->pIcon->fWidth) / 2,
-			(pFlyingContainer->iHeight - pFlyingContainer->pIcon->fHeight) / 2);
+			(pFlyingContainer->iWidth - pFlyingContainer->pIcon->fWidth * pFlyingContainer->pIcon->fScale) / 2,
+			pFlyingContainer->iHeight - pFlyingContainer->pIcon->fHeight * pFlyingContainer->pIcon->fScale);
 		/*cairo_scale (pCairoContext, 1./(1+g_fAmplitude), 1./(1+g_fAmplitude));
 		cairo_set_source_surface (pCairoContext, pFlyingContainer->pIcon->pIconBuffer, 0., 0.);
 		cairo_paint (pCairoContext);*/
+		///pFlyingContainer->pIcon->iCount=0;
 		cairo_dock_render_one_icon (pFlyingContainer->pIcon, pCairoContext, TRUE, 1., 1., FALSE, FALSE, pFlyingContainer->iWidth, TRUE);
+		cairo_restore (pCairoContext);
+		
+		double fImageWidth, fImageHeight;
+		gchar *cImagePath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, "hand.svg");
+		cairo_surface_t *pHandSurface = cairo_dock_create_surface_from_image (cImagePath, pCairoContext, 1., pFlyingContainer->iWidth, 0, CAIRO_DOCK_KEEP_RATIO, &fImageWidth, &fImageHeight, NULL, NULL);
+		cairo_set_source_surface (pCairoContext, pHandSurface, 0., 0.);
+		cairo_paint (pCairoContext);
+		
+		g_free (cImagePath);
+		cairo_surface_destroy (pHandSurface);
 	}
 	else
 	{
 		g_print ("compte a rebours : %d\n", pFlyingContainer->iAnimationCount);
 		if (pFlyingContainer->iAnimationCount > 0)
 		{
-			gchar *cImagePath = g_strdup_printf ("%s/%d.png", "/home/fab/CD/trunk/cairo-dock/data/explosion", 10+1 - pFlyingContainer->iAnimationCount);
-			cairo_surface_t *pExplosionSurface = cairo_dock_create_surface_for_icon (cImagePath, pCairoContext, CAIRO_DOCK_FLYING_WIDTH, CAIRO_DOCK_FLYING_WIDTH);
+			gchar *cImagePath = g_strdup_printf ("%s/%s/%d.png", CAIRO_DOCK_SHARE_DATA_DIR, "explosion", 10+1 - pFlyingContainer->iAnimationCount);
+			cairo_surface_t *pExplosionSurface = cairo_dock_create_surface_for_icon (cImagePath, pCairoContext, pFlyingContainer->iWidth, pFlyingContainer->iWidth);
 			
 			cairo_translate (pCairoContext, 
 				0.,
-				(pFlyingContainer->iHeight - CAIRO_DOCK_FLYING_WIDTH) / 2);
-			cairo_scale (pCairoContext, 1.*CAIRO_DOCK_FLYING_WIDTH/128, 1.*CAIRO_DOCK_FLYING_WIDTH/128);
+				(pFlyingContainer->iHeight - pFlyingContainer->iWidth) / 2);
 			cairo_set_source_surface (pCairoContext, pExplosionSurface, 0., 0.);
 			cairo_paint (pCairoContext);
 			
@@ -122,8 +133,9 @@ CairoFlyingContainer *cairo_dock_create_flying_container (Icon *pFlyingIcon, Cai
 		G_CALLBACK (on_expose_flying_icon),
 		pFlyingContainer);
 	
-	pFlyingContainer->iWidth = CAIRO_DOCK_FLYING_WIDTH;
-	pFlyingContainer->iHeight = CAIRO_DOCK_FLYING_HEIGHT;
+	g_print ("pFlyingContainer->pIcon->fScale : %.2f\n", pFlyingContainer->pIcon->fScale);
+	pFlyingContainer->iWidth = pFlyingIcon->fWidth * pFlyingContainer->pIcon->fScale * 3.7;
+	pFlyingContainer->iHeight = pFlyingIcon->fHeight * pFlyingContainer->pIcon->fScale + 1.*pFlyingContainer->iWidth / HAND_WIDTH * HAND_HEIGHT * .6;
 	pFlyingContainer->iPositionX = pOriginDock->iWindowPositionX + pOriginDock->iMouseX - pFlyingContainer->iWidth/2;
 	pFlyingContainer->iPositionY = pOriginDock->iWindowPositionY + pOriginDock->iMouseY - pFlyingContainer->iHeight/2;
 	/*g_print ("%s (%d;%d %dx%d)\n", __func__ pFlyingContainer->iPositionX,

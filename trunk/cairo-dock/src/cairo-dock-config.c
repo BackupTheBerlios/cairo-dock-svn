@@ -48,6 +48,7 @@ extern gchar *g_cSubDockDefaultRendererName;
 extern gchar *g_cCurrentThemePath;
 extern gchar *g_cEasyConfFile;
 extern gchar *g_cCairoDockDataDir;
+extern gchar *g_cCurrentLaunchersPath;
 
 extern int g_iMaxAuthorizedWidth;
 extern int g_iScrollAmount;
@@ -819,22 +820,42 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 			if (directoryList[i][0] == '~')
 			{
 				g_pDefaultIconDirectory[j] = g_strdup_printf ("%s%s", getenv ("HOME"), directoryList[i]+1);
+				cd_message (" utilisation du repertoire %s", g_pDefaultIconDirectory[j]);
 			}
 			else if (directoryList[i][0] == '/')
 			{
 				g_pDefaultIconDirectory[j] = g_strdup (directoryList[i]);
+				cd_message (" utilisation du repertoire %s", g_pDefaultIconDirectory[j]);
+			}
+			else if (strncmp (directoryList[i], CAIRO_DOCK_LOCAL_THEME_KEYWORD, strlen (CAIRO_DOCK_LOCAL_THEME_KEYWORD)) == 0)
+			{
+				g_pDefaultIconDirectory[j] = g_strdup_printf ("%s/%s%s", g_cCurrentThemePath, CAIRO_DOCK_LOCAL_ICONS_DIR, directoryList[i]+strlen (CAIRO_DOCK_LOCAL_THEME_KEYWORD));
+				cd_message (" utilisation du repertoire local %s", g_pDefaultIconDirectory[j]);
 			}
 			else if (strncmp (directoryList[i], "_ThemeDirectory_", 16) == 0)
 			{
-				g_pDefaultIconDirectory[j] = g_strdup_printf ("%s%s", g_cCurrentLaunchersPath, directoryList[i]+16);
+				g_pDefaultIconDirectory[j] = g_strdup_printf ("%s/%s%s", g_cCurrentThemePath, CAIRO_DOCK_LOCAL_ICONS_DIR, directoryList[i]+16);
+				cd_message (" utilisation du nouveau repertoire local %s", g_pDefaultIconDirectory[j]);
+				cd_warning ("Cairo-Dock's local icons are now located in the 'icons' folder, they will be moved there");
+				gchar *cCommand = g_strdup_printf ("cd '%s' && mv *.svg *.png *.xpm *.jpg *.bmp *.gif '%s/%s' > /dev/null", g_cCurrentLaunchersPath, g_cCurrentThemePath, CAIRO_DOCK_LOCAL_ICONS_DIR);
+				cd_message ("%s", cCommand);
+				system (cCommand);
+				g_free (cCommand);
+				cCommand = g_strdup_printf ("sed -i \"s/_ThemeDirectory_/%s/g\" '%s/%s'", CAIRO_DOCK_LOCAL_THEME_KEYWORD, g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
+				cd_message ("%s", cCommand);
+				system (cCommand);
+				g_free (cCommand);
+				cCommand = g_strdup_printf ("sed -i \"/default icon directory/ { s/~\\/.config\\/%s\\/%s\\/icons/%s/g }\" '%s/%s'", CAIRO_DOCK_DATA_DIR, CAIRO_DOCK_CURRENT_THEME_NAME, CAIRO_DOCK_LOCAL_THEME_KEYWORD, g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
+				cd_message ("%s", cCommand);
+				system (cCommand);
+				g_free (cCommand);
 			}
 			else
 			{
-				cd_message ("theme %s\n", directoryList[i]);
+				cd_message (" utilisation du theme %s", directoryList[i]);
 				g_pDefaultIconDirectory[j+1] = gtk_icon_theme_new ();
 				gtk_icon_theme_set_custom_theme (g_pDefaultIconDirectory[j+1], directoryList[i]);
 			}
-			//g_print ("+ %s\n", g_cDefaultIconDirectory[j]);
 			i ++;
 			j += 2;
 		}
@@ -1427,7 +1448,7 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 		g_ptr_array_free (pDataGarbage, TRUE);
 		g_free (user_data);
 
-		cairo_dock_edit_conf_file_core (pWindow, cConfFilePath2, cTitle, iWindowWidth, iWindowHeight, iIdentifier, NULL, pConfigFunc2, data, pFreeUserDataFunc, pConfigFunc, cConfFilePath, cButtonRevert, cButtonConvert, NULL);
+		cairo_dock_edit_conf_file_core (pWindow, cConfFilePath2, cTitle, iWindowWidth, iWindowHeight, iIdentifier, NULL, pConfigFunc2, data, pFreeUserDataFunc, pConfigFunc, cConfFilePath, cButtonRevert, cButtonConvert, CAIRO_DOCK_GETTEXT_PACKAGE);
 	}
 }
 

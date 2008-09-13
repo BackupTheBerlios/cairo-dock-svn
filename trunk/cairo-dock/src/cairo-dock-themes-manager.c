@@ -215,7 +215,7 @@ gchar *cairo_dock_edit_themes (GHashTable **hThemeTable, gboolean bSafeMode)
 		pDialog = cairo_dock_show_general_message (_("You are running Cairo-Dock in safe mode.\nWhy ? Probably because a plug-in has messed into your dock,\n or maybe your theme has got corrupted.\nSo, no plug-in will be available, and you can now save your current theme if you want\n before you start using the dock.\nTry with your current theme, if it works, it means a plug-in is wrong.\nOtherwise, try with another theme.\nSave a config that is working, and restart the dock in normal mode.\nThen, activate plug-ins one by one to guess which one is wrong."), 0.);
 	}
 	
-	gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTmpConfFile, cTitle, CAIRO_DOCK_THEME_PANEL_WIDTH, CAIRO_DOCK_THEME_PANEL_HEIGHT, 0, cPresentedGroup, NULL, NULL, NULL, NULL);
+	gboolean bChoiceOK = cairo_dock_edit_conf_file (NULL, cTmpConfFile, cTitle, CAIRO_DOCK_THEME_PANEL_WIDTH, CAIRO_DOCK_THEME_PANEL_HEIGHT, 0, cPresentedGroup, NULL, NULL, NULL, CAIRO_DOCK_GETTEXT_PACKAGE);
 	if (! bChoiceOK)
 	{
 		g_remove (cTmpConfFile);
@@ -507,12 +507,35 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode)
 				g_free (cNewConfFilePath);
 			}
 			//\___________________ On charge les icones.
-			g_string_printf (sCommand, "find '%s' -mindepth 1 ! -name '*.desktop' ! -name 'container-*' -delete", g_cCurrentLaunchersPath);
+			///g_string_printf (sCommand, "find '%s' -mindepth 1 ! -name '*.desktop' ! -name 'container-*' -delete", g_cCurrentLaunchersPath);
+			g_string_printf (sCommand, "rm -f '%s/%s'/*", g_cCurrentThemePath, CAIRO_DOCK_LOCAL_ICONS_DIR);
 			cd_message ("%s", sCommand->str);
 			system (sCommand->str);
-			g_string_printf (sCommand, "find '%s/%s' -mindepth 1 ! -name '*.desktop' -exec /bin/cp -p '{}' '%s' \\;", cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR, g_cCurrentLaunchersPath);
+			///g_string_printf (sCommand, "find '%s/%s' -mindepth 1 ! -name '*.desktop' -exec /bin/cp -p '{}' '%s' \\;", cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR, g_cCurrentLaunchersPath);
+			gchar *cNewLocalIconsPath = g_strdup_printf ("%s/%s", cNewThemePath, CAIRO_DOCK_LOCAL_ICONS_DIR);
+			if (! g_file_test (cNewLocalIconsPath, G_FILE_TEST_IS_DIR))
+			{
+				g_string_printf (sCommand, "sed -i \"s/~\\/.cairo-dock/~\\/.config\\/%s/g\" '%s/%s/%s'", CAIRO_DOCK_DATA_DIR, g_cCairoDockDataDir, CAIRO_DOCK_CURRENT_THEME_NAME, CAIRO_DOCK_CONF_FILE);
+				cd_message ("%s", sCommand->str);
+				system (sCommand->str);
+				
+				g_string_printf (sCommand, "sed -i \"/default icon directory/ { s/~\\/.config\\/%s\\/%s\\/icons/%s/g }\" '%s/%s'", CAIRO_DOCK_DATA_DIR, CAIRO_DOCK_CURRENT_THEME_NAME, CAIRO_DOCK_LOCAL_THEME_KEYWORD, g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
+				cd_message ("%s", sCommand->str);
+				system (sCommand->str);
+				
+				g_string_printf (sCommand, "sed -i \"s/_ThemeDirectory_/%s/g\" '%s/%s'", CAIRO_DOCK_LOCAL_THEME_KEYWORD, g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
+				cd_message ("%s", sCommand->str);
+				system (sCommand->str);
+				
+				g_string_printf (sCommand, "find '%s/%s' -mindepth 1 ! -name '*.desktop' -exec /bin/cp '{}' '%s/%s' \\;", cNewThemePath, CAIRO_DOCK_LAUNCHERS_DIR, g_cCurrentThemePath, CAIRO_DOCK_LOCAL_ICONS_DIR);
+			}
+			else
+			{
+				g_string_printf (sCommand, "cp '%s'/* '%s/%s'", cNewLocalIconsPath, g_cCurrentThemePath, CAIRO_DOCK_LOCAL_ICONS_DIR);
+			}
 			cd_message ("%s", sCommand->str);
 			system (sCommand->str);
+			g_free (cNewLocalIconsPath);
 			
 			//\___________________ On charge les extras.
 			g_string_printf (sCommand, "%s/%s", cNewThemePath, CAIRO_DOCK_EXTRAS_DIR);
@@ -536,7 +559,7 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode)
 			}
 			
 			//\___________________ On remplace tous les autres fichiers par les nouveaux.
-			g_string_printf (sCommand, "find '%s' -mindepth 1 -maxdepth 1  ! -name '*.conf' -type f -exec rm -rf '{}' \\;", g_cCurrentThemePath);  // efface tous les fichiers du theme mais sans toucher aux lanceurs et aux plug-ins.
+			g_string_printf (sCommand, "find '%s' -mindepth 1 -maxdepth 1  ! -name '*.conf' -type f -exec rm -f '{}' \\;", g_cCurrentThemePath);  // efface tous les fichiers du theme mais sans toucher aux lanceurs et aux plug-ins.
 			cd_message ("%s", sCommand->str);
 			system (sCommand->str);
 

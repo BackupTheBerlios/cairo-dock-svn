@@ -243,7 +243,7 @@ gboolean g_bUseFakeTransparency = FALSE;
 
 gboolean g_bDisplayDropEmblem = FALSE; // indicateur de drop
 gchar *g_cThemeServerAdress = NULL;
-gboolean g_bTesting = FALSE;
+gboolean g_bEasterEggs = FALSE;
 
 static gchar *cLaunchCommand = NULL;
 
@@ -308,7 +308,7 @@ int main (int argc, char** argv)
 	GError *erreur = NULL;
 	
 	//\___________________ On recupere quelques options.
-	gboolean bSafeMode = FALSE, bMaintenance = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE;
+	gboolean bSafeMode = FALSE, bMaintenance = FALSE, bNoSkipPager = FALSE, bNoSkipTaskbar = FALSE, bNoSticky = FALSE, bToolBarHint = FALSE, bNormalHint = FALSE, bCappuccino = FALSE, bExpresso = FALSE, bCafeLatte = FALSE, bPrintVersion = FALSE, bTesting = FALSE;
 	gchar *cEnvironment = NULL, *cUserDefinedDataDir = NULL, *cVerbosity = 0, *cUserDefinedModuleDir = NULL;
 	GOptionEntry TableDesOptions[] =
 	{
@@ -351,7 +351,7 @@ int main (int argc, char** argv)
 		{"capuccino", 'C', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&bCappuccino,
 			"Cairo-Dock makes anything, including coffee !", NULL},
-		{"expresso", 'E', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+		{"expresso", 'X', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
 			&bExpresso,
 			"Cairo-Dock makes anything, including coffee !", NULL},
 		{"cafe-latte", 'L', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
@@ -367,8 +367,11 @@ int main (int argc, char** argv)
 			&g_bUseFakeTransparency,
 			"emulate composition with fake transparency. Only use this if you don't run a compositor like Compiz, xcompmgr, etc and have a black background around your dock.", NULL},
 		{"testing", 'T', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
-			&g_bTesting,
-			"for debugging purpose only. The crash manager will not be started, and some unstable options may be activated.", NULL},
+			&bTesting,
+			"for debugging purpose only. The crash manager will not be started to hunt down the bugs.", NULL},
+		{"easter-eggs", 'E', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&g_bEasterEggs,
+			"for debugging purpose only. Some hidden and still unstable options will be activated.", NULL},
 		{"server", 'S', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
 			&g_cThemeServerAdress,
 			"adress of a server containing additional themes. This will overwrite the default server adress.", NULL},
@@ -476,15 +479,22 @@ int main (int argc, char** argv)
 			{
 				cd_warning ("Cairo-Dock's data dir is now located in ~/.config, it will be moved there");
 				gchar *cCommand = g_strdup_printf ("mkdir '%s/.config' > /dev/null", getenv("HOME"));
+				cd_message ("%s", cCommand);
 				system (cCommand);
 				g_free (cCommand);
 					
 				cCommand = g_strdup_printf ("mv '%s' '%s'", cOldDataDir, g_cCairoDockDataDir);
+				cd_message ("%s", cCommand);
 				system (cCommand);
 				g_free (cCommand);
 				
 				cCommand = g_strdup_printf ("sed -i \"s/~\\/.cairo-dock/~\\/.config\\/%s/g\" '%s/%s/%s'", CAIRO_DOCK_DATA_DIR, g_cCairoDockDataDir, CAIRO_DOCK_CURRENT_THEME_NAME, CAIRO_DOCK_CONF_FILE);
-				g_print ("%s\n", cCommand);
+				cd_message ("%s", cCommand);
+				system (cCommand);
+				g_free (cCommand);
+				
+				cCommand = g_strdup_printf ("sed -i \"/default icon directory/ { s/~\\/.config\\/%s\\/%s\\/icons/%s/g }\" '%s/%s'", CAIRO_DOCK_DATA_DIR, CAIRO_DOCK_CURRENT_THEME_NAME, CAIRO_DOCK_LOCAL_THEME_KEYWORD, g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
+				cd_message ("%s", cCommand);
 				system (cCommand);
 				g_free (cCommand);
 			}
@@ -522,6 +532,31 @@ int main (int argc, char** argv)
 		if (g_mkdir (g_cCurrentLaunchersPath, 7*8*8+7*8+5) != 0)
 			cd_warning ("Attention : couldn't create directory %s", g_cCurrentLaunchersPath);
 	}
+	gchar *cLocalIconsPath = g_strdup_printf ("%s/%s", g_cCurrentThemePath, CAIRO_DOCK_LOCAL_ICONS_DIR);
+	if (! g_file_test (cLocalIconsPath, G_FILE_TEST_IS_DIR))
+	{
+		if (g_mkdir (cLocalIconsPath, 7*8*8+7*8+5) != 0)
+			cd_warning ("Attention : couldn't create directory %s", cLocalIconsPath);
+		else
+		{
+			cd_warning ("Cairo-Dock's local icons are now located in the 'icons' folder, they will be moved there");
+			gchar *cCommand = g_strdup_printf ("cd '%s' && mv *.svg *.png *.xpm *.jpg *.bmp *.gif '%s' > /dev/null", g_cCurrentLaunchersPath, cLocalIconsPath);
+			cd_message ("%s", cCommand);
+			system (cCommand);
+			g_free (cCommand);
+			
+			cCommand = g_strdup_printf ("sed -i \"s/_ThemeDirectory_/%s/g\" '%s/%s'", CAIRO_DOCK_LOCAL_THEME_KEYWORD, g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
+			cd_message ("%s", cCommand);
+			system (cCommand);
+			g_free (cCommand);
+			
+			cCommand = g_strdup_printf ("sed -i \"/default icon directory/ { s/~\\/.config\\/%s\\/%s\\/icons/%s/g }\" '%s/%s'", CAIRO_DOCK_DATA_DIR, CAIRO_DOCK_CURRENT_THEME_NAME, CAIRO_DOCK_LOCAL_THEME_KEYWORD, g_cCurrentThemePath, CAIRO_DOCK_CONF_FILE);
+			cd_message ("%s", cCommand);
+			system (cCommand);
+			g_free (cCommand);
+		}
+	}
+	g_free (cLocalIconsPath);
 	
 	//\___________________ On initialise les numeros de version.
 	cairo_dock_get_version_from_string (CAIRO_DOCK_VERSION, &g_iMajorVersion, &g_iMinorVersion, &g_iMicroVersion);
@@ -568,7 +603,7 @@ int main (int argc, char** argv)
 	cairo_dock_register_notification (CAIRO_DOCK_REMOVE_ICON, (CairoDockNotificationFunc) cairo_dock_notification_remove_icon, CAIRO_DOCK_RUN_AFTER, NULL);
 	
 	//\___________________ On initialise la gestion des crash.
-	if (! g_bTesting)
+	if (! bTesting)
 		_cairo_dock_set_signal_interception ();
 	
 	//\___________________ On charge le dernier theme ou on demande a l'utilisateur d'en choisir un.
@@ -577,7 +612,7 @@ int main (int argc, char** argv)
 	
 	gboolean config_ok;
 	if (bMaintenance)
-		config_ok = cairo_dock_edit_conf_file (NULL, g_cConfFile, _("< Maintenance mode >"), 800, 600, 0, NULL, NULL, NULL, NULL, NULL);
+		config_ok = cairo_dock_edit_conf_file (NULL, g_cConfFile, _("< Maintenance mode >"), 800, 600, 0, NULL, NULL, NULL, NULL, CAIRO_DOCK_GETTEXT_PACKAGE);
 	
 	if (! g_file_test (g_cConfFile, G_FILE_TEST_EXISTS) || bSafeMode)
 	{
@@ -720,7 +755,7 @@ int main (int argc, char** argv)
 		cd_message (" ==> %.2f\n", fAnswer);*/
 	}
 	
-	if (! g_bTesting)
+	if (! bTesting)
 		g_timeout_add_seconds (5, _cairo_dock_successful_launch, NULL);
 	
 	gtk_main ();

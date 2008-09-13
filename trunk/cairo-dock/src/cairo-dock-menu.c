@@ -71,9 +71,9 @@ static void _cairo_dock_edit_and_reload_conf (GtkMenuItem *pMenuItem, gpointer *
 	cairo_dock_build_easy_conf_file (g_cConfFile, g_cEasyConfFile);
 
 	if (cairo_dock_use_full_conf_file ())
-		cairo_dock_edit_conf_file_full (GTK_WINDOW (pDock->pWidget), g_cConfFile, "Configuration of Cairo-Dock", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL, cairo_dock_read_easy_conf_file, g_cEasyConfFile, _("Easy Mode"), _("Advanced mode"), NULL);
+		cairo_dock_edit_conf_file_full (GTK_WINDOW (pDock->pWidget), g_cConfFile, "Configuration of Cairo-Dock", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_pMainDock, NULL, cairo_dock_read_easy_conf_file, g_cEasyConfFile, _("Easy Mode"), _("Advanced mode"), CAIRO_DOCK_GETTEXT_PACKAGE);
 	else
-		cairo_dock_edit_conf_file_full (GTK_WINDOW (pDock->pWidget), g_cEasyConfFile, "Configuration of Cairo-Dock", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_easy_conf_file, g_pMainDock, NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_cConfFile, _("Advanced mode"), _("Easy Mode"), NULL);
+		cairo_dock_edit_conf_file_full (GTK_WINDOW (pDock->pWidget), g_cEasyConfFile, "Configuration of Cairo-Dock", CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, '\0', NULL, (CairoDockConfigFunc) cairo_dock_read_easy_conf_file, g_pMainDock, NULL, (CairoDockConfigFunc) cairo_dock_read_conf_file, g_cConfFile, _("Advanced mode"), _("Easy Mode"), CAIRO_DOCK_GETTEXT_PACKAGE);
 }
 
 static void _cairo_dock_initiate_theme_management (GtkMenuItem *pMenuItem, gpointer *data)
@@ -291,7 +291,7 @@ static void _cairo_dock_create_launcher (GtkMenuItem *pMenuItem, gpointer *data,
 
 	gboolean config_ok;
 	if (iLauncherType != CAIRO_DOCK_LAUNCHER_FOR_SEPARATOR)  // inutile pour un separateur.
-		config_ok = cairo_dock_edit_conf_file (GTK_WINDOW (pDock->pWidget), cNewDesktopFilePath, _("Fill this launcher"), CAIRO_DOCK_LAUNCHER_PANEL_WIDTH, CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT, 0, NULL, NULL, NULL, NULL, NULL);
+		config_ok = cairo_dock_edit_conf_file (GTK_WINDOW (pDock->pWidget), cNewDesktopFilePath, _("Fill this launcher"), CAIRO_DOCK_LAUNCHER_PANEL_WIDTH, CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT, 0, NULL, NULL, NULL, NULL, CAIRO_DOCK_GETTEXT_PACKAGE);
 	else
 		config_ok = TRUE;
 	if (config_ok)
@@ -418,7 +418,7 @@ static void _cairo_dock_modify_launcher (GtkMenuItem *pMenuItem, gpointer *data)
 
 	cairo_dock_update_launcher_desktop_file (cDesktopFilePath, CAIRO_DOCK_IS_SEPARATOR (icon) ? CAIRO_DOCK_LAUNCHER_FOR_SEPARATOR : (icon->pSubDock != NULL && icon->Xid == 0) ? CAIRO_DOCK_LAUNCHER_FOR_CONTAINER : CAIRO_DOCK_LAUNCHER_FROM_DESKTOP_FILE);
 
-	gboolean config_ok = cairo_dock_edit_conf_file (GTK_WINDOW (pDock->pWidget), cDesktopFilePath, _("Modify this launcher"), CAIRO_DOCK_LAUNCHER_PANEL_WIDTH, CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT, 0, NULL, NULL, NULL, NULL, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (GTK_WINDOW (pDock->pWidget), cDesktopFilePath, _("Modify this launcher"), CAIRO_DOCK_LAUNCHER_PANEL_WIDTH, CAIRO_DOCK_LAUNCHER_PANEL_HEIGHT, 0, NULL, NULL, NULL, NULL, CAIRO_DOCK_GETTEXT_PACKAGE);
 	g_free (cDesktopFilePath);
 
 	if (! pDock->bInside)
@@ -1066,7 +1066,7 @@ static void _cairo_dock_configure_root_dock_position (GtkMenuItem *pMenuItem, gp
 	}
 	
 	gchar *cTitle = g_strdup_printf (_("Set position for the dock '%s'"), cDockName);
-	gboolean config_ok = cairo_dock_edit_conf_file (GTK_WINDOW (pDock->pWidget), cConfFilePath, cTitle, CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, 0, NULL, NULL, NULL, NULL, NULL);
+	gboolean config_ok = cairo_dock_edit_conf_file (GTK_WINDOW (pDock->pWidget), cConfFilePath, cTitle, CAIRO_DOCK_CONF_PANEL_WIDTH, CAIRO_DOCK_CONF_PANEL_HEIGHT, 0, NULL, NULL, NULL, NULL, CAIRO_DOCK_GETTEXT_PACKAGE);
 	g_free (cTitle);  // c'est OK de le liberer tout de suite puisqu'on bloque dans l'edition.
 	
 	if (config_ok)

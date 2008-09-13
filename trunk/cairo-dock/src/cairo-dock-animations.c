@@ -47,7 +47,7 @@ extern int g_tNbAnimationRounds[CAIRO_DOCK_NB_TYPES];
 extern int g_tNbIterInOneRound[CAIRO_DOCK_NB_ANIMATIONS];
 
 extern gboolean g_bPopUp;
-extern gboolean g_bTesting;
+extern gboolean g_bEasterEggs;
 
 extern CairoDock *g_pMainDock;
 
@@ -328,7 +328,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 				gboolean bIsAppli = CAIRO_DOCK_IS_NORMAL_APPLI (pRemovingIcon);  // car apres avoir ete enleve du dock elle n'est plus rien.
 				cairo_dock_remove_icon_from_dock (pDock, pRemovingIcon);
 				
-				if (! g_bTesting)
+				if (! g_bEasterEggs)
 				{
 					if (bIsAppli && pRemovingIcon->cClass != NULL && pDock == cairo_dock_search_dock_from_name (pRemovingIcon->cClass) && pDock->icons == NULL)  // il n'y a plus aucune icone de cette classe.
 					{

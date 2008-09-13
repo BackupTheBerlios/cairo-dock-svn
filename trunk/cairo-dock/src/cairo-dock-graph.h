@@ -14,6 +14,9 @@ typedef enum {
 	CAIRO_DOCK_GRAPH_CIRCLE
 	} CairoDockTypeGraph;
 
+#define CAIRO_DOCK_MIX_DOUBLE_GRAPH  (1<<2)
+#define CCAIRO_DOCK_COMPUTE_MAX_VALUE (1<<3)
+
 typedef struct _CairoDockGraph {
 	gint iNbValues;
 	gdouble *pTabValues;

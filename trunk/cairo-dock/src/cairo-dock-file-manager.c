@@ -82,7 +82,7 @@ gboolean cairo_dock_fm_launch_uri (const gchar *cURI)
 		GThread* pThread = g_thread_create ((GThreadFunc) _cairo_dock_fm_launch_uri_threaded, (gpointer) cURI, FALSE, &erreur);
 		if (erreur != NULL)
 		{
-			cd_warning ("Attention : %s", erreur->message);
+			cd_warning (erreur->message);
 			g_error_free (erreur);
 		}
 		return TRUE;
