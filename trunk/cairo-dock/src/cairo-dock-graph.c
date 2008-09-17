@@ -20,6 +20,7 @@ extern int g_iDockRadius;
 extern double g_fAmplitude;
 extern CairoDockLabelDescription g_quickInfoTextDescription;
 
+
 void cairo_dock_draw_graph (cairo_t *pCairoContext, CairoDockGraph *pGraph)
 {
 	g_return_if_fail (pGraph != NULL);
@@ -38,125 +39,134 @@ void cairo_dock_draw_graph (cairo_t *pCairoContext, CairoDockGraph *pGraph)
 	if (pGraph->iNbValues <= 1)
 		return;
 	
-	double fMargin = pGraph->iRadius * (1. - sqrt(2)/2);
+	double fMargin = pGraph->fMargin;
 	double fWidth = pGraph->fWidth - 2*fMargin;
 	double fHeight = pGraph->fHeight - 2*fMargin;
-	
-	cairo_pattern_t *pGradationPattern = NULL;
-	if (pGraph->fLowColor[0] != pGraph->fHighColor[0] || pGraph->fLowColor[1] != pGraph->fHighColor[1] || pGraph->fLowColor[2] != pGraph->fHighColor[2])
+	if (pGraph->pTabValues2 != NULL && ! pGraph->bMixDoubleGraph)
 	{
-		if (pGraph->iType == CAIRO_DOCK_GRAPH_CIRCLE)
-			pGradationPattern = cairo_pattern_create_radial (fMargin + fWidth/2,
-				fMargin + fHeight/2,
-				0.,
-				fMargin + fWidth/2,
-				fMargin + fHeight/2,
-				MIN (fWidth, fHeight)/2);
+		fHeight /= 2;
+	}
+	
+	double *pTabValues;
+	int k;
+	for (k = 0; k < (pGraph->pTabValues2 == NULL ? 1 : 2); k ++)
+	{
+		if (k == 1)
+		{
+			pTabValues = pGraph->pTabValues2;
+			if (! pGraph->bMixDoubleGraph)
+				cairo_translate (pCairoContext,
+					0.,
+					fHeight);
+			if (pGraph->pGradationPattern != NULL)
+				cairo_set_source (pCairoContext, pGraph->pGradationPattern);
+			else
+				cairo_set_source_rgb (pCairoContext,
+				pGraph->fLowColor[0],
+				pGraph->fLowColor[1],
+				pGraph->fLowColor[2]);
+		}
 		else
-			pGradationPattern = cairo_pattern_create_linear (0.,
-				fMargin + fHeight,
-				0.,
-				fMargin);
-		g_return_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS);	
-		
-		cairo_pattern_set_extend (pGradationPattern, CAIRO_EXTEND_NONE);
-		cairo_pattern_add_color_stop_rgba (pGradationPattern,
-			0.,
-			pGraph->fLowColor[0],
-			pGraph->fLowColor[1],
-			pGraph->fLowColor[2],
-			1.);
-		cairo_pattern_add_color_stop_rgba (pGradationPattern,
-			1.,
-			pGraph->fHighColor[0],
-			pGraph->fHighColor[1],
-			pGraph->fHighColor[2],
-			1.);
-		cairo_set_source (pCairoContext, pGradationPattern);
-	}
-	else
-	{
-		cairo_set_source_rgb (pCairoContext,
-			pGraph->fLowColor[0],
-			pGraph->fLowColor[1],
-			pGraph->fLowColor[2]);
-	}
-	
-	if (pGraph->iType == CAIRO_DOCK_GRAPH_LINE || pGraph->iType == CAIRO_DOCK_GRAPH_PLAIN)
-	{
-		cairo_set_line_width (pCairoContext, 1);
-		cairo_set_line_join (pCairoContext, CAIRO_LINE_JOIN_ROUND);
-		int j = pGraph->iCurrentIndex + 1;
-		if (j >= pGraph->iNbValues)
-			j -= pGraph->iNbValues;
-		cairo_move_to (pCairoContext, fMargin, fMargin + (1 - pGraph->pTabValues[j]) * fHeight);
-		int i;
-		for (i = 1; i < pGraph->iNbValues; i ++)
 		{
-			j = pGraph->iCurrentIndex + i + 1;
+			pTabValues = pGraph->pTabValues;
+			if (pGraph->pGradationPattern != NULL)
+				cairo_set_source (pCairoContext, pGraph->pGradationPattern);
+			else
+				cairo_set_source_rgb (pCairoContext,
+				pGraph->fLowColor[0],
+				pGraph->fLowColor[1],
+				pGraph->fLowColor[2]);
+		}
+		if (pGraph->iType == CAIRO_DOCK_GRAPH_LINE || pGraph->iType == CAIRO_DOCK_GRAPH_PLAIN)
+		{
+			cairo_set_line_width (pCairoContext, 1);
+			cairo_set_line_join (pCairoContext, CAIRO_LINE_JOIN_ROUND);
+			int j = pGraph->iCurrentIndex + 1;
 			if (j >= pGraph->iNbValues)
 				j -= pGraph->iNbValues;
-			cairo_line_to (pCairoContext,
-				fMargin + i * fWidth / pGraph->iNbValues,
-				fMargin + (1 - pGraph->pTabValues[j]) * fHeight);
+			cairo_move_to (pCairoContext, fMargin, fMargin + (1 - pTabValues[j]) * fHeight);
+			int i;
+			for (i = 1; i < pGraph->iNbValues; i ++)
+			{
+				j = pGraph->iCurrentIndex + i + 1;
+				if (j >= pGraph->iNbValues)
+					j -= pGraph->iNbValues;
+				cairo_line_to (pCairoContext,
+					fMargin + i * fWidth / pGraph->iNbValues,
+					fMargin + (1 - pTabValues[j]) * fHeight);
+			}
+			if (pGraph->iType == CAIRO_DOCK_GRAPH_PLAIN)
+			{
+				i --;
+				cairo_line_to (pCairoContext,
+					fMargin + i * fWidth / pGraph->iNbValues,
+					fMargin + fHeight);
+				cairo_line_to (pCairoContext,
+					fMargin,
+					fMargin + fHeight);
+				cairo_close_path (pCairoContext);
+				cairo_fill_preserve (pCairoContext);
+			}
+			cairo_stroke (pCairoContext);
 		}
-		if (pGraph->iType == CAIRO_DOCK_GRAPH_PLAIN)
+		else if (pGraph->iType == CAIRO_DOCK_GRAPH_BAR)
 		{
-			i --;
-			cairo_line_to (pCairoContext,
-				fMargin + i * fWidth / pGraph->iNbValues,
-				fMargin + fHeight);
-			cairo_line_to (pCairoContext,
-				fMargin,
-				fMargin + fHeight);
-			cairo_line_to (pCairoContext,
-				fMargin,
-				fMargin);
-			cairo_fill_preserve (pCairoContext);
+			double fBarWidth = fWidth / pGraph->iNbValues / 4;
+			cairo_set_line_width (pCairoContext, fBarWidth);
+			int i, j;
+			for (i = 1; i < pGraph->iNbValues; i ++)
+			{
+				j = pGraph->iCurrentIndex + i + 1;
+				if (j >= pGraph->iNbValues)
+					j -= pGraph->iNbValues;
+				cairo_move_to (pCairoContext,
+					fMargin + i * fWidth / pGraph->iNbValues,
+					fMargin + fHeight);
+				cairo_rel_line_to (pCairoContext,
+					0.,
+					- pTabValues[j] * fHeight);
+				cairo_stroke (pCairoContext);
+			}
 		}
-		cairo_stroke (pCairoContext);
-	}
-	else if (pGraph->iType == CAIRO_DOCK_GRAPH_BAR)
-	{
-		double fBarWidth = fWidth / pGraph->iNbValues / 4;
-		cairo_set_line_width (pCairoContext, fBarWidth);
-		int i, j;
-		for (i = 1; i < pGraph->iNbValues; i ++)
+		else
 		{
-			j = pGraph->iCurrentIndex + i + 1;
+			cairo_set_line_width (pCairoContext, 1);
+			cairo_set_line_join (pCairoContext, CAIRO_LINE_JOIN_ROUND);
+			int j = pGraph->iCurrentIndex + 1;
 			if (j >= pGraph->iNbValues)
 				j -= pGraph->iNbValues;
+			double angle, radius = MIN (fWidth, fHeight)/2;
+			angle = 2*G_PI*(-.5/pGraph->iNbValues);
 			cairo_move_to (pCairoContext,
-				fMargin + i * fWidth / pGraph->iNbValues,
-				fMargin + fHeight);
-			cairo_rel_line_to (pCairoContext,
-				0.,
-				- pGraph->pTabValues[j] * fHeight);
+				fMargin + fWidth/2 + radius * (pTabValues[j] * cos (angle)),
+				fMargin + fHeight/2 + radius * (pTabValues[j] * sin (angle)));
+			angle = 2*G_PI*(.5/pGraph->iNbValues);
+			cairo_line_to (pCairoContext,
+				fMargin + fWidth/2 + radius * (pTabValues[j] * cos (angle)),
+				fMargin + fHeight/2 + radius * (pTabValues[j] * sin (angle)));
+			int i;
+			for (i = 1; i < pGraph->iNbValues; i ++)
+			{
+				j = pGraph->iCurrentIndex + i + 1;
+				if (j >= pGraph->iNbValues)
+					j -= pGraph->iNbValues;
+				angle = 2*G_PI*((i-.5)/pGraph->iNbValues);
+				cairo_line_to (pCairoContext,
+					fMargin + fWidth/2 + radius * (pTabValues[j] * cos (angle)),
+					fMargin + fHeight/2 + radius * (pTabValues[j] * sin (angle)));
+				angle = 2*G_PI*((i+.5)/pGraph->iNbValues);
+				cairo_line_to (pCairoContext,
+					fMargin + fWidth/2 + radius * (pTabValues[j] * cos (angle)),
+					fMargin + fHeight/2 + radius * (pTabValues[j] * sin (angle)));
+			}
+			if (pGraph->iType == CAIRO_DOCK_GRAPH_CIRCLE_PLAIN)
+			{
+				cairo_close_path (pCairoContext);
+				cairo_fill_preserve (pCairoContext);
+			}
 			cairo_stroke (pCairoContext);
 		}
 	}
-	else
-	{
-		cairo_set_line_width (pCairoContext, 1);
-		cairo_set_line_join (pCairoContext, CAIRO_LINE_JOIN_ROUND);
-		int j = pGraph->iCurrentIndex + 1;
-		if (j >= pGraph->iNbValues)
-			j -= pGraph->iNbValues;
-		cairo_move_to (pCairoContext, fMargin + fWidth/2 + pGraph->pTabValues[j] * MIN (fWidth, fHeight)/2, fMargin + fHeight/2);
-		int i;
-		for (i = 1; i < pGraph->iNbValues; i ++)
-		{
-			j = pGraph->iCurrentIndex + i + 1;
-			if (j >= pGraph->iNbValues)
-				j -= pGraph->iNbValues;
-			cairo_line_to (pCairoContext,
-				fMargin + MIN (fWidth, fHeight)/2 * (1 + pGraph->pTabValues[j] * cos (i*2*G_PI/pGraph->iNbValues)),
-				fMargin + MIN (fWidth, fHeight)/2 * (1 + pGraph->pTabValues[j] * sin (i*2*G_PI/pGraph->iNbValues)));
-		}
-		cairo_stroke (pCairoContext);
-	}
-	if (pGradationPattern != NULL)
-		cairo_pattern_destroy (pGradationPattern);
 }
 
 void cairo_dock_render_graph (cairo_t *pSourceContext, CairoContainer *pContainer, Icon *pIcon, CairoDockGraph *pGraph)
@@ -224,7 +234,7 @@ static cairo_surface_t *_cairo_dock_create_graph_background (cairo_t *pSourceCon
 	double fMargin = fRadius * (1. - sqrt(2)/2);
 	cairo_set_source_rgb (pCairoContext, g_quickInfoTextDescription.fBackgroundColor[0], g_quickInfoTextDescription.fBackgroundColor[1], g_quickInfoTextDescription.fBackgroundColor[2]);  // meme couleur que le fond des info-rapides.
 	cairo_set_line_width (pCairoContext, 1.);
-	if (iType == CAIRO_DOCK_GRAPH_CIRCLE)
+	if (iType == CAIRO_DOCK_GRAPH_CIRCLE || iType == CAIRO_DOCK_GRAPH_CIRCLE_PLAIN)
 	{
 		cairo_arc (pCairoContext,
 			fWidth/2,
@@ -245,14 +255,61 @@ static cairo_surface_t *_cairo_dock_create_graph_background (cairo_t *pSourceCon
 	cairo_destroy (pCairoContext);
 	return  pBackgroundSurface;
 }
-
+static cairo_pattern_t *_cairo_dock_create_graph_pattern (CairoDockGraph*pGraph, double fOffsetY)
+{
+	cairo_pattern_t *pGradationPattern = NULL;
+	if (pGraph->fLowColor[0] != pGraph->fHighColor[0] || pGraph->fLowColor[1] != pGraph->fHighColor[1] || pGraph->fLowColor[2] != pGraph->fHighColor[2])
+	{
+		double fMargin = pGraph->fMargin;
+		double fWidth = pGraph->fWidth - 2*fMargin;
+		double fHeight = pGraph->fHeight - 2*fMargin;
+		if (pGraph->pTabValues2 != NULL && ! pGraph->bMixDoubleGraph)
+		{
+			fHeight /= 2;
+		}
+		
+		if (pGraph->iType == CAIRO_DOCK_GRAPH_CIRCLE || pGraph->iType == CAIRO_DOCK_GRAPH_CIRCLE_PLAIN)
+		{
+			double radius = MIN (fWidth, fHeight)/2;
+			pGradationPattern = cairo_pattern_create_radial (fMargin + radius,
+				fMargin + radius + fOffsetY,
+				0.,
+				fMargin + radius,
+				fMargin + radius + fOffsetY,
+				radius);
+		}
+		else
+			pGradationPattern = cairo_pattern_create_linear (0.,
+				fMargin + fHeight + fOffsetY,
+				0.,
+				fMargin + fOffsetY);
+		g_return_val_if_fail (cairo_pattern_status (pGradationPattern) == CAIRO_STATUS_SUCCESS, NULL);	
+		
+		cairo_pattern_set_extend (pGradationPattern, CAIRO_EXTEND_NONE);
+		cairo_pattern_add_color_stop_rgba (pGradationPattern,
+			0.,
+			pGraph->fLowColor[0],
+			pGraph->fLowColor[1],
+			pGraph->fLowColor[2],
+			1.);
+		cairo_pattern_add_color_stop_rgba (pGradationPattern,
+			1.,
+			pGraph->fHighColor[0],
+			pGraph->fHighColor[1],
+			pGraph->fHighColor[2],
+			1.);
+	}
+	return pGradationPattern;
+}
 CairoDockGraph* cairo_dock_create_graph (cairo_t *pSourceContext, int iNbValues, CairoDockTypeGraph iType, double fWidth, double fHeight, gdouble *pLowColor, gdouble *pHighColor, gdouble *pBackGroundColor)
 {
 	g_return_val_if_fail (iNbValues > 0, NULL);
 	CairoDockGraph *pGraph = g_new0 (CairoDockGraph, 1);
 	pGraph->iNbValues = iNbValues;
 	pGraph->pTabValues = g_new0 (double, iNbValues);
-	pGraph->iType = iType;
+	if (iType & CAIRO_DOCK_DOUBLE_GRAPH)
+		pGraph->pTabValues2 = g_new0 (double, iNbValues);
+	pGraph->iType = iType & CAIRO_DOCK_TYPE_GRAPH_MASK;
 	
 	if (pLowColor != NULL)
 		memcpy (pGraph->fLowColor, pLowColor, sizeof (pGraph->fLowColor));
@@ -264,7 +321,12 @@ CairoDockGraph* cairo_dock_create_graph (cairo_t *pSourceContext, int iNbValues,
 	pGraph->fWidth = fWidth;
 	pGraph->fHeight = fHeight;
 	pGraph->iRadius = g_iDockRadius;  // memes arrondis que le dock et les desklets.
+	pGraph->fMargin = pGraph->iRadius * (1. - sqrt(2)/2);
+	pGraph->bMixDoubleGraph = (iType & CAIRO_DOCK_MIX_DOUBLE_GRAPH);
+	
 	pGraph->pBackgroundSurface = _cairo_dock_create_graph_background (pSourceContext, fWidth, fHeight, g_iDockRadius, pGraph->fBackGroundColor, iType);
+	
+	pGraph->pGradationPattern = _cairo_dock_create_graph_pattern (pGraph, 0.);
 	
 	return pGraph;
 }
@@ -273,6 +335,8 @@ void cairo_dock_reload_graph (cairo_t *pSourceContext, CairoDockGraph *pGraph, i
 {
 	if (pGraph->pBackgroundSurface != NULL)
 		cairo_surface_destroy (pGraph->pBackgroundSurface);
+	if (pGraph->pGradationPattern != NULL)
+                cairo_pattern_destroy (pGraph->pGradationPattern);
 	pGraph->fWidth = iWidth;
 	pGraph->fHeight = iHeight;
 	pGraph->iRadius = g_iDockRadius;
@@ -286,8 +350,11 @@ void cairo_dock_free_graph (CairoDockGraph *pGraph)
 	if (pGraph == NULL)
 		return ;
 	g_free (pGraph->pTabValues);
+	g_free (pGraph->pTabValues2);
 	if (pGraph->pBackgroundSurface != NULL)
 		cairo_surface_destroy (pGraph->pBackgroundSurface);
+	if (pGraph->pGradationPattern != NULL)
+                cairo_pattern_destroy (pGraph->pGradationPattern);
 	g_free (pGraph);
 }
 
@@ -301,6 +368,12 @@ void cairo_dock_update_graph (CairoDockGraph *pGraph, double fNewValue)
 		pGraph->iCurrentIndex -= pGraph->iNbValues;
 	
 	pGraph->pTabValues[pGraph->iCurrentIndex] = fNewValue;
+}
+void cairo_dock_update_double_graph (CairoDockGraph *pGraph, double fNewValue, double fNewValue2)
+{
+	cairo_dock_update_graph (pGraph, fNewValue);
+	if (pGraph->pTabValues2 != NULL)
+		pGraph->pTabValues2[pGraph->iCurrentIndex] = fNewValue2;
 }
 
 

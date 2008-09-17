@@ -365,7 +365,7 @@ void cairo_dock_on_change_icon (Icon *pLastPointedIcon, Icon *pPointedIcon, Cair
 }
 static gboolean _cairo_dock_make_icon_glide (CairoDock *pDock)
 {
-	g_print ("%s ()\n", __func__);
+	//g_print ("%s ()\n", __func__);
 	Icon *icon;
 	GList *ic;
 	gboolean bGliding = FALSE;
@@ -385,7 +385,7 @@ static gboolean _cairo_dock_make_icon_glide (CairoDock *pDock)
 				icon->fGlideOffset = 0;
 				icon->iGlideDirection = 0;
 			}
-			g_print ("  %s <- %.2f\n", icon->acName, icon->fGlideOffset);
+			//g_print ("  %s <- %.2f\n", icon->acName, icon->fGlideOffset);
 			bGliding = TRUE;
 		}
 	}
@@ -606,7 +606,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 			}
 			if (pDock->iSidIconGlide == 0)
 			{
-				pDock->iSidIconGlide = g_timeout_add (100, (GSourceFunc) _cairo_dock_make_icon_glide, pDock);
+				pDock->iSidIconGlide = g_timeout_add (50, (GSourceFunc) _cairo_dock_make_icon_glide, pDock);
 			}
 		}
 	}
@@ -1298,15 +1298,31 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 						}
 
 						Icon *prev_icon, *next_icon;
-						if (pDock->iMouseX > icon->fX + icon->fWidth * icon->fScale / 2)
+						if (! g_bEasterEggs)
 						{
-							prev_icon = icon;
-							next_icon = cairo_dock_get_next_icon (pDock->icons, icon);
+							if (pDock->iMouseX > icon->fX + icon->fWidth * icon->fScale / 2)
+							{
+								prev_icon = icon;
+								next_icon = cairo_dock_get_next_icon (pDock->icons, icon);
+							}
+							else
+							{
+								prev_icon = cairo_dock_get_previous_icon (pDock->icons, icon);
+								next_icon = icon;
+							}
 						}
 						else
 						{
-							prev_icon = cairo_dock_get_previous_icon (pDock->icons, icon);
-							next_icon = icon;
+							if (icon->fXAtRest > s_pIconClicked->fXAtRest)
+							{
+								prev_icon = icon;
+								next_icon = cairo_dock_get_next_icon (pDock->icons, icon);
+							}
+							else
+							{
+								prev_icon = cairo_dock_get_previous_icon (pDock->icons, icon);
+								next_icon = icon;
+							}
 						}
 						if ((prev_icon == NULL || cairo_dock_get_icon_order (prev_icon) != cairo_dock_get_icon_order (s_pIconClicked)) && (next_icon == NULL || cairo_dock_get_icon_order (next_icon) != cairo_dock_get_icon_order (s_pIconClicked)))
 						{

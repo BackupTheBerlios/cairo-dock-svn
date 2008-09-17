@@ -1100,6 +1100,9 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data, CairoDockModuleInstance *myApplet)
 #define CD_APPLET_RENDER_GRAPH_NEW_VALUE(pGraph, fValue) \
 	cairo_dock_update_graph (pGraph, fValue); \
 	CD_APPLET_RENDER_GRAPH (pGraph)
+#define CD_APPLET_RENDER_GRAPH_NEW_VALUES(pGraph, fValue, fValue2) \
+	cairo_dock_update_double_graph (pGraph, fValue, fValue2); \
+	CD_APPLET_RENDER_GRAPH (pGraph)
 
 
 //\_________________________________ DESKLETS et SOUS-DOCKS

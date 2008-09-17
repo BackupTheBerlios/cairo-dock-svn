@@ -11,25 +11,34 @@ typedef enum {
 	CAIRO_DOCK_GRAPH_LINE=0,
 	CAIRO_DOCK_GRAPH_PLAIN,
 	CAIRO_DOCK_GRAPH_BAR,
-	CAIRO_DOCK_GRAPH_CIRCLE
+	CAIRO_DOCK_GRAPH_CIRCLE,
+	CAIRO_DOCK_GRAPH_CIRCLE_PLAIN
 	} CairoDockTypeGraph;
 
-#define CAIRO_DOCK_MIX_DOUBLE_GRAPH  (1<<2)
-#define CCAIRO_DOCK_COMPUTE_MAX_VALUE (1<<3)
+#define CAIRO_DOCK_TYPE_GRAPH_MASK 7
+#define CAIRO_DOCK_DOUBLE_GRAPH (1<<3)
+#define CAIRO_DOCK_MIX_DOUBLE_GRAPH  (1<<4)
+#define CCAIRO_DOCK_COMPUTE_MAX_VALUE (1<<5)
 
 typedef struct _CairoDockGraph {
 	gint iNbValues;
 	gdouble *pTabValues;
+	gdouble *pTabValues2;
 	gint iCurrentIndex;
 	gdouble fHighColor[3];
 	gdouble fLowColor[3];
 	gdouble fBackGroundColor[4];
 	CairoDockTypeGraph iType;
 	cairo_surface_t *pBackgroundSurface;
+	cairo_pattern_t *pGradationPattern;
 	gdouble fWidth;
 	gdouble fHeight;
 	gint iRadius;
 	gdouble fMargin;
+	gboolean bMixDoubleGraph;
+	gboolean bComputeMaxValue;
+	gdouble fMaxValue;
+	gdouble fMaxValue2;
 	} CairoDockGraph;
 
 /** Trace un graphe sur un contexte.
@@ -45,6 +54,12 @@ void cairo_dock_draw_graph (cairo_t *pCairoContext, CairoDockGraph *pGraph);
 * @param fNewValue la nouvelle valeur (entre 0 et 1).
 */
 void cairo_dock_update_graph (CairoDockGraph *pGraph, double fNewValue);
+/** Ajoute une nouvelle paires de valeurs au graphe. La valeur la plus vieille est perdue.
+* @param pGraph le graphe a mettre a jour.
+* @param fNewValue la nouvelle valeur (entre 0 et 1).
+* @param fNewValue2 la 2eme nouvelle valeur (entre 0 et 1).
+*/
+void cairo_dock_update_double_graph (CairoDockGraph *pGraph, double fNewValue, double fNewValue2);
 
 /** Dessine le graphe sur la surface de l'icone, et met a jour celle-ci.
 * @param pSourceContext le contexte de dessin sur lequel dessiner le graphe. N'est pas altere.

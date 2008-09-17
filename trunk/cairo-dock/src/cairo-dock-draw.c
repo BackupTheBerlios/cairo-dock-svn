@@ -41,6 +41,9 @@ extern gint g_iStringLineWidth;
 extern double g_fStringColor[4];
 extern double g_fReflectSize;
 
+extern double g_fAmplitude;
+extern int g_iSinusoidWidth;
+
 extern gboolean g_bRoundedBottomCorner;
 extern gboolean bDirectionUp;
 extern double g_fStripesSpeedFactor;
@@ -572,18 +575,33 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 			icon->fAlpha *= MIN (g_fVisibleAppliAlpha + 1, 1);*/
 		//g_print ("g_fVisibleAppliAlpha : %.2f & %d => %.2f\n", g_fVisibleAppliAlpha, icon->bIsHidden, icon->fAlpha);
 	}
+	
 	double fGlideScale;
 	if (icon->fGlideOffset != 0)
 	{
-		fGlideScale = -.5*fabs(icon->fGlideOffset)+1;
-		fGlideScale = MAX (fGlideScale, 1/icon->fScale);
+		double fPhase =  icon->fPhase + icon->fGlideOffset * icon->fWidth / fRatio / g_iSinusoidWidth * G_PI;
+		if (fPhase < 0)
+		{
+			fPhase = 0;
+		}
+		else if (fPhase > G_PI)
+		{
+			fPhase = G_PI;
+		}
+		fGlideScale = (1 + fDockMagnitude * g_fAmplitude * sin (fPhase)) / icon->fScale;  // c'est un peu hacky ... il faudrait passer l'icone precedente en parametre ...
+		if (bDirectionUp)
+			if (bHorizontalDock)
+				cairo_translate (pCairoContext, 0., (1-fGlideScale)*icon->fHeight*icon->fScale);
+			else
+				cairo_translate (pCairoContext, (1-fGlideScale)*icon->fHeight*icon->fScale, 0.);
 	}
 	else
 		fGlideScale = 1;
+	
 	if (bHorizontalDock)
-		cairo_translate (pCairoContext, icon->fDrawX + icon->fGlideOffset * icon->fWidth * icon->fScale * fGlideScale, icon->fDrawY + (1-fGlideScale)*icon->fHeight*icon->fScale);
+		cairo_translate (pCairoContext, icon->fDrawX + icon->fGlideOffset * icon->fWidth * icon->fScale * (icon->fGlideOffset < 0 ? fGlideScale : 1), icon->fDrawY);
 	else
-		cairo_translate (pCairoContext, icon->fDrawY, icon->fDrawX + icon->fGlideOffset * icon->fWidth * icon->fScale * fGlideScale);
+		cairo_translate (pCairoContext, icon->fDrawY, icon->fDrawX + icon->fGlideOffset * icon->fWidth * icon->fScale * (icon->fGlideOffset < 0 ? fGlideScale : 1));
 	
 	if (icon->bHasIndicator && ! g_bIndicatorAbove && g_pIndicatorSurface[0] != NULL)
 	{

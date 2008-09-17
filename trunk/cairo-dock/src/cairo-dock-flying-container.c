@@ -47,7 +47,7 @@ static gboolean on_expose_flying_icon (GtkWidget *pWidget,
 	
 	if (pFlyingContainer->pIcon != NULL)
 	{
-		pFlyingContainer->pIcon->fScale = (1 + g_fAmplitude);
+		//pFlyingContainer->pIcon->fScale = (1 + g_fAmplitude);
 		cairo_save (pCairoContext);
 		cairo_translate (pCairoContext, 
 			(pFlyingContainer->iWidth - pFlyingContainer->pIcon->fWidth * pFlyingContainer->pIcon->fScale) / 2,
@@ -55,7 +55,6 @@ static gboolean on_expose_flying_icon (GtkWidget *pWidget,
 		/*cairo_scale (pCairoContext, 1./(1+g_fAmplitude), 1./(1+g_fAmplitude));
 		cairo_set_source_surface (pCairoContext, pFlyingContainer->pIcon->pIconBuffer, 0., 0.);
 		cairo_paint (pCairoContext);*/
-		///pFlyingContainer->pIcon->iCount=0;
 		cairo_dock_render_one_icon (pFlyingContainer->pIcon, pCairoContext, TRUE, 1., 1., FALSE, FALSE, pFlyingContainer->iWidth, TRUE);
 		cairo_restore (pCairoContext);
 		
@@ -134,6 +133,7 @@ CairoFlyingContainer *cairo_dock_create_flying_container (Icon *pFlyingIcon, Cai
 		pFlyingContainer);
 	
 	g_print ("pFlyingContainer->pIcon->fScale : %.2f\n", pFlyingContainer->pIcon->fScale);
+	pFlyingContainer->pIcon->fScale = 1.;
 	pFlyingContainer->iWidth = pFlyingIcon->fWidth * pFlyingContainer->pIcon->fScale * 3.7;
 	pFlyingContainer->iHeight = pFlyingIcon->fHeight * pFlyingContainer->pIcon->fScale + 1.*pFlyingContainer->iWidth / HAND_WIDTH * HAND_HEIGHT * .6;
 	pFlyingContainer->iPositionX = pOriginDock->iWindowPositionX + pOriginDock->iMouseX - pFlyingContainer->iWidth/2;
@@ -159,7 +159,6 @@ CairoFlyingContainer *cairo_dock_create_flying_container (Icon *pFlyingIcon, Cai
 	pFlyingContainer->pIcon->iCount = 1e6;  // attention : cette animation s'arretera au bout de 11.5 ans :o)
 	pFlyingContainer->pIcon->fDrawX = 0;
 	pFlyingContainer->pIcon->fDrawY = 0;
-	pFlyingContainer->pIcon->fScale = 1.;
 	pFlyingContainer->iSidAnimationTimer = g_timeout_add (60, (GSourceFunc) _cairo_dock_animate_flying_icon, (gpointer) pFlyingContainer);
 	return pFlyingContainer;
 }
