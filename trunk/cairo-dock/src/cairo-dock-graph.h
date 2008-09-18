@@ -27,10 +27,13 @@ typedef struct _CairoDockGraph {
 	gint iCurrentIndex;
 	gdouble fHighColor[3];
 	gdouble fLowColor[3];
+	gdouble fHighColor2[3];
+	gdouble fLowColor2[3];
 	gdouble fBackGroundColor[4];
 	CairoDockTypeGraph iType;
 	cairo_surface_t *pBackgroundSurface;
 	cairo_pattern_t *pGradationPattern;
+	cairo_pattern_t *pGradationPattern2;
 	gdouble fWidth;
 	gdouble fHeight;
 	gint iRadius;
@@ -79,8 +82,10 @@ void cairo_dock_render_graph (cairo_t *pSourceContext, CairoContainer *pContaine
 * @param pLowColor couleur RVB des valeurs faibles.
 * @param pHighColor couleur RVB des valeurs hautes.
 * @param pBackGroundColor couleur RVBA du fond.
+* @param pLowColor2 couleur RVB des valeurs faibles de la 2eme mesure.
+* @param pHighColor2 couleur RVB des valeurs hautes de la 2eme mesure.
 */
-CairoDockGraph* cairo_dock_create_graph (cairo_t *pSourceContext, int iNbValues, CairoDockTypeGraph iType, double fWidth, double fHeight, gdouble *pLowColor, gdouble *pHighColor, gdouble *pBackGroundColor);
+CairoDockGraph* cairo_dock_create_graph (cairo_t *pSourceContext, int iNbValues, CairoDockTypeGraph iType, double fWidth, double fHeight, gdouble *pLowColor, gdouble *pHighColor, gdouble *pBackGroundColor, gdouble *pLowColor2, gdouble *pHighColor2);
 
 /** Recharge un graphe a une taille donnee.
 * @param pSourceContext un contexte de dessin.

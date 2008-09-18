@@ -15,7 +15,7 @@ msgstr ""
 msgid "Do you want to mount this point ?"
 msgstr "Volete montare questo punto ?"
 
-#: ../src/cairo-dock-callbacks.c:1867
+#: ../src/cairo-dock-callbacks.c:1883
 msgid "Quit Cairo-Dock ?"
 msgstr "Abbandonare Cairo-Dock ?"
 
@@ -383,27 +383,27 @@ msgstr ""
 "Le perderete se non si salva il tema prima di sceglierne uno nuovo. "
 "Continuare ugualmente ?"
 
-#: ../src/cairo-dock-themes-manager.c:649
+#: ../src/cairo-dock-themes-manager.c:672
 #, c-format
 msgid "Are you sure you want to overwrite theme %s ?"
 msgstr "Siete sicuri di voler sovrascrivere il tema %s ?"
 
-#: ../src/cairo-dock.c:546
+#: ../src/cairo-dock.c:615
 msgid "< Maintenance mode >"
 msgstr "< Maintenace mode >"
 
 # #################################
 # ########### cairo-dock.conf #############
 # #################################
-#: ../data/messages:1 ../data/messages:791
+#: ../data/messages:1 ../data/messages:797
 msgid "Position"
 msgstr "Posizionamento"
 
-#: ../data/messages:3 ../data/messages:619 ../data/messages:793
+#: ../data/messages:3 ../data/messages:619 ../data/messages:799
 msgid "Position on the screen"
 msgstr "Posizionamento sullo schermo"
 
-#: ../data/messages:5 ../data/messages:621 ../data/messages:795
+#: ../data/messages:5 ../data/messages:621 ../data/messages:801
 msgid ""
 "The icons will scroll according to the chosen placement type. Of course the "
 "dock can be placed anywhere on the screen, here we specify regarding to what."
@@ -412,30 +412,30 @@ msgstr ""
 "La barra si può posizionare ovunque, qui si tratta di precisare in rapporto "
 "a cosa."
 
-#: ../data/messages:7 ../data/messages:623 ../data/messages:797
+#: ../data/messages:7 ../data/messages:623 ../data/messages:803
 msgid ""
 "Choose the screen border regarding to which the dock will place itself :"
 msgstr ""
 "Scegliere il bordo dello schermo in rapporto al quale la barra verrà "
 "piazzata:"
 
-#: ../data/messages:9 ../data/messages:625 ../data/messages:799
+#: ../data/messages:9 ../data/messages:625 ../data/messages:805
 msgid "bottom"
 msgstr "basso"
 
-#: ../data/messages:11 ../data/messages:627 ../data/messages:801
+#: ../data/messages:11 ../data/messages:627 ../data/messages:807
 msgid "top"
 msgstr "alto"
 
-#: ../data/messages:13 ../data/messages:629 ../data/messages:803
+#: ../data/messages:13 ../data/messages:629 ../data/messages:809
 msgid "right"
 msgstr "destra"
 
-#: ../data/messages:15 ../data/messages:631 ../data/messages:805
+#: ../data/messages:15 ../data/messages:631 ../data/messages:811
 msgid "left"
 msgstr "sinistra"
 
-#: ../data/messages:17 ../data/messages:807
+#: ../data/messages:17 ../data/messages:813
 msgid ""
 "At 0, the dock will place itself regarding the left corner if horizontal and "
 "the top corner if vertical, at 1 regarding the right corner if horizontal "
@@ -447,15 +447,15 @@ msgstr ""
 "orizzontale (angolo basso in verticale), e a 0.5 in mezzo alla parte bassa "
 "dello schermo."
 
-#: ../data/messages:19 ../data/messages:809
+#: ../data/messages:19 ../data/messages:815
 msgid "Relative alignment :"
 msgstr "Allineamento relativo :"
 
-#: ../data/messages:21 ../data/messages:811
+#: ../data/messages:21 ../data/messages:817
 msgid "Position regarding the chosen screen's edge"
 msgstr "Posizionamento in rapporto al bordo scelto dello schermo"
 
-#: ../data/messages:23 ../data/messages:813
+#: ../data/messages:23 ../data/messages:819
 msgid ""
 "Gap from the absolute position on the screen's edge, in pixels. You can also "
 "move the dock by holding ALT or CTRL key and left mouse button."
@@ -464,11 +464,11 @@ msgstr ""
 "Potete anche muovere la barra premendo ALT o CTRL e il tasto sinistro del "
 "mouse"
 
-#: ../data/messages:25 ../data/messages:815
+#: ../data/messages:25 ../data/messages:821
 msgid "Lateral gap :"
 msgstr "Scarto laterale :"
 
-#: ../data/messages:27 ../data/messages:817
+#: ../data/messages:27 ../data/messages:823
 msgid ""
 "in pixels. You can also move the dock by holding ALT or CTRL key and left "
 "mouse button."
@@ -476,7 +476,7 @@ msgstr ""
 "in pixel. Potete anche muovere la barra premendo ALT o CTRL e il tasto "
 "sinistro del mouse."
 
-#: ../data/messages:29 ../data/messages:819
+#: ../data/messages:29 ../data/messages:825
 msgid "Distance to the screen's edge :"
 msgstr "Distanza dai bordi dello schermo :"
 
@@ -506,7 +506,7 @@ msgstr ""
 msgid "Reserve space at the edge of the screen for the dock ?"
 msgstr "Riservare lo spazio in fondo allo schermo per la barra ?"
 
-#: ../data/messages:39 ../data/messages:635 ../data/messages:821
+#: ../data/messages:39 ../data/messages:635 ../data/messages:827
 msgid ""
 "The dock will automatically hide itself outside of the scren when the mouse "
 "leaves it and will show a callback zone instead. Place the mouse into this "
@@ -516,7 +516,7 @@ msgstr ""
 "lascerà, e mostrerà una zona per ricordarla al suo posto. Posizionare il "
 "mouse in quella zona farà riapparire la barra."
 
-#: ../data/messages:41 ../data/messages:637 ../data/messages:823
+#: ../data/messages:41 ../data/messages:637 ../data/messages:829
 msgid "Activate auto-hide ?"
 msgstr "Attivare l'auto-nascondimento ?"
 
@@ -904,7 +904,7 @@ msgstr ""
 msgid "Reflections should be calculated in real-time ?"
 msgstr "I riflessi devono essere ricalcolati in tempo reale ?"
 
-#: ../data/messages:183 ../data/messages:735
+#: ../data/messages:183 ../data/messages:741
 msgid "Labels"
 msgstr "Etichette"
 
@@ -1216,17 +1216,17 @@ msgstr "Profondità del campo della vista :"
 msgid "Style of the icons' labels"
 msgstr "Stile delle etichette"
 
-#: ../data/messages:319 ../data/messages:511 ../data/messages:741
+#: ../data/messages:319 ../data/messages:511 ../data/messages:747
 msgid "approximately size in pixels, put 0 to not display labels"
 msgstr ""
 "approssimativamente la dimensione in pixel, mettere 0 per non vedere "
 "etichette"
 
-#: ../data/messages:321 ../data/messages:513 ../data/messages:743
+#: ../data/messages:321 ../data/messages:513 ../data/messages:749
 msgid "Size of the font :"
 msgstr "Dimensione del carattere :"
 
-#: ../data/messages:323 ../data/messages:515 ../data/messages:737
+#: ../data/messages:323 ../data/messages:515 ../data/messages:743
 msgid ""
 "for exemple Monospace, Purisa, ... Just write the font name wihtout any "
 "number or so."
@@ -1234,7 +1234,7 @@ msgstr ""
 "per esempio Monospace, Purisa, ... Scrivere solo il nome del carattere, "
 "senza cifre o altro."
 
-#: ../data/messages:325 ../data/messages:517 ../data/messages:739
+#: ../data/messages:325 ../data/messages:517 ../data/messages:745
 msgid "Family of the font used for labels :"
 msgstr "Famiglia dei caratteri usati dalle etichette :"
 
@@ -1310,17 +1310,18 @@ msgstr "Spessore della stringa, in pixel (0 per non avere stringa) :"
 msgid "Color of the string (red, blue, green, alpha) :"
 msgstr "Colore della stringa (rosso, verde, blu, alpha):"
 
-#: ../data/messages:357
+#: ../data/messages:357 ../data/messages:695
 msgid "Icons' themes"
 msgstr "Temi delle icone"
 
-#: ../data/messages:359
+#: ../data/messages:359 ../data/messages:697
+#, fuzzy
 msgid ""
 "Directories or themes where to search icons. Put some directories where you "
 "have icons you wish to see in the dock, or put some theme's name you've "
 "installed on your system. (the order is taken into account during the "
-"research). The key word _ThemeDirectory_ represents the directory ~/.cairo-"
-"dock/current_theme/launchers"
+"research). The key word _LocalTheme_ represents the directory ~/.config/"
+"cairo-dock/current_theme/icons"
 msgstr ""
 "Cartelle o temi dove cercare le icone. Inserire delle cartelle dove si hanno "
 "delle icone che vorreste vedere sulla barra, o inserite il nome di un tema "
@@ -1328,7 +1329,7 @@ msgstr ""
 "durante la ricerca). La parola chiave _ThemeDirectory_ rappresenta la "
 "cartella ~/.cairo-dock/current_theme/launchers"
 
-#: ../data/messages:361
+#: ../data/messages:361 ../data/messages:699
 msgid "List of icons themes or directories :"
 msgstr "Lista dei temi di icone o cartelle :"
 
@@ -1351,37 +1352,37 @@ msgid "Animation type when clicked :"
 msgstr "Tipo di animazione al momento del click :"
 
 #: ../data/messages:371 ../data/messages:395 ../data/messages:419
-#: ../data/messages:699 ../data/messages:715
+#: ../data/messages:705 ../data/messages:721
 msgid "bounce"
 msgstr "rimbalzo"
 
 #: ../data/messages:373 ../data/messages:397 ../data/messages:421
-#: ../data/messages:701 ../data/messages:717
+#: ../data/messages:707 ../data/messages:723
 msgid "rotate"
 msgstr "rotazione"
 
 #: ../data/messages:375 ../data/messages:399 ../data/messages:423
-#: ../data/messages:703 ../data/messages:719
+#: ../data/messages:709 ../data/messages:725
 msgid "blink"
 msgstr "lampeggiamento"
 
 #: ../data/messages:377 ../data/messages:401 ../data/messages:425
-#: ../data/messages:705 ../data/messages:721
+#: ../data/messages:711 ../data/messages:727
 msgid "pulse"
 msgstr "pulsazione"
 
 #: ../data/messages:379 ../data/messages:403 ../data/messages:427
-#: ../data/messages:707 ../data/messages:723
+#: ../data/messages:713 ../data/messages:729
 msgid "upside-down"
 msgstr "capovolgimento"
 
 #: ../data/messages:381 ../data/messages:405 ../data/messages:429
-#: ../data/messages:709 ../data/messages:725
+#: ../data/messages:715 ../data/messages:731
 msgid "wobbly"
 msgstr "molla"
 
 #: ../data/messages:383 ../data/messages:407 ../data/messages:431
-#: ../data/messages:711 ../data/messages:727
+#: ../data/messages:717 ../data/messages:733
 msgid "random"
 msgstr "casuale"
 
@@ -1556,7 +1557,7 @@ msgstr ""
 msgid "Homogeneous with icons' label ?"
 msgstr "Omogeneità con le etichette delle icone ?"
 
-#: ../data/messages:523 ../data/messages:745
+#: ../data/messages:523 ../data/messages:751
 msgid "Desklets"
 msgstr "Desklets"
 
@@ -1793,75 +1794,75 @@ msgstr "Zoom massimo :"
 msgid "Space between icons (in pixels) :"
 msgstr "Spazio tra le icone (in pixels) :"
 
-#: ../data/messages:695
+#: ../data/messages:701
 msgid "Animations"
 msgstr "Animazioni"
 
-#: ../data/messages:697
+#: ../data/messages:703
 msgid "Animation type for launchers :"
 msgstr "Tipo di animazione per i lanciatori :"
 
-#: ../data/messages:713
+#: ../data/messages:719
 msgid "Animation type for applis :"
 msgstr "Tipo di animazione per le applicazioni :"
 
-#: ../data/messages:729
+#: ../data/messages:735
 msgid "Extern frame"
 msgstr "Cornice esterna"
 
-#: ../data/messages:731
+#: ../data/messages:737
 msgid "Corner radius, in pixels:"
 msgstr "Raggio degli angoli, in pixels :"
 
-#: ../data/messages:733
+#: ../data/messages:739
 msgid "Color of the extern line (red, blue, green, alpha):"
 msgstr "Colore della cornice (rosso, verde, blu, alpha):"
 
-#: ../data/messages:747
+#: ../data/messages:753
 msgid "Desklet's background color :"
 msgstr "Colore di sfondo delle desklets :"
 
-#: ../data/messages:749
+#: ../data/messages:755
 msgid "Desklet's background color when mouse hovers it :"
 msgstr "Colore di sfondo al momento in cui il mouse sorvola la desklet :"
 
-#: ../data/messages:751 ../data/messages:765 ../data/messages:825
+#: ../data/messages:757 ../data/messages:771 ../data/messages:831
 msgid "Desktop Entry"
 msgstr "Icone del menu"
 
-#: ../data/messages:753
+#: ../data/messages:759
 #, fuzzy
 msgid "Sub-dock's name :"
 msgstr "Sub-Docks"
 
-#: ../data/messages:755 ../data/messages:773 ../data/messages:827
+#: ../data/messages:761 ../data/messages:779 ../data/messages:833
 msgid "Image's name or path :"
 msgstr "Percorso o nome dell'immagine:"
 
-#: ../data/messages:757 ../data/messages:779 ../data/messages:829
+#: ../data/messages:763 ../data/messages:785 ../data/messages:835
 msgid "Extra parameters"
 msgstr "Altri parametri"
 
-#: ../data/messages:759 ../data/messages:781 ../data/messages:831
+#: ../data/messages:765 ../data/messages:787 ../data/messages:837
 msgid "Order you want for this launcher among the others:"
 msgstr "Ordine di questo lanciatore tra gli altri :"
 
-#: ../data/messages:761 ../data/messages:777 ../data/messages:833
+#: ../data/messages:767 ../data/messages:783 ../data/messages:839
 msgid "Name of the container it belongs to:"
 msgstr "Nome del contenitore al quale appartiene :"
 
-#: ../data/messages:763
+#: ../data/messages:769
 msgid "Name of the view used for the sub-dock :"
 msgstr "Nome della vista utilizzata per la sub-dock :"
 
 # #################################
 # ########### launcher.conf #############
 # #################################
-#: ../data/messages:767
+#: ../data/messages:773
 msgid "Launcher's name :"
 msgstr "Nome del lanciatore :"
 
-#: ../data/messages:769
+#: ../data/messages:775
 msgid ""
 "Exemple : nautilus --no-desktop, gedit, etc. You can even enter a keyboard "
 "shortcut, for exemple <Alt>F1 for the Applications Menu, <Ctrl>c or <Ctrl>v "
@@ -1871,11 +1872,11 @@ msgstr ""
 "scorciatoia da tastiera, per esempio <ALT>F1 per il menu delle Applicazioni, "
 "<CTRL>C o <CTRL>V per copiare, incollare, etc..."
 
-#: ../data/messages:771
+#: ../data/messages:777
 msgid "Command to launch on click :"
 msgstr "Commando da eseguire al click :"
 
-#: ../data/messages:775
+#: ../data/messages:781
 msgid ""
 "If you write here a container's name that doesn't exist yet, a new one will "
 "be created, with this icon inside."
@@ -1883,7 +1884,7 @@ msgstr ""
 "Se si scrive qui il nome di un contenitore ancora non esistente, ne sarà "
 "creato uno nuovo, con quest'icona all'interno."
 
-#: ../data/messages:783
+#: ../data/messages:789
 msgid ""
 "Use this option for exemple if the launcher launches a script in a terminal "
 "but you don't want it to steal normal terminal's icons from the TaskBar, or "
@@ -1897,11 +1898,11 @@ msgstr ""
 "poiché fornisce delle informazioni specifiche, per esempio le icone di "
 "Pidgin che rappresentano l'avatar del contatto."
 
-#: ../data/messages:785
+#: ../data/messages:791
 msgid "Prevent this launcher from stealing appli from taskbar ?"
 msgstr "Impedire a questo lanciatore di rubare l'applicazione nella TaskBar ?"
 
-#: ../data/messages:787
+#: ../data/messages:793
 msgid ""
 "The only reason you may want to modify this parameter is if you made this "
 "launcher by hands. If you dropped it into the dock from the menu, it is "
@@ -1913,26 +1914,26 @@ msgstr ""
 "dal menu, è quasi certo che non serva metterci mano. Definisce la classe del "
 "programma, ciò che risulta utile per legare l'applicazione al suo lanciatore."
 
-#: ../data/messages:789
+#: ../data/messages:795
 msgid "Class of the program :"
 msgstr "Classe del programma :"
 
 # #################################
 # ########### themes.conf #############
 # #################################
-#: ../data/messages:835
+#: ../data/messages:841
 msgid "Themes"
 msgstr "Temi"
 
-#: ../data/messages:837
+#: ../data/messages:843
 msgid "Choose a theme"
 msgstr "Scegliete un tema"
 
-#: ../data/messages:839
+#: ../data/messages:845
 msgid "List of themes :"
 msgstr "Lista dei temi :"
 
-#: ../data/messages:841
+#: ../data/messages:847
 msgid ""
 "Otherwise the current behaviour will be kept. It's all about the dock's "
 "position, behaviour parameters such as auto-hide, using taskbar or not, etc."
@@ -1941,11 +1942,11 @@ msgstr ""
 "riguarda la posizione della barra, i parametri di comportamento come l'auto-"
 "nascondimento, l'utilizzo della TaskBar, etc..."
 
-#: ../data/messages:843
+#: ../data/messages:849
 msgid "Use the new theme's behaviour ?"
 msgstr "Utilizzare il comportamento del nuovo tema ?"
 
-#: ../data/messages:845
+#: ../data/messages:851
 msgid ""
 "So if you check this box, your launchers will be deleted and replaced by the "
 "ones provided in the new theme. Otherwise the current launchers will be "
@@ -1955,53 +1956,53 @@ msgstr ""
 "rimpiazzati da quelli forniti dal nuovo tema. Altrimenti i lanciatori "
 "attuali saranno mantenuti e cambieranno solo le icone."
 
-#: ../data/messages:847
+#: ../data/messages:853
 msgid "Use the new theme's launchers ?"
 msgstr "Utilizzare i lanciatori del nuovo tema ?"
 
-#: ../data/messages:849
+#: ../data/messages:855
 msgid "Save"
 msgstr "Salva"
 
-#: ../data/messages:851
+#: ../data/messages:857
 msgid "Save current theme"
 msgstr "Salva anche il tema attuale"
 
-#: ../data/messages:853
+#: ../data/messages:859
 msgid "You will then be able to re-open it at any time."
 msgstr "Potrete riaprirlo ad ogni momento."
 
-#: ../data/messages:855
+#: ../data/messages:861
 msgid "Save as :"
 msgstr "Salva come :"
 
-#: ../data/messages:857
+#: ../data/messages:863
 msgid "Save current behaviour too ?"
 msgstr "Salva anche il comportamento attuale ?"
 
-#: ../data/messages:859
+#: ../data/messages:865
 msgid "Save current launchers too ?"
 msgstr "Salva anche i lanciatori attuali ?"
 
-#: ../data/messages:861
+#: ../data/messages:867
 msgid "Delete"
 msgstr "Cancella"
 
-#: ../data/messages:863
+#: ../data/messages:869
 msgid "List of your personnal themes"
 msgstr "Lista dei temi personali"
 
-#: ../data/messages:865
+#: ../data/messages:871
 msgid "Uncheck from the list themes you don't want anymore :"
 msgstr "Togli la spunta ai temi che non vuoi più vedere nella lista :"
 
-#: ../data/messages:867
+#: ../data/messages:873
 #, fuzzy
 msgid "pouet"
 msgstr "montare"
 
-#: ../data/messages:869 ../data/messages:871 ../data/messages:873
-#: ../data/messages:875
+#: ../data/messages:875 ../data/messages:877 ../data/messages:879
+#: ../data/messages:881
 msgid ""
 "v1.4.6.3 :\n"
 "Just to say :\n"
@@ -2012,7 +2013,7 @@ msgstr ""
 # #################################
 # ########### ChangeLog #############
 # #################################
-#: ../data/messages:877
+#: ../data/messages:883
 msgid ""
 "v1.5.0 : it's been 1 month since previous release, and we worked hardly to "
 "bring you :\n"
@@ -2032,7 +2033,7 @@ msgid ""
 "  Now, why not try to make an applet for Cairo-Dock ? ;-)"
 msgstr ""
 
-#: ../data/messages:879
+#: ../data/messages:885
 msgid ""
 "v1.5.1 :\n"
 " - The 1.5 branch is still young, so this version brings a lot of bug fixes\n"
@@ -2044,7 +2045,7 @@ msgid ""
 " and behave as real desklets."
 msgstr ""
 
-#: ../data/messages:881
+#: ../data/messages:887
 msgid ""
 "v1.5.2.1 :\n"
 " - a lot of bug fixes, especially on desklets.\n"
@@ -2052,7 +2053,7 @@ msgid ""
 " - Cairo-Dock is now fully translated in Japanese, thanks to Jiro Kawada !"
 msgstr ""
 
-#: ../data/messages:883
+#: ../data/messages:889
 msgid ""
 "v1.5.3.2 :\n"
 " - Themes have been deeply reviewed\n"
@@ -2066,7 +2067,7 @@ msgid ""
 "  who could help cairo-dock to be well-integrated into KDE ;-)"
 msgstr ""
 
-#: ../data/messages:885
+#: ../data/messages:891
 msgid ""
 "v1.5.4.2 : a huge release !\n"
 " - add a cute pinguin in your dock with the new applet Cairo-Penguin\n"
@@ -2080,7 +2081,7 @@ msgid ""
 " - 3 more themes in Weather"
 msgstr ""
 
-#: ../data/messages:887
+#: ../data/messages:893
 msgid ""
 "v1.5.5.4 :\n"
 " - Huge enhancements in the TaskBar :\n"
@@ -2096,7 +2097,7 @@ msgid ""
 "soon ;-)"
 msgstr ""
 
-#: ../data/messages:889
+#: ../data/messages:895
 msgid ""
 "v1.5.6 :\n"
 " - Integration into the last Gnome 2.22 (Ubuntu8.04, Fedora9, ...) - still "
@@ -2114,7 +2115,7 @@ msgid ""
 " - Any help would be welcome to integrate the dock into KDE !"
 msgstr ""
 
-#: ../data/messages:891
+#: ../data/messages:897
 msgid ""
 "v1.6.0 :\n"
 " - A new view has appeared : Diapositive !\n"
@@ -2133,7 +2134,7 @@ msgid ""
 " - Real window thumbnail when minimized."
 msgstr ""
 
-#: ../data/messages:893
+#: ../data/messages:899
 msgid ""
 "v1.6.1 :\n"
 "Cairo-Dock has one year ! To celebrate this event, we are happy to offer "
@@ -2146,7 +2147,7 @@ msgid ""
 "plug-in ^_^"
 msgstr ""
 
-#: ../data/messages:895
+#: ../data/messages:901
 msgid ""
 "v1.6.2 : the first version integrated in the Ubuntu repositories !\n"
 " - 2 new applets have been released :\n"
@@ -2157,6 +2158,19 @@ msgid ""
 " so feel free to send us all your themes, we can distribute them ! :-)\n"
 " - And we are still searching someone motivated to write a kde-integration "
 "plug-in ^_^"
+msgstr ""
+
+#: ../data/messages:903
+msgid ""
+"v1.6.3 : a minor release before the arriving of Ubuntu Ibex.\n"
+" - User datas have been moved into ~/.config to respect the FreeDesktop "
+"standards.\n"
+" - Local icons are now in a dedicated 'icons' sub-folder.\n"
+" - Cpusage and other applets can now display graphics.\n"
+" - You can now remove launchers by dragging them out of the dock\n"
+"  and detach applet in the same way\n"
+" - Smooth icons movement when dragging them inside the dock\n"
+" - The dock is now translated in Sweden and partially in Greek."
 msgstr ""
 
 #~ msgid "Add a launcher"

@@ -1094,9 +1094,9 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data, CairoDockModuleInstance *myApplet)
 
 
 #define CD_APPLET_RENDER_GAUGE(pGauge, fValue) cairo_dock_render_gauge (myDrawContext, myContainer, myIcon, pGauge, fValue);
+#define CD_APPLET_RENDER_GAUGE_MULTI_VALUE(pGauge, pValueList) cairo_dock_render_gauge_multi_value (myDrawContext, myContainer, myIcon, pGauge, pValueList);
 
 #define CD_APPLET_RENDER_GRAPH(pGraph) cairo_dock_render_graph (myDrawContext, myContainer, myIcon, pGraph);
-
 #define CD_APPLET_RENDER_GRAPH_NEW_VALUE(pGraph, fValue) \
 	cairo_dock_update_graph (pGraph, fValue); \
 	CD_APPLET_RENDER_GRAPH (pGraph)
