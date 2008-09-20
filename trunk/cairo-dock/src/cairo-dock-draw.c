@@ -1359,6 +1359,7 @@ void cairo_dock_draw_drop_indicator (CairoDock *pDock, cairo_t *pCairoContext)
 	//cairo_move_to (pCairoContext, fX, pDock->iDropIndicatorOffset);
 	cairo_translate (pCairoContext, 0, pDock->iDropIndicatorOffset);
 	cairo_pattern_t* pPattern = cairo_pattern_create_for_surface (g_pDropIndicatorSurface);
+	g_return_if_fail (cairo_pattern_status (pPattern) == CAIRO_STATUS_SUCCESS);
 	cairo_pattern_set_extend (pPattern, CAIRO_EXTEND_REPEAT);
 	cairo_set_source (pCairoContext, pPattern);
 	

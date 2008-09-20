@@ -103,9 +103,6 @@ extern gboolean g_bUseGlitz;
 extern CairoDockFMSortType g_iFileSortType;
 extern gchar *g_cRaiseDockShortcut;
 
-extern cairo_surface_t *g_pDesktopBgSurface;
-extern gboolean g_bUseFakeTransparency;
-
 extern gboolean g_bDisplayDropEmblem;
 extern gboolean g_bEasterEggs;
 

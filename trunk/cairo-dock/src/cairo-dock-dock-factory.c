@@ -74,6 +74,7 @@ extern gboolean g_bPopUp;
 extern gboolean g_bSkipPager;
 extern gboolean g_bSkipTaskbar;
 extern gboolean g_bSticky;
+extern gboolean g_bUseFakeTransparency;
 
 extern gboolean g_bUseGlitz;
 
@@ -111,7 +112,9 @@ CairoDock *cairo_dock_create_new_dock (GdkWindowTypeHint iWmHint, gchar *cDockNa
 	if (g_bKeepAbove)
 		gtk_window_set_keep_above (GTK_WINDOW (pWindow), g_bKeepAbove);
 	if (g_bPopUp)
-		gtk_window_set_keep_below (GTK_WINDOW (pWindow), g_bPopUp);
+		gtk_window_set_keep_below (GTK_WINDOW (pWindow), TRUE);
+	if (g_bUseFakeTransparency)
+		gtk_window_set_keep_below (GTK_WINDOW (pWindow), TRUE);
 	gtk_window_set_skip_pager_hint (GTK_WINDOW (pWindow), g_bSkipPager);
 	gtk_window_set_skip_taskbar_hint (GTK_WINDOW (pWindow), g_bSkipTaskbar);
 	gtk_window_set_gravity (GTK_WINDOW (pWindow), GDK_GRAVITY_STATIC);

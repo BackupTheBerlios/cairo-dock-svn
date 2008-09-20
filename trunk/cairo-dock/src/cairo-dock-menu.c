@@ -1087,7 +1087,7 @@ static void _cairo_dock_configure_root_dock_position (GtkMenuItem *pMenuItem, gp
 }
 
 
-static void cairo_dock_delete_menu (GtkMenuShell *menu, CairoDock *pDock)
+void cairo_dock_delete_menu (GtkMenuShell *menu, CairoDock *pDock)
 {
 	cd_debug ("");
 	pDock->bMenuVisible = FALSE;

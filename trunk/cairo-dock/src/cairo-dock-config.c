@@ -169,6 +169,8 @@ extern gboolean g_bLinkIndicatorWithIcon;
 extern gboolean g_bIndicatorAbove;
 
 extern gboolean g_bPopUp;
+extern gboolean g_bUseFakeTransparency;
+extern cairo_surface_t *g_pDesktopBgSurface;
 
 static gchar **g_cUseXIconAppliList = NULL;
 static gboolean s_bLoading = FALSE;
@@ -587,6 +589,10 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	gboolean bPopUpOld = g_bPopUp;
 	g_bPopUp = cairo_dock_get_boolean_key_value (pKeyFile, "Position", "pop-up", &bFlushConfFileNeeded, FALSE, NULL, NULL);
 	
+	gboolean bUseFakeTransparencyOld = g_bUseFakeTransparency;
+	g_bUseFakeTransparency = cairo_dock_get_boolean_key_value (pKeyFile, "System", "fake transparency", &bFlushConfFileNeeded, FALSE, NULL, NULL);
+	if (g_bUseFakeTransparency && g_pDesktopBgSurface == NULL)
+		cairo_dock_load_desktop_background_surface ();
 	
 	//\___________________ On recupere les parametres de la zone visible.
 	gchar *cVisibleZoneImageFile = cairo_dock_get_string_key_value (pKeyFile, "Background", "callback image", &bFlushConfFileNeeded, NULL, "Auto-Hide", "background image");
@@ -1238,6 +1244,10 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	}
 	else if (g_bPopUp && ! bPopUpOld)
 		gtk_window_set_keep_below (GTK_WINDOW (pDock->pWidget), TRUE);  // le main dock ayant ete cree avant, il n'a pas herite de ce parametre.
+	if (g_bUseFakeTransparency && ! bUseFakeTransparencyOld)
+		gtk_window_set_keep_below (GTK_WINDOW (pDock->pWidget), TRUE);  // le main dock ayant ete cree avant, il n'a pas herite de ce parametre.
+	else if (! g_bUseFakeTransparency && bUseFakeTransparencyOld)
+		gtk_window_set_keep_below (GTK_WINDOW (pDock->pWidget), FALSE);
 	
 	//\___________________ On applique les modifs au fichier de conf easy.
 	cairo_dock_copy_to_easy_conf_file (pKeyFile, g_cEasyConfFile);

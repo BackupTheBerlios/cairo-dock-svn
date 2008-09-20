@@ -161,6 +161,7 @@ cairo_surface_t *cairo_dock_load_image (cairo_t *pSourceContext, const gchar *cI
 			cairo_t *pCairoContext = cairo_create (pNewSurfaceFilled);
 	
 			cairo_pattern_t* pPattern = cairo_pattern_create_for_surface (pNewSurface);
+			g_return_val_if_fail (cairo_pattern_status (pPattern) == CAIRO_STATUS_SUCCESS, NULL);
 			cairo_pattern_set_extend (pPattern, CAIRO_EXTEND_REPEAT);
 	
 			cairo_set_source (pCairoContext, pPattern);

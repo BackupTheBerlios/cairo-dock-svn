@@ -231,6 +231,11 @@ sort files = 0
 #b- Show hidden files ?
 show hidden files = false
 
+#F-[Composition;gtk-clear]
+frame_fake =
+#b- Emulates composition with fake transparency ?
+#{Only use this if you don't run a composite manager like Compiz, xcompmgr, etc and have a black background around your dock. For esthetic reason, the dock will be kept under other windows.}
+fake transparency = false
 
 #[gtk-disconnect]
 [Applets]

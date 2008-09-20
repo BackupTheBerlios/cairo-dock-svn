@@ -43,7 +43,6 @@ extern double g_fStringColor[4];
 
 extern double g_fAmplitude;
 extern CairoDockLabelDescription g_iconTextDescription;
-extern cairo_surface_t *g_pDesktopBgSurface;
 
 
 void cairo_dock_set_subdock_position_linear (Icon *pPointedIcon, CairoDock *pDock)

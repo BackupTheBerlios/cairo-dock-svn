@@ -360,6 +360,8 @@ void cairo_dock_free_graph (CairoDockGraph *pGraph)
 		cairo_surface_destroy (pGraph->pBackgroundSurface);
 	if (pGraph->pGradationPattern != NULL)
                 cairo_pattern_destroy (pGraph->pGradationPattern);
+	if (pGraph->pGradationPattern2 != NULL)
+                cairo_pattern_destroy (pGraph->pGradationPattern2);
 	g_free (pGraph);
 }
 
