@@ -1338,6 +1338,7 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConf
 	{
 		gboolean config_ok;
 		gint action = gtk_dialog_run (GTK_DIALOG (pDialog));
+		cairo_dock_config_panel_destroyed ();
 		if (action == GTK_RESPONSE_ACCEPT)
 		{
 			config_ok = TRUE;
@@ -1436,6 +1437,7 @@ static void _cairo_dock_user_action_on_config (GtkDialog *pDialog, gint action, 
 		cairo_dock_mark_prefered_conf_file (cConfFilePath);
 
 		gtk_widget_destroy (GTK_WIDGET (pDialog));
+		cairo_dock_config_panel_destroyed ();
 		g_key_file_free (pKeyFile);
 		cairo_dock_free_generated_widget_list (pWidgetList);
 		g_ptr_array_foreach (pDataGarbage, (GFunc) g_free, NULL);

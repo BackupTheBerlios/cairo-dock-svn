@@ -7,6 +7,9 @@
 #include "cairo-dock-struct.h"
 G_BEGIN_DECLS
 
+void cairo_dock_config_dialog_destroyed (void);
+void cairo_dock_config_dialog_created (void);
+
 
 gboolean cairo_dock_move_up (CairoDock *pDock);
 

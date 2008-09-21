@@ -39,6 +39,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-X-utilities.h"
 #include "cairo-dock-dock-manager.h"
 #include "cairo-dock-class-manager.h"
+#include "cairo-dock-gui-factory.h"
 #include "cairo-dock-menu.h"
 
 #define CAIRO_DOCK_CONF_PANEL_WIDTH 800
@@ -62,6 +63,7 @@ extern gchar *g_cCurrentThemePath;
 extern int g_iNbDesktops;
 extern int g_iNbViewportX,g_iNbViewportY ;
 extern int g_iScreenWidth[2], g_iScreenHeight[2];
+
 
 static void _cairo_dock_edit_and_reload_conf (GtkMenuItem *pMenuItem, gpointer *data)
 {
@@ -148,11 +150,13 @@ static void _cairo_dock_about (GtkMenuItem *pMenuItem, gpointer *data)
 <b>Site (cairo-dock.org) :</b>\n  Necropotame\n  Tdey\n\
 <b>Suggestions/Comments/Bêta-Testers :</b>\n  AuraHxC\n  Chilperik\n  Cybergoll\n  Damster\n  Djoole\n  Glattering\n  Mav\n  Necropotame\n  Nochka85\n  Ppmt\n  RavanH\n  Rhinopierroce\n  Sombrero\n  Vilraleur");
 	
+	cairo_dock_config_panel_created ();
 	gtk_widget_show_all (pDialog);
 	gtk_window_set_position (GTK_WINDOW (pDialog), GTK_WIN_POS_CENTER_ALWAYS);  // un GTK_WIN_POS_CENTER simple ne marche pas, probablement parceque la fenetre n'est pas encore realisee. le 'always' ne pose pas de probleme, puisqu'on ne peut pas redimensionner le dialogue.
 	gtk_window_set_keep_above (GTK_WINDOW (pDialog), TRUE);
 	gtk_dialog_run (GTK_DIALOG (pDialog));
 	gtk_widget_destroy (pDialog);
+	cairo_dock_config_panel_destroyed ();
 }
 
 static void _launch_url (const gchar *cURL)

@@ -14,9 +14,10 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include <glib/gi18n.h>
 
 #include "cairo-dock-modules.h"
-#include "cairo-dock-gui-factory.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-animations.h"
 #include "cairo-dock-applet-facility.h"
+#include "cairo-dock-gui-factory.h"
 
 #define CAIRO_DOCK_GUI_MARGIN 4
 #define CAIRO_DOCK_ICON_MARGIN 6
@@ -30,6 +31,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 int mkstemp(char *template);
 #endif
 
+extern CairoDock *g_pMainDock;
 extern gboolean g_bPopUp;
 
 typedef enum {
@@ -608,6 +610,26 @@ static void _cairo_dock_configure_renderer (GtkButton *button, gpointer *data)
 	cairo_dock_configure_module (pDialog, "rendering");
 }
 
+static int iNbConfigDialogs = 0;
+int cairo_dock_get_nb_config_panels (void)
+{
+	return iNbConfigDialogs;
+}
+void cairo_dock_config_panel_destroyed (void)
+{
+	iNbConfigDialogs --;
+	if (iNbConfigDialogs <= 0)
+	{
+		iNbConfigDialogs = 0;
+		cairo_dock_pop_down (g_pMainDock);
+	}
+}
+void cairo_dock_config_panel_created (void)
+{
+	iNbConfigDialogs ++;
+}
+
+
 #define _allocate_new_buffer\
 	data = g_new (gpointer, 3); \
 	g_ptr_array_add (pDataGarbage, data);
@@ -657,8 +679,6 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 	gchar *cValue, **cValueList, *cSmallIcon;
 	GdkColor gdkColor;
 	GtkListStore *modele;
-	//if (g_bPopUp)
-	//	pParentWindow = NULL;
 	
 	GtkWidget *pDialog;
 	if (bApplyButtonPresent)
@@ -700,14 +720,6 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 			NULL);
 	}
 	
-	if (g_bPopUp)  /// faire quelque chose pour pas que le dock passe en arriere-plan et pDialog avec...
-	{
-		//gtk_window_set_keep_above (GTK_WINDOW (pDialog), TRUE);
-		gtk_window_set_keep_below (GTK_WINDOW (pDialog), FALSE);
-		gtk_window_present (GTK_WINDOW (pDialog));
-		//gtk_window_set_modal (GTK_WINDOW (pDialog), FALSE);
-		//gtk_window_set_transient_for (GTK_WINDOW (pDialog), NULL);
-	}
 	gchar *cIconPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_ICON);
 	gtk_window_set_icon_from_file (GTK_WINDOW (pDialog), cIconPath, NULL);
 	g_free (cIconPath);
@@ -1670,35 +1682,6 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 						}
 					break ;
 
-					/*case 'k' :
-						cValue = g_key_file_get_string(pKeyFile, cGroupName, cKeyName, NULL);
-
-						pOneWidget = gtk_entry_new();
-						gtk_entry_set_text(GTK_ENTRY(pOneWidget), cValue);
-						GtkWidget *w = gtk_button_new_with_label("grab");
-						GtkWidget *b = gtk_hbox_new(FALSE, 0);
-						gtk_box_pack_start(GTK_BOX(b), pOneWidget, FALSE, FALSE, 0);
-						gtk_box_pack_start(GTK_BOX(b), w, FALSE, FALSE, 0);
-
-						pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
-						gtk_box_pack_start(GTK_BOX (pHBox),
-							b,
-							FALSE,
-							FALSE,
-							0);
-
-						_allocate_new_buffer;
-						data[0] = pOneWidget;
-						data[1] = GTK_WINDOW (pDialog);
-						gtk_widget_add_events(pDialog, GDK_KEY_PRESS_MASK);
-
-						g_signal_connect (G_OBJECT (w),
-							"clicked",
-							G_CALLBACK (_cairo_dock_key_grab_clicked),
-							data);*/
-
-					break;
-
 					default :
 						cd_warning ("this conf file seems to be incorrect !");
 					break ;
@@ -1740,7 +1723,8 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 		"delete-event",
 		G_CALLBACK (_cairo_dock_free_conf_widget_data),
 		user_data);*/
-		
+	
+	cairo_dock_config_panel_created ();
 	return pDialog;
 }
 

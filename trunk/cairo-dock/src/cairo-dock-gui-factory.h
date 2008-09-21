@@ -6,6 +6,10 @@
 G_BEGIN_DECLS
 
 
+int cairo_dock_get_nb_config_panels (void);
+void cairo_dock_config_panel_destroyed (void);
+void cairo_dock_config_panel_created (void);
+
 void cairo_dock_build_renderer_list_for_gui (GHashTable *pHashTable);
 
 GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, const gchar *cTitle, GtkWindow *pParentWindow, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier, gchar *cPresentedGroup, gboolean bSwitchButtonPresent, gchar *cButtonConvert, gchar *cGettextDomain, GPtrArray *pDataGarbage);

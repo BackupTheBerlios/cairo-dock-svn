@@ -26,6 +26,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-applications-manager.h"
 #include "cairo-dock-dock-manager.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-gui-factory.h"
 #include "cairo-dock-animations.h"
 
 extern double g_fScrollAcceleration;
@@ -50,6 +51,7 @@ extern gboolean g_bPopUp;
 extern gboolean g_bEasterEggs;
 
 extern CairoDock *g_pMainDock;
+
 
 gboolean cairo_dock_move_up (CairoDock *pDock)
 {
@@ -77,6 +79,7 @@ gboolean cairo_dock_move_up (CairoDock *pDock)
 
 gboolean cairo_dock_pop_up (CairoDock *pDock)
 {
+	cd_debug ("%s (%d)", __func__, pDock->bPopped);
 	if (! pDock->bPopped && g_bPopUp)
 		gtk_window_set_keep_above (GTK_WINDOW (pDock->pWidget), TRUE);
 	
@@ -88,7 +91,9 @@ gboolean cairo_dock_pop_up (CairoDock *pDock)
 
 gboolean cairo_dock_pop_down (CairoDock *pDock)
 {
-	g_print ("%s (%d)\n", __func__, pDock->bPopped);
+	cd_debug ("%s (%d)", __func__, pDock->bPopped);
+	if (pDock->bIsMainDock && cairo_dock_get_nb_config_panels () != 0)
+		return FALSE;
 	if (pDock->bPopped && g_bPopUp)
 		gtk_window_set_keep_below (GTK_WINDOW (pDock->pWidget), TRUE);
 	
