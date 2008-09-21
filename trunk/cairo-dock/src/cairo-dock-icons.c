@@ -230,8 +230,6 @@ Icon* cairo_dock_get_first_icon_of_type (GList *pIconList, CairoDockIconType iTy
 	}
 	return NULL;
 }
-
-
 Icon* cairo_dock_get_last_icon_of_type (GList *pIconList, CairoDockIconType iType)
 {
 	GList* ic;
@@ -240,6 +238,32 @@ Icon* cairo_dock_get_last_icon_of_type (GList *pIconList, CairoDockIconType iTyp
 	{
 		icon = ic->data;
 		if (icon->iType == iType)
+			return icon;
+	}
+	return NULL;
+}
+Icon* cairo_dock_get_first_icon_of_order (GList *pIconList, CairoDockIconType iType)
+{
+	int iGroupOrder = cairo_dock_get_group_order (iGroupOrder);
+	GList* ic;
+	Icon *icon;
+	for (ic = pIconList; ic != NULL; ic = ic->next)
+	{
+		icon = ic->data;
+		if (cairo_dock_get_icon_order (icon) == iGroupOrder)
+			return icon;
+	}
+	return NULL;
+}
+Icon* cairo_dock_get_last_icon_of_order (GList *pIconList, CairoDockIconType iType)
+{
+	int iGroupOrder = cairo_dock_get_group_order (iGroupOrder);
+	GList* ic;
+	Icon *icon;
+	for (ic = g_list_last (pIconList); ic != NULL; ic = ic->prev)
+	{
+		icon = ic->data;
+		if (cairo_dock_get_icon_order (icon) == iGroupOrder)
 			return icon;
 	}
 	return NULL;
@@ -553,7 +577,7 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 	}
 	else
 	{
-		Icon *pFirstIcon = cairo_dock_get_first_icon_of_type (pDock->icons, icon1->iType);
+		Icon *pFirstIcon = cairo_dock_get_first_icon_of_order (pDock->icons, icon1->iType);
 		if (pFirstIcon != NULL)
 			icon1->fOrder = pFirstIcon->fOrder - 1;
 		else
@@ -698,14 +722,14 @@ gboolean cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolea
 		Icon * pSeparatorIcon = NULL;
 		if (! CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon))
 		{
-			Icon *pSameTypeIcon = cairo_dock_get_first_icon_of_type (pDock->icons, icon->iType);
+			Icon *pSameTypeIcon = cairo_dock_get_first_icon_of_order (pDock->icons, icon->iType);
 			if (pSameTypeIcon == NULL)
 			{
 				int iOrder = cairo_dock_get_icon_order (icon);
 				if (iOrder > 1)  // attention : iType - 1 > 0 si iType = 0, car c'est un unsigned int !
-					pSeparatorIcon = cairo_dock_get_first_icon_of_type (pDock->icons, iOrder - 1);
+					pSeparatorIcon = cairo_dock_get_first_icon_of_order (pDock->icons, iOrder - 1);
 				else if (iOrder + 1 < CAIRO_DOCK_NB_TYPES)
-					pSeparatorIcon = cairo_dock_get_first_icon_of_type (pDock->icons, iOrder + 1);
+					pSeparatorIcon = cairo_dock_get_first_icon_of_order (pDock->icons, iOrder + 1);
 
 				if (pSeparatorIcon != NULL)
 				{
@@ -917,7 +941,7 @@ void cairo_dock_insert_separators_in_dock (CairoDock *pDock)
 			if (ic->next != NULL)
 			{
 				next_icon = ic->next->data;
-				if (! CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon) && icon->iType != next_icon->iType)
+				if (! CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon) && cairo_dock_get_icon_order (icon) != cairo_dock_get_icon_order (next_icon))  // icon->iType != next_icon->iType
 				{
 					int iSeparatorType = g_tIconTypeOrder[next_icon->iType] - 1;
 					cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
@@ -932,15 +956,15 @@ void cairo_dock_insert_separators_in_dock (CairoDock *pDock)
 }
 
 
-void cairo_dock_insert_separator_between_launchers_and_applis (CairoDock *pDock)
+/*void cairo_dock_insert_separator_between_launchers_and_applis (CairoDock *pDock)
 {
-	Icon *pFirstLauncher = cairo_dock_get_first_icon_of_type (pDock->icons, CAIRO_DOCK_LAUNCHER);
-	Icon *pFirstAppli = cairo_dock_get_first_icon_of_type (pDock->icons, CAIRO_DOCK_APPLI);
+	Icon *pFirstLauncher = cairo_dock_get_first_icon_of_order (pDock->icons, CAIRO_DOCK_LAUNCHER);
+	Icon *pFirstAppli = cairo_dock_get_first_icon_of_order (pDock->icons, CAIRO_DOCK_APPLI);
 
 	if (pFirstLauncher != NULL && pFirstAppli != NULL)
 	{
 		int iSeparatorType = MIN (g_tIconTypeOrder[CAIRO_DOCK_LAUNCHER], g_tIconTypeOrder[CAIRO_DOCK_APPLI]) + 1;
-		if (cairo_dock_get_first_icon_of_type (pDock->icons, iSeparatorType) == NULL)
+		if (cairo_dock_get_first_icon_of_order (pDock->icons, iSeparatorType) == NULL)
 		{
 			cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 			Icon *pSeparator = cairo_dock_create_separator_icon (pCairoContext, iSeparatorType, pDock, ! CAIRO_DOCK_APPLY_RATIO);
@@ -949,7 +973,7 @@ void cairo_dock_insert_separator_between_launchers_and_applis (CairoDock *pDock)
 			cairo_dock_insert_icon_in_dock (pSeparator, pDock, !CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, ! CAIRO_DOCK_INSERT_SEPARATOR);
 		}
 	}
-}
+}*/
 
 
 GList *cairo_dock_calculate_icons_positions_at_rest_linear (GList *pIconList, double fFlatDockWidth, int iXOffset)
@@ -1042,20 +1066,6 @@ Icon * cairo_dock_calculate_wave_with_position_linear (GList *pIconList, GList *
 			else
 				icon->fScale *= (1 + icon->fPersonnalScale);
 		}
-// 		if (icon->fPersonnalScale > 0 && iWidth > 0)
-// 		{
-// 			icon->fPersonnalScale *= .85;
-// 			icon->fScale *= icon->fPersonnalScale;
-// 			if (icon->fPersonnalScale < 0.05)
-// 				icon->fPersonnalScale = 0.05;
-// 		}
-// 		else if (icon->fPersonnalScale < 0 && iWidth > 0)
-// 		{
-// 			icon->fPersonnalScale *= .85;
-// 			icon->fScale *= (1 + icon->fPersonnalScale);
-// 			if (icon->fPersonnalScale > -0.05)
-// 				icon->fPersonnalScale = -0.05;
-// 		}
 		icon->fY = (bDirectionUp ? iHeight - g_iDockLineWidth - g_iFrameMargin - icon->fScale * icon->fHeight : g_iDockLineWidth + g_iFrameMargin);
 		
 		//\_______________ Si on avait deja defini l'icone pointee, on peut placer l'icone courante par rapport a la precedente.

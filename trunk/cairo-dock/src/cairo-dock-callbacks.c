@@ -104,7 +104,6 @@ extern CairoDockFMSortType g_iFileSortType;
 extern gchar *g_cRaiseDockShortcut;
 
 extern gboolean g_bDisplayDropEmblem;
-extern gboolean g_bEasterEggs;
 
 static gboolean s_bTemporaryAutoHide = FALSE;
 static gboolean s_bEntranceAllowed = TRUE;
@@ -482,11 +481,8 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 		if (s_pIconClicked != NULL && pDock->iAvoidingMouseIconType == -1)
 		{
 			s_pIconClicked->iAnimationType = CAIRO_DOCK_FOLLOW_MOUSE;
-			if (! g_bEasterEggs)
-			{
-				pDock->iAvoidingMouseIconType = s_pIconClicked->iType;  // on pourrait le faire lors du clic aussi.
-				pDock->fAvoidingMouseMargin = .5;
-			}
+			//pDock->fAvoidingMouseMargin = .5;
+			pDock->iAvoidingMouseIconType = s_pIconClicked->iType;  // on pourrait le faire lors du clic aussi.
 		}
 
 		//gdk_event_request_motions (pMotion);  // ce sera pour GDK 2.12.
@@ -552,7 +548,7 @@ gboolean on_motion_notify2 (GtkWidget* pWidget,
 	{
 		cairo_dock_on_change_icon (pLastPointedIcon, pPointedIcon, pDock);
 		
-		if (s_pIconClicked != NULL && g_bEasterEggs)
+		if (pPointedIcon != NULL && s_pIconClicked != NULL && cairo_dock_get_icon_order (s_pIconClicked) == cairo_dock_get_icon_order (pPointedIcon))
 		{
 			/// parcourir les icones et renseigner iGlideDirection.
 			Icon *icon;
@@ -666,7 +662,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	//s_pLastPointedDock = NULL;
 	//g_print ("s_pLastPointedDock <- NULL\n");
 	
-	if (g_bEasterEggs && s_pIconClicked != NULL && (CAIRO_DOCK_IS_LAUNCHER (s_pIconClicked) || CAIRO_DOCK_IS_DETACHABLE_APPLET (s_pIconClicked) || CAIRO_DOCK_IS_USER_SEPARATOR(s_pIconClicked)) && s_pFlyingContainer == NULL)
+	if (s_pIconClicked != NULL && (CAIRO_DOCK_IS_LAUNCHER (s_pIconClicked) || CAIRO_DOCK_IS_DETACHABLE_APPLET (s_pIconClicked) || CAIRO_DOCK_IS_USER_SEPARATOR(s_pIconClicked)) && s_pFlyingContainer == NULL)
 	{
 		g_print ("on a sorti %s du dock (%d;%d)\n", s_pIconClicked->acName, pDock->iMouseX, pDock->iMouseY);
 		CairoDock *pOriginDock = cairo_dock_search_dock_from_name (s_pIconClicked->cParentDockName);
@@ -690,7 +686,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 			}
 		}
 	}
-	else if (g_bEasterEggs && s_pFlyingContainer != NULL && s_pFlyingContainer->pIcon != NULL && pDock->iRefCount > 0)
+	else if (s_pFlyingContainer != NULL && s_pFlyingContainer->pIcon != NULL && pDock->iRefCount > 0)
 	{
 		CairoDock *pOriginDock = cairo_dock_search_dock_from_name (s_pFlyingContainer->pIcon->cParentDockName);
 		if (pOriginDock == pDock)
@@ -945,7 +941,6 @@ gboolean on_key_release (GtkWidget *pWidget,
 	GdkEventKey *pKey,
 	CairoDock *pDock)
 {
-	cd_message ("");
 	iMoveByArrow = 0;
 	if (pKey->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK))  // On relache la touche ALT, typiquement apres avoir fait un ALT + clique gauche + deplacement.
 	{
@@ -1295,7 +1290,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 						}
 
 						Icon *prev_icon, *next_icon;
-						if (! g_bEasterEggs)
+						/*if (! g_bEasterEggs)
 						{
 							if (pDock->iMouseX > icon->fX + icon->fWidth * icon->fScale / 2)
 							{
@@ -1308,7 +1303,7 @@ gboolean on_button_press2 (GtkWidget* pWidget,
 								next_icon = icon;
 							}
 						}
-						else
+						else*/
 						{
 							if (icon->fXAtRest > s_pIconClicked->fXAtRest)
 							{

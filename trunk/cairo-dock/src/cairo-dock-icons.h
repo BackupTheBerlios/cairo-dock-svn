@@ -154,6 +154,20 @@ Icon *cairo_dock_get_first_icon_of_type (GList *pIconList, CairoDockIconType iTy
 */
 Icon *cairo_dock_get_last_icon_of_type (GList *pIconList, CairoDockIconType iType);
 /**
+*Renvoie la 1ere icone dont le groupe correspond.
+*@param pIconList la liste d'icones.
+*@param iType le type/groupe dont on recherche l'ordre.
+*@return la 1ere icone trouvee ayant cet ordre, ou NULL si aucune icone n'est trouvee.
+*/
+Icon* cairo_dock_get_first_icon_of_order (GList *pIconList, CairoDockIconType iType);
+/**
+*Renvoie la derniere icone dont le groupe correspond.
+*@param pIconList la liste d'icones.
+*@param iType le type/groupe d'icone recherche.
+*@return la derniere icone trouvee ayant cet ordre, ou NULL si aucune icone n'est trouvee.
+*/
+Icon* cairo_dock_get_last_icon_of_order (GList *pIconList, CairoDockIconType iType);
+/**
 *Renvoie l'icone actuellement pointee parmi une liste d'icones.
 *@param pIconList la liste d'icones.
 *@return l'icone dont le champ bPointed a TRUE, ou NULL si aucune icone n'est pointee.

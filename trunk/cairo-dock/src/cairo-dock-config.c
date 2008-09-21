@@ -183,7 +183,7 @@ gboolean cairo_dock_get_boolean_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 	if (erreur != NULL)
 	{
 		if (bFlushConfFileNeeded != NULL)
-			cd_warning ("Attention : %s", erreur->message);
+			cd_warning (erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -226,7 +226,7 @@ int cairo_dock_get_integer_key_value (GKeyFile *pKeyFile, gchar *cGroupName, gch
 	if (erreur != NULL)
 	{
 		if (bFlushConfFileNeeded != NULL)
-			cd_warning ("Attention : %s", erreur->message);
+			cd_warning (erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -269,7 +269,7 @@ double cairo_dock_get_double_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 	if (erreur != NULL)
 	{
 		if (bFlushConfFileNeeded != NULL)
-			cd_warning ("Attention : %s", erreur->message);
+			cd_warning (erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -312,7 +312,7 @@ gchar *cairo_dock_get_string_key_value (GKeyFile *pKeyFile, gchar *cGroupName, g
 	if (erreur != NULL)
 	{
 		if (bFlushConfFileNeeded != NULL)
-			cd_warning ("Attention : %s", erreur->message);
+			cd_warning (erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -364,7 +364,7 @@ void cairo_dock_get_integer_list_key_value (GKeyFile *pKeyFile, gchar *cGroupNam
 	if (erreur != NULL)
 	{
 		if (bFlushConfFileNeeded != NULL)
-			cd_warning ("Attention : %s", erreur->message);
+			cd_warning (erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -428,7 +428,7 @@ void cairo_dock_get_double_list_key_value (GKeyFile *pKeyFile, gchar *cGroupName
 	if (erreur != NULL)
 	{
 		if (bFlushConfFileNeeded != NULL)
-			cd_warning ("Attention : %s", erreur->message);
+			cd_warning (erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -489,7 +489,7 @@ gchar **cairo_dock_get_string_list_key_value (GKeyFile *pKeyFile, gchar *cGroupN
 	if (erreur != NULL)
 	{
 		if (bFlushConfFileNeeded != NULL)
-			cd_warning ("Attention : %s", erreur->message);
+			cd_warning (erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 
@@ -563,7 +563,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_warning ("Attention : %s", erreur->message);
+		cd_warning (erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 		return ;
@@ -755,7 +755,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	g_fStripesWidth = cairo_dock_get_double_key_value (pKeyFile, "Background", "stripes width", &bFlushConfFileNeeded, 0.02, NULL, NULL);
 	if (g_iNbStripes > 0 && g_fStripesWidth > 1. / g_iNbStripes)
 	{
-		cd_warning ("Attention : the stripes' width is greater than the space between them.");
+		cd_warning ("the stripes' width is greater than the space between them.");
 		g_fStripesWidth = 0.99 / g_iNbStripes;
 	}
 
@@ -1280,7 +1280,7 @@ static gboolean cairo_dock_edit_conf_file_core (GtkWindow *pWindow, gchar *cConf
 	g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_warning ("Attention : %s", erreur->message);
+		cd_warning (erreur->message);
 		g_error_free (erreur);
 		return FALSE;
 	}
@@ -1570,7 +1570,7 @@ static void cairo_dock_copy_value_to_keyfile (GKeyFile *pKeyFile, gchar *cGroupN
 	gchar *cValue = g_key_file_get_string (pKeyFile, cGroupName, cKeyName, &erreur);
 	if (erreur != NULL)
 	{
-		cd_warning ("Attention : %s", erreur->message);
+		cd_warning (erreur->message);
 		g_error_free (erreur);
 	}
 	else
@@ -1589,7 +1589,7 @@ void cairo_dock_copy_easy_conf_file (gchar *cEasyConfFilePath, GKeyFile *pMainKe
 	g_key_file_load_from_file (pKeyFile, cEasyConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_warning ("Attention : %s", erreur->message);
+		cd_warning (erreur->message);
 		g_error_free (erreur);
 		erreur = NULL;
 	}
@@ -1666,7 +1666,7 @@ void cairo_dock_copy_to_easy_conf_file (GKeyFile *pMainKeyFile, gchar *cEasyConf
 	g_free (cEasyConfTemplate);
 	if (erreur != NULL)
 	{
-		cd_warning ("Attention : %s", erreur->message);
+		cd_warning (erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
@@ -1736,7 +1736,7 @@ void cairo_dock_build_easy_conf_file (gchar *cMainConfFilePath, gchar *cEasyConf
 	g_key_file_load_from_file (pMainKeyFile, cMainConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_warning ("Attention : %s", erreur->message);
+		cd_warning (erreur->message);
 		g_error_free (erreur);
 		return ;
 	}
@@ -1753,7 +1753,7 @@ void cairo_dock_read_easy_conf_file (gchar *cEasyConfFilePath, gpointer data)
 	g_key_file_load_from_file (pMainKeyFile, g_cConfFile, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
 	{
-		cd_warning ("Attention : %s", erreur->message);
+		cd_warning (erreur->message);
 		g_error_free (erreur);
 		return ;
 	}

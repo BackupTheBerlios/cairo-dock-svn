@@ -615,13 +615,7 @@ static void _cairo_dock_configure_renderer (GtkButton *button, gpointer *data)
 #define _allocate_new_model\
 	modele = gtk_list_store_new (CAIRO_DOCK_MODEL_NB_COLUMNS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_INT, G_TYPE_STRING, GDK_TYPE_PIXBUF);
 
-static void on_configure_config_dialog (GtkWidget* pWidget,
-	gpointer user_data)
-{
-	g_print ("%s ()\n", __func__);
-	gtk_window_present (GTK_WINDOW (pWidget));
-	//return FALSE;
-}
+
 GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, const gchar *cTitle, GtkWindow *pParentWindow, GSList **pWidgetList, gboolean bApplyButtonPresent, gchar iIdentifier, gchar *cPresentedGroup, gboolean bSwitchButtonPresent, gchar *cButtonConvert, gchar *cGettextDomain, GPtrArray *pDataGarbage)
 {
 	g_return_val_if_fail (cairo_dock_is_advanced_keyfile (pKeyFile), NULL);
@@ -713,10 +707,6 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 		gtk_window_present (GTK_WINDOW (pDialog));
 		//gtk_window_set_modal (GTK_WINDOW (pDialog), FALSE);
 		//gtk_window_set_transient_for (GTK_WINDOW (pDialog), NULL);
-		g_signal_connect (G_OBJECT (pDialog),
-			"realize",
-			G_CALLBACK (on_configure_config_dialog),
-			NULL);
 	}
 	gchar *cIconPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_ICON);
 	gtk_window_set_icon_from_file (GTK_WINDOW (pDialog), cIconPath, NULL);

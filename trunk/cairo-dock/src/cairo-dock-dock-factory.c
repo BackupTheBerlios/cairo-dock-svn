@@ -707,7 +707,7 @@ void cairo_dock_insert_icon_in_dock_full (Icon *icon, CairoDock *pDock, gboolean
 	gboolean bSeparatorNeeded = FALSE;
 	if (bInsertSeparator && ! CAIRO_DOCK_IS_SEPARATOR (icon))
 	{
-		Icon *pSameTypeIcon = cairo_dock_get_first_icon_of_type (pDock->icons, icon->iType);
+		Icon *pSameTypeIcon = cairo_dock_get_first_icon_of_order (pDock->icons, icon->iType);
 		if (pSameTypeIcon == NULL && pDock->icons != NULL)
 		{
 			bSeparatorNeeded = TRUE;
@@ -718,7 +718,7 @@ void cairo_dock_insert_icon_in_dock_full (Icon *icon, CairoDock *pDock, gboolean
 	//\______________ On insere l'icone a sa place dans la liste.
 	if (icon->fOrder == CAIRO_DOCK_LAST_ORDER)
 	{
-		Icon *pLastIcon = cairo_dock_get_last_icon_of_type (pDock->icons, icon->iType);
+		Icon *pLastIcon = cairo_dock_get_last_icon_of_order (pDock->icons, icon->iType);
 		if (pLastIcon != NULL)
 			icon->fOrder = pLastIcon->fOrder + 1;
 		else
@@ -755,7 +755,7 @@ void cairo_dock_insert_icon_in_dock_full (Icon *icon, CairoDock *pDock, gboolean
 		if (iOrder + 1 < CAIRO_DOCK_NB_TYPES)
 		{
 			Icon *pNextIcon = cairo_dock_get_next_icon (pDock->icons, icon);
-			if (pNextIcon != NULL && ((pNextIcon->iType - icon->iType) % 2 == 0))
+			if (pNextIcon != NULL && ((cairo_dock_get_icon_order (pNextIcon) - cairo_dock_get_icon_order (icon)) % 2 == 0))
 			{
 				int iSeparatorType = iOrder + 1;
 				cd_message (" insertion de %s -> iSeparatorType : %d", icon->acName, iSeparatorType);
@@ -776,7 +776,7 @@ void cairo_dock_insert_icon_in_dock_full (Icon *icon, CairoDock *pDock, gboolean
 		if (iOrder > 1)
 		{
 			Icon *pPrevIcon = cairo_dock_get_previous_icon (pDock->icons, icon);
-			if (pPrevIcon != NULL && ((pPrevIcon->iType - icon->iType) % 2 == 0))
+			if (pPrevIcon != NULL && ((cairo_dock_get_icon_order (pPrevIcon) - cairo_dock_get_icon_order (icon)) % 2 == 0))
 			{
 				int iSeparatorType = iOrder - 1;
 				cd_message (" insertion de %s -> iSeparatorType : %d", icon->acName, iSeparatorType);

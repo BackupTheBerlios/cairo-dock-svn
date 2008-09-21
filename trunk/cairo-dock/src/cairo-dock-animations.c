@@ -282,7 +282,7 @@ gboolean cairo_dock_shrink_down (CairoDock *pDock)
 
 		if (pBouncingIcon == NULL && pRemovingIcon == NULL && (! g_bResetScrollOnLeave || pDock->iScrollOffset == 0))  // plus aucune animation en cours.
 		{
-			if (! (pDock->bAutoHide && pDock->iRefCount == 0) && ! pDock->bInside)
+			if (! (pDock->bAutoHide && pDock->iRefCount == 0) && ! pDock->bInside && ! pDock->bMenuVisible)
 			{
 				int iNewWidth, iNewHeight;
 				cairo_dock_get_window_position_and_geometry_at_balance (pDock, CAIRO_DOCK_NORMAL_SIZE, &iNewWidth, &iNewHeight);
