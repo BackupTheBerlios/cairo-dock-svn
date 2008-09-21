@@ -48,6 +48,7 @@ void cairo_dock_draw_graph (cairo_t *pCairoContext, CairoDockGraph *pGraph)
 	}
 	
 	double *pTabValues;
+	cairo_pattern_t *pGradationPattern;
 	int k;
 	for (k = 0; k < (pGraph->pTabValues2 == NULL ? 1 : 2); k ++)
 	{
@@ -58,18 +59,21 @@ void cairo_dock_draw_graph (cairo_t *pCairoContext, CairoDockGraph *pGraph)
 				cairo_translate (pCairoContext,
 					0.,
 					fHeight);
+			pGradationPattern = pGraph->pGradationPattern2;
 		}
 		else
 		{
 			pTabValues = pGraph->pTabValues;
+			pGradationPattern = pGraph->pGradationPattern;
+			
 		}
-		if (pGraph->pGradationPattern != NULL)
-			cairo_set_source (pCairoContext, pGraph->pGradationPattern);
+		if (pGradationPattern != NULL)
+			cairo_set_source (pCairoContext, pGradationPattern);
 		else
 			cairo_set_source_rgb (pCairoContext,
-			pGraph->fLowColor[0],
-			pGraph->fLowColor[1],
-			pGraph->fLowColor[2]);
+				pGraph->fLowColor[0],
+				pGraph->fLowColor[1],
+				pGraph->fLowColor[2]);
 		if (pGraph->iType == CAIRO_DOCK_GRAPH_LINE || pGraph->iType == CAIRO_DOCK_GRAPH_PLAIN)
 		{
 			cairo_set_line_width (pCairoContext, 1);
