@@ -661,6 +661,10 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 
 	//\___________________ On recupere les parametres du dock en lui-meme.
+	gboolean bMixAppletsAndLaunchersOld = (g_tIconTypeOrder[CAIRO_DOCK_APPLET] == g_tIconTypeOrder[CAIRO_DOCK_LAUNCHER]);
+	
+	int tIconTypeOrderOld[CAIRO_DOCK_NB_TYPES];
+	memcpy (tIconTypeOrderOld, g_tIconTypeOrder, sizeof (tIconTypeOrderOld));
 	gchar **cIconsTypesList = cairo_dock_get_string_list_key_value (pKeyFile, "Icons", "icon's type order", &bFlushConfFileNeeded, &length, NULL, "Cairo Dock", NULL);
 	if (cIconsTypesList != NULL && length > 0)
 	{
@@ -677,10 +681,18 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		}
 	}
 	g_strfreev (cIconsTypesList);
-
+	
 	gboolean bMixAppletsAndLaunchers = cairo_dock_get_boolean_key_value (pKeyFile, "Icons", "mix applets with launchers", &bFlushConfFileNeeded, FALSE , NULL, NULL);
 	if (bMixAppletsAndLaunchers)
 		g_tIconTypeOrder[CAIRO_DOCK_APPLET] = g_tIconTypeOrder[CAIRO_DOCK_LAUNCHER];
+	
+	gboolean bGroupOrderChanged;
+	if (tIconTypeOrderOld[CAIRO_DOCK_LAUNCHER] != g_tIconTypeOrder[CAIRO_DOCK_LAUNCHER] ||
+		tIconTypeOrderOld[CAIRO_DOCK_APPLI] != g_tIconTypeOrder[CAIRO_DOCK_APPLI] ||
+		tIconTypeOrderOld[CAIRO_DOCK_APPLET] != g_tIconTypeOrder[CAIRO_DOCK_APPLET])
+		bGroupOrderChanged = TRUE;
+	else
+		bGroupOrderChanged = FALSE;
 	
 	g_free (g_cMainDockDefaultRendererName);
 	g_cMainDockDefaultRendererName = cairo_dock_get_string_key_value (pKeyFile, "Views", "main dock view", &bFlushConfFileNeeded, CAIRO_DOCK_DEFAULT_RENDERER_NAME, "Cairo Dock", NULL);
@@ -1153,17 +1165,18 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	{
 		cairo_dock_stop_application_manager ();
 	}
+	
+	if (bGroupOrderChanged || bMixAppletsAndLaunchers != bMixAppletsAndLaunchersOld)
+		pDock->icons = g_list_sort (pDock->icons, (GCompareFunc) cairo_dock_compare_icons_order);  // on re-ordonne car l'ordre des types a pu changer.
 
-	pDock->icons = g_list_sort (pDock->icons, (GCompareFunc) cairo_dock_compare_icons_order);  // on reordonne car l'ordre des types a pu changer.
-
-	if (bUseSeparatorOld && ! g_bUseSeparator)
+	if ((bUseSeparatorOld && ! g_bUseSeparator) || (! bMixAppletsAndLaunchersOld && bMixAppletsAndLaunchers) || bGroupOrderChanged)
 		cairo_dock_remove_all_separators (pDock);
 		
 	g_fBackgroundImageWidth = 1e4;  // inutile de mettre a jour les decorations maintenant.
 	g_fBackgroundImageHeight = 1e4;
 	if (pDock->icons == NULL)
 	{
-		pDock->fFlatDockWidth = - g_iIconGap;  // car on ne le connaissais pas encore au moment de la creation du dock.
+		pDock->fFlatDockWidth = - g_iIconGap;  // car on ne le connaissait pas encore au moment de la creation du dock.
 		cairo_dock_build_docks_tree_with_desktop_files (pDock, g_cCurrentLaunchersPath);
 	}
 	else
@@ -1178,7 +1191,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		cairo_dock_start_application_manager (pDock);  // va inserer le separateur si necessaire.
 	}
 
-	if (g_bUseSeparator && ! bUseSeparatorOld)
+	if ((g_bUseSeparator && ! bUseSeparatorOld) || (bMixAppletsAndLaunchersOld != bMixAppletsAndLaunchers) || bGroupOrderChanged)
 	{
 		cairo_dock_insert_separators_in_dock (pDock);
 	}

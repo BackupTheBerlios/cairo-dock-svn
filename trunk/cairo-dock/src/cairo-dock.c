@@ -702,8 +702,9 @@ int main (int argc, char** argv)
 	//const gchar *cSillyMessage = "J-2 avant la 1.5, la tension monte !";
 	//const gchar *cSillyMessage = "Cairo-Dock : sans danger si l'on se conforme au mode d'emploi.";
 	//const gchar *cSillyMessage = "Nochka, ton home a disparu !";
-	const gchar *cSillyMessage = "La nouvelle sauce Cairo-Dock rehaussera le goût de tous vos plats !";
-	const gchar *cNumSilllyMessage = "18";
+	//const gchar *cSillyMessage = "La nouvelle sauce Cairo-Dock rehaussera le goût de tous vos plats !";
+	const gchar *cSillyMessage = "Avec Cairo-Dock c'est vous qui avez la plus grosse (barre de lancement) !";
+	const gchar *cNumSilllyMessage = "19";
 	gboolean bWriteSillyMessage;
 	if (! g_file_test (cSillyMessageFilePath, G_FILE_TEST_EXISTS))
 	{

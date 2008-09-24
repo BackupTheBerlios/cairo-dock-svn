@@ -755,10 +755,11 @@ void cairo_dock_insert_icon_in_dock_full (Icon *icon, CairoDock *pDock, gboolean
 		if (iOrder + 1 < CAIRO_DOCK_NB_TYPES)
 		{
 			Icon *pNextIcon = cairo_dock_get_next_icon (pDock->icons, icon);
-			if (pNextIcon != NULL && ((cairo_dock_get_icon_order (pNextIcon) - cairo_dock_get_icon_order (icon)) % 2 == 0))
+			if (pNextIcon != NULL && ((cairo_dock_get_icon_order (pNextIcon) - cairo_dock_get_icon_order (icon)) % 2 == 0) && (cairo_dock_get_icon_order (pNextIcon) != cairo_dock_get_icon_order (icon)))
 			{
 				int iSeparatorType = iOrder + 1;
-				cd_message (" insertion de %s -> iSeparatorType : %d", icon->acName, iSeparatorType);
+				//int iSeparatorType = icon->iType + 1;
+				g_print (" insertion de %s avant %s -> iSeparatorType : %d\n", icon->acName, pNextIcon->acName, iSeparatorType);
 
 				cairo_t *pSourceContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 				Icon *pSeparatorIcon = cairo_dock_create_separator_icon (pSourceContext, iSeparatorType, pDock, bApplyRatio);
@@ -776,10 +777,11 @@ void cairo_dock_insert_icon_in_dock_full (Icon *icon, CairoDock *pDock, gboolean
 		if (iOrder > 1)
 		{
 			Icon *pPrevIcon = cairo_dock_get_previous_icon (pDock->icons, icon);
-			if (pPrevIcon != NULL && ((cairo_dock_get_icon_order (pPrevIcon) - cairo_dock_get_icon_order (icon)) % 2 == 0))
+			if (pPrevIcon != NULL && ((cairo_dock_get_icon_order (pPrevIcon) - cairo_dock_get_icon_order (icon)) % 2 == 0) && (cairo_dock_get_icon_order (pPrevIcon) != cairo_dock_get_icon_order (icon)))
 			{
 				int iSeparatorType = iOrder - 1;
-				cd_message (" insertion de %s -> iSeparatorType : %d", icon->acName, iSeparatorType);
+				//int iSeparatorType = icon->iType - 1;
+				g_print (" insertion de %s apres %s -> iSeparatorType : %d\n", icon->acName, pPrevIcon->acName, iSeparatorType);
 
 				cairo_t *pSourceContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 				Icon *pSeparatorIcon = cairo_dock_create_separator_icon (pSourceContext, iSeparatorType, pDock, bApplyRatio);

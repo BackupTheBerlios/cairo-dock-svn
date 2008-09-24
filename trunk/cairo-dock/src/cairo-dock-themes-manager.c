@@ -767,6 +767,8 @@ gboolean cairo_dock_manage_themes (GtkWidget *pWidget, gboolean bSafeMode)
 		g_free (cNewThemeName);
 		g_key_file_free (pKeyFile);
 	}
+	else
+		cd_warning ("No choosed theme");
 	
 	g_string_free (sCommand, TRUE);
 	g_hash_table_destroy (hThemeTable);

@@ -621,7 +621,8 @@ void cairo_dock_config_panel_destroyed (void)
 	if (iNbConfigDialogs <= 0)
 	{
 		iNbConfigDialogs = 0;
-		cairo_dock_pop_down (g_pMainDock);
+		if (g_pMainDock != NULL)  // peut arriver au 1er lancement.
+			cairo_dock_pop_down (g_pMainDock);
 	}
 }
 void cairo_dock_config_panel_created (void)
@@ -683,6 +684,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 	GtkWidget *pDialog;
 	if (bApplyButtonPresent)
 	{
+		pParentWindow = NULL;  // evite de la rendre modale, et ainsi la fait apparaitre dans la barre des taches.
 		if (bSwitchButtonPresent)
 		pDialog = gtk_dialog_new_with_buttons ((cTitle != NULL ? cTitle : ""),
 			(pParentWindow != NULL ? GTK_WINDOW (pParentWindow) : NULL),
