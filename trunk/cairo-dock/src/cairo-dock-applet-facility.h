@@ -793,9 +793,9 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data, CairoDockModuleInstance *myApp
 /**
  * Ajoute un separateur dans un menu deja existant
  */
-#define CD_APPLET_ADD_SEPARATOR() \
+#define CD_APPLET_ADD_SEPARATOR(pMenu) \
 	pMenuItem = gtk_separator_menu_item_new (); \
-	gtk_menu_shell_append(GTK_MENU_SHELL (pSubMenu), pMenuItem);
+	gtk_menu_shell_append(GTK_MENU_SHELL (pMenu), pMenuItem);
 
 /**
 *Ajoute une entree pour la fonction 'A propos'.

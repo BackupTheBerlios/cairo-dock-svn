@@ -419,7 +419,7 @@ int main (int argc, char** argv)
 		else if (strcmp (cEnvironment, "xfce") == 0)
 			g_iDesktopEnv = CAIRO_DOCK_XFCE;
 		else if (strcmp (cEnvironment, "none") == 0)
-			g_iDesktopEnv = CAIRO_DOCK_NO_DESKTOP;
+			g_iDesktopEnv = CAIRO_DOCK_UNKNOWN_ENV;
 		else
 			cd_warning ("Attention : unknown environnment '%s'", cEnvironment);
 		g_free (cEnvironment);

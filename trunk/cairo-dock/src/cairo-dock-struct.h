@@ -911,7 +911,7 @@ typedef enum {
 	CAIRO_DOCK_GNOME,
 	CAIRO_DOCK_KDE,
 	CAIRO_DOCK_XFCE,
-	CAIRO_DOCK_NO_DESKTOP
+	CAIRO_DOCK_NB_DESKTOPS
 	} CairoDockDesktopEnv;
 
 typedef enum {
