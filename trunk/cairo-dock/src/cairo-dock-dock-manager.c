@@ -445,6 +445,18 @@ void cairo_dock_remove_root_dock_config (const gchar *cDockName)
 	g_free (cConfFilePath);
 }
 
+static void _cairo_dock_redraw_one_root_dock (gchar *cDockName, CairoDock *pDock, gpointer data)
+{
+	if (pDock->iRefCount == 0 && ! (data && pDock->bIsMainDock))
+	{
+		gtk_widget_queue_draw (pDock->pWidget);
+	}
+}
+void cairo_dock_redraw_root_docks (gboolean bExceptMainDock)
+{
+	g_hash_table_foreach (s_hDocksTable, (GHFunc)_cairo_dock_redraw_one_root_dock, GINT_TO_POINTER (bExceptMainDock));
+}
+
 
 static gboolean s_bTemporaryAutoHide = FALSE;
 static gboolean s_bQuickHide = FALSE;

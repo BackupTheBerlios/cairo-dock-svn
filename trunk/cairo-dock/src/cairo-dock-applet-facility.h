@@ -744,8 +744,7 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data, CairoDockModuleInstance *myApp
 *@param pMenu GtkWidget du menu auquel on rajoutera le sous-menu.
 *@return le GtkWidget du sous-menu.
 */
-#define CD_APPLET_CREATE_AND_ADD_SUB_MENU(cLabel, pMenu) \
-	cairo_dock_create_sub_menu (cLabel, pMenu);
+#define CD_APPLET_CREATE_AND_ADD_SUB_MENU(cLabel, pMenu) cairo_dock_create_sub_menu (cLabel, pMenu);
 
 /**
 *Cree et ajoute un sous-menu a un menu.
@@ -754,10 +753,10 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data, CairoDockModuleInstance *myApp
 *@param pMenu GtkWidget du menu auquel on rajoutera le sous-menu.
 *@param pData donnees passees en parametre de la fonction (doit contenir myApplet).
 */
-#define CD_APPLET_ADD_IN_MENU_WITH_DATA(cLabel, pFunction, pMenu, pData) \
+#define CD_APPLET_ADD_IN_MENU_WITH_DATA(cLabel, pFunction, pMenu, pData) do { \
 	pMenuItem = gtk_menu_item_new_with_label (cLabel); \
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pMenu), pMenuItem); \
-	g_signal_connect (G_OBJECT (pMenuItem), "activate", G_CALLBACK (pFunction), pData);
+	g_signal_connect (G_OBJECT (pMenuItem), "activate", G_CALLBACK (pFunction), pData); } while (0)
 
 /**
 *Ajoute une entree a un menu deja existant.
@@ -775,12 +774,12 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data, CairoDockModuleInstance *myApp
 *@param pMenu GtkWidget du menu auquel on rajoutera l'entree.
 *@param pData donnees passees en parametre de la fonction (doit contenir myApplet).
 */
-#define CD_APPLET_ADD_IN_MENU_WITH_STOCK_AND_DATA(cLabel, gtkStock, pFunction, pMenu, pData) \
+#define CD_APPLET_ADD_IN_MENU_WITH_STOCK_AND_DATA(cLabel, gtkStock, pFunction, pMenu, pData) do { \
 	pMenuItem = gtk_image_menu_item_new_with_label (cLabel); \
 	image = gtk_image_new_from_stock (gtkStock, GTK_ICON_SIZE_MENU); \
 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (pMenuItem), image); \
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pMenu), pMenuItem); \
-	g_signal_connect (G_OBJECT (pMenuItem), "activate", G_CALLBACK(pFunction), pData);
+	g_signal_connect (G_OBJECT (pMenuItem), "activate", G_CALLBACK(pFunction), pData); } while (0)
 
 /**
 *Ajoute une entree avec une icone GTK a un menu deja existant.

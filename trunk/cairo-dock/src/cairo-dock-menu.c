@@ -304,7 +304,9 @@ static void _cairo_dock_create_launcher (GtkMenuItem *pMenuItem, gpointer *data,
 		Icon *pNewIcon = cairo_dock_create_icon_from_desktop_file (cNewDesktopFileName, pCairoContext);
 
 		if (iLauncherType = CAIRO_DOCK_LAUNCHER_FOR_SEPARATOR)
-			pNewIcon->iType = icon->iType;  // pour une futur insertion de separateurs dans les applis ou les applets.
+			pNewIcon->iType = icon->iType;
+		else if (pNewIcon->acName == NULL)
+			pNewIcon->acName = g_strdup (_("Undefined"));
 
 		CairoDock *pParentDock = cairo_dock_search_dock_from_name (icon->cParentDockName);
 		cairo_dock_insert_icon_in_dock (pNewIcon, pParentDock, CAIRO_DOCK_UPDATE_DOCK_SIZE, CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
@@ -1181,32 +1183,6 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	GtkWidget *menu = data[2];
 	GtkWidget *pMenuItem, *image;
 	static gpointer *pDesktopData = NULL;
-	
-	//\_________________________ On construit un sous-menu pour deplacer l'icone.
-	/*if (CAIRO_DOCK_IS_DOCK (pContainer) && icon != NULL && ! CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon))
-	{
-		pMenuItem = gtk_separator_menu_item_new ();
-		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), pMenuItem);
-		
-		pMenuItem = gtk_image_menu_item_new_with_label (_("Move this icon"));
-
-		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), pMenuItem);
-		image = gtk_image_new_from_stock (GTK_STOCK_JUMP_TO, GTK_ICON_SIZE_MENU);
-		gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (pMenuItem), image);
-		GtkWidget *pSubMenu = gtk_menu_new ();
-		gtk_menu_item_set_submenu (GTK_MENU_ITEM (pMenuItem), pSubMenu);
-
-		_add_entry_in_menu (_("To the left"), GTK_STOCK_GO_BACK, cairo_dock_swap_with_prev_icon, pSubMenu);
-		
-		_add_entry_in_menu (_("To the right"), GTK_STOCK_GO_FORWARD, cairo_dock_swap_with_next_icon, pSubMenu);
-
-		_add_entry_in_menu (_("To the beginning"), GTK_STOCK_GOTO_FIRST, cairo_dock_move_icon_to_beginning, pSubMenu);
-		
-		_add_entry_in_menu (_("To the end"), GTK_STOCK_GOTO_LAST, cairo_dock_move_icon_to_end, pSubMenu);
-
-		pMenuItem = gtk_separator_menu_item_new ();
-		gtk_menu_shell_append (GTK_MENU_SHELL (menu), pMenuItem);
-	}*/
 
 	//\_________________________ Si pas d'icone dans un dock, on s'arrete la.
 	if (CAIRO_DOCK_IS_DOCK (pContainer) && (icon == NULL || CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon)))
@@ -1228,7 +1204,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	}
 
 	//\_________________________ On rajoute des actions suivant le type de l'icone.
-	if (CAIRO_DOCK_IS_LAUNCHER (icon) || CAIRO_DOCK_IS_USER_SEPARATOR (icon))
+	if (CAIRO_DOCK_IS_LAUNCHER (icon) || CAIRO_DOCK_IS_USER_SEPARATOR (icon) || icon->acDesktopFileName != NULL)  // le dernier cas est la pour les cas ou l'utilisateur aurait par megarde efface la commande du lanceur.
 	{
 		//\_________________________ On rajoute les actions sur les icones de fichiers.
 		if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
@@ -1286,14 +1262,15 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 				_add_entry_in_menu (_("Add a separator"), GTK_STOCK_ADD, cairo_dock_add_separator, menu);
 			}
 			
-			if (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon) || CAIRO_DOCK_IS_USER_SEPARATOR (icon))  // possede un .desktop.
+			///if (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon) || CAIRO_DOCK_IS_USER_SEPARATOR (icon))  // possede un .desktop.
+			if (icon->acDesktopFileName != NULL)
 			{
 				pMenuItem = gtk_separator_menu_item_new ();
 				gtk_menu_shell_append (GTK_MENU_SHELL (menu), pMenuItem);
 			
-				_add_entry_in_menu (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon) ? _("Remove this launcher") : _("Remove this separator"), GTK_STOCK_REMOVE, _cairo_dock_remove_launcher, menu);
+				_add_entry_in_menu (CAIRO_DOCK_IS_USER_SEPARATOR (icon) ? _("Remove this separator") : _("Remove this launcher"), GTK_STOCK_REMOVE, _cairo_dock_remove_launcher, menu);
 			
-				_add_entry_in_menu (CAIRO_DOCK_IS_NORMAL_LAUNCHER (icon) ? _("Modify this launcher") : _("Modify this separator"), GTK_STOCK_EDIT, _cairo_dock_modify_launcher, menu);
+				_add_entry_in_menu (CAIRO_DOCK_IS_USER_SEPARATOR (icon) ? _("Modify this separator") : _("Modify this launcher"), GTK_STOCK_EDIT, _cairo_dock_modify_launcher, menu);
 			}
 		}
 	}

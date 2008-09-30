@@ -136,8 +136,16 @@ CairoFlyingContainer *cairo_dock_create_flying_container (Icon *pFlyingIcon, Cai
 	pFlyingContainer->pIcon->fScale = 1.;
 	pFlyingContainer->iWidth = pFlyingIcon->fWidth * pFlyingContainer->pIcon->fScale * 3.7;
 	pFlyingContainer->iHeight = pFlyingIcon->fHeight * pFlyingContainer->pIcon->fScale + 1.*pFlyingContainer->iWidth / HAND_WIDTH * HAND_HEIGHT * .6;
-	pFlyingContainer->iPositionX = pOriginDock->iWindowPositionX + pOriginDock->iMouseX - pFlyingContainer->iWidth/2;
-	pFlyingContainer->iPositionY = pOriginDock->iWindowPositionY + pOriginDock->iMouseY - pFlyingContainer->iHeight/2;
+	if (pOriginDock->bHorizontalDock)
+	{
+		pFlyingContainer->iPositionX = pOriginDock->iWindowPositionX + pOriginDock->iMouseX - pFlyingContainer->iWidth/2;
+		pFlyingContainer->iPositionY = pOriginDock->iWindowPositionY + pOriginDock->iMouseY - pFlyingContainer->iHeight/2;
+	}
+	else
+	{
+		pFlyingContainer->iPositionY = pOriginDock->iWindowPositionX + pOriginDock->iMouseX - pFlyingContainer->iWidth/2;
+		pFlyingContainer->iPositionX = pOriginDock->iWindowPositionY + pOriginDock->iMouseY - pFlyingContainer->iHeight/2;
+	}
 	/*g_print ("%s (%d;%d %dx%d)\n", __func__ pFlyingContainer->iPositionX,
 		pFlyingContainer->iPositionY,
 		pFlyingContainer->iWidth,
@@ -165,8 +173,16 @@ CairoFlyingContainer *cairo_dock_create_flying_container (Icon *pFlyingIcon, Cai
 
 void cairo_dock_drag_flying_container (CairoFlyingContainer *pFlyingContainer, CairoDock *pOriginDock)
 {
-	pFlyingContainer->iPositionX = pOriginDock->iWindowPositionX + pOriginDock->iMouseX - pFlyingContainer->iWidth/2;
-	pFlyingContainer->iPositionY = pOriginDock->iWindowPositionY + pOriginDock->iMouseY - pFlyingContainer->iHeight/2;
+	if (pOriginDock->bHorizontalDock)
+	{
+		pFlyingContainer->iPositionX = pOriginDock->iWindowPositionX + pOriginDock->iMouseX - pFlyingContainer->iWidth/2;
+		pFlyingContainer->iPositionY = pOriginDock->iWindowPositionY + pOriginDock->iMouseY - pFlyingContainer->iHeight/2;
+	}
+	else
+	{
+		pFlyingContainer->iPositionY = pOriginDock->iWindowPositionX + pOriginDock->iMouseX - pFlyingContainer->iWidth/2;
+		pFlyingContainer->iPositionX = pOriginDock->iWindowPositionY + pOriginDock->iMouseY - pFlyingContainer->iHeight/2;
+	}
 	//g_print ("  on tire l'icone volante en (%d;%d)\n", pFlyingContainer->iPositionX, pFlyingContainer->iPositionY);
 	gtk_window_move (GTK_WINDOW (pFlyingContainer->pWidget),
 		pFlyingContainer->iPositionX,

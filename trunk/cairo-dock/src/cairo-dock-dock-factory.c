@@ -540,10 +540,11 @@ CairoDock *cairo_dock_create_subdock_from_scratch_with_type (GList *pIconList, g
 	return pSubDock;
 }
 
-static void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDock, gpointer data)
+/*static void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDock, gpointer data)
 {
 	if (! pDock->bIsMainDock)
 	{
+		gtk_widget_queue_draw (pDock->pWidget);
 		cd_message ("  %s (%s)", __func__, cDockName);
 		cairo_dock_update_dock_size (pDock);
 		///pDock->iMouseX = -1; // utile ?
@@ -557,7 +558,7 @@ static void _cairo_dock_update_child_dock_size (gchar *cDockName, CairoDock *pDo
 		else
 			gtk_window_move (GTK_WINDOW (pDock->pWidget), 500, 500);  // sinon ils n'apparaisesent pas.
 	}
-}
+}*/
 void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar *cDirectory)
 {
 	cd_message ("%s (%s)", __func__, cDirectory);
@@ -592,6 +593,8 @@ void cairo_dock_build_docks_tree_with_desktop_files (CairoDock *pMainDock, gchar
 	g_dir_close (dir);
 	cairo_destroy (pCairoContext);
 	//g_hash_table_foreach (s_hDocksTable, (GHFunc) _cairo_dock_update_child_dock_size, NULL);  // on mettra a jour la taille du dock principal apres y avoir insere les applis/applets, car pour l'instant les docks fils n'en ont pas.
+	cairo_dock_redraw_root_docks (TRUE);
+
 }
 
 void cairo_dock_free_all_docks (void)
