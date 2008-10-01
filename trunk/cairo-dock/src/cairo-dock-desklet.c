@@ -75,10 +75,12 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 	gboolean bRenderOptimized = (pExpose->area.x > 0 || pExpose->area.y > 0);
 	if (bRenderOptimized)
 	{
+		//cd_debug ("Using optimized render");
 		pCairoContext = cairo_dock_create_drawing_context_on_area (CAIRO_CONTAINER (pDesklet), &pExpose->area, fColor);
 	}
 	else
 	{
+		//cd_debug ("Using normal render");
 		pCairoContext = cairo_dock_create_drawing_context (CAIRO_CONTAINER (pDesklet));
 		
 		if (pDesklet->fZoom != 1)
@@ -127,6 +129,8 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 		if (pDesklet->pRenderer->render != NULL)
 			pDesklet->pRenderer->render (pCairoContext, pDesklet, bRenderOptimized);
 	}
+	else
+		cd_warning ("Attention: no render set for this desklet");
 	
 	cairo_destroy (pCairoContext);
 	return FALSE;

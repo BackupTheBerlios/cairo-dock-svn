@@ -25,7 +25,7 @@ static CairoDockFullEmblem s_pFullEmblems[CAIRO_DOCK_EMBLEM_CLASSIC_NB];
 static gchar *s_cEmblemConfPath[CAIRO_DOCK_EMBLEM_CLASSIC_NB];
 
 
-//Fonctions proposée par Nécropotame, rédigée par ChAnGFu
+//Fonctions proposées par Nécropotame, rédigées par ChAnGFu
 void cairo_dock_draw_emblem_on_my_icon (cairo_t *pIconContext, const gchar *cIconFile, Icon *pIcon, CairoContainer *pContainer, CairoDockEmblem iEmblemType, gboolean bPersistent)
 {
 	cd_debug ("%s (%s %d)", __func__, cIconFile, iEmblemType);
@@ -120,6 +120,8 @@ void cairo_dock_draw_emblem_from_surface (cairo_t *pIconContext, cairo_surface_t
 	
 	if (!bPersistent)
 		cairo_restore (pIconContext);
+		
+	cairo_dock_redraw_my_icon (pIcon, pContainer); //Test 
 }
 
 void cairo_dock_draw_emblem_classic (cairo_t *pIconContext, Icon *pIcon, CairoContainer *pContainer, CairoDockClassicEmblem iEmblemClassic, CairoDockEmblem iEmblemType, gboolean bPersistent)
@@ -216,6 +218,8 @@ void cairo_dock_draw_temporary_emblem_on_my_icon (cairo_t *pIconContext, Icon *p
 		cairo_dock_draw_emblem_on_my_icon (pIconContext, cIconFile, pIcon, pContainer, iEmblemType, FALSE);
 	else
 		cairo_dock_draw_emblem_classic (pIconContext, pIcon, pContainer, iEmblemClassic, iEmblemType, FALSE);
+	
+	cairo_dock_redraw_my_icon (pIcon, pContainer);
 	
 	CairoDockTempEmblem *pEmblem = g_new0 (CairoDockTempEmblem, 1);
 	pEmblem->pIcon = pIcon;

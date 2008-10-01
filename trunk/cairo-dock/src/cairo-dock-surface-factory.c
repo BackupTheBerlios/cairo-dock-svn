@@ -645,7 +645,8 @@ cairo_surface_t *cairo_dock_create_surface_from_text_full (gchar *cText, cairo_t
 	double fZoom = ((iMaxWidth != 0 && ink.width + 2 > iMaxWidth) ? 1.*iMaxWidth / (ink.width + 2) : 1.);
 	
 	*iTextWidth = (ink.width + 2) * fZoom;
-	*iTextHeight = ink.height + 2 + 1;  // +1 car certaines polices "debordent".
+	*iTextHeight = ink.height + 2 + 1; // +1 car certaines polices "debordent".
+	//Test du zoom en W ET H *iTextHeight = (ink.height + 2 + 1) * fZoom; 
 	
 	cairo_surface_t* pNewSurface = cairo_surface_create_similar (cairo_get_target (pSourceContext),
 		CAIRO_CONTENT_COLOR_ALPHA,
