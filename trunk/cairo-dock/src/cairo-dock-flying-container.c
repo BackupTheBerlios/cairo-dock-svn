@@ -150,17 +150,17 @@ CairoFlyingContainer *cairo_dock_create_flying_container (Icon *pFlyingIcon, Cai
 		pFlyingContainer->iPositionY,
 		pFlyingContainer->iWidth,
 		pFlyingContainer->iHeight);*/
-	/*gdk_window_move_resize (pWindow->window,
+	gdk_window_move_resize (pWindow->window,
 		pFlyingContainer->iPositionX,
 		pFlyingContainer->iPositionY,
 		pFlyingContainer->iWidth,
-		pFlyingContainer->iHeight);*/
-	gtk_window_resize (GTK_WINDOW (pWindow),
+		pFlyingContainer->iHeight);
+	/*gtk_window_resize (GTK_WINDOW (pWindow),
 		pFlyingContainer->iWidth,
 		pFlyingContainer->iHeight);
 	gtk_window_move (GTK_WINDOW (pWindow),
 		pFlyingContainer->iPositionX,
-		pFlyingContainer->iPositionY);
+		pFlyingContainer->iPositionY);*/
 	gtk_window_present (GTK_WINDOW (pWindow));
 	
 	pFlyingContainer->pIcon->iAnimationType = CAIRO_DOCK_PULSE;

@@ -63,6 +63,7 @@ extern gchar *g_cCurrentThemePath;
 extern int g_iNbDesktops;
 extern int g_iNbViewportX,g_iNbViewportY ;
 extern int g_iScreenWidth[2], g_iScreenHeight[2];
+extern gboolean g_bLocked;
 
 
 static void _cairo_dock_edit_and_reload_conf (GtkMenuItem *pMenuItem, gpointer *data)
@@ -1145,16 +1146,19 @@ GtkWidget *cairo_dock_build_menu (Icon *icon, CairoContainer *pContainer)
 	GtkWidget *pSubMenu = gtk_menu_new ();
 	gtk_menu_item_set_submenu (GTK_MENU_ITEM (pMenuItem), pSubMenu);
 
-	_add_entry_in_menu (_("Configure"), GTK_STOCK_PREFERENCES, _cairo_dock_edit_and_reload_conf, pSubMenu);
-
-	pMenuItem = gtk_separator_menu_item_new ();
-	gtk_menu_shell_append (GTK_MENU_SHELL (pSubMenu), pMenuItem);
-
-	if (CAIRO_DOCK_IS_DOCK (pContainer) && ! CAIRO_DOCK (pContainer)->bIsMainDock && CAIRO_DOCK (pContainer)->iRefCount == 0)
+	if (! g_bLocked)
 	{
-		_add_entry_in_menu (_("Set up this dock"), GTK_STOCK_EXECUTE, _cairo_dock_configure_root_dock_position, pSubMenu);
+		_add_entry_in_menu (_("Configure"), GTK_STOCK_PREFERENCES, _cairo_dock_edit_and_reload_conf, pSubMenu);
+	
+		pMenuItem = gtk_separator_menu_item_new ();
+		gtk_menu_shell_append (GTK_MENU_SHELL (pSubMenu), pMenuItem);
+	
+		if (CAIRO_DOCK_IS_DOCK (pContainer) && ! CAIRO_DOCK (pContainer)->bIsMainDock && CAIRO_DOCK (pContainer)->iRefCount == 0)
+		{
+			_add_entry_in_menu (_("Set up this dock"), GTK_STOCK_EXECUTE, _cairo_dock_configure_root_dock_position, pSubMenu);
+		}
+		_add_entry_in_menu (_("Manage themes"), GTK_STOCK_EXECUTE, _cairo_dock_initiate_theme_management, pSubMenu);
 	}
-	_add_entry_in_menu (_("Manage themes"), GTK_STOCK_EXECUTE, _cairo_dock_initiate_theme_management, pSubMenu);
 
 	_add_entry_in_menu (_("About"), GTK_STOCK_ABOUT, _cairo_dock_about, pSubMenu);
 
@@ -1166,8 +1170,11 @@ GtkWidget *cairo_dock_build_menu (Icon *icon, CairoContainer *pContainer)
 	{
 		_add_entry_in_menu (_("Quick-Hide"), GTK_STOCK_GOTO_BOTTOM, _cairo_dock_quick_hide, pSubMenu);
 	}
-
-	_add_entry_in_menu (_("Quit"), GTK_STOCK_QUIT, _cairo_dock_quit, pSubMenu);
+	
+	if (! g_bLocked)
+	{
+		_add_entry_in_menu (_("Quit"), GTK_STOCK_QUIT, _cairo_dock_quit, pSubMenu);
+	}
 
 	//\_________________________ On passe la main a ceux qui veulent y rajouter des choses.
 	cairo_dock_notify (CAIRO_DOCK_BUILD_MENU, data);
@@ -1185,7 +1192,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	static gpointer *pDesktopData = NULL;
 
 	//\_________________________ Si pas d'icone dans un dock, on s'arrete la.
-	if (CAIRO_DOCK_IS_DOCK (pContainer) && (icon == NULL || CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon)))
+	if (! g_bLocked && CAIRO_DOCK_IS_DOCK (pContainer) && (icon == NULL || CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon)))
 	{
 		pMenuItem = gtk_separator_menu_item_new ();
 		gtk_menu_shell_append  (GTK_MENU_SHELL (menu), pMenuItem);
@@ -1204,7 +1211,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	}
 
 	//\_________________________ On rajoute des actions suivant le type de l'icone.
-	if (CAIRO_DOCK_IS_LAUNCHER (icon) || CAIRO_DOCK_IS_USER_SEPARATOR (icon) || icon->acDesktopFileName != NULL)  // le dernier cas est la pour les cas ou l'utilisateur aurait par megarde efface la commande du lanceur.
+	if (CAIRO_DOCK_IS_LAUNCHER (icon) || CAIRO_DOCK_IS_USER_SEPARATOR (icon) || (icon != NULL && icon->acDesktopFileName != NULL))  // le dernier cas est la pour les cas ou l'utilisateur aurait par megarde efface la commande du lanceur.
 	{
 		//\_________________________ On rajoute les actions sur les icones de fichiers.
 		if (CAIRO_DOCK_IS_URI_LAUNCHER (icon))
@@ -1247,7 +1254,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 		}
 		
 		//\_________________________ On rajoute des actions de modifications sur le dock.
-		if (CAIRO_DOCK_IS_DOCK (pContainer))
+		if (! g_bLocked && CAIRO_DOCK_IS_DOCK (pContainer))
 		{
 			pMenuItem = gtk_separator_menu_item_new ();
 			gtk_menu_shell_append  (GTK_MENU_SHELL (menu), pMenuItem);
@@ -1364,7 +1371,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 			pIconModule = NULL;
 		
 		//\_________________________ On rajoute les actions propres a un module.
-		if (CAIRO_DOCK_IS_APPLET (pIconModule))
+		if (! g_bLocked && CAIRO_DOCK_IS_APPLET (pIconModule))
 		{
 			pMenuItem = gtk_separator_menu_item_new ();
 			gtk_menu_shell_append (GTK_MENU_SHELL (menu), pMenuItem);
@@ -1386,7 +1393,7 @@ gboolean cairo_dock_notification_build_menu (gpointer *data)
 	}
 
 	//\_________________________ On rajoute les actions de positionnement d'un desklet.
-	if (CAIRO_DOCK_IS_DESKLET (pContainer))
+	if (! g_bLocked && CAIRO_DOCK_IS_DESKLET (pContainer))
 	{
 		pMenuItem = gtk_separator_menu_item_new ();
 		gtk_menu_shell_append (GTK_MENU_SHELL (menu), pMenuItem);

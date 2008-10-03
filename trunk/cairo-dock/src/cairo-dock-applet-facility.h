@@ -252,7 +252,9 @@ void cairo_dock_play_sound (const gchar *cSoundPath);
 
 /**
 *Renvoie la version de gnome.
-*@param Adresse des ints.
+*@param iMajor adresse de la majeure.
+*@param iMinor adresse de la mineure.
+*@param iMicro adresse de la micro.
 */
 void cairo_dock_get_gnome_version (int *iMajor, int *iMinor, int *iMicro);
 
@@ -438,8 +440,7 @@ void reset_data (CairoDockModuleInstance *myApplet);
 *@param cKeyName nom de la cle dans le fichier de conf.
 *@return un gboolean.
 */
-#define CD_CONFIG_GET_BOOLEAN(cGroupName, cKeyName) \
-CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT (cGroupName, cKeyName, TRUE)
+#define CD_CONFIG_GET_BOOLEAN(cGroupName, cKeyName) CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT (cGroupName, cKeyName, TRUE)
 
 /**
 *Recupere la valeur d'un parametre 'entier' du fichier de conf.
@@ -523,7 +524,7 @@ CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT (cGroupName, cKeyName, TRUE)
 *@param iDefaultAnimation valeur par defaut si la cle et/ou le groupe n'est pas trouve (typiquement si cette cle est nouvelle).
 *@return le type de l'animation, un #CairoDockAnimationType.
 */
-#define CD_CONFIG_GET_ANIMATION_WITH_DEFAULT(cGroupName, cKeyName, iDefaultAnimation) cairo_dock_get_animation_type_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, iDefaultAnimation, NULL, NULL);
+#define CD_CONFIG_GET_ANIMATION_WITH_DEFAULT(cGroupName, cKeyName, iDefaultAnimation) cairo_dock_get_animation_type_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, iDefaultAnimation, NULL, NULL)
 /**
 *Recupere la valeur d'un parametre 'type d'animation' du fichier de conf, avec #CAIRO_DOCK_BOUNCE comme valeur par defaut.
 *@param cGroupName nom du groupe dans le fichier de conf.
@@ -539,7 +540,7 @@ CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT (cGroupName, cKeyName, TRUE)
 *@param pColorBuffer tableau de 4 double deja alloue, et qui sera rempli avec les 4 composantes de la couleur.
 *@param pDefaultColor valeur par defaut si la cle et/ou le groupe n'est pas trouve (typiquement si cette cle est nouvelle). C'est un tableau de 4 double, ou NULL.
 */
-#define CD_CONFIG_GET_COLOR_WITH_DEFAULT(cGroupName, cKeyName, pColorBuffer, pDefaultColor) cairo_dock_get_double_list_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, pColorBuffer, 4, pDefaultColor, NULL, NULL);
+#define CD_CONFIG_GET_COLOR_WITH_DEFAULT(cGroupName, cKeyName, pColorBuffer, pDefaultColor) cairo_dock_get_double_list_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, pColorBuffer, 4, pDefaultColor, NULL, NULL)
 /**
 *Recupere la valeur d'un parametre 'couleur' au format RVBA. du fichier de conf, avec NULL comme valeur par defaut.
 *@param cGroupName nom du groupe dans le fichier de conf.
@@ -554,7 +555,7 @@ CD_CONFIG_GET_BOOLEAN_WITH_DEFAULT (cGroupName, cKeyName, TRUE)
 *@param pColorBuffer tableau de 3 double deja alloue, et qui sera rempli avec les 3 composantes de la couleur.
 *@param pDefaultColor valeur par defaut si la cle et/ou le groupe n'est pas trouve (typiquement si cette cle est nouvelle). C'est un tableau de 3 double, ou NULL.
 */
-#define CD_CONFIG_GET_COLOR_RVB_WITH_DEFAULT(cGroupName, cKeyName, pColorBuffer, pDefaultColor) cairo_dock_get_double_list_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, pColorBuffer, 3, pDefaultColor, NULL, NULL);
+#define CD_CONFIG_GET_COLOR_RVB_WITH_DEFAULT(cGroupName, cKeyName, pColorBuffer, pDefaultColor) cairo_dock_get_double_list_key_value (pKeyFile, cGroupName, cKeyName, &bFlushConfFileNeeded, pColorBuffer, 3, pDefaultColor, NULL, NULL)
 /**
 *Recupere la valeur d'un parametre 'couleur' au format RVB. du fichier de conf, avec NULL comme valeur par defaut.
 *@param cGroupName nom du groupe dans le fichier de conf.
@@ -736,7 +737,7 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data, CairoDockModuleInstance *myApp
 	GtkWidget *pSubMenu = gtk_menu_new (); \
 	pMenuItem = gtk_menu_item_new_with_label (cLabel); \
 	gtk_menu_shell_append  (GTK_MENU_SHELL (pMenu), pMenuItem); \
-	gtk_menu_item_set_submenu (GTK_MENU_ITEM (pMenuItem), pSubMenu);
+	gtk_menu_item_set_submenu (GTK_MENU_ITEM (pMenuItem), pSubMenu)
 
 /**
 *Cree et ajoute un sous-menu a un menu deja existant.
@@ -744,7 +745,7 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data, CairoDockModuleInstance *myApp
 *@param pMenu GtkWidget du menu auquel on rajoutera le sous-menu.
 *@return le GtkWidget du sous-menu.
 */
-#define CD_APPLET_CREATE_AND_ADD_SUB_MENU(cLabel, pMenu) cairo_dock_create_sub_menu (cLabel, pMenu);
+#define CD_APPLET_CREATE_AND_ADD_SUB_MENU(cLabel, pMenu) cairo_dock_create_sub_menu (cLabel, pMenu)
 
 /**
 *Cree et ajoute un sous-menu a un menu.
@@ -792,9 +793,9 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data, CairoDockModuleInstance *myApp
 /**
  * Ajoute un separateur dans un menu deja existant
  */
-#define CD_APPLET_ADD_SEPARATOR(pMenu) \
+#define CD_APPLET_ADD_SEPARATOR(pMenu) do { \
 	pMenuItem = gtk_separator_menu_item_new (); \
-	gtk_menu_shell_append(GTK_MENU_SHELL (pMenu), pMenuItem);
+	gtk_menu_shell_append(GTK_MENU_SHELL (pMenu), pMenuItem); } while (0)
 
 /**
 *Ajoute une entree pour la fonction 'A propos'.
@@ -813,11 +814,11 @@ gboolean CD_APPLET_ON_BUILD_MENU (gpointer *data, CairoDockModuleInstance *myApp
 /**
 *Abonne l'applet aux notifications du clic du milieu. A effectuer lors de l'init de l'applet.
 */
-#define CD_APPLET_REGISTER_FOR_MIDDLE_CLICK_EVENT cairo_dock_register_notification (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_MIDDLE_CLICK, CAIRO_DOCK_RUN_FIRST, myApplet);
+#define CD_APPLET_REGISTER_FOR_MIDDLE_CLICK_EVENT cairo_dock_register_notification (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_MIDDLE_CLICK, CAIRO_DOCK_RUN_FIRST, myApplet)
 /**
 *Desabonne l'applet aux notifications du clic du milieu. A effectuer lors de l'arret de l'applet.
 */
-#define CD_APPLET_UNREGISTER_FOR_MIDDLE_CLICK_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_MIDDLE_CLICK, myApplet);
+#define CD_APPLET_UNREGISTER_FOR_MIDDLE_CLICK_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_MIDDLE_CLICK_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_MIDDLE_CLICK, myApplet)
 
 /**
 *Debut de la fonction de notification du clic du milieu.
@@ -891,11 +892,11 @@ gboolean CD_APPLET_ON_DROP_DATA (gpointer *data, CairoDockModuleInstance *myAppl
 /**
 *Abonne l'applet aux notifications du clic gauche. A effectuer lors de l'init de l'applet.
 */
-#define CD_APPLET_REGISTER_FOR_SCROLL_EVENT cairo_dock_register_notification (CAIRO_DOCK_SCROLL_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_SCROLL, CAIRO_DOCK_RUN_FIRST, myApplet);
+#define CD_APPLET_REGISTER_FOR_SCROLL_EVENT cairo_dock_register_notification (CAIRO_DOCK_SCROLL_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_SCROLL, CAIRO_DOCK_RUN_FIRST, myApplet)
 /**
 *Desabonne l'applet aux notifications du clic gauche. A effectuer lors de l'arret de l'applet.
 */
-#define CD_APPLET_UNREGISTER_FOR_SCROLL_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_SCROLL_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_SCROLL, myApplet);
+#define CD_APPLET_UNREGISTER_FOR_SCROLL_EVENT cairo_dock_remove_notification_func (CAIRO_DOCK_SCROLL_ICON, (CairoDockNotificationFunc) CD_APPLET_ON_SCROLL, myApplet)
 
 /**
 *Debut de la fonction de notification au clic gauche.
@@ -942,91 +943,87 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data, CairoDockModuleInstance *myApplet)
 *Redessine immediatement l'icone de l'applet.
 */
 #define CD_APPLET_REDRAW_MY_ICON \
-	cairo_dock_redraw_my_icon (myIcon, myContainer);
+	cairo_dock_redraw_my_icon (myIcon, myContainer)
 
 /**
 *Applique une surface existante sur le contexte de dessin de l'applet, et la redessine. La surface est redimensionnee aux dimensions de l'icone.
 *@param pSurface la surface cairo a dessiner.
 */
-#define CD_APPLET_SET_SURFACE_ON_MY_ICON(pSurface) \
+#define CD_APPLET_SET_SURFACE_ON_MY_ICON(pSurface) do { \
 	cairo_dock_set_icon_surface_with_reflect (myDrawContext, pSurface, myIcon, myContainer); \
-	cairo_dock_redraw_my_icon (myIcon, myContainer);
+	cairo_dock_redraw_my_icon (myIcon, myContainer); } while (0)
 /**
 *Applique une surface existante sur le contexte de dessin de l'applet, et la redessine. La surface est redimensionnee aux dimensions de l'icone, et zoomee.
 *@param pSurface la surface cairo a dessiner.
 *@param fScale le facteur de zoom (>= 0)
 */
-#define CD_APPLET_SET_SURFACE_ON_MY_ICON_WITH_ZOOM(pSurface, fScale) \
+#define CD_APPLET_SET_SURFACE_ON_MY_ICON_WITH_ZOOM(pSurface, fScale) do { \
 	cairo_dock_set_icon_surface_full (myDrawContext, pSurface, fScale, 1., myIcon, myContainer); \
 	cairo_dock_add_reflection_to_icon (myDrawContext, myIcon, myContainer); \
-	cairo_dock_redraw_my_icon (myIcon, myContainer);
+	cairo_dock_redraw_my_icon (myIcon, myContainer); } while (0)
 /**
 *Applique une surface existante sur le contexte de dessin de l'applet, et la redessine. La surface est redimensionnee aux dimensions de l'icone, et avec un facteur de transparence.
 *@param pSurface la surface cairo a dessiner.
 *@param fAlpha la transparence (dans [0 , 1]).
 */
-#define CD_APPLET_SET_SURFACE_ON_MY_ICON_WITH_ALPHA(pSurface, fAlpha) \
+#define CD_APPLET_SET_SURFACE_ON_MY_ICON_WITH_ALPHA(pSurface, fAlpha) do { \
 	cairo_dock_set_icon_surface_full (myDrawContext, pSurface, 1., fAlpha, myIcon, myContainer); \
 	cairo_dock_add_reflection_to_icon (myDrawContext, myIcon, myContainer); \
-	cairo_dock_redraw_my_icon (myIcon, myContainer);
+	cairo_dock_redraw_my_icon (myIcon, myContainer); } while (0)
 /**
 *Applique une surface existante sur le contexte de dessin de l'applet, et la redessine. La surface est redimensionnee aux dimensions de l'icone, et une barre est dessinee a sa base.
 *@param pSurface la surface cairo a dessiner.
 *@param fValue la valeur en fraction de la valeur max (donc dans [0 , 1]).
 */
-#define CD_APPLET_SET_SURFACE_ON_MY_ICON_WITH_BAR(pSurface, fValue) \
+#define CD_APPLET_SET_SURFACE_ON_MY_ICON_WITH_BAR(pSurface, fValue) do { \
 	cairo_dock_set_icon_surface_full (myDrawContext, pSurface, 1., 1., myIcon, myContainer); \
 	cairo_dock_draw_bar_on_icon (myDrawContext, fValue, myIcon, myContainer); \
 	cairo_dock_add_reflection_to_icon (myDrawContext, myIcon, myContainer); \
-	cairo_dock_redraw_my_icon (myIcon, myContainer);
+	cairo_dock_redraw_my_icon (myIcon, myContainer); } while (0)
 
 /**
 *Applique une image definie par son chemin sur le contexte de dessin de l'applet, mais ne la rafraichit pas. L'image est redimensionnee aux dimensions de l'icone.
 *@param cImagePath chemin du fichier de l'image.
 */
-#define CD_APPLET_SET_IMAGE_ON_MY_ICON(cImagePath) \
+#define CD_APPLET_SET_IMAGE_ON_MY_ICON(cImagePath) do { \
 	if (cImagePath != myIcon->acFileName) \
 	{ \
 		g_free (myIcon->acFileName); \
 		myIcon->acFileName = g_strdup (cImagePath); \
 	} \
-	cairo_dock_set_image_on_icon (myDrawContext, cImagePath, myIcon, myContainer);
+	cairo_dock_set_image_on_icon (myDrawContext, cImagePath, myIcon, myContainer); } while (0)
 
 /**
 *Idem que precedemment mais l'image est definie par son nom localement au repertoire d'installation de l'applet
 *@param cImageName nom du fichier de l'image 
 */
-#define CD_APPLET_SET_LOCAL_IMAGE_ON_MY_ICON(cImageName) \
-	{ \
-		gchar *cImageFilePath = g_strconcat (MY_APPLET_SHARE_DATA_DIR, "/", cImageName, NULL); \
-		CD_APPLET_SET_IMAGE_ON_MY_ICON (cImageFilePath); \
-		g_free (cImageFilePath); \
-	}
+#define CD_APPLET_SET_LOCAL_IMAGE_ON_MY_ICON(cImageName) do { \
+		gchar *_cImageFilePath = g_strconcat (MY_APPLET_SHARE_DATA_DIR, "/", cImageName, NULL); \
+		CD_APPLET_SET_IMAGE_ON_MY_ICON (_cImageFilePath); \
+		g_free (_cImageFilePath); } while (0)
 
 /**
 *Idem que precedemment mais l'image est definie relativement au repertoire utilisateur, ou relativement au repertoire d'installation de l'applet si la 1ere est NULL.
 *@param cUserImageName nom du fichier de l'image cote utilisateur.
 *@param cDefaultLocalImageName image locale par defaut cote installation.
 */
-#define CD_APPLET_SET_USER_IMAGE_ON_MY_ICON(cUserImageName, cDefaultLocalImageName) \
-	{ \
+#define CD_APPLET_SET_USER_IMAGE_ON_MY_ICON(cUserImageName, cDefaultLocalImageName) do { \
 		gchar *cImagePath; \
 		if (cUserImageName != NULL) \
 			cImagePath = cairo_dock_generate_file_path (cUserImageName); \
 		else \
 			cImagePath = g_strdup_printf ("%s/%s", MY_APPLET_SHARE_DATA_DIR, cDefaultLocalImageName); \
 		CD_APPLET_SET_IMAGE_ON_MY_ICON (cImagePath); \
-		g_free (cImagePath); \
-	}
+		g_free (cImagePath); } while (0)
 
 /**
 *Applique une surface existante sur le contexte de dessin de l'applet, et la redessine. La surface est redimensionnee aux dimensions de l'icone.
 *@param pSurface
 *@param fScale
 */
-#define CD_APPLET_SET_ZOOMED_SURFACE_ON_MY_ICON(pSurface, fScale) \
+#define CD_APPLET_SET_ZOOMED_SURFACE_ON_MY_ICON(pSurface, fScale) do { \
 	cairo_dock_set_icon_surface_with_zoom (myDrawContext, pSurface, fScale, myIcon, myContainer); \
-	cairo_dock_redraw_my_icon (myIcon, myContainer);
+	cairo_dock_redraw_my_icon (myIcon, myContainer); } while (0)
 
 
 /**
@@ -1034,45 +1031,45 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data, CairoDockModuleInstance *myApplet)
 *@param cIconName la nouvelle etiquette.
 */
 #define CD_APPLET_SET_NAME_FOR_MY_ICON(cIconName) \
-	cairo_dock_set_icon_name (myDrawContext, cIconName, myIcon, myContainer);
+	cairo_dock_set_icon_name (myDrawContext, cIconName, myIcon, myContainer)
 /**
 *Remplace l'etiquette de l'icone de l'applet par une nouvelle.
 *@param cIconNameFormat la nouvelle etiquette au format 'printf'.
 */
 #define CD_APPLET_SET_NAME_FOR_MY_ICON_PRINTF(cIconNameFormat, ...) \
-	cairo_dock_set_icon_name_full (myDrawContext, myIcon, myContainer, cIconNameFormat, ##__VA_ARGS__);
+	cairo_dock_set_icon_name_full (myDrawContext, myIcon, myContainer, cIconNameFormat, ##__VA_ARGS__)
 
 /**
 *Ecris une info-rapide sur l'icone de l'applet.
 *@param cQuickInfo l'info-rapide. Ce doit etre une chaine de caracteres particulièrement petite, representant une info concise, puisque ecrite directement sur l'icone.
 */
 #define CD_APPLET_SET_QUICK_INFO_ON_MY_ICON(cQuickInfo) \
-	cairo_dock_set_quick_info (myDrawContext, cQuickInfo, myIcon, myDock ? (1 + g_fAmplitude) / 1 : 1);
+	cairo_dock_set_quick_info (myDrawContext, cQuickInfo, myIcon, myDock ? (1 + g_fAmplitude) / 1 : 1)
 /**
 *Ecris une info-rapide sur l'icone de l'applet.
 *@param cQuickInfoFormat l'info-rapide, au format 'printf'. Ce doit etre une chaine de caracteres particulièrement petite, representant une info concise, puisque ecrite directement sur l'icone.
 */
 #define CD_APPLET_SET_QUICK_INFO_ON_MY_ICON_PRINTF(cQuickInfoFormat, ...) \
-	cairo_dock_set_quick_info_full (myDrawContext, myIcon, myContainer, cQuickInfoFormat, ##__VA_ARGS__);
+	cairo_dock_set_quick_info_full (myDrawContext, myIcon, myContainer, cQuickInfoFormat, ##__VA_ARGS__)
 
 /**
 *Ecris le temps en heures-minutes en info-rapide sur l'icone de l'applet.
 *@param iTimeInSeconds le temps en secondes.
 */
 #define CD_APPLET_SET_HOURS_MINUTES_AS_QUICK_INFO(iTimeInSeconds) \
-	cairo_dock_set_hours_minutes_as_quick_info (myDrawContext, myIcon, myContainer, iTimeInSeconds);
+	cairo_dock_set_hours_minutes_as_quick_info (myDrawContext, myIcon, myContainer, iTimeInSeconds)
 /**
 *Ecris le temps en minutes-secondes en info-rapide sur l'icone de l'applet.
 *@param iTimeInSeconds le temps en secondes.
 */
 #define CD_APPLET_SET_MINUTES_SECONDES_AS_QUICK_INFO(iTimeInSeconds) \
-	cairo_dock_set_minutes_secondes_as_quick_info (myDrawContext, myIcon, myContainer, iTimeInSeconds);
+	cairo_dock_set_minutes_secondes_as_quick_info (myDrawContext, myIcon, myContainer, iTimeInSeconds)
 /**
 *Ecris une taille en octets en info-rapide sur l'icone de l'applet.
 *@param iSizeInBytes la taille en octets.
 */
 #define CD_APPLET_SET_SIZE_AS_QUICK_INFO(iSizeInBytes) \
-	cairo_dock_set_size_as_quick_info (myDrawContext, myIcon, myContainer, iSizeInBytes);
+	cairo_dock_set_size_as_quick_info (myDrawContext, myIcon, myContainer, iSizeInBytes)
 
 
 /**
@@ -1081,7 +1078,7 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data, CairoDockModuleInstance *myApplet)
 *@param iAnimationLength duree de l'animation, en nombre de tours.
 */
 #define CD_APPLET_ANIMATE_MY_ICON(iAnimationType, iAnimationLength) \
-	cairo_dock_animate_icon (myIcon, myDock, iAnimationType, iAnimationLength);
+	cairo_dock_animate_icon (myIcon, myDock, iAnimationType, iAnimationLength)
 
 /**
 *Charge une image dans une surface, aux dimensions de l'icone de l'applet.
@@ -1089,19 +1086,19 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data, CairoDockModuleInstance *myApplet)
 *@return la surface nouvellement creee.
 */
 #define CD_APPLET_LOAD_SURFACE_FOR_MY_APPLET(cImagePath) \
-	cairo_dock_create_surface_for_icon (cImagePath, myDrawContext, myIcon->fWidth * (myDock ? (1 + g_fAmplitude) / myDock->fRatio : 1), myIcon->fHeight* (myDock ? (1 + g_fAmplitude) / myDock->fRatio : 1));
+	cairo_dock_create_surface_for_icon (cImagePath, myDrawContext, myIcon->fWidth * (myDock ? (1 + g_fAmplitude) / myDock->fRatio : 1), myIcon->fHeight* (myDock ? (1 + g_fAmplitude) / myDock->fRatio : 1))
 
 
-#define CD_APPLET_RENDER_GAUGE(pGauge, fValue) cairo_dock_render_gauge (myDrawContext, myContainer, myIcon, pGauge, fValue);
-#define CD_APPLET_RENDER_GAUGE_MULTI_VALUE(pGauge, pValueList) cairo_dock_render_gauge_multi_value (myDrawContext, myContainer, myIcon, pGauge, pValueList);
+#define CD_APPLET_RENDER_GAUGE(pGauge, fValue) cairo_dock_render_gauge (myDrawContext, myContainer, myIcon, pGauge, fValue)
+#define CD_APPLET_RENDER_GAUGE_MULTI_VALUE(pGauge, pValueList) cairo_dock_render_gauge_multi_value (myDrawContext, myContainer, myIcon, pGauge, pValueList)
 
 #define CD_APPLET_RENDER_GRAPH(pGraph) cairo_dock_render_graph (myDrawContext, myContainer, myIcon, pGraph);
-#define CD_APPLET_RENDER_GRAPH_NEW_VALUE(pGraph, fValue) \
+#define CD_APPLET_RENDER_GRAPH_NEW_VALUE(pGraph, fValue) do { \
 	cairo_dock_update_graph (pGraph, fValue); \
-	CD_APPLET_RENDER_GRAPH (pGraph)
-#define CD_APPLET_RENDER_GRAPH_NEW_VALUES(pGraph, fValue, fValue2) \
+	CD_APPLET_RENDER_GRAPH (pGraph); } while (0)
+#define CD_APPLET_RENDER_GRAPH_NEW_VALUES(pGraph, fValue, fValue2) do { \
 	cairo_dock_update_double_graph (pGraph, fValue, fValue2); \
-	CD_APPLET_RENDER_GRAPH (pGraph)
+	CD_APPLET_RENDER_GRAPH (pGraph); } while (0)
 
 
 //\_________________________________ DESKLETS et SOUS-DOCKS
@@ -1111,9 +1108,9 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data, CairoDockModuleInstance *myApplet)
 *@param cRendererName nom du rendu.
 *@param pConfig donnees de configuration du rendu.
 */
-#define CD_APPLET_SET_DESKLET_RENDERER_WITH_DATA(cRendererName, pConfig) \
+#define CD_APPLET_SET_DESKLET_RENDERER_WITH_DATA(cRendererName, pConfig) do { \
 	cairo_dock_set_desklet_renderer_by_name (myDesklet, cRendererName, NULL, CAIRO_DOCK_LOAD_ICONS_FOR_DESKLET, (CairoDeskletRendererConfigPtr) pConfig); \
-	myDrawContext = cairo_create (myIcon->pIconBuffer);
+	myDrawContext = cairo_create (myIcon->pIconBuffer); } while (0)
 /**
 *Definit le moteur de rendu de l'applet en mode desklet et le contexte de dessin associe a l'icone. A appeler a l'init mais ausi au reload pour prendre en compte les redimensionnements.
 *@param cRendererName nom du rendu.
@@ -1125,28 +1122,28 @@ gboolean CD_APPLET_ON_SCROLL (gpointer *data, CairoDockModuleInstance *myApplet)
 *@param pIconsList la liste (eventuellement NULL) des icones du sous-dock; celles-ci seront chargees en dans la foulee.
 *@param cRenderer nom du rendu.
 */
-#define CD_APPLET_CREATE_MY_SUBDOCK(pIconsList, cRenderer) \
+#define CD_APPLET_CREATE_MY_SUBDOCK(pIconsList, cRenderer) do { \
 	if (myIcon->acName == NULL) { \
-		CD_APPLET_SET_NAME_FOR_MY_ICON (myIcon->pModuleInstance->pModule->pVisitCard->cModuleName) } \
+		CD_APPLET_SET_NAME_FOR_MY_ICON (myIcon->pModuleInstance->pModule->pVisitCard->cModuleName); } \
 	myIcon->pSubDock = cairo_dock_create_subdock_from_scratch (pIconsList, myIcon->acName, myDock); \
 	cairo_dock_set_renderer (myIcon->pSubDock, cRenderer); \
-	cairo_dock_update_dock_size (myIcon->pSubDock);
+	cairo_dock_update_dock_size (myIcon->pSubDock); } while (0)
 /**
 *Detruit notre sous-dock et les icones contenues dedans s'il y'en a.
 */
-#define CD_APPLET_DESTROY_MY_SUBDOCK \
+#define CD_APPLET_DESTROY_MY_SUBDOCK do { \
 	cairo_dock_destroy_dock (myIcon->pSubDock, myIcon->acName, NULL, NULL); \
-	myIcon->pSubDock = NULL;
+	myIcon->pSubDock = NULL; } while (0)
 /**
 *Charge entierement une liste d'icones dans le sous-dock de notre icone.
 *@param pIconsList la liste (eventuellement NULL) des icones du sous-dock; celles-ci seront chargees en dans la foulee.
 */
-#define CD_APPLET_LOAD_ICONS_IN_MY_SUBDOCK(pIconsList) \
+#define CD_APPLET_LOAD_ICONS_IN_MY_SUBDOCK(pIconsList) do { \
 	if (myIcon->acName == NULL) { \
-		CD_APPLET_SET_NAME_FOR_MY_ICON (myIcon->pModuleInstance->pModule->pVisitCard->cModuleName) } \
+		CD_APPLET_SET_NAME_FOR_MY_ICON (myIcon->pModuleInstance->pModule->pVisitCard->cModuleName); } \
 	myIcon->pSubDock->icons = pIconsList; \
 	cairo_dock_load_buffers_in_one_dock (myIcon->pSubDock); \
-	cairo_dock_update_dock_size (myIcon->pSubDock);
+	cairo_dock_update_dock_size (myIcon->pSubDock); } while (0)
 
 //\_________________________________ INCLUDE
 /**

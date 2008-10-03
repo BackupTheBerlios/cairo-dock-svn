@@ -104,6 +104,7 @@ extern CairoDockFMSortType g_iFileSortType;
 extern gchar *g_cRaiseDockShortcut;
 
 extern gboolean g_bDisplayDropEmblem;
+extern gboolean g_bLocked;
 
 static gboolean s_bTemporaryAutoHide = FALSE;
 static gboolean s_bEntranceAllowed = TRUE;
@@ -662,7 +663,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	//s_pLastPointedDock = NULL;
 	//g_print ("s_pLastPointedDock <- NULL\n");
 	
-	if (s_pIconClicked != NULL && (CAIRO_DOCK_IS_LAUNCHER (s_pIconClicked) || CAIRO_DOCK_IS_DETACHABLE_APPLET (s_pIconClicked) || CAIRO_DOCK_IS_USER_SEPARATOR(s_pIconClicked)) && s_pFlyingContainer == NULL)
+	if (s_pIconClicked != NULL && (CAIRO_DOCK_IS_LAUNCHER (s_pIconClicked) || CAIRO_DOCK_IS_DETACHABLE_APPLET (s_pIconClicked) || CAIRO_DOCK_IS_USER_SEPARATOR(s_pIconClicked)) && s_pFlyingContainer == NULL && ! g_bLocked)
 	{
 		g_print ("on a sorti %s du dock (%d;%d)\n", s_pIconClicked->acName, pDock->iMouseX, pDock->iMouseY);
 		CairoDock *pOriginDock = cairo_dock_search_dock_from_name (s_pIconClicked->cParentDockName);
@@ -1774,7 +1775,9 @@ gboolean cairo_dock_notification_drop_data (gpointer *data)
 			}
 		}
 
-
+		if (g_bLocked)
+			return CAIRO_DOCK_LET_PASS_NOTIFICATION;
+		
 		//\_________________ On l'ajoute dans le repertoire des lanceurs du theme courant.
 		GError *erreur = NULL;
 		const gchar *cDockName = cairo_dock_search_dock_name (pReceivingDock);

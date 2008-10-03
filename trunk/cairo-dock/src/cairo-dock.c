@@ -244,6 +244,7 @@ gboolean g_bUseFakeTransparency = FALSE;
 gboolean g_bDisplayDropEmblem = FALSE; // indicateur de drop
 gchar *g_cThemeServerAdress = NULL;
 gboolean g_bEasterEggs = FALSE;
+gboolean g_bLocked = FALSE;
 
 static gchar *cLaunchCommand = NULL;
 
@@ -372,6 +373,9 @@ int main (int argc, char** argv)
 		{"server", 'S', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
 			&g_cThemeServerAdress,
 			"adress of a server containing additional themes. This will overwrite the default server adress.", NULL},
+		{"locked", 'k', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+			&g_bLocked,
+			"lock the dock so that any modification is impossible for users.", NULL},
 		{NULL}
 	};
 
@@ -398,6 +402,9 @@ int main (int argc, char** argv)
 		g_print ("%s\n", CAIRO_DOCK_VERSION);
 		return 0;
 	}
+	
+	if (g_bLocked)
+		g_print ("Cairo-Dock will be locked.\n");
 	
 	_cairo_dock_set_verbosity(cVerbosity);
 	g_free (cVerbosity);
