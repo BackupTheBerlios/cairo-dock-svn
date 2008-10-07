@@ -82,8 +82,8 @@ extern gchar *g_cConfFile;
 
 extern int g_iVisibleZoneWidth;
 extern int g_iVisibleZoneHeight;
-extern int g_fBackgroundImageWidth;
-extern int g_fBackgroundImageHeight;
+extern double g_fBackgroundImageWidth;
+extern double g_fBackgroundImageHeight;
 
 extern int g_iDockRadius;
 extern gint g_iFrameMargin;

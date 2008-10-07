@@ -192,7 +192,7 @@ void cairo_dock_render_optimized_linear (cairo_t *pCairoContext, CairoDock *pDoc
 		fDockOffsetY = pArea->y;
 	}
 
-	cairo_move_to (pCairoContext, fDockOffsetX, fDockOffsetY);
+	//cairo_move_to (pCairoContext, fDockOffsetX, fDockOffsetY);
 	if (pDock->bHorizontalDock)
 		cairo_rectangle (pCairoContext, fDockOffsetX, fDockOffsetY, pArea->width, pDock->iDecorationsHeight);
 	else

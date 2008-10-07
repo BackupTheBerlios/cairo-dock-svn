@@ -111,6 +111,7 @@ extern double g_fDeskletColor[4];
 extern double g_fDeskletColorInside[4];
 
 extern cairo_surface_t *g_pBackgroundSurfaceFull[2];
+extern cairo_surface_t *g_pBackgroundSurface[2];
 
 extern gboolean g_bEasterEggs;
 

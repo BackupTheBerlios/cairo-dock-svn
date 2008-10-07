@@ -722,7 +722,7 @@ void cairo_dock_update_background_decorations_if_necessary (CairoDock *pDock, in
 		}
 		
 		cairo_destroy (pCairoContext);
-		cd_debug ("  MaJ des decorations du fond -> %.2fx%.2f", g_fBackgroundImageWidth, g_fBackgroundImageHeight);
+		g_print ("  MaJ des decorations du fond -> %.2fx%.2f\n", g_fBackgroundImageWidth, g_fBackgroundImageHeight);
 	}
 }
 

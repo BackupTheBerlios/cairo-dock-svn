@@ -355,7 +355,7 @@ void cairo_dock_render_decorations_in_frame (cairo_t *pCairoContext, CairoDock *
 			cairo_scale (pCairoContext, 1. * pDock->iDecorationsHeight / g_fBackgroundImageHeight, 1. * fWidth / g_fBackgroundImageWidth);
 		}
 		
-		//g_print ("(%dx%d) / (%dx%d)\n", pDock->iCurrentWidth, pDock->iMaxIconHeight, (int) g_fBackgroundImageWidth, (int) g_fBackgroundImageHeight);
+		//g_print ("(%dx%d) / (%dx%d)\n", pDock->iCurrentWidth, (int) pDock->iMaxIconHeight, (int) g_fBackgroundImageWidth, (int) g_fBackgroundImageHeight);
 		cairo_set_source_surface (pCairoContext, g_pBackgroundSurface[pDock->bHorizontalDock], 0., 0.);
 		cairo_fill_preserve (pCairoContext);
 		cairo_restore (pCairoContext);
