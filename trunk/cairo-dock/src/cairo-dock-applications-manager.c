@@ -514,7 +514,8 @@ void cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Window Xid, gboolea
 	*bIsFullScreen = FALSE;
 	*bIsHidden = FALSE;
 	*bIsMaximized = FALSE;
-	*bDemandsAttention = FALSE;
+	if (bDemandsAttention != NULL)
+		*bDemandsAttention = FALSE;
 	if (iBufferNbElements > 0)
 	{
 		int i, iNbMaximizedDimensions = 0;

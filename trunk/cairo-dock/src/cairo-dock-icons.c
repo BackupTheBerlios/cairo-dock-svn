@@ -444,7 +444,7 @@ Icon *cairo_dock_get_icon_with_class (GList *pIconList, gchar *cClass)
 
 void cairo_dock_normalize_icons_order (GList *pIconList, CairoDockIconType iType)
 {
-	g_print ("%s (%d)\n", __func__, iType);
+	cd_message ("%s (%d)", __func__, iType);
 	int iOrder = 1;
 	int iGroupOrder = cairo_dock_get_group_order (iType);
 	GString *sDesktopFilePath = g_string_new ("");
@@ -499,7 +499,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 			g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 			if (erreur != NULL)
 			{
-				cd_warning ("%s", erreur->message);
+				cd_warning (erreur->message);
 				g_error_free (erreur);
 				return ;
 			}
@@ -517,7 +517,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 			g_key_file_load_from_file (pKeyFile, cDesktopFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 			if (erreur != NULL)
 			{
-				cd_warning ("%s", erreur->message);
+				cd_warning (erreur->message);
 				g_error_free (erreur);
 				return ;
 			}
@@ -557,7 +557,7 @@ void cairo_dock_swap_icons (CairoDock *pDock, Icon *icon1, Icon *icon2)
 
 void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2)
 {
-	g_print ("%s (%s, %.2f, %x)\n", __func__, icon1->acName, icon1->fOrder, icon2);
+	//g_print ("%s (%s, %.2f, %x)\n", __func__, icon1->acName, icon1->fOrder, icon2);
 	///if ((icon2 != NULL) && (! ( (CAIRO_DOCK_IS_APPLI (icon1) && CAIRO_DOCK_IS_APPLI (icon2)) || (CAIRO_DOCK_IS_LAUNCHER (icon1) && CAIRO_DOCK_IS_LAUNCHER (icon2)) || (CAIRO_DOCK_IS_APPLET (icon1) && CAIRO_DOCK_IS_APPLET (icon2)) ) ))
 	if ((icon2 != NULL) && fabs (cairo_dock_get_icon_order (icon1) - cairo_dock_get_icon_order (icon2)) > 1)
 		return ;
@@ -583,8 +583,7 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 		else
 			icon1->fOrder = 1;
 	}
-	
-	g_print ("icon1->fOrder:%.2f\n", icon1->fOrder);
+	//g_print ("icon1->fOrder:%.2f\n", icon1->fOrder);
 	
 	//\_________________ On change l'ordre dans le fichier du lanceur 1.
 	if ((CAIRO_DOCK_IS_LAUNCHER (icon1) || CAIRO_DOCK_IS_SEPARATOR (icon1)) && icon1->acDesktopFileName != NULL)
@@ -715,9 +714,10 @@ gboolean cairo_dock_detach_icon_from_dock (Icon *icon, CairoDock *pDock, gboolea
 			if (pSameTypeIcon == NULL)
 			{
 				int iOrder = cairo_dock_get_icon_order (icon);
+				//g_print ("iOrder : %d\n", iOrder);
 				if (iOrder > 1)  // attention : iType - 1 > 0 si iType = 0, car c'est un unsigned int !
 					pSeparatorIcon = cairo_dock_get_first_icon_of_order (pDock->icons, iOrder - 1);
-				else if (iOrder + 1 < CAIRO_DOCK_NB_TYPES)
+				if (iOrder + 1 < CAIRO_DOCK_NB_TYPES && pSeparatorIcon == NULL)
 					pSeparatorIcon = cairo_dock_get_first_icon_of_order (pDock->icons, iOrder + 1);
 
 				if (pSeparatorIcon != NULL)
@@ -893,7 +893,7 @@ Icon *cairo_dock_foreach_icons_of_type (GList *pIconList, CairoDockIconType iTyp
 
 void cairo_dock_remove_all_separators (CairoDock *pDock)
 {
-	g_print ("%s ()\n", __func__);
+	//g_print ("%s ()\n", __func__);
 	Icon *icon;
 	GList *ic;
 	if (pDock->icons == NULL)
@@ -908,7 +908,7 @@ void cairo_dock_remove_all_separators (CairoDock *pDock)
 		icon = ic->next->data;  // on ne peut pas enlever l'element courant, sinon on perd 'ic'.
 		if (CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon))
 		{
-			g_print ("un separateur en moins (apres %s)\n", ((Icon*)ic->data)->acName);
+			//g_print ("un separateur en moins (apres %s)\n", ((Icon*)ic->data)->acName);
 			cairo_dock_remove_one_icon_from_dock (pDock, icon);
 			cairo_dock_free_icon (icon);
 		}
@@ -923,7 +923,7 @@ void cairo_dock_remove_all_separators (CairoDock *pDock)
 		icon = pDock->icons->data;
 		if (CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon))
 		{
-			g_print ("un separateur en moins (au debut)\n");
+			//g_print ("un separateur en moins (au debut)\n");
 			cairo_dock_remove_one_icon_from_dock (pDock, icon);
 			cairo_dock_free_icon (icon);
 		}
@@ -932,7 +932,7 @@ void cairo_dock_remove_all_separators (CairoDock *pDock)
 
 void cairo_dock_insert_separators_in_dock (CairoDock *pDock)
 {
-	g_print ("%s ()\n", __func__);
+	//g_print ("%s ()\n", __func__);
 	Icon *icon, *next_icon;
 	GList *ic;
 	for (ic = pDock->icons; ic != NULL; ic = ic->next)
@@ -946,7 +946,7 @@ void cairo_dock_insert_separators_in_dock (CairoDock *pDock)
 				if (! CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (next_icon) && abs (cairo_dock_get_icon_order (icon) - cairo_dock_get_icon_order (next_icon)) > 1)  // icon->iType != next_icon->iType
 				{
 					int iSeparatorType = g_tIconTypeOrder[next_icon->iType] - 1;
-					g_print ("un separateur entre %s et %s, dans le groupe %d (=%d)\n", icon->acName, next_icon->acName, iSeparatorType, g_tIconTypeOrder[iSeparatorType]);
+					//g_print ("un separateur entre %s et %s, dans le groupe %d (=%d)\n", icon->acName, next_icon->acName, iSeparatorType, g_tIconTypeOrder[iSeparatorType]);
 					cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDock));
 					Icon *pSeparator = cairo_dock_create_separator_icon (pCairoContext, iSeparatorType, pDock, ! CAIRO_DOCK_APPLY_RATIO);
 					cairo_destroy (pCairoContext);
