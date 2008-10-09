@@ -94,7 +94,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 		
 		if (pDesklet->iDesiredWidth != 0 && pDesklet->iDesiredHeight != 0 && (pDesklet->iKnownWidth != pDesklet->iDesiredWidth || pDesklet->iKnownHeight != pDesklet->iDesiredHeight))
 		{
-			//g_print ("on saute le dessin\n");
+			g_print ("on saute le dessin\n");
 			cairo_destroy (pCairoContext);
 			return FALSE;
 		}
@@ -145,18 +145,19 @@ static gboolean _cairo_dock_write_desklet_size (CairoDesklet *pDesklet)
 			G_TYPE_INT, "Desklet", "height", pDesklet->iHeight,
 			G_TYPE_INVALID);
 	pDesklet->iSidWriteSize = 0;
-	if (pDesklet->pIcon != NULL)
+	pDesklet->iKnownWidth = pDesklet->iWidth;
+	pDesklet->iKnownHeight = pDesklet->iHeight;
+	if (pDesklet->iDesiredWidth == pDesklet->iWidth && pDesklet->iDesiredHeight == pDesklet->iHeight)
 	{
-		pDesklet->iKnownWidth = pDesklet->iWidth;
-		pDesklet->iKnownHeight = pDesklet->iHeight;
-		if (pDesklet->iDesiredWidth == pDesklet->iWidth && pDesklet->iDesiredHeight == pDesklet->iHeight)
-		{
-			pDesklet->iDesiredWidth = 0;
-			pDesklet->iDesiredHeight = 0;
-		}
+		pDesklet->iDesiredWidth = 0;
+		pDesklet->iDesiredHeight = 0;
+	}
+	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModuleInstance != NULL)
+	{
 		cairo_dock_reload_module_instance (pDesklet->pIcon->pModuleInstance, FALSE);
 		gtk_widget_queue_draw (pDesklet->pWidget);  // sinon on ne redessine que l'interieur.
 	}
+	//g_print ("iWidth <- %d;iHeight <- %d ; (%dx%d) (%x)\n", pDesklet->iWidth, pDesklet->iHeight, pDesklet->iKnownWidth, pDesklet->iKnownHeight, pDesklet->pIcon);
 	return FALSE;
 }
 static gboolean _cairo_dock_write_desklet_position (CairoDesklet *pDesklet)

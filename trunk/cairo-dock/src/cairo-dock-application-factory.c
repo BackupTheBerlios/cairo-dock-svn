@@ -69,6 +69,7 @@ static Atom s_aNetWmHidden;
 static Atom s_aNetWmFullScreen;
 static Atom s_aNetWmMaximizedHoriz;
 static Atom s_aNetWmMaximizedVert;
+static Atom s_aNetWmDemandsAttention;
 
 
 void cairo_dock_initialize_application_factory (Display *pXDisplay)
@@ -104,6 +105,7 @@ void cairo_dock_initialize_application_factory (Display *pXDisplay)
 	s_aNetWmFullScreen = XInternAtom (s_XDisplay, "_NET_WM_STATE_FULLSCREEN", False);
 	s_aNetWmMaximizedHoriz = XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
 	s_aNetWmMaximizedVert = XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_VERT", False);
+	s_aNetWmDemandsAttention = XInternAtom (s_XDisplay, "_NET_WM_STATE_DEMANDS_ATTENTION", False);
 }
 
 void cairo_dock_unregister_pid (Icon *icon)
@@ -346,7 +348,19 @@ CairoDock *cairo_dock_manage_appli_class (Icon *icon, CairoDock *pMainDock)
 	return pParentDock;
 }
 
+static Window _cairo_dock_get_parent_window (Window Xid)
+{
+	Atom aReturnedType = 0;
+	int aReturnedFormat = 0;
+	unsigned long iLeftBytes, iBufferNbElements = 0;
+	Window *pXBuffer = NULL;
+	XGetWindowProperty (s_XDisplay, Xid, XInternAtom (s_XDisplay, "WM_TRANSIENT_FOR", False), 0, G_MAXULONG, False, XA_WINDOW, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXBuffer);
 
+	Window xParentWindow = (iBufferNbElements > 0 && pXBuffer != NULL ? pXBuffer[0] : 0);
+	if (pXBuffer != NULL)
+		XFree (pXBuffer);
+	return xParentWindow;
+}
 Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid, CairoDock *pDock)
 {
 	//g_print ("%s (%d)\n", __func__, Xid);
@@ -359,7 +373,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	double fWidth, fHeight;
 
 	//\__________________ On regarde si on doit l'afficher ou la sauter.
-	gboolean bSkip = FALSE, bIsHidden = FALSE, bIsFullScreen = FALSE, bIsMaximized = FALSE;
+	gboolean bSkip = FALSE, bIsHidden = FALSE, bIsFullScreen = FALSE, bIsMaximized = FALSE, bDemandsAttention = FALSE;
 	gulong *pXStateBuffer = NULL;
 	iBufferNbElements = 0;
 	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmState, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXStateBuffer);
@@ -378,6 +392,8 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 				iNbMaximizedDimensions ++;
 			else if (pXStateBuffer[i] == s_aNetWmFullScreen)
 				bIsFullScreen = TRUE;
+			else if (pXStateBuffer[i] == s_aNetWmDemandsAttention)
+				bDemandsAttention = TRUE;
 			//else if (pXStateBuffer[i] == s_aNetWmSkipPager)  // contestable ...
 			//	bSkip = TRUE;
 		}
@@ -418,6 +434,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 
 	//\__________________ On regarde son type.
 	gulong *pTypeBuffer = NULL;
+	g_print ("nouvelle icone d'appli (%d)\n", Xid);
 	XGetWindowProperty (s_XDisplay, Xid, s_aNetWmWindowType, 0, G_MAXULONG, False, XA_ATOM, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pTypeBuffer);
 	if (iBufferNbElements != 0)
 	{
@@ -425,11 +442,23 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 		{
 			if (*pTypeBuffer == s_aNetWmWindowTypeDialog)
 			{
-				Window XMainAppliWindow = 0;
-				XGetTransientForHint (s_XDisplay, Xid, &XMainAppliWindow);
+				/*Window iPropWindow;
+				XGetTransientForHint (s_XDisplay, Xid, &iPropWindow);
+				g_print ("%s\n", gdk_x11_get_xatom_name (iPropWindow));*/
+				Window XMainAppliWindow = _cairo_dock_get_parent_window (Xid);
 				if (XMainAppliWindow != 0)
 				{
-					//g_print ("dialogue 'transient for' => on ignore\n");
+					g_print ("dialogue 'transient for' => on ignore\n");
+					if (bDemandsAttention)
+					{
+						Icon *pParentIcon = cairo_dock_get_icon_with_Xid (XMainAppliWindow);
+						if (pParentIcon != NULL)
+						{
+							g_print ("%s requiert votre attention indirectement !\n", pParentIcon->acName);
+						}
+						else
+							g_print ("ce dialogue est bien bruyant ! (%d)\n", XMainAppliWindow);
+					}
 					XFree (pTypeBuffer);
 					return NULL;  // inutile de rajouter le PID ici, c'est le meme que la fenetre principale.
 				}
@@ -452,7 +481,17 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 		XGetTransientForHint (s_XDisplay, Xid, &XMainAppliWindow);
 		if (XMainAppliWindow != 0)
 		{
-			//g_print ("fenetre modale => on saute.\n");
+			g_print ("fenetre modale => on saute.\n");
+			if (bDemandsAttention)
+			{
+				Icon *pParentIcon = cairo_dock_get_icon_with_Xid (XMainAppliWindow);
+				if (pParentIcon != NULL)
+				{
+					g_print ("%s requiert votre attention indirectement !\n", pParentIcon->acName);
+				}
+				else
+					g_print ("ce dialogue est bien bruyant ! (%d)\n", XMainAppliWindow);
+			}
 			return NULL;  // meme remarque.
 		}
 		//else
@@ -586,7 +625,7 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 			{
 				if (iState == PropertyNewValue)
 				{
-					cd_message ("%s vous interpelle !", icon->acName);
+					g_print ("%s vous interpelle !\n", icon->acName);
 					if (g_bDemandsAttentionWithDialog)
 						cairo_dock_show_temporary_dialog (icon->acName, icon, CAIRO_CONTAINER (pDock), 2000);
 					if (g_bDemandsAttentionWithAnimation)
@@ -597,14 +636,14 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 				}
 				else if (iState == PropertyDelete)
 				{
-					cd_message ("%s arrette de vous interpeler.", icon->acName);
+					g_print ("%s arrette de vous interpeler.\n", icon->acName);
 					if (g_bDemandsAttentionWithDialog)
 						cairo_dock_remove_dialog_if_any (icon);
 					if (g_bDemandsAttentionWithAnimation)
 						cairo_dock_arm_animation (icon, 0, 0);  // arrete son animation quelqu'elle soit.
 				}
 				else
-					cd_warning ("  etat du changement inconnu sur %s !", icon->acName);
+					cd_warning ("  etat du changement d'urgence inconnu sur %s !", icon->acName);
 			}
 			if (iState == PropertyNewValue && (pWMHints->flags & (IconPixmapHint | IconMaskHint | IconWindowHint)))
 			{

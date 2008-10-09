@@ -4,7 +4,7 @@ Section: desktop
 Priority: optional
 Architecture: all
 Essential: no
-Depends: cairo-dock, libdbus-1-3, libdbus-glib-1-2, libvte9, libxxf86vm1, libxml2, libasound2, libgnome-menu2, libgio0
+Depends: cairo-dock, libdbus-1-3, libdbus-glib-1-2, libvte9, libxxf86vm1, libxml2, libasound2, libgnome-menu2
 Installed-Size: 1024
 Maintainer: Fabrice Rey fabounet@users.berlios.de
 Provides: cairo-dock-plug-ins

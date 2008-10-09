@@ -36,6 +36,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-config.h"
 #include "cairo-dock-dock-manager.h"
 #include "cairo-dock-class-manager.h"
+#include "cairo-dock-dialogs.h"
 #include "cairo-dock-applications-manager.h"
 
 #define CAIRO_DOCK_TASKBAR_CHECK_INTERVAL 250
@@ -59,7 +60,9 @@ extern int g_iNbViewportX,g_iNbViewportY ;
 extern gboolean g_bMixLauncherAppli;
 extern gboolean g_bShowThumbnail;
 extern gboolean g_bUseFakeTransparency;
-//extern int g_iDamageEvent;
+
+extern gboolean g_bDemandsAttentionWithDialog;
+extern gboolean g_bDemandsAttentionWithAnimation;//extern int g_iDamageEvent;
 
 static GHashTable *s_hXWindowTable = NULL;  // table des fenetres X affichees dans le dock.
 static Display *s_XDisplay = NULL;
@@ -80,6 +83,7 @@ static Atom s_aNetWmMaximizedHoriz;
 static Atom s_aNetWmMaximizedVert;
 static Atom s_aRootMapID;
 static Atom s_aNetNbDesktops;
+static Atom s_aNetWmDemandsAttention;
 
 void cairo_dock_initialize_application_manager (Display *pDisplay)
 {
@@ -105,6 +109,7 @@ void cairo_dock_initialize_application_manager (Display *pDisplay)
 	s_aNetWmMaximizedVert = XInternAtom (s_XDisplay, "_NET_WM_STATE_MAXIMIZED_VERT", False);
 	s_aRootMapID = XInternAtom (s_XDisplay, "_XROOTPMAP_ID", False);
 	s_aNetNbDesktops = XInternAtom (s_XDisplay, "_NET_NUMBER_OF_DESKTOPS", False);
+	s_aNetWmDemandsAttention = XInternAtom (s_XDisplay, "_NET_WM_STATE_DEMANDS_ATTENTION", False);
 }
 
 
@@ -496,8 +501,9 @@ void cairo_dock_window_is_above_or_below (Window Xid, gboolean *bIsAbove, gboole
 	XFree (pXStateBuffer);
 }
 
-void cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Window Xid, gboolean *bIsFullScreen, gboolean *bIsHidden, gboolean *bIsMaximized)
+void cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Window Xid, gboolean *bIsFullScreen, gboolean *bIsHidden, gboolean *bIsMaximized, gboolean *bDemandsAttention)
 {
+	g_print ("%s ()\n", __func__);
 	g_return_if_fail (Xid > 0);
 	Atom aReturnedType = 0;
 	int aReturnedFormat = 0;
@@ -508,6 +514,7 @@ void cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Window Xid, gboolea
 	*bIsFullScreen = FALSE;
 	*bIsHidden = FALSE;
 	*bIsMaximized = FALSE;
+	*bDemandsAttention = FALSE;
 	if (iBufferNbElements > 0)
 	{
 		int i, iNbMaximizedDimensions = 0;
@@ -543,6 +550,11 @@ void cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Window Xid, gboolea
 					//break;
 				}
 			}
+			else if (pXStateBuffer[i] == s_aNetWmDemandsAttention && bDemandsAttention != NULL)
+			{
+				g_print (" cette fenetre demande notre attention !\n");
+				*bDemandsAttention = TRUE;
+			}
 		}
 	}
 	
@@ -554,7 +566,7 @@ Window cairo_dock_get_active_xwindow (void)
 	Atom aReturnedType = 0;
 	int aReturnedFormat = 0;
 	unsigned long iLeftBytes, iBufferNbElements = 0;
-	gulong *pXBuffer = NULL;
+	Window *pXBuffer = NULL;
 	Window root = DefaultRootWindow (s_XDisplay);
 	XGetWindowProperty (s_XDisplay, root, s_aNetActiveWindow, 0, G_MAXULONG, False, XA_WINDOW, &aReturnedType, &aReturnedFormat, &iBufferNbElements, &iLeftBytes, (guchar **)&pXBuffer);
 
@@ -661,7 +673,7 @@ static gboolean _cairo_dock_window_is_on_our_way (Window *Xid, Icon *icon, int *
 	if (icon != NULL && cairo_dock_window_is_on_this_desktop (*Xid, data[0]))
 	{
 		gboolean bIsFullScreen, bIsHidden, bIsMaximized;
-		cairo_dock_window_is_fullscreen_or_hidden_or_maximized (*Xid, &bIsFullScreen, &bIsHidden, &bIsMaximized);
+		cairo_dock_window_is_fullscreen_or_hidden_or_maximized (*Xid, &bIsFullScreen, &bIsHidden, &bIsMaximized, NULL);
 		if ((data[1] && bIsMaximized & ! bIsHidden) || (data[2] && bIsFullScreen))
 		{
 			cd_message ("%s est genante (%d, %d) (%d;%d %dx%d)", icon->acName, bIsMaximized, bIsFullScreen, icon->windowGeometry.x, icon->windowGeometry.y, icon->windowGeometry.width, icon->windowGeometry.height);
@@ -871,23 +883,32 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 			{
 				if (event.xproperty.atom == s_aNetWmState || event.xproperty.atom == XInternAtom (s_XDisplay, "_KDE_WM_WINDOW_OPACITY", False))
 				{
-					gboolean bIsFullScreen, bIsHidden, bIsMaximized;
-					cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Xid, &bIsFullScreen, &bIsHidden, &bIsMaximized);
-					cd_message ("changement d'etat de %d => {%d ; %d ; %d}", Xid, bIsFullScreen, bIsHidden, bIsMaximized);
-					/*if (g_bAutoHideOnFullScreen)
+					gboolean bIsFullScreen, bIsHidden, bIsMaximized, bDemandsAttention;
+					cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Xid, &bIsFullScreen, &bIsHidden, &bIsMaximized, &bDemandsAttention);
+					g_print ("changement d'etat de %d => {%d ; %d ; %d ; %d}\n", Xid, bIsFullScreen, bIsHidden, bIsMaximized, bDemandsAttention);
+					
+					//gboolean bIsDemandingAttention = FALSE;
+					if (bDemandsAttention && (g_bDemandsAttentionWithDialog || g_bDemandsAttentionWithAnimation)/* && ! bIsDemandingAttention*/)
 					{
-						if (bIsFullScreen && ! cairo_dock_quick_hide_is_activated ())
+						icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
+						g_print ("%s demande votre attention !\n", icon->acName);
+						if (g_bDemandsAttentionWithDialog)
+							cairo_dock_show_temporary_dialog (icon->acName, icon, CAIRO_CONTAINER (pDock), 2000);
+						if (g_bDemandsAttentionWithAnimation)
 						{
-							cd_message (" => devient plein ecran");
-							cairo_dock_activate_temporary_auto_hide ();
+							cairo_dock_arm_animation (icon, -1, 1e6);  // animation sans fin.
+							cairo_dock_start_animation (icon, pDock);
 						}
-						else if (! bIsFullScreen && cairo_dock_quick_hide_is_activated ())
-						{
-							if (cairo_dock_search_fullscreen_window_on_current_desktop () == NULL)
-								cairo_dock_deactivate_temporary_auto_hide ();
-						}
-					}*/
-					gboolean bChangeIntercepted = FALSE;
+					}
+					else if (! bDemandsAttention/* && bIsDemandingAttention*/)
+					{
+						icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
+						g_print ("%s se tait !\n", icon->acName);
+						if (g_bDemandsAttentionWithDialog)
+							cairo_dock_remove_dialog_if_any (icon);
+						if (g_bDemandsAttentionWithAnimation)
+							cairo_dock_arm_animation (icon, 0, 0);  // arrete son animation quelqu'elle soit.
+					}
 					if (g_bAutoHideOnMaximized || g_bAutoHideOnFullScreen)
 					{
 						if ( ((bIsMaximized && ! bIsHidden && g_bAutoHideOnMaximized) || (bIsFullScreen && g_bAutoHideOnFullScreen)) && ! cairo_dock_quick_hide_is_activated ())
@@ -908,7 +929,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 							}
 						}
 					}
-					if (! bChangeIntercepted)
+					//if (! bChangeIntercepted)
 					{
 						icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
 						if (icon != NULL && icon->fPersonnalScale <= 0)  // pour une icône en cours de supression, on ne fait rien.
@@ -986,7 +1007,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 						}
 					}
 				}
-				if (event.xproperty.atom == s_aNetWmDesktop)  // cela ne gere pas les changements de viewports, qui eux se font en changeant les coordonnees. Il faudrait donc recueillir les ConfigureNotify, qui donnent les redimensionnements et les deplacements.
+				if (event.xproperty.atom == s_aNetWmDesktop)  // cela ne gere pas les changements de viewports, qui eux se font en changeant les coordonnees. Il faut donc recueillir les ConfigureNotify, qui donnent les redimensionnements et les deplacements.
 				{
 					cd_message ("changement de bureau pour %d", Xid);
 					if (g_bAppliOnCurrentDesktopOnly)

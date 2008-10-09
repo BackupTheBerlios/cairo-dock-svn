@@ -1096,6 +1096,8 @@ CairoDockModuleInstance *cairo_dock_instanciate_module (CairoDockModule *pModule
 		pIcon->fHeight /= pDock->fRatio;
 		cairo_dock_insert_icon_in_dock (pIcon, pDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, g_bUseSeparator);
 	}
+	else if (pDesklet && pDesklet->iDesiredWidth == 0 && pDesklet->iDesiredHeight == 0)  // peut arriver si le desklet a fini de se redimensionner avant l'init.
+		gtk_widget_queue_draw (pDesklet->pWidget);
 	if (pKeyFile != NULL)
 		g_key_file_free (pKeyFile);
 	return pInstance;

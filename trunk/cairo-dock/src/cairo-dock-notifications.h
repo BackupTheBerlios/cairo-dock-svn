@@ -59,6 +59,8 @@ void cairo_dock_register_notification (CairoDockNotificationType iNotifType, Cai
 *@param pFunction fonction notifiee.
 */
 void cairo_dock_remove_notification_func (CairoDockNotificationType iNotifType, CairoDockNotificationFunc pFunction, gpointer pUserData);
+
+GList *cairo_dock_get_notifications_list (CairoDockNotificationType iNotifType);
 /**
 *Appelle toutes les fonctions enregistrees pour une notification donnee.
 *@param iNotifType type de la notification.
@@ -67,6 +69,20 @@ void cairo_dock_remove_notification_func (CairoDockNotificationType iNotifType, 
 */
 gboolean cairo_dock_notify (CairoDockNotificationType iNotifType, gpointer data);
 
+typedef gboolean (* CairoDockNotificationFunc2) (gpointer pUserData, ...);
+#define cairo_dock_notify2(iNotifType, ...) {\
+	GSList *pNotificationRecordList = cairo_dock_get_notifications_list (iNotifType);\
+	if (pNotificationRecordList == NULL)\
+		FALSE;\
+	gboolean bStop = FALSE;\
+	CairoDockNotificationFunc2 pFunction;\
+	CairoDockNotificationRecord *pNotificationRecord;\
+	GSList *pElement = pNotificationRecordList;\
+	while (pElement != NULL && ! bStop) {\
+		pNotificationRecord = pElement->data;\
+		bStop = pNotificationRecord->pFunction (pNotificationRecord->pUserData, ##__VA_ARGS__);\
+		pElement = pElement->next; }\
+	TRUE; }
 
 /**
 *Enregistre une liste de fonctions devant etre notifiees en premier. La liste est une liste de couples (CairoDockNotificationType, CairoDockNotificationFunc), et doit etre clot par -1.

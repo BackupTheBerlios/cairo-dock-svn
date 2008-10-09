@@ -50,6 +50,14 @@ void cairo_dock_remove_notification_func (CairoDockNotificationType iNotifType, 
 	}
 }
 
+GList *cairo_dock_get_notifications_list (CairoDockNotificationType iNotifType)
+{
+	if (s_pNotificationsTab == NULL || iNotifType < s_pNotificationsTab->len)
+		return NULL;
+	
+	return g_ptr_array_index (s_pNotificationsTab, iNotifType);
+}
+
 gboolean cairo_dock_notify (CairoDockNotificationType iNotifType, gpointer data)
 {
 	if (s_pNotificationsTab != NULL)

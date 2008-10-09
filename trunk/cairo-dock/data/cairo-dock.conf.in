@@ -49,6 +49,9 @@ auto-hide = false
 #{The dock will pop-up on the foreground when you place the mouse on its screen border. This option is only useful if you don't want to reserve space for the dock, nor to activate auto-hide.}
 pop-up = false
 
+#b- Pop-up only if the mouse hits a screen corner ?
+pop in corner only = false;
+
 #k- Keyboard shortcut to show/hide the dock :
 #{When you press the shortcut, the dock will show itself at the potition of your mouse. The rest of the time, it stays invisible, thus acting like a menu.}
 raise shortcut = 

@@ -169,6 +169,7 @@ extern gboolean g_bLinkIndicatorWithIcon;
 extern gboolean g_bIndicatorAbove;
 
 extern gboolean g_bPopUp;
+extern gboolean g_bPopUpOnScreenBorder;
 extern gboolean g_bUseFakeTransparency;
 extern cairo_surface_t *g_pDesktopBgSurface;
 
@@ -588,6 +589,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	gboolean bPopUpOld = g_bPopUp;
 	g_bPopUp = cairo_dock_get_boolean_key_value (pKeyFile, "Position", "pop-up", &bFlushConfFileNeeded, FALSE, NULL, NULL);
+	g_bPopUpOnScreenBorder = ! cairo_dock_get_boolean_key_value (pKeyFile, "Position", "pop in corner only", &bFlushConfFileNeeded, FALSE, NULL, NULL);
 	
 	gboolean bUseFakeTransparencyOld = g_bUseFakeTransparency;
 	g_bUseFakeTransparency = cairo_dock_get_boolean_key_value (pKeyFile, "System", "fake transparency", &bFlushConfFileNeeded, FALSE, NULL, NULL);

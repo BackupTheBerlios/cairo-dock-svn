@@ -943,7 +943,7 @@ void cairo_dock_insert_separators_in_dock (CairoDock *pDock)
 			if (ic->next != NULL)
 			{
 				next_icon = ic->next->data;
-				if (! CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (icon) && abs (cairo_dock_get_icon_order (icon) - cairo_dock_get_icon_order (next_icon)) > 1)  // icon->iType != next_icon->iType
+				if (! CAIRO_DOCK_IS_AUTOMATIC_SEPARATOR (next_icon) && abs (cairo_dock_get_icon_order (icon) - cairo_dock_get_icon_order (next_icon)) > 1)  // icon->iType != next_icon->iType
 				{
 					int iSeparatorType = g_tIconTypeOrder[next_icon->iType] - 1;
 					g_print ("un separateur entre %s et %s, dans le groupe %d (=%d)\n", icon->acName, next_icon->acName, iSeparatorType, g_tIconTypeOrder[iSeparatorType]);

@@ -66,6 +66,7 @@ extern gboolean bShowSubDockOnClick;
 extern gboolean g_bUseSeparator;
 extern gboolean g_bKeepAbove;
 extern gboolean g_bPopUp;
+extern gboolean g_bPopUpOnScreenBorder;
 extern int g_tIconTypeOrder[CAIRO_DOCK_NB_TYPES];
 extern double g_fAmplitude;
 
@@ -640,7 +641,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 	/**if (g_bPopUp && pDock->bIsMainDock)
 	{
 		//the mouse has exited the dock window, cancel any pop up event, and trigger a pop down event.
-		*if (pDock->iSidPopUp != 0)
+		if (pDock->iSidPopUp != 0)
 		{
 			g_source_remove(pDock->iSidPopUp);
 			pDock->iSidPopUp = 0;
@@ -803,18 +804,32 @@ gboolean cairo_dock_poll_screen_edge (CairoDock *pDock)  // thanks to Smidgey fo
 		iPrevPointerX = iMousePosX;
 		iPrevPointerY = iMousePosY;
 		
-		CairoDockPositionType iScreenBorder = 0;
+		CairoDockPositionType iScreenBorder1 = -1, iScreenBorder2 = -1;
 		if (iMousePosY == 0)
-			iScreenBorder = CAIRO_DOCK_TOP;
+		{
+			iScreenBorder1 = CAIRO_DOCK_TOP;
+		}
 		else if (iMousePosY + 1 == g_iScreenHeight[CAIRO_DOCK_HORIZONTAL])
-			iScreenBorder = CAIRO_DOCK_BOTTOM;
-		else if (iMousePosX == 0)
-			iScreenBorder = CAIRO_DOCK_LEFT;
+		{
+			iScreenBorder1 = CAIRO_DOCK_BOTTOM;
+		}
+		if (iMousePosX == 0)
+		{
+			iScreenBorder2 = CAIRO_DOCK_LEFT;
+		}
 		else if (iMousePosX + 1 == g_iScreenWidth[CAIRO_DOCK_HORIZONTAL])
-			iScreenBorder = CAIRO_DOCK_RIGHT;
-		else
+		{
+			iScreenBorder2 = CAIRO_DOCK_RIGHT;
+		}
+		if (iScreenBorder1 == -1 && iScreenBorder2 == -1)
 			return g_bPopUp;
-		cairo_dock_pop_up_root_docks_on_screen_edge (iScreenBorder);
+		if ((iScreenBorder1 != -1 && iScreenBorder2 != -1) || g_bPopUpOnScreenBorder)
+		{
+			if (iScreenBorder1 != -1)
+				cairo_dock_pop_up_root_docks_on_screen_edge (iScreenBorder1);
+			if (iScreenBorder2 != -1)
+				cairo_dock_pop_up_root_docks_on_screen_edge (iScreenBorder2);
+		}
 	}
 	
 	return g_bPopUp;
@@ -1069,6 +1084,12 @@ gboolean on_key_press (GtkWidget *pWidget,
 }
 
 
+static gpointer _cairo_dock_launch_threaded (gchar *cCommand)
+{
+	system (cCommand);
+	g_free (cCommand);
+	return NULL;
+}
 gboolean cairo_dock_launch_command_full (const gchar *cCommandFormat, gchar *cWorkingDirectory, ...)
 {
 	g_return_val_if_fail (cCommandFormat != NULL, FALSE);
@@ -1076,9 +1097,28 @@ gboolean cairo_dock_launch_command_full (const gchar *cCommandFormat, gchar *cWo
 	va_list args;
 	va_start (args, cWorkingDirectory);
 	gchar *cCommand = g_strdup_vprintf (cCommandFormat, args);
+	va_end (args);
 	cd_debug ("%s (%s , %s)", __func__, cCommand, cWorkingDirectory);
 	
+	gchar *cBGCommand;
+	if (cCommand[strlen (cCommand)-1] != '&')
+	{
+		cBGCommand = g_strconcat (cCommand, " &", NULL);
+		g_free (cCommand);
+	}
+	else
+		cBGCommand = cCommand;
 	GError *erreur = NULL;
+	GThread* pThread = g_thread_create ((GThreadFunc) _cairo_dock_launch_threaded, cBGCommand, FALSE, &erreur);
+	if (erreur != NULL)
+	{
+		cd_warning ("couldn't launch this command (%s)", erreur->message);
+		g_error_free (erreur);
+		g_free (cBGCommand);
+		return FALSE;
+	}
+	return TRUE;
+	/**GError *erreur = NULL;
 	int argc;
 	gchar **argv = NULL;
 	g_shell_parse_argv (cCommand,
@@ -1087,10 +1127,8 @@ gboolean cairo_dock_launch_command_full (const gchar *cCommandFormat, gchar *cWo
 		&erreur);
 	if (erreur != NULL)
 	{
-		cd_warning ("Attention : %s", erreur->message);
+		cd_warning ("couldn't parse this command (%s), will try to launch it as a script", erreur->message);
 		g_error_free (erreur);
-		g_free (cCommand);
-		va_end (args);
 		return FALSE;
 	}
 	
@@ -1106,16 +1144,14 @@ gboolean cairo_dock_launch_command_full (const gchar *cCommandFormat, gchar *cWo
 	g_strfreev (argv);
 	if (erreur != NULL)
 	{
-		cd_warning ("Attention : when trying to execute '%s' : %s", cCommand, erreur->message);
+		cd_warning ("when trying to execute '%s' : %s", cCommand, erreur->message);
 		g_error_free (erreur);
 		g_free (cCommand);
-		va_end (args);
 		return FALSE;
 	}
 	
 	g_free (cCommand);
-	va_end (args);
-	return TRUE;
+	return TRUE;*/
 }
 
 gboolean cairo_dock_notification_click_icon (gpointer *data)

@@ -450,6 +450,7 @@ static void _cairo_dock_redraw_one_root_dock (gchar *cDockName, CairoDock *pDock
 	if (pDock->iRefCount == 0 && ! (data && pDock->bIsMainDock))
 	{
 		gtk_widget_queue_draw (pDock->pWidget);
+		g_print ("redessin de %s\n", cDockName);
 	}
 }
 void cairo_dock_redraw_root_docks (gboolean bExceptMainDock)
