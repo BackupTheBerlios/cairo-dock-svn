@@ -670,7 +670,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		cairo_save (pCairoContext);
 		if (icon->fWidth / fRatio != g_fActiveIndicatorWidth || icon->fHeight / fRatio != g_fActiveIndicatorHeight)
 		{
-			cairo_scale (pCairoContext, icon->fWidth / fRatio / g_fActiveIndicatorWidth, icon->fHeight / fRatio / g_fActiveIndicatorHeight);
+			cairo_scale (pCairoContext, icon->fWidth * icon->fWidthFactor * 1 / fRatio / g_fActiveIndicatorWidth, icon->fHeight * icon->fHeightFactor * 1 / fRatio / g_fActiveIndicatorHeight);
 		}
 		cairo_set_source_surface (pCairoContext, g_pActiveIndicatorSurface, 0., 0.);
 		cairo_paint (pCairoContext);
@@ -811,7 +811,7 @@ void cairo_dock_render_one_icon (Icon *icon, cairo_t *pCairoContext, gboolean bH
 		cairo_save (pCairoContext);
 		if (icon->fWidth / fRatio / (1 + g_fAmplitude) != g_fActiveIndicatorWidth || icon->fHeight / fRatio / (1 + g_fAmplitude) != g_fActiveIndicatorHeight)
 		{
-			cairo_scale (pCairoContext, icon->fWidth / fRatio / g_fActiveIndicatorWidth / (1 + g_fAmplitude), icon->fHeight / fRatio / g_fActiveIndicatorHeight / (1 + g_fAmplitude));
+			cairo_scale (pCairoContext, icon->fWidth * icon->fWidthFactor / fRatio / g_fActiveIndicatorWidth * icon->fScale / (1 + g_fAmplitude), icon->fHeight * icon->fHeightFactor / fRatio / g_fActiveIndicatorHeight * icon->fScale / (1 + g_fAmplitude));
 		}
 		cairo_set_source_surface (pCairoContext, g_pActiveIndicatorSurface, 0., 0.);
 		cairo_paint (pCairoContext);
