@@ -41,6 +41,7 @@
 #include "cairo-dock-menu.h"
 #include "cairo-dock-dock-factory.h"
 #include "cairo-dock-X-utilities.h"
+#include "cairo-dock-surface-factory.h"
 #include "cairo-dock-desklet.h"
 
 extern CairoDock *g_pMainDock;
@@ -94,7 +95,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 		
 		if (pDesklet->iDesiredWidth != 0 && pDesklet->iDesiredHeight != 0 && (pDesklet->iKnownWidth != pDesklet->iDesiredWidth || pDesklet->iKnownHeight != pDesklet->iDesiredHeight))
 		{
-			g_print ("on saute le dessin\n");
+			//g_print ("on saute le dessin\n");
 			cairo_destroy (pCairoContext);
 			return FALSE;
 		}
@@ -122,6 +123,12 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 			cairo_fill(pCairoContext);
 			cairo_restore (pCairoContext);  // retour au debut.
 		}
+		/*cairo_save (pCairoContext);
+		double fImageWidth=0, fImageHeight=0;
+		cairo_surface_t* pSurface = cairo_dock_create_surface_from_image ("/home/fab/CD/trunk/cairo-dock/data/FondDesklet.png", pCairoContext, 1, pDesklet->iWidth, pDesklet->iHeight, CAIRO_DOCK_FILL_SPACE, &fImageWidth, &fImageHeight, NULL, NULL);
+		cairo_set_source_surface (pCairoContext, pSurface, 0, 0);
+		cairo_paint (pCairoContext);
+		cairo_restore (pCairoContext);  // retour au debut.*/
 	}
 	
 	if (pDesklet->pRenderer != NULL)  // un moteur de rendu specifique a ete fourni.
@@ -130,7 +137,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 			pDesklet->pRenderer->render (pCairoContext, pDesklet, bRenderOptimized);
 	}
 	else
-		cd_warning ("Attention: no render set for this desklet");
+		cd_warning ("no render set for this desklet");
 	
 	cairo_destroy (pCairoContext);
 	return FALSE;
@@ -170,6 +177,26 @@ static gboolean _cairo_dock_write_desklet_position (CairoDesklet *pDesklet)
 			G_TYPE_INT, "Desklet", "x position", iRelativePositionX,
 			G_TYPE_INT, "Desklet", "y position", iRelativePositionY,
 			G_TYPE_INVALID);
+		
+		/*GdkBitmap* pShapeBitmap = (GdkBitmap*) gdk_pixmap_new (NULL, pDesklet->iWidth, pDesklet->iHeight, 1);
+		cairo_t* pCairoContext = gdk_cairo_create (pShapeBitmap);
+		if (cairo_status (pCairoContext) == CAIRO_STATUS_SUCCESS)
+		{
+			cairo_set_source_rgb (pCairoContext, 1, 1, 1);
+			cairo_paint (pCairoContext);
+			cairo_destroy (pCairoContext);
+		
+		
+			gtk_widget_input_shape_combine_mask (pDesklet->pWidget,
+				NULL,
+				0,
+				0);
+			gtk_widget_input_shape_combine_mask (pDesklet->pWidget,
+				pShapeBitmap,
+				0,
+				0);
+		}
+		g_object_unref ((gpointer) pShapeBitmap);*/
 	}
 	pDesklet->iSidWritePosition = 0;
 	return FALSE;
@@ -251,7 +278,7 @@ Icon *cairo_dock_find_clicked_icon_in_desklet (CairoDesklet *pDesklet)
 	return NULL;
 }
 
-static gboolean on_button_press_desklet(GtkWidget *widget,
+static gboolean on_button_press_desklet(GtkWidget *pWidget,
 	GdkEventButton *pButton,
 	CairoDesklet *pDesklet)
 {
@@ -262,6 +289,11 @@ static gboolean on_button_press_desklet(GtkWidget *widget,
 			pDesklet->diff_x = - pButton->x;  // pour le deplacement manuel.
 			pDesklet->diff_y = - pButton->y;
 			cd_debug ("diff : %d;%d", pDesklet->diff_x, pDesklet->diff_y);
+			gtk_window_begin_move_drag (GTK_WINDOW (gtk_widget_get_toplevel (pWidget)),
+				pButton->button,
+				pButton->x_root,
+				pButton->y_root,
+				pButton->time);
 		}
 		else if (pButton->type == GDK_BUTTON_RELEASE)
 		{
@@ -330,9 +362,9 @@ static gboolean on_motion_notify_desklet(GtkWidget *pWidget,
 	{
 		cd_debug ("root : %d;%d", (int) pMotion->x_root, (int) pMotion->y_root);
 		pDesklet->moving = TRUE;
-		gtk_window_move (GTK_WINDOW (pWidget),
+		/*gtk_window_move (GTK_WINDOW (pWidget),
 			pMotion->x_root + pDesklet->diff_x,
-			pMotion->y_root + pDesklet->diff_y);
+			pMotion->y_root + pDesklet->diff_y);*/
 	}
 	else  // le 'press-button' est local au sous-widget clique, alors que le 'motion-notify' est global a la fenetre; c'est donc par lui qu'on peut avoir a coup sur les coordonnees du curseur (juste avant le clic).
 	{

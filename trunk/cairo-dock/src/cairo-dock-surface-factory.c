@@ -14,8 +14,8 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 
 #include "cairo-dock-struct.h"
 #include "cairo-dock-draw.h"
-#include "cairo-dock-surface-factory.h"
 #include "cairo-dock-log.h"
+#include "cairo-dock-surface-factory.h"
 
 extern int g_tIconAuthorizedWidth[CAIRO_DOCK_NB_TYPES];
 extern int g_tIconAuthorizedHeight[CAIRO_DOCK_NB_TYPES];
@@ -283,7 +283,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (const gchar *cImagePath, 
 		rsvg_handle = rsvg_handle_new_from_file (cImagePath, &erreur);
 		if (erreur != NULL)
 		{
-			cd_warning ("Attention : %s", erreur->message);
+			cd_warning (erreur->message);
 			g_error_free (erreur);
 			return NULL;
 		}
@@ -349,7 +349,7 @@ cairo_surface_t *cairo_dock_create_surface_from_image (const gchar *cImagePath, 
 		GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file (cImagePath, &erreur);  // semble se baser sur l'extension pour definir le type !
 		if (erreur != NULL)
 		{
-			cd_warning ("Attention : %s", erreur->message);
+			cd_warning (erreur->message);
 			g_error_free (erreur);
 			return NULL;
 		}
