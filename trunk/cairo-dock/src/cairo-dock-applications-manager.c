@@ -888,27 +888,33 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 					cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Xid, &bIsFullScreen, &bIsHidden, &bIsMaximized, &bDemandsAttention);
 					g_print ("changement d'etat de %d => {%d ; %d ; %d ; %d}\n", Xid, bIsFullScreen, bIsHidden, bIsMaximized, bDemandsAttention);
 					
-					//gboolean bIsDemandingAttention = FALSE;
-					if (bDemandsAttention && (g_bDemandsAttentionWithDialog || g_bDemandsAttentionWithAnimation)/* && ! bIsDemandingAttention*/)
+					///gboolean bIsDemandingAttention = FALSE;
+					if (bDemandsAttention && (g_bDemandsAttentionWithDialog || g_bDemandsAttentionWithAnimation))
 					{
 						icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
-						g_print ("%s demande votre attention !\n", icon->acName);
-						if (g_bDemandsAttentionWithDialog)
-							cairo_dock_show_temporary_dialog (icon->acName, icon, CAIRO_CONTAINER (pDock), 2000);
-						if (g_bDemandsAttentionWithAnimation)
+						if (icon != NULL/* && ! bIsDemandingAttention*/)
 						{
-							cairo_dock_arm_animation (icon, -1, 1e6);  // animation sans fin.
-							cairo_dock_start_animation (icon, pDock);
+							g_print ("%s demande votre attention !\n", icon->acName);
+							if (g_bDemandsAttentionWithDialog)
+								cairo_dock_show_temporary_dialog (icon->acName, icon, CAIRO_CONTAINER (pDock), 2000);
+							if (g_bDemandsAttentionWithAnimation)
+							{
+								cairo_dock_arm_animation (icon, -1, 1e6);  // animation sans fin.
+								cairo_dock_start_animation (icon, pDock);
+							}
 						}
 					}
 					else if (! bDemandsAttention/* && bIsDemandingAttention*/)
 					{
 						icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
-						g_print ("%s se tait !\n", icon->acName);
-						if (g_bDemandsAttentionWithDialog)
-							cairo_dock_remove_dialog_if_any (icon);
-						if (g_bDemandsAttentionWithAnimation)
-							cairo_dock_arm_animation (icon, 0, 0);  // arrete son animation quelqu'elle soit.
+						if (icon != NULL/* && bIsDemandingAttention*/)
+						{
+							g_print ("%s se tait !\n", icon->acName);
+							if (g_bDemandsAttentionWithDialog)
+								cairo_dock_remove_dialog_if_any (icon);
+							if (g_bDemandsAttentionWithAnimation)
+								cairo_dock_arm_animation (icon, 0, 0);  // arrete son animation quelqu'elle soit.
+						}
 					}
 					if (g_bAutoHideOnMaximized || g_bAutoHideOnFullScreen)
 					{
