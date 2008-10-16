@@ -34,6 +34,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-surface-factory.h"
 #include "cairo-dock-class-manager.h"
 #include "cairo-dock-emblem.h"
+#include "cairo-dock-desklet.h"
 #include "cairo-dock-config.h"
 
 #define CAIRO_DOCK_TYPE_CONF_FILE_FILE ".cairo-dock-conf-file"
@@ -153,9 +154,6 @@ extern int g_iDialogButtonHeight;
 extern double g_fDialogColor[4];
 extern int g_iDialogIconSize;
 
-extern double g_fDeskletColor[4];
-extern double g_fDeskletColorInside[4];
-
 extern CairoDockFMSortType g_iFileSortType;
 extern gboolean g_bShowHiddenFiles;
 extern gchar *g_cRaiseDockShortcut;
@@ -172,6 +170,8 @@ extern gboolean g_bPopUp;
 extern gboolean g_bPopUpOnScreenBorder;
 extern gboolean g_bUseFakeTransparency;
 extern cairo_surface_t *g_pDesktopBgSurface;
+
+extern gchar *g_cDeskletDecorationsName;
 
 static gchar **g_cUseXIconAppliList = NULL;
 static gboolean s_bLoading = FALSE;
@@ -1061,10 +1061,28 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	cairo_dock_get_double_list_key_value (pKeyFile, "Dialogs", "text color", &bFlushConfFileNeeded, g_dialogTextDescription.fColorStart, 3, couleur_dtext, NULL, NULL);
 	memcpy (&g_dialogTextDescription.fColorStop, &g_dialogTextDescription.fColorStart, 3*sizeof (double));
 	
-	double couleur_desklett[4] = {1.0, 1.0, 1.0, 0.2};
-	cairo_dock_get_double_list_key_value (pKeyFile, "Desklets", "background color", &bFlushConfFileNeeded, g_fDeskletColor, 4, couleur_desklett, NULL, NULL);
-	couleur_desklett[3] = .6;
-	cairo_dock_get_double_list_key_value (pKeyFile, "Desklets", "background color inside", &bFlushConfFileNeeded, g_fDeskletColorInside, 4, couleur_desklett, NULL, NULL);
+	gchar *cDeskletDecorationsNameOld = g_cDeskletDecorationsName;
+	g_cDeskletDecorationsName = cairo_dock_get_string_key_value (pKeyFile, "Desklets", "decorations", &bFlushConfFileNeeded, "dark", NULL, NULL);
+	if (g_cDeskletDecorationsName == NULL || strcmp (g_cDeskletDecorationsName, "personnal") == 0)
+	{
+		CairoDeskletDecoration *pUserDeskletDecorations = cairo_dock_get_desklet_decoration ("personnal");
+		if (pUserDeskletDecorations == NULL)
+		{
+			pUserDeskletDecorations = g_new0 (CairoDeskletDecoration, 1);
+			cairo_dock_register_desklet_decoration ("personnal", pUserDeskletDecorations);
+		}
+		g_free (pUserDeskletDecorations->cBackGroundImagePath);
+		pUserDeskletDecorations->cBackGroundImagePath = cairo_dock_get_string_key_value (pKeyFile, "Desklets", "bg desklet", &bFlushConfFileNeeded, NULL, NULL, NULL);
+		g_free (pUserDeskletDecorations->cForeGroundImagePath);
+		pUserDeskletDecorations->cForeGroundImagePath = cairo_dock_get_string_key_value (pKeyFile, "Desklets", "fg desklet", &bFlushConfFileNeeded, NULL, NULL, NULL);
+		pUserDeskletDecorations->iLoadingModifier = CAIRO_DOCK_FILL_SPACE;
+		pUserDeskletDecorations->fBackGroundAlpha = cairo_dock_get_double_key_value (pKeyFile, "Desklets", "bg alpha", &bFlushConfFileNeeded, 1.0, NULL, NULL);
+		pUserDeskletDecorations->fForeGroundAlpha = cairo_dock_get_double_key_value (pKeyFile, "Desklets", "fg alpha", &bFlushConfFileNeeded, 1.0, NULL, NULL);
+		pUserDeskletDecorations->iLeftMargin = cairo_dock_get_integer_key_value (pKeyFile, "Desklets", "left offset", &bFlushConfFileNeeded, CAIRO_DOCK_FM_SORT_BY_NAME, NULL, NULL);
+		pUserDeskletDecorations->iTopMargin = cairo_dock_get_integer_key_value (pKeyFile, "Desklets", "top offset", &bFlushConfFileNeeded, CAIRO_DOCK_FM_SORT_BY_NAME, NULL, NULL);
+		pUserDeskletDecorations->iRightMargin = cairo_dock_get_integer_key_value (pKeyFile, "Desklets", "right offset", &bFlushConfFileNeeded, CAIRO_DOCK_FM_SORT_BY_NAME, NULL, NULL);
+		pUserDeskletDecorations->iBottomMargin = cairo_dock_get_integer_key_value (pKeyFile, "Desklets", "bottom offset", &bFlushConfFileNeeded, CAIRO_DOCK_FM_SORT_BY_NAME, NULL, NULL);
+	}
 	
 	g_iFileSortType = cairo_dock_get_integer_key_value (pKeyFile, "System", "sort files", &bFlushConfFileNeeded, CAIRO_DOCK_FM_SORT_BY_NAME, NULL, NULL);
 	g_bShowHiddenFiles = cairo_dock_get_boolean_key_value (pKeyFile, "System", "show hidden files", &bFlushConfFileNeeded, FALSE, NULL, NULL);
@@ -1224,7 +1242,25 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	gtk_widget_queue_draw (pDock->pWidget);  // le 'gdk_window_move_resize' ci-dessous ne provoquera pas le redessin si la taille n'a pas change.
 
 	cairo_dock_place_root_dock (pDock);
-
+	
+	if (cDeskletDecorationsNameOld == NULL && g_cDeskletDecorationsName != NULL)  // chargement initial, on charge juste ceux qui n'ont pas encore leur deco et qui ont atteint leur taille definitive.
+	{
+		cairo_dock_reload_desklets_decorations (FALSE, pCairoContext);
+	}
+	else if (cDeskletDecorationsNameOld != NULL && (g_cDeskletDecorationsName == NULL || strcmp (cDeskletDecorationsNameOld, g_cDeskletDecorationsName) != 0))  // le theme par defaut a change, on recharge les desklets qui utilisent le theme "default".
+	{
+		cairo_dock_reload_desklets_decorations (TRUE, pCairoContext);
+	}
+	else if (g_cDeskletDecorationsName != NULL && strcmp (g_cDeskletDecorationsName, "personnal") == 0)  // on a configure le theme personnel, il peut avoir change.
+	{
+		cairo_dock_reload_desklets_decorations (TRUE, pCairoContext);
+	}
+	else  // on charge juste ceux qui n'ont pas encore leur deco et qui ont atteint leur taille definitive.
+	{
+		cairo_dock_reload_desklets_decorations (FALSE, pCairoContext);
+	}
+	g_free (cDeskletDecorationsNameOld);
+	
 	//\___________________ On ecrit si necessaire.
 	if (! bFlushConfFileNeeded)
 		bFlushConfFileNeeded = cairo_dock_conf_file_needs_update (pKeyFile, CAIRO_DOCK_VERSION);
@@ -1239,6 +1275,8 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	}
 
 	cairo_dock_update_renderer_list_for_gui ();
+	cairo_dock_update_desklet_decorations_list_for_gui ();
+	cairo_dock_update_desklet_decorations_list_for_applet_gui ();
 	
 	if (g_cRaiseDockShortcut != NULL)
 	{
@@ -1665,8 +1703,7 @@ void cairo_dock_copy_easy_conf_file (gchar *cEasyConfFilePath, GKeyFile *pMainKe
 
 	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "font size", pMainKeyFile, "Icons", "size");
 	
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "desklet bg color", pMainKeyFile, "Desklets", "background color");
-	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "desklet bg color inside", pMainKeyFile, "Desklets", "background color inside");
+	cairo_dock_copy_value_to_keyfile (pKeyFile, "Personnalisation", "desklet decorations", pMainKeyFile, "Desklets", "decorations");
 	
 	g_key_file_free (pKeyFile);
 }
@@ -1733,8 +1770,7 @@ void cairo_dock_copy_to_easy_conf_file (GKeyFile *pMainKeyFile, gchar *cEasyConf
 
 	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Icons", "size", pKeyFile, "Personnalisation", "font size");
 	
-	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Desklets", "background color", pKeyFile, "Personnalisation", "desklet bg color");
-	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Desklets", "background color inside", pKeyFile, "Personnalisation", "desklet bg color inside");
+	cairo_dock_copy_value_to_keyfile (pMainKeyFile, "Desklets", "decorations", pKeyFile, "Personnalisation", "desklet decorations");
 	
 	//\___________________ On ecrit tout.
 	cairo_dock_write_keys_to_file (pKeyFile, cEasyConfFilePath);

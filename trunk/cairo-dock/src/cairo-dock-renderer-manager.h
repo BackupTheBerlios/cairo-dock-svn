@@ -22,6 +22,11 @@ CairoDialogRenderer *cairo_dock_get_dialog_renderer (const gchar *cRendererName)
 void cairo_dock_register_dialog_renderer (const gchar *cRendererName, CairoDialogRenderer *pRenderer);
 void cairo_dock_remove_dialog_renderer (const gchar *cRendererName);
 
+CairoDeskletDecoration *cairo_dock_get_desklet_decoration (const gchar *cDecorationName);
+void cairo_dock_register_desklet_decoration (const gchar *cDecorationName, CairoDeskletDecoration *pDecoration);
+void cairo_dock_remove_desklet_decoration (const gchar *cDecorationName);
+void cairo_dock_free_desklet_decoration (CairoDeskletDecoration *pDecoration);
+
 
 void cairo_dock_initialize_renderer_manager (void);
 
@@ -40,6 +45,8 @@ void cairo_dock_render_dialog_with_new_data (CairoDialog *pDialog, CairoDialogRe
 
 
 void cairo_dock_update_renderer_list_for_gui (void);
+void cairo_dock_update_desklet_decorations_list_for_gui (void);
+void cairo_dock_update_desklet_decorations_list_for_applet_gui (void);
 
 
 G_END_DECLS

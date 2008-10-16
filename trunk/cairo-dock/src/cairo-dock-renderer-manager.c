@@ -26,9 +26,12 @@ extern gchar *g_cSubDockDefaultRendererName;
 
 extern int g_iDockRadius;
 
+extern gchar *g_cDeskletDecorationsName;
+
 static GHashTable *s_hRendererTable = NULL;  // table des fonctions de rendus de dock.
 static GHashTable *s_hDeskletRendererTable = NULL;  // table des fonctions de rendus des desklets.
 static GHashTable *s_hDialogRendererTable = NULL;  // table des fonctions de rendus des dialogues.
+static GHashTable *s_hDeskletDecorationsTable = NULL;  // table des decorations des desklets.
 
 
 CairoDockRenderer *cairo_dock_get_renderer (const gchar *cRendererName, gboolean bForMainDock)
@@ -129,6 +132,40 @@ void cairo_dock_remove_dialog_renderer (const gchar *cRendererName)
 }
 
 
+
+
+CairoDeskletDecoration *cairo_dock_get_desklet_decoration (const gchar *cDecorationName)
+{
+	g_print ("%s (%s)\n", __func__, cDecorationName);
+	if (cDecorationName != NULL)
+		return g_hash_table_lookup (s_hDeskletDecorationsTable, cDecorationName);
+	else if (g_cDeskletDecorationsName != NULL)
+		return g_hash_table_lookup (s_hDeskletDecorationsTable, g_cDeskletDecorationsName);
+	else
+		return NULL;
+}
+
+void cairo_dock_register_desklet_decoration (const gchar *cDecorationName, CairoDeskletDecoration *pDecoration)
+{
+	cd_message ("%s (%s)", __func__, cDecorationName);
+	g_hash_table_insert (s_hDeskletDecorationsTable, g_strdup (cDecorationName), pDecoration);
+}
+
+void cairo_dock_remove_desklet_decoration (const gchar *cDecorationName)
+{
+	g_hash_table_remove (s_hDeskletDecorationsTable, cDecorationName);
+}
+
+void cairo_dock_free_desklet_decoration (CairoDeskletDecoration *pDecoration)
+{
+	if (pDecoration == NULL)
+		return ;
+	g_free (pDecoration->cBackGroundImagePath);
+	g_free (pDecoration->cForeGroundImagePath);
+	g_free (pDecoration);
+}
+
+
 void cairo_dock_initialize_renderer_manager (void)
 {
 	g_return_if_fail (s_hRendererTable == NULL);
@@ -148,6 +185,11 @@ void cairo_dock_initialize_renderer_manager (void)
 		g_str_equal,
 		g_free,
 		g_free);
+	
+	s_hDeskletDecorationsTable = g_hash_table_new_full (g_str_hash,
+		g_str_equal,
+		g_free,
+		(GFreeFunc) cairo_dock_free_desklet_decoration);
 	
 	cairo_dock_register_default_renderer ();
 }
@@ -284,4 +326,14 @@ void cairo_dock_render_dialog_with_new_data (CairoDialog *pDialog, CairoDialogRe
 void cairo_dock_update_renderer_list_for_gui (void)
 {
 	cairo_dock_build_renderer_list_for_gui (s_hRendererTable);
+}
+
+void cairo_dock_update_desklet_decorations_list_for_gui (void)
+{
+	cairo_dock_build_desklet_decorations_list_for_gui (s_hDeskletDecorationsTable);
+}
+
+void cairo_dock_update_desklet_decorations_list_for_applet_gui (void)
+{
+	cairo_dock_build_desklet_decorations_list_for_applet_gui (s_hDeskletDecorationsTable);
 }

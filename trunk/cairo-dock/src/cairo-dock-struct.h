@@ -30,6 +30,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 
 typedef struct _CairoDockRenderer CairoDockRenderer;
 typedef struct _CairoDeskletRenderer CairoDeskletRenderer;
+typedef struct _CairoDeskletDecoration CairoDeskletDecoration;
 typedef struct _CairoDialogRenderer CairoDialogRenderer;
 
 typedef struct _Icon Icon;
@@ -378,6 +379,8 @@ struct _CairoDockMinimalAppletConfig {
 	gboolean bKeepAbove;
 	gboolean bOnWidgetLayer;
 	gboolean bPositionLocked;
+	gchar *cDecorationTheme;
+	CairoDeskletDecoration *pUserDecoration;
 };
 
 
@@ -616,6 +619,8 @@ struct _Icon {
 	gboolean bIsFullScreen;
 	/// TRUE ssi la fenetre est en mode maximisee.
 	gboolean bIsMaximized;
+	/// TRUE ssi la fenetre demande l'attention ou est en mode urgente.
+	gboolean bIsDemandingAttention;
 	//\____________ Pour les modules.
 	/// Instance de module que represente l'icone.
 	CairoDockModuleInstance *pModuleInstance;
@@ -780,8 +785,42 @@ struct _CairoDesklet {
 	gint iDesiredWidth, iDesiredHeight;
 	/// taille connue par l'applet associee.
 	gint iKnownWidth, iKnownHeight;
+	/// les decorations.
+	gchar *cDecorationTheme;
+	CairoDeskletDecoration *pUserDecoration;
+	gint iLeftSurfaceOffset;
+        gint iTopSurfaceOffset;
+        gint iRightSurfaceOffset;
+        gint iBottomSurfaceOffset;
+        cairo_surface_t *pBackGroundSurface;
+        cairo_surface_t *pForeGroundSurface;
+        gdouble fImageWidth;
+        gdouble fImageHeight;
+	gdouble fBackGroundAlpha;
+        gdouble fForeGroundAlpha;
+	/// rotation.
+	gdouble fRotation;
+	/// date du clic.
+	guint time;
 };
 
+typedef enum {
+	CAIRO_DOCK_FILL_SPACE 		= 0,
+	CAIRO_DOCK_KEEP_RATIO 		= 1<<0,
+	CAIRO_DOCK_DONT_ZOOM_IN 	= 1<<1
+	} CairoDockLoadImageModifier;
+
+struct _CairoDeskletDecoration {
+	gchar *cBackGroundImagePath;
+	gchar *cForeGroundImagePath;
+	CairoDockLoadImageModifier iLoadingModifier;
+	gdouble fBackGroundAlpha;
+        gdouble fForeGroundAlpha;
+	gint iLeftMargin;
+	gint iTopMargin;
+	gint iRightMargin;
+	gint iBottomMargin;
+	};
 
 #define CAIRO_DOCK_FM_VFS_ROOT "_vfsroot_"
 #define CAIRO_DOCK_FM_NETWORK "_network_"
@@ -928,11 +967,5 @@ typedef enum {
 	CAIRO_DOCK_LAUNCHER_FOR_SEPARATOR,
 	CAIRO_DOCK_NB_NEW_LAUNCHER_TYPE
 	} CairoDockNewLauncherType;
-
-typedef enum {
-	CAIRO_DOCK_FILL_SPACE 		= 0,
-	CAIRO_DOCK_KEEP_RATIO 		= 1<<0,
-	CAIRO_DOCK_DONT_ZOOM_IN 	= 1<<1
-	} CairoDockLoadImageModifier;
 
 #endif

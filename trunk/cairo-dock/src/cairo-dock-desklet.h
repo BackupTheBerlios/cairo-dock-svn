@@ -61,11 +61,11 @@ CairoDesklet *cairo_dock_create_desklet (Icon *pIcon, GtkWidget *pInteractiveWid
 Icon *cairo_dock_find_clicked_icon_in_desklet (CairoDesklet *pDesklet);
 
 /**
-* Place entièrement un desklet en fonction de ses paramètres de sauvegarde extraits d'un fichier de conf. Le place, le dimensionne, le garde devant/derrière, vérouille sa position, et le place sur la couche des widgets.
+* Configure entièrement un desklet en fonction de ses paramètres de sauvegarde extraits d'un fichier de conf. Le place, le dimensionne, le garde devant/derrière, vérouille sa position, et le place sur la couche des widgets, et pour finir definit ses decorations.
 *@param pDesklet le desklet à placer.
 *@param pMinimalConfig la config minimale du desklet, contenant tous les paramètres necessaires.
 */
-void cairo_dock_place_desklet (CairoDesklet *pDesklet, CairoDockMinimalAppletConfig *pMinimalConfig);
+void cairo_dock_configure_desklet (CairoDesklet *pDesklet, CairoDockMinimalAppletConfig *pMinimalConfig);
 
 /**
 * Détache un GtkWidget d'un desklet, le rendant libre d'être inséré autre part.
@@ -118,6 +118,15 @@ CairoDesklet *cairo_dock_get_desklet_by_Xid (Window Xid);
 *@param pDesklet le desklet.
 */
 void cairo_dock_zoom_out_desklet (CairoDesklet *pDesklet);
+
+
+void cairo_dock_load_desklet_decorations (CairoDesklet *pDesklet, cairo_t *pSourceContext);
+
+
+void cairo_dock_free_minimal_config (CairoDockMinimalAppletConfig *pMinimalConfig);
+
+void cairo_dock_reload_desklets_decorations (gboolean bDefaultThemeOnly, cairo_t *pSourceContext);
+
 
 G_END_DECLS
 

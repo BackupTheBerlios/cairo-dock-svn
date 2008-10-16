@@ -37,17 +37,6 @@ extern CairoDockLabelDescription g_quickInfoTextDescription;
 extern gboolean g_bTextAlwaysHorizontal;
 
 
-void cairo_dock_free_minimal_config (CairoDockMinimalAppletConfig *pMinimalConfig)
-{
-	if (pMinimalConfig == NULL)
-		return;
-	g_free (pMinimalConfig->cLabel);
-	g_free (pMinimalConfig->cIconFileName);
-	g_free (pMinimalConfig->cDockName);
-	g_free (pMinimalConfig);
-}
-
-
 void cairo_dock_set_icon_surface_full (cairo_t *pIconContext, cairo_surface_t *pSurface, double fScale, double fAlpha, Icon *pIcon, CairoContainer *pContainer)
 {
 	g_return_if_fail (cairo_status (pIconContext) == CAIRO_STATUS_SUCCESS);

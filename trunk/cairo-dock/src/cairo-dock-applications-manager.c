@@ -888,13 +888,13 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 					cairo_dock_window_is_fullscreen_or_hidden_or_maximized (Xid, &bIsFullScreen, &bIsHidden, &bIsMaximized, &bDemandsAttention);
 					g_print ("changement d'etat de %d => {%d ; %d ; %d ; %d}\n", Xid, bIsFullScreen, bIsHidden, bIsMaximized, bDemandsAttention);
 					
-					///gboolean bIsDemandingAttention = FALSE;
 					if (bDemandsAttention && (g_bDemandsAttentionWithDialog || g_bDemandsAttentionWithAnimation))
 					{
 						icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
-						if (icon != NULL/* && ! bIsDemandingAttention*/)
+						if (icon != NULL && ! icon->bIsDemandingAttention)
 						{
 							g_print ("%s demande votre attention !\n", icon->acName);
+							icon->bIsDemandingAttention = TRUE;
 							if (g_bDemandsAttentionWithDialog)
 								cairo_dock_show_temporary_dialog (icon->acName, icon, CAIRO_CONTAINER (pDock), 2000);
 							if (g_bDemandsAttentionWithAnimation)
@@ -904,12 +904,13 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 							}
 						}
 					}
-					else if (! bDemandsAttention/* && bIsDemandingAttention*/)
+					else if (! bDemandsAttention)
 					{
 						icon = g_hash_table_lookup (s_hXWindowTable, &Xid);
-						if (icon != NULL/* && bIsDemandingAttention*/)
+						if (icon != NULL && icon->bIsDemandingAttention)
 						{
 							g_print ("%s se tait !\n", icon->acName);
+							icon->bIsDemandingAttention = FALSE;
 							if (g_bDemandsAttentionWithDialog)
 								cairo_dock_remove_dialog_if_any (icon);
 							if (g_bDemandsAttentionWithAnimation)

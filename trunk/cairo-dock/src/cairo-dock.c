@@ -204,9 +204,6 @@ double g_fDialogColor[4];
 int g_iDialogIconSize;
 CairoDockLabelDescription g_dialogTextDescription;
 
-double g_fDeskletColor[4];
-double g_fDeskletColorInside[4];
-
 gchar *g_cRaiseDockShortcut = NULL;
 
 gboolean g_bKeepAbove = FALSE;
@@ -246,6 +243,8 @@ gboolean g_bDisplayDropEmblem = FALSE; // indicateur de drop
 gchar *g_cThemeServerAdress = NULL;
 gboolean g_bEasterEggs = FALSE;
 gboolean g_bLocked = FALSE;
+
+gchar *g_cDeskletDecorationsName = NULL;
 
 static gchar *cLaunchCommand = NULL;
 

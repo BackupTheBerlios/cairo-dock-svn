@@ -19,11 +19,11 @@ msgstr ""
 "X-Poedit-SourceCharset: utf-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../src/cairo-dock-callbacks.c:1173
+#: ../src/cairo-dock-callbacks.c:1172
 msgid "Do you want to mount this point ?"
 msgstr "Vill du montera denna plats?"
 
-#: ../src/cairo-dock-callbacks.c:1914
+#: ../src/cairo-dock-callbacks.c:1913
 msgid "Quit Cairo-Dock ?"
 msgstr "Avsluta Cairo-Dock?"
 
@@ -57,7 +57,7 @@ msgstr "montera"
 msgid "unmount"
 msgstr "avmontera"
 
-#: ../src/cairo-dock-gui-factory.c:1569
+#: ../src/cairo-dock-gui-factory.c:1622
 msgid "grab"
 msgstr "fånga"
 
@@ -336,7 +336,7 @@ msgstr "Alltid under"
 msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr "Ange beteendet i Compiz med: (name=cairo-dock & type=utility)"
 
-#: ../src/cairo-dock-modules.c:797 ../src/cairo-dock-modules.c:820
+#: ../src/cairo-dock-modules.c:819 ../src/cairo-dock-modules.c:842
 #, c-format
 msgid "Configuration of %s"
 msgstr "Inställningar för %s"
@@ -392,22 +392,22 @@ msgstr ""
 msgid "Are you sure you want to overwrite theme %s ?"
 msgstr "Är du säker på att du vill skriva över tema %s?"
 
-#: ../src/cairo-dock.c:620
+#: ../src/cairo-dock.c:619
 msgid "< Maintenance mode >"
 msgstr "< Underhållsläge >"
 
 # #################################
 # ########### cairo-dock.conf #############
 # #################################
-#: ../data/messages:1 ../data/messages:805
+#: ../data/messages:1 ../data/messages:829
 msgid "Position"
 msgstr "Placering"
 
-#: ../data/messages:3 ../data/messages:627 ../data/messages:807
+#: ../data/messages:3 ../data/messages:653 ../data/messages:831
 msgid "Position on the screen"
 msgstr "Placering på skärmen"
 
-#: ../data/messages:5 ../data/messages:629 ../data/messages:809
+#: ../data/messages:5 ../data/messages:655 ../data/messages:833
 msgid ""
 "The icons will scroll according to the chosen placement type. Of course the "
 "dock can be placed anywhere on the screen, here we specify regarding to what."
@@ -415,28 +415,28 @@ msgstr ""
 "Ikonerna kommer att bläddras enligt vald placering. Dockan kan placeras var "
 "som helst på skärmen, bläddring sker i förhållande till detta."
 
-#: ../data/messages:7 ../data/messages:631 ../data/messages:811
+#: ../data/messages:7 ../data/messages:657 ../data/messages:835
 msgid ""
 "Choose the screen border regarding to which the dock will place itself :"
 msgstr "Skärmkant för dockan:"
 
-#: ../data/messages:9 ../data/messages:633 ../data/messages:813
+#: ../data/messages:9 ../data/messages:659 ../data/messages:837
 msgid "bottom"
 msgstr "nederkant"
 
-#: ../data/messages:11 ../data/messages:635 ../data/messages:815
+#: ../data/messages:11 ../data/messages:661 ../data/messages:839
 msgid "top"
 msgstr "ovankant"
 
-#: ../data/messages:13 ../data/messages:637 ../data/messages:817
+#: ../data/messages:13 ../data/messages:663 ../data/messages:841
 msgid "right"
 msgstr "högerkant"
 
-#: ../data/messages:15 ../data/messages:639 ../data/messages:819
+#: ../data/messages:15 ../data/messages:665 ../data/messages:843
 msgid "left"
 msgstr "västerkant"
 
-#: ../data/messages:17 ../data/messages:821
+#: ../data/messages:17 ../data/messages:845
 msgid ""
 "At 0, the dock will place itself regarding the left corner if horizontal and "
 "the top corner if vertical, at 1 regarding the right corner if horizontal "
@@ -448,15 +448,15 @@ msgstr ""
 "att placera sig i förhållande till högerkanten vid horisontell placering och "
 "i förhållande till underkant vid vertikal placering."
 
-#: ../data/messages:19 ../data/messages:823
+#: ../data/messages:19 ../data/messages:847
 msgid "Relative alignment :"
 msgstr "Relativ justering:"
 
-#: ../data/messages:21 ../data/messages:825
+#: ../data/messages:21 ../data/messages:849
 msgid "Position regarding the chosen screen's edge"
 msgstr "Placering i förhållande till vald skärmkant"
 
-#: ../data/messages:23 ../data/messages:827
+#: ../data/messages:23 ../data/messages:851
 msgid ""
 "Gap from the absolute position on the screen's edge, in pixels. You can also "
 "move the dock by holding ALT or CTRL key and left mouse button."
@@ -464,11 +464,11 @@ msgstr ""
 "Avstånd i pixlar från vald skärmkant. Du kan också flytta fönstret genom att "
 "trycka CTRL eller ALT och sedan dra fönstret med musen. "
 
-#: ../data/messages:25 ../data/messages:829
+#: ../data/messages:25 ../data/messages:853
 msgid "Lateral gap :"
 msgstr "Parallellt avstånd:"
 
-#: ../data/messages:27 ../data/messages:831
+#: ../data/messages:27 ../data/messages:855
 msgid ""
 "in pixels. You can also move the dock by holding ALT or CTRL key and left "
 "mouse button."
@@ -476,7 +476,7 @@ msgstr ""
 "Avstånd i pixlar från vald skärmkant. Du kan också flytta fönstret genom att "
 "trycka CTRL eller ALT och sedan dra fönstret med musen. "
 
-#: ../data/messages:29 ../data/messages:833
+#: ../data/messages:29 ../data/messages:857
 msgid "Distance to the screen's edge :"
 msgstr "Vinkelrät avstånd:"
 
@@ -505,7 +505,7 @@ msgstr ""
 msgid "Reserve space at the edge of the screen for the dock ?"
 msgstr "Reservera utrymme för dockan vid skärmkanten?"
 
-#: ../data/messages:39 ../data/messages:643 ../data/messages:835
+#: ../data/messages:39 ../data/messages:669 ../data/messages:859
 msgid ""
 "The dock will automatically hide itself outside of the scren when the mouse "
 "leaves it and will show a callback zone instead. Place the mouse into this "
@@ -514,7 +514,7 @@ msgstr ""
 "Dockan kommer att döljas automatiskt när musen lämnar fönstret och en "
 "aktiveringszon visas istället. För in musen i zonen för att visa dockan igen."
 
-#: ../data/messages:41 ../data/messages:645 ../data/messages:837
+#: ../data/messages:41 ../data/messages:671 ../data/messages:861
 msgid "Activate auto-hide ?"
 msgstr "Dölj automatiskt?"
 
@@ -549,7 +549,7 @@ msgstr ""
 msgid "Keyboard shortcut to show/hide the dock :"
 msgstr "Tangentkombination för att visa/dölja dockan:"
 
-#: ../data/messages:53 ../data/messages:647
+#: ../data/messages:53 ../data/messages:673
 msgid "TaskBar"
 msgstr "Aktivitetsfält"
 
@@ -557,7 +557,7 @@ msgstr "Aktivitetsfält"
 msgid "Behaviour"
 msgstr "Beteende"
 
-#: ../data/messages:57 ../data/messages:649
+#: ../data/messages:57 ../data/messages:675
 msgid ""
 "Cairo-Dock will then replace your taskbar. It is recommanded to remove any "
 "other taskbar, and to not force the dock's type to normal."
@@ -565,7 +565,7 @@ msgstr ""
 "Cairo-Dock ersätter din fönsterlista. Vi rekommenderar att du tar bort andra "
 "fönsterlistor och undviker att tvinga dockans typ till normal."
 
-#: ../data/messages:59 ../data/messages:651
+#: ../data/messages:59 ../data/messages:677
 msgid "Show the current applications in the dock ?"
 msgstr "Visa aktiva program?"
 
@@ -713,7 +713,7 @@ msgstr ""
 msgid "Transparency of icons whose window is or isn't minimized :"
 msgstr "Ikoners genomskinlighet för synliga och minimerade fönster:"
 
-#: ../data/messages:117 ../data/messages:625
+#: ../data/messages:117 ../data/messages:651
 msgid "System"
 msgstr "System"
 
@@ -877,7 +877,7 @@ msgstr ""
 msgid "Reflections should be calculated in real-time ?"
 msgstr "Beräkna reflektioner i realtid?"
 
-#: ../data/messages:185 ../data/messages:749
+#: ../data/messages:185 ../data/messages:775
 msgid "Labels"
 msgstr "Etiketter"
 
@@ -945,12 +945,12 @@ msgstr ""
 msgid "Applets"
 msgstr "Applets"
 
-#: ../data/messages:215 ../data/messages:653
+#: ../data/messages:215 ../data/messages:679
 msgid "Choose some useful accessories for your dock !"
 msgstr "Välj användbara tillbehör!"
 
 #: ../data/messages:217 ../data/messages:223 ../data/messages:229
-#: ../data/messages:655 ../data/messages:661 ../data/messages:667
+#: ../data/messages:681 ../data/messages:687 ../data/messages:693
 msgid ""
 "Just check the box to activate a plug-in, or uncheck to deactivate it. Once "
 "activated, you can use it and configure it."
@@ -958,23 +958,23 @@ msgstr ""
 "Markera för att aktivera. Klicka på Inställningar för att konfigurera "
 "appleten."
 
-#: ../data/messages:219 ../data/messages:657
+#: ../data/messages:219 ../data/messages:683
 msgid "List of available accessories :"
 msgstr "Tillbehör:"
 
-#: ../data/messages:221 ../data/messages:659
+#: ../data/messages:221 ../data/messages:685
 msgid "Add fonctionnalities to your dock !"
 msgstr "Lägg till funktionalitet!"
 
-#: ../data/messages:225 ../data/messages:663
+#: ../data/messages:225 ../data/messages:689
 msgid "List of available desktop enhancements :"
 msgstr "Förbättringar:"
 
-#: ../data/messages:227 ../data/messages:665
+#: ../data/messages:227 ../data/messages:691
 msgid "Control your PC from your dock !"
 msgstr "Kontrollera din dator!"
 
-#: ../data/messages:231 ../data/messages:669
+#: ../data/messages:231 ../data/messages:695
 msgid "List of available controlers :"
 msgstr "Kontrollprogram:"
 
@@ -994,13 +994,13 @@ msgstr "Placera musen i zonen för att visa dockan."
 msgid "Size of the callback zone (width x height, in pixels) :"
 msgstr "Zonens storlek (bredd x höjd, i pixlar):"
 
-#: ../data/messages:241 ../data/messages:685
+#: ../data/messages:241 ../data/messages:711
 msgid ""
 "Any format allowed; let this field empty to have an invisible callback zone. "
 "The callback zone is what you see when the dock hides itselfs."
 msgstr "Alla format stöds: lämna tomt för att dölja aktiveringszonen."
 
-#: ../data/messages:243 ../data/messages:687
+#: ../data/messages:243 ../data/messages:713
 msgid "Filename of an image to put on the callback zone :"
 msgstr "Bild att visa i zonen:"
 
@@ -1051,13 +1051,13 @@ msgstr "Ska de nedre hörnen avrundas?"
 msgid "Background image..."
 msgstr "Bakgrundsbild ... "
 
-#: ../data/messages:271 ../data/messages:681
+#: ../data/messages:271 ../data/messages:707
 msgid ""
 "Any format allowed; let this field empty if you don't want to use an image "
 "as background."
 msgstr "Alla format stöds: lämna tomt om du vill använda färgtoning."
 
-#: ../data/messages:273 ../data/messages:683
+#: ../data/messages:273 ../data/messages:709
 msgid "Image's filename to use as a background :"
 msgstr "Bakgrundsbild:"
 
@@ -1188,15 +1188,15 @@ msgstr "Fältdjup för vyn:"
 msgid "Style of the icons' labels"
 msgstr "Ikonetiketter"
 
-#: ../data/messages:327 ../data/messages:519 ../data/messages:755
+#: ../data/messages:327 ../data/messages:519 ../data/messages:781
 msgid "approximately size in pixels, put 0 to not display labels"
 msgstr "Ungefärlig storlek i pixlar. Ange 0 för att dölja etiketter."
 
-#: ../data/messages:329 ../data/messages:521 ../data/messages:757
+#: ../data/messages:329 ../data/messages:521 ../data/messages:783
 msgid "Size of the font :"
 msgstr "Teckenstorlek:"
 
-#: ../data/messages:331 ../data/messages:523 ../data/messages:751
+#: ../data/messages:331 ../data/messages:523 ../data/messages:777
 msgid ""
 "for exemple Monospace, Purisa, ... Just write the font name wihtout any "
 "number or so."
@@ -1204,7 +1204,7 @@ msgstr ""
 "T ex Monospace, Purisa, sans... Ange endast namnet utan storlek eller "
 "liknande"
 
-#: ../data/messages:333 ../data/messages:525 ../data/messages:753
+#: ../data/messages:333 ../data/messages:525 ../data/messages:779
 msgid "Family of the font used for labels :"
 msgstr "Typsnitt för etiketter:"
 
@@ -1279,11 +1279,11 @@ msgstr "Bredd på snöret, i pixlar (ange 0 för att inaktivera)"
 msgid "Color of the string (red, blue, green, alpha) :"
 msgstr "Färg på snöret (röd, grön, blå, alfa):"
 
-#: ../data/messages:365 ../data/messages:703
+#: ../data/messages:365 ../data/messages:729
 msgid "Icons' themes"
 msgstr "Ikonteman"
 
-#: ../data/messages:367 ../data/messages:705
+#: ../data/messages:367 ../data/messages:731
 #, fuzzy
 msgid ""
 "Directories or themes where to search icons. Put some directories where you "
@@ -1297,7 +1297,7 @@ msgstr ""
 "vid sökning). Nyckelordet _ThemeDirectory_ kan användas för att referera "
 "till mappen ~/.cairo-dock/current_theme/launchers."
 
-#: ../data/messages:369 ../data/messages:707
+#: ../data/messages:369 ../data/messages:733
 msgid "List of icons themes or directories :"
 msgstr "Teman och mappar:"
 
@@ -1320,37 +1320,37 @@ msgid "Animation type when clicked :"
 msgstr "Animering vid klick:"
 
 #: ../data/messages:379 ../data/messages:403 ../data/messages:427
-#: ../data/messages:713 ../data/messages:729
+#: ../data/messages:739 ../data/messages:755
 msgid "bounce"
 msgstr "studsa"
 
 #: ../data/messages:381 ../data/messages:405 ../data/messages:429
-#: ../data/messages:715 ../data/messages:731
+#: ../data/messages:741 ../data/messages:757
 msgid "rotate"
 msgstr "rotera"
 
 #: ../data/messages:383 ../data/messages:407 ../data/messages:431
-#: ../data/messages:717 ../data/messages:733
+#: ../data/messages:743 ../data/messages:759
 msgid "blink"
 msgstr "blinka"
 
 #: ../data/messages:385 ../data/messages:409 ../data/messages:433
-#: ../data/messages:719 ../data/messages:735
+#: ../data/messages:745 ../data/messages:761
 msgid "pulse"
 msgstr "pulsera"
 
 #: ../data/messages:387 ../data/messages:411 ../data/messages:435
-#: ../data/messages:721 ../data/messages:737
+#: ../data/messages:747 ../data/messages:763
 msgid "upside-down"
 msgstr "upp och ner"
 
 #: ../data/messages:389 ../data/messages:413 ../data/messages:437
-#: ../data/messages:723 ../data/messages:739
+#: ../data/messages:749 ../data/messages:765
 msgid "wobbly"
 msgstr "vingla"
 
 #: ../data/messages:391 ../data/messages:415 ../data/messages:439
-#: ../data/messages:725 ../data/messages:741
+#: ../data/messages:751 ../data/messages:767
 msgid "random"
 msgstr "slumpmässig"
 
@@ -1379,11 +1379,11 @@ msgstr ""
 msgid "Automatically add separators ?"
 msgstr "Skapa avgränsare automatiskt?"
 
-#: ../data/messages:453 ../data/messages:689
+#: ../data/messages:453 ../data/messages:715
 msgid "If you don't provide one, blanks will be used."
 msgstr "Om du inte anger något, kommer blanka att användas."
 
-#: ../data/messages:455 ../data/messages:691
+#: ../data/messages:455 ../data/messages:717
 msgid "Filename of an image to use for separators :"
 msgstr "Bild att använda som avgränsare:"
 
@@ -1413,7 +1413,7 @@ msgstr ""
 msgid "Allow applets to be placed amongst launchers ?"
 msgstr "Tillåt applets bland startare?"
 
-#: ../data/messages:467 ../data/messages:673
+#: ../data/messages:467 ../data/messages:699
 msgid "Views"
 msgstr "Utseende"
 
@@ -1421,7 +1421,7 @@ msgstr "Utseende"
 msgid "Main Dock"
 msgstr "Huvuddocka"
 
-#: ../data/messages:471 ../data/messages:675
+#: ../data/messages:471 ../data/messages:701
 msgid "Choose the default view for root docks :"
 msgstr "Välj standardutseende på huvuddockan:"
 
@@ -1433,7 +1433,7 @@ msgstr "Sub-dockor"
 msgid "You can overwrite this parameter for each sub-dock."
 msgstr "Du kan ändra denna inställning för varje sub-docka."
 
-#: ../data/messages:477 ../data/messages:677
+#: ../data/messages:477 ../data/messages:703
 msgid "Choose the default view for sub-docks :"
 msgstr "Välj standardutseende för sub-dockor:"
 
@@ -1467,10 +1467,10 @@ msgstr "Knappar"
 msgid "Size of buttons in the info-bubbles (width x height) :"
 msgstr "Storlek på knappar i info-bubblor (bredd x höjd):"
 
-#: ../data/messages:495 ../data/messages:499 ../data/messages:593
-#: ../data/messages:597 ../data/messages:601 ../data/messages:605
-#: ../data/messages:609 ../data/messages:613 ../data/messages:617
-#: ../data/messages:621
+#: ../data/messages:495 ../data/messages:499 ../data/messages:619
+#: ../data/messages:623 ../data/messages:627 ../data/messages:631
+#: ../data/messages:635 ../data/messages:639 ../data/messages:643
+#: ../data/messages:647
 msgid "If you don't provide any, a default image will be used."
 msgstr "Om du inte anger något, kommer en standardbild att användas."
 
@@ -1518,27 +1518,102 @@ msgstr ""
 msgid "Homogeneous with icons' label ?"
 msgstr "Samma som ikonetiketter?"
 
-#: ../data/messages:531 ../data/messages:759
+#: ../data/messages:531 ../data/messages:785
 msgid "Desklets"
 msgstr "Desklets"
 
 #: ../data/messages:533
-msgid "Background color (r,v,b,a) :"
-msgstr "Bakgrundsfärg (r,g,b,a) - inaktiv:"
+#, fuzzy
+msgid "Choose a default decoration for all desklets :"
+msgstr "Välj standardutseende på huvuddockan:"
 
 #: ../data/messages:535
-msgid "Background color when mouse hovers it (r,v,b,a) :"
-msgstr "Bakgrundsfärg (r,g,b,a) - aktiv:"
+#, fuzzy
+msgid ""
+"It's an image that will be displayed below the drawings, like a frame for "
+"exemple. Let empty to not use any."
+msgstr ""
+"Bild som visas för att ange att det går att släppa objektet på den. Lämna "
+"tomt för att använda standardbild."
 
 #: ../data/messages:537
+#, fuzzy
+msgid "Background image :"
+msgstr "Bakgrundsbild ... "
+
+#: ../data/messages:539
+#, fuzzy
+msgid "Background tansparency :"
+msgstr "Genomskinlighet för bilden:"
+
+#: ../data/messages:541
+#, fuzzy
+msgid "in pixels. Use this to adjust the left position of the drawings."
+msgstr "i pixlar. Använd för att ange indikatorns vertikala placering."
+
+#: ../data/messages:543
+#, fuzzy
+msgid "Left offset :"
+msgstr "Vertikal justering:"
+
+#: ../data/messages:545
+#, fuzzy
+msgid "in pixels. Use this to adjust the top position of the drawings."
+msgstr "i pixlar. Använd för att ange indikatorns vertikala placering."
+
+#: ../data/messages:547
+#, fuzzy
+msgid "Top offset :"
+msgstr "Vertikal justering:"
+
+#: ../data/messages:549
+#, fuzzy
+msgid "in pixels. Use this to adjust the right position of the drawings."
+msgstr "i pixlar. Använd för att ange indikatorns vertikala placering."
+
+#: ../data/messages:551
+#, fuzzy
+msgid "Right offset :"
+msgstr "Vertikal justering:"
+
+#: ../data/messages:553
+#, fuzzy
+msgid "in pixels. Use this to adjust the bottom position of the drawings."
+msgstr "i pixlar. Använd för att ange indikatorns vertikala placering."
+
+#: ../data/messages:555
+#, fuzzy
+msgid "Bottom offset :"
+msgstr "Vertikal justering:"
+
+#: ../data/messages:557
+#, fuzzy
+msgid ""
+"It's an image that will be displayed above the drawings, like a reflect for "
+"exemple. Let empty to not use any."
+msgstr ""
+"Bild som visas för att ange att det går att släppa objektet på den. Lämna "
+"tomt för att använda standardbild."
+
+#: ../data/messages:559
+#, fuzzy
+msgid "Foreground image :"
+msgstr "Bakgrundsbild ... "
+
+#: ../data/messages:561
+#, fuzzy
+msgid "Foreground tansparency :"
+msgstr "Genomskinlighet för bilden:"
+
+#: ../data/messages:563
 msgid "Indicators"
 msgstr "Indikatorer"
 
-#: ../data/messages:539
+#: ../data/messages:565
 msgid "Indicator of drag'n'drop on the dock"
 msgstr "Indikator för drag-och-släpp"
 
-#: ../data/messages:541
+#: ../data/messages:567
 msgid ""
 "Typically an arrow, that will be displayed when you try to drop a new "
 "launcher into the dock. Let empty to use the default one."
@@ -1546,19 +1621,19 @@ msgstr ""
 "Bild (oftast en pil) som  visas när en startare släpps i dockan. Lämna tomt "
 "för att använda standardbild."
 
-#: ../data/messages:543
+#: ../data/messages:569
 msgid "Image for the drag'n'drop animation :"
 msgstr "Bild för indikatorn:"
 
-#: ../data/messages:545
+#: ../data/messages:571
 msgid "Indicator of drag'n'drop on icons"
 msgstr "Indikator för dra-och-släpp på ikoner"
 
-#: ../data/messages:547
+#: ../data/messages:573
 msgid "Display a drop indicator on icon while dragging over them ?"
 msgstr "Visa indikator på ikoner när något dras över dem?"
 
-#: ../data/messages:549
+#: ../data/messages:575
 msgid ""
 "It's an image that will be displayed on the icon to indicate you can drop on "
 "it. Let empty to use the default one."
@@ -1566,51 +1641,51 @@ msgstr ""
 "Bild som visas för att ange att det går att släppa objektet på den. Lämna "
 "tomt för att använda standardbild."
 
-#: ../data/messages:551
+#: ../data/messages:577
 msgid "Image for the indicator :"
 msgstr "Bild för indikatorn:"
 
-#: ../data/messages:553
+#: ../data/messages:579
 msgid "Indicator of the active window"
 msgstr "Indikator för aktivt fönster"
 
-#: ../data/messages:555
+#: ../data/messages:581
 msgid "Set transparency to 0 if you don't want to use an indicator."
 msgstr "Ange 0 för genomskinlighet om du inte vill använda en indikator."
 
-#: ../data/messages:557
+#: ../data/messages:583
 msgid "Color of the frame (r,v,b,a) :"
 msgstr "Färg på ramen (r,g,b,a):"
 
-#: ../data/messages:559
+#: ../data/messages:585
 msgid "Set 0 to fill the frame."
 msgstr "Ange 0 för att fylla ramen."
 
-#: ../data/messages:561
+#: ../data/messages:587
 msgid "Linewidth of the frame around the active window :"
 msgstr "Bredd på ramen:"
 
-#: ../data/messages:563
+#: ../data/messages:589
 msgid "Corner radius of the frame around the active window :"
 msgstr "Hörnradie för ramen:"
 
-#: ../data/messages:565
+#: ../data/messages:591
 msgid "Let it empty to draw a simple frame."
 msgstr "Om du anger en bild, kommer ramen ovan inte att ritas."
 
-#: ../data/messages:567
+#: ../data/messages:593
 msgid "Alternatively you can set an image for the indicator :"
 msgstr "Bild för indikatorn:"
 
-#: ../data/messages:569
+#: ../data/messages:595
 msgid "Draw indicator above the icon ?"
 msgstr "Visa indikatorn ovanpå ikonen?"
 
-#: ../data/messages:571
+#: ../data/messages:597
 msgid "Indicator of active launcher"
 msgstr "Indikator för aktiv startare"
 
-#: ../data/messages:573
+#: ../data/messages:599
 msgid ""
 "Indicators are drawn on launchers icons to show that they have already been "
 "launched. Let blank to use the default one."
@@ -1618,15 +1693,15 @@ msgstr ""
 "Indikatorer visas på ikoner för att ange att programmet redan körs. Lämna "
 "tomt för standardbild."
 
-#: ../data/messages:575
+#: ../data/messages:601
 msgid "Filename of an image to use for indicators :"
 msgstr "Bild för indikatorn:"
 
-#: ../data/messages:577
+#: ../data/messages:603
 msgid "Display the indicator above the icon ?"
 msgstr "Visa indikatorn ovanpå ikonen?"
 
-#: ../data/messages:579
+#: ../data/messages:605
 msgid ""
 "You can choose to make the indicator smaller or bigger than the icons. The "
 "bigger the value is, the bigger the indicator is. 1 means the indicator will "
@@ -1636,11 +1711,11 @@ msgstr ""
 "indikator i förhållande till ikonen. Ange 1 om indikatorn skall vara lika "
 "stor som ikonen."
 
-#: ../data/messages:581
+#: ../data/messages:607
 msgid "Indicator size ratio :"
 msgstr "Indikatorns relativa storlek:"
 
-#: ../data/messages:583
+#: ../data/messages:609
 msgid ""
 "It will then be resized like the icon, move like the icon, etc. Otherwise it "
 "will be drawn directly on the dock."
@@ -1648,159 +1723,156 @@ msgstr ""
 "Markera för att indikatorn ska ändra storlek, flyttas etc på samma sätt som "
 "ikonen. Avmarkera för att alltid visa indikatorn på samma ställe."
 
-#: ../data/messages:585
+#: ../data/messages:611
 msgid "Link the indicator with its icon ?"
 msgstr "Länka indikatorn till ikonen?"
 
-#: ../data/messages:587
+#: ../data/messages:613
 msgid ""
 "in pixels. You can use this parameter to adjust the indicator's vertical "
 "position."
 msgstr "i pixlar. Använd för att ange indikatorns vertikala placering."
 
-#: ../data/messages:589
+#: ../data/messages:615
 msgid "Vertical offset :"
 msgstr "Vertikal justering:"
 
-#: ../data/messages:591
+#: ../data/messages:617
 msgid "Misc. Emblems"
 msgstr "Övriga indikatorer"
 
-#: ../data/messages:595
+#: ../data/messages:621
 msgid "Name of an image to use for the charge emblem :"
 msgstr "Bild för batteriladdning:"
 
-#: ../data/messages:599
+#: ../data/messages:625
 msgid "Name of an image to use for the play emblem :"
 msgstr "Bild för spela upp:"
 
-#: ../data/messages:603
+#: ../data/messages:629
 msgid "Name of an image to use for the pause emblem :"
 msgstr "Bild för pausa:"
 
-#: ../data/messages:607
+#: ../data/messages:633
 msgid "Name of an image to use for the stop emblem :"
 msgstr "Bild för stop:"
 
-#: ../data/messages:611
+#: ../data/messages:637
 msgid "Name of an image to use for the broken emblem :"
 msgstr "Bild för bruten:"
 
-#: ../data/messages:615
+#: ../data/messages:641
 msgid "Name of an image to use for the error emblem :"
 msgstr "Bild för fel:"
 
-#: ../data/messages:619
+#: ../data/messages:645
 msgid "Name of an image to use for the warning emblem :"
 msgstr "Bild för varning:"
 
-#: ../data/messages:623
+#: ../data/messages:649
 msgid "Name of an image to use for the locked emblem :"
 msgstr "Bild för låsning:"
 
-#: ../data/messages:641
+#: ../data/messages:667
 msgid "Auto-Hide"
 msgstr "Dölj automatiskt"
 
 # #################################
 # ########### cairo-dock-easy.conf #############
 # #################################
-#: ../data/messages:671
+#: ../data/messages:697
 msgid "Personnalisation"
 msgstr "Inställningar"
 
-#: ../data/messages:679
+#: ../data/messages:705
 msgid "Images"
 msgstr "Bilder"
 
-#: ../data/messages:693
+#: ../data/messages:719
 msgid "Icons' size"
 msgstr "Ikonstorlek"
 
-#: ../data/messages:695
+#: ../data/messages:721
 msgid "or 0 if you don't want to constraint them."
 msgstr "eller 0 om du inte vill begränsa dem."
 
-#: ../data/messages:697
+#: ../data/messages:723
 msgid "Size of the icons at rest :"
 msgstr "Ikonens storlek i vila:"
 
-#: ../data/messages:699
+#: ../data/messages:725
 msgid "Maximum zoom :"
 msgstr "Maximal zoom:"
 
-#: ../data/messages:701
+#: ../data/messages:727
 msgid "Space between icons (in pixels) :"
 msgstr "Avstånd mellan ikoner (i pixlar):"
 
-#: ../data/messages:709
+#: ../data/messages:735
 msgid "Animations"
 msgstr "Animationer"
 
-#: ../data/messages:711
+#: ../data/messages:737
 msgid "Animation type for launchers :"
 msgstr "Animation för startare:"
 
-#: ../data/messages:727
+#: ../data/messages:753
 msgid "Animation type for applis :"
 msgstr "Animation för program:"
 
-#: ../data/messages:743
+#: ../data/messages:769
 msgid "Extern frame"
 msgstr "Yttre ram"
 
-#: ../data/messages:745
+#: ../data/messages:771
 msgid "Corner radius, in pixels:"
 msgstr "Hörnradie (i pixlar):"
 
-#: ../data/messages:747
+#: ../data/messages:773
 msgid "Color of the extern line (red, blue, green, alpha):"
 msgstr "Färg för extern linje (röd, grön, blå, alfa):"
 
-#: ../data/messages:761
-msgid "Desklet's background color :"
+#: ../data/messages:787
+#, fuzzy
+msgid "Desklet's decorations :"
 msgstr "Bakgrundsfärg för Desklets - inaktiv:"
 
-#: ../data/messages:763
-msgid "Desklet's background color when mouse hovers it :"
-msgstr "Bakgrundsfärg för Desklets - aktiv:"
-
-#: ../data/messages:765 ../data/messages:779 ../data/messages:839
+#: ../data/messages:789 ../data/messages:803 ../data/messages:863
 msgid "Desktop Entry"
 msgstr "Skrivbord"
 
-#: ../data/messages:767
+#: ../data/messages:791
 msgid "Sub-dock's name :"
 msgstr "Sub-dockans namn:"
 
-#: ../data/messages:769 ../data/messages:787 ../data/messages:841
+#: ../data/messages:793 ../data/messages:811 ../data/messages:865
 msgid "Image's name or path :"
 msgstr "Bildens namn eller sökväg"
 
-#: ../data/messages:771 ../data/messages:793 ../data/messages:843
+#: ../data/messages:795 ../data/messages:817 ../data/messages:867
 msgid "Extra parameters"
 msgstr "Extra parametrar"
 
-#: ../data/messages:773 ../data/messages:795 ../data/messages:845
+#: ../data/messages:797 ../data/messages:819 ../data/messages:869
 msgid "Order you want for this launcher among the others:"
 msgstr "Relativ sortering på dockan:"
 
-#: ../data/messages:775 ../data/messages:791 ../data/messages:847
+#: ../data/messages:799 ../data/messages:815 ../data/messages:871
 msgid "Name of the container it belongs to:"
 msgstr "Namn på tillhörande behållare:"
 
-#: ../data/messages:777
+#: ../data/messages:801
 msgid "Name of the view used for the sub-dock :"
 msgstr "Namn på vy för sub-dockan:"
 
 # #################################
 # ########### launcher.conf #############
 # #################################
-#: ../data/messages:781
+#: ../data/messages:805
 msgid "Launcher's name :"
 msgstr "Etikett:"
 
-#: ../data/messages:783
+#: ../data/messages:807
 msgid ""
 "Exemple : nautilus --no-desktop, gedit, etc. You can even enter a keyboard "
 "shortcut, for exemple <Alt>F1 for the Applications Menu, <Ctrl>c or <Ctrl>v "
@@ -1810,18 +1882,18 @@ msgstr ""
 "tangentkombinationer som <Alt>F1 för Programmenyn, <Ctrl>c eller <Ctrl>v för "
 "att kopiera, klistra in etc"
 
-#: ../data/messages:785
+#: ../data/messages:809
 msgid "Command to launch on click :"
 msgstr "Kommando som ska köras:"
 
-#: ../data/messages:789
+#: ../data/messages:813
 msgid ""
 "If you write here a container's name that doesn't exist yet, a new one will "
 "be created, with this icon inside."
 msgstr ""
 "Om du anger ett namn på en behållare som inte finns, skapas den automatiskt."
 
-#: ../data/messages:797
+#: ../data/messages:821
 msgid ""
 "Use this option for exemple if the launcher launches a script in a terminal "
 "but you don't want it to steal normal terminal's icons from the TaskBar, or "
@@ -1834,11 +1906,11 @@ msgstr ""
 "i aktivitetsfältet innehåller speciell information som du vill använda dig "
 "av (t ex så visar Pidgin status genom att byta ikonen i aktivitetsfältet)."
 
-#: ../data/messages:799
+#: ../data/messages:823
 msgid "Prevent this launcher from stealing appli from taskbar ?"
 msgstr "Hindra startaren att stjäla program från aktivitetsfältet?"
 
-#: ../data/messages:801
+#: ../data/messages:825
 msgid ""
 "The only reason you may want to modify this parameter is if you made this "
 "launcher by hands. If you dropped it into the dock from the menu, it is "
@@ -1850,26 +1922,26 @@ msgstr ""
 "ändra detta. Klassnamnet används för att länka ihop startaren med sitt "
 "program."
 
-#: ../data/messages:803
+#: ../data/messages:827
 msgid "Class of the program :"
 msgstr "Programklass:"
 
 # #################################
 # ########### themes.conf #############
 # #################################
-#: ../data/messages:849
+#: ../data/messages:873
 msgid "Themes"
 msgstr "Teman"
 
-#: ../data/messages:851
+#: ../data/messages:875
 msgid "Choose a theme"
 msgstr "Välj ett tema"
 
-#: ../data/messages:853
+#: ../data/messages:877
 msgid "List of themes :"
 msgstr "Teman:"
 
-#: ../data/messages:855
+#: ../data/messages:879
 msgid ""
 "Otherwise the current behaviour will be kept. It's all about the dock's "
 "position, behaviour parameters such as auto-hide, using taskbar or not, etc."
@@ -1877,11 +1949,11 @@ msgstr ""
 "Markera för att ersätta alla aktuella beteenden med temats inbyggda. "
 "Avmarkera för att behålla aktuella beteenden."
 
-#: ../data/messages:857
+#: ../data/messages:881
 msgid "Use the new theme's behaviour ?"
 msgstr "Använd temats beteenden?"
 
-#: ../data/messages:859
+#: ../data/messages:883
 msgid ""
 "So if you check this box, your launchers will be deleted and replaced by the "
 "ones provided in the new theme. Otherwise the current launchers will be "
@@ -1890,52 +1962,52 @@ msgstr ""
 "Markera för att ersätta alla aktuella startare med temats inbyggda. "
 "Avmarkera för att endast ersätta ikonerna."
 
-#: ../data/messages:861
+#: ../data/messages:885
 msgid "Use the new theme's launchers ?"
 msgstr "Använd temats startare?"
 
-#: ../data/messages:863
+#: ../data/messages:887
 msgid "Save"
 msgstr "Spara"
 
-#: ../data/messages:865
+#: ../data/messages:889
 msgid "Save current theme"
 msgstr "Spara aktuellt tema"
 
-#: ../data/messages:867
+#: ../data/messages:891
 msgid "You will then be able to re-open it at any time."
 msgstr "Du kan sedan öppna dem igen när som helst."
 
-#: ../data/messages:869
+#: ../data/messages:893
 msgid "Save as :"
 msgstr "Spara som:"
 
-#: ../data/messages:871
+#: ../data/messages:895
 msgid "Save current behaviour too ?"
 msgstr "Spara beteenden också?"
 
-#: ../data/messages:873
+#: ../data/messages:897
 msgid "Save current launchers too ?"
 msgstr "Spara startare också?"
 
-#: ../data/messages:875
+#: ../data/messages:899
 msgid "Delete"
 msgstr "Radera"
 
-#: ../data/messages:877
+#: ../data/messages:901
 msgid "List of your personnal themes"
 msgstr "Egna teman"
 
-#: ../data/messages:879
+#: ../data/messages:903
 msgid "Uncheck from the list themes you don't want anymore :"
 msgstr "Avmarkera teman du *inte* vill behålla:"
 
-#: ../data/messages:881
+#: ../data/messages:905
 msgid "pouet"
 msgstr "pouet"
 
-#: ../data/messages:883 ../data/messages:885 ../data/messages:887
-#: ../data/messages:889
+#: ../data/messages:907 ../data/messages:909 ../data/messages:911
+#: ../data/messages:913
 msgid ""
 "v1.4.6.3 :\n"
 "Just to say :\n"
@@ -1950,7 +2022,7 @@ msgstr ""
 # #################################
 # ########### ChangeLog #############
 # #################################
-#: ../data/messages:891
+#: ../data/messages:915
 msgid ""
 "v1.5.0 : it's been 1 month since previous release, and we worked hardly to "
 "bring you :\n"
@@ -1986,7 +2058,7 @@ msgstr ""
 " - And cherry on the cake, a new theme (I, Cairo) !\n"
 "  Now, why not try to make an applet for Cairo-Dock ? ;-)"
 
-#: ../data/messages:893
+#: ../data/messages:917
 msgid ""
 "v1.5.1 :\n"
 " - The 1.5 branch is still young, so this version brings a lot of bug fixes\n"
@@ -2006,7 +2078,7 @@ msgstr ""
 "  most of applets can now detached themselves from the dock\n"
 " and behave as real desklets."
 
-#: ../data/messages:895
+#: ../data/messages:919
 msgid ""
 "v1.5.2.1 :\n"
 " - a lot of bug fixes, especially on desklets.\n"
@@ -2018,7 +2090,7 @@ msgstr ""
 " - New applet : weather !\n"
 " - Cairo-Dock is now fully translated in Japanese, thanks to Jiro Kawada !"
 
-#: ../data/messages:897
+#: ../data/messages:921
 msgid ""
 "v1.5.3.2 :\n"
 " - Themes have been deeply reviewed\n"
@@ -2042,7 +2114,7 @@ msgstr ""
 "  By the way, we are still searching someone\n"
 "  who could help cairo-dock to be well-integrated into KDE ;-)"
 
-#: ../data/messages:899
+#: ../data/messages:923
 msgid ""
 "v1.5.4.2 : a huge release !\n"
 " - add a cute pinguin in your dock with the new applet Cairo-Penguin\n"
@@ -2066,7 +2138,7 @@ msgstr ""
 " - refresh your dock with the new theme : Wood\n"
 " - 3 more themes in Weather"
 
-#: ../data/messages:901
+#: ../data/messages:925
 msgid ""
 "v1.5.5.4 :\n"
 " - Huge enhancements in the TaskBar :\n"
@@ -2094,7 +2166,7 @@ msgstr ""
 " - Cairo-Dock is not yet well integrated into Gnome 2.22, but it will come "
 "soon ;-)"
 
-#: ../data/messages:903
+#: ../data/messages:927
 msgid ""
 "v1.5.6 :\n"
 " - Integration into the last Gnome 2.22 (Ubuntu8.04, Fedora9, ...) - still "
@@ -2126,7 +2198,7 @@ msgstr ""
 " - Bug fixes in XGamma/Weather.\n"
 " - Any help would be welcome to integrate the dock into KDE !"
 
-#: ../data/messages:905
+#: ../data/messages:929
 msgid ""
 "v1.6.0 :\n"
 " - A new view has appeared : Diapositive !\n"
@@ -2160,7 +2232,7 @@ msgstr ""
 " - Auto-reload on crash.\n"
 " - Real window thumbnail when minimized."
 
-#: ../data/messages:907
+#: ../data/messages:931
 msgid ""
 "v1.6.1 :\n"
 "Cairo-Dock has one year ! To celebrate this event, we are happy to offer "
@@ -2182,7 +2254,7 @@ msgstr ""
 " - And we are still hoping someone would help us writing a kde-integration "
 "plug-in ^_^"
 
-#: ../data/messages:909
+#: ../data/messages:933
 msgid ""
 "v1.6.2 : the first version integrated in the Ubuntu repositories !\n"
 " - 2 new applets have been released :\n"
@@ -2204,7 +2276,7 @@ msgstr ""
 " - And we are still searching someone motivated to write a kde-integration "
 "plug-in ^_^"
 
-#: ../data/messages:911
+#: ../data/messages:935
 msgid ""
 "v1.6.3 : farther and farther !\n"
 " - first the bad news :\n"
@@ -2220,3 +2292,12 @@ msgid ""
 " - Smooth icons movement when dragging them inside the dock\n"
 " - The dock is now translated in Sweden and partially in Greek."
 msgstr ""
+
+#~ msgid "Background color (r,v,b,a) :"
+#~ msgstr "Bakgrundsfärg (r,g,b,a) - inaktiv:"
+
+#~ msgid "Background color when mouse hovers it (r,v,b,a) :"
+#~ msgstr "Bakgrundsfärg (r,g,b,a) - aktiv:"
+
+#~ msgid "Desklet's background color when mouse hovers it :"
+#~ msgstr "Bakgrundsfärg för Desklets - aktiv:"

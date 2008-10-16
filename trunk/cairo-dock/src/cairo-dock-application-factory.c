@@ -449,12 +449,20 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 				if (XMainAppliWindow != 0)
 				{
 					g_print ("dialogue 'transient for' => on ignore\n");
-					if (bDemandsAttention)
+					if (bDemandsAttention && (g_bDemandsAttentionWithDialog || g_bDemandsAttentionWithAnimation))
 					{
 						Icon *pParentIcon = cairo_dock_get_icon_with_Xid (XMainAppliWindow);
 						if (pParentIcon != NULL)
 						{
 							g_print ("%s requiert votre attention indirectement !\n", pParentIcon->acName);
+							pParentIcon->bIsDemandingAttention = TRUE;
+							if (g_bDemandsAttentionWithDialog)
+								cairo_dock_show_temporary_dialog (pParentIcon->acName, pParentIcon, CAIRO_CONTAINER (pDock), 2000);
+							if (g_bDemandsAttentionWithAnimation)
+							{
+								cairo_dock_arm_animation (pParentIcon, -1, 1e6);  // animation sans fin.
+								cairo_dock_start_animation (pParentIcon, pDock);
+							}
 						}
 						else
 							g_print ("ce dialogue est bien bruyant ! (%d)\n", XMainAppliWindow);
@@ -482,12 +490,20 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 		if (XMainAppliWindow != 0)
 		{
 			g_print ("fenetre modale => on saute.\n");
-			if (bDemandsAttention)
+			if (bDemandsAttention && (g_bDemandsAttentionWithDialog || g_bDemandsAttentionWithAnimation))
 			{
 				Icon *pParentIcon = cairo_dock_get_icon_with_Xid (XMainAppliWindow);
 				if (pParentIcon != NULL)
 				{
 					g_print ("%s requiert votre attention indirectement !\n", pParentIcon->acName);
+					pParentIcon->bIsDemandingAttention = TRUE;
+					if (g_bDemandsAttentionWithDialog)
+						cairo_dock_show_temporary_dialog (pParentIcon->acName, pParentIcon, CAIRO_CONTAINER (pDock), 2000);
+					if (g_bDemandsAttentionWithAnimation)
+					{
+						cairo_dock_arm_animation (pParentIcon, -1, 1e6);  // animation sans fin.
+						cairo_dock_start_animation (pParentIcon, pDock);
+					}
 				}
 				else
 					g_print ("ce dialogue est bien bruyant ! (%d)\n", XMainAppliWindow);
@@ -542,6 +558,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 	icon->bIsHidden = bIsHidden;
 	icon->bIsMaximized = bIsMaximized;
 	icon->bIsFullScreen = bIsFullScreen;
+	icon->bIsDemandingAttention = bDemandsAttention;
 	
 	cairo_dock_get_window_geometry (Xid,
 		&icon->windowGeometry.x,
@@ -626,6 +643,7 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 				if (iState == PropertyNewValue)
 				{
 					g_print ("%s vous interpelle !\n", icon->acName);
+					icon->bIsDemandingAttention = TRUE;
 					if (g_bDemandsAttentionWithDialog)
 						cairo_dock_show_temporary_dialog (icon->acName, icon, CAIRO_CONTAINER (pDock), 2000);
 					if (g_bDemandsAttentionWithAnimation)
@@ -637,6 +655,7 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 				else if (iState == PropertyDelete)
 				{
 					g_print ("%s arrette de vous interpeler.\n", icon->acName);
+					icon->bIsDemandingAttention = FALSE;
 					if (g_bDemandsAttentionWithDialog)
 						cairo_dock_remove_dialog_if_any (icon);
 					if (g_bDemandsAttentionWithAnimation)

@@ -105,11 +105,6 @@ extern CairoDockFMSortType g_iFileSortType;
 /// Montrer les fichiers caches ou non.
 extern gboolean g_bShowHiddenFiles;
 
-/// Couleur du fond des desklets.
-extern double g_fDeskletColor[4];
-/// Couleur du fond des desklets lorsque la souris est dedans..
-extern double g_fDeskletColorInside[4];
-
 extern cairo_surface_t *g_pBackgroundSurfaceFull[2];
 extern cairo_surface_t *g_pBackgroundSurface[2];
 

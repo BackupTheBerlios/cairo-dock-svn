@@ -27,10 +27,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #define CAIRO_DOCK_TAB_ICON_SIZE 32
 #define CAIRO_DOCK_FRAME_ICON_SIZE 24
 
-#ifndef mkstemp
-int mkstemp(char *template);
-#endif
-
 extern CairoDock *g_pMainDock;
 extern gboolean g_bPopUp;
 
@@ -46,6 +42,8 @@ typedef enum {
 	} _CairoDockModelColumns;
 
 static GtkListStore *s_pRendererListStore = NULL;
+static GtkListStore *s_pDecorationsListStore = NULL;
+static GtkListStore *s_pDecorationsListStore2 = NULL;
 
 static void _cairo_dock_activate_one_element (GtkCellRendererToggle * cell_renderer, gchar * path, GtkTreeModel * model)
 {
@@ -577,8 +575,39 @@ void cairo_dock_build_renderer_list_for_gui (GHashTable *pHashTable)
 	_cairo_dock_add_one_renderer_item ("", NULL, s_pRendererListStore);
 	g_hash_table_foreach (pHashTable, (GHFunc) _cairo_dock_add_one_renderer_item, s_pRendererListStore);
 }
+void _cairo_dock_add_one_decoration_item (gchar *cName, CairoDeskletDecoration *pDecoration, GtkListStore *pModele)
+{
+	g_print ("add %s\n", cName);
+	GtkTreeIter iter;
+	memset (&iter, 0, sizeof (GtkTreeIter));
+	gtk_list_store_append (GTK_LIST_STORE (pModele), &iter);
+	gtk_list_store_set (GTK_LIST_STORE (pModele), &iter,
+		CAIRO_DOCK_MODEL_NAME, cName,
+		CAIRO_DOCK_MODEL_RESULT, cName,
+		CAIRO_DOCK_MODEL_DESCRIPTION_FILE, "none"/*(pRenderer != NULL ? pRenderer->cReadmeFilePath : "none")*/,
+		CAIRO_DOCK_MODEL_IMAGE, "none"/*(pRenderer != NULL ? pRenderer->cPreviewFilePath : "none")*/, -1);
+}
+void cairo_dock_build_desklet_decorations_list_for_gui (GHashTable *pHashTable)
+{
+	if (s_pDecorationsListStore != NULL)
+		g_object_unref (s_pDecorationsListStore);
+	
+	s_pDecorationsListStore = gtk_list_store_new (CAIRO_DOCK_MODEL_NB_COLUMNS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_INT, G_TYPE_STRING, GDK_TYPE_PIXBUF);
+	
+	g_hash_table_foreach (pHashTable, (GHFunc) _cairo_dock_add_one_decoration_item, s_pDecorationsListStore);
+}
+void cairo_dock_build_desklet_decorations_list_for_applet_gui (GHashTable *pHashTable)
+{
+	if (s_pDecorationsListStore2 != NULL)
+		g_object_unref (s_pDecorationsListStore2);
+	
+	s_pDecorationsListStore2 = gtk_list_store_new (CAIRO_DOCK_MODEL_NB_COLUMNS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_INT, G_TYPE_STRING, GDK_TYPE_PIXBUF);
+	
+	_cairo_dock_add_one_decoration_item ("default", NULL, s_pDecorationsListStore2);
+	g_hash_table_foreach (pHashTable, (GHFunc) _cairo_dock_add_one_decoration_item, s_pDecorationsListStore2);
+}
 
-static gboolean _cairo_dock_test_one_renderer_name (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer *data)
+static gboolean _cairo_dock_test_one_name (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer *data)
 {
 	gchar *cName = NULL;
 	gtk_tree_model_get (model, iter, CAIRO_DOCK_MODEL_NAME, &cName, -1);
@@ -592,15 +621,16 @@ static gboolean _cairo_dock_test_one_renderer_name (GtkTreeModel *model, GtkTree
 	}
 	return FALSE;
 }
-gboolean _cairo_dock_find_iter_from_renderer_name (gchar *cName, GtkTreeIter *iter)
+static gboolean _cairo_dock_find_iter_from_name (GtkListStore *pModele, gchar *cName, GtkTreeIter *iter)
 {
 	if (cName == NULL)
 		return FALSE;
 	gboolean bFound = FALSE;
 	gpointer data[3] = {cName, iter, &bFound};
-	gtk_tree_model_foreach (GTK_TREE_MODEL (s_pRendererListStore), (GtkTreeModelForeachFunc) _cairo_dock_test_one_renderer_name, data);
+	gtk_tree_model_foreach (GTK_TREE_MODEL (pModele), (GtkTreeModelForeachFunc) _cairo_dock_test_one_name, data);
 	return bFound;
 }
+
 
 static void _cairo_dock_configure_renderer (GtkButton *button, gpointer *data)
 {
@@ -668,6 +698,8 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 	GtkWidget *pDescriptionLabel;
 	GtkWidget *pPreviewImage;
 	GtkWidget *pButtonConfigRenderer;
+	GtkCellRenderer *rend;
+	GtkTreeIter iter;
 	gchar *cGroupName, *cGroupComment , *cKeyName, *cKeyComment, *cUsefulComment, *cAuthorizedValuesChain, *pTipString, **pAuthorizedValuesList, *cSmallGroupIcon;
 	gpointer *pGroupKeyWidget;
 	int i, j, k, iNbElements;
@@ -1089,7 +1121,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 						cValue = g_key_file_get_string (pKeyFile, cGroupName, cKeyName, NULL);
 						modele = s_pRendererListStore;
 						pOneWidget = gtk_combo_box_new_with_model (GTK_TREE_MODEL (modele));
-						GtkCellRenderer *rend = gtk_cell_renderer_text_new ();
+						rend = gtk_cell_renderer_text_new ();
 						gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (pOneWidget), rend, FALSE);
 						gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (pOneWidget), rend, "text", CAIRO_DOCK_MODEL_NAME, NULL);
 						
@@ -1118,8 +1150,7 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 							FALSE,
 							0);
 						
-						GtkTreeIter iter;
-						if (_cairo_dock_find_iter_from_renderer_name (cValue, &iter))
+						if (_cairo_dock_find_iter_from_name (modele, cValue, &iter))
 							gtk_combo_box_set_active_iter (GTK_COMBO_BOX (pOneWidget), &iter);
 						
 						pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
@@ -1143,6 +1174,27 @@ GtkWidget *cairo_dock_generate_advanced_ihm_from_keyfile (GKeyFile *pKeyFile, co
 							FALSE,
 							FALSE,
 							0);
+					break ;
+					
+					case 'd' :
+					case 'o' :
+						cValue = g_key_file_get_string (pKeyFile, cGroupName, cKeyName, NULL);
+						modele = (iElementType == 'd' ? s_pDecorationsListStore : s_pDecorationsListStore2);
+						pOneWidget = gtk_combo_box_new_with_model (GTK_TREE_MODEL (modele));
+						
+						rend = gtk_cell_renderer_text_new ();
+						gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (pOneWidget), rend, FALSE);
+						gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (pOneWidget), rend, "text", CAIRO_DOCK_MODEL_NAME, NULL);
+						
+						if (_cairo_dock_find_iter_from_name (modele, cValue, &iter))
+							gtk_combo_box_set_active_iter (GTK_COMBO_BOX (pOneWidget), &iter);
+						pSubWidgetList = g_slist_append (pSubWidgetList, pOneWidget);
+						gtk_box_pack_start (GTK_BOX (pHBox),
+							pOneWidget,
+							FALSE,
+							FALSE,
+							0);
+						g_free (cValue);
 					break ;
 					
 					case 's' :  // string

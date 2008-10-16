@@ -12,9 +12,6 @@ G_BEGIN_DECLS
 * Pour un exemple tres simple, consultez les sources de l'applet 'logout'.
 */
 
-
-void cairo_dock_free_minimal_config (CairoDockMinimalAppletConfig *pMinimalConfig);
-
 /**
 *Applique une surface sur un contexte, en effacant tout au prealable, et en appliquant un facteur de zoom et de transparence.
 *@param pIconContext le contexte du dessin; n'est pas altere par la fonction.

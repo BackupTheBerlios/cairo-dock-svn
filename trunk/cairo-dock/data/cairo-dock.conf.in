@@ -596,12 +596,31 @@ message italic = false
 #[gtk-convert]
 [Desklets]
 
-#c+4[0;1] Background color (r,v,b,a) :
-background color = 1.0; 1.0; 1.0; 0.2
+#d+ Choose a default decoration for all desklets :
+decorations = dark
 
-#c+4[0;1] Background color when mouse hovers it (r,v,b,a) :
-background color inside = 1.0; 1.0; 1.0; 0.6
-
+#S+ Background image :
+#{It's an image that will be displayed below the drawings, like a frame for exemple. Let empty to not use any.}
+bg desklet =
+#e+[0;1] Background tansparency :
+bg alpha = 1
+#i+[0;256] Left offset :
+#{in pixels. Use this to adjust the left position of the drawings.}
+left offset = 0
+#i+[0;256] Top offset :
+#{in pixels. Use this to adjust the top position of the drawings.}
+top offset = 0
+#i+[0;256] Right offset :
+#{in pixels. Use this to adjust the right position of the drawings.}
+right offset = 0
+#i+[0;256] Bottom offset :
+#{in pixels. Use this to adjust the bottom position of the drawings.}
+bottom offset = 0
+#S+ Foreground image :
+#{It's an image that will be displayed above the drawings, like a reflect for exemple. Let empty to not use any.}
+fg desklet =
+#e+[0;1] Foreground tansparency :
+fg alpha = 1
 
 #[gtk-dialog-info]
 [Indicators]

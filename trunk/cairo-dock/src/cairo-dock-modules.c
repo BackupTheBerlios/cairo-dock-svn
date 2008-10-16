@@ -294,7 +294,6 @@ void cairo_dock_activate_modules_from_list (gchar **cActiveModuleList, double fT
 		}
 		
 		pModule->fLastLoadingTime = fTime;
-		///if (! pModule->bActive)
 		if (pModule->pInstancesList == NULL)
 		{
 			cairo_dock_activate_module (pModule, &erreur);
@@ -416,6 +415,30 @@ GKeyFile *cairo_dock_pre_read_module_instance_config (CairoDockModuleInstance *p
 		pMinimalConfig->bKeepAbove = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "keep above", NULL, FALSE, NULL, NULL);
 		pMinimalConfig->bOnWidgetLayer = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "on widget layer", NULL, FALSE, NULL, NULL);
 		pMinimalConfig->bPositionLocked = cairo_dock_get_boolean_key_value (pKeyFile, "Desklet", "locked", NULL, FALSE, NULL, NULL);
+		
+		gchar *cDecorationTheme = cairo_dock_get_string_key_value (pKeyFile, "Desklet", "decorations", NULL, NULL, NULL, NULL);
+		if (cDecorationTheme == NULL || strcmp (cDecorationTheme, "personnal") == 0)
+		{
+			g_print ("on recupere les decorations personnelles au desklet\n");
+			CairoDeskletDecoration *pUserDeskletDecorations = g_new0 (CairoDeskletDecoration, 1);
+			pMinimalConfig->pUserDecoration = pUserDeskletDecorations;
+			
+			pUserDeskletDecorations->cBackGroundImagePath = cairo_dock_get_string_key_value (pKeyFile, "Desklet", "bg desklet", NULL, NULL, NULL, NULL);
+			pUserDeskletDecorations->cForeGroundImagePath = cairo_dock_get_string_key_value (pKeyFile, "Desklet", "fg desklet", NULL, NULL, NULL, NULL);
+			pUserDeskletDecorations->iLoadingModifier = CAIRO_DOCK_FILL_SPACE;
+			pUserDeskletDecorations->fBackGroundAlpha = cairo_dock_get_double_key_value (pKeyFile, "Desklet", "bg alpha", NULL, 1.0, NULL, NULL);
+			pUserDeskletDecorations->fForeGroundAlpha = cairo_dock_get_double_key_value (pKeyFile, "Desklet", "fg alpha", NULL, 1.0, NULL, NULL);
+			pUserDeskletDecorations->iLeftMargin = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "left offset", NULL, CAIRO_DOCK_FM_SORT_BY_NAME, NULL, NULL);
+			pUserDeskletDecorations->iTopMargin = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "top offset", NULL, CAIRO_DOCK_FM_SORT_BY_NAME, NULL, NULL);
+			pUserDeskletDecorations->iRightMargin = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "right offset", NULL, CAIRO_DOCK_FM_SORT_BY_NAME, NULL, NULL);
+			pUserDeskletDecorations->iBottomMargin = cairo_dock_get_integer_key_value (pKeyFile, "Desklet", "bottom offset", NULL, CAIRO_DOCK_FM_SORT_BY_NAME, NULL, NULL);
+			g_free (cDecorationTheme);
+		}
+		else
+		{
+			g_print ("decorations : %s\n", cDecorationTheme);
+			pMinimalConfig->cDecorationTheme = cDecorationTheme;
+		}
 	}
 	return pKeyFile;
 }
@@ -500,7 +523,6 @@ void cairo_dock_reload_module_instance (CairoDockModuleInstance *pInstance, gboo
 	
 	//\______________ On tente de recharger le module.
 	gboolean bModuleReloaded = FALSE;
-	//if (module->bActive && module->reloadModule != NULL)
 	if (module->pInstancesList != NULL && module->pInterface->reloadModule != NULL)
 	{
 		Icon *pIcon = pInstance->pIcon;
@@ -556,7 +578,7 @@ void cairo_dock_reload_module_instance (CairoDockModuleInstance *pInstance, gboo
 						pDesklet = CAIRO_DESKLET (pActualContainer);
 					}
 					pNewContainer = CAIRO_CONTAINER (pDesklet);
-					cairo_dock_place_desklet (pDesklet, pMinimalConfig);
+					cairo_dock_configure_desklet (pDesklet, pMinimalConfig);
 				}
 				else  // l'applet est maintenant dans un dock.
 				{
@@ -864,7 +886,6 @@ static gboolean _cairo_dock_for_one_desklet (gchar *cModuleName, CairoDockModule
 			CairoDockForeachDeskletFunc pCallback = data[0];
 			gpointer user_data = data[1];
 			
-			
 			if (pCallback (pInstance->pDesklet, pInstance, user_data))
 			{
 				data[2] = pInstance;
@@ -889,7 +910,6 @@ static void _cairo_dock_write_one_module_by_category (gchar *cModuleName, CairoD
 {
 	GString **pStrings = data[0];
 	gboolean bActiveOnly = GPOINTER_TO_INT (data[1]);
-	///if (! bActiveOnly || pModule->bActive)
 	if (! bActiveOnly || pModule->pInstancesList != NULL)
 	{
 		GString *sModuleInCategory = pStrings[pModule->pVisitCard->iCategory];
@@ -1009,7 +1029,7 @@ CairoDockModuleInstance *cairo_dock_instanciate_module (CairoDockModule *pModule
 		if (pModule->bCanDetach && pMinimalConfig->bIsDetached)
 		{
 			pDesklet = cairo_dock_create_desklet (NULL, NULL, pMinimalConfig->bOnWidgetLayer);
-			cairo_dock_place_desklet (pDesklet, pMinimalConfig);
+			cairo_dock_configure_desklet (pDesklet, pMinimalConfig);
 			while (gtk_events_pending ())  // pour la transparence initiale.
 				gtk_main_iteration ();
 			pContainer = CAIRO_CONTAINER (pDesklet);

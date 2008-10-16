@@ -669,7 +669,7 @@ void cairo_dock_leave_from_main_dock (CairoDock *pDock)
 		g_print ("on a sorti %s du dock (%d;%d) / %dx%d\n", s_pIconClicked->acName, pDock->iMouseX, pDock->iMouseY, pDock->iCurrentWidth, pDock->iCurrentHeight);
 		CairoDock *pOriginDock = cairo_dock_search_dock_from_name (s_pIconClicked->cParentDockName);
 		g_return_if_fail (pOriginDock != NULL);
-		if (pOriginDock == pDock && (pOriginDock->iMouseX < 0 || pOriginDock->iMouseX > pOriginDock->iCurrentWidth || pOriginDock->iMouseY < 0 || pOriginDock->iMouseY > pOriginDock->iCurrentHeight))
+		if (pOriginDock == pDock && (pOriginDock->iMouseX <= 0 || pOriginDock->iMouseX >= pOriginDock->iCurrentWidth || pOriginDock->iMouseY <= 0 || pOriginDock->iMouseY >= pOriginDock->iCurrentHeight))
 		{
 			gchar *cParentDockName = s_pIconClicked->cParentDockName;
 			s_pIconClicked->cParentDockName = NULL;
@@ -779,7 +779,13 @@ gboolean on_leave_notify2 (GtkWidget* pWidget,
 
 	if (! cairo_dock_hide_child_docks (pDock))  // on quitte si on entre dans un sous-dock, pour rester en position "haute".
 		return TRUE;
-
+	
+	if (pEvent != NULL)
+	{
+		pDock->iMouseX = pEvent->x;
+		pDock->iMouseY = pEvent->y;
+	}
+	
 	cairo_dock_leave_from_main_dock (pDock);
 
 	return TRUE;
