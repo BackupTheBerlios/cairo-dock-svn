@@ -193,7 +193,10 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 			cairo_paint (pCairoContext);
 		else
 			cairo_paint_with_alpha (pCairoContext, pDesklet->fBackGroundAlpha);
-		
+	}
+	
+	if (pDesklet->iLeftSurfaceOffset != 0 || pDesklet->iTopSurfaceOffset != 0 || pDesklet->iRightSurfaceOffset != 0 || pDesklet->iBottomSurfaceOffset != 0)
+	{
 		cairo_translate (pCairoContext, pDesklet->iLeftSurfaceOffset, pDesklet->iTopSurfaceOffset);
 		cairo_scale (pCairoContext,
 			1. - 1.*(pDesklet->iLeftSurfaceOffset + pDesklet->iRightSurfaceOffset) / pDesklet->iWidth,
@@ -219,18 +222,21 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 			cairo_paint_with_alpha (pCairoContext, pDesklet->fForeGroundAlpha);
 	}
 	
-	cairo_restore (pCairoContext);
-	if (pRotateButtonSurface != NULL)
+	if (pDesklet->bInside || pDesklet->rotating)
 	{
-		cairo_set_source_surface (pCairoContext, pRotateButtonSurface, 0., 0.);
-		cairo_paint (pCairoContext);
+		cairo_restore (pCairoContext);
+		if (pRotateButtonSurface != NULL)
+		{
+			cairo_set_source_surface (pCairoContext, pRotateButtonSurface, 0., 0.);
+			cairo_paint (pCairoContext);
+		}
+		if (pRetachButtonSurface != NULL)
+		{
+			cairo_set_source_surface (pCairoContext, pRetachButtonSurface, pDesklet->iWidth - 16, 0.);
+			cairo_paint (pCairoContext);
+		}
 	}
-	if (pRetachButtonSurface != NULL)
-	{
-		cairo_set_source_surface (pCairoContext, pRetachButtonSurface, pDesklet->iWidth - 16, 0.);
-		cairo_paint (pCairoContext);
-	}
-	
+
 	cairo_destroy (pCairoContext);
 	return FALSE;
 }
