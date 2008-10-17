@@ -1150,6 +1150,7 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	cairo_dock_load_active_window_indicator (pCairoContext, cActiveIndicatorImagePath, cairo_dock_get_max_scale (pDock), iActiveCornerRadius, iActiveLineWidth, fActiveColor);
 	g_free (cActiveIndicatorImagePath);
 	
+	cairo_dock_load_desklet_buttons (pCairoContext);
 	
 	g_fReflectSize = 0;
 	for (i = 0; i < CAIRO_DOCK_NB_TYPES; i ++)

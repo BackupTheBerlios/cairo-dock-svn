@@ -379,6 +379,7 @@ struct _CairoDockMinimalAppletConfig {
 	gboolean bKeepAbove;
 	gboolean bOnWidgetLayer;
 	gboolean bPositionLocked;
+	gint iRotation;
 	gchar *cDecorationTheme;
 	CairoDeskletDecoration *pUserDecoration;
 };
@@ -800,6 +801,7 @@ struct _CairoDesklet {
         gdouble fForeGroundAlpha;
 	/// rotation.
 	gdouble fRotation;
+	gboolean rotating;
 	/// date du clic.
 	guint time;
 };

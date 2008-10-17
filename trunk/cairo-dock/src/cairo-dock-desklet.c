@@ -52,6 +52,26 @@ extern int g_iDockRadius;
 extern gboolean g_bSticky;
 extern gchar *g_cDeskletDecorationsName;
 
+static cairo_surface_t *pRotateButtonSurface = NULL;
+static cairo_surface_t *pRetachButtonSurface = NULL;
+
+void cairo_dock_load_desklet_buttons (cairo_t *pSourceContext)
+{
+	if (pRotateButtonSurface == NULL)
+	{
+		gchar *cRotateButtonPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, "rotate-desklet.svg");
+		pRotateButtonSurface = cairo_dock_create_surface_for_icon (cRotateButtonPath, pSourceContext, 16, 16);
+		g_free (cRotateButtonPath);
+	}
+	
+	if (pRetachButtonSurface == NULL)
+	{
+		gchar *cRetachButtonPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, "retach-desklet.svg");
+		pRetachButtonSurface = cairo_dock_create_surface_for_icon (cRetachButtonPath, pSourceContext, 16, 16);
+		g_free (cRetachButtonPath);
+	}
+}
+
 static gboolean on_expose_desklet(GtkWidget *pWidget,
 	GdkEventExpose *pExpose,
 	CairoDesklet *pDesklet)
@@ -69,7 +89,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 	if (gtk_window_is_active (GTK_WINDOW (pDesklet->pWidget)))
 		fColor[3] = 1.;
 	else
-		fColor[3] = .75*pDesklet->iGradationCount / CD_NB_ITER_FOR_GRADUATION;
+		fColor[3] = 1.*pDesklet->iGradationCount / CD_NB_ITER_FOR_GRADUATION;
 	
 	gboolean bRenderOptimized = (pExpose->area.x > 0 || pExpose->area.y > 0);
 	if (bRenderOptimized)
@@ -100,11 +120,9 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 		pDesklet->iDesiredWidth = 0;
 		pDesklet->iDesiredHeight = 0;
 		
-		
 		if (fColor[3] != 0)
 		{
-			cairo_save (pCairoContext);
-			cairo_set_source_rgba (pCairoContext, fColor[0], fColor[1], fColor[2], fColor[3]);
+			/*cairo_set_source_rgba (pCairoContext, fColor[0], fColor[1], fColor[2], fColor[3]);
 			cairo_set_line_width (pCairoContext, g_iDockRadius);
 			cairo_set_line_join (pCairoContext, CAIRO_LINE_JOIN_ROUND);
 			//draw a rounded square
@@ -116,16 +134,57 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 			cairo_rel_line_to (pCairoContext, -(w - (g_iDockRadius)) , 0);
 			cairo_close_path (pCairoContext);
 			cairo_stroke (pCairoContext);
-			
 			cairo_rectangle(pCairoContext, g_iDockRadius, g_iDockRadius, (w - 2*g_iDockRadius), (h - 2*g_iDockRadius));
-			cairo_fill(pCairoContext);
-			cairo_restore (pCairoContext);  // retour au debut.
+			cairo_fill(pCairoContext);*/
+			cairo_pattern_t *pPattern = cairo_pattern_create_radial (.5*pDesklet->iWidth,
+				.5*pDesklet->iHeight,
+				0.,
+				.5*pDesklet->iWidth,
+				.5*pDesklet->iHeight,
+				.5*MIN (pDesklet->iWidth, pDesklet->iHeight));
+			 cairo_pattern_set_extend (pPattern, CAIRO_EXTEND_NONE);
+			
+			cairo_pattern_add_color_stop_rgba   (pPattern,
+				0.,
+				fColor[0], fColor[1], fColor[2], fColor[3]);
+			cairo_pattern_add_color_stop_rgba   (pPattern,
+				1.,
+				fColor[0], fColor[1], fColor[2], 0.);
+			cairo_set_source (pCairoContext, pPattern);
+			cairo_paint (pCairoContext);
+			cairo_pattern_destroy (pPattern);
+		}
+		
+		cairo_save (pCairoContext);
+		
+		if (pDesklet->fRotation != 0)
+		{
+			double alpha = atan2 (pDesklet->iHeight, pDesklet->iWidth);
+			double theta = fabs (pDesklet->fRotation);
+			if (theta > G_PI/2)
+				theta -= G_PI/2;
+			double fZoomX, fZoomY;
+			double d = .5 * sqrt (pDesklet->iWidth * pDesklet->iWidth + pDesklet->iHeight * pDesklet->iHeight);
+			fZoomX = fabs (.5 * pDesklet->iWidth / (d * sin (alpha + theta)));
+			fZoomY = fabs (.5 * pDesklet->iHeight / (d * cos (alpha - theta)));
+			//g_print ("d = %.2f ; alpha = %.2f ; zoom : %.2fx%.2f\n", d, alpha/G_PI*180., fZoomX, fZoomY);
+			
+			cairo_translate (pCairoContext,
+				.5*pDesklet->iWidth,
+				.5*pDesklet->iHeight);
+			
+			cairo_rotate (pCairoContext, pDesklet->fRotation);
+			
+			cairo_translate (pCairoContext,
+				-.5*pDesklet->iWidth * fZoomX,
+				-.5*pDesklet->iHeight * fZoomY);
+			cairo_scale (pCairoContext, fZoomX, fZoomY);
 		}
 	}
 	
+	cairo_save (pCairoContext);
 	if (pDesklet->pBackGroundSurface != NULL && pDesklet->fBackGroundAlpha != 0)
 	{
-		cairo_save (pCairoContext);
 		cairo_set_source_surface (pCairoContext,
 			pDesklet->pBackGroundSurface,
 			0.,
@@ -147,9 +206,9 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 			pDesklet->pRenderer->render (pCairoContext, pDesklet, bRenderOptimized);
 	}
 	
+	cairo_restore (pCairoContext);
 	if (pDesklet->pForeGroundSurface != NULL && pDesklet->fForeGroundAlpha != 0)
 	{
-		cairo_restore (pCairoContext);
 		cairo_set_source_surface (pCairoContext,
 			pDesklet->pForeGroundSurface,
 			0.,
@@ -159,7 +218,18 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 		else
 			cairo_paint_with_alpha (pCairoContext, pDesklet->fForeGroundAlpha);
 	}
-		
+	
+	cairo_restore (pCairoContext);
+	if (pRotateButtonSurface != NULL)
+	{
+		cairo_set_source_surface (pCairoContext, pRotateButtonSurface, 0., 0.);
+		cairo_paint (pCairoContext);
+	}
+	if (pRetachButtonSurface != NULL)
+	{
+		cairo_set_source_surface (pCairoContext, pRetachButtonSurface, pDesklet->iWidth - 16, 0.);
+		cairo_paint (pCairoContext);
+	}
 	
 	cairo_destroy (pCairoContext);
 	return FALSE;
@@ -317,6 +387,19 @@ static gboolean on_button_press_desklet(GtkWidget *pWidget,
 			pDesklet->diff_y = - pButton->y;
 			cd_debug ("diff : %d;%d", pDesklet->diff_x, pDesklet->diff_y);
 			pDesklet->time = pButton->time;
+			
+			if (pButton->x < 16 && pButton->y < 16)
+				pDesklet->rotating = TRUE;
+			else if (pButton->x > pDesklet->iWidth - 16 && pButton->y < 16)
+			{
+				Icon *icon = pDesklet->pIcon;
+				g_return_val_if_fail (CAIRO_DOCK_IS_APPLET (icon), FALSE);
+				cairo_dock_update_conf_file (icon->pModuleInstance->cConfFilePath,
+					G_TYPE_BOOLEAN, "Desklet", "initially detached", FALSE,
+					G_TYPE_INVALID);
+				cairo_dock_reload_module_instance (icon->pModuleInstance, TRUE);
+				return FALSE;
+			}
 			/*if (! pDesklet->bPositionLocked)
 				gtk_window_begin_move_drag (GTK_WINDOW (gtk_widget_get_toplevel (pWidget)),
 					pButton->button,
@@ -331,6 +414,13 @@ static gboolean on_button_press_desklet(GtkWidget *pWidget,
 			{
 				pDesklet->moving = FALSE;
 			}
+			else if (pDesklet->rotating)
+			{
+				pDesklet->rotating = FALSE;
+				cairo_dock_update_conf_file (pDesklet->pIcon->pModuleInstance->cConfFilePath,
+					G_TYPE_INT, "Desklet", "rotation", (int) (pDesklet->fRotation / G_PI * 180.),
+					G_TYPE_INVALID);
+			}
 			else
 			{
 				Icon *pClickedIcon = cairo_dock_find_clicked_icon_in_desklet (pDesklet);
@@ -340,9 +430,20 @@ static gboolean on_button_press_desklet(GtkWidget *pWidget,
 		}
 		else if (pButton->type == GDK_2BUTTON_PRESS)
 		{
-			Icon *pClickedIcon = cairo_dock_find_clicked_icon_in_desklet (pDesklet);
-			gpointer data[2] = {pClickedIcon, pDesklet};
-			cairo_dock_notify (CAIRO_DOCK_DOUBLE_CLICK_ICON, data);
+			if (pButton->x < 16 && pButton->y < 16)
+			{
+				pDesklet->fRotation = 0.;
+				gtk_widget_queue_draw (pDesklet->pWidget);
+				cairo_dock_update_conf_file (pDesklet->pIcon->pModuleInstance->cConfFilePath,
+					G_TYPE_INT, "Desklet", "rotation", 0,
+					G_TYPE_INVALID);
+			}
+			else
+			{
+				Icon *pClickedIcon = cairo_dock_find_clicked_icon_in_desklet (pDesklet);
+				gpointer data[2] = {pClickedIcon, pDesklet};
+				cairo_dock_notify (CAIRO_DOCK_DOUBLE_CLICK_ICON, data);
+			}
 		}
 	}
 	else if (pButton->button == 3 && pButton->type == GDK_BUTTON_PRESS)  // clique droit.
@@ -363,8 +464,19 @@ static gboolean on_button_press_desklet(GtkWidget *pWidget,
 	}
 	else if (pButton->button == 2 && pButton->type == GDK_BUTTON_PRESS)  // clique milieu.
 	{
-		gpointer data[2] = {pDesklet->pIcon, pDesklet};
-		cairo_dock_notify (CAIRO_DOCK_MIDDLE_CLICK_ICON, data);
+		if (pButton->x < 16 && pButton->y < 16)
+		{
+			pDesklet->fRotation = 0.;
+			gtk_widget_queue_draw (pDesklet->pWidget);
+			cairo_dock_update_conf_file (pDesklet->pIcon->pModuleInstance->cConfFilePath,
+				G_TYPE_INT, "Desklet", "rotation", 0,
+				G_TYPE_INVALID);
+		}
+		else
+		{
+			gpointer data[2] = {pDesklet->pIcon, pDesklet};
+			cairo_dock_notify (CAIRO_DOCK_MIDDLE_CLICK_ICON, data);
+		}
 	}
 	return FALSE;
 }
@@ -401,7 +513,17 @@ static gboolean on_motion_notify_desklet(GtkWidget *pWidget,
 		pDesklet->diff_y = -pMotion->y;
 	}
 	
-	if (pMotion->state & GDK_BUTTON1_MASK && ! pDesklet->bPositionLocked && ! pDesklet->moving)
+	if (pDesklet->rotating)
+	{
+		double alpha = atan2 (pDesklet->iHeight, - pDesklet->iWidth);
+		pDesklet->fRotation = alpha - atan2 (.5*pDesklet->iHeight - pMotion->y, pMotion->x - .5*pDesklet->iWidth);
+		while (pDesklet->fRotation > G_PI)
+			pDesklet->fRotation -= 2 * G_PI;
+		while (pDesklet->fRotation <= - G_PI)
+			pDesklet->fRotation += 2 * G_PI;
+		gtk_widget_queue_draw(pDesklet->pWidget);
+	}
+	else if (pMotion->state & GDK_BUTTON1_MASK && ! pDesklet->bPositionLocked && ! pDesklet->moving)
 	{
 		gtk_window_begin_move_drag (GTK_WINDOW (gtk_widget_get_toplevel (pWidget)),
 			1/*pButton->button*/,
@@ -608,6 +730,7 @@ void cairo_dock_configure_desklet (CairoDesklet *pDesklet, CairoDockMinimalApple
 		cairo_dock_set_xwindow_type_hint (Xid, "_NET_WM_WINDOW_TYPE_NORMAL");
 	
 	pDesklet->bPositionLocked = pMinimalConfig->bPositionLocked;
+	pDesklet->fRotation = pMinimalConfig->iRotation / 180. * G_PI ;
 	
 	g_free (pDesklet->cDecorationTheme);
 	pDesklet->cDecorationTheme = pMinimalConfig->cDecorationTheme;

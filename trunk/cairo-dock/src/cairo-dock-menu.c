@@ -801,7 +801,7 @@ static void _cairo_dock_detach_module (GtkMenuItem *pMenuItem, gpointer *data)
 		G_TYPE_INVALID);
 
 	cairo_dock_reload_module_instance (icon->pModuleInstance, TRUE);
-	if (icon->pModuleInstance->pDesklet)  // toujours vrai normalement.
+	if (icon->pModuleInstance->pDesklet)  // on a detache l'applet.
 		cairo_dock_zoom_out_desklet (icon->pModuleInstance->pDesklet);
 }
 

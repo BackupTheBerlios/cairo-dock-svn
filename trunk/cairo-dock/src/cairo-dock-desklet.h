@@ -44,6 +44,8 @@ G_BEGIN_DECLS
 */
 #define CAIRO_DESKLET(pContainer) ((CairoDesklet *)pContainer)
 
+void cairo_dock_load_desklet_buttons (cairo_t *pSourceContext);
+
 /**
 * Créer un desklet tout simple, sans le placer ni lui définir un moteur de rendu.
 *@param pIcon l'icône principale du desklet (jamais testé avec une icône nulle).
