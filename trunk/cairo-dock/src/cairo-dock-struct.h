@@ -180,9 +180,13 @@ struct _CairoDock {
 	gdouble fRatio;
 
 	gint iMaxLabelWidth;
+	gint iMinLeftMargin;
+	gint iMinRightMargin;
+	gint iMaxLeftMargin;
+	gint iMaxRightMargin;
+	gint iLeftMargin;
 	gint iRightMargin;
-	gint iTopMargin;
-
+	
 	//\_______________ Les parametres lies a une animation du dock.
 	/// pour faire defiler les icones avec la molette.
 	gint iScrollOffset;
@@ -802,6 +806,8 @@ struct _CairoDesklet {
 	/// rotation.
 	gdouble fRotation;
 	gboolean rotating;
+	/// rattachement au dock.
+	gboolean retaching;
 	/// date du clic.
 	guint time;
 };

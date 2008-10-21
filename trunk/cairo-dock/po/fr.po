@@ -13,11 +13,11 @@ msgstr ""
 "X-Poedit-Language: French\n"
 "X-Poedit-Country: France\n"
 
-#: ../src/cairo-dock-callbacks.c:1172
+#: ../src/cairo-dock-callbacks.c:1178
 msgid "Do you want to mount this point ?"
 msgstr "Voulez-vous monter ce point ?"
 
-#: ../src/cairo-dock-callbacks.c:1913
+#: ../src/cairo-dock-callbacks.c:1919
 msgid "Quit Cairo-Dock ?"
 msgstr "Quitter Cairo-Dock ?"
 
@@ -51,7 +51,7 @@ msgstr "monter"
 msgid "unmount"
 msgstr "démonter"
 
-#: ../src/cairo-dock-gui-factory.c:1622
+#: ../src/cairo-dock-gui-factory.c:1621
 msgid "grab"
 msgstr "récupérer"
 
@@ -332,7 +332,7 @@ msgstr "Toujours derrière"
 msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr "Réglez le comportement de Compiz à : (name=cairo-dock & type=utility)"
 
-#: ../src/cairo-dock-modules.c:819 ../src/cairo-dock-modules.c:842
+#: ../src/cairo-dock-modules.c:821 ../src/cairo-dock-modules.c:844
 #, c-format
 msgid "Configuration of %s"
 msgstr "Configuration de %s"
@@ -956,20 +956,19 @@ msgstr "Montrer les fichiers cachés ?"
 # ########### cairo-dock.conf #############
 # #################################
 #: ../data/messages:207
-#, fuzzy
 msgid "Composition"
-msgstr "Positionnement"
+msgstr "Composition"
 
 #: ../data/messages:209
 msgid ""
 "Only use this if you don't run a composite manager like Compiz, xcompmgr, "
 "etc and have a black background around your dock. For esthetic reason, the "
 "dock will be kept under other windows."
-msgstr ""
+msgstr "Utilisez cette option seulement si vous n'avez pas de gestionnaire de composite, tel que Compiz, xcompmgr, etc, et que vous avez un fond noir autour de votre dock. Pour des raisons esthétiques, le dock sera gardé derrière les autres fenêtres."
 
 #: ../data/messages:211
 msgid "Emulates composition with fake transparency ?"
-msgstr ""
+msgstr "Emuler la composition par de la fausse transparence ?"
 
 #: ../data/messages:213 ../data/messages:419
 msgid "Applets"
@@ -1330,7 +1329,6 @@ msgid "Icons' themes"
 msgstr "Thèmes d'icônes"
 
 #: ../data/messages:367 ../data/messages:731
-#, fuzzy
 msgid ""
 "Directories or themes where to search icons. Put some directories where you "
 "have icons you wish to see in the dock, or put some theme's name you've "
@@ -1341,8 +1339,8 @@ msgstr ""
 "Répertoires ou thèmes où chercher les icônes. Entrez un répertoire où vous "
 "avez des icônes que vous souhaitez voir apparaître dans le dock, ou entrez "
 "le nom d'un thème que vous avez installé sur votre système. (l'ordre est "
-"pris en compte durant la recherche). Le mot clé _Répertoire des Thèmes_ "
-"représente la répertoire ~/.cairo-dock/current_theme/launchers"
+"pris en compte durant la recherche). Le mot clé _LocalTheme_ "
+"représente le répertoire ~/.config/cairo-dock/current_theme/icons"
 
 #: ../data/messages:369 ../data/messages:733
 msgid "List of icons themes or directories :"
@@ -1576,95 +1574,75 @@ msgid "Desklets"
 msgstr "Desklets"
 
 #: ../data/messages:533
-#, fuzzy
 msgid "Choose a default decoration for all desklets :"
-msgstr "Choisissez la vue par défaut à utiliser pour les docks racine :"
+msgstr "Choisissez une décoration par défaut pour les desklets :"
 
 #: ../data/messages:535
-#, fuzzy
 msgid ""
 "It's an image that will be displayed below the drawings, like a frame for "
 "exemple. Let empty to not use any."
 msgstr ""
-"C'est une image qui sera dessinée sur l'icône pour indiquer que vous pouvez "
-"lacher dessus. Laissez vide pour utiliser celle par défaut."
+"C'est une image qui sera dessinée derrière les dessins, telle qu'un cadre par exemple. Laissez vide pour n'en utiliser aucune."
 
 #: ../data/messages:537
-#, fuzzy
 msgid "Background image :"
-msgstr "Image de fond..."
+msgstr "Image de fond :"
 
 #: ../data/messages:539
-#, fuzzy
 msgid "Background tansparency :"
-msgstr "Transparence de l'image :"
+msgstr "Transparence du fond :"
 
 #: ../data/messages:541
-#, fuzzy
 msgid "in pixels. Use this to adjust the left position of the drawings."
 msgstr ""
-"En pixels. Vous pouvez utiliser ce paramètre pour ajuster la position "
-"verticale de l'indicateur."
+"En pixels. Utilisez ce paramètre pour ajuster la position à gauche "
+"des dessins."
 
 #: ../data/messages:543
-#, fuzzy
 msgid "Left offset :"
-msgstr "Décalage vertical :"
+msgstr "Décalage à gauche :"
 
 #: ../data/messages:545
-#, fuzzy
 msgid "in pixels. Use this to adjust the top position of the drawings."
 msgstr ""
-"En pixels. Vous pouvez utiliser ce paramètre pour ajuster la position "
-"verticale de l'indicateur."
+"En pixels. Utilisez ce paramètre pour ajuster la position en haut des dessins."
 
 #: ../data/messages:547
-#, fuzzy
 msgid "Top offset :"
-msgstr "Décalage vertical :"
+msgstr "Décalage en haut :"
 
 #: ../data/messages:549
-#, fuzzy
 msgid "in pixels. Use this to adjust the right position of the drawings."
 msgstr ""
-"En pixels. Vous pouvez utiliser ce paramètre pour ajuster la position "
-"verticale de l'indicateur."
+"En pixels. Utilisez ce paramètre pour ajuster la position à droite des dessins."
 
 #: ../data/messages:551
-#, fuzzy
 msgid "Right offset :"
-msgstr "Décalage vertical :"
+msgstr "Décalage à droite :"
 
 #: ../data/messages:553
-#, fuzzy
 msgid "in pixels. Use this to adjust the bottom position of the drawings."
 msgstr ""
-"En pixels. Vous pouvez utiliser ce paramètre pour ajuster la position "
-"verticale de l'indicateur."
+"En pixels. Utilisez ce paramètre pour ajuster la position en bas des dessins."
 
 #: ../data/messages:555
-#, fuzzy
 msgid "Bottom offset :"
-msgstr "Décalage vertical :"
+msgstr "Décalage en bas :"
 
 #: ../data/messages:557
-#, fuzzy
 msgid ""
 "It's an image that will be displayed above the drawings, like a reflect for "
 "exemple. Let empty to not use any."
 msgstr ""
-"C'est une image qui sera dessinée sur l'icône pour indiquer que vous pouvez "
-"lacher dessus. Laissez vide pour utiliser celle par défaut."
+"C'est une image qui sera dessinée par dessus les dessins, comme un reflet par exemple. Laissez vide pour n'en utiliser aucune."
 
 #: ../data/messages:559
-#, fuzzy
 msgid "Foreground image :"
-msgstr "Image de fond..."
+msgstr "Image d'avant-plan :"
 
 #: ../data/messages:561
-#, fuzzy
 msgid "Foreground tansparency :"
-msgstr "Transparence de l'image :"
+msgstr "Transparence de l'avant-plan :"
 
 #: ../data/messages:563
 msgid "Indicators"
@@ -1897,9 +1875,8 @@ msgid "Color of the extern line (red, blue, green, alpha):"
 msgstr "Couleur du cadre (rouge, vert, bleu, alpha):"
 
 #: ../data/messages:787
-#, fuzzy
 msgid "Desklet's decorations :"
-msgstr "Couleur de fond des desklets :"
+msgstr "Décorations des desklets :"
 
 #: ../data/messages:789 ../data/messages:803 ../data/messages:863
 msgid "Desktop Entry"
@@ -2357,12 +2334,3 @@ msgid ""
 " - Smooth icons movement when dragging them inside the dock\n"
 " - The dock is now translated in Sweden and partially in Greek."
 msgstr ""
-
-#~ msgid "Background color (r,v,b,a) :"
-#~ msgstr "Couleur de fond (r,v,b,a) :"
-
-#~ msgid "Background color when mouse hovers it (r,v,b,a) :"
-#~ msgstr "Couleur de fond lorsque la souris le survole (r,v,b,a) :"
-
-#~ msgid "Desklet's background color when mouse hovers it :"
-#~ msgstr "Couleur de fond des desklets au survol de la souris :"

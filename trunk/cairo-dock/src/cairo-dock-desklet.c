@@ -52,6 +52,7 @@ extern int g_iDockRadius;
 extern gboolean g_bSticky;
 extern gchar *g_cDeskletDecorationsName;
 
+#define CAIRO_DOCK_DESKLET_BUTTONS_SIZE 16
 static cairo_surface_t *pRotateButtonSurface = NULL;
 static cairo_surface_t *pRetachButtonSurface = NULL;
 
@@ -60,14 +61,14 @@ void cairo_dock_load_desklet_buttons (cairo_t *pSourceContext)
 	if (pRotateButtonSurface == NULL)
 	{
 		gchar *cRotateButtonPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, "rotate-desklet.svg");
-		pRotateButtonSurface = cairo_dock_create_surface_for_icon (cRotateButtonPath, pSourceContext, 16, 16);
+		pRotateButtonSurface = cairo_dock_create_surface_for_icon (cRotateButtonPath, pSourceContext, CAIRO_DOCK_DESKLET_BUTTONS_SIZE, CAIRO_DOCK_DESKLET_BUTTONS_SIZE);
 		g_free (cRotateButtonPath);
 	}
 	
 	if (pRetachButtonSurface == NULL)
 	{
 		gchar *cRetachButtonPath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, "retach-desklet.svg");
-		pRetachButtonSurface = cairo_dock_create_surface_for_icon (cRetachButtonPath, pSourceContext, 16, 16);
+		pRetachButtonSurface = cairo_dock_create_surface_for_icon (cRetachButtonPath, pSourceContext, CAIRO_DOCK_DESKLET_BUTTONS_SIZE, CAIRO_DOCK_DESKLET_BUTTONS_SIZE);
 		g_free (cRetachButtonPath);
 	}
 }
@@ -122,20 +123,6 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 		
 		if (fColor[3] != 0)
 		{
-			/*cairo_set_source_rgba (pCairoContext, fColor[0], fColor[1], fColor[2], fColor[3]);
-			cairo_set_line_width (pCairoContext, g_iDockRadius);
-			cairo_set_line_join (pCairoContext, CAIRO_LINE_JOIN_ROUND);
-			//draw a rounded square
-			w = pDesklet->iWidth;
-			h = pDesklet->iHeight;
-			cairo_move_to (pCairoContext, .5*g_iDockRadius, .5*g_iDockRadius);
-			cairo_rel_line_to (pCairoContext, w - (g_iDockRadius), 0);
-			cairo_rel_line_to (pCairoContext, 0, h - (g_iDockRadius));
-			cairo_rel_line_to (pCairoContext, -(w - (g_iDockRadius)) , 0);
-			cairo_close_path (pCairoContext);
-			cairo_stroke (pCairoContext);
-			cairo_rectangle(pCairoContext, g_iDockRadius, g_iDockRadius, (w - 2*g_iDockRadius), (h - 2*g_iDockRadius));
-			cairo_fill(pCairoContext);*/
 			cairo_pattern_t *pPattern = cairo_pattern_create_radial (.5*pDesklet->iWidth,
 				.5*pDesklet->iHeight,
 				0.,
@@ -224,7 +211,8 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 	
 	if (pDesklet->bInside || pDesklet->rotating)
 	{
-		cairo_restore (pCairoContext);
+		if (! pDesklet->rotating)
+			cairo_restore (pCairoContext);
 		if (pRotateButtonSurface != NULL)
 		{
 			cairo_set_source_surface (pCairoContext, pRotateButtonSurface, 0., 0.);
@@ -232,7 +220,7 @@ static gboolean on_expose_desklet(GtkWidget *pWidget,
 		}
 		if (pRetachButtonSurface != NULL)
 		{
-			cairo_set_source_surface (pCairoContext, pRetachButtonSurface, pDesklet->iWidth - 16, 0.);
+			cairo_set_source_surface (pCairoContext, pRetachButtonSurface, pDesklet->iWidth - CAIRO_DOCK_DESKLET_BUTTONS_SIZE, 0.);
 			cairo_paint (pCairoContext);
 		}
 	}
@@ -392,26 +380,15 @@ static gboolean on_button_press_desklet(GtkWidget *pWidget,
 			pDesklet->diff_x = - pButton->x;  // pour le deplacement manuel.
 			pDesklet->diff_y = - pButton->y;
 			cd_debug ("diff : %d;%d", pDesklet->diff_x, pDesklet->diff_y);
-			pDesklet->time = pButton->time;
 			
-			if (pButton->x < 16 && pButton->y < 16)
+			if (pButton->x < CAIRO_DOCK_DESKLET_BUTTONS_SIZE && pButton->y < CAIRO_DOCK_DESKLET_BUTTONS_SIZE)
 				pDesklet->rotating = TRUE;
-			else if (pButton->x > pDesklet->iWidth - 16 && pButton->y < 16)
+			else if (pButton->x > pDesklet->iWidth - CAIRO_DOCK_DESKLET_BUTTONS_SIZE && pButton->y < CAIRO_DOCK_DESKLET_BUTTONS_SIZE)
 			{
-				Icon *icon = pDesklet->pIcon;
-				g_return_val_if_fail (CAIRO_DOCK_IS_APPLET (icon), FALSE);
-				cairo_dock_update_conf_file (icon->pModuleInstance->cConfFilePath,
-					G_TYPE_BOOLEAN, "Desklet", "initially detached", FALSE,
-					G_TYPE_INVALID);
-				cairo_dock_reload_module_instance (icon->pModuleInstance, TRUE);
-				return FALSE;
+				pDesklet->retaching = TRUE;
 			}
-			/*if (! pDesklet->bPositionLocked)
-				gtk_window_begin_move_drag (GTK_WINDOW (gtk_widget_get_toplevel (pWidget)),
-					pButton->button,
-					pButton->x_root,
-					pButton->y_root,
-					pButton->time);*/
+			else
+				pDesklet->time = pButton->time;
 		}
 		else if (pButton->type == GDK_BUTTON_RELEASE)
 		{
@@ -426,6 +403,21 @@ static gboolean on_button_press_desklet(GtkWidget *pWidget,
 				cairo_dock_update_conf_file (pDesklet->pIcon->pModuleInstance->cConfFilePath,
 					G_TYPE_INT, "Desklet", "rotation", (int) (pDesklet->fRotation / G_PI * 180.),
 					G_TYPE_INVALID);
+				gtk_widget_queue_draw (pDesklet->pWidget);
+			}
+			else if (pDesklet->retaching)
+			{
+				pDesklet->retaching = FALSE;
+				if (! pDesklet->bPositionLocked && pButton->x > pDesklet->iWidth - CAIRO_DOCK_DESKLET_BUTTONS_SIZE && pButton->y < CAIRO_DOCK_DESKLET_BUTTONS_SIZE)
+				{
+					Icon *icon = pDesklet->pIcon;
+					g_return_val_if_fail (CAIRO_DOCK_IS_APPLET (icon), FALSE);
+					cairo_dock_update_conf_file (icon->pModuleInstance->cConfFilePath,
+						G_TYPE_BOOLEAN, "Desklet", "initially detached", FALSE,
+						G_TYPE_INVALID);
+					cairo_dock_reload_module_instance (icon->pModuleInstance, TRUE);
+					return FALSE;
+				}
 			}
 			else
 			{
@@ -436,7 +428,7 @@ static gboolean on_button_press_desklet(GtkWidget *pWidget,
 		}
 		else if (pButton->type == GDK_2BUTTON_PRESS)
 		{
-			if (pButton->x < 16 && pButton->y < 16)
+			if (pButton->x < CAIRO_DOCK_DESKLET_BUTTONS_SIZE && pButton->y < CAIRO_DOCK_DESKLET_BUTTONS_SIZE)
 			{
 				pDesklet->fRotation = 0.;
 				gtk_widget_queue_draw (pDesklet->pWidget);
@@ -470,7 +462,7 @@ static gboolean on_button_press_desklet(GtkWidget *pWidget,
 	}
 	else if (pButton->button == 2 && pButton->type == GDK_BUTTON_PRESS)  // clique milieu.
 	{
-		if (pButton->x < 16 && pButton->y < 16)
+		if (pButton->x < CAIRO_DOCK_DESKLET_BUTTONS_SIZE && pButton->y < CAIRO_DOCK_DESKLET_BUTTONS_SIZE)
 		{
 			pDesklet->fRotation = 0.;
 			gtk_widget_queue_draw (pDesklet->pWidget);
@@ -519,7 +511,7 @@ static gboolean on_motion_notify_desklet(GtkWidget *pWidget,
 		pDesklet->diff_y = -pMotion->y;
 	}
 	
-	if (pDesklet->rotating)
+	if (pDesklet->rotating && ! pDesklet->bPositionLocked)
 	{
 		double alpha = atan2 (pDesklet->iHeight, - pDesklet->iWidth);
 		pDesklet->fRotation = alpha - atan2 (.5*pDesklet->iHeight - pMotion->y, pMotion->x - .5*pDesklet->iWidth);

@@ -1256,6 +1256,14 @@ void cairo_dock_redraw_my_icon (Icon *icon, CairoContainer *pContainer)
 void cairo_dock_set_window_position_at_balance (CairoDock *pDock, int iNewWidth, int iNewHeight)
 {
 	pDock->iWindowPositionX = (g_iScreenWidth[pDock->bHorizontalDock] - iNewWidth) * pDock->fAlign + pDock->iGapX;
+	/*if (pDock->fAlign < 0.5)
+	{
+		pDock->iWindowPositionX += pDock->iLeftMargin * (0.5 - pDock->fAlign)*2;
+	}
+	else
+	{
+		pDock->iWindowPositionX += pDock->iRightMargin * (pDock->fAlign - 0.5)*2;
+	}*/
 	pDock->iWindowPositionY = (pDock->bDirectionUp ? g_iScreenHeight[pDock->bHorizontalDock] - iNewHeight - pDock->iGapY : pDock->iGapY);
 	//g_print ("pDock->iGapX : %d => iWindowPositionX <- %d\n", pDock->iGapX, pDock->iWindowPositionX);
 	//g_print ("iNewHeight : %d -> pDock->iWindowPositionY <- %d\n", iNewHeight, pDock->iWindowPositionY);
@@ -1277,16 +1285,22 @@ void cairo_dock_get_window_position_and_geometry_at_balance (CairoDock *pDock, C
 	{
 		*iNewWidth = pDock->iMaxDockWidth;
 		*iNewHeight = pDock->iMaxDockHeight;
+		pDock->iLeftMargin = pDock->iMaxLeftMargin;
+		pDock->iRightMargin = pDock->iMaxRightMargin;
 	}
 	else if (iSizeType == CAIRO_DOCK_NORMAL_SIZE)
 	{
 		*iNewWidth = pDock->iMinDockWidth;
 		*iNewHeight = pDock->iMinDockHeight;
+		pDock->iLeftMargin = pDock->iMinLeftMargin;
+		pDock->iRightMargin = pDock->iMinRightMargin;
 	}
 	else
 	{
 		*iNewWidth = g_iVisibleZoneWidth;
 		*iNewHeight = g_iVisibleZoneHeight;
+		pDock->iLeftMargin = 0;
+		pDock->iRightMargin = 0;
 	}
 
 	cairo_dock_set_window_position_at_balance (pDock, *iNewWidth, *iNewHeight);

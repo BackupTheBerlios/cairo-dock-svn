@@ -28,7 +28,6 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #define CAIRO_DOCK_FRAME_ICON_SIZE 24
 
 extern CairoDock *g_pMainDock;
-extern gboolean g_bPopUp;
 
 typedef enum {
 	CAIRO_DOCK_MODEL_NAME = 0,
@@ -650,6 +649,7 @@ void cairo_dock_config_panel_destroyed (void)
 	iNbConfigDialogs --;
 	if (iNbConfigDialogs <= 0)
 	{
+		g_print ("plus de panneaux de config\n");
 		iNbConfigDialogs = 0;
 		if (g_pMainDock != NULL)  // peut arriver au 1er lancement.
 			cairo_dock_pop_down (g_pMainDock);
@@ -658,6 +658,7 @@ void cairo_dock_config_panel_destroyed (void)
 void cairo_dock_config_panel_created (void)
 {
 	iNbConfigDialogs ++;
+	g_print ("nbre de panneaux de config <- %d\n", iNbConfigDialogs);
 }
 
 

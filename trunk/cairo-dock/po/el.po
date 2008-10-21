@@ -18,11 +18,11 @@ msgstr ""
 "X-Poedit-Country: France\n"
 "X-Generator: KBabel 1.11.4\n"
 
-#: ../src/cairo-dock-callbacks.c:1172
+#: ../src/cairo-dock-callbacks.c:1178
 msgid "Do you want to mount this point ?"
 msgstr "Θέλετε να προσαρτήσετε αυτό το σημείο;"
 
-#: ../src/cairo-dock-callbacks.c:1913
+#: ../src/cairo-dock-callbacks.c:1919
 msgid "Quit Cairo-Dock ?"
 msgstr "Έξοδος από το Cairo-Dock;"
 
@@ -56,7 +56,7 @@ msgstr "προσάρτηση"
 msgid "unmount"
 msgstr "αποπροσάρτηση"
 
-#: ../src/cairo-dock-gui-factory.c:1622
+#: ../src/cairo-dock-gui-factory.c:1621
 msgid "grab"
 msgstr "λήψη"
 
@@ -341,7 +341,7 @@ msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr ""
 "καθορισμός συμπεριφοράς στο Compiz σε: (όνομα=cairo-dock & τύπος=βοήθημα)"
 
-#: ../src/cairo-dock-modules.c:819 ../src/cairo-dock-modules.c:842
+#: ../src/cairo-dock-modules.c:821 ../src/cairo-dock-modules.c:844
 #, c-format
 msgid "Configuration of %s"
 msgstr "Ρύθμιση του %s"

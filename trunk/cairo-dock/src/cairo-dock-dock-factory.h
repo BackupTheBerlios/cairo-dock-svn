@@ -135,7 +135,7 @@ void cairo_dock_reserve_space_for_dock (CairoDock *pDock, gboolean bReserve);
 */
 void cairo_dock_place_root_dock (CairoDock *pDock);
 /**
-* Borne la position d'un dock a l'intetieur de l'ecran.
+* Borne la position d'un dock a l'interieur de l'ecran.
 * @param pDock le dock.
 */
 void cairo_dock_prevent_dock_from_out_of_screen (CairoDock *pDock);
