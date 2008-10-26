@@ -566,7 +566,7 @@ void cairo_dock_move_icon_after_icon (CairoDock *pDock, Icon *icon1, Icon *icon2
 	if (icon2 != NULL)
 	{
 		Icon *pNextIcon = cairo_dock_get_next_icon (pDock->icons, icon2);
-		if (fabs (pNextIcon->fOrder - icon2->fOrder) < 1e-3)
+		if (pNextIcon != NULL && fabs (pNextIcon->fOrder - icon2->fOrder) < 1e-3)
 		{
 			bForceUpdate = TRUE;
 		}

@@ -44,7 +44,7 @@ msgstr "挂载"
 msgid "unmount"
 msgstr "卸载"
 
-#: ../src/cairo-dock-gui-factory.c:1621
+#: ../src/cairo-dock-gui-factory.c:1622
 msgid "grab"
 msgstr "捕捉"
 
@@ -86,7 +86,7 @@ msgstr "填充此启动器"
 msgid "Undefined"
 msgstr ""
 
-#: ../src/cairo-dock-menu.c:428 ../src/cairo-dock-menu.c:1280
+#: ../src/cairo-dock-menu.c:428 ../src/cairo-dock-menu.c:1288
 msgid "Modify this launcher"
 msgstr "编辑此启动器"
 
@@ -136,194 +136,194 @@ msgstr "设定dock'%s'的位置"
 # This file is distributed under the same license as the Cairo-Dock package.
 # Fabrice Rey <fabounet@users.berlios.de>, 2007.
 #
-#: ../src/cairo-dock-menu.c:1151
+#: ../src/cairo-dock-menu.c:1159
 msgid "Configure"
 msgstr "配置"
 
-#: ../src/cairo-dock-menu.c:1158
+#: ../src/cairo-dock-menu.c:1166
 msgid "Set up this dock"
 msgstr "设置此dock"
 
-#: ../src/cairo-dock-menu.c:1160
+#: ../src/cairo-dock-menu.c:1168
 msgid "Manage themes"
 msgstr "管理主题"
 
-#: ../src/cairo-dock-menu.c:1163
+#: ../src/cairo-dock-menu.c:1171
 msgid "About"
 msgstr "关于"
 
-#: ../src/cairo-dock-menu.c:1165
+#: ../src/cairo-dock-menu.c:1173
 msgid "Development's site"
 msgstr "开发站点"
 
-#: ../src/cairo-dock-menu.c:1167
+#: ../src/cairo-dock-menu.c:1175
 msgid "Community's site"
 msgstr "社区站点"
 
-#: ../src/cairo-dock-menu.c:1171
+#: ../src/cairo-dock-menu.c:1179
 msgid "Quick-Hide"
 msgstr "快速隐藏"
 
-#: ../src/cairo-dock-menu.c:1176
+#: ../src/cairo-dock-menu.c:1184
 msgid "Quit"
 msgstr "退出"
 
-#: ../src/cairo-dock-menu.c:1200 ../src/cairo-dock-menu.c:1262
+#: ../src/cairo-dock-menu.c:1208 ../src/cairo-dock-menu.c:1270
 #, fuzzy
 msgid "Add a manual launcher"
 msgstr "添加一个启动器"
 
-#: ../src/cairo-dock-menu.c:1201 ../src/cairo-dock-menu.c:1263
+#: ../src/cairo-dock-menu.c:1209 ../src/cairo-dock-menu.c:1271
 msgid ""
 "Don't forget you can drag a launcher from the menu and drop it in the dock !"
 msgstr "不要忘记，你可以从菜单拖一个启动器到dock上！"
 
-#: ../src/cairo-dock-menu.c:1203 ../src/cairo-dock-menu.c:1265
+#: ../src/cairo-dock-menu.c:1211 ../src/cairo-dock-menu.c:1273
 msgid "Add a sub-dock"
 msgstr "添加一个子dock"
 
-#: ../src/cairo-dock-menu.c:1207 ../src/cairo-dock-menu.c:1269
+#: ../src/cairo-dock-menu.c:1215 ../src/cairo-dock-menu.c:1277
 msgid "Add a separator"
 msgstr "添加一个间隔"
 
-#: ../src/cairo-dock-menu.c:1227
+#: ../src/cairo-dock-menu.c:1235
 msgid "Unmount"
 msgstr "卸载"
 
-#: ../src/cairo-dock-menu.c:1227
+#: ../src/cairo-dock-menu.c:1235
 msgid "Mount"
 msgstr "挂载"
 
-#: ../src/cairo-dock-menu.c:1233
+#: ../src/cairo-dock-menu.c:1241
 msgid "Eject"
 msgstr "弹出"
 
-#: ../src/cairo-dock-menu.c:1240
+#: ../src/cairo-dock-menu.c:1248
 #, fuzzy
 msgid "Delete this file"
 msgstr "卸载此模块"
 
-#: ../src/cairo-dock-menu.c:1244
+#: ../src/cairo-dock-menu.c:1252
 #, fuzzy
 msgid "Rename this file"
 msgstr "移除此模块"
 
-#: ../src/cairo-dock-menu.c:1248
+#: ../src/cairo-dock-menu.c:1256
 msgid "Properties"
 msgstr ""
 
-#: ../src/cairo-dock-menu.c:1278
+#: ../src/cairo-dock-menu.c:1286
 msgid "Remove this separator"
 msgstr "移除此分隔"
 
-#: ../src/cairo-dock-menu.c:1278
+#: ../src/cairo-dock-menu.c:1286
 msgid "Remove this launcher"
 msgstr "移除此启动器"
 
-#: ../src/cairo-dock-menu.c:1280
+#: ../src/cairo-dock-menu.c:1288
 msgid "Modify this separator"
 msgstr "修改此分隔"
 
-#: ../src/cairo-dock-menu.c:1290
+#: ../src/cairo-dock-menu.c:1298
 msgid "Other actions"
 msgstr "其它行为"
 
-#: ../src/cairo-dock-menu.c:1296
+#: ../src/cairo-dock-menu.c:1304
 msgid "Not Fullscreen"
 msgstr "非全屏"
 
-#: ../src/cairo-dock-menu.c:1296
+#: ../src/cairo-dock-menu.c:1304
 msgid "Fullscreen"
 msgstr "全屏"
 
-#: ../src/cairo-dock-menu.c:1298
+#: ../src/cairo-dock-menu.c:1306
 msgid "Move to this desktop"
 msgstr "移到桌面"
 
-#: ../src/cairo-dock-menu.c:1302
+#: ../src/cairo-dock-menu.c:1310
 msgid "Don't keep above"
 msgstr "不要保持在上"
 
-#: ../src/cairo-dock-menu.c:1302
+#: ../src/cairo-dock-menu.c:1310
 msgid "Keep above"
 msgstr "保持在上"
 
-#: ../src/cairo-dock-menu.c:1309
+#: ../src/cairo-dock-menu.c:1317
 #, c-format
 msgid "Move to desktop %d - face %d"
 msgstr "移动至桌面%d - 面%d"
 
-#: ../src/cairo-dock-menu.c:1311
+#: ../src/cairo-dock-menu.c:1319
 #, c-format
 msgid "Move to desktop %d"
 msgstr "移至桌面 %d"
 
-#: ../src/cairo-dock-menu.c:1313
+#: ../src/cairo-dock-menu.c:1321
 #, c-format
 msgid "Move to face %d"
 msgstr "移至面%d"
 
-#: ../src/cairo-dock-menu.c:1344
+#: ../src/cairo-dock-menu.c:1352
 msgid "Kill"
 msgstr "杀死"
 
-#: ../src/cairo-dock-menu.c:1350
+#: ../src/cairo-dock-menu.c:1358
 msgid "Launch new"
 msgstr "启动新的"
 
-#: ../src/cairo-dock-menu.c:1354
+#: ../src/cairo-dock-menu.c:1362
 msgid "Unmaximize"
 msgstr "恢复"
 
-#: ../src/cairo-dock-menu.c:1354
+#: ../src/cairo-dock-menu.c:1362
 msgid "Maximize"
 msgstr "最大化"
 
-#: ../src/cairo-dock-menu.c:1356
+#: ../src/cairo-dock-menu.c:1364
 msgid "Show"
 msgstr "显示"
 
-#: ../src/cairo-dock-menu.c:1358
+#: ../src/cairo-dock-menu.c:1366
 msgid "Minimize"
 msgstr "最小化"
 
-#: ../src/cairo-dock-menu.c:1360
+#: ../src/cairo-dock-menu.c:1368
 msgid "Close"
 msgstr "关闭"
 
-#: ../src/cairo-dock-menu.c:1379
+#: ../src/cairo-dock-menu.c:1387
 msgid "Configure this applet"
 msgstr "配置此模块"
 
-#: ../src/cairo-dock-menu.c:1383
+#: ../src/cairo-dock-menu.c:1391
 msgid "Detach this applet"
 msgstr "卸载此模块"
 
-#: ../src/cairo-dock-menu.c:1383
+#: ../src/cairo-dock-menu.c:1391
 msgid "Return to dock"
 msgstr "返回dock"
 
-#: ../src/cairo-dock-menu.c:1386
+#: ../src/cairo-dock-menu.c:1394
 msgid "Remove this applet"
 msgstr "移除此模块"
 
-#: ../src/cairo-dock-menu.c:1390
+#: ../src/cairo-dock-menu.c:1398
 msgid "Launch another instance of this applet"
 msgstr ""
 
-#: ../src/cairo-dock-menu.c:1409
+#: ../src/cairo-dock-menu.c:1417
 msgid "Always on top"
 msgstr "总是置顶"
 
-#: ../src/cairo-dock-menu.c:1416
+#: ../src/cairo-dock-menu.c:1424
 msgid "Normal"
 msgstr "普通"
 
-#: ../src/cairo-dock-menu.c:1423
+#: ../src/cairo-dock-menu.c:1431
 msgid "Always below"
 msgstr "总在下面"
 
-#: ../src/cairo-dock-menu.c:1438
+#: ../src/cairo-dock-menu.c:1446
 msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr "设置Compiz中的行为成：(name=cairo-dock-desklet & type=utility)"
 
@@ -514,12 +514,11 @@ msgid "Pop-up only if the mouse hits a screen corner ?"
 msgstr ""
 
 #: ../data/messages:49
-#, fuzzy
 msgid ""
 "When you press the shortcut, the dock will show itself at the potition of "
 "your mouse. The rest of the time, it stays invisible, thus acting like a "
 "menu."
-msgstr "按下快捷键时，dock将象菜单一样在您鼠标的位置隐藏或显现。"
+msgstr ""
 
 #: ../data/messages:51
 msgid "Keyboard shortcut to show/hide the dock :"
@@ -625,24 +624,20 @@ msgid "Middle click on an icon closes its relative application ?"
 msgstr "中键点击图标关闭其相应应用程序。"
 
 #: ../data/messages:93
-#, fuzzy
 msgid ""
 "This is only usefull if you don't already use the auto-hide, and if your WM "
 "let the dock in front of fullscreen windows (which is rare)."
 msgstr ""
-"此选项仅用于你没启用自动隐藏，而且你的窗口管理器把dock置于全屏窗口之前（罕"
-"见）"
 
 #: ../data/messages:95
 msgid "Automatically quick-hide the dock when a window becomes fullscreen ?"
 msgstr "当一个窗口变为全屏时，自动快速隐藏dock？"
 
 #: ../data/messages:97
-#, fuzzy
 msgid ""
 "This is only usefull if don't already use the auto-hide, and if you don't "
 "want to reserve the space for your dock nor let it below the other windows."
-msgstr "仅当你没有启用自动隐藏"
+msgstr ""
 
 #: ../data/messages:99
 msgid "Automatically quick-hide the dock when a window becomes maximized ?"
@@ -761,11 +756,10 @@ msgid "Should the decorations be enslaved to the cursor ?"
 msgstr "装饰的移动紧随指针？"
 
 #: ../data/messages:147
-#, fuzzy
 msgid ""
 "If you put 0, this will make them scroll of exactly one icon each time. If "
 "you put -1, the scroll wil be de-activated"
-msgstr "如果取值为0,则每次恰好卷动一个图标。"
+msgstr ""
 
 #: ../data/messages:149
 msgid "Amount of pixels the icons will scroll at each wheel scroll :"
@@ -895,6 +889,9 @@ msgstr "显示隐藏文件？"
 msgid "Composition"
 msgstr "位置"
 
+# #################################
+# ########### cairo-dock.conf #############
+# #################################
 #: ../data/messages:209
 msgid ""
 "Only use this if you don't run a composite manager like Compiz, xcompmgr, "
@@ -1235,7 +1232,6 @@ msgid "Icons' themes"
 msgstr "图标主题"
 
 #: ../data/messages:367 ../data/messages:731
-#, fuzzy
 msgid ""
 "Directories or themes where to search icons. Put some directories where you "
 "have icons you wish to see in the dock, or put some theme's name you've "
@@ -1243,9 +1239,6 @@ msgid ""
 "research). The key word _LocalTheme_ represents the directory ~/.config/"
 "cairo-dock/current_theme/icons"
 msgstr ""
-"从中搜寻图标的目录或主题。设为您想在其中搜寻图标的目录名，或是您已经装入系统"
-"的主题名称。（已经考虑了顺序问题）关键词：_ThemeDirectory_指的是目录~/.cairo-"
-"dock/current_theme/launchers"
 
 #: ../data/messages:369 ../data/messages:733
 msgid "List of icons themes or directories :"
@@ -1471,7 +1464,7 @@ msgstr "桌面小工具"
 #: ../data/messages:533
 #, fuzzy
 msgid "Choose a default decoration for all desklets :"
-msgstr "选择主dock的默认视图："
+msgstr "为根dock选择默认的视图："
 
 #: ../data/messages:535
 msgid ""
@@ -1555,11 +1548,10 @@ msgid "Indicator of drag'n'drop on the dock"
 msgstr ""
 
 #: ../data/messages:567
-#, fuzzy
 msgid ""
 "Typically an arrow, that will be displayed when you try to drop a new "
 "launcher into the dock. Let empty to use the default one."
-msgstr "通常是一个箭头，出现于你将一个启动器放入dock的时候。"
+msgstr ""
 
 #: ../data/messages:569
 msgid "Image for the drag'n'drop animation :"
@@ -1571,9 +1563,8 @@ msgid "Indicator of drag'n'drop on icons"
 msgstr "用于拖曳动画的图片："
 
 #: ../data/messages:573
-#, fuzzy
 msgid "Display a drop indicator on icon while dragging over them ?"
-msgstr "在图标上显示指示器么？"
+msgstr ""
 
 #: ../data/messages:575
 msgid ""
@@ -1584,7 +1575,7 @@ msgstr ""
 #: ../data/messages:577
 #, fuzzy
 msgid "Image for the indicator :"
-msgstr "用于插入动画的图片："
+msgstr "用于拖曳动画的图片："
 
 #: ../data/messages:579
 #, fuzzy
@@ -1782,9 +1773,8 @@ msgid "Color of the extern line (red, blue, green, alpha):"
 msgstr "描边颜色 (红，蓝，绿，alpha)："
 
 #: ../data/messages:787
-#, fuzzy
 msgid "Desklet's decorations :"
-msgstr "桌面小程序的背景色："
+msgstr ""
 
 #: ../data/messages:789 ../data/messages:803 ../data/messages:863
 msgid "Desktop Entry"
@@ -2155,7 +2145,7 @@ msgstr ""
 
 #: ../data/messages:935
 msgid ""
-"v1.6.3 : farther and farther !\n"
+"v1.6.3 : \n"
 " - first the bad news :\n"
 " user datas have been moved into ~/.config to respect the FreeDesktop "
 "standards.\n"
@@ -2163,6 +2153,7 @@ msgid ""
 " So in advance, sorry for the possible inconvenience ^_^\n"
 " - And now the very good news !\n"
 " - 2 new applets have just been born : Clipper and GMenu. \n"
+" - Lot of improvements for Desklets : decorations, rotation, dragging, etc\n"
 " - Cpusage and other applets can now display nice graphics.\n"
 " - You can now remove launchers by dragging them out of the dock\n"
 "  and detach applet in the same way.\n"
@@ -2179,28 +2170,13 @@ msgstr ""
 #~ msgid "Desklet's background color when mouse hovers it :"
 #~ msgstr "当鼠标掠过时桌面小程序的背景色："
 
-#~ msgid "Add a launcher"
-#~ msgstr "添加一个启动器"
-
 #~ msgid "Choose or Create a launcher"
 #~ msgstr "选择或创建一个启动器"
-
-#, fuzzy
-#~ msgid "Color of the indicator (r,v,b,a) :"
-#~ msgstr "框线颜色 (红,绿,蓝,alpha) :"
 
 #~ msgid ""
 #~ "The ratio between indicator's size and icon's size. The bigger, the "
 #~ "bigger the indicators are."
 #~ msgstr "指示器大小和图标大小的比率。越大，指示器越大。"
-
-#, fuzzy
-#~ msgid "Options"
-#~ msgstr "应用程序"
-
-#, fuzzy
-#~ msgid "Name of an image to use for the drop indicator emblem :"
-#~ msgstr "用做指示器的图片文件名："
 
 #~ msgid "All"
 #~ msgstr "所有"

@@ -56,7 +56,7 @@ msgstr "προσάρτηση"
 msgid "unmount"
 msgstr "αποπροσάρτηση"
 
-#: ../src/cairo-dock-gui-factory.c:1621
+#: ../src/cairo-dock-gui-factory.c:1622
 msgid "grab"
 msgstr "λήψη"
 
@@ -100,7 +100,7 @@ msgstr "Φόρτωση αυτού του εκκινητή;"
 msgid "Undefined"
 msgstr ""
 
-#: ../src/cairo-dock-menu.c:428 ../src/cairo-dock-menu.c:1280
+#: ../src/cairo-dock-menu.c:428 ../src/cairo-dock-menu.c:1288
 msgid "Modify this launcher"
 msgstr "Μετατροπή αυτού του εκκινητή;"
 
@@ -150,193 +150,193 @@ msgstr ""
 msgid "Set position for the dock '%s'"
 msgstr "Καθορίστε τη θέση του dock '%s'"
 
-#: ../src/cairo-dock-menu.c:1151
+#: ../src/cairo-dock-menu.c:1159
 msgid "Configure"
 msgstr "Ρυθμίσεις"
 
-#: ../src/cairo-dock-menu.c:1158
+#: ../src/cairo-dock-menu.c:1166
 msgid "Set up this dock"
 msgstr "Ρύθμιση αυτού του dock"
 
-#: ../src/cairo-dock-menu.c:1160
+#: ../src/cairo-dock-menu.c:1168
 msgid "Manage themes"
 msgstr "Διαχείριση θεμάτων"
 
-#: ../src/cairo-dock-menu.c:1163
+#: ../src/cairo-dock-menu.c:1171
 msgid "About"
 msgstr "Σχετικά"
 
-#: ../src/cairo-dock-menu.c:1165
+#: ../src/cairo-dock-menu.c:1173
 msgid "Development's site"
 msgstr "Ιστότοπος ανάπτυξης"
 
-#: ../src/cairo-dock-menu.c:1167
+#: ../src/cairo-dock-menu.c:1175
 msgid "Community's site"
 msgstr "Ιστότοπος κοινότητας"
 
-#: ../src/cairo-dock-menu.c:1171
+#: ../src/cairo-dock-menu.c:1179
 msgid "Quick-Hide"
 msgstr "Άμεση-Απόκρυψη"
 
-#: ../src/cairo-dock-menu.c:1176
+#: ../src/cairo-dock-menu.c:1184
 msgid "Quit"
 msgstr "Έξοδος"
 
-#: ../src/cairo-dock-menu.c:1200 ../src/cairo-dock-menu.c:1262
+#: ../src/cairo-dock-menu.c:1208 ../src/cairo-dock-menu.c:1270
 msgid "Add a manual launcher"
 msgstr "Προσθήκη ενός χειροκίνητου εκκινητή"
 
-#: ../src/cairo-dock-menu.c:1201 ../src/cairo-dock-menu.c:1263
+#: ../src/cairo-dock-menu.c:1209 ../src/cairo-dock-menu.c:1271
 msgid ""
 "Don't forget you can drag a launcher from the menu and drop it in the dock !"
 msgstr ""
 "Μην ξεχνάτε ότι μπορείτε να τραβήξετε έναν εκκινητή από το μενού και να τον "
 "αποθέσετε στο dock!"
 
-#: ../src/cairo-dock-menu.c:1203 ../src/cairo-dock-menu.c:1265
+#: ../src/cairo-dock-menu.c:1211 ../src/cairo-dock-menu.c:1273
 msgid "Add a sub-dock"
 msgstr "Προσθήκη ενός sub-dock"
 
-#: ../src/cairo-dock-menu.c:1207 ../src/cairo-dock-menu.c:1269
+#: ../src/cairo-dock-menu.c:1215 ../src/cairo-dock-menu.c:1277
 msgid "Add a separator"
 msgstr "Προσθήκη ενός διαχωριστή"
 
-#: ../src/cairo-dock-menu.c:1227
+#: ../src/cairo-dock-menu.c:1235
 msgid "Unmount"
 msgstr "Αποπροσάρτηση"
 
-#: ../src/cairo-dock-menu.c:1227
+#: ../src/cairo-dock-menu.c:1235
 msgid "Mount"
 msgstr "Προσάρτηση"
 
-#: ../src/cairo-dock-menu.c:1233
+#: ../src/cairo-dock-menu.c:1241
 msgid "Eject"
 msgstr "Αποβολή"
 
-#: ../src/cairo-dock-menu.c:1240
+#: ../src/cairo-dock-menu.c:1248
 msgid "Delete this file"
 msgstr "Διαγραφή αυτού του αρχείου"
 
-#: ../src/cairo-dock-menu.c:1244
+#: ../src/cairo-dock-menu.c:1252
 msgid "Rename this file"
 msgstr "Μετονομασία αυτού του αρχείου"
 
-#: ../src/cairo-dock-menu.c:1248
+#: ../src/cairo-dock-menu.c:1256
 msgid "Properties"
 msgstr "Ιδιότητες"
 
-#: ../src/cairo-dock-menu.c:1278
+#: ../src/cairo-dock-menu.c:1286
 msgid "Remove this separator"
 msgstr "Αφαίρεση αυτού του διαχωριστή"
 
-#: ../src/cairo-dock-menu.c:1278
+#: ../src/cairo-dock-menu.c:1286
 msgid "Remove this launcher"
 msgstr "Αφαίρεση αυτού του εκκινητή"
 
-#: ../src/cairo-dock-menu.c:1280
+#: ../src/cairo-dock-menu.c:1288
 msgid "Modify this separator"
 msgstr "Μετατροπή αυτού του διαχωριστή"
 
-#: ../src/cairo-dock-menu.c:1290
+#: ../src/cairo-dock-menu.c:1298
 msgid "Other actions"
 msgstr "Άλλες ενέργειες"
 
-#: ../src/cairo-dock-menu.c:1296
+#: ../src/cairo-dock-menu.c:1304
 msgid "Not Fullscreen"
 msgstr "Όχι Πλήρης Οθόνη"
 
-#: ../src/cairo-dock-menu.c:1296
+#: ../src/cairo-dock-menu.c:1304
 msgid "Fullscreen"
 msgstr "Πλήρης Οθόνη"
 
-#: ../src/cairo-dock-menu.c:1298
+#: ../src/cairo-dock-menu.c:1306
 msgid "Move to this desktop"
 msgstr "Μετάβαση σε αυτή την επιφάνεια εργασίας"
 
-#: ../src/cairo-dock-menu.c:1302
+#: ../src/cairo-dock-menu.c:1310
 msgid "Don't keep above"
 msgstr "Όχι διατήρηση στο προσκήνιο"
 
-#: ../src/cairo-dock-menu.c:1302
+#: ../src/cairo-dock-menu.c:1310
 msgid "Keep above"
 msgstr "Διατήρηση στο προσκήνιο"
 
-#: ../src/cairo-dock-menu.c:1309
+#: ../src/cairo-dock-menu.c:1317
 #, c-format
 msgid "Move to desktop %d - face %d"
 msgstr "Μετάβαση στην επιφάνεια εργασίας %d - όψη %d"
 
-#: ../src/cairo-dock-menu.c:1311
+#: ../src/cairo-dock-menu.c:1319
 #, c-format
 msgid "Move to desktop %d"
 msgstr "Μετάβαση στην επιφάνεια εργασίας %d"
 
-#: ../src/cairo-dock-menu.c:1313
+#: ../src/cairo-dock-menu.c:1321
 #, c-format
 msgid "Move to face %d"
 msgstr "Μετάβαση στην όψη %d"
 
-#: ../src/cairo-dock-menu.c:1344
+#: ../src/cairo-dock-menu.c:1352
 msgid "Kill"
 msgstr "Σκότωμα"
 
-#: ../src/cairo-dock-menu.c:1350
+#: ../src/cairo-dock-menu.c:1358
 msgid "Launch new"
 msgstr "Φόρτωση νέου"
 
-#: ../src/cairo-dock-menu.c:1354
+#: ../src/cairo-dock-menu.c:1362
 msgid "Unmaximize"
 msgstr "Απομεγιστοποίηση"
 
-#: ../src/cairo-dock-menu.c:1354
+#: ../src/cairo-dock-menu.c:1362
 msgid "Maximize"
 msgstr "Μεγέθυνση"
 
-#: ../src/cairo-dock-menu.c:1356
+#: ../src/cairo-dock-menu.c:1364
 msgid "Show"
 msgstr "Εμφάνιση"
 
-#: ../src/cairo-dock-menu.c:1358
+#: ../src/cairo-dock-menu.c:1366
 msgid "Minimize"
 msgstr "Σμίκρυνση"
 
-#: ../src/cairo-dock-menu.c:1360
+#: ../src/cairo-dock-menu.c:1368
 msgid "Close"
 msgstr "Κλείσιμο"
 
-#: ../src/cairo-dock-menu.c:1379
+#: ../src/cairo-dock-menu.c:1387
 msgid "Configure this applet"
 msgstr "Ρύθμιση αυτής της μικροεφαρμογής"
 
-#: ../src/cairo-dock-menu.c:1383
+#: ../src/cairo-dock-menu.c:1391
 msgid "Detach this applet"
 msgstr "Αποσύνδεση αυτής της μικροεφαρμογής"
 
-#: ../src/cairo-dock-menu.c:1383
+#: ../src/cairo-dock-menu.c:1391
 msgid "Return to dock"
 msgstr "Επιστροφή στο dock"
 
-#: ../src/cairo-dock-menu.c:1386
+#: ../src/cairo-dock-menu.c:1394
 msgid "Remove this applet"
 msgstr "Αφαίρεση αυτής της μικροεφαρμογής"
 
-#: ../src/cairo-dock-menu.c:1390
+#: ../src/cairo-dock-menu.c:1398
 msgid "Launch another instance of this applet"
 msgstr "Φόρτωση άλλου στιγμιότυπου αυτής της μικροεφαρμογής"
 
-#: ../src/cairo-dock-menu.c:1409
+#: ../src/cairo-dock-menu.c:1417
 msgid "Always on top"
 msgstr "Πάντα επάνω"
 
-#: ../src/cairo-dock-menu.c:1416
+#: ../src/cairo-dock-menu.c:1424
 msgid "Normal"
 msgstr "Κανονικά"
 
-#: ../src/cairo-dock-menu.c:1423
+#: ../src/cairo-dock-menu.c:1431
 msgid "Always below"
 msgstr "Πάντα κάτω"
 
-#: ../src/cairo-dock-menu.c:1438
+#: ../src/cairo-dock-menu.c:1446
 msgid "set behaviour in Compiz to: (name=cairo-dock & type=utility)"
 msgstr ""
 "καθορισμός συμπεριφοράς στο Compiz σε: (όνομα=cairo-dock & τύπος=βοήθημα)"
@@ -2410,7 +2410,7 @@ msgstr ""
 
 #: ../data/messages:935
 msgid ""
-"v1.6.3 : farther and farther !\n"
+"v1.6.3 : \n"
 " - first the bad news :\n"
 " user datas have been moved into ~/.config to respect the FreeDesktop "
 "standards.\n"
@@ -2418,6 +2418,7 @@ msgid ""
 " So in advance, sorry for the possible inconvenience ^_^\n"
 " - And now the very good news !\n"
 " - 2 new applets have just been born : Clipper and GMenu. \n"
+" - Lot of improvements for Desklets : decorations, rotation, dragging, etc\n"
 " - Cpusage and other applets can now display nice graphics.\n"
 " - You can now remove launchers by dragging them out of the dock\n"
 "  and detach applet in the same way.\n"
