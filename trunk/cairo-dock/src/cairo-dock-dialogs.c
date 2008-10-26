@@ -19,6 +19,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet@users.ber
 #include "cairo-dock-desklet.h"
 #include "cairo-dock-dock-manager.h"
 #include "cairo-dock-renderer-manager.h"
+#include "cairo-dock-surface-factory.h"
 #include "cairo-dock-dialogs.h"
 
 static GSList *s_pDialogList = NULL;
@@ -34,6 +35,7 @@ extern int g_iVisibleZoneWidth, g_iVisibleZoneHeight;
 extern int g_iDockLineWidth;
 extern int g_iDockRadius;
 extern double g_fLineColor[4];
+extern double g_fAmplitude;
 
 extern int g_iDialogButtonWidth;
 extern int g_iDialogButtonHeight;
@@ -799,8 +801,18 @@ CairoDialog *cairo_dock_build_dialog (const gchar *cText, Icon *pIcon, CairoCont
 			pDialog->iIconSize = pDialog->iTextHeight;
 		else
 			pDialog->iIconSize = MAX (g_iDialogIconSize, 16);
-		pDialog->pIconBuffer = cairo_dock_load_image_for_square_icon (pSourceContext, cImageFilePath, pDialog->iIconSize);
-		
+		if (strcmp (cImageFilePath, "same icon") == 0)
+		{
+			double fMaxScale = cairo_dock_get_max_scale (pContainer);
+			pDialog->pIconBuffer = cairo_dock_duplicate_surface (pIcon->pIconBuffer,
+				pSourceContext,
+				pIcon->fWidth * fMaxScale, pIcon->fHeight * fMaxScale,
+				pDialog->iIconSize, pDialog->iIconSize);
+		}
+		else
+		{
+			pDialog->pIconBuffer = cairo_dock_load_image_for_square_icon (pSourceContext, cImageFilePath, pDialog->iIconSize);
+		}
 		pDialog->iMessageWidth += pDialog->iIconSize + CAIRO_DIALOG_TEXT_MARGIN;
 		pDialog->iMessageHeight = MAX (pDialog->iMessageHeight, pDialog->iIconSize + 2 * CAIRO_DIALOG_TEXT_MARGIN);
 		pDialog->iBubbleWidth = pDialog->iMessageWidth;
@@ -1004,10 +1016,10 @@ void cairo_dock_set_dialog_message (CairoDialog *pDialog, const gchar *cMessage)
 
 void cairo_dock_set_dialog_icon (CairoDialog *pDialog, const gchar *cImageFilePath)
 {
-	cairo_surface_destroy (pDialog->pIconBuffer);
-	
 	if (cImageFilePath != NULL)
 	{
+		if (pDialog->pIconBuffer != NULL)
+			cairo_surface_destroy (pDialog->pIconBuffer);
 		cairo_t *pSourceContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDialog));
 		pDialog->pIconBuffer = cairo_dock_load_image_for_square_icon (pSourceContext, cImageFilePath, pDialog->iIconSize);
 		cairo_destroy (pSourceContext);
@@ -1018,8 +1030,9 @@ void cairo_dock_set_dialog_icon (CairoDialog *pDialog, const gchar *cImageFilePa
 			pDialog->iIconSize,
 			pDialog->iIconSize);
 	}
-	else
+	else if (pDialog->pIconBuffer != NULL)
 	{
+		cairo_surface_destroy (pDialog->pIconBuffer);
 		pDialog->pIconBuffer = NULL;
 		pDialog->iMessageWidth -= pDialog->iIconSize;
 		pDialog->iMessageHeight = pDialog->iTextHeight + 2 * CAIRO_DIALOG_TEXT_MARGIN;

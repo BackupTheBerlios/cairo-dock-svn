@@ -1116,9 +1116,17 @@ void cairo_dock_delete_menu (GtkMenuShell *menu, CairoDock *pDock)
 GtkWidget *cairo_dock_build_menu (Icon *icon, CairoContainer *pContainer)
 {
 	static gpointer *data = NULL;
-
+	static GtkWidget *s_pMenu = NULL;
+	
+	if (s_pMenu != NULL)
+	{
+		gtk_widget_destroy (s_pMenu);
+		s_pMenu = NULL;
+	}
+	
 	//\_________________________ On construit le menu et les donnees passees en callback.
 	GtkWidget *menu = gtk_menu_new ();
+	s_pMenu = menu;
 	
 	if (CAIRO_DOCK_IS_DOCK (pContainer))
 		g_signal_connect (G_OBJECT (menu),

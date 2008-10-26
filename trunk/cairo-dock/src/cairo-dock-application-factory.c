@@ -457,7 +457,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 							g_print ("%s requiert votre attention indirectement !\n", pParentIcon->acName);
 							pParentIcon->bIsDemandingAttention = TRUE;
 							if (g_bDemandsAttentionWithDialog)
-								cairo_dock_show_temporary_dialog (pParentIcon->acName, pParentIcon, CAIRO_CONTAINER (pDock), 2000);
+								cairo_dock_show_temporary_dialog_with_icon (pParentIcon->acName, pParentIcon, CAIRO_CONTAINER (pDock), 2000, "same icon");
 							if (g_bDemandsAttentionWithAnimation)
 							{
 								cairo_dock_arm_animation (pParentIcon, -1, 1e6);  // animation sans fin.
@@ -498,7 +498,7 @@ Icon * cairo_dock_create_icon_from_xwindow (cairo_t *pSourceContext, Window Xid,
 					g_print ("%s requiert votre attention indirectement !\n", pParentIcon->acName);
 					pParentIcon->bIsDemandingAttention = TRUE;
 					if (g_bDemandsAttentionWithDialog)
-						cairo_dock_show_temporary_dialog (pParentIcon->acName, pParentIcon, CAIRO_CONTAINER (pDock), 2000);
+						cairo_dock_show_temporary_dialog_with_icon (pParentIcon->acName, pParentIcon, CAIRO_CONTAINER (pDock), 2000, "same icon");
 					if (g_bDemandsAttentionWithAnimation)
 					{
 						cairo_dock_arm_animation (pParentIcon, -1, 1e6);  // animation sans fin.
@@ -645,7 +645,7 @@ void cairo_dock_Xproperty_changed (Icon *icon, Atom aProperty, int iState, Cairo
 					g_print ("%s vous interpelle !\n", icon->acName);
 					icon->bIsDemandingAttention = TRUE;
 					if (g_bDemandsAttentionWithDialog)
-						cairo_dock_show_temporary_dialog (icon->acName, icon, CAIRO_CONTAINER (pDock), 2000);
+						cairo_dock_show_temporary_dialog_with_icon (icon->acName, icon, CAIRO_CONTAINER (pDock), 2000, "same icon");
 					if (g_bDemandsAttentionWithAnimation)
 					{
 						cairo_dock_arm_animation (icon, -1, 1e6);  // animation sans fin.

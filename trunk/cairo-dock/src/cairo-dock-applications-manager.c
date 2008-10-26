@@ -896,7 +896,7 @@ gboolean cairo_dock_unstack_Xevents (CairoDock *pDock)
 							g_print ("%s demande votre attention !\n", icon->acName);
 							icon->bIsDemandingAttention = TRUE;
 							if (g_bDemandsAttentionWithDialog)
-								cairo_dock_show_temporary_dialog (icon->acName, icon, CAIRO_CONTAINER (pDock), 2000);
+								cairo_dock_show_temporary_dialog_with_icon (icon->acName, icon, CAIRO_CONTAINER (pDock), 2000, "same icon");
 							if (g_bDemandsAttentionWithAnimation)
 							{
 								cairo_dock_arm_animation (icon, -1, 1e6);  // animation sans fin.
