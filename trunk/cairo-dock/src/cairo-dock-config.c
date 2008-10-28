@@ -1063,14 +1063,14 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	gchar *cDeskletDecorationsNameOld = g_cDeskletDecorationsName;
 	g_cDeskletDecorationsName = cairo_dock_get_string_key_value (pKeyFile, "Desklets", "decorations", &bFlushConfFileNeeded, "dark", NULL, NULL);
+	CairoDeskletDecoration *pUserDeskletDecorations = cairo_dock_get_desklet_decoration ("personnal");
+	if (pUserDeskletDecorations == NULL)
+	{
+		pUserDeskletDecorations = g_new0 (CairoDeskletDecoration, 1);
+		cairo_dock_register_desklet_decoration ("personnal", pUserDeskletDecorations);
+	}
 	if (g_cDeskletDecorationsName == NULL || strcmp (g_cDeskletDecorationsName, "personnal") == 0)
 	{
-		CairoDeskletDecoration *pUserDeskletDecorations = cairo_dock_get_desklet_decoration ("personnal");
-		if (pUserDeskletDecorations == NULL)
-		{
-			pUserDeskletDecorations = g_new0 (CairoDeskletDecoration, 1);
-			cairo_dock_register_desklet_decoration ("personnal", pUserDeskletDecorations);
-		}
 		g_free (pUserDeskletDecorations->cBackGroundImagePath);
 		pUserDeskletDecorations->cBackGroundImagePath = cairo_dock_get_string_key_value (pKeyFile, "Desklets", "bg desklet", &bFlushConfFileNeeded, NULL, NULL, NULL);
 		g_free (pUserDeskletDecorations->cForeGroundImagePath);

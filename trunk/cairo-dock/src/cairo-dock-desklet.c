@@ -240,7 +240,7 @@ static gboolean _cairo_dock_write_desklet_size (CairoDesklet *pDesklet)
 	pDesklet->iSidWriteSize = 0;
 	pDesklet->iKnownWidth = pDesklet->iWidth;
 	pDesklet->iKnownHeight = pDesklet->iHeight;
-	if (pDesklet->iDesiredWidth == pDesklet->iWidth && pDesklet->iDesiredHeight == pDesklet->iHeight && (pDesklet->iDesiredWidth != 0 || pDesklet->iDesiredHeight != 0))
+	if (((pDesklet->iDesiredWidth != 0 || pDesklet->iDesiredHeight != 0) && pDesklet->iDesiredWidth == pDesklet->iWidth && pDesklet->iDesiredHeight == pDesklet->iHeight) || (pDesklet->iDesiredWidth == 0 && pDesklet->iDesiredHeight == 0))
 	{
 		pDesklet->iDesiredWidth = 0;
 		pDesklet->iDesiredHeight = 0;
@@ -248,12 +248,14 @@ static gboolean _cairo_dock_write_desklet_size (CairoDesklet *pDesklet)
 		cairo_t *pCairoContext = cairo_dock_create_context_from_window (CAIRO_CONTAINER (pDesklet));
 		cairo_dock_load_desklet_decorations (pDesklet, pCairoContext);
 		cairo_destroy (pCairoContext);
+		
+		if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModuleInstance != NULL)
+		{
+			cairo_dock_reload_module_instance (pDesklet->pIcon->pModuleInstance, FALSE);
+			gtk_widget_queue_draw (pDesklet->pWidget);  // sinon on ne redessine que l'interieur.
+		}
 	}
-	if (pDesklet->pIcon != NULL && pDesklet->pIcon->pModuleInstance != NULL)
-	{
-		cairo_dock_reload_module_instance (pDesklet->pIcon->pModuleInstance, FALSE);
-		gtk_widget_queue_draw (pDesklet->pWidget);  // sinon on ne redessine que l'interieur.
-	}
+	
 	//g_print ("iWidth <- %d;iHeight <- %d ; (%dx%d) (%x)\n", pDesklet->iWidth, pDesklet->iHeight, pDesklet->iKnownWidth, pDesklet->iKnownHeight, pDesklet->pIcon);
 	return FALSE;
 }
@@ -909,7 +911,7 @@ void cairo_dock_load_desklet_decorations (CairoDesklet *pDesklet, cairo_t *pSour
 	
 	CairoDeskletDecoration *pDeskletDecorations;
 	g_print ("%s (%s)\n", __func__, pDesklet->cDecorationTheme);
-	if (pDesklet->cDecorationTheme == NULL || (pDesklet->cDecorationTheme, "personnal") == 0)
+	if (pDesklet->cDecorationTheme == NULL || strcmp (pDesklet->cDecorationTheme, "personnal") == 0)
 		pDeskletDecorations = pDesklet->pUserDecoration;
 	else if (strcmp (pDesklet->cDecorationTheme, "default") == 0)
 		pDeskletDecorations = cairo_dock_get_desklet_decoration (g_cDeskletDecorationsName);
