@@ -26,7 +26,7 @@ extern gint g_iDockLineWidth;
 /// rayon des coins du cadre.
 extern gint g_iDockRadius;
 /// Marge entre le cadre et les icones.
-gint g_iFrameMargin;
+extern gint g_iFrameMargin;
 /// La couleur du cadre.
 extern double g_fLineColor[4];
 /// Ecart en pixels entre les icones.

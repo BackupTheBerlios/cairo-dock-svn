@@ -239,6 +239,17 @@ gboolean cairo_dock_fm_logout (void)
 		return FALSE;
 }
 
+gboolean cairo_dock_fm_shutdown (void)
+{
+	if (s_pVFSBackend != NULL && s_pVFSBackend->shutdown!= NULL)
+	{
+		s_pVFSBackend->shutdown ();
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
 gboolean cairo_dock_fm_setup_time (void)
 {
 	if (s_pVFSBackend != NULL && s_pVFSBackend->setup_time!= NULL)

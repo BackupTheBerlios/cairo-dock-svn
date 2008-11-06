@@ -711,6 +711,7 @@ struct _CairoDockVFSBackend {
 	CairoDockFMGetTrashFunc 		get_trash_path;
 	CairoDockFMGetDesktopFunc 	get_desktop_path;
 	CairoDockFMUserActionFunc		logout;
+	CairoDockFMUserActionFunc		shutdown;
 	CairoDockFMUserActionFunc		setup_time;
 };
 
