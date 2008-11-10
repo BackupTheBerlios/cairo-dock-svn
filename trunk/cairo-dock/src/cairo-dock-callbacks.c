@@ -1997,3 +1997,8 @@ void cairo_dock_hide_dock_like_a_menu (void)
 		s_bHideAfterShortcut = FALSE;
 	}
 }
+
+void cairo_dock_unregister_current_flying_container (void)
+{
+	s_pFlyingContainer = NULL;
+}

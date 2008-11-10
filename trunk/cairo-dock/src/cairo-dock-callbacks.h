@@ -87,6 +87,7 @@ void cairo_dock_raise_from_keyboard (const char *cKeyShortcut, gpointer data);
 
 void cairo_dock_hide_dock_like_a_menu (void);
 
+void cairo_dock_unregister_current_flying_container (void);
 
 G_END_DECLS
 #endif

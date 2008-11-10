@@ -69,7 +69,7 @@ static gboolean on_expose_flying_icon (GtkWidget *pWidget,
 	}
 	else
 	{
-		g_print ("compte a rebours : %d\n", pFlyingContainer->iAnimationCount);
+		//g_print ("compte a rebours : %d\n", pFlyingContainer->iAnimationCount);
 		if (pFlyingContainer->iAnimationCount > 0)
 		{
 			gchar *cImagePath = g_strdup_printf ("%s/%s/%d.png", CAIRO_DOCK_SHARE_DATA_DIR, "explosion", 10+1 - pFlyingContainer->iAnimationCount);
@@ -97,6 +97,7 @@ static gboolean _cairo_dock_animate_flying_icon (CairoFlyingContainer *pFlyingCo
 		if (pFlyingContainer->iAnimationCount < 0)
 		{
 			cairo_dock_free_flying_container (pFlyingContainer);
+			cairo_dock_unregister_current_flying_container ();
 			return FALSE;
 		}
 	}
@@ -150,6 +151,7 @@ CairoFlyingContainer *cairo_dock_create_flying_container (Icon *pFlyingIcon, Cai
 		pFlyingContainer->iPositionY,
 		pFlyingContainer->iWidth,
 		pFlyingContainer->iHeight);*/
+	gtk_window_present (GTK_WINDOW (pWindow));
 	gdk_window_move_resize (pWindow->window,
 		pFlyingContainer->iPositionX,
 		pFlyingContainer->iPositionY,
@@ -161,7 +163,6 @@ CairoFlyingContainer *cairo_dock_create_flying_container (Icon *pFlyingIcon, Cai
 	gtk_window_move (GTK_WINDOW (pWindow),
 		pFlyingContainer->iPositionX,
 		pFlyingContainer->iPositionY);*/
-	gtk_window_present (GTK_WINDOW (pWindow));
 	
 	pFlyingContainer->pIcon->iAnimationType = CAIRO_DOCK_PULSE;
 	pFlyingContainer->pIcon->iCount = 1e6;  // attention : cette animation s'arretera au bout de 11.5 ans :o)
@@ -191,6 +192,7 @@ void cairo_dock_drag_flying_container (CairoFlyingContainer *pFlyingContainer, C
 
 void cairo_dock_free_flying_container (CairoFlyingContainer *pFlyingContainer)
 {
+	
 	gtk_widget_destroy (pFlyingContainer->pWidget);  // enleve les signaux.
 	if (pFlyingContainer->iSidAnimationTimer != 0)
 		g_source_remove (pFlyingContainer->iSidAnimationTimer);
@@ -247,12 +249,20 @@ void cairo_dock_terminate_flying_container (CairoFlyingContainer *pFlyingContain
 			//\______________ On fait apparaitre le desklet avec un effet de zoom.
 			if (pIcon->pModuleInstance->pDesklet)  // normalement toujours vrai.
 			{
+				g_print ("debut de la boucle\n");
 				while (pIcon->pModuleInstance->pDesklet->iDesiredWidth != 0 && pIcon->pModuleInstance->pDesklet->iDesiredHeight != 0 && (pIcon->pModuleInstance->pDesklet->iKnownWidth != pIcon->pModuleInstance->pDesklet->iDesiredWidth || pIcon->pModuleInstance->pDesklet->iKnownHeight != pIcon->pModuleInstance->pDesklet->iDesiredHeight))
 				{
 					gtk_main_iteration ();
-					//if (! pIcon->pModuleInstance->pDesklet)  // ne devrait pas arriver.
-					//	break ;
+					if (! pIcon->pModuleInstance->pDesklet)  // ne devrait pas arriver.
+						break ;
 				}
+				/*if (pIcon->pModuleInstance->pDesklet->iDesiredWidth != 0 && pIcon->pModuleInstance->pDesklet->iDesiredHeight != 0 && (pIcon->pModuleInstance->pDesklet->iKnownWidth != pIcon->pModuleInstance->pDesklet->iDesiredWidth || pIcon->pModuleInstance->pDesklet->iKnownHeight != pIcon->pModuleInstance->pDesklet->iDesiredHeight))
+				{
+					g_print ("debut de la boucle\n");
+					while (gtk_events_pending ())
+						gtk_main_iteration ();
+				}*/
+				g_print ("fin de la boucle\n");
 				cairo_dock_zoom_out_desklet (pIcon->pModuleInstance->pDesklet);
 			}
 		}
