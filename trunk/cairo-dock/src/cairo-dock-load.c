@@ -88,6 +88,8 @@ extern double g_fIndicatorWidth, g_fIndicatorHeight;
 extern cairo_surface_t *g_pActiveIndicatorSurface;
 extern double g_fActiveIndicatorWidth, g_fActiveIndicatorHeight;
 
+extern cairo_surface_t *g_pIconBackgroundImageSurface;
+
 extern cairo_surface_t *g_pDesktopBgSurface;
 
 void cairo_dock_free_label_description (CairoDockLabelDescription *pTextDescription)
@@ -249,6 +251,14 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	
 	if (icon->fWidth < 0 || icon->fHeight < 0)  // on ne veut pas de surface.
 		return;
+
+	// pas de fond pour les applets, elles ont deja leurs propres moyens pour se dessiner
+	// fabounet: es-tu d'accord ?
+	if (CAIRO_DOCK_IS_NORMAL_LAUNCHER(icon) || CAIRO_DOCK_IS_APPLI(icon))  
+	{
+		cd_message (">>> %s prendra un fond d'icone", icon->acName);
+		icon->bHasIconBackgroundImage = TRUE;
+	}
 	
 	if (CAIRO_DOCK_IS_LAUNCHER (icon) || (CAIRO_DOCK_IS_USER_SEPARATOR (icon) && icon->acFileName != NULL))
 	{
@@ -307,6 +317,19 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 		g_free (cIconPath);
 	}
 	cd_debug ("%s () -> %.2fx%.2f", __func__, icon->fWidth, icon->fHeight);
+
+  //\_____________ On met le background de l'icone si necessaire
+	if (icon->pIconBuffer != NULL && icon->bHasIconBackgroundImage && g_pIconBackgroundImageSurface != NULL)
+	{
+		cairo_t *pCairoIconBGContext = cairo_create (icon->pIconBuffer);
+		cairo_set_source_surface (pCairoIconBGContext,
+			g_pIconBackgroundImageSurface,
+			0.,
+			0.);
+		cairo_set_operator (pCairoIconBGContext, CAIRO_OPERATOR_DEST_OVER);
+		cairo_paint (pCairoIconBGContext);
+		cairo_destroy (pCairoIconBGContext);
+	}
 
 	if (g_fAlbedo > 0 && icon->pIconBuffer != NULL && ! (CAIRO_DOCK_IS_APPLET (icon) && icon->acFileName == NULL))
 	{
@@ -750,6 +773,30 @@ void cairo_dock_load_drop_indicator (gchar *cImagePath, cairo_t* pSourceContext,
 		CAIRO_DOCK_KEEP_RATIO,
 		&g_fDropIndicatorWidth, &g_fDropIndicatorHeight,
 		NULL, NULL);
+}
+
+void cairo_dock_load_image_background_surface (gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale)
+{
+	if (g_pIconBackgroundImageSurface != NULL)
+	{
+		cairo_surface_destroy (g_pIconBackgroundImageSurface);
+		g_pIconBackgroundImageSurface = NULL;
+	}
+
+	if( cImagePath != NULL )
+	{
+		double oWidth = 0, oHeight = 0;
+
+		// Tofe: probleme ici, car il faudrait creer la surface de la bonne taille...
+		g_pIconBackgroundImageSurface = cairo_dock_create_surface_from_image (cImagePath,
+				pSourceContext,
+				fMaxScale,
+				g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER],   /* largeur avant creation [IN] */
+				g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER], /* hauteur avant creation [IN] */
+				CAIRO_DOCK_FILL_SPACE,
+				&oWidth, &oHeight,  /* largeur et hauteur apres creation [OUT] */
+				NULL, NULL); /* zoom applique [OUT] */
+	}
 }
 
 

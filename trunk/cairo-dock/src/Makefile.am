@@ -38,9 +38,9 @@ cairo_dock_CFLAGS = \
 	-DCAIRO_DOCK_ICON=\""cairo-dock.svg"\"\
 	-DCAIRO_DOCK_LOGO=\""cairo-dock-logo.png"\"\
 	-std=c99\
-	-O3\
 	-g -ggdb\
 	-Wno-unused-parameter
+#	-O3\
 #	-Wall -Wunreachable-code -Wstrict-prototypes -Wextra -Wwrite-strings -Wuninitialized -Werror-implicit-function-declaration
 
 cairo_dock_LDFLAGS = \

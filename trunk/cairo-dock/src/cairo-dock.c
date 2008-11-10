@@ -192,6 +192,8 @@ int g_iNbViewportX, g_iNbViewportY;  // nombre de "faces du cube".
 gboolean g_bActiveIndicatorAbove;
 cairo_surface_t *g_pActiveIndicatorSurface = NULL;
 double g_fActiveIndicatorWidth, g_fActiveIndicatorHeight;
+	
+cairo_surface_t *g_pIconBackgroundImageSurface = NULL;  // Surface cairo de l'image de fond d'icone.
 
 gboolean g_bUseSeparator = TRUE;  // utiliser les separateurs ou pas.
 gchar *g_cSeparatorImage = NULL;

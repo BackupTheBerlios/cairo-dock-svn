@@ -512,6 +512,9 @@ icon's type order = launchers;applications;applets
 #{This parameter will overwrite the previously defined order, to allow you to mix applets and launchers into the dock.}
 mix applets with launchers = false
 
+#S+ Image's filename to use as a background for launchers and applications:
+#{Any format allowed; let this field empty if you don't want to use an image as background.}
+icons background =
 
 #[gtk-zoom-fit]
 [Views]

@@ -1106,6 +1106,14 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 		cDropIndicatorImagePath = g_strdup_printf ("%s/%s", CAIRO_DOCK_SHARE_DATA_DIR, CAIRO_DOCK_DEFAULT_DROP_INDICATOR_NAME);
 	}
 	
+	gchar *cIconBackgroundImageName = cairo_dock_get_string_key_value (pKeyFile, "Icons", "icons background", &bFlushConfFileNeeded, NULL, NULL, NULL);
+	gchar *cIconBackgroundImagePath = NULL;
+	if (cIconBackgroundImageName != NULL)
+	{
+		cIconBackgroundImagePath = cairo_dock_generate_file_path (cIconBackgroundImageName);
+		g_free (cIconBackgroundImageName);
+	}
+	
 	cairo_dock_updated_emblem_conf_file (pKeyFile, &bFlushConfFileNeeded);
 	
 	//\___________________ On (re)charge tout, car n'importe quel parametre peut avoir change.
@@ -1149,6 +1157,12 @@ void cairo_dock_read_conf_file (gchar *cConfFilePath, CairoDock *pDock)
 	
 	cairo_dock_load_active_window_indicator (pCairoContext, cActiveIndicatorImagePath, cairo_dock_get_max_scale (pDock), iActiveCornerRadius, iActiveLineWidth, fActiveColor);
 	g_free (cActiveIndicatorImagePath);
+
+	cairo_dock_load_image_background_surface (cIconBackgroundImagePath, pCairoContext, fMaxScale);
+	if( cIconBackgroundImagePath != NULL )
+	{
+		g_free (cIconBackgroundImagePath);
+  }
 	
 	cairo_dock_load_desklet_buttons (pCairoContext);
 	
