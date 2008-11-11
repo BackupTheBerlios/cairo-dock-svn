@@ -88,7 +88,7 @@ extern double g_fIndicatorWidth, g_fIndicatorHeight;
 extern cairo_surface_t *g_pActiveIndicatorSurface;
 extern double g_fActiveIndicatorWidth, g_fActiveIndicatorHeight;
 
-extern cairo_surface_t *g_pIconBackgroundImageSurface;
+extern cairo_surface_t *g_pIconBackgroundImageSurface[2];
 
 extern cairo_surface_t *g_pDesktopBgSurface;
 
@@ -252,14 +252,6 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	if (icon->fWidth < 0 || icon->fHeight < 0)  // on ne veut pas de surface.
 		return;
 
-	// pas de fond pour les applets, elles ont deja leurs propres moyens pour se dessiner
-	// fabounet: es-tu d'accord ?
-	if (CAIRO_DOCK_IS_NORMAL_LAUNCHER(icon) || CAIRO_DOCK_IS_APPLI(icon))  
-	{
-		cd_message (">>> %s prendra un fond d'icone", icon->acName);
-		icon->bHasIconBackgroundImage = TRUE;
-	}
-	
 	if (CAIRO_DOCK_IS_LAUNCHER (icon) || (CAIRO_DOCK_IS_USER_SEPARATOR (icon) && icon->acFileName != NULL))
 	{
 		//\_______________________ On recherche une icone.
@@ -318,12 +310,20 @@ void cairo_dock_fill_one_icon_buffer (Icon *icon, cairo_t* pSourceContext, gdoub
 	}
 	cd_debug ("%s () -> %.2fx%.2f", __func__, icon->fWidth, icon->fHeight);
 
+	// pas de fond par defaut
+	icon->bHasIconBackgroundImage = FALSE;
+	
   //\_____________ On met le background de l'icone si necessaire
-	if (icon->pIconBuffer != NULL && icon->bHasIconBackgroundImage && g_pIconBackgroundImageSurface != NULL)
+	if(icon->pIconBuffer != NULL &&
+	  (g_pIconBackgroundImageSurface[0] != NULL && CAIRO_DOCK_IS_NORMAL_LAUNCHER(icon)) ||
+	  (g_pIconBackgroundImageSurface[1] != NULL && CAIRO_DOCK_IS_APPLI(icon)))
 	{
+		cd_message (">>> %s prendra un fond d'icone", icon->acName);
+	  icon->bHasIconBackgroundImage = TRUE;
+
 		cairo_t *pCairoIconBGContext = cairo_create (icon->pIconBuffer);
 		cairo_set_source_surface (pCairoIconBGContext,
-			g_pIconBackgroundImageSurface,
+			g_pIconBackgroundImageSurface[CAIRO_DOCK_IS_NORMAL_LAUNCHER(icon)?0:1],
 			0.,
 			0.);
 		cairo_set_operator (pCairoIconBGContext, CAIRO_OPERATOR_DEST_OVER);
@@ -775,24 +775,43 @@ void cairo_dock_load_drop_indicator (gchar *cImagePath, cairo_t* pSourceContext,
 		NULL, NULL);
 }
 
-void cairo_dock_load_image_background_surface (gchar *cImagePath, cairo_t* pSourceContext, double fMaxScale)
+void cairo_dock_load_image_background_surface (gchar *cLauncherImagePath, gchar *cAppliImagePath, cairo_t* pSourceContext, double fMaxScale)
 {
-	if (g_pIconBackgroundImageSurface != NULL)
+	if (g_pIconBackgroundImageSurface[0] != NULL)
 	{
-		cairo_surface_destroy (g_pIconBackgroundImageSurface);
-		g_pIconBackgroundImageSurface = NULL;
+		cairo_surface_destroy (g_pIconBackgroundImageSurface[0]);
+		g_pIconBackgroundImageSurface[0] = NULL;
+	}
+	if (g_pIconBackgroundImageSurface[1] != NULL)
+	{
+		cairo_surface_destroy (g_pIconBackgroundImageSurface[1]);
+		g_pIconBackgroundImageSurface[1] = NULL;
 	}
 
-	if( cImagePath != NULL )
+	// On cree deux surfaces: une de la taille des launcher et une de la taille des appli
+	if( cLauncherImagePath != NULL )
 	{
 		double oWidth = 0, oHeight = 0;
 
-		// Tofe: probleme ici, car il faudrait creer la surface de la bonne taille...
-		g_pIconBackgroundImageSurface = cairo_dock_create_surface_from_image (cImagePath,
+		g_pIconBackgroundImageSurface[0] = cairo_dock_create_surface_from_image (cLauncherImagePath,
 				pSourceContext,
 				fMaxScale,
 				g_tIconAuthorizedWidth[CAIRO_DOCK_LAUNCHER],   /* largeur avant creation [IN] */
 				g_tIconAuthorizedHeight[CAIRO_DOCK_LAUNCHER], /* hauteur avant creation [IN] */
+				CAIRO_DOCK_FILL_SPACE,
+				&oWidth, &oHeight,  /* largeur et hauteur apres creation [OUT] */
+				NULL, NULL); /* zoom applique [OUT] */
+	}
+
+	if( cAppliImagePath != NULL )
+	{
+		double oWidth = 0, oHeight = 0;
+
+		g_pIconBackgroundImageSurface[1] = cairo_dock_create_surface_from_image (cAppliImagePath,
+				pSourceContext,
+				fMaxScale,
+				g_tIconAuthorizedWidth[CAIRO_DOCK_APPLI],   /* largeur avant creation [IN] */
+				g_tIconAuthorizedHeight[CAIRO_DOCK_APPLI], /* hauteur avant creation [IN] */
 				CAIRO_DOCK_FILL_SPACE,
 				&oWidth, &oHeight,  /* largeur et hauteur apres creation [OUT] */
 				NULL, NULL); /* zoom applique [OUT] */

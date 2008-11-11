@@ -193,7 +193,7 @@ gboolean g_bActiveIndicatorAbove;
 cairo_surface_t *g_pActiveIndicatorSurface = NULL;
 double g_fActiveIndicatorWidth, g_fActiveIndicatorHeight;
 	
-cairo_surface_t *g_pIconBackgroundImageSurface = NULL;  // Surface cairo de l'image de fond d'icone.
+cairo_surface_t *g_pIconBackgroundImageSurface[2] =  {NULL, NULL};  // Surface cairo de l'image de fond pour les icones des launchers [0] et applis [1].
 
 gboolean g_bUseSeparator = TRUE;  // utiliser les separateurs ou pas.
 gchar *g_cSeparatorImage = NULL;

@@ -448,6 +448,10 @@ launcher animation = bounce
 #i+ Number of times the icon will bounce/rotate/blink/etc when clicked :
 launcher number of rounds = 4
 
+#S+ Image's filename to use as a background for launchers:
+#{Any format allowed; let this field empty if you don't want to use an image as background.}
+launcher icons background =
+
 
 #X+[Applications]
 frame_appli =
@@ -463,6 +467,10 @@ appli animation = bounce
 
 #i+ Number of times the icon will bounce/rotate/blink/etc when clicked :
 appli number of rounds = 4
+
+#S+ Image's filename to use as a background for applications:
+#{Any format allowed; let this field empty if you don't want to use an image as background.}
+appli icons background =
 
 #X+[Applets]
 frame_applet =
@@ -511,10 +519,6 @@ icon's type order = launchers;applications;applets
 #b Allow applets to be placed amongst launchers ?
 #{This parameter will overwrite the previously defined order, to allow you to mix applets and launchers into the dock.}
 mix applets with launchers = false
-
-#S+ Image's filename to use as a background for launchers and applications:
-#{Any format allowed; let this field empty if you don't want to use an image as background.}
-icons background =
 
 #[gtk-zoom-fit]
 [Views]
