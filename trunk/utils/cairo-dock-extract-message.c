@@ -264,6 +264,11 @@ main (int argc, char** argv)
 
 					case 'k' :
 					break;
+					
+					case 'o' :
+					case 'd' :
+						
+					break;
 
 					default :
 						g_print ("Attention : this conf file seems to be incorrect !\n");
