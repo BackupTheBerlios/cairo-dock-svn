@@ -182,6 +182,22 @@ main (int argc, char** argv)
 					case 'e' :  // float dans un HScale.
 						
 					break;
+					
+					case 'n' :
+					case 'h' :
+					case 'H' :
+					case 'x' :
+					case 'a' :
+					case 't' :
+					case 'o' :
+					case 'O' :
+					case 'g' :
+					case 'd' :
+					case 'm' :
+					case 'M' :
+					case '_' :
+						
+					break;
 
 					case 's' :  // string
 					case 'S' :  // string avec un selecteur de fichier a cote du GtkEntry.
@@ -192,9 +208,7 @@ main (int argc, char** argv)
 					case 'R' :  // string, avec un label pour la description.
 					case 'P' :  // string avec un selecteur de font a cote du GtkEntry.
 					case 'r' :  // string representee par son numero dans une liste de choix.
-					case 'M' :  // string, avec un label pour la description et un bouton configurer (specialement fait pour les modules).
 					case 'K' :  // string avec un selecteur de touche clavier (Merci Ctaf !)
-					case 'n' :  // rendu.
 						//g_print ("  + string (%s)\n", cUsefulComment);
 						length = 0;
 						cValueList = g_key_file_get_locale_string_list (pKeyFile, cGroupName, cKeyName, NULL, &length, NULL);
@@ -264,9 +278,6 @@ main (int argc, char** argv)
 
 					case 'k' :
 					break;
-					
-					case 'o' :
-					case 'd' :
 						
 					break;
 
