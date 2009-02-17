@@ -10,7 +10,6 @@ Installed-Size: 1024
 Maintainer: Fabrice Rey fabounet@users.berlios.de
 Provides: cairo-dock
 Description: A light and eye-candy dock to launch your programs easily.
- Uses cairo to render nice graphics, and Glitz to use hardware acceleration.
+ Uses Cairo/OpenGL to render nice graphics with hardware acceleration.
  It's fully configurable and can be a taskbar too.
  You can easily plug applets into it.
-
