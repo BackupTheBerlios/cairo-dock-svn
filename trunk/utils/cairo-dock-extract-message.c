@@ -196,6 +196,7 @@ main (int argc, char** argv)
 					case 'm' :
 					case 'M' :
 					case '_' :
+					case '>' :
 						
 					break;
 
