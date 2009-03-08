@@ -174,6 +174,7 @@ main (int argc, char** argv)
 
 					case 'i' :  // integer
 					case 'I' :  // integer dans un HScale
+					case 'j' :  // integer par paire
 						
 						break;
 
