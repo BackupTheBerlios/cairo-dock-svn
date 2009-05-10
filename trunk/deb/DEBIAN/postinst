@@ -5,8 +5,9 @@ set -e
 case "$1" in
 	configure)
 		echo 'installation complete'
-		echo 'You can start using cairo-dock by just typing "cairo-dock" in a terminal !'
-		echo 'Cairo-Dock is currently translated in french and english.'
+		echo 'You can start using cairo-dock from the Applications menu, "System" tab,'
+		echo ' or by typing "cairo-dock" in a terminal !'
+		echo "Don't forget to consult the help and to visit cairo-dock.org if you have any problem."
 	;;
 	
 	abort-upgrade|abort-remove|abort-deconfigure)

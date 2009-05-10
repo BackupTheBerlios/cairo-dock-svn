@@ -7,6 +7,8 @@ case "$1" in
     ;;
 
     failed-upgrade|upgrade)
+		rm -rf /usr/share/cairo-dock/plug-ins/*
+		rm -rf /usr/lib/cairo-dock/*
     ;;
 
     *)

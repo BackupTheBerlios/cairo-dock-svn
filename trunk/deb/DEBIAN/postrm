@@ -4,8 +4,8 @@ set -e
 if [ -x "`which update-menus 2>/dev/null`" ]; then update-menus ; fi
 
 if [ "$1" = purge ]; then
-	if test -d ~/.cairo-dock; then
-		rm -rf ~/.cairo-dock
+	if test -d ~/.config/cairo-dock; then
+		rm -rf ~/.config/cairo-dock
 	fi
 fi
 

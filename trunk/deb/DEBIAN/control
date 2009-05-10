@@ -1,5 +1,5 @@
 Package: cairo-dock
-Version: 2.0.0-rc5
+Version: 2.0.0
 Section: desktop
 Priority: optional
 Architecture: all
