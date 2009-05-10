@@ -4,8 +4,8 @@ Section: desktop
 Priority: optional
 Architecture: all
 Essential: no
-Depends: cairo-dock, libvte9, libxxf86vm1, libasound2, libgnome-menu2, libexif12, libetpan13, libxklavier12, libwebkit-1.0-1
+Depends: cairo-dock, libvte9, libxxf86vm1, libasound2, libgnome-menu2, libexif12, libxklavier12, libwebkit-1.0-1
 Installed-Size: 1024
 Maintainer: Fabrice Rey fabounet@users.berlios.de
 Provides: cairo-dock-plug-ins
-Description: A collection of official plug-ins and applets for cairo-dock, that will add fonctionnalities, desktop enhancement, and accessories to your dock.
+Description: A collection of official plug-ins and applets for cairo-dock, that will add effects, fonctionnalities, desktop enhancement, and accessories to your dock.
