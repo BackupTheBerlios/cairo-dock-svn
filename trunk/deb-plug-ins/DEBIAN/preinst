@@ -1,0 +1,9 @@
+#! /bin/sh
+
+case "$1" in
+    install|upgrade)
+		rm -rf /usr/share/cairo-dock/plug-ins/*
+		rm -rf /usr/lib/cairo-dock/*
+esac
+
+exit 0
