@@ -1,0 +1,21 @@
+#! /bin/sh
+
+set -e
+
+case "$1" in
+    remove|deconfigure)
+    ;;
+
+    failed-upgrade|upgrade)
+		rm -rf /usr/share/cairo-dock
+		rm -rf /usr/lib/cairo-dock
+    ;;
+
+    *)
+        echo "prerm called with unknown argument \`$1'" >&2
+        exit 0
+    ;;
+esac
+
+exit 0
+

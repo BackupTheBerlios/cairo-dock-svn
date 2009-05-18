@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+if [ -x "`which update-menus 2>/dev/null`" ]; then update-menus ; fi
+
+if [ "$1" = purge ]; then
+	if test -d ~/.cairo-dock/plug-in; then
+		rm -rf ~/.cairo-dock/plug-in/*
+	fi
+fi
+
