@@ -4,6 +4,8 @@ Section: desktop
 Priority: optional
 Architecture: all
 Essential: no
+Conflicts: cairo-dock-plugins-data
+Replaces: cairo-dock-plugins-data
 Depends: cairo-dock, libvte9, libxxf86vm1, libasound2, libgnome-menu2, libexif12, libxklavier12, libwebkit-1.0-1 | libwebkit-1.0-2
 Installed-Size: 1024
 Maintainer: Fabrice Rey fabounet@users.berlios.de
