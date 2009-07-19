@@ -25,7 +25,7 @@ main (int argc, char** argv)
 	GError *erreur = NULL;
 	g_key_file_load_from_file (pKeyFile, cConfFilePath, G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, &erreur);
 	if (erreur != NULL)
-		g_error (erreur->message);
+		g_error ("%s\n", erreur->message);
 	
 	int iNbBuffers = 0;
 	gsize length = 0;
@@ -280,11 +280,9 @@ main (int argc, char** argv)
 
 					case 'k' :
 					break;
-						
-					break;
-
+					
 					default :
-						g_print ("Attention : this conf file seems to be incorrect !\n");
+						g_print ("Attention : this conf file seems to be incorrect ! (%c)\n", iElementType);
 					break ;
 				}
 				g_strfreev (pAuthorizedValuesList);
