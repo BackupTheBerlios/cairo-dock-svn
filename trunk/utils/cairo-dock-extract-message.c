@@ -180,6 +180,7 @@ main (int argc, char** argv)
 
 					case 'f' :  // float.
 					case 'c' :  // float avec un bouton de choix de couleur.
+					case 'C' :
 					case 'e' :  // float dans un HScale.
 						
 					break;
