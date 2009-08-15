@@ -10,6 +10,7 @@ Written by Fabrice Rey (for any bug report, please mail me to fabounet_03@yahoo.
 #include <stdlib.h>
 #include <stdio.h>
 #include <glib.h>
+#include <cairo-dock.h>
 
 #define write_message(m) fprintf (f, "_(\"%s\")\n\n", g_strescape (m, NULL))
 
@@ -168,105 +169,62 @@ main (int argc, char** argv)
 				
 				switch (iElementType)
 				{
-					case 'b' :  // boolean
-						
-					break;
-
-					case 'i' :  // integer
-					case 'I' :  // integer dans un HScale
-					case 'j' :  // integer par paire
-						
-						break;
-
-					case 'f' :  // float.
-					case 'c' :  // float avec un bouton de choix de couleur.
-					case 'C' :
-					case 'e' :  // float dans un HScale.
-						
+					case CAIRO_DOCK_WIDGET_CHECK_BUTTON :
+					
+					case CAIRO_DOCK_WIDGET_SPIN_INTEGER :  
+					case CAIRO_DOCK_WIDGET_HSCALE_INTEGER :
+					case CAIRO_DOCK_WIDGET_SIZE_INTEGER :  
+					
+					case CAIRO_DOCK_WIDGET_SPIN_DOUBLE :
+					case CAIRO_DOCK_WIDGET_COLOR_SELECTOR_RGB : 
+					case CAIRO_DOCK_WIDGET_COLOR_SELECTOR_RGBA :
+					case CAIRO_DOCK_WIDGET_HSCALE_DOUBLE :
+					
+					case CAIRO_DOCK_WIDGET_STRING_ENTRY :
+					case CAIRO_DOCK_WIDGET_PASSWORD_ENTRY :
+					case CAIRO_DOCK_WIDGET_FILE_SELECTOR :
+					case CAIRO_DOCK_WIDGET_FOLDER_SELECTOR :  
+					case CAIRO_DOCK_WIDGET_SOUND_SELECTOR :
+					case CAIRO_DOCK_WIDGET_FONT_SELECTOR :
+					case CAIRO_DOCK_WIDGET_SHORTKEY_SELECTOR :
+					
+					case CAIRO_DOCK_WIDGET_TREE_VIEW_SORT_AND_MODIFY :  // rien a faire car les choix sont modifiables.
+					
+					case CAIRO_DOCK_WIDGET_VIEW_LIST :
+					case CAIRO_DOCK_WIDGET_THEME_LIST :
+					case CAIRO_DOCK_WIDGET_THEME_LIST_ENTRY :
+					case CAIRO_DOCK_WIDGET_USER_THEME_SELECTOR :
+					case CAIRO_DOCK_WIDGET_ANIMATION_LIST :
+					case CAIRO_DOCK_WIDGET_DIALOG_DECORATOR_LIST :
+					case CAIRO_DOCK_WIDGET_DESKLET_DECORATION_LIST :
+					case CAIRO_DOCK_WIDGET_DESKLET_DECORATION_LIST_WITH_DEFAULT :
+					case CAIRO_DOCK_WIDGET_GAUGE_LIST :
+					case CAIRO_DOCK_WIDGET_DOCK_LIST :
+					case CAIRO_DOCK_WIDGET_JUMP_TO_MODULE :
+					case CAIRO_DOCK_WIDGET_JUMP_TO_MODULE_IF_EXISTS :
+					
+					case CAIRO_DOCK_WIDGET_EMPTY_WIDGET :
+					case CAIRO_DOCK_WIDGET_TEXT_LABEL :
+					case CAIRO_DOCK_WIDGET_SEPARATOR :
 					break;
 					
-					case 'n' :
-					case 'h' :
-					case 'H' :
-					case 'x' :
-					case 'a' :
-					case 't' :
-					case 'o' :
-					case 'O' :
-					case 'g' :
-					case 'd' :
-					case 'm' :
-					case 'M' :
-					case '_' :
-					case '>' :
-						
-					break;
-
-					case 's' :  // string
-					case 'S' :  // string avec un selecteur de fichier a cote du GtkEntry.
-					case 'u' :  // string avec un selecteur de fichier a cote du GtkEntry et un boutton play.
-					case 'D' :  // string avec un selecteur de repertoire a cote du GtkEntry.
-					case 'T' :  // string, mais sans pouvoir decochez les cases.
-					case 'E' :  // string, mais avec un GtkComboBoxEntry pour le choix unique.
-					case 'R' :  // string, avec un label pour la description.
-					case 'P' :  // string avec un selecteur de font a cote du GtkEntry.
-					case 'r' :  // string representee par son numero dans une liste de choix.
-					case 'K' :  // string avec un selecteur de touche clavier (Merci Ctaf !)
-						//g_print ("  + string (%s)\n", cUsefulComment);
-						length = 0;
-						cValueList = g_key_file_get_locale_string_list (pKeyFile, cGroupName, cKeyName, NULL, &length, NULL);
-						if (iNbElements == 1)
+					case CAIRO_DOCK_WIDGET_LIST :
+					case CAIRO_DOCK_WIDGET_NUMBERED_LIST :  
+					case CAIRO_DOCK_WIDGET_LIST_WITH_ENTRY :
+					case CAIRO_DOCK_WIDGET_TREE_VIEW_SORT :
+					case CAIRO_DOCK_WIDGET_TREE_VIEW_MULTI_CHOICE :
+						if (pAuthorizedValuesList != NULL)
 						{
-							cValue =  (0 < length ? cValueList[0] : "");
-							if (pAuthorizedValuesList == NULL || pAuthorizedValuesList[0] == NULL)
+							for (k = 0; pAuthorizedValuesList[k] != NULL; k ++)
 							{
-								
-							}
-							else
-							{
-								k = 0;
-								int iSelectedItem = -1;
-								if (iElementType == 'r')
-								iSelectedItem = atoi (cValue);
-								gchar *cResult = (iElementType == 'r' ? g_new0 (gchar , 10) : NULL);
-								while (pAuthorizedValuesList[k] != NULL)
-								{
-									//g_print ("%d) %s\n", k, pAuthorizedValuesList[k]);
-									if (iSelectedItem == -1 && strcmp (cValue, pAuthorizedValuesList[k]) == 0)
-										iSelectedItem = (iElementType == 'R' || iElementType == 'M' ? k / 3 : k);
-
-									if (cResult != NULL)
-									{
-										snprintf (cResult, 10, "%d", k);
-									}
-									write_message (pAuthorizedValuesList[k]);
-									
-									if (iElementType == 'R' || iElementType == 'M')
-									{
-										k += 3;
-										if (pAuthorizedValuesList[k-2] == NULL)  // ne devrait pas arriver si le fichier de conf est bien rempli.
-											break;
-									}
-									else
-									k ++;
-								}
-								g_free (cResult);
-								
-								if (iElementType != 'E' && iSelectedItem == -1)
-									iSelectedItem = 0;
+								write_message (pAuthorizedValuesList[k]);
 							}
 						}
-						g_strfreev (cValueList);
 					break;
-
-					case 'F' :
-					case 'X' :
-						//g_print ("  + frame\n");
-						if (pAuthorizedValuesList == NULL)
-						{
-							
-						}
-						else
+					
+					case CAIRO_DOCK_WIDGET_FRAME :
+					case CAIRO_DOCK_WIDGET_EXPANDER :
+						if (pAuthorizedValuesList != NULL)
 						{
 							if (pAuthorizedValuesList[0] == NULL || *pAuthorizedValuesList[0] == '\0')
 								cValue = g_key_file_get_string (pKeyFile, cGroupName, cKeyName, NULL);
@@ -274,16 +232,10 @@ main (int argc, char** argv)
 								cValue = pAuthorizedValuesList[0];
 							write_message (cValue);
 						}
-						break;
-
-					case 'v' :  // separateur.
-					break ;
-
-					case 'k' :
 					break;
 					
 					default :
-						g_print ("Attention : this conf file seems to be incorrect ! (%c)\n", iElementType);
+						g_print ("this conf file seems to be incorrect ! (type : %c)\n", iElementType);
 					break ;
 				}
 				g_strfreev (pAuthorizedValuesList);
