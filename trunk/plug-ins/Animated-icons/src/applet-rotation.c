@@ -336,5 +336,5 @@ gboolean cd_animations_update_rotating (Icon *pIcon, CairoDock *pDock, CDAnimati
 	else
 		cairo_dock_redraw_icon (pIcon, CAIRO_CONTAINER (pDock));
 	 
-	 return (pData->fRotationAngle < 360);
+	return (pData->fRotationAngle < 360);
 }

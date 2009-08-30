@@ -784,10 +784,10 @@ void cd_rendering_render_3D_plane_opengl (CairoDock *pDock)
 		double c = - W / 2;
 		gamma = (-b + sqrt (b * b - 4 * a * c)) / 2  / a;
 		h = hi + h0 / (1 + gamma);
-		g_print ("h : %.2f (=) %d\n", h, pDock->iDecorationsHeight);
+		//g_print ("h : %.2f (=) %d\n", h, pDock->iDecorationsHeight);
 		w = 2 * H * gamma;
 		dw = (Ws - w) / 2;
-		g_print ("dw : %.2f (=) %.2f\n", dw, h * gamma + r + (l+(r==0)*2)*sqrt(1+gamma*gamma));
+		//g_print ("dw : %.2f (=) %.2f\n", dw, h * gamma + r + (l+(r==0)*2)*sqrt(1+gamma*gamma));
 		dx =dw;
 	}
 	else
@@ -802,15 +802,17 @@ void cd_rendering_render_3D_plane_opengl (CairoDock *pDock)
 	
 	//\____________________ On trace le cadre.
 	int sens;
-	if (pDock->bDirectionUp)
+	if ((pDock->bDirectionUp && pDock->bHorizontalDock) || (!pDock->bDirectionUp && !pDock->bHorizontalDock))
 	{
 		sens = 1;
-		dy = pDock->iCurrentHeight - pDock->iDecorationsHeight - 1.5 * l;
+		//dy = pDock->iCurrentHeight - pDock->iDecorationsHeight - 1.5 * l;
+		dy = pDock->iDecorationsHeight + 1.5*l;
 	}
 	else
 	{
 		sens = -1;
-		dy = pDock->iDecorationsHeight + 1.5 * l;
+		//dy = pDock->iDecorationsHeight + 1.5 * l;
+		dy = pDock->iCurrentHeight - .5 * l;
 	}
 	
 	int iNbVertex;

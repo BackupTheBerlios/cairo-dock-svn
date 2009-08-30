@@ -156,7 +156,8 @@ gboolean cd_animations_update_spot (Icon *pIcon, CairoDock *pDock, CDAnimationDa
 		else
 			bContinueAnimation = TRUE;
 	}
-	pIcon->fDeltaYReflection += 2 * pData->fIconOffsetY * cairo_dock_calculate_magnitude (pDock->iMagnitudeIndex);
+	pData->fIconOffsetY *= cairo_dock_calculate_magnitude (pDock->iMagnitudeIndex);
+	pIcon->fDeltaYReflection += 2 * pData->fIconOffsetY;
 	
 	pData->fHaloRotationAngle += 360. / myConfig.iSpotDuration * dt;
 	
