@@ -671,7 +671,9 @@ int main (int argc, char** argv)
 	if (! bTesting)
 		g_timeout_add_seconds (5, _cairo_dock_successful_launch, NULL);
 	
-	g_print ("\nVERIFIER LE CHANGEMENT DE CONTAINER POUR TERMINAL\n\nAINSI QUE LES SEPARATEURS AUTOMATIQUES\n\nLES SEPARATEURS PHYSIQUES EN MODE VERTICAL\n\nVERIFIER LES TEXTES A LA VERTICALE\n\nTESTER R-BASE\n");
+	cd_warning ("\n====================================================\nYour current version of Cairo-Dock is not maintained anymore !\nCAIRO-DOCK HAS MOVED TO LAUNCHPAD :\n  https://launchpad.net/cairo-dock\n====================================================\n");
+	
+	cairo_dock_show_general_message ("Exit Berlios, Cairo-Dock is now hosted on LaunchPad !\n  The new adress is : https://launchpad.net/cairo-dock\nWe are now using bzr instead of SVN, so the current version you are using is not maintained anymore;\nIf you need any help to switch to bzr, you can always contact us at http://cairo-dock.org.", 0);
 	
 	gtk_main ();
 
